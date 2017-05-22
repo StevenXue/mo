@@ -1,7 +1,8 @@
 # encoding: utf-8
 # import platform
-import os
 import ConfigParser
+
+import os
 
 # https://docs.python.org/3/library/configparser.html
 # import codecs
