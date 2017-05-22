@@ -8,3 +8,5 @@ class DataSet(Document):
     description = StringField(max_length=140)
     # type = StringField(required=True, choices=DATA_SET_TYPE)
     # ownership = ReferenceField('Ownership', required=True)
+
+    meta = {'allow_inheritance': True}
