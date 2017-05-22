@@ -2,13 +2,13 @@
 
 from mongoengine import connect
 
-from server.repository import config_repo
+from server.repository import config
 
 connect(
-    db=config_repo.get_mongo_db(),
-    username=config_repo.get_mongo_user(),
-    password=config_repo.get_mongo_pass(),
-    host=config_repo.get_mongo_host(),
+    db=config.get_mongo_db(),
+    username=config.get_mongo_user(),
+    password=config.get_mongo_pass(),
+    host=config.get_mongo_host(),
 )
 
 
