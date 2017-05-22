@@ -1,14 +1,11 @@
 # -*- coding: UTF-8 -*-
 import sys
+
 from os import path
+
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-from datetime import datetime
-from server.entity import data
-from server.entity import data_set
-from server.repository import general_repo
-from server.service import user_service
-
+# from server.entity.t_class import T_class
 
 # ds_name = 'test_data_set4'
 # ds_class = data_set.DataSet
@@ -29,4 +26,5 @@ from server.service import user_service
 # print general_repo.save_one(data_class, new_data)
 
 # general.modify(data_class, value=1.0, set__value=2.0)
-user_service.create_user()
+# user = User()
+# print user_business.find_by_user_id({'user_id': 'test_user'})

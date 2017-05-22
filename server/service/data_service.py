@@ -1,7 +1,5 @@
-from server.repository import user_repo
 from server.repository import data_repo
 from server.repository import data_set_repo
-from server.repository import ownership_repo
 
 
 def import_data(data_array, data_set_name):

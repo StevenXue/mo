@@ -1,7 +1,5 @@
 from mongoengine import *
 
-from server.repository import user_repo
-
 GENDER = ('male', 'female')
 
 
@@ -13,10 +11,6 @@ class User(Document):
     phone = IntField(unique=True)
     gender = StringField(choices=GENDER)
     age = IntField()
-
-    def find_by_user_id(self, user_id):
-        # self.user_id = user_id
-        user_repo.find_unique_one(self, {'user_id': user_id})
 
     # def save(self, user_id):
         # self.user_id = user_id

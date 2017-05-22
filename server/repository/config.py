@@ -1,7 +1,8 @@
 # encoding: utf-8
 # import platform
-import os
 import ConfigParser
+
+import os
 
 # https://docs.python.org/3/library/configparser.html
 # import codecs
@@ -11,7 +12,6 @@ config = ConfigParser.ConfigParser()
 config_url = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.ini')
 
 config.read(config_url)
-# config.readfp(codecs.open('config_t.ini', 'r', encoding='utf-8'))
 
 mongo = 'DEFAULT'
 

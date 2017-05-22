@@ -2,30 +2,31 @@
 
 from mongoengine import connect
 
-from server.repository import config_repo
+from server.repository import config
 
 connect(
-    db=config_repo.get_mongo_db(),
-    username=config_repo.get_mongo_user(),
-    password=config_repo.get_mongo_pass(),
-    host=config_repo.get_mongo_host(),
+    db=config.get_mongo_db(),
+    username=config.get_mongo_user(),
+    password=config.get_mongo_pass(),
+    host=config.get_mongo_host(),
 )
 
 
-def find(instance, query):
-    return instance.objects(**query)
+class Repo:
+    def __init__(self, instance):
+        self.__instance = instance
 
+    def find(self, query):
+        return self.__instance.objects(**query)
 
-def find_one(instance, query):
-    return instance.objects(**query)[0]
+    def find_one(self, query):
+        return self.__instance.objects(**query)[0]
 
+    def find_unique_one(self, query):
+        return self.__instance.objects.get(**query)
 
-def find_unique_one(instance, query):
-    return instance.objects.get(**query)
-
-
-def save_one(instance, content):
-    return instance(**content).save()
+    def save_one(self, content):
+        return self.__instance(**content).save()
 
 
 # def modify(instance, **query, **update):
