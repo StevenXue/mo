@@ -1,6 +1,6 @@
 from mongoengine import *
 
-from server.entity.data import Data
+from entity.data import Data
 
 
 class StagingData(Document):

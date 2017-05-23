@@ -1,13 +1,7 @@
 # -*- coding: UTF-8 -*-
-import sys
-
-from os import path
-
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-
 from mongoengine import connect
 
-from server.repository import config
+from repository import config
 
 connect(
     db=config.get_mongo_db(),

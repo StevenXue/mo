@@ -1,14 +1,8 @@
 # -*- coding: UTF-8 -*-
-import sys
-
-from os import path
-
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-
 from flask import Flask
 from flask_cors import CORS
 
-from server.route import file_route
+from route import file_route
 
 UPLOAD_FOLDER = './'
 

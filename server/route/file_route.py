@@ -12,7 +12,7 @@ from flask import redirect
 from flask import request
 from flask import send_from_directory
 
-from server.service import file_service
+from service import file_service
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'csv'])
 PREFIX = '/file'
@@ -63,6 +63,6 @@ def upload_file():
 
 @file_app.route(UPLOAD_URL + '<filename>')
 def uploaded_file(filename):
-    from server.run import app as flask_app
+    from run import app as flask_app
     return send_from_directory(flask_app.config['UPLOAD_FOLDER'],
                                filename)

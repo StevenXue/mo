@@ -1,15 +1,8 @@
 # -*- coding: UTF-8 -*-
-import sys
 
-from os import path
-from server.repository.general_repo import Repo
-
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+from repository.general_repo import Repo
 
 
 class ProjectRepo(Repo):
     def __init__(self, instance):
         Repo.__init__(self, instance)
-
-    def create(self, project):
-        return Repo.save(project)

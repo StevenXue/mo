@@ -1,11 +1,11 @@
-from server.repository import data_repo
-from server.repository import data_set_repo
+from repository import data_repo
+from repository import data_set_repo
 
 
 def import_data(data_array, data_set_name):
     ds_obj = data_set_repo.find_one({'name': data_set_name})
-    # user_obj = user.find_unique_one({'name': owner_name})
-    # ownership_obj = ownership.find_unique_one({'owner': user_obj})
+    # user_obj = user.read_unique_one({'name': owner_name})
+    # ownership_obj = ownership.read_unique_one({'owner': user_obj})
 
     if ds_obj:
         # ds exists insert data to it
