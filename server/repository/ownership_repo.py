@@ -7,6 +7,9 @@ class OwnershipRepo(Repo):
     def __init__(self, instance):
         Repo.__init__(self, instance)
 
+    def read_by_user(self, ownership):
+        return Repo.read(self, {'user': ownership.user})
+
 # def read(query):
 #     return general_repo.read(Instance, query)
 #

@@ -3,6 +3,7 @@
 from mongoengine import connect
 from entity.project import Project
 from business import project_business
+from service import project_service
 from repository import config
 
 
@@ -13,7 +14,7 @@ connect(
     host=config.get_mongo_host(),
 )
 
-new_project = Project()
-new_project.name = "ccc"
+# project_service.create_project("testasdfasdf", "adsfafd",
+#    'test_user', True)
 
-project_business.create(new_project)
+print project_service.get_projects_by_user_ID('test_user')
