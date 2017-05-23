@@ -6,3 +6,6 @@
 out
 gen
 /.idea/
+
+# ignore all .pyc files
+*.pyc
