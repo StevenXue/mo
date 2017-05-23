@@ -30,7 +30,8 @@ def allowed_file(filename):
 
 @file_app.route('/upload_file', methods=['POST'])
 def upload_file():
-    user_id = request.args.get('user_id')
+    user_ID = request.args.get('user_ID')
+    if_private = request.args.get('if_private')
     if request.method == 'POST':
         # check if the post request has the file part
         if REQUEST_FILE_NAME not in request.files:
@@ -47,12 +48,12 @@ def upload_file():
 
             try:
                 file_service.add_file(file.filename, file_size, file_url,
-                                      user_id)
+                                      user_ID, if_private)
             except ValueError:
-                return make_response(jsonify({'response': ValueError},
+                return make_response(jsonify({'response': str(ValueError)},
                                              400))
             except NameError:
-                return make_response(jsonify({'response': NameError},
+                return make_response(jsonify({'response': str(NameError)},
                                              400))
             return redirect(file_url)
         else:
