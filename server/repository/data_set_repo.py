@@ -1,10 +1,4 @@
 # -*- coding: UTF-8 -*-
-import sys
-
-from os import path
-
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-
 from server.repository.general_repo import Repo
 
 
@@ -16,5 +10,5 @@ class DataSetRepo(Repo):
 #     general_repo.save_one(Instance, new_ds)
 #
 #
-# def find_one(query):
-#     general_repo.find_one(Instance, query)
+# def find_first_one(query):
+#     general_repo.find_first_one(Instance, query)

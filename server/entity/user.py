@@ -15,4 +15,3 @@ class User(Document):
     # def save(self, user_id):
         # self.user_id = user_id
         # user_repo.find_unique_one(self, {'user_id': user_id})
-
