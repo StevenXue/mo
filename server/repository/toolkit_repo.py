@@ -1,5 +1,14 @@
+#!/usr/bin/python
 # -*- coding: UTF-8 -*-
-from server.repository.general_repo import Repo
+'''
+# @author   : Tianyi Zhang
+# @version  : 1.0
+# @date     : 2017-05-23 11:00pm
+# @function : Getting all of the toolkit of statics analysis
+# @running  : python
+# Further to FIXME of None
+'''
+from repository.general_repo import Repo
 
 
 class ToolkitRepo(Repo):
@@ -7,8 +16,13 @@ class ToolkitRepo(Repo):
         Repo.__init__(self, instance)
 
     def read_by_toolkit_name(self, toolkit_obj):
-        return Repo.find_unique_one(self, {'user_ID': toolkit_obj.name})
+        return Repo.read_unique_one(self, {'name': toolkit_obj.name})
 
+    def read_by_toolkit_id(self, toolkit_obj):
+        return Repo.read_unique_one(self, {'_id': toolkit_obj._id})
+
+    def read_all_toolkit(self, toolkit_obj):
+        return Repo.read(self, {})
 
 # def find(query):
 #     return general_repo.find(User, query)
