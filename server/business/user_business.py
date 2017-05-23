@@ -4,5 +4,6 @@ from server.repository.user_repo import UserRepo
 user_repo = UserRepo(User)
 
 
-def find_by_user_id(user_id):
-    return user_repo.find_unique_one({'user_id': user_id})
+def get_by_user_id(user_id):
+    user_obj = User(user_id=user_id)
+    return user_repo.read_by_id(user_obj)

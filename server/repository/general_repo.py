@@ -19,8 +19,8 @@ class Repo:
     def find(self, query):
         return self.__instance.objects(**query)
 
-    def find_one(self, query):
-        return self.__instance.objects(**query)[0]
+    def find_first_one(self, query):
+        return self.__instance.objects(**query).first()
 
     def find_unique_one(self, query):
         return self.__instance.objects.get(**query)
@@ -28,6 +28,8 @@ class Repo:
     def save_one(self, content):
         return self.__instance(**content).save()
 
+    def save(self, obj):
+        return obj.save()
 
 # def modify(instance, **query, **update):
 #     return instance.objects(**query).modify(**update)
