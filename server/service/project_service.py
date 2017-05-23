@@ -5,5 +5,4 @@ from server.business import user_business
 
 
 def get_projects_by_user_ID(user_ID):
-    user_business.get_projects_by_user_ID(user_ID)
-    return project_repo.find_unique_one({'_id': project_id})
+    
