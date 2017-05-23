@@ -7,4 +7,4 @@ project_repo = ProjectRepo(Project)
 
 
 def create(project):
-    project_repo.save(project)
+    return project_repo.create(project)
