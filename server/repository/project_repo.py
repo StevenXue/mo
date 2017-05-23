@@ -10,6 +10,3 @@ sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 class ProjectRepo(Repo):
     def __init__(self, instance):
         Repo.__init__(self, instance)
-
-    def create(self, project):
-        return Repo.save(project)
