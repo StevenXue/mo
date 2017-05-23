@@ -4,7 +4,7 @@ GENDER = ('male', 'female')
 
 
 class User(Document):
-    user_id = StringField(max_length=20, unique=True)
+    user_ID = StringField(max_length=20, unique=True)
     name = StringField(max_length=20, unique=True)
     password = StringField(min_length=6, max_length=20)
     email = EmailField(unique=True)

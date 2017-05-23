@@ -6,8 +6,8 @@ class UserRepo(Repo):
     def __init__(self, instance):
         Repo.__init__(self, instance)
 
-    def read_by_id(self, user_obj):
-        return Repo.find_unique_one(self, {'user_id': user_obj.user_id})
+    def read_by_user_ID(self, user_obj):
+        return Repo.find_unique_one(self, {'user_ID': user_obj.user_ID})
 
 # def find(query):
 #     return general_repo.find(User, query)

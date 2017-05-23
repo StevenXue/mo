@@ -5,8 +5,8 @@ from server.repository.file_repo import FileRepo
 file_repo = FileRepo(File)
 
 
-def add(file_name, file_size, url, user):
-    file_obj = File(name=file_name, size=file_size, path=url, user=user)
+def add(file_name, file_size, url):
+    file_obj = File(name=file_name, size=file_size, path=url)
     return file_repo.save(file_obj)
 
 
