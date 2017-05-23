@@ -11,6 +11,10 @@
 
 # import numpy as np
 import pandas as pd
+from server.entity.toolkit import Toolkit
+from server.repository.toolkit_repo import ToolkitRepo
+
+toolkit_repo = ToolkitRepo(Toolkit)
 
 
 def convert_json_str_to_dataframe(arr):
@@ -146,4 +150,4 @@ if __name__ == '__main__':
         }
     ]
 
-    print (convert_json_str_to_dataframe(DD).mean())
+    # print (convert_json_str_to_dataframe(DD).mean())
