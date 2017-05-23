@@ -7,4 +7,4 @@ project_repo = ProjectRepo(Project)
 
 
 def create(project):
-    print(project.name)
+    project_repo.save(project)

@@ -1,16 +1,8 @@
 # -*- coding: UTF-8 -*-
-import sys
-
-from os import path
-
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-
-from entity.project import Project
-from business import project_business
 
 from mongoengine import connect
-
-
+from entity.project import Project
+from business import project_business
 from repository import config
 
 
@@ -22,6 +14,6 @@ connect(
 )
 
 new_project = Project()
-new_project.name = "test"
+new_project.name = "bbb"
 
 project_business.create(new_project)

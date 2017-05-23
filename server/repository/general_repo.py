@@ -33,4 +33,3 @@ class Repo:
 
 # def modify(instance, **query, **update):
 #     return instance.objects(**query).modify(**update)
-

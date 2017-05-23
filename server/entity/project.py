@@ -2,7 +2,6 @@
 
 from mongoengine import *
 
-
 class Project(Document):
     name = StringField(max_length=20, unique=True, required=True)
     description = StringField(max_length=140)
