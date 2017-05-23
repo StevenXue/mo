@@ -13,3 +13,7 @@ def list_by_user_ID(user_ID):
         return ownership_business.list_ownership_by_user(user)
     else:
         raise NameError('no user found')
+
+
+# def check_ownership(user, owned):
+

@@ -8,7 +8,8 @@ class OwnershipRepo(Repo):
         Repo.__init__(self, instance)
 
     def read_by_user(self, ownership):
-        return Repo.read(self, {'user_ID': ownership.user})
+        return Repo.read(self, {'user': ownership.user})
+
 # def read(query):
 #     return general_repo.read(Instance, query)
 #
