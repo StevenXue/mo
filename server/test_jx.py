@@ -14,6 +14,6 @@ connect(
 )
 
 new_project = Project()
-new_project.name = "bbb"
+new_project.name = "ccc"
 
 project_business.create(new_project)
