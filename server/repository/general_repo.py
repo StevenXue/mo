@@ -2,7 +2,7 @@
 
 from mongoengine import connect
 
-from server.repository import config
+from repository import config
 
 connect(
     db=config.get_mongo_db(),
@@ -33,4 +33,3 @@ class Repo:
 
 # def modify(instance, **query, **update):
 #     return instance.objects(**query).modify(**update)
-
