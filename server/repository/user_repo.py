@@ -16,6 +16,8 @@ class UserRepo(Repo):
     def __init__(self, instance):
         Repo.__init__(self, instance)
 
+    def find_by_user_id(user_id):
+        pass
 # def find(query):
 #     return general_repo.find(User, query)
 #
