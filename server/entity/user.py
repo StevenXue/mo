@@ -12,6 +12,3 @@ class User(Document):
     gender = StringField(choices=GENDER)
     age = IntField()
 
-    # def save(self, user_ID):
-        # self.user_ID = user_ID
-        # user_repo.find_unique_one(self, {'user_ID': user_ID})

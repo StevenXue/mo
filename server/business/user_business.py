@@ -1,5 +1,5 @@
-from server.entity.user import User
-from server.repository.user_repo import UserRepo
+from entity.user import User
+from repository.user_repo import UserRepo
 
 user_repo = UserRepo(User)
 

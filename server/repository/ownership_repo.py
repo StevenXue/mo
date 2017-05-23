@@ -1,26 +1,26 @@
 # -*- coding: UTF-8 -*-
-from server.entity.user import User as Instance
-from server.repository.general_repo import Repo
+from entity.user import User as Instance
+from repository.general_repo import Repo
 
 
 class OwnershipRepo(Repo):
     def __init__(self, instance):
         Repo.__init__(self, instance)
 
-# def find(query):
-#     return general_repo.find(Instance, query)
+# def read(query):
+#     return general_repo.read(Instance, query)
 #
 #
-# def find_first_one(query):
-#     return general_repo.find_first_one(Instance, query)
+# def read_first_one(query):
+#     return general_repo.read_first_one(Instance, query)
 #
 #
-# def find_unique_one(query):
-#     return general_repo.find_unique_one(Instance, query)
+# def read_unique_one(query):
+#     return general_repo.read_unique_one(Instance, query)
 #
 #
-# def save_one(content):
-#     return general_repo.save_one(Instance, content)
+# def create_one(content):
+#     return general_repo.create_one(Instance, content)
 
 
 

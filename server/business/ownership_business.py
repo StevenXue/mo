@@ -1,6 +1,6 @@
 
-from server.entity.ownership import Ownership
-from server.repository.ownership_repo import OwnershipRepo
+from entity.ownership import Ownership
+from repository.ownership_repo import OwnershipRepo
 
 ownership_repo = OwnershipRepo(Ownership)
 
@@ -13,5 +13,5 @@ def add(user, if_private, **owned_obj):
     if not user or not if_private:
         raise ValueError('no user or no private')
     ownership_obj = Ownership(user=user, private=if_private, **owned_obj)
-    return ownership_repo.save(ownership_obj)
+    return ownership_repo.create(ownership_obj)
 

@@ -5,13 +5,13 @@ from os import path
 
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-from server.entity.project import Project
-from server.business import project_business
+from entity.project import Project
+from business import project_business
 
 from mongoengine import connect
 
 
-from server.repository import config
+from repository import config
 
 
 connect(
