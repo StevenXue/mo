@@ -1,7 +1,7 @@
 
 
-# def create_file(file_name, file_size, url, user_id):
-#     user = User.find_by_user_id(User, user_id)
+# def create_file(file_name, file_size, url, user_ID):
+#     user = User.find_by_user_ID(User, user_ID)
 #     obj = {
 #         'name': file_name,
 #         'upload_time': datetime.utcnow(),

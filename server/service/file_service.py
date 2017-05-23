@@ -5,10 +5,10 @@ from server.business import user_business
 from server.business import ownership_business
 
 
-def add_file(file_name, file_size, url, user_id, if_private=True):
-    if not user_id:
+def add_file(file_name, file_size, url, user_ID, if_private=True):
+    if not user_ID:
         raise ValueError('no user id or private input')
-    user = user_business.get_by_user_ID(user_id)
+    user = user_business.get_by_user_ID(user_ID)
     if not user:
         raise NameError('no user found')
     saved_file = file_business.add(file_name, file_size, url)
