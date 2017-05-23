@@ -3,7 +3,6 @@
 """
 from mongoengine import connect
 from repository import config
-from entity.toolkit import Toolkit
 from business import toolkit_business
 
 
