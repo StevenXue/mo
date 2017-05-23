@@ -15,3 +15,6 @@ def add(user, if_private, **owned_obj):
     ownership_obj = Ownership(user=user, private=if_private, **owned_obj)
     return ownership_repo.create(ownership_obj)
 
+
+def find_ownership_by_user_ID(user_ID):
+    pass
