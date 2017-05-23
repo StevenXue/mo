@@ -42,19 +42,14 @@ def upload_file():
             return make_response(jsonify({'response': 'no selected file'},
                                          400))
         if file and allowed_file(file.filename):
-
-            file_size = file_service.save_file_and_get_size(file)
-            file_url = PREFIX + UPLOAD_URL + file.filename
-
             try:
+                file_size = file_service.save_file_and_get_size(file)
+                file_url = PREFIX + UPLOAD_URL + file.filename
                 file_service.add_file(file.filename, file_size, file_url,
                                       user_ID, if_private)
-            except ValueError:
-                return make_response(jsonify({'response': str(ValueError)},
-                                             400))
-            except NameError:
-                return make_response(jsonify({'response': str(NameError)},
-                                             400))
+            except Exception, e:
+                return make_response(jsonify({'response': '%s: %s' % (str(
+                    Exception), e.args)}, 400))
             return redirect(file_url)
         else:
             return make_response(jsonify({'response': 'file is not allowed'},
