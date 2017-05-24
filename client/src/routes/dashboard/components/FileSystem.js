@@ -38,11 +38,18 @@ class FileSystem extends React.Component {
     );
   }
 
+  onOk (data) {
+    dispatch({
+      //type: `user/${modalType}`,
+      payload: data,
+    })
+  }
+
   render() {
     return (
       <div>
         <div style={{marginBottom: 20}}>My Projects</div>
-        <ProjectModal record={{}}>
+        <ProjectModal record={{}} onOk={() => this.onOk(data)}>
           <Button type="primary" style={{marginBottom: 20}}>新增项目</Button>
         </ProjectModal>
         <Button type="primary" style={{marginBottom: 20, float: 'Right'}}>上传数据集</Button>
