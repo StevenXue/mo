@@ -6,13 +6,6 @@ module.exports = [
     router: '/project',
   },
   {
-    id: 2,
-    bpid: 1,
-    name: 'User Manage',
-    icon: 'user',
-    router: '/user',
-  },
-  {
     id: 21,
     mpid: -1,
     bpid: 2,
@@ -22,7 +15,7 @@ module.exports = [
   {
     id: 3,
     bpid: 1,
-    name: 'Request',
+    name: 'Request Test',
     icon: 'api',
     router: '/request',
   },
