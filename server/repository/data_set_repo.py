@@ -1,20 +1,16 @@
 # -*- coding: UTF-8 -*-
-import sys
-
-from os import path
-
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-
-from server.repository.general_repo import Repo
+from repository.general_repo import Repo
 
 
 class DataSetRepo(Repo):
     def __init__(self, instance):
         Repo.__init__(self, instance)
 
-# def save_one(new_ds):
-#     general_repo.save_one(Instance, new_ds)
+    def read_by_name(self, data_set):
+        return Repo.read_unique_one(self, {'name': data_set.name})
+# def create_one(new_ds):
+#     general_repo.create_one(Instance, new_ds)
 #
 #
-# def find_one(query):
-#     general_repo.find_one(Instance, query)
+# def read_first_one(query):
+#     general_repo.read_first_one(Instance, query)

@@ -39,6 +39,10 @@ def get_named_query(name):
 def get_named_return(name):
     return config.get('NAMED_RETURN', name)
 
+
+def get_file_prop(name):
+    return config.get('FILE', name)
+
 # def test():
 #     #print config.sections()
 #     print config['NAMED_QUERY']['ALL_TEMP_WARNING']

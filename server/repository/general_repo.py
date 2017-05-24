@@ -2,7 +2,7 @@
 
 from mongoengine import connect
 
-from server.repository import config
+from repository import config
 
 connect(
     db=config.get_mongo_db(),
@@ -16,19 +16,23 @@ class Repo:
     def __init__(self, instance):
         self.__instance = instance
 
-    def find(self, query):
+    def read_by_object_id(self, object_id):
+        return self.__instance.objects.get(id=object_id)
+
+    def read(self, query):
         return self.__instance.objects(**query)
 
-    def find_one(self, query):
-        return self.__instance.objects(**query)[0]
+    def read_first_one(self, query):
+        return self.__instance.objects(**query).first()
 
-    def find_unique_one(self, query):
+    def read_unique_one(self, query):
         return self.__instance.objects.get(**query)
 
-    def save_one(self, content):
+    def create_one(self, content):
         return self.__instance(**content).save()
 
+    def create(self, obj):
+        return obj.save()
 
 # def modify(instance, **query, **update):
 #     return instance.objects(**query).modify(**update)
-

@@ -1,8 +1,9 @@
-from server.entity.user import User
-from server.repository.user_repo import UserRepo
+from entity.user import User
+from repository.user_repo import UserRepo
 
 user_repo = UserRepo(User)
 
 
-def find_by_user_id(user_id):
-    return user_repo.find_unique_one({'user_id': user_id})
+def get_by_user_ID(user_ID):
+    user_obj = User(user_ID=user_ID)
+    return user_repo.read_by_user_ID(user_obj)
