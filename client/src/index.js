@@ -1,28 +1,26 @@
-import dva from 'dva';
-import { browserHistory } from 'dva/router';
-import createLoading from 'dva-loading';
-import { message } from 'antd';
-import './index.html';
-import './index.css';
-
-const ERROR_MSG_DURATION = 3; // 3 秒
+import './index.html'
+import 'babel-polyfill'
+import dva from 'dva'
+import createLoading from 'dva-loading'
+import { browserHistory } from 'dva/router'
+import { message } from 'antd'
 
 // 1. Initialize
 const app = dva({
+  ...createLoading({
+    effects: true,
+  }),
   history: browserHistory,
-  onError(e) {
-    message.error(e.message, ERROR_MSG_DURATION);
+  onError (error) {
+    message.error(error.message)
   },
-});
+})
 
-// 2. Plugins
-app.use(createLoading());
+// 2. Model
+app.model(require('./models/app'))
 
-// 3. Model
-// Moved to router.js
+// 3. Router
+app.router(require('./router'))
 
-// 4. Router
-app.router(require('./router'));
-
-// 5. Start
-app.start('#root');
+// 4. Start
+app.start('#root')
