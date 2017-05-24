@@ -16,7 +16,9 @@ def list_by_user(user_obj):
 
 
 def get_by_object_id(object_id):
-    return file_repo.read_by_object_id(object_id)
+    print type(object_id)
+    file_obj = File(id=object_id)
+    return file_repo.read_by_object_id(file_obj)
 
 
 def delete_by_object_id(object_id):

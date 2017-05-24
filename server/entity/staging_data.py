@@ -4,7 +4,8 @@ from entity.data import Data
 
 
 class StagingData(Document):
-    time = DateTimeField()
-    data_set = ReferenceField('DataSet')
-    value = FloatField()
+    # time = DateTimeField()
+    # value = FloatField()
+    staging_data_set = ReferenceField('StagingDataSet')
+
 

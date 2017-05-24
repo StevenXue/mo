@@ -1,8 +1,8 @@
 """
-Blueprint for ownership
+Blueprint for project
 
 Author: Zhaofeng Li
-Date: 2017.05.22
+Date: 2017.05.24
 """
 
 from flask import Blueprint
@@ -15,8 +15,7 @@ from flask import send_from_directory
 from service import ownership_service
 from utility import json_utility
 
-PREFIX = '/ownership'
-
+PREFIX = '/project'
 
 ownership_app = Blueprint("ownership_app", __name__, url_prefix=PREFIX)
 
