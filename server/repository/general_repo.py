@@ -16,7 +16,7 @@ class Repo:
     def __init__(self, instance):
         self.__instance = instance
 
-    # def read_by_object_id(self, object_id):
+    # def read_by_id(self, object_id):
     #     return self.__instance.objects.get(id=object_id)
 
     def read(self, query):
@@ -34,5 +34,5 @@ class Repo:
     def create(self, obj):
         return obj.save()
 
-# def modify(instance, **query, **update):
-#     return instance.objects(**query).modify(**update)
+    # def modify(instance, **query, **update):
+    #     return instance.objects(**query).modify(**update)

@@ -9,9 +9,9 @@
 # Further to FIXME of None
 '''
 
-import numpy as np
+# import numpy as np
 import pandas as pd
-from bson import ObjectId
+# from bson import ObjectId
 
 from entity.toolkit import Toolkit
 from repository.toolkit_repo import ToolkitRepo
@@ -24,12 +24,14 @@ def get_by_toolkit_name(toolkit_name):
     # print 'toolkit_obj', toolkit_obj.name
     return toolkit_repo.read_by_toolkit_name(toolkit_obj)
 
+
 def get_by_toolkit_id(toolkit_id):
     toolkit_obj = Toolkit(id=toolkit_id)
     # toolkit_obj = Toolkit(_id=ObjectId(toolkit_id))
 
     # print 'toolkit_obj', toolkit_obj.name
     return toolkit_repo.read_by_toolkit_id(toolkit_obj)
+
 
 def list_available_toolkits():
     toolkit_obj = Toolkit()
@@ -38,7 +40,6 @@ def list_available_toolkits():
     for tool in toolkit_repo.read_all_toolkit(toolkit_obj):
         all_names.append(tool.name)
     return all_names
-
 
 
 def convert_json_str_to_dataframe(arr):

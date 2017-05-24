@@ -24,7 +24,7 @@ def add_file(file, url_base, user_ID, if_private=True):
     if saved_file:
         if not ownership_business.add(user, bool(if_private), file=saved_file):
             # revert file saving
-            file_business.delete_by_object_id(saved_file['_id'])
+            file_business.delete_by_id(saved_file['_id'])
             raise RuntimeError('ownership create failed')
         else:
             return file_url
@@ -47,8 +47,8 @@ def save_file_and_get_size(file, path):
 
 
 # get file
-def file_loader(object_id, user_ID):
-    file = file_business.get_by_object_id(object_id)
+def file_loader(file_id, user_ID):
+    file = file_business.get_by_id(file_id)
     # if user_ID != file
     is_private = ownership_service.check_private(file, 'file')
     is_owned = ownership_service.check_ownership(user_ID, file, 'file')
