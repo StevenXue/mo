@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 
 from entity.data_set import DataSet
 from repository.data_set_repo import DataSetRepo

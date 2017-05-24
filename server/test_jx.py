@@ -5,7 +5,9 @@ from entity.project import Project
 from business import project_business
 from repository import config
 from entity.data import Data
+from entity.data_set import DataSet
 from service import staging_data_service
+
 
 
 connect(
@@ -24,4 +26,4 @@ test_project = project_business.get_by_name('aaa')
 print test_project.name
 data = Data.objects()
 print data.count()
-staging_data_service.add_staging_data_set('test', 'test', test_project, data)
+staging_data_service.add_staging_data_set('test', 'test', test_project.id, data)

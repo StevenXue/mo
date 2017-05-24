@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 from business import user_business
 from business import ownership_business
 from entity.project import Project

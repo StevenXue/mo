@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 
 from entity.file import File
 from repository.file_repo import FileRepo

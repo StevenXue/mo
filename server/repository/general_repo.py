@@ -19,6 +19,12 @@ class Repo:
     # def read_by_id(self, object_id):
     #     return self.__instance.objects.get(id=object_id)
 
+    def create_one(self, content):
+        return self.__instance(**content).save()
+
+    def create(self, obj):
+        return obj.save()
+
     def read(self, query):
         return self.__instance.objects(**query)
 
@@ -28,11 +34,14 @@ class Repo:
     def read_unique_one(self, query):
         return self.__instance.objects.get(**query)
 
-    def create_one(self, content):
-        return self.__instance(**content).save()
+    def update_one(self, query, update):
+        return self.__instance.objects(**query).update_one(**update)
 
-    def create(self, obj):
-        return obj.save()
+    def update(self, query, update):
+        return self.__instance.objects(**query).update(**update)
 
-    # def modify(instance, **query, **update):
-    #     return instance.objects(**query).modify(**update)
+    def delete_first_one(self, query):
+        return self.__instance.objects(**query).first().delete()
+
+    def delete_unique_one(self, query):
+        return self.__instance.objects.get(**query).delete()

@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
 from entity.user import User
 from repository.user_repo import UserRepo
 

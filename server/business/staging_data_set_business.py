@@ -21,4 +21,4 @@ def add(name, description, project):
         raise ValueError('no name or no description or no project')
     staging_data_set = StagingDataSet(name=name, description=description,
                                       project=project)
-    return staging_data_set_repo.create(data_set)
+    return staging_data_set_repo.create(staging_data_set)

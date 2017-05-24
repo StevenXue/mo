@@ -3,6 +3,6 @@
 from repository.general_repo import Repo
 
 
-class StagingDataSetRepo(Repo):
+class StagingDataRepo(Repo):
     def __init__(self, instance):
         Repo.__init__(self, instance)

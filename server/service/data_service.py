@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 from mongoengine import *
 from business import data_business
 from business import data_set_business

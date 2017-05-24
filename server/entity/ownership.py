@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
 from mongoengine import *
 
 OWNERSHIP_LEVEL = ('public', 'private')
