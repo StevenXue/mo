@@ -2,7 +2,6 @@
   "private": true,
   "dependencies": {
     "antd": "^2.10.0",
-    "babel-eslint": "^6.1.2",
     "classnames": "^2.2.5",
     "draftjs-to-markdown": "^0.4.0",
     "dva": "^1.2.0",
