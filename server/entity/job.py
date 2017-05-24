@@ -10,5 +10,5 @@ STATUS = (
 class Job(Document):
     model = ReferenceField('Model')
     toolkit = ReferenceField('ToolKit')
-    temp = ReferenceField('Temp')
+    staging_data_set = ReferenceField('StagingDataSet')
     status = IntField(choices=STATUS, required=True)

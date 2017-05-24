@@ -6,6 +6,8 @@ class DataSetRepo(Repo):
     def __init__(self, instance):
         Repo.__init__(self, instance)
 
+    def read_by_name(self, data_set):
+        return Repo.read_unique_one(self, {'name': data_set.name})
 # def create_one(new_ds):
 #     general_repo.create_one(Instance, new_ds)
 #

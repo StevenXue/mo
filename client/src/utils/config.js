@@ -1,0 +1,21 @@
+module.exports = {
+  name: "Golder's Green",
+  prefix: 'antdAdmin',
+  footerText: "Golder's Green Datalab  © 2017",
+  logo: '/logo.png',
+  iconFontCSS: '/iconfont.css',
+  iconFontJS: '/iconfont.js',
+  baseURL: 'http://localhost:8000/api/v1',
+  YQL: ['http://www.zuimeitianqi.com'],
+  CORS: ['http://localhost:7000'],
+  openPages: ['/login'],
+  apiPrefix: '/api/v1',
+  api: {
+    userLogin: '/user/login',
+    userLogout: '/user/logout',
+    userInfo: '/userInfo',
+    users: '/users',
+    user: '/user/:id',
+    dashboard: '/dashboard',
+  },
+}

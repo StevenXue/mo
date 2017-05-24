@@ -1,18 +1,10 @@
-# -*- coding: UTF-8 -*-
-from mongoengine import connect
-
-from repository import config
-
+# # -*- coding: UTF-8 -*-
+from bson import ObjectId
+from service import data_service
 from service import ownership_service
-from entity.project import Project
-from entity.file import File
+from business import ownership_business
 
-connect(
-    db=config.get_mongo_db(),
-    username=config.get_mongo_user(),
-    password=config.get_mongo_pass(),
-    host=config.get_mongo_host(),
-)
-
-
-print ownership_service.list_by_user_ID('tttt')
+data_service.import_data_from_file_object_id(ObjectId(
+    "59250e97df86b2fe3b8991b4"), 'test_with_os', 'some ds',
+    'tttt', True)
+# print ownership_business.list_ownership_by_type('file')

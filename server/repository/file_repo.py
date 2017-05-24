@@ -13,7 +13,7 @@ class FileRepo(Repo):
         return Repo.create(self, file_obj)
 
     def read_by_user(self, file_obj):
-        return Repo.read_unique_one(self, {'user': file_obj.user})
+        return Repo.read(self, {'user': file_obj.user})
 
     def delete_by_object_id(self, file_obj):
         return Repo.read_unique_one(self, {'_id': file_obj.object_id}).delete()
