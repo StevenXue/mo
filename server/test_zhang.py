@@ -6,6 +6,7 @@ from repository import config
 from business import toolkit_business
 from entity import toolkit
 from bson import ObjectId
+from lib import *
 
 
 connect(
@@ -27,3 +28,6 @@ if __name__ == '__main__':
     # print a.to_mongo()
     # f = open('./run.py')
     # print f.read()
+    a = [1,2,3,4,5]
+    print AVG.toolkit_average(a)
+    print STD.toolkit_std(a)
