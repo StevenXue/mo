@@ -8,9 +8,7 @@ Date: 2017.05.22
 from flask import Blueprint
 from flask import jsonify
 from flask import make_response
-from flask import redirect
 from flask import request
-from flask import send_from_directory
 
 from service import ownership_service
 from utility import json_utility

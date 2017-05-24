@@ -12,8 +12,8 @@ from flask import redirect
 from flask import request
 from flask import send_from_directory
 
-from service import file_service
 from repository import config
+from service import file_service
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
@@ -46,17 +46,13 @@ def upload_file():
             return make_response(jsonify({'response': 'no selected file'},
                                          400))
         if file and allowed_file(file.filename):
-            url_base = PREFIX + UPLOAD_URL
-            file_url = file_service.add_file(file, url_base,
+            try:
+                url_base = PREFIX + UPLOAD_URL
+                file_url = file_service.add_file(file, url_base,
                                              user_ID, if_private)
-            # try:
-            #     # file_size = file_service.save_file_and_get_size(file)
-            #     file_url = PREFIX + UPLOAD_URL + file.filename
-            #     file_service.add_file(file, file_url,
-            #                           user_ID, if_private)
-            # except Exception, e:
-            #     return make_response(jsonify({'response': '%s: %s' % (str(
-            #         Exception), e.args)}, 400))
+            except Exception, e:
+                return make_response(jsonify({'response': '%s: %s' % (str(
+                    Exception), e.args)}, 400))
             return redirect(file_url)
         else:
             return make_response(jsonify({'response': 'file is not allowed'},
