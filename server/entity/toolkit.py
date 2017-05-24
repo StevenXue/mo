@@ -86,7 +86,7 @@ def save_once():
                                     'k': 2}).save()
 
     MIC = Toolkit(name='最大互信息数',
-                  description='计算所选数据集合的皮尔森相关系数, 表达两变量之间(函数关系)相关系数',
+                  description='计算所选数据集合的最大互信息数, 表达两变量之间(函数关系)相关系数',
                   parameter_spec={'input_data0': 'list',
                                   'input_data1': 'list'}).save()
 
