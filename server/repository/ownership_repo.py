@@ -10,6 +10,9 @@ class OwnershipRepo(Repo):
     def read_by_user(self, ownership):
         return Repo.read(self, {'user': ownership.user})
 
+    def read_by_type_and_private(self, owned_type, ownership):
+        return Repo.read(self, {'private': ownership.private,
+                                '%s__exists' % owned_type: True})
 # def read(query):
 #     return general_repo.read(Instance, query)
 #

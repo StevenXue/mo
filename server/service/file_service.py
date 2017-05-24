@@ -4,6 +4,7 @@ import csv
 from business import file_business
 from business import user_business
 from business import ownership_business
+from service import ownership_service
 from repository import config
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
@@ -46,8 +47,13 @@ def save_file_and_get_size(file, path):
 
 
 # get file
-def file_loader(object_id):
+def file_loader(object_id, user_ID):
     file = file_business.get_by_object_id(object_id)
+    # if user_ID != file
+    is_private = ownership_service.check_private(file, 'file')
+    is_owned = ownership_service.check_ownership(user_ID, file, 'file')
+    if is_private or not is_owned:
+        raise Exception('file permission denied')
     with open(file.path) as csv_data:
         reader = csv.reader(csv_data)
 
