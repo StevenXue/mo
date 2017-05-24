@@ -1,13 +1,11 @@
 # -*- coding: UTF-8 -*-
 """
 """
-import sys
-from os import path
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-
 from mongoengine import connect
-from server.repository import config
-from server.entity import toolkit
+from repository import config
+from entity.toolkit import Toolkit
+from business import toolkit_business
+
 
 connect(
     db=config.get_mongo_db(),
@@ -16,4 +14,10 @@ connect(
     host=config.get_mongo_host(),)
 
 if __name__ == '__main__':
-    toolkit.save_once()
+    a = toolkit_business.get_by_toolkit_name('平均值')
+    b = toolkit_business.get_by_toolkit_id("5924127f8be34d7b560c8cdd")
+    c = toolkit_business.list_available_toolkits()
+    # print isInstance(a, class)
+    # print c
+    # print a
+    print [a.name]
