@@ -1,7 +1,9 @@
+from mongoengine import *
 from business import data_business
 from business import data_set_business
 from business import ownership_business
 from business import user_business
+from service import file_service
 
 
 def add_data_set(data_set_name, ds_description, user_ID, is_private):
@@ -13,9 +15,14 @@ def add_data_set(data_set_name, ds_description, user_ID, is_private):
 
 def import_data(data_array, data_set_name, ds_description, user_ID, is_private):
     # find data set, if not exists add new one
-    ds = data_set_business.get_by_name(data_set_name)
-    if ds is None:
+    try:
+        ds = data_set_business.get_by_name(data_set_name)
+    except DoesNotExist:
         ds = add_data_set(data_set_name, ds_description, user_ID, is_private)
     for data in data_array:
         data_business.add(ds, data)
 
+
+def import_data_from_file_object_id(file_object_id, data_set_name, ds_description, user_ID, is_private):
+    table = file_service.file_loader(file_object_id)
+    import_data(table, data_set_name, ds_description, user_ID, is_private)

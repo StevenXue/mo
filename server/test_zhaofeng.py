@@ -1,20 +1,7 @@
 # # -*- coding: UTF-8 -*-
-# from mongoengine import connect
-#
-# from repository import config
-#
-# from service import ownership_service
-# from entity.project import Project
-# from entity.file import File
-#
-# connect(
-#     db=config.get_mongo_db(),
-#     username=config.get_mongo_user(),
-#     password=config.get_mongo_pass(),
-#     host=config.get_mongo_host(),
-# )
-#
-#
-# print ownership_service.list_by_user_ID('tttt')
-f = open('./run.py')
-print f.read()
+from bson import ObjectId
+from service import data_service
+
+data_service.import_data_from_file_object_id(ObjectId(
+    "59250e97df86b2fe3b8991b4"), 'dsdsds', 'ds_descriptionds_description',
+    'test_user', True)
