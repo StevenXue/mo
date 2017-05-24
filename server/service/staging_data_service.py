@@ -15,7 +15,18 @@ def add_staging_data_set(sds_name, sds_description, project_id,
     #print 'ttt', data_objects
     # copy data from data(raw) to staging data
     for do in data_objects:
+        print do
         #print 'do', do
         # print do['device_level']
-        print do['device_type']
+        # print dict(do)['device_type']
         #staging_data_business.add(sds, do)
+
+
+def run():
+    test_project = project_business.get_by_name('aaa')
+    data = Data.objects(device_level='3')
+    # data = eval(data.to_json())
+    # for obj in data:
+    #     print obj, '\n'
+    add_staging_data_set('test', 'test', test_project.id, data)
+

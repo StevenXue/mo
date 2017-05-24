@@ -23,8 +23,6 @@ connect(
 
 #print project_service.get_projects_by_user_ID('test_user')
 #(sds_name, sds_description, project_id,data_objs):
-test_project = project_business.get_by_name('aaa')
-data = Data.objects(device_level='3')
-# data = eval(data.to_json())
+
 # data = json_utility.convert_to_json(data)
-staging_data_service.add_staging_data_set('test', 'test', test_project.id, data)
+staging_data_service.run()
