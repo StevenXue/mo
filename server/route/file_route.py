@@ -12,8 +12,8 @@ from flask import redirect
 from flask import request
 from flask import send_from_directory
 
-from service import file_service
 from repository import config
+from service import file_service
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 

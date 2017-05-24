@@ -15,16 +15,14 @@ def list_by_user(user_obj):
     return file_repo.read_by_user(file_obj)
 
 
-def get_by_object_id(object_id):
-    file_obj = File(id=object_id)
-    return file_repo.read_by_object_id(file_obj)
+def get_by_id(file_id):
+    file_obj = File(id=file_id)
+    return file_repo.read_by_id(file_obj)
 
 
-def delete_by_object_id(object_id):
-    file_obj = File(_id=object_id)
-    return file_repo.delete_by_object_id(file_obj)
-    # file_obj = file_repo.read_first_one({'_id': object_id})
-    # return file_obj.delete()
+def delete_by_id(file_id):
+    file_obj = File(id=file_id)
+    return file_repo.delete_by_id(file_obj)
 
 
 def get_raw_file(file):

@@ -23,6 +23,6 @@ def import_data(data_array, data_set_name, ds_description, user_ID, is_private):
         data_business.add(ds, data)
 
 
-def import_data_from_file_object_id(file_object_id, data_set_name, ds_description, user_ID, is_private):
-    table = file_service.file_loader(file_object_id, user_ID)
+def import_data_from_file_id(file_id, data_set_name, ds_description, user_ID, is_private):
+    table = file_service.file_loader(file_id, user_ID)
     import_data(table, data_set_name, ds_description, user_ID, is_private)
