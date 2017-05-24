@@ -29,15 +29,17 @@ const Routers = function ({ history, app }) {
               cb(null, require('./routes/dashboard/'))
             }, 'dashboard')
           },
-        }, {
-          path: 'user',
-          getComponent (nextState, cb) {
-            require.ensure([], require => {
-              registerModel(app, require('./models/user'))
-              cb(null, require('./routes/user/'))
-            }, 'user')
-          },
-        }, {
+        },
+        // {
+        //   path: 'user',
+        //   getComponent (nextState, cb) {
+        //     require.ensure([], require => {
+        //       registerModel(app, require('./models/user'))
+        //       cb(null, require('./routes/user/'))
+        //     }, 'user')
+        //   },
+        // },
+        {
           path: 'user/:id',
           getComponent (nextState, cb) {
             require.ensure([], require => {
@@ -68,70 +70,7 @@ const Routers = function ({ history, app }) {
               cb(null, require('./routes/request/'))
             }, 'request')
           },
-        }, {
-          path: 'UIElement/iconfont',
-          getComponent (nextState, cb) {
-            require.ensure([], require => {
-              cb(null, require('./routes/UIElement/iconfont/'))
-            }, 'UIElement-iconfont')
-          },
-        }, {
-          path: 'UIElement/search',
-          getComponent (nextState, cb) {
-            require.ensure([], require => {
-              cb(null, require('./routes/UIElement/search/'))
-            }, 'UIElement-search')
-          },
-        }, {
-          path: 'UIElement/dropOption',
-          getComponent (nextState, cb) {
-            require.ensure([], require => {
-              cb(null, require('./routes/UIElement/dropOption/'))
-            }, 'UIElement-dropOption')
-          },
-        }, {
-          path: 'UIElement/layer',
-          getComponent (nextState, cb) {
-            require.ensure([], require => {
-              cb(null, require('./routes/UIElement/layer/'))
-            }, 'UIElement-layer')
-          },
-        }, {
-          path: 'UIElement/dataTable',
-          getComponent (nextState, cb) {
-            require.ensure([], require => {
-              cb(null, require('./routes/UIElement/dataTable/'))
-            }, 'UIElement-dataTable')
-          },
-        }, {
-          path: 'UIElement/editor',
-          getComponent (nextState, cb) {
-            require.ensure([], require => {
-              cb(null, require('./routes/UIElement/editor/'))
-            }, 'UIElement-editor')
-          },
-        }, {
-          path: 'chart/lineChart',
-          getComponent (nextState, cb) {
-            require.ensure([], require => {
-              cb(null, require('./routes/chart/lineChart/'))
-            }, 'chart-lineChart')
-          },
-        }, {
-          path: 'chart/barChart',
-          getComponent (nextState, cb) {
-            require.ensure([], require => {
-              cb(null, require('./routes/chart/barChart/'))
-            }, 'chart-barChart')
-          },
-        }, {
-          path: 'chart/areaChart',
-          getComponent (nextState, cb) {
-            require.ensure([], require => {
-              cb(null, require('./routes/chart/areaChart/'))
-            }, 'chart-areaChart')
-          },
-        }, {
+        },{
           path: '*',
           getComponent (nextState, cb) {
             require.ensure([], require => {
