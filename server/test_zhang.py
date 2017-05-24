@@ -14,15 +14,16 @@ connect(
     password=config.get_mongo_pass(),
     host=config.get_mongo_host(),)
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
     # toolkit.save_once()
     # a = toolkit_business.get_by_toolkit_name('平均值')
-b = toolkit_business.get_by_toolkit_id(ObjectId("592546b18be34d179b95d96f"))
-print b.to_mongo()
+
+    b = toolkit_business.get_by_toolkit_id(ObjectId("592546b18be34d179b95d96f"))
+    print b.to_mongo()
     # c = toolkit_business.list_available_toolkits()
     # print isInstance(a, class)
     # print c
     # print a
     # print a.to_mongo()
-# f = open('./run.py')
-# print f.read()
+    # f = open('./run.py')
+    # print f.read()
