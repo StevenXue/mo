@@ -1,5 +1,5 @@
 """
-Blueprint for logs
+Blueprint for file
 
 Author: Zhaofeng Li
 Date: 2017.05.22

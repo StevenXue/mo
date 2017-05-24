@@ -16,8 +16,8 @@ class Repo:
     def __init__(self, instance):
         self.__instance = instance
 
-    def read_by_object_id(self, object_id):
-        return self.__instance.objects.get(id=object_id)
+    # def read_by_object_id(self, object_id):
+    #     return self.__instance.objects.get(id=object_id)
 
     def read(self, query):
         return self.__instance.objects(**query)

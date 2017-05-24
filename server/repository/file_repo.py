@@ -15,5 +15,8 @@ class FileRepo(Repo):
     def read_by_user(self, file_obj):
         return Repo.read(self, {'user': file_obj.user})
 
+    def read_by_object_id(self, file_obj):
+        return Repo.read_unique_one(self, {'id': file_obj.id})
+
     def delete_by_object_id(self, file_obj):
         return Repo.read_unique_one(self, {'_id': file_obj.object_id}).delete()
