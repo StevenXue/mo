@@ -8,7 +8,7 @@ from datetime import datetime
 
 def get_projects_by_user_ID(user_ID):
     user = user_business.get_by_user_ID(user_ID)
-    ownerships = ownership_service.list_ownership_by_user(user_ID)
+    ownerships = ownership_service.list_by_user_ID(user_ID)
     return [os.project for os in ownerships if 'project' in os]
 
 

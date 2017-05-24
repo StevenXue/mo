@@ -1,6 +1,6 @@
 from business import user_business
 from business import ownership_business
-
+from entity.project import Project
 
 def list_by_user_ID(user_ID):
     """
@@ -18,7 +18,8 @@ def list_by_user_ID(user_ID):
 def check_private(owned, owned_type):
     ownerships = ownership_business.list_ownership_by_type_and_private(
         owned_type, True)
-    if owned in [ownership[owned_type] for ownership in ownerships]:
+    if owned in [ownership[owned_type] for ownership in ownerships if
+                 owned_type in ownership]:
         return True
     return False
 

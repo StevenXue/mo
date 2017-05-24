@@ -28,6 +28,7 @@ def list_ownership_by_user_ID():
         ownerships = ownership_service.list_by_user_ID(user_ID)
         ownerships = [ownership.to_mongo() for ownership in ownerships]
         ownerships = json_utility.convert_to_json(ownerships)
+        # ownerships = ownerships.to_json()
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}, 400))

@@ -52,8 +52,9 @@ def file_loader(object_id, user_ID):
     # if user_ID != file
     is_private = ownership_service.check_private(file, 'file')
     is_owned = ownership_service.check_ownership(user_ID, file, 'file')
-    if is_private or not is_owned:
-        raise Exception('file permission denied')
+    if is_private and not is_owned:
+        raise Exception('file permission denied, private: %s, owned: %s' % (
+            is_private, is_owned))
     with open(file.path) as csv_data:
         reader = csv.reader(csv_data)
 
