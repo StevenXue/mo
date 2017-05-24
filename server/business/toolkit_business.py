@@ -25,7 +25,7 @@ def get_by_toolkit_name(toolkit_name):
     return toolkit_repo.read_by_toolkit_name(toolkit_obj)
 
 def get_by_toolkit_id(toolkit_id):
-    toolkit_obj = Toolkit(_id=toolkit_id)
+    toolkit_obj = Toolkit(id=toolkit_id)
     # toolkit_obj = Toolkit(_id=ObjectId(toolkit_id))
 
     # print 'toolkit_obj', toolkit_obj.name

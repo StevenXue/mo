@@ -19,7 +19,7 @@ class ToolkitRepo(Repo):
         return Repo.read_unique_one(self, {'name': toolkit_obj.name})
 
     def read_by_toolkit_id(self, toolkit_obj):
-        return Repo.read_unique_one(self, {'_id': toolkit_obj._id})
+        return Repo.read_unique_one(self, {'id': toolkit_obj.id})
 
     def read_all_toolkit(self, toolkit_obj):
         return Repo.read(self, {})
