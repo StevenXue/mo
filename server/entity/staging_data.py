@@ -1,11 +1,5 @@
 from mongoengine import *
 
-from entity.data import Data
 
-
-class StagingData(Document):
-    # time = DateTimeField()
-    # value = FloatField()
+class StagingData(DynamicDocument):
     staging_data_set = ReferenceField('StagingDataSet')
-
-
