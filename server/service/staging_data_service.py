@@ -28,5 +28,6 @@ def run():
     # data = eval(data.to_json())
     # for obj in data:
     #     print obj, '\n'
-    add_staging_data_set('test', 'test', test_project.id, data)
-
+    #add_staging_data_set('test', 'test', test_project.id, data)
+    for obj in data:
+        print 'a'
