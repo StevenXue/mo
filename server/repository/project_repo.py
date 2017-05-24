@@ -9,3 +9,6 @@ class ProjectRepo(Repo):
 
     def read_by_id(self, project_obj):
         return Repo.read_unique_one(self, {'id': project_obj.id})
+
+    def read_by_name(self, project_obj):
+        return Repo.read_unique_one(self, {'name': project_obj.name})
