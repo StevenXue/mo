@@ -8,5 +8,3 @@ class StagingDataSet(Document):
     description = StringField(max_length=140)
     # stage = StringField(required=True, choices=STAGES)
     # source_data_sets = ListField(ReferenceField('DataSet'))
-
-
