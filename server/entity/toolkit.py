@@ -61,7 +61,7 @@ def save_once():
     SMA = Toolkit(name='移动平均值',
                   description='计算所选数据集合的移动平均值',
                   parameter_spec={'input_data': 'list',
-                                  'period': 'int'}).save()
+                                  'window': 3}).save()
 
     RANGE = Toolkit(name='全距',
                     description='计算所选数据集合的最大/最小值之差',
@@ -71,15 +71,24 @@ def save_once():
                   description='计算所选数据集合的标准差',
                   parameter_spec={'input_data': 'list'}).save()
 
+    VAR = Toolkit(name='方差',
+                  description='计算所选数据集合的方差',
+                  parameter_spec={'input_data': 'list'}).save()
+
     PEARSON = Toolkit(name='皮尔森相关系数',
-                      description='计算所选数据集合的皮尔森相关系数, 表达两变量之间相关系数',
+                      description='计算所选数据集合的皮尔森相关系数, 表达两变量之间(线性)相关系数',
                       parameter_spec={'input_data0': 'list',
                                       'input_data1': 'list'}).save()
 
     KMEAN = Toolkit(name='K平均数算法',
                     description='计算所选数据集合的k-mean, 把一个把数据空间划分为k个子集',
                     parameter_spec={'input_data': 'list',
-                                    'k': 'int'}).save()
+                                    'k': 2}).save()
+
+    MIC = Toolkit(name='最大互信息数',
+                  description='计算所选数据集合的皮尔森相关系数, 表达两变量之间(函数关系)相关系数',
+                  parameter_spec={'input_data0': 'list',
+                                  'input_data1': 'list'}).save()
 
 # if __name__ == '__main__':
 #     # save_once()
