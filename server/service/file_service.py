@@ -32,8 +32,8 @@ def add_file(file, url_base, user_ID, if_private=True):
         raise RuntimeError('file create failed')
 
 
-def list_files_by_user(user):
-    return file_business.list_by_user(user)
+# def list_files_by_user(user):
+#     return file_business.list_by_user(user)
 
 
 #######################################################################

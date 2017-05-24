@@ -2,6 +2,18 @@ from business import user_business
 from business import ownership_business
 from entity.project import Project
 
+
+def get_ownership_objects_by_user_ID(user_ID, owned_type):
+    """
+    get different type of objects belong to a user, by user_Id
+    :param user_ID:
+    :param owned_type:
+    :return: list of objects
+    """
+    ownerships = list_by_user_ID(user_ID)
+    return [os[owned_type] for os in ownerships if owned_type in os]
+
+
 def list_by_user_ID(user_ID):
     """
     list all owned items of a user, by user_ID
@@ -16,6 +28,12 @@ def list_by_user_ID(user_ID):
 
 
 def check_private(owned, owned_type):
+    """
+    check if the object is private
+    :param owned:
+    :param owned_type:
+    :return: True for private, False for public
+    """
     ownerships = ownership_business.list_ownership_by_type_and_private(
         owned_type, True)
     if owned in [ownership[owned_type] for ownership in ownerships if
@@ -25,6 +43,13 @@ def check_private(owned, owned_type):
 
 
 def check_ownership(user_ID, owned, owned_type):
+    """
+    check if object owned by user
+    :param user_ID:
+    :param owned:
+    :param owned_type:
+    :return:
+    """
     user = user_business.get_by_user_ID(user_ID)
     ownerships = ownership_business.list_ownership_by_user(user)
     owned_list = [os[owned_type] for os in ownerships]
