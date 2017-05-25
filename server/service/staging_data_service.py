@@ -7,7 +7,7 @@ from business import data_business
 
 
 def add_staging_data_set_by_objects(sds_name, sds_description, project_id,
-                         data_set_id):
+                                    data_set_id):
     # get project object
     project = project_business.get_by_id(project_id)
 
@@ -18,17 +18,23 @@ def add_staging_data_set_by_objects(sds_name, sds_description, project_id,
     data_objects = data_business.get_by_data_set(data_set_id)
     try:
         for data_obj in data_objects:
-            # data_obj = data_obj.to_mongo().to_dict()
+            # convert data_obj to SON format
             data_obj_son_format = data_obj.to_mongo()
-            # print data_obj
+
+            # Add into staging_data collection
             staging_data_business.add(sds, data_obj_son_format)
     except Exception:
         staging_data_set_business.remove_by_id(sds.id)
         raise RuntimeError("Create staging data set failed")
 
 
-def list_fields(staging_data_set_name):
-    sds_object = staging_data_set_business.get_by_name(staging_data_set_name)
+def list_fields(staging_data_set_id):
+    """
+    
+    :param staging_data_set_id: 
+    :return: the list of field name and value type 
+    """
+    sds_object = staging_data_set_business.get_by_id(staging_data_set_id)
     sd_object = staging_data_business.get_first_one_by_staging_data_set(
                  sds_object)
     sd_object = sd_object.to_mongo().to_dict()
