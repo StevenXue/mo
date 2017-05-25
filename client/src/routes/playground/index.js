@@ -203,7 +203,7 @@ export default class Playground extends React.Component {
               {this.renderInputs()}
               {this.renderCheckBoxTable()}
             </div>
-            <Button style={{marginTop: 10}} onClick={() => this.onClick()}>OK</Button>
+            <Button style={{marginTop: 10}} onClick={() => this.onClick()}>RUN</Button>
           </div>
         </div>
       </div>
