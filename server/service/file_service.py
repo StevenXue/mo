@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import os
 import csv
+import io
 
 from business import file_business
 from business import user_business
@@ -50,7 +51,7 @@ def save_file_and_get_size(file, path):
 # get file
 def file_loader(file_id, user_ID):
     file = file_business.get_by_id(file_id)
-    # if user_ID != file
+    # if user_ID != file,
     is_private = ownership_service.check_private(file, 'file')
     is_owned = ownership_service.check_ownership(user_ID, file, 'file')
     if is_private and not is_owned:
