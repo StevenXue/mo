@@ -15,6 +15,7 @@ def add(user, if_private, **owned_obj):
     if not isinstance(user, User) or not isinstance(if_private, bool):
         raise ValueError('no user or no private')
     ownership_obj = Ownership(user=user, private=if_private, **owned_obj)
+    # ownership_obj = Ownership(user=user, private=if_private, **(file='abc'))
     return ownership_repo.create(ownership_obj)
 
 

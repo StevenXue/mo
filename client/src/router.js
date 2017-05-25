@@ -22,6 +22,24 @@ const Routers = function ({ history, app }) {
       },
       childRoutes: [
         {
+          path: 'upload',
+          getComponent (nextState, cb) {
+            require.ensure([], require => {
+              registerModel(app, require('./models/upload'))
+              cb(null, require('./routes/upload/'))
+            }, 'project')
+          },
+        },
+        {
+          path: 'upload/:name',
+          getComponent (nextState, cb) {
+            require.ensure([], require => {
+              registerModel(app, require('./models/upload'))
+              cb(null, require('./routes/upload/components/detail'))
+            }, 'project')
+          },
+        },
+        {
           path: 'project',
           getComponent (nextState, cb) {
             require.ensure([], require => {

@@ -1,17 +1,7 @@
 import React, { Component } from 'react';
-import { Modal, Upload, Button, Icon } from 'antd';
+import { Modal, Select } from 'antd';
 import PropTypes from 'prop-types';
 import {jupyterServer,flaskServer } from '../../../constants';
-
-const props = {
-  action: '//jsonplaceholder.typicode.com/posts/',
-  onChange({ file, fileList }) {
-    if (file.status !== 'uploading') {
-      console.log(file, fileList);
-    }
-  },
-  defaultFileList: [],
-};
 
 class FileModel extends Component {
   constructor(props) {
@@ -34,9 +24,22 @@ class FileModel extends Component {
     });
   };
 
+  onChange(values){
+    //this.okHandler(values);
+    this.props.onOk(values);
+    this.setState({
+      visible: false,
+    });
+
+  }
+
   okHandler = (values) => {
-    //const { onOk } = this.props;
+    console.log(values);
+    // const { onOk } = this.props;
+    //this.props.onOk(values);
   };
+
+
 
   render() {
     const { children } = this.props;
@@ -47,16 +50,14 @@ class FileModel extends Component {
           { children }
         </span>
         <Modal
-          title="File Upload"
+          title="Select Dataset"
           visible={this.state.visible}
-          onOk={this.okHandler}
+          //onOk={this.okHandler}
           onCancel={this.hideModelHandler}
         >
-          <Upload {...props}>
-            <Button>
-              <Icon type="upload" /> Upload
-            </Button>
-          </Upload>
+          <Select style={{ width: "100%"}} onChange={(values) => this.onChange(values)}>
+            {this.renderOptions()}
+          </Select>
         </Modal>
       </span>
     );
@@ -64,9 +65,8 @@ class FileModel extends Component {
 }
 
 FileModel.propTypes = {
-  type: PropTypes.string,
-  item: PropTypes.object,
   onOk: PropTypes.func,
+  files: PropTypes.Object,
 };
 
 export default FileModel;

@@ -5,6 +5,6 @@ from service import ownership_service
 from business import ownership_business
 from entity.file import File
 
-data_service.import_data_from_file_id(ObjectId("592551a8df86b22826983bdc"), 'test_with_os', 'some ds',
-    'tttt', True)
+data_service.import_data_from_file_id(ObjectId("592551a8df86b22826983bdc"),
+                                      'test_with_os', 'some ds', 'tttt', True)
 # print ownership_business.list_ownership_by_type('file')

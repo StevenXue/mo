@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-
+from bson import ObjectId
 from business import project_business
 from business import staging_data_set_business, staging_data_business
 from entity.data import Data
@@ -24,8 +24,9 @@ def add_staging_data_set(sds_name, sds_description, project_id,
 
 def run():
     test_project = project_business.get_by_name('aaa')
-    data = Data.objects(device_level='3')
+    data = Data.objects(id=ObjectId("5925c511df86b2044e29ded7"))
     # data = eval(data.to_json())
+    print data
     # for obj in data:
     #     print obj, '\n'
     #add_staging_data_set('test', 'test', test_project.id, data)
