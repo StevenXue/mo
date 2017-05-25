@@ -25,7 +25,7 @@ def get_all_public_toolkit():
     return list
 
 
-def create_toolkit_job(id):
+def create_toolkit_job(name):
     """
     help toolkit to create a job before toolkit runs,
     as well as save the job & create a result after toolkit runs
@@ -36,7 +36,7 @@ def create_toolkit_job(id):
         @functools.wraps(func)
         def wrapper(*args, **kw):
             # create a job
-            toolkit_obj = toolkit_business.get_by_toolkit_id(id)
+            toolkit_obj = toolkit_business.get_by_toolkit_name(name)
             job_obj = job_business.add_toolkit_job(toolkit_obj)
 
             # calculate
