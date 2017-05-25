@@ -16,6 +16,11 @@ def get_by_id(sds_id):
     return staging_data_set_repo.read_by_id(sds)
 
 
+def get_by_project_id(project_id):
+    project = Project(id=project_id)
+    return staging_data_set_repo.read_by_project(project)
+
+
 def add(name, description, project):
     if not name or not description or not project:
         raise ValueError('no name or no description or no project')

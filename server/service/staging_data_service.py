@@ -6,6 +6,12 @@ from business import staging_data_business
 from business import data_business
 
 
+def list_staging_data_sets_by_project_id(project_id):
+    sds_objects = staging_data_set_business.get_by_project_id(project_id)
+    return sds_objects.to_mongo().to_dict()
+
+
+
 def add_staging_data_set_by_objects(sds_name, sds_description, project_id,
                                     data_set_id):
     # get project object
