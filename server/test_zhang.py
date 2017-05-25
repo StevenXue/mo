@@ -50,4 +50,5 @@ if __name__ == '__main__':
     # b = a
     # b(1,2,3,4,5)
 
-    print toolkit_code.dict_of_toolkit['最大互信息数']([1,2,3,4,10],[2,3,3,4,5]).to_mongo().to_dict()
+    # print toolkit_code.dict_of_toolkit['最大互信息数']([1,2,3,4,10],[2,3,3,4,5]).to_mongo().to_dict()
+    print toolkit_service.toolkit_calculate("59266bd08be34d2b2362f90e",[1,2,3,4,5])
