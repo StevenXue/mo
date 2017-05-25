@@ -28,13 +28,13 @@ def now(arr0, arr1, k):
     print 'love wyt'
 
 if __name__ == '__main__':
-    # toolkit.save_once()
+    toolkit_business.save_public_toolkit()
     # a = toolkit_business.get_by_toolkit_name('平均值')
     # b = toolkit_business.get_by_toolkit_id(ObjectId("592546b18be34d179b95d96f"))
     # print b.to_mongo()
-    c = toolkit_business.list_available_toolkits()
+    # c = toolkit_business.list_available_toolkits()
     # print isInstance(a, class)
-    print len(c)
+    # print len(c)
     # print a
     # print a.to_mongo()
     # f = open('./run.py')
