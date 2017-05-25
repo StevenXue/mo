@@ -15,7 +15,7 @@ from business import toolkit_business, ownership_business, user_business
 from lib import *
 
 
-def create_job_and_result(text):
+def create_toolkit_job(text):
     """
     help toolkit to create a job before toolkit runs,
     as well as save the job & create a result after toolkit runs
