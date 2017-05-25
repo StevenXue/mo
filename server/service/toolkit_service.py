@@ -53,7 +53,6 @@ def create_toolkit_job(name):
 
 
 def toolkit_calculate(id, *args):
-    id = args[0]
-    name = toolkit_business.get_by_toolkit_id().name
-    print name, 'haha'
+    name = toolkit_business.get_by_toolkit_id(id).name
+    from lib import toolkit_code
     return toolkit_code.dict_of_toolkit[name](*args).to_mongo().to_dict()

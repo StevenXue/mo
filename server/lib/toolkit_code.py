@@ -118,13 +118,13 @@ def k_mean_predict(arr0, arr1, list_points, n_clusters=2):
     return kmeans.predict(list_points)
 
 
-dict_of_toolkit = {"平均值": toolkit_average,
-                   "中位数": toolkit_median,
-                   "最大互信息数": toolkit_mic,
-                   "众数": toolkit_mode,
-                   "皮尔森相关系数": toolkit_pearson,
-                   "全距": toolkit_range,
-                   "移动平均值": toolkit_moving_average,
-                   "标准差": toolkit_std,
-                   "方差": toolkit_variance,
-                   "K平均数算法": k_mean}
+dict_of_toolkit = {u"平均值": toolkit_average,
+                   u"中位数": toolkit_median,
+                   u"最大互信息数": toolkit_mic,
+                   u"众数": toolkit_mode,
+                   u"皮尔森相关系数": toolkit_pearson,
+                   u"全距": toolkit_range,
+                   u"移动平均值": toolkit_moving_average,
+                   u"标准差": toolkit_std,
+                   u"方差": toolkit_variance,
+                   u"K平均数算法": k_mean}
