@@ -15,6 +15,7 @@ import pandas as pd
 
 from entity.toolkit import Toolkit
 from repository.toolkit_repo import ToolkitRepo
+from business import user_business, ownership_business
 
 toolkit_repo = ToolkitRepo(Toolkit)
 
@@ -56,63 +57,75 @@ def convert_json_str_to_dataframe(arr):
     return df_converted
 
 
-def save_public_toolkit():
+def create_public_toolkit():
     """
     数据库建一个toolkit的collection, 记载public的数据分析工具包简介
     """
+    user = user_business.get_by_user_ID('tttt') # fixme
+
     AVG = Toolkit(name='平均值',
                   description='计算所选数据集合的平均值',
                   parameter_spec={'input_data': 'list'})
-    toolkit_repo.create(AVG)
+    AVG = toolkit_repo.create(AVG)
+    ownership_business.add(user, False, toolkit=AVG)
 
     MEDIAN = Toolkit(name='中位数',
                      description='计算所选数据集合的中位数',
                      parameter_spec={'input_data': 'list'})
-    toolkit_repo.create(MEDIAN)
+    MEDIAN = toolkit_repo.create(MEDIAN)
+    ownership_business.add(user, False, toolkit=MEDIAN)
 
     MODE = Toolkit(name='众数',
                    description='计算所选数据集合的众数',
                    parameter_spec={'input_data': 'list'})
-    toolkit_repo.create(MODE)
+    MODE = toolkit_repo.create(MODE)
+    ownership_business.add(user, False, toolkit=MODE)
 
     SMA = Toolkit(name='移动平均值',
                   description='计算所选数据集合的移动平均值',
                   parameter_spec={'input_data': 'list',
                                   'window': 3})
-    toolkit_repo.create(SMA)
+    SMA = toolkit_repo.create(SMA)
+    ownership_business.add(user, False, toolkit=SMA)
 
     RANGE = Toolkit(name='全距',
                     description='计算所选数据集合的最大/最小值之差',
                     parameter_spec={'input_data': 'list'})
-    toolkit_repo.create(RANGE)
+    RANGE = toolkit_repo.create(RANGE)
+    ownership_business.add(user, False, toolkit=RANGE)
 
     STD = Toolkit(name='标准差',
                   description='计算所选数据集合的标准差',
                   parameter_spec={'input_data': 'list'})
-    toolkit_repo.create(STD)
+    STD = toolkit_repo.create(STD)
+    ownership_business.add(user, False, toolkit=STD)
 
     VAR = Toolkit(name='方差',
                   description='计算所选数据集合的方差',
                   parameter_spec={'input_data': 'list'})
-    toolkit_repo.create(VAR)
+    VAR = toolkit_repo.create(VAR)
+    ownership_business.add(user, False, toolkit=VAR)
 
     PEARSON = Toolkit(name='皮尔森相关系数',
                       description='计算所选数据集合的皮尔森相关系数, 表达两变量之间(线性)相关系数',
                       parameter_spec={'input_data0': 'list',
                                       'input_data1': 'list'})
-    toolkit_repo.create(PEARSON)
+    PEARSON = toolkit_repo.create(PEARSON)
+    ownership_business.add(user, False, toolkit=PEARSON)
 
     KMEAN = Toolkit(name='K平均数算法',
                     description='计算所选数据集合的k-mean, 把一个把数据空间划分为k个子集',
                     parameter_spec={'input_data': 'list',
                                     'k': 2})
-    toolkit_repo.create(KMEAN)
+    KMEAN = toolkit_repo.create(KMEAN)
+    ownership_business.add(user, False, toolkit=KMEAN)
 
     MIC = Toolkit(name='最大互信息数',
                   description='计算所选数据集合的最大互信息数, 表达两变量之间(函数关系)相关系数',
                   parameter_spec={'input_data0': 'list',
                                   'input_data1': 'list'})
-    toolkit_repo.create(MIC)
+    MIC = toolkit_repo.create(MIC)
+    ownership_business.add(user, False, toolkit=MIC)
 
 # if __name__ == '__main__':
 #     # pass

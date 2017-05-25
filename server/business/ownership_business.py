@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 from entity.ownership import Ownership
+from entity.user import User
 from repository.ownership_repo import OwnershipRepo
 
 ownership_repo = OwnershipRepo(Ownership)
@@ -11,7 +12,7 @@ def add(user, if_private, **owned_obj):
     #         owned_obj['model'] or owned_obj['toolkit'] or owned_obj['file']
     if not 0 < len(owned_obj.items()) <= 1:
         raise ValueError('invalid owned_obj')
-    if not user or not if_private:
+    if not isinstance(user, User) or not isinstance(if_private, bool):
         raise ValueError('no user or no private')
     ownership_obj = Ownership(user=user, private=if_private, **owned_obj)
     return ownership_repo.create(ownership_obj)
