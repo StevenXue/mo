@@ -2,8 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import { FileSystem } from './components';
-import styles from './index.less'
-import { color } from '../../utils'
+import { Router , routerRedux} from 'dva/router';
+import styles from './index.less';
+import { color } from '../../utils';
 
 const bodyStyle = {
   bodyStyle: {
@@ -12,10 +13,16 @@ const bodyStyle = {
   },
 };
 
-function Dashboard ({ dashboard }) {
+function Dashboard ({ dispatch }) {
+  function handleToDetail(name){
+    dispatch(routerRedux.push({
+      pathname: `project/${name}`,
+    }));
+  }
+
   return(
     <div style={bodyStyle}>
-      <FileSystem/>
+      <FileSystem toDetail={handleToDetail}/>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { request, config } from '../utils'
+import { request } from '../utils'
 
 
 export async function create (params) {

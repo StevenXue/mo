@@ -2,7 +2,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styles from './index.less';
+import { FileModel } from './components';
 import { Button, Select } from 'antd';
+import {jupyterServer } from '../../constants';
 
 const bodyStyle = {
 	bodyStyle: {
@@ -24,7 +26,7 @@ export default class Playground extends React.Component {
 	}
 
 	spawnNotebookSession() {
-		fetch('http://localhost:8888/api/contents/', {
+		fetch(jupyterServer, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -73,9 +75,12 @@ export default class Playground extends React.Component {
         <div style={{ textAlign: 'center', fontSize: 18}}>Toolkits</div>
         <div style={{  marginTop: 20, height:700}}>
           <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-          <Button type="primary" onClick={() => this.onUploadData()}
-                  style={{margin: 10}}>Upload Dataset</Button>
+            <FileModel>
+              <Button type="primary" onClick={() => this.onUploadData()}
+                      style={{margin: 10}}>Upload Dataset</Button>
+            </FileModel>
           </div>
+
           <Select style={{ width: "100%"}} onChange={(value) => this.handleChange(value)}>
             <Select.Option value="mic">MIC</Select.Option>
             <Select.Option value="k-means">K-means</Select.Option>
