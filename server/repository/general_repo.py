@@ -50,6 +50,9 @@ class Repo:
     def delete(self, obj):
         return obj.delete()
 
+    def delete_many(self, query):
+        return self.__instance.objects(**query).delete()
+
     def delete_first_one(self, query):
         return self.__instance.objects(**query).first().delete()
 

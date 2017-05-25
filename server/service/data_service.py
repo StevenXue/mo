@@ -16,10 +16,10 @@ def add_data_set(data_set_name, ds_description, user_ID, is_private):
 
 def import_data(data_array, data_set_name, ds_description, user_ID, is_private):
     # find data set, if not exists add new one
-    try:
-        ds = data_set_business.get_by_name(data_set_name)
-    except DoesNotExist:
-        ds = add_data_set(data_set_name, ds_description, user_ID, is_private)
+    # try:
+    #     ds = data_set_business.get_by_name(data_set_name)
+    # except DoesNotExist:
+    ds = add_data_set(data_set_name, ds_description, user_ID, is_private)
     for data in data_array:
         data_business.add(ds, data)
 

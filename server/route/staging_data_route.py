@@ -42,3 +42,30 @@ def get_by_staging_data_set_and_fields():
     return make_response(jsonify({'response': data}),
                          200)
 
+
+@staging_data_app.route('/get_fields_with_types', methods=['GET'])
+def get_fields_with_types():
+    staging_data_set_id = request.args.get('staging_data_set_id')
+    try:
+        data = staging_data_service.get_fields_with_types(
+            ObjectId(staging_data_set_id))
+    except Exception, e:
+        return make_response(jsonify({'response': '%s: %s' % (str(
+            Exception), e.args)}, 400))
+    return make_response(jsonify({'response': data}),
+                         200)
+
+
+@staging_data_app.route('/list_staging_data_sets_by_project_id', methods=['GET'])
+def list_staging_data_sets_by_project_id():
+    project_id = request.args.get('project_id')
+    try:
+        data = staging_data_service.list_staging_data_sets_by_project_id(
+            ObjectId(project_id))
+        data = [d.to_mongo() for d in data]
+        data = json_utility.convert_to_json(data)
+    except Exception, e:
+        return make_response(jsonify({'response': '%s: %s' % (str(
+            Exception), e.args)}, 400))
+    return make_response(jsonify({'response': data}),
+                         200)
