@@ -6,6 +6,13 @@ module.exports = [
     router: '/project',
   },
   {
+    id: 11,
+    mpid: -1,
+    bpid: 1,
+    name: 'Project Detail',
+    router: '/project/:name',
+  },
+  {
     id: 21,
     mpid: -1,
     bpid: 2,

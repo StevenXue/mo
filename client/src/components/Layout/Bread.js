@@ -9,7 +9,8 @@ import { queryArray } from '../../utils'
 const Bread = ({ menu }) => {
   // 匹配当前路由
   let pathArray = []
-  let current
+  let current;
+  //console.log(menu, location.pathname);
   for (let index in menu) {
     if (menu[index].router && pathToRegexp(menu[index].router).exec(location.pathname)) {
       current = menu[index]
@@ -36,6 +37,7 @@ const Bread = ({ menu }) => {
 
   // 递归查找父级
   const breads = pathArray.map((item, key) => {
+    //console.log(item.name, item.router);
     const content = (
       <span>{item.icon
           ? <Icon type={item.icon} style={{ marginRight: 4 }} />

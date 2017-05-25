@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { Modal, Form, Input } from 'antd';
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
+import {jupyterServer,flaskServer } from '../../../constants';
 
 const FormItem = Form.Item;
 
-class ProjectModelModal extends Component {
+class ProjectModal extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -26,11 +27,11 @@ class ProjectModelModal extends Component {
   };
 
   okHandler = (values) => {
-    const { onOk } = this.props;
+    //const { onOk } = this.props;
     this.props.form.validateFields((err, values) => {
       console.log(values.name);
       if (!err) {
-        fetch('http://localhost:8888/api/contents/', {
+        fetch(jupyterServer, {
           method: 'post',
           crossDomain: true,
           headers:{
@@ -40,7 +41,7 @@ class ProjectModelModal extends Component {
           body: JSON.stringify({"type": "directory"})
         }).then((response) => response.json())
           .then((res) => {
-            fetch('http://localhost:8888/api/contents/'+res.name, {
+            fetch(jupyterServer+res.name, {
               method: 'PATCH',
               crossDomain: true,
               headers:{
@@ -53,8 +54,29 @@ class ProjectModelModal extends Component {
               })
             }).then((response) => {
               console.log(response.status);
+
               if(response.status === 200){
-                this.hideModelHandler();
+                fetch(flaskServer + '/project/create_project', {
+                  method: 'POST',
+                  crossDomain: true,
+                  headers:{
+                    "content-type": "application/json;charset=utf-8",
+                  },
+                  body: JSON.stringify({
+                    name: values.name,
+                    description: "descriptiondescriptiondescriptiondescription",
+                    user_ID: "test_user",
+                    is_private: true
+                  })
+                }).then((response) => {
+                  console.log(response.status);
+                  if(response.status === 200){
+
+                    this.hideModelHandler();
+                    this.props.refresh();
+                  }
+                });
+                //this.hideModelHandler();
               }
             });
           });
@@ -100,11 +122,11 @@ class ProjectModelModal extends Component {
   }
 }
 
-ProjectModelModal.propTypes = {
+ProjectModal.propTypes = {
   form: PropTypes.object.isRequired,
   type: PropTypes.string,
   item: PropTypes.object,
   onOk: PropTypes.func,
 };
 
-export default Form.create()(ProjectModelModal);
+export default Form.create()(ProjectModal);
