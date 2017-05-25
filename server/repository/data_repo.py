@@ -9,8 +9,7 @@ class DataRepo(Repo):
 
     def get_by_data_set(self, data):
         return Repo.read(self, {'data_set': data.data_set})
-# def create_one(new_data):
-#     general_repo.create_one(Instance, new_data)
+
 
 
 

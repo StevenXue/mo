@@ -12,3 +12,8 @@ def add(staging_data_set, other_fields_obj):
     staging_data = StagingData(staging_data_set=staging_data_set,
                                **other_fields_obj)
     return staging_data_repo.create(staging_data)
+
+
+def get_by_staging_data_set(staging_data_set):
+    staging_data = StagingData(staging_data_set=staging_data_set)
+    return staging_data_repo.get_by_staging_data_set(staging_data)
