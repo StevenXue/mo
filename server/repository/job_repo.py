@@ -29,11 +29,4 @@ class JobRepo(Repo):
 
     def read_by_status(self, job_obj):
         return Repo.read_unique_one(self, {'status': job_obj.status})
-    # def create_job(self, job_obj):
-    #     # do some custom
-    #     return Repo.create(self, job_obj)
-
-    # def read_all_job(self, job_obj):
-    #     return Repo.read(self, {})
-
 
