@@ -6,6 +6,7 @@ from route import file_route
 from route import ownership_route
 from route import project_route
 from route import data_route
+from route import staging_data_route
 from route import analysis_route
 from repository import config
 
@@ -18,6 +19,7 @@ app.register_blueprint(file_route.file_app)
 app.register_blueprint(ownership_route.ownership_app)
 app.register_blueprint(project_route.project_app)
 app.register_blueprint(data_route.data_app)
+app.register_blueprint(staging_data_route.staging_data_app)
 app.register_blueprint(analysis_route.analysis_app)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
