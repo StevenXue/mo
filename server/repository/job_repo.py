@@ -18,23 +18,22 @@ class JobRepo(Repo):
     def read_by_job_id(self, job_obj):
         return Repo.read_unique_one(self, {'id': job_obj.id})
 
-    def read_by_model_id(self, job_obj):
+    def read_by_model(self, job_obj):
         return Repo.read_unique_one(self, {'model': job_obj.model})
 
-    def read_by_toolkit_id(self, job_obj):
+    def read_by_toolkit(self, job_obj):
         return Repo.read_unique_one(self, {'toolkit': job_obj.toolkit})
 
-    def read_by_staging_data_set_id(self, job_obj):
+    def read_by_staging_data_set(self, job_obj):
         return Repo.read_unique_one(self, {'staging_data_set': job_obj.staging_data_set})
 
+    def read_by_status(self, job_obj):
+        return Repo.read_unique_one(self, {'status': job_obj.status})
     # def create_job(self, job_obj):
     #     # do some custom
     #     return Repo.create(self, job_obj)
 
     # def read_all_job(self, job_obj):
     #     return Repo.read(self, {})
-    #
-    #     return Repo.read_unique_one(self, {'name': job_obj.name})
-    # def read_by_job_name(self, job_obj):
 
 

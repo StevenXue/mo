@@ -28,8 +28,6 @@ def get_by_toolkit_name(toolkit_name):
 
 def get_by_toolkit_id(toolkit_id):
     toolkit_obj = Toolkit(id=toolkit_id)
-    # toolkit_obj = Toolkit(_id=ObjectId(toolkit_id))
-
     # print 'toolkit_obj', toolkit_obj.name
     return toolkit_repo.read_by_id(toolkit_obj)
 
@@ -45,20 +43,6 @@ def list_public_toolkit_name():
 
 def get_all_public_toolkit():
     return ownership_business.list_ownership_by_type_and_private('toolkit', False)
-
-
-def convert_json_str_to_dataframe(arr):
-    """
-    convert input data:
-    from
-        data from staging data => database_type like, which is a list of dicts
-    to
-        DataFrame in pandas
-    """
-    col = arr[0].keys()
-    df_converted = pd.DataFrame([[i[j] for j in col] for i in arr],
-                                columns=col)
-    return df_converted
 
 
 def create_public_toolkit():
@@ -130,6 +114,21 @@ def create_public_toolkit():
                                   'input_data1': 'list'})
     MIC = toolkit_repo.create(MIC)
     ownership_business.add(user, False, toolkit=MIC)
+
+
+"""
+def convert_json_str_to_dataframe(arr):
+    """
+    convert input data:
+    from
+        data from staging data => database_type like, which is a list of dicts
+    to
+        DataFrame in pandas
+    """
+    col = arr[0].keys()
+    df_converted = pd.DataFrame([[i[j] for j in col] for i in arr],
+                                columns=col)
+    return df_converted
 
 # if __name__ == '__main__':
 #     # pass
@@ -251,3 +250,4 @@ def create_public_toolkit():
 #     ]
 
 # print (convert_json_str_to_dataframe(DD).mean())
+"""
