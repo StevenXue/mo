@@ -1,33 +1,40 @@
 module.exports = [
+
   {
     id: 1,
+    icon: 'file',
+    name: 'Upload',
+    router: '/request',
+  },
+  {
+    id: 2,
     icon: 'laptop',
     name: 'Projects',
     router: '/project',
   },
   {
-    id: 11,
+    id: 21,
     mpid: -1,
     bpid: 1,
     name: 'Project Detail',
     router: '/project/:name',
   },
-  {
-    id: 21,
-    mpid: -1,
-    bpid: 2,
-    name: 'User Detail',
-    router: '/user/:id',
-  },
+  // {
+  //   id: 21,
+  //   mpid: -1,
+  //   bpid: 2,
+  //   name: 'User Detail',
+  //   router: '/user/:id',
+  // },
+  // {
+  //   id: 3,
+  //   bpid: 1,
+  //   name: 'Request Test',
+  //   icon: 'api',
+  //   router: '/request',
+  // },
   {
     id: 3,
-    bpid: 1,
-    name: 'Request Test',
-    icon: 'api',
-    router: '/request',
-  },
-  {
-    id: 4,
     bpid: 1,
     name: 'Playgound',
     icon: 'database',

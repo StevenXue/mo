@@ -32,13 +32,6 @@ class FileSystem extends React.Component {
       });
   }
 
-  // onOk (data) {
-  //   dispatch({
-  //     //type: `user/${modalType}`,
-  //     payload: data,
-  //   })
-  // }
-
   toProjectDetail(name) {
     console.log(name);
     this.props.toDetail(name);
@@ -49,7 +42,7 @@ class FileSystem extends React.Component {
     let dirList =  filelist.filter((e) => e.type === 'directory');
     //console.log(dirList.length);
     return dirList.map((e) =>
-      <Card key={e.created} title={e.name} style={{ width: 500 }} onClick={() => this.toProjectDetail(e.name)}>
+      <Card key={e.name} title={e.name} style={{ width: 500 }} onClick={() => this.toProjectDetail(e.name)}>
         <p>路径: {e.path}</p>
         <p>最后修改时间: {e.last_modified}</p>
       </Card>
