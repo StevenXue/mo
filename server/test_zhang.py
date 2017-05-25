@@ -28,14 +28,18 @@ def log(func):
 def now(arr0, arr1, k):
     print 'love wyt'
 
+def a(*args):
+    print args[0], args[1], args[2]
+
 if __name__ == '__main__':
     pass
+
     # toolkit_business.create_public_toolkit()
     # a = toolkit_business.get_by_toolkit_name('平均值')
     # b = toolkit_business.get_by_toolkit_id(ObjectId("592546b18be34d179b95d96f"))
     # print b.to_mongo()
-    c = toolkit_service.get_all_public_toolkit()
-    print c
+    # c = toolkit_service.get_all_public_toolkit()
+    # print c
     # print a.to_mongo()
     # f = open('./run.py')
     # print f.read()
@@ -43,3 +47,5 @@ if __name__ == '__main__':
     # print AVG.toolkit_average(a)
     # print STD.toolkit_std(a)
     # now([1, 2], [2, 3], 3)
+    b = a
+    b(1,2,3,4,5)
