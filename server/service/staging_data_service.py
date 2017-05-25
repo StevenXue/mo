@@ -3,6 +3,7 @@
 from business import project_business
 from business import staging_data_set_business, staging_data_business
 from entity.data import Data
+# from utility import json_utility
 
 
 def add_staging_data_set(sds_name, sds_description, project_id,
@@ -12,22 +13,18 @@ def add_staging_data_set(sds_name, sds_description, project_id,
 
     # create new staging data set
     sds = staging_data_set_business.add(sds_name, sds_description, project)
-    #print 'ttt', data_objects
+
     # copy data from data(raw) to staging data
-    for do in data_objects:
-        print do
-        #print 'do', do
-        # print do['device_level']
-        # print dict(do)['device_type']
-        #staging_data_business.add(sds, do)
+    try:
+        for data_obj in data_objects:
+            # data_obj = data_obj.to_mongo().to_dict()
+            data_obj = data_obj.to_mongo()
+            # print data_obj
+            staging_data_business.add(sds, data_obj)
+    except Exception as e:
+        staging_data_set_business.remove_by_id(sds.id)
+        raise RuntimeError("Create staging data set failed")
 
 
-def run():
-    test_project = project_business.get_by_name('aaa')
-    data = Data.objects(device_level='3')
-    # data = eval(data.to_json())
-    # for obj in data:
-    #     print obj, '\n'
-    #add_staging_data_set('test', 'test', test_project.id, data)
-    for obj in data:
-        print 'a'
+
+

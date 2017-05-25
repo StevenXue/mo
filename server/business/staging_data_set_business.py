@@ -22,3 +22,7 @@ def add(name, description, project):
     staging_data_set = StagingDataSet(name=name, description=description,
                                       project=project)
     return staging_data_set_repo.create(staging_data_set)
+
+
+def remove_by_id(sds_id):
+    return staging_data_set_repo.delete(get_by_id(sds_id))
