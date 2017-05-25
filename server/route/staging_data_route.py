@@ -36,3 +36,16 @@ def get_by_staging_data_set_and_fields():
     return make_response(jsonify({'response': data}),
                          200)
 
+
+@staging_data_app.route('/get_fields_with_types', methods=['GET'])
+def get_fields_with_types():
+    staging_data_set_id = request.args.get('staging_data_set_id')
+    try:
+        data = staging_data_service.get_fields_with_types(
+            ObjectId(staging_data_set_id))
+    except Exception, e:
+        return make_response(jsonify({'response': '%s: %s' % (str(
+            Exception), e.args)}, 400))
+    return make_response(jsonify({'response': data}),
+                         200)
+

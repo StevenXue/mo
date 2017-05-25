@@ -28,7 +28,7 @@ def add_staging_data_set_by_objects(sds_name, sds_description, project_id,
         raise RuntimeError("Create staging data set failed")
 
 
-def list_fields(staging_data_set_id):
+def get_fields_with_types(staging_data_set_id):
     """
     
     :param staging_data_set_id: 
