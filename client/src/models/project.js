@@ -1,4 +1,4 @@
-import { create } from '../services/project';
+import { create, edit} from '../services/project';
 import { parse } from 'qs';
 
 export default {
@@ -16,14 +16,18 @@ export default {
         yield put({
           type: 'querySuccess',
           payload: {
-            list: data.data,
-            pagination: {
-              // current: Number(payload.page) || 1,
-              // pageSize: Number(payload.pageSize) || 10,
-              // total: data.total,
-            },
+            list: data.data
           },
         })
+      }
+    },
+
+    *edit ({ payload }, { call, put }) {
+      const data = yield call(edit, payload)
+      if (data.success) {
+        yield put({ type: 'query' })
+      } else {
+        throw data
       }
     },
 

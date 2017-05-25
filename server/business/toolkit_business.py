@@ -11,7 +11,7 @@
 
 # import numpy as np
 import pandas as pd
-# from bson import ObjectId
+from bson import ObjectId
 
 from entity.toolkit import Toolkit
 from repository.toolkit_repo import ToolkitRepo
@@ -27,7 +27,7 @@ def get_by_toolkit_name(toolkit_name):
 
 
 def get_by_toolkit_id(toolkit_id):
-    toolkit_obj = Toolkit(id=toolkit_id)
+    toolkit_obj = Toolkit(id=ObjectId(toolkit_id))
     # print 'toolkit_obj', toolkit_obj.name
     return toolkit_repo.read_by_id(toolkit_obj)
 
@@ -131,4 +131,4 @@ def convert_json_str_to_dataframe(arr):
     return df_converted
 
 if __name__ == '__main__':
-    # pass
+    pass
