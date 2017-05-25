@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import functools
 from business import toolkit_business, ownership_business, user_business, job_business, result_business
-from lib import *
+from lib import toolkit_code
 
 
 def get_all_public_toolkit():
@@ -52,10 +52,7 @@ def create_toolkit_job(name):
     return decorator
 
 
-# Further FIXME to check whether toolkit name/id is input
-# @create_job('toolkit_name')
-# def now():
-#     print '2013-12-25'
-
-def calculate(input_data, name):
-    pass
+def toolkit_calculate(id, *args):
+    name = toolkit_business.get_by_toolkit_id(id).name
+    from lib import toolkit_code
+    return toolkit_code.dict_of_toolkit[name](*args).to_mongo().to_dict()

@@ -10,6 +10,7 @@
 """
 
 from entity.job import Job
+from entity.toolkit import Toolkit
 from repository.job_repo import JobRepo
 
 job_repo = JobRepo(Job)
@@ -48,5 +49,6 @@ def add_toolkit_job(toolkit_obj):
     job_obj = Job(status=0, toolkit=toolkit_obj)
     return job_repo.create(job_obj)
 
+
 def end_job(job_obj):
-    return job_repo.update_one_by_id(job_obj, stauts = 2)
+    return job_repo.update_one_by_id(job_obj, {'status': 2})
