@@ -3,8 +3,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styles from './index.less';
 import { FileModel } from './components';
-import { Button, Select } from 'antd';
+import { Button, Select, Checkbox, Input} from 'antd';
 import {jupyterServer, flaskServer } from '../../constants';
+
+const mockResult = [['device_node_id', 'unicode'], ['productor', 'unicode'], ['name', 'unicode'], ['f1', 'unicode'], ['device_model', 'unicode'], ['data_set', 'ObjectId'], ['local_device_id', 'unicode'], ['asset_code', 'unicode'], ['staging_data_set', 'ObjectId'], ['version', 'unicode'], ['station_id', 'unicode'], ['device_type', 'unicode'], ['_id', 'ObjectId']];
+
 
 const bodyStyle = {
 	bodyStyle: {
@@ -13,6 +16,7 @@ const bodyStyle = {
 	},
 };
 
+//let selectable = 0;
 
 export default class Playground extends React.Component {
 	constructor(props) {
@@ -24,6 +28,8 @@ export default class Playground extends React.Component {
       extraInput: [],
       data_set: [],
       selectedData: '',
+      dataColumns: [],
+      checkedCols: []
     }
 	}
 
@@ -52,20 +58,20 @@ export default class Playground extends React.Component {
 	}
 
 	spawnNotebookSession() {
+
 		fetch(jupyterServer, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'Access-Control-Allow-Origin': '*',
+				//'Access-Control-Allow-Origin': '*',
 			},
 			body: JSON.stringify({ type: 'notebook' }),
 		}).then(response => response.json())
       .then((res) => {
-	console.log(res);
-	const URL = `http://localhost:8888/notebooks/${res.path}`;
-	console.log('constructed', URL);
-	this.setState({ notebookURL: URL });
-});
+        const URL = `http://localhost:8888/notebooks/${res.path}`;
+        console.log('constructed', URL);
+        this.setState({ notebookURL: URL });
+      });
 	}
 
 	reloadTest() {
@@ -78,30 +84,57 @@ export default class Playground extends React.Component {
   handleChange(e) {
     let toolkit = this.state.toolkits;
     let target = toolkit.filter((el) => el._id === e);
-    console.log(target);
     let extra = [];
     let temp = target[0].parameter_spec;
     if(temp.hasOwnProperty('k')) {
         extra.push('k值');
     }
     let keys = Object.keys(temp);
-    console.log(keys);
-    let count = 0;
-    for(var i = 0; i < keys.length; i ++) {
-      if(keys[i] === 'input_data') {
-        count = count + 1;
-      }
-    }
+
+    keys = keys.filter((e) => e === 'input_data');
+
     this.setState({
-      selectable: count,
+      selectable: keys.length ,
       extraInput: extra
     });
+    console.log(keys.length, this.state.selectable);
 
   }
 
   onSelectDataSet(values){
 	  console.log(values);
 	  this.setState({selectedData: values});
+	  this.setState({dataColumns: mockResult});
+  }
+
+  onCheckCol(e){
+    console.log(e.target);
+    let c = e.target.id;
+    let max = this.state.selectable;
+    console.log(c, max);
+    let checked = this.state.checkedCols;
+    if (e.target.checked === true){
+        checked.push(e.target.id);
+    }
+    this.setState({checkedCols: checked});
+  }
+
+  onClick(){
+    console.log(this.state.checkedCols, this.state.selectedData)
+  }
+
+  renderInputs(){
+    let fields = this.state.extraInput;
+    console.log(fields);
+    if(fields.length !== 0){
+      return fields.map((e) =>
+        <div style={{marginTop: 10}}>
+          <Input placeholder={e} id={e}/>
+        </div>
+      );
+    }else{
+      return null
+    }
   }
 
   renderOptions(){
@@ -119,6 +152,20 @@ export default class Playground extends React.Component {
         {e.name}
       </Select.Option>
     )
+  }
+
+  renderCheckBoxTable(){
+    let col = this.state.dataColumns;
+    if(col.length !== 0){
+      return col.map((el) =>
+        <div style={{marginTop: 10}}>
+          <Checkbox onChange={(e) => this.onCheckCol(e)}
+                    id={el[0]}>{el[0]}</Checkbox>
+        </div>
+      );
+    }else{
+      return null
+    }
   }
 
 	render() {
@@ -151,6 +198,12 @@ export default class Playground extends React.Component {
               placeholder="Choose DataSet">
               {this.renderOptionsData()}
             </Select>
+            <div style={{ marginLeft: -20}}>
+              <div style ={{marginLeft: 20}}>{"choose" + this.state.selectable }</div>
+              {this.renderInputs()}
+              {this.renderCheckBoxTable()}
+            </div>
+            <Button style={{marginTop: 10}} onClick={() => this.onClick()}>OK</Button>
           </div>
         </div>
       </div>
@@ -159,4 +212,3 @@ export default class Playground extends React.Component {
 		);
 	}
 }
-
