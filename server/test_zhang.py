@@ -30,12 +30,11 @@ def now(arr0, arr1, k):
 if __name__ == '__main__':
     # toolkit.save_once()
     # a = toolkit_business.get_by_toolkit_name('平均值')
-
     # b = toolkit_business.get_by_toolkit_id(ObjectId("592546b18be34d179b95d96f"))
     # print b.to_mongo()
-    # c = toolkit_business.list_available_toolkits()
+    c = toolkit_business.list_available_toolkits()
     # print isInstance(a, class)
-    # print c
+    print len(c)
     # print a
     # print a.to_mongo()
     # f = open('./run.py')
@@ -43,4 +42,4 @@ if __name__ == '__main__':
     # a = [1,2,3,4,5]
     # print AVG.toolkit_average(a)
     # print STD.toolkit_std(a)
-    now([1, 2], [2, 3], 3)
+    # now([1, 2], [2, 3], 3)

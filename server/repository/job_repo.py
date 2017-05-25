@@ -27,9 +27,9 @@ class JobRepo(Repo):
     def read_by_staging_data_set_id(self, job_obj):
         return Repo.read_unique_one(self, {'staging_data_set': job_obj.staging_data_set})
 
-    def create_job(self, job_obj):
-        # do some custom
-        return Repo.create(self, job_obj)
+    # def create_job(self, job_obj):
+    #     # do some custom
+    #     return Repo.create(self, job_obj)
 
     # def read_all_job(self, job_obj):
     #     return Repo.read(self, {})

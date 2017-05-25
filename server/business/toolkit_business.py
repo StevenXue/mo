@@ -30,14 +30,14 @@ def get_by_toolkit_id(toolkit_id):
     # toolkit_obj = Toolkit(_id=ObjectId(toolkit_id))
 
     # print 'toolkit_obj', toolkit_obj.name
-    return toolkit_repo.read_by_toolkit_id(toolkit_obj)
+    return toolkit_repo.read_by_id(toolkit_obj)
 
 
 def list_available_toolkits():
-    toolkit_obj = Toolkit()
+    # toolkit_obj = Toolkit()
     all_names = []
     # print 'toolkit_obj', toolkit_obj.name
-    for tool in toolkit_repo.read_all_toolkit(toolkit_obj):
+    for tool in toolkit_repo.read({}):
         all_names.append(tool.name)
     return all_names
 
