@@ -17,3 +17,8 @@ def get_by_name(name):
     ds = DataSet(name=name)
     return data_set_repo.read_by_name(ds)
 
+
+def get_by_id(data_set_id):
+    data_set = DataSet(id=data_set_id)
+    return data_set_repo.read_by_id(data_set)
+
