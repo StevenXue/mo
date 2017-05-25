@@ -34,13 +34,17 @@ def get_by_toolkit_id(toolkit_id):
     return toolkit_repo.read_by_id(toolkit_obj)
 
 
-def list_available_toolkits():
+def list_public_toolkit_name():
     # toolkit_obj = Toolkit()
     all_names = []
     # print 'toolkit_obj', toolkit_obj.name
-    for tool in toolkit_repo.read({}):
-        all_names.append(tool.name)
+    for tool in get_all_public_toolkit():
+        all_names.append(tool.toolkit.name)
     return all_names
+
+
+def get_all_public_toolkit():
+    return ownership_business.list_ownership_by_type_and_private('toolkit', False)
 
 
 def convert_json_str_to_dataframe(arr):
