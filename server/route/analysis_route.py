@@ -12,6 +12,7 @@ from flask import make_response
 from flask import request
 
 from service import toolkit_service
+from utility import json_utility
 
 PREFIX = '/analysis'
 
@@ -32,3 +33,12 @@ def analysis_calculate():
             Exception), e.args)}, 400))
     return make_response(jsonify({'message': 'calculate result success', 'response': result}), 200)
 
+
+@analysis_app.route('/get_all_toolkit_info', methods=['GET'])
+def get_all_toolkit_info():
+    try:
+        result = toolkit_service.get_all_public_toolkit()
+    except Exception, e:
+        return make_response(jsonify({'response': '%s: %s' % (str(
+            Exception), e.args)}, 400))
+    return make_response(jsonify({'message': 'get info success', 'response': json_utility.convert_to_json(result)}), 200)

@@ -40,13 +40,13 @@ def get_by_job_status(job_status):
     return job_repo.read_by_status(job_obj)
 
 
-def add_toolkit_job(status=0, toolkit_obj):
+def add_toolkit_job(toolkit_obj):
     """toolkit is a obj"""
     # job = job_obj['staging_data_set'] or job_obj['model'] or job_obj['toolkit']
-    if not 0 < len(toolkit_obj.items()) <= 1:
-        raise ValueError('invalid toolkit_obj')
+    # if not 0 < len(toolkit_obj.items()) <= 1:
+    #     raise ValueError('invalid toolkit_obj')
     job_obj = Job(status=0, toolkit=toolkit_obj)
     return job_repo.create(job_obj)
 
 def end_job(job_obj):
-    reutrn job_repo.update_one_by_id(job_obj, stauts = 2)
+    return job_repo.update_one_by_id(job_obj, stauts = 2)

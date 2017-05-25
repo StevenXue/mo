@@ -4,6 +4,7 @@
 from mongoengine import connect
 from repository import config
 from business import toolkit_business
+from service import toolkit_service
 from entity import toolkit
 from bson import ObjectId
 from lib import *
@@ -33,8 +34,8 @@ if __name__ == '__main__':
     # a = toolkit_business.get_by_toolkit_name('平均值')
     # b = toolkit_business.get_by_toolkit_id(ObjectId("592546b18be34d179b95d96f"))
     # print b.to_mongo()
-    # c = toolkit_business.list_public_toolkit_name()
-    # print len(c)
+    c = toolkit_service.get_all_public_toolkit()
+    print c
     # print a.to_mongo()
     # f = open('./run.py')
     # print f.read()
