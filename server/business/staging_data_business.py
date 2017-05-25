@@ -6,7 +6,12 @@ from repository.staging_data_repo import StagingDataRepo
 staging_data_repo = StagingDataRepo(StagingData)
 
 
-def add_by_son_format(staging_data_set, other_fields_obj):
+def add(staging_data_set, other_fields_obj):
+    """
+    :param staging_data_set: staging_data_set object
+    :param other_fields_obj: in SON format
+    :return: a staging_data object
+    """
     if not staging_data_set or not other_fields_obj:
         raise ValueError('no data_set or no other_fields')
     staging_data = StagingData(staging_data_set=staging_data_set,

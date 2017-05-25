@@ -1,22 +1,13 @@
 # -*- coding: UTF-8 -*-
 from bson import ObjectId
 from business import project_business
-from business import staging_data_set_business, staging_data_business
-
-
-def add_staging_data_set(sds_name, sds_description, project_id,
-                         data_set):
-    # get project object
-    project = project_business.get_by_id(project_id)
-
-    # create new staging data set
-    sds = staging_data_set_business.add(sds_name, sds_description, project)
-
-    # copy data from data(raw) to staging data
+from business import staging_data_set_business
+from business import staging_data_business
+from business import data_business
 
 
 def add_staging_data_set_by_objects(sds_name, sds_description, project_id,
-                         data_objects):
+                         data_set_id):
     # get project object
     project = project_business.get_by_id(project_id)
 
@@ -24,12 +15,13 @@ def add_staging_data_set_by_objects(sds_name, sds_description, project_id,
     sds = staging_data_set_business.add(sds_name, sds_description, project)
 
     # copy data from data(raw) to staging data
+    data_objects = data_business.get_by_data_set(data_set_id)
     try:
         for data_obj in data_objects:
             # data_obj = data_obj.to_mongo().to_dict()
             data_obj_son_format = data_obj.to_mongo()
             # print data_obj
-            staging_data_business.add_by_son_format(sds, data_obj_son_format)
+            staging_data_business.add(sds, data_obj_son_format)
     except Exception:
         staging_data_set_business.remove_by_id(sds.id)
         raise RuntimeError("Create staging data set failed")
