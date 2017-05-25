@@ -20,6 +20,6 @@ STATUS = (
 
 class Job(Document):
     model = ReferenceField('Model')
-    toolkit = ReferenceField('ToolKit')
+    toolkit = ReferenceField('Toolkit')
     staging_data_set = ReferenceField('StagingDataSet')
     status = IntField(choices=STATUS, required=True)

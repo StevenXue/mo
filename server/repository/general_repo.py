@@ -44,7 +44,8 @@ class Repo:
         return self.__instance.objects(**query).update_one(**update)
 
     def update_one_by_id(self, obj, update):
-        return self.__instance.objects(id=obj.id).update_one(**update)
+        modified_obj = self.__instance.objects(id=obj.id).modify(**update)
+        return modified_obj.reload()
 
     def delete(self, obj):
         return obj.delete()

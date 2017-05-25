@@ -1,3 +1,14 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+"""
+# @author   : Tianyi Zhang
+# @version  : 1.0
+# @date     : 2017-05-23 11:00pm
+# @function : Getting all of the toolkit of statics analysis
+# @running  : python
+# Further to FIXME of None
+"""
+
 import numpy as np
 from sklearn.cluster import KMeans
 from minepy import MINE
@@ -94,7 +105,7 @@ def k_mean(arr0, arr1, n_clusters=2):
 
     X = np.array([[arr0[i], arr1[i]] for i in range(len(arr0))])
     kmeans = KMeans(n_clusters).fit(X)
-    return kmeans.labels_, kmeans.cluster_centers_, kmeans.inertia_
+    return kmeans.labels_.tolist(), kmeans.cluster_centers_.tolist(), kmeans.inertia_
 
 
 @toolkit_service.create_toolkit_job("K平均数算法")
@@ -105,3 +116,15 @@ def k_mean_predict(arr0, arr1, list_points, n_clusters=2):
     kmeans = KMeans(n_clusters).fit(X)
 
     return kmeans.predict(list_points)
+
+
+dict_of_toolkit = {"平均值": toolkit_average,
+                   "中位数": toolkit_median,
+                   "最大互信息数": toolkit_mic,
+                   "众数": toolkit_mode,
+                   "皮尔森相关系数": toolkit_pearson,
+                   "全距": toolkit_range,
+                   "移动平均值": toolkit_moving_average,
+                   "标准差": toolkit_std,
+                   "方差": toolkit_variance,
+                   "K平均数算法": k_mean}
