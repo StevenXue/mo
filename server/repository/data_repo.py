@@ -7,8 +7,9 @@ class DataRepo(Repo):
     def __init__(self, instance):
         Repo.__init__(self, instance)
 
-# def create_one(new_data):
-#     general_repo.create_one(Instance, new_data)
+    def get_by_data_set(self, data):
+        return Repo.read(self, {'data_set': data.data_set})
+
 
 
 

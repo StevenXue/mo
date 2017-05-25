@@ -12,3 +12,8 @@ def add(data_set, other_fields_obj):
     data = Data(data_set=data_set, **other_fields_obj)
     return data_repo.create(data)
 
+
+def get_by_data_set(data_set):
+    data = Data(data_set=data_set)
+    return data_repo.get_by_data_set(data)
+

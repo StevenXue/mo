@@ -27,3 +27,7 @@ def import_data(data_array, data_set_name, ds_description, user_ID, is_private):
 def import_data_from_file_id(file_id, data_set_name, ds_description, user_ID, is_private):
     table = file_service.file_loader(file_id, user_ID)
     import_data(table, data_set_name, ds_description, user_ID, is_private)
+
+
+def get_data_of_data_set(data_set):
+    return data_business.get_by_data_set(data_set)
