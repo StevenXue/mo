@@ -56,6 +56,8 @@ def list_staging_data_sets_by_project_id():
     try:
         data = staging_data_service.list_staging_data_sets_by_project_id(
             ObjectId(project_id))
+        data = [d.to_mongo() for d in data]
+        data = json_utility.convert_to_json(data)
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}, 400))
