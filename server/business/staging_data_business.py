@@ -6,12 +6,20 @@ from repository.staging_data_repo import StagingDataRepo
 staging_data_repo = StagingDataRepo(StagingData)
 
 
-def add(staging_data_set, other_fields_obj):
+def add_by_son_format(staging_data_set, other_fields_obj):
     if not staging_data_set or not other_fields_obj:
         raise ValueError('no data_set or no other_fields')
     staging_data = StagingData(staging_data_set=staging_data_set,
                                **other_fields_obj)
     return staging_data_repo.create(staging_data)
+
+
+def get_by_staging_data_set(sds_object):
+    return staging_data_repo.read_by_staging_data_set(sds_object)
+
+
+def get_first_one_by_staging_data_set(sds_object):
+    return staging_data_repo.read_first_one_by_staging_data_set(sds_object)
 
 
 def get_by_staging_data_set(staging_data_set):

@@ -21,9 +21,14 @@ connect(
 # project_service.create_project("testasdfasdf", "adsfafd",
 #    'test_user', True)
 
-test_project = project_business.get_by_name('aaa')
-data_objects = Data.objects()
-staging_data_service.add_staging_data_set('aaa', 'bbb', test_project.id, data_objects)
+# to save some test staging_data_set and staging_data
+# test_project = project_business.get_by_name('aaa')
+# data_objects = Data.objects()
+# staging_data_service.add_staging_data_set('aaa', 'bbb', test_project.id, data_objects)
+
+# to list fields of staging data
+staging_data_service.list_fields('aaa')
+
 #
 # for obj in data_objects:
 #     list = [k for k,v in obj._fields.iteritems()]
