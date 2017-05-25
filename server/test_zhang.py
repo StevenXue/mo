@@ -28,6 +28,7 @@ def now(arr0, arr1, k):
     print 'love wyt'
 
 if __name__ == '__main__':
+    pass
     # toolkit_business.create_public_toolkit()
     # a = toolkit_business.get_by_toolkit_name('平均值')
     # b = toolkit_business.get_by_toolkit_id(ObjectId("592546b18be34d179b95d96f"))

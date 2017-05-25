@@ -6,6 +6,7 @@ import lodash from 'lodash';
 import { Router , routerRedux} from 'dva/router';
 import './FileSystem.css';
 import ProjectModal from './ProjectModal';
+import {jupyterServer } from '../../../constants';
 
 class FileSystem extends React.Component {
   constructor (props) {
@@ -20,7 +21,7 @@ class FileSystem extends React.Component {
   }
 
   fetchData(){
-    fetch('http://localhost:8888/api/contents/', {
+    fetch(jupyterServer, {
       method: 'get'
     }).then((response) => response.json())
       .then((res) => {
