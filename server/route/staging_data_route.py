@@ -28,14 +28,13 @@ def get_by_staging_data_set_and_fields():
     fields = fields.split(',')
     id = request.args.get('id')
     # 初始值为0
-    k = 0
     k = request.args.get('k')
 
     try:
         data = staging_data_business.get_by_staging_data_set_and_fields(
             ObjectId(staging_data_set_id), fields)
         data = [d.to_mongo().to_dict() for d in data]
-        toolkit_service.convert_json_list(id, data, k)
+        data = toolkit_service.convert_json_and_calculate(id, data, k)
         data = json_utility.convert_to_json(data)
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
