@@ -84,6 +84,7 @@ export default class Playground extends React.Component {
           <Select style={{ width: "100%"}} onChange={(value) => this.handleChange(value)}>
             <Select.Option value="mic">MIC</Select.Option>
             <Select.Option value="k-means">K-means</Select.Option>
+            <Select.Option value="Average">Average</Select.Option>
           </Select>
         </div>
       </div>
