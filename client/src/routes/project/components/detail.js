@@ -21,7 +21,8 @@ export default class ProjectDetail extends React.Component {
         "metadata": {},
         "nbformat": 4,
         "nbformat_minor": 2
-      }
+      },
+      data_id : "",
     }
   }
 
@@ -69,11 +70,17 @@ export default class ProjectDetail extends React.Component {
     });
   }
 
+  dataOp(){
+
+  }
+
   onChange(info) {
     if (info.file.status !== 'uploading') {
       console.log(info.file, info.fileList);
     }
     if (info.file.status === 'done') {
+      console.log("done", info.file.response[0].response._id);
+      this.setState({data_id: info.file.response[0].response._id});
       message.success(`${info.file.name} file uploaded successfully`);
     } else if (info.file.status === 'error') {
       message.error(`${info.file.name} file upload failed.`);
@@ -100,18 +107,23 @@ export default class ProjectDetail extends React.Component {
           <div >
             <h1>{this.state.projectName}</h1>
             <h2>{"id: " + this.props.location.query._id}</h2>
-            <Upload name= 'uploaded_file'
-                action= {flaskServer + '/file/upload_file?user_ID=test_user&if_private=True'}
-                onChange={(info) => this.onChange(info)}>
-              <Button>
-                <Icon type="file" /> Upload
-              </Button>
-            </Upload>
-
-            <Button type='primary' style={{marginTop: 10}}
-                    onClick={() => this.stageData()}>OK</Button>
-            <Button type='primary' style={{marginTop: 10, marginLeft: 10}}
-                    onClick={() => this.handleClick()}>Start Exploring</Button>
+            <div style={{marginTop: 10, display: 'flex', flexDirection: 'column'}}>
+                <Button type='primary' style={{ width: 120}}
+                        onClick={() => this.handleClick()}>Start Exploring</Button>
+              { this.state.editing?
+                (<div>
+                <Upload name='uploaded_file'
+                        action={flaskServer + '/file/upload_file?user_ID=test_user&if_private=True'}
+                        onChange={(info) => this.onChange(info)}>
+                  <Button style={{marginTop: 10, width: 120}}>
+                    <Icon type="file"/> Upload File
+                  </Button>
+                </Upload>
+                < Button type='primary' style={{marginTop: 10, width: 120}}
+                onClick={() => this.dataOp()}>OK</Button>
+                </div>): null
+              }
+            </div>
           </div>
           <div style={{marginTop: 20, display: 'flex', flexDirection: 'row'}}>
             <div style={{width: '40%', height: 700, border: '1px solid #f3f3f3'}}>
