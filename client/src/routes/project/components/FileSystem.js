@@ -6,7 +6,7 @@ import lodash from 'lodash';
 import { Router , routerRedux} from 'dva/router';
 import './FileSystem.css';
 import ProjectModal from './ProjectModal';
-import {jupyterServer } from '../../../constants';
+import { jupyterServer, flaskServer } from '../../../constants';
 
 class FileSystem extends React.Component {
   constructor (props) {
@@ -21,30 +21,39 @@ class FileSystem extends React.Component {
   }
 
   fetchData(){
-    fetch(jupyterServer, {
+    // fetch(jupyterServer, {
+    //   method: 'get'
+    // }).then((response) => response.json())
+    //   .then((res) => {
+    //     //console.log(res.content[0].name);
+    //     this.setState({
+    //       files: res.content
+    //     });
+    //   });
+    fetch(flaskServer+'/ownership/get_ownership_objects_by_user_ID?owned_type=project&user_ID=test_user', {
       method: 'get'
     }).then((response) => response.json())
       .then((res) => {
-        //console.log(res.content[0].name);
+        console.log(res.response);
         this.setState({
-          files: res.content
+          files: res.response
         });
       });
   }
 
-  toProjectDetail(name) {
-    console.log(name);
-    this.props.toDetail(name);
+  toProjectDetail(name, _id) {
+    console.log(name, _id);
+    this.props.toDetail(name, _id);
   }
 
   renderCards(){
     let filelist = this.state.files;
-    let dirList =  filelist.filter((e) => e.type === 'directory');
+   // let dirList =  filelist.filter((e) => e.type === 'directory');
     //console.log(dirList.length);
-    return dirList.map((e) =>
-      <Card key={e.name} title={e.name} style={{ width: 500 }} onClick={() => this.toProjectDetail(e.name)}>
-        <p>路径: {e.path}</p>
-        <p>最后修改时间: {e.last_modified}</p>
+    return filelist.map((e) =>
+      <Card key={e.name} title={e.name} style={{ width: 500 }} onClick={() => this.toProjectDetail(e.name, e._id)}>
+        <p>描述: {e.description}</p>
+        <p>创建时间: {e.create_time}</p>
       </Card>
     );
   }

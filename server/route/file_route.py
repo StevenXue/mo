@@ -34,6 +34,12 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+@file_app.route('/fake_upload', methods=['POST'])
+def fake_upload():
+    return make_response(jsonify({'response': 'fake'},
+                                 200))
+
+
 @file_app.route('/upload_file', methods=['POST'])
 def upload_file():
     user_ID = request.args.get('user_ID')

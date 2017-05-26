@@ -2,22 +2,22 @@ module.exports = [
 
   {
     id: 1,
-    icon: 'file',
-    name: 'Upload',
-    router: '/request',
-  },
-  {
-    id: 2,
     icon: 'laptop',
     name: 'Projects',
     router: '/project',
   },
   {
-    id: 21,
+    id: 11,
     mpid: -1,
     bpid: 1,
     name: 'Project Detail',
     router: '/project/:name',
+  },
+  {
+    id: 2,
+    icon: 'file',
+    name: 'Upload',
+    router: '/request',
   },
   // {
   //   id: 21,
