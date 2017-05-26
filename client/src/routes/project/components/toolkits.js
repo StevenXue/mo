@@ -28,7 +28,7 @@ export default class ProjectDetail extends React.Component {
   componentDidMount() {
     //let URL = ;
     //console.log(URL);
-    fetch(flaskServer+'/analysis/get_all_toolkit_info', {
+    fetch(flaskServer+'/toolkit/get_all_toolkit_info', {
       method: 'get',
       headers: {
         'Content-Type': 'application/json',
