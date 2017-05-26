@@ -25,7 +25,7 @@ connect(
 # test_project = project_business.get_by_name('aaa')
 # data_objects = Data.objects()
 # staging_data_service.add_staging_data_set('aaa', 'bbb', test_project.id, data_objects)
-staging_data_service.test(
+staging_data_service.add_staging_data_set_by_data_set_id(
     'bbb', 'bbb', ObjectId('59269fb0e89bde25dfb873db'),
     ObjectId("592714d8df86b2a741b926ad"))
 

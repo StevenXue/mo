@@ -6,12 +6,9 @@ from repository.project_repo import ProjectRepo
 project_repo = ProjectRepo(Project)
 
 
-def create(project):
-    return project_repo.create(project)
-
-
-def add(name, description):
-    project_obj = Project(name=name, description=description)
+def add(name, description, create_time):
+    project_obj = Project(name=name, description=description,
+                          create_time=create_time)
     return project_repo.create(project_obj)
 
 
