@@ -69,6 +69,10 @@ export default class ProjectDetail extends React.Component {
     });
   }
 
+  dataOp(){
+
+  }
+
   onChange(info) {
     if (info.file.status !== 'uploading') {
       console.log(info.file, info.fileList);
@@ -104,12 +108,12 @@ export default class ProjectDetail extends React.Component {
                 action= {flaskServer + '/file/upload_file?user_ID=test_user&if_private=True'}
                 onChange={(info) => this.onChange(info)}>
               <Button>
-                <Icon type="file" /> Upload
+                <Icon type="file" /> Upload File
               </Button>
             </Upload>
 
             <Button type='primary' style={{marginTop: 10}}
-                    onClick={() => this.stageData()}>OK</Button>
+                    onClick={() => this.dataOp()}>OK</Button>
             <Button type='primary' style={{marginTop: 10, marginLeft: 10}}
                     onClick={() => this.handleClick()}>Start Exploring</Button>
           </div>
