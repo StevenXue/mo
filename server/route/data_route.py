@@ -36,7 +36,7 @@ def import_data_from_file_id():
         ds_json = json_utility.convert_to_json(saved_ds.to_mongo())
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}, 400))
+            Exception), e.args)}), 400)
     return make_response(jsonify({'response': ds_json}),
                          200)
 

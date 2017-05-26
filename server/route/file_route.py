@@ -36,8 +36,7 @@ def allowed_file(filename):
 
 @file_app.route('/fake_upload', methods=['POST'])
 def fake_upload():
-    return make_response(jsonify({'response': 'fake'},
-                                 200))
+    return make_response(jsonify({'response': 'fake'}), 200)
 
 
 @file_app.route('/upload_file', methods=['POST'])
@@ -47,12 +46,10 @@ def upload_file():
     if request.method == 'POST':
         # check if the post request has the file part
         if REQUEST_FILE_NAME not in request.files:
-            return make_response(jsonify({'response': 'no file part'},
-                                         400))
+            return make_response(jsonify({'response': 'no file part'}), 400)
         file = request.files[REQUEST_FILE_NAME]
         if file.filename == '':
-            return make_response(jsonify({'response': 'no selected file'},
-                                         400))
+            return make_response(jsonify({'response': 'no selected file'}), 400)
         if file and allowed_file(file.filename):
             try:
                 url_base = PREFIX + UPLOAD_URL
@@ -61,11 +58,11 @@ def upload_file():
                 file_json = json_utility.convert_to_json(saved_file.to_mongo())
             except Exception, e:
                 return make_response(jsonify({'response': '%s: %s' % (str(
-                    Exception), e.args)}, 400))
-            return make_response(jsonify({'response': file_json}, 200))
+                    Exception), e.args)}), 400)
+            return make_response(jsonify({'response': file_json}), 200)
         else:
-            return make_response(jsonify({'response': 'file is not allowed'},
-                                         400))
+            return make_response(jsonify({'response': 'file is not allowed'}),
+                                 400)
 
 
 @file_app.route(UPLOAD_URL + '<user_ID>/<filename>')

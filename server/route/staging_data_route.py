@@ -39,9 +39,8 @@ def get_by_staging_data_set_and_fields():
         data = json_utility.convert_to_json(data)
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}, 400))
-    return make_response(jsonify({'response': data}),
-                         200)
+            Exception), e.args)}), 400)
+    return make_response(jsonify({'response': data}), 200)
 
 
 @staging_data_app.route('/get_fields_with_types', methods=['GET'])
@@ -52,7 +51,7 @@ def get_fields_with_types():
             ObjectId(staging_data_set_id))
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}, 400))
+            Exception), e.args)}), 400)
     return make_response(jsonify({'response': data}),
                          200)
 
@@ -67,7 +66,7 @@ def list_staging_data_sets_by_project_id():
         data = json_utility.convert_to_json(data)
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}, 400))
+            Exception), e.args)}), 400)
     return make_response(jsonify({'response': data}),
                          200)
 
@@ -90,6 +89,6 @@ def add_staging_data_set_by_data_set_id():
         sds_json = json_utility.convert_to_json(saved_sds.to_mongo())
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}, 400))
+            Exception), e.args)}), 400)
     return make_response(jsonify({'response': sds_json}),
                          200)

@@ -1,10 +1,14 @@
 # -*- coding: UTF-8 -*-
+import  sys
 from bson import ObjectId
 from business import project_business
 from business import staging_data_set_business
 from business import staging_data_business
 from business import data_business
 
+# 使得 sys.getdefaultencoding() 的值为 'utf-8'
+reload(sys)                      # reload 才能调用 setdefaultencoding 方法
+sys.setdefaultencoding('utf-8')  # 设置 'utf-8'
 
 def list_staging_data_sets_by_project_id(project_id):
     sds_objects = staging_data_set_business.get_by_project_id(project_id)

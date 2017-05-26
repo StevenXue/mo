@@ -31,7 +31,7 @@ toolkit_app = Blueprint("toolkit_app", __name__, url_prefix=PREFIX)
 #         result = toolkit_service.calculate(input_data, id)
 #     except Exception, e:
 #         return make_response(jsonify({'response': '%s: %s' % (str(
-#             Exception), e.args)}, 400))
+#             Exception), e.args)}), 400)
 #     return make_response(jsonify({'message': 'calculate result success', 'response': result}), 200)
 
 
@@ -41,5 +41,5 @@ def get_all_toolkit_info():
         result = toolkit_service.get_all_public_toolkit()
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}, 400))
+            Exception), e.args)}), 400)
     return make_response(jsonify({'message': 'get info success', 'response': json_utility.convert_to_json(result)}), 200)
