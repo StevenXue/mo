@@ -71,7 +71,36 @@ export default class ProjectDetail extends React.Component {
   }
 
   dataOp(){
-
+    console.log(this.state.data_id);
+    fetch(flaskServer + '/data/import_data_from_file_id', {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body:JSON.stringify({
+        "file_id": this.state.data_id,
+        "data_set_name": "testing_data_3",
+        "ds_description": "some dssss",
+        "user_ID": "test_user",
+        "is_private": true
+     })
+    }).then((response) => response.json())
+      .then((res) => {
+          console.log(res);
+          if(res[1] === 400){
+            console.log("error");
+          }else {
+              fetch(flaskServer + '/staging_data/add_staging_data_set_by_data_set_id', {
+              method: 'post',
+              body:JSON.stringify({
+                "project_id": this.props.location.query._id,
+                "staging_data_set_name": "testing_stage_name",
+                "staging_data_set_description": "dsdsds",
+                "data_set_id": res._id
+              })
+            });
+          }
+      })
   }
 
   onChange(info) {
@@ -129,7 +158,7 @@ export default class ProjectDetail extends React.Component {
             <div style={{width: '40%', height: 700, border: '1px solid #f3f3f3'}}>
               {this.state.editing?
                 (<div style={{marginTop: 10, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                <Toolkits />
+                <Toolkits project_id={this.props.location.query._id}/>
                 </div>):(<div>
                   <h3 style={{margin: '5px 5px 5px 10px'}}>File List</h3>
                 {this.renderList()}

@@ -40,7 +40,7 @@ export default class ProjectDetail extends React.Component {
         }
       );
 
-    fetch(flaskServer+'/ownership/get_ownership_objects_by_user_ID?owned_type=data_set&user_ID=tttt', {
+    fetch(flaskServer+'/staging_data/list_staging_data_sets_by_project_id?project_id=' + this.props.project_id, {
       method: 'get',
       headers: {
         'Content-Type': 'application/json',
