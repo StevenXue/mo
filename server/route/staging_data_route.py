@@ -27,6 +27,7 @@ def get_by_staging_data_set_and_fields():
     fields = request.args.get('fields')
     fields = fields.split(',')
     toolkit_id = request.args.get('toolkit_id')
+    project_id = request.args.get('project_id')
     # 初始值为0
     k = request.args.get('k')
 

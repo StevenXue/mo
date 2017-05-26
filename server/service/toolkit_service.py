@@ -21,7 +21,7 @@ def get_all_public_toolkit():
     for obj in toolkit_business.get_all_public_toolkit():
         # list.append(obj.to_mongo().to_dict())
         # print obj.toolkit.id
-        list.append(toolkit_business.get_by_toolkit_id(obj.toolkit.id).to_mongo().to_dict())
+        list.append(obj.toolkit.to_mongo().to_dict())
     return list
 
 
@@ -33,12 +33,12 @@ def toolkit_calculate(id, *argv):
 def convert_json_and_calculate(id, data, k):
     """convert json list"""
     col = data[0].keys()
-    print 'col', col
-    print 'data', data
-    argv = []
+    # print 'col', col
+    # print 'data', data
+    # argv = []
     argv = [[j[i] for j in data] for i in col]
-    print 'argv', argv
+    # print 'argv', argv
     if k:
         argv.append(k)
-    print 'argv1', argv
+    # print 'argv1', argv
     return toolkit_calculate(id, *argv)

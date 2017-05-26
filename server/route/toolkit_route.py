@@ -14,13 +14,13 @@ from flask import request
 from service import toolkit_service
 from utility import json_utility
 
-PREFIX = '/analysis'
+PREFIX = '/toolkit'
 
-analysis_app = Blueprint("analysis_app", __name__, url_prefix=PREFIX)
+toolkit_app = Blueprint("toolkit_app", __name__, url_prefix=PREFIX)
 
 
 # 后端直接传输了，不一定要restful api
-# @analysis_app.route('/analysis_calculate', methods=['POST'])
+# @toolkit_app.route('/analysis_calculate', methods=['POST'])
 # def analysis_calculate():
 #     data = request.get_json()
 #     # 得到的func的名字是name么？
@@ -35,7 +35,7 @@ analysis_app = Blueprint("analysis_app", __name__, url_prefix=PREFIX)
 #     return make_response(jsonify({'message': 'calculate result success', 'response': result}), 200)
 
 
-@analysis_app.route('/get_all_toolkit_info', methods=['GET'])
+@toolkit_app.route('/get_all_toolkit_info', methods=['GET'])
 def get_all_toolkit_info():
     try:
         result = toolkit_service.get_all_public_toolkit()
