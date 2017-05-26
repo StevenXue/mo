@@ -42,7 +42,9 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
         #     new_data_obj[k] = v
 
         # Add into staging_data collection
-        staging_data_business.add(sds, data_obj)
+        # print data_obj
+        staging_data_business.add(sds, data_obj.to_mongo())
+    return sds
     # except Exception:
     #     staging_data_business.remove_by_staging_data_set_id(sds.id)
     #     staging_data_set_business.remove_by_id(sds.id)
