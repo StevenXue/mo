@@ -15,6 +15,7 @@ from flask import send_from_directory
 
 from repository import config
 from service import file_service
+from utility import json_utility
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
@@ -49,12 +50,13 @@ def upload_file():
         if file and allowed_file(file.filename):
             try:
                 url_base = PREFIX + UPLOAD_URL
-                file_url = file_service.add_file(file, url_base,
+                saved_file = file_service.add_file(file, url_base,
                                              user_ID, if_private)
+                file_json = json_utility.convert_to_json(saved_file.to_mongo())
             except Exception, e:
                 return make_response(jsonify({'response': '%s: %s' % (str(
                     Exception), e.args)}, 400))
-            return redirect(file_url)
+            return make_response(jsonify({'response': file_json}, 400))
         else:
             return make_response(jsonify({'response': 'file is not allowed'},
                                          400))
