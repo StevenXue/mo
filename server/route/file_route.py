@@ -56,7 +56,7 @@ def upload_file():
             except Exception, e:
                 return make_response(jsonify({'response': '%s: %s' % (str(
                     Exception), e.args)}, 400))
-            return make_response(jsonify({'response': file_json}, 400))
+            return make_response(jsonify({'response': file_json}, 200))
         else:
             return make_response(jsonify({'response': 'file is not allowed'},
                                          400))
