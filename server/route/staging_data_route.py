@@ -69,3 +69,23 @@ def list_staging_data_sets_by_project_id():
             Exception), e.args)}, 400))
     return make_response(jsonify({'response': data}),
                          200)
+
+
+@staging_data_app.route('/add_staging_data_set_by_data_set_id', methods=['GET'])
+def add_staging_data_set_by_data_set_id():
+    # sds_name, sds_description, project_id, data_set_id
+    project_id = request.args.get('project_id')
+    staging_data_set_name = request.args.get('staging_data_set_name')
+    staging_data_set_description = \
+        request.args.get('staging_data_set_description')
+    data_set_id = request.args.get('data_set_id')
+
+    try:
+        staging_data_service.add_staging_data_set_by_data_set_id(
+            staging_data_set_name, staging_data_set_description,
+            ObjectId(project_id), ObjectId(data_set_id))
+    except Exception, e:
+        return make_response(jsonify({'response': '%s: %s' % (str(
+            Exception), e.args)}, 400))
+    return make_response(jsonify({'response': 'Success'}),
+                         200)
