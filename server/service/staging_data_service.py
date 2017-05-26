@@ -21,27 +21,28 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
     print sds.name
     # copy data from data(raw) to staging data
     data_objects = data_business.get_by_data_set(data_set_id)
-    data_objects = data_objects.to_json()
-    print data_objects
+    # data_objects = data_objects.to_json()
+    print data_objects[0]
     # print type(data_objects)
 
     # try:
-    for data_obj in eval(data_objects):
+    # for data_obj in eval(data_objects):
+    for data_obj in data_objects:
         # convert data_obj to SON format
         # data_obj_son_format = data_obj.to_mongo()
         # print data_obj_son_format
 
-        data_obj['data_set_id'] = data_obj['data_set']['$oid']
-        data_obj['data_id'] = data_obj['_id']['$oid']
-        data_obj.pop('_id')
-        data_obj.pop('data_set')
+        # data_obj['data_set_id'] = data_obj['data_set']['$oid']
+        # data_obj['data_id'] = data_obj['_id']['$oid']
+        # data_obj.pop('_id')
+        # data_obj.pop('data_set')
 
-        new_data_obj={}
-        for k, v in data_obj.iteritems():
-            new_data_obj[k] = v
+        # new_data_obj={}
+        # for k, v in data_obj.iteritems():
+        #     new_data_obj[k] = v
 
         # Add into staging_data collection
-        staging_data_business.add(sds, new_data_obj)
+        staging_data_business.add(sds, data_obj)
     # except Exception:
     #     staging_data_business.remove_by_staging_data_set_id(sds.id)
     #     staging_data_set_business.remove_by_id(sds.id)
