@@ -26,7 +26,7 @@ def get_by_staging_data_set_and_fields():
     staging_data_set_id = request.args.get('staging_data_set_id')
     fields = request.args.get('fields')
     fields = fields.split(',')
-    id = request.args.get('id')
+    toolkit_id = request.args.get('toolkit_id')
     # 初始值为0
     k = request.args.get('k')
 
@@ -34,7 +34,7 @@ def get_by_staging_data_set_and_fields():
         data = staging_data_business.get_by_staging_data_set_and_fields(
             ObjectId(staging_data_set_id), fields)
         data = [d.to_mongo().to_dict() for d in data]
-        data = toolkit_service.convert_json_and_calculate(id, data, k)
+        data = toolkit_service.convert_json_and_calculate(toolkit_id, data, k)
         data = json_utility.convert_to_json(data)
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
