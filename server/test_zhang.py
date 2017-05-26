@@ -4,11 +4,12 @@
 from mongoengine import connect
 from repository import config
 from business import toolkit_business
+from business import staging_data_business
 from service import toolkit_service
 # from entity.toolkit import Toolkit
+from entity.staging_data_set import StagingDataSet
 from bson import ObjectId
 from lib import toolkit_code
-
 
 connect(
     db=config.get_mongo_db(),
@@ -49,6 +50,15 @@ if __name__ == '__main__':
     # now([1, 2], [2, 3], 3)
     # b = a
     # b(1,2,3,4,5)
+    # data = staging_data_business.get_by_staging_data_set_and_fields(ObjectId("5926d6291c5ad4881f4d060a"),fields=["name","device_type"])
+    # temp = [d.to_mongo() for d in data]
+    # print temp, "\n"
+    # # print int('\u667a\u80fd\u7535\u8868\u8f93\u51fa\u67dc1\u7535\u529b\u5ba42_PD194E-9FY')
+    # # print toolkit_code.dict_of_toolkit['最大互信息数']([1,2,3,4,10],[2,3,3,4,5]).to_mongo().to_dict()
+    # # print toolkit_service.toolkit_calculate("59266bd08be34d2b2362f91e",[1,2,3,4,5],[2,3,4,5,6])
+    # df = toolkit_business.convert_json_str_to_dataframe(temp)
+    # print df
+    # print df[0]
+    # print df[1]
 
-    # print toolkit_code.dict_of_toolkit['最大互信息数']([1,2,3,4,10],[2,3,3,4,5]).to_mongo().to_dict()
-    print toolkit_service.toolkit_calculate("59266bd08be34d2b2362f91e",[1,2,3,4,5],[2,3,4,5,6])
+    print toolkit_service.convert_json_and_calculate("59266bd08be34d2b2362f920",[{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2}],0)

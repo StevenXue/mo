@@ -17,15 +17,15 @@ from service import job_service
 
 
 @job_service.create_toolkit_job("平均值")
-def toolkit_average(arr):
+def toolkit_average(arr0):
     """average"""
-    return np.average(np.array(arr))
+    return np.average(np.array(arr0))
 
 
 @job_service.create_toolkit_job("中位数")
-def toolkit_median(arr):
+def toolkit_median(arr0):
     """median"""
-    return np.median(np.array(arr))
+    return np.median(np.array(arr0))
 
 
 @job_service.create_toolkit_job("最大互信息数")
@@ -42,9 +42,9 @@ def toolkit_mic(arr0, arr1, alpha=0.6, c=15):
 
 
 @job_service.create_toolkit_job("众数")
-def toolkit_mode(arr):
+def toolkit_mode(arr0):
     """list the first mode(elements of maximum number)"""
-    count = np.bincount(np.array(arr))
+    count = np.bincount(np.array(arr0))
     max_mode = np.argmax(count)
     return max_mode, np.max(count)
 
@@ -62,31 +62,31 @@ def toolkit_pearson(arr0, arr1):
 
 
 @job_service.create_toolkit_job("全距")
-def toolkit_range(arr):
+def toolkit_range(arr0):
     """range"""
-    np_temp = np.array(arr)
+    np_temp = np.array(arr0)
     return np.max(np_temp) - np.min(np_temp)
 
 
 @job_service.create_toolkit_job("移动平均值")
-def toolkit_moving_average(arr, window):
+def toolkit_moving_average(arr0, window):
     """simple moving average"""
-    ret = np.cumsum(np.array(arr), dtype=float)
+    ret = np.cumsum(np.array(arr0), dtype=float)
     ret[window:] = ret[window:] - ret[:-window]
     return ret[window - 1:] / window
 
 
 @job_service.create_toolkit_job("标准差")
-def toolkit_std(arr):
+def toolkit_std(arr0):
     """STD"""
-    np_temp = np.array(arr)
+    np_temp = np.array(arr0)
     return np.std(np_temp)
 
 
 @job_service.create_toolkit_job("方差")
-def toolkit_variance(arr):
+def toolkit_variance(arr0):
     """MSE represents Mean Square Error"""
-    np_temp = np.array(arr)
+    np_temp = np.array(arr0)
     return np.var(np_temp)
 
 
