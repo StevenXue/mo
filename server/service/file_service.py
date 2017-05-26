@@ -29,7 +29,7 @@ def add_file(file, url_base, user_ID, if_private=True):
             file_business.delete_by_id(saved_file['_id'])
             raise RuntimeError('ownership create failed')
         else:
-            return file_url
+            return saved_file
     else:
         raise RuntimeError('file create failed')
 
