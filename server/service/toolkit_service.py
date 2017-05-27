@@ -12,7 +12,8 @@
 import numpy as np
 import pandas as pd
 import functools
-from business import toolkit_business, ownership_business, user_business, job_business, result_business
+from bson import ObjectId
+from business import toolkit_business, ownership_business, user_business, job_business, result_business, project_business
 from lib import toolkit_code
 
 
@@ -27,18 +28,20 @@ def get_all_public_toolkit():
 
 def toolkit_calculate(id, *argv):
     name = toolkit_business.get_by_toolkit_id(id).name
-    return toolkit_code.dict_of_toolkit[name](*argv).to_mongo().to_dict()
+    return toolkit_code.dict_of_toolkit[name](*argv)
 
 
-def convert_json_and_calculate(id, data, k):
+def convert_json_and_calculate(toolkit_id, project_id, data, k):
     """convert json list"""
     col = data[0].keys()
     # print 'col', col
     # print 'data', data
     # argv = []
-    argv = [[j[i] for j in data] for i in col]
+    argv = [[float(j[i]) for j in data] for i in col]
     # print 'argv', argv
     if k:
         argv.append(k)
     # print 'argv1', argv
-    return toolkit_calculate(id, *argv)
+    result = toolkit_calculate(toolkit_id, *argv)
+    project_business.add_job_and_result_to_project(result, ObjectId(project_id))
+    return result.to_mongo().to_dict()
