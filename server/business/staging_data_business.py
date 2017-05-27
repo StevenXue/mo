@@ -7,6 +7,10 @@ from repository.staging_data_repo import StagingDataRepo
 staging_data_repo = StagingDataRepo(StagingData)
 
 
+def get_by_query_str(**kwargs):
+    return staging_data_repo.read(kwargs)
+
+
 def remove_by_staging_data_set_id(staging_data_set_id):
     """
     Remove a staging_data by its ObjectId

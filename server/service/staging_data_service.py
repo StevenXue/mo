@@ -9,6 +9,13 @@ reload(sys)                      # reload 才能调用 setdefaultencoding 方法
 sys.setdefaultencoding('utf-8')  # 设置 'utf-8'
 
 
+def find_by_query_str(staging_data_set_id, **kwargs):
+
+    # query_str = dict(query_str_in_mongodb_form)
+    # query_str['staging_data_set'] = staging_data_set_id
+    kwargs['staging_data_set'] = staging_data_set_id
+    return staging_data_business.get_by_query_str(**kwargs)
+
 def list_staging_data_sets_by_project_id(project_id):
     """
     Get the list of staging_data_set by project id

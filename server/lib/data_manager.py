@@ -11,6 +11,12 @@ reload(sys)                      # reload 才能调用 setdefaultencoding 方法
 sys.setdefaultencoding('utf-8')  # 设置 'utf-8'
 
 
+def find(query_str_in_mongodb_form, staging_data_set_id):
+    return staging_data_service.\
+        find_by_query_str(ObjectId(staging_data_set_id),
+                          **query_str_in_mongodb_form)
+
+
 def get_staging_data(staging_data_set_id):
     """
     Get staging_data by staging_data_set_id

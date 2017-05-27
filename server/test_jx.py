@@ -22,29 +22,38 @@ connect(
     host=config.get_mongo_host(),
 )
 
-# Test block of data_manager.py
-# print type([1,2,3])
-# print type(data_manager.list_staging_data_set('59259247e89bde050b6f02d4'))
-sds_list = data_manager.list_staging_data_set('59259247e89bde050b6f02d4')
-print sds_list
-# for elem in sds_list:
-#     print elem
+# ---------------
+# Test for find()
+# query = {"总待还本金": "8712.73"}
+query = {'性别':'男', '借款期限': '12', '借款金额': '20000'}
+data = data_manager.find(query, '592917341c5ad409b07335e6')
+print data
 
-field_list = data_manager.list_fields('592917341c5ad409b07335e6')
-# field_list = data_manager.list_fields('5928f1a81c5ad40862d93542')
+# # --------------------------
+# # Test block of data_manager.py
+# # print type([1,2,3])
+# # print type(data_manager.list_staging_data_set('59259247e89bde050b6f02d4'))
+# sds_list = data_manager.list_staging_data_set('59259247e89bde050b6f02d4')
+# print sds_list
+# # for elem in sds_list:
+# #     print elem
+#
+# field_list = data_manager.list_fields('592917341c5ad409b07335e6')
+# # field_list = data_manager.list_fields('5928f1a81c5ad40862d93542')
+#
+# for field in field_list:
+#     print field
+#
+# sd_data = data_manager.get_staging_data('592917341c5ad409b07335e6')
+# # sd_data = data_manager.get_staging_data('5928f1a81c5ad40862d93542')
+#
+# print len(sd_data)
+# for sd_obj in sd_data:
+#     # transformed_obj = json_utility.convert_to_json(sd_obj.to_mongo().to_dict())
+#     print isinstance(sd_obj[u'征信认证'], unicode), sd_obj[u'征信认证']
+#     # print unicode(transformed_obj, 'utf-8').encode('utf-8')
 
-for field in field_list:
-    print field
-
-sd_data = data_manager.get_staging_data('592917341c5ad409b07335e6')
-# sd_data = data_manager.get_staging_data('5928f1a81c5ad40862d93542')
-
-print len(sd_data)
-for sd_obj in sd_data:
-    # transformed_obj = json_utility.convert_to_json(sd_obj.to_mongo().to_dict())
-    print isinstance(sd_obj[u'征信认证'], unicode), sd_obj[u'征信认证']
-    # print unicode(transformed_obj, 'utf-8').encode('utf-8')
-
+# --------------------------
 # Test for reference field
 # staging_data_set_business.add('a', 'b', ObjectId('59259247e89bde050b6f02d4'))
 
