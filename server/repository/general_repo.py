@@ -1,9 +1,13 @@
 # -*- coding: UTF-8 -*-
+"""
+Need to be FIXED, further think of how to save
+"""
+# TODO
 
 from mongoengine import connect
 
 from repository import config
-
+from entity.data_set import DataSet
 connect(
     db=config.get_mongo_db(),
     username=config.get_mongo_user(),
@@ -43,8 +47,22 @@ class Repo:
     def update_one(self, query, update):
         return self.__instance.objects(**query).update_one(**update)
 
-    def update_one_by_id(self, obj, update):
-        modified_obj = self.__instance.objects(id=obj.id).modify(**update)
+    def update_one_by_id(self, obj_id, update):
+        # print '2', type(obj_id), obj_id
+        modified_obj = self.__instance.objects(id=obj_id).modify(**update)
+        # print '3', type(modified_obj)
+        return modified_obj.reload()
+
+    # for List field add only one new element- update={'job': new_job_obj,
+    #                                                  'result': new_result_obj}
+    def add_and_update_one_by_id(self, obj_id, update):
+        # print '2*', type(obj), obj
+        # print '3*', update
+        update = {'push__' + k: v for k, v in update.items()}
+        # for key in update.keys():
+        #     update['push__'+key] = update.pop(key)
+        # print 'update', update
+        modified_obj = self.__instance.objects(id=obj_id).modify(**update)
         return modified_obj.reload()
 
     def delete(self, obj):

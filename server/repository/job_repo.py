@@ -30,3 +30,6 @@ class JobRepo(Repo):
     def read_by_status(self, job_obj):
         return Repo.read_unique_one(self, {'status': job_obj.status})
 
+    def read_by_result(self, result_obj):
+        print 'result_obj', result_obj.id
+        return Repo.read_unique_one(self, {'id': result_obj.id})
