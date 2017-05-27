@@ -9,6 +9,7 @@ from entity.data_set import DataSet
 from service import staging_data_service
 from utility import json_utility
 
+from lib import data_manager
 
 
 connect(
@@ -22,12 +23,9 @@ connect(
 #    'test_user', True)
 
 # to save some test staging_data_set and staging_data
-# test_project = project_business.get_by_name('aaa')
-# data_objects = Data.objects()
-# staging_data_service.add_staging_data_set('aaa', 'bbb', test_project.id, data_objects)
 staging_data_service.add_staging_data_set_by_data_set_id(
-    'aaa', 'bbb', ObjectId('59269fb0e89bde25dfb873db'),
-    ObjectId('592714d8df86b2a741b926ad'))
+    'bbb', 'bbb', ObjectId('59269fb0e89bde25dfb873db'),
+    ObjectId("592714d8df86b2a741b926ad"))
 
 # to list fields of staging data
 # staging_data_service.list_fields('aaa')
@@ -45,3 +43,5 @@ staging_data_service.add_staging_data_set_by_data_set_id(
 
 # data = json_utility.convert_to_json(data)
 # staging_data_service.run()
+
+# data_manager.list_staging_data_set('')

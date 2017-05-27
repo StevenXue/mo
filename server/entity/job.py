@@ -13,13 +13,16 @@ from mongoengine import *
 
 STATUS = (
     (0, 'start'),
-    (1, 'process'),
-    (2, 'end')
+    (100, 'processing'),
+    (200, 'completed'),
+    (300, 'interrupted')
 )
 
 
 class Job(Document):
     model = ReferenceField('Model')
     toolkit = ReferenceField('Toolkit')
-    staging_data_set = ReferenceField('StagingDataSet')
+    staging_data_set = ReferenceField('StagingDataSet', required=True)
     status = IntField(choices=STATUS, required=True)
+    create_time = DateTimeField(required=True)
+    updated_time = DateTimeField()

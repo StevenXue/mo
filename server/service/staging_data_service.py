@@ -1,56 +1,62 @@
 # -*- coding: UTF-8 -*-
-from bson import ObjectId
+import sys
 from business import project_business
 from business import staging_data_set_business
 from business import staging_data_business
 from business import data_business
 
+# 使得 sys.getdefaultencoding() 的值为 'utf-8'
+reload(sys)                      # reload 才能调用 setdefaultencoding 方法
+sys.setdefaultencoding('utf-8')  # 设置 'utf-8'
+
 
 def list_staging_data_sets_by_project_id(project_id):
+    """
+    get the list of staging_data_set by project id
+    
+    :param project_id: 
+    :return: list of staging_data_set objects
+    """
     sds_objects = staging_data_set_business.get_by_project_id(project_id)
     return [obj for obj in sds_objects]
 
 
 def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
-                                    data_set_id):
+                                        data_set_id):
+    """
+    Create staging_data_set and copy to staging_data by original data_set id
+        
+    :param sds_name: str
+    :param sds_description: str 
+    :param project_id: ObjectId
+    :param data_set_id: ObjectId
+    :return: new staging_data_set object
+    """
     # get project object
     project = project_business.get_by_id(project_id)
-    print project.name
+
     # create new staging data set
     sds = staging_data_set_business.add(sds_name, sds_description, project)
-    print sds.name
+
     # copy data from data(raw) to staging data
-    data_objects = data_business.get_by_data_set(data_set_id)
-    data_objects = data_objects.to_json()
-    print data_objects
-    # print type(data_objects)
-
-    # try:
-    for data_obj in eval(data_objects):
-        # convert data_obj to SON format
-        # data_obj_son_format = data_obj.to_mongo()
-        # print data_obj_son_format
-
-        data_obj['data_set_id'] = data_obj['data_set']['$oid']
-        data_obj['data_id'] = data_obj['_id']['$oid']
-        data_obj.pop('_id')
-        data_obj.pop('data_set')
-
-        new_data_obj={}
-        for k, v in data_obj.iteritems():
-            new_data_obj[k] = v
-
-        # Add into staging_data collection
-        staging_data_business.add(sds, new_data_obj)
-    # except Exception:
-    #     staging_data_business.remove_by_staging_data_set_id(sds.id)
-    #     staging_data_set_business.remove_by_id(sds.id)
-    #     raise RuntimeError("Create staging data set failed")
+    # get all data objects by data_set id
+    try:
+        data_objects = data_business.get_by_data_set(data_set_id)
+        for data_obj in data_objects:
+            # create staging_data object
+            staging_data_business.add(sds, data_obj.to_mongo())
+        return sds
+    except Exception:
+        # remove staging_data_set and staging_data
+        staging_data_business.remove_by_staging_data_set_id(sds.id)
+        staging_data_set_business.remove_by_id(sds.id)
+        raise RuntimeError("Create staging data set failed")
 
 
 def get_fields_with_types(staging_data_set_id):
     """
-    
+    Get the fields and its types of one staging_data_set
+        
     :param staging_data_set_id: 
     :return: the list of field name and value type 
     """
@@ -61,8 +67,3 @@ def get_fields_with_types(staging_data_set_id):
     return [[k, type(v).__name__]for k, v in sd_object.iteritems()]
 
 
-
-
-# def get_by_staging_data_set_id_and_fields(staging_data_set_id, fields):
-#     return staging_data_business.get_by_staging_data_set_and_fields(
-#         staging_data_set_id, fields)

@@ -22,12 +22,14 @@ def import_data(data_array, data_set_name, ds_description, user_ID, is_private):
     ds = add_data_set(data_set_name, ds_description, user_ID, is_private)
     for data in data_array:
         data_business.add(ds, data)
+    return ds
 
 
 def import_data_from_file_id(file_id, data_set_name, ds_description, user_ID,
                              is_private):
     table = file_service.file_loader(file_id, user_ID)
-    import_data(table, data_set_name, ds_description, user_ID, is_private)
+    return import_data(table, data_set_name, ds_description, user_ID,
+                       is_private)
 
 
 # def get_data_of_data_set(data_set):

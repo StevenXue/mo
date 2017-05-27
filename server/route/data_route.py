@@ -12,6 +12,7 @@ from flask import make_response
 from flask import request
 
 from service import data_service
+from utility import json_utility
 
 PREFIX = '/data'
 
@@ -28,13 +29,15 @@ def import_data_from_file_id():
     user_ID = data['user_ID']
     is_private = data['is_private']
     try:
-        data_service.import_data_from_file_id(ObjectId(file_id),
-                                              data_set_name,
-                                              ds_description,
-                                              user_ID, bool(is_private))
+        saved_ds = data_service.import_data_from_file_id(ObjectId(file_id),
+                                                         data_set_name,
+                                                         ds_description,
+                                                         user_ID,
+                                                         bool(is_private))
+        ds_json = json_utility.convert_to_json(saved_ds.to_mongo())
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}, 400))
-    return make_response(jsonify({'response': 'import file to mongo success'}),
+            Exception), e.args)}), 400)
+    return make_response(jsonify({'response': ds_json}),
                          200)
 

@@ -4,7 +4,7 @@ from mongoengine import *
 
 
 class Data(DynamicDocument):
-    data_set = ReferenceField('DataSet')
+    data_set = ReferenceField('DataSet', required=True)
     # value = FloatField()
     # time = DateTimeField()
 

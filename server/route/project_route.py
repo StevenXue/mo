@@ -31,6 +31,6 @@ def create_project():
                                        bool(is_private))
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}, 400))
+            Exception), e.args)}), 400)
     return make_response(jsonify({'response': 'create project success'}), 200)
 

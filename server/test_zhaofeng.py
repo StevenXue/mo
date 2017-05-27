@@ -1,7 +1,9 @@
 # # -*- coding: UTF-8 -*-
+import sys
 from bson import ObjectId
 from service import data_service
 from business import data_set_business
+from business import data_business
 from business import staging_data_business
 from service import staging_data_service
 from service import ownership_service
@@ -14,5 +16,10 @@ from entity.file import File
 # data_set = data_set_business.get_by_id(ObjectId("59263812df86b2225a372472"))
 # sds = staging_data_business.
 # print type(data_set.id)
-print staging_data_business.get_by_staging_data_set_and_fields(
-    ObjectId("5926d6291c5ad4881f4d060a"), ['name', 'device_type'])
+# print staging_data_business.get_by_staging_data_set_and_fields(
+#     ObjectId("5926d6291c5ad4881f4d060a"), ['name', 'device_type'])
+
+
+
+data_objects = data_business.get_by_data_set(ObjectId("592714d8df86b2a741b926ad"))
+print data_objects

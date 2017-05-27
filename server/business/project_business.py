@@ -18,8 +18,10 @@ from business import job_business
 project_repo = ProjectRepo(Project)
 
 
-def create(project):
-    return project_repo.create(project)
+def add(name, description, create_time):
+    project_obj = Project(name=name, description=description,
+                          create_time=create_time)
+    return project_repo.create(project_obj)
 
 
 def get_by_id(object_id):

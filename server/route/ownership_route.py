@@ -30,10 +30,10 @@ def list_ownership_by_user_ID():
         ownerships = json_utility.convert_to_json(ownerships)
     except DoesNotExist, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
-            DoesNotExist), e.args)}, 400))
+            DoesNotExist), e.args)}), 400)
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}, 400))
+            Exception), e.args)}), 400)
     return make_response(jsonify({'response': ownerships}), 200)
 
 
@@ -46,10 +46,10 @@ def get_all_public_objects():
         ownerships = json_utility.convert_to_json(ownerships)
     except DoesNotExist, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
-            DoesNotExist), e.args)}, 400))
+            DoesNotExist), e.args)}), 400)
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}, 400))
+            Exception), e.args)}), 400)
     return make_response(jsonify({'response': ownerships}), 200)
 
 
@@ -64,8 +64,8 @@ def get_ownership_objects_by_user_ID():
         ownerships = json_utility.convert_to_json(ownerships)
     except DoesNotExist, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
-            DoesNotExist), e.args)}, 400))
+            DoesNotExist), e.args)}), 400)
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}, 400))
+            Exception), e.args)}), 400)
     return make_response(jsonify({'response': ownerships}), 200)

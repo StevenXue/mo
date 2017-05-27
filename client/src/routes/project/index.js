@@ -14,9 +14,12 @@ const bodyStyle = {
 }
 
 function Dashboard ({ dispatch }) {
-  function handleToDetail (name) {
+  function handleToDetail (name, id) {
     dispatch(routerRedux.push({
       pathname: `project/${name}`,
+      query:{
+        _id: id
+      }
     }))
   }
 

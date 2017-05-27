@@ -2,7 +2,6 @@
 from datetime import datetime
 from business import project_business, user_business, ownership_business
 from service import ownership_service
-from entity.project import Project
 from datetime import datetime
 
 
@@ -13,14 +12,9 @@ def get_projects_by_user_ID(user_ID):
 
 
 def create_project(name, description, user_ID, is_private):
-    '''
-    '''
+
     # create a new project object
-    new_project = Project()
-    new_project.name = name
-    new_project.description = description
-    new_project.create_time = datetime.utcnow()
-    created_project = project_business.create(new_project)
+    created_project = project_business.add(name, description, datetime.utcnow())
     if created_project:
         # create project successfully
 
