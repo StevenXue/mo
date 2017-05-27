@@ -7,7 +7,7 @@ class DataRepo(Repo):
     def __init__(self, instance):
         Repo.__init__(self, instance)
 
-    def get_by_data_set(self, data):
+    def read_by_data_set(self, data):
         return Repo.read(self, {'data_set': data.data_set})
 
 
