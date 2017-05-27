@@ -37,7 +37,7 @@ class Toolkit(DynamicDocument):
 
     parameter_spec = DictField()
     # {
-    #     "input_data": [{'type': 'list'},{{'type':'list', 'default':[1,2,3,4,5}]
+        # "input_data": [{'type': 'list'},{'type':'list', 'default':[1,2,3,4,5]}],
     #     "k": {
     #         'type': 'int',
     #         'default': 2

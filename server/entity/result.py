@@ -19,6 +19,8 @@ RESULT_TYPE = (
 class Result(Document):
     job = ReferenceField('Job', required=True)
     # TODO Changed "time" to "create_time", Added "description", "result_type"
+    # FIXME
+    # TODO
     create_time = DateTimeField(required=True)
     description = StringField(max_length=140)
     # should be data_set, float or dynamic?

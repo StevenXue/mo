@@ -22,7 +22,8 @@ STATUS = (
 class Job(Document):
     model = ReferenceField('Model')
     toolkit = ReferenceField('Toolkit')
-    staging_data_set = ReferenceField('StagingDataSet', required=True)
+    # TODO required = true
+    staging_data_set = ReferenceField('StagingDataSet')
     status = IntField(choices=STATUS, required=True)
     create_time = DateTimeField(required=True)
     updated_time = DateTimeField()

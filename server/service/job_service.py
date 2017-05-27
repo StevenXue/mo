@@ -11,11 +11,11 @@
 
 
 import functools
+# from json import ObjectId
 from business import toolkit_business, job_business, result_business, project_business
 from repository import job_repo
 
-
-def create_toolkit_job(name):
+def create_toolkit_job(toolkit_id):
     """
     help toolkit to create a job before toolkit runs,
     as well as save the job & create a result after toolkit runs
@@ -26,7 +26,7 @@ def create_toolkit_job(name):
         @functools.wraps(func)
         def wrapper(*args, **kw):
             # create a job
-            toolkit_obj = toolkit_business.get_by_toolkit_name(name)
+            toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
             job_obj = job_business.add_toolkit_job(toolkit_obj)
 
             # calculate

@@ -8,11 +8,16 @@
 # @running  : python
 # Further to FIXME of None
 '''
-
+import functools
 import numpy as np
 import pandas as pd
-import functools
+from sklearn.cluster import KMeans
+from minepy import MINE
+from sklearn.decomposition import PCA
 from bson import ObjectId
+
+
+from service import job_service
 from business import toolkit_business, ownership_business, user_business, job_business, result_business, project_business
 from lib import toolkit_code
 
@@ -31,12 +36,15 @@ def toolkit_calculate(id, *argv):
     return toolkit_code.dict_of_toolkit[name](*argv)
 
 
-# for database
+# for database 调用toolkit code tag for zhaofeng
 def toolkit_calculate_temp(toolkit_id, *argv):
     toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
     # name = toolkit_obj.name
-    exec toolkit_obj.target_py_code
-    return run(*argv)
+    prefix = "@job_service.create_toolkit_job(\"%s\")\n" % toolkit_obj.id
+    code = toolkit_obj.target_py_code
+    string = prefix + code + '\nresult = %s(*argv)' % toolkit_obj.entry_function
+    exec string
+    return result
 
 
 def convert_json_and_calculate(toolkit_id, project_id, data, k):
@@ -50,6 +58,8 @@ def convert_json_and_calculate(toolkit_id, project_id, data, k):
     if k:
         argv.append(k)
     # print 'argv1', argv
-    result = toolkit_calculate(toolkit_id, *argv)
+    # result = toolkit_calculate(toolkit_id, *argv)
+    result = toolkit_calculate_temp(toolkit_id, *argv)
+    print '111', result.to_mongo().to_dict()
     project_business.add_job_and_result_to_project(result, ObjectId(project_id))
     return result.to_mongo().to_dict()

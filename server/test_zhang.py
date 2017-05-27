@@ -5,7 +5,7 @@ from mongoengine import connect
 from repository import config
 from business import toolkit_business
 from business import staging_data_business
-from service import toolkit_service
+from service import toolkit_service, job_service
 # from entity.toolkit import Toolkit
 from entity.staging_data_set import StagingDataSet
 from bson import ObjectId
@@ -40,7 +40,7 @@ def test(a,b,c=3):
 if __name__ == '__main__':
     pass
 
-    toolkit_business.create_public_toolkit()
+    # toolkit_business.create_public_toolkit()
     # a = toolkit_business.get_by_toolkit_name('平均值')
     # b = toolkit_business.get_by_toolkit_id(ObjectId("592546b18be34d179b95d96f"))
     # print b.to_mongo()
@@ -66,7 +66,5 @@ if __name__ == '__main__':
     # print df[0]
     # print df[1]
     # a = [{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2}]
-    # b = [{'a':1},{'a':2},{'a':4}]
-    # print toolkit_service.convert_json_and_calculate("59266bd08be34d2b2362f90e", "59259247e89bde050b6f02d4", b,0)
-    argv = [1,2,4]
-    test(*argv)
+    b = [{'a':1},{'a':2},{'a':4}]
+    print toolkit_service.convert_json_and_calculate("59266bd08be34d2b2362f90e", "59259247e89bde050b6f02d4", b,0)
