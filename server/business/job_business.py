@@ -12,6 +12,7 @@
 from entity.job import Job
 from entity.toolkit import Toolkit
 from repository.job_repo import JobRepo
+from business import result_business
 
 job_repo = JobRepo(Job)
 
@@ -51,4 +52,8 @@ def add_toolkit_job(toolkit_obj):
 
 
 def end_job(job_obj):
-    return job_repo.update_one_by_id(job_obj, {'status': 2})
+    return job_repo.update_one_by_id(job_obj.id, {'status': 2})
+
+
+def get_job_by_result(result_obj):
+    return result_business.get_result_by_id(result_obj).job
