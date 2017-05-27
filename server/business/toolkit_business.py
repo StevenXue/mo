@@ -41,8 +41,9 @@ def list_public_toolkit_name():
     return all_names
 
 
+# TODO 涉及到别的 entity 或者 business 放到 service 里 to tianyi by zhaofeng
 def get_all_public_toolkit():
-    return ownership_business.list_ownership_by_type_and_private('toolkit', False)
+    return ownership_business.get_ownership_by_type_and_private('toolkit', False)
 
 
 def create_public_toolkit():
@@ -116,7 +117,7 @@ def create_public_toolkit():
     ownership_business.add(user, False, toolkit=MIC)
 
 
-
+# TODO 建议放入 utility to tianyi by zhaofeng
 def convert_json_str_to_dataframe(arr):
     """
     convert input data:

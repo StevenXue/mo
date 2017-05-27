@@ -19,11 +19,11 @@ def add(user, is_private, **owned_obj):
     return ownership_repo.create(ownership_obj)
 
 
-def list_ownership_by_user(user):
+def get_ownership_by_user(user):
     ownership = Ownership(user=user)
     return ownership_repo.read_by_user(ownership)
 
 
-def list_ownership_by_type_and_private(owned_type, is_private):
+def get_ownership_by_type_and_private(owned_type, is_private):
     ownership = Ownership(private=is_private)
     return ownership_repo.read_by_type_and_private(owned_type, ownership)

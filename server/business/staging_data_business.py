@@ -63,5 +63,5 @@ def get_by_staging_data_set_and_fields(staging_data_set_id, fields):
     :return: staging_data objects in specific fields
     """
     staging_data = StagingData(staging_data_set=staging_data_set_id)
-    return staging_data_repo.get_by_staging_data_set_and_fields(staging_data,
-                                                                fields)
+    return staging_data_repo.read_by_staging_data_set_and_fields(staging_data,
+                                                                 fields)
