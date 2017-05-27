@@ -116,7 +116,6 @@ def create_public_toolkit():
     ownership_business.add(user, False, toolkit=MIC)
 
 
-
 def convert_json_str_to_dataframe(arr):
     """
     convert input data:

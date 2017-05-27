@@ -12,6 +12,7 @@
 import numpy as np
 from sklearn.cluster import KMeans
 from minepy import MINE
+from sklearn.decomposition import PCA
 
 from service import job_service
 
@@ -116,6 +117,34 @@ def k_mean_predict(arr0, arr1, list_points, n_clusters=2):
     kmeans = KMeans(n_clusters).fit(X)
 
     return kmeans.predict(list_points)
+
+
+def dimension_reduction_PCA(arr, n_components, svd_solver)
+    """
+    pram: arr: array-like, shape (n_samples, n_features)
+          n_components: int, float, None or string
+          svd_solver: string {‘auto’, ‘full’, ‘arpack’, ‘randomized’}
+          auto :
+            the solver is selected by a default policy based on X.shape and n_components: 
+            if the input data is larger than 500x500 and the number of components to extract is lower than 80% of the smallest dimension of the data,
+            then the more efficient ‘randomized’ method is enabled. Otherwise the exact full SVD is computed and optionally truncated afterwards.
+          full :
+            run exact full SVD calling the standard LAPACK solver via scipy.linalg.svd and select the components by postprocessing
+          arpack :
+            run SVD truncated to n_components calling ARPACK solver via scipy.sparse.linalg.svds. It requires strictly 0 < n_components < X.shape[1]
+          randomized :
+            run randomized SVD by the method of Halko et al.
+    return: pca.components_: Principal axes in feature space, representing the directions of maximum variance in the data.
+            pca.explained_variance_: The amount of variance explained by each of the selected components.
+            pca.explained_variance_ratio_: Percentage of variance explained by each of the selected components.
+            pca.mean_: Per-feature empirical mean, estimated from the training set.
+            pca.noise_variance_: The estimated noise covariance following the Probabilistic PCA model from Tipping and Bishop 1999.
+    """
+    X = np.array(arr)
+    pca = PCA(n_components=n_components, svd_solver=svd_solver)
+    pca = pca.fit(X)
+    return pca.components_, pca.explained_variance_, pca.explained_variance_ratio_, pca.mean_, pca.noise_variance_
+
 
 
 dict_of_toolkit = {u"平均值": toolkit_average,
