@@ -33,10 +33,10 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
     :return: new staging_data_set object
     """
     # get project object
-    project = project_business.get_by_id(project_id)
+    # project = project_business.get_by_id(project_id)
 
     # create new staging data set
-    sds = staging_data_set_business.add(sds_name, sds_description, project)
+    sds = staging_data_set_business.add(sds_name, sds_description, project_id)
 
     # copy data from data(raw) to staging data
     # get all data objects by data_set id
