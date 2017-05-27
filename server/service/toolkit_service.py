@@ -53,3 +53,13 @@ def convert_json_and_calculate(toolkit_id, project_id, data, k):
     result = toolkit_calculate(toolkit_id, *argv)
     project_business.add_job_and_result_to_project(result, ObjectId(project_id))
     return result.to_mongo().to_dict()
+
+
+def add_toolkit_with_ownership(name, description, target_py_code,
+                               entry_function, parameter_spec, user_ID,
+                               is_private):
+    toolkit = toolkit_business.add(name, description, target_py_code,
+                         entry_function, parameter_spec)
+    user = user_business.get_by_user_ID(user_ID)
+    ownership_business.add(user, is_private, toolkit=toolkit)
+

@@ -21,6 +21,7 @@ def add_file(file, url_base, user_ID, is_private=True, description=''):
         raise NameError('no user found')
     file_url = url_base + user.user_ID + '/' + file.filename
     save_directory = UPLOAD_FOLDER + user.user_ID + '/'
+    # TODO need to be undo when failed
     file_size, file_uri = save_file_and_get_size(file, save_directory)
     saved_file = file_business.add(file.filename, file_size, file_url,
                                    file_uri, description)
