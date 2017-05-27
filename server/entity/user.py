@@ -15,4 +15,3 @@ class User(Document):
     phone = StringField(unique=True)
     gender = IntField(choices=GENDER)
     age = IntField()
-

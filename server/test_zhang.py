@@ -60,5 +60,6 @@ if __name__ == '__main__':
     # print df
     # print df[0]
     # print df[1]
-
-    print toolkit_service.convert_json_and_calculate("59266bd08be34d2b2362f920",[{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2}],0)
+    a = [{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2}]
+    b = [{'a':1},{'a':2},{'a':4}]
+    print toolkit_service.convert_json_and_calculate("59266bd08be34d2b2362f90e", "59259247e89bde050b6f02d4", b,0)
