@@ -24,11 +24,6 @@ staging_data_app = Blueprint("staging_data_app", __name__, url_prefix=PREFIX)
 @staging_data_app.route('/get_by_staging_data_set_and_fields', methods=['POST'])
 def get_by_staging_data_set_and_fields():
     data = request.get_json()
-    # staging_data_set_id = request.args.get('staging_data_set_id')
-    # fields = request.args.get('fields')
-    # fields = fields.split(',')
-    # toolkit_id = request.args.get('toolkit_id')
-    # project_id = request.args.get('project_id')
 
     staging_data_set_id = data['staging_data_set_id']
     fields = data['fields']
