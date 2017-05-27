@@ -9,6 +9,7 @@ class StagingDataRepo(Repo):
 
     def read_by_staging_data_set(self, staging_data_set):
         return Repo.read(self, {'staging_data_set': staging_data_set.id})
+        # return Repo.read(self, {'staging_data_set': staging_data_set})
 
     def read_first_one_by_staging_data_set(self, staging_data_set):
         return Repo.read_first_one(self, {'staging_data_set': staging_data_set.id})

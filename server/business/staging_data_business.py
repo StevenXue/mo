@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 from entity.staging_data import StagingData
+from entity.staging_data_set import StagingDataSet
 from repository.staging_data_repo import StagingDataRepo
 
 staging_data_repo = StagingDataRepo(StagingData)
@@ -50,9 +51,9 @@ def get_by_staging_data_set_id(staging_data_set_id):
     :param staging_data_set_id: ObjectId
     :return: matched staging_data objects in list form
     """
-    staging_data = StagingData(staging_data_set=staging_data_set_id)
-    return staging_data_repo.read_by_staging_data_set(staging_data)
-
+    staging_data_set = StagingDataSet(id=staging_data_set_id)
+    return staging_data_repo.read_by_staging_data_set(staging_data_set)
+    # return staging_data_repo.read_by_staging_data_set(staging_data_set_id)
 
 def get_by_staging_data_set_and_fields(staging_data_set_id, fields):
     """

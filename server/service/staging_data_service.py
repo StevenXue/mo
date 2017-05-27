@@ -62,7 +62,11 @@ def get_fields_with_types(staging_data_set_id):
     sds_object = staging_data_set_business.get_by_id(staging_data_set_id)
     sd_object = staging_data_business.get_first_one_by_staging_data_set(
                  sds_object)
-    sd_object = sd_object.to_mongo().to_dict()
-    return [[k, type(v).__name__]for k, v in sd_object.iteritems()]
+    if sd_object:
+        transformed_sb_object = sd_object.to_mongo().to_dict()
+        return [[k, type(v).__name__]for k, v
+                in transformed_sb_object.iteritems()]
+    else:
+        raise RuntimeError("No matched data")
 
 

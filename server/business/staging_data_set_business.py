@@ -30,7 +30,6 @@ def get_by_project_id(project_id):
 
 
 def add(name, description, project):
-    # TODO need to check project can be object or object's ObjectId
     """
     Add a new staging_dat_set
 
