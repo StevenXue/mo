@@ -41,8 +41,17 @@ def fake_upload():
 
 @file_app.route('/upload_file', methods=['POST'])
 def upload_file():
-    user_ID = request.args.get('user_ID')
-    if_private = request.args.get('if_private')
+    # data = request.get_json()
+    # user_ID = data['user_ID']
+    # if_private = data['if_private']
+    # description = data['description']
+
+    user_ID = request.form['user_ID']
+    is_private = request.form['if_private']
+    description = request.form['description']
+    # convert string to bool
+    is_private = is_private.lower() == 'true'
+
     if request.method == 'POST':
         # check if the post request has the file part
         if REQUEST_FILE_NAME not in request.files:
@@ -54,7 +63,7 @@ def upload_file():
             try:
                 url_base = PREFIX + UPLOAD_URL
                 saved_file = file_service.add_file(file, url_base,
-                                             user_ID, if_private)
+                                             user_ID, is_private, description)
                 file_json = json_utility.convert_to_json(saved_file.to_mongo())
             except Exception, e:
                 return make_response(jsonify({'response': '%s: %s' % (str(

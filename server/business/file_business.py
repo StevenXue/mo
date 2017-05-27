@@ -1,13 +1,14 @@
 # -*- coding: UTF-8 -*-
-
+from datetime import datetime
 from entity.file import File
 from repository.file_repo import FileRepo
 
 file_repo = FileRepo(File)
 
 
-def add(file_name, file_size, url, path):
-    file_obj = File(name=file_name, size=file_size, url=url, path=path)
+def add(file_name, file_size, url, uri, description):
+    file_obj = File(name=file_name, size=file_size, url=url, uri=uri,
+                    upload_time=datetime.utcnow(), description=description)
     return file_repo.create(file_obj)
 
 
@@ -27,5 +28,5 @@ def delete_by_id(file_id):
 
 
 def get_raw_file(file):
-    path = file.path
+    path = file.uri
 
