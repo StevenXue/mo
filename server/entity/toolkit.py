@@ -26,7 +26,6 @@ class Toolkit(DynamicDocument):
     # target_py = StringField(max_length=25, unique=True)
     target_py_code = StringField(required=True)
 
-
     # ownership_ref = StringField(max_length=20, unique=True)
     # ownership_ref = ReferenceField('Ownership')
 
@@ -34,17 +33,14 @@ class Toolkit(DynamicDocument):
     # status = IntField(choices=STATUS, required=True)
 
     entry_function = StringField(required=True)
-    # 'run()'
+    # 'run'
 
     parameter_spec = DictField()
     # {
-    #     "input_data": {
-    #         type: array,
-    #     }
+    #     "input_data": [{'type': 'list'},{{'type':'list', 'default':[1,2,3,4,5}]
     #     "k": {
-    #         type: int,
-    #         default: 2
+    #         'type': 'int',
+    #         'default': 2
     #     }
     # }
     # meta = {'allow_inheritance': True}
-

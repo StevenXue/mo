@@ -31,6 +31,14 @@ def toolkit_calculate(id, *argv):
     return toolkit_code.dict_of_toolkit[name](*argv)
 
 
+# for database
+def toolkit_calculate_temp(toolkit_id, *argv):
+    toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
+    # name = toolkit_obj.name
+    exec toolkit_obj.target_py_code
+    return run(*argv)
+
+
 def convert_json_and_calculate(toolkit_id, project_id, data, k):
     """convert json list"""
     col = data[0].keys()

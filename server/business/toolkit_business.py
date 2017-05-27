@@ -50,10 +50,11 @@ def create_public_toolkit():
     """
     数据库建一个toolkit的collection, 记载public的数据分析工具包简介
     """
-    user = user_business.get_by_user_ID('tttt') # fixme
+    user = user_business.get_by_user_ID('system') # fixme
 
     AVG = Toolkit(name='平均值',
                   description='计算所选数据集合的平均值',
+                  entry_function='run',
                   parameter_spec={'input_data': 'list'})
     AVG = toolkit_repo.create(AVG)
     ownership_business.add(user, False, toolkit=AVG)

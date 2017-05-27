@@ -32,10 +32,15 @@ def now(arr0, arr1, k):
 def a(*args):
     print args[0], args[1], args[2]
 
+def test(a,b,c=3):
+    print 'a', a
+    print 'b', b
+    print 'c', c
+
 if __name__ == '__main__':
     pass
 
-    # toolkit_business.create_public_toolkit()
+    toolkit_business.create_public_toolkit()
     # a = toolkit_business.get_by_toolkit_name('平均值')
     # b = toolkit_business.get_by_toolkit_id(ObjectId("592546b18be34d179b95d96f"))
     # print b.to_mongo()
@@ -60,6 +65,8 @@ if __name__ == '__main__':
     # print df
     # print df[0]
     # print df[1]
-    a = [{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2}]
-    b = [{'a':1},{'a':2},{'a':4}]
-    print toolkit_service.convert_json_and_calculate("59266bd08be34d2b2362f90e", "59259247e89bde050b6f02d4", b,0)
+    # a = [{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2}]
+    # b = [{'a':1},{'a':2},{'a':4}]
+    # print toolkit_service.convert_json_and_calculate("59266bd08be34d2b2362f90e", "59259247e89bde050b6f02d4", b,0)
+    argv = [1,2,4]
+    test(*argv)
