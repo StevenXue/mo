@@ -117,9 +117,10 @@ def k_mean_predict(arr0, arr1, list_points, n_clusters=2):
     kmeans = KMeans(n_clusters).fit(X)
 
     return kmeans.predict(list_points)
+# run = k_mean_predict
 
 
-def dimension_reduction_PCA(arr, n_components, svd_solver)
+def dimension_reduction_PCA(arr, n_components, svd_solver):
     """
     pram: arr: array-like, shape (n_samples, n_features)
           n_components: int, float, None or string

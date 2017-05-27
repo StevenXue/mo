@@ -33,7 +33,7 @@ class Toolkit(DynamicDocument):
     # status = IntField(choices=STATUS, required=True)
 
     entry_function = StringField(required=True)
-    # 'run()'
+    # 'run'
 
     parameter_spec = DictField()
     # {
@@ -44,4 +44,3 @@ class Toolkit(DynamicDocument):
     #     }
     # }
     # meta = {'allow_inheritance': True}
-
