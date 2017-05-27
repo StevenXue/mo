@@ -52,6 +52,15 @@ def get_all_public_toolkit():
     return ownership_business.get_ownership_by_type_and_private('toolkit', False)
 
 
+def add(name, description, target_py_code, entry_function, parameter_spec):
+    toolkit = Toolkit(name=name, description=description,
+                      target_py_code=target_py_code,
+                      entry_function=entry_function,
+                      parameter_spec=parameter_spec)
+    # TODO add ownership
+    return toolkit_repo.create(toolkit)
+
+
 def create_public_toolkit():
     """
     数据库建一个toolkit的collection, 记载public的数据分析工具包简介

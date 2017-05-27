@@ -18,6 +18,7 @@ RESULT_TYPE = (
 
 class Result(Document):
     job = ReferenceField('Job', required=True)
+    # TODO Changed "time" to "create_time", Added "description", "type"
     # TODO Changed "time" to "create_time", Added "description", "result_type"
     # FIXME
     # TODO

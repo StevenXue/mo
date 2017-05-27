@@ -12,12 +12,21 @@ from flask import make_response
 from flask import request
 
 from service import toolkit_service
+from business import toolkit_business
 from utility import json_utility
 
 PREFIX = '/toolkit'
 
 toolkit_app = Blueprint("toolkit_app", __name__, url_prefix=PREFIX)
 
+ALLOWED_EXTENSIONS = set(['py'])
+# UPLOAD_URL = '/uploads/'
+REQUEST_FILE_NAME = 'uploaded_code'
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # 后端直接传输了，不一定要restful api
 # @toolkit_app.route('/analysis_calculate', methods=['POST'])
@@ -43,3 +52,46 @@ def get_all_toolkit_info():
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}), 400)
     return make_response(jsonify({'message': 'get info success', 'response': json_utility.convert_to_json(result)}), 200)
+
+
+@toolkit_app.route('/upload_code', methods=['POST'])
+def upload_code():
+    print 'in in in 111'
+
+    user_ID = request.form['user_ID']
+    is_private = request.form['if_private']
+    name = request.form['name']
+    description = request.form['description']
+    entry_function = request.form['entry_function']
+    parameter_spec = request.form['parameter_spec']
+    # convert string to bool
+    is_private = is_private.lower() == 'true'
+
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if REQUEST_FILE_NAME not in request.files:
+            return make_response(jsonify({'response': 'no file part'}), 400)
+        file = request.files[REQUEST_FILE_NAME]
+        if file.filename == '':
+            return make_response(jsonify({'response': 'no selected file'}), 400)
+        if file and allowed_file(file.filename):
+            # try:
+            print 'in in in'
+            target_py_code = file.read()
+            toolkit_service.add_toolkit_with_ownership(name, description,
+                                                           target_py_code,
+                                                           entry_function,
+                                                           eval(parameter_spec),
+                                                           user_ID,
+                                                           is_private)
+                # url_base = PREFIX + UPLOAD_URL
+                # saved_file = file_service.add_file(file, url_base,
+                #                                    user_ID, is_private, description)
+                # file_json = json_utility.convert_to_json(saved_file.to_mongo())
+            # except Exception, e:
+            #     return make_response(jsonify({'response': '%s: %s' % (str(
+            #         Exception), e.args)}), 400)
+            return make_response(jsonify({'response': 'success'}), 200)
+        else:
+            return make_response(jsonify({'response': 'file is not allowed'}),
+                                 400)
