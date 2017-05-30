@@ -33,9 +33,7 @@ def get_by_toolkit_name(toolkit_name):
 
 
 def get_by_toolkit_id(toolkit_id):
-    toolkit_obj = Toolkit(id=ObjectId(toolkit_id))
-    # print 'toolkit_obj', toolkit_obj.name
-    return toolkit_repo.read_by_id(toolkit_obj)
+    return toolkit_repo.read_by_id(toolkit_id)
 
 
 def list_public_toolkit_name():

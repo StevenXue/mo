@@ -39,8 +39,8 @@ def get_by_id(object_id):
     :param object_id: ObjectId
     :return: a matched Project object
     """
-    project = Project(id=object_id)
-    return project_repo.read_by_id(project)
+    # project = Project(id=object_id)
+    return project_repo.read_by_id(object_id)
 
 
 # def add_job_to_project(job_obj, project_obj):

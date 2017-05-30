@@ -17,12 +17,10 @@ def get_by_user(user_obj):
 
 
 def get_by_id(file_id):
-    file_obj = File(id=file_id)
-    return file_repo.read_by_id(file_obj)
+    return file_repo.read_by_id(file_id)
 
 
 def delete_by_id(file_id):
-    file_obj = File(id=file_id)
-    return file_repo.delete_by_id(file_obj)
+    return file_repo.delete_by_id(file_id)
 
 

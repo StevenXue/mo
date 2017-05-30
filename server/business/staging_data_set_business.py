@@ -14,8 +14,7 @@ def get_by_id(sds_id):
     :param sds_id: staging_data_set ObjectId
     :return: staging_data_set object
     """
-    sds = StagingDataSet(id=sds_id)
-    return staging_data_set_repo.read_by_id(sds)
+    return staging_data_set_repo.read_by_id(sds_id)
 
 
 def get_by_project_id(project_id):

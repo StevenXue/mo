@@ -19,6 +19,5 @@ def add(name, description):
 
 
 def get_by_id(data_set_id):
-    data_set = DataSet(id=data_set_id)
-    return data_set_repo.read_by_id(data_set)
+    return data_set_repo.read_by_id(data_set_id)
 

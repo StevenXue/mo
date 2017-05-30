@@ -39,13 +39,25 @@ class Repo:
         return self.__instance.objects.get(**query)
 
     def read_by_unique_field(self, field_name, field_value):
+        """
+        general function to query the db by unique field
+        :param field_name:
+        :param field_value:
+        :return: return the unique object corresponding to the query
+        """
         return Repo.read_unique_one(self, {field_name: field_value})
 
     def read_by_non_unique_field(self, field_name, field_value):
+        """
+        general function to query the db by non unique field, thus return a list
+        :param field_name:
+        :param field_value:
+        :return: a list of objects corresponding to the query
+        """
         return Repo.read(self, {field_name: field_value})
 
-    def read_by_id(self, obj):
-        return self.__instance.objects.get(id=obj.id)
+    def read_by_id(self, object_id):
+        return self.__instance.objects.get(id=object_id)
 
     def update(self, query, update):
         return self.__instance.objects(**query).update(**update)
@@ -83,5 +95,5 @@ class Repo:
     def delete_unique_one(self, query):
         return self.__instance.objects.get(**query).delete()
 
-    def delete_by_id(self, obj):
-        return self.__instance.objects.get(id=obj.id).delete()
+    def delete_by_id(self, object_id):
+        return self.__instance.objects.get(id=object_id).delete()
