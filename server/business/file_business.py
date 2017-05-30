@@ -13,8 +13,7 @@ def add(file_name, file_size, url, uri, description):
 
 
 def get_by_user(user_obj):
-    file_obj = File(user=user_obj)
-    return file_repo.read_by_user(file_obj)
+    return file_repo.read_by_unique_field('user', user_obj)
 
 
 def get_by_id(file_id):

@@ -38,6 +38,12 @@ class Repo:
     def read_unique_one(self, query):
         return self.__instance.objects.get(**query)
 
+    def read_by_unique_field(self, field_name, field_value):
+        return Repo.read_unique_one(self, {field_name: field_value})
+
+    def read_by_non_unique_field(self, field_name, field_value):
+        return Repo.read(self, {field_name: field_value})
+
     def read_by_id(self, obj):
         return self.__instance.objects.get(id=obj.id)
 

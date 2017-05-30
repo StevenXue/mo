@@ -12,5 +12,4 @@ def add(user_ID, password, kwargs):
 
 
 def get_by_user_ID(user_ID):
-    user_obj = User(user_ID=user_ID)
-    return user_repo.read_by_user_ID(user_obj)
+    return user_repo.read_by_unique_field('user_ID', user_ID)

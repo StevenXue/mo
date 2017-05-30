@@ -16,8 +16,8 @@ def get_ownership_objects_by_user_ID(user_ID, owned_type):
 
 
 def get_all_public_objects(owned_type):
-    return ownership_business.get_ownership_by_type_and_private(owned_type,
-                                                                False)
+    return ownership_business.list_ownership_by_type_and_private(owned_type,
+                                                                 False)
 
 
 def list_by_user_ID(user_ID):
@@ -28,7 +28,7 @@ def list_by_user_ID(user_ID):
     """
     user = user_business.get_by_user_ID(user_ID)
     if user:
-        return ownership_business.get_ownership_by_user(user)
+        return ownership_business.list_ownership_by_user(user)
     else:
         raise NameError('no user found')
 
@@ -40,7 +40,7 @@ def check_private(owned, owned_type):
     :param owned_type:
     :return: True for private, False for public
     """
-    ownerships = ownership_business.get_ownership_by_type_and_private(
+    ownerships = ownership_business.list_ownership_by_type_and_private(
         owned_type, True)
     if owned in [ownership[owned_type] for ownership in ownerships if
                  owned_type in ownership]:
@@ -57,7 +57,7 @@ def check_ownership(user_ID, owned, owned_type):
     :return:
     """
     user = user_business.get_by_user_ID(user_ID)
-    ownerships = ownership_business.get_ownership_by_user(user)
+    ownerships = ownership_business.list_ownership_by_user(user)
     owned_list = [os[owned_type] for os in ownerships]
     if owned in owned_list:
         return True

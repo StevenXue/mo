@@ -51,13 +51,12 @@ def get_all_toolkit_info():
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}), 400)
-    return make_response(jsonify({'message': 'get info success', 'response': json_utility.convert_to_json(result)}), 200)
+    return make_response(jsonify({'message': 'get info success', 'response':
+        json_utility.convert_to_json(result)}), 200)
 
 
 @toolkit_app.route('/upload_code', methods=['POST'])
 def upload_code():
-    print 'in in in 111'
-
     user_ID = request.form['user_ID']
     is_private = request.form['if_private']
     name = request.form['name']
@@ -75,22 +74,17 @@ def upload_code():
         if file.filename == '':
             return make_response(jsonify({'response': 'no selected file'}), 400)
         if file and allowed_file(file.filename):
-            # try:
-            print 'in in in'
-            target_py_code = file.read()
-            toolkit_service.add_toolkit_with_ownership(name, description,
+            try:
+                target_py_code = file.read()
+                toolkit_service.add_toolkit_with_ownership(name, description,
                                                            target_py_code,
                                                            entry_function,
                                                            eval(parameter_spec),
                                                            user_ID,
                                                            is_private)
-                # url_base = PREFIX + UPLOAD_URL
-                # saved_file = file_service.add_file(file, url_base,
-                #                                    user_ID, is_private, description)
-                # file_json = json_utility.convert_to_json(saved_file.to_mongo())
-            # except Exception, e:
-            #     return make_response(jsonify({'response': '%s: %s' % (str(
-            #         Exception), e.args)}), 400)
+            except Exception, e:
+                return make_response(jsonify({'response': '%s: %s' % (str(
+                    Exception), e.args)}), 400)
             return make_response(jsonify({'response': 'success'}), 200)
         else:
             return make_response(jsonify({'response': 'file is not allowed'}),

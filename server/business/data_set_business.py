@@ -13,9 +13,9 @@ def add(name, description):
     return data_set_repo.create(data_set)
 
 
-def get_by_name(name):
-    ds = DataSet(name=name)
-    return data_set_repo.read_by_name(ds)
+# def get_by_name(name):
+    # ds = DataSet(name=name)
+    # return data_set_repo.read_by_name(name)
 
 
 def get_by_id(data_set_id):

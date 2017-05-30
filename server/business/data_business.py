@@ -14,6 +14,5 @@ def add(data_set, other_fields_dict):
 
 
 def get_by_data_set(data_set):
-    data = Data(data_set=data_set)
-    return data_repo.read_by_data_set(data)
+    return data_repo.read_by_unique_field('data_set', data_set)
 
