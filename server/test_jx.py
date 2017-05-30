@@ -27,7 +27,8 @@ connect(
 # query = {"总待还本金": "8712.73"}
 query = {'性别':'男', '借款期限': '12', '借款金额': '20000'}
 data = data_manager.find(query, '592917341c5ad409b07335e6')
-print data
+for d in data:
+    print d[u'借款金额']
 
 # # --------------------------
 # # Test block of data_manager.py

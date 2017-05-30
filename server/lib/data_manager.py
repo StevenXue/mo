@@ -12,9 +12,10 @@ sys.setdefaultencoding('utf-8')  # 设置 'utf-8'
 
 
 def find(query_str_in_mongodb_form, staging_data_set_id):
-    return staging_data_service.\
+    data = staging_data_service.\
         find_by_query_str(ObjectId(staging_data_set_id),
                           **query_str_in_mongodb_form)
+    return convert_staging_data_objects_to_json(data)
 
 
 def get_staging_data(staging_data_set_id):
@@ -26,9 +27,9 @@ def get_staging_data(staging_data_set_id):
     """
     data = staging_data_business.\
         get_by_staging_data_set_id(ObjectId(staging_data_set_id))
-    transformed_data = convert_to_json([sd.to_mongo().to_dict() for sd in data])
-    return transformed_data
-
+    # transformed_data = convert_to_json([sd.to_mongo().to_dict() for sd in data])
+    # return transformed_data
+    return convert_staging_data_objects_to_json(data)
 
 def list_staging_data_set(project_id):
     """
@@ -40,8 +41,8 @@ def list_staging_data_set(project_id):
     sd_objects = staging_data_service.\
         list_staging_data_sets_by_project_id(ObjectId(project_id))
     # return [obj.to_mongo().to_dict() for obj in sd_objects]
-    return convert_to_json([obj.to_mongo().to_dict() for obj in sd_objects])
-
+    # return convert_to_json([obj.to_mongo().to_dict() for obj in sd_objects])
+    return convert_staging_data_objects_to_json(sd_objects)
 
 def list_fields(staging_data_set_id):
     """
@@ -55,6 +56,10 @@ def list_fields(staging_data_set_id):
     # return convert_to_json([elem[0] for elem in data])
     return [elem[0] for elem in data]
 
+
+def convert_staging_data_objects_to_json(staging_data_objects):
+    return convert_to_json([obj.to_mongo().to_dict()
+                            for obj in staging_data_objects])
 
 def convert_to_json(data):
     """
