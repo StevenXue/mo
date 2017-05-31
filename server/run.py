@@ -1,6 +1,11 @@
 # -*- coding: UTF-8 -*-
 from flask import Flask
+from flask import jsonify
+from flask import request
+from flask import make_response
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager, jwt_required, \
+    get_jwt_identity, get_jwt_claims
 
 from route import file_route
 from route import ownership_route
@@ -11,10 +16,47 @@ from route import toolkit_route
 from route import user_route
 from repository import config
 
+
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
 app = Flask(__name__, static_url_path='')
+app.secret_key = 'super-secret'  # Change this!
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 CORS(app, supports_credentials=True)
+
+# Setup the Flask-JWT-Extended extension
+jwt = JWTManager(app)
+
+
+# This method will get whatever object is passed into the
+# create_access_token method.
+@jwt.user_claims_loader
+def add_claims_to_access_token(user):
+    # add more claims in the future
+    return {'age': user.age}
+
+
+# This method will also get whatever object is passed into the
+# create_access_token method, and let us define what the identity
+# should be for this object
+@jwt.user_identity_loader
+def user_identity_lookup(user):
+    return user.user_ID
+
+
+# This is an example for jwt_required
+# Protect a view with jwt_required, which requires a valid access token
+# in the request to access.
+@app.route('/protected', methods=['GET'])
+@jwt_required
+def protected():
+    # Access the identity of the current user with get_jwt_identity
+    current_user = get_jwt_identity()
+    claims = get_jwt_claims()
+    return jsonify({
+        'hello_from': current_user,
+        'age': claims['age']
+    }), 200
 
 app.register_blueprint(file_route.file_app)
 app.register_blueprint(ownership_route.ownership_app)
@@ -23,8 +65,6 @@ app.register_blueprint(data_route.data_app)
 app.register_blueprint(staging_data_route.staging_data_app)
 app.register_blueprint(toolkit_route.toolkit_app)
 app.register_blueprint(user_route.user_app)
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True, threaded=True)
