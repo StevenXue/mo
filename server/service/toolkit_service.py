@@ -53,6 +53,14 @@ def convert_json_and_calculate(toolkit_id, project_id, data, k):
     # print 'col', col
     # print 'data', data
     # argv = []
+
+    # print 'before argv', col
+    # argv = [[int(j[i]) for j in data] for i in col]
+    # print 'argv', argv
+    # if k:
+    #     argv.append(k)
+    # print 'argv1', argv
+    # return toolkit_calculate(id, *argv)
     argv = [[float(j[i]) for j in data] for i in col]
     # print 'argv', argv
     if k:
@@ -72,4 +80,3 @@ def add_toolkit_with_ownership(name, description, target_py_code,
                          entry_function, parameter_spec)
     user = user_business.get_by_user_ID(user_ID)
     ownership_business.add(user, is_private, toolkit=toolkit)
-

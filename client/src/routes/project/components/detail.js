@@ -79,28 +79,57 @@ export default class ProjectDetail extends React.Component {
       },
       body:JSON.stringify({
         "file_id": this.state.data_id,
-        "data_set_name": "testing_data_3",
+        "data_set_name": "test_" + Math.floor(Math.random()*1000),
         "ds_description": "some dssss",
         "user_ID": "test_user",
         "is_private": true
      })
     }).then((response) => response.json())
       .then((res) => {
-          console.log(res);
-          if(res[1] === 400){
-            console.log("error");
-          }else {
-              fetch(flaskServer + '/staging_data/add_staging_data_set_by_data_set_id', {
-              method: 'post',
-              body:JSON.stringify({
-                "project_id": this.props.location.query._id,
-                "staging_data_set_name": "testing_stage_name",
-                "staging_data_set_description": "dsdsds",
-                "data_set_id": res._id
-              })
-            });
+          console.log(res.response._id, this.props.location.query._id);
+
+        fetch(flaskServer + '/staging_data/add_staging_data_set_by_data_set_id', {
+            method: 'post',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              "project_id": this.props.location.query._id,
+              "staging_data_set_name": "test_" + Math.floor(Math.random()*1000),
+              "staging_data_set_description": "dsdsds",
+              "data_set_id": res.response._id
+            })
           }
-      })
+        ).then((response) => response.json())
+          .then((res) => {
+            console.log(res);
+            this.setState({
+              notebookName: ''
+            });
+          })
+      });
+
+
+  }
+
+  showResult(r) {
+    console.log("result is", r);
+    this.setState({notebookJSON: {
+      "cells": [{
+        "execution_count": 1,
+        "cell_type": "code",
+        "source": "result is: " + r,
+        "outputs": [],
+        "metadata": {
+          "collapsed": true,
+          "trusted": true
+        }
+      }],
+      "metadata": {},
+      "nbformat": 4,
+      "nbformat_minor": 2
+    }});
+
   }
 
   onChange(info) {
@@ -108,8 +137,8 @@ export default class ProjectDetail extends React.Component {
       console.log(info.file, info.fileList);
     }
     if (info.file.status === 'done') {
-      console.log("done", info.file.response[0].response._id);
-      this.setState({data_id: info.file.response[0].response._id});
+      console.log("done", info.file.response.response._id);
+      this.setState({data_id: info.file.response.response._id});
       message.success(`${info.file.name} file uploaded successfully`);
     } else if (info.file.status === 'error') {
       message.error(`${info.file.name} file upload failed.`);
@@ -148,8 +177,8 @@ export default class ProjectDetail extends React.Component {
                     <Icon type="file"/> Upload File
                   </Button>
                 </Upload>
-                < Button type='primary' style={{marginTop: 10, width: 120}}
-                onClick={() => this.dataOp()}>OK</Button>
+                <Button type='primary' style={{marginTop: 10, width: 120}}
+                  onClick={() => this.dataOp()}>OK</Button>
                 </div>): null
               }
             </div>
@@ -157,9 +186,11 @@ export default class ProjectDetail extends React.Component {
           <div style={{marginTop: 20, display: 'flex', flexDirection: 'row'}}>
             <div style={{width: '40%', height: 700, border: '1px solid #f3f3f3'}}>
               {this.state.editing?
-                (<div style={{marginTop: 10, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                <Toolkits project_id={this.props.location.query._id}/>
-                </div>):(<div>
+                (
+                  <div style={{marginTop: 10, width: '100%', display: 'flex',
+                    height: 500, overFlowY: 'auto', flexDirection: 'column', alignItems: 'center'}}>
+                    <Toolkits project_id={this.props.location.query._id} fetchResult={(r) => this.showResult(r)}/>
+                  </div>):(<div>
                   <h3 style={{margin: '5px 5px 5px 10px'}}>File List</h3>
                 {this.renderList()}
                   <h3 style = {{margin: '5px 5px 5px 10px'}}>Data List</h3>
