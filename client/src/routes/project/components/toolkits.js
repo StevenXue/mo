@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Select, Upload, Icon, message, Checkbox } from 'antd';
+import { Button, Select, Upload, Icon, message, Checkbox, Input } from 'antd';
 import {jupyterServer, flaskServer} from '../../../constants';
 import { Router , routerRedux} from 'dva/router';
 import Jupyter from 'react-jupyter';
@@ -21,7 +21,9 @@ export default class ProjectDetail extends React.Component {
       data_set: [],
       selectedData: '',
       dataColumns: [],
-      checkedCols: []
+      checkedCols: [],
+      result: 0,
+      toolkit: ''
     }
   }
 
@@ -54,7 +56,35 @@ export default class ProjectDetail extends React.Component {
 
   }
 
+  componentWillReceiveProps(nextProps) {
+
+    fetch(flaskServer+'/toolkit/get_all_toolkit_info', {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then((response) => response.json())
+      .then((res) =>{
+          console.log(res.response);
+          this.setState({toolkits: res.response});
+        }
+      );
+
+    fetch(flaskServer+'/staging_data/list_staging_data_sets_by_project_id?project_id=' + nextProps.project_id, {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then((response) => response.json())
+      .then((res) => {
+          console.log(res.response);
+          this.setState({data_set: res.response});
+        }
+      );
+  }
+
   handleChange(e) {
+    console.log("toolkit" + e);
     let toolkit = this.state.toolkits;
     let target = toolkit.filter((el) => el._id === e);
     let extra = [];
@@ -67,6 +97,7 @@ export default class ProjectDetail extends React.Component {
     keys = keys.filter((e) => e === 'input_data');
 
     this.setState({
+      toolkit: e,
       selectable: keys.length ,
       extraInput: extra
     });
@@ -77,7 +108,18 @@ export default class ProjectDetail extends React.Component {
   onSelectDataSet(values){
     console.log(values);
     this.setState({selectedData: values});
-    this.setState({dataColumns: mockResult});
+    //this.setState({dataColumns: mockResult});
+    fetch(flaskServer+'/staging_data/get_fields_with_types?staging_data_set_id=' + values, {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then((response) => response.json())
+      .then((res) => {
+          console.log(res.response);
+          this.setState({dataColumns: res.response});
+        }
+      );
   }
 
   onCheckCol(e){
@@ -88,12 +130,31 @@ export default class ProjectDetail extends React.Component {
     let checked = this.state.checkedCols;
     if (e.target.checked === true){
       checked.push(e.target.id);
+    }else{
+      checked.pop();
     }
     this.setState({checkedCols: checked});
   }
 
   onClick(){
-    console.log(this.state.checkedCols, this.state.selectedData)
+    //console.log(this.state.checkedCols, this.state.selectedData,)
+    let check = this.state.checkedCols.join(',');
+    console.log(this.state.selectedData, check, this.state.toolkit, this.props.project_id )
+    fetch(flaskServer + '/staging_data/get_by_staging_data_set_and_fields?staging_data_set_id='
+      + this.state.selectedData + '&fields=' + check + "&toolkit_id=" + this.state.toolkit +
+      "&project_id=" + this.props.project_id, {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then((response) => response.json())
+      .then((res) => {
+          console.log(res.response);
+          this.props.fetchResult(res.response.result);
+          this.setState({result: res.response.result});
+        }
+      );
+
   }
 
   renderCheckBoxTable(){
@@ -102,8 +163,7 @@ export default class ProjectDetail extends React.Component {
       return col.map((el) =>
         <div style={{marginTop: 10}}>
           <Checkbox onChange={(e) => this.onCheckCol(e)}
-            // checked={(e) => this.checked(e)}
-                    id={el[0]}>{el[0]}</Checkbox>
+                    id={el[0]}>{el[0] + "("+ el[1] + ")"}</Checkbox>
         </div>
       );
     }else{
@@ -161,10 +221,13 @@ export default class ProjectDetail extends React.Component {
               {this.renderOptionsData()}
             </Select>
             <div style={{marginLeft: -20}}>
-              <div style={{marginLeft: 20}}>{"choose" + this.state.selectable }</div>
+              <h4 style={{marginLeft: 20, marginTop: 10}}>{"choose " + this.state.selectable + " fields"}</h4>
               {this.renderInputs()}
+              <div style={{ height: 450, overflowY: 'auto' }}>
               {this.renderCheckBoxTable()}
+              </div>
             </div>
+            <h3>{"Result is : " + this.state.result}</h3>
             <Button style={{marginTop: 10}} onClick={() => this.onClick()}>RUN</Button>
           </div>
         </div>

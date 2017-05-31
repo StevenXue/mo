@@ -25,7 +25,10 @@ staging_data_app = Blueprint("staging_data_app", __name__, url_prefix=PREFIX)
 def get_by_staging_data_set_and_fields():
     staging_data_set_id = request.args.get('staging_data_set_id')
     fields = request.args.get('fields')
-    fields = fields.split(',')
+    if ',' in fields:
+        fields = fields.split(',')
+    else:
+        fields = [fields]
     toolkit_id = request.args.get('toolkit_id')
     project_id = request.args.get('project_id')
     # 初始值为0
@@ -35,6 +38,7 @@ def get_by_staging_data_set_and_fields():
         data = staging_data_business.get_by_staging_data_set_and_fields(
             ObjectId(staging_data_set_id), fields)
         data = [d.to_mongo().to_dict() for d in data]
+        print 'route', toolkit_id, data, k
         data = toolkit_service.convert_json_and_calculate(toolkit_id, data, k)
         data = json_utility.convert_to_json(data)
     except Exception, e:
@@ -82,13 +86,13 @@ def add_staging_data_set_by_data_set_id():
     staging_data_set_description = data['staging_data_set_description']
     data_set_id = data['data_set_id']
 
-    try:
-        saved_sds = staging_data_service.add_staging_data_set_by_data_set_id(
+    # try:
+    saved_sds = staging_data_service.add_staging_data_set_by_data_set_id(
             staging_data_set_name, staging_data_set_description,
             ObjectId(project_id), ObjectId(data_set_id))
-        sds_json = json_utility.convert_to_json(saved_sds.to_mongo())
-    except Exception, e:
-        return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}), 400)
+    sds_json = json_utility.convert_to_json(saved_sds.to_mongo())
+    # except Exception, e:
+    #     return make_response(jsonify({'response': '%s: %s' % (str(
+    #         Exception), e.args)}), 400)
     return make_response(jsonify({'response': sds_json}),
                          200)

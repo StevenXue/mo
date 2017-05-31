@@ -36,9 +36,10 @@ def convert_json_and_calculate(id, data, k):
     # print 'col', col
     # print 'data', data
     # argv = []
-    argv = [[j[i] for j in data] for i in col]
-    # print 'argv', argv
+    print 'before argv', col
+    argv = [[int(j[i]) for j in data] for i in col]
+    print 'argv', argv
     if k:
         argv.append(k)
-    # print 'argv1', argv
+    print 'argv1', argv
     return toolkit_calculate(id, *argv)
