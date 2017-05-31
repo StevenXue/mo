@@ -22,15 +22,15 @@ const requestOptions = [
     url: baseURL + dashboard,
     desc: 'intercept request by mock.js',
   },
-  {
-    url: baseURL + userLogin,
-    method: 'post',
-    data: {
-      username: 'guest',
-      password: 'guest',
-    },
-    desc: 'intercept request by mock.js',
-  },
+  // {
+  //   url: baseURL + userLogin,
+  //   method: 'post',
+  //   data: {
+  //     username: 'guest',
+  //     password: 'guest',
+  //   },
+  //   desc: 'intercept request by mock.js',
+  // },
   {
     url: baseURL + users,
     desc: 'intercept request by mock.js',
