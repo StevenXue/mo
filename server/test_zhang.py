@@ -5,7 +5,7 @@ from mongoengine import connect
 from repository import config
 from business import toolkit_business
 from business import staging_data_business
-from service import toolkit_service
+from service import toolkit_service, job_service
 # from entity.toolkit import Toolkit
 from entity.staging_data_set import StagingDataSet
 from bson import ObjectId
@@ -31,6 +31,11 @@ def now(arr0, arr1, k):
 
 def a(*args):
     print args[0], args[1], args[2]
+
+def test(a,b,c=3):
+    print 'a', a
+    print 'b', b
+    print 'c', c
 
 if __name__ == '__main__':
     pass
@@ -60,5 +65,6 @@ if __name__ == '__main__':
     # print df
     # print df[0]
     # print df[1]
-
-    print toolkit_service.convert_json_and_calculate("59266bd08be34d2b2362f920",[{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2}],0)
+    # a = [{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2},{'a':1,"b":2}]
+    b = [{'a':1},{'a':2},{'a':4}]
+    print toolkit_service.convert_json_and_calculate("59266bd08be34d2b2362f90e", "59259247e89bde050b6f02d4", b,0)

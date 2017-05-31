@@ -12,8 +12,8 @@ class FileRepo(Repo):
         # do some custom
         return Repo.create(self, file_obj)
 
-    def read_by_user(self, file_obj):
-        return Repo.read(self, {'user': file_obj.user})
+    def read_by_user(self, user_obj):
+        return Repo.read(self, {'user': user_obj})
 
     # def delete_by_id(self, file_obj):
     #     return Repo.delete_by_id(file_obj)

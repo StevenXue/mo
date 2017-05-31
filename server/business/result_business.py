@@ -19,5 +19,9 @@ result_repo = ResultRepo(Result)
 def add_result(result, job_obj):
     """job_obj is a obj"""
     time = datetime.utcnow()
-    result_obj = Result(result=result, time=time, job=job_obj)
+    result_obj = Result(result=result, create_time=time, job=job_obj)
     return result_repo.create(result_obj)
+
+
+def get_result_by_id(result_id):
+    return result_repo.read_by_result_id(result_id)

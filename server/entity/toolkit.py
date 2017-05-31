@@ -19,36 +19,28 @@ class Toolkit(DynamicDocument):
     """
 
     # object_id = StringField(max_length=20, unique=True)
-    name = StringField(max_length=50, unique=True)
-    description = StringField(max_length=100)
+    name = StringField(max_length=50, unique=True, required=True)
+    description = StringField(max_length=140)
     # input_data = ListField()
 
     # target_py = StringField(max_length=25, unique=True)
-    target_py = ReferenceField('File')
+    target_py_code = StringField(required=True)
 
     # ownership_ref = StringField(max_length=20, unique=True)
     # ownership_ref = ReferenceField('Ownership')
 
-    status = DictField()
+    # status = DictField()
     # status = IntField(choices=STATUS, required=True)
 
+    entry_function = StringField(required=True)
+    # 'run'
+
     parameter_spec = DictField()
+    # {
+        # "input_data": [{'type': 'list'},{'type':'list', 'default':[1,2,3,4,5]}],
+    #     "k": {
+    #         'type': 'int',
+    #         'default': 2
+    #     }
+    # }
     # meta = {'allow_inheritance': True}
-
-    # def __init__(self, name, description, parameter_spec):
-    #     self.name = name
-    #     self.description = description
-    #     # self.input_data = input_data
-    #     self.parameter_spec = parameter_spec
-
-
-if __name__ == '__main__':
-    pass
-#     # save_once()
-#     # print dir(AVG)
-#     aa = 'list'
-#     aaa = 'int'
-#     bb = isinstance([1, 2, 3], eval(aa))
-#     bb = isinstance(1, eval(aaa))
-#
-#     print bb

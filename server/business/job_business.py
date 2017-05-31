@@ -12,6 +12,9 @@
 from entity.job import Job
 from entity.toolkit import Toolkit
 from repository.job_repo import JobRepo
+from business import result_business
+from datetime import datetime
+
 
 job_repo = JobRepo(Job)
 
@@ -46,9 +49,17 @@ def add_toolkit_job(toolkit_obj):
     # job = job_obj['staging_data_set'] or job_obj['model'] or job_obj['toolkit']
     # if not 0 < len(toolkit_obj.items()) <= 1:
     #     raise ValueError('invalid toolkit_obj')
-    job_obj = Job(status=0, toolkit=toolkit_obj)
+    time = datetime.utcnow()
+    # TODO
+    # FIXME
+    # VERY BAD
+    job_obj = Job(status=0, toolkit=toolkit_obj, create_time=time)
     return job_repo.create(job_obj)
 
 
 def end_job(job_obj):
-    return job_repo.update_one_by_id(job_obj, {'status': 2})
+    return job_repo.update_one_by_id(job_obj.id, {'status': 2})
+
+
+def get_job_by_result(result_obj):
+    return result_business.get_result_by_id(result_obj).job

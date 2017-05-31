@@ -11,9 +11,19 @@
 
 from mongoengine import *
 
+RESULT_TYPE = (
+    (0, 'Type 1')
+)
+
 
 class Result(Document):
-    job = ReferenceField('Job')
-    time = DateTimeField()
+    job = ReferenceField('Job', required=True)
+    # TODO Changed "time" to "create_time", Added "description", "type"
+    # TODO Changed "time" to "create_time", Added "description", "result_type"
+    # FIXME
+    # TODO
+    create_time = DateTimeField(required=True)
+    description = StringField(max_length=140)
     # should be data_set, float or dynamic?
     result = DynamicField()
+    type = IntField(choices=RESULT_TYPE)

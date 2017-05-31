@@ -12,19 +12,22 @@ from repository import config
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
 
-def add_file(file, url_base, user_ID, if_private=True):
+def add_file(file, url_base, user_ID, is_private=True, description=''):
     if not user_ID:
         raise ValueError('no user id or private input')
+    # check user exists
     user = user_business.get_by_user_ID(user_ID)
     if not user:
         raise NameError('no user found')
     file_url = url_base + user.user_ID + '/' + file.filename
     save_directory = UPLOAD_FOLDER + user.user_ID + '/'
-    file_size, file_path = save_file_and_get_size(file, save_directory)
+    # TODO need to be undo when failed
+    file_size, file_uri = save_file_and_get_size(file, save_directory)
     saved_file = file_business.add(file.filename, file_size, file_url,
-                                   file_path)
+                                   file_uri, description)
     if saved_file:
-        if not ownership_business.add(user, bool(if_private), file=saved_file):
+        if not ownership_business.add(user, is_private,
+                                      file=saved_file):
             # revert file saving
             file_business.delete_by_id(saved_file['_id'])
             raise RuntimeError('ownership create failed')
@@ -57,7 +60,7 @@ def file_loader(file_id, user_ID):
     if is_private and not is_owned:
         raise Exception('file permission denied, private: %s, owned: %s' % (
             is_private, is_owned))
-    with open(file.path) as csv_data:
+    with open(file.uri) as csv_data:
         reader = csv.reader(csv_data)
 
         # eliminate blank rows if they exist

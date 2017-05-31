@@ -6,8 +6,8 @@ class UserRepo(Repo):
     def __init__(self, instance):
         Repo.__init__(self, instance)
 
-    def read_by_user_ID(self, user_obj):
-        return Repo.read_unique_one(self, {'user_ID': user_obj.user_ID})
+    def read_by_user_ID(self, user_ID):
+        return Repo.read_unique_one(self, {'user_ID': user_ID})
 
 # def read(query):
 #     return general_repo.read(User, query)

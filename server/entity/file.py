@@ -4,11 +4,10 @@ from mongoengine import *
 
 
 class File(Document):
-    name = StringField(max_length=20)
-    description = StringField(max_length=50)
-    upload_time = DateTimeField()
+    name = StringField(max_length=50, required=True)
+    upload_time = DateTimeField(required=True)
+    url = StringField(required=True)
+    uri = StringField(unique=True, required=True)
     size = IntField()
-    url = StringField()
-    path = StringField(unique=True)
-    # user = ReferenceField('User')
+    description = StringField(max_length=140)
 

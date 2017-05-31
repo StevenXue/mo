@@ -3,4 +3,4 @@ from mongoengine import *
 
 
 class StagingData(DynamicDocument):
-    staging_data_set = ReferenceField('StagingDataSet')
+    staging_data_set = ReferenceField('StagingDataSet', required=True)

@@ -1,26 +1,35 @@
 # -*- coding: UTF-8 -*-
 from datetime import datetime
-from business import project_business, user_business, ownership_business
+
+from business import project_business
+from business import user_business
+from business import ownership_business
 from service import ownership_service
-from entity.project import Project
-from datetime import datetime
 
 
 def get_projects_by_user_ID(user_ID):
-    user = user_business.get_by_user_ID(user_ID)
+    """
+    Get project by user's ID
+    :param user_ID: str
+    :return: list of project objects
+    """
     ownerships = ownership_service.list_by_user_ID(user_ID)
     return [os.project for os in ownerships if 'project' in os]
 
 
 def create_project(name, description, user_ID, is_private):
-    '''
-    '''
+    """
+    Create a new project
+
+    :param name: str
+    :param description: str
+    :param user_ID: ObjectId
+    :param is_private: boolean
+    :return: a new created project object
+    """
+
     # create a new project object
-    new_project = Project()
-    new_project.name = name
-    new_project.description = description
-    new_project.create_time = datetime.utcnow()
-    created_project = project_business.create(new_project)
+    created_project = project_business.add(name, description, datetime.utcnow())
     if created_project:
         # create project successfully
 
