@@ -1,9 +1,14 @@
 # -*- coding: UTF-8 -*-
-
 from entity.staging_data import StagingData
 from repository.staging_data_repo import StagingDataRepo
-
+from bson import ObjectId
 staging_data_repo = StagingDataRepo(StagingData)
+
+
+def get_fields_by_map_reduce(staging_data_set_id, mapper, reducer):
+    return StagingData.objects(
+        staging_data_set=staging_data_set_id).\
+        map_reduce(mapper, reducer, 'inline')
 
 
 def get_by_query_str(**kwargs):

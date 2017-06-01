@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 import sys
+from bson import Code
 from business import staging_data_set_business
 from business import staging_data_business
 from business import data_business
@@ -60,6 +61,36 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
 
 
 def get_fields_with_types(staging_data_set_id):
+    """
+    Get the fields and its types of one staging_data_set by map/reduce function.
+    :param staging_data_set_id:
+    :return: [field_name, [type1, type2, ...]]
+    """
+    mapper = Code("""
+        function() {
+            for (var key in this) { emit(key, typeof this[key]); }
+            //for (var key in this) { emit(key, null); }
+        }
+    """)
+
+    reducer = Code("""
+        function(key, stuff) { 
+        let obj = {}
+        stuff.forEach(e => obj[e] = null)
+        return obj; 
+        }
+    """)
+    result = staging_data_business.\
+        get_fields_by_map_reduce(staging_data_set_id, mapper, reducer)
+    # result = StagingData.objects(ListingId='126541').map_reduce(mapper, reducer, 'inline')
+    # print isinstance(result, MapReduceDocument)
+    # print len(list(result))
+    return [[mr_doc.key, mr_doc.value.keys()] for mr_doc in result]
+    # for mr_doc in result:
+    #     print mr_doc.key, mr_doc.value
+
+
+def _get_fields_with_types(staging_data_set_id):
     """
     Get the fields and its types of one staging_data_set
         

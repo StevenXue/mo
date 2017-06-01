@@ -2,15 +2,16 @@
 import sys
 from bson import ObjectId
 from flask import jsonify
-# from mongoengine import connect
+from mongoengine import connect
 from repository import config
 from entity.staging_data_set import StagingDataSet
 from utility import json_utility
 from business import staging_data_set_business
 from service import staging_data_service
-
+from mongoengine.document import MapReduceDocument
 from lib import data_manager
-
+from bson import Code
+from entity.staging_data import StagingData
 
 
 
@@ -18,35 +19,40 @@ from lib import data_manager
 reload(sys)                      # reload 才能调用 setdefaultencoding 方法
 sys.setdefaultencoding('utf-8')  # 设置 'utf-8'
 
-# connect(
-#     db=config.get_mongo_db(),
-#     username=config.get_mongo_user(),
-#     password=config.get_mongo_pass(),
-#     host=config.get_mongo_host(),
-# )
+connect(
+    db=config.get_mongo_db(),
+    username=config.get_mongo_user(),
+    password=config.get_mongo_pass(),
+    host=config.get_mongo_host(),
+)
 
 # ------
 # Test for MapReduceDocument()
-from pymongo import MongoClient
-from bson.code import Code
-client = MongoClient('10.52.14.181')
-db = client['goldersgreen']
-db.authenticate('c9', 'sucks')
-mapper = Code("""
-    function() {
-                  for (var key in this) { emit(key, null); }
-               }
-""")
-reducer = Code("""
-    function(key, stuff) { return null; }
-""")
+#
+# mapper = Code("""
+#     function() {
+#                     for (var key in this) { emit(key, typeof this[key]); }
+#                   //for (var key in this) { emit(key, this[key]); }
+#                }
+# """)
+# reducer = Code("""
+#     function(key, stuff) { return null; }
+# """)
+#
+# result = StagingData.objects(ListingId='126541').map_reduce(mapper, reducer, 'inline')
+# # print isinstance(result, MapReduceDocument)
+# # print list(result)
+# for mp_doc in result:
+#     # print isinstance(mp_doc, MapReduceDocument)
+#     print 'type:%s, value:%s' % (mp_doc.value, mp_doc.key)
 
-distinctThingFields = db.staging_data.map_reduce(mapper, reducer
-                                           , out = {'inline' : 1}
-                                           , full_response = True)
-field_list = [i['_id'] for i in distinctThingFields['results']]
-for field in field_list:
-    print field
+# distinctThingFields = db.staging_data.map_reduce(mapper, reducer
+#                                            , out = {'inline' : 1}
+#                                            , full_response = True)
+# field_list = [i['_id'] for i in distinctThingFields['results']]
+# for field in field_list:
+#     print field
+staging_data_service.get_fields_with_types(ObjectId("592917341c5ad409b07335e6"))
 
 
 # def get_field_names(collection):
