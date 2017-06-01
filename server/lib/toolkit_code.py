@@ -74,7 +74,7 @@ def toolkit_moving_average(arr0, window):
     """simple moving average"""
     ret = np.cumsum(np.array(arr0), dtype=float)
     ret[window:] = ret[window:] - ret[:-window]
-    return ret[window - 1:] / window
+    return list(ret[window - 1:] / window)
 
 
 @job_service.create_toolkit_job("标准差")
@@ -126,7 +126,7 @@ def dimension_reduction_PCA(arr, n_components, svd_solver):
           n_components: int, float, None or string
           svd_solver: string {‘auto’, ‘full’, ‘arpack’, ‘randomized’}
           auto :
-            the solver is selected by a default policy based on X.shape and n_components: 
+            the solver is selected by a default policy based on X.shape and n_components:
             if the input data is larger than 500x500 and the number of components to extract is lower than 80% of the smallest dimension of the data,
             then the more efficient ‘randomized’ method is enabled. Otherwise the exact full SVD is computed and optionally truncated afterwards.
           full :
