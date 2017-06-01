@@ -47,28 +47,14 @@ def toolkit_calculate_temp(toolkit_id, *argv):
     return result
 
 
-def convert_json_and_calculate(toolkit_id, project_id, data, k):
+def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id, data, k):
     """convert json list"""
     col = data[0].keys()
-    # print 'col', col
-    # print 'data', data
-    # argv = []
-
-    # print 'before argv', col
-    # argv = [[int(j[i]) for j in data] for i in col]
-    # print 'argv', argv
-    # if k:
-    #     argv.append(k)
-    # print 'argv1', argv
-    # return toolkit_calculate(id, *argv)
     argv = [[float(j[i]) for j in data] for i in col]
-    # print 'argv', argv
     if k:
         argv.append(k)
-    # print 'argv1', argv
     # result = toolkit_calculate(toolkit_id, *argv)
     result = toolkit_calculate_temp(toolkit_id, *argv)
-    print '111', result.to_mongo().to_dict()
     project_business.add_job_and_result_to_project(result, ObjectId(project_id))
     return result.to_mongo().to_dict()
 
