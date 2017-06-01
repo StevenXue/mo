@@ -38,14 +38,15 @@ def add(staging_data_set, other_fields_obj):
     return staging_data_repo.create(staging_data)
 
 
-def get_first_one_by_staging_data_set(sds_object):
+def get_first_one_by_staging_data_set_id(staging_data_set_id):
     """
     Get the first object of a staging_data_set
 
-    :param sds_object: staging_data_set object
+    :param staging_data_set_id: staging_data_set object
     :return: a staging_data object
     """
-    return staging_data_repo.read_first_one_by_staging_data_set(sds_object)
+    return staging_data_repo.read_first_one_by_staging_data_set_id(
+           staging_data_set_id)
 
 
 def get_by_staging_data_set_id(staging_data_set_id):
@@ -55,9 +56,11 @@ def get_by_staging_data_set_id(staging_data_set_id):
     :param staging_data_set_id: ObjectId
     :return: matched staging_data objects in list form
     """
-    staging_data_set = StagingDataSet(id=staging_data_set_id)
-    return staging_data_repo.read_by_staging_data_set(staging_data_set)
-    # return staging_data_repo.read_by_staging_data_set(staging_data_set_id)
+    # staging_data_set = StagingDataSet(id=staging_data_set_id)
+    # return staging_data_repo.read_by_staging_data_set(staging_data_set)
+    return staging_data_repo.read_by_non_unique_field('staging_data_set',
+                                                      staging_data_set_id)
+
 
 def get_by_staging_data_set_and_fields(staging_data_set_id, fields):
     """
