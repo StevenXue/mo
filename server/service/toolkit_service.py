@@ -28,9 +28,9 @@ def get_all_public_toolkit():
     return list
 
 
-def toolkit_calculate(id, *argv):
-    name = toolkit_business.get_by_toolkit_id(id).name
-    return toolkit_code.dict_of_toolkit[name](*argv)
+# def toolkit_calculate(id, *argv):
+#     name = toolkit_business.get_by_toolkit_id(id).name
+#     return toolkit_code.dict_of_toolkit[name](*argv)
 
 
 # for database 调用toolkit code tag for zhaofeng
