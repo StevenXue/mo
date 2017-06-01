@@ -62,4 +62,4 @@ if __name__ == '__main__':
     # 重构后联动调试计算结果
     a = [{'a':1,"b":0.11},{'a':2,"b":0.12},{'a':3,"b":0.13},{'a':5,"b":0.15},{'a':8,"b":0.18}]
     b = [{'a':1},{'a':2},{'a':4}]
-    print toolkit_service.convert_json_and_calculate("592592fee89bde050b6f02d6", "5928f1a81c5ad40862d93542", "592fadb78be34d92802892ff", a, 0)
+    print toolkit_service.convert_json_and_calculate("592592fee89bde050b6f02d6", "5928f1a81c5ad40862d93542", "592fadb78be34d92802892ff", a, 99)
