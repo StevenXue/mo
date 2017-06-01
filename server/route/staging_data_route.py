@@ -24,10 +24,9 @@ staging_data_app = Blueprint("staging_data_app", __name__, url_prefix=PREFIX)
 @staging_data_app.route('/get_by_staging_data_set_and_fields', methods=['POST'])
 def get_by_staging_data_set_and_fields():
     data = request.get_json()
-
-    staging_data_set_id = data['staging_data_set_id']
     fields = data['fields']
     # fields = fields.split(',')
+    staging_data_set_id = data['staging_data_set_id']
     toolkit_id = data['toolkit_id']
     project_id = data['project_id']
     # 初始值为0
@@ -37,12 +36,11 @@ def get_by_staging_data_set_and_fields():
         data = staging_data_business.get_by_staging_data_set_and_fields(
             ObjectId(staging_data_set_id), fields)
         data = [d.to_mongo().to_dict() for d in data]
-        data = toolkit_service.convert_json_and_calculate(toolkit_id, project_id, data, k)
-        data = json_utility.convert_to_json(data)
+        result = toolkit_service.convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id, data, k)
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}), 400)
-    return make_response(jsonify({'response': data}), 200)
+    return make_response(jsonify({'response': json_utility.convert_to_json(result)}), 200)
 
 
 @staging_data_app.route('/get_fields_with_types', methods=['GET'])
