@@ -17,7 +17,7 @@ module.exports = [
     id: 2,
     icon: 'file',
     name: 'Upload',
-    router: '/request',
+    router: '/upload',
   },
   // {
   //   id: 21,

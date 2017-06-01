@@ -18,6 +18,7 @@ export default {
       console.log('data', data)
       if (data.success) {
         const from = queryURL('from')
+        // TODO try to understand this
         // yield put({ type: 'app/query' })
         if (from) {
           yield put(routerRedux.push(from))
