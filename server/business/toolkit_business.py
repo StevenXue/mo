@@ -45,9 +45,9 @@ def list_public_toolkit_name():
     return all_names
 
 
-# TODO 涉及到别的 entity 或者 business 放到 service 里 to tianyi by zhaofeng
-def get_all_public_toolkit():
-    return ownership_business.list_ownership_by_type_and_private('toolkit', False)
+# DONE BY Tianyi(涉及到别的 entity 或者 business 放到 service 里 to tianyi by zhaofeng)
+# def get_all_public_toolkit():
+#     return ownership_business.list_ownership_by_type_and_private('toolkit', False)
 
 
 def add(name, description, target_py_code, entry_function, parameter_spec):
@@ -63,7 +63,7 @@ def create_public_toolkit():
     """
     数据库建一个toolkit的collection, 记载public的数据分析工具包简介
     """
-    user = user_business.get_by_user_ID('system') # fixme
+    user = user_business.get_by_user_ID('system')
 
     AVG = Toolkit(name='平均值',
                   description='计算所选数据集合的平均值',
@@ -146,20 +146,6 @@ def create_public_toolkit():
                   parameter_spec={"input_data": [{'type': 'list'}, {'type': 'list'}]})
     MIC = toolkit_repo.create(MIC)
     ownership_business.add(user, False, toolkit=MIC)
-
-
-# TODO 建议放入 utility to tianyi by zhaofeng
-def convert_json_str_to_dataframe(arr):
-    """
-    convert input data:
-    from
-        data from staging data => database_type like, which is a list of dicts
-    to
-        DataFrame in pandas
-    """
-    col = arr[0].keys()
-    df_converted = pd.DataFrame([[i[j] for j in col] for i in arr],columns=col)
-    return df_converted
 
 if __name__ == '__main__':
     pass

@@ -57,5 +57,4 @@ def get_by_id(object_id):
 
 def add_job_and_result_to_project(result_obj, project_id):
     job_obj = job_business.get_job_by_result(result_obj)
-    # print '1', job_obj.to_mongo().to_dict()
     return project_repo.add_and_update_one_by_id(project_id, {'results': result_obj, 'jobs': job_obj})
