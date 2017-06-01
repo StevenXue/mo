@@ -27,7 +27,7 @@ const Routers = function ({ history, app }) {
             require.ensure([], require => {
               registerModel(app, require('./models/upload'))
               cb(null, require('./routes/upload/'))
-            }, 'project')
+            }, 'upload')
           },
         },
         {
@@ -36,7 +36,7 @@ const Routers = function ({ history, app }) {
             require.ensure([], require => {
               registerModel(app, require('./models/upload'))
               cb(null, require('./routes/upload/components/detail'))
-            }, 'project')
+            }, 'upload-detail')
           },
         },
         {

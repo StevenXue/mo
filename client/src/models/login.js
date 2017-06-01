@@ -15,9 +15,11 @@ export default {
       yield put({ type: 'showLoginLoading' })
       const data = yield call(login, payload)
       yield put({ type: 'hideLoginLoading' })
+      console.log('data', data)
       if (data.success) {
         const from = queryURL('from')
-        yield put({ type: 'app/query' })
+        // TODO try to understand this
+        // yield put({ type: 'app/query' })
         if (from) {
           yield put(routerRedux.push(from))
         } else {

@@ -5,7 +5,7 @@ import { request } from '../../../utils'
 import lodash from 'lodash'
 import { Router, routerRedux } from 'dva/router'
 import './FileSystem.css'
-import ProjectModal from './ProjectModal'
+import FileModal from './FileModal'
 import { jupyterServer } from '../../../constants'
 
 class FileSystem extends React.Component {
@@ -59,11 +59,11 @@ class FileSystem extends React.Component {
   render () {
     return (
       <div>
-        <div style={{ marginBottom: 20 }}>数据集列表</div>
-        <ProjectModal record={{}} refresh={() => this.fetchData()}>
-          <Button type="primary" style={{ marginBottom: 20 }}>新增项目</Button>
-        </ProjectModal>
-        <Button type="primary" style={{ marginBottom: 20, float: 'Right' }}>上传数据集</Button>
+        <div style={{ marginBottom: 20 }}>文件列表</div>
+        <FileModal record={{}} refresh={() => this.fetchData()}>
+          <Button type="primary" style={{ marginBottom: 20 }}>上传</Button>
+        </FileModal>
+        <Button type="primary" style={{ marginBottom: 20, float: 'right' }}>上传数据集</Button>
         <div className="cards">
           {this.renderCards()}
         </div>

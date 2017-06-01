@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-
 from entity.user import User
 from repository.user_repo import UserRepo
 
@@ -13,3 +12,7 @@ def add(user_ID, password, kwargs):
 
 def get_by_user_ID(user_ID):
     return user_repo.read_by_unique_field('user_ID', user_ID)
+
+
+def get_by_user_object_id(object_id):
+    return user_repo.read_by_id(object_id)

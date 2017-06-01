@@ -107,10 +107,10 @@ class ProjectModal extends Component {
           <Form horizontal onSubmit={() => this.okHandler(values)}>
             <FormItem
               {...formItemLayout}
-              label="Project Name"
+              label="描述"
             >
               {
-                getFieldDecorator('name', {
+                getFieldDecorator('description', {
                   initialValue: name,
                 })(<Input />)
               }
