@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 
 from entity.staging_data import StagingData
-from entity.staging_data_set import StagingDataSet
 from repository.staging_data_repo import StagingDataRepo
 
 staging_data_repo = StagingDataRepo(StagingData)
