@@ -90,4 +90,4 @@ def dimension_reduction_TSNE(arr0, n_components=2):
     tsne = TSNE(n_components=n_components, random_state=0)
     np.set_printoptions(suppress=True)
     result = tsne.fit_transform(matrix)
-    return result.tolist()
+    return result
