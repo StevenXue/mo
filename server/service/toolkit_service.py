@@ -14,6 +14,7 @@ import pandas as pd
 from sklearn.cluster import KMeans
 from minepy import MINE
 from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
 
 
 from service import job_service
