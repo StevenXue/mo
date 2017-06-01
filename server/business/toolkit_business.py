@@ -152,10 +152,5 @@ def convert_json_str_to_dataframe(arr):
     df_converted = pd.DataFrame([[i[j] for j in col] for i in arr],columns=col)
     return df_converted
 
-decorater= \
-"""
-
-"""
-
 if __name__ == '__main__':
     pass
