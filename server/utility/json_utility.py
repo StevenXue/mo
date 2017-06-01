@@ -6,6 +6,7 @@ Author: BingWei Chen
 Date: 2017.05.17
 """
 import json
+import pandas as pd
 
 from bson import ObjectId
 from datetime import datetime
@@ -44,3 +45,17 @@ def convert_string_to_date(timestamp):
         return timestamp
     timestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S')
     return timestamp
+
+
+# 将json转化成DataFrame格式
+def convert_json_str_to_dataframe(arr):
+    """
+    convert input data:
+    from
+        data from staging data => database_type like, which is a list of dicts
+    to
+        DataFrame in pandas
+    """
+    col = arr[0].keys()
+    df_converted = pd.DataFrame([[i[j] for j in col] for i in arr],columns=col)
+    return df_converted
