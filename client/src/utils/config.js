@@ -17,5 +17,7 @@ module.exports = {
     users: '/users',
     user: '/user/:id',
     dashboard: '/dashboard',
+    fileUpload: '/file/upload_file',
+    fileList: '/file/list_files_by_user_ID',
   },
 }

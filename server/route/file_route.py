@@ -45,7 +45,7 @@ def upload_file():
     # user_ID = data['user_ID']
     # if_private = data['if_private']
     # description = data['description']
-
+    print request.form
     user_ID = request.form['user_ID']
     is_private = request.form['if_private']
     description = request.form['description']
@@ -78,3 +78,25 @@ def upload_file():
 def uploaded_file(user_ID, filename):
     path = '%s%s/' % (UPLOAD_FOLDER, user_ID)
     return send_from_directory(path, filename)
+
+
+@file_app.route('/list_files_by_user_ID', methods=['GET'])
+def list_files_by_user_ID():
+    user_ID = request.args.get('user_ID')
+    try:
+        public_files, owned_files = file_service.list_files_by_user_ID(user_ID)
+        public_files = me_obj_list_to_dict_list(public_files)
+        owned_files = me_obj_list_to_dict_list(owned_files)
+        result = {
+            'public_files': public_files,
+            'owned_files': owned_files
+        }
+    except Exception, e:
+        return make_response(jsonify({'response': '%s: %s' % (str(
+                             Exception), e.args)}), 400)
+    return make_response(jsonify({'response': result}), 200)
+
+
+def me_obj_list_to_dict_list(me_obj_list):
+    return [json_utility.convert_to_json(me_obj.to_mongo()) for me_obj in
+            me_obj_list]

@@ -1,88 +1,62 @@
 import React, { Component } from 'react';
-import { Modal, Form, Input } from 'antd';
+import { Modal, Form, Input, Button, Upload, Icon, Select } from 'antd';
+import { connect } from 'dva';
 import PropTypes from 'prop-types';
 import {jupyterServer,flaskServer } from '../../../constants';
 
-const FormItem = Form.Item;
 
-class ProjectModal extends Component {
+const FormItem = Form.Item;
+const Option = Select.Option;
+
+class FileModal extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      visible: false,
+      ...props.upload,
     };
   }
 
+  // normFile = (e) => {
+  //   console.log('Upload event:', e);
+  //   if (Array.isArray(e)) {
+  //     return e;
+  //   }
+  //   return e && e.fileList;
+  // }
+
   showModelHandler = (e) => {
     if (e) e.stopPropagation();
-    this.setState({
-      visible: true,
-    });
+    this.props.dispatch({ type: 'upload/showModal' })
   };
 
   hideModelHandler = () => {
-    this.setState({
-      visible: false,
-    });
+    this.props.dispatch({ type: 'upload/hideModal' })
   };
 
-  okHandler = (values) => {
-    //const { onOk } = this.props;
+  okHandler = (e) => {
+    e.preventDefault();
     this.props.form.validateFields((err, values) => {
-      console.log(values.name);
       if (!err) {
-        fetch(jupyterServer, {
-          method: 'post',
-          crossDomain: true,
-          headers:{
-            "content-type": "application/json",
-            //"cache-control": "no-cache",
-          },
-          body: JSON.stringify({"type": "directory"})
-        }).then((response) => response.json())
-          .then((res) => {
-            fetch(jupyterServer+res.name, {
-              method: 'PATCH',
-              crossDomain: true,
-              headers:{
-                "content-type": "application/json;charset=utf-8",
-                //"cache-control": "no-cache",
-                //'Access-Control-Allow-Method': 'PATCH'
-              },
-              body: JSON.stringify({
-                "path": values.name
-              })
-            }).then((response) => {
-              console.log(response.status);
-
-              if(response.status === 200){
-                fetch(flaskServer + '/project/create_project', {
-                  method: 'POST',
-                  crossDomain: true,
-                  headers:{
-                    "content-type": "application/json;charset=utf-8",
-                  },
-                  body: JSON.stringify({
-                    name: values.name,
-                    description: "descriptiondescriptiondescriptiondescription",
-                    user_ID: "test_user",
-                    is_private: true
-                  })
-                }).then((response) => {
-                  console.log(response.status);
-                  if(response.status === 200){
-
-                    this.hideModelHandler();
-                    this.props.refresh();
-                  }
-                });
-                //this.hideModelHandler();
-              }
-            });
-          });
+        this.props.dispatch({ type: 'upload/upload', payload: values })
+      } else {
+        console.log('error', err);
       }
     });
   };
+
+  beforeUpload = (file) => {
+    this.props.form.setFieldsValue({
+      'upload': [file]
+    });
+    // let reader = new FileReader();
+    // reader.readAsDataURL(file);
+    //
+    // reader.onloadend = function () {
+    // }.bind(this);
+
+    //Prevent file uploading
+    return false;
+  }
 
   render() {
     const { children } = this.props;
@@ -99,12 +73,29 @@ class ProjectModal extends Component {
           { children }
         </span>
         <Modal
-          title="Project Configuration"
-          visible={this.state.visible}
-          onOk={this.okHandler}
+          title="文件上传"
+          visible={this.props.upload.visible}
+          // onOk={this.okHandler}
           onCancel={this.hideModelHandler}
+          footer={null}
         >
-          <Form horizontal onSubmit={() => this.okHandler(values)}>
+          <Form layout='horizontal' onSubmit={(e) => this.okHandler(e)}>
+            <FormItem
+              {...formItemLayout}
+              label="是否私有"
+              hasFeedback
+            >
+              {getFieldDecorator('isPrivate', {
+                rules: [
+                  { required: true, message: '请选择文件是否私有' },
+                ],
+              })(
+                <Select placeholder="请选择文件是否私有">
+                  <Option value="true">是</Option>
+                  <Option value="false">否</Option>
+                </Select>
+              )}
+            </FormItem>
             <FormItem
               {...formItemLayout}
               label="描述"
@@ -112,8 +103,40 @@ class ProjectModal extends Component {
               {
                 getFieldDecorator('description', {
                   initialValue: name,
+                  rules: [
+                    { required: true, message: '请输入描述' },
+                  ],
                 })(<Input />)
               }
+            </FormItem>
+            <FormItem
+              {...formItemLayout}
+              label="上传"
+              extra="请选择你的数据文件"
+              fileList={this.state.fileList}
+            >
+              {getFieldDecorator('upload', {
+                valuePropName: 'fileList',
+                // getValueFromEvent: this.normFile,
+                rules: [
+                  { required: true, message: '请选择文件' },
+                ],
+              })(
+                <Upload
+                  name="uploaded_file"
+                  action="/upload.do"
+                  beforeUpload={(e) => this.beforeUpload(e)}
+                >
+                  <Button>
+                    <Icon type="upload" /> 点击上传
+                  </Button>
+                </Upload>
+              )}
+            </FormItem>
+            <FormItem
+              wrapperCol={{ span: 12, offset: 6 }}
+            >
+              <Button type="primary" htmlType="submit">Submit</Button>
             </FormItem>
           </Form>
         </Modal>
@@ -122,11 +145,11 @@ class ProjectModal extends Component {
   }
 }
 
-ProjectModal.propTypes = {
+FileModal.propTypes = {
   form: PropTypes.object.isRequired,
   type: PropTypes.string,
   item: PropTypes.object,
   onOk: PropTypes.func,
 };
 
-export default Form.create()(ProjectModal);
+export default connect(({ upload }) => ({ upload }))(Form.create()(FileModal));

@@ -16,7 +16,12 @@ const fetch = (options) => {
     url,
   } = options
 
-  const cloneData = lodash.cloneDeep(data)
+  let cloneData;
+  if (data instanceof FormData) {
+    cloneData = data
+  } else {
+    cloneData = lodash.cloneDeep(data)
+  }
 
   try {
     let domin = ''

@@ -1,5 +1,6 @@
 import React from 'react'
-import { Card, Button } from 'antd'
+import { Card, Button, Tabs } from 'antd'
+import { connect } from 'dva';
 import PropTypes from 'prop-types'
 import { request } from '../../../utils'
 import lodash from 'lodash'
@@ -7,6 +8,8 @@ import { Router, routerRedux } from 'dva/router'
 import './FileSystem.css'
 import FileModal from './FileModal'
 import { jupyterServer } from '../../../constants'
+
+const TabPane = Tabs.TabPane;
 
 class FileSystem extends React.Component {
   constructor (props) {
@@ -17,7 +20,7 @@ class FileSystem extends React.Component {
   }
 
   componentDidMount () {
-    this.fetchData()
+    this.props.dispatch({ type: 'upload/fetch' })
   }
 
   fetchData () {
@@ -39,21 +42,31 @@ class FileSystem extends React.Component {
   //   })
   // }
 
-  toProjectDetail (name) {
+  onClickCard (name) {
     console.log(name)
-    this.props.toDetail(name)
+    // this.props.toDetail(name)
   }
 
   renderCards () {
-    let filelist = this.state.files
-    let dirList = filelist.filter((e) => e.type === 'directory')
-    // console.log(dirList.length);
-    return dirList.map((e) =>
-      <Card key={e.created} title={e.name} style={{ width: 500 }} onClick={() => this.toProjectDetail(e.name)}>
-        <p>路径: {e.path}</p>
-        <p>最后修改时间: {e.last_modified}</p>
-      </Card>,
-    )
+    let filelist = this.props.upload.files
+    let publicFiles = filelist.public_files
+    let privateFiles = filelist.owned_files
+    let publicFilesCards = publicFiles.map(e =>
+      <Card key={e._id} title={e.name} style={{ width: 500 }} onClick={() => this.onClickCard(e.name)}>
+        <p>路径: {e.uri.replace(/..\/user_directory\//, '')}</p>
+        <p>上传时间: {e.upload_time}</p>
+      </Card>
+    );
+    let privateFilesCards = privateFiles.map(e =>
+      <Card key={e._id} title={e.name} style={{ width: 500 }} onClick={() => this.onClickCard(e.name)}>
+        <p>路径: {e.uri.replace(/..\/user_directory\//, '')}</p>
+        <p>上传时间: {e.upload_time}</p>
+      </Card>
+    );
+    return <Tabs defaultActiveKey="1">
+      <TabPane tab="私有" key="1">{privateFilesCards}</TabPane>
+      <TabPane tab="公共" key="2">{publicFilesCards}</TabPane>
+    </Tabs>
   }
 
   render () {
@@ -78,4 +91,4 @@ FileSystem.propTypes = {
   dispatch: PropTypes.func,
 }
 
-export default FileSystem
+export default connect(({ upload }) => ({ upload }))(FileSystem)

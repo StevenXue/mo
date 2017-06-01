@@ -55,11 +55,14 @@ def login():
     password = request.json.get('password', None)
     try:
         user = user_service.authenticate(user_ID, password)
+        user_obj = json_utility.convert_to_json(user.to_mongo())
+        user_obj.pop('password')
     except DoesNotExist, e:
         return jsonify({'response': '%s: %s' % (str(
             DoesNotExist), e.args)}), 400
     if not user:
         return jsonify({'response': 'Bad username or password'}), 400
     # Identity can be any data that is json serializable
-    response = {'response': create_access_token(identity=user)}
+    response = {'response': {'token': create_access_token(identity=user),
+                             'user': user_obj}}
     return jsonify(response), 200
