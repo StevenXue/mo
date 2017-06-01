@@ -12,6 +12,8 @@ from mongoengine.document import MapReduceDocument
 from lib import data_manager
 from bson import Code
 from entity.staging_data import StagingData
+from entity.staging_data_set import StagingDataSet
+from entity.staging_data_set import SubDataSet
 
 
 
@@ -25,6 +27,18 @@ connect(
     password=config.get_mongo_pass(),
     host=config.get_mongo_host(),
 )
+
+# ----
+# test for sub_staging_data_set
+SubDataSet(name='wtf',
+           description='qqq',
+           project=ObjectId('59259247e89bde050b6f02d4'),
+           purpose=0,
+           data=[ObjectId('592917341c5ad409b07335e8'),
+                 ObjectId('592917341c5ad409b07335e7')],
+           parent_set=ObjectId('592917341c5ad409b07335e6')).save()
+
+
 
 # ------
 # Test for MapReduceDocument()
@@ -52,7 +66,8 @@ connect(
 # field_list = [i['_id'] for i in distinctThingFields['results']]
 # for field in field_list:
 #     print field
-staging_data_service.get_fields_with_types(ObjectId("592917341c5ad409b07335e6"))
+
+# staging_data_service.get_fields_with_types(ObjectId("592917341c5ad409b07335e6"))
 
 
 # def get_field_names(collection):
