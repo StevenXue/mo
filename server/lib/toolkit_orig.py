@@ -55,6 +55,7 @@ def toolkit_moving_average(arr0, window):
     ret[window:] = ret[window:] - ret[:-window]
     return list(ret[window - 1:] / window)
 
+
 def toolkit_std(arr0):
     np_temp = np.array(arr0)
     return np.std(np_temp)
@@ -76,10 +77,9 @@ def k_mean_predict(arr0, arr1, list_points, n_clusters=2):
     kmeans = KMeans(n_clusters).fit(X)
 
     return kmeans.predict(list_points)
-# run = k_mean_predict
 
 
-def dimension_reduction_PCA(arr, n_components, svd_solver):
+def dimension_reduction_PCA(arr, n_components='mle', svd_solver='auto'):
     """
     pram: arr: array-like, shape (n_samples, n_features)
           n_components: int, float, None or string
@@ -103,17 +103,5 @@ def dimension_reduction_PCA(arr, n_components, svd_solver):
     X = np.array(arr)
     pca = PCA(n_components=n_components, svd_solver=svd_solver)
     pca = pca.fit(X)
+    newData = pca.fit_transform(X)
     return pca.components_, pca.explained_variance_, pca.explained_variance_ratio_, pca.mean_, pca.noise_variance_
-
-
-
-dict_of_toolkit = {u"平均值": toolkit_average,
-                   u"中位数": toolkit_median,
-                   u"最大互信息数": toolkit_mic,
-                   u"众数": toolkit_mode,
-                   u"皮尔森相关系数": toolkit_pearson,
-                   u"全距": toolkit_range,
-                   u"移动平均值": toolkit_moving_average,
-                   u"标准差": toolkit_std,
-                   u"方差": toolkit_variance,
-                   u"K平均数算法": k_mean}

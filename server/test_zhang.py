@@ -49,8 +49,8 @@ if __name__ == '__main__':
     # print b.to_mongo()
 
     # 找到所有的public toolkit
-    c = toolkit_service.get_all_public_toolkit()
-    print len(c)
+    # c = toolkit_service.get_all_public_toolkit()
+    # print len(c)
 
     # 联动dataset调试toolkit计算，已废除
     # data = staging_data_business.get_by_staging_data_set_and_fields(ObjectId("5926d6291c5ad4881f4d060a"),fields=["name","device_type"])
@@ -60,7 +60,6 @@ if __name__ == '__main__':
     # # print toolkit_service.toolkit_calculate("59266bd08be34d2b2362f91e",[1,2,3,4,5],[2,3,4,5,6])
 
     # 重构后联动调试计算结果
-    # a = [{'a':1,"b":0.11},{'a':2,"b":0.12},{'a':3,"b":0.13},{'a':5,"b":0.15},{'a':8,"b":0.18}]
-    # b = [{'a':1},{'a':2},{'a':4}]
-    # print toolkit_service.convert_json_and_calculate("592592fee89bde050b6f02d6", "5928f1a81c5ad40862d93542", "592fadb78be34d92802892f1", b, 0)
-a
+    a = [{'a':1,"b":0.11},{'a':2,"b":0.12},{'a':3,"b":0.13},{'a':5,"b":0.15},{'a':8,"b":0.18}]
+    b = [{'a':1},{'a':2},{'a':4}]
+    print toolkit_service.convert_json_and_calculate("592592fee89bde050b6f02d6", "5928f1a81c5ad40862d93542", "592fadb78be34d92802892ff", a, 0)
