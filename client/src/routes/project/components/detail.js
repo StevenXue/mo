@@ -5,7 +5,15 @@ import {jupyterServer, flaskServer} from '../../../constants';
 import { Router , routerRedux} from 'dva/router';
 import Toolkits from './toolkits';
 import Jupyter from 'react-jupyter';
+import JupyterNotebook from './jupyterNotebook';
+//import CodeMirror from  'react-code-mirror';
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/monokai.css';
 
+// let JupyterNotebook;
+// require.ensure([],()=>{
+//   JupyterNotebook=require('./jupyterNotebook');
+// })
 
 export default class ProjectDetail extends React.Component {
   constructor(props) {
@@ -159,6 +167,7 @@ export default class ProjectDetail extends React.Component {
 
 
   render() {
+    //const JupyterNotebook =  require('./jupyterNotebook');
     return (
       <div className="content-inner">
         <div>
@@ -206,10 +215,11 @@ export default class ProjectDetail extends React.Component {
                   defaultStyle={true} // optional
                   loadMathjax={true} // optional
                 />
+
             </div>
             </div>
           </div>
-
+          <JupyterNotebook />
         </div>
       </div>
     );
