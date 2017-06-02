@@ -16,8 +16,9 @@ def get_ownership_objects_by_user_ID(user_ID, owned_type):
 
 
 def get_all_public_objects(owned_type):
-    return ownership_business.list_ownership_by_type_and_private(owned_type,
-                                                                 False)
+    ownerships = ownership_business.list_ownership_by_type_and_private(
+        owned_type, False)
+    return [os[owned_type] for os in ownerships if owned_type in os]
 
 
 def list_by_user_ID(user_ID):

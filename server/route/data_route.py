@@ -22,12 +22,17 @@ data_app = Blueprint("data_app", __name__, url_prefix=PREFIX)
 @data_app.route('/import_data_from_file_id', methods=['POST'])
 def import_data_from_file_id():
     data = request.get_json()
-
+    user_ID = data['user_ID']
     file_id = data['file_id']
     data_set_name = data['data_set_name']
     ds_description = data['ds_description']
-    user_ID = data['user_ID']
     is_private = data['is_private']
+    # saved_ds = data_service.import_data_from_file_id(ObjectId(file_id),
+    #                                                  data_set_name,
+    #                                                  ds_description,
+    #                                                  user_ID,
+    #                                                  bool(is_private))
+    # ds_json = json_utility.convert_to_json(saved_ds.to_mongo())
     try:
         saved_ds = data_service.import_data_from_file_id(ObjectId(file_id),
                                                          data_set_name,

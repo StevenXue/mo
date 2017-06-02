@@ -8,6 +8,7 @@ import { Router, routerRedux } from 'dva/router'
 import './FileSystem.css'
 import FileModal from './FileModal'
 import { jupyterServer } from '../../../constants'
+import ImportPanel from './ImportPanel'
 
 const TabPane = Tabs.TabPane;
 
@@ -42,31 +43,58 @@ class FileSystem extends React.Component {
   //   })
   // }
 
-  onClickCard (name) {
+  toggleButton(i) {
+    this.props.dispatch({ type: 'upload/toggleButton', payload: i })
+  }
+
+  importData(id) {
+    this.props.dispatch({ type: 'upload/importData', payload: id })
+  }
+
+  showImportPanel(file) {
+    this.props.dispatch({ type: 'upload/showImportPanel', payload: file })
+  }
+
+  onClickCard (e, name) {
+    if (e) e.stopPropagation()
     console.log(name)
     // this.props.toDetail(name)
   }
 
-  renderCards () {
+  renderCards (key) {
+    console.log('states', this.props.upload)
     let filelist = this.props.upload.files
-    let publicFiles = filelist.public_files
-    let privateFiles = filelist.owned_files
-    let publicFilesCards = publicFiles.map(e =>
-      <Card key={e._id} title={e.name} style={{ width: 500 }} onClick={() => this.onClickCard(e.name)}>
-        <p>路径: {e.uri.replace(/..\/user_directory\//, '')}</p>
-        <p>上传时间: {e.upload_time}</p>
+    let button = this.props.upload.button
+    return filelist[key].map((e, i) =>
+      <Card key={e._id} title={e.name} style={{ width: 500 }}
+            onClick={(ev) => this.onClickCard(ev, e.name)}
+            onMouseOver={() => this.toggleButton(i)}
+            onMouseLeave={() => this.toggleButton(-1)}>
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <div style={{width: 400}}>
+            <p>路径: {e.uri.replace(/..\/user_directory\//, '')}</p>
+            <p>上传时间: {e.upload_time}</p>
+          </div>
+          <Button type="primary" style={{ display: button === i ? 'inline':'none' }}
+          onClick={() => this.showImportPanel(e)}
+          >导入</Button>
+        </div>
       </Card>
     );
-    let privateFilesCards = privateFiles.map(e =>
-      <Card key={e._id} title={e.name} style={{ width: 500 }} onClick={() => this.onClickCard(e.name)}>
-        <p>路径: {e.uri.replace(/..\/user_directory\//, '')}</p>
-        <p>上传时间: {e.upload_time}</p>
-      </Card>
-    );
-    return <Tabs defaultActiveKey="1">
-      <TabPane tab="私有" key="1">{privateFilesCards}</TabPane>
-      <TabPane tab="公共" key="2">{publicFilesCards}</TabPane>
-    </Tabs>
+  }
+
+  renderTabContent(key) {
+    const file = this.props.upload.file
+    return <div className='full-width' style={{ display: 'flex', flexDirection: 'row' }}>
+      <div style={{ width: '50%'}}>
+        {this.renderCards(key)}
+      </div>
+      {file && <div style={{ width: '50%', display: this.props.upload.panelVisible ? 'inline':'none'}}>
+        <h2>导入数据集</h2>
+        <h3>文件：{file.name}</h3>
+        <ImportPanel />
+      </div>}
+    </div>
   }
 
   render () {
@@ -78,7 +106,10 @@ class FileSystem extends React.Component {
         </FileModal>
         <Button type="primary" style={{ marginBottom: 20, float: 'right' }}>上传数据集</Button>
         <div className="cards">
-          {this.renderCards()}
+          <Tabs defaultActiveKey="1">
+            <TabPane tab="私有" key="1">{this.renderTabContent('owned_files')}</TabPane>
+            <TabPane tab="公有" key="2">{this.renderTabContent('public_files')}</TabPane>
+          </Tabs>
         </div>
       </div>
     )

@@ -19,5 +19,6 @@ module.exports = {
     dashboard: '/dashboard',
     fileUpload: '/file/upload_file',
     fileList: '/file/list_files_by_user_ID',
+    dataImport: '/data/import_data_from_file_id',
   },
 }

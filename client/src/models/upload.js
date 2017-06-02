@@ -1,5 +1,6 @@
-import { uploadFile, fetchFileList } from '../services/upload'
+import { uploadFile, fetchFileList, importData } from '../services/upload'
 import { parse } from 'qs'
+import lodash from 'lodash'
 import { message } from 'antd'
 
 export default {
@@ -8,10 +9,12 @@ export default {
 
   state: {
     visible: false,
+    panelVisible: false,
     files: {
       public_files: [],
       owned_files: []
-    }
+    },
+    button: -1,
   },
 
   effects: {
@@ -60,6 +63,24 @@ export default {
         throw data
       }
     },
+    *importData(
+      {
+        payload,
+      }, { put, call, select }) {
+      const user = yield select(state => state['app'].user);
+      const file = yield select(state => state['upload'].file);
+      let body = lodash.cloneDeep(payload)
+      body['user_ID'] = user.user_ID
+      body['file_id'] = file._id
+      const data = yield call(importData, body)
+      if (data.success) {
+        console.log('fetch success', data.response);
+        message.success('导入成功')
+      } else {
+        console.log('error', data);
+        throw data
+      }
+    },
   },
   reducers: {
 
@@ -84,6 +105,27 @@ export default {
       return { ...state, visible: false }
     },
 
+    toggleButton (state, {payload: button}) {
+      return {
+        ...state,
+        button,
+      }
+    },
+
+    showImportPanel (state, { payload: file }) {
+      return {
+        ...state,
+        panelVisible: true,
+        file,
+      }
+    },
+
+    hideImportPanel (state) {
+      return {
+        ...state,
+        panelVisible: false,
+      }
+    },
   },
 
 }
