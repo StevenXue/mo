@@ -1,21 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Toolbar from '../../../react-notebook/src/toolbar';
+// import Toolbar from '../../../react-notebook/src/toolbar';
 import sample from './sample.ipynb.json';
+import { Button } from 'antd';
 
 import { Notebook, createStore} from '../../../react-notebook/src/';
 import { setNotebook } from '../../../react-notebook/src/actions';
 import * as enchannelBackend from '../../../react-notebook/enchannel-notebook-backend';
 
 import 'normalize.css/normalize.css';
-// import 'codemirror/lib/codemirror.css';
-// import '/Users/darthvader/goldersgreen/client/node_modules/codemirror/lib/codemirror.css';
 import 'material-design-icons/iconfont/material-icons.css';
-// import '../../../react-notebook/src/nteract/styles/base.less';
-// import '../../../react-notebook/src/nteract/styles/cm-composition.css';
-// import '../../../react-notebook/src/nteract/styles/main.css';
 import '../../../react-notebook/src/toolbar/styles/base.less';
-import './style.css';
+import './style.less';
 import './codemirror.css';
 
 class JupyterNotebook extends React.Component {
@@ -98,22 +94,21 @@ class JupyterNotebook extends React.Component {
     console.log("set");
   }
 
-  renderToolbar() {
-    if (this.state.channels) {
-      return (
-        <div>
-          <Toolbar
-            store={this.store}
-            dispatch={this.dispatch}
-            channels={this.state.channels}
-          />
-          <button onClick={() => this.onClickButton()}>test</button>
-        </div>
-      );
-    }
+  // renderToolbar() {
+  //   if (this.state.channels) {
+  //     return (
+  //       <div>
+  //         {/*<Toolbar*/}
+  //           {/*store={this.store}*/}
+  //           {/*dispatch={this.dispatch}*/}
+  //           {/*channels={this.state.channels}*/}
+  //         {/*/>*/}
+  //       </div>
+  //     );
+  //   }
 
-    return <div />;
-  }
+  //   return <div />;
+  // }
 
   renderNotebook(type) {
     if (this.state.channels) {
@@ -136,8 +131,8 @@ class JupyterNotebook extends React.Component {
     return (
       <form>
         <label htmlFor="ipynb-file">
-          File:
-          <input type="file" name="ipynb-file" ref="ipynb-file" id="ipynb-file" onChange={this.handleFileChange} />
+          {" File: "}
+          <input className="file-selector" type="file" name="ipynb-file" ref="ipynb-file" id="ipynb-file" onChange={this.handleFileChange} />
         </label>
       </form>
     );
@@ -146,10 +141,9 @@ class JupyterNotebook extends React.Component {
     return (
       <div>
         { this.renderInputForm() }
-        <hr />
-        { this.renderToolbar() }
-        <hr />
+
         <div >
+          <Button onClick={() => this.onClickButton()}>Get Code</Button>
           { this.renderNotebook('nteract') }
         </div>
       </div>
