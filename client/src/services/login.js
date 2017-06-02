@@ -8,7 +8,6 @@ export async function login (data) {
     url: CORS + userLogin,
     method: 'post',
     headers: {
-      'Accept': 'application/json',
       'Content-Type': 'application/json',
     },
     data,

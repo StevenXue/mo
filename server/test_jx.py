@@ -4,12 +4,18 @@ from bson import ObjectId
 from flask import jsonify
 from mongoengine import connect
 from repository import config
-
+from entity.staging_data_set import StagingDataSet
 from utility import json_utility
 from business import staging_data_set_business
 from service import staging_data_service
-
+from mongoengine.document import MapReduceDocument
 from lib import data_manager
+from bson import Code
+from entity.staging_data import StagingData
+from entity.staging_data_set import StagingDataSet
+from entity.staging_data_set import SubDataSet
+
+
 
 # 使得 sys.getdefaultencoding() 的值为 'utf-8'
 reload(sys)                      # reload 才能调用 setdefaultencoding 方法
@@ -22,13 +28,81 @@ connect(
     host=config.get_mongo_host(),
 )
 
+# ----
+# test for sub_staging_data_set
+SubDataSet(name='wtf',
+           description='qqq',
+           project=ObjectId('59259247e89bde050b6f02d4'),
+           purpose=0,
+           data=[ObjectId('592917341c5ad409b07335e8'),
+                 ObjectId('592917341c5ad409b07335e7')],
+           parent_set=ObjectId('592917341c5ad409b07335e6')).save()
+
+
+
+# ------
+# Test for MapReduceDocument()
+#
+# mapper = Code("""
+#     function() {
+#                     for (var key in this) { emit(key, typeof this[key]); }
+#                   //for (var key in this) { emit(key, this[key]); }
+#                }
+# """)
+# reducer = Code("""
+#     function(key, stuff) { return null; }
+# """)
+#
+# result = StagingData.objects(ListingId='126541').map_reduce(mapper, reducer, 'inline')
+# # print isinstance(result, MapReduceDocument)
+# # print list(result)
+# for mp_doc in result:
+#     # print isinstance(mp_doc, MapReduceDocument)
+#     print 'type:%s, value:%s' % (mp_doc.value, mp_doc.key)
+
+# distinctThingFields = db.staging_data.map_reduce(mapper, reducer
+#                                            , out = {'inline' : 1}
+#                                            , full_response = True)
+# field_list = [i['_id'] for i in distinctThingFields['results']]
+# for field in field_list:
+#     print field
+
+# staging_data_service.get_fields_with_types(ObjectId("592917341c5ad409b07335e6"))
+
+
+# def get_field_names(collection):
+#     """
+#     get all field names of a collection
+#     """
+#     # collection = 'operation_detail_logs'
+#     map = Code(
+#         """
+#         function() {
+#             for (var key in this)
+#                 {emit(key, null);}
+#         }
+#         """
+#     )
+#     reduce = Code(
+#         """
+#         function(key, stuff) {
+#             return null;
+#         }
+#         """
+#     )
+#     results = mongo_manager.map_reduce_basic(collection, map, reduce,
+#                                              {"inline": 1})
+#     fields_list = [i['_id'] for i in results['results']]
+#
+#     return fields_list
+
 # ---------------
 # Test for find()
 # query = {"总待还本金": "8712.73"}
-query = {'性别':'男', '借款期限': '12', '借款金额': '20000'}
-data = data_manager.find(query, '592917341c5ad409b07335e6')
-for d in data:
-    print d[u'借款金额']
+# query = {'性别':'男', '借款期限': '12', '借款金额': '20000'}
+# data = data_manager.find(query, '592917341c5ad409b07335e6')
+# for d in data:
+#     print d[u'借款金额']
 
 # # --------------------------
 # # Test block of data_manager.py

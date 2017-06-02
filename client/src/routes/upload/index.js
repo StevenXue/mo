@@ -28,7 +28,7 @@ function Dashboard ({ dispatch }) {
 }
 
 Dashboard.propTypes = {
-  dashboard: PropTypes.object,
+  upload: PropTypes.object,
 }
 
-export default connect(({ dashboard }) => ({ dashboard }))(Dashboard)
+export default connect(({ upload }) => ({ upload }))(Dashboard)
