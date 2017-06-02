@@ -219,7 +219,9 @@ export default class ProjectDetail extends React.Component {
             </div>
             </div>
           </div>
-          <JupyterNotebook />
+          { this.state.editing?
+            <JupyterNotebook />:null
+          }
         </div>
       </div>
     );
