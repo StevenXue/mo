@@ -4,13 +4,13 @@ import ReactDOM from 'react-dom';
 import sample from './sample.ipynb.json';
 import { Button } from 'antd';
 
-import { Notebook, createStore} from '../../../react-notebook/src/';
-import { setNotebook } from '../../../react-notebook/src/actions';
-import * as enchannelBackend from '../../../react-notebook/enchannel-notebook-backend';
+import { Notebook, createStore} from '../../../notebook/src/';
+import { setNotebook } from '../../../notebook/src/actions';
+import * as enchannelBackend from '../../../notebook/enchannel-notebook-backend';
 
 import 'normalize.css/normalize.css';
 import 'material-design-icons/iconfont/material-icons.css';
-import '../../../react-notebook/src/toolbar/styles/base.less';
+import '../../../notebook/src/toolbar/styles/base.less';
 import './style.less';
 import './codemirror.css';
 
