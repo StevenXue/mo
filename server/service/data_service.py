@@ -25,6 +25,9 @@ def import_data(data_array, data_set_name, ds_description, user_ID, is_private):
         if 'id' in data:
             data['id_1'] = data['id']
             data.pop('id')
+        if '_id' in data:
+            data['_id_1'] = data['id']
+            data.pop('_id')
         data_business.add(ds, data)
     return ds
 
