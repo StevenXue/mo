@@ -71,7 +71,7 @@ def list_staging_data_sets_by_project_id():
                          200)
 
 
-@staging_data_app.route('/ add_staging_data_set_by_data_set_id', methods=[
+@staging_data_app.route('/add_staging_data_set_by_data_set_id', methods=[
     'POST'])
 def add_staging_data_set_by_data_set_id():
     # sds_name, sds_description, project_id, data_set_id
@@ -82,13 +82,13 @@ def add_staging_data_set_by_data_set_id():
     staging_data_set_description = data['staging_data_set_description']
     data_set_id = data['data_set_id']
 
-    # try:
-    saved_sds = staging_data_service.add_staging_data_set_by_data_set_id(
+    try:
+        saved_sds = staging_data_service.add_staging_data_set_by_data_set_id(
             staging_data_set_name, staging_data_set_description,
             ObjectId(project_id), ObjectId(data_set_id))
-    sds_json = json_utility.convert_to_json(saved_sds.to_mongo())
-    # except Exception, e:
-    #     return make_response(jsonify({'response': '%s: %s' % (str(
-    #         Exception), e.args)}), 400)
+        sds_json = json_utility.convert_to_json(saved_sds.to_mongo())
+    except Exception, e:
+        return make_response(jsonify({'response': '%s: %s' % (str(
+            Exception), e.args)}), 400)
     return make_response(jsonify({'response': sds_json}),
                          200)

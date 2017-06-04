@@ -44,22 +44,24 @@ def list_staging_data_set(project_id):
     # return convert_to_json([obj.to_mongo().to_dict() for obj in sd_objects])
     return convert_staging_data_objects_to_json(sd_objects)
 
-def list_fields(staging_data_set_id):
-    """
-    List all fields of one staging_data_set
 
-    :param staging_data_set_id: ObjectId
-    :return: list of fields
-    """
-    data = staging_data_service.get_fields_with_types(
-        ObjectId(staging_data_set_id))
-    # return convert_to_json([elem[0] for elem in data])
-    return [elem[0] for elem in data]
+# def list_fields(staging_data_set_id):
+#     """
+#     List all fields of one staging_data_set
+#
+#     :param staging_data_set_id: ObjectId
+#     :return: list of fields
+#     """
+#     data = staging_data_service.get_fields_with_types(
+#         ObjectId(staging_data_set_id))
+#     # return convert_to_json([elem[0] for elem in data])
+#     return [elem[0] for elem in data]
 
 
 def convert_staging_data_objects_to_json(staging_data_objects):
     return convert_to_json([obj.to_mongo().to_dict()
                             for obj in staging_data_objects])
+
 
 def convert_to_json(data):
     """

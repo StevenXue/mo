@@ -1,4 +1,4 @@
-import { create, edit} from '../services/project';
+import { create, edit, listDataSets } from '../services/project';
 import { parse } from 'qs';
 
 export default {
@@ -6,6 +6,11 @@ export default {
   namespace: 'project',
 
   state: {
+    dataSets: {
+      public_ds: [],
+      owned_ds: [],
+    },
+    selectedDSIds: []
   },
 
   effects: {
@@ -19,6 +24,23 @@ export default {
             list: data.data
           },
         })
+      }
+    },
+
+    *listDataSets ({ payload }, { call, put, select }) {
+      const user = yield select(state => state['app'].user);
+      const data = yield call(listDataSets, user.user_ID)
+      console.log('listDataSets', data)
+      if (data.success) {
+        yield put({
+          type: 'querySuccess',
+          payload: {
+            dataSets: data.response
+          },
+        })
+      } else {
+        console.log('error', data);
+        throw data
       }
     },
 
@@ -45,14 +67,7 @@ export default {
   reducers: {
 
     querySuccess (state, action) {
-      const { } = action.payload
-      return { ...state,
-        // list,
-        // pagination: {
-        //   ...state.pagination,
-        //   ...pagination,
-        // }
-      }
+      return { ...state, ...action.payload }
     },
 
     showModal (state, action) {
@@ -61,6 +76,10 @@ export default {
 
     hideModal (state) {
       return { ...state, modalVisible: false }
+    },
+
+    selectDataSets (state, action) {
+      return { ...state, ...action.payload }
     },
 
   }

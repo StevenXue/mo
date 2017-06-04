@@ -85,8 +85,8 @@ def list_files_by_user_ID():
     user_ID = request.args.get('user_ID')
     try:
         public_files, owned_files = file_service.list_files_by_user_ID(user_ID)
-        public_files = me_obj_list_to_dict_list(public_files)
-        owned_files = me_obj_list_to_dict_list(owned_files)
+        public_files = json_utility.me_obj_list_to_dict_list(public_files)
+        owned_files = json_utility.me_obj_list_to_dict_list(owned_files)
         result = {
             'public_files': public_files,
             'owned_files': owned_files
@@ -97,6 +97,4 @@ def list_files_by_user_ID():
     return make_response(jsonify({'response': result}), 200)
 
 
-def me_obj_list_to_dict_list(me_obj_list):
-    return [json_utility.convert_to_json(me_obj.to_mongo()) for me_obj in
-            me_obj_list]
+

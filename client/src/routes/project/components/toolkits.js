@@ -37,8 +37,7 @@ export default class ProjectDetail extends React.Component {
       },
     }).then((response) => response.json())
       .then((res) =>{
-          console.log(res.response);
-          this.setState({toolkits: res.response});
+        this.setState({toolkits: res.response});
         }
       );
 
@@ -49,8 +48,7 @@ export default class ProjectDetail extends React.Component {
       },
     }).then((response) => response.json())
       .then((res) => {
-          console.log(res.response);
-          this.setState({data_set: res.response});
+        this.setState({data_set: res.response});
         }
       );
 
@@ -65,8 +63,7 @@ export default class ProjectDetail extends React.Component {
       },
     }).then((response) => response.json())
       .then((res) =>{
-          console.log(res.response);
-          this.setState({toolkits: res.response});
+        this.setState({toolkits: res.response});
         }
       );
 
@@ -77,14 +74,12 @@ export default class ProjectDetail extends React.Component {
       },
     }).then((response) => response.json())
       .then((res) => {
-          console.log(res.response);
-          this.setState({data_set: res.response});
+        this.setState({data_set: res.response});
         }
       );
   }
 
   handleChange(e) {
-    console.log("toolkit" + e);
     let toolkit = this.state.toolkits;
     let target = toolkit.filter((el) => el._id === e);
     let extra = [];
@@ -101,12 +96,10 @@ export default class ProjectDetail extends React.Component {
       selectable: keys.length ,
       extraInput: extra
     });
-    console.log(keys.length, this.state.selectable);
 
   }
 
   onSelectDataSet(values){
-    console.log(values);
     this.setState({selectedData: values});
     //this.setState({dataColumns: mockResult});
     fetch(flaskServer+'/staging_data/get_fields_with_types?staging_data_set_id=' + values, {
@@ -116,17 +109,16 @@ export default class ProjectDetail extends React.Component {
       },
     }).then((response) => response.json())
       .then((res) => {
-          console.log(res.response);
-          this.setState({dataColumns: res.response});
+        console.log('dataColumns', res.response);
+        this.setState({dataColumns: res.response});
         }
-      );
+      )
+      .catch((err) => console.log('Error: get_fields_with_types', err))
   }
 
   onCheckCol(e){
-    console.log(e.target);
     let c = e.target.id;
     let max = this.state.selectable;
-    console.log(c, max);
     let checked = this.state.checkedCols;
     if (e.target.checked === true){
       checked.push(e.target.id);
@@ -137,9 +129,7 @@ export default class ProjectDetail extends React.Component {
   }
 
   onClick(){
-    //console.log(this.state.checkedCols, this.state.selectedData,)
     let check = this.state.checkedCols.join(',');
-    console.log(this.state.selectedData, check, this.state.toolkit, this.props.project_id )
     fetch(flaskServer + '/staging_data/get_by_staging_data_set_and_fields?staging_data_set_id='
       + this.state.selectedData + '&fields=' + check + "&toolkit_id=" + this.state.toolkit +
       "&project_id=" + this.props.project_id, {
@@ -149,9 +139,8 @@ export default class ProjectDetail extends React.Component {
       },
     }).then((response) => response.json())
       .then((res) => {
-          console.log(res.response);
-          this.props.fetchResult(res.response.result);
-          this.setState({result: res.response.result});
+        this.props.fetchResult(res.response.result);
+        this.setState({result: res.response.result});
         }
       );
 
@@ -195,7 +184,6 @@ export default class ProjectDetail extends React.Component {
   renderOptionsData(){
     let data = this.state.data_set;
     if(data !== 0){
-      console.log("data", data);
       return data.map((e) =>
         <Select.Option value={e._id} key={e._id}>
           {e.name}
@@ -224,7 +212,7 @@ export default class ProjectDetail extends React.Component {
               <h4 style={{marginLeft: 20, marginTop: 10}}>{"choose " + this.state.selectable + " fields"}</h4>
               {this.renderInputs()}
               <div style={{ height: 450, overflowY: 'auto' }}>
-              {this.renderCheckBoxTable()}
+                {this.renderCheckBoxTable()}
               </div>
             </div>
             <h3>{"Result is : " + this.state.result}</h3>
