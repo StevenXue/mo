@@ -17,7 +17,7 @@
   color: #000000;
 }
 
-.file-selector {
+.file {
   display: inline-block;
   margin-bottom: 0;
   font-weight: 500;
@@ -28,7 +28,7 @@
   border: 1px solid transparent;
   white-space: nowrap;
   line-height: 1.5;
-  padding: 0 15px;
+  padding: 5px 17px 0 17px;
   font-size: 12px;
   border-radius: 3px;
   height: 28px;
@@ -41,4 +41,16 @@
   color: #666;
   background-color: #fff;
   border-color: #e5e5e5;
+}
+.file input {
+  position: absolute;
+  font-size: 100px;
+  right: 0;
+  top: 0;
+  opacity: 0;
+}
+.file:hover {
+  color: #108ee9;
+  background-color: #fff;
+  border-color: #108ee9;
 }

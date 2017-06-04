@@ -42,12 +42,15 @@ function _stealKernelWebsocket(kernel) {
  * @param  {WebSocket} ws
  * @return {Observable}
  */
-function _wsObservable(ws) {
+function _wsObservable(ws, connectionOptions) {
   return new Rx.Observable(subscriber => {
     ws.onmessage = msg => {
       try {
-        // let m = JSON.parse(msg.data);
-        // console.log("message", m.content);
+        let m = JSON.parse(msg.data);
+        if(m.content.name === 'stdout'){
+          connectionOptions.func(m.content.text);
+          //record_output(m.content.text);
+        }
         subscriber.next(msg);
       } catch (error) { /* nom nom nom */ }
     };
@@ -64,13 +67,17 @@ function _wsObservable(ws) {
   });
 }
 
+function record_output(output) {
+  console.log(output);
+}
+
 /**
  * Convert a kernel object to a Subject
  * @param  {object} kernel    kernel object returned from jupyter-js-services
  * @return {Promise<Subject>} promise for a subject that can be used to
  *                            communicate to the kernel via a websocket.
  */
-function _kernelToSubject(kernel) {
+function _kernelToSubject(kernel, connectionOptions) {
   const ws = _stealKernelWebsocket(kernel);
   return (new Promise((resolve, reject) => {
     ws.onopen = resolve;
@@ -92,7 +99,7 @@ function _kernelToSubject(kernel) {
       ws.close();
     });
 
-    const observable = _wsObservable(ws)
+    const observable = _wsObservable(ws, connectionOptions)
       .map((event) => {
         return JSON.parse(event.data);
       })
@@ -177,7 +184,7 @@ export function spawn(connectionOptions, kernelName) {
  */
 export function connect(connectionOptions, kernelId) {
   return _getKernelById(connectionOptions, kernelId).then(kernel => {
-    return _kernelToSubject(kernel);
+    return _kernelToSubject(kernel, connectionOptions);
   }).then(wsSubject => {
     return {
       shell: _multiplexChannel(wsSubject, 'shell'),

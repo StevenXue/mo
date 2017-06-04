@@ -3,6 +3,7 @@ import React from 'react';
 import CodeCell from './code-cell';
 import MarkdownCell from './markdown-cell';
 import Toolbar from './toolbar';
+import Immutable from 'immutable';
 
 class Cell extends React.Component {
   static propTypes = {
@@ -24,10 +25,12 @@ class Cell extends React.Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    console.log("cell nextProps", nextProps.forceSource);
+    // let temp = nextProps.cell.get('outputs')
+   // console.log(nextProps.cell);
     this.setState({
       forceSource: nextProps.forceSource
     });
+
   }
 
   onMouseEnter() {
@@ -45,6 +48,7 @@ class Cell extends React.Component {
     return (
       <div
         className="cell"
+        //style={{paddingTop: 10}}
         onClick={this.onMouseEnter}
         onMouseEnter={this.onMouseEnter}
         onMouseLeave={this.onMouseLeave}
