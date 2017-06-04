@@ -9,6 +9,13 @@ export function exit() {
   };
 }
 
+export function recordResults(results) {
+  return {
+    type: constants.RECORD_RESULTS,
+    results,
+  };
+}
+
 export function setExecutionState(executionState) {
   return {
     type: constants.SET_EXECUTION_STATE,

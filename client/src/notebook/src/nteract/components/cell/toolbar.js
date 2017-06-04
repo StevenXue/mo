@@ -36,7 +36,7 @@ class Toolbar extends React.Component {
 
   render() {
     return (
-      <div className="cell_toolbar-mask">
+      <div className="cell_toolbar-mask" style={{}}>
         <div className="cell_toolbar">
           <button onClick={this.executeCell}>
             <i className="material-icons">play_arrow</i>

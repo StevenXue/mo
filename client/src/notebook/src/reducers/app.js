@@ -55,4 +55,12 @@ export default {
     }
     return { ...state, filename };
   },
+  [constants.RECORD_RESULTS]: function recordResults(state, action) {
+    const { results } = action;
+    alert(results);
+    if (!results) {
+      return state;
+    }
+    return { ...state, results };
+  },
 };

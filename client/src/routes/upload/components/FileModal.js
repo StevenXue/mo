@@ -45,6 +45,7 @@ class FileModal extends Component {
   };
 
   beforeUpload = (file) => {
+    console.log(file);
     this.props.form.setFieldsValue({
       'upload': [file]
     });

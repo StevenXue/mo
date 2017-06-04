@@ -48,8 +48,6 @@ class FileSystem extends React.Component {
 
   renderCards(){
     let filelist = this.state.files;
-   // let dirList =  filelist.filter((e) => e.type === 'directory');
-    //console.log(dirList.length);
     return filelist.map((e) =>
       <Card key={e.name} title={e.name} style={{ width: 500 }} onClick={() => this.toProjectDetail(e.name, e._id)}>
         <p>描述: {e.description}</p>
@@ -65,7 +63,6 @@ class FileSystem extends React.Component {
         <ProjectModal record={{}} refresh={() => this.fetchData()}>
           <Button type="primary" style={{marginBottom: 20}}>新增项目</Button>
         </ProjectModal>
-        <Button type="primary" style={{marginBottom: 20, float: 'Right'}}>上传数据集</Button>
         <div className="cards">
           {this.renderCards()}
         </div>

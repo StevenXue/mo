@@ -4,7 +4,7 @@ import Nteract from './nteract/';
 import Provider from './util/provider';
 
 import createStoreRx from './store';
-import { setNotebook, setExecutionState } from './actions';
+import { setNotebook, setExecutionState, recordResults } from './actions';
 import { reducers } from './reducers';
 import Rx from 'rxjs';
 
