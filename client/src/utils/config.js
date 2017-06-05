@@ -12,6 +12,7 @@ module.exports = {
   apiPrefix: '/api/v1',
   api: {
     userLogin: '/user/login',
+    refreshToken: '/refresh_token',
     userLogout: '/user/logout',
     userInfo: '/userInfo',
     users: '/users',

@@ -1,6 +1,7 @@
 import { query, logout } from '../services/app'
 import { routerRedux } from 'dva/router'
 import { parse } from 'qs'
+import { queryURL } from '../utils'
 import { config } from '../utils'
 const { prefix } = config
 
@@ -34,14 +35,20 @@ export default {
       payload,
     }, { call, put }) {
       const data = yield call(query, parse(payload))
-      console.log('payload', data);
+      // const user = yield select(state => state['app'].user);
+      // data['user'] = user
       if (data.success && data.user) {
         yield put({
           type: 'querySuccess',
           payload: data.user,
         })
+        const from = queryURL('from')
+        if (from) {
+          yield put(routerRedux.push(from))
+        }
         if (location.pathname === '/login') {
-          yield put(routerRedux.push('/dashboard'))
+          // user dashboard not build yet, push to project by default
+          yield put(routerRedux.push('/project'))
         }
       } else {
         if (location.pathname !== '/login') {
@@ -57,12 +64,14 @@ export default {
     *logout ({
       payload,
     }, { call, put }) {
-      const data = yield call(logout, parse(payload))
-      if (data.success) {
-        yield put({ type: 'query' })
-      } else {
-        throw (data)
-      }
+      localStorage.clear()
+      yield put(routerRedux.push('/login'))
+      // const data = yield call(logout, parse(payload))
+      // if (data.success) {
+      //   yield put({ type: 'query' })
+      // } else {
+      //   throw (data)
+      // }
     },
 
     *changeNavbar ({

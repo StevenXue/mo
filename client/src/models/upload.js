@@ -25,7 +25,6 @@ export default {
       const user = yield select(state => state['app'].user);
       const data = yield call(fetchFileList, user.user_ID)
       if (data.success) {
-        console.log('fetch success', data.response);
         yield put({ type: 'querySuccess', payload: data.response })
       } else {
         console.log('error', data);
@@ -74,7 +73,6 @@ export default {
       body['file_id'] = file._id
       const data = yield call(importData, body)
       if (data.success) {
-        console.log('fetch success', data.response);
         message.success('导入成功')
       } else {
         console.log('error', data);

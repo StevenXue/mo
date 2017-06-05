@@ -16,9 +16,8 @@ export default {
       const data = yield call(login, payload)
       yield put({ type: 'hideLoginLoading' })
       if (data.success) {
-        console.log(data)
+        localStorage.setItem('token', data.response.token)
         const from = queryURL('from')
-        // TODO try to understand this
         yield put({ type: 'app/querySuccess', payload: data.response.user })
         if (from) {
           yield put(routerRedux.push(from))

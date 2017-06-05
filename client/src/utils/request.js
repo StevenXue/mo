@@ -14,6 +14,7 @@ const fetch = (options) => {
     data,
     fetchType,
     url,
+    headers,
   } = options
 
   let cloneData;
@@ -63,6 +64,7 @@ const fetch = (options) => {
     case 'get':
       return axios.get(url, {
         params: cloneData,
+        headers: headers
       })
     case 'delete':
       return axios.delete(url, {
