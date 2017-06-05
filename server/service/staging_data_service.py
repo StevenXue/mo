@@ -51,7 +51,7 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
         data_objects = data_business.get_by_data_set(data_set_id)
         for data_obj in data_objects:
             # create staging_data object
-            staging_data_business.add(sds, data_obj.to_mongo())
+            staging_data_business.add(sds, data_obj.to_mongo().to_dict())
         return sds
     except Exception:
         # remove staging_data_set and staging_data

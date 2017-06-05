@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'dva';
+import { connect } from 'dva'
 import { Button, Select, Upload, Icon, message } from 'antd'
 import { jupyterServer, flaskServer } from '../../../constants'
 import { Router, routerRedux } from 'dva/router'
@@ -83,9 +83,9 @@ class ProjectDetail extends React.Component {
 
   dataOp () {
     // let dataSetId = this.props.project.selectedDSIds[0];
-    let dataSetId = this.props.project.selectedDSIds;
-    if(!dataSetId) {
-      return;
+    let dataSetId = this.props.project.selectedDSIds
+    if (!dataSetId) {
+      return
     }
     console.log(dataSetId, this.props.location.query._id)
 
@@ -104,6 +104,7 @@ class ProjectDetail extends React.Component {
     ).then((response) => response.json())
       .then((res) => {
         console.log('add_staging_data_set_by_data_set_id', res)
+        message.success('successfully added to staging data set')
         this.setState({
           notebookName: '',
         })
@@ -159,7 +160,7 @@ class ProjectDetail extends React.Component {
   }
 
   handleChange (value) {
-    this.props.dispatch({ type: 'project/selectDataSets', payload: { selectedDSIds: value  } })
+    this.props.dispatch({ type: 'project/selectDataSets', payload: { selectedDSIds: value } })
     // console.log(`selected ${value}`)
   }
 
@@ -182,13 +183,13 @@ class ProjectDetail extends React.Component {
                 <Select
                   // mode="multiple"
                   style={{ marginTop: 10, width: 120 }}
-                  placeholder="请选择数据集"
+                  placeholder="Please select data set"
                   onChange={(value) => this.handleChange(value)}
                 >
-                  <OptGroup label="私有数据集">
+                  <OptGroup label="private">
                     {this.renderOptions('owned_ds')}
                   </OptGroup>
-                  <OptGroup label="共有数据集">
+                  <OptGroup label="public">
                     {this.renderOptions('public_ds')}
                   </OptGroup>
                 </Select>

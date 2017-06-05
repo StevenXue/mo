@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { Router, routerRedux } from 'dva/router'
 import { connect } from 'dva'
 import { FileSystem } from './components'
-import { Router, routerRedux } from 'dva/router'
 import styles from './index.less'
 import { color } from '../../utils'
 
@@ -17,9 +17,9 @@ function Dashboard ({ dispatch }) {
   function handleToDetail (name, id) {
     dispatch(routerRedux.push({
       pathname: `project/${name}`,
-      query:{
-        _id: id
-      }
+      query: {
+        _id: id,
+      },
     }))
   }
 
@@ -31,7 +31,11 @@ function Dashboard ({ dispatch }) {
 }
 
 Dashboard.propTypes = {
-  dashboard: PropTypes.object,
+  dispatch: PropTypes.shape,
+}
+
+Dashboard.defaultProps = {
+  dispatch: {},
 }
 
 export default connect(({ dashboard }) => ({ dashboard }))(Dashboard)
