@@ -182,6 +182,7 @@ class ProjectDetail extends React.Component {
               { this.state.editing && <div>
                 <Select
                   // mode="multiple"
+                  // showSearch
                   style={{ marginTop: 10, width: 120 }}
                   placeholder="Please select data set"
                   onChange={(value) => this.handleChange(value)}
