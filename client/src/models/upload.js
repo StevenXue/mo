@@ -51,7 +51,7 @@ export default {
         yield put({ type: 'hideModal' })
 
         // const from = queryURL('from')
-        yield put({ type: 'upload/fetch' })
+        yield put({ type: 'fetch' })
         // if (from) {
         //   yield put(routerRedux.push(from))
         // } else {
