@@ -3,9 +3,12 @@ import React from 'react';
 import Inputs from './inputs';
 
 import Editor from './editor';
-import Display from 'react-jupyter-display-area';
+import { Display } from '../../../../../display-area/src/index';
+//import Display from 'react-jupyter-display-area';
 import { Button } from 'antd';
 import Immutable from 'immutable';
+import 'codemirror/mode/markdown/markdown';
+import 'codemirror/mode/python/python';
 
 import {
   executeCell,

@@ -1,6 +1,6 @@
 import React from 'react';
 import Nteract from './nteract/';
-//import Jupyter from './jupyter/';
+import Jupyter from './jupyter/';
 import Provider from './util/provider';
 
 import createStoreRx from './store';
@@ -49,6 +49,7 @@ export class Notebook extends React.Component {
         filename: 'test',
         executionState: 'not connected',
         notebook: null,
+        result: ''
       });
 
       this.store = store;
@@ -61,6 +62,7 @@ export class Notebook extends React.Component {
     };
 
     this.store.subscribe(state => this.setState(state));
+
   }
   componentDidMount() {
     if (this.props.content) {
@@ -75,18 +77,18 @@ export class Notebook extends React.Component {
     });
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    //let t = this.store.getState();
+    //console.log('state', this.state.results, prevState.results)
+    if (this.state.results !== prevState.results) {
+      //console.log("不一样了", "跑");
+      this.props.result(this.state.results);
+    }
+  }
+
   render() {
     const dispatch = this.dispatch;
     const store = this.store;
-    //const ui = this.props.ui || 'jupyter';
-    // let notebook = (
-    //     <Nteract
-    //       notebook={this.state.notebook}
-    //       channels={this.state.channels}
-    //       forceSource={this.state.forceSource}
-    //     />
-    //   );
-
 
     return (
       <Provider rx={{ dispatch, store }}  store="">
@@ -96,7 +98,8 @@ export class Notebook extends React.Component {
             <pre>{this.state.err.toString()}</pre>
           }
           {
-            this.state.notebook && <Nteract
+            this.state.notebook &&
+            <Nteract
               notebook={this.state.notebook}
               channels={this.state.channels}
               forceSource={this.state.forceSource}
@@ -115,6 +118,7 @@ Notebook.propTypes = {
   dispatch: React.PropTypes.func,
   channels: React.PropTypes.object,
   forceSource: React.PropTypes.string,
+  result: React.PropTypes.func,
 };
 
 export default Notebook;

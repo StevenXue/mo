@@ -2,17 +2,20 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 // import Toolbar from '../../../react-notebook/src/toolbar';
 import empty from './empty.ipynb.json';
-import { Button } from 'antd';
+import { Affix, Button } from 'antd';
 
 import { Notebook, createStore} from '../../../notebook/src/';
 import { setNotebook, recordResults } from '../../../notebook/src/actions';
 import * as enchannelBackend from '../../../notebook/enchannel-notebook-backend';
 import style from './style.css';
+import Curve from './curve';
 
 import 'normalize.css/normalize.css';
 import 'material-design-icons/iconfont/material-icons.css';
 import '../../../notebook/src/toolbar/styles/base.less';
 import './codemirror.css';
+
+let result = [];
 
 class JupyterNotebook extends React.Component {
   constructor(props) {
@@ -33,24 +36,31 @@ class JupyterNotebook extends React.Component {
     this.state = {
       channels: null,
       forceSource: '',
-      fileName: 'empty'
+      fileName: 'empty',
+      output: []
     };
+
+    //this.store.subscribe(state => this.setState(state));
+
   }
 
   componentDidMount() {
-    //console.log("code mirror");
     this.attachChannels();
-    // this.dispatch(recordResults('test_results'));
-    // console.log('store', this.store.getState());
-    this.timer = setInterval(() => console.log('store', this.store.getState()), 10*1000)
   }
 
-  // componentDidUpdate() {
-  //   console.log('store', this.store.getState());
-  // }
+  componentDidUpdate() {
+  }
 
   componentWillUnmount() {
-    this.timer && this.timer.clear();
+  }
+
+  getResult(r){
+    //let rt = r.results
+    //console.log("result", r);
+    r = r.split('\n');
+    r = r.filter(Boolean);
+    //console.log(r);
+    this.setState({output: r});
   }
 
   attachChannels() {
@@ -106,26 +116,19 @@ class JupyterNotebook extends React.Component {
 
   onClickButton() {
     this.setState({
-      forceSource: 'print("hello there")'
+      forceSource: '%run mnist_1.0_softmax.py'
     });
   }
 
-  // renderToolbar() {
-  //   if (this.state.channels) {
-  //     return (
-  //       <div>
-  //         {/*<Toolbar*/}
-  //           {/*store={this.store}*/}
-  //           {/*dispatch={this.dispatch}*/}
-  //           {/*channels={this.state.channels}*/}
-  //         {/*/>*/}
-  //       </div>
-  //     );
-  //   }
+  renderResult() {
+    //console.log(this.state.output);
+    let outputs = this.state.output;
+    if(outputs.length !== 0) {
+      return (<Curve dataString={this.state.output} />);
+    }
 
-  //   return <div />;
-  // }
-
+  }
+  // %run mnist_1.0_softmax.py
   renderNotebook(type) {
     if (this.state.channels) {
       return (
@@ -136,6 +139,7 @@ class JupyterNotebook extends React.Component {
           ui={type}
           channels={this.state.channels}
           forceSource={this.state.forceSource}
+          result={(r) => this.getResult(r)}
         />
 
       );
@@ -156,15 +160,17 @@ class JupyterNotebook extends React.Component {
   render() {
     return (
       <div>
-        { this.renderInputForm() }
+        <div>
+          { this.renderInputForm() }
+        </div>
         <div style={{marginTop: 10}}>
           <Button onClick={() => this.onClickButton()}>Get Code</Button>
           <div style={{display: 'flex', flexDirection: 'row'}}>
             <div style={{width: '70%'}}>
           { this.renderNotebook('nteract') }
             </div>
-            <div style={{marginLeft: 20,marginTop: 10, width: '28%', border: '1px solid #f2f2f2', height: 500}}>
-              <span>choose</span>
+            <div style={{width: '30%', height: 600, border: '1px solid #f2f2f2', zIndex: 999, marginTop: 20}}>
+              {this.renderResult()}
             </div>
           </div>
         </div>

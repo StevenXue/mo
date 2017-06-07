@@ -59,7 +59,7 @@ class Notebook extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("notebook nextProps", nextProps.forceSource);
+    // console.log("notebook nextProps", nextProps.forceSource);
     this.setState({
       forceSource: nextProps.forceSource
     });
