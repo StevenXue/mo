@@ -24,23 +24,27 @@ staging_data_app = Blueprint("staging_data_app", __name__, url_prefix=PREFIX)
 @staging_data_app.route('/get_by_staging_data_set_and_fields', methods=['POST'])
 def get_by_staging_data_set_and_fields():
     data = request.get_json()
-    fields = data['fields']
-    # fields = fields.split(',')
-    staging_data_set_id = data['staging_data_set_id']
-    toolkit_id = data['toolkit_id']
-    project_id = data['project_id']
+    fields = data.get('fields')
+    staging_data_set_id = data.get('staging_data_set_id')
+    toolkit_id = data.get('toolkit_id')
+    project_id = data.get('project_id')
     # 初始值为0
-    k = data['k']
+    k = data.get('k')
 
     try:
         data = staging_data_business.get_by_staging_data_set_and_fields(
             ObjectId(staging_data_set_id), fields)
         data = [d.to_mongo().to_dict() for d in data]
-        result = toolkit_service.convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id, data, k)
+        result = toolkit_service.convert_json_and_calculate(project_id,
+                                                            staging_data_set_id,
+                                                            toolkit_id, data,
+                                                            int(k))
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}), 400)
-    return make_response(jsonify({'response': json_utility.convert_to_json(result)}), 200)
+    return make_response(jsonify({'response':
+                         json_utility.convert_to_json(result)}),
+                         200)
 
 
 @staging_data_app.route('/get_fields_with_types', methods=['GET'])
@@ -64,14 +68,14 @@ def list_staging_data_sets_by_project_id():
             ObjectId(project_id))
         data = [d.to_mongo() for d in data]
         data = json_utility.convert_to_json(data)
-    except Exception, e:
+    except Exception as e:
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}), 400)
     return make_response(jsonify({'response': data}),
                          200)
 
 
-@staging_data_app.route('/ add_staging_data_set_by_data_set_id', methods=[
+@staging_data_app.route('/add_staging_data_set_by_data_set_id', methods=[
     'POST'])
 def add_staging_data_set_by_data_set_id():
     # sds_name, sds_description, project_id, data_set_id
@@ -82,13 +86,13 @@ def add_staging_data_set_by_data_set_id():
     staging_data_set_description = data['staging_data_set_description']
     data_set_id = data['data_set_id']
 
-    # try:
-    saved_sds = staging_data_service.add_staging_data_set_by_data_set_id(
+    try:
+        saved_sds = staging_data_service.add_staging_data_set_by_data_set_id(
             staging_data_set_name, staging_data_set_description,
             ObjectId(project_id), ObjectId(data_set_id))
-    sds_json = json_utility.convert_to_json(saved_sds.to_mongo())
-    # except Exception, e:
-    #     return make_response(jsonify({'response': '%s: %s' % (str(
-    #         Exception), e.args)}), 400)
+        sds_json = json_utility.convert_to_json(saved_sds.to_mongo())
+    except Exception, e:
+        return make_response(jsonify({'response': '%s: %s' % (str(
+            Exception), e.args)}), 400)
     return make_response(jsonify({'response': sds_json}),
                          200)

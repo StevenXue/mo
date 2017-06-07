@@ -59,3 +59,8 @@ def convert_json_str_to_dataframe(arr):
     col = arr[0].keys()
     df_converted = pd.DataFrame([[i[j] for j in col] for i in arr],columns=col)
     return df_converted
+
+
+def me_obj_list_to_dict_list(me_obj_list):
+    return [convert_to_json(me_obj.to_mongo()) for me_obj in
+            me_obj_list]

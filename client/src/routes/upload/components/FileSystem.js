@@ -62,7 +62,6 @@ class FileSystem extends React.Component {
   }
 
   renderCards (key) {
-    console.log('states', this.props.upload)
     let filelist = this.props.upload.files
     let button = this.props.upload.button
     return filelist[key].map((e, i) =>
@@ -104,7 +103,6 @@ class FileSystem extends React.Component {
         <FileModal record={{}} refresh={() => this.fetchData()}>
           <Button type="primary" style={{ marginBottom: 20 }}>上传</Button>
         </FileModal>
-        <Button type="primary" style={{ marginBottom: 20, float: 'right' }}>上传数据集</Button>
         <div className="cards">
           <Tabs defaultActiveKey="1">
             <TabPane tab="私有" key="1">{this.renderTabContent('owned_files')}</TabPane>

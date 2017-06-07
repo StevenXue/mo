@@ -1,6 +1,6 @@
 import { request, config } from '../utils'
-const { api } = config
-const { user, userLogout, userLogin } = api
+const { api, CORS } = config
+const { user, userLogout, userLogin, refreshToken } = api
 
 export async function login (params) {
   return request({
@@ -20,8 +20,10 @@ export async function logout (params) {
 
 export async function query (params) {
   return request({
-    url: user.replace('/:id', ''),
+    url: CORS + refreshToken,
     method: 'get',
-    data: params,
+    headers: {
+      'Authorization': 'Bearer ' + localStorage.getItem('token')
+    }
   })
 }

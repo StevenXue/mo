@@ -12,6 +12,7 @@ module.exports = {
   apiPrefix: '/api/v1',
   api: {
     userLogin: '/user/login',
+    refreshToken: '/refresh_token',
     userLogout: '/user/logout',
     userInfo: '/userInfo',
     users: '/users',
@@ -20,5 +21,6 @@ module.exports = {
     fileUpload: '/file/upload_file',
     fileList: '/file/list_files_by_user_ID',
     dataImport: '/data/import_data_from_file_id',
+    dataSets: '/data/list_data_sets_by_user_ID'
   },
 }

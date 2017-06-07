@@ -15,6 +15,7 @@ from route import staging_data_route
 from route import toolkit_route
 from route import user_route
 from repository import config
+from utility import json_utility
 
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
@@ -33,7 +34,9 @@ jwt = JWTManager(app)
 @jwt.user_claims_loader
 def add_claims_to_access_token(user):
     # add more claims in the future
-    return {'age': user.age}
+    user_json = json_utility.convert_to_json(user.to_mongo())
+    user_json.pop('password')
+    return {'user': user_json}
 
 
 # This method will also get whatever object is passed into the
@@ -47,15 +50,14 @@ def user_identity_lookup(user):
 # This is an example for jwt_required
 # Protect a view with jwt_required, which requires a valid access token
 # in the request to access.
-@app.route('/protected', methods=['GET'])
+@app.route('/refresh_token', methods=['GET'])
 @jwt_required
-def protected():
+def refresh_token():
     # Access the identity of the current user with get_jwt_identity
     current_user = get_jwt_identity()
     claims = get_jwt_claims()
     return jsonify({
-        'hello_from': current_user,
-        'age': claims['age']
+        'user': claims['user'],
     }), 200
 
 app.register_blueprint(file_route.file_app)
