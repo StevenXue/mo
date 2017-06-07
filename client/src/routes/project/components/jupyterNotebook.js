@@ -15,8 +15,6 @@ import 'material-design-icons/iconfont/material-icons.css'
 import '../../../notebook/src/toolbar/styles/base.less'
 import './codemirror.css'
 
-let result = [];
-
 class JupyterNotebook extends React.Component {
   constructor (props) {
     super(props)
