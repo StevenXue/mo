@@ -25,11 +25,11 @@ class JupyterNotebook extends React.Component {
       notebook: null,
     })
 
-    this.createFileReader()
-    this.handleFileChange = this.handleFileChange.bind(this)
+    this.createFileReader();
+    this.handleFileChange = this.handleFileChange.bind(this);
 
-    this.store = store
-    this.dispatch = dispatch
+    this.store = store;
+    this.dispatch = dispatch;
 
     this.state = {
       channels: null,
@@ -122,7 +122,7 @@ class JupyterNotebook extends React.Component {
     //console.log(this.state.output);
     let outputs = this.state.output;
     if(outputs.length !== 0) {
-      return (<Curve dataString={this.state.output} />);
+      return (<Curve style={{height: '100%', width: '100%'}} dataString={this.state.output} />);
     }
 
   }

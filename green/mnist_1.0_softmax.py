@@ -100,13 +100,13 @@ def training_step(i, update_test_data, update_train_data):
         a, c, w, b = sess.run([accuracy, cross_entropy, allweights, allbiases], feed_dict={X: batch_X, Y_: batch_Y})
         datavis.append_training_curves_data(i, a, c)
         datavis.append_data_histograms(i, w, b)
-        # print(str(i) + ": accuracy:" + str(a) + " loss: " + str(c) + " weight: " + str(w) + " biases: " + str(b) + '\n')
-        print(str(i) + ": accuracy:" + str(a) + " loss: " + str(c) + '\n')
+        # print(str(i) + ": accuracy:" + str(a) + " loss: " + str(c) + " weight: " + str(w) + str(len(w)) + " biases: " + str(b) + '\n')
+        print(str(i) + ": accuracy:" + str(a) + " loss:" + str(c) + '\n')
     # compute test values for visualisation
     if update_test_data:
         a, c = sess.run([accuracy, cross_entropy], feed_dict={X: mnist.test.images, Y_: mnist.test.labels})
         datavis.append_test_curves_data(i, a, c)
-        print(str(i) + ": epoch" + str(i*100//mnist.train.images.shape[0]+1) + " test accuracy:" + str(a) + " test loss:" + str(c) + '\n')
+        print(str(i) + ": epoch" + " accuracy:" + str(a) + " loss:" + str(c) + '\n')
 
     # the backpropagation training step
     sess.run(train_step, feed_dict={X: batch_X, Y_: batch_Y})
@@ -119,7 +119,7 @@ def training_step(i, update_test_data, update_train_data):
 # to disable the visualisation use the following line instead of the datavis.animate line
 for i in range(2000+1):
     training_step(i, i % 200 == 0, i % 50 == 0)
-
-print("max test accuracy: " + str(datavis.get_max_test_accuracy()))
+#
+# print("max test accuracy: " + str(datavis.get_max_test_accuracy()))
 
 # final max test accuracy = 0.9268 (10K iterations). Accuracy should peak above 0.92 in the first 2000 iterations.

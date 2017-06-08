@@ -81,7 +81,6 @@ export class Notebook extends React.Component {
     //let t = this.store.getState();
     //console.log('state', this.state.results, prevState.results)
     if (this.state.results !== prevState.results) {
-      //console.log("不一样了", "跑");
       this.props.result(this.state.results);
     }
   }

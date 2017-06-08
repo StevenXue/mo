@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactEcharts from 'echarts-for-react';
+let colors = ['#5793f3', '#d14a61', '#675bba'];
 
 export default class LearningCurve extends React.Component{
   static propTypes = {
@@ -9,83 +10,172 @@ export default class LearningCurve extends React.Component{
 
   constructor(props) {
     super(props);
-    this.state={
+    this.state= {
       data: this.props.dataString,
-      step: 0,
+      trainStep: [],
+      testStep: [],
+      trainData: [],
+      testData: [],
+      trainLoss: []
     }
   }
 
-  componentWillMount(){
-
-  }
-
   componentDidMount(){
-    //2000: accuracy:0.94 loss: 25.467
-    //2000: epoch4 test accuracy:0.9214 test loss:27.7595
     let outputs = this.state.data;
     for ( let i = 0; i < outputs.length; i++) {
-
+      let line = outputs[i];
+      line = line.split(":");
+      //console.log(line);
     }
   }
 
   componentWillReceiveProps(nextProps){
       this.setState({
-          data: nextProps.dataString
+          data: nextProps.dataString,
       });
+      let outputs = nextProps.dataString;
+      let teststep = this.state.testStep;
+      let testdata = this.state.testData;
+      let trainstep = this.state.trainStep;
+      let traindata = this.state.trainData;
+      let trainLoss = this.state.trainLoss
+      for ( let i = 0; i < outputs.length; i++) {
+        let line = outputs[i];
+        let c = line.split(" ");
+        if (c[1] === 'epoch') {
+          // teststep.push(c[0]);
+          // this.setState({testStep: teststep});
+          // let a = c[2].split(":");
+          // testdata.push(a[1]);
+          // this.setState({testData: testdata});
+          // console.log("test", c[0], a[1]);
+        }else{
+          if(c[0] !== 'Extracting' && c[0] !== 'max') {
+            let p = c[0].split(":")
+            trainstep.push(p[0]);
+            this.setState({trainStep: trainstep});
+            let b = c[1].split(":");
+            traindata.push(b[1]);
+            let q = c[2].split(":");
+            trainLoss.push(q[1]);
+            this.setState({trainLoss: trainLoss});
+          }
+        }
+      }
   }
 
-  componentDidUpdate(){
+  componentDidUpdate() {
 
   }
 
-  getOption(){
-      return option = {
-        title: {
-          text: 'accuracy'
-        },
-        tooltip: {
-          trigger: 'axis',
+  getOptionAccuracy() {
+    let options = {
+      title: {
+        text: "train accuracy"
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          animation: false
+        }
+      },
+      xAxis:
+        {
+          type: 'category',
+          axisTick: {
+            alignWithLabel: true
+          },
+          axisLine: {
+            onZero: false,
+            lineStyle: {
+              color: colors[2]
+            }
+          },
           axisPointer: {
-            animation: false
-          }
+            label: {
+              formatter: function (params) {
+                return 'accuracy' + params.value
+                  + (params.seriesData.length ? '：' + params.seriesData[0].data : '');
+              }
+            }
+          },
+          data: this.state.trainStep
         },
-        xAxis: {
-          type: 'time',
-          splitLine: {
-            show: false
-          }
-        },
-        yAxis: {
-          type: 'value',
-          boundaryGap: [0, '100%'],
-          splitLine: {
-            show: false
-          }
-        },
-        series: [{
-          name: '模拟数据',
+      yAxis:
+        {
+          type: 'value'
+        }
+      ,
+      series:
+        {
+          name: 'test data',
           type: 'line',
-          showSymbol: false,
-          hoverAnimation: false,
-          data: {}
-        }]
-      };
+          smooth: true,
+          data: this.state.trainData
+        }
+    }
+    return options
   }
 
-  renderTest(){
-    let outputs = this.state.data;
-    if(outputs.length !== 0) {
-      return outputs.map((e) => <div key={e}>{e}</div>);
+  getOptionLoss() {
+    let options = {
+      title: {
+        text: "train loss"
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          animation: false
+        }
+      },
+      xAxis:
+        {
+          type: 'category',
+          axisTick: {
+            alignWithLabel: true
+          },
+          axisLine: {
+            onZero: false,
+            lineStyle: {
+              color: colors[2]
+            }
+          },
+          axisPointer: {
+            label: {
+              formatter: function (params) {
+                return 'accuracy' + params.value
+                  + (params.seriesData.length ? '：' + params.seriesData[0].data : '');
+              }
+            }
+          },
+          data: this.state.trainStep
+        },
+      yAxis:
+        {
+          type: 'value'
+        }
+      ,
+      series:
+        {
+          name: 'test data',
+          type: 'line',
+          smooth: true,
+          data: this.state.trainLoss
+        }
     }
+    return options;
   }
+
 
   render(){
     return(
-      <div>
-        <div>{this.renderTest()}</div>
-        {/*<ReactEcharts*/}
-          {/*option={() => this.getOption()}*/}
-          {/*/>*/}
+      <div >
+        <ReactEcharts
+          option={this.getOptionAccuracy()}
+          />
+        <ReactEcharts
+          option={this.getOptionLoss()}
+        />
       </div>
     );
   }
