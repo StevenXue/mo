@@ -19,6 +19,7 @@ from sklearn.manifold import TSNE
 
 from service import job_service
 from business import toolkit_business, ownership_business, user_business, job_business, result_business, project_business
+from utility import json_utility
 # from lib import toolkit_code
 
 
@@ -57,7 +58,9 @@ def toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, *argv):
 def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id, data, k):
     """convert json list"""
     col = data[0].keys()
-    argv = [[[float(obj[i]) for i in col] for obj in data]]
+    argv = [[[json_utility.convert_string_to_number(obj[i]) for i in col] for obj in data]]
+    # argv = [[[float(obj[i]) if obj[i] is not None else np.nan for i in col] for obj in data]]
+
     if k:
         argv.append(k)
     # result = toolkit_calculate(toolkit_id, *argv)
