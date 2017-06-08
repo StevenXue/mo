@@ -49,7 +49,6 @@ function _wsObservable(ws, connectionOptions) {
         let m = JSON.parse(msg.data);
         if(m.content.name === 'stdout'){
           connectionOptions.func(m.content.text);
-          //record_output(m.content.text);
         }
         subscriber.next(msg);
       } catch (error) { /* nom nom nom */ }
@@ -65,10 +64,6 @@ function _wsObservable(ws, connectionOptions) {
       } catch (error2) { /* nom nom nom */ }
     };
   });
-}
-
-function record_output(output) {
-  console.log(output);
 }
 
 /**

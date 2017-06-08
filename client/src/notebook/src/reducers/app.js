@@ -57,7 +57,6 @@ export default {
   },
   [constants.RECORD_RESULTS]: function recordResults(state, action) {
     const { results } = action;
-    alert(results);
     if (!results) {
       return state;
     }

@@ -3,18 +3,21 @@ import React from 'react';
 import Inputs from './inputs';
 
 import Editor from './editor';
-import Display from 'react-jupyter-display-area';
+import { Display } from '../../../../../display-area/src/index';
 import { Button } from 'antd';
 import Immutable from 'immutable';
+import 'codemirror/mode/markdown/markdown';
+import 'codemirror/mode/python/python';
 
 import {
   executeCell,
-  // forceSetSource
-  updateCellSource
+  updateCellSource,
+  createCellAfter
 } from '../../../actions';
 
 const CodeCell = (props, context) => {
   function keyDown(e) {
+    console.log(e);
     if (e.key !== 'Enter') {
       return;
     }
@@ -25,11 +28,7 @@ const CodeCell = (props, context) => {
     }
 
     if (e.shiftKey) {
-      // TODO: Remove this, as it should be created if at the end of document only
-      // this.context.dispatch(createCellAfter('code', props.id));
-
-      // should instead be
-      // this.context.dispatch(nextCell(props.id));
+      context.dispatch(createCellAfter('code', props.id));
     }
 
     context.dispatch(executeCell(context.channels,

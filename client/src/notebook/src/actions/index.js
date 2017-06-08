@@ -1,4 +1,4 @@
-import * as commutable from 'commutable';
+import * as commutable from '@nteract/commutable';
 
 import * as agendas from '../agendas';
 import * as constants from '../constants';

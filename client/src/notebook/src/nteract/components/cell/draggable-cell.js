@@ -3,6 +3,8 @@ import { DragSource, DropTarget } from 'react-dnd';
 import { findDOMNode } from 'react-dom';
 
 import Cell from './cell';
+import 'codemirror/mode/markdown/markdown';
+import 'codemirror/mode/python/python';
 
 const cellSource = {
   beginDrag(props) {
@@ -99,10 +101,11 @@ class DraggableCell extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("notebook nextProps", nextProps.forceSource);
+    // console.log("notebook nextProps", nextProps.forceSource);
     this.setState({
       forceSource: nextProps.forceSource
     });
+    // console.log(nextProps.cell.get('outputs'));
   }
 
   render() {

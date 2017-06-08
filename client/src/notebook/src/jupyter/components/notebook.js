@@ -1,6 +1,8 @@
 import React from 'react';
 import Cell from './cell/cell';
 import { moveCell } from '../../actions';
+import 'codemirror/mode/markdown/markdown';
+import 'codemirror/mode/python/python';
 
 class Notebook extends React.Component {
   static propTypes = {
@@ -29,18 +31,18 @@ class Notebook extends React.Component {
   }
 
   componentWillMount() {
-    require('codemirror/mode/markdown/markdown');
 
-    const lang = this.props.notebook.getIn(['metadata', 'kernelspec', 'language']);
+
+    /*const lang = this.props.notebook.getIn(['metadata', 'kernelspec', 'language']);
     if (!lang) {
       return;
-    }
+    }*/
     // HACK: This should give you the heeby-jeebies
     // Mostly because lang could be ../../../../whatever
     // This is the notebook though, so hands off
     // We'll want to check for this existing later
     // and any other validation
-    require(`codemirror/mode/${lang}/${lang}`);
+    // require(`codemirror/mode/${lang}/${lang}`);
     // Assume markdown should be required
   }
 

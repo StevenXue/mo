@@ -34,7 +34,6 @@ class Cell extends React.Component {
   }
 
   onMouseEnter() {
-    console.log("cell focused");
     this.setState({ showToolbar: true });
   }
 

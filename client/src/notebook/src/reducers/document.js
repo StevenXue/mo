@@ -1,4 +1,4 @@
-import * as commutable from 'commutable';
+import * as commutable from '@nteract/commutable';
 import * as uuid from 'uuid';
 
 import * as constants from '../constants';
@@ -15,7 +15,7 @@ export default {
     const { notebook } = state;
     return {
       ...state,
-      notebook: commutable.updateExecutionCount(notebook, id, count),
+      notebook: notebook.setIn(['cellMap', id, 'execution_count'], count),
     };
   },
   [constants.MOVE_CELL]: function moveCell(state, action) {
@@ -87,7 +87,8 @@ export default {
     const { notebook } = state;
     return {
       ...state,
-      notebook: commutable.updateSource(notebook, id, source),
+      //notebook: commutable.updateSource(notebook, id, source),
+      notebook: notebook.setIn(['cellMap', id, 'source'], source)
     };
   },
   [constants.UPDATE_CELL_OUTPUTS]: function updateOutputs(state, action) {
@@ -95,7 +96,7 @@ export default {
     const { notebook } = state;
     return {
       ...state,
-      notebook: commutable.updateOutputs(notebook, id, outputs),
+      notebook: notebook.setIn(['cellMap', id, 'outputs'], outputs)
     };
   },
   [constants.SET_LANGUAGE_INFO]: function setLanguageInfo(state, action) {

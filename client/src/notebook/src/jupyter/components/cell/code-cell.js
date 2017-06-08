@@ -2,7 +2,7 @@ import React from 'react';
 
 import Inputs from '../../../nteract/components/cell/inputs';
 import Editor from '../../../nteract/components/cell/editor';
-import Display from 'react-jupyter-display-area';
+import Display from '@nteract/display-area';
 
 import Immutable from 'immutable';
 
