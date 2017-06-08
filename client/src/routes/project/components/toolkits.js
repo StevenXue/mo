@@ -115,23 +115,25 @@ export default class ProjectDetail extends React.Component {
     } else {
       checked.pop()
     }
-    this.setState({ checkedCols: checked })
+    this.setState({ checkedCols: checked });
+    console.log(this.state.checkedCols);
   }
 
   onRunClick () {
     // let check = this.state.checkedCols.join(',')
-    let kValue
-    console.log('input', document.getElementById('k值').value)
+    let kValue;
+    //console.log('input', document.getElementById('k值').value)
     if(document.getElementById('k值')) {
       kValue = document.getElementById('k值').value;
     }
     let body = {
-      staging_data_set_id: this.state.selectedData,
-      fields: this.state.checkedCols,
-      toolkit_id: this.state.toolkit,
-      project_id: this.props.project_id
+      'staging_data_set_id': this.state.selectedData,
+      'fields': this.state.checkedCols,
+      'toolkit_id': this.state.toolkit,
+      'project_id': this.props.project_id
     };
     kValue && (body['k'] = kValue)
+    console.log('body', body);
     fetch(flaskServer + '/staging_data/get_by_staging_data_set_and_fields', {
       method: 'post',
       headers: {
