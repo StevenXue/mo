@@ -73,6 +73,6 @@ def add_toolkit_with_ownership(name, description, target_py_code,
                                entry_function, parameter_spec, user_ID,
                                is_private):
     toolkit = toolkit_business.add(name, description, target_py_code,
-                         entry_function, parameter_spec)
+                                   entry_function, parameter_spec)
     user = user_business.get_by_user_ID(user_ID)
     ownership_business.add(user, is_private, toolkit=toolkit)
