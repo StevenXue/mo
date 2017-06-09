@@ -27,20 +27,21 @@ RESUlt_TYPE1 = (
 class Model(Document):
     name = StringField(max_length=50, required=True)
     description = StringField(max_length=140, required=True)
-    # 类型，用作何用途
-    usage = IntField(choices=RESUlt_TYPE, required=True)
-    classification = IntField(choices=RESUlt_TYPE1, required=True)
-    input={
-        'shape': {
-            'seq':0,
-            'length':20,
-
-        }，
-        'ranks'
-        'type'
-        ''
-    }
+    usage = IntField(choices=RESUlt_TYPE, required=True)    # 类型，用作何用途
+    classification = IntField(choices=RESUlt_TYPE1, required=True)  # model分类
+    input = DictField(required=True)
     target_py_code = StringField(required=True)     # 显示路径
     CNN_level = IntField(required=True)     # CNN 层数
     optimization_algorithm = ListField()     # 优化方法
     evaluate_matrix = ListField(required=True)      # 测量方法
+
+    # input={
+    #     'shape': {
+    #         'seq':0,
+    #         'length':20,
+    #
+    #     },
+    #     'ranks': 3,
+    #     'type':
+    #     'target_input_addr':
+    # }
