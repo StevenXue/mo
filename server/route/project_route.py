@@ -12,6 +12,7 @@ from flask import make_response
 from flask import request
 
 from service import project_service
+from utility import json_utility
 
 PREFIX = '/project'
 
@@ -34,3 +35,20 @@ def create_project():
             Exception), e.args)}), 400)
     return make_response(jsonify({'response': 'create project success'}), 200)
 
+
+@project_app.route('/list_projects_by_user_ID', methods=['GET'])
+def list_projects_by_user_ID():
+    user_ID = request.args.get('user_ID')
+    try:
+        public_projects, owned_projects = project_service.list_projects_by_user_ID(
+            user_ID)
+        public_projects = json_utility.me_obj_list_to_dict_list(public_projects)
+        owned_projects = json_utility.me_obj_list_to_dict_list(owned_projects)
+        result = {
+            'public_projects': public_projects,
+            'owned_projects': owned_projects
+        }
+    except Exception, e:
+        return make_response(jsonify({'response': '%s: %s' % (str(
+            Exception), e.args)}), 400)
+    return make_response(jsonify({'response': result}), 200)

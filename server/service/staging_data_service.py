@@ -4,6 +4,8 @@ from bson import Code
 from business import staging_data_set_business
 from business import staging_data_business
 from business import data_business
+from utility import data_utility
+from utility import json_utility
 
 # 使得 sys.getdefaultencoding() 的值为 'utf-8'
 reload(sys)                      # reload 才能调用 setdefaultencoding 方法
@@ -17,6 +19,7 @@ def find_by_query_str(staging_data_set_id, **kwargs):
     kwargs['staging_data_set'] = staging_data_set_id
     return staging_data_business.get_by_query_str(**kwargs)
 
+
 def list_staging_data_sets_by_project_id(project_id):
     """
     Get the list of staging_data_set by project id
@@ -29,7 +32,7 @@ def list_staging_data_sets_by_project_id(project_id):
 
 
 def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
-                                        data_set_id):
+                                        data_set_id, f_t_arrays):
     """
     Create staging_data_set and copy to staging_data by original data_set id
         
@@ -37,6 +40,8 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
     :param sds_description: str 
     :param project_id: ObjectId
     :param data_set_id: ObjectId
+    :param f_t_arrays: array: [['name', 'str'],['age', 'int'], ['salary',
+    'float']]
     :return: new staging_data_set object
     """
     # get project object
@@ -44,15 +49,24 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
 
     # create new staging data set
     sds = staging_data_set_business.add(sds_name, sds_description, project_id)
-
     # copy data from data(raw) to staging data
     # get all data objects by data_set id
     try:
         data_objects = data_business.get_by_data_set(data_set_id)
+        # convert mongoengine objects to dicts
+        data_objects = json_utility.me_obj_list_to_dict_list(data_objects)
+        # convert types of values in dicts
+        result = data_utility.convert_data_array_by_fields(data_objects,
+                                                           f_t_arrays)
+        data_objects = result['result']
+        # add to staging data set
         for data_obj in data_objects:
             # create staging_data object
-            staging_data_business.add(sds, data_obj.to_mongo().to_dict())
-        return sds
+            staging_data_business.add(sds, data_obj)
+        if 'failure_count' in result:
+            failure_count = result['failure_count']
+            return {'result': sds, 'failure_count': failure_count}
+        return {'result': sds}
     except Exception:
         # remove staging_data_set and staging_data
         staging_data_business.remove_by_staging_data_set_id(sds.id)

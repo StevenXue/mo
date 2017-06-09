@@ -60,7 +60,7 @@ def file_loader(file_id, user_ID):
     if is_private and not is_owned:
         raise Exception('file permission denied, private: %s, owned: %s' % (
             is_private, is_owned))
-    with open(file.uri) as csv_data:
+    with open(file.uri, 'rU') as csv_data:
         reader = csv.reader(csv_data)
 
         # eliminate blank rows if they exist

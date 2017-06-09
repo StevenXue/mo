@@ -24,6 +24,11 @@ class FileSystem extends React.Component {
     this.props.dispatch({ type: 'upload/fetch' })
   }
 
+  // componentWillReceiveProps (nextProps) {
+  //   if(Object.compare(nextProps.upload.files, ))
+  //   // nextProps.dispatch({ type: 'upload/fetch' })
+  // }
+
   fetchData () {
     fetch(jupyterServer, {
       method: 'get',
