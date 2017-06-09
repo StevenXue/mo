@@ -32,6 +32,7 @@ def get_staging_data(staging_data_set_id):
     # return transformed_data
     return convert_staging_data_objects_to_json(data)
 
+
 def list_staging_data_set(project_id):
     """
     Get current staging_data_set within one project

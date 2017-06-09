@@ -38,8 +38,8 @@ def add(name, description, usage, classification, input_data,
     model = Model(name=name, description=description, usage=usage, input_data=input_data,
                   classification=classification, target_py_code=target_py_code, cnn_level=cnn_level,
                   evaluate_matrix=evaluate_matrix, optimization_algorithm=optimization_algorithm)
-    user = user_business.get_by_user_ID('system')
-    ownership_business.add(user, False, model=model)
+    # user = user_business.get_by_user_ID('system')
+    # ownership_business.add(user, False, model=model)
     return model_repo.create(model)
 
 
