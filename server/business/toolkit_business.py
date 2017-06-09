@@ -139,14 +139,6 @@ def create_public_toolkit():
     KMEAN = toolkit_repo.create(KMEAN)
     ownership_business.add(user, False, toolkit=KMEAN)
 
-    MIC = Toolkit(name='最大互信息数',
-                  description='计算所选数据集合的最大互信息数, 表达两变量之间(函数关系)相关系数',
-                  entry_function='toolkit_mic',
-                  target_py_code=inspect.getsource(toolkit_file.toolkit_mic),
-                  parameter_spec={"input_data": {'type': 'list', 'dimension': 2}})
-    MIC = toolkit_repo.create(MIC)
-    ownership_business.add(user, False, toolkit=MIC)
-
     PCA = Toolkit(name='降维PCA-主成分分析算法',
                   description='计算所选数据集合(多为数据)的降维，default自动降维，输入k可降到k维',
                   entry_function='dimension_reduction_PCA',
@@ -156,20 +148,93 @@ def create_public_toolkit():
     PCA = toolkit_repo.create(PCA)
     ownership_business.add(user, False, toolkit=PCA)
 
-
-def update_one_public_toolkit():
-    """
-        数据库建一个toolkit的collection, 记载public的数据分析工具包简介
-        """
-    user = user_business.get_by_user_ID('system')
     TSNE = Toolkit(name='降维TSNE-t_分布邻域嵌入算法',
                    description='计算所选数据集合(多维数据)的降维，default自动降维，输入k可降到k维，通常为了方便可视化，降至2维',
                    entry_function='dimension_reduction_TSNE',
                    target_py_code=inspect.getsource(toolkit_file.dimension_reduction_TSNE),
                    parameter_spec={"input_data": {'type': 'list', 'dimension': None},
-                                  "k": {'type': 'int', 'default': 2}})
+                                   "k": {'type': 'int', 'default': 2}})
     TSNE = toolkit_repo.create(TSNE)
     ownership_business.add(user, False, toolkit=TSNE)
+
+    N = Toolkit(name='数据量',
+                description='返回数据个数',
+                entry_function='toolkit_n',
+                target_py_code=inspect.getsource(toolkit_orig.toolkit_n),
+                parameter_spec={"input_data": {'type': 'list', 'dimension': 1}})
+    N = toolkit_repo.create(N)
+    ownership_business.add(user, False, toolkit=N)
+
+    IQR = Toolkit(name='IQR',
+                  description='数据列的IQR',
+                  entry_function='toolkit_IQR',
+                  target_py_code=inspect.getsource(toolkit_orig.toolkit_IQR),
+                  parameter_spec={"input_data": {'type': 'list', 'dimension': 1}})
+    IQR = toolkit_repo.create(IQR)
+    ownership_business.add(user, False, toolkit=IQR)
+
+    CV = Toolkit(name='变异系数',
+                 description='返回数据变异系数',
+                 entry_function='toolkit_cv',
+                 target_py_code=inspect.getsource(toolkit_orig.toolkit_cv),
+                 parameter_spec={"input_data": {'type': 'list', 'dimension': 1}})
+    CV = toolkit_repo.create(CV)
+    ownership_business.add(user, False, toolkit=CV)
+
+    MAX = Toolkit(name='最大值',
+                  description='返回数据最大值',
+                  entry_function='toolkit_max',
+                  target_py_code=inspect.getsource(toolkit_orig.toolkit_max),
+                  parameter_spec={"input_data": {'type': 'list', 'dimension': 1}})
+    MAX = toolkit_repo.create(MAX)
+    ownership_business.add(user, False, toolkit=MAX)
+
+    MIN = Toolkit(name='最小值',
+                  description='返回数据最小值',
+                  entry_function='toolkit_min',
+                  target_py_code=inspect.getsource(toolkit_orig.toolkit_min),
+                  parameter_spec={"input_data": {'type': 'list', 'dimension': 1}})
+    MIN = toolkit_repo.create(MIN)
+    ownership_business.add(user, False, toolkit=MIN)
+
+    Z_SCORE = Toolkit(name='z_分数',
+                      description='返回数据z_score',
+                      entry_function='toolkit_z_score',
+                      target_py_code=inspect.getsource(toolkit_orig.toolkit_z_score),
+                      parameter_spec={"input_data": {'type': 'list', 'dimension': 1}})
+    Z_SCORE = toolkit_repo.create(Z_SCORE)
+    ownership_business.add(user, False, toolkit=Z_SCORE)
+
+    CORRELATION = Toolkit(name='数据互相关',
+                          description='返回数据correlation',
+                          entry_function='toolkit_correlation',
+                          target_py_code=inspect.getsource(toolkit_orig.toolkit_correlation),
+                          parameter_spec={"input_data": {'type': 'list', 'dimension': 2}})
+    CORRELATION = toolkit_repo.create(CORRELATION)
+    ownership_business.add(user, False, toolkit=CORRELATION)
+
+    COV = Toolkit(name='数据协方差',
+                  description='返回数据协方差',
+                  entry_function='toolkit_cov',
+                  target_py_code=inspect.getsource(toolkit_orig.toolkit_cov),
+                  parameter_spec={"input_data": {'type': 'list', 'dimension': 2}})
+    COV = toolkit_repo.create(COV)
+    ownership_business.add(user, False, toolkit=COV)
+
+
+def update_one_public_toolkit():
+    """
+        数据库建一个toolkit的collection, 记载public的数据分析工具包简介
+    """
+    user = user_business.get_by_user_ID('system')
+
+    MIC = Toolkit(name='最大互信息数',
+                  description='计算所选数据集合的最大互信息数, 表达第一个所选值域与其他值域变量之间的相关系数',
+                  entry_function='toolkit_mic',
+                  target_py_code=inspect.getsource(toolkit_orig.toolkit_mic),
+                  parameter_spec={"input_data": {'type': 'list', 'dimension': None}})
+    MIC = toolkit_repo.create(MIC)
+    ownership_business.add(user, False, toolkit=MIC)
 
 
 if __name__ == '__main__':

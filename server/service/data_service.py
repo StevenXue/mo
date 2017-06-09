@@ -22,6 +22,7 @@ def import_data(data_array, data_set_name, ds_description, user_ID, is_private):
     # except DoesNotExist:
     ds = add_data_set(data_set_name, ds_description, user_ID, is_private)
     for data in data_array:
+        # print data, '\n'
         # id field will conflict with object_id
         if 'id' in data:
             data['id_1'] = data['id']

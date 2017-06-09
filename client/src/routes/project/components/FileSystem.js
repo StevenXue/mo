@@ -1,12 +1,15 @@
 import React from 'react';
-import { Card, Button } from 'antd';
+import { Card, Button, Tabs} from 'antd';
 import PropTypes from 'prop-types';
+import { connect } from 'dva';
 import { request } from '../../../utils';
 import lodash from 'lodash';
 import { Router , routerRedux} from 'dva/router';
 import './FileSystem.css';
 import ProjectModal from './ProjectModal';
 import { jupyterServer, flaskServer } from '../../../constants';
+
+const TabPane = Tabs.TabPane;
 
 class FileSystem extends React.Component {
   constructor (props) {
@@ -17,7 +20,8 @@ class FileSystem extends React.Component {
   }
 
   componentDidMount(){
-    this.fetchData();
+    // this.fetchData()
+    this.props.dispatch({ type: 'project/query' })
   }
 
   fetchData(){
@@ -51,9 +55,18 @@ class FileSystem extends React.Component {
     console.log("delete");
   }
 
-  renderCards(){
-    let filelist = this.state.files;
-    return filelist.map((e) =>
+  renderTabContent(key) {
+    return <div className='full-width' style={{ display: 'flex', flexDirection: 'row' }}>
+      <div style={{ width: '100%'}}>
+        {this.renderCards(key)}
+      </div>
+    </div>
+  }
+
+  renderCards(key){
+    let projects = this.props.project.projects;
+    let cards = projects[key]
+    return cards.map((e) =>
       <Card key={e.name} title={e.name} extra={
         <Button type="danger" style={{marginTop: -5}} onClick={(event) => this.onClickDelete(event)}>
           DELETE
@@ -62,19 +75,21 @@ class FileSystem extends React.Component {
             style={{ width: 500 }} onClick={() => this.toProjectDetail(e.name, e._id)}>
         <p>描述: {e.description}</p>
         <p>创建时间: {e.create_time}</p>
-      </Card>
-    );
+      </Card>)
   }
 
   render() {
     return (
       <div>
         <div style={{marginBottom: 20}}>My Projects</div>
-        <ProjectModal record={{}} refresh={() => this.fetchData()}>
+        <ProjectModal record={{}} refresh={() => this.fetchData()} >
           <Button type="primary" style={{marginBottom: 20}}>新增项目</Button>
         </ProjectModal>
         <div className="cards">
-          {this.renderCards()}
+          <Tabs defaultActiveKey="1">
+            <TabPane tab="私有" key="1">{this.renderTabContent('owned_projects')}</TabPane>
+            <TabPane tab="公有" key="2">{this.renderTabContent('public_projects')}</TabPane>
+          </Tabs>
         </div>
       </div>
     )
@@ -88,4 +103,4 @@ FileSystem.propTypes = {
   dispatch: PropTypes.func
 }
 
-export default FileSystem
+export default connect(({ project }) => ({ project }))(FileSystem);

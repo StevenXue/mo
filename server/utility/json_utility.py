@@ -7,6 +7,7 @@ Date: 2017.05.17
 """
 import json
 import pandas as pd
+import numpy as np
 
 from bson import ObjectId
 from datetime import datetime
@@ -64,3 +65,16 @@ def convert_json_str_to_dataframe(arr):
 def me_obj_list_to_dict_list(me_obj_list):
     return [convert_to_json(me_obj.to_mongo()) for me_obj in
             me_obj_list]
+
+
+def convert_string_to_number(s):
+    if s == "":
+        return np.nan
+    else:
+        try:
+            return int(s)
+        except ValueError:
+            try:
+                return float(s)
+            except ValueError:
+                return s

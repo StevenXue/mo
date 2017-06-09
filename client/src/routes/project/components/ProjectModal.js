@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Modal, Form, Input } from 'antd';
 import PropTypes from 'prop-types';
-import {jupyterServer,flaskServer } from '../../../constants';
+import { connect } from 'dva';
+import {jupyterServer, flaskServer } from '../../../constants';
 
 const FormItem = Form.Item;
 
@@ -15,23 +16,28 @@ class ProjectModal extends Component {
 
   showModelHandler = (e) => {
     if (e) e.stopPropagation();
-    this.setState({
-      visible: true,
-    });
+    // this.setState({
+    //   visible: true,
+    // });
+    this.props.dispatch({ type: 'project/showModal' })
   };
 
   hideModelHandler = () => {
-    this.setState({
-      visible: false,
-    });
+    // this.setState({
+    //   visible: false,
+    // });
+    this.props.dispatch({ type: 'project/hideModal' })
+
   };
 
   okHandler = (values) => {
     //const { onOk } = this.props;
+    const user_ID = this.props.project.user.user_ID
+    console.log('user_ID', user_ID);
     this.props.form.validateFields((err, values) => {
       console.log(values.name);
       if (!err) {
-        fetch(jupyterServer, {
+        fetch(jupyterServer+user_ID, {
           method: 'post',
           crossDomain: true,
           headers:{
@@ -41,7 +47,7 @@ class ProjectModal extends Component {
           body: JSON.stringify({"type": "directory"})
         }).then((response) => response.json())
           .then((res) => {
-            fetch(jupyterServer+res.name, {
+            fetch(jupyterServer+user_ID+'/'+res.name, {
               method: 'PATCH',
               crossDomain: true,
               headers:{
@@ -56,30 +62,38 @@ class ProjectModal extends Component {
               console.log(response.status);
 
               if(response.status === 200){
-                fetch(flaskServer + '/project/create_project', {
-                  method: 'POST',
-                  crossDomain: true,
-                  headers:{
-                    "content-type": "application/json;charset=utf-8",
-                  },
-                  body: JSON.stringify({
-                    name: values.name,
-                    description: "descriptiondescriptiondescriptiondescription",
-                    user_ID: "test_user",
-                    is_private: true
-                  })
-                }).then((response) => {
-                  console.log(response.status);
-                  if(response.status === 200){
+                let body = {
+                  name: values.name,
+                  description: "descriptiondescriptiondescriptiondescription",
+                  is_private: true
+                }
+                this.props.dispatch({ type: 'project/create', payload: body })
 
-                    this.hideModelHandler();
-                    this.props.refresh();
-                  }
-                });
+                // fetch(flaskServer + '/project/create_project', {
+                //   method: 'POST',
+                //   crossDomain: true,
+                //   headers:{
+                //     "content-type": "application/json;charset=utf-8",
+                //   },
+                //   body: JSON.stringify({
+                //     name: values.name,
+                //     description: "descriptiondescriptiondescriptiondescription",
+                //     user_ID: "test_user",
+                //     is_private: true
+                //   })
+                // }).then((response) => {
+                //   console.log(response.status);
+                //   if(response.status === 200){
+                //
+                //     this.hideModelHandler();
+                //     // this.props.refresh();
+                //   }
+                // });
                 //this.hideModelHandler();
               }
             });
-          });
+          })
+          .catch((err) => console.log('error', err));
       }
     });
   };
@@ -100,11 +114,11 @@ class ProjectModal extends Component {
         </span>
         <Modal
           title="Project Configuration"
-          visible={this.state.visible}
+          visible={this.props.project.modalVisible}
           onOk={this.okHandler}
           onCancel={this.hideModelHandler}
         >
-          <Form horizontal onSubmit={() => this.okHandler(values)}>
+          <Form layout='horizontal' onSubmit={() => this.okHandler(values)}>
             <FormItem
               {...formItemLayout}
               label="Project Name"
@@ -129,4 +143,4 @@ ProjectModal.propTypes = {
   onOk: PropTypes.func,
 };
 
-export default Form.create()(ProjectModal);
+export default connect(({ project }) => ({ project }))(Form.create()(ProjectModal));

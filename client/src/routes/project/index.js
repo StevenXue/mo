@@ -25,17 +25,17 @@ function Dashboard ({ dispatch }) {
 
   return (
     <div style={bodyStyle}>
-      <FileSystem toDetail={handleToDetail} />
+      <FileSystem toDetail={handleToDetail} dispatch={dispatch} />
     </div>
   )
 }
 
-Dashboard.propTypes = {
-  dispatch: PropTypes.shape,
-}
+// Dashboard.propTypes = {
+//   dispatch: PropTypes.shape,
+// }
+//
+// Dashboard.defaultProps = {
+//   dispatch: {},
+// }
 
-Dashboard.defaultProps = {
-  dispatch: {},
-}
-
-export default connect(({ dashboard }) => ({ dashboard }))(Dashboard)
+export default connect(({ project }) => ({ project }))(Dashboard)
