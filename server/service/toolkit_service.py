@@ -24,11 +24,17 @@ from utility import json_utility
 
 
 def get_all_public_toolkit():
-    list = []
+    list_toolkit = []
     for obj in ownership_business.list_ownership_by_type_and_private('toolkit', False):
-        list.append(obj.toolkit.to_mongo().to_dict())
-    return list
+        list_toolkit.append(obj.toolkit.to_mongo().to_dict())
+    return list_toolkit
 
+
+def list_public_toolkit_name():
+    all_names = []
+    for tool in get_all_public_toolkit():
+        all_names.append(tool.toolkit.name)
+    return all_names
 
 # def toolkit_calculate(id, *argv):
 #     name = toolkit_business.get_by_toolkit_id(id).name
