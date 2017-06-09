@@ -66,7 +66,6 @@ export default class Editor extends React.Component {
   }
 
   onChange(e) {
-    console.log(e.target.value);
     if (this.props.onChange) {
       console.log('on change?');
       this.props.onChange(e.target.value);

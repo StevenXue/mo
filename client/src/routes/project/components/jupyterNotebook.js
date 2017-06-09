@@ -1,5 +1,6 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
+import React from 'react';
+import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types';
 // import Toolbar from '../../../react-notebook/src/toolbar';
 import empty from './empty.ipynb.json';
 import { Affix, Button } from 'antd';
@@ -89,9 +90,9 @@ class JupyterNotebook extends React.Component {
     }).then((args) => {
       const id = args[0]
       const channels = args[1]
-      console.info('connected', id, channels) // eslint-disable-line
-      console.log(args)
-      this.setState({ channels })
+      console.info('connected', id, channels); // eslint-disable-line
+      console.log(args);
+      this.setState({ channels });
     })
   }
 
@@ -108,13 +109,13 @@ class JupyterNotebook extends React.Component {
     if (input.files[0]) {
       this.reader.readAsText(input.files[0])
       console.log(input.files[0])
-      this.setState({ fileName: input.files[0].name })
+      this.setState({ fileName: input.files[0].name });
     }
   }
 
   onClickButton () {
     this.setState({
-      forceSource: '%run mnist_1.0_softmax.py'
+      forceSource: '%run mnist_1.0_softmax.py $[your training steps]'
     });
   }
 
@@ -138,6 +139,7 @@ class JupyterNotebook extends React.Component {
           channels={this.state.channels}
           forceSource={this.state.forceSource}
           result={(r) => this.getResult(r)}
+          project_id={this.props.project_id}
         />
 
       )
@@ -177,6 +179,10 @@ class JupyterNotebook extends React.Component {
       </div>
     )
   }
+}
+
+JupyterNotebook.propTypes = {
+  project_id: PropTypes.string,
 }
 
 export default JupyterNotebook

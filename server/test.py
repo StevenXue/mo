@@ -1,4 +1,3 @@
 def aaa():
-    print 'saaaaxasda'
+    print ('saaaaxasda')
     # test_zhang.test()
-aaa()

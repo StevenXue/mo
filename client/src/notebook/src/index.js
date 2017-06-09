@@ -4,7 +4,13 @@ import Jupyter from './jupyter/';
 import Provider from './util/provider';
 
 import createStoreRx from './store';
-import { setNotebook, setExecutionState, recordResults } from './actions';
+import {
+  setNotebook,
+  setExecutionState,
+  createCellAfter,
+  updateCellSource,
+  executeCell
+} from './actions';
 import { reducers } from './reducers';
 import Rx from 'rxjs';
 
@@ -78,8 +84,22 @@ export class Notebook extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    //let t = this.store.getState();
-    //console.log('state', this.state.results, prevState.results)
+    // let t = this.store.getState();
+    // console.log('state', this.state.results, prevState.results)
+    // console.log(prevState.notebook, this.state.notebook);
+    if(prevState.notebook === undefined){
+      let source = `# this is the id of the project you are editting \n` +
+        `project_id = "${this.props.project_id}" \n` + "# you might need to use it some where in your code\n"
+      + "# to run MNIST, you need to specify your training steps after \n# getting the code";
+      const cellOrder = this.state.notebook.get('cellOrder');
+      let id = cellOrder.get(0, null);
+      this.dispatch(updateCellSource(id, source));
+      this.dispatch(executeCell(this.props.channels,
+        id,
+        source));
+      this.dispatch(createCellAfter('code', id));
+    }
+
     if (this.state.results !== prevState.results) {
       this.props.result(this.state.results);
     }

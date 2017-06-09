@@ -1,21 +1,29 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
-import { Button, Select, Upload, Icon, message } from 'antd'
+import { Button, Select, Upload, Icon, message, Modal, Table} from 'antd';
 import { jupyterServer, flaskServer } from '../../../constants'
 import { Router, routerRedux } from 'dva/router'
 import Toolkits from './toolkits'
 import Jupyter from 'react-jupyter'
 import JupyterNotebook from './jupyterNotebook'
+//import scrollToComponent from 'react-scroll-to-component';
+
 //import CodeMirror from  'react-code-mirror';
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/monokai.css'
 
 const { Option, OptGroup } = Select
-// let JupyterNotebook;
-// require.ensure([],()=>{
-//   JupyterNotebook=require('./jupyterNotebook');
-// })
+
+const columns = [{
+  title: '名称',
+  dataIndex: 'name',
+  key: 'name',
+}, {
+  title: '描述',
+  dataIndex: 'description',
+  key: 'description',
+}];
 
 class ProjectDetail extends React.Component {
   constructor (props) {
@@ -33,6 +41,22 @@ class ProjectDetail extends React.Component {
         'nbformat_minor': 2,
       },
       data_id: '',
+      start_notebook: false,
+      visible: false,
+      data_prop: 'owned_ds',
+      selectedData: '',
+      project_id: this.props.location.query._id
+  }
+  }
+
+  rowSelection = {
+    onChange: (selectedRowKeys, selectedRows) => {
+      console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+      this.props.dispatch({ type: 'project/selectDataSets', payload: { selectedDSIds: selectedRows[0]._id } });
+      this.setState({
+        selectedData: selectedRows[0]._id,
+        visible: false
+      });
     }
   }
 
@@ -43,7 +67,7 @@ class ProjectDetail extends React.Component {
   }
 
   componentDidMount () {
-
+    console.log("project id", this.state.project_id)
     fetch(jupyterServer + this.state.projectName, {
       method: 'get',
     }).then((response) => response.json())
@@ -147,9 +171,27 @@ class ProjectDetail extends React.Component {
     }
   }
 
+  handleChoose(){
+    this.setState({
+      visible: true
+    });
+    //console.log(this.props.project.dataSets[this.state.data_prop]);
+  }
+
+  // handleChange (value) {
+  //   this.props.dispatch({ type: 'project/selectDataSets', payload: { selectedDSIds: value } })
+  //   // console.log(`selected ${value}`)
+  // }
+
+  startNotebook() {
+    this.setState({
+      start_notebook: true
+    });
+  }
+
   renderList () {
     let files = this.state.fileList
-    console.log(files, this.state.files)
+    // console.log(files, this.state.files)
     if (files) {
       return files.map((e) =>
         <div style={{ margin: '5px 10px 5px 20px' }} key={e.name}>{e.name}</div>,
@@ -157,11 +199,6 @@ class ProjectDetail extends React.Component {
     } else {
       return null
     }
-  }
-
-  handleChange (value) {
-    this.props.dispatch({ type: 'project/selectDataSets', payload: { selectedDSIds: value } })
-    // console.log(`selected ${value}`)
   }
 
   renderOptions (key) {
@@ -177,25 +214,36 @@ class ProjectDetail extends React.Component {
             <h1>{this.state.projectName}</h1>
             <h2>{'id: ' + this.props.location.query._id}</h2>
             <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column' }}>
-              <Button type='primary' style={{ width: 120 }}
-                      onClick={() => this.handleClick()}>Start Exploring</Button>
+              {!this.state.editing && <Button type='primary' style={{width: 120}}
+                       onClick={() => this.handleClick()}>Start Exploring</Button>
+              }
               { this.state.editing && <div>
-                <Select
-                  // mode="multiple"
-                  style={{ marginTop: 10, width: 120 }}
-                  placeholder="Please select data set"
-                  onChange={(value) => this.handleChange(value)}
-                >
-                  <OptGroup label="private">
-                    {this.renderOptions('owned_ds')}
-                  </OptGroup>
-                  <OptGroup label="public">
-                    {this.renderOptions('public_ds')}
-                  </OptGroup>
-                </Select>
-                <br />
+                <Modal title="Choose Dataset"
+                       visible={this.state.visible}
+                       onOk={() => this.setState({visible: false})}
+                       onCancel={() => this.setState({visible: false})}
+                       footer= {null}
+                  >
+                  <Button onClick={() => this.setState({data_prop: 'owned_ds'})}>PRIVATE</Button>
+                  <Button style={{marginLeft: 10}} onClick={() => this.setState({data_prop: 'public_ds'})}>PUBlIC</Button>
+                  <Table style={{marginTop: 10}}
+                         rowSelection={this.rowSelection}
+                         dataSource={this.props.project.dataSets[this.state.data_prop]}
+                         columns={columns}/>
+                </Modal>
+                <div style={{display: 'flex', flexDirection: 'row'}}>
+                  <Button type='primary' style={{width: 120}}
+                          onClick={() => this.handleChoose()}>Choose Data</Button>
+                  <div style={{marginLeft: 10}}>{"id: "+ this.state.selectedData}</div>
+                </div>
                 <Button type='primary' style={{ marginTop: 10, width: 120 }}
                         onClick={() => this.dataOp()}>OK</Button>
+                <Button type='primary' style={{ marginTop: 10, width: 120 , marginLeft: 20}}
+                        onClick={() => this.startNotebook()}>
+                  <a href="#notebookSection" >
+                    Start Notebook
+                  </a>
+                </Button>
               </div> }
             </div>
           </div>
@@ -219,17 +267,19 @@ class ProjectDetail extends React.Component {
               <div style={{ paddingLeft: 70, paddingTop: 20 }}>
                 <Jupyter
                   notebook={this.state.notebookJSON}
-                  showCode={true} // optional
-                  defaultStyle={true} // optional
-                  loadMathjax={true} // optional
+                  showCode={true}
+                  defaultStyle={true}
+                  loadMathjax={true}
                 />
 
               </div>
             </div>
           </div>
-          { this.state.editing &&
-          <JupyterNotebook />
+          <div id="notebookSection" >
+          { this.state.start_notebook &&
+          <JupyterNotebook project_id={this.state.project_id} />
           }
+          </div>
         </div>
       </div>
     )

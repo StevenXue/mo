@@ -1,13 +1,15 @@
 # encoding: utf-8
 # import platform
-import ConfigParser
+
+# change to configparser instead of ConfigParse in favor of python3
+import configparser
 
 import os
 
 # https://docs.python.org/3/library/configparser.html
 # import codecs
 
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 
 config_url = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.ini')
 

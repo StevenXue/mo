@@ -1,5 +1,7 @@
 # -*- coding: UTF-8 -*-
 
+from entity import data
+from repository import data_repo
 from entity.data import Data
 from repository.data_repo import DataRepo
 

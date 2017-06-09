@@ -36,11 +36,8 @@ const CodeCell = (props, context) => {
                                  props.cell.get('source')));
   }
 
-  function onClick(e) {
-    console.log(e.target);
+  function onClick() {
     context.dispatch(updateCellSource(props.id, props.forceSource));
-    console.log(props.id, e.target);
-    //console.log(state.source);
   }
 
   return (
@@ -53,7 +50,7 @@ const CodeCell = (props, context) => {
           language={props.language}
           forceSource={props.forceSource}
         />
-        <Button onClick={(e) => onClick(e)}>Add Code</Button>
+        <Button onClick={(e) => onClick()}>Add Code</Button>
       </div>
       <Display
         className="cell_display"
