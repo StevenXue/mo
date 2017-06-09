@@ -36,26 +36,13 @@ def get_by_toolkit_id(toolkit_id):
     return toolkit_repo.read_by_id(toolkit_id)
 
 
-def list_public_toolkit_name():
-    # toolkit_obj = Toolkit()
-    all_names = []
-    # print 'toolkit_obj', toolkit_obj.name
-    for tool in get_all_public_toolkit():
-        all_names.append(tool.toolkit.name)
-    return all_names
-
-
-# DONE BY Tianyi(涉及到别的 entity 或者 business 放到 service 里 to tianyi by zhaofeng)
-# def get_all_public_toolkit():
-#     return ownership_business.list_ownership_by_type_and_private('toolkit', False)
-
-
 def add(name, description, target_py_code, entry_function, parameter_spec):
     toolkit = Toolkit(name=name, description=description,
                       target_py_code=target_py_code,
                       entry_function=entry_function,
                       parameter_spec=parameter_spec)
-    # TODO add ownership
+    user = user_business.get_by_user_ID('system')
+    ownership_business.add(user, False, toolkit=toolkit)
     return toolkit_repo.create(toolkit)
 
 
