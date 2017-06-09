@@ -58,9 +58,40 @@ def toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, *argv):
 def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id, data, k):
     """convert json list"""
     col = data[0].keys()
-    argv = [[[json_utility.convert_string_to_number(obj[i]) for i in col] for obj in data]]
-    # argv = [[[float(obj[i]) if obj[i] is not None else np.nan for i in col] for obj in data]]
+    # argv = [[json_utility.convert_string_to_number(obj[i]) for i in col] for obj in data]
+    # # 删掉所有的np.nan, to FIXME 要给出index
+    # # arg_filter = [[arr for arr in argv if np.nan not in arr]]
+    index_nan = []
+    arg_filter = []
+    for arr in data:
+        arr_temp = [json_utility.convert_string_to_number(arr[i]) for i in col]
+        if np.nan not in arr_temp:
+            arg_filter.append(arr_temp)
+        else:
+            index_nan.append(data.index(arr))
+    # argv = [arg_filter]
 
+    # 临时救急，转文字为数字
+    argv_b = zip(*arg_filter)
+    print argv_b
+    argv_a = []
+    for arr in argv_b:
+        try:
+            float(arr[0])
+            argv_a.append(arr)
+        except ValueError:
+            hash_obj = {}
+            i = 1
+            temp = []
+            for item in arr:
+                if item in hash_obj:
+                    temp.append(hash_obj[item])
+                else:
+                    hash_obj[item] = i
+                    i += 1
+                    temp.append(hash_obj[item])
+            argv_a.append(temp)
+    argv = [argv_a]
     if k:
         argv.append(k)
     # result = toolkit_calculate(toolkit_id, *argv)
