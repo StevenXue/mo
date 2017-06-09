@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import sys
-from bson import ObjectId
+
+from bson.objectid import ObjectId
 
 from server.business import staging_data_business
 from service import staging_data_service
@@ -71,3 +72,7 @@ def convert_to_json(data):
     :return: data in JSON format
     """
     return json_utility.convert_to_json(data)
+
+
+if __name__ == '__main__':
+    pass

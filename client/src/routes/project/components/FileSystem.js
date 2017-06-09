@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Button, Tabs } from 'antd';
+import { Card, Button, Tabs} from 'antd';
 import PropTypes from 'prop-types';
 import { connect } from 'dva';
 import { request } from '../../../utils';
@@ -50,6 +50,11 @@ class FileSystem extends React.Component {
     this.props.toDetail(name, _id);
   }
 
+  onClickDelete(event) {
+    event.stopPropagation();
+    console.log("delete");
+  }
+
   renderTabContent(key) {
     return <div className='full-width' style={{ display: 'flex', flexDirection: 'row' }}>
       <div style={{ width: '100%'}}>
@@ -62,7 +67,12 @@ class FileSystem extends React.Component {
     let projects = this.props.project.projects;
     let cards = projects[key]
     return cards.map((e) =>
-      <Card key={e.name} title={e.name} style={{ width: 500 }} onClick={() => this.toProjectDetail(e.name, e._id)}>
+      <Card key={e.name} title={e.name} extra={
+        <Button type="danger" style={{marginTop: -5}} onClick={(event) => this.onClickDelete(event)}>
+          DELETE
+        </Button>
+      }
+            style={{ width: 500 }} onClick={() => this.toProjectDetail(e.name, e._id)}>
         <p>描述: {e.description}</p>
         <p>创建时间: {e.create_time}</p>
       </Card>)

@@ -95,6 +95,7 @@ class Notebook extends React.Component {
       );
     }
     const cellOrder = this.props.notebook.get('cellOrder');
+    // console.log(cellOrder.get(0, null));
     return (
       <div style={{
         paddingTop: '10px',

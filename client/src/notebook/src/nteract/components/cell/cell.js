@@ -34,6 +34,7 @@ class Cell extends React.Component {
   }
 
   onMouseEnter() {
+    //console.log("cell id", this.props.id);
     this.setState({ showToolbar: true });
   }
 
@@ -47,8 +48,6 @@ class Cell extends React.Component {
     return (
       <div
         className="cell"
-        //style={{paddingTop: 10}}
-        onClick={this.onMouseEnter}
         onMouseEnter={this.onMouseEnter}
         onMouseLeave={this.onMouseLeave}
       >
