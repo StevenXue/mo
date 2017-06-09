@@ -139,14 +139,6 @@ def create_public_toolkit():
     KMEAN = toolkit_repo.create(KMEAN)
     ownership_business.add(user, False, toolkit=KMEAN)
 
-    MIC = Toolkit(name='最大互信息数',
-                  description='计算所选数据集合的最大互信息数, 表达两变量之间(函数关系)相关系数',
-                  entry_function='toolkit_mic',
-                  target_py_code=inspect.getsource(toolkit_orig.toolkit_mic),
-                  parameter_spec={"input_data": {'type': 'list', 'dimension': None}})
-    MIC = toolkit_repo.create(MIC)
-    ownership_business.add(user, False, toolkit=MIC)
-
     PCA = Toolkit(name='降维PCA-主成分分析算法',
                   description='计算所选数据集合(多为数据)的降维，default自动降维，输入k可降到k维',
                   entry_function='dimension_reduction_PCA',
@@ -189,13 +181,6 @@ def create_public_toolkit():
     CV = toolkit_repo.create(CV)
     ownership_business.add(user, False, toolkit=CV)
 
-
-def update_one_public_toolkit():
-    """
-        数据库建一个toolkit的collection, 记载public的数据分析工具包简介
-    """
-    user = user_business.get_by_user_ID('system')
-
     MAX = Toolkit(name='最大值',
                   description='返回数据最大值',
                   entry_function='toolkit_max',
@@ -235,6 +220,21 @@ def update_one_public_toolkit():
                   parameter_spec={"input_data": {'type': 'list', 'dimension': 2}})
     COV = toolkit_repo.create(COV)
     ownership_business.add(user, False, toolkit=COV)
+
+
+def update_one_public_toolkit():
+    """
+        数据库建一个toolkit的collection, 记载public的数据分析工具包简介
+    """
+    user = user_business.get_by_user_ID('system')
+
+    MIC = Toolkit(name='最大互信息数',
+                  description='计算所选数据集合的最大互信息数, 表达第一个所选值域与其他值域变量之间的相关系数',
+                  entry_function='toolkit_mic',
+                  target_py_code=inspect.getsource(toolkit_orig.toolkit_mic),
+                  parameter_spec={"input_data": {'type': 'list', 'dimension': None}})
+    MIC = toolkit_repo.create(MIC)
+    ownership_business.add(user, False, toolkit=MIC)
 
 
 if __name__ == '__main__':
