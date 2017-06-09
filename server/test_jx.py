@@ -28,6 +28,16 @@ connect(
     host=config.get_mongo_host(),
 )
 
+# ------
+# print staging_data_service.get_fields_with_types(ObjectId(
+#     '59341201df86b26b1f12f924'))
+# print staging_data_service.get_fields_with_types(ObjectId("592917341c5ad409b07335e6"))
+
+# ----
+# Random test
+# staging_data_set_business.get_by_id(ObjectId('59303bda1c5ad41cdb2bba9b'))
+# staging_data_set_business.get_by_project_id(ObjectId('59259247e89bde050b6f02d4'))
+
 # ----
 # test for sub_staging_data_set
 # SubDataSet(name='wtf',
@@ -37,8 +47,8 @@ connect(
 #            data=[ObjectId('592917341c5ad409b07335e8'),
 #                  ObjectId('592917341c5ad409b07335e7')],
 #            parent_set=ObjectId('592917341c5ad409b07335e6')).save()
-#
-#
+
+
 
 # ------
 # Test for MapReduceDocument()
@@ -67,7 +77,7 @@ connect(
 # for field in field_list:
 #     print field
 
-print staging_data_service.get_fields_with_types(ObjectId("592917341c5ad409b07335e6"))
+# staging_data_service.get_fields_with_types(ObjectId("592917341c5ad409b07335e6"))
 
 
 # def get_field_names(collection):

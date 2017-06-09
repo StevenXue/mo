@@ -6,6 +6,7 @@ SUB_SET_PURPOSE =(
     (1, 'testing')
 )
 
+
 class StagingDataSet(Document):
     project = ReferenceField('Project', required=True)
     name = StringField(max_length=50, required=True, unique_with='project')
@@ -16,7 +17,7 @@ class StagingDataSet(Document):
     # source_data_sets = ListField(ReferenceField('DataSet'))
 
 
-# TODO Need to discussion for future
+# TODO Need to discussion for the future
 class SubDataSet(StagingDataSet):
     purpose = IntField(choices=SUB_SET_PURPOSE, required=True)
     data = ListField(ReferenceField('StagingData'))
