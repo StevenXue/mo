@@ -7,7 +7,6 @@ Date: 2017.05.17
 """
 import json
 import pandas as pd
-import numpy as np
 
 from bson import ObjectId
 from datetime import datetime

@@ -5,7 +5,7 @@ utility used in all project
 Author: Zhaofeng Li
 Date: 2017.06.09
 """
-
+import numpy as np
 
 # int, float
 def convert_data_array_by_fields(array, field_type_arrays):
