@@ -19,8 +19,7 @@ from sklearn.manifold import TSNE
 
 from service import job_service
 from business import toolkit_business, ownership_business, user_business, job_business, result_business, project_business
-from utility import json_utility
-# from lib import toolkit_code
+from utility import data_utility
 
 
 def get_all_public_toolkit():
@@ -70,7 +69,7 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id, data
     index_nan = []
     arg_filter = []
     for arr in data:
-        arr_temp = [json_utility.convert_string_to_number(arr[i]) for i in col]
+        arr_temp = [data_utility.convert_string_to_number_with_poss(arr[i]) for i in col]
         if np.nan not in arr_temp:
             arg_filter.append(arr_temp)
         else:
