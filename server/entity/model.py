@@ -29,9 +29,9 @@ class Model(Document):
     description = StringField(max_length=140, required=True)
     usage = IntField(choices=RESUlt_TYPE, required=True)    # 类型，用作何用途
     classification = IntField(choices=RESUlt_TYPE1, required=True)  # model分类
-    input = DictField(required=True)
+    input_data = DictField(required=True)
     target_py_code = StringField(required=True)     # 显示路径
-    CNN_level = IntField(required=True)     # CNN 层数
+    cnn_level = IntField(required=True)     # CNN 层数
     optimization_algorithm = ListField()     # 优化方法
     evaluate_matrix = ListField(required=True)      # 测量方法
 

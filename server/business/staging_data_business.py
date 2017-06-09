@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
 from bson import ObjectId
 
-from server.entity.staging_data import StagingData
-from server.repository.staging_data_repo import StagingDataRepo
+from entity.staging_data import StagingData
+from repository.staging_data_repo import StagingDataRepo
 staging_data_repo = StagingDataRepo(StagingData)
 
 
