@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
-import { Button, Select, Upload, Icon, message, Modal, Table} from 'antd';
+import { Button, Select, Upload, Icon, message, Modal, Table, Radio} from 'antd';
 import { jupyterServer, flaskServer } from '../../../constants'
 import { Router, routerRedux } from 'dva/router'
 import Toolkits from './toolkits'
@@ -14,6 +14,7 @@ import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/monokai.css'
 
 const { Option, OptGroup } = Select
+const RadioGroup = Radio.Group;
 
 const columns = [{
   title: '名称',
@@ -45,7 +46,8 @@ class ProjectDetail extends React.Component {
       visible: false,
       data_prop: 'owned_ds',
       selectedData: '',
-      project_id: this.props.location.query._id
+      project_id: this.props.location.query._id,
+      dataSet: []
   }
   }
 
@@ -111,8 +113,33 @@ class ProjectDetail extends React.Component {
     if (!dataSetId) {
       return
     }
-    console.log(dataSetId, this.props.location.query._id)
+    fetch(flaskServer + '/data/get_data_set?data_set_id='+dataSetId+'&limit=10', {
+        method: 'get',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      },
+    ).then((response) => response.json())
+      .then((res) => {
+        let values = {}
+        console.log('/data/get_data_set?data_set_id='+dataSetId, res.response)
+        Object.keys(res.response[0]).forEach((e) => values[e] = 'str')
+        this.setState({
+          dataSet: res.response,
+          values
+        })
+      })
+      .catch((err) => console.log('Error: /data/get_data_set', err))
+  }
 
+  convertToStaging() {
+    let dataSetId = this.props.project.selectedDSIds
+    let values = this.state.values
+    if (!dataSetId || !values) {
+      return
+    }
+    let f_t_arrays = Object.keys(values).map((e) => [e, values[e]])
+    // console.log('f_t_arrays', f_t_arrays)
     fetch(flaskServer + '/staging_data/add_staging_data_set_by_data_set_id', {
         method: 'post',
         headers: {
@@ -123,6 +150,7 @@ class ProjectDetail extends React.Component {
           'staging_data_set_name': 'test_' + Math.floor(Math.random() * 1000),
           'staging_data_set_description': 'dsdsds',
           'data_set_id': dataSetId,
+          'f_t_arrays': f_t_arrays
         }),
       },
     ).then((response) => response.json())
@@ -205,8 +233,36 @@ class ProjectDetail extends React.Component {
     return this.props.project.dataSets[key].map((e) => <Option key={e._id} value={e._id}>{e.name}</Option>)
   }
 
+  onRadioChange(ev, field) {
+    let values = this.state.values
+    values[field] = ev.target.value
+    this.setState({
+      values
+    })
+  }
+
   render () {
     //const JupyterNotebook =  require('./jupyterNotebook');
+    // FIXME
+    let dsColumns
+    if(this.state.dataSet.length > 0) {
+      dsColumns = Object.keys(this.state.dataSet[0]).map((e) => ({
+        title: e,
+        dataIndex: e,
+        key: e,
+        filterDropdown: (
+          <div className="custom-filter-dropdown">
+            <RadioGroup onChange={(ev) => this.onRadioChange(ev, e)} value={this.state.values[e]}>
+              <Radio value={'str'}>String</Radio>
+              <Radio value={'int'}>Integer</Radio>
+              <Radio value={'float'}>Float</Radio>
+            </RadioGroup>
+          </div>
+        ),
+        // onFilter: (value, record) => console.log('value, record', value, record),
+        filterIcon: <Icon type="info-circle" style={{ color: this.state.filtered ? '#108ee9' : '#aaa' }} />
+      }))
+    }
     return (
       <div className="content-inner">
         <div>
@@ -218,7 +274,7 @@ class ProjectDetail extends React.Component {
                        onClick={() => this.handleClick()}>Start Exploring</Button>
               }
               { this.state.editing && <div>
-                <Modal title="Choose Dataset"
+                <Modal title="Choose DataSet"
                        visible={this.state.visible}
                        onOk={() => this.setState({visible: false})}
                        onCancel={() => this.setState({visible: false})}
@@ -237,7 +293,7 @@ class ProjectDetail extends React.Component {
                   <div style={{marginLeft: 10}}>{"id: "+ this.state.selectedData}</div>
                 </div>
                 <Button type='primary' style={{ marginTop: 10, width: 120 }}
-                        onClick={() => this.dataOp()}>OK</Button>
+                        onClick={() => this.dataOp()}>Show</Button>
                 <Button type='primary' style={{ marginTop: 10, width: 120 , marginLeft: 20}}
                         onClick={() => this.startNotebook()}>
                   <a href="#notebookSection" >
@@ -246,6 +302,14 @@ class ProjectDetail extends React.Component {
                 </Button>
               </div> }
             </div>
+          </div>
+          <div>
+            {this.state.dataSet.length > 0 && dsColumns && <div>
+              <Table style={{marginTop: 10}}
+                   dataSource={this.state.dataSet}
+                   columns={dsColumns}/>
+              <Button onClick={() => this.convertToStaging()}>Ok</Button>
+            </div>}
           </div>
           <div style={{ marginTop: 20, display: 'flex', flexDirection: 'row' }}>
             <div style={{ width: '40%', height: 700, border: '1px solid #f3f3f3' }}>

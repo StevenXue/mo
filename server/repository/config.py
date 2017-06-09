@@ -2,14 +2,14 @@
 # import platform
 
 # change to configparser instead of ConfigParse in favor of python3
-import configparser
+import ConfigParser
 
 import os
 
 # https://docs.python.org/3/library/configparser.html
 # import codecs
 
-config = configparser.ConfigParser()
+config = ConfigParser.ConfigParser()
 
 config_url = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.ini')
 

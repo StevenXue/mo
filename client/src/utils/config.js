@@ -23,6 +23,7 @@ module.exports = {
     dataImport: '/data/import_data_from_file_id',
     dataSets: '/data/list_data_sets_by_user_ID',
     projects: '/project/list_projects_by_user_ID',
-    projectCreate: '/project/create_project'
+    projectCreate: '/project/create_project',
+    getDataFields: '/data/get_fields_with_types'
   },
 }
