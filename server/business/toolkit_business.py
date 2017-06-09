@@ -18,7 +18,7 @@ from minepy import MINE
 from bson.objectid import ObjectId
 import inspect
 
-from lib import toolkit_file
+from lib import toolkit_orig
 from entity.toolkit import Toolkit
 from repository.toolkit_repo import ToolkitRepo
 from business import user_business, ownership_business
@@ -55,7 +55,7 @@ def create_public_toolkit():
     AVG = Toolkit(name='平均值',
                   description='计算所选数据集合的平均值',
                   entry_function='toolkit_average',
-                  target_py_code=inspect.getsource(toolkit_file.toolkit_average),
+                  target_py_code=inspect.getsource(toolkit_orig.toolkit_average),
                   parameter_spec={"input_data": {'type': 'list', 'dimension': 1}})
     AVG = toolkit_repo.create(AVG)
     ownership_business.add(user, False, toolkit=AVG)
@@ -63,7 +63,7 @@ def create_public_toolkit():
     MEDIAN = Toolkit(name='中位数',
                      description='计算所选数据集合的中位数',
                      entry_function='toolkit_median',
-                     target_py_code=inspect.getsource(toolkit_file.toolkit_median),
+                     target_py_code=inspect.getsource(toolkit_orig.toolkit_median),
                      parameter_spec={"input_data": {'type': 'list', 'dimension': 1}})
     MEDIAN = toolkit_repo.create(MEDIAN)
     ownership_business.add(user, False, toolkit=MEDIAN)
@@ -71,7 +71,7 @@ def create_public_toolkit():
     MODE = Toolkit(name='众数',
                    description='计算所选数据集合的众数',
                    entry_function='toolkit_mode',
-                   target_py_code=inspect.getsource(toolkit_file.toolkit_mode),
+                   target_py_code=inspect.getsource(toolkit_orig.toolkit_mode),
                    parameter_spec={"input_data": {'type': 'list', 'dimension': 1}})
     MODE = toolkit_repo.create(MODE)
     ownership_business.add(user, False, toolkit=MODE)
@@ -79,7 +79,7 @@ def create_public_toolkit():
     SMA = Toolkit(name='移动平均值',
                   description='计算所选数据集合的移动平均值',
                   entry_function='toolkit_moving_average',
-                  target_py_code=inspect.getsource(toolkit_file.toolkit_moving_average),
+                  target_py_code=inspect.getsource(toolkit_orig.toolkit_moving_average),
                   parameter_spec={"input_data": {'type': 'list', 'dimension': 1},
                                   "k": {'type': 'int', 'default': 3}})
     SMA = toolkit_repo.create(SMA)
@@ -88,7 +88,7 @@ def create_public_toolkit():
     RANGE = Toolkit(name='全距',
                     description='计算所选数据集合的最大/最小值之差',
                     entry_function='toolkit_range',
-                    target_py_code=inspect.getsource(toolkit_file.toolkit_range),
+                    target_py_code=inspect.getsource(toolkit_orig.toolkit_range),
                     parameter_spec={"input_data": {'type': 'list', 'dimension': 1}})
     RANGE = toolkit_repo.create(RANGE)
     ownership_business.add(user, False, toolkit=RANGE)
@@ -96,7 +96,7 @@ def create_public_toolkit():
     STD = Toolkit(name='标准差',
                   description='计算所选数据集合的标准差',
                   entry_function='toolkit_std',
-                  target_py_code=inspect.getsource(toolkit_file.toolkit_std),
+                  target_py_code=inspect.getsource(toolkit_orig.toolkit_std),
                   parameter_spec={"input_data": {'type': 'list', 'dimension': 1}})
     STD = toolkit_repo.create(STD)
     ownership_business.add(user, False, toolkit=STD)
@@ -104,7 +104,7 @@ def create_public_toolkit():
     VAR = Toolkit(name='方差',
                   description='计算所选数据集合的方差',
                   entry_function='toolkit_variance',
-                  target_py_code=inspect.getsource(toolkit_file.toolkit_variance),
+                  target_py_code=inspect.getsource(toolkit_orig.toolkit_variance),
                   parameter_spec={"input_data": {'type': 'list', 'dimension': 1}})
     VAR = toolkit_repo.create(VAR)
     ownership_business.add(user, False, toolkit=VAR)
@@ -112,7 +112,7 @@ def create_public_toolkit():
     PEARSON = Toolkit(name='皮尔森相关系数',
                       description='计算所选数据集合的皮尔森相关系数, 表达两变量之间(线性)相关系数',
                       entry_function='toolkit_pearson',
-                      target_py_code=inspect.getsource(toolkit_file.toolkit_pearson),
+                      target_py_code=inspect.getsource(toolkit_orig.toolkit_pearson),
                       parameter_spec={"input_data": {'type': 'list', 'dimension': 2}})
     PEARSON = toolkit_repo.create(PEARSON)
     ownership_business.add(user, False, toolkit=PEARSON)
@@ -120,7 +120,7 @@ def create_public_toolkit():
     KMEAN = Toolkit(name='K平均数算法',
                     description='计算所选数据集合的k-mean, 把一个把数据空间划分为k个子集',
                     entry_function='k_mean',
-                    target_py_code=inspect.getsource(toolkit_file.k_mean),
+                    target_py_code=inspect.getsource(toolkit_orig.k_mean),
                     parameter_spec={"input_data": {'type': 'list', 'dimension': None},
                                     "k": {'type': 'int', 'default': 2}})
     KMEAN = toolkit_repo.create(KMEAN)
@@ -129,7 +129,7 @@ def create_public_toolkit():
     PCA = Toolkit(name='降维PCA-主成分分析算法',
                   description='计算所选数据集合(多为数据)的降维，default自动降维，输入k可降到k维',
                   entry_function='dimension_reduction_PCA',
-                  target_py_code=inspect.getsource(toolkit_file.dimension_reduction_PCA),
+                  target_py_code=inspect.getsource(toolkit_orig.dimension_reduction_PCA),
                   parameter_spec={"input_data": {'type': 'list', 'dimension': None},
                                   "k": {'type': 'int', 'default': 1}})
     PCA = toolkit_repo.create(PCA)
@@ -138,7 +138,7 @@ def create_public_toolkit():
     TSNE = Toolkit(name='降维TSNE-t_分布邻域嵌入算法',
                    description='计算所选数据集合(多维数据)的降维，default自动降维，输入k可降到k维，通常为了方便可视化，降至2维',
                    entry_function='dimension_reduction_TSNE',
-                   target_py_code=inspect.getsource(toolkit_file.dimension_reduction_TSNE),
+                   target_py_code=inspect.getsource(toolkit_orig.dimension_reduction_TSNE),
                    parameter_spec={"input_data": {'type': 'list', 'dimension': None},
                                    "k": {'type': 'int', 'default': 2}})
     TSNE = toolkit_repo.create(TSNE)
