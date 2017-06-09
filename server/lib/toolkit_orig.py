@@ -51,7 +51,7 @@ def toolkit_mode(arr0):
 
 
 # 移动平均值
-def toolkit_moving_average(arr0, window):
+def toolkit_moving_average(arr0, index, window):
     ret = np.cumsum(np.array(arr0), dtype=float)
     ret[window:] = ret[window:] - ret[:-window]
     return {"移动平均值": list(ret[window - 1:] / window)}
@@ -137,10 +137,13 @@ def toolkit_pearson(arr0):
 # 最大互信息数
 def toolkit_mic(arr0, alpha=0.6, c=15):
     matrix = np.array(arr0)
-    t_matrix = np.transpose(matrix)
+    t_matrix = np.transpose(matrix).astype(float)
     mine = MINE(alpha, c, est="mic_approx")
-    mine.compute_score(t_matrix[0], t_matrix[1])
-    return mine.mic()
+    mic_result = []
+    for t_matr in t_matrix[1:]:
+        mine.compute_score(t_matrix[0], t_matr)
+        mic_result.append(mine.mic())
+    return mic_result
 
 ######################################################################
 # 数据处理 Data Pre-processing
@@ -149,12 +152,17 @@ def toolkit_mic(arr0, alpha=0.6, c=15):
 ###################################
 # 降维
 # 降维PCA-主成分分析算法
-def dimension_reduction_PCA(arr0, n_components='mle'):
+def dimension_reduction_PCA(arr0, index, n_components='mle'):
     matrix = np.array(arr0)
     svd_solver = 'auto'
     pca = PCA(n_components=n_components, svd_solver=svd_solver).fit(matrix)
     new_data = pca.fit_transform(matrix)
-    return {"降维后数据值": new_data.tolist(),
+    label = new_data.tolist()
+    i = 0
+    for ind in index:
+        label.insert(ind, ['NAN'])
+        i += 1
+    return {"降维后数据值": label,
             "维度": pca.components_.tolist(),
             "待定": pca.explained_variance_.tolist(),
             "待定1": pca.explained_variance_ratio_.tolist(),
@@ -164,12 +172,17 @@ def dimension_reduction_PCA(arr0, n_components='mle'):
 
 
 # 降维TSNE-t_分布邻域嵌入算法
-def dimension_reduction_TSNE(arr0, n_components=2):
+def dimension_reduction_TSNE(arr0, index, n_components=2):
     matrix = np.array(arr0)
     t_sne = TSNE(n_components=n_components, random_state=0)
     np.set_printoptions(suppress=True)
     result = t_sne.fit_transform(matrix)
-    return {"降维后数据值": result, "数据源": arr0}
+    label = result.tolist()
+    i = 0
+    for ind in index:
+        label.insert(ind, ['NAN'])
+        i += 1
+    return {"降维后数据值": label, "数据源": arr0}
 
 
 ######################################################################
@@ -179,10 +192,15 @@ def dimension_reduction_TSNE(arr0, n_components=2):
 
 
 # K平均数算法
-def k_mean(arr0, n_clusters=2):
+def k_mean(arr0, index, n_clusters=2):
     matrix = np.array(arr0)
     k_means = KMeans(n_clusters).fit(matrix)
-    return {"分类标签": k_means.labels_.tolist(), "类别中心点": k_means.cluster_centers_.tolist(), "距中心点距离总和": k_means.inertia_, "数据源": arr0}
+    label = k_means.labels_.tolist()
+    i = 0
+    for ind in index:
+        label.insert(ind, 'NAN')
+        i += 1
+    return {"分类label": label, "类别中心点": k_means.cluster_centers_.tolist(), "距中心点距离总和": k_means.inertia_, "数据源": arr0}
 
 
 def k_mean_predict(arr0, list_points, n_clusters=2):
