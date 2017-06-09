@@ -52,3 +52,16 @@ def convert_string_to_number(s):
         return int(s)
     except ValueError:
         return float(s)
+
+
+def convert_string_to_number_with_poss(s):
+    if s == "":
+        return np.nan
+    else:
+        try:
+            return int(s)
+        except ValueError:
+            try:
+                return float(s)
+            except ValueError:
+                return s
