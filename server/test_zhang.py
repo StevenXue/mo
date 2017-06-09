@@ -38,8 +38,8 @@ def test(a,b,c=3):
 
 if __name__ == '__main__':
     # 创建所有的public toolkit
-    # toolkit_business.create_public_toolkit()
-    # toolkit_business.update_one_public_toolkit()
+    toolkit_business.create_public_toolkit()
+    toolkit_business.update_one_public_toolkit()
 
     # 通过名字找
     # a = toolkit_business.get_by_toolkit_name('平均值')
@@ -61,6 +61,6 @@ if __name__ == '__main__':
     # # print toolkit_service.toolkit_calculate("59266bd08be34d2b2362f91e",[1,2,3,4,5],[2,3,4,5,6])
 
     # 重构后联动调试计算结果
-    a = [{'a':1,"b":0.11,"c":111,"d":0.3},{'a':2,"b":0.12,"c":None,"d":11.3},{'a':3,"b":0.13,"c":1111,"d":78.3},{'a':5,"b":0.15,"c":0.1,"d":0.3},{'a':8,"b":0.18,"c":9,"d":9.3}]
-    b = [{'a':1},{'a':2},{'a':4},{'a':3},{'a':5},{'a':None}]
-    print toolkit_service.convert_json_and_calculate("5925b208e89bde050b6f02d8", "59303bda1c5ad41cdb2bba9b", "59301a628be34d0f7bd9cc57", b, 3)
+    # a = [{'a':1,"b":0.11,"c":111,"d":0.3},{'a':2,"b":0.12,"c":2,"d":11.3},{'a':3,"b":0.13,"c":1111,"d":78.3},{'a':5,"b":0.15,"c":0.1,"d":0.3},{'a':8,"b":0.18,"c":9,"d":9.3}]
+    # b = [{'a':1},{'a':2},{'a':4},{'a':3},{'a':5},{'a':"None"}]
+    # print toolkit_service.convert_json_and_calculate("5925b208e89bde050b6f02d8", "59303bda1c5ad41cdb2bba9b", "59301a628be34d0f7bd9cc5b", a, 2)

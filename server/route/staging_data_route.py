@@ -37,9 +37,7 @@ def get_by_staging_data_set_and_fields():
         data = staging_data_business.get_by_staging_data_set_and_fields(
             ObjectId(staging_data_set_id), fields)
         data = [d.to_mongo().to_dict() for d in data]
-        for da in data:
-            print da
-        print 'k', k
+        # data.pop(0)
         result = toolkit_service.convert_json_and_calculate(project_id,
                                                             staging_data_set_id,
                                                             toolkit_id, data,
