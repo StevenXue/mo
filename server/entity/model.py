@@ -22,8 +22,17 @@ RESUlt_TYPE1 = (
      2, '半监督式学习')
 )
 
+RESUlt_TYPE2 = (
+    (0, 'Gradient descent',
+     1, 'Gradient boosting')
+)
 
-# TODO Need to be confirmed
+RESUlt_TYPE3 = (
+    (0, 'accuracy',
+     1, 'cross-entropy')
+)
+
+
 class Model(Document):
     name = StringField(max_length=50, required=True)
     description = StringField(max_length=140, required=True)
@@ -32,8 +41,8 @@ class Model(Document):
     input_data = DictField(required=True)
     target_py_code = StringField(required=True)     # 显示路径
     cnn_level = IntField(required=True)     # CNN 层数
-    optimization_algorithm = ListField()     # 优化方法
-    evaluate_matrix = ListField(required=True)      # 测量方法
+    optimization_algorithm = ListField(IntField(choices=RESUlt_TYPE2))     # 优化方法
+    evaluate_matrix = ListField(IntField(choices=RESUlt_TYPE3), required=True)      # 测量方法
 
     # input={
     #     'shape': {
