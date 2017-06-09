@@ -1,13 +1,21 @@
 import { request, config } from '../utils';
 import { jupyterServer } from '../constants';
 const { api, CORS } = config;
-const { dataSets } = api;
+const { dataSets, projects, projectCreate } = api;
 
-export async function create (params) {
+export async function query (user_ID) {
+  let query = `?user_ID=${user_ID}`
   return request({
-    url: "new project",
+    url: CORS + projects + query,
+    method: 'get',
+  })
+}
+
+export async function create (data) {
+  return request({
+    url: CORS + projectCreate,
     method: 'post',
-    data: params,
+    data,
   })
 }
 
@@ -20,7 +28,6 @@ export async function edit (params) {
 
 export async function listDataSets (user_ID) {
   let query = `?user_ID=${user_ID}`
-  console.log('url', CORS + dataSets + query);
   return request({
     url: CORS + dataSets + query,
     method: 'get',

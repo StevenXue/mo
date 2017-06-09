@@ -1,5 +1,7 @@
-import { create, edit, listDataSets } from '../services/project';
-import { parse } from 'qs';
+import lodash from 'lodash'
+import { parse } from 'qs'
+import { message } from 'antd'
+import { query, create, edit, listDataSets } from '../services/project'
 
 export default {
 
@@ -10,36 +12,50 @@ export default {
       public_ds: [],
       owned_ds: [],
     },
-    selectedDSIds: []
+    projects: {
+      public_projects: [],
+      owned_projects: [],
+    },
+    selectedDSIds: [],
   },
 
   effects: {
-    *query ({ payload }, { call, put }) {
-      //payload = parse(location.search.substr(1))
-      const data = yield call(query, payload)
+    *query ({ payload }, { call, put, select }) {
+      const user = yield select(state => state['app'].user)
+      yield put({
+        type: 'querySuccess',
+        payload: {
+          user: user,
+        }
+      })
+
+      const data = yield call(query, user.user_ID)
       if (data) {
         yield put({
           type: 'querySuccess',
           payload: {
-            list: data.data
+            projects: data.response,
           },
         })
+      } else {
+        console.log('error', data)
+        throw data
       }
     },
 
     *listDataSets ({ payload }, { call, put, select }) {
-      const user = yield select(state => state['app'].user);
+      const user = yield select(state => state['app'].user)
       const data = yield call(listDataSets, user.user_ID)
       console.log('listDataSets', data)
       if (data.success) {
         yield put({
           type: 'querySuccess',
           payload: {
-            dataSets: data.response
+            dataSets: data.response,
           },
         })
       } else {
-        console.log('error', data);
+        console.log('error', data)
         throw data
       }
     },
@@ -53,12 +69,17 @@ export default {
       }
     },
 
-    *create ({ payload }, { call, put }) {
-      const data = yield call(create, payload)
+    *create ({ payload }, { call, put, select }) {
+      const user = yield select(state => state['app'].user)
+      let body = lodash.cloneDeep(payload)
+      body['user_ID'] = user.user_ID
+      const data = yield call(create, body)
       if (data.success) {
-        yield put({ type: 'hideModal' })
+        message.success('create success')
         yield put({ type: 'query' })
+        yield put({ type: 'hideModal' })
       } else {
+        console.log('error', data)
         throw data
       }
     },
@@ -82,6 +103,6 @@ export default {
       return { ...state, ...action.payload }
     },
 
-  }
+  },
 
 }
