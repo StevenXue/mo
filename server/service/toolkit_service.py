@@ -73,7 +73,6 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id, data
 
     # 临时救急，转文字为数字
     argv_b = zip(*arg_filter)
-    print argv_b
     argv_a = []
     for arr in argv_b:
         try:
@@ -91,7 +90,9 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id, data
                     i += 1
                     temp.append(hash_obj[item])
             argv_a.append(temp)
-    argv = [argv_a]
+    argv = [zip(*argv_a)]
+
+    # 正常
     if k:
         argv.append(k)
     # result = toolkit_calculate(toolkit_id, *argv)
