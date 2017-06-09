@@ -80,7 +80,7 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id, data
             argv_a.append(arr)
         except ValueError:
             hash_obj = {}
-            i = 1
+            i = 1.0
             temp = []
             for item in arr:
                 if item in hash_obj:
@@ -94,6 +94,7 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id, data
 
     # 正常
     if k:
+        argv.append(index_nan)
         argv.append(k)
     # result = toolkit_calculate(toolkit_id, *argv)
     result = toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, *argv)
