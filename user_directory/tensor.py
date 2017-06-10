@@ -2,58 +2,60 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import argparse
-import sys
+import itertools
 
-from tensorflow.examples.tutorials.mnist import input_data
-
+import pandas as pd
 import tensorflow as tf
 
-FLAGS = None
+# tf.logging.set_verbosity(tf.logging.INFO)
+
+COLUMNS = ["crim", "zn", "indus", "nox", "rm", "age",
+           "dis", "tax", "ptratio", "medv"]
+FEATURES = ["crim", "zn", "indus", "nox", "rm",
+            "age", "dis", "tax", "ptratio"]
+LABEL = "medv"
 
 
-def main(_):
-  # Import data
-  mnist = input_data.read_data_sets(FLAGS.data_dir, one_hot=True)
+def input_fn(data_set):
+    feature_cols = {k: tf.constant(data_set[k].values) for k in FEATURES}
+    labels = tf.constant(data_set[LABEL].values)
+    return feature_cols, labels
 
-  # Create the model
-  x = tf.placeholder(tf.float32, [None, 784])
-  W = tf.Variable(tf.zeros([784, 10]))
-  b = tf.Variable(tf.zeros([10]))
-  y = tf.matmul(x, W) + b
 
-  # Define loss and optimizer
-  y_ = tf.placeholder(tf.float32, [None, 10])
+def main(unused_argv):
+    # Load datasets
+    training_set = pd.read_csv("boston_train.csv", skipinitialspace=True,
+                               skiprows=1, names=COLUMNS)
+    test_set = pd.read_csv("boston_test.csv", skipinitialspace=True,
+                           skiprows=1, names=COLUMNS)
 
-  # The raw formulation of cross-entropy,
-  #
-  #   tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(tf.nn.softmax(y)),
-  #                                 reduction_indices=[1]))
-  #
-  # can be numerically unstable.
-  #
-  # So here we use tf.nn.softmax_cross_entropy_with_logits on the raw
-  # outputs of 'y', and then average across the batch.
-  cross_entropy = tf.reduce_mean(
-      tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y))
-  train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
+    # Set of 6 examples for which to predict median house values
+    prediction_set = pd.read_csv("boston_predict.csv", skipinitialspace=True,
+                                 skiprows=1, names=COLUMNS)
 
-  sess = tf.InteractiveSession()
-  tf.global_variables_initializer().run()
-  # Train
-  for _ in range(1000):
-    batch_xs, batch_ys = mnist.train.next_batch(100)
-    sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})
+    # Feature cols
+    feature_cols = [tf.contrib.layers.real_valued_column(k)
+                    for k in FEATURES]
 
-  # Test trained model
-  correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
-  accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-  print(sess.run(accuracy, feed_dict={x: mnist.test.images,
-                                      y_: mnist.test.labels}))
+    # Build 2 layer fully connected DNN with 10, 10 units respectively.
+    regressor = tf.contrib.learn.DNNRegressor(feature_columns=feature_cols,
+                                              hidden_units=[10, 10],
+                                              model_dir="/tmp/boston_model")
 
-if __name__ == '__main__':
-  parser = argparse.ArgumentParser()
-  parser.add_argument('--data_dir', type=str, default='/tmp/tensorflow/mnist/input_data',
-                      help='Directory for storing input data')
-  FLAGS, unparsed = parser.parse_known_args()
-  tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
+    # Fit
+    regressor.fit(input_fn=lambda: input_fn(training_set), steps=5000)
+
+    # Score accuracy
+    ev = regressor.evaluate(input_fn=lambda: input_fn(test_set), steps=1)
+    loss_score = ev["loss"]
+    print("Loss: {0:f}".format(loss_score))
+
+    # Print out predictions
+    y = regressor.predict(input_fn=lambda: input_fn(prediction_set))
+    # .predict() returns an iterator; convert to a list and print predictions
+    predictions = list(itertools.islice(y, 6))
+    print("Predictions: {}".format(str(predictions)))
+
+if __name__ == "__main__":
+    tf.app.run()
+

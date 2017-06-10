@@ -5,7 +5,7 @@ utility used in all project
 Author: Zhaofeng Li
 Date: 2017.06.09
 """
-
+import numpy as np
 
 # int, float
 def convert_data_array_by_fields(array, field_type_arrays):
@@ -52,3 +52,16 @@ def convert_string_to_number(s):
         return int(s)
     except ValueError:
         return float(s)
+
+
+def convert_string_to_number_with_poss(s):
+    if s == "":
+        return np.nan
+    else:
+        try:
+            return int(s)
+        except ValueError:
+            try:
+                return float(s)
+            except ValueError:
+                return s

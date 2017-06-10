@@ -4,7 +4,7 @@
 from mongoengine import connect
 from repository import config
 from business import toolkit_business
-from business import staging_data_business, staging_data_set_business
+from business import staging_data_business, staging_data_set_business, model_business
 from service import toolkit_service, job_service
 # from entity.toolkit import Toolkit
 from entity.staging_data_set import StagingDataSet
@@ -38,8 +38,10 @@ def test(a,b,c=3):
 
 if __name__ == '__main__':
     # 创建所有的public toolkit
-    toolkit_business.create_public_toolkit()
-    toolkit_business.update_one_public_toolkit()
+    # toolkit_business.create_public_toolkit()
+    # toolkit_business.update_one_public_toolkit()
+
+    model_business.update_one_public_model()
 
     # 通过名字找
     # a = toolkit_business.get_by_toolkit_name('平均值')

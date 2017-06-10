@@ -50,7 +50,7 @@ export default class LearningCurve extends React.Component{
           // this.setState({testData: testdata});
           // console.log("test", c[0], a[1]);
         }else{
-          if(c[0] !== 'Extracting' && c[0] !== 'max') {
+          if(c[0] !== 'Extracting' && c[0] !== 'max' && c[0] !=='using') {
             let p = c[0].split(":")
             trainstep.push(p[0]);
             this.setState({trainStep: trainstep});
