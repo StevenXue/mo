@@ -68,28 +68,6 @@ class ProjectModal extends Component {
                   is_private: true
                 }
                 this.props.dispatch({ type: 'project/create', payload: body })
-
-                // fetch(flaskServer + '/project/create_project', {
-                //   method: 'POST',
-                //   crossDomain: true,
-                //   headers:{
-                //     "content-type": "application/json;charset=utf-8",
-                //   },
-                //   body: JSON.stringify({
-                //     name: values.name,
-                //     description: "descriptiondescriptiondescriptiondescription",
-                //     user_ID: "test_user",
-                //     is_private: true
-                //   })
-                // }).then((response) => {
-                //   console.log(response.status);
-                //   if(response.status === 200){
-                //
-                //     this.hideModelHandler();
-                //     // this.props.refresh();
-                //   }
-                // });
-                //this.hideModelHandler();
               }
             });
           })
@@ -97,6 +75,10 @@ class ProjectModal extends Component {
       }
     });
   };
+
+  changeHandler(values) {
+    console.log(values.name);
+  }
 
   render() {
     const { children } = this.props;
@@ -118,7 +100,7 @@ class ProjectModal extends Component {
           onOk={this.okHandler}
           onCancel={this.hideModelHandler}
         >
-          <Form layout='horizontal' onSubmit={() => this.okHandler(values)}>
+          <Form layout='horizontal' onSubmit={() => this.okHandler(values)} >
             <FormItem
               {...formItemLayout}
               label="Project Name"
@@ -126,6 +108,11 @@ class ProjectModal extends Component {
               {
                 getFieldDecorator('name', {
                   initialValue: name,
+                  rules: [
+                    {
+                      required: true,
+                    },
+                  ]
                 })(<Input />)
               }
             </FormItem>
