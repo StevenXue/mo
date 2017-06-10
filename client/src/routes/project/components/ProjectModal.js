@@ -76,10 +76,6 @@ class ProjectModal extends Component {
     });
   };
 
-  changeHandler(values) {
-    console.log(values.name);
-  }
-
   render() {
     const { children } = this.props;
     const { getFieldDecorator } = this.props.form;
