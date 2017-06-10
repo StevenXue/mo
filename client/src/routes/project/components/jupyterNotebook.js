@@ -140,6 +140,8 @@ class JupyterNotebook extends React.Component {
           forceSource={this.state.forceSource}
           result={(r) => this.getResult(r)}
           project_id={this.props.project_id}
+          dataset_id={this.props.dataset_id}
+          dataset_name={this.props.dataset_name}
         />
 
       )
@@ -183,6 +185,8 @@ class JupyterNotebook extends React.Component {
 
 JupyterNotebook.propTypes = {
   project_id: PropTypes.string,
+  dataset_id: PropTypes.string,
+  dataset_name: PropTypes.string
 }
 
 export default JupyterNotebook

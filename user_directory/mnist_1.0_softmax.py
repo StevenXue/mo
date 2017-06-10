@@ -125,5 +125,7 @@ def training_step(i, update_test_data, update_train_data):
 # final max test accuracy = 0.9268 (10K iterations). Accuracy should peak above 0.92 in the first 2000 iterations.
 if __name__ == '__main__':
     steps = sys.argv[1]
+    test_argv = sys.argv[2]
+    eval(test_argv)
     for i in range(int(steps) + 1):
         training_step(i, i % 200 == 0, i % 50 == 0)

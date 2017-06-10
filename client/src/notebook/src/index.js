@@ -89,8 +89,12 @@ export class Notebook extends React.Component {
     // console.log(prevState.notebook, this.state.notebook);
     if(prevState.notebook === undefined){
       let source = `# this is the id of the project you are editting \n` +
-        `project_id = "${this.props.project_id}" \n` + "# you might need to use it some where in your code\n"
-      + "# to run MNIST, you need to specify your training steps after \n# getting the code";
+        `project_id = "${this.props.project_id}" \n` +
+        `dataset_id = "${this.props.dataset_id}" \n` +
+        `dataset_name = "${this.props.dataset_name}" \n` +
+        "# you might need to use it some where in your code\n" +
+        "# to run MNIST, you need to specify your training steps after \n# getting the code \n" +
+        "# you also need to specify the traning data set id as listed above";
       const cellOrder = this.state.notebook.get('cellOrder');
       let id = cellOrder.get(0, null);
       this.dispatch(updateCellSource(id, source));

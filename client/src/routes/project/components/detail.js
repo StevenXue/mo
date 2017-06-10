@@ -45,7 +45,8 @@ class ProjectDetail extends React.Component {
       visible: false,
       data_prop: 'owned_ds',
       selectedData: '',
-      project_id: this.props.location.query._id
+      project_id: this.props.location.query._id,
+      dataset_name: ''
   }
   }
 
@@ -55,6 +56,7 @@ class ProjectDetail extends React.Component {
       this.props.dispatch({ type: 'project/selectDataSets', payload: { selectedDSIds: selectedRows[0]._id } });
       this.setState({
         selectedData: selectedRows[0]._id,
+        dataset_name: selectedRows[0].name,
         visible: false
       });
     }
@@ -123,6 +125,7 @@ class ProjectDetail extends React.Component {
           'staging_data_set_name': 'test_' + Math.floor(Math.random() * 1000),
           'staging_data_set_description': 'dsdsds',
           'data_set_id': dataSetId,
+          'f_t_arrays': []
         }),
       },
     ).then((response) => response.json())
@@ -138,12 +141,13 @@ class ProjectDetail extends React.Component {
 
   showResult (r) {
     console.log('result is', r)
+    let key = Object.keys(r);
     this.setState({
       notebookJSON: {
         'cells': [{
           'execution_count': 1,
           'cell_type': 'code',
-          'source': 'result is: ' + r,
+          'source': 'result is: ' + key[0] + ": "+ r[key[0]],
           'outputs': [],
           'metadata': {
             'collapsed': true,
@@ -277,7 +281,9 @@ class ProjectDetail extends React.Component {
           </div>
           <div id="notebookSection" >
           { this.state.start_notebook &&
-          <JupyterNotebook project_id={this.state.project_id} />
+          <JupyterNotebook project_id={this.state.project_id}
+                           dataset_name={this.state.dataset_name}
+                           dataset_id={this.state.selectedData}/>
           }
           </div>
         </div>

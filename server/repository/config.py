@@ -15,7 +15,6 @@ else:
     import configparser
     config = configparser.ConfigParser()
 
-
 config_url = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.ini')
 
 config.read(config_url)
