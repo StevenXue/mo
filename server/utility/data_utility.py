@@ -110,3 +110,20 @@ def tensor_transform(data_matrix, order=(0, 1, 2)):
     X = np.array(data_matrix)
     X_out = X.transpose(order)
     return X_out
+
+
+def string_label_encoder(arr):
+    """
+    string to numeric method
+    @author   : Tianyi Zhang
+
+    :param arr: arr of set(string list)
+    :return: list of number
+    """
+    from sklearn.preprocessing import LabelEncoder
+    lab = LabelEncoder()
+    return lab.fit_transform(arr)
+
+
+def one_hot_encoder(arr):
+    
