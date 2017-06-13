@@ -96,3 +96,17 @@ def k_fold_cross_validation(data_train, data_target, ratio=0.1):
     x_train, x_test, y_train, y_test = train_test_split(data_train, data_target,
                                                         test_size=ratio, random_state=ramdom_state)
     return x_train, x_test, y_train, y_test
+
+
+def tensor_transform(data_matrix, order=(0, 1, 2)):
+    """
+    tensor_transform
+    @author   : Tianyi Zhang
+
+    :param data_matrix: nd array
+    :param order: transform to new order
+    :return: new ordered array
+    """
+    X = np.array(data_matrix)
+    X_out = X.transpose(order)
+    return X_out
