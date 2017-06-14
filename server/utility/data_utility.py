@@ -48,6 +48,12 @@ def str_to_float(s):
 
 
 def convert_string_to_number(s):
+    """
+    just convert string to number, if not possibility, raise error
+    @author   : Tianyi Zhang
+    :param s: input string
+    :return: int or float of raise error
+    """
     try:
         return int(s)
     except ValueError:
@@ -55,6 +61,12 @@ def convert_string_to_number(s):
 
 
 def convert_string_to_number_with_poss(s):
+    """
+    just convert string to number, if not possibility, keep string itself
+    @author   : Tianyi Zhang
+    :param s: input string
+    :return: np.nan(not a number), int or float, or string
+    """
     if s == "":
         return np.nan
     else:
@@ -65,3 +77,79 @@ def convert_string_to_number_with_poss(s):
                 return float(s)
             except ValueError:
                 return s
+
+
+def k_fold_cross_validation(data_train, data_target, ratio=0.1):
+    """
+    k-fold cross validation, split the training data into two part:
+    one of it is for training
+    the other is for testing
+    @author   : Tianyi Zhang
+    :param data_train: raw training data
+    :param data_target: raw training target
+    :param ratio: number of training data/testing data
+    :return: X_train, X_test, y_train, y_test
+    """
+    from sklearn.model_selection import train_test_split
+    from random import randint
+    ramdom_state = randint(1,100)
+    x_train, x_test, y_train, y_test = train_test_split(data_train, data_target,
+                                                        test_size=ratio, random_state=ramdom_state)
+    return x_train, x_test, y_train, y_test
+
+
+def tensor_transform(data_matrix, order=(0, 1, 2)):
+    """
+    tensor_transform
+    @author   : Tianyi Zhang
+
+    :param data_matrix: nd array
+    :param order: transform to new order
+    :return: new ordered array
+    """
+    X = np.array(data_matrix)
+    X_out = X.transpose(order)
+    return X_out
+
+
+def string_label_encoder(arr):
+    """
+    string to numeric method
+    @author   : Tianyi Zhang
+
+    :param arr: arr of set(string list)
+    :return: list of number
+    """
+    from sklearn.preprocessing import LabelEncoder
+    lab = LabelEncoder()
+    return lab.fit_transform(arr)
+
+
+def one_hot_encoder(arr):
+    """
+    string to numeric method, the label is random and 无序
+    @author   : Tianyi Zhang
+
+    :param arr: arr of set(string list)
+    :return: list of number
+    """
+    # from sklearn.preprocessing import LabelBinarizer
+    # return LabelBinarizer().fit_transform(arr)
+
+    from sklearn.preprocessing import OneHotEncoder
+    return OneHotEncoder(sparse=False).fit_transform(arr.reshape(-1, 1))
+
+
+def multi_one_hot_encoder(matrix):
+    """
+    string to numeric method, field selected is combined together
+    a bedy bedy gud weib: https://ask.hellobi.com/blog/DataMiner/4897
+    @author   : Tianyi Zhang
+
+    :param arr: arr of set(string list)
+    # :param col: col is an array of field
+    :return: matrix
+    """
+
+    from sklearn.preprocessing import MultiLabelBinarizer
+    return MultiLabelBinarizer().fit_transform(matrix)

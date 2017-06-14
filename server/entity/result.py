@@ -12,7 +12,9 @@
 from mongoengine import *
 
 RESULT_TYPE = (
-    (0, 'analysis of toolkit')
+    (0, 'analysis of toolkit',
+     1, 'training result',
+     2, 'testing result')
 )
 
 

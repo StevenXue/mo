@@ -34,13 +34,12 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id):
 
             # calculate
             func_result = func(*args, **kw)
-
             # update a job
             job_obj = job_business.end_job(job_obj)
 
             # create a result, future TODO => add description
             result_obj = result_business.add_result(func_result, job_obj, 0, "")
-            
+
             # update a project
             project_business.add_job_and_result_to_project(result_obj, ObjectId(project_id))
             return result_obj

@@ -23,5 +23,16 @@ def add_result(result, job_obj, result_type, description):
     return result_repo.create(result_obj)
 
 
+def update_result(result_id, result_obj):
+    # should be dictionary
+    result = get_result_by_id(result_id).result.copy()
+    result.update(result_obj)
+    return result_repo.add_and_update_one_by_id(result_obj.id, {'result': result})
+
+
 def get_result_by_id(result_id):
     return result_repo.read_by_result_id(result_id)
+
+
+def get_result_by_job(job_obj):
+    return result_repo.read_by_job(job_obj)
