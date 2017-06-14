@@ -37,10 +37,9 @@ def get_by_staging_data_set_and_fields():
         data = staging_data_business.get_by_staging_data_set_and_fields(
             ObjectId(staging_data_set_id), fields)
         data = [d.to_mongo().to_dict() for d in data]
-        # data.pop(0)
         result = toolkit_service.convert_json_and_calculate(project_id,
                                                             staging_data_set_id,
-                                                            toolkit_id, data,
+                                                            toolkit_id, fields, data,
                                                             k)
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
