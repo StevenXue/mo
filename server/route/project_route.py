@@ -27,9 +27,11 @@ def create_project():
     description = data['description']
     user_ID = data['user_ID']
     is_private = data['is_private']
+    is_private = is_private.lower() == 'true'
+
     try:
         project_service.create_project(name, description, user_ID,
-                                       bool(is_private))
+                                       is_private)
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}), 400)

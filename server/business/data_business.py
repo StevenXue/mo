@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 
 from entity import data
-from repository import data_repo
 from entity.data import Data
 from repository.data_repo import DataRepo
 
@@ -18,3 +17,12 @@ def add(data_set, other_fields_dict):
 def get_by_data_set(data_set):
     return data_repo.read_by_non_unique_field('data_set', data_set)
 
+
+def get_by_data_set_limit(data_set, limit):
+    return data_repo.read_by_non_unique_field_limit('data_set', data_set, limit)
+
+
+def get_fields_by_map_reduce(data_set_id, mapper, reducer):
+    return Data.objects(
+        data_set=data_set_id). \
+        map_reduce(mapper, reducer, 'inline')

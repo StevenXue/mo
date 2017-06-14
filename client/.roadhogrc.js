@@ -22,6 +22,7 @@ export default {
         ]
       },
       "production": {
+        // "presets": ["babel-preset-es2015", "babel-preset-es2016", "babel-preset-es2017"].map(require.resolve),
         "extraBabelPlugins": [
           "transform-runtime",
   		    ["import", { "libraryName": "antd", "style": true}]

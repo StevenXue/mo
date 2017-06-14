@@ -1,5 +1,7 @@
 # -*- coding: UTF-8 -*-
 from mongoengine import *
+from bson import Code
+
 from business import data_business
 from business import data_set_business
 from business import ownership_business
@@ -50,5 +52,31 @@ def list_data_sets_by_user_ID(user_ID):
     return public_ds, owned_ds
 
 
-# def get_data_of_data_set(data_set):
-#     return data_business.get_by_data_set(data_set)
+def get_fields_with_types(data_set_id):
+    """
+    Get the fields and its types of one staging_data_set by map/reduce function.
+    :param data_set_id:
+    :return: [field_name, [type1, type2, ...]]
+    """
+    mapper = Code("""
+        function() {
+            for (var key in this) { emit(key, typeof this[key]); }
+            //for (var key in this) { emit(key, null); }
+        }
+    """)
+
+    reducer = Code("""
+        function(key, stuff) { 
+        let obj = {}
+        stuff.forEach(e => obj[e] = null)
+        return obj; 
+        }
+    """)
+    result = data_business. \
+        get_fields_by_map_reduce(data_set_id, mapper, reducer)
+    # result = StagingData.objects(ListingId='126541').map_reduce(mapper, reducer, 'inline')
+    # print isinstance(result, MapReduceDocument)
+    # print len(list(result))
+    return [[mr_doc.key, mr_doc.value.keys()] for mr_doc in result]
+    # for mr_doc in result:
+    #     print mr_doc.key, mr_doc.value

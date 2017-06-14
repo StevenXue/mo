@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 // import Toolbar from '../../../react-notebook/src/toolbar';
+
+import { jupyterServer } from '../../../constants'
 import empty from './empty.ipynb.json';
 import { Affix, Button } from 'antd';
 
@@ -65,7 +67,8 @@ class JupyterNotebook extends React.Component {
 
   attachChannels () {
     // Prompt the user for the baseUrl and wsUrl
-    const baseUrl = 'http://localhost:8888'
+    //const baseUrl = jupyterServer;
+    const baseUrl = 'http://10.52.14.182:8888'
     const domain = baseUrl.split('://').slice(1).join('://')
     const wsUrl = `ws://${domain}`
 
@@ -140,6 +143,8 @@ class JupyterNotebook extends React.Component {
           forceSource={this.state.forceSource}
           result={(r) => this.getResult(r)}
           project_id={this.props.project_id}
+          dataset_id={this.props.dataset_id}
+          dataset_name={this.props.dataset_name}
         />
 
       )
@@ -183,6 +188,8 @@ class JupyterNotebook extends React.Component {
 
 JupyterNotebook.propTypes = {
   project_id: PropTypes.string,
+  dataset_id: PropTypes.string,
+  dataset_name: PropTypes.string
 }
 
 export default JupyterNotebook

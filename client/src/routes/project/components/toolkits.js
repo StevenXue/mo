@@ -179,6 +179,9 @@ export default class ProjectDetail extends React.Component {
 
   renderOptions () {
     let toolkit = this.state.toolkits
+    if(toolkit === undefined) {
+      return
+    }
     return toolkit.map((e) =>
       <Select.Option value={e._id} key={e.name}>
         {e.name}
