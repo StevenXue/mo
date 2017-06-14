@@ -48,7 +48,7 @@ def add(name, description, target_py_code, entry_function, parameter_spec):
 
 
 def remove(toolkit_obj):
-    toolkit_repo.delete_by_id(toolkit_obj)
+    toolkit_repo.delete_by_id(toolkit_obj.id)
 
 
 def create_public_toolkit():
@@ -232,7 +232,7 @@ def update_one_public_toolkit():
 def remove_one_public_toolkit():
     user = user_business.get_by_user_ID('system')
     toolkit = get_by_toolkit_name('最大互信息数')
-    remove(toolkit)
+    # remove(toolkit)
     ownership_business.remove_ownership_by_user_and_owned_item(user, toolkit, 'toolkit')
 
 if __name__ == '__main__':

@@ -41,7 +41,12 @@ if __name__ == '__main__':
     # toolkit_business.create_public_toolkit()
     # toolkit_business.update_one_public_toolkit()
 
-    model_business.update_one_public_model()
+    # 删除一个public toolkit和它的ownership
+    # 593a27a88be34db7c6e24349
+    toolkit_business.remove_one_public_toolkit()
+
+    # 更新一个model
+    # model_business.update_one_public_model()
 
     # 通过名字找
     # a = toolkit_business.get_by_toolkit_name('平均值')
