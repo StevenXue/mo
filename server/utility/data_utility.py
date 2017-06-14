@@ -126,4 +126,31 @@ def string_label_encoder(arr):
 
 
 def one_hot_encoder(arr):
-    
+    """
+    string to numeric method, the label is random and 无序
+    @author   : Tianyi Zhang
+
+    :param arr: arr of set(string list)
+    :return: list of number
+    """
+    # from sklearn.preprocessing import LabelBinarizer
+    # return LabelBinarizer().fit_transform(arr)
+
+    from sklearn.preprocessing import OneHotEncoder
+    return OneHotEncoder(sparse=False).fit_transform(arr.reshape(-1, 1))
+
+
+def multi_one_hot_encoder(matrix, col):
+    """
+    string to numeric method, field selected is combined together
+    a bedy bedy gud weib: https://ask.hellobi.com/blog/DataMiner/4897
+    @author   : Tianyi Zhang
+
+    :param arr: arr of set(string list)
+    :param col: col is an array of field
+
+    :return: matrix
+    """
+
+    from sklearn.preprocessing import MultiLabelBinarizer
+    return MultiLabelBinarizer().fit_transform(matrix)
