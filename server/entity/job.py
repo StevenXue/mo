@@ -11,6 +11,10 @@
 
 from mongoengine import *
 
+from entity.staging_data_set import StagingDataSet
+from entity.toolkit import Toolkit
+from entity.model import Model
+
 STATUS = (
     (0, 'start'),
     (100, 'processing'),
@@ -20,10 +24,10 @@ STATUS = (
 
 
 class Job(Document):
-    model = ReferenceField('Model')
-    toolkit = ReferenceField('Toolkit')
+    model = ReferenceField(Model)
+    toolkit = ReferenceField(Toolkit)
     # TODO FIXME very bad
-    staging_data_set = ReferenceField('StagingDataSet', required=True)
+    staging_data_set = ReferenceField(StagingDataSet, required=True)
     # staging_data_set = StringField('StagingDataSet')
     status = IntField(choices=STATUS, required=True)
     create_time = DateTimeField(required=True)

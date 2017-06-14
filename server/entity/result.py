@@ -11,6 +11,9 @@
 
 from mongoengine import *
 
+from entity.job import Job
+
+
 RESULT_TYPE = (
     (0, 'analysis of toolkit',
      1, 'training result',
@@ -19,7 +22,7 @@ RESULT_TYPE = (
 
 
 class Result(Document):
-    job = ReferenceField('Job', required=True)
+    job = ReferenceField(Job, required=True)
     create_time = DateTimeField(required=True)
     description = StringField(max_length=140)
     result = DynamicField()
