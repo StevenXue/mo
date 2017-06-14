@@ -80,3 +80,9 @@ def get_fields_with_types(data_set_id):
     return [[mr_doc.key, mr_doc.value.keys()] for mr_doc in result]
     # for mr_doc in result:
     #     print mr_doc.key, mr_doc.value
+
+
+def remove_data_set_by_id(data_set_id):
+    data_set
+    # remove data set
+    data_set_business.remove_by_id(data_set_id)

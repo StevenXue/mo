@@ -4,17 +4,8 @@ from datetime import datetime
 from business import project_business
 from business import user_business
 from business import ownership_business
+from business import data_set_business
 from service import ownership_service
-
-
-def get_projects_by_user_ID(user_ID):
-    """
-    Get project by user's ID
-    :param user_ID: str
-    :return: list of project objects
-    """
-    ownerships = ownership_service.list_by_user_ID(user_ID)
-    return [os.project for os in ownerships if 'project' in os]
 
 
 def create_project(name, description, user_ID, is_private):
@@ -52,3 +43,11 @@ def list_projects_by_user_ID(user_ID):
     owned_files = ownership_service.get_ownership_objects_by_user_ID(user_ID,
                                                                      'project')
     return public_projects, owned_files
+
+
+def remove_project_by_user_ID_and_id(user_ID, project_id):
+    user = user_business.get_by_user_ID(user_ID)
+    return ownership_business.remove_ownership_by_user_and_owned_item(user,
+                                                                      project_id
+                                                                      ,'project'
+                                                                      )

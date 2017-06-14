@@ -26,3 +26,7 @@ def get_fields_by_map_reduce(data_set_id, mapper, reducer):
     return Data.objects(
         data_set=data_set_id). \
         map_reduce(mapper, reducer, 'inline')
+
+
+def remove_data_by_data_set_id(data_set_id):
+    data_repo.delete()

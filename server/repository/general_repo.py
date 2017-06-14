@@ -106,3 +106,12 @@ class Repo:
 
     def delete_by_id(self, object_id):
         return self.__instance.objects.get(id=object_id).delete()
+
+    def delete_by_non_unique_field(self, field_name, field_value):
+        """
+        general function to query the db by non unique field, thus return a list
+        :param field_name:
+        :param field_value:
+        :return: a list of objects corresponding to the query
+        """
+        return Repo.delete_many(self, {field_name: field_value})
