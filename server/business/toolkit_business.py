@@ -47,6 +47,10 @@ def add(name, description, target_py_code, entry_function, parameter_spec):
     return toolkit_repo.create(toolkit)
 
 
+def remove(toolkit_obj):
+    toolkit_repo.delete_by_id(toolkit_obj)
+
+
 def create_public_toolkit():
     """
     数据库建一个toolkit的collection, 记载public的数据分析工具包简介
@@ -224,6 +228,12 @@ def update_one_public_toolkit():
     MIC = toolkit_repo.create(MIC)
     ownership_business.add(user, False, toolkit=MIC)
 
+
+def remove_one_public_toolkit():
+    user = user_business.get_by_user_ID('system')
+    toolkit = get_by_toolkit_name('最大互信息数')
+    remove(toolkit)
+    ownership_business.remove_ownership_by_user_and_owned_item(user, toolkit, 'toolkit')
 
 if __name__ == '__main__':
     pass
