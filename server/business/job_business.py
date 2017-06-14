@@ -44,13 +44,15 @@ def get_by_job_status(job_status):
     return job_repo.read_by_status(job_obj)
 
 
-def add_toolkit_job(toolkit_obj, staging_data_set_obj):
+def add_toolkit_job(toolkit_obj, staging_data_set_obj, *argv):
     """toolkit is a obj"""
     # job = job_obj['staging_data_set'] or job_obj['model'] or job_obj['toolkit']
     # if not 0 < len(toolkit_obj.items()) <= 1:
     #     raise ValueError('invalid toolkit_obj')
     time = datetime.utcnow()
-    job_obj = Job(status=0, toolkit=toolkit_obj, staging_data_set=staging_data_set_obj, create_time=time)
+
+    job_obj = Job(status=0, toolkit=toolkit_obj, staging_data_set=staging_data_set_obj,
+                  create_time=time, fields=argv if argv else None)
     return job_repo.create(job_obj)
 
 
