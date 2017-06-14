@@ -27,7 +27,7 @@ def create_project():
     description = data['description']
     user_ID = data['user_ID']
     is_private = data['is_private']
-    is_private = is_private.lower() == 'true'
+    is_private = str(is_private).lower() == 'true'
 
     try:
         project_service.create_project(name, description, user_ID,

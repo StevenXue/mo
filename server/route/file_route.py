@@ -50,7 +50,7 @@ def upload_file():
     is_private = request.form['if_private']
     description = request.form['description']
     # convert string to bool
-    is_private = is_private.lower() == 'true'
+    is_private = str(is_private).lower() == 'true'
 
     if request.method == 'POST':
         # check if the post request has the file part
