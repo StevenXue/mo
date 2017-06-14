@@ -140,15 +140,14 @@ def one_hot_encoder(arr):
     return OneHotEncoder(sparse=False).fit_transform(arr.reshape(-1, 1))
 
 
-def multi_one_hot_encoder(matrix, col):
+def multi_one_hot_encoder(matrix):
     """
     string to numeric method, field selected is combined together
     a bedy bedy gud weib: https://ask.hellobi.com/blog/DataMiner/4897
     @author   : Tianyi Zhang
 
     :param arr: arr of set(string list)
-    :param col: col is an array of field
-
+    # :param col: col is an array of field
     :return: matrix
     """
 
