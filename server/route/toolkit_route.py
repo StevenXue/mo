@@ -64,7 +64,7 @@ def upload_code():
     entry_function = request.form['entry_function']
     parameter_spec = request.form['parameter_spec']
     # convert string to bool
-    is_private = is_private.lower() == 'true'
+    is_private = str(is_private).lower() == 'true'
 
     if request.method == 'POST':
         # check if the post request has the file part

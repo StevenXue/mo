@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-
 from entity.ownership import Ownership
 from entity.user import User
 from repository.ownership_repo import OwnershipRepo

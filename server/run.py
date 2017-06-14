@@ -7,6 +7,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager, jwt_required, \
     get_jwt_identity, get_jwt_claims
 
+
 from route import file_route
 from route import ownership_route
 from route import project_route

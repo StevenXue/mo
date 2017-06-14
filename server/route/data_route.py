@@ -28,7 +28,7 @@ def import_data_from_file_id():
     data_set_name = data['data_set_name']
     ds_description = data['ds_description']
     is_private = data['is_private']
-    is_private = is_private.lower() == 'true'
+    is_private = str(is_private).lower() == 'true'
 
     try:
         saved_ds = data_service.import_data_from_file_id(ObjectId(file_id),
