@@ -143,7 +143,7 @@ def toolkit_mic(arr0, alpha=0.6, c=15):
     for t_matr in t_matrix[1:]:
         mine.compute_score(t_matrix[0], t_matr)
         mic_result.append(mine.mic())
-    return mic_result
+    return {"最大互信息数": mic_result}
 
 ######################################################################
 # 数据处理 Data Pre-processing

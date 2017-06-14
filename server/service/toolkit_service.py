@@ -35,13 +35,20 @@ def list_public_toolkit_name():
         all_names.append(tool.toolkit.name)
     return all_names
 
-# def toolkit_calculate(id, *argv):
-#     name = toolkit_business.get_by_toolkit_id(id).name
-#     return toolkit_code.dict_of_toolkit[name](*argv)
+
+def toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, *argv):
+    toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
+    entry_function = toolkit_obj.entry_function
+    code = "from lib.toolkit_orig import " + entry_function
+    exec code
+    func = locals()[toolkit_obj.entry_function]
+    func = job_service.create_toolkit_job(project_id, staging_data_set_id, toolkit_id)(func)
+    result = func(*argv)
+    return result
 
 
 # for database 调用toolkit code tag for zhaofeng
-def toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, *argv):
+def toolkit_calculate(project_id, staging_data_set_id, toolkit_id, *argv):
     toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
 
     # old code with old-fashioned decorator

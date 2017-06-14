@@ -23,8 +23,8 @@ class Job(Document):
     model = ReferenceField('Model')
     toolkit = ReferenceField('Toolkit')
     # TODO FIXME very bad
-    # staging_data_set = ReferenceField('StagingDataSet', required=True)
-    staging_data_set = StringField('StagingDataSet')
+    staging_data_set = ReferenceField('StagingDataSet', required=True)
+    # staging_data_set = StringField('StagingDataSet')
     status = IntField(choices=STATUS, required=True)
     create_time = DateTimeField(required=True)
     updated_time = DateTimeField()
