@@ -37,13 +37,13 @@ def test(a,b,c=3):
     print 'c', c
 
 if __name__ == '__main__':
-    # 创建所有的public toolkit
+    '# 创建所有的public toolkit'
     # toolkit_business.create_public_toolkit()
     # toolkit_business.update_one_public_toolkit()
 
     # 删除一个public toolkit和它的ownership
     # 593a27a88be34db7c6e24349
-    toolkit_business.remove_one_public_toolkit()
+    # toolkit_business.remove_one_public_toolkit()
 
     # 更新一个model
     # model_business.update_one_public_model()
