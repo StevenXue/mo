@@ -21,3 +21,7 @@ def add(name, description):
 def get_by_id(data_set_id):
     return data_set_repo.read_by_id(data_set_id)
 
+
+def remove_by_id(data_set_id):
+    return data_set_repo.delete_by_id(data_set_id)
+

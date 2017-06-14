@@ -5,7 +5,7 @@ Blueprint for project
 Author: Zhaofeng Li
 Date: 2017.05.24
 """
-
+from bson import ObjectId
 from flask import Blueprint
 from flask import jsonify
 from flask import make_response
@@ -50,6 +50,21 @@ def list_projects_by_user_ID():
             'public_projects': public_projects,
             'owned_projects': owned_projects
         }
+    except Exception, e:
+        return make_response(jsonify({'response': '%s: %s' % (str(
+            Exception), e.args)}), 400)
+    return make_response(jsonify({'response': result}), 200)
+
+
+@project_app.route('/delete_project_by_user_ID_and_id', methods=['GET'])
+def delete_project_by_id():
+    project_id = request.args.get('project_id')
+    user_ID = request.args.get('user_Id')
+    try:
+        result = project_service.remove_project_by_user_ID_and_id(user_ID,
+                                                                  ObjectId(
+                                                                      project_id
+                                                                  ))
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}), 400)
