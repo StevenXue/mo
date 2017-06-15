@@ -83,6 +83,5 @@ def get_fields_with_types(data_set_id):
 
 
 def remove_data_set_by_id(data_set_id):
-    data_set
-    # remove data set
-    data_set_business.remove_by_id(data_set_id)
+    data_business.remove_data_by_data_set_id(data_set_id)
+    return data_set_business.remove_by_id(data_set_id)

@@ -87,3 +87,14 @@ def get_data_set():
             Exception), e.args)}), 400)
     return make_response(jsonify({'response': data}),
                          200)
+
+
+@data_app.route('/remove_data_set_by_id', methods=['GET'])
+def remove_data_set_by_id():
+    data_set_id = request.args.get('data_set_id')
+    try:
+        result = data_service.remove_data_set_by_id(ObjectId(data_set_id))
+    except Exception, e:
+        return make_response(jsonify({'response': '%s: %s' % (str(
+            Exception), e.args)}), 400)
+    return make_response(jsonify({'response': result}), 200)

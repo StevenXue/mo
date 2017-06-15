@@ -29,7 +29,7 @@ def add_file(file, url_base, user_ID, is_private=True, description=''):
         if not ownership_business.add(user, is_private,
                                       file=saved_file):
             # revert file saving
-            file_business.delete_by_id(saved_file['_id'])
+            file_business.remove_by_id(saved_file['_id'])
             raise RuntimeError('ownership create failed')
         else:
             return saved_file
@@ -83,3 +83,7 @@ def list_files_by_user_ID(user_ID):
     owned_files = ownership_service.get_ownership_objects_by_user_ID(user_ID,
                                                                  'file')
     return public_files, owned_files
+
+
+def remove_file_by_id(file_id):
+    return file_business.remove_by_id(file_id)

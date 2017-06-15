@@ -29,4 +29,4 @@ def get_fields_by_map_reduce(data_set_id, mapper, reducer):
 
 
 def remove_data_by_data_set_id(data_set_id):
-    data_repo.delete()
+    return data_repo.delete_by_non_unique_field('data_set', data_set_id)

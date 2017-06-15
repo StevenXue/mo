@@ -52,5 +52,5 @@ def remove_by_id(sds_id):
     :param sds_id: staging_data_set's ObjectId
     :return: None
     """
-    return staging_data_set_repo.delete(get_by_id(sds_id))
+    return staging_data_set_repo.delete_by_id(sds_id)
 

@@ -45,9 +45,5 @@ def list_projects_by_user_ID(user_ID):
     return public_projects, owned_files
 
 
-def remove_project_by_user_ID_and_id(user_ID, project_id):
-    user = user_business.get_by_user_ID(user_ID)
-    return ownership_business.remove_ownership_by_user_and_owned_item(user,
-                                                                      project_id
-                                                                      ,'project'
-                                                                      )
+def remove_project_by_id(project_id):
+    return project_business.remove_by_id(project_id)
