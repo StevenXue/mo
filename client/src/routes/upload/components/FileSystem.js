@@ -66,11 +66,21 @@ class FileSystem extends React.Component {
     // this.props.toDetail(name)
   }
 
+  onClickDelete(e) {
+
+  }
+
   renderCards (key) {
     let filelist = this.props.upload.files
     let button = this.props.upload.button
     return filelist[key].map((e, i) =>
-      <Card key={e._id} title={e.name} style={{ width: 500 }}
+      <Card key={e._id} title={e.name}
+            extra={
+              <Button type="danger" style={{marginTop: -5}} onClick={(event) => this.onClickDelete(event)}>
+                DELETE
+              </Button>
+            }
+            style={{ width: 500 }}
             onClick={(ev) => this.onClickCard(ev, e.name)}
             onMouseOver={() => this.toggleButton(i)}
             onMouseLeave={() => this.toggleButton(-1)}>

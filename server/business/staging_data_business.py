@@ -1,6 +1,14 @@
 # -*- coding: UTF-8 -*-
+import os
+import sys
+module_path = os.path.abspath(os.path.join('..'))
+if module_path not in sys.path:
+    sys.path.append('../../')
+
 from bson import ObjectId
 
+from entity import staging_data
+from repository import staging_data_repo
 from entity.staging_data import StagingData
 from repository.staging_data_repo import StagingDataRepo
 staging_data_repo = StagingDataRepo(StagingData)

@@ -7,8 +7,11 @@ from business import data_business
 from utility import data_utility
 from utility import json_utility
 
+# import importlib
+
 # 使得 sys.getdefaultencoding() 的值为 'utf-8'
-reload(sys)                      # reload 才能调用 setdefaultencoding 方法
+# importlib.reload(sys)                      # reload 才能调用 setdefaultencoding 方法
+reload(sys)
 sys.setdefaultencoding('utf-8')  # 设置 'utf-8'
 
 

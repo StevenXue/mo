@@ -1,11 +1,12 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { Button, Select, Upload, Icon, message, Checkbox, Input } from 'antd'
-import { jupyterServer, flaskServer } from '../../../constants'
-import { Router, routerRedux } from 'dva/router'
-import Jupyter from 'react-jupyter'
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Button, Select, Upload, Icon, message, Checkbox, Input, Steps} from 'antd'
+const Step = Steps.Step;
+import { jupyterServer, flaskServer } from '../../../constants';
+import { Router, routerRedux } from 'dva/router';
+import ReactJson from 'react-json-view';
 
-const mockResult = [['device_node_id', 'unicode'], ['productor', 'unicode'], ['name', 'unicode'], ['f1', 'unicode'], ['device_model', 'unicode'], ['data_set', 'ObjectId'], ['local_device_id', 'unicode'], ['asset_code', 'unicode'], ['staging_data_set', 'ObjectId'], ['version', 'unicode'], ['station_id', 'unicode'], ['device_type', 'unicode'], ['_id', 'ObjectId']]
+const mockResult = [['device_node_id', 'unicode'], ['productor', 'unicode'], ['name', 'unicode'], ['f1', 'unicode'], ['device_model', 'unicode'], ['local_device_id', 'unicode'], ['asset_code', 'unicode'], ['staging_data_set', 'ObjectId'], ['version', 'unicode'], ['station_id', 'unicode'], ['device_type', 'unicode'], ['_id', 'ObjectId']]
 
 export default class ProjectDetail extends React.Component {
   constructor (props) {
@@ -23,6 +24,8 @@ export default class ProjectDetail extends React.Component {
       checkedCols: [],
       result: 0,
       toolkit: '',
+      current: 0,
+      resultJson: {}
     }
   }
 
@@ -142,12 +145,36 @@ export default class ProjectDetail extends React.Component {
       body: JSON.stringify(body)
     }).then((response) => response.json())
       .then((res) => {
-        this.props.fetchResult(res.response.result)
-        this.setState({ result: res.response.result })
-        },
+        console.log(res);
+        let responseObj = res.response.result;
+        this.setState({
+          resultJson: responseObj
+        });
+        }
       )
       .catch((err) => console.log('Error: get_by_staging_data_set_and_fields', err))
 
+  }
+
+  steps = [{
+    title: 'Choose ToolKit',
+  }, {
+    title: 'Choose Dataset',
+  }, {
+    title: 'Result',
+  }]
+
+  next() {
+    if(this.state.current === 1){
+      console.log('run');
+      this.onRunClick();
+    }
+    const current = this.state.current + 1;
+    this.setState({ current });
+  }
+  prev() {
+    const current = this.state.current - 1;
+    this.setState({ current });
   }
 
   renderCheckBoxTable () {
@@ -178,19 +205,18 @@ export default class ProjectDetail extends React.Component {
   }
 
   renderOptions () {
-    let toolkit = this.state.toolkits
-    if(toolkit === undefined) {
-      return
+    if(this.state.toolkits) {
+      let toolkit = this.state.toolkits;
+      return toolkit.map((e) =>
+        <Select.Option value={e._id} key={e.name}>
+          {e.name}
+        </Select.Option>)
     }
-    return toolkit.map((e) =>
-      <Select.Option value={e._id} key={e.name}>
-        {e.name}
-      </Select.Option>)
   }
 
   renderOptionsData () {
     let data = this.state.data_set
-    if (data !== 0) {
+    if (data.length !== 0) {
       return data.map((e) =>
         <Select.Option value={e._id} key={e._id}>
           {e.name}
@@ -201,30 +227,80 @@ export default class ProjectDetail extends React.Component {
     }
   }
 
-  render () {
-    return (
-      <div style={{ width: '60%' }}>
-        <div style={{ textAlign: 'center', fontSize: 18 }}>Toolkits</div>
-        <div style={{ marginTop: 20, height: 700 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+  renderStepContent(){
+    let count = this.state.current;
+    switch(count){
+      case  0:
+        return(
+          <div style={{marginTop: 10, marginLeft: 5, width: '25%'}}>
             <Select style={{ width: '100%' }} onChange={(e) => this.handleChange(e)}
-                    placeholder="Choose Toolkit Type">
+                         placeholder="Choose Toolkit Type">
               {this.renderOptions()}
             </Select>
+          </div>
+        );
+
+      case 1:
+        return (
+          <div style={{marginTop: 10, marginLeft: '40%', width: '25%'}}>
             <Select style={{ width: '100%', marginTop: 10 }} onChange={(values) => this.onSelectDataSet(values)}
                     placeholder="Choose DataSet">
               {this.renderOptionsData()}
             </Select>
-            <div style={{ marginLeft: -20 }}>
-              <h4 style={{marginLeft: 20, marginTop: 10}}>{"choose " + this.state.selectable + " fields"}</h4>
-              {this.renderInputs()}
-              <div style={{ height: 450, overflowY: 'auto' }}>
-                {this.renderCheckBoxTable()}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ marginLeft: -20 }}>
+                <h4 style={{marginLeft: 20, marginTop: 10}}>{"choose " + this.state.selectable + " fields"}</h4>
+                {this.renderInputs()}
+                <div style={{ height: 300, overflowY: 'auto', marginBottom: 10}}>
+                  {this.renderCheckBoxTable()}
+                </div>
               </div>
+              {/*<h3>{'结果 : ' + this.state.result}</h3>*/}
+              {/*<Button style={{ marginTop: 10 }} onClick={() => this.onRunClick()}>RUN</Button>*/}
             </div>
-            {/*<h3>{'结果 : ' + this.state.result}</h3>*/}
-            <Button style={{ marginTop: 10 }} onClick={() => this.onRunClick()}>RUN</Button>
+
           </div>
+        )
+
+      case 2:
+        return (
+          <div style={{marginTop: 10, marginLeft: '75%', height: 500, overflowY: 'auto'}}>
+            <ReactJson src={ this.state.resultJson } style={{ width: '100%', height: 400 }}/>
+          </div>
+        )
+
+
+
+    }
+  }
+
+  render () {
+    return (
+      <div style={{width: '80%', marginTop: 10}}>
+        <Steps current={this.state.current}>
+          {this.steps.map(item => <Step key={item.title} title={item.title} />)}
+        </Steps>
+        <div className="steps-content" >
+          {this.renderStepContent()}
+        </div>
+        <div className="steps-action">
+          {
+            this.state.current < this.steps.length - 1
+            &&
+            <Button style={{ marginTop: 10 }} type="primary" onClick={() => this.next()}>Next</Button>
+          }
+          {
+            this.state.current === this.steps.length - 1
+            &&
+            <Button style={{ marginTop: 10 }} type="primary" onClick={() => message.success('Processing complete!')}>Done</Button>
+          }
+          {
+            this.state.current > 0
+            &&
+            <Button style={{ marginLeft: 8, marginTop: 10 }} onClick={() => this.prev()}>
+              Previous
+            </Button>
+          }
         </div>
       </div>
     )

@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
-import { Modal, Form, Input } from 'antd';
+import { Modal, Form, Input, Radio } from 'antd';
 import PropTypes from 'prop-types';
 import { connect } from 'dva';
 import {jupyterServer, flaskServer } from '../../../constants';
 
 const FormItem = Form.Item;
+const RadioButton = Radio.Button;
+const RadioGroup = Radio.Group;
 
 class ProjectModal extends Component {
   constructor(props) {
     super(props);
     this.state = {
       visible: false,
+      is_private: 'true',
     };
   }
 
@@ -31,11 +34,10 @@ class ProjectModal extends Component {
   };
 
   okHandler = (values) => {
-    //const { onOk } = this.props;
+    console.log(values);
     const user_ID = this.props.project.user.user_ID
-    console.log('user_ID', user_ID);
     this.props.form.validateFields((err, values) => {
-      console.log(values.name);
+      console.log(values);
       if (!err) {
         fetch(jupyterServer+user_ID, {
           method: 'post',
@@ -47,7 +49,7 @@ class ProjectModal extends Component {
           body: JSON.stringify({"type": "directory"})
         }).then((response) => response.json())
           .then((res) => {
-            fetch(jupyterServer+user_ID+'/'+res.name, {
+            fetch(jupyterServer+res.path, {
               method: 'PATCH',
               crossDomain: true,
               headers:{
@@ -56,16 +58,15 @@ class ProjectModal extends Component {
                 //'Access-Control-Allow-Method': 'PATCH'
               },
               body: JSON.stringify({
-                "path": values.name
+                "path": user_ID +'/' + values.name
               })
             }).then((response) => {
               console.log(response.status);
-
               if(response.status === 200){
                 let body = {
                   name: values.name,
-                  description: "descriptiondescriptiondescriptiondescription",
-                  is_private: true
+                  description: values.description,
+                  is_private: this.state.is_private
                 }
                 this.props.dispatch({ type: 'project/create', payload: body })
               }
@@ -76,10 +77,16 @@ class ProjectModal extends Component {
     });
   };
 
+  onChangePrivacy(e){
+    this.setState({
+      is_private: e.target.value
+    });
+  }
+
   render() {
     const { children } = this.props;
     const { getFieldDecorator } = this.props.form;
-    const { name } = this.props.record;
+    const { name, description, privacy } = this.props.record;
     const formItemLayout = {
       labelCol: { span: 6 },
       wrapperCol: { span: 14 },
@@ -111,6 +118,30 @@ class ProjectModal extends Component {
                   ]
                 })(<Input />)
               }
+            </FormItem>
+            <FormItem
+              {...formItemLayout}
+              label="Description"
+            >
+              {
+                getFieldDecorator('description', {
+                  initialValue: description,
+                  rules: [
+                    {
+                      required: true,
+                    },
+                  ]
+                })(<Input />)
+              }
+            </FormItem>
+            <FormItem
+              {...formItemLayout}
+              label="Privacy"
+            >
+              <RadioGroup defaultValue="true" onChange={(e) => this.onChangePrivacy(e)}>
+                <RadioButton value="true">Private</RadioButton>
+                <RadioButton value="false">Public</RadioButton>
+              </RadioGroup>
             </FormItem>
           </Form>
         </Modal>

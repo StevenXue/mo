@@ -71,8 +71,7 @@ class FileSystem extends React.Component {
         <Button type="danger" style={{marginTop: -5}} onClick={(event) => this.onClickDelete(event)}>
           DELETE
         </Button>
-      }
-            style={{ width: 500 }} onClick={() => this.toProjectDetail(e.name, e._id)}>
+      } style={{ width: 500 }} onClick={() => this.toProjectDetail(e.name, e._id)}>
         <p>描述: {e.description}</p>
         <p>创建时间: {e.create_time}</p>
       </Card>)
