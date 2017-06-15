@@ -69,7 +69,7 @@ class FileSystem extends React.Component {
   onClickDelete(e, _id) {
     // localhost:5000/data/remove_data_set_by_id?data_set_id=59422819df86b2285d9e2cc6
     fetch(flaskServer + '/file/remove_file_by_id?file_id=' + _id, {
-      method: 'get'
+      method: 'delete'
     }).then((response) =>
     {
       if(response.status === 200){
