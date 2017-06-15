@@ -83,44 +83,28 @@ class FileModal extends Component {
           <Form layout='horizontal' onSubmit={(e) => this.okHandler(e)}>
             <FormItem
               {...formItemLayout}
-              label="是否私有"
-              hasFeedback
-            >
-              {getFieldDecorator('isPrivate', {
-                rules: [
-                  { required: true, message: '请选择文件是否私有' },
-                ],
-              })(
-                <Select placeholder="请选择文件是否私有">
-                  <Option value="true">是</Option>
-                  <Option value="false">否</Option>
-                </Select>
-              )}
-            </FormItem>
-            <FormItem
-              {...formItemLayout}
-              label="描述"
+              label="Description"
             >
               {
                 getFieldDecorator('description', {
                   initialValue: name,
                   rules: [
-                    { required: true, message: '请输入描述' },
+                    { required: true, message: 'Please enter description' },
                   ],
                 })(<Input />)
               }
             </FormItem>
             <FormItem
               {...formItemLayout}
-              label="上传"
-              extra="请选择你的数据文件"
+              label="Choose File"
+              extra="Please choose file"
               fileList={this.state.fileList}
             >
               {getFieldDecorator('upload', {
                 valuePropName: 'fileList',
                 // getValueFromEvent: this.normFile,
                 rules: [
-                  { required: true, message: '请选择文件' },
+                  { required: true, message: 'please choose file' },
                 ],
               })(
                 <Upload
@@ -129,9 +113,26 @@ class FileModal extends Component {
                   beforeUpload={(e) => this.beforeUpload(e)}
                 >
                   <Button>
-                    <Icon type="upload" /> 点击上传
+                    <Icon type="upload" /> choose file
                   </Button>
                 </Upload>
+              )}
+            </FormItem>
+            <FormItem
+              {...formItemLayout}
+              label="Privacy"
+              hasFeedback
+            >
+              {getFieldDecorator('isPrivate', {
+                initialValue: 'false',
+                rules: [
+                  { required: true, message: 'please choose privacy' },
+                ],
+              })(
+                <Select >
+                  <Option value="false">public</Option>
+                  <Option value="true">private</Option>
+                </Select>
               )}
             </FormItem>
             <FormItem
