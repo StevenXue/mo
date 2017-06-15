@@ -97,13 +97,11 @@ def list_files_by_user_ID():
     return make_response(jsonify({'response': result}), 200)
 
 
-@file_app.route('/delete_file_by_user_ID_and_id', methods=['GET'])
-def delete_file_by_id():
+@file_app.route('/remove_file_by_id', methods=['GET'])
+def remove_file_by_id():
     file_id = request.args.get('file_id')
-    user_ID = request.args.get('user_ID')
     try:
-        result = file_service.remove_file_by_user_ID_and_id(user_ID,
-                                                            ObjectId(file_id))
+        result = file_service.remove_file_by_id(ObjectId(file_id))
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}), 400)

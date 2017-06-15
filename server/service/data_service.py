@@ -82,9 +82,6 @@ def get_fields_with_types(data_set_id):
     #     print mr_doc.key, mr_doc.value
 
 
-def remove_data_set_by_user_ID_and_id(user_ID, data_set_id):
-    user = user_business.get_by_user_ID(user_ID)
+def remove_data_set_by_id(data_set_id):
     data_business.remove_data_by_data_set_id(data_set_id)
-    return ownership_business.remove_ownership_by_user_and_owned_item(user,
-                                                                      data_set_id,
-                                                                      'data_set')
+    return data_set_business.remove_by_id(data_set_id)

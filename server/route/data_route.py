@@ -89,14 +89,11 @@ def get_data_set():
                          200)
 
 
-@data_app.route('/delete_data_set_by_user_ID_and_id', methods=['GET'])
-def delete_data_set_by_user_ID_and_id():
-    file_id = request.args.get('file_id')
-    user_ID = request.args.get('user_ID')
+@data_app.route('/remove_data_set_by_id', methods=['GET'])
+def remove_data_set_by_id():
+    data_set_id = request.args.get('data_set_id')
     try:
-        result = data_service.remove_data_set_by_user_ID_and_id(user_ID,
-                                                                ObjectId(
-                                                                   file_id))
+        result = data_service.remove_data_set_by_id(ObjectId(data_set_id))
     except Exception, e:
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}), 400)
