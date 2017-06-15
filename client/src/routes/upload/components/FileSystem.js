@@ -7,7 +7,7 @@ import lodash from 'lodash'
 import { Router, routerRedux } from 'dva/router'
 import './FileSystem.css'
 import FileModal from './FileModal'
-import { jupyterServer } from '../../../constants'
+import { jupyterServer, flaskServer } from '../../../constants'
 import ImportPanel from './ImportPanel'
 
 const TabPane = Tabs.TabPane;
@@ -61,13 +61,21 @@ class FileSystem extends React.Component {
   }
 
   onClickCard (e, name) {
-    if (e) e.stopPropagation()
+    e.stopPropagation();
     console.log(name)
     // this.props.toDetail(name)
   }
 
-  onClickDelete(e) {
-
+  onClickDelete(e, _id) {
+    // localhost:5000/data/remove_data_set_by_id?data_set_id=59422819df86b2285d9e2cc6
+    fetch(flaskServer + '/file/remove_file_by_id?file_id=' + _id, {
+      method: 'get'
+    }).then((response) =>
+    {
+      if(response.status === 200){
+        this.props.dispatch({ type: 'upload/fetch' });
+      }
+    });
   }
 
   renderCards (key) {
@@ -76,7 +84,7 @@ class FileSystem extends React.Component {
     return filelist[key].map((e, i) =>
       <Card key={e._id} title={e.name}
             extra={
-              <Button type="danger" style={{marginTop: -5}} onClick={(event) => this.onClickDelete(event)}>
+              <Button type="danger" style={{marginTop: -5}} onClick={(event) => this.onClickDelete(event, e._id)}>
                 DELETE
               </Button>
             }
