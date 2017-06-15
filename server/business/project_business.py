@@ -60,5 +60,5 @@ def add_job_and_result_to_project(result_obj, project_id):
     return project_repo.add_and_update_one_by_id(project_id, {'results': result_obj, 'jobs': job_obj})
 
 
-def delete_by_id(project_id):
+def remove_by_id(project_id):
     return project_repo.delete_by_id(project_id)
