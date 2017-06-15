@@ -73,7 +73,7 @@ export default {
       body['file_id'] = file._id
       const data = yield call(importData, body)
       if (data.success) {
-        message.success('导入成功')
+        message.success('Import Success!')
       } else {
         console.log('error', data);
         throw data

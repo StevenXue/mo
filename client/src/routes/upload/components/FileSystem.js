@@ -69,7 +69,7 @@ class FileSystem extends React.Component {
   onClickDelete(e, _id) {
     // localhost:5000/data/remove_data_set_by_id?data_set_id=59422819df86b2285d9e2cc6
     fetch(flaskServer + '/file/remove_file_by_id?file_id=' + _id, {
-      method: 'get'
+      method: 'delete'
     }).then((response) =>
     {
       if(response.status === 200){
@@ -94,12 +94,12 @@ class FileSystem extends React.Component {
             onMouseLeave={() => this.toggleButton(-1)}>
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <div style={{width: 400}}>
-            <p>路径: {e.uri.replace(/..\/user_directory\//, '')}</p>
-            <p>上传时间: {e.upload_time}</p>
+            <p>Path: {e.uri.replace(/..\/user_directory\//, '')}</p>
+            <p>Upload Time: {e.upload_time}</p>
           </div>
           <Button type="primary" style={{ display: button === i ? 'inline':'none' }}
           onClick={() => this.showImportPanel(e)}
-          >导入</Button>
+          >Import</Button>
         </div>
       </Card>
     );
@@ -111,9 +111,9 @@ class FileSystem extends React.Component {
       <div style={{ width: '50%'}}>
         {this.renderCards(key)}
       </div>
-      {file && <div style={{ width: '50%', display: this.props.upload.panelVisible ? 'inline':'none'}}>
-        <h2>导入数据集</h2>
-        <h3>文件：{file.name}</h3>
+      {file && <div style={{ width: '45%', marginLeft: '5%', display: this.props.upload.panelVisible ? 'inline':'none'}}>
+        <h2>Import Data Set From File</h2>
+        <h3>File：{file.name}</h3>
         <ImportPanel />
       </div>}
     </div>
@@ -122,14 +122,14 @@ class FileSystem extends React.Component {
   render () {
     return (
       <div>
-        <div style={{ marginBottom: 20 }}>文件列表</div>
+        <div style={{ marginBottom: 20 }}>File List</div>
         <FileModal record={{}} refresh={() => this.fetchData()}>
-          <Button type="primary" style={{ marginBottom: 20 }}>上传</Button>
+          <Button type="primary" style={{ marginBottom: 20 }}>Upload</Button>
         </FileModal>
         <div className="cards">
           <Tabs defaultActiveKey="1">
-            <TabPane tab="私有" key="1">{this.renderTabContent('owned_files')}</TabPane>
-            <TabPane tab="公有" key="2">{this.renderTabContent('public_files')}</TabPane>
+            <TabPane tab="Private" key="1">{this.renderTabContent('owned_files')}</TabPane>
+            <TabPane tab="Public" key="2">{this.renderTabContent('public_files')}</TabPane>
           </Tabs>
         </div>
       </div>
