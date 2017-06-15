@@ -56,7 +56,7 @@ def list_projects_by_user_ID():
     return make_response(jsonify({'response': result}), 200)
 
 
-@project_app.route('/remove_project_by_user_ID_and_id', methods=['GET'])
+@project_app.route('/remove_project_by_id', methods=['GET'])
 def remove_project_by_id():
     project_id = request.args.get('project_id')
     try:
