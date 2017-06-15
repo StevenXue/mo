@@ -36,19 +36,19 @@ def list_public_toolkit_name():
     return all_names
 
 
-def toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, *argv):
+def toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, fields, *argv):
     toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
     entry_function = toolkit_obj.entry_function
     code = "from lib.toolkit_orig import " + entry_function
     exec code
     func = locals()[toolkit_obj.entry_function]
-    func = job_service.create_toolkit_job(project_id, staging_data_set_id, toolkit_id)(func)
+    func = job_service.create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields)(func)
     result = func(*argv)
     return result
 
 
 # for database 调用toolkit code tag for zhaofeng
-def toolkit_calculate(project_id, staging_data_set_id, toolkit_id, *argv):
+def toolkit_calculate(project_id, staging_data_set_id, toolkit_id, fields, *argv):
     toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
 
     # old code with old-fashioned decorator
@@ -61,13 +61,13 @@ def toolkit_calculate(project_id, staging_data_set_id, toolkit_id, *argv):
     code = toolkit_obj.target_py_code
     exec code
     func = locals()[toolkit_obj.entry_function]
-    func = job_service.create_toolkit_job(project_id, staging_data_set_id, toolkit_id)(func)
+    func = job_service.create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields)(func)
     result = func(*argv)
 
     return result
 
 
-def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id, data, k):
+def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id, fields, data, k):
     """convert json list"""
     col = data[0].keys()
     # argv = [[json_utility.convert_string_to_number(obj[i]) for i in col] for obj in data]
@@ -109,7 +109,7 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id, data
         argv.append(index_nan)
         argv.append(k)
     # result = toolkit_calculate(toolkit_id, *argv)
-    result = toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, *argv)
+    result = toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, fields, *argv)
     # project_business.add_job_and_result_to_project(result, ObjectId(project_id))
     return result.to_mongo().to_dict()
 

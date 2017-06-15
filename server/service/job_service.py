@@ -16,11 +16,14 @@ from business import toolkit_business, job_business, result_business, project_bu
 from repository import job_repo
 
 
-def create_toolkit_job(project_id, staging_data_set_id, toolkit_id):
+def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
     """
     help toolkit to create a job before toolkit runs,
     as well as save the job & create a result after toolkit runs
-    :param name: project_id, staging_data_set_id, toolkit_id
+    :param project_id: project_id, staging_data_set_id, toolkit_id
+    :param staging_data_set_id: project_id, staging_data_set_id, toolkit_id
+    :param toolkit_id: project_id, staging_data_set_id, toolkit_id
+    :param fields: project_id, staging_data_set_id, toolkit_id
     :return:
     """
     def decorator(func):
@@ -29,7 +32,9 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id):
             # create a job
             toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
             staging_data_set_obj = staging_data_set_business.get_by_id(staging_data_set_id)
-            job_obj = job_business.add_toolkit_job(toolkit_obj, staging_data_set_obj)
+
+            argv = fields
+            job_obj = job_business.add_toolkit_job(toolkit_obj, staging_data_set_obj, *argv)
             # job_obj = job_business.add_toolkit_job(toolkit_obj, '123')
 
             # calculate
