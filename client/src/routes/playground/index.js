@@ -72,8 +72,8 @@ export default class Playground extends React.Component {
 			body: JSON.stringify({ type: 'notebook' }),
 		}).then(response => response.json())
       .then((res) => {
-		    const URL = `http://10.52.14.182:8888/notebooks/${res.path}`;
-        //const URL = `http://localhost:8888/notebooks/${res.path}`;
+		    //const URL = `http://10.52.14.182:8888/notebooks/${res.path}`;
+        const URL = `http://localhost:8888/notebooks/${res.path}`;
         console.log('constructed', URL);
         this.setState({ notebookURL: URL });
       });

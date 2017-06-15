@@ -68,7 +68,7 @@ class JupyterNotebook extends React.Component {
   attachChannels () {
     // Prompt the user for the baseUrl and wsUrl
     //const baseUrl = jupyterServer;
-    const baseUrl = 'http://10.52.14.182:8888'
+    const baseUrl = 'http://localhost:8888'
     const domain = baseUrl.split('://').slice(1).join('://')
     const wsUrl = `ws://${domain}`
 
@@ -133,6 +133,7 @@ class JupyterNotebook extends React.Component {
   // %run mnist_1.0_softmax.py
   renderNotebook(type) {
     if (this.state.channels) {
+      console.log(this.state.channels);
       return (
         <Notebook
           store={this.store}

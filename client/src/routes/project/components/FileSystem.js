@@ -45,14 +45,28 @@ class FileSystem extends React.Component {
       });
   }
 
-  toProjectDetail(name, _id) {
-    console.log(name, _id);
-    this.props.toDetail(name, _id);
+  toProjectDetail(name, _id, isDeleting) {
+    console.log("isDeleting", isDeleting);
+    if(!isDeleting) {
+      this.props.toDetail(name, _id);
+    }
   }
 
-  onClickDelete(event) {
+  onClickDelete(event, _id, isDeleting) {
     event.stopPropagation();
-    console.log("delete");
+    event.preventDefault();
+    console.log("isDeleting", isDeleting);
+    if(isDeleting) {
+      fetch(flaskServer + '/project/remove_project_by_id?project_id=' + _id, {
+        method: 'get'
+      }).then((response) =>
+      {
+        console.log(response.status);
+        if(response.status === 200){
+          this.props.dispatch({ type: 'project/query' });
+        }
+      });
+    }
   }
 
   renderTabContent(key) {
@@ -65,16 +79,19 @@ class FileSystem extends React.Component {
 
   renderCards(key){
     let projects = this.props.project.projects;
-    let cards = projects[key]
+    let cards = projects[key];
     return cards.map((e) =>
       <Card key={e.name} title={e.name} extra={
-        <Button type="danger" style={{marginTop: -5}} onClick={(event) => this.onClickDelete(event)}>
+        <a>
+        <Button type="danger" style={{marginTop: -5}} onClick={() => this.onClickDelete(event, e._id, true)}>
           DELETE
         </Button>
-      }
-            style={{ width: 500 }} onClick={() => this.toProjectDetail(e.name, e._id)}>
-        <p>描述: {e.description}</p>
-        <p>创建时间: {e.create_time}</p>
+        </a>
+      } style={{ width: 500 }}>
+        <div onClick={() => this.toProjectDetail(e.name, e._id, false)}>
+          <p>描述: {e.description}</p>
+          <p>创建时间: {e.create_time}</p>
+        </div>
       </Card>)
   }
 

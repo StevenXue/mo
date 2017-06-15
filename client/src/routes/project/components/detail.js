@@ -1,15 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
-import { Button, Select, Upload, Icon, message, Modal, Table, Radio} from 'antd';
+import { Button, Select, Icon, message, Modal, Table, Radio, Collapse} from 'antd';
+const Panel = Collapse.Panel;
 import { jupyterServer, flaskServer } from '../../../constants'
 import { Router, routerRedux } from 'dva/router'
 import Toolkits from './toolkits'
-import Jupyter from 'react-jupyter'
 import JupyterNotebook from './jupyterNotebook'
-//import scrollToComponent from 'react-scroll-to-component';
-
-//import CodeMirror from  'react-code-mirror';
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/monokai.css'
 
@@ -48,7 +45,7 @@ class ProjectDetail extends React.Component {
       selectedData: '',
       project_id: this.props.location.query._id,
       dataSet: [],
-      dataset_name: ''
+      dataset_name: 'DataSet Selected'
   }
   }
 
@@ -61,6 +58,7 @@ class ProjectDetail extends React.Component {
         dataset_name: selectedRows[0].name,
         visible: false
       });
+      this.dataOp();
     }
   }
 
@@ -166,28 +164,6 @@ class ProjectDetail extends React.Component {
       .catch((err) => console.log('Error: add_staging_data_set_by_data_set_id', err))
   }
 
-  showResult (r) {
-    console.log('result is', r)
-    let key = Object.keys(r);
-    this.setState({
-      notebookJSON: {
-        'cells': [{
-          'execution_count': 1,
-          'cell_type': 'code',
-          'source': 'result is: ' + key[0] + ": "+ r[key[0]],
-          'outputs': [],
-          'metadata': {
-            'collapsed': true,
-            'trusted': true,
-          },
-        }],
-        'metadata': {},
-        'nbformat': 4,
-        'nbformat_minor': 2,
-      },
-    })
-
-  }
 
   onChange (info) {
     if (info.file.status !== 'uploading') {
@@ -220,17 +196,17 @@ class ProjectDetail extends React.Component {
     });
   }
 
-  renderList () {
-    let files = this.state.fileList
-    // console.log(files, this.state.files)
-    if (files) {
-      return files.map((e) =>
-        <div style={{ margin: '5px 10px 5px 20px' }} key={e.name}>{e.name}</div>,
-      )
-    } else {
-      return null
-    }
-  }
+  // renderList () {
+  //   let files = this.state.fileList
+  //   // console.log(files, this.state.files)
+  //   if (files) {
+  //     return files.map((e) =>
+  //       <div style={{ margin: '5px 10px 5px 20px' }} key={e.name}>{e.name}</div>,
+  //     )
+  //   } else {
+  //     return null
+  //   }
+  // }
 
   renderOptions (key) {
     return this.props.project.dataSets[key].map((e) => <Option key={e._id} value={e._id}>{e.name}</Option>)
@@ -249,7 +225,9 @@ class ProjectDetail extends React.Component {
     // FIXME
     let dsColumns
     if(this.state.dataSet.length > 0) {
-      dsColumns = Object.keys(this.state.dataSet[0]).map((e) => ({
+      dsColumns = Object.keys(this.state.dataSet[0])
+        .filter((el) => el !== 'data_set')
+        .map((e) => ({
         title: e,
         dataIndex: e,
         key: e,
@@ -264,25 +242,23 @@ class ProjectDetail extends React.Component {
         ),
         // onFilter: (value, record) => console.log('value, record', value, record),
         filterIcon: <Icon type="info-circle" style={{ color: this.state.filtered ? '#108ee9' : '#aaa' }} />
-      }))
+      }
+      ))
     }
     return (
       <div className="content-inner">
         <div>
           <div >
-            <h1>{this.state.projectName}</h1>
-            <h2>{'id: ' + this.props.location.query._id}</h2>
-            <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column' }}>
-              {!this.state.editing && <Button type='primary' style={{width: 120}}
-                       onClick={() => this.handleClick()}>Start Exploring</Button>
-              }
-              { this.state.editing && <div>
+            <h2>{this.state.projectName}</h2>
+            <h4 style={{marginTop: 10}}>{'project id: ' + this.props.location.query._id}</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', marginTop: 20}}>
+              <div>
                 <Modal title="Choose DataSet"
                        visible={this.state.visible}
                        onOk={() => this.setState({visible: false})}
                        onCancel={() => this.setState({visible: false})}
                        footer= {null}
-                  >
+                >
                   <Button onClick={() => this.setState({data_prop: 'owned_ds'})}>PRIVATE</Button>
                   <Button style={{marginLeft: 10}} onClick={() => this.setState({data_prop: 'public_ds'})}>PUBlIC</Button>
                   <Table style={{marginTop: 10}}
@@ -293,55 +269,47 @@ class ProjectDetail extends React.Component {
                 <div style={{display: 'flex', flexDirection: 'row'}}>
                   <Button type='primary' style={{width: 120}}
                           onClick={() => this.handleChoose()}>Choose Data</Button>
-                  <div style={{marginLeft: 10}}>{"id: "+ this.state.selectedData}</div>
+                  {/*<div style={{marginLeft: 20, marginTop: 3}}>{"data set name: " + this.state.dataset_name}</div>*/}
                 </div>
-                <Button type='primary' style={{ marginTop: 10, width: 120 }}
-                        onClick={() => this.dataOp()}>Show</Button>
-                <Button type='primary' style={{ marginTop: 10, width: 120 , marginLeft: 20}}
-                        onClick={() => this.startNotebook()}>
-                  <a href="#notebookSection" >
-                    Start Notebook
-                  </a>
-                </Button>
-              </div> }
-            </div>
-          </div>
-          <div>
-            {this.state.dataSet.length > 0 && dsColumns && <div>
-              <Table style={{marginTop: 10}}
-                   dataSource={this.state.dataSet}
-                   columns={dsColumns}/>
-              <Button onClick={() => this.convertToStaging()}>Ok</Button>
-            </div>}
-          </div>
-          <div style={{ marginTop: 20, display: 'flex', flexDirection: 'row' }}>
-            <div style={{ width: '40%', height: 700, border: '1px solid #f3f3f3' }}>
-              {this.state.editing ? (
-                <div style={{
-                  marginTop: 10, width: '100%', display: 'flex',
-                  height: 500, overFlowY: 'auto', flexDirection: 'column', alignItems: 'center',
-                }}>
-                  <Toolkits project_id={this.props.location.query._id} fetchResult={(r) => this.showResult(r)}/>
-                </div>) : (<div>
-                <h3 style={{ margin: '5px 5px 5px 10px' }}>File List</h3>
-                {this.renderList()}
-                <h3 style={{ margin: '5px 5px 5px 10px' }}>Data List</h3>
-              </div>)
-              }
-            </div>
-            <div style={{ width: '59%', height: 700, marginLeft: '2%', border: '1px solid #f3f3f3' }}>
-              <h3 style={{ margin: '5px 5px 5px 10px' }}>{this.state.editing ? 'Result' : 'Previous Results'}</h3>
-              <div style={{ paddingLeft: 70, paddingTop: 20 }}>
-                <Jupyter
-                  notebook={this.state.notebookJSON}
-                  showCode={true}
-                  defaultStyle={true}
-                  loadMathjax={true}
-                />
-
+                {/*<Button type='primary' style={{ marginTop: 10, width: 120 }}*/}
+                        {/*onClick={() => }>Show</Button>*/}
               </div>
             </div>
           </div>
+          <div>
+              <Collapse bordered={true} style={{marginTop: 30, width: '100%'}}>
+                <Panel header={this.state.dataset_name + " "+ this.state.selectedData } key="1">
+                  {this.state.dataSet.length > 0 && dsColumns &&
+                  <div>
+                    <Table style={{marginTop: -20, width: '100%'}}
+                           dataSource={this.state.dataSet}
+                           columns={dsColumns}/>
+                    <Button type='primary'
+                            onClick={() => this.convertToStaging()}
+                            style={{marginLeft: 20, marginTop: -10}}
+                      >
+                      Confirm and Stage
+                    </Button>
+                  </div>
+                  }
+                </Panel>
+              </Collapse>
+          </div>
+          <div>
+            <Collapse bordered={true} style={{marginTop: 30, width: '100%'}}>
+              <Panel header={"Analytic Toolkits"} key="1" >
+                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
+                  <Toolkits project_id={this.props.location.query._id} />
+                </div>
+              </Panel>
+            </Collapse>
+          </div>
+          <Button type='primary' style={{ marginTop: 20, width: 120 }}
+                  onClick={() => this.startNotebook()}>
+            <a href="#notebookSection" >
+              Start Notebook
+            </a>
+          </Button>
           <div id="notebookSection" >
           { this.state.start_notebook &&
           <JupyterNotebook project_id={this.state.project_id}
