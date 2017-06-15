@@ -83,3 +83,10 @@ def list_files_by_user_ID(user_ID):
     owned_files = ownership_service.get_ownership_objects_by_user_ID(user_ID,
                                                                  'file')
     return public_files, owned_files
+
+
+def remove_file_by_user_ID_and_id(user_ID, file_id):
+    user = user_business.get_by_user_ID(user_ID)
+    return ownership_business.remove_ownership_by_user_and_owned_item(user,
+                                                                      file_id,
+                                                                      'file')

@@ -59,7 +59,7 @@ def list_projects_by_user_ID():
 @project_app.route('/delete_project_by_user_ID_and_id', methods=['GET'])
 def delete_project_by_id():
     project_id = request.args.get('project_id')
-    user_ID = request.args.get('user_Id')
+    user_ID = request.args.get('user_ID')
     try:
         result = project_service.remove_project_by_user_ID_and_id(user_ID,
                                                                   ObjectId(
