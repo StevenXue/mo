@@ -43,6 +43,10 @@ def add(name, description, usage, classification, input_data,
     return model_repo.create(model)
 
 
+def remove(model_obj):
+    model_repo.delete_by_id(model_obj.id)
+
+
 def update_one_public_model():
     """
         数据库建一个model的collection, 记载public的数据分析工具包简介

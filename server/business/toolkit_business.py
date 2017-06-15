@@ -232,8 +232,9 @@ def update_one_public_toolkit():
 def remove_one_public_toolkit():
     user = user_business.get_by_user_ID('system')
     toolkit = get_by_toolkit_name('最大互信息数')
-    # remove(toolkit)
-    ownership_business.remove_ownership_by_user_and_owned_item(user, toolkit, 'toolkit')
+    remove(toolkit)
+    # 已舍去
+    # ownership_business.remove_ownership_by_user_and_owned_item(user, toolkit, 'toolkit')
 
 if __name__ == '__main__':
     pass

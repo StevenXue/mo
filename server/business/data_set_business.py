@@ -25,3 +25,7 @@ def get_by_id(data_set_id):
 def remove_by_id(data_set_id):
     return data_set_repo.delete_by_id(data_set_id)
 
+
+def remove(data_set_obj):
+    data_set_repo.delete_by_id(data_set_obj.id)
+
