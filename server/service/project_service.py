@@ -40,9 +40,9 @@ def list_projects_by_user_ID(user_ID):
     if not user_ID:
         raise ValueError('no user id')
     public_projects = ownership_service.get_all_public_objects('project')
-    owned_files = ownership_service.get_ownership_objects_by_user_ID(user_ID,
-                                                                     'project')
-    return public_projects, owned_files
+    private_projects = ownership_service.\
+        get_private_ownership_objects_by_user_ID(user_ID, 'project')
+    return public_projects, private_projects
 
 
 def remove_project_by_id(project_id):

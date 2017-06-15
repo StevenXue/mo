@@ -80,8 +80,8 @@ def list_files_by_user_ID(user_ID):
     if not user_ID:
         raise ValueError('no user id')
     public_files = ownership_service.get_all_public_objects('file')
-    owned_files = ownership_service.get_ownership_objects_by_user_ID(user_ID,
-                                                                 'file')
+    owned_files = ownership_service.\
+        get_private_ownership_objects_by_user_ID(user_ID, 'file')
     return public_files, owned_files
 
 

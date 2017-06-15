@@ -47,8 +47,8 @@ def list_data_sets_by_user_ID(user_ID):
     if not user_ID:
         raise ValueError('no user id')
     public_ds = ownership_service.get_all_public_objects('data_set')
-    owned_ds = ownership_service.get_ownership_objects_by_user_ID(user_ID,
-                                                                     'data_set')
+    owned_ds = ownership_service.\
+        get_private_ownership_objects_by_user_ID(user_ID, 'data_set')
     return public_ds, owned_ds
 
 
