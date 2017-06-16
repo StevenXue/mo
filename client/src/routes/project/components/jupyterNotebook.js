@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 // import Toolbar from '../../../react-notebook/src/toolbar';
 
 import { jupyterServer } from '../../../constants'
-import empty from './empty.ipynb.json';
+import empty from './empty.ipynb';
 import { Affix, Button } from 'antd';
 
 import { Notebook, createStore} from '../../../notebook/src/';
@@ -38,7 +38,8 @@ class JupyterNotebook extends React.Component {
       channels: null,
       forceSource: '',
       fileName: 'empty',
-      output: []
+      output: [],
+      kernalId: ''
     };
 
     //this.store.subscribe(state => this.setState(state));
@@ -54,6 +55,26 @@ class JupyterNotebook extends React.Component {
   }
 
   componentDidUpdate() {
+  }
+
+  componentWillUnmount() {
+    console.log('disconnect');
+    const baseUrl = 'http://localhost:8888'
+    const domain = baseUrl.split('://').slice(1).join('://')
+    const wsUrl = `ws://${domain}`
+
+    // Create a connection options object
+    let _connectionOptions = {
+      baseUrl,
+      wsUrl,
+    };
+
+    enchannelBackend.shutdown(_connectionOptions, this.state.kernalId).then((r) => {
+      console.info(r) // eslint-disable-line
+      //return id
+    });
+
+
   }
 
   getResult(r){
@@ -81,6 +102,7 @@ class JupyterNotebook extends React.Component {
 
     enchannelBackend.spawn(connectionOptions, 'python3').then((id) => {
       console.info('spawned', id) // eslint-disable-line
+      this.setState({kernalId: id});
       return id
     }).catch((err) => {
       console.error('could not spawn', err) // eslint-disable-line
@@ -172,7 +194,12 @@ class JupyterNotebook extends React.Component {
           { this.renderInputForm() }
         </div>
         <div style={{marginTop: 10}}>
-          <Button onClick={() => this.onClickButton()}>Get Code</Button>
+          <div style={{backgroundColor: '#f7f7f7', height: 50, width: '70%', display: 'flex',
+            flexDirection: 'row', alignItems: 'center',
+            borderRadius: 3, border: '1px solid #e5e5e5'}}>
+            <Button style={{marginLeft: 30, width: 100}}>SAVE</Button>
+            <Button onClick={() => this.onClickButton()} style={{marginLeft: 10, width: 100}}>Get Code</Button>
+          </div>
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             <div style={{ width: '70%' }}>
               { this.renderNotebook('nteract') }

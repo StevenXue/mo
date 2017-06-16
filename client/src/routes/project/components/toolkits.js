@@ -5,8 +5,21 @@ const Step = Steps.Step;
 import { jupyterServer, flaskServer } from '../../../constants';
 import { Router, routerRedux } from 'dva/router';
 import ReactJson from 'react-json-view';
-
 const mockResult = [['device_node_id', 'unicode'], ['productor', 'unicode'], ['name', 'unicode'], ['f1', 'unicode'], ['device_model', 'unicode'], ['local_device_id', 'unicode'], ['asset_code', 'unicode'], ['staging_data_set', 'ObjectId'], ['version', 'unicode'], ['station_id', 'unicode'], ['device_type', 'unicode'], ['_id', 'ObjectId']]
+
+let hasOwnProperty = Object.prototype.hasOwnProperty;
+
+function isEmpty(obj) {
+  if (obj == null) return true;
+  if (obj.length > 0)    return false;
+  if (obj.length === 0)  return true;
+  if (typeof obj !== "object") return true;
+  for (let key in obj) {
+    if (hasOwnProperty.call(obj, key)) return false;
+  }
+
+  return true;
+}
 
 export default class ProjectDetail extends React.Component {
   constructor (props) {
@@ -125,6 +138,7 @@ export default class ProjectDetail extends React.Component {
   onRunClick () {
     // let check = this.state.checkedCols.join(',')
     let kValue;
+    console.log(this.state.resultJson.length);
     //console.log('input', document.getElementById('k值').value)
     if(document.getElementById('k值')) {
       kValue = document.getElementById('k值').value;
@@ -148,7 +162,9 @@ export default class ProjectDetail extends React.Component {
         console.log(res);
         let responseObj = res.response.result;
         this.setState({
-          resultJson: responseObj
+          resultJson: responseObj,
+          toolkit: '',
+          checkedCols: []
         });
         }
       )
@@ -166,7 +182,6 @@ export default class ProjectDetail extends React.Component {
 
   next() {
     if(this.state.current === 1){
-      console.log('run');
       this.onRunClick();
     }
     const current = this.state.current + 1;
@@ -211,6 +226,8 @@ export default class ProjectDetail extends React.Component {
         <Select.Option value={e._id} key={e.name}>
           {e.name}
         </Select.Option>)
+    }else{
+      return null;
     }
   }
 
@@ -220,10 +237,10 @@ export default class ProjectDetail extends React.Component {
       return data.map((e) =>
         <Select.Option value={e._id} key={e._id}>
           {e.name}
-        </Select.Option>,
+        </Select.Option>
       )
     } else {
-      return null
+      return null;
     }
   }
 
@@ -233,8 +250,8 @@ export default class ProjectDetail extends React.Component {
       case  0:
         return(
           <div style={{marginTop: 10, marginLeft: 5, width: '25%'}}>
-            <Select style={{ width: '100%' }} onChange={(e) => this.handleChange(e)}
-                         placeholder="Choose Toolkit Type">
+            <Select className="toolkit" style={{ width: '100%' }} onChange={(e) => this.handleChange(e)}
+                         placeholder="Choose Toolkit Type" allowClear>
               {this.renderOptions()}
             </Select>
           </div>
@@ -243,9 +260,17 @@ export default class ProjectDetail extends React.Component {
       case 1:
         return (
           <div style={{marginTop: 10, marginLeft: '40%', width: '25%'}}>
-            <Select style={{ width: '100%', marginTop: 10 }} onChange={(values) => this.onSelectDataSet(values)}
-                    placeholder="Choose DataSet">
-              {this.renderOptionsData()}
+            <Select className="dataset-select" style={{ width: '100%', marginTop: 10 }} onChange={(values) => this.onSelectDataSet(values)}
+                    value={this.state.selectedData}
+                    placeholder="Choose DataSet" allowClear>
+              {/*{this.renderOptionsData()}*/}
+              {
+                this.state.data_set.map((e) =>
+                  <Select.Option value={e._id} key={e._id}>
+                    {e.name}
+                  </Select.Option>
+                )
+              }
             </Select>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <div style={{ marginLeft: -20 }}>
@@ -255,8 +280,6 @@ export default class ProjectDetail extends React.Component {
                   {this.renderCheckBoxTable()}
                 </div>
               </div>
-              {/*<h3>{'结果 : ' + this.state.result}</h3>*/}
-              {/*<Button style={{ marginTop: 10 }} onClick={() => this.onRunClick()}>RUN</Button>*/}
             </div>
 
           </div>
@@ -265,7 +288,11 @@ export default class ProjectDetail extends React.Component {
       case 2:
         return (
           <div style={{marginTop: 10, marginLeft: '75%', height: 500, overflowY: 'auto'}}>
-            <ReactJson src={ this.state.resultJson } style={{ width: '100%', height: 400 }}/>
+            {
+              !isEmpty(this.state.resultJson) &&
+              <ReactJson src={ this.state.resultJson } style={{width: '100%', height: 400}}/>
+
+            }
           </div>
         )
 
@@ -292,7 +319,7 @@ export default class ProjectDetail extends React.Component {
           {
             this.state.current === this.steps.length - 1
             &&
-            <Button style={{ marginTop: 10 }} type="primary" onClick={() => message.success('Processing complete!')}>Done</Button>
+            <Button style={{ marginTop: 10 }} type="primary" onClick={() => this.setState({current: 0})}>Done</Button>
           }
           {
             this.state.current > 0

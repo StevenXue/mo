@@ -78,8 +78,8 @@ class FileSystem extends React.Component {
   }
 
   renderCards(key){
-    let projects = this.props.project.projects;
-    let cards = projects[key];
+    let projects = this.props.project.projects[key];
+    let cards =projects.reverse();
     return cards.map((e) =>
       <Card key={e.name} title={e.name} extra={
         <a>
@@ -88,7 +88,7 @@ class FileSystem extends React.Component {
         </Button>
         </a>
       } style={{ width: 500 }}>
-        <div onClick={() => this.toProjectDetail(e.name, e._id, false)}>
+        <div onClick={() => this.toProjectDetail(e.name, e._id, false)} style={{cursor: 'pointer'}}>
           <p>描述: {e.description}</p>
           <p>创建时间: {e.create_time}</p>
         </div>
