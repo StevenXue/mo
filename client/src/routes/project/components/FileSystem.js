@@ -57,7 +57,7 @@ class FileSystem extends React.Component {
     event.preventDefault();
     console.log("isDeleting", isDeleting);
     if(isDeleting) {
-      fetch(flaskServer + '/project/remove_project_by_id?project_id=' + _id, {
+      fetch(flaskServer + '/project/projects/' + _id, {
         method: 'delete'
       }).then((response) =>
       {

@@ -8,3 +8,6 @@ class UserRepo(Repo):
 
     def read_by_user_ID(self, user_ID):
         return Repo.read_unique_one(self, {'user_ID': user_ID})
+
+    def delete_by_user_ID(self, user_ID):
+        return Repo.delete_unique_one(self, {'user_ID': user_ID})

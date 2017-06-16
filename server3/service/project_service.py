@@ -38,12 +38,16 @@ def create_project(name, description, user_ID, is_private):
         raise RuntimeError('Cannot create the new project')
 
 
-def list_projects_by_user_ID(user_ID):
+def list_projects_by_user_ID(user_ID, order=-1):
     if not user_ID:
         raise ValueError('no user id')
     public_projects = ownership_service.get_all_public_objects('project')
     owned_projects = ownership_service.\
         get_private_ownership_objects_by_user_ID(user_ID, 'project')
+
+    if order == -1:
+        public_projects.reverse()
+        owned_projects.reverse()
     return public_projects, owned_projects
 
 

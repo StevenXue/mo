@@ -16,3 +16,10 @@ def get_by_user_ID(user_ID):
 
 def get_by_user_object_id(object_id):
     return user_repo.read_by_id(object_id)
+
+
+def remove_by_id(user_id):
+    return user_repo.delete_by_id(user_id)
+
+
+

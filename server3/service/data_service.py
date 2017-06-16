@@ -43,12 +43,16 @@ def import_data_from_file_id(file_id, data_set_name, ds_description, user_ID,
                        is_private)
 
 
-def list_data_sets_by_user_ID(user_ID):
+def list_data_sets_by_user_ID(user_ID, order=-1):
     if not user_ID:
         raise ValueError('no user id')
     public_ds = ownership_service.get_all_public_objects('data_set')
     owned_ds = ownership_service.\
         get_private_ownership_objects_by_user_ID(user_ID, 'data_set')
+
+    if order == -1:
+        public_ds.reverse()
+        owned_ds.reverse()
     return public_ds, owned_ds
 
 

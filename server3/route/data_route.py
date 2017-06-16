@@ -48,7 +48,8 @@ def import_data_from_file_id():
 def list_data_sets_by_user_ID():
     user_ID = request.args.get('user_ID')
     try:
-        public_ds, owned_ds = data_service.list_data_sets_by_user_ID(user_ID)
+        public_ds, owned_ds = data_service.list_data_sets_by_user_ID(user_ID,
+                                                                     -1)
         public_ds = json_utility.me_obj_list_to_dict_list(public_ds)
         owned_ds = json_utility.me_obj_list_to_dict_list(owned_ds)
         result = {

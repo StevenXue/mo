@@ -1,7 +1,7 @@
 import { request, config } from '../utils';
 import { jupyterServer } from '../constants';
 const { api, CORS } = config;
-const { dataSets, projects, projectCreate, getDataFields } = api;
+const { dataSets, projects, getDataFields } = api;
 
 export async function query (user_ID) {
   let query = `?user_ID=${user_ID}`
@@ -13,7 +13,7 @@ export async function query (user_ID) {
 
 export async function create (data) {
   return request({
-    url: CORS + projectCreate,
+    url: CORS + projects,
     method: 'post',
     data,
   })
