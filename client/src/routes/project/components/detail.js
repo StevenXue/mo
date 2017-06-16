@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
-import { Button, Select, Icon, message, Modal, Table, Radio, Collapse} from 'antd';
+import { Button, Select, Icon, message, Modal, Table, Radio, Collapse, Input} from 'antd';
 const Panel = Collapse.Panel;
 import { jupyterServer, flaskServer } from '../../../constants'
 import { Router, routerRedux } from 'dva/router'
@@ -9,6 +9,7 @@ import Toolkits from './toolkits'
 import JupyterNotebook from './jupyterNotebook'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/monokai.css'
+//import Input from 'antd/lib/input/Input.d'
 
 const { Option, OptGroup } = Select
 const RadioGroup = Radio.Group;
@@ -45,7 +46,8 @@ class ProjectDetail extends React.Component {
       selectedData: '',
       project_id: this.props.location.query._id,
       dataSet: [],
-      dataset_name: 'DataSet Selected'
+      dataset_name: 'DataSet Selected',
+      to_disconnect: false
   }
   }
 
@@ -95,16 +97,9 @@ class ProjectDetail extends React.Component {
     this.props.dispatch({ type: 'project/listDataSets' })
   }
 
-  handleClick () {
-    this.setState({
-      editing: true,
-      notebookJSON: {
-        'cells': [],
-        'metadata': {},
-        'nbformat': 4,
-        'nbformat_minor': 2,
-      },
-    })
+  componentWillUnmount() {
+    console.log('disconnect');
+    this.setState({to_disconnect: true});
   }
 
   dataOp () {
@@ -140,6 +135,10 @@ class ProjectDetail extends React.Component {
     }
     let f_t_arrays = Object.keys(values).map((e) => [e, values[e]])
     // console.log('f_t_arrays', f_t_arrays)
+    let name;
+    if(document.getElementById('stage_data_name')) {
+      name = document.getElementById('stage_data_name').value;
+    }
     fetch(flaskServer + '/staging_data/add_staging_data_set_by_data_set_id', {
         method: 'post',
         headers: {
@@ -147,7 +146,7 @@ class ProjectDetail extends React.Component {
         },
         body: JSON.stringify({
           'project_id': this.props.location.query._id,
-          'staging_data_set_name': 'test_' + Math.floor(Math.random() * 1000),
+          'staging_data_set_name': name,
           'staging_data_set_description': 'dsdsds',
           'data_set_id': dataSetId,
           'f_t_arrays': f_t_arrays
@@ -195,18 +194,6 @@ class ProjectDetail extends React.Component {
       start_notebook: true
     });
   }
-
-  // renderList () {
-  //   let files = this.state.fileList
-  //   // console.log(files, this.state.files)
-  //   if (files) {
-  //     return files.map((e) =>
-  //       <div style={{ margin: '5px 10px 5px 20px' }} key={e.name}>{e.name}</div>,
-  //     )
-  //   } else {
-  //     return null
-  //   }
-  // }
 
   renderOptions (key) {
     return this.props.project.dataSets[key].map((e) => <Option key={e._id} value={e._id}>{e.name}</Option>)
@@ -284,12 +271,18 @@ class ProjectDetail extends React.Component {
                     <Table style={{marginTop: -20, width: '100%'}}
                            dataSource={this.state.dataSet}
                            columns={dsColumns}/>
-                    <Button type='primary'
-                            onClick={() => this.convertToStaging()}
-                            style={{marginLeft: 20, marginTop: -10}}
+                    <div style={{ marginBottom: 10, width: 100, marginLeft: 20, display: 'flex', flexDirection: 'row'}}>
+                      <Input placeholder="enter statge data name"
+                             id="stage_data_name"
+                             style={{width: 200}}
+                      />
+                      <Button type='primary'
+                              style={{marginLeft: 20}}
+                              onClick={() => this.convertToStaging()}
                       >
-                      Confirm and Stage
-                    </Button>
+                        Confirm and Stage
+                      </Button>
+                    </div>
                   </div>
                   }
                 </Panel>
@@ -314,7 +307,8 @@ class ProjectDetail extends React.Component {
           { this.state.start_notebook &&
           <JupyterNotebook project_id={this.state.project_id}
                            dataset_name={this.state.dataset_name}
-                           dataset_id={this.state.selectedData}/>
+                           dataset_id={this.state.selectedData}
+                           />
           }
           </div>
         </div>

@@ -79,9 +79,10 @@ class FileSystem extends React.Component {
   }
 
   renderCards (key) {
-    let filelist = this.props.upload.files
-    let button = this.props.upload.button
-    return filelist[key].map((e, i) =>
+    let filelist = this.props.upload.files[key];
+    let button = this.props.upload.button;
+    //filelist.reverse();
+    return filelist.map((e, i) =>
       <Card key={e._id} title={e.name}
             extra={
               <Button type="danger" style={{marginTop: -5}} onClick={(event) => this.onClickDelete(event, e._id)}>
