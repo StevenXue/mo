@@ -32,32 +32,6 @@ export default class ProjectDetail extends React.Component {
 
   componentDidMount() {
 
-    fetch(jupyterServer + this.state.projectName, {
-      method: 'get'
-    }).then((response) => response.json())
-      .then((res) => {
-        console.log(res.content);
-        this.setState({
-          fileList: res.content
-        });
-        let content = res.content;
-        let target;
-        content.forEach((e) => {
-          console.log(e.name, typeof(e.name));
-          let el = e.name.split(".");
-          console.log(el[0], el[1]);
-          if (el[1] === "ipynb") {
-            //this.setState({notebookName: e.name});
-            console.log(e.name);
-            fetch(jupyterServer + this.state.projectName +'/' + e.name, {
-              method: 'get'
-            }).then((response) => response.json())
-              .then((res) => {
-                  this.setState({notebookJSON: res.content});
-              })
-          }
-        });
-      });
   }
 
   handleClick() {

@@ -17,7 +17,6 @@ import {
 
 const CodeCell = (props, context) => {
   function keyDown(e) {
-    console.log(e);
     if (e.key !== 'Enter') {
       return;
     }

@@ -14,15 +14,9 @@ const bodyStyle = {
 }
 
 function Dashboard ({ dispatch }) {
-  function handleToDetail (name) {
-    dispatch(routerRedux.push({
-      pathname: `project/${name}`,
-    }))
-  }
-
   return (
     <div style={bodyStyle}>
-      <FileSystem toDetail={handleToDetail} />
+      <FileSystem />
     </div>
   )
 }

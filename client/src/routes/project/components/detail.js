@@ -32,13 +32,8 @@ class ProjectDetail extends React.Component {
       projectName: name,
       fileList: [],
       notebookName: '',
+      notebookPath: {},
       editing: false,
-      notebookJSON: {
-        'cells': [],
-        'metadata': {},
-        'nbformat': 4,
-        'nbformat_minor': 2,
-      },
       data_id: '',
       start_notebook: false,
       visible: false,
@@ -72,28 +67,6 @@ class ProjectDetail extends React.Component {
 
   componentDidMount () {
     console.log("project id", this.state.project_id)
-    fetch(jupyterServer + this.state.projectName, {
-      method: 'get',
-    }).then((response) => response.json())
-      .then((res) => {
-        this.setState({
-          fileList: res.content,
-        })
-        let content = res.content
-        content.forEach((e) => {
-          let el = e.name.split('.')
-          if (el[1] === 'ipynb') {
-            console.log(e.name)
-            fetch(jupyterServer + this.state.projectName + '/' + e.name, {
-              method: 'get',
-            }).then((response) => response.json())
-              .then((res) => {
-                this.setState({ notebookJSON: res.content })
-              })
-          }
-        })
-      })
-
     this.props.dispatch({ type: 'project/listDataSets' })
   }
 
@@ -184,15 +157,24 @@ class ProjectDetail extends React.Component {
     //console.log(this.props.project.dataSets[this.state.data_prop]);
   }
 
-  // handleChange (value) {
-  //   this.props.dispatch({ type: 'project/selectDataSets', payload: { selectedDSIds: value } })
-  //   // console.log(`selected ${value}`)
-  // }
-
   startNotebook() {
-    this.setState({
-      start_notebook: true
-    });
+    fetch(jupyterServer + this.props.project.user.user_ID + "/" + this.state.projectName, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          'type': "notebook"
+        }),
+      },
+    ).then((response) => response.json())
+      .then((res) => {
+        console.log(res);
+        this.setState({
+          notebookPath: res,
+          start_notebook: true
+        });
+      });
   }
 
   renderOptions (key) {
@@ -256,10 +238,7 @@ class ProjectDetail extends React.Component {
                 <div style={{display: 'flex', flexDirection: 'row'}}>
                   <Button type='primary' style={{width: 120}}
                           onClick={() => this.handleChoose()}>Choose Data</Button>
-                  {/*<div style={{marginLeft: 20, marginTop: 3}}>{"data set name: " + this.state.dataset_name}</div>*/}
                 </div>
-                {/*<Button type='primary' style={{ marginTop: 10, width: 120 }}*/}
-                        {/*onClick={() => }>Show</Button>*/}
               </div>
             </div>
           </div>
@@ -305,7 +284,8 @@ class ProjectDetail extends React.Component {
           </Button>
           <div id="notebookSection" >
           { this.state.start_notebook &&
-          <JupyterNotebook project_id={this.state.project_id}
+          <JupyterNotebook notebookPath={this.state.notebookPath}
+                           project_id={this.state.project_id}
                            dataset_name={this.state.dataset_name}
                            dataset_id={this.state.selectedData}
                            />
