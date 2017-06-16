@@ -35,47 +35,52 @@ const ImportPanel =
     return (
       <Form layout='horizontal'  onSubmit={(e) => okHandler(e)}>
         <FormItem
-          label="数据集名称"
+          label="Name"
         >
           {
             getFieldDecorator('data_set_name', {
               rules: [
-                { required: true, message: '请输入名称' },
+                { required: true, message: 'please import name' },
               ],
             })(<Input />)
           }
         </FormItem>
         <FormItem
-          label="是否私有"
-          hasFeedback
-        >
-          {getFieldDecorator('is_private', {
-            rules: [
-              { required: true, message: '请选择文件是否私有' },
-            ],
-          })(
-            <Select placeholder="请选择文件是否私有">
-              <Option value="true">是</Option>
-              <Option value="false">否</Option>
-            </Select>
-          )}
-        </FormItem>
-        <FormItem
-          label="描述"
+          label="Description"
         >
           {
             getFieldDecorator('ds_description', {
               initialValue: name,
               rules: [
-                { required: true, message: '请输入描述' },
+                { required: true, message: 'please input description' },
               ],
             })(<Input />)
           }
         </FormItem>
         <FormItem
-          wrapperCol={{ span: 12, offset: 6 }}
+          label="Privacy"
+          hasFeedback
         >
+          {getFieldDecorator('is_private', {
+            initialValue: 'false',
+            rules: [
+              { required: true, message: '请选择文件是否私有' },
+            ],
+          })(
+            <Select >
+              <Option value="false">public</Option>
+              <Option value="true">private</Option>
+            </Select>
+          )}
+        </FormItem>
+        <FormItem
+          wrapperCol={{ span: 12, offset: 0 }}
+        >
+
           <Button type="primary" htmlType="submit">Submit</Button>
+          <Button type="default" style={{marginLeft: 10}}
+                  onClick={() => dispatch({ type: 'upload/hideImportPanel'})}>Cancel</Button>
+
         </FormItem>
       </Form>
     )
