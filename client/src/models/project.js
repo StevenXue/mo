@@ -1,6 +1,7 @@
 import lodash from 'lodash'
 import { parse } from 'qs'
 import { message } from 'antd'
+import { Router, routerRedux } from 'dva/router'
 import { query, create, edit, listDataSets } from '../services/project'
 
 export default {
@@ -21,6 +22,7 @@ export default {
 
   effects: {
     *query ({ payload }, { call, put, select }) {
+      console.log('query')
       const user = yield select(state => state['app'].user)
       yield put({
         type: 'querySuccess',
@@ -42,6 +44,22 @@ export default {
         throw data
       }
     },
+
+    *toDetail ({ payload }, { call, put, select }) {
+      console.log("to detail", payload);
+      const user = yield select(state => state['app'].user)
+      yield put(
+        routerRedux.push({
+        pathname: `project/${payload.name}`,
+        query: {
+          _id: payload._id,
+          user: user
+        },
+      })
+      )
+    },
+
+
 
     *listDataSets ({ payload }, { call, put, select }) {
       const user = yield select(state => state['app'].user)

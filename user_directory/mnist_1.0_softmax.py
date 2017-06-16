@@ -120,12 +120,11 @@ def training_step(i, update_test_data, update_train_data):
 # to save the animation as a movie, add save_movie=True as an argument to datavis.animate
 # to disable the visualisation use the following line instead of the datavis.animate line
 #
-# print("max test accuracy: " + str(datavis.get_max_test_accuracy()))
+print("max test accuracy: " + str(datavis.get_max_test_accuracy()))
 
 # final max test accuracy = 0.9268 (10K iterations). Accuracy should peak above 0.92 in the first 2000 iterations.
 if __name__ == '__main__':
-    steps = sys.argv[1]
-    test_argv = sys.argv[2]
-    eval(test_argv)
-    for i in range(int(steps) + 1):
+    #datavis.animate(training_step, iterations=2000+1, train_data_update_freq=10, test_data_update_freq=100, more_tests_at_start=True)
+    #steps = sys.argv[1]
+    for i in range(2000 + 1):
         training_step(i, i % 200 == 0, i % 50 == 0)

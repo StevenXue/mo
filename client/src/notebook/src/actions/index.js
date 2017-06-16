@@ -37,6 +37,7 @@ export function setLanguageInfo(langInfo) {
 }
 
 export function save(filename) {
+  console.log(filename);
   return (subject) => {
     // If there isn't a filename, save-as it instead
     if (!filename) {
@@ -54,6 +55,7 @@ export function save(filename) {
 
 export function saveAs(filename, notebook) {
   return (subject, dispatch) => {
+    console.log(subject);
     subject.next({
       type: constants.CHANGE_FILENAME,
       filename,
@@ -63,6 +65,7 @@ export function saveAs(filename, notebook) {
 }
 
 export function setNotebook(nbData) {
+  console.log(nbData);
   return (subject) => {
     const data = commutable.fromJS(nbData);
     subject.next({

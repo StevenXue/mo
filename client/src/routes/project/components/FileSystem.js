@@ -24,31 +24,11 @@ class FileSystem extends React.Component {
     this.props.dispatch({ type: 'project/query' })
   }
 
-  fetchData(){
-    // fetch(jupyterServer, {
-    //   method: 'get'
-    // }).then((response) => response.json())
-    //   .then((res) => {
-    //     //console.log(res.content[0].name);
-    //     this.setState({
-    //       files: res.content
-    //     });
-    //   });
-    fetch(flaskServer+'/ownership/get_ownership_objects_by_user_ID?owned_type=project&user_ID=test_user', {
-      method: 'get'
-    }).then((response) => response.json())
-      .then((res) => {
-        console.log(res.response);
-        this.setState({
-          files: res.response
-        });
-      });
-  }
-
   toProjectDetail(name, _id, isDeleting) {
     console.log("isDeleting", isDeleting);
     if(!isDeleting) {
       this.props.toDetail(name, _id);
+      // this.props.dispatch({ type: 'project/toDetail'});
     }
   }
 
@@ -99,7 +79,7 @@ class FileSystem extends React.Component {
     return (
       <div>
         <div style={{marginBottom: 20}}>My Projects</div>
-        <ProjectModal record={{}} refresh={() => this.fetchData()} >
+        <ProjectModal record={{}}>
           <Button type="primary" style={{marginBottom: 20}}>新增项目</Button>
         </ProjectModal>
         <div className="cards">

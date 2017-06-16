@@ -2,6 +2,7 @@ import React from 'react';
 import Nteract from './nteract/';
 import Jupyter from './jupyter/';
 import Provider from './util/provider';
+import Immutable from 'immutable';
 
 import createStoreRx from './store';
 import {
@@ -84,9 +85,8 @@ export class Notebook extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    // let t = this.store.getState();
-    // console.log('state', this.state.results, prevState.results)
-    // console.log(prevState.notebook, this.state.notebook);
+    let order = this.state.notebook.get('cellOrder');
+    console.log("cell order", order, order.size, this.state.notebook);
     if(prevState.notebook === undefined){
       let source = `# this is the id of the project you are editting \n` +
         `project_id = "${this.props.project_id}" \n` +
