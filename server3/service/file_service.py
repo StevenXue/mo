@@ -86,4 +86,11 @@ def list_files_by_user_ID(user_ID):
 
 
 def remove_file_by_id(file_id):
+    file_obj = file_business.get_by_id(file_id)
+    uri = file_obj['uri']
+    remove_file_by_uri(uri)
     return file_business.remove_by_id(file_id)
+
+
+def remove_file_by_uri(uri):
+    os.remove(uri)
