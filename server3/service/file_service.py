@@ -13,6 +13,15 @@ UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
 
 def add_file(file, url_base, user_ID, is_private=True, description=''):
+    """
+    add file by all file attributes
+    :param file: file instance
+    :param url_base: url can use to fetch the file
+    :param user_ID: user_ID
+    :param is_private: true or false
+    :param description: description of file
+    :return:
+    """
     if not user_ID:
         raise ValueError('no user id or private input')
     # check user exists
@@ -35,6 +44,18 @@ def add_file(file, url_base, user_ID, is_private=True, description=''):
             return saved_file
     else:
         raise RuntimeError('file create failed')
+
+
+def remove_file_by_id(file_id):
+    """
+    remove file by id
+    :param file_id: object_id of file to remove
+    :return:
+    """
+    file_obj = file_business.get_by_id(file_id)
+    uri = file_obj['uri']
+    remove_file_by_uri(uri)
+    return file_business.remove_by_id(file_id)
 
 
 # def list_files_by_user(user):
@@ -85,12 +106,10 @@ def list_files_by_user_ID(user_ID):
     return public_files, owned_files
 
 
-def remove_file_by_id(file_id):
-    file_obj = file_business.get_by_id(file_id)
-    uri = file_obj['uri']
-    remove_file_by_uri(uri)
-    return file_business.remove_by_id(file_id)
-
-
 def remove_file_by_uri(uri):
+    """
+    remove file in directory
+    :param uri: file uri
+    :return:
+    """
     os.remove(uri)
