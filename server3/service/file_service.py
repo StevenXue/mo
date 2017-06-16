@@ -24,7 +24,7 @@ def add_file(file, url_base, user_ID, is_private=True, description=''):
     """
     if not user_ID:
         raise ValueError('no user id or private input')
-    # check user exists
+    # check user existence
     user = user_business.get_by_user_ID(user_ID)
     if not user:
         raise NameError('no user found')

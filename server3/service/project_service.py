@@ -4,6 +4,8 @@ from datetime import datetime
 from business import project_business
 from business import user_business
 from business import ownership_business
+from business import job_business
+from business import result_business
 from business import data_set_business
 from service import ownership_service
 
@@ -46,4 +48,14 @@ def list_projects_by_user_ID(user_ID):
 
 
 def remove_project_by_id(project_id):
+    """
+    remove project by its object_id
+    :param project_id: object_id of project to remove
+    :return:
+    """
+    project = project_business.get_by_id(project_id)
+    for job in project['jobs']:
+        job_business.remove_by_id(job['id'])
+    for result in project['results']:
+        result_business.remove_by_id(result['id'])
     return project_business.remove_by_id(project_id)

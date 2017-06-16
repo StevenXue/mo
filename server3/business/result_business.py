@@ -36,3 +36,7 @@ def get_result_by_id(result_id):
 
 def get_result_by_job(job_obj):
     return result_repo.read_by_job(job_obj)
+
+
+def remove_by_id(file_id):
+    return result_repo.delete_by_id(file_id)

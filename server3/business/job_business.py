@@ -74,3 +74,7 @@ def update_job(job_obj):
 
 def get_job_by_result(result_obj):
     return result_business.get_result_by_id(result_obj).job
+
+
+def remove_by_id(file_id):
+    return job_repo.delete_by_id(file_id)
