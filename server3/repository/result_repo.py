@@ -19,4 +19,4 @@ class ResultRepo(Repo):
         return Repo.read_unique_one(self, {'id': result_obj.id})
 
     def read_by_job(self, job_obj):
-        return Repo.read_unique_one(self, {'id': job_obj.id})
+        return Repo.read_unique_one(self, {'job': job_obj.id})

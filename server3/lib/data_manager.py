@@ -14,8 +14,8 @@ from utility import json_utility
 
 def find(query_str_in_mongodb_form, staging_data_set_id):
     data = staging_data_service.\
-        find_by_query_str(ObjectId(staging_data_set_id),
-                          **query_str_in_mongodb_form)
+        get_by_query_str(ObjectId(staging_data_set_id),
+                         **query_str_in_mongodb_form)
     return convert_staging_data_objects_to_json(data)
 
 

@@ -50,7 +50,7 @@ class Repo:
     def read_by_non_unique_field(self, field_name, field_value):
         """
         general function to query the db by non unique field, thus return a list
-        :param field_name:
+        :param field_name:str
         :param field_value:
         :return: a list of objects corresponding to the query
         """
@@ -59,8 +59,9 @@ class Repo:
     def read_by_non_unique_field_limit(self, field_name, field_value, limit):
         """
         general function to query the db by non unique field, thus return a list
-        :param field_name:
+        :param field_name:str
         :param field_value:
+        :param limit: int
         :return: a list of objects corresponding to the query
         """
         return Repo.read(self, {field_name: field_value}).limit(limit)

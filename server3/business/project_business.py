@@ -13,7 +13,6 @@
 from entity.project import Project
 # from repository import job_repo
 from repository.project_repo import ProjectRepo
-from business import job_business
 
 project_repo = ProjectRepo(Project)
 
@@ -55,10 +54,11 @@ def get_by_id(object_id):
 #     return project_repo.add_and_update_one_by_id(project_obj, {'result': result_obj})
 
 
-def add_job_and_result_to_project(result_obj, project_id):
-    job_obj = job_business.get_job_by_result(result_obj)
-    return project_repo.add_and_update_one_by_id(project_id, {'results': result_obj, 'jobs': job_obj})
-
-
 def remove_by_id(project_id):
     return project_repo.delete_by_id(project_id)
+
+
+def add_and_update_one_by_id(project_id, result_obj, job_obj):
+    return project_repo.add_and_update_one_by_id(project_id,
+                                                 {'results': result_obj,
+                                                  'jobs': job_obj})

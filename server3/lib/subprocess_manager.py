@@ -11,7 +11,7 @@
 
 import sys
 from bson.objectid import ObjectId
-
+from service import project_service
 from server.business import model_business, staging_data_set_business, job_business, result_business, project_business
 # from service import *
 
@@ -54,7 +54,8 @@ def add_training_result(project_id, job_obj, is_train=1, *args):
     job_business.update_job(job_obj)
 
     # update a project
-    project_business.add_job_and_result_to_project(result_obj, ObjectId(project_id))
+    project_service.add_job_and_result_to_project(result_obj, ObjectId(
+        project_id))
 
 
 def end_training_result(job_obj):

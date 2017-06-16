@@ -8,8 +8,3 @@ class FileRepo(Repo):
     def __init__(self, instance):
         Repo.__init__(self, instance)
 
-    def read_by_user(self, user_obj):
-        return Repo.read(self, {'user': user_obj})
-
-    # def delete_by_id(self, file_obj):
-    #     return Repo.delete_by_id(file_obj)

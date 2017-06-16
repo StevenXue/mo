@@ -12,7 +12,7 @@ from utility import json_utility
 # sys.setdefaultencoding('utf-8')  # 设置 'utf-8'
 
 
-def find_by_query_str(staging_data_set_id, **kwargs):
+def get_by_query_str(staging_data_set_id, **kwargs):
 
     # query_str = dict(query_str_in_mongodb_form)
     # query_str['staging_data_set'] = staging_data_set_id

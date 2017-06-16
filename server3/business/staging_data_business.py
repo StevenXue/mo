@@ -7,6 +7,13 @@ staging_data_repo = StagingDataRepo(StagingData)
 
 
 def get_fields_by_map_reduce(staging_data_set_id, mapper, reducer):
+    """
+    get fields of staging data by staging_data_set_id
+    :param staging_data_set_id: ObjectId
+    :param mapper: str
+    :param reducer: str
+    :return: list of staging data objects
+    """
     return StagingData.objects(
         staging_data_set=staging_data_set_id).\
         map_reduce(mapper, reducer, 'inline')
@@ -23,9 +30,11 @@ def remove_by_staging_data_set_id(staging_data_set_id):
     :param staging_data_set_id: ObjectId
     :return: None
     """
-    sd_objects = get_by_staging_data_set_id(staging_data_set_id)
-    for obj in sd_objects:
-        obj.delete()
+    staging_data_repo.delete_by_non_unique_field('staging_data_set',
+                                                 staging_data_set_id)
+    # sd_objects = get_by_staging_data_set_id(staging_data_set_id)
+    # for obj in sd_objects:
+    #     obj.delete()
 
 
 def add(staging_data_set, other_fields_obj):
