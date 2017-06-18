@@ -95,11 +95,11 @@ class JupyterNotebook extends React.Component {
   }
 
   componentDidMount() {
-    let defpath = this.props.notebookPath.path;
-    console.log(defpath);
-    let path = defpath.split("/");
-    console.log(path);
-    this.setState({name: path[path.length -1]});
+    // let defpath = this.props.notebookPath.path;
+    // console.log(defpath);
+    // let path = defpath.split("/");
+    // console.log(path);
+    // this.setState({name: path[path.length -1]});
     this.attachChannels()
   }
 
@@ -111,7 +111,8 @@ class JupyterNotebook extends React.Component {
 
   componentWillUnmount() {
     console.log('disconnect');
-    const baseUrl = 'http://localhost:8888'
+    //const baseUrl = 'http://localhost:8888'
+    const baseUrl = '10.52.14.182:8888'
     const domain = baseUrl.split('://').slice(1).join('://')
     const wsUrl = `ws://${domain}`
 
@@ -140,8 +141,8 @@ class JupyterNotebook extends React.Component {
 
   attachChannels () {
     // Prompt the user for the baseUrl and wsUrl
-    //const baseUrl = jupyterServer;
-    const baseUrl = 'http://localhost:8888'
+    //const baseUrl = 'http://localhost:8888'
+    const baseUrl = 'http://10.52.14.182:8888'
     const domain = baseUrl.split('://').slice(1).join('://')
     const wsUrl = `ws://${domain}`
 
@@ -202,8 +203,15 @@ class JupyterNotebook extends React.Component {
 
   }
 
+  formatNotebook(notebook) {
+      let cell_order = notebook.get('cellOrder');
+      // console.log(cell_order.size);
+      console.log(cell_order.get(0, null));
+
+  }
+
   renderResult() {
-    console.log(this.state.output);
+    //console.log(this.state.output);
     let outputs = this.state.output;
     if(outputs.length !== 0) {
       return (<Curve style={{height: '100%', width: '100%'}} dataString={this.state.output} />);
@@ -219,7 +227,7 @@ class JupyterNotebook extends React.Component {
           dispatch={this.dispatch}
           content={empty}
           ui={type}
-          //onClickSave={(notebook) => this.onClickSave(notebook)}
+          onReceiveData={(notebook) => this.formatNotebook(notebook)}
           channels={this.state.channels}
           forceSource={this.state.forceSource}
           result={(r) => this.getResult(r)}

@@ -55,7 +55,7 @@ class ProjectDetail extends React.Component {
         dataset_name: selectedRows[0].name,
         visible: false
       });
-      this.dataOp();
+      this.dataOp(selectedRows[0]._id);
     }
   }
 
@@ -75,9 +75,10 @@ class ProjectDetail extends React.Component {
     this.setState({to_disconnect: true});
   }
 
-  dataOp () {
+  dataOp(dataSetId) {
     // let dataSetId = this.props.project.selectedDSIds[0];
-    let dataSetId = this.props.project.selectedDSIds
+    //let dataSetId = this.props.project.selectedDSIds
+    //let dataSetId = this.state.selectedData;
     if (!dataSetId) {
       return
     }
