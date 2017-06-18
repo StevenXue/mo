@@ -80,13 +80,15 @@ def get_data_set():
     data_set_id = request.args.get('data_set_id')
     limit = request.args.get('limit')
     try:
-        data = data_business.get_by_data_set_limit(
-            ObjectId(data_set_id), int(limit))
+        data = data_business.get_by_data_set_limit(ObjectId(data_set_id),
+                                                   int(limit))
+        fields = data_service.get_fields_with_types(ObjectId(data_set_id))
+        fields = {e[0]: e[1] for e in fields}
         data = json_utility.me_obj_list_to_dict_list(data)
     except Exception as e:
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}), 400)
-    return make_response(jsonify({'response': data}),
+    return make_response(jsonify({'response': data, 'fields': fields}),
                          200)
 
 
