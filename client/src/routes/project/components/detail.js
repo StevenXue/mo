@@ -75,7 +75,7 @@ class ProjectDetail extends React.Component {
     this.setState({to_disconnect: true});
   }
 
-  dataOp (dataSetId) {
+  dataOp(dataSetId) {
     // let dataSetId = this.props.project.selectedDSIds[0];
     // let dataSetId = this.props.project.selectedDSIds
     // if (!dataSetId) {
