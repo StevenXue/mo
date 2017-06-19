@@ -95,11 +95,11 @@ class JupyterNotebook extends React.Component {
   }
 
   componentDidMount() {
-    let defpath = this.props.notebookPath.path;
-    console.log(defpath);
-    let path = defpath.split("/");
-    console.log(path);
-    this.setState({name: path[path.length -1]});
+    // let defpath = this.props.notebookPath.path;
+    // console.log(defpath);
+    // let path = defpath.split("/");
+    // console.log(path);
+    // this.setState({name: path[path.length -1]});
     this.attachChannels()
   }
 
@@ -111,7 +111,8 @@ class JupyterNotebook extends React.Component {
 
   componentWillUnmount() {
     console.log('disconnect');
-    const baseUrl = 'http://localhost:8888'
+    // const baseUrl = 'http://localhost:8888'
+    const baseUrl = 'http://10.52.14.182:8888'
     const domain = baseUrl.split('://').slice(1).join('://')
     const wsUrl = `ws://${domain}`
 
@@ -141,7 +142,8 @@ class JupyterNotebook extends React.Component {
   attachChannels () {
     // Prompt the user for the baseUrl and wsUrl
     //const baseUrl = jupyterServer;
-    const baseUrl = 'http://localhost:8888'
+    // const baseUrl = 'http://localhost:8888'
+    const baseUrl = 'http://10.52.14.182:8888'
     const domain = baseUrl.split('://').slice(1).join('://')
     const wsUrl = `ws://${domain}`
 

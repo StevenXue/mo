@@ -55,7 +55,7 @@ class ProjectDetail extends React.Component {
         dataset_name: selectedRows[0].name,
         visible: false
       });
-      this.dataOp();
+      this.dataOp(selectedRows[0]._id);
     }
   }
 
@@ -75,9 +75,9 @@ class ProjectDetail extends React.Component {
     this.setState({to_disconnect: true});
   }
 
-  dataOp () {
+  dataOp (dataSetId) {
     // let dataSetId = this.props.project.selectedDSIds[0];
-    let dataSetId = this.props.project.selectedDSIds
+    // let dataSetId = this.props.project.selectedDSIds
     if (!dataSetId) {
       return
     }
@@ -158,23 +158,24 @@ class ProjectDetail extends React.Component {
   }
 
   startNotebook() {
-    fetch(jupyterServer + this.props.project.user.user_ID + "/" + this.state.projectName, {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          'type': "notebook"
-        }),
-      },
-    ).then((response) => response.json())
-      .then((res) => {
-        console.log(res);
-        this.setState({
-          notebookPath: res,
-          start_notebook: true
-        });
-      });
+    // fetch(jupyterServer + this.props.project.user.user_ID + "/" + this.state.projectName, {
+    //     method: 'post',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({
+    //       'type': "notebook"
+    //     }),
+    //   },
+    // ).then((response) => response.json())
+    //   .then((res) => {
+    //     console.log(res);
+    //     this.setState({
+    //       notebookPath: res,
+    //       start_notebook: true
+    //     });
+    //   });
+    this.setState({start_notebook: true});
   }
 
   renderOptions (key) {
