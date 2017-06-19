@@ -91,10 +91,11 @@ class ProjectDetail extends React.Component {
       .then((res) => {
         let values = {}
         console.log('/data/get_data_set?data_set_id='+dataSetId, res.response)
-        Object.keys(res.response[0]).forEach((e) => values[e] = 'str')
+        Object.keys(res.fields).forEach((e) => values[e] = 'str')
         this.setState({
           dataSet: res.response,
-          values
+          values,
+          fields: res.fields
         })
       })
       .catch((err) => console.log('Error: /data/get_data_set', err))
@@ -192,13 +193,13 @@ class ProjectDetail extends React.Component {
 
   render () {
     //const JupyterNotebook =  require('./jupyterNotebook');
-    // FIXME
     let dsColumns
     if(this.state.dataSet.length > 0) {
+      console.log('fields', this.state.fields)
       dsColumns = Object.keys(this.state.dataSet[0])
         .filter((el) => el !== 'data_set')
         .map((e) => ({
-        title: e,
+            title: <div>{e}<br/>{this.state.fields[e]}</div>,
         dataIndex: e,
         key: e,
         filterDropdown: (

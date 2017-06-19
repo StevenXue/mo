@@ -55,4 +55,4 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
 
 
 def get_job_from_result(result_obj):
-    return result_business.get_result_by_id(result_obj).job
+    return result_business.get_result_by_id(result_obj['id']).job

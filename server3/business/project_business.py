@@ -59,6 +59,6 @@ def remove_by_id(project_id):
 
 
 def add_and_update_one_by_id(project_id, result_obj, job_obj):
-    return project_repo.add_and_update_one_by_id(project_id,
-                                                 {'results': result_obj,
+    return project_repo.insert_to_list_fields_by_id(project_id,
+                                                    {'results': result_obj,
                                                   'jobs': job_obj})

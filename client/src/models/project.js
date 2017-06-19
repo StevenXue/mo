@@ -118,6 +118,7 @@ export default {
     },
 
     selectDataSets (state, action) {
+      console.log('action', action)
       return { ...state, ...action.payload }
     },
 
