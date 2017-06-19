@@ -1,3 +1,5 @@
+import CONSTANT from '../constants'
+
 module.exports = {
   name: "Golder's Green",
   prefix: 'antdAdmin',
@@ -6,10 +8,11 @@ module.exports = {
   iconFontCSS: '/iconfont.css',
   iconFontJS: '/iconfont.js',
   baseURL: 'http://localhost:8000/api/v1',
-  CORS: ['http://localhost:5000'],
-  // CORS: ['http://10.52.14.182:5000'],
+  YQL: ['http://www.zuimeitianqi.com'],
+  CORS: [CONSTANT.flaskServer],
   openPages: ['/login'],
   apiPrefix: '/api/v1',
+  jupyterServer: CONSTANT.jupyterServer,
   api: {
     userLogin: '/user/login',
     refreshToken: '/refresh_token',
