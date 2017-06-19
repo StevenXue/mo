@@ -56,7 +56,7 @@ class ProjectDetail extends React.Component {
         dataset_name: selectedRows[0].name,
         visible: false
       });
-      this.dataOp();
+      this.dataOp(selectedRows[0]._id);
     }
   }
 
