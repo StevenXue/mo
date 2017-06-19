@@ -7,6 +7,7 @@ import lodash from 'lodash';
 import { Router , routerRedux} from 'dva/router';
 import './FileSystem.css';
 import ProjectModal from './ProjectModal';
+import { showTime } from '../../../utils/time';
 import { jupyterServer, flaskServer } from '../../../constants';
 
 const TabPane = Tabs.TabPane;
@@ -69,7 +70,7 @@ class FileSystem extends React.Component {
       } style={{ width: 500 }}>
         <div onClick={() => this.toProjectDetail(e.name, e._id, false)} style={{cursor: 'pointer'}}>
           <p>描述: {e.description}</p>
-          <p>创建时间: {e.create_time}</p>
+          <p>创建时间: {showTime(e.create_time)}</p>
         </div>
       </Card>)
   }
