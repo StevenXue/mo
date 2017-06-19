@@ -58,8 +58,7 @@ class FileSystem extends React.Component {
   }
 
   renderCards(key){
-    let projects = this.props.project.projects[key];
-    let cards =projects.reverse();
+    let cards = this.props.project.projects[key];
     return cards.map((e) =>
       <Card key={e.name} title={e.name} extra={
         <a>
