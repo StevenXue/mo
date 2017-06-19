@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import { jupyterServer } from '../../../constants'
 import empty from './empty.ipynb';
-import { Affix, Button } from 'antd';
+import { Button } from 'antd';
 
 import { Notebook, createStore} from '../../../notebook/src/';
 import { setNotebook, recordResults, save, saveAs} from '../../../notebook/src/actions';
@@ -179,7 +179,7 @@ class JupyterNotebook extends React.Component {
     this.reader = new FileReader()
     this.reader.addEventListener('loadend', () => {
       console.log(this.reader.result);
-      this.dispatch(setNotebook(JSON.parse(this.reader.result)))
+      this.dispatch(setNotebook(JSON.parse(this.reader.result)));
     })
   }
 
@@ -188,7 +188,7 @@ class JupyterNotebook extends React.Component {
 
     if (input.files[0]) {
       this.reader.readAsText(input.files[0])
-      console.log(input.files[0])
+      // console.log(input.files[0])
       this.setState({ fileName: input.files[0].name });
     }
   }
@@ -201,13 +201,6 @@ class JupyterNotebook extends React.Component {
 
   onClickSave(notebook) {
     //this.dispatch(saveAs(this.state.fileName + '.ipynb', empty))
-
-  }
-
-  formatNotebook(notebook) {
-      let cell_order = notebook.get('cellOrder');
-      // console.log(cell_order.size);
-      console.log(cell_order.get(0, null));
 
   }
 
@@ -228,7 +221,7 @@ class JupyterNotebook extends React.Component {
           dispatch={this.dispatch}
           content={empty}
           ui={type}
-          onReceiveData={(notebook) => this.formatNotebook(notebook)}
+          //onClickSave={(notebook) => this.onClickSave(notebook)}
           channels={this.state.channels}
           forceSource={this.state.forceSource}
           result={(r) => this.getResult(r)}
@@ -289,7 +282,7 @@ JupyterNotebook.propTypes = {
   project_id: PropTypes.string,
   dataset_id: PropTypes.string,
   dataset_name: PropTypes.string,
-  notebookPath: PropTypes.object
+  // notebookPath: PropTypes.object
 }
 
 export default JupyterNotebook

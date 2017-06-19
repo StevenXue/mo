@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import { Button, Select, Icon, message, Modal, Table, Radio, Collapse, Input} from 'antd';
 const Panel = Collapse.Panel;
+
 import { jupyterServer, flaskServer } from '../../../constants'
 import { Router, routerRedux } from 'dva/router'
 import Toolkits from './toolkits'
@@ -55,7 +56,7 @@ class ProjectDetail extends React.Component {
         dataset_name: selectedRows[0].name,
         visible: false
       });
-      this.dataOp(selectedRows[0]._id);
+      this.dataOp();
     }
   }
 
@@ -74,6 +75,7 @@ class ProjectDetail extends React.Component {
     console.log('disconnect');
     this.setState({to_disconnect: true});
   }
+
 
   dataOp (dataSetId) {
     // let dataSetId = this.props.project.selectedDSIds[0];
@@ -286,7 +288,8 @@ class ProjectDetail extends React.Component {
           </Button>
           <div id="notebookSection" >
           { this.state.start_notebook &&
-          <JupyterNotebook notebookPath={this.state.notebookPath}
+          <JupyterNotebook
+            //notebookPath={this.state.notebookPath}
                            project_id={this.state.project_id}
                            dataset_name={this.state.dataset_name}
                            dataset_id={this.state.selectedData}

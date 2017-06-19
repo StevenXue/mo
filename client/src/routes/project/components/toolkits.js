@@ -250,7 +250,7 @@ export default class ProjectDetail extends React.Component {
       case  0:
         return(
           <div style={{marginTop: 10, marginLeft: 5, width: '25%'}}>
-            <Select key="toolkit" style={{ width: '100%' }} onChange={(e) => this.handleChange(e)}
+            <Select className="toolkit" style={{ width: '100%' }} onChange={(e) => this.handleChange(e)}
                          placeholder="Choose Toolkit Type" allowClear>
               {this.renderOptions()}
             </Select>
@@ -260,8 +260,8 @@ export default class ProjectDetail extends React.Component {
       case 1:
         return (
           <div style={{marginTop: 10, marginLeft: '40%', width: '25%'}}>
-            <Select key="dataset-select" style={{ width: '100%', marginTop: 10 }} onChange={(values) => this.onSelectDataSet(values)}
-                    // value={this.state.selectedData}
+            <Select className="dataset-select" style={{ width: '100%', marginTop: 10 }} onChange={(values) => this.onSelectDataSet(values)}
+                    value={this.state.selectedData}
                     placeholder="Choose DataSet" allowClear>
               {/*{this.renderOptionsData()}*/}
               {
@@ -319,7 +319,7 @@ export default class ProjectDetail extends React.Component {
           {
             this.state.current === this.steps.length - 1
             &&
-            <Button style={{ marginTop: 10 }} type="primary" onClick={() => this.setState({current: 0, resultJson: {}})}>Done</Button>
+            <Button style={{ marginTop: 10 }} type="primary" onClick={() => this.setState({current: 0})}>Done</Button>
           }
           {
             this.state.current > 0
