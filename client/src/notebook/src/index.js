@@ -82,11 +82,15 @@ export class Notebook extends React.Component {
     this.setState({
       forceSource: nextProps.forceSource
     });
+    if(this.props.toOutput ===false && nextProps.toOutput === true){
+      console.log("save triggered");
+      this.props.saveTrigger(this.state.notebook);
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
     let order = this.state.notebook.get('cellOrder');
-    console.log("cell order", order, order.size, this.state.notebook);
+    //console.log("cell order", order, order.size, this.state.notebook);
     if(prevState.notebook === undefined){
       let source = `# this is the id of the project you are editting \n` +
         `project_id = "${this.props.project_id}" \n` +
@@ -107,6 +111,7 @@ export class Notebook extends React.Component {
     if (this.state.results !== prevState.results) {
       this.props.result(this.state.results);
     }
+
   }
 
   render() {
@@ -142,6 +147,8 @@ Notebook.propTypes = {
   channels: React.PropTypes.object,
   forceSource: React.PropTypes.string,
   result: React.PropTypes.func,
+  toOutput: React.PropTypes.bool,
+  saveTrigger: React.PropTypes.func
 };
 
 export default Notebook;

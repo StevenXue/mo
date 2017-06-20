@@ -19,50 +19,6 @@ import 'material-design-icons/iconfont/material-icons.css'
 import '../../../notebook/src/toolbar/styles/base.less'
 import './codemirror.css'
 
-
-let notebookJSON = {
-  "cells": [],
-  "metadata": {
-    "kernelspec": {
-      "display_name": "Python 3",
-      "language": "python",
-      "name": "python3"
-    },
-    "language_info": {
-      "codemirror_mode": {
-        "name": "ipython",
-        "version": 3.0
-      },
-      "file_extension": ".py",
-      "mimetype": "text/x-python",
-      "name": "python",
-      "nbconvert_exporter": "python",
-      "pygments_lexer": "ipython3",
-      "version": "3.6.1"
-    }
-  },
-  "nbformat": 4,
-  "nbformat_minor": 2
-};
-
-let cell_prototype = {
-  "cell_type": "code",
-  "execution_count": 0,
-  "metadata": {},
-  "outputs": [
-    {
-      "name": "stdout",
-      "output_type": "stream",
-      "text": [
-
-      ]
-    }
-  ],
-  "source": [
-
-  ]
-};
-
 class JupyterNotebook extends React.Component {
   constructor (props) {
     super(props)
@@ -84,7 +40,8 @@ class JupyterNotebook extends React.Component {
       forceSource: '',
       fileName: 'empty',
       output: [],
-      kernalId: ''
+      kernalId: '',
+      getOutput: false
     };
 
     //this.store.subscribe(state => this.setState(state));
@@ -110,7 +67,6 @@ class JupyterNotebook extends React.Component {
   }
 
   componentWillUnmount() {
-    console.log('disconnect');
     //const baseUrl = 'http://localhost:8888'
     // const baseUrl = 'http://10.52.14.182:8888'
     const domain = baseUrl.split('://').slice(1).join('://')
@@ -123,8 +79,7 @@ class JupyterNotebook extends React.Component {
     };
 
     enchannelBackend.shutdown(_connectionOptions, this.state.kernalId).then((r) => {
-      console.info(r) // eslint-disable-line
-      //return id
+
     });
 
 
@@ -199,9 +154,80 @@ class JupyterNotebook extends React.Component {
     });
   }
 
-  onClickSave(notebook) {
-    //this.dispatch(saveAs(this.state.fileName + '.ipynb', empty))
+  onClickSave() {
+    this.setState({
+      getOutput: true
+    });
+  }
 
+  saveTrigger(notebook){
+    let ntb = notebook;
+    console.log("notebook", ntb.toJS());
+    let nbData = ntb.toJS();
+    delete nbData.cellOrder;
+    let keys = Object.keys(nbData.cellMap);
+    let cells = keys.map((e) => {
+      return nbData.cellMap[e];
+    });
+    nbData.cells = cells;
+
+    if(this.state.fileName === 'empty') {
+      fetch(jupyterServer + this.props.user_id + "/" + this.props.project_name, {
+          method: 'post',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            'type': "notebook"
+          }),
+        },
+      ).then((response) => response.json())
+        .then((res) => {
+          console.log(res);
+          if (res.path) {
+            let p = res.path.split("/");
+            this.setState({
+              fileName: p[p.length - 1]
+            });
+            delete nbData.cellMap;
+            fetch(jupyterServer + res.path, {
+                method: 'put',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  'content': nbData,
+                  'type': "notebook"
+                }),
+              },
+            ).then((response) => {
+              if (response.status === 200) {
+                this.setState({
+                  getOutput: false
+                });
+              }
+            })
+          }
+        });
+    }else{
+      fetch(jupyterServer + this.props.user_id + "/" + this.props.project_name + "/" + this.state.fileName, {
+          method: 'put',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            'content': nbData,
+            'type': "notebook"
+          }),
+        },
+      ).then((response) => {
+        if (response.status === 200) {
+          this.setState({
+            getOutput: false
+          });
+        }
+      })
+    }
   }
 
   renderResult() {
@@ -221,13 +247,14 @@ class JupyterNotebook extends React.Component {
           dispatch={this.dispatch}
           content={empty}
           ui={type}
-          //onClickSave={(notebook) => this.onClickSave(notebook)}
           channels={this.state.channels}
           forceSource={this.state.forceSource}
           result={(r) => this.getResult(r)}
+          saveTrigger={(notebook) => this.saveTrigger(notebook)}
           project_id={this.props.project_id}
           dataset_id={this.props.dataset_id}
           dataset_name={this.props.dataset_name}
+          toOutput={this.state.getOutput}
         />
 
       )
@@ -282,7 +309,8 @@ JupyterNotebook.propTypes = {
   project_id: PropTypes.string,
   dataset_id: PropTypes.string,
   dataset_name: PropTypes.string,
-  // notebookPath: PropTypes.object
+  user_id: PropTypes.string,
+  project_name: PropTypes.string
 }
 
 export default JupyterNotebook

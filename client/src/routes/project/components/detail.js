@@ -161,23 +161,6 @@ class ProjectDetail extends React.Component {
   }
 
   startNotebook() {
-    // fetch(jupyterServer + this.props.project.user.user_ID + "/" + this.state.projectName, {
-    //     method: 'post',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //       'type': "notebook"
-    //     }),
-    //   },
-    // ).then((response) => response.json())
-    //   .then((res) => {
-    //     console.log(res);
-    //     this.setState({
-    //       notebookPath: res,
-    //       start_notebook: true
-    //     });
-    //   });
     this.setState({start_notebook: true});
   }
 
@@ -288,8 +271,8 @@ class ProjectDetail extends React.Component {
           </Button>
           <div id="notebookSection" >
           { this.state.start_notebook &&
-          <JupyterNotebook
-            //notebookPath={this.state.notebookPath}
+          <JupyterNotebook user_id={this.props.project.user.user_ID}
+                           project_name={this.state.projectName}
                            project_id={this.state.project_id}
                            dataset_name={this.state.dataset_name}
                            dataset_id={this.state.selectedData}
