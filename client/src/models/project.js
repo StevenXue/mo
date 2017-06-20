@@ -22,7 +22,6 @@ export default {
 
   effects: {
     *query ({ payload }, { call, put, select }) {
-      console.log('query')
       const user = yield select(state => state['app'].user)
       yield put({
         type: 'querySuccess',

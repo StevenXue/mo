@@ -7,6 +7,7 @@ import lodash from 'lodash'
 import { Router, routerRedux } from 'dva/router'
 import './FileSystem.css'
 import FileModal from './FileModal'
+import { showTime } from '../../../utils/time';
 import { jupyterServer, flaskServer } from '../../../constants'
 import ImportPanel from './ImportPanel'
 
@@ -96,7 +97,7 @@ class FileSystem extends React.Component {
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <div style={{width: 400}}>
             <p>Path: {e.uri.replace(/..\/user_directory\//, '')}</p>
-            <p>Upload Time: {e.upload_time}</p>
+            <p>Upload Time: {showTime(e.upload_time)}</p>
           </div>
           <Button type="primary" style={{ display: button === i ? 'inline':'none' }}
           onClick={() => this.showImportPanel(e)}
