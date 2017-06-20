@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import { jupyterServer, baseUrl} from '../../../constants'
 import empty from './empty.ipynb';
-import { Button } from 'antd';
+import { Button, message} from 'antd';
 
 import { Notebook, createStore} from '../../../notebook/src/';
 import { setNotebook, recordResults, save, saveAs} from '../../../notebook/src/actions';
@@ -18,50 +18,6 @@ import 'normalize.css/normalize.css'
 import 'material-design-icons/iconfont/material-icons.css'
 import '../../../notebook/src/toolbar/styles/base.less'
 import './codemirror.css'
-
-
-let notebookJSON = {
-  "cells": [],
-  "metadata": {
-    "kernelspec": {
-      "display_name": "Python 3",
-      "language": "python",
-      "name": "python3"
-    },
-    "language_info": {
-      "codemirror_mode": {
-        "name": "ipython",
-        "version": 3.0
-      },
-      "file_extension": ".py",
-      "mimetype": "text/x-python",
-      "name": "python",
-      "nbconvert_exporter": "python",
-      "pygments_lexer": "ipython3",
-      "version": "3.6.1"
-    }
-  },
-  "nbformat": 4,
-  "nbformat_minor": 2
-};
-
-let cell_prototype = {
-  "cell_type": "code",
-  "execution_count": 0,
-  "metadata": {},
-  "outputs": [
-    {
-      "name": "stdout",
-      "output_type": "stream",
-      "text": [
-
-      ]
-    }
-  ],
-  "source": [
-
-  ]
-};
 
 class JupyterNotebook extends React.Component {
   constructor (props) {
@@ -84,7 +40,9 @@ class JupyterNotebook extends React.Component {
       forceSource: '',
       fileName: 'empty',
       output: [],
-      kernalId: ''
+      kernalId: '',
+      getOutput: false,
+      spawned: false,
     };
 
     //this.store.subscribe(state => this.setState(state));
@@ -110,7 +68,6 @@ class JupyterNotebook extends React.Component {
   }
 
   componentWillUnmount() {
-    console.log('disconnect');
     //const baseUrl = 'http://localhost:8888'
     // const baseUrl = 'http://10.52.14.182:8888'
     const domain = baseUrl.split('://').slice(1).join('://')
@@ -123,8 +80,7 @@ class JupyterNotebook extends React.Component {
     };
 
     enchannelBackend.shutdown(_connectionOptions, this.state.kernalId).then((r) => {
-      console.info(r) // eslint-disable-line
-      //return id
+
     });
 
 
@@ -178,7 +134,7 @@ class JupyterNotebook extends React.Component {
   createFileReader () {
     this.reader = new FileReader()
     this.reader.addEventListener('loadend', () => {
-      console.log(this.reader.result);
+      //console.log(this.reader.result);
       this.dispatch(setNotebook(JSON.parse(this.reader.result)));
     })
   }
@@ -189,7 +145,8 @@ class JupyterNotebook extends React.Component {
     if (input.files[0]) {
       this.reader.readAsText(input.files[0])
       // console.log(input.files[0])
-      this.setState({ fileName: input.files[0].name });
+      let temp = input.files[0].name.split(".");
+      this.setState({ fileName: temp[0]});
     }
   }
 
@@ -199,9 +156,86 @@ class JupyterNotebook extends React.Component {
     });
   }
 
-  onClickSave(notebook) {
-    //this.dispatch(saveAs(this.state.fileName + '.ipynb', empty))
+  onClickSave() {
+    this.setState({
+      getOutput: true
+    });
+  }
 
+  onRenameNotebook(e) {
+    this.setState({fileName: e.target.value});
+  }
+
+  saveTrigger(notebook){
+    let ntb = notebook;
+    console.log("notebook", ntb.toJS());
+    let nbData = ntb.toJS();
+    delete nbData.cellOrder;
+    let keys = Object.keys(nbData.cellMap);
+    let cells = keys.map((e) => {
+      return nbData.cellMap[e];
+    });
+    nbData.cells = cells;
+
+    if(this.state.fileName === 'empty') {
+      fetch(jupyterServer + this.props.user_id + "/" + this.props.project_name, {
+          method: 'post',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            'type': "notebook"
+          }),
+        },
+      ).then((response) => response.json())
+        .then((res) => {
+          console.log(res);
+          if (res.path) {
+            let p = res.path.split("/");
+            this.setState({
+              fileName: p[p.length - 1]
+            });
+            delete nbData.cellMap;
+            fetch(jupyterServer + res.path, {
+                method: 'put',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  'content': nbData,
+                  'type': "notebook"
+                }),
+              },
+            ).then((response) => {
+              if (response.status === 200) {
+                this.setState({
+                  getOutput: false
+                });
+                message.success('successfully saved')
+              }
+            })
+          }
+        });
+    }else{
+      fetch(jupyterServer + this.props.user_id + "/" + this.props.project_name + "/" + this.state.fileName + ".ipynb", {
+          method: 'put',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            'content': nbData,
+            'type': "notebook"
+          }),
+        },
+      ).then((response) => {
+        if (response.status === 200) {
+          this.setState({
+            getOutput: false
+          });
+          message.success('successfully saved')
+        }
+      })
+    }
   }
 
   renderResult() {
@@ -221,13 +255,14 @@ class JupyterNotebook extends React.Component {
           dispatch={this.dispatch}
           content={empty}
           ui={type}
-          //onClickSave={(notebook) => this.onClickSave(notebook)}
           channels={this.state.channels}
           forceSource={this.state.forceSource}
           result={(r) => this.getResult(r)}
+          saveTrigger={(notebook) => this.saveTrigger(notebook)}
           project_id={this.props.project_id}
           dataset_id={this.props.dataset_id}
           dataset_name={this.props.dataset_name}
+          toOutput={this.state.getOutput}
         />
 
       )
@@ -242,10 +277,10 @@ class JupyterNotebook extends React.Component {
         <a className={style.file}>选择文件
           <input type="file" name="ipynb-file" ref="ipynb-file" id="ipynb-file" onChange={this.handleFileChange} />
         </a>
-        <span style={{ marginLeft: 10 }}>
-          <input value={this.state.fileName}
-                 style={{border: 'none'}}
-                  onChange={(e) => this.onRenameNotebook(e)}/>
+        <span style={{ marginLeft: 10 }}> {this.state.fileName}
+          {/*<input value={this.state.fileName}*/}
+                 {/*style={{border: 'none'}}*/}
+                  {/*onChange={(e) => this.onRenameNotebook(e)}/>*/}
         </span>
       </div>
     )
@@ -282,7 +317,8 @@ JupyterNotebook.propTypes = {
   project_id: PropTypes.string,
   dataset_id: PropTypes.string,
   dataset_name: PropTypes.string,
-  // notebookPath: PropTypes.object
+  user_id: PropTypes.string,
+  project_name: PropTypes.string
 }
 
 export default JupyterNotebook
