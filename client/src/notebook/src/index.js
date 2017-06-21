@@ -108,9 +108,9 @@ export class Notebook extends React.Component {
       this.dispatch(createCellAfter('code', id));
     }
 
-    if (this.state.results !== prevState.results) {
-      this.props.result(this.state.results);
-    }
+    // if (this.state.results !== prevState.results) {
+    //   this.props.result(this.state.results);
+    // }
 
   }
 
