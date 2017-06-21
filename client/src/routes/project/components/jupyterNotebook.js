@@ -182,7 +182,7 @@ class JupyterNotebook extends React.Component {
     });
     nbData.cells = cells;
 
-    if(this.state.fileName === 'empty') {
+    if(this.props.spawn_new) {
       fetch(jupyterServer + this.props.user_id + "/" + this.props.project_name, {
           method: 'post',
           headers: {
@@ -281,9 +281,9 @@ class JupyterNotebook extends React.Component {
   renderInputForm () {
     return (
       <div style={{ marginTop: 10 }}>
-        {/*<a className={style.file}>选择文件*/}
-          {/*<input type="file" name="ipynb-file" ref="ipynb-file" id="ipynb-file" onChange={this.handleFileChange} />*/}
-        {/*</a>*/}
+        <a className={style.file}>选择文件
+          <input type="file" name="ipynb-file" ref="ipynb-file" id="ipynb-file" onChange={this.handleFileChange} />
+        </a>
         <span style={{ marginLeft: 10 }}> {this.state.fileName}
           {/*<input value={this.state.fileName}*/}
                  {/*style={{border: 'none'}}*/}

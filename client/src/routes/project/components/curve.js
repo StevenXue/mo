@@ -17,7 +17,9 @@ export default class LearningCurve extends React.Component{
       trainData: [],
       testData: [],
       trainLoss: [],
-      testLoss: []
+      testLoss: [],
+      render: false,
+      update: false
     }
   }
 
@@ -34,14 +36,42 @@ export default class LearningCurve extends React.Component{
       this.setState({
           data: nextProps.dataString,
       });
+
       let outputs = nextProps.dataString;
+      if(outputs.indexOf('start_animation') !== -1) {
+        this.setState({render: true, update:true});
+        if(outputs.length !== 1) {
+          outputs.splice(0, 1);
+          this.updateChart(outputs);
+        }
+      }else if(outputs.indexOf('stop_animation') === 0){
+        this.setState({update: false});
+      }else if(outputs.indexOf('stop_animation') === outputs.length-1){
+        console.log(outputs)
+        outputs.splice(outputs.length-1, 1);
+        console.log(outputs);
+        this.updateChart(outputs);
+        this.setState({update: false});
+      }
+
+      this.updateChart(outputs);
+
+  }
+
+  componentDidUpdate() {
+
+  }
+
+  updateChart(outputs){
+    console.log(outputs);
+    if(this.state.render === true && this.state.update === true) {
       let teststep = this.state.testStep;
       let testdata = this.state.testData;
       let testLoss = this.state.testLoss;
       let trainstep = this.state.trainStep;
       let traindata = this.state.trainData;
       let trainLoss = this.state.trainLoss
-      for ( let i = 0; i < outputs.length; i++) {
+      for (let i = 0; i < outputs.length; i++) {
         let line = outputs[i];
         let c = line.split(" ");
         //console.log(c[0]);
@@ -56,8 +86,8 @@ export default class LearningCurve extends React.Component{
           let u = c[3].split(":");
           testLoss.push(parseFloat(u[1]));
           this.setState({testLoss: testLoss});
-        }else{
-          if(c[0] !== 'Extracting' && c[0] !== 'max' && c[0] !=='using') {
+        } else {
+          if (c[0] !== 'Extracting' && c[0] !== 'max' && c[0] !== 'using') {
             let p = c[0].split(":")
             trainstep.push(parseInt(p[0]));
             this.setState({trainStep: trainstep});
@@ -69,10 +99,7 @@ export default class LearningCurve extends React.Component{
           }
         }
       }
-  }
-
-  componentDidUpdate() {
-
+    }
   }
 
   getOptionAccuracy() {
@@ -240,16 +267,27 @@ export default class LearningCurve extends React.Component{
     return options;
   }
 
+  renderCharts(){
+    if(this.state.render === true){
+      //console.log("render");
+      return(<div>
+        <ReactEcharts
+          option={this.getOptionAccuracy()}
+        />
+        <ReactEcharts
+          option={this.getOptionLoss()}
+        />
+      </div>
+      )}
+  }
+
 
   render(){
     return(
       <div >
-        <ReactEcharts
-          option={this.getOptionAccuracy()}
-          />
-        <ReactEcharts
-          option={this.getOptionLoss()}
-        />
+        {
+          this.renderCharts()
+        }
       </div>
     );
   }
