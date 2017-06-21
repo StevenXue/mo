@@ -38,7 +38,7 @@ class JupyterNotebook extends React.Component {
     this.state = {
       channels: null,
       forceSource: '',
-      fileName: 'empty',
+      fileName: this.props.notebook_name,
       output: [],
       kernalId: '',
       getOutput: false,
@@ -50,6 +50,7 @@ class JupyterNotebook extends React.Component {
   }
 
   componentWillMount() {
+    console.log(this.props.notebook_name)
   }
 
   componentDidMount() {
@@ -59,9 +60,13 @@ class JupyterNotebook extends React.Component {
     // console.log(path);
     // this.setState({name: path[path.length -1]});
     this.attachChannels()
+    console.log(this.props.notebook_content);
   }
 
   componentWillReceiveProps(nextProps) {
+    if(this.props.notebook_name !== nextProps.notebook_name) {
+      this.setState({fileName: nextProps.notebook_name});
+    }
   }
 
   componentDidUpdate() {
@@ -217,7 +222,7 @@ class JupyterNotebook extends React.Component {
           }
         });
     }else{
-      fetch(jupyterServer + this.props.user_id + "/" + this.props.project_name + "/" + this.state.fileName + ".ipynb", {
+      fetch(jupyterServer + this.props.user_id + "/" + this.props.project_name + "/" + this.state.fileName, {
           method: 'put',
           headers: {
             'Content-Type': 'application/json',
@@ -253,7 +258,8 @@ class JupyterNotebook extends React.Component {
         <Notebook
           store={this.store}
           dispatch={this.dispatch}
-          content={empty}
+          content={this.props.notebook_content}
+          spawn_new={this.props.spawn_new}
           ui={type}
           channels={this.state.channels}
           forceSource={this.state.forceSource}
@@ -274,9 +280,9 @@ class JupyterNotebook extends React.Component {
   renderInputForm () {
     return (
       <div style={{ marginTop: 10 }}>
-        <a className={style.file}>选择文件
-          <input type="file" name="ipynb-file" ref="ipynb-file" id="ipynb-file" onChange={this.handleFileChange} />
-        </a>
+        {/*<a className={style.file}>选择文件*/}
+          {/*<input type="file" name="ipynb-file" ref="ipynb-file" id="ipynb-file" onChange={this.handleFileChange} />*/}
+        {/*</a>*/}
         <span style={{ marginLeft: 10 }}> {this.state.fileName}
           {/*<input value={this.state.fileName}*/}
                  {/*style={{border: 'none'}}*/}
@@ -318,7 +324,10 @@ JupyterNotebook.propTypes = {
   dataset_id: PropTypes.string,
   dataset_name: PropTypes.string,
   user_id: PropTypes.string,
-  project_name: PropTypes.string
+  project_name: PropTypes.string,
+  notebook_content: PropTypes.any,
+  spawn_new: PropTypes.bool,
+  notebook_name: PropTypes.string
 }
 
 export default JupyterNotebook

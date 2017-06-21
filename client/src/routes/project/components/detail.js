@@ -4,6 +4,8 @@ import { connect } from 'dva'
 import { Button, Select, Icon, message, Modal, Table, Radio, Collapse, Input} from 'antd';
 const Panel = Collapse.Panel;
 
+import empty from './empty.ipynb';
+
 import { jupyterServer, flaskServer } from '../../../constants'
 import { Router, routerRedux } from 'dva/router'
 import Toolkits from './toolkits'
@@ -14,6 +16,24 @@ import 'codemirror/theme/monokai.css'
 
 const { Option, OptGroup } = Select
 const RadioGroup = Radio.Group;
+
+let hasOwnProperty = Object.prototype.hasOwnProperty;
+
+function isEmpty(obj) {
+
+  if (obj == null) return true;
+
+  if (obj.length > 0)    return false;
+  if (obj.length === 0)  return true;
+
+  if (typeof obj !== "object") return true;
+
+  for (let key in obj) {
+    if (hasOwnProperty.call(obj, key)) return false;
+  }
+
+  return true;
+}
 
 const columns = [{
   title: '名称',
@@ -43,7 +63,9 @@ class ProjectDetail extends React.Component {
       project_id: this.props.location.query._id,
       dataSet: [],
       dataset_name: 'DataSet Selected',
-      to_disconnect: false
+      to_disconnect: false,
+      notebook: empty,
+      spawn_new: false
   }
   }
 
@@ -160,8 +182,46 @@ class ProjectDetail extends React.Component {
     //console.log(this.props.project.dataSets[this.state.data_prop]);
   }
 
+  getNotebook(content) {
+    for(let i = 0; 0 < content.length; i++){
+      if(content[i]['type'] === 'notebook') {
+        console.log(content[i]);
+        return content[i];
+      }
+    }
+  }
+
   startNotebook() {
-    this.setState({start_notebook: true});
+    fetch(jupyterServer + this.props.project.user.user_ID + "/" + this.state.projectName, {
+      method: 'get'
+    }).then((response) => response.json())
+      .then((res) => {
+        let content = res.content;
+        // console.log(content);
+        let notebook_content = {};
+        if(content.length) {
+          notebook_content = this.getNotebook(content);
+        }
+        if (isEmpty(notebook_content)){
+            this.setState({
+              start_notebook: true,
+              notebookName: 'empty',
+              spawn_new: true
+            });
+        }else{
+          fetch(jupyterServer + notebook_content.path, {
+            method: 'get'
+          }).then((response) => response.json())
+            .then((res) => {
+            console.log(notebook_content.name);
+                this.setState({
+                  notebook: res.content,
+                  notebookName: notebook_content.name
+                }, this.setState({start_notebook: true}));
+            });
+        }
+
+      });
   }
 
   renderOptions (key) {
@@ -280,10 +340,13 @@ class ProjectDetail extends React.Component {
           <div id="notebookSection" >
           { this.state.start_notebook &&
           <JupyterNotebook user_id={this.props.project.user.user_ID}
+                           notebook_content={this.state.notebook}
+                           notebook_name={this.state.notebookName}
                            project_name={this.state.projectName}
                            project_id={this.state.project_id}
                            dataset_name={this.state.dataset_name}
                            dataset_id={this.state.selectedData}
+                           spawn_new={this.state.spawn_new}
                            />
           }
           </div>
