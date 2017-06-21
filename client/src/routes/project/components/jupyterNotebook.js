@@ -162,9 +162,9 @@ class JupyterNotebook extends React.Component {
     });
   }
 
-  onRenameNotebook(e) {
-    this.setState({fileName: e.target.value});
-  }
+  // onRenameNotebook(e) {
+  //   this.setState({fileName: e.target.value});
+  // }
 
   saveTrigger(notebook){
     let ntb = notebook;
