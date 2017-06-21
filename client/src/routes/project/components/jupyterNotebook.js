@@ -222,6 +222,7 @@ class JupyterNotebook extends React.Component {
           }
         });
     }else{
+      delete nbData.cellMap;
       fetch(jupyterServer + this.props.user_id + "/" + this.props.project_name + "/" + this.state.fileName, {
           method: 'put',
           headers: {
