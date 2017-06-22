@@ -89,9 +89,9 @@ export class Notebook extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    let order = this.state.notebook.get('cellOrder');
+    // let order = this.state.notebook.get('cellOrder');
     //console.log("cell order", order, order.size, this.state.notebook);
-    if(prevState.notebook === undefined){
+    if(prevState.notebook === undefined && this.props.spawn_new === true){
       let source = `# this is the id of the project you are editting \n` +
         `project_id = "${this.props.project_id}" \n` +
         `dataset_id = "${this.props.dataset_id}" \n` +
