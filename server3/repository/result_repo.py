@@ -15,8 +15,3 @@ class ResultRepo(Repo):
     def __init__(self, instance):
         Repo.__init__(self, instance)
 
-    def read_by_result_id(self, result_obj):
-        return Repo.read_unique_one(self, {'id': result_obj.id})
-
-    def read_by_job(self, job_obj):
-        return Repo.read_unique_one(self, {'job': job_obj.id})

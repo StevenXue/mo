@@ -3,6 +3,9 @@ import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import { Button, Select, Icon, message, Modal, Table, Radio, Collapse, Input} from 'antd';
 const Panel = Collapse.Panel;
+
+import empty from './empty.ipynb';
+
 import { jupyterServer, flaskServer } from '../../../constants'
 import { Router, routerRedux } from 'dva/router'
 import Toolkits from './toolkits'
@@ -13,6 +16,24 @@ import 'codemirror/theme/monokai.css'
 
 const { Option, OptGroup } = Select
 const RadioGroup = Radio.Group;
+
+let hasOwnProperty = Object.prototype.hasOwnProperty;
+
+function isEmpty(obj) {
+
+  if (obj == null) return true;
+
+  if (obj.length > 0)    return false;
+  if (obj.length === 0)  return true;
+
+  if (typeof obj !== "object") return true;
+
+  for (let key in obj) {
+    if (hasOwnProperty.call(obj, key)) return false;
+  }
+
+  return true;
+}
 
 const columns = [{
   title: '名称',
@@ -32,13 +53,8 @@ class ProjectDetail extends React.Component {
       projectName: name,
       fileList: [],
       notebookName: '',
+      notebookPath: {},
       editing: false,
-      notebookJSON: {
-        'cells': [],
-        'metadata': {},
-        'nbformat': 4,
-        'nbformat_minor': 2,
-      },
       data_id: '',
       start_notebook: false,
       visible: false,
@@ -47,7 +63,9 @@ class ProjectDetail extends React.Component {
       project_id: this.props.location.query._id,
       dataSet: [],
       dataset_name: 'DataSet Selected',
-      to_disconnect: false
+      to_disconnect: false,
+      notebook: empty,
+      spawn_new: false
   }
   }
 
@@ -60,7 +78,7 @@ class ProjectDetail extends React.Component {
         dataset_name: selectedRows[0].name,
         visible: false
       });
-      this.dataOp();
+      this.dataOp(selectedRows[0]._id);
     }
   }
 
@@ -72,28 +90,6 @@ class ProjectDetail extends React.Component {
 
   componentDidMount () {
     console.log("project id", this.state.project_id)
-    fetch(jupyterServer + this.state.projectName, {
-      method: 'get',
-    }).then((response) => response.json())
-      .then((res) => {
-        this.setState({
-          fileList: res.content,
-        })
-        let content = res.content
-        content.forEach((e) => {
-          let el = e.name.split('.')
-          if (el[1] === 'ipynb') {
-            console.log(e.name)
-            fetch(jupyterServer + this.state.projectName + '/' + e.name, {
-              method: 'get',
-            }).then((response) => response.json())
-              .then((res) => {
-                this.setState({ notebookJSON: res.content })
-              })
-          }
-        })
-      })
-
     this.props.dispatch({ type: 'project/listDataSets' })
   }
 
@@ -102,13 +98,14 @@ class ProjectDetail extends React.Component {
     this.setState({to_disconnect: true});
   }
 
-  dataOp () {
+
+  dataOp (dataSetId) {
     // let dataSetId = this.props.project.selectedDSIds[0];
-    let dataSetId = this.props.project.selectedDSIds
+    // let dataSetId = this.props.project.selectedDSIds
     if (!dataSetId) {
       return
     }
-    fetch(flaskServer + '/data/get_data_set?data_set_id='+dataSetId+'&limit=10', {
+    fetch(flaskServer + '/data/data_sets/'+dataSetId+'?limit=10', {
         method: 'get',
         headers: {
           'Content-Type': 'application/json',
@@ -117,14 +114,15 @@ class ProjectDetail extends React.Component {
     ).then((response) => response.json())
       .then((res) => {
         let values = {}
-        console.log('/data/get_data_set?data_set_id='+dataSetId, res.response)
-        Object.keys(res.response[0]).forEach((e) => values[e] = 'str')
+        console.log('/data/data_sets/'+dataSetId+'?limit=10', res.response)
+        Object.keys(res.fields).forEach((e) => values[e] = 'str')
         this.setState({
           dataSet: res.response,
-          values
+          values,
+          fields: res.fields
         })
       })
-      .catch((err) => console.log('Error: /data/get_data_set', err))
+      .catch((err) => console.log('Error: /data/data_sets/', err))
   }
 
   convertToStaging() {
@@ -184,15 +182,46 @@ class ProjectDetail extends React.Component {
     //console.log(this.props.project.dataSets[this.state.data_prop]);
   }
 
-  // handleChange (value) {
-  //   this.props.dispatch({ type: 'project/selectDataSets', payload: { selectedDSIds: value } })
-  //   // console.log(`selected ${value}`)
-  // }
+  getNotebook(content) {
+    for(let i = 0; 0 < content.length; i++){
+      if(content[i]['type'] === 'notebook') {
+        console.log(content[i]);
+        return content[i];
+      }
+    }
+  }
 
   startNotebook() {
-    this.setState({
-      start_notebook: true
-    });
+    fetch(jupyterServer + this.props.project.user.user_ID + "/" + this.state.projectName, {
+      method: 'get'
+    }).then((response) => response.json())
+      .then((res) => {
+        let content = res.content;
+        // console.log(content);
+        let notebook_content = {};
+        if(content.length) {
+          notebook_content = this.getNotebook(content);
+        }
+        if (isEmpty(notebook_content)){
+            this.setState({
+              start_notebook: true,
+              notebookName: 'empty',
+              spawn_new: true
+            });
+        }else{
+          fetch(jupyterServer + notebook_content.path, {
+            method: 'get'
+          }).then((response) => response.json())
+            .then((res) => {
+            console.log(notebook_content.name);
+                this.setState({
+                  notebook: res.content,
+                  notebookName: notebook_content.name
+                }, this.setState({start_notebook: true}));
+            });
+        }
+
+      });
   }
 
   renderOptions (key) {
@@ -209,13 +238,13 @@ class ProjectDetail extends React.Component {
 
   render () {
     //const JupyterNotebook =  require('./jupyterNotebook');
-    // FIXME
     let dsColumns
     if(this.state.dataSet.length > 0) {
+      console.log('fields', this.state.fields)
       dsColumns = Object.keys(this.state.dataSet[0])
         .filter((el) => el !== 'data_set')
         .map((e) => ({
-        title: e,
+            title: <div>{e}<br/>{this.state.fields[e]}</div>,
         dataIndex: e,
         key: e,
         filterDropdown: (
@@ -256,10 +285,7 @@ class ProjectDetail extends React.Component {
                 <div style={{display: 'flex', flexDirection: 'row'}}>
                   <Button type='primary' style={{width: 120}}
                           onClick={() => this.handleChoose()}>Choose Data</Button>
-                  {/*<div style={{marginLeft: 20, marginTop: 3}}>{"data set name: " + this.state.dataset_name}</div>*/}
                 </div>
-                {/*<Button type='primary' style={{ marginTop: 10, width: 120 }}*/}
-                        {/*onClick={() => }>Show</Button>*/}
               </div>
             </div>
           </div>
@@ -290,7 +316,7 @@ class ProjectDetail extends React.Component {
           </div>
           <div>
             <Collapse bordered={true} style={{marginTop: 30, width: '100%'}}>
-              <Panel header={"Analytic Toolkits"} key="1" >
+              <Panel header={"Data Exploration & Analysis"} key="1" >
                 <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                   <Toolkits project_id={this.props.location.query._id} />
                 </div>
@@ -305,9 +331,14 @@ class ProjectDetail extends React.Component {
           </Button>
           <div id="notebookSection" >
           { this.state.start_notebook &&
-          <JupyterNotebook project_id={this.state.project_id}
+          <JupyterNotebook user_id={this.props.project.user.user_ID}
+                           notebook_content={this.state.notebook}
+                           notebook_name={this.state.notebookName}
+                           project_name={this.state.projectName}
+                           project_id={this.state.project_id}
                            dataset_name={this.state.dataset_name}
                            dataset_id={this.state.selectedData}
+                           spawn_new={this.state.spawn_new}
                            />
           }
           </div>

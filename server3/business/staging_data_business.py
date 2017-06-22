@@ -52,6 +52,14 @@ def add(staging_data_set, other_fields_obj):
     return staging_data_repo.create(staging_data)
 
 
+def add_many(staging_data_set, data_array):
+    if not staging_data_set or not data_array:
+        raise ValueError('no data_set or no data_array')
+    return staging_data_repo.\
+        create_many([StagingData(staging_data_set=staging_data_set, **doc) for
+                     doc in data_array])
+
+
 def get_first_one_by_staging_data_set_id(staging_data_set_id):
     """
     Get the first object of a staging_data_set

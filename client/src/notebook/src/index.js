@@ -2,6 +2,7 @@ import React from 'react';
 import Nteract from './nteract/';
 import Jupyter from './jupyter/';
 import Provider from './util/provider';
+import Immutable from 'immutable';
 
 import createStoreRx from './store';
 import {
@@ -46,7 +47,6 @@ export function createStore(state) {
 export class Notebook extends React.Component {
   constructor(props) {
     super(props);
-
     if (this.props.store && this.props.dispatch) {
       this.store = this.props.store;
       this.dispatch = this.props.dispatch;
@@ -81,13 +81,16 @@ export class Notebook extends React.Component {
     this.setState({
       forceSource: nextProps.forceSource
     });
+    if(this.props.toOutput ===false && nextProps.toOutput === true){
+      console.log("save triggered");
+      this.props.saveTrigger(this.state.notebook);
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
-    // let t = this.store.getState();
-    // console.log('state', this.state.results, prevState.results)
-    // console.log(prevState.notebook, this.state.notebook);
-    if(prevState.notebook === undefined){
+    // let order = this.state.notebook.get('cellOrder');
+    //console.log("cell order", order, order.size, this.state.notebook);
+    if(prevState.notebook === undefined && this.props.spawn_new === true){
       let source = `# this is the id of the project you are editting \n` +
         `project_id = "${this.props.project_id}" \n` +
         `dataset_id = "${this.props.dataset_id}" \n` +
@@ -107,6 +110,7 @@ export class Notebook extends React.Component {
     if (this.state.results !== prevState.results) {
       this.props.result(this.state.results);
     }
+
   }
 
   render() {
@@ -142,6 +146,8 @@ Notebook.propTypes = {
   channels: React.PropTypes.object,
   forceSource: React.PropTypes.string,
   result: React.PropTypes.func,
+  toOutput: React.PropTypes.bool,
+  saveTrigger: React.PropTypes.func
 };
 
 export default Notebook;

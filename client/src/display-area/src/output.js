@@ -31,6 +31,7 @@ export default function Output(props: Props): ?React.Element<any> | null {
 
     // falls through
     case "display_data": {
+      //console.log("display_data");
       const bundle = output.get("data");
       const metadata = output.get("metadata");
       return (
@@ -48,14 +49,18 @@ export default function Output(props: Props): ?React.Element<any> | null {
     case "stream": {
       let text = output.get("text");
       const name = output.get("name");
-      //console.log("steam", text);
+      //console.log("stream", text);
       switch (name) {
         case "stdout":
           text = text.split("\n");
           return (
             <div className="code-block">
-            {text.map((e) => <div style={{fontFamily: 'monospace'}} key={Math.random()}>{e}</div>)}
-           </div>);
+              {text.map((e) =>
+                <div key={Math.random()}>
+                  <Ansi style={{fontFamily: 'monospace'}} className={classPrefix + name}>{e}
+                  </Ansi>
+                </div>)}
+            </div>);
         case "stderr":
           return <Ansi className={classPrefix + name}>{text}</Ansi>;
         default:

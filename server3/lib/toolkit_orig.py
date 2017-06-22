@@ -200,7 +200,8 @@ def k_mean(arr0, index, n_clusters=2):
     for ind in index:
         label.insert(ind, 'NAN')
         i += 1
-    return {"分类label": label, "类别中心点": k_means.cluster_centers_.tolist(), "距中心点距离总和": k_means.inertia_, "数据源": arr0}
+    return {"分类label": label, "类别中心点": k_means.cluster_centers_.tolist(),
+            "距中心点距离总和": k_means.inertia_, "数据源": arr0}
 
 
 def k_mean_predict(arr0, list_points, n_clusters=2):

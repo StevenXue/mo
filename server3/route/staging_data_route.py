@@ -32,18 +32,24 @@ def get_by_staging_data_set_and_fields():
     k = data.get('k')
     if k is not None:
         k = int(k)
-
-    try:
-        data = staging_data_business.get_by_staging_data_set_and_fields(
-            ObjectId(staging_data_set_id), fields)
-        data = [d.to_mongo().to_dict() for d in data]
-        result = toolkit_service.convert_json_and_calculate(project_id,
-                                                            staging_data_set_id,
-                                                            toolkit_id, fields, data,
-                                                            k)
-    except Exception as e:
-        return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}), 400)
+    data = staging_data_business.get_by_staging_data_set_and_fields(
+        ObjectId(staging_data_set_id), fields)
+    data = [d.to_mongo().to_dict() for d in data]
+    result = toolkit_service.convert_json_and_calculate(project_id,
+                                                        staging_data_set_id,
+                                                        toolkit_id, fields,
+                                                        data, k)
+    # try:
+    #     data = staging_data_business.get_by_staging_data_set_and_fields(
+    #         ObjectId(staging_data_set_id), fields)
+    #     data = [d.to_mongo().to_dict() for d in data]
+    #     result = toolkit_service.convert_json_and_calculate(project_id,
+    #                                                         staging_data_set_id,
+    #                                                         toolkit_id, fields,
+    #                                                         data, k)
+    # except Exception as e:
+    #     return make_response(jsonify({'response': '%s: %s' % (str(
+    #         Exception), e.args)}), 400)
     return make_response(jsonify({'response':
                          json_utility.convert_to_json(result)}),
                          200)
