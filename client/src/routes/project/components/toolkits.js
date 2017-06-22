@@ -194,6 +194,8 @@ export default class Toolkit extends React.Component {
           title: 'Result',
         }]
       });
+      const current = this.state.current + 1;
+      this.setState({ current });
     }else if(this.state.current === 1){
       this.setState({
         steps:[{
@@ -204,10 +206,15 @@ export default class Toolkit extends React.Component {
           title: 'Result',
         }]
       });
-      this.onRunClick();
+      if(this.state.checkedCols.length === 0){
+        message.error("please choose data fields");
+      }else{
+        const current = this.state.current + 1;
+        this.setState({ current });
+        this.onRunClick();
+      }
+
     }
-    const current = this.state.current + 1;
-    this.setState({ current });
   }
   prev() {
     const current = this.state.current - 1;
