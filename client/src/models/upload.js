@@ -47,7 +47,7 @@ export default {
       const data = yield call(uploadFile, formData)
       if (data.success) {
         console.log('upload success');
-        message.success('上传成功')
+        message.success('upload success')
         yield put({ type: 'hideModal' })
 
         // const from = queryURL('from')

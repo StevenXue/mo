@@ -137,7 +137,7 @@ class ProjectDetail extends React.Component {
     if(document.getElementById('stage_data_name')) {
       name = document.getElementById('stage_data_name').value;
     }
-    fetch(flaskServer + '/staging_data/add_staging_data_set_by_data_set_id', {
+    fetch(flaskServer + '/staging_data/staging_data_sets', {
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
@@ -158,7 +158,7 @@ class ProjectDetail extends React.Component {
           notebookName: '',
         })
       })
-      .catch((err) => console.log('Error: add_staging_data_set_by_data_set_id', err))
+      .catch((err) => console.log('Error: /staging_data/staging_data_sets', err))
   }
 
 

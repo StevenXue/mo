@@ -1,10 +1,10 @@
 import { request, config } from '../utils';
 const { api, CORS } = config;
-const { fileUpload, fileList, dataSets } = api;
+const { files, dataSets } = api;
 
 export async function uploadFile (data) {
   return request({
-    url: CORS + fileUpload,
+    url: CORS + files,
     method: 'post',
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -16,7 +16,7 @@ export async function uploadFile (data) {
 export async function fetchFileList (user_ID) {
   let query = `?user_ID=${user_ID}`
   return request({
-    url: CORS + fileList + query,
+    url: CORS + files + query,
     method: 'get',
   })
 }

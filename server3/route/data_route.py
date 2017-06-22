@@ -8,7 +8,6 @@ Date: 2017.05.24
 from bson import ObjectId
 from flask import Blueprint
 from flask import jsonify
-from flask import make_response
 from flask import request
 
 from service import data_service
@@ -24,6 +23,8 @@ data_app = Blueprint("data_app", __name__, url_prefix=PREFIX)
 @data_app.route('/data_sets', methods=['GET'])
 def list_data_sets_by_user_ID():
     user_ID = request.args.get('user_ID')
+    if not user_ID:
+        jsonify({'response': 'insufficient args'}), 400
     if user_ID:
         try:
             public_ds, owned_ds = data_service.\

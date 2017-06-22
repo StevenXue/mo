@@ -47,17 +47,17 @@ export default class Playground extends React.Component {
         }
       );
 
-    fetch(flaskServer+'/ownership/get_ownership_objects_by_user_ID?owned_type=data_set&user_ID=tttt', {
-      method: 'get',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then((response) => response.json())
-      .then((res) => {
-          console.log(res.response);
-          this.setState({data_set: res.response});
-        }
-      );
+    // fetch(flaskServer+'/ownership/get_ownership_objects_by_user_ID?owned_type=data_set&user_ID=tttt', {
+    //   method: 'get',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    // }).then((response) => response.json())
+    //   .then((res) => {
+    //       console.log(res.response);
+    //       this.setState({data_set: res.response});
+    //     }
+    //   );
 
 	}
 

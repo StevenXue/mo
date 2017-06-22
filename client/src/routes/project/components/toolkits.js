@@ -51,7 +51,7 @@ export default class ProjectDetail extends React.Component {
   }
 
   fetchData(props) {
-    fetch(flaskServer + '/toolkit/get_all_toolkit_info', {
+    fetch(flaskServer + '/toolkit/toolkits/public', {
       method: 'get',
       headers: {
         'Content-Type': 'application/json',
@@ -62,7 +62,7 @@ export default class ProjectDetail extends React.Component {
         },
       )
 
-    fetch(flaskServer + '/staging_data/list_staging_data_sets_by_project_id?project_id=' + props.project_id, {
+    fetch(flaskServer + '/staging_data/staging_data_sets?project_id=' + props.project_id, {
       method: 'get',
       headers: {
         'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ export default class ProjectDetail extends React.Component {
   onSelectDataSet (values) {
     this.setState({ selectedData: values })
     //this.setState({dataColumns: mockResult});
-    fetch(flaskServer + '/staging_data/get_fields_with_types?staging_data_set_id=' + values, {
+    fetch(flaskServer + '/staging_data/staging_data_sets/fields?staging_data_set_id=' + values, {
       method: 'get',
       headers: {
         'Content-Type': 'application/json',
@@ -119,7 +119,7 @@ export default class ProjectDetail extends React.Component {
         this.setState({ dataColumns: res.response })
         },
       )
-      .catch((err) => console.log('Error: get_fields_with_types', err))
+      .catch((err) => console.log('Error: /staging_data/staging_data_sets/fields', err))
   }
 
   onCheckCol (e) {
@@ -151,7 +151,7 @@ export default class ProjectDetail extends React.Component {
     };
     kValue && (body['k'] = kValue)
     console.log('body', body);
-    fetch(flaskServer + '/staging_data/get_by_staging_data_set_and_fields', {
+    fetch(flaskServer + '/toolkit/toolkits/staging_data_set', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
@@ -168,7 +168,7 @@ export default class ProjectDetail extends React.Component {
         });
         }
       )
-      .catch((err) => console.log('Error: get_by_staging_data_set_and_fields', err))
+      .catch((err) => console.log('Error: /toolkit/toolkits/staging_data_set', err))
 
   }
 
