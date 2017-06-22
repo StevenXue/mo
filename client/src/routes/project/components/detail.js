@@ -316,15 +316,7 @@ class ProjectDetail extends React.Component {
           </div>
           <div>
             <Collapse bordered={true} style={{marginTop: 30, width: '100%'}}>
-              <Panel header={"Preprocess"} key="1" >
-                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                </div>
-              </Panel>
-            </Collapse>
-          </div>
-          <div>
-            <Collapse bordered={true} style={{marginTop: 30, width: '100%'}}>
-              <Panel header={"Analytic Toolkits"} key="1" >
+              <Panel header={"Data Exploration & Analysis"} key="1" >
                 <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                   <Toolkits project_id={this.props.location.query._id} />
                 </div>
