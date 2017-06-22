@@ -60,9 +60,11 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
                                                            f_t_arrays)
         data_objects = result['result']
         # add to staging data set
-        for data_obj in data_objects:
-            # create staging_data object
-            staging_data_business.add(sds, data_obj)
+        # for data_obj in data_objects:
+        #     # create staging_data object
+        #     staging_data_business.add(sds, data_obj)
+        staging_data_business.add_many(sds, data_objects)
+
         if 'failure_count' in result:
             failure_count = result['failure_count']
             return {'result': sds, 'failure_count': failure_count}

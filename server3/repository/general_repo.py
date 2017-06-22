@@ -26,6 +26,9 @@ class Repo:
     def create(self, obj):
         return obj.save()
 
+    def create_many(self, objects):
+        return self.__instance.objects.insert(objects, load_bulk=False)
+
     def create_one(self, content):
         return self.__instance(**content).save()
 
@@ -70,8 +73,7 @@ class Repo:
         return self.__instance.objects.get(id=object_id)
 
     def update(self, query, update):
-        modified_obj = self.__instance.objects(**query).update(**update)
-        return modified_obj.reload()
+        return self.__instance.objects(**query).update(**update)
 
     def update_one(self, query, update):
         modified_obj = self.__instance.objects(**query).update_one(**update)
@@ -82,6 +84,12 @@ class Repo:
         modified_obj = self.__instance.objects(id=obj_id).modify(**update)
         # print '3', type(modified_obj)
         return modified_obj.reload()
+
+    def update_unset_fields_by_non_unique_field(self, field_name, field_value,
+                                                fields):
+        update = {'unset__' + k: '' for k in fields}
+        return self.__instance.objects(**{field_name: field_value})\
+            .update(**update)
 
     # for List field add only one new element- update={'job': new_job_obj,
     #                                                  'result': new_result_obj}

@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 from mongoengine import *
 from bson import Code
+from bson import ObjectId
 
 from business import data_business
 from business import data_set_business
@@ -9,7 +10,7 @@ from business import user_business
 from service import file_service
 from service import ownership_service
 from utility import json_utility
-
+import constants
 
 def add_data_set(data_set_name, ds_description, user_ID, is_private):
     ds = data_set_business.add(data_set_name, ds_description)
@@ -24,16 +25,19 @@ def import_data(data_array, data_set_name, ds_description, user_ID, is_private):
     #     ds = data_set_business.get_by_name(data_set_name)
     # except DoesNotExist:
     ds = add_data_set(data_set_name, ds_description, user_ID, is_private)
+    new_data_array = []
     for data in data_array:
-        # print data, '\n'
         # id field will conflict with object_id
         if 'id' in data:
-            data['id_1'] = data['id']
-            data.pop('id')
+            data['id_1'] = data.pop('id')
         if '_id' in data:
-            data['_id_1'] = data['id']
-            data.pop('_id')
-        data_business.add(ds, data)
+            data['_id_1'] = data.pop('_id')
+
+        data = {key.replace('.', '_'): value for key, value in data.items()}
+
+        new_data_array.append(data)
+
+    data_business.add_many(ds, new_data_array)
     return ds
 
 
@@ -96,13 +100,26 @@ def check_data_set_integrity(data_set_id):
 
 
 def check_data_integrity(data_array, data_fields):
-    missing = []
-    for row_i, row in enumerate(data_array):
+    missing = {}
+    for row in data_array:
+        oid = row['_id']
         for field in data_fields:
             if field[0] not in row:
-                missing.append([row_i, field[0]])
-                row[field[0]] = 'BLANK_GRID'
-    return {'missing': missing, 'data_array': data_array}
+                if oid in missing:
+                    missing[oid].append({field[0]: ''})
+                else:
+                    missing[oid] = [{field[0]: ''}]
+                row[field[0]] = constants.FILL_BLANK
+    # return missing
+    return {'missing': missing, 'data_array_filled': data_array}
+
+
+def update_data(update):
+    for oid in update.keys():
+        query = {}
+        for q in update[oid]:
+            query.update(q)
+        data_business.update_by_id(oid, query)
 
 
 def remove_data_set_by_id(data_set_id):
