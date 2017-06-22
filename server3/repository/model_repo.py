@@ -15,6 +15,3 @@ from repository.general_repo import Repo
 class ModelRepo(Repo):
     def __init__(self, instance):
         Repo.__init__(self, instance)
-
-    def read_by_model_name(self, model_obj):
-        return Repo.read_unique_one(self, {'name': model_obj.name})
