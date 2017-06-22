@@ -35,9 +35,8 @@ export async function listDataSets (user_ID) {
 }
 
 export async function listDataFields (data_set_id) {
-  let query = `?data_set_id=${data_set_id}`
   return request({
-    url: CORS + getDataFields + query,
+    url: CORS + getDataFields + '/' + data_set_id,
     method: 'get',
   })
 }

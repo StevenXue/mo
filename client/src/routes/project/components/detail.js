@@ -83,7 +83,7 @@ class ProjectDetail extends React.Component {
     if (!dataSetId) {
       return
     }
-    fetch(flaskServer + '/data/get_data_set?data_set_id='+dataSetId+'&limit=10', {
+    fetch(flaskServer + '/data/data_sets/'+dataSetId+'?limit=10', {
         method: 'get',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ class ProjectDetail extends React.Component {
     ).then((response) => response.json())
       .then((res) => {
         let values = {}
-        console.log('/data/get_data_set?data_set_id='+dataSetId, res.response)
+        console.log('/data/data_sets/'+dataSetId+'?limit=10', res.response)
         Object.keys(res.fields).forEach((e) => values[e] = 'str')
         this.setState({
           dataSet: res.response,
@@ -100,7 +100,7 @@ class ProjectDetail extends React.Component {
           fields: res.fields
         })
       })
-      .catch((err) => console.log('Error: /data/get_data_set', err))
+      .catch((err) => console.log('Error: /data/data_sets/', err))
   }
 
   convertToStaging() {

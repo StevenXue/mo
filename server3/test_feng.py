@@ -34,7 +34,7 @@ def sequential(obj):
     # loop to add layers
     for l in ls:
         # get layer class from keras
-        layer_class = getattr(layers, l['name'])
+        layer_class = getattr(layers, get_value(l, 'name', 'Dense'))
         # add layer
         model.add(layer_class(l['n'], **l['args']))
 
@@ -54,6 +54,16 @@ def sequential(obj):
     # testing
     score = model.evaluate(e['x_test'], e['y_test'], **e['args'])
     print(score)
+
+
+def get_value(obj, key, default):
+    if obj:
+        if obj[key]:
+            return obj[key]
+        else:
+            return default
+    else:
+        raise ValueError
 
 
 sequential(

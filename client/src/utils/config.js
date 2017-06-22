@@ -23,10 +23,10 @@ module.exports = {
     dashboard: '/dashboard',
     fileUpload: '/file/upload_file',
     fileList: '/file/list_files_by_user_ID',
-    dataImport: '/data/import_data_from_file_id',
-    dataSets: '/data/list_data_sets_by_user_ID',
+    // dataImport: '/data/import_data_from_file_id',
+    dataSets: '/data/data_sets',
     projects: '/project/projects',
     // projectCreate: '/project/create_project',
-    getDataFields: '/data/get_fields_with_types'
+    getDataFields: '/data/data_sets/fields'
   },
 }

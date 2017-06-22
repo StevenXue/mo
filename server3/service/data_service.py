@@ -8,6 +8,7 @@ from business import ownership_business
 from business import user_business
 from service import file_service
 from service import ownership_service
+from utility import json_utility
 
 
 def add_data_set(data_set_name, ds_description, user_ID, is_private):
@@ -84,6 +85,24 @@ def get_fields_with_types(data_set_id):
     return [[mr_doc.key, list(mr_doc.value.keys())] for mr_doc in result]
     # for mr_doc in result:
     #     print mr_doc.key, mr_doc.value
+
+
+def check_data_set_integrity(data_set_id):
+    data_objects = data_business.get_by_data_set(data_set_id)
+    # convert mongoengine objects to dicts
+    data_objects = json_utility.me_obj_list_to_dict_list(data_objects)
+    data_fields = get_fields_with_types(data_set_id)
+    return check_data_integrity(data_objects, data_fields)
+
+
+def check_data_integrity(data_array, data_fields):
+    missing = []
+    for row_i, row in enumerate(data_array):
+        for field in data_fields:
+            if field[0] not in row:
+                missing.append([row_i, field[0]])
+                row[field[0]] = 'BLANK_GRID'
+    return {'missing': missing, 'data_array': data_array}
 
 
 def remove_data_set_by_id(data_set_id):

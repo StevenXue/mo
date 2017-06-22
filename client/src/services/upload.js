@@ -1,6 +1,6 @@
 import { request, config } from '../utils';
 const { api, CORS } = config;
-const { fileUpload, fileList, dataImport } = api;
+const { fileUpload, fileList, dataSets } = api;
 
 export async function uploadFile (data) {
   return request({
@@ -23,7 +23,7 @@ export async function fetchFileList (user_ID) {
 
 export async function importData (data) {
   return request({
-    url: CORS + dataImport,
+    url: CORS + dataSets,
     method: 'post',
     data,
   })

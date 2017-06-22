@@ -20,7 +20,58 @@ PREFIX = '/data'
 data_app = Blueprint("data_app", __name__, url_prefix=PREFIX)
 
 
-@data_app.route('/import_data_from_file_id', methods=['POST'])
+# @data_app.route('/list_data_sets_by_user_ID', methods=['GET'])
+@data_app.route('/data_sets', methods=['GET'])
+def list_data_sets_by_user_ID():
+    user_ID = request.args.get('user_ID')
+    if user_ID:
+        try:
+            public_ds, owned_ds = data_service.\
+                list_data_sets_by_user_ID(user_ID, -1)
+            public_ds = json_utility.me_obj_list_to_dict_list(public_ds)
+            owned_ds = json_utility.me_obj_list_to_dict_list(owned_ds)
+            result = {
+                'public_ds': public_ds,
+                'owned_ds': owned_ds
+            }
+        except Exception as e:
+            return jsonify({'response': '%s: %s' % (str(Exception),
+                                                    e.args)}), 400
+        return jsonify({'response': result}), 200
+    return jsonify({'response': 'insufficient arguments'}), 400
+
+
+# @data_app.route('/get_fields_with_types', methods=['GET'])
+@data_app.route('/data_sets/fields/<string:data_set_id>', methods=['GET'])
+def get_fields_with_types(data_set_id):
+    try:
+        data = data_service.get_fields_with_types(
+            ObjectId(data_set_id))
+    except Exception as e:
+        return make_response(jsonify({'response': '%s: %s' % (str(
+            Exception), e.args)}), 400)
+    return make_response(jsonify({'response': data}),
+                         200)
+
+
+@data_app.route('/data_sets/<string:data_set_id>', methods=['GET'])
+def get_data_set(data_set_id):
+    limit = request.args.get('limit')
+    if not limit:
+        limit = 100
+    try:
+        data = data_business.get_by_data_set_limit(ObjectId(data_set_id),
+                                                   int(limit))
+        fields = data_service.get_fields_with_types(ObjectId(data_set_id))
+        fields = {e[0]: e[1] for e in fields}
+        data = json_utility.me_obj_list_to_dict_list(data)
+    except Exception as e:
+        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    return jsonify({'response': data, 'fields': fields}), 200
+
+
+# @data_app.route('/import_data_from_file_id', methods=['POST'])
+@data_app.route('/data_sets', methods=['POST'])
 def import_data_from_file_id():
     data = request.get_json()
     user_ID = data['user_ID']
@@ -38,66 +89,14 @@ def import_data_from_file_id():
                                                          is_private)
         ds_json = json_utility.convert_to_json(saved_ds.to_mongo())
     except Exception as e:
-        return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}), 400)
-    return make_response(jsonify({'response': ds_json}),
-                         200)
+        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    return jsonify({'response': ds_json}), 200
 
 
-@data_app.route('/list_data_sets_by_user_ID', methods=['GET'])
-def list_data_sets_by_user_ID():
-    user_ID = request.args.get('user_ID')
-    try:
-        public_ds, owned_ds = data_service.list_data_sets_by_user_ID(user_ID,
-                                                                     -1)
-        public_ds = json_utility.me_obj_list_to_dict_list(public_ds)
-        owned_ds = json_utility.me_obj_list_to_dict_list(owned_ds)
-        result = {
-            'public_ds': public_ds,
-            'owned_ds': owned_ds
-        }
-    except Exception as e:
-        return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}), 400)
-    return make_response(jsonify({'response': result}), 200)
-
-
-@data_app.route('/get_fields_with_types', methods=['GET'])
-def get_fields_with_types():
-    data_set_id = request.args.get('data_set_id')
-    try:
-        data = data_service.get_fields_with_types(
-            ObjectId(data_set_id))
-    except Exception as e:
-        return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}), 400)
-    return make_response(jsonify({'response': data}),
-                         200)
-
-
-@data_app.route('/get_data_set', methods=['GET'])
-def get_data_set():
-    data_set_id = request.args.get('data_set_id')
-    limit = request.args.get('limit')
-    try:
-        data = data_business.get_by_data_set_limit(ObjectId(data_set_id),
-                                                   int(limit))
-        fields = data_service.get_fields_with_types(ObjectId(data_set_id))
-        fields = {e[0]: e[1] for e in fields}
-        data = json_utility.me_obj_list_to_dict_list(data)
-    except Exception as e:
-        return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}), 400)
-    return make_response(jsonify({'response': data, 'fields': fields}),
-                         200)
-
-
-@data_app.route('/remove_data_set_by_id', methods=['DELETE'])
-def remove_data_set_by_id():
-    data_set_id = request.args.get('data_set_id')
+@data_app.route('/data_sets/<string:data_set_id>', methods=['DELETE'])
+def remove_data_set_by_id(data_set_id):
     try:
         result = data_service.remove_data_set_by_id(ObjectId(data_set_id))
     except Exception as e:
-        return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}), 400)
-    return make_response(jsonify({'response': result}), 200)
+        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    return jsonify({'response': result}), 200
