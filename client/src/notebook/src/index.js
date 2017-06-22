@@ -47,7 +47,6 @@ export function createStore(state) {
 export class Notebook extends React.Component {
   constructor(props) {
     super(props);
-
     if (this.props.store && this.props.dispatch) {
       this.store = this.props.store;
       this.dispatch = this.props.dispatch;

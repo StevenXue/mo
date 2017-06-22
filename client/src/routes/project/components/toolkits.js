@@ -251,7 +251,7 @@ export default class ProjectDetail extends React.Component {
         return(
           <div style={{marginTop: 10, marginLeft: 5, width: '25%'}}>
             <Select className="toolkit" style={{ width: '100%' }} onChange={(e) => this.handleChange(e)}
-                         placeholder="Choose Toolkit Type" allowClear>
+                         placeholder="Choose Method" allowClear>
               {this.renderOptions()}
             </Select>
           </div>

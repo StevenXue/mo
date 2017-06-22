@@ -39,7 +39,16 @@ export default class LearningCurve extends React.Component{
 
       let outputs = nextProps.dataString;
       if(outputs.indexOf('start_animation') !== -1) {
-        this.setState({render: true, update:true});
+        this.setState({
+          render: true,
+          update:true,
+          trainStep: [],
+          testStep: [],
+          trainData: [],
+          testData: [],
+          trainLoss: [],
+          testLoss: []
+        });
         if(outputs.length !== 1) {
           outputs.splice(0, 1);
           this.updateChart(outputs);
@@ -47,9 +56,9 @@ export default class LearningCurve extends React.Component{
       }else if(outputs.indexOf('stop_animation') === 0){
         this.setState({update: false});
       }else if(outputs.indexOf('stop_animation') === outputs.length-1){
-        console.log(outputs)
+        //console.log(outputs)
         outputs.splice(outputs.length-1, 1);
-        console.log(outputs);
+        //console.log(outputs);
         this.updateChart(outputs);
         this.setState({update: false});
       }
