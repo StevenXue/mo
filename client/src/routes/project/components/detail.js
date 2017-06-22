@@ -8,7 +8,7 @@ import empty from './empty.ipynb';
 
 import { jupyterServer, flaskServer } from '../../../constants'
 import { Router, routerRedux } from 'dva/router'
-import Toolkits from './toolkits'
+import Toolkits from './toolSteps'
 import JupyterNotebook from './jupyterNotebook'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/monokai.css'
@@ -185,7 +185,7 @@ class ProjectDetail extends React.Component {
   getNotebook(content) {
     for(let i = 0; 0 < content.length; i++){
       if(content[i]['type'] === 'notebook') {
-        console.log(content[i]);
+        // console.log(content[i]);
         return content[i];
       }
     }
@@ -213,7 +213,7 @@ class ProjectDetail extends React.Component {
             method: 'get'
           }).then((response) => response.json())
             .then((res) => {
-            console.log(notebook_content.name);
+            // console.log(notebook_content.name);
                 this.setState({
                   notebook: res.content,
                   notebookName: notebook_content.name
