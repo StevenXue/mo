@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Select, Upload, Icon, message, Checkbox, Input, Steps} from 'antd'
+import { Button, Select, Icon, message, Checkbox, Input, Steps} from 'antd'
 const Step = Steps.Step;
 import { jupyterServer, flaskServer } from '../../../constants';
 import { Router, routerRedux } from 'dva/router';
@@ -21,24 +21,31 @@ function isEmpty(obj) {
   return true;
 }
 
-export default class ProjectDetail extends React.Component {
+export default class Toolkit extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      //projectName: name,
       flieList: [],
-      notebookName: '',
       toolkits: [],
       selectable: 0,
       extraInput: [],
       data_set: [],
-      selectedData: '',
+      selectedDataName: '',
       dataColumns: [],
       checkedCols: [],
       result: 0,
       toolkit: '',
+      selectedName: '',
+      selectedData: '',
       current: 0,
-      resultJson: {}
+      resultJson: {},
+      steps : [{
+        title: 'Choose ToolKit',
+      }, {
+        title: 'Choose Dataset',
+      }, {
+        title: 'Result',
+      }]
     }
   }
 
@@ -75,6 +82,9 @@ export default class ProjectDetail extends React.Component {
   }
 
   handleChange (e) {
+    //console.log(this.state.toolkits);
+    let selected = this.state.toolkits.filter((el) => el._id === e);
+    let selectedName = selected[0].name;
     let toolkit = this.state.toolkits
     let target = toolkit.filter((el) => el._id === e)
     let extra = []
@@ -91,23 +101,23 @@ export default class ProjectDetail extends React.Component {
     }
 
     if (selectable === null) {
-      // do something
-      console.log('dimension is null')
       selectable = '任意'
     }
 
-    // let keys = Object.keys(temp)
-    // keys = keys.filter((e) => e === 'input_data');
     this.setState({
       toolkit: e,
       selectable,
       extraInput: extra,
+      selectedName
     })
 
   }
 
   onSelectDataSet (values) {
-    this.setState({ selectedData: values })
+    let selected = this.state.data_set.filter((el) => el._id === values);
+    let selectedName = selected[0].name;
+    console.log(selectedName);
+    this.setState({ selectedData: values, selectedDataName: selectedName })
     //this.setState({dataColumns: mockResult});
     fetch(flaskServer + '/staging_data/get_fields_with_types?staging_data_set_id=' + values, {
       method: 'get',
@@ -138,7 +148,7 @@ export default class ProjectDetail extends React.Component {
   onRunClick () {
     // let check = this.state.checkedCols.join(',')
     let kValue;
-    console.log(this.state.resultJson.length);
+    //console.log(this.state.resultJson.length);
     //console.log('input', document.getElementById('k值').value)
     if(document.getElementById('k值')) {
       kValue = document.getElementById('k值').value;
@@ -150,7 +160,7 @@ export default class ProjectDetail extends React.Component {
       'project_id': this.props.project_id
     };
     kValue && (body['k'] = kValue)
-    console.log('body', body);
+    //console.log('body', body);
     fetch(flaskServer + '/staging_data/get_by_staging_data_set_and_fields', {
       method: 'post',
       headers: {
@@ -159,8 +169,9 @@ export default class ProjectDetail extends React.Component {
       body: JSON.stringify(body)
     }).then((response) => response.json())
       .then((res) => {
-        console.log(res);
+        //console.log(res);
         let responseObj = res.response.result;
+        this.props.onReceiveResult(this.props.section_id);
         this.setState({
           resultJson: responseObj,
           toolkit: '',
@@ -172,16 +183,27 @@ export default class ProjectDetail extends React.Component {
 
   }
 
-  steps = [{
-    title: 'Choose ToolKit',
-  }, {
-    title: 'Choose Dataset',
-  }, {
-    title: 'Result',
-  }]
-
   next() {
-    if(this.state.current === 1){
+    if(this.state.current === 0){
+      this.setState({
+        steps:[{
+          title: this.state.selectedName,
+        }, {
+          title: 'Choose Dataset',
+        }, {
+          title: 'Result',
+        }]
+      });
+    }else if(this.state.current === 1){
+      this.setState({
+        steps:[{
+          title: this.state.selectedName,
+        }, {
+          title: 'Dataset: ' + this.state.selectedDataName,
+        }, {
+          title: 'Result',
+        }]
+      });
       this.onRunClick();
     }
     const current = this.state.current + 1;
@@ -231,27 +253,17 @@ export default class ProjectDetail extends React.Component {
     }
   }
 
-  renderOptionsData () {
-    let data = this.state.data_set
-    if (data.length !== 0) {
-      return data.map((e) =>
-        <Select.Option value={e._id} key={e._id}>
-          {e.name}
-        </Select.Option>
-      )
-    } else {
-      return null;
-    }
-  }
-
   renderStepContent(){
     let count = this.state.current;
     switch(count){
       case  0:
         return(
           <div style={{marginTop: 10, marginLeft: 5, width: '25%'}}>
-            <Select className="toolkit" style={{ width: '100%' }} onChange={(e) => this.handleChange(e)}
-                         placeholder="Choose Method" allowClear>
+            <Select className="toolkit"
+                    style={{ width: '100%' }}
+                    onChange={(e) => this.handleChange(e)}
+                    placeholder="Choose Method"
+                    allowClear>
               {this.renderOptions()}
             </Select>
           </div>
@@ -260,10 +272,12 @@ export default class ProjectDetail extends React.Component {
       case 1:
         return (
           <div style={{marginTop: 10, marginLeft: '40%', width: '25%'}}>
-            <Select className="dataset-select" style={{ width: '100%', marginTop: 10 }} onChange={(values) => this.onSelectDataSet(values)}
+            <Select className="dataset-select"
+                    style={{ width: '100%', marginTop: 10 }}
+                    onChange={(values) => this.onSelectDataSet(values)}
                     value={this.state.selectedData}
-                    placeholder="Choose DataSet" allowClear>
-              {/*{this.renderOptionsData()}*/}
+                    placeholder="Choose DataSet"
+                    allowClear>
               {
                 this.state.data_set.map((e) =>
                   <Select.Option value={e._id} key={e._id}>
@@ -281,55 +295,71 @@ export default class ProjectDetail extends React.Component {
                 </div>
               </div>
             </div>
-
           </div>
         )
 
       case 2:
         return (
-          <div style={{marginTop: 10, marginLeft: '75%', height: 500, overflowY: 'auto'}}>
+          <div style={{marginTop: 10, marginLeft: '75%', height: 100, overflowY: 'auto'}}>
             {
               !isEmpty(this.state.resultJson) &&
               <ReactJson src={ this.state.resultJson } style={{width: '100%', height: 400}}/>
-
             }
           </div>
         )
-
-
-
     }
   }
 
   render () {
+    let steps = this.state.steps;
     return (
-      <div style={{width: '80%', marginTop: 10}}>
+      <div style={{width: '100%', marginTop: 10}}>
         <Steps current={this.state.current}>
-          {this.steps.map(item => <Step key={item.title} title={item.title} />)}
+          {steps.map(item => <Step key={item.title} title={item.title} />)}
         </Steps>
         <div className="steps-content" >
           {this.renderStepContent()}
         </div>
-        <div className="steps-action">
+        {this.props.isActive &&
+        <div className="steps-actions">
           {
-            this.state.current < this.steps.length - 1
+            this.state.current === 0
             &&
-            <Button style={{ marginTop: 10 }} type="primary" onClick={() => this.next()}>Next</Button>
+            <div>
+              <Button style={{ marginTop: 10, marginLeft: '40%' }} type="primary" onClick={() => this.next()}>Next</Button>
+            </div>
           }
           {
-            this.state.current === this.steps.length - 1
+            this.state.current < steps.length - 1 && this.state.current !== 0
             &&
-            <Button style={{ marginTop: 10 }} type="primary" onClick={() => this.setState({current: 0})}>Done</Button>
+            <div>
+              <Button style={{ marginTop: 10, marginLeft: '40%' }} type="primary" onClick={() => this.next()}>Next</Button>
+              <Button style={{ marginLeft: 8, marginTop: 10 }} onClick={() => this.prev()}>
+                Previous
+              </Button>
+            </div>
           }
           {
-            this.state.current > 0
+            this.state.current === steps.length - 1
             &&
-            <Button style={{ marginLeft: 8, marginTop: 10 }} onClick={() => this.prev()}>
-              Previous
-            </Button>
+              <div style={{ marginTop: 10, marginLeft: '40%' }}>
+                <Button style={{ marginLeft: 8, marginTop: 10 }} onClick={() => this.prev()}>
+                  Previous
+                </Button>
+              </div>
           }
         </div>
+        }
       </div>
     )
   }
 }
+
+
+Toolkit.PropTypes = {
+  section_id: PropTypes.any,
+  project_id: PropTypes.string,
+  isActive: PropTypes.bool,
+  onReceiveResult: PropTypes.func,
+}
+
