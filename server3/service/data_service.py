@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-from mongoengine import *
 from bson import Code
 from bson import ObjectId
 

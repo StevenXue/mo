@@ -1,6 +1,9 @@
 # -*- coding: UTF-8 -*-
 
-from mongoengine import *
+from mongoengine import Document
+from mongoengine import BooleanField
+from mongoengine import ReferenceField
+from mongoengine import CASCADE
 
 from entity.toolkit import Toolkit
 from entity.file import File

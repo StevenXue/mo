@@ -5,7 +5,7 @@ Blueprint for analysis
 Author: Tianyi Zhang
 Date: 2017.05.24
 """
-
+from bson import ObjectId
 from flask import Blueprint
 from flask import jsonify
 from flask import make_response
@@ -13,6 +13,7 @@ from flask import request
 
 from service import toolkit_service
 from business import toolkit_business
+from business import staging_data_business
 from utility import json_utility
 
 PREFIX = '/toolkit'
@@ -44,18 +45,18 @@ def allowed_file(filename):
 #     return make_response(jsonify({'message': 'calculate result success', 'response': result}), 200)
 
 
-@toolkit_app.route('/get_all_toolkit_info', methods=['GET'])
+@toolkit_app.route('/toolkits/public', methods=['GET'])
 def get_all_toolkit_info():
     try:
         result = toolkit_service.get_all_public_toolkit()
     except Exception as e:
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}), 400)
-    return make_response(jsonify({'message': 'get info success', 'response':
-        json_utility.convert_to_json(result)}), 200)
+    return jsonify({'message': 'get info success', 'response':
+        json_utility.convert_to_json(result)}), 200
 
 
-@toolkit_app.route('/upload_code', methods=['POST'])
+@toolkit_app.route('/toolkits', methods=['POST'])
 def upload_code():
     user_ID = request.form['user_ID']
     is_private = request.form['if_private']
@@ -83,9 +84,33 @@ def upload_code():
                                                            user_ID,
                                                            is_private)
             except Exception as e:
-                return make_response(jsonify({'response': '%s: %s' % (str(
-                    Exception), e.args)}), 400)
-            return make_response(jsonify({'response': 'success'}), 200)
+                return jsonify({'response': '%s: %s' % (str(
+                    Exception), e.args)}), 400
+            return jsonify({'response': 'success'}), 200
         else:
-            return make_response(jsonify({'response': 'file is not allowed'}),
-                                 400)
+            return jsonify({'response': 'file is not allowed'}), 400
+
+
+@toolkit_app.route('/toolkits/staging_data_set', methods=['POST'])
+def get_by_staging_data_set_and_fields():
+    data = request.get_json()
+    fields = data.get('fields')
+    staging_data_set_id = data.get('staging_data_set_id')
+    toolkit_id = data.get('toolkit_id')
+    project_id = data.get('project_id')
+    # 初始值为0
+    k = data.get('k')
+    if k is not None:
+        k = int(k)
+
+    try:
+        data = staging_data_business.get_by_staging_data_set_and_fields(
+            ObjectId(staging_data_set_id), fields)
+        data = [d.to_mongo().to_dict() for d in data]
+        result = toolkit_service.convert_json_and_calculate(project_id,
+                                                            staging_data_set_id,
+                                                            toolkit_id, fields,
+                                                            data, k)
+    except Exception as e:
+        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    return jsonify({'response': json_utility.convert_to_json(result)}), 200

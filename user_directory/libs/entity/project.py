@@ -1,6 +1,10 @@
 # -*- coding: UTF-8 -*-
 
-from mongoengine import *
+from mongoengine import Document
+from mongoengine import StringField
+from mongoengine import DateTimeField
+from mongoengine import ReferenceField
+from mongoengine import ListField
 
 from entity.data_set import DataSet
 from entity.job import Job
@@ -12,5 +16,5 @@ class Project(Document):
     description = StringField(max_length=140)
     create_time = DateTimeField(required=True)
     datasets = ListField(ReferenceField(DataSet))
-    jobs = ListField(ReferenceField(Job, reverse_delete_rule=CASCADE))
-    results = ListField(ReferenceField(Result, reverse_delete_rule=CASCADE))
+    jobs = ListField(ReferenceField(Job))
+    results = ListField(ReferenceField(Result))

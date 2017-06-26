@@ -1,4 +1,6 @@
 # -*- coding: UTF-8 -*-
+from datetime import timedelta
+
 from flask import Flask
 from flask import jsonify
 from flask_cors import CORS
@@ -13,6 +15,7 @@ from route import data_route
 from route import staging_data_route
 from route import toolkit_route
 from route import user_route
+from route import monitor_route
 from repository import config
 from utility import json_utility
 
@@ -22,6 +25,9 @@ UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 app = Flask(__name__, static_url_path='')
 app.secret_key = 'super-super-secret'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
+
+
 CORS(app, supports_credentials=True)
 
 # Setup the Flask-JWT-Extended extension
@@ -64,6 +70,7 @@ app.register_blueprint(data_route.data_app)
 app.register_blueprint(staging_data_route.staging_data_app)
 app.register_blueprint(toolkit_route.toolkit_app)
 app.register_blueprint(user_route.user_app)
+app.register_blueprint(monitor_route.monitor_app)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True, threaded=True)

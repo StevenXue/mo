@@ -1,5 +1,9 @@
 # -*- coding: UTF-8 -*-
-from mongoengine import *
+from mongoengine import Document
+from mongoengine import ReferenceField
+from mongoengine import StringField
+from mongoengine import IntField
+from mongoengine import ListField
 
 SUB_SET_PURPOSE =(
     (0, 'training'),

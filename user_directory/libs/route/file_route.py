@@ -34,18 +34,8 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@file_app.route('/fake_upload', methods=['POST'])
-def fake_upload():
-    return make_response(jsonify({'response': 'fake'}), 200)
-
-
-@file_app.route('/upload_file', methods=['POST'])
+@file_app.route('/files', methods=['POST'])
 def upload_file():
-    # data = request.get_json()
-    # user_ID = data['user_ID']
-    # if_private = data['if_private']
-    # description = data['description']
-    print(request.form)
     user_ID = request.form['user_ID']
     is_private = request.form['if_private']
     description = request.form['description']
@@ -74,17 +64,14 @@ def upload_file():
                                  400)
 
 
-@file_app.route(UPLOAD_URL + '<user_ID>/<filename>')
-def uploaded_file(user_ID, filename):
-    path = '%s%s/' % (UPLOAD_FOLDER, user_ID)
-    return send_from_directory(path, filename)
-
-
-@file_app.route('/list_files_by_user_ID', methods=['GET'])
+@file_app.route('/files', methods=['GET'])
 def list_files_by_user_ID():
     user_ID = request.args.get('user_ID')
+    if not user_ID:
+        jsonify({'response': 'insufficient args'}), 400
     try:
-        public_files, owned_files = file_service.list_files_by_user_ID(user_ID)
+        public_files, owned_files = file_service.list_files_by_user_ID(user_ID,
+                                                                       -1)
         public_files = json_utility.me_obj_list_to_dict_list(public_files)
         owned_files = json_utility.me_obj_list_to_dict_list(owned_files)
         result = {
@@ -97,12 +84,17 @@ def list_files_by_user_ID():
     return make_response(jsonify({'response': result}), 200)
 
 
-@file_app.route('/remove_file_by_id', methods=['DELETE'])
-def remove_file_by_id():
-    file_id = request.args.get('file_id')
+@file_app.route('/files/<string:file_id>', methods=['DELETE'])
+def remove_file_by_id(file_id):
     try:
         result = file_service.remove_file_by_id(ObjectId(file_id))
     except Exception as e:
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}), 400)
     return make_response(jsonify({'response': result}), 200)
+
+
+@file_app.route(UPLOAD_URL + '<user_ID>/<filename>')
+def uploaded_file(user_ID, filename):
+    path = '%s%s/' % (UPLOAD_FOLDER, user_ID)
+    return send_from_directory(path, filename)

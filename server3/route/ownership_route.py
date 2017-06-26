@@ -10,7 +10,7 @@ from flask import Blueprint
 from flask import jsonify
 from flask import make_response
 from flask import request
-from mongoengine import *
+from mongoengine import DoesNotExist
 
 from service import ownership_service
 from utility import json_utility

@@ -3,7 +3,6 @@ from keras.models import Sequential
 from keras import optimizers
 from keras import utils
 from keras import layers
-from keras import callbacks
 
 
 # Generate dummy data
@@ -49,12 +48,8 @@ def sequential(obj):
                   optimizer=sgd,
                   metrics=comp['metrics'])
 
-    # monitor = callbacks.RemoteMonitor(root='http://localhost:5000',
-    #                                   path='/monitor/events')
-    monitor = callbacks.RemoteMonitor()
-
     # training
-    model.fit(f['x_train'], f['y_train'], **f['args'], callbacks=[monitor])
+    model.fit(f['x_train'], f['y_train'], **f['args'])
 
     # testing
     score = model.evaluate(e['x_test'], e['y_test'], **e['args'])
@@ -94,7 +89,7 @@ sequential(
      'fit': {'x_train': x_train,
              'y_train': y_train,
              'args': {
-                 'epochs': 200,
+                 'epochs': 20,
                  'batch_size': 128
              }
              },

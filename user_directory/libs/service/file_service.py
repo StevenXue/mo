@@ -12,10 +12,19 @@ from repository import config
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
 
-def add_file(file, url_base, user_ID, is_private=True, description=''):
+def add_file(file, url_base, user_ID, is_private=False, description=''):
+    """
+    add file by all file attributes
+    :param file: file instance
+    :param url_base: url can use to fetch the file
+    :param user_ID: user_ID
+    :param is_private: true or false
+    :param description: description of file
+    :return:
+    """
     if not user_ID:
         raise ValueError('no user id or private input')
-    # check user exists
+    # check user existence
     user = user_business.get_by_user_ID(user_ID)
     if not user:
         raise NameError('no user found')
@@ -35,6 +44,18 @@ def add_file(file, url_base, user_ID, is_private=True, description=''):
             return saved_file
     else:
         raise RuntimeError('file create failed')
+
+
+def remove_file_by_id(file_id):
+    """
+    remove file by id
+    :param file_id: object_id of file to remove
+    :return:
+    """
+    file_obj = file_business.get_by_id(file_id)
+    uri = file_obj['uri']
+    remove_file_by_uri(uri)
+    return file_business.remove_by_id(file_id)
 
 
 # def list_files_by_user(user):
@@ -76,14 +97,23 @@ def file_loader(file_id, user_ID):
     return table
 
 
-def list_files_by_user_ID(user_ID):
+def list_files_by_user_ID(user_ID, order=-1):
     if not user_ID:
         raise ValueError('no user id')
     public_files = ownership_service.get_all_public_objects('file')
     owned_files = ownership_service.\
         get_private_ownership_objects_by_user_ID(user_ID, 'file')
+
+    if order == -1:
+        public_files.reverse()
+        owned_files.reverse()
     return public_files, owned_files
 
 
-def remove_file_by_id(file_id):
-    return file_business.remove_by_id(file_id)
+def remove_file_by_uri(uri):
+    """
+    remove file in directory
+    :param uri: file uri
+    :return:
+    """
+    os.remove(uri)

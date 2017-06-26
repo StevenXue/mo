@@ -67,7 +67,8 @@ def toolkit_calculate(project_id, staging_data_set_id, toolkit_id, fields, *argv
     return result
 
 
-def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id, fields, data, k):
+def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
+                               fields, data, k):
     """convert json list"""
     col = list(data[0].keys())
     # argv = [[json_utility.convert_string_to_number(obj[i]) for i in col] for obj in data]

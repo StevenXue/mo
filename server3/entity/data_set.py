@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
-from mongoengine import *
+from mongoengine import Document
+from mongoengine import StringField
 
 DATA_SET_TYPE = ('type1', 'type2')
 

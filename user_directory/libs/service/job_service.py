@@ -12,6 +12,7 @@
 
 import functools
 from bson import ObjectId
+
 from business import toolkit_business, job_business, result_business, project_business, staging_data_set_business
 from repository import job_repo
 
@@ -45,8 +46,13 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
             # create a result, future TODO => add description
             result_obj = result_business.add_result(func_result, job_obj, 0, "")
 
+            from service import project_service
             # update a project
-            project_business.add_job_and_result_to_project(result_obj, ObjectId(project_id))
+            project_service.add_job_and_result_to_project(result_obj, ObjectId(project_id))
             return result_obj
         return wrapper
     return decorator
+
+
+def get_job_from_result(result_obj):
+    return result_business.get_result_by_id(result_obj['id']).job

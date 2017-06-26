@@ -9,7 +9,11 @@
 # Further to FIXME of None
 """
 
-from mongoengine import *
+from mongoengine import Document
+from mongoengine import StringField
+from mongoengine import IntField
+from mongoengine import DictField
+from mongoengine import ListField
 
 RESUlt_TYPE = (
     (0, 'Regression',
