@@ -25,15 +25,14 @@ export default class Toolkit extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      flieList: [],
       toolkits: [],
       selectable: 0,
       extraInput: [],
+      constant: '',
       data_set: [],
       selectedDataName: '',
       dataColumns: [],
       checkedCols: [],
-      result: 0,
       toolkit: '',
       selectedName: '',
       selectedData: '',
@@ -152,6 +151,7 @@ export default class Toolkit extends React.Component {
     //console.log('input', document.getElementById('k值').value)
     if(document.getElementById('k值')) {
       kValue = document.getElementById('k值').value;
+      this.setState({constant: kValue});
     }
     let body = {
       'staging_data_set_id': this.state.selectedData,
@@ -174,12 +174,11 @@ export default class Toolkit extends React.Component {
         this.props.onReceiveResult(this.props.section_id);
         this.setState({
           resultJson: responseObj,
-          toolkit: '',
-          checkedCols: []
+          toolkit: ''
         });
         }
       )
-      .catch((err) => console.log('Error: /toolkit/toolkits/staging_data_set', err))
+      .catch((err) => message.error(err))
 
   }
 
@@ -216,6 +215,7 @@ export default class Toolkit extends React.Component {
 
     }
   }
+
   prev() {
     const current = this.state.current - 1;
     this.setState({ current });
@@ -307,14 +307,27 @@ export default class Toolkit extends React.Component {
 
       case 2:
         return (
-          <div style={{marginTop: 10, marginLeft: '75%', height: 100, overflowY: 'auto'}}>
-            {
-              !isEmpty(this.state.resultJson) &&
-              <ReactJson src={ this.state.resultJson } style={{width: '100%', height: 400}}/>
-            }
+          <div style={{marginTop: 10, marginLeft: '46%', display: 'flex', flexDirection: 'row'}}>
+            <div style={{width: '40%'}}>
+              <p>Chosen Input Constant:</p>
+              <p style={{color: '#00AAAA'}}>{this.state.constant}</p>
+              <p>Selected Fields:</p>
+              {this.renderSelections()}
+            </div>
+            <div style={{marginTop: 10, marginLeft: '30%', height: 200, overflowY: 'auto'}}>
+              {
+                !isEmpty(this.state.resultJson) &&
+                    <ReactJson src={ this.state.resultJson } style={{width: '100%', height: 400}}/>
+              }
+            </div>
           </div>
         )
     }
+  }
+
+  renderSelections(){
+    let selectedCols = this.state.checkedCols;
+    return selectedCols.map((el) => <p style={{color: '#00AAAA'}}>{el}</p>)
   }
 
   render () {

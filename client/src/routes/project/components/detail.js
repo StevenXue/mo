@@ -12,6 +12,7 @@ import Toolkits from './toolSteps'
 import JupyterNotebook from './jupyterNotebook'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/monokai.css'
+import Preprocess from './preprocess'
 //import Input from 'antd/lib/input/Input.d'
 
 const { Option, OptGroup } = Select
@@ -125,43 +126,6 @@ class ProjectDetail extends React.Component {
       .catch((err) => console.log('Error: /data/data_sets/', err))
   }
 
-  convertToStaging() {
-    let dataSetId = this.props.project.selectedDSIds
-    let values = this.state.values
-    if (!dataSetId || !values) {
-      return
-    }
-    let f_t_arrays = Object.keys(values).map((e) => [e, values[e]])
-    // console.log('f_t_arrays', f_t_arrays)
-    let name;
-    if(document.getElementById('stage_data_name')) {
-      name = document.getElementById('stage_data_name').value;
-    }
-    fetch(flaskServer + '/staging_data/staging_data_sets', {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          'project_id': this.props.location.query._id,
-          'staging_data_set_name': name,
-          'staging_data_set_description': 'dsdsds',
-          'data_set_id': dataSetId,
-          'f_t_arrays': f_t_arrays
-        }),
-      },
-    ).then((response) => response.json())
-      .then((res) => {
-        console.log('add_staging_data_set_by_data_set_id', res)
-        message.success('successfully added to staging data set')
-        this.setState({
-          notebookName: '',
-        })
-      })
-      .catch((err) => console.log('Error: /staging_data/staging_data_sets', err))
-  }
-
-
   onChange (info) {
     if (info.file.status !== 'uploading') {
       console.log(info.file, info.fileList)
@@ -228,39 +192,7 @@ class ProjectDetail extends React.Component {
     return this.props.project.dataSets[key].map((e) => <Option key={e._id} value={e._id}>{e.name}</Option>)
   }
 
-  onRadioChange(ev, field) {
-    let values = this.state.values
-    values[field] = ev.target.value
-    this.setState({
-      values
-    })
-  }
-
   render () {
-    //const JupyterNotebook =  require('./jupyterNotebook');
-    let dsColumns
-    if(this.state.dataSet.length > 0) {
-      console.log('fields', this.state.fields)
-      dsColumns = Object.keys(this.state.dataSet[0])
-        .filter((el) => el !== 'data_set')
-        .map((e) => ({
-            title: <div>{e}<br/>{this.state.fields[e]}</div>,
-        dataIndex: e,
-        key: e,
-        filterDropdown: (
-          <div className="custom-filter-dropdown">
-            <RadioGroup onChange={(ev) => this.onRadioChange(ev, e)} value={this.state.values[e]}>
-              <Radio value={'str'}>String</Radio>
-              <Radio value={'int'}>Integer</Radio>
-              <Radio value={'float'}>Float</Radio>
-            </RadioGroup>
-          </div>
-        ),
-        // onFilter: (value, record) => console.log('value, record', value, record),
-        filterIcon: <Icon type="info-circle" style={{ color: this.state.filtered ? '#108ee9' : '#aaa' }} />
-      }
-      ))
-    }
     return (
       <div className="content-inner">
         <div>
@@ -280,7 +212,8 @@ class ProjectDetail extends React.Component {
                   <Table style={{marginTop: 10}}
                          rowSelection={this.rowSelection}
                          dataSource={this.props.project.dataSets[this.state.data_prop]}
-                         columns={columns}/>
+                         columns={columns}
+                         />
                 </Modal>
                 <div style={{display: 'flex', flexDirection: 'row'}}>
                   <Button type='primary' style={{width: 120}}
@@ -291,25 +224,12 @@ class ProjectDetail extends React.Component {
           </div>
           <div>
               <Collapse bordered={true} style={{marginTop: 30, width: '100%'}}>
-                <Panel header={this.state.dataset_name + " "+ this.state.selectedData } key="1">
-                  {this.state.dataSet.length > 0 && dsColumns &&
-                  <div>
-                    <Table style={{marginTop: -20, width: '100%'}}
-                           dataSource={this.state.dataSet}
-                           columns={dsColumns}/>
-                    <div style={{ marginBottom: 10, width: 100, marginLeft: 20, display: 'flex', flexDirection: 'row'}}>
-                      <Input placeholder="enter statge data name"
-                             id="stage_data_name"
-                             style={{width: 200}}
-                      />
-                      <Button type='primary'
-                              style={{marginLeft: 20}}
-                              onClick={() => this.convertToStaging()}
-                      >
-                        Confirm and Stage
-                      </Button>
-                    </div>
-                  </div>
+                <Panel header={"Preprocess"} key="1">
+                  {this.state.dataSet.length > 0 &&
+                    <Preprocess dataSet={this.state.dataSet}
+                                fields={this.state.fields}
+                                dataSetId={this.props.project.selectedDSIds}
+                                project_id={this.props.location.query._id}/>
                   }
                 </Panel>
               </Collapse>
