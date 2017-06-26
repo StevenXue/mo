@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Select, Icon, message, Checkbox, Input, Steps} from 'antd'
-const Step = Steps.Step;
-import { jupyterServer, flaskServer } from '../../../constants';
 import Toolkit from './toolkits';
 
 export default class ToolkitContainer extends React.Component {
@@ -40,8 +38,8 @@ export default class ToolkitContainer extends React.Component {
     let toolOrder = this.state.toolID;
     console.log("rendering order", this.props.project_id);
     let toolkitStack = toolOrder.map((e) =>
-    <div key={e} style={{display: 'flex', flexDirection: 'row', marginLeft: '10%'}}>
-      <div style={{width: '80%'}}>
+    <div key={e} style={{display: 'flex', flexDirection: 'row', marginLeft: '5%'}}>
+      <div style={{width: '90%'}}>
         <Toolkit section_id={e}
                  project_id={this.props.project_id}
                  isActive={this.state.statusStack[e]}
