@@ -54,7 +54,7 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
     try:
         data_objects = data_business.get_by_data_set(data_set_id)
         # convert mongoengine objects to dicts
-        data_objects = json_utility.me_obj_list_to_dict_list(data_objects)
+        data_objects = json_utility.me_obj_list_to_json_list(data_objects)
         # convert types of values in dicts
         result = data_utility.convert_data_array_by_fields(data_objects,
                                                            f_t_arrays)

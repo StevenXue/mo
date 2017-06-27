@@ -15,6 +15,7 @@ from business import staging_data_business
 from service import staging_data_service
 from service import toolkit_service
 from utility import json_utility
+import constants
 
 PREFIX = '/staging_data'
 
@@ -45,23 +46,36 @@ def list_staging_data_sets_by_project_id():
     return jsonify({'response': data}), 200
 
 
-# @staging_data_app.route('/staging_data_set_by_data_set_id', methods=[
 @staging_data_app.route('/staging_data_sets', methods=[
     'POST'])
 def add_staging_data_set_by_data_set_id():
-    # sds_name, sds_description, project_id, data_set_id
     data = request.get_json()
 
     project_id = data['project_id']
     staging_data_set_name = data['staging_data_set_name']
     staging_data_set_description = data['staging_data_set_description']
     data_set_id = data['data_set_id']
+    try:
+        saved_sds = staging_data_service.add_staging_data_set_by_data_set_id(
+            staging_data_set_name, staging_data_set_description,
+            ObjectId(project_id), ObjectId(data_set_id))
+        sds_json = json_utility.convert_to_json(saved_sds.to_mongo())
+    except Exception as e:
+        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    return jsonify({'response': sds_json}), 200
+
+
+@staging_data_app.route('/staging_data_sets/types', methods=[
+    'PUT'])
+def convert_fields_type():
+    data = request.get_json()
+
+    sds_id = data['staging_data_set_id']
     f_t_arrays = data['f_t_arrays']
 
     try:
-        result = staging_data_service.add_staging_data_set_by_data_set_id(
-            staging_data_set_name, staging_data_set_description,
-            ObjectId(project_id), ObjectId(data_set_id), f_t_arrays)
+        result = staging_data_service.convert_fields_type(ObjectId(sds_id),
+                                                          f_t_arrays)
         saved_sds = result['result']
         sds_json = json_utility.convert_to_json(saved_sds.to_mongo())
     except Exception as e:
@@ -71,3 +85,24 @@ def add_staging_data_set_by_data_set_id():
         return jsonify({'response': sds_json, 'failure_count':
                        failure_count}), 200
     return jsonify({'response': sds_json}), 200
+
+
+@staging_data_app.route('/staging_data_sets/integrity/<string:data_set_id>',
+                        methods=['GET'])
+def check_staging_data_set_integrity(data_set_id):
+    try:
+        result = staging_data_service.check_integrity(ObjectId(data_set_id))
+        result['fill_blank'] = constants.FILL_BLANK
+    except Exception as e:
+        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    return jsonify({'response': result}), 200
+
+
+@staging_data_app.route('/staging_data_sets/integrity', methods=['PUT'])
+def update_data_set_integrity():
+    update = request.get_json()
+    try:
+        result = staging_data_service.update_data(update)
+    except Exception as e:
+        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    return jsonify({'response': result}), 200

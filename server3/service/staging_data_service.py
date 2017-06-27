@@ -4,8 +4,10 @@ from bson import Code
 from business import staging_data_set_business
 from business import staging_data_business
 from business import data_business
+from service import data_service
 from utility import data_utility
 from utility import json_utility
+import constants
 
 # 使得 sys.getdefaultencoding() 的值为 'utf-8'
 # reload(sys)                      # reload 才能调用 setdefaultencoding 方法
@@ -32,7 +34,7 @@ def list_staging_data_sets_by_project_id(project_id):
 
 
 def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
-                                        data_set_id, f_t_arrays):
+                                        data_set_id):
     """
     Create staging_data_set and copy to staging_data by original data_set id
         
@@ -40,8 +42,6 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
     :param sds_description: str 
     :param project_id: ObjectId
     :param data_set_id: ObjectId
-    :param f_t_arrays: array: [['name', 'str'],['age', 'int'], ['salary',
-    'float']]
     :return: new staging_data_set object
     """
     # get project object
@@ -55,25 +55,49 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
         data_objects = data_business.get_by_data_set(data_set_id)
         # convert mongoengine objects to dicts
         data_objects = json_utility.me_obj_list_to_dict_list(data_objects)
-        # convert types of values in dicts
-        result = data_utility.convert_data_array_by_fields(data_objects,
-                                                           f_t_arrays)
-        data_objects = result['result']
-        # add to staging data set
-        # for data_obj in data_objects:
-        #     # create staging_data object
-        #     staging_data_business.add(sds, data_obj)
-        staging_data_business.add_many(sds, data_objects)
 
-        if 'failure_count' in result:
-            failure_count = result['failure_count']
-            return {'result': sds, 'failure_count': failure_count}
-        return {'result': sds}
+        staging_data_business.add_many(sds, data_objects)
+        return sds
     except Exception:
         # remove staging_data_set and staging_data
         staging_data_business.remove_by_staging_data_set_id(sds.id)
         staging_data_set_business.remove_by_id(sds.id)
         raise RuntimeError("Create staging data set failed")
+
+
+def convert_fields_type(sds_id, f_t_arrays):
+    """
+    convert field types of staging data set
+    :param sds_id: ObjectId
+    :param f_t_arrays: array: [['name', 'str'],['age', 'int'], ['salary',
+    'float']]
+    :return: new staging_data_set object
+    """
+    # get project object
+    # project = project_business.get_by_id(project_id)
+
+    # create new staging data set
+    sds = staging_data_set_business.get_by_id(sds_id)
+    # copy data from data(raw) to staging data
+    # get all data objects by data_set id
+
+    data_objects = staging_data_business.\
+        get_by_staging_data_set_id(sds['id'])
+    # convert mongoengine objects to dicts
+    data_objects = json_utility.me_obj_list_to_dict_list(data_objects)
+    # convert types of values in dicts
+    result = data_utility.convert_data_array_by_fields(data_objects,
+                                                       f_t_arrays)
+    data_objects = result['result']
+
+    # update all rows
+    for data_obj in data_objects:
+        staging_data_business.update_by_id(data_obj['_id'], data_obj)
+
+    if 'failure_count' in result:
+        failure_count = result['failure_count']
+        return {'result': sds, 'failure_count': failure_count}
+    return {'result': sds}
 
 
 def get_fields_with_types(staging_data_set_id):
@@ -126,4 +150,20 @@ def _get_fields_with_types(staging_data_set_id):
     else:
         raise RuntimeError("No matched data")
 
+
+def check_integrity(staging_data_set_id):
+    data_objects = staging_data_business.\
+        get_by_staging_data_set_id(staging_data_set_id)
+    # convert mongoengine objects to dicts
+    data_objects = json_utility.me_obj_list_to_json_list(data_objects)
+    data_fields = get_fields_with_types(staging_data_set_id)
+    return data_service.check_data_integrity(data_objects, data_fields)
+
+
+def update_data(update):
+    for oid in update.keys():
+        query = {}
+        for q in update[oid]:
+            query.update(q)
+        staging_data_business.update_by_id(oid, query)
 

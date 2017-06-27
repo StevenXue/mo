@@ -29,8 +29,8 @@ def list_data_sets_by_user_ID():
         try:
             public_ds, owned_ds = data_service.\
                 list_data_sets_by_user_ID(user_ID, -1)
-            public_ds = json_utility.me_obj_list_to_dict_list(public_ds)
-            owned_ds = json_utility.me_obj_list_to_dict_list(owned_ds)
+            public_ds = json_utility.me_obj_list_to_json_list(public_ds)
+            owned_ds = json_utility.me_obj_list_to_json_list(owned_ds)
             result = {
                 'public_ds': public_ds,
                 'owned_ds': owned_ds
@@ -80,7 +80,7 @@ def get_data_set(data_set_id):
                                                    int(limit))
         fields = data_service.get_fields_with_types(ObjectId(data_set_id))
         fields = {e[0]: e[1] for e in fields}
-        data = json_utility.me_obj_list_to_dict_list(data)
+        data = json_utility.me_obj_list_to_json_list(data)
     except Exception as e:
         return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
     return jsonify({'response': data, 'fields': fields}), 200

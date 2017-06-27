@@ -95,3 +95,7 @@ def get_by_staging_data_set_and_fields(staging_data_set_id, fields):
     staging_data = StagingData(staging_data_set=staging_data_set_id)
     return staging_data_repo.read_by_staging_data_set_and_fields(staging_data,
                                                                  fields)
+
+
+def update_by_id(data_id, update_query):
+    return staging_data_repo.update_one_by_id(data_id, update_query)
