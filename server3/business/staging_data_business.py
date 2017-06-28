@@ -124,3 +124,12 @@ def filter_data_set_fields(sds_id, fields):
 def remove_data_by_staging_data_set_id(sds_id):
     return staging_data_repo.\
         delete_by_non_unique_field('staging_data_set', sds_id)
+
+
+def remove_data_by_ids(sd_ids):
+    for sd_id in sd_ids:
+        remove_data_by_id(sd_id)
+
+
+def remove_data_by_id(sd_id):
+    return staging_data_repo.delete_by_id(sd_id)
