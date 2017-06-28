@@ -66,7 +66,7 @@ def get_value(obj, key, default):
         raise ValueError
 
 
-def sequential_tostr(obj):
+def sequential_to_str(obj):
     """
     a general implementation of sequential model of keras
     :param obj: config obj
@@ -124,6 +124,7 @@ def get_args(obj):
         else:
             temp_str += str(i) + '=' + str(temp_args) + ', '
     return temp_str
+
 
 sequential(
     {'layers': [{'name': 'Dense', 'units': 64,

@@ -46,6 +46,20 @@ def list_staging_data_sets_by_project_id():
     return jsonify({'response': data}), 200
 
 
+@staging_data_app.route('/staging_data_sets/<string:sds_id>', methods=['GET'])
+def get_data_set(sds_id):
+    limit = request.args.get('limit')
+    if not limit:
+        limit = 10
+    try:
+        data = staging_data_business.\
+            get_by_staging_data_set_id_limit(ObjectId(sds_id), int(limit))
+        data = json_utility.me_obj_list_to_json_list(data)
+    except Exception as e:
+        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    return jsonify({'response': data}), 200
+
+
 @staging_data_app.route('/staging_data_sets', methods=[
     'POST'])
 def add_staging_data_set_by_data_set_id():

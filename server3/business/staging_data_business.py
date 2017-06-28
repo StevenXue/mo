@@ -84,6 +84,21 @@ def get_by_staging_data_set_id(staging_data_set_id):
                                                       staging_data_set_id)
 
 
+def get_by_staging_data_set_id_limit(staging_data_set_id, limit):
+    """
+    Get staging_data objects by staging_data_set ObjectId
+
+    :param staging_data_set_id: ObjectId
+    :return: matched staging_data objects in list form
+    """
+    # staging_data_set = StagingDataSet(id=staging_data_set_id)
+    # return staging_data_repo.read_by_staging_data_set(staging_data_set)
+    return staging_data_repo.read_by_non_unique_field_limit('staging_data_set',
+                                                      staging_data_set_id,
+                                                            limit)
+
+
+
 def get_by_staging_data_set_and_fields(staging_data_set_id, fields):
     """
     Get specific fields of a staging_data_set
