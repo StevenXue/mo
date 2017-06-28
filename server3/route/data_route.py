@@ -60,7 +60,8 @@ def filter_fields(data_set_id):
     if not fields:
         return jsonify({'response': 'insufficient args'}), 400
     try:
-        updated_n = data_business.filter_data_set_fields(data_set_id, fields)
+        updated_n = data_business.filter_data_set_fields(ObjectId(data_set_id),
+                                                         fields)
         if updated_n > 0:
             res = 'success'
         else:

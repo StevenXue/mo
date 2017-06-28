@@ -99,3 +99,13 @@ def get_by_staging_data_set_and_fields(staging_data_set_id, fields):
 
 def update_by_id(data_id, update_query):
     return staging_data_repo.update_one_by_id(data_id, update_query)
+
+
+def filter_data_set_fields(sds_id, fields):
+    return staging_data_repo.update_unset_fields_by_non_unique_field(
+               'staging_data_set', sds_id, fields)
+
+
+def remove_data_by_staging_data_set_id(sds_id):
+    return staging_data_repo.\
+        delete_by_non_unique_field('staging_data_set', sds_id)

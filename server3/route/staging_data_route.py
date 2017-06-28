@@ -106,3 +106,37 @@ def update_data_set_integrity():
     except Exception as e:
         return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
     return jsonify({'response': result}), 200
+
+
+@staging_data_app.route('/staging_data_sets/fields/<string:sds_id>', methods=[
+    'PUT'])
+def filter_fields(sds_id):
+    data = request.get_json()
+    if not data:
+        return jsonify({'response': 'insufficient args'}), 400
+    fields = data['fields']
+    if not fields:
+        return jsonify({'response': 'insufficient args'}), 400
+    try:
+        updated_n = staging_data_business.\
+            filter_data_set_fields(ObjectId(sds_id), fields)
+        print(updated_n)
+        if updated_n > 0:
+            res = 'success'
+        else:
+            res = 'no data updated'
+    except Exception as e:
+        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    return jsonify({'response': res}), 200
+
+
+@staging_data_app.route('/staging_data_sets/<string:sds_id>',
+                        methods=['DELETE'])
+def remove_staging_data_set_by_ids(sds_id):
+    try:
+        result = staging_data_service.remove_staging_data_set_by_id(ObjectId(
+            sds_id))
+    except Exception as e:
+        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    return jsonify({'response': result}), 200
+

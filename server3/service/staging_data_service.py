@@ -167,3 +167,7 @@ def update_data(update):
             query.update(q)
         staging_data_business.update_by_id(oid, query)
 
+
+def remove_staging_data_set_by_id(sds_id):
+    staging_data_business.remove_by_staging_data_set_id(sds_id)
+    return staging_data_set_business.remove_by_id(sds_id)
