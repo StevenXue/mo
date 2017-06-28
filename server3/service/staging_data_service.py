@@ -56,6 +56,10 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
         # convert mongoengine objects to dicts
         data_objects = json_utility.me_obj_list_to_dict_list(data_objects)
 
+        # remove data set id when import to sds
+        for d in data_objects:
+            d.pop('data_set')
+
         staging_data_business.add_many(sds, data_objects)
         return sds
     except Exception:
