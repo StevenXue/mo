@@ -403,7 +403,8 @@ KERAS_SEQ_SPEC = {
                           'msle',
                           'cosine']
             },
-            'default': 'sgd'
+            'default': 'sgd',
+            'required': False
         },
     ],
     'fit': {
