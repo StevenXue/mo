@@ -403,13 +403,29 @@ KERAS_SEQ_SPEC = {
                           'msle',
                           'cosine']
             },
-            'default': 'sgd',
+            'default': [],
             'required': False
         },
     ],
     'fit': {
-        'x_train': x_train,
-        'y_train': y_train,
+        'x_train': {
+            'name': 'x_train',
+            'type': {
+                'key': 'data_set',
+                "des": "x_train",
+            },
+            "default": None,
+            'required': True
+        },
+        'y_train': {
+            'name': 'y_train',
+            'type': {
+                'key': 'data_set',
+                "des": "y_train",
+            },
+            "default": None,
+            'required': True
+        },
         'args': [
             {
                 'name': 'batch_size',
@@ -432,8 +448,24 @@ KERAS_SEQ_SPEC = {
         ],
     },
     'evaluate': {
-        'x_test': x_test,
-        'y_test': y_test,
+        'x_test': {
+            'name': 'x_test',
+            'type': {
+                'key': 'data_set',
+                "des": "x_test",
+            },
+            "default": None,
+            'required': True
+        },
+        'y_test': {
+            'name': 'y_test',
+            'type': {
+                'key': 'data_set',
+                "des": "y_test",
+            },
+            "default": None,
+            'required': True
+        },
         'args': [
             {
                 'name': 'batch_size',
