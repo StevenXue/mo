@@ -46,7 +46,7 @@ def get_all_model_info():
 def get_model(model_id):
     try:
         model = model_business.get_by_model_id(ObjectId(model_id))
-        model = json_utility.convert_to_json(model)
+        model = json_utility.convert_to_json(model.to_mongo())
     except Exception as e:
         return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
     return jsonify({'response': model}), 200

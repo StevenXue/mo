@@ -14,6 +14,9 @@ from mongoengine import StringField
 from mongoengine import IntField
 from mongoengine import DictField
 from mongoengine import ListField
+import importlib
+
+from lib import keras_seq
 
 RESUlt_TYPE = (
     (0, 'Regression',
@@ -53,13 +56,10 @@ class Model(DynamicDocument):
     # optimization_algorithm = ListField(IntField(choices=RESUlt_TYPE2))     # 优化方法
     # evaluate_matrix = ListField(IntField(choices=RESUlt_TYPE3), required=True)      # 测量方法
 
-    # input={
-    #     'shape': {
-    #         'seq':0,
-    #         'length':20,
-    #
-    #     },
-    #     'ranks': 3,
-    #     'type':
-    #     'target_input_addr':
-    # }
+    def to_code(self, conf):
+        func = getattr(keras_seq, 'keras_seq_to_str')
+        func(conf)
+
+    def run_code(self, conf):
+        func = getattr(keras_seq, 'keras_seq')
+        func(conf)

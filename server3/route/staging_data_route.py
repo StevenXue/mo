@@ -57,7 +57,7 @@ def get_data_set(sds_id):
         data = json_utility.me_obj_list_to_json_list(data)
         data = {'data': data}
 
-        # HACK
+        # FIXME
         info = {
             'field': 'Government',
             'tags': ['scheduled releases', 'open data datasets', 'city',
