@@ -61,7 +61,8 @@ def get_data_set(sds_id):
         info = {
             'field': 'Government',
             'tags': ['scheduled releases', 'open data datasets', 'city',
-                     'canada', 'public sevice']
+                     'canada', 'public sevice'],
+            'related tasks': ['classification']
         }
         data.update(info)
 
