@@ -55,6 +55,8 @@ def get_data_set(sds_id):
         data = staging_data_business.\
             get_by_staging_data_set_id_limit(ObjectId(sds_id), int(limit))
         data = json_utility.me_obj_list_to_json_list(data)
+        data = {'data': data}
+        data.update(staging_data_service.get_row_col_info(ObjectId(sds_id)))
     except Exception as e:
         return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
     return jsonify({'response': data}), 200

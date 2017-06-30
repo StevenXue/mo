@@ -9,7 +9,7 @@
 # Further to FIXME of None
 """
 
-from mongoengine import Document
+from mongoengine import DynamicDocument
 from mongoengine import StringField
 from mongoengine import IntField
 from mongoengine import DictField
@@ -20,7 +20,7 @@ RESUlt_TYPE = (
      1, 'Classifier')
 )
 
-RESUlt_TYPE1 = (
+RESUlT_TYPE1 = (
     (0, '监督式学习',
      1, '非监督式学习',
      2, '半监督式学习')
@@ -37,16 +37,21 @@ RESUlt_TYPE3 = (
 )
 
 
-class Model(Document):
+class Model(DynamicDocument):
     name = StringField(max_length=50, required=True)
     description = StringField(max_length=140, required=True)
-    usage = IntField(choices=RESUlt_TYPE, required=True)    # 类型，用作何用途
-    classification = IntField(choices=RESUlt_TYPE1, required=True)  # model分类
-    input_data = DictField(required=True)
     target_py_code = StringField(required=True)     # 显示路径
-    cnn_level = IntField(required=True)     # CNN 层数
-    optimization_algorithm = ListField(IntField(choices=RESUlt_TYPE2))     # 优化方法
-    evaluate_matrix = ListField(IntField(choices=RESUlt_TYPE3), required=True)      # 测量方法
+    entry_function = StringField(required=True)
+    to_code_function = StringField(required=True)
+    category = IntField(required=True, choices=RESUlT_TYPE1)
+    parameter_spec = DictField(required=True)
+    input = DictField(required=True)
+    # usage = IntField(choices=RESUlt_TYPE, required=True)    # 类型，用作何用途
+    # classification = IntField(choices=RESUlt_TYPE1, required=True)  # model分类
+    # input_data = DictField(required=True)
+    # cnn_level = IntField(required=True)     # CNN 层数
+    # optimization_algorithm = ListField(IntField(choices=RESUlt_TYPE2))     # 优化方法
+    # evaluate_matrix = ListField(IntField(choices=RESUlt_TYPE3), required=True)      # 测量方法
 
     # input={
     #     'shape': {

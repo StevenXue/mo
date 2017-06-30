@@ -98,7 +98,6 @@ def get_by_staging_data_set_id_limit(staging_data_set_id, limit):
                                                             limit)
 
 
-
 def get_by_staging_data_set_and_fields(staging_data_set_id, fields):
     """
     Get specific fields of a staging_data_set

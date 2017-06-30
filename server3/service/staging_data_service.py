@@ -172,6 +172,13 @@ def update_data(update):
         staging_data_business.update_by_id(oid, query)
 
 
+def get_row_col_info(sds_id):
+    sds = staging_data_business.get_by_staging_data_set_id(sds_id)
+    row_n = len(sds)
+    col_n = len(get_fields_with_types(sds_id))
+    return {'row': row_n, 'col': col_n}
+
+
 def remove_staging_data_set_by_id(sds_id):
     staging_data_business.remove_by_staging_data_set_id(sds_id)
     return staging_data_set_business.remove_by_id(sds_id)

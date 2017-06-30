@@ -16,10 +16,10 @@ from utility import json_utility
 
 
 def get_all_public_model():
-    list_model = []
-    for obj in ownership_business.list_ownership_by_type_and_private('model', False):
-        list_model.append(obj.model.to_mongo().to_dict())
-    return list_model
+    models = [obj.model.to_mongo().to_dict() for obj in ownership_business.
+              list_ownership_by_type_and_private('model', False)]
+    print('models', len(models))
+    return models
 
 
 def list_public_model_name():
@@ -29,12 +29,15 @@ def list_public_model_name():
     return all_names
 
 
-def add_model_with_ownership(user_ID, is_private, name, description, usage, classification, input_data,
-                             target_py_code, cnn_level, optimization_algorithm, evaluate_matrix):
-    model = model_business.add(name, description, usage, classification, input_data,
-                               target_py_code, cnn_level, optimization_algorithm, evaluate_matrix)
+def add_model_with_ownership(user_ID, is_private, name, description, category,
+                             target_py_code, entry_function,
+                             to_code_function, parameter_spec, input):
+    model = model_business.add(name, description, category,
+                               target_py_code, entry_function,
+                               to_code_function, parameter_spec, input)
     user = user_business.get_by_user_ID(user_ID)
     ownership_business.add(user, is_private, model=model)
+    return model
 
 
 def get_value(obj, key, default):
@@ -47,7 +50,7 @@ def get_value(obj, key, default):
         raise ValueError
 
 
-def sequential_to_str(obj):
+def keras_seq_to_str(obj):
     """
     a general implementation of sequential model of keras
     :param obj: config obj

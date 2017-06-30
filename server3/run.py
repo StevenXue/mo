@@ -16,6 +16,7 @@ from route import staging_data_route
 from route import toolkit_route
 from route import user_route
 from route import monitor_route
+from route import  model_route
 from repository import config
 from utility import json_utility
 
@@ -69,6 +70,7 @@ app.register_blueprint(project_route.project_app)
 app.register_blueprint(data_route.data_app)
 app.register_blueprint(staging_data_route.staging_data_app)
 app.register_blueprint(toolkit_route.toolkit_app)
+app.register_blueprint(model_route.model_app)
 app.register_blueprint(user_route.user_app)
 app.register_blueprint(monitor_route.monitor_app)
 
