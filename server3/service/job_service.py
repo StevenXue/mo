@@ -13,7 +13,13 @@
 import functools
 from bson import ObjectId
 
-from business import toolkit_business, job_business, result_business, project_business, staging_data_set_business
+from business import toolkit_business
+from business import job_business
+from business import result_business
+from business import project_business
+from business import staging_data_set_business
+from business import model_business
+from lib import keras_seq
 from repository import job_repo
 
 
@@ -54,5 +60,107 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
     return decorator
 
 
+def create_model_job(project_id, staging_data_set_id, model_obj, *argv):
+    """
+    help toolkit to create a job before toolkit runs,
+    as well as save the job & create a result after toolkit runs
+    :param project_id: project_id, staging_data_set_id, toolkit_id
+    :param staging_data_set_id: project_id, staging_data_set_id, toolkit_id
+    :param model_obj: project_id, staging_data_set_id, toolkit_id
+    :param fields: project_id, staging_data_set_id, toolkit_id
+    :return:
+    """
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kw):
+            # create a job
+            # model_obj = model_business.get_by_model_id(model_id)
+            staging_data_set_obj = \
+                staging_data_set_business.get_by_id(staging_data_set_id)
+
+            # create model job
+            job_obj = job_business.add_model_job(model_obj,
+                                                 staging_data_set_obj, *argv)
+            # create result sds for model
+            project_obj = project_business.get_by_id(project_id)
+            sds_name = model_obj['name']+'_result3'
+            result_sds_obj = staging_data_set_business.add(sds_name, 'des',
+                                                           project_obj,
+                                                           job=job_obj,
+                                                           type='result')
+
+            # run
+            func_result = func(*args, **kw, result_sds=result_sds_obj)
+            # update a job
+            job_obj = job_business.end_job(job_obj)
+
+            # create a result
+            # result_obj = result_business.add_result(func_result, job_obj, 0, "")
+
+            # update a project
+            from service import project_service
+            project_service.add_job_to_project(job_obj, ObjectId(project_id))
+            return job_obj
+        return wrapper
+    return decorator
+
+
 def get_job_from_result(result_obj):
     return result_business.get_result_by_id(result_obj['id']).job
+
+
+def to_code(conf, model):
+    func = getattr(keras_seq, model.to_code_function)
+    func(conf)
+
+
+def run_code(conf, project_id, staging_data_set_id, model_id):
+    model = model_business.get_by_model_id(model_id)
+    func = getattr(keras_seq, model.entry_function)
+    func = create_model_job(project_id, staging_data_set_id, model)(func)
+    print('func', func)
+    func(conf)
+
+
+if __name__ == '__main__':
+    # get data
+    from keras import utils
+    # Generate dummy data
+    import numpy as np
+    x_train = np.random.random((1000, 20))
+    y_train = utils.to_categorical(np.random.randint(10, size=(1000, 1)),
+                                   num_classes=10)
+    x_test = np.random.random((100, 20))
+    y_test = utils.to_categorical(np.random.randint(10, size=(100, 1)),
+                                  num_classes=10)
+    run_code({'layers': [{'name': 'Dense',
+                          'args': {'units': 64, 'activation': 'relu', 'input_shape': [
+                              20, ]}},
+                         {'name': 'Dropout',
+                          'args': {'rate': 0.5}},
+                         {'name': 'Dense',
+                          'args': {'units': 64, 'activation': 'relu'}},
+                         {'name': 'Dropout',
+                          'args': {'rate': 0.5}},
+                         {'name': 'Dense',
+                          'args': {'units': 10, 'activation': 'softmax'}}
+                         ],
+              'compile': {'loss': 'categorical_crossentropy',
+                          'optimizer': 'SGD',
+                          'metrics': ['accuracy']
+                          },
+              'fit': {'x_train': x_train,
+                      'y_train': y_train,
+                      'args': {
+                          'epochs': 20,
+                          'batch_size': 128
+                      }
+                      },
+              'evaluate': {'x_test': x_test,
+                           'y_test': y_test,
+                           'args': {
+                               'batch_size': 128
+                           }
+                           }
+              }, "595453ebe89bde2da1cbff50", "5934d1e5df86b2c9ccc7145a",
+             "59562a76d123ab6f72bcac23")

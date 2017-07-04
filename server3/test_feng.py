@@ -2,47 +2,29 @@
 from keras import utils
 # Generate dummy data
 import numpy as np
+import tensorflow as tf
 from entity.model import Model
 
-x_train = np.random.random((1000, 20))
-y_train = utils.to_categorical(np.random.randint(10, size=(1000, 1)),
-                               num_classes=10)
-x_test = np.random.random((100, 20))
-y_test = utils.to_categorical(np.random.randint(10, size=(100, 1)),
-                              num_classes=10)
-conf = {'layers': [{'name': 'Dense', 'units': 64,
-                    'args': {'activation': 'relu', 'input_dim': 20}},
-                   {'name': 'Dropout', 'units': 0.5,
-                    'args': {}},
-                   {'name': 'Dense', 'units': 64,
-                    'args': {'activation': 'relu'}},
-                   {'name': 'Dropout', 'units': 0.5,
-                    'args': {}},
-                   {'name': 'Dense', 'units': 10,
-                    'args': {'activation': 'softmax'}}
-                   ],
-        'compile': {'loss': 'categorical_crossentropy',
-                    'optimizer': {'name': 'SGD',
-                                  'args':
-                                      {'lr': 0.01, 'decay': 1e-6,
-                                       'momentum': 0.9,
-                                       'nesterov': True}
-                                  },
-                    'metrics': ['accuracy']
-                    },
-        'fit': {'x_train': 'x_train',
-                'y_train': 'y_train',
-                'args': {
-                    'epochs': 20,
-                    'batch_size': 128
-                }
-                },
-        'evaluate': {'x_test': 'x_test',
-                     'y_test': 'y_test',
-                     'args': {
-                         'batch_size': 128
-                     }
-                     }
-        }
-m = Model()
-m.to_code(conf)
+from keras.wrappers.scikit_learn import KerasClassifier
+from keras.wrappers.scikit_learn import KerasRegressor
+
+
+def model(features, labels, mode):
+    # Build a linear model and predict values
+    W = tf.get_variable("W", [1], dtype=tf.float64)
+    b = tf.get_variable("b", [1], dtype=tf.float64)
+    y = W*features['x'] + b
+    # Loss sub-graph
+    loss = tf.reduce_sum(tf.square(y - labels))
+    # Training sub-graph
+    global_step = tf.train.get_global_step()
+    optimizer = tf.train.GradientDescentOptimizer(0.01)
+    train = tf.group(optimizer.minimize(loss),
+                     tf.assign_add(global_step, 1))
+    # ModelFnOps connects subgraphs we built to the
+    # appropriate functionality.
+    return tf.contrib.learn.ModelFnOps(
+        mode=mode, predictions=y,
+        loss=loss,
+        train_op=train)
+

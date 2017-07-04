@@ -13,6 +13,7 @@ from service import job_service
 from business import model_business, ownership_business, user_business
 from utility import json_utility
 from lib import keras_seq
+from service import controller
 
 
 def get_all_public_model():
@@ -40,6 +41,17 @@ def add_model_with_ownership(user_ID, is_private, name, description, category,
     return model
 
 
+def run_model(conf, project_id, staging_data_set_id, model_id):
+    """
+    run model by model_id and the parameter config
+    :param model_id:
+    :param conf:
+    :return:
+    """
+    job_service.run_code(conf, project_id, staging_data_set_id, model_id)
+    # controller.run_code(conf, model)
+
+
 def temp():
     add_model_with_ownership(
         'system',
@@ -53,3 +65,7 @@ def temp():
         keras_seq.KERAS_SEQ_SPEC,
         {'type': 'ndarray', 'n': None}
     )
+
+if __name__ == '__main__':
+    pass
+    # temp()

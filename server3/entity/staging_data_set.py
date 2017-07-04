@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-from mongoengine import Document
+from mongoengine import DynamicDocument
 from mongoengine import ReferenceField
 from mongoengine import StringField
 from mongoengine import IntField
@@ -11,7 +11,7 @@ SUB_SET_PURPOSE =(
 )
 
 
-class StagingDataSet(Document):
+class StagingDataSet(DynamicDocument):
     project = ReferenceField('Project', required=True)
     name = StringField(max_length=50, required=True, unique_with='project')
     description = StringField(max_length=140)

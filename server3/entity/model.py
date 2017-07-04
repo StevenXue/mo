@@ -14,11 +14,8 @@ from mongoengine import StringField
 from mongoengine import IntField
 from mongoengine import DictField
 from mongoengine import ListField
-import importlib
 
-from lib import keras_seq
-
-RESUlt_TYPE = (
+RESUlT_TYPE = (
     (0, 'Regression',
      1, 'Classifier')
 )
@@ -29,12 +26,12 @@ RESUlT_TYPE1 = (
      2, '半监督式学习')
 )
 
-RESUlt_TYPE2 = (
+RESUlT_TYPE2 = (
     (0, 'Gradient descent',
      1, 'Gradient boosting')
 )
 
-RESUlt_TYPE3 = (
+RESUlT_TYPE3 = (
     (0, 'accuracy',
      1, 'cross-entropy')
 )
@@ -55,11 +52,3 @@ class Model(DynamicDocument):
     # cnn_level = IntField(required=True)     # CNN 层数
     # optimization_algorithm = ListField(IntField(choices=RESUlt_TYPE2))     # 优化方法
     # evaluate_matrix = ListField(IntField(choices=RESUlt_TYPE3), required=True)      # 测量方法
-
-    def to_code(self, conf):
-        func = getattr(keras_seq, 'keras_seq_to_str')
-        func(conf)
-
-    def run_code(self, conf):
-        func = getattr(keras_seq, 'keras_seq')
-        func(conf)

@@ -60,6 +60,22 @@ def add_toolkit_job(toolkit_obj, staging_data_set_obj, *argv):
     return job_repo.create(job_obj)
 
 
+def add_model_job(model_obj, staging_data_set_obj, *argv):
+    """
+
+    :param model_obj:
+    :param staging_data_set_obj:
+    :param argv:
+    :return:
+    """
+    now = datetime.utcnow()
+
+    job_obj = Job(status=0, model=model_obj,
+                  staging_data_set=staging_data_set_obj,
+                  create_time=now, fields=argv if argv else None)
+    return job_repo.create(job_obj)
+
+
 def add_model_train_job(model_obj, staging_data_set_obj):
     time = datetime.utcnow()
     job_obj = Job(status=0, toolkit=model_obj,

@@ -29,19 +29,20 @@ def get_by_project_id(project_id):
     return staging_data_set_repo.read_by_non_unique_field('project', project_id)
 
 
-def add(name, description, project):
+def add(name, description, project, **kwargs):
     """
     Add a new staging_dat_set
 
     :param name: str
     :param description: str
     :param project: ObjectId or Object
+    :param kwargs: other params
     :return: an added staging_data_set object
     """
     if not name or not description or not project:
         raise ValueError('no name or no description or no project')
     staging_data_set = StagingDataSet(name=name, description=description,
-                                      project=project)
+                                      project=project, **kwargs)
     return staging_data_set_repo.create(staging_data_set)
 
 

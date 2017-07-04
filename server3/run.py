@@ -1,12 +1,19 @@
 # -*- coding: UTF-8 -*-
 from datetime import timedelta
 
+# import eventlet
+# eventlet.monkey_patch()
+
 from flask import Flask
 from flask import jsonify
+from flask import request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import get_jwt_claims
+from flask_socketio import SocketIO
+from flask_socketio import emit
+from flask_socketio import socketio as sio
 
 from route import file_route
 from route import ownership_route
@@ -16,10 +23,10 @@ from route import staging_data_route
 from route import toolkit_route
 from route import user_route
 from route import monitor_route
-from route import  model_route
+from route import model_route
 from repository import config
 from utility import json_utility
-
+from sio import socketio
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
@@ -27,7 +34,7 @@ app = Flask(__name__, static_url_path='')
 app.secret_key = 'super-super-secret'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
-
+socketio.init_app(app, logger=True, async_mode='eventlet')
 
 CORS(app, supports_credentials=True)
 
@@ -74,5 +81,13 @@ app.register_blueprint(model_route.model_app)
 app.register_blueprint(user_route.user_app)
 app.register_blueprint(monitor_route.monitor_app)
 
+
+@app.route('/spawn', methods=['GET'])
+def spawn():
+    from service import logger
+    logger.emit_log(1, {'loss': 0.3}, {'id': '11'})
+    return jsonify({'user': 1}), 200
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True, threaded=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
