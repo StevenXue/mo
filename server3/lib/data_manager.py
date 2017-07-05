@@ -2,6 +2,7 @@
 import sys
 
 from bson import ObjectId
+import pandas as pd
 
 from business import staging_data_business
 from service import staging_data_service
@@ -73,6 +74,20 @@ def convert_to_json(data):
     :return: data in JSON format
     """
     return json_utility.convert_to_json(data)
+
+
+def get_staging_data_pandas(staging_data_set_id):
+    """
+    Get staging_data by staging_data_set_id
+
+    :param staging_data_set_id: ObjectId
+    :return:  stating_data in pandas format
+    """
+    data = staging_data_business. \
+        get_by_staging_data_set_id(ObjectId(staging_data_set_id))
+    print (data)
+    data = convert_to_json([d.to_mongo() for d in list(data)])
+    return pd.DataFrame(data)
 
 
 if __name__ == '__main__':
