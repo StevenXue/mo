@@ -2,13 +2,14 @@
 """
 """
 from mongoengine import connect
-from .repository import config
-from .business import toolkit_business
-from .business import staging_data_business, staging_data_set_business, model_business
-from .service import toolkit_service, job_service
-# from entity.toolkit import Toolkit
-from .entity.staging_data_set import StagingDataSet
-from bson import ObjectId
+from repository import config
+# from business import toolkit_business
+# from .business import staging_data_business, staging_data_set_business, model_business
+# from .service import toolkit_service, job_service
+# # from entity.toolkit import Toolkit
+# from .entity.staging_data_set import StagingDataSet
+# from bson import ObjectId
+from lib.data_manager import get_staging_data_pandas
 
 connect(
     db=config.get_mongo_db(),
@@ -71,3 +72,6 @@ if __name__ == '__main__':
     # a = [{'a':1,"b":0.11,"c":111,"d":0.3},{'a':2,"b":0.12,"c":2,"d":11.3},{'a':3,"b":0.13,"c":1111,"d":78.3},{'a':5,"b":0.15,"c":0.1,"d":0.3},{'a':8,"b":0.18,"c":9,"d":9.3}]
     # b = [{'a':1},{'a':2},{'a':4},{'a':3},{'a':5},{'a':"None"}]
     # print toolkit_service.convert_json_and_calculate("5925b208e89bde050b6f02d8", "59303bda1c5ad41cdb2bba9b", "59301a628be34d0f7bd9cc5b", a, 2)
+
+    # 转换dataFrame格式
+    print (get_staging_data_pandas("5951cf7244a6372a608ec4e4"))
