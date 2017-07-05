@@ -2,10 +2,11 @@
 """
 utility used in all project
 
-Author: Zhaofeng Li
+Author: Zhaofeng Li, Tianyi Zhang
 Date: 2017.06.09
 """
 import numpy as np
+
 
 # int, float
 def convert_data_array_by_fields(array, field_type_arrays):
@@ -153,3 +154,9 @@ def multi_one_hot_encoder(matrix):
 
     from sklearn.preprocessing import MultiLabelBinarizer
     return MultiLabelBinarizer().fit_transform(matrix)
+
+
+def retrieve_nan_index(result, nan_index):
+    for ind in nan_index:
+        result.insert(ind, [np.nan])
+    return result
