@@ -13,7 +13,7 @@ import numpy as np
 def keras_seq(conf, **kw):
     """
     a general implementation of sequential model of keras
-    :param conf: config obj
+    :param conf: config dict
     :return:
     """
     if not kw['result_sds']:
@@ -52,7 +52,8 @@ def keras_seq(conf, **kw):
 
     batch_print_callback = LambdaCallback(
         # on_batch_end=lambda batch, logs: logger.save_log(batch, logs),
-        on_epoch_end=lambda epoch, logs: logger.log_epoch_end(epoch, logs, result_sds))
+        on_epoch_end=lambda epoch, logs: logger.log_epoch_end(epoch, logs,
+                                                              result_sds))
 
     # training
     model.fit(f['x_train'], f['y_train'], **f['args'],

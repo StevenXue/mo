@@ -19,6 +19,8 @@ from business import result_business
 from business import project_business
 from business import staging_data_set_business
 from business import model_business
+from service import staging_data_service
+
 from lib import keras_seq
 from repository import job_repo
 
@@ -83,7 +85,7 @@ def create_model_job(project_id, staging_data_set_id, model_obj, *argv):
                                                  staging_data_set_obj, *argv)
             # create result sds for model
             project_obj = project_business.get_by_id(project_id)
-            sds_name = model_obj['name']+'_result3'
+            sds_name = '%s_%s_result' % (model_obj['name'], job_obj['id'])
             result_sds_obj = staging_data_set_business.add(sds_name, 'des',
                                                            project_obj,
                                                            job=job_obj,
@@ -110,15 +112,51 @@ def get_job_from_result(result_obj):
 
 
 def to_code(conf, model):
+    """
+    convert config to code string
+    :param conf:
+    :param model:
+    :return:
+    """
     func = getattr(keras_seq, model.to_code_function)
     func(conf)
 
 
-def run_code(conf, project_id, staging_data_set_id, model_id):
+def manage_supervised_input(conf, staging_data_set_id, **kwargs):
+    """
+    deal with input when supervised learning
+    :param conf:
+    :param staging_data_set_id:
+    :return:
+    """
+    x_fields = conf['fit']['x_train']
+    y_fields = conf['fit']['y_train']
+    schema = kwargs.pop('schema')
+    obj = staging_data_service.split_x_y(staging_data_set_id, x_fields,
+                                         y_fields)
+    obj = staging_data_service.split_test_train(obj,
+                                                schema=schema)
+    conf['fit']['x_train'] = obj['x_tr']
+    conf['fit']['y_train'] = obj['y_tr']
+    conf['evaluate']['x_test'] = obj['x_te']
+    conf['evaluate']['y_test'] = obj['y_te']
+    return conf
+
+
+def run_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
+    """
+    run supervised learning code
+    :param conf:
+    :param project_id:
+    :param staging_data_set_id:
+    :param model_id:
+    :return:
+    """
     model = model_business.get_by_model_id(model_id)
+    if model['category'] == 0:
+        conf = manage_supervised_input(conf, staging_data_set_id, **kwargs)
     func = getattr(keras_seq, model.entry_function)
     func = create_model_job(project_id, staging_data_set_id, model)(func)
-    print('func', func)
     func(conf)
 
 
@@ -133,34 +171,35 @@ if __name__ == '__main__':
     x_test = np.random.random((100, 20))
     y_test = utils.to_categorical(np.random.randint(10, size=(100, 1)),
                                   num_classes=10)
-    run_code({'layers': [{'name': 'Dense',
-                          'args': {'units': 64, 'activation': 'relu', 'input_shape': [
-                              20, ]}},
-                         {'name': 'Dropout',
-                          'args': {'rate': 0.5}},
-                         {'name': 'Dense',
-                          'args': {'units': 64, 'activation': 'relu'}},
-                         {'name': 'Dropout',
-                          'args': {'rate': 0.5}},
-                         {'name': 'Dense',
-                          'args': {'units': 10, 'activation': 'softmax'}}
-                         ],
-              'compile': {'loss': 'categorical_crossentropy',
-                          'optimizer': 'SGD',
-                          'metrics': ['accuracy']
-                          },
-              'fit': {'x_train': x_train,
-                      'y_train': y_train,
-                      'args': {
-                          'epochs': 20,
-                          'batch_size': 128
-                      }
-                      },
-              'evaluate': {'x_test': x_test,
-                           'y_test': y_test,
-                           'args': {
-                               'batch_size': 128
-                           }
-                           }
-              }, "595453ebe89bde2da1cbff50", "5934d1e5df86b2c9ccc7145a",
-             "59562a76d123ab6f72bcac23")
+    print(x_train.shape)
+    # run_code({'layers': [{'name': 'Dense',
+    #                       'args': {'units': 64, 'activation': 'relu', 'input_shape': [
+    #                           20, ]}},
+    #                      {'name': 'Dropout',
+    #                       'args': {'rate': 0.5}},
+    #                      {'name': 'Dense',
+    #                       'args': {'units': 64, 'activation': 'relu'}},
+    #                      {'name': 'Dropout',
+    #                       'args': {'rate': 0.5}},
+    #                      {'name': 'Dense',
+    #                       'args': {'units': 10, 'activation': 'softmax'}}
+    #                      ],
+    #           'compile': {'loss': 'categorical_crossentropy',
+    #                       'optimizer': 'SGD',
+    #                       'metrics': ['accuracy']
+    #                       },
+    #           'fit': {'x_train': x_train,
+    #                   'y_train': y_train,
+    #                   'args': {
+    #                       'epochs': 20,
+    #                       'batch_size': 128
+    #                   }
+    #                   },
+    #           'evaluate': {'x_test': x_test,
+    #                        'y_test': y_test,
+    #                        'args': {
+    #                            'batch_size': 128
+    #                        }
+    #                        }
+    #           }, "595453ebe89bde2da1cbff50", "5934d1e5df86b2c9ccc7145a",
+    #          "59562a76d123ab6f72bcac23")

@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 import sys
 from bson import Code
+import numpy as np
+
 from business import staging_data_set_business
 from business import staging_data_business
 from business import data_business
@@ -9,13 +11,13 @@ from utility import data_utility
 from utility import json_utility
 import constants
 
+
 # 使得 sys.getdefaultencoding() 的值为 'utf-8'
 # reload(sys)                      # reload 才能调用 setdefaultencoding 方法
 # sys.setdefaultencoding('utf-8')  # 设置 'utf-8'
 
 
 def get_by_query_str(staging_data_set_id, **kwargs):
-
     # query_str = dict(query_str_in_mongodb_form)
     # query_str['staging_data_set'] = staging_data_set_id
     kwargs['staging_data_set'] = staging_data_set_id
@@ -85,7 +87,7 @@ def convert_fields_type(sds_id, f_t_arrays):
     # copy data from data(raw) to staging data
     # get all data objects by data_set id
 
-    data_objects = staging_data_business.\
+    data_objects = staging_data_business. \
         get_by_staging_data_set_id(sds['id'])
     # convert mongoengine objects to dicts
     data_objects = json_utility.me_obj_list_to_dict_list(data_objects)
@@ -124,7 +126,7 @@ def get_fields_with_types(staging_data_set_id):
         return obj; 
         }
     """)
-    result = staging_data_business.\
+    result = staging_data_business. \
         get_fields_by_map_reduce(staging_data_set_id, mapper, reducer)
     # result = StagingData.objects(ListingId='126541').map_reduce(mapper, reducer, 'inline')
     # print isinstance(result, MapReduceDocument)
@@ -149,14 +151,14 @@ def _get_fields_with_types(staging_data_set_id):
 
     if sd_object:
         transformed_sb_object = sd_object.to_mongo().to_dict()
-        return [[k, type(v).__name__]for k, v
+        return [[k, type(v).__name__] for k, v
                 in transformed_sb_object.items()]
     else:
         raise RuntimeError("No matched data")
 
 
 def check_integrity(staging_data_set_id):
-    data_objects = staging_data_business.\
+    data_objects = staging_data_business. \
         get_by_staging_data_set_id(staging_data_set_id)
     # convert mongoengine objects to dicts
     data_objects = json_utility.me_obj_list_to_json_list(data_objects)
@@ -182,3 +184,46 @@ def get_row_col_info(sds_id):
 def remove_staging_data_set_by_id(sds_id):
     staging_data_business.remove_by_staging_data_set_id(sds_id)
     return staging_data_set_business.remove_by_id(sds_id)
+
+
+def mongo_to_array(cursor, fields):
+    arrays = [[c[field] for field in fields] for c in cursor]
+    arrays = np.array(arrays)
+    return arrays
+
+
+def split_x_y(sds_id, x_fields, y_fields):
+    x = staging_data_business.get_by_staging_data_set_and_fields(sds_id,
+                                                                 x_fields)
+    x = mongo_to_array(x, x_fields)
+    y = staging_data_business.get_by_staging_data_set_and_fields(sds_id,
+                                                                 y_fields)
+    y = mongo_to_array(y, y_fields)
+    return {'x': x, 'y': y}
+
+
+def split_test_train(x_y_obj, schema='cv', ratio=0.3, trl=1000):
+    x = x_y_obj.pop('x', np.array([]))
+    y = x_y_obj.pop('y', np.array([]))
+    if schema == 'cv':
+        x_tr, x_te, y_tr, y_te = \
+            data_utility.k_fold_cross_validation(x, y, ratio)
+        return {'x_tr': x_tr, 'y_tr': y_tr, 'x_te': x_te, 'y_te': y_te}
+    if schema == 'seq':
+        print('split_test_train', x.shape)
+        print('split_test_train', y.shape)
+        if ratio and not trl:
+            trl = x.shape[0] * ratio
+        if trl:
+            return {'x_tr': x[:trl, :], 'y_tr': y[:trl, :],
+                    'x_te': x[trl:, :], 'y_te': y[trl:, :]}
+    if schema == 'rand':
+        pass
+        # if ratio and not trl:
+        #     trl = x.shape[0] * ratio
+        # if trl:
+        #     return {'x_tr': x[:trl], 'y_tr': y[:trl],
+        #             'x_te': x[trl:], 'y_te': y[trl:]}
+    # raise NameError('arg error')
+
+
