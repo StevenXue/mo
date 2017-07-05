@@ -36,20 +36,24 @@ def get_fields_with_types():
 @staging_data_app.route('/staging_data_sets', methods=['GET'])
 def list_staging_data_sets_by_project_id():
     project_id = request.args.get('project_id')
-    try:
-        data = staging_data_service.list_staging_data_sets_by_project_id(
-            ObjectId(project_id))
-        data = [d.to_mongo() for d in data]
-        data = json_utility.convert_to_json(data)
-    except Exception as e:
-        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    data = staging_data_service.list_staging_data_sets_by_project_id(
+        ObjectId(project_id))
+    data = [d.to_mongo() for d in data]
+    data = json_utility.convert_to_json(data)
+    # try:
+    #     data = staging_data_service.list_staging_data_sets_by_project_id(
+    #         ObjectId(project_id))
+    #     data = [d.to_mongo() for d in data]
+    #     data = json_utility.convert_to_json(data)
+    # except Exception as e:
+    #     return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
     return jsonify({'response': data}), 200
 
 
 @staging_data_app.route('/staging_data_sets/<string:sds_id>', methods=['GET'])
 def get_data_set(sds_id):
     limit = request.args.get('limit')
-    if not limit:
+    if limit is not None:
         limit = 10
     try:
         data = staging_data_business.\
@@ -139,10 +143,10 @@ def update_data_set_integrity():
     'PUT'])
 def filter_fields(sds_id):
     data = request.get_json()
-    if not data:
+    if data is not None:
         return jsonify({'response': 'no json'}), 400
     fields = data['fields']
-    if not fields:
+    if fields is not None:
         return jsonify({'response': 'no fields'}), 400
     try:
         updated_n = staging_data_business.\
@@ -160,10 +164,10 @@ def filter_fields(sds_id):
 @staging_data_app.route('/staging_data/rows', methods=['DELETE'])
 def delete_rows():
     data = request.get_json()
-    if not data:
+    if data is not None:
         return jsonify({'response': 'no json'}), 400
     rows = data['rows']
-    if not rows:
+    if rows is not None:
         return jsonify({'response': 'no rows'}), 400
     try:
         rows = [ObjectId(row_id) for row_id in rows]

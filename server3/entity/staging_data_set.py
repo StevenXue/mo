@@ -15,6 +15,7 @@ class StagingDataSet(DynamicDocument):
     project = ReferenceField('Project', required=True)
     name = StringField(max_length=50, required=True, unique_with='project')
     description = StringField(max_length=140)
+    job = ReferenceField('Job')
     meta = {'allow_inheritance': True}
     # TODO when import the type of fields will be specified
     # stage = StringField(required=True, choices=STAGES)

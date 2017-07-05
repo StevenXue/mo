@@ -32,7 +32,7 @@ def list_staging_data_sets_by_project_id(project_id):
     :return: list of staging_data_set objects
     """
     sds_objects = staging_data_set_business.get_by_project_id(project_id)
-    return [obj for obj in sds_objects]
+    return sds_objects
 
 
 def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,

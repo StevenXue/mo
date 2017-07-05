@@ -83,6 +83,9 @@ def create_model_job(project_id, staging_data_set_id, model_obj, *argv):
             # create model job
             job_obj = job_business.add_model_job(model_obj,
                                                  staging_data_set_obj, *argv)
+            # update a project
+            from service import project_service
+            project_service.add_job_to_project(job_obj, ObjectId(project_id))
             # create result sds for model
             project_obj = project_business.get_by_id(project_id)
             sds_name = '%s_%s_result' % (model_obj['name'], job_obj['id'])
@@ -99,9 +102,6 @@ def create_model_job(project_id, staging_data_set_id, model_obj, *argv):
             # create a result
             # result_obj = result_business.add_result(func_result, job_obj, 0, "")
 
-            # update a project
-            from service import project_service
-            project_service.add_job_to_project(job_obj, ObjectId(project_id))
             return job_obj
         return wrapper
     return decorator
