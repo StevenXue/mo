@@ -152,7 +152,7 @@ ACTIVATION = {
                   'elu',
                   'selu',
                   'softplus',
-                  'softsign,'
+                  'softsign',
                   'relu',
                   'tanh',
                   'sigmoid',
