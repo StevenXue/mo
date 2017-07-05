@@ -2,6 +2,7 @@
 import sys
 
 from bson import ObjectId
+import pandas as pd
 
 from business import staging_data_business
 from service import staging_data_service
@@ -133,6 +134,20 @@ def read_mongo(db, collection, field=None, query={}, host='localhost',
             field_num = len(field)
         arrays = [[c[field[i]] for c in cursor] for i in range(field_num)]
         return arrays
+
+
+def get_staging_data_pandas(staging_data_set_id):
+    """
+    Get staging_data by staging_data_set_id
+
+    :param staging_data_set_id: ObjectId
+    :return:  stating_data in pandas format
+    """
+    data = staging_data_business. \
+        get_by_staging_data_set_id(ObjectId(staging_data_set_id))
+    print (data)
+    data = convert_to_json([d.to_mongo() for d in list(data)])
+    return pd.DataFrame(data)
 
 
 if __name__ == '__main__':

@@ -14,8 +14,10 @@ from sklearn.cluster import KMeans
 from minepy import MINE
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
+import scipy.stats as stats
 
-import scipy.stats as stats # !!!
+from utility import data_utility
+
 
 ######################################################################
 # 探索数据 Exploring Data
@@ -156,12 +158,8 @@ def dimension_reduction_PCA(arr0, index, n_components='mle'):
     matrix = np.array(arr0)
     svd_solver = 'auto'
     pca = PCA(n_components=n_components, svd_solver=svd_solver).fit(matrix)
-    new_data = pca.fit_transform(matrix)
-    label = new_data.tolist()
-    i = 0
-    for ind in index:
-        label.insert(ind, ['NAN'])
-        i += 1
+    result = pca.fit_transform(matrix)
+    label = data_utility.retrieve_nan_index(result.tolist(), index)
     return {"降维后数据值": label,
             "维度": pca.components_.tolist(),
             "待定": pca.explained_variance_.tolist(),
@@ -177,11 +175,7 @@ def dimension_reduction_TSNE(arr0, index, n_components=2):
     t_sne = TSNE(n_components=n_components, random_state=0)
     np.set_printoptions(suppress=True)
     result = t_sne.fit_transform(matrix)
-    label = result.tolist()
-    i = 0
-    for ind in index:
-        label.insert(ind, ['NAN'])
-        i += 1
+    label = data_utility.retrieve_nan_index(result.tolist(), index)
     return {"降维后数据值": label, "数据源": arr0}
 
 
@@ -195,11 +189,9 @@ def dimension_reduction_TSNE(arr0, index, n_components=2):
 def k_mean(arr0, index, n_clusters=2):
     matrix = np.array(arr0)
     k_means = KMeans(n_clusters).fit(matrix)
-    label = k_means.labels_.tolist()
-    i = 0
-    for ind in index:
-        label.insert(ind, 'NAN')
-        i += 1
+    result = k_means.labels_
+    label = data_utility.retrieve_nan_index(result.tolist(), index)
+
     return {"分类label": label, "类别中心点": k_means.cluster_centers_.tolist(),
             "距中心点距离总和": k_means.inertia_, "数据源": arr0}
 
