@@ -12,14 +12,15 @@
 from service import job_service
 from business import model_business, ownership_business, user_business
 from utility import json_utility
-# from lib import model_code
+from lib import keras_seq
+from service import controller
 
 
 def get_all_public_model():
-    list_model = []
-    for obj in ownership_business.list_ownership_by_type_and_private('model', False):
-        list_model.append(obj.model.to_mongo().to_dict())
-    return list_model
+    models = [obj.model.to_mongo().to_dict() for obj in ownership_business.
+              list_ownership_by_type_and_private('model', False)]
+    print('models', len(models))
+    return models
 
 
 def list_public_model_name():
@@ -29,9 +30,42 @@ def list_public_model_name():
     return all_names
 
 
-def add_model_with_ownership(user_ID, is_private, name, description, usage, classification, input_data,
-                             target_py_code, cnn_level, optimization_algorithm, evaluate_matrix):
-    model = model_business.add(name, description, usage, classification, input_data,
-                               target_py_code, cnn_level, optimization_algorithm, evaluate_matrix)
+def add_model_with_ownership(user_ID, is_private, name, description, category,
+                             target_py_code, entry_function,
+                             to_code_function, parameter_spec, input):
+    model = model_business.add(name, description, category,
+                               target_py_code, entry_function,
+                               to_code_function, parameter_spec, input)
     user = user_business.get_by_user_ID(user_ID)
     ownership_business.add(user, is_private, model=model)
+    return model
+
+
+def run_model(conf, project_id, staging_data_set_id, model_id):
+    """
+    run model by model_id and the parameter config
+    :param model_id:
+    :param conf:
+    :return:
+    """
+    job_service.run_code(conf, project_id, staging_data_set_id, model_id)
+    # controller.run_code(conf, model)
+
+
+def temp():
+    add_model_with_ownership(
+        'system',
+        False,
+        'keras_seq',
+        'keras_seq from keras',
+        0,
+        '/lib/keras_seq',
+        'keras_seq',
+        'keras_seq_to_str',
+        keras_seq.KERAS_SEQ_SPEC,
+        {'type': 'ndarray', 'n': None}
+    )
+
+if __name__ == '__main__':
+    pass
+    # temp()

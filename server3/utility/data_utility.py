@@ -20,6 +20,7 @@ def convert_data_array_by_fields(array, field_type_arrays):
     failure_exists = False
     failure_count = {f_t[0]: [] for f_t in field_type_arrays}
     for i, a in enumerate(array):
+        oid = a['_id']
         for f_t in field_type_arrays:
             field = f_t[0]
             value_type = f_t[1]
@@ -31,11 +32,11 @@ def convert_data_array_by_fields(array, field_type_arrays):
                 elif value_type == 'str':
                     a[field] = str(a[field])
             except ValueError:
-                failure_count[field].append(i)
+                failure_count[field].append(str(oid))
                 failure_exists = True
                 continue
     if failure_exists:
-        return {'result': array, 'failure_count': failure_count}
+        return {'result': array, 'failures': failure_count}
     else:
         return {'result': array}
 

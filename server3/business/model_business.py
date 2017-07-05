@@ -34,11 +34,14 @@ def get_by_model_id(model_obj):
     return model_repo.read_by_id(model_obj)
 
 
-def add(name, description, usage, classification, input_data,
-        target_py_code, cnn_level, optimization_algorithm, evaluate_matrix):
-    model = Model(name=name, description=description, usage=usage, input_data=input_data,
-                  classification=classification, target_py_code=target_py_code, cnn_level=cnn_level,
-                  evaluate_matrix=evaluate_matrix, optimization_algorithm=optimization_algorithm)
+def add(name, description, category,
+        target_py_code, entry_function,
+        to_code_function, parameter_spec, input):
+    model = Model(name=name, description=description, category=category,
+                  entry_function=entry_function, target_py_code=target_py_code,
+                  to_code_function=to_code_function,
+                  parameter_spec=parameter_spec,
+                  input=input)
     # user = user_business.get_by_user_ID('system')
     # ownership_business.add(user, False, model=model)
     return model_repo.create(model)

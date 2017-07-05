@@ -93,7 +93,7 @@ def get_fields_with_types(data_set_id):
 def check_data_set_integrity(data_set_id):
     data_objects = data_business.get_by_data_set(data_set_id)
     # convert mongoengine objects to dicts
-    data_objects = json_utility.me_obj_list_to_dict_list(data_objects)
+    data_objects = json_utility.me_obj_list_to_json_list(data_objects)
     data_fields = get_fields_with_types(data_set_id)
     return check_data_integrity(data_objects, data_fields)
 

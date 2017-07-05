@@ -67,6 +67,10 @@ def remove_project_by_id(project_id):
     return project_business.remove_by_id(project_id)
 
 
+def add_job_to_project(job_obj, project_id):
+    return project_business.insert_job_by_id(project_id, job_obj)
+
+
 def add_job_and_result_to_project(result_obj, project_id):
     job_obj = job_service.get_job_from_result(result_obj)
     return project_business.add_and_update_one_by_id(project_id, result_obj,
