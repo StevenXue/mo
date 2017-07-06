@@ -522,41 +522,41 @@ if __name__ == '__main__':
     # import json
     # print(json.dumps(KERAS_SEQ_SPEC))
     pass
-    x_train = np.random.random((1000, 20))
-    y_train = utils.to_categorical(np.random.randint(10, size=(1000, 1)),
-                               num_classes=10)
-    x_test = np.random.random((100, 20))
-    y_test = utils.to_categorical(np.random.randint(10, size=(100, 1)),
-    num_classes=10)
-    keras_seq(
-    {'layers': [{'name': 'Dense',
-                 'args': {'units': 64, 'activation': 'relu', 'input_shape': [
-                     20, ]}},
-                {'name': 'Dropout',
-                 'args': {'rate': 0.5}},
-                {'name': 'Dense',
-                 'args': {'units': 64, 'activation': 'relu'}},
-                {'name': 'Dropout',
-                 'args': {'rate': 0.5}},
-                {'name': 'Dense',
-                 'args': {'units': 10, 'activation': 'softmax'}}
-                ],
-     'compile': {'loss': 'categorical_crossentropy',
-                 'optimizer': 'SGD',
-                 'metrics': ['accuracy']
-                 },
-     'fit': {'x_train': x_train,
-             'y_train': y_train,
-             'args': {
-                 'epochs': 20,
-                 'batch_size': 128
-             }
-             },
-     'evaluate': {'x_test': x_test,
-                  'y_test': y_test,
-                  'args': {
-                      'batch_size': 128
-                  }
-                  }
-     })
+    # x_train = np.random.random((1000, 20))
+    # y_train = utils.to_categorical(np.random.randint(10, size=(1000, 1)),
+    #                            num_classes=10)
+    # x_test = np.random.random((100, 20))
+    # y_test = utils.to_categorical(np.random.randint(10, size=(100, 1)),
+    # num_classes=10)
+    # keras_seq(
+    # {'layers': [{'name': 'Dense',
+    #              'args': {'units': 64, 'activation': 'relu', 'input_shape': [
+    #                  20, ]}},
+    #             {'name': 'Dropout',
+    #              'args': {'rate': 0.5}},
+    #             {'name': 'Dense',
+    #              'args': {'units': 64, 'activation': 'relu'}},
+    #             {'name': 'Dropout',
+    #              'args': {'rate': 0.5}},
+    #             {'name': 'Dense',
+    #              'args': {'units': 10, 'activation': 'softmax'}}
+    #             ],
+    #  'compile': {'loss': 'categorical_crossentropy',
+    #              'optimizer': 'SGD',
+    #              'metrics': ['accuracy']
+    #              },
+    #  'fit': {'x_train': x_train,
+    #          'y_train': y_train,
+    #          'args': {
+    #              'epochs': 20,
+    #              'batch_size': 128
+    #          }
+    #          },
+    #  'evaluate': {'x_test': x_test,
+    #               'y_test': y_test,
+    #               'args': {
+    #                   'batch_size': 128
+    #               }
+    #               }
+    #  })
 

@@ -103,7 +103,8 @@ def check_data_integrity(data_array, data_fields):
     for row in data_array:
         oid = row['_id']
         for field in data_fields:
-            if field[0] not in row or row[field[0]] == '':
+            if field[0] not in row or row[field[0]] == '' \
+                    or row[field[0]] == ' ':
                 if oid in missing:
                     missing[oid].append({field[0]: ''})
                 else:

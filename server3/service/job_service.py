@@ -21,7 +21,7 @@ from business import staging_data_set_business
 from business import model_business
 from service import staging_data_service
 
-from lib import keras_seq
+from lib import models
 from repository import job_repo
 
 
@@ -118,7 +118,7 @@ def to_code(conf, model):
     :param model:
     :return:
     """
-    func = getattr(keras_seq, model.to_code_function)
+    func = getattr(models, model.to_code_function)
     func(conf)
 
 
@@ -155,7 +155,7 @@ def run_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
     model = model_business.get_by_model_id(model_id)
     if model['category'] == 0:
         conf = manage_supervised_input(conf, staging_data_set_id, **kwargs)
-    func = getattr(keras_seq, model.entry_function)
+    func = getattr(models, model.entry_function)
     func = create_model_job(project_id, staging_data_set_id, model)(func)
     func(conf)
 

@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+from flask_socketio import SocketIO
 from sio import socketio
 from business import staging_data_business
 
@@ -23,6 +24,7 @@ def emit_log(n, logs, result_sds, event):
     kw.update(logs)
     sds_id = result_sds['id']
     # add sds id to namespace
+    socketio = SocketIO(message_queue='redis://')
     socketio.emit('log_epoch_end', kw, namespace='/log')#/'+sds_id)
     print('send by socket', n, logs, result_sds)
 

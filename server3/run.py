@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
 from datetime import timedelta
 
-# import eventlet
-# eventlet.monkey_patch()
+import eventlet
+eventlet.monkey_patch()
 
 from flask import Flask
 from flask import jsonify
@@ -34,7 +34,11 @@ app = Flask(__name__, static_url_path='')
 app.secret_key = 'super-super-secret'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
-socketio.init_app(app, logger=True, async_mode='eventlet')
+# app.config['REDIS_QUEUE_KEY'] = 'my_queue'
+
+
+socketio.init_app(app, logger=True, async_mode='eventlet',
+                  message_queue='redis://')
 
 CORS(app, supports_credentials=True)
 

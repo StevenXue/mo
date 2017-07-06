@@ -32,7 +32,8 @@
 
             socket.on('log_epoch_end', function(msg) {
               console.log('receive')
-              $('#log').append('<br>' + $('<div/>').text('Received #' + msg.step + ': ' + msg.loss + msg.acc).html());
+              $('#log').append('<br>' + $('<div/>').text('Received #' + msg.n + ': ' + msg.loss + ' '+
+              msg.acc).html());
             });
             // Interval function that tests message latency by sending a "ping"
             // message. The server then responds with a "pong" message and the
