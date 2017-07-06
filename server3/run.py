@@ -86,12 +86,5 @@ app.register_blueprint(user_route.user_app)
 app.register_blueprint(monitor_route.monitor_app)
 
 
-@app.route('/spawn', methods=['GET'])
-def spawn():
-    from service import logger
-    logger.emit_log(1, {'loss': 0.3}, {'id': '11'})
-    return jsonify({'user': 1}), 200
-
-
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000, debug=True)

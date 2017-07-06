@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 from flask_socketio import SocketIO
-from sio import socketio
+# from sio import socketio
 from business import staging_data_business
 
 
@@ -8,7 +8,7 @@ from business import staging_data_business
 
 
 def log_epoch_end(*args):
-    print(*args)
+    pass
     save_log(*args, 'epoch')
     emit_log(*args, 'epoch')
 
@@ -26,7 +26,7 @@ def emit_log(n, logs, result_sds, event):
     # add sds id to namespace
     socketio = SocketIO(message_queue='redis://')
     socketio.emit('log_epoch_end', kw, namespace='/log')#/'+sds_id)
-    print('send by socket', n, logs, result_sds)
+    # print('send by socket', n, logs)
 
 
 def save_result():

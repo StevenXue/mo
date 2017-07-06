@@ -33,43 +33,34 @@ import numpy as np
 # socketio = SocketIO(message_queue='redis://')
 # socketio.emit('log_epoch_end', {'step': 111, 'loss': 222, 'acc': 333},
 #               namespace='/log')
+import keras
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Activation
+from keras.optimizers import SGD
 
-x_fields = ['field%s' % i for i in range(20)]
-y_fields = ['field%s' % i for i in range(20, 30)]
-conf = {'layers': [{'name': 'Dense',
-                    'args': {'units': 64, 'activation': 'relu',
-                             'input_shape': [
-                                 20, ]}},
-                   {'name': 'Dropout',
-                    'args': {'rate': 0.5}},
-                   {'name': 'Dense',
-                    'args': {'units': 64, 'activation': 'relu'}},
-                   {'name': 'Dropout',
-                    'args': {'rate': 0.5}},
-                   {'name': 'Dense',
-                    'args': {'units': 10, 'activation': 'softmax'}}
-                   ],
-        'compile': {'loss': 'categorical_crossentropy',
-                    'optimizer': 'SGD',
-                    'metrics': ['accuracy']
-                    },
-        'fit': {'x_train': x_fields,
-                'y_train': y_fields,
-                'args': {
-                    'epochs': 20,
-                    'batch_size': 128
-                }
-                },
-        'evaluate': {'x_test': x_fields,
-                     'y_test': y_fields,
-                     'args': {
-                         'batch_size': 128
-                     }
-                     }
-        }
-project_id = "595b4bf8e89bde931433f466"
-staging_data_set_id = "595c970144a6372a23cb3da2"
-model_id = "59562a76d123ab6f72bcac23"
-schema = "seq"
-import json
-print(json.dumps(conf))
+# Generate dummy data
+import numpy as np
+x_train = np.random.random((1000, 20))
+y_train = keras.utils.to_categorical(np.random.randint(10, size=(1000, 1)), num_classes=10)
+x_test = np.random.random((100, 20))
+y_test = keras.utils.to_categorical(np.random.randint(10, size=(100, 1)), num_classes=10)
+
+model = Sequential()
+# Dense(64) is a fully-connected layer with 64 hidden units.
+# in the first layer, you must specify the expected input data shape:
+# here, 20-dimensional vectors.
+model.add(Dense(64, activation='relu', input_dim=20))
+model.add(Dropout(0.5))
+model.add(Dense(64, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(10, activation='softmax'))
+
+sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+model.compile(loss='categorical_crossentropy',
+              optimizer=sgd,
+              metrics=['accuracy'])
+
+model.fit(x_train, y_train,
+          epochs=20,
+          batch_size=128)
+score = model.evaluate(x_test, y_test, batch_size=128)

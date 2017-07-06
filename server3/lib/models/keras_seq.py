@@ -16,10 +16,9 @@ def keras_seq(conf, **kw):
     :param conf: config dict
     :return:
     """
-    if not kw['result_sds']:
+    result_sds = kw.pop('result_sds', None)
+    if result_sds is None:
         raise RuntimeError('no result_sds created')
-
-    result_sds = kw['result_sds']
 
     model = Sequential()
     # Dense(64) is a fully-connected layer with 64 hidden units.
@@ -57,6 +56,7 @@ def keras_seq(conf, **kw):
 
     # training
     model.fit(f['x_train'], f['y_train'], **f['args'],
+              validation_data=(f['x_val'], f['y_val']),
               callbacks=[batch_print_callback])
 
     # testing
@@ -98,7 +98,7 @@ def keras_seq_to_str(obj):
     # str_model += 'optimizers = %s(%s)' % (optimizers_name, get_args(op)[:-2]) + '\n'
     str_model += "model.compile(loss='" + \
                  get_value(comp, 'loss', 'categorical_crossentropy') + \
-                 "', optimizer='"+comp['optimizer']+"', metrics= [" + \
+                 "', optimizer='" + comp['optimizer'] + "', metrics= [" + \
                  get_metrics(comp) + \
                  "])\n"
     str_model += "model.fit(x_train, y_train, " + get_args(f)[:-2] + ")\n"
@@ -163,19 +163,18 @@ ACTIVATION = {
 }
 
 INPUT_SHAPE = {
-                  'name': 'input_shape',
-                  'type': {
-                      'key': 'int_m',
-                      'des': 'nD tensor with shape: (batch_size, ..., '
-                             'input_dim). The most common situation would be a '
-                             '2D input with shape (batch_size, input_dim).',
-                      'range': None
-                  },
-                  'default': None,
-                  'required': False,
-                  'len_range': None
-              }
-
+    'name': 'input_shape',
+    'type': {
+        'key': 'int_m',
+        'des': 'nD tensor with shape: (batch_size, ..., '
+               'input_dim). The most common situation would be a '
+               '2D input with shape (batch_size, input_dim).',
+        'range': None
+    },
+    'default': None,
+    'required': False,
+    'len_range': None
+}
 
 # supported layers:
 # Dense, Dropout, Flatten, Reshape, Conv1D, Conv2D, MaxPooling2D
@@ -464,6 +463,24 @@ KERAS_SEQ_SPEC = {
             "default": None,
             "required": True
         },
+        "x_val": {
+            "name": "x_val",
+            "type": {
+                "key": "data_set",
+                "des": "x_test",
+            },
+            "default": None,
+            "required": True
+        },
+        "y_val": {
+            "name": "y_val",
+            "type": {
+                "key": "data_set",
+                "des": "y_test",
+            },
+            "default": None,
+            "required": True
+        },
         "args": [
             {
                 "name": "batch_size",
@@ -522,41 +539,41 @@ if __name__ == '__main__':
     # import json
     # print(json.dumps(KERAS_SEQ_SPEC))
     pass
-    # x_train = np.random.random((1000, 20))
-    # y_train = utils.to_categorical(np.random.randint(10, size=(1000, 1)),
-    #                            num_classes=10)
-    # x_test = np.random.random((100, 20))
-    # y_test = utils.to_categorical(np.random.randint(10, size=(100, 1)),
-    # num_classes=10)
-    # keras_seq(
-    # {'layers': [{'name': 'Dense',
-    #              'args': {'units': 64, 'activation': 'relu', 'input_shape': [
-    #                  20, ]}},
-    #             {'name': 'Dropout',
-    #              'args': {'rate': 0.5}},
-    #             {'name': 'Dense',
-    #              'args': {'units': 64, 'activation': 'relu'}},
-    #             {'name': 'Dropout',
-    #              'args': {'rate': 0.5}},
-    #             {'name': 'Dense',
-    #              'args': {'units': 10, 'activation': 'softmax'}}
-    #             ],
-    #  'compile': {'loss': 'categorical_crossentropy',
-    #              'optimizer': 'SGD',
-    #              'metrics': ['accuracy']
-    #              },
-    #  'fit': {'x_train': x_train,
-    #          'y_train': y_train,
-    #          'args': {
-    #              'epochs': 20,
-    #              'batch_size': 128
-    #          }
-    #          },
-    #  'evaluate': {'x_test': x_test,
-    #               'y_test': y_test,
-    #               'args': {
-    #                   'batch_size': 128
-    #               }
-    #               }
-    #  })
-
+    x_train = np.random.random((1000, 20))
+    y_train = utils.to_categorical(np.random.randint(10, size=(1000, 1)),
+                                   num_classes=10)
+    x_test = np.random.random((100, 20))
+    y_test = utils.to_categorical(np.random.randint(10, size=(100, 1)),
+                                  num_classes=10)
+    keras_seq(
+        {'layers': [{'name': 'Dense',
+                     'args': {'units': 64, 'activation': 'relu',
+                              'input_shape': [
+                                  20, ]}},
+                    {'name': 'Dropout',
+                     'args': {'rate': 0.5}},
+                    {'name': 'Dense',
+                     'args': {'units': 64, 'activation': 'relu'}},
+                    {'name': 'Dropout',
+                     'args': {'rate': 0.5}},
+                    {'name': 'Dense',
+                     'args': {'units': 10, 'activation': 'softmax'}}
+                    ],
+         'compile': {'loss': 'categorical_crossentropy',
+                     'optimizer': 'SGD',
+                     'metrics': ['accuracy']
+                     },
+         'fit': {'x_train': x_train,
+                 'y_train': y_train,
+                 'args': {
+                     'epochs': 20,
+                     'batch_size': 128
+                 }
+                 },
+         'evaluate': {'x_test': x_test,
+                      'y_test': y_test,
+                      'args': {
+                          'batch_size': 128
+                      }
+                      }
+         }, result_sds='11')

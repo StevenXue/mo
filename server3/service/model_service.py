@@ -12,7 +12,7 @@
 from service import job_service
 from business import model_business, ownership_business, user_business
 from utility import json_utility
-from lib import keras_seq
+from lib.models import keras_seq
 from service import controller
 
 

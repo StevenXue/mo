@@ -138,6 +138,8 @@ def manage_supervised_input(conf, staging_data_set_id, **kwargs):
                                                 schema=schema)
     conf['fit']['x_train'] = obj['x_tr']
     conf['fit']['y_train'] = obj['y_tr']
+    conf['fit']['x_val'] = obj['x_te']
+    conf['fit']['y_val'] = obj['y_te']
     conf['evaluate']['x_test'] = obj['x_te']
     conf['evaluate']['y_test'] = obj['y_te']
     return conf
