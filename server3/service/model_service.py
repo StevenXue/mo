@@ -12,7 +12,7 @@
 from service import job_service
 from business import model_business, ownership_business, user_business
 from utility import json_utility
-from lib.models import keras_seq
+from lib.models import ks
 from service import controller
 
 
@@ -33,6 +33,20 @@ def list_public_model_name():
 def add_model_with_ownership(user_ID, is_private, name, description, category,
                              target_py_code, entry_function,
                              to_code_function, parameter_spec, input):
+    """
+    add_model_with_ownership
+    :param user_ID:
+    :param is_private:
+    :param name:
+    :param description:
+    :param category:
+    :param target_py_code:
+    :param entry_function:
+    :param to_code_function:
+    :param parameter_spec:
+    :param input:
+    :return:
+    """
     model = model_business.add(name, description, category,
                                target_py_code, entry_function,
                                to_code_function, parameter_spec, input)
@@ -83,7 +97,7 @@ def temp():
         '/lib/keras_seq',
         'keras_seq',
         'keras_seq_to_str',
-        keras_seq.KERAS_SEQ_SPEC,
+        ks.KERAS_SEQ_SPEC,
         {'type': 'ndarray', 'n': None}
     )
 

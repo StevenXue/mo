@@ -107,7 +107,8 @@ def keras_seq_to_str(obj, head_str, **kw):
                  "])\n"
     # callback
     str_model += "batch_print_callback = LambdaCallback(on_epoch_end=lambda " \
-                 "epoch, logs: logger.log_epoch_end(epoch, logs, '%s'))" % result_sds
+                 "epoch, logs: logger.log_epoch_end(epoch, " \
+                 "logs, '%s'))\n" % result_sds
     # fit
     str_model += "model.fit(x_train, y_train,  validation_data=(f['x_val'], " \
                  "f['y_val']), callbacks=[batch_print_callback], " + \
