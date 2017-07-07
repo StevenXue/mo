@@ -50,14 +50,15 @@ def keras_seq(conf, **kw):
                   metrics=comp['metrics'])
 
     batch_print_callback = LambdaCallback(
-        # on_batch_end=lambda batch, logs: logger.save_log(batch, logs),
         on_epoch_end=lambda epoch, logs: logger.log_epoch_end(epoch, logs,
                                                               result_sds))
 
     # training
-    model.fit(f['x_train'], f['y_train'], **f['args'],
+    model.fit(f['x_train'], f['y_train'],
               validation_data=(f['x_val'], f['y_val']),
-              callbacks=[batch_print_callback])
+              callbacks=[batch_print_callback],
+              **f['args'])
+
 
     # testing
     score = model.evaluate(e['x_test'], e['y_test'], **e['args'])
@@ -65,11 +66,10 @@ def keras_seq(conf, **kw):
     weights = model.get_weights()
 
     config = model.get_config()
-
     return score
 
 
-def keras_seq_to_str(obj):
+def keras_seq_to_str(obj, head_str, **kw):
     """
     a general implementation of sequential model of keras
     :param obj: config obj
@@ -79,11 +79,16 @@ def keras_seq_to_str(obj):
     # Dense(64) is a fully-connected layer with 64 hidden units.
     # in the first layer, you must specify the expected input data shape:
     # here, 20-dimensional vectors.
+    result_sds = kw.pop('result_sds', None)
+    if result_sds is None:
+        raise RuntimeError('no result_sds created')
+
     ls = obj['layers']
     comp = obj['compile']
     f = obj['fit']
     e = obj['evaluate']
-    str_model = 'model = Sequential()\n'
+    str_model = head_str
+    str_model += 'model = Sequential()\n'
     # op = comp['optimizer']
     for l in ls:
         layer_name = get_value(l, 'name', 'Dense')
@@ -94,18 +99,23 @@ def keras_seq_to_str(obj):
         else:
             str_model += 'model.add(%s())' % layer_name + '\n'
 
-    # optimizers_name = get_value(op, 'name', 'SGD')
-    # str_model += 'optimizers = %s(%s)' % (optimizers_name, get_args(op)[:-2]) + '\n'
+    # compile
     str_model += "model.compile(loss='" + \
                  get_value(comp, 'loss', 'categorical_crossentropy') + \
                  "', optimizer='" + comp['optimizer'] + "', metrics= [" + \
                  get_metrics(comp) + \
                  "])\n"
-    str_model += "model.fit(x_train, y_train, " + get_args(f)[:-2] + ")\n"
+    # callback
+    str_model += "batch_print_callback = LambdaCallback(on_epoch_end=lambda " \
+                 "epoch, logs: logger.log_epoch_end(epoch, logs, '%s'))" % result_sds
+    # fit
+    str_model += "model.fit(x_train, y_train,  validation_data=(f['x_val'], " \
+                 "f['y_val']), callbacks=[batch_print_callback], " + \
+                 get_args(f)[:-2] + ")\n"
     str_model += "score = model.evaluate(x_test, y_test, " + get_args(e)[
                                                              :-2] + ")\n"
 
-    print(str_model)
+    return str_model
 
 
 def get_metrics(obj):
@@ -565,6 +575,8 @@ if __name__ == '__main__':
                      },
          'fit': {'x_train': x_train,
                  'y_train': y_train,
+                 'x_val': x_test,
+                 'y_val': y_test,
                  'args': {
                      'epochs': 20,
                      'batch_size': 128

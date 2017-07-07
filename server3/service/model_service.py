@@ -57,6 +57,22 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
     # controller.run_code(conf, model)
 
 
+def model_to_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
+    """
+    run model by model_id and the parameter config
+
+    :param conf:
+    :param project_id:
+    :param staging_data_set_id:
+    :param model_id:
+    :param kwargs:
+    :return:
+    """
+    return job_service.to_code(conf, project_id, staging_data_set_id, model_id,
+                               **kwargs)
+    # controller.run_code(conf, model)
+
+
 def temp():
     add_model_with_ownership(
         'system',

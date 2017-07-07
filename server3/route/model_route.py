@@ -66,3 +66,19 @@ def run_model(model_id):
     except Exception as e:
         return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
     return jsonify({'response': 'success'}), 200
+
+
+@model_app.route('/models/to_code/<string:model_id>', methods=['POST'])
+def model_to_code(model_id):
+    data = request.get_json()
+    conf = data['conf']
+    project_id = data['project_id']
+    staging_data_set_id = data['staging_data_set_id']
+    schema = data['schema']
+    try:
+        code = model_service.model_to_code(conf, project_id,
+                                           staging_data_set_id,
+                                           model_id, schema=schema)
+    except Exception as e:
+        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    return jsonify({'response': code}), 200

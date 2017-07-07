@@ -143,7 +143,7 @@ def filter_fields(sds_id):
     if data is None:
         return jsonify({'response': 'no json'}), 400
     fields = data['fields']
-    if fields is None:
+    if fields is None or fields == []:
         return jsonify({'response': 'no fields'}), 400
     try:
         updated_n = staging_data_business.\
