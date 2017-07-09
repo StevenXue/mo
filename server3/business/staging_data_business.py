@@ -45,8 +45,9 @@ def add(staging_data_set, other_fields_obj):
     :param other_fields_obj: dynamic fields in SON format
     :return: a added staging_data object
     """
-    if not staging_data_set or not other_fields_obj:
-        raise ValueError('no data_set or no other_fields')
+    if not staging_data_set:
+        raise ValueError('no data_set')
+    print(staging_data_set, other_fields_obj)
     staging_data = StagingData(staging_data_set=staging_data_set,
                                **other_fields_obj)
     return staging_data_repo.create(staging_data)

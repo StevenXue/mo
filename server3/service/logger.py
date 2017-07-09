@@ -8,7 +8,6 @@ from business import staging_data_business
 
 
 def log_epoch_end(*args):
-    pass
     save_log(*args, 'epoch')
     emit_log(*args, 'epoch')
 

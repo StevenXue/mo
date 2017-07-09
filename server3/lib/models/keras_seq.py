@@ -18,7 +18,7 @@ def keras_seq(conf, **kw):
     """
     result_sds = kw.pop('result_sds', None)
     if result_sds is None:
-        raise RuntimeError('no result_sds created')
+        raise RuntimeError('no result sds id passed to model')
 
     model = Sequential()
     # Dense(64) is a fully-connected layer with 64 hidden units.
@@ -49,11 +49,13 @@ def keras_seq(conf, **kw):
                   optimizer=comp['optimizer'],
                   metrics=comp['metrics'])
 
-    batch_print_callback = LambdaCallback(
-        on_epoch_end=lambda epoch, logs: logger.log_epoch_end(epoch, logs,
-                                                              result_sds))
+    batch_print_callback = LambdaCallback(on_epoch_end=
+                                          lambda epoch, logs:
+                                          logger.log_epoch_end(epoch, logs,
+                                                               result_sds))
 
     # training
+    # TODO callback 改成异步，考虑 celery
     model.fit(f['x_train'], f['y_train'],
               validation_data=(f['x_val'], f['y_val']),
               callbacks=[batch_print_callback],

@@ -64,7 +64,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
 
 def create_model_job(project_id, staging_data_set_id, model_obj, *argv):
     """
-    help toolkit to create a job before toolkit runs,
+    help model to create a job before model runs,
     as well as save the job & create a result after toolkit runs
     :param project_id: project_id, staging_data_set_id, toolkit_id
     :param staging_data_set_id: project_id, staging_data_set_id, toolkit_id

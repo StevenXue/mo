@@ -20,6 +20,7 @@ class Repo:
         self.__instance = instance
 
     def create(self, obj):
+        print(obj.to_mongo())
         return obj.save()
 
     def create_many(self, objects):

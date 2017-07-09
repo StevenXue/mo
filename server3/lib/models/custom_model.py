@@ -1,9 +1,29 @@
+import logging
+
 import numpy as np
 import tensorflow as tf
+from lib.models.custom_log_handler import MetricsHandler
 
 
-def custom_model(model):
+def custom_model(model, **kw):
+    """
+
+    :param model:
+    :param kw:
+    :return:
+    """
+
+    result_sds = kw.pop('result_sds', None)
+    if result_sds is None:
+        raise RuntimeError('no result sds id passed to model')
+
     tf.logging.set_verbosity(tf.logging.INFO)
+    mh = MetricsHandler()
+    mh.result_sds_id = result_sds
+    logger = logging.getLogger('tensorflow')
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(mh)
+
     estimator = tf.contrib.learn.Estimator(model_fn=model)
     # define our data sets
     x_train = np.array([1., 2., 3., 4.])
@@ -44,4 +64,8 @@ def linear_regressor(features, labels, mode):
         train_op=train)
 
 if __name__ == '__main__':
-    custom_model(linear_regressor)
+    pass
+
+    from business import staging_data_set_business
+    sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
+    custom_model(linear_regressor, result_sds=sds)
