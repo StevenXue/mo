@@ -24,11 +24,10 @@ class MetricsHandler(logging.StreamHandler):
         obj = {metric[0]: float(metric[1]) for metric in metrics}
         for s in sec:
             obj.update({'sec': s})
+        print(obj)
         if obj:
             n = obj.get('step', None)
-            # TODO sds id and global step
-            if n is None:
-                return
-            if self.result_sds_id is None:
-                raise NameError('no result sds id')
-            logger.log_epoch_end(n, obj, self.result_sds_id)
+            if n:
+                logger.log_epoch_end(n, obj, self.result_sds_id)
+
+

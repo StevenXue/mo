@@ -13,6 +13,8 @@ def log_epoch_end(*args):
 
 
 def save_log(n, logs, result_sds, event):
+    if result_sds is None:
+        raise NameError('no result sds id')
     kw = {'n': n, 'event': event}
     kw.update(logs)
     staging_data_business.add(result_sds, kw)
@@ -21,7 +23,7 @@ def save_log(n, logs, result_sds, event):
 def emit_log(n, logs, result_sds, event):
     kw = {'n': n, 'event': event}
     kw.update(logs)
-    sds_id = result_sds['id']
+    # sds_id = result_sds['id']
     # add sds id to namespace
     socketio = SocketIO(message_queue='redis://')
     socketio.emit('log_epoch_end', kw, namespace='/log')#/'+sds_id)
