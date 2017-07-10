@@ -1,5 +1,8 @@
 # -*- coding: UTF-8 -*-
-from mongoengine import *
+from mongoengine import Document
+from mongoengine import StringField
+from mongoengine import EmailField
+from mongoengine import IntField
 
 GENDER = (
     (0, 'female'),

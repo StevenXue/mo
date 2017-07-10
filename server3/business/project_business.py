@@ -58,6 +58,11 @@ def remove_by_id(project_id):
     return project_repo.delete_by_id(project_id)
 
 
+def insert_job_by_id(project_id, job_obj):
+    return project_repo.insert_to_list_fields_by_id(project_id,
+                                                    {'jobs': job_obj})
+
+
 def add_and_update_one_by_id(project_id, result_obj, job_obj):
     return project_repo.insert_to_list_fields_by_id(project_id,
                                                     {'results': result_obj,

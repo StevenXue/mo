@@ -61,6 +61,21 @@ def convert_json_str_to_dataframe(arr):
     return df_converted
 
 
-def me_obj_list_to_dict_list(me_obj_list):
+def me_obj_list_to_json_list(me_obj_list):
+    """
+    mongoengine object list to json list
+    :param me_obj_list: list
+    :return:
+    """
     return [convert_to_json(me_obj.to_mongo()) for me_obj in
+            me_obj_list]
+
+
+def me_obj_list_to_dict_list(me_obj_list):
+    """
+    mongoengine object list to dict list
+    :param me_obj_list: list
+    :return:
+    """
+    return [me_obj.to_mongo().to_dict() for me_obj in
             me_obj_list]

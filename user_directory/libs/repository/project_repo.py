@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from repository.general_repo import Repo
+from ..repository.general_repo import Repo
 
 
 class ProjectRepo(Repo):

@@ -29,6 +29,7 @@ toolkit_repo = ToolkitRepo(Toolkit)
 
 def get_by_toolkit_name(toolkit_name):
     # toolkit_obj = Toolkit(name=toolkit_name)
+    # print 'toolkit_obj', toolkit_obj.name
     # return toolkit_repo.read_by_toolkit_name(toolkit_obj)
     return toolkit_repo.read_by_unique_field('name', toolkit_name)
 

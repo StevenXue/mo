@@ -95,9 +95,15 @@ export class Notebook extends React.Component {
         `project_id = "${this.props.project_id}" \n` +
         `dataset_id = "${this.props.dataset_id}" \n` +
         `dataset_name = "${this.props.dataset_name}" \n` +
-        "# you might need to use it some where in your code\n" +
-        "# to run MNIST, you need to specify your training steps after \n# getting the code \n" +
-        "# you also need to specify the traning data set id as listed above";
+        "# you might need to use it some where in your code\n"+
+        "import os\n"+
+        "import sys\n"+
+        "module_path = os.path.abspath(os.path.join('..'))\n"+
+        "if module_path not in sys.path:\n"+
+        "    sys.path.append('../../../')\n"+
+        "from libs import lib\n"+
+        "from libs import service\n"+
+        "from libs.service import job_service"
       const cellOrder = this.state.notebook.get('cellOrder');
       let id = cellOrder.get(0, null);
       this.dispatch(updateCellSource(id, source));

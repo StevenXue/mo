@@ -2,10 +2,11 @@
 """
 utility used in all project
 
-Author: Zhaofeng Li
+Author: Zhaofeng Li, Tianyi Zhang
 Date: 2017.06.09
 """
 import numpy as np
+
 
 # int, float
 def convert_data_array_by_fields(array, field_type_arrays):
@@ -19,6 +20,7 @@ def convert_data_array_by_fields(array, field_type_arrays):
     failure_exists = False
     failure_count = {f_t[0]: [] for f_t in field_type_arrays}
     for i, a in enumerate(array):
+        oid = a['_id']
         for f_t in field_type_arrays:
             field = f_t[0]
             value_type = f_t[1]
@@ -30,11 +32,11 @@ def convert_data_array_by_fields(array, field_type_arrays):
                 elif value_type == 'str':
                     a[field] = str(a[field])
             except ValueError:
-                failure_count[field].append(i)
+                failure_count[field].append(str(oid))
                 failure_exists = True
                 continue
     if failure_exists:
-        return {'result': array, 'failure_count': failure_count}
+        return {'result': array, 'failures': failure_count}
     else:
         return {'result': array}
 
@@ -153,3 +155,9 @@ def multi_one_hot_encoder(matrix):
 
     from sklearn.preprocessing import MultiLabelBinarizer
     return MultiLabelBinarizer().fit_transform(matrix)
+
+
+def retrieve_nan_index(result, nan_index):
+    for ind in nan_index:
+        result.insert(ind, [np.nan])
+    return result

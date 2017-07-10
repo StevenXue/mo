@@ -7,7 +7,6 @@ Need to be FIXED, further think of how to save
 from mongoengine import connect
 
 from repository import config
-from entity.data_set import DataSet
 connect(
     db=config.get_mongo_db(),
     username=config.get_mongo_user(),
@@ -20,10 +19,8 @@ class Repo:
     def __init__(self, instance):
         self.__instance = instance
 
-    # def read_by_id(self, object_id):
-    #     return self.__instance.objects.get(id=object_id)
-
     def create(self, obj):
+        print(obj.to_mongo())
         return obj.save()
 
     def create_many(self, objects):

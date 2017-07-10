@@ -9,7 +9,12 @@
 # Further to FIXME of None
 """
 
-from mongoengine import *
+from mongoengine import Document
+from mongoengine import ReferenceField
+from mongoengine import DateTimeField
+from mongoengine import StringField
+from mongoengine import DynamicField
+from mongoengine import IntField
 
 from entity.job import Job
 

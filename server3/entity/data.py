@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
-from mongoengine import *
+from mongoengine import DynamicDocument
+from mongoengine import ReferenceField
 
 from entity.data_set import DataSet
 

@@ -40,9 +40,9 @@ def list_projects():
             public_projects, owned_projects = project_service.\
                 list_projects_by_user_ID(user_ID, -1)
             public_projects = json_utility.\
-                me_obj_list_to_dict_list(public_projects)
+                me_obj_list_to_json_list(public_projects)
             owned_projects = json_utility.\
-                me_obj_list_to_dict_list(owned_projects)
+                me_obj_list_to_json_list(owned_projects)
             result = {
                 'public_projects': public_projects,
                 'owned_projects': owned_projects

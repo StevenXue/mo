@@ -9,7 +9,9 @@
 # Further to FIXME of None
 """
 
-from mongoengine import *
+from mongoengine import DynamicDocument
+from mongoengine import StringField
+from mongoengine import DictField
 
 
 class Toolkit(DynamicDocument):

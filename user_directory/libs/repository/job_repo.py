@@ -8,28 +8,21 @@
 # @running  : python
 # Further to FIXME of None
 """
-from repository.general_repo import Repo
+import os
+import sys
+module_path = os.path.abspath(os.path.join('..'))
+if module_path not in sys.path:
+    sys.path.append('../../')
+
+from ..repository.general_repo import Repo
 
 
 class JobRepo(Repo):
     def __init__(self, instance):
         Repo.__init__(self, instance)
 
-    def read_by_job_id(self, job_obj):
-        return Repo.read_unique_one(self, {'id': job_obj.id})
+    def update_one_by_id_status_and_time(self, job_id, status, updated_time):
+        return Repo.update_one_by_id(self, job_id,
+                                     {'status': status,
+                                      'updated_time': updated_time})
 
-    def read_by_model(self, job_obj):
-        return Repo.read_unique_one(self, {'model': job_obj.model})
-
-    def read_by_toolkit(self, job_obj):
-        return Repo.read_unique_one(self, {'toolkit': job_obj.toolkit})
-
-    def read_by_staging_data_set(self, job_obj):
-        return Repo.read_unique_one(self, {'staging_data_set': job_obj.staging_data_set})
-
-    def read_by_status(self, job_obj):
-        return Repo.read_unique_one(self, {'status': job_obj.status})
-
-    def read_by_result(self, result_obj):
-        print('result_obj', result_obj.id)
-        return Repo.read_unique_one(self, {'id': result_obj.id})

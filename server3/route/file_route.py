@@ -72,8 +72,8 @@ def list_files_by_user_ID():
     try:
         public_files, owned_files = file_service.list_files_by_user_ID(user_ID,
                                                                        -1)
-        public_files = json_utility.me_obj_list_to_dict_list(public_files)
-        owned_files = json_utility.me_obj_list_to_dict_list(owned_files)
+        public_files = json_utility.me_obj_list_to_json_list(public_files)
+        owned_files = json_utility.me_obj_list_to_json_list(owned_files)
         result = {
             'public_files': public_files,
             'owned_files': owned_files

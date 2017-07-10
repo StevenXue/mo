@@ -9,7 +9,9 @@
 # Further to FIXME of None
 """
 
-from mongoengine import *
+from mongoengine import DynamicDocument
+from mongoengine import StringField
+from mongoengine import DictField
 
 
 class Toolkit(DynamicDocument):
@@ -36,11 +38,3 @@ class Toolkit(DynamicDocument):
     # 'run'
 
     parameter_spec = DictField()
-    # {
-        # "input_data": [{'type': 'list'},{'type':'list', 'default':[1,2,3,4,5]}],
-    #     "k": {
-    #         'type': 'int',
-    #         'default': 2
-    #     }
-    # }
-    # meta = {'allow_inheritance': True}

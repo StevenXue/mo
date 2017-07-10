@@ -32,8 +32,7 @@ def register():
     data.pop('user_ID')
     data.pop('password')
     if user_ID is None or password is None:
-        return make_response(jsonify({'response': 'invalid user or password'}),
-                             400)
+        return jsonify({'response': 'invalid user or password'}), 400
     # added_user = user_service.add(user_ID, password, data)
     # added_user = json_utility.convert_to_json(added_user.to_mongo())
     # added_user.pop('password')
@@ -42,9 +41,8 @@ def register():
         added_user = json_utility.convert_to_json(added_user.to_mongo())
         added_user.pop('password')
     except Exception as e:
-        return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}), 400)
-    return make_response(jsonify({'response': added_user}), 200)
+        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    return jsonify({'response': added_user}), 200
 
 
 # Provide a method to create access tokens. The create_access_token()

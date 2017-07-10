@@ -1,0 +1,9 @@
+{
+  "layers": [
+    {
+      "name": "Dense",
+      "units": "int",
+      "activation": "string"
+    }
+  ]
+}

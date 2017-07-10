@@ -6,8 +6,7 @@ Need to be FIXED, further think of how to save
 
 from mongoengine import connect
 
-from repository import config
-from entity.data_set import DataSet
+from ..repository import config
 connect(
     db=config.get_mongo_db(),
     username=config.get_mongo_user(),
@@ -20,11 +19,11 @@ class Repo:
     def __init__(self, instance):
         self.__instance = instance
 
-    # def read_by_id(self, object_id):
-    #     return self.__instance.objects.get(id=object_id)
-
     def create(self, obj):
         return obj.save()
+
+    def create_many(self, objects):
+        return self.__instance.objects.insert(objects, load_bulk=False)
 
     def create_one(self, content):
         return self.__instance(**content).save()
@@ -50,7 +49,7 @@ class Repo:
     def read_by_non_unique_field(self, field_name, field_value):
         """
         general function to query the db by non unique field, thus return a list
-        :param field_name:
+        :param field_name:str
         :param field_value:
         :return: a list of objects corresponding to the query
         """
@@ -59,8 +58,9 @@ class Repo:
     def read_by_non_unique_field_limit(self, field_name, field_value, limit):
         """
         general function to query the db by non unique field, thus return a list
-        :param field_name:
+        :param field_name:str
         :param field_value:
+        :param limit: int
         :return: a list of objects corresponding to the query
         """
         return Repo.read(self, {field_name: field_value}).limit(limit)
@@ -72,7 +72,8 @@ class Repo:
         return self.__instance.objects(**query).update(**update)
 
     def update_one(self, query, update):
-        return self.__instance.objects(**query).update_one(**update)
+        modified_obj = self.__instance.objects(**query).update_one(**update)
+        return modified_obj.reload()
 
     def update_one_by_id(self, obj_id, update):
         # print '2', type(obj_id), obj_id
@@ -80,9 +81,21 @@ class Repo:
         # print '3', type(modified_obj)
         return modified_obj.reload()
 
+    def update_unset_fields_by_non_unique_field(self, field_name, field_value,
+                                                fields):
+        update = {'unset__' + k: '' for k in fields}
+        return self.__instance.objects(**{field_name: field_value})\
+            .update(**update)
+
     # for List field add only one new element- update={'job': new_job_obj,
     #                                                  'result': new_result_obj}
-    def add_and_update_one_by_id(self, obj_id, update):
+    def insert_to_list_fields_by_id(self, obj_id, update):
+        """
+        insert item to list fields of document with given object id
+        :param obj_id: ObjectId
+        :param update: dict
+        :return: modified_obj
+        """
         # print '2*', type(obj), obj
         # print '3*', update
         update = {'push__' + k: v for k, v in list(update.items())}
@@ -110,7 +123,7 @@ class Repo:
     def delete_by_non_unique_field(self, field_name, field_value):
         """
         general function to query the db by non unique field, thus return a list
-        :param field_name:
+        :param field_name: str
         :param field_value:
         :return: a list of objects corresponding to the query
         """
