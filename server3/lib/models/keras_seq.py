@@ -66,12 +66,12 @@ def keras_seq(conf, **kw):
                   **f['args'])
 
         # testing
-        score = model.evaluate(e['x_test'], e['y_test'], **e['args'])
+        # score = model.evaluate(e['x_test'], e['y_test'], **e['args'])
 
         weights = model.get_weights()
 
         config = model.get_config()
-        return score
+        # return score
 
 
 def keras_seq_to_str(obj, head_str, **kw):
