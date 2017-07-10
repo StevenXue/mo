@@ -60,7 +60,7 @@ def keras_seq(conf, **kw):
         # training
         # TODO callback 改成异步，考虑 celery
         model.fit(f['x_train'], f['y_train'],
-                  validation_data=(f['x_val'], f['y_val']),
+                  # validation_data=(f['x_val'], f['y_val']),
                   callbacks=[batch_print_callback],
                   verbose=0,
                   **f['args'])
