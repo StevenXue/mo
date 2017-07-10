@@ -9,4 +9,5 @@ module.exports = {
   //jupyter
   //baseUrl: 'http://localhost:8888',
   baseUrl: 'http://10.52.14.182:8888'
+
 }

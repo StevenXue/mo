@@ -41,7 +41,7 @@ export default class ModelForms extends React.Component {
       divide: this.props.divide
     });
 
-    let socket = io.connect('http://localhost:5000'+ '/log');
+    let socket = io.connect(flaskServer+ '/log');
 
     socket.on('log_epoch_end', (msg) => {
       //console.log(msg);

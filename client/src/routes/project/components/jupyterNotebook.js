@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import { jupyterServer, baseUrl} from '../../../constants'
+import { jupyterServer, baseUrl, flaskServer} from '../../../constants'
 import empty from './empty.ipynb';
 import { Button, message, Modal} from 'antd';
 import { Notebook, createStore} from '../../../notebook/src/';
@@ -76,7 +76,7 @@ class JupyterNotebook extends React.Component {
     // this.setState({name: path[path.length -1]});
     this.attachChannels()
     //console.log(this.props.notebook_content);
-    let socket = io.connect('http://localhost:5000'+ '/log');
+    let socket = io.connect(flaskServer+ '/log');
 
     socket.on('log_epoch_end', (msg) => {
       //console.log(msg);
