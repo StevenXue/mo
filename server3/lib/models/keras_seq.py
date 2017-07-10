@@ -47,6 +47,8 @@ def keras_seq(conf, **kw):
     model.compile(loss=comp['loss'],
                   optimizer=comp['optimizer'],
                   metrics=comp['metrics'])
+    import tensorflow as tf
+    graph = tf.get_default_graph()
 
     batch_print_callback = LambdaCallback(on_epoch_end=
                                           lambda epoch, logs:
@@ -59,11 +61,11 @@ def keras_seq(conf, **kw):
               validation_data=(f['x_val'], f['y_val']),
               callbacks=[batch_print_callback],
               verbose=0,
-              **f['args']
+              **f['args'])
 
-)
     # testing
-    score = model.evaluate(e['x_test'], e['y_test'], **e['args'])
+    with graph.as_default():
+        score = model.evaluate(e['x_test'], e['y_test'], **e['args'])
 
     weights = model.get_weights()
 
