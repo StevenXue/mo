@@ -1,15 +1,15 @@
 # -*- coding: UTF-8 -*-
 from datetime import datetime
 
-from service import job_service
-from business import project_business, job_business
-from business import user_business
-from business import ownership_business
-from business import job_business
-from business import result_business
-from business import data_set_business
-from business.project_business import project_repo
-from service import ownership_service
+from ..service import job_service
+from ..business import project_business, job_business
+from ..business import user_business
+from ..business import ownership_business
+from ..business import job_business
+from ..business import result_business
+from ..business import data_set_business
+from ..business.project_business import project_repo
+from ..service import ownership_service
 
 
 def create_project(name, description, user_ID, is_private):
@@ -65,6 +65,10 @@ def remove_project_by_id(project_id):
     for result in project['results']:
         result_business.remove_by_id(result['id'])
     return project_business.remove_by_id(project_id)
+
+
+def add_job_to_project(job_obj, project_id):
+    return project_business.insert_job_by_id(project_id, job_obj)
 
 
 def add_job_and_result_to_project(result_obj, project_id):

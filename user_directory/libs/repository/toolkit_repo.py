@@ -8,7 +8,7 @@
 # @running  : python
 # Further to FIXME of None
 """
-from repository.general_repo import Repo
+from ..repository.general_repo import Repo
 
 
 class ToolkitRepo(Repo):

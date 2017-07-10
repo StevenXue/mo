@@ -1,23 +1,36 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-// import Toolbar from '../../../react-notebook/src/toolbar';
-
-import { jupyterServer, baseUrl} from '../../../constants'
+import { jupyterServer, baseUrl, flaskServer} from '../../../constants'
 import empty from './empty.ipynb';
-import { Button, message} from 'antd';
-
+import { Button, message, Modal} from 'antd';
 import { Notebook, createStore} from '../../../notebook/src/';
 import { setNotebook, recordResults, save, saveAs} from '../../../notebook/src/actions';
 import * as enchannelBackend from '../../../notebook/enchannel-notebook-backend';
 import style from './style.css';
-import Curve from './curve';
-import Immutable from 'immutable';
+//import Curve from './curve';
+import CurveTest from './realTime';
+import Model from './modelProcess';
+import io from 'socket.io-client';
 
 import 'normalize.css/normalize.css'
 import 'material-design-icons/iconfont/material-icons.css'
 import '../../../notebook/src/toolbar/styles/base.less'
 import './codemirror.css'
+
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+function isEmpty(obj) {
+  if (obj == null) return true;
+  if (obj.length > 0)    return false;
+  if (obj.length === 0)  return true;
+  if (typeof obj !== "object") return true;
+  for (var key in obj) {
+    if (hasOwnProperty.call(obj, key)) return false;
+  }
+
+  return true;
+}
 
 class JupyterNotebook extends React.Component {
   constructor (props) {
@@ -43,6 +56,8 @@ class JupyterNotebook extends React.Component {
       kernalId: '',
       getOutput: false,
       spawned: false,
+      visible: false,
+      ioData: {}
     };
 
     //this.store.subscribe(state => this.setState(state));
@@ -60,7 +75,14 @@ class JupyterNotebook extends React.Component {
     // console.log(path);
     // this.setState({name: path[path.length -1]});
     this.attachChannels()
-    console.log(this.props.notebook_content);
+    //console.log(this.props.notebook_content);
+    let socket = io.connect(flaskServer+ '/log');
+
+    socket.on('log_epoch_end', (msg) => {
+      //console.log(msg);
+      //this.timer = setTimeout(()=> this.setState({ioData: msg}), 100);
+      this.setState({ioData: msg});
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -157,7 +179,8 @@ class JupyterNotebook extends React.Component {
 
   onClickButton() {
     this.setState({
-      forceSource: '%run mnist_1.0_softmax.py $[your training steps]'
+      //forceSource: '%run mnist_1.0_softmax.py $[your training steps]',
+      visible: true
     });
   }
 
@@ -244,13 +267,21 @@ class JupyterNotebook extends React.Component {
     }
   }
 
+  onReceiveCode(code){
+    console.log("this is code", code);
+    this.setState({forceSource: code});
+    message.success('Code Copied!!');
+  }
+
   renderResult() {
     //console.log(this.state.output);
-    let outputs = this.state.output;
-    if(outputs.length !== 0) {
-      return (<Curve style={{height: '100%', width: '100%'}} dataString={this.state.output} />);
+    // let outputs = this.state.output;
+    // if(outputs.length !== 0) {
+    //   return (<Curve style={{height: '100%', width: '100%'}} dataString={this.state.output} />);
+    // }
+    if(!isEmpty(this.state.ioData )) {
+      return <CurveTest data={this.state.ioData}/>
     }
-
   }
   // %run mnist_1.0_softmax.py
   renderNotebook(type) {
@@ -304,7 +335,20 @@ class JupyterNotebook extends React.Component {
             flexDirection: 'row', alignItems: 'center',
             borderRadius: 3, border: '1px solid #e5e5e5'}}>
             <Button style={{marginLeft: 30, width: 100}} onClick={() => this.onClickSave()}>SAVE</Button>
-            <Button onClick={() => this.onClickButton()} style={{marginLeft: 10, width: 100}}>Get Code</Button>
+            <Button onClick={() => this.onClickButton()} style={{marginLeft: 10, width: 100}}>Config Model</Button>
+            <Modal title="Model Config"
+                   width={1200}
+                   style={{overflowX: 'auto'}}
+                   visible={this.state.visible}
+                   onOk={() => this.setState({visible: false})}
+                   onCancel={() => this.setState({visible: false})}>
+              <Model style={{width: 1000, height: 450}}
+                     project_id={this.props.project_id}
+                     dataset_id={this.props.dataset_id}
+                     cols={this.props.columns}
+                     jupyter={true}
+                     getCode={(code) => this.onReceiveCode(code)}/>
+            </Modal>
           </div>
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             <div style={{ width: '70%' }}>
