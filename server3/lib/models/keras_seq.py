@@ -115,10 +115,13 @@ def keras_seq_to_str(obj, head_str, **kw):
                  "', optimizer='" + comp['optimizer'] + "', metrics= [" + \
                  get_metrics(comp) + \
                  "])\n"
+
+    str_model += "result_sds = staging_data_set_business.get_by_id(result_sds)"
+
     # callback
     str_model += "batch_print_callback = LambdaCallback(on_epoch_end=lambda " \
                  "epoch, \\\nlogs: logger.log_epoch_end(epoch, " \
-                 "logs, '%s'))\n" % result_sds
+                 "logs, result_sds))\n"
     # fit
     str_model += "model.fit(x_train, y_train,  validation_data=(x_test, " \
                  "y_test), \\\ncallbacks=[batch_print_callback], " + \

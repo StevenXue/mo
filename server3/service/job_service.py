@@ -165,7 +165,7 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
     y_str = line_split_for_long_fields(y_str)
     code_str += x_str
     code_str += y_str
-    code_str += "from service import job_service\n"
+    code_str += "from libs.service import job_service\n"
     code_str += "obj = job_service.split_supervised_input(" \
                 "staging_data_set_id, x_fields, y_fields, schema)\n"
     code_str += "x_train = obj['x_tr']\n"
