@@ -56,22 +56,22 @@ def keras_seq(conf, **kw):
                                           logger.log_epoch_end(epoch, logs,
                                                                result_sds))
 
-    with graph.as_default():
-        # training
-        # TODO callback 改成异步，考虑 celery
-        model.fit(f['x_train'], f['y_train'],
-                  # validation_data=(f['x_val'], f['y_val']),
-                  callbacks=[batch_print_callback],
-                  verbose=0,
-                  **f['args'])
 
-        # testing
-        # score = model.evaluate(e['x_test'], e['y_test'], **e['args'])
+    # training
+    # TODO callback 改成异步，考虑 celery
+    model.fit(f['x_train'], f['y_train'],
+              validation_data=(f['x_val'], f['y_val']),
+              callbacks=[batch_print_callback],
+              verbose=0,
+              **f['args'])
 
-        weights = model.get_weights()
+    # testing
+    score = model.evaluate(e['x_test'], e['y_test'], **e['args'])
 
-        config = model.get_config()
-        # return score
+    weights = model.get_weights()
+
+    config = model.get_config()
+    return score
 
 
 def keras_seq_to_str(obj, head_str, **kw):
