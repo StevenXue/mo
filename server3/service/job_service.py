@@ -217,9 +217,7 @@ def run_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
         conf = manage_supervised_input(conf, staging_data_set_id, **kwargs)
     func = getattr(models, model.entry_function)
     func = create_model_job(project_id, staging_data_set_id, model)(func)
-    global graph
-    with graph.as_default():
-        return func(conf)
+    return func(conf)
 
 
 if __name__ == '__main__':

@@ -54,8 +54,7 @@ def keras_seq(conf, **kw):
     batch_print_callback = LambdaCallback(on_epoch_end=
                                           lambda epoch, logs:
                                           logger.log_epoch_end(epoch, logs,
-                                                               result_sds))
-
+                                                               result_sds, graph))
 
     # training
     # TODO callback 改成异步，考虑 celery
