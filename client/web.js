@@ -7,7 +7,7 @@ app.use(express.static('./dist'));
 
 
 app.get('/*', function (req, res) {
-    res.sendFile(path.join(__dirname, './dist', 'stats.html'));
+    res.sendFile(path.join(__dirname, './dist', 'index.html'));
 });
 
 app.listen(3090, "0.0.0.0");
