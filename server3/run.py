@@ -36,7 +36,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
 
 
-socketio.init_app(app, logger=True, async_mode='eventlet',
+socketio.init_app(app, logger=True, engineio_logger=True, async_mode='eventlet',
                   message_queue='redis://')
 
 CORS(app, supports_credentials=True)

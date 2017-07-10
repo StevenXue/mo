@@ -39,7 +39,7 @@ export default class Layer extends React.Component {
           let v = target.value;
           v = v.replace(/\s+/g,"");
           let array = v.split(',');
-          array.map((el) => array[array.indexOf(el)] = parseInt(el));
+          array.filter(e => e).map((el) => parseInt(el));
           layer['args'][e.name] = array;
         }else if(e.type.key === 'float'){
           layer['args'][e.name] = parseFloat(target.value);
