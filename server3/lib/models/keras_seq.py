@@ -47,8 +47,6 @@ def keras_seq(conf, **kw):
     model.compile(loss=comp['loss'],
                   optimizer=comp['optimizer'],
                   metrics=comp['metrics'])
-    import tensorflow as tf
-    graph = tf.get_default_graph()
 
     batch_print_callback = LambdaCallback(on_epoch_end=
                                           lambda epoch, logs:
@@ -63,14 +61,17 @@ def keras_seq(conf, **kw):
               verbose=0,
               **f['args'])
 
+    import tensorflow as tf
+    graph = tf.get_default_graph()
+
     # testing
     with graph.as_default():
         score = model.evaluate(e['x_test'], e['y_test'], **e['args'])
 
-    weights = model.get_weights()
+        weights = model.get_weights()
 
-    config = model.get_config()
-    return score
+        config = model.get_config()
+        return score
 
 
 def keras_seq_to_str(obj, head_str, **kw):
