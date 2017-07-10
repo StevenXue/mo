@@ -34,7 +34,6 @@ app = Flask(__name__, static_url_path='')
 app.secret_key = 'super-super-secret'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
-# app.config['REDIS_QUEUE_KEY'] = 'my_queue'
 
 
 socketio.init_app(app, logger=True, async_mode='eventlet',

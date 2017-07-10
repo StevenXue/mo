@@ -1,13 +1,12 @@
 # -*- coding: UTF-8 -*-
-from keras.models import Sequential
-from keras import optimizers
-from keras import utils
-from keras.callbacks import LambdaCallback
-from keras import layers
-from service import logger
-import sklearn
 # Generate dummy data
 import numpy as np
+from keras import layers
+from keras import utils
+from keras.callbacks import LambdaCallback
+from keras.models import Sequential
+
+from service import logger
 
 
 def keras_seq(conf, **kw):
@@ -89,7 +88,16 @@ def keras_seq_to_str(obj, head_str, **kw):
     comp = obj['compile']
     f = obj['fit']
     e = obj['evaluate']
-    str_model = head_str
+    layer_names = set([l['name'] for l in ls])
+    layer_import = ''
+    for n in layer_names:
+        layer_import += 'from keras.layers import %s' % n
+    str_model = 'from keras.models import Sequential\n'
+    str_model += 'from keras.callbacks import LambdaCallback\n'
+    str_model += 'from libs.service import logger\n'
+    str_model += 'from libs.business import staging_data_set_business\n'
+    str_model += layer_import
+    str_model += head_str
     str_model += 'model = Sequential()\n'
     # op = comp['optimizer']
     for l in ls:
@@ -109,11 +117,11 @@ def keras_seq_to_str(obj, head_str, **kw):
                  "])\n"
     # callback
     str_model += "batch_print_callback = LambdaCallback(on_epoch_end=lambda " \
-                 "epoch, logs: logger.log_epoch_end(epoch, " \
+                 "epoch, \\\nlogs: logger.log_epoch_end(epoch, " \
                  "logs, '%s'))\n" % result_sds
     # fit
-    str_model += "model.fit(x_train, y_train,  validation_data=(f['x_val'], " \
-                 "f['y_val']), callbacks=[batch_print_callback], " + \
+    str_model += "model.fit(x_train, y_train,  validation_data=(x_test, " \
+                 "y_test), \\\ncallbacks=[batch_print_callback], " + \
                  get_args(f)[:-2] + ")\n"
     str_model += "score = model.evaluate(x_test, y_test, " + get_args(e)[
                                                              :-2] + ")\n"

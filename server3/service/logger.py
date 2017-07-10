@@ -14,7 +14,7 @@ def log_epoch_end(*args):
 
 def save_log(n, logs, result_sds, event):
     if result_sds is None:
-        raise NameError('no result sds id')
+        raise ValueError('no result sds id')
     kw = {'n': n, 'event': event}
     kw.update(logs)
     staging_data_business.add(result_sds, kw)

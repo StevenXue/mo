@@ -131,6 +131,13 @@ def manage_supervised_input(conf, staging_data_set_id, **kwargs):
     return conf
 
 
+def line_split_for_long_fields(field_str):
+    field_str = field_str.split(' ')
+    for i in range(len(field_str) // 10):
+        field_str[i * 10 + 1] += '\n'
+    return ' '.join(field_str)
+
+
 def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
     """
     deal with input when supervised learning
@@ -152,11 +159,15 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
     code_str = "schema = '%s'\n" % schema
     # str += 'conf = %s\n' % conf
     code_str += "staging_data_set_id = '%s'\n" % staging_data_set_id
-    code_str += "x_fields = '%s'\n" % x_fields
-    code_str += "y_fields = '%s'\n" % y_fields
+    x_str = "x_fields = %s\n" % x_fields
+    y_str = "y_fields = %s\n" % y_fields
+    x_str = line_split_for_long_fields(x_str)
+    y_str = line_split_for_long_fields(y_str)
+    code_str += x_str
+    code_str += y_str
     code_str += "from service import job_service\n"
-    code_str += "obj = split_supervised_input(staging_data_set_id, x_fields, " \
-                "y_fields, schema)\n"
+    code_str += "obj = job_service.split_supervised_input(" \
+                "staging_data_set_id, x_fields, y_fields, schema)\n"
     code_str += "x_train = obj['x_tr']\n"
     code_str += "y_train = obj['y_tr']\n"
     code_str += "x_test = obj['x_te']\n"
@@ -189,7 +200,7 @@ def to_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
                                                   **kwargs)
     func = getattr(models, model.to_code_function)
     func = create_model_job(project_id, staging_data_set_id, model)(func)
-    return func(conf, head_str)
+    print(func(conf, head_str))
 
 
 def run_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
@@ -237,7 +248,9 @@ if __name__ == '__main__':
                           'optimizer': 'SGD',
                           'metrics': ['accuracy']
                           },
-              'fit': {'x_train': '11',
+              'fit': {'x_train': ['11', '11', '11', '11', '11', '11',
+                                  '11', '11', '11', '11', '11', '11',
+                                  '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11', '11'],
                       'y_train': '11',
                       'x_val': '11',
                       'y_val': '11',
