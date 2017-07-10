@@ -15,9 +15,9 @@ from mongoengine import ListField
 from mongoengine import IntField
 from mongoengine import DateTimeField
 
-from entity.staging_data_set import StagingDataSet
-from entity.toolkit import Toolkit
-from entity.model import Model
+from ..entity.staging_data_set import StagingDataSet
+from ..entity.toolkit import Toolkit
+from ..entity.model import Model
 
 STATUS = (
     (0, 'start'),

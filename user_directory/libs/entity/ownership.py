@@ -5,12 +5,12 @@ from mongoengine import BooleanField
 from mongoengine import ReferenceField
 from mongoengine import CASCADE
 
-from entity.toolkit import Toolkit
-from entity.file import File
-from entity.data_set import DataSet
-from entity.project import Project
-from entity.model import Model
-from entity.user import User
+from ..entity.toolkit import Toolkit
+from ..entity.file import File
+from ..entity.data_set import DataSet
+from ..entity.project import Project
+from ..entity.model import Model
+from ..entity.user import User
 
 OWNERSHIP_LEVEL = ('public', 'private')
 

@@ -9,7 +9,7 @@ from business import data_business
 from service import data_service
 from utility import data_utility
 from utility import json_utility
-import constants
+#import constants
 
 
 # 使得 sys.getdefaultencoding() 的值为 'utf-8'

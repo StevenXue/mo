@@ -3,11 +3,11 @@ import os
 import csv
 import io
 
-from business import file_business
-from business import user_business
-from business import ownership_business
-from service import ownership_service
-from repository import config
+from ..business import file_business
+from ..business import user_business
+from ..business import ownership_business
+from ..service import ownership_service
+from ..repository import config
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 

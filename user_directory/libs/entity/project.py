@@ -6,9 +6,9 @@ from mongoengine import DateTimeField
 from mongoengine import ReferenceField
 from mongoengine import ListField
 
-from entity.data_set import DataSet
-from entity.job import Job
-from entity.result import Result
+from ..entity.data_set import DataSet
+from ..entity.job import Job
+from ..entity.result import Result
 
 
 class Project(Document):

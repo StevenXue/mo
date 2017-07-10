@@ -16,7 +16,7 @@ from mongoengine import StringField
 from mongoengine import DynamicField
 from mongoengine import IntField
 
-from entity.job import Job
+from ..entity.job import Job
 
 
 RESULT_TYPE = (

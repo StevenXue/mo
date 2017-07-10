@@ -2,14 +2,14 @@
 from bson import Code
 from bson import ObjectId
 
-from business import data_business
-from business import data_set_business
-from business import ownership_business
-from business import user_business
-from service import file_service
-from service import ownership_service
-from utility import json_utility
-import constants
+from ..business import data_business
+from ..business import data_set_business
+from ..business import ownership_business
+from ..business import user_business
+from ..service import file_service
+from ..service import ownership_service
+from ..utility import json_utility
+#import constants
 
 def add_data_set(data_set_name, ds_description, user_ID, is_private):
     ds = data_set_business.add(data_set_name, ds_description)
@@ -103,7 +103,8 @@ def check_data_integrity(data_array, data_fields):
     for row in data_array:
         oid = row['_id']
         for field in data_fields:
-            if field[0] not in row:
+            if field[0] not in row or row[field[0]] == '' \
+                    or row[field[0]] == ' ':
                 if oid in missing:
                     missing[oid].append({field[0]: ''})
                 else:

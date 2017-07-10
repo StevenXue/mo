@@ -58,8 +58,10 @@ def keras_seq(conf, **kw):
     model.fit(f['x_train'], f['y_train'],
               validation_data=(f['x_val'], f['y_val']),
               callbacks=[batch_print_callback],
-              **f['args'])
+              verbose=0,
+              **f['args']
 
+)
     # testing
     score = model.evaluate(e['x_test'], e['y_test'], **e['args'])
 

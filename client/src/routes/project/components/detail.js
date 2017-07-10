@@ -13,6 +13,7 @@ import JupyterNotebook from './jupyterNotebook'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/monokai.css'
 import Preprocess from './preprocess'
+import AutomatedModel from './autoModal';
 //import Input from 'antd/lib/input/Input.d'
 
 const { Option, OptGroup } = Select
@@ -66,7 +67,9 @@ class ProjectDetail extends React.Component {
       dataset_name: 'DataSet Selected',
       to_disconnect: false,
       notebook: empty,
-      spawn_new: false
+      spawn_new: false,
+      columns: [],
+      stagingDataID: ''
   }
   }
 
@@ -115,7 +118,7 @@ class ProjectDetail extends React.Component {
     ).then((response) => response.json())
       .then((res) => {
         let values = {}
-        console.log('/data/data_sets/'+dataSetId+'?limit=10', res.response)
+        //console.log('/data/data_sets/'+dataSetId+'?limit=10', res.response)
         Object.keys(res.fields).forEach((e) => values[e] = 'str')
         this.setState({
           dataSet: res.response,
@@ -188,6 +191,24 @@ class ProjectDetail extends React.Component {
       });
   }
 
+  getStagingId(value) {
+    //console.log("staged", value);
+    fetch(flaskServer + '/staging_data/staging_data_sets/' + value, {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then((response) => response.json())
+      .then((res) => {
+          let c = Object.keys(res.response.data[1]);
+          this.setState({
+            columns: c,
+            stagingDataID: value
+          });
+        },
+      )
+  }
+
   renderOptions (key) {
     return this.props.project.dataSets[key].map((e) => <Option key={e._id} value={e._id}>{e.name}</Option>)
   }
@@ -228,8 +249,8 @@ class ProjectDetail extends React.Component {
                   {this.state.dataSet.length > 0 &&
                     <Preprocess dataSet={this.state.dataSet}
                                 fields={this.state.fields}
-                                dataSetId={this.props.project.selectedDSIds}
-                                project_id={this.props.location.query._id}/>
+                                project_id={this.props.location.query._id}
+                                passStaging={(value) => this.getStagingId(value)}/>
                   }
                 </Panel>
               </Collapse>
@@ -240,6 +261,13 @@ class ProjectDetail extends React.Component {
                 <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                   <Toolkits project_id={this.props.location.query._id} />
                 </div>
+              </Panel>
+            </Collapse>
+          </div>
+          <div>
+            <Collapse bordered={true} style={{marginTop: 30, width: '100%'}}>
+              <Panel header={"Automated Modelling"} key="1" style={{width: '100%'}} >
+                <AutomatedModel project_id={this.props.location.query._id} />
               </Panel>
             </Collapse>
           </div>
@@ -257,8 +285,9 @@ class ProjectDetail extends React.Component {
                            project_name={this.state.projectName}
                            project_id={this.state.project_id}
                            dataset_name={this.state.dataset_name}
-                           dataset_id={this.state.selectedData}
+                           dataset_id={this.state.stagingDataID}
                            spawn_new={this.state.spawn_new}
+                           columns={this.state.columns}
                            />
           }
           </div>
