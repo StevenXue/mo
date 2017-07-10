@@ -8,7 +8,7 @@ import { Notebook, createStore} from '../../../notebook/src/';
 import { setNotebook, recordResults, save, saveAs} from '../../../notebook/src/actions';
 import * as enchannelBackend from '../../../notebook/enchannel-notebook-backend';
 import style from './style.css';
-import Curve from './curve';
+//import Curve from './curve';
 import CurveTest from './realTime';
 import Model from './modelProcess';
 import io from 'socket.io-client';
