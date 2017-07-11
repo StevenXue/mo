@@ -2,13 +2,15 @@ import logging
 
 import tensorflow as tf
 
-from server3.lib.models import MetricsHandler
+from server3.service.custom_log_handler import MetricsHandler
 
 
-def custom_model(model_fn, params, input, **kw):
+def custom_model(params, model_fn, input, **kw):
     """
 
-    :param model:
+    :param model_fn:
+    :param params:
+    :param input:
     :param kw:
     :return:
     """
@@ -130,9 +132,9 @@ if __name__ == '__main__':
                           skiprows=1)
     LABEL_COLUMN = "label"
     df_train[LABEL_COLUMN] = (
-    df_train["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
+        df_train["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
     df_test[LABEL_COLUMN] = (
-    df_test["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
+        df_test["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
     # 添加一列 index，格式为string，作为"example_id_column"的输入
     df_train['index'] = df_train.index.astype(str)
     print(df_train)
@@ -165,5 +167,6 @@ if __name__ == '__main__':
         "config": None,
     }
     sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
-    from server3.lib.models import sdca_fn
-    custom_model(sdca_fn, params, input, result_sds=sds)
+    from server3.lib.models import sdca_model_fn
+
+    custom_model(params, sdca_model_fn, input, result_sds=sds)

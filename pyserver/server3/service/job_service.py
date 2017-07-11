@@ -143,10 +143,8 @@ def run_code(conf, project_id, staging_data_set_id, model, f, *args):
     :param f:
     :return:
     """
-    # import model function
-    func = getattr(models, f)
     # add decorator
-    func = create_model_job(project_id, staging_data_set_id, model)(func)
+    func = create_model_job(project_id, staging_data_set_id, model)(f)
     # run model with decorator
     return func(conf, *args)
 

@@ -159,3 +159,98 @@ def sdca_model_fn(features, labels, mode, params):
             training_chief_hooks=(model_fn_ops.training_chief_hooks +
                                   [update_weights_hook]))
     return model_fn_ops
+
+
+SVM = {
+    'args': [
+        {
+            "name": "example_id_column",
+            "type": {
+                "key": "string",
+                "des": "A string defining the feature column name representing "
+                       "example ids. Used to initialize the underlying "
+                       "optimizer."
+            },
+            "default": "index",
+            "required": True
+        },
+        # {
+        #     "name": "feature_columns",
+        #     "type": {
+        #         "key": "string_m",
+        #         "des": "features columns name "
+        #     },
+        #     "default": None,
+        #     "required": True
+        # },
+        {
+            "name": "weight_column_name",
+            "type": {
+                "key": "string",
+                "des": "A string defining feature column name representing "
+                       "weights. It is used to down weight or boost examples "
+                       "during training. It will be multiplied by the loss of the "
+                       "example."
+            },
+            "default": None,
+            "required": False
+        },
+        {
+            "name": "l1_regularization",
+            "type": {
+                "key": "float",
+                "des": "L1-regularization parameter. Refers to global L1 "
+                       "regularization (across all examples).",
+                "range": None
+            },
+            "default": 0.0,
+            "required": True
+        },
+        {
+            "name": "l2_regularization",
+            "type": {
+                "key": "float",
+                "des": "L2-regularization parameter. Refers to global L1 "
+                       "regularization (across all examples).",
+                "range": None
+            },
+            "default": 0.0,
+            "required": True
+        },
+        {
+            "name": "num_loss_partitions",
+            "type": {
+                "key": "int",
+                "des": "number of partitions of the (global) loss function "
+                       "optimized by the underlying optimizer (SDCAOptimizer)."
+                       "num_loss_partitions defines the number of partitions of "
+                       "the global loss function",
+                "range": None
+            },
+            "default": 1,
+            "required": True
+        },
+        {
+            "name": "kernels",
+            "type": {
+                "key": "string",
+                "des": "A list of kernels for the SVM. Currently, no kernels are "
+                       "supported. Reserved for future use for non-linear SVMs."
+            },
+            "default": None,
+            "required": False
+        },
+        {
+            "name": "feature_engineering_fn",
+            "type": {
+                "key": "string",
+                "des": "Feature engineering function. Takes features and labels "
+                       "which are the output of input_fn and returns features "
+                       "and labels which will be fed into the model.",
+                "range": [0, 10, 234, 5, 6]
+            },
+            "default": None,
+            "required": False
+        },
+    ]
+}

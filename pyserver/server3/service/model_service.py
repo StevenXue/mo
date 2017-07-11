@@ -10,9 +10,9 @@
 """
 
 from server3.business import model_business, ownership_business, user_business
-from server3.lib.models import ks
 from server3.service import job_service
 from server3.service.job_service import split_supervised_input
+from server3.lib import models
 
 
 def get_all_public_model():
@@ -67,18 +67,57 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
     :return:
     """
     model = model_business.get_by_model_id(model_id)
-    f = model.entry_function
+    # import model function
+    f = getattr(models, model.entry_function)
     if model['category'] == 0:
         # keras nn
         conf = manage_supervised_input(conf, staging_data_set_id, **kwargs)
+        return job_service.run_code(conf, project_id, staging_data_set_id,
+                                    model, f)
     elif model['category'] == 1:
+        # TODO read csv using pandas
+        # TODO add function to split categorical and continuous automatically
+        import pandas as pd
 
-        f = model.entry_function
+        COLUMNS = ["age", "workclass", "fnlwgt", "education", "education_num",
+                   "marital_status", "occupation", "relationship", "race",
+                   "gender",
+                   "capital_gain", "capital_loss", "hours_per_week",
+                   "native_country",
+                   "income_bracket"]
+        df_train = pd.read_csv('train_file', names=COLUMNS,
+                               skipinitialspace=True)
+        df_test = pd.read_csv('test_file', names=COLUMNS, skipinitialspace=True,
+                              skiprows=1)
+        LABEL_COLUMN = "label"
+        df_train[LABEL_COLUMN] = (
+            df_train["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
+        df_test[LABEL_COLUMN] = (
+            df_test["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
+        # 添加一列 index，格式为string，作为"example_id_column"的输入
+        df_train['index'] = df_train.index.astype(str)
+        print(df_train)
+        df_test['index'] = df_test.index.astype(str)
 
-    return job_service.run_code(conf, project_id, staging_data_set_id, model, f)
+        # 将连续型和类别型特征分离开，为input做准备
+        CATEGORICAL_COLUMNS = ["workclass", "education", "marital_status",
+                               "occupation",
+                               "relationship", "race", "gender",
+                               "native_country"]
+        CONTINUOUS_COLUMNS = ["age", "education_num", "capital_gain",
+                              "capital_loss", "hours_per_week", "index"]
+        input = {
+            'train': df_train,
+            'test': df_test,
+            'categorical_cols': CATEGORICAL_COLUMNS,
+            'continuous_cols': CONTINUOUS_COLUMNS,
+            'label_col': LABEL_COLUMN
+        }
 
-
-# controller.run_code(conf, model)
+        f = models.custom_model
+        model_fn = getattr(models, model.entry_function)
+        return job_service.run_code(conf, project_id, staging_data_set_id,
+                                    model, f, model_fn, input)
 
 
 def run_multiple_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
@@ -212,6 +251,7 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
 
 
 def temp():
+
     add_model_with_ownership(
         'system',
         False,
@@ -221,11 +261,40 @@ def temp():
         '/lib/keras_seq',
         'keras_seq',
         'keras_seq_to_str',
-        ks.KERAS_SEQ_SPEC,
+        models.KERAS_SEQ_SPEC,
+        {'type': 'ndarray', 'n': None}
+    )
+
+    add_model_with_ownership(
+        'system',
+        False,
+        'sdca',
+        'custom sdca model',
+        1,
+        '/lib/sdca',
+        'sdca_model_fn',
+        'custom_model_to_str',
+        models.SVM,
         {'type': 'ndarray', 'n': None}
     )
 
 
 if __name__ == '__main__':
     pass
+    conf = {
+        "example_id_column": 'index',
+        "feature_columns": [["age", "education_num", "capital_gain",
+                             "capital_loss", "hours_per_week"], ["race"]],
+        "weight_column_name": None,
+        "model_dir": None,
+        "l1_regularization": 0.0,
+        "l2_regularization": 0.5,
+        "num_loss_partitions": 1,
+        "kernels": None,
+        "config": None,
+    }
+    run_model(conf, "595f32e4e89bde8ba70738a3", "5934d1e5df86b2c9ccc7145a",
+              "5964f16ad123ab7df77c80ba")
     # temp()
+
+
