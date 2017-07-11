@@ -2,11 +2,12 @@
 # Generate dummy data
 import numpy as np
 from keras import layers
-from keras import utils
 from keras.callbacks import LambdaCallback
 from keras.models import Sequential
-
+import tensorflow as tf
 from service import logger
+
+graph = tf.get_default_graph()
 
 
 def keras_seq(conf, **kw):
@@ -19,58 +20,56 @@ def keras_seq(conf, **kw):
     if result_sds is None:
         raise RuntimeError('no result sds id passed to model')
 
-    model = Sequential()
-    # Dense(64) is a fully-connected layer with 64 hidden units.
-    # in the first layer, you must specify the expected input data shape:
-    # here, 20-dimensional vectors.
-    ls = conf['layers']
-    comp = conf['compile']
-    f = conf['fit']
-    e = conf['evaluate']
+    with graph.as_default():
+        model = Sequential()
+        # Dense(64) is a fully-connected layer with 64 hidden units.
+        # in the first layer, you must specify the expected input data shape:
+        # here, 20-dimensional vectors.
+        ls = conf['layers']
+        comp = conf['compile']
+        f = conf['fit']
+        e = conf['evaluate']
 
-    # TODO add validator
-    # op = comp['optimizer']
+        # TODO add validator
+        # op = comp['optimizer']
 
-    # loop to add layers
-    for l in ls:
-        # get layer class from keras
-        layer_class = getattr(layers, l['name'])
-        # add layer
-        model.add(layer_class(**l['args']))
+        # loop to add layers
+        for l in ls:
+            # get layer class from keras
+            layer_class = getattr(layers, l['name'])
+            # add layer
+            model.add(layer_class(**l['args']))
 
-    # optimiser
-    # sgd_class = getattr(optimizers, op['name'])
-    # sgd = sgd_class(**op['args'])
+        # optimiser
+        # sgd_class = getattr(optimizers, op['name'])
+        # sgd = sgd_class(**op['args'])
 
-    # define the metrics
-    # compile
-    model.compile(loss=comp['loss'],
-                  optimizer=comp['optimizer'],
-                  metrics=comp['metrics'])
+        # define the metrics
+        # compile
+        model.compile(loss=comp['loss'],
+                      optimizer=comp['optimizer'],
+                      metrics=comp['metrics'])
 
-    import tensorflow as tf
-    graph = tf.get_default_graph()
+        batch_print_callback = LambdaCallback(on_epoch_end=
+                                              lambda epoch, logs:
+                                              logger.log_epoch_end(epoch, logs,
+                                                                   result_sds))
 
-    batch_print_callback = LambdaCallback(on_epoch_end=
-                                          lambda epoch, logs:
-                                          logger.log_epoch_end(epoch, logs,
-                                                               result_sds, graph))
+        # training
+        # TODO callback 改成异步，考虑 celery
+        model.fit(f['x_train'], f['y_train'],
+                  validation_data=(f['x_val'], f['y_val']),
+                  callbacks=[batch_print_callback],
+                  verbose=0,
+                  **f['args'])
 
-    # training
-    # TODO callback 改成异步，考虑 celery
-    model.fit(f['x_train'], f['y_train'],
-              validation_data=(f['x_val'], f['y_val']),
-              callbacks=[batch_print_callback],
-              verbose=0,
-              **f['args'])
+        # testing
+        score = model.evaluate(e['x_test'], e['y_test'], **e['args'])
 
-    # testing
-    score = model.evaluate(e['x_test'], e['y_test'], **e['args'])
+        weights = model.get_weights()
 
-    weights = model.get_weights()
-
-    config = model.get_config()
-    return score
+        config = model.get_config()
+        return score
 
 
 def keras_seq_to_str(obj, head_str, **kw):
@@ -567,6 +566,8 @@ if __name__ == '__main__':
     # import json
     # print(json.dumps(KERAS_SEQ_SPEC))
     pass
+    from keras import utils
+
     x_train = np.random.random((1000, 20))
     y_train = utils.to_categorical(np.random.randint(10, size=(1000, 1)),
                                    num_classes=10)

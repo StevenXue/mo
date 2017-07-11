@@ -215,8 +215,11 @@ def run_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
     model = model_business.get_by_model_id(model_id)
     if model['category'] == 0:
         conf = manage_supervised_input(conf, staging_data_set_id, **kwargs)
+    # import model function
     func = getattr(models, model.entry_function)
+    # add decorator
     func = create_model_job(project_id, staging_data_set_id, model)(func)
+    # run model with decorator
     return func(conf)
 
 
