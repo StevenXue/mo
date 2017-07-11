@@ -14,7 +14,11 @@ sys.path.append("/usr/local/spark/python")
 from pyspark import SparkContext
 from pyspark import SparkConf
 
+from keras import layers
+from keras.models import Sequential
+import tensorflow as tf
 
+# graph = tf.get_default_graph()
 # ------------------------------ self package ------------------------------
 # sys.path.append("/Users/chen/myPoject/gitRepo/goldersgreen/")
 # sys.path.append("/root/project/git_repo/goldersgreen/server3")
@@ -27,12 +31,13 @@ KERAS_SEQ_PATH = '/Users/chen/myPoject/gitRepo/goldersgreen/server3/lib/models/k
 
 MASTER_ADDRESS = "spark://10.52.14.188:7077"
 
+
 # ------------------------------ code ------------------------------
 def CreateSparkContext():
     sparkConf = SparkConf() \
         .setAppName("hyperparameter_tuning") \
         .set("spark.ui.showConsoleProgress", "false") \
-        .setMaster("local") \
+        .setMaster(MASTER_ADDRESS) \
         .set("spark.executor.memory", SPARK_EXECUTOR_MEMORY)
     sc = SparkContext(conf=sparkConf, pyFiles=[SERVER3_PATH])
     print("master = " + sc.master)
@@ -55,12 +60,66 @@ def SetPath(sc):
 
 # for hyper parameters tuning
 def hyper_parameters_tuning(parameters_grid):
+    def simple_keras_seq(conf, **kw):
+        """
+        a general implementation of sequential model of keras
+        :param conf: config dict
+        :return:
+        """
+        result_sds = kw.pop('result_sds', None)
+        if result_sds is None:
+            raise RuntimeError('no result sds id passed to model')
+
+        model = Sequential()
+        # Dense(64) is a fully-connected layer with 64 hidden units.
+        # in the first layer, you must specify the expected input data shape:
+        # here, 20-dimensional vectors.
+        ls = conf['layers']
+        comp = conf['compile']
+        f = conf['fit']
+        e = conf['evaluate']
+
+        # TODO add validator
+        # op = comp['optimizer']
+
+        # loop to add layers
+        for l in ls:
+            # get layer class from keras
+            layer_class = getattr(layers, l['name'])
+            # add layer
+            model.add(layer_class(**l['args']))
+
+        # optimiser
+        # sgd_class = getattr(optimizers, op['name'])
+        # sgd = sgd_class(**op['args'])
+
+        # define the metrics
+        # compile
+        model.compile(loss=comp['loss'],
+                      optimizer=comp['optimizer'],
+                      metrics=comp['metrics'])
+
+        # training
+        # TODO callback 改成异步，考虑 celery
+        model.fit(f['x_train'], f['y_train'],
+                  validation_data=(f['x_val'], f['y_val']),
+                  verbose=0,
+                  **f['args'])
+
+        # testing
+        score = model.evaluate(e['x_test'], e['y_test'], **e['args'])
+
+        weights = model.get_weights()
+        config = model.get_config()
+        return score
+
     def model_training(parameter):
         # from py file import code (if it has dependency, using zip to access it)
-        from server3.lib.models.keras_seq import keras_seq
+        # from server3.lib.models.keras_seq import keras_seq
+
         # staging_data_set_id 595cb76ed123ab59779604c3
-        from server3.business.staging_data_set_business import get_by_id
-        result = keras_seq(parameter, result_sds=get_by_id('595cb76ed123ab59779604c3'))
+        # from server3.business.staging_data_set_business import get_by_id
+        result = simple_keras_seq(parameter, result_sds="11")
         return {
             "result": result,
             "epochs": parameter['fit']['args']['epochs'],
@@ -82,6 +141,7 @@ if __name__ == "__main__":
     # 获取数据
     from keras import utils
     import numpy as np
+
     x_train = np.random.random((1000, 20))
     y_train = utils.to_categorical(np.random.randint(10, size=(1000, 1)), num_classes=10)
     x_test = np.random.random((100, 20))
@@ -157,6 +217,3 @@ if __name__ == "__main__":
     ]
     hyper_parameters_tuning(parametersGrid)
     pass
-
-
-
