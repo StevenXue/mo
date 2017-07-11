@@ -76,6 +76,7 @@ def keras_seq_to_str(obj, head_str, **kw):
     """
     a general implementation of sequential model of keras
     :param obj: config obj
+    :param head_str: config obj
     :return:
     """
     #     model = Sequential()

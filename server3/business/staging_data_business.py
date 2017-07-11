@@ -47,7 +47,6 @@ def add(staging_data_set, other_fields_obj):
     """
     if not staging_data_set:
         raise ValueError('no data_set')
-    print(staging_data_set, other_fields_obj)
     staging_data = StagingData(staging_data_set=staging_data_set,
                                **other_fields_obj)
     return staging_data_repo.create(staging_data)
