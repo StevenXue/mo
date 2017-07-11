@@ -1,8 +1,8 @@
 import logging
 
-import numpy as np
 import tensorflow as tf
-from server3.lib.models.custom_log_handler import MetricsHandler
+
+from server3.lib.models import MetricsHandler
 
 
 def custom_model(model_fn, params, input, **kw):

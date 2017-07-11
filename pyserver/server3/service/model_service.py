@@ -9,12 +9,10 @@
 # Further to FIXME of None
 """
 
-from server3.service import job_service
 from server3.business import model_business, ownership_business, user_business
-from server3.service.job_service import split_supervised_input
-from server3.utility import json_utility
 from server3.lib.models import ks
-from server3.service import controller
+from server3.service import job_service
+from server3.service.job_service import split_supervised_input
 
 
 def get_all_public_model():
