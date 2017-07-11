@@ -18,8 +18,9 @@ from service import controller
 
 
 def get_all_public_model():
-    models = [obj.model.to_mongo().to_dict() for obj in ownership_business.
-        list_ownership_by_type_and_private('model', False)]
+    models = [obj.model.to_mongo().to_dict() for obj in
+              ownership_business.list_ownership_by_type_and_private('model',
+                                                                    False)]
     print('models', len(models))
     return models
 
@@ -70,7 +71,12 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
     model = model_business.get_by_model_id(model_id)
     f = model.entry_function
     if model['category'] == 0:
+        # keras nn
         conf = manage_supervised_input(conf, staging_data_set_id, **kwargs)
+    elif model['category'] == 1:
+
+        f = model.entry_function
+
     return job_service.run_code(conf, project_id, staging_data_set_id, model, f)
 
 
@@ -96,31 +102,6 @@ def model_to_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
                                                   **kwargs)
     return job_service.run_code(conf, project_id, staging_data_set_id,
                                 model, f, head_str)
-
-
-# controller.run_code(conf, model)
-
-
-def temp():
-    add_model_with_ownership(
-        'system',
-        False,
-        'keras_seq',
-        'keras_seq from keras',
-        0,
-        '/lib/keras_seq',
-        'keras_seq',
-        'keras_seq_to_str',
-        ks.KERAS_SEQ_SPEC,
-        {'type': 'ndarray', 'n': None}
-    )
-
-
-if __name__ == '__main__':
-    pass
-
-
-# temp()
 
 
 def manage_supervised_input(conf, staging_data_set_id, **kwargs):
@@ -187,3 +168,23 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
     code_str += "y_test = obj['y_te']\n"
 
     return code_str
+
+
+def temp():
+    add_model_with_ownership(
+        'system',
+        False,
+        'keras_seq',
+        'keras_seq from keras',
+        0,
+        '/lib/keras_seq',
+        'keras_seq',
+        'keras_seq_to_str',
+        ks.KERAS_SEQ_SPEC,
+        {'type': 'ndarray', 'n': None}
+    )
+
+
+if __name__ == '__main__':
+    pass
+    # temp()
