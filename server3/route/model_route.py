@@ -70,6 +70,18 @@ def run_model(model_id):
     return jsonify({'response': 'success'}), 200
 
 
+@model_app.route('/models/run_multiple/<string:model_id>', methods=['POST'])
+def run_multiple_model(model_id):
+    data = request.get_json()
+    conf = data['conf']
+    project_id = data['project_id']
+    staging_data_set_id = data['staging_data_set_id']
+    schema = data['schema']
+    model_service.run_multiple_model(conf, project_id, staging_data_set_id, model_id,
+                                     schema=schema)
+    return jsonify({'response': 'success'}), 200
+
+
 @model_app.route('/models/to_code/<string:model_id>', methods=['POST'])
 def model_to_code(model_id):
     data = request.get_json()

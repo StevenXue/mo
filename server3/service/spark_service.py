@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 """
-spark engine used to access spark cluster
+spark service used to access spark cluster
 
 Author: Bingwei Chen
 Date: 2017.07.11
@@ -32,7 +32,7 @@ def CreateSparkContext():
         .set("spark.ui.showConsoleProgress", "false") \
         .setMaster("spark://10.52.14.188:7077") \
         .set("spark.executor.memory", SPARK_EXECUTOR_MEMORY)
-    sc = SparkContext(conf=sparkConf, pyFiles=[KERAS_SEQ_PATH])
+    sc = SparkContext(conf=sparkConf, pyFiles=[SERVER3_PATH])
     print("master = " + sc.master)
     SetLogger(sc)
     SetPath(sc)
@@ -55,7 +55,7 @@ def SetPath(sc):
 def hyper_parameters_tuning(parameters_grid):
     def model_training(parameter):
         # from py file import code (if it has dependency, using zip to access it)
-        from keras_seq import keras_seq
+        from server3.lib.models.keras_seq import keras_seq
         result = keras_seq(parameter, result_sds='11')
         return {
             "result": result,
