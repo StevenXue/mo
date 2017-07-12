@@ -74,6 +74,14 @@ const ImportPanel =
           )}
         </FormItem>
         <FormItem
+          label="Columns"
+        >
+          {
+            getFieldDecorator('names', {
+            })(<Input />)
+          }
+        </FormItem>
+        <FormItem
           wrapperCol={{ span: 12, offset: 0 }}
         >
 
