@@ -1,4 +1,0 @@
-﻿,station_id,local_device_id,name,device_node_id,device_type,asset_code,productor,device_model,version,device_level,sy_id,sy_name,tech_supporter,tech_phone,begin_runtime,capacity,real_capacity,warn_capacity,lifetime,category
-25,A902,A902613001,机房环境(1F门卫室),90753024,机房/基站环境,,博世,,,3,200857,机房环境系统-7,,,,,,,,device
-31,A902,A90261FF06,机房环境(3F综合机房),90765312,机房/基站环境,,未知品牌,,,3,200857,机房环境系统-7,,,,,,,,device
-54,A902,A90211FF05,智能电表(输出柜1电力室1_PD194E-9FY),90814464,智能电表,,斯菲尔电气,PD194E-9FY,,2,200851,低压配电系统-1,,,2014-10-08,,,,,device

@@ -8,7 +8,13 @@
 # @running  : python
 # Further to FIXME of None
 """
-from repository.general_repo import Repo
+import os
+import sys
+module_path = os.path.abspath(os.path.join('..'))
+if module_path not in sys.path:
+    sys.path.append('../../')
+
+from ..repository.general_repo import Repo
 
 
 class JobRepo(Repo):

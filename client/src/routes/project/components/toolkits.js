@@ -68,7 +68,7 @@ export default class Toolkit extends React.Component {
         },
       )
 
-    fetch(flaskServer + '/staging_data/staging_data_sets?project_id=' + props.project_id, {
+    fetch(flaskServer + '/staging_data/staging_data_sets?project_id=' + this.props.project_id, {
       method: 'get',
       headers: {
         'Content-Type': 'application/json',

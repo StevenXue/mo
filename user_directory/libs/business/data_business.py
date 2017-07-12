@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
 
-from entity import data
-from entity.data import Data
-from repository.data_repo import DataRepo
+from ..entity import data
+from ..entity.data import Data
+from ..repository.data_repo import DataRepo
 
 data_repo = DataRepo(Data)
 

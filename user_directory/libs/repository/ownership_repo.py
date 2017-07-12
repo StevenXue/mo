@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
-from entity.user import User as Instance
-from repository.general_repo import Repo
+from ..entity.user import User as Instance
+from ..repository.general_repo import Repo
 
 
 class OwnershipRepo(Repo):

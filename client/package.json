@@ -40,7 +40,7 @@
     "react-draft-wysiwyg": "^1.8.1",
     "react-helmet": "^5.0.0",
     "react-highlight": "^0.7.0",
-    "react-json-view": "^1.8.4",
+    "react-json-view": "^1.9.4",
     "react-jupyter": "^0.1.0",
     "react-jupyter-display-area": "^0.2.1",
     "react-markdown": "^2.1.1",
@@ -49,6 +49,7 @@
     "remark": "^4.2.0",
     "remark-react": "^2.0.0",
     "rxjs": "^5.0.0-beta.5",
+    "socket.io-client": "^2.0.3",
     "style-loader": "^0.18.1",
     "uuid": "^2.0.1"
   },

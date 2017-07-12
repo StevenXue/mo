@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
-from business import user_business
-from business import ownership_business
-from entity.project import Project
+from ..business import user_business
+from ..business import ownership_business
+from ..entity.project import Project
 
 
 def get_ownership_objects_by_user_ID(user_ID, owned_type):

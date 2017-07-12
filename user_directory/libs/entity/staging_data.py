@@ -2,7 +2,7 @@
 from mongoengine import DynamicDocument
 from mongoengine import ReferenceField
 
-from entity.staging_data_set import StagingDataSet
+from ..entity.staging_data_set import StagingDataSet
 
 
 class StagingData(DynamicDocument):

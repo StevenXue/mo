@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
 from bson import ObjectId
 
-from entity.staging_data import StagingData
-from repository.staging_data_repo import StagingDataRepo
+from ..entity.staging_data import StagingData
+from ..repository.staging_data_repo import StagingDataRepo
 staging_data_repo = StagingDataRepo(StagingData)
 
 
@@ -84,6 +84,20 @@ def get_by_staging_data_set_id(staging_data_set_id):
                                                       staging_data_set_id)
 
 
+def get_by_staging_data_set_id_limit(staging_data_set_id, limit):
+    """
+    Get staging_data objects by staging_data_set ObjectId
+
+    :param staging_data_set_id: ObjectId
+    :return: matched staging_data objects in list form
+    """
+    # staging_data_set = StagingDataSet(id=staging_data_set_id)
+    # return staging_data_repo.read_by_staging_data_set(staging_data_set)
+    return staging_data_repo.read_by_non_unique_field_limit('staging_data_set',
+                                                      staging_data_set_id,
+                                                            limit)
+
+
 def get_by_staging_data_set_and_fields(staging_data_set_id, fields):
     """
     Get specific fields of a staging_data_set
@@ -95,3 +109,26 @@ def get_by_staging_data_set_and_fields(staging_data_set_id, fields):
     staging_data = StagingData(staging_data_set=staging_data_set_id)
     return staging_data_repo.read_by_staging_data_set_and_fields(staging_data,
                                                                  fields)
+
+
+def update_by_id(data_id, update_query):
+    return staging_data_repo.update_one_by_id(data_id, update_query)
+
+
+def filter_data_set_fields(sds_id, fields):
+    return staging_data_repo.update_unset_fields_by_non_unique_field(
+               'staging_data_set', sds_id, fields)
+
+
+def remove_data_by_staging_data_set_id(sds_id):
+    return staging_data_repo.\
+        delete_by_non_unique_field('staging_data_set', sds_id)
+
+
+def remove_data_by_ids(sd_ids):
+    for sd_id in sd_ids:
+        remove_data_by_id(sd_id)
+
+
+def remove_data_by_id(sd_id):
+    return staging_data_repo.delete_by_id(sd_id)

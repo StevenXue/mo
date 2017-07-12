@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 from datetime import datetime
 
-from repository.general_repo import Repo
+from ..repository.general_repo import Repo
 
 
 class FileRepo(Repo):

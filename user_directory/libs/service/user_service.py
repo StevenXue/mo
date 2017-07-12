@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 
 
-from business import user_business
+from ..business import user_business
 
 
 def add(user_ID, password, kwargs):
