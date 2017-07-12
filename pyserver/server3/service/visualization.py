@@ -1,13 +1,13 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-'''
+"""
 # @author   : Tianyi Zhang
 # @version  : 1.0
 # @date     : 2017-07-10 11:00pm
 # @function : Getting all of the method of visualization analysis
 # @running  : python
 # Further to FIXME of None
-'''
+"""
 
 from itertools import groupby
 import pandas as pd
@@ -46,7 +46,7 @@ def generate_stats_info(data):
 def hypo_test(arr, mean, std, type='norm'):
     arr = np.array(arr)
 
-    if
+    # if 1:
     # 产生标准正太分布数值转换，用于检验
     arr_norm_test = [(arr - mean) / std]
     # 根据x, 产生概率密度函数，真是的正太分布，用于作图
