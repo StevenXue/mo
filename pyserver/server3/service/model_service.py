@@ -8,6 +8,8 @@
 # @running  : python
 # Further to FIXME of None
 """
+import numpy as np
+
 from server3.business import model_business, ownership_business, user_business
 from server3.service import job_service
 from server3.service.job_service import split_supervised_input
@@ -56,15 +58,18 @@ def add_model_with_ownership(user_ID, is_private, name, description, category,
     return model
 
 
-def split_categorical_and_continuous(sds_id):
-    fields = staging_data_service.get_fields_with_types(sds_id)
-    continuous_cols = []
+def split_categorical_and_continuous(df, label_col, index_col):
+    fields = list(df.columns.values)
+    fields.remove(label_col)
+    fields.remove(index_col)
+    continuous_cols = [index_col]
     categorical_cols = []
     for field in fields:
-        if 'string' in field[1]:
-            continuous_cols.append(field[0])
-        elif 'object' not in field[1]:
-            categorical_cols.append(field[0])
+        dtype = df[field].dtype
+        if dtype == np.int_ or dtype == np.float_:
+            continuous_cols.append(field)
+        else:
+            categorical_cols.append(field)
     return [continuous_cols, categorical_cols]
 
 
@@ -92,12 +97,12 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
         train_cursor = staging_data_business.get_by_staging_data_set_id(
             staging_data_set_id)
         df_train = staging_data_service.mongo_to_df(train_cursor)
-        print(df_train)
         LABEL_COLUMN = "label"
         df_train[LABEL_COLUMN] = (
             df_train["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
         # 添加一列 index，格式为string，作为"example_id_column"的输入
-        df_train['index'] = df_train.index.astype(str)
+        INDEX_COLUMN = 'index'
+        df_train[INDEX_COLUMN] = df_train.index.astype(str)
 
         # df_test = staging_data_service.mongo_to_df(test_cursor)
         # df_test[LABEL_COLUMN] = (
@@ -106,7 +111,7 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
 
         # 将连续型和类别型特征分离开，为input做准备
         continuous_cols, categorical_cols = \
-            split_categorical_and_continuous(staging_data_set_id)
+            split_categorical_and_continuous(df_train, LABEL_COLUMN, INDEX_COLUMN)
 
         input = {
             'train': df_train,
@@ -295,7 +300,7 @@ if __name__ == '__main__':
         "kernels": None,
         "config": None,
     }
-    run_model(conf, "595f32e4e89bde8ba70738a3", "5934d1e5df86b2c9ccc7145a",
+    run_model(conf, "595f32e4e89bde8ba70738a3", "5965cda1d123ab8f604a8dd0",
               "5964f16ad123ab7df77c80ba")
     # temp()
 
