@@ -70,7 +70,7 @@ def split_categorical_and_continuous(df, label_col, index_col):
             continuous_cols.append(field)
         else:
             categorical_cols.append(field)
-    return [continuous_cols, categorical_cols]
+    return continuous_cols, categorical_cols
 
 
 def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
@@ -115,7 +115,9 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
 
         # 将连续型和类别型特征分离开，为input做准备
         continuous_cols, categorical_cols = \
-            split_categorical_and_continuous(df_train, LABEL_COLUMN, INDEX_COLUMN)
+            split_categorical_and_continuous(df_train, LABEL_COLUMN,
+                                             INDEX_COLUMN)
+        conf["feature_columns"] = [continuous_cols, categorical_cols]
 
         input = {
             'train': df_train,
@@ -294,8 +296,6 @@ if __name__ == '__main__':
     pass
     conf = {
         "example_id_column": 'index',
-        "feature_columns": [["age", "education_num", "capital_gain",
-                             "capital_loss", "hours_per_week"], ["race"]],
         "weight_column_name": None,
         "model_dir": None,
         "l1_regularization": 0.0,

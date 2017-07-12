@@ -85,7 +85,7 @@ def sdca_model_fn(features, labels, mode, params):
     #   Continuous Feature Columns 或  CATEGORICAL_COLUMNS
 
     #   feature_columns = params["feature_columns"]
-
+    print(params)
     feature_columns_realvalued = [tf.contrib.layers.real_valued_column(i) for i
                                   in params["feature_columns"][0]]
     feature_columns_sparse = [
@@ -239,18 +239,6 @@ SVM = {
             },
             "default": None,
             "required": False
-        },
-        {
-            "name": "feature_engineering_fn",
-            "type": {
-                "key": "string",
-                "des": "Feature engineering function. Takes features and labels "
-                       "which are the output of input_fn and returns features "
-                       "and labels which will be fed into the model.",
-                "range": [0, 10, 234, 5, 6]
-            },
-            "default": None,
-            "required": False
-        },
+        }
     ]
 }
