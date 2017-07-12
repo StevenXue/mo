@@ -97,13 +97,17 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
         train_cursor = staging_data_business.get_by_staging_data_set_id(
             staging_data_set_id)
         df_train = staging_data_service.mongo_to_df(train_cursor)
+
+        # TODO choose column to be label, or choose column to generate label
         LABEL_COLUMN = "label"
         df_train[LABEL_COLUMN] = (
             df_train["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
+
         # 添加一列 index，格式为string，作为"example_id_column"的输入
         INDEX_COLUMN = 'index'
         df_train[INDEX_COLUMN] = df_train.index.astype(str)
 
+        # TODO support two data set
         # df_test = staging_data_service.mongo_to_df(test_cursor)
         # df_test[LABEL_COLUMN] = (
         #    df_test["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
