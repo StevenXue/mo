@@ -116,13 +116,15 @@ def import_data_from_file_id():
     ds_description = data['ds_description']
     is_private = data['is_private']
     is_private = str(is_private).lower() == 'true'
+    names = data.get('names', None)
 
     try:
         saved_ds = data_service.import_data_from_file_id(ObjectId(file_id),
                                                          data_set_name,
                                                          ds_description,
                                                          user_ID,
-                                                         is_private)
+                                                         is_private,
+                                                         names=names)
         ds_json = json_utility.convert_to_json(saved_ds.to_mongo())
     except Exception as e:
         return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400

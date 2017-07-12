@@ -130,7 +130,6 @@ def get_fields_with_types(staging_data_set_id):
         get_fields_by_map_reduce(staging_data_set_id, mapper, reducer)
     # result = StagingData.objects(ListingId='126541').map_reduce(mapper, reducer, 'inline')
     # print isinstance(result, MapReduceDocument)
-    # print len(list(result))
     return [[mr_doc.key, list(mr_doc.value.keys())] for mr_doc in result]
     # for mr_doc in result:
     #     print mr_doc.key, mr_doc.value

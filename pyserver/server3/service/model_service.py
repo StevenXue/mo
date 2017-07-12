@@ -8,11 +8,11 @@
 # @running  : python
 # Further to FIXME of None
 """
-
 from server3.business import model_business, ownership_business, user_business
 from server3.service import job_service
 from server3.service.job_service import split_supervised_input
 from server3.lib import models
+from server3.service import staging_data_service
 
 
 def get_all_public_model():
@@ -53,6 +53,18 @@ def add_model_with_ownership(user_ID, is_private, name, description, category,
     user = user_business.get_by_user_ID(user_ID)
     ownership_business.add(user, is_private, model=model)
     return model
+
+
+def split_categorical_and_continuous(sds_id):
+    fields = staging_data_service.get_fields_with_types(sds_id)
+    continuous_cols = []
+    categorical_cols = []
+    for field in fields:
+        if 'string' in field[1]:
+            continuous_cols.append(field[0])
+        elif 'object' not in field[1]:
+            categorical_cols.append(field[0])
+    return [continuous_cols, categorical_cols]
 
 
 def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):

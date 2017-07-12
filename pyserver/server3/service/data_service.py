@@ -41,8 +41,8 @@ def import_data(data_array, data_set_name, ds_description, user_ID, is_private):
 
 
 def import_data_from_file_id(file_id, data_set_name, ds_description, user_ID,
-                             is_private):
-    table = file_service.file_loader(file_id, user_ID)
+                             is_private, **kwargs):
+    table = file_service.file_loader(file_id, user_ID, **kwargs)
     return import_data(table, data_set_name, ds_description, user_ID,
                        is_private)
 
