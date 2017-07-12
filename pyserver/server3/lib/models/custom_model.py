@@ -20,12 +20,12 @@ def custom_model(params, model_fn, input, **kw):
     categorical_cols = input.pop('categorical_cols', None)
     continuous_cols = input.pop('continuous_cols', None)
     label_col = input.pop('label_col', None)
+    predict_x = kw.pop('predict_x', None)
+
     if result_sds is None:
         raise RuntimeError('no result sds id passed to model')
     if train is None:
         raise RuntimeError('no train input')
-    if test is None:
-        raise RuntimeError('no test input')
     if categorical_cols is None:
         raise RuntimeError('no categorical_cols input')
     if continuous_cols is None:
@@ -55,13 +55,14 @@ def custom_model(params, model_fn, input, **kw):
         return input_fn(test, categorical_cols, continuous_cols, label_col)
 
     estimator.fit(input_fn=train_input_fn, steps=30)
-    metrics = estimator.evaluate(input_fn=eval_input_fn, steps=1)
-    # loss = metrics['loss']
-    # accuracy = metrics['accuracy']
-    result = {
-        'eval_metrics': metrics
-    }
-    predict_x = kw.pop('predict_x', None)
+    result = {}
+    if test:
+        metrics = estimator.evaluate(input_fn=eval_input_fn, steps=1)
+        # loss = metrics['loss']
+        # accuracy = metrics['accuracy']
+        result.update({
+            'eval_metrics': metrics
+        })
     if predict_x:
         predictions = estimator.predict(predict_x, as_iterable=True)
         result['predictions'] = predictions

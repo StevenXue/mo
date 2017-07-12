@@ -13,6 +13,7 @@ from server3.service import job_service
 from server3.service.job_service import split_supervised_input
 from server3.lib import models
 from server3.service import staging_data_service
+from server3.business import staging_data_business
 
 
 def get_all_public_model():
@@ -83,46 +84,35 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
     f = getattr(models, model.entry_function)
     if model['category'] == 0:
         # keras nn
-        conf = manage_supervised_input(conf, staging_data_set_id, **kwargs)
+        conf = manage_nn_input(conf, staging_data_set_id, **kwargs)
         return job_service.run_code(conf, project_id, staging_data_set_id,
                                     model, f)
     elif model['category'] == 1:
-        # TODO read csv using pandas
-        # TODO add function to split categorical and continuous automatically
-        import pandas as pd
 
-        COLUMNS = ["age", "workclass", "fnlwgt", "education", "education_num",
-                   "marital_status", "occupation", "relationship", "race",
-                   "gender",
-                   "capital_gain", "capital_loss", "hours_per_week",
-                   "native_country",
-                   "income_bracket"]
-        df_train = pd.read_csv('train_file', names=COLUMNS,
-                               skipinitialspace=True)
-        df_test = pd.read_csv('test_file', names=COLUMNS, skipinitialspace=True,
-                              skiprows=1)
+        train_cursor = staging_data_business.get_by_staging_data_set_id(
+            staging_data_set_id)
+        df_train = staging_data_service.mongo_to_df(train_cursor)
+        print(df_train)
         LABEL_COLUMN = "label"
         df_train[LABEL_COLUMN] = (
             df_train["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
-        df_test[LABEL_COLUMN] = (
-            df_test["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
         # 添加一列 index，格式为string，作为"example_id_column"的输入
         df_train['index'] = df_train.index.astype(str)
-        print(df_train)
-        df_test['index'] = df_test.index.astype(str)
+
+        # df_test = staging_data_service.mongo_to_df(test_cursor)
+        # df_test[LABEL_COLUMN] = (
+        #    df_test["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
+        # df_test['index'] = df_test.index.astype(str)
 
         # 将连续型和类别型特征分离开，为input做准备
-        CATEGORICAL_COLUMNS = ["workclass", "education", "marital_status",
-                               "occupation",
-                               "relationship", "race", "gender",
-                               "native_country"]
-        CONTINUOUS_COLUMNS = ["age", "education_num", "capital_gain",
-                              "capital_loss", "hours_per_week", "index"]
+        continuous_cols, categorical_cols = \
+            split_categorical_and_continuous(staging_data_set_id)
+
         input = {
             'train': df_train,
-            'test': df_test,
-            'categorical_cols': CATEGORICAL_COLUMNS,
-            'continuous_cols': CONTINUOUS_COLUMNS,
+            # 'test': df_test,
+            'categorical_cols': categorical_cols,
+            'continuous_cols': continuous_cols,
             'label_col': LABEL_COLUMN
         }
 
@@ -196,7 +186,7 @@ def model_to_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
                                 model, f, head_str)
 
 
-def manage_supervised_input(conf, staging_data_set_id, **kwargs):
+def manage_nn_input(conf, staging_data_set_id, **kwargs):
     """
     deal with input when supervised learning
     :param conf:

@@ -75,6 +75,7 @@ const ImportPanel =
         </FormItem>
         <FormItem
           label="Columns"
+          extra="Column names for data, please split by ','"
         >
           {
             getFieldDecorator('names', {

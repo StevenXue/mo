@@ -2,6 +2,7 @@
 import sys
 from bson import Code
 import numpy as np
+import pandas as pd
 
 from server3.business import staging_data_set_business
 from server3.business import staging_data_business
@@ -114,7 +115,20 @@ def get_fields_with_types(staging_data_set_id):
     """
     mapper = Code("""
         function() {
-            for (var key in this) { emit(key, typeof this[key]); }
+            function isInt(n){
+                return n % 1 === 0;
+            }
+            for (var key in this) {
+                let type = typeof this[key]
+                if(type === 'number') {
+                    if(isInt(this[key])) {
+                        type = 'integer'
+                    } else {
+                        type = 'float'
+                    }
+                }
+                emit(key, type); 
+            }
             //for (var key in this) { emit(key, null); }
         }
     """)
@@ -189,6 +203,10 @@ def mongo_to_array(cursor, fields):
     arrays = [[c[field] for field in fields] for c in cursor]
     arrays = np.array(arrays)
     return arrays
+
+
+def mongo_to_df(cursor):
+    return pd.DataFrame.from_records(list(cursor))
 
 
 def split_x_y(sds_id, x_fields, y_fields):
