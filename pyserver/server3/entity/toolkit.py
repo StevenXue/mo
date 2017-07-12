@@ -12,6 +12,13 @@
 from mongoengine import DynamicDocument
 from mongoengine import StringField
 from mongoengine import DictField
+from mongoengine import IntField
+
+RESUlT_FORM = (
+    (0, 'Direct Show',
+     1, 'Add New Column',
+     2, 'Add New Staging Data')
+)
 
 
 class Toolkit(DynamicDocument):
@@ -24,7 +31,8 @@ class Toolkit(DynamicDocument):
     name = StringField(max_length=50, unique=True, required=True)
     description = StringField(max_length=140)
     # input_data = ListField()
-
+    category = StringField(required=True)
+    result_form = IntField(required=True, choices=RESUlT_FORM)
     # target_py = StringField(max_length=25, unique=True)
     target_py_code = StringField(required=True)
 
