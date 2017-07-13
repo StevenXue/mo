@@ -79,8 +79,12 @@ if __name__ == '__main__':
     # print (get_staging_data_pandas("5951cf7244a6372a608ec4e4"))
 
     # 测量假设检验函数
-    result = visualization_service.usr_story1_exploration(np.arange(142, 157, 0.1), 'int', group_num=10)
-
+    array = list(np.arange(142, 157, 0.1))
+    arr = []
+    for i in array:
+        arr.append({'a': str(i)})
+    result = visualization_service.usr_story1_exploration(arr, 'str', group_num=10)
+    print (result)
 
 # import keras
 # from keras.models import Sequential
