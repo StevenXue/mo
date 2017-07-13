@@ -25,6 +25,8 @@ from server3.service import staging_data_service
 from server3.lib import models
 from server3.repository import job_repo
 
+def test():
+    print("successful")
 
 def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
     """

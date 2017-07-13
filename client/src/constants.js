@@ -4,7 +4,7 @@ module.exports = {
 
   // server api
   flaskServer: 'http://localhost:5000',
-  // flaskServer: 'http://10.52.14.182:5000',
+  //flaskServer: 'http://10.52.14.182:5000',
 
   //jupyter
   baseUrl: 'http://localhost:8888',

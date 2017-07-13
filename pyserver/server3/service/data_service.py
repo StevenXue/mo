@@ -9,7 +9,7 @@ from server3.business import user_business
 from server3.service import file_service
 from server3.service import ownership_service
 from server3.utility import json_utility
-#import constants
+from server3 import constants
 
 def add_data_set(data_set_name, ds_description, user_ID, is_private):
     ds = data_set_business.add(data_set_name, ds_description)

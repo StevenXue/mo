@@ -10,7 +10,7 @@ from server3.business import data_business
 from server3.service import data_service
 from server3.utility import data_utility
 from server3.utility import json_utility
-#import constants
+from server3 import constants
 
 
 # 使得 sys.getdefaultencoding() 的值为 'utf-8'
