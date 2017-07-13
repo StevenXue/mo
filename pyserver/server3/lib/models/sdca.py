@@ -161,68 +161,70 @@ def sdca_model_fn(features, labels, mode, params):
 
 
 SVM = {
-    'params': [
-        {
-            "name": "example_id_column",
-            "type": {
-                "key": "string",
-                "des": "A string defining the feature column name representing "
-                       "example ids. Used to initialize the underlying "
-                       "optimizer."
+    'params': {
+        'args': [
+            {
+                "name": "example_id_column",
+                "type": {
+                    "key": "string",
+                    "des": "A string defining the feature column name representing "
+                           "example ids. Used to initialize the underlying "
+                           "optimizer."
+                },
+                "default": "index",
+                "required": True
             },
-            "default": "index",
-            "required": True
-        },
-        {
-            "name": "weight_column_name",
-            "type": {
-                "key": "string",
-                "des": "A string defining feature column name representing "
-                       "weights. It is used to down weight or boost examples "
-                       "during training. It will be multiplied by the loss of the "
-                       "example."
+            {
+                "name": "weight_column_name",
+                "type": {
+                    "key": "string",
+                    "des": "A string defining feature column name representing "
+                           "weights. It is used to down weight or boost examples "
+                           "during training. It will be multiplied by the loss of the "
+                           "example."
+                },
+                "default": None,
+                "required": False
             },
-            "default": None,
-            "required": False
-        },
-        {
-            "name": "l1_regularization",
-            "type": {
-                "key": "float",
-                "des": "L1-regularization parameter. Refers to global L1 "
-                       "regularization (across all examples).",
-                "range": None
+            {
+                "name": "l1_regularization",
+                "type": {
+                    "key": "float",
+                    "des": "L1-regularization parameter. Refers to global L1 "
+                           "regularization (across all examples).",
+                    "range": None
+                },
+                "default": 0.0,
+                "required": True
             },
-            "default": 0.0,
-            "required": True
-        },
-        {
-            "name": "l2_regularization",
-            "type": {
-                "key": "float",
-                "des": "L2-regularization parameter. Refers to global L1 "
-                       "regularization (across all examples).",
-                "range": None
+            {
+                "name": "l2_regularization",
+                "type": {
+                    "key": "float",
+                    "des": "L2-regularization parameter. Refers to global L1 "
+                           "regularization (across all examples).",
+                    "range": None
+                },
+                "default": 0.0,
+                "required": True
             },
-            "default": 0.0,
-            "required": True
-        },
-        {
-            "name": "num_loss_partitions",
-            "type": {
-                "key": "int",
-                "des": "number of partitions of the (global) loss function "
-                       "optimized by the underlying optimizer (SDCAOptimizer)."
-                       "num_loss_partitions defines the number of partitions of "
-                       "the global loss function",
-                "range": None
-            },
-            "default": 1,
-            "required": True
-        }
-    ],
-    'fit': [
-        {
+            {
+                "name": "num_loss_partitions",
+                "type": {
+                    "key": "int",
+                    "des": "number of partitions of the (global) loss function "
+                           "optimized by the underlying optimizer (SDCAOptimizer)."
+                           "num_loss_partitions defines the number of partitions of "
+                           "the global loss function",
+                    "range": None
+                },
+                "default": 1,
+                "required": True
+            }
+        ]
+    },
+    'fit': {
+        'y': {
             "name": "y",
             "type": {
                 "key": "string",
@@ -231,27 +233,32 @@ SVM = {
             "default": None,
             "required": True
         },
-        {
-            "name": "step",
-            "type": {
-                "key": "int",
-                "des": "steps for training",
-                "range": None
+        'args': [
+
+            {
+                "name": "step",
+                "type": {
+                    "key": "int",
+                    "des": "steps for training",
+                    "range": None
+                },
+                "default": 30,
+                "required": True
             },
-            "default": 30,
-            "required": True
-        },
-    ],
-    'evaluate': [
-        {
-            "name": "step",
-            "type": {
-                "key": "int",
-                "des": "steps for evaluate",
-                "range": None
+        ],
+    },
+    'evaluate': {
+        'args': [
+            {
+                "name": "step",
+                "type": {
+                    "key": "int",
+                    "des": "steps for evaluate",
+                    "range": None
+                },
+                "default": 1,
+                "required": True
             },
-            "default": 1,
-            "required": True
-        },
-    ]
+        ]
+    }
 }

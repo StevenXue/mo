@@ -38,13 +38,14 @@ import json
 
 from server3.business import data_business
 from server3.utility import json_utility
+from datetime import datetime
 
 data = data_business.get_by_data_set_limit(ObjectId('5966eb29d123abad6fb9c8bb'),
                                            10)
 print(data)
-data = [json_utility.convert_to_json(d.to_mongo()) for d in data]
-print(json.dumps(data))
-
-
-# data = jsonify(data)
+data = [d.to_mongo() for d in data]
 # print(data)
+data = [json_utility.convert_to_json(d) for d in data]
+print(data)
+
+

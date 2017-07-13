@@ -7,6 +7,7 @@ from keras.models import Sequential
 import tensorflow as tf
 from server3.service import logger
 
+global graph
 graph = tf.get_default_graph()
 
 
@@ -48,9 +49,7 @@ def keras_seq(conf, **kw):
 
         # define the metrics
         # compile
-        model.compile(loss=comp['loss'],
-                      optimizer=comp['optimizer'],
-                      metrics=comp['metrics'])
+        model.compile(**comp)
 
         batch_print_callback = LambdaCallback(on_epoch_end=
                                               lambda epoch, logs:
@@ -417,66 +416,69 @@ KERAS_SEQ_SPEC = {
             ],
         },
     ],
-    "compile": [
-        {
-            "name": "loss",
-            "type": {
-                "key": "choice",
-                "des": "A loss function (or objective function, or "
-                       "optimization score function) is one of the two "
-                       "parameters required to compile a model",
-                "range": ["mean_squared_error",
-                          "mean_absolute_error",
-                          "mean_absolute_percentage_error",
-                          "mean_squared_logarithmic_error",
-                          "squared_hinge",
-                          "hinge",
-                          "categorical_hinge",
-                          "logcosh",
-                          "categorical_crossentropy",
-                          "sparse_categorical_crossentropy",
-                          "binary_crossentropy",
-                          "kullback_leibler_divergence",
-                          "poisson",
-                          "cosine_proximity"]
-            },
-            "default": "categorical_crossentropy",
-            "required": True
-        },
-        {
-            "name": "optimizer",
-            "type": {
-                "key": "choice",
-                "des": "An optimizer is one of the two arguments required for "
-                       "compiling a Keras model",
-                "range": ["sgd",
-                          "rmsprop",
-                          "adagrad",
-                          "adadelta",
-                          "adam",
-                          "adamax",
-                          "nadam"]
-            },
-            "default": "sgd",
-            "required": True
-        },
-        {
-            "name": "metrics",
-            "type": {
-                "key": "choices",
-                "des": "A metric is a function that is used to judge the "
-                       "performance of your model",
-                "range": ["acc",
-                          "mse",
-                          "mae",
-                          "mape",
-                          "msle",
-                          "cosine"]
-            },
-            "default": [],
-            "required": False
-        },
-    ],
+    "compile": {
+        'args':
+            [
+                {
+                    "name": "loss",
+                    "type": {
+                        "key": "choice",
+                        "des": "A loss function (or objective function, or "
+                               "optimization score function) is one of the two "
+                               "parameters required to compile a model",
+                        "range": ["mean_squared_error",
+                                  "mean_absolute_error",
+                                  "mean_absolute_percentage_error",
+                                  "mean_squared_logarithmic_error",
+                                  "squared_hinge",
+                                  "hinge",
+                                  "categorical_hinge",
+                                  "logcosh",
+                                  "categorical_crossentropy",
+                                  "sparse_categorical_crossentropy",
+                                  "binary_crossentropy",
+                                  "kullback_leibler_divergence",
+                                  "poisson",
+                                  "cosine_proximity"]
+                    },
+                    "default": "categorical_crossentropy",
+                    "required": True
+                },
+                {
+                    "name": "optimizer",
+                    "type": {
+                        "key": "choice",
+                        "des": "An optimizer is one of the two arguments required for "
+                               "compiling a Keras model",
+                        "range": ["sgd",
+                                  "rmsprop",
+                                  "adagrad",
+                                  "adadelta",
+                                  "adam",
+                                  "adamax",
+                                  "nadam"]
+                    },
+                    "default": "sgd",
+                    "required": True
+                },
+                {
+                    "name": "metrics",
+                    "type": {
+                        "key": "choices",
+                        "des": "A metric is a function that is used to judge the "
+                               "performance of your model",
+                        "range": ["acc",
+                                  "mse",
+                                  "mae",
+                                  "mape",
+                                  "msle",
+                                  "cosine"]
+                    },
+                    "default": [],
+                    "required": False
+                },
+            ],
+    },
     "fit": {
         "x_train": {
             "name": "x_train",

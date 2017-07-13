@@ -7,6 +7,7 @@ from keras.models import Sequential
 import tensorflow as tf
 # from server3.service import logger
 
+global graph
 graph = tf.get_default_graph()
 
 

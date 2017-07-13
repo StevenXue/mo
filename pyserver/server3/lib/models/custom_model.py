@@ -145,7 +145,6 @@ if __name__ == '__main__':
         df_test["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
     # 添加一列 index，格式为string，作为"example_id_column"的输入
     df_train['index'] = df_train.index.astype(str)
-    print(df_train)
     df_test['index'] = df_test.index.astype(str)
 
     # 将连续型和类别型特征分离开，为input做准备

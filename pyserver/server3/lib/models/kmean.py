@@ -183,53 +183,55 @@ def kmeans_clustering_model_fn(features, labels, mode, params, config):
 
 
 Kmeans = {
-    'custom': [
-        {
-            "name": "num_clusters",
-            "type": {
-                "key": "int",
-                "des": "number of clusters to train."
+    'custom': {
+        'args': [
+            {
+                "name": "num_clusters",
+                "type": {
+                    "key": "int",
+                    "des": "number of clusters to train."
+                },
+                "default": 2,
+                "required": True
             },
-            "default": 2,
-            "required": True
-        },
-        {
-            "name": "random_seed",
-            "type": {
-                "key": "int",
-                "des": "Seed for PRNG used to initialize centers."
+            {
+                "name": "random_seed",
+                "type": {
+                    "key": "int",
+                    "des": "Seed for PRNG used to initialize centers."
+                },
+                "default": None,
+                "required": True
             },
-            "default": None,
-            "required": True
-        },
-        {
-            "name": "use_mini_batch",
-            "type": {
-                "key": "bool",
-                "des": "If true, use the mini-batch k-means algorithm. Else assume full batch."
+            {
+                "name": "use_mini_batch",
+                "type": {
+                    "key": "bool",
+                    "des": "If true, use the mini-batch k-means algorithm. Else assume full batch."
+                },
+                "default": None,
+                "required": False
             },
-            "default": None,
-            "required": False
-        },
-        {
-            "name": "kmeans_plus_plus_num_retries",
-            "type": {
-                "key": "int",
-                "des": "For each point that is sampled during kmeans++ initialization, this parameter specifies the number of additional points to draw from the current distribution before selecting the best. If a negative value is specified, a heuristic is used to sample O(log(num_to_sample)) additional points.",
-                "range": None
+            {
+                "name": "kmeans_plus_plus_num_retries",
+                "type": {
+                    "key": "int",
+                    "des": "For each point that is sampled during kmeans++ initialization, this parameter specifies the number of additional points to draw from the current distribution before selecting the best. If a negative value is specified, a heuristic is used to sample O(log(num_to_sample)) additional points.",
+                    "range": None
+                },
+                "default": 1,
+                "required": True
             },
-            "default": 1,
-            "required": True
-        },
-        {
-            "name": "relative_tolerance",
-            "type": {
-                "key": "float",
-                "des": "A relative tolerance of change in the loss between iterations. Stops learning if the loss changes less than this amount. Note that this may not work correctly if use_mini_batch=True.",
-                "range": [0.0, 100]
-            },
-            "default": None,
-            "required": False
-        }
-    ]
+            {
+                "name": "relative_tolerance",
+                "type": {
+                    "key": "float",
+                    "des": "A relative tolerance of change in the loss between iterations. Stops learning if the loss changes less than this amount. Note that this may not work correctly if use_mini_batch=True.",
+                    "range": [0.0, 100]
+                },
+                "default": None,
+                "required": False
+            }
+        ]
+    }
 }
