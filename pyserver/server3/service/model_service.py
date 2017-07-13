@@ -58,10 +58,10 @@ def add_model_with_ownership(user_ID, is_private, name, description, category,
     return model
 
 
-def split_categorical_and_continuous(df, label_col, index_col):
+def split_categorical_and_continuous(df, exclude_cols):
     fields = list(df.columns.values)
-    fields.remove(label_col)
-    fields.remove(index_col)
+    for col in exclude_cols:
+        fields.remove(col)
     continuous_cols = []
     categorical_cols = []
     for field in fields:
@@ -92,48 +92,60 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
         conf = manage_nn_input(conf, staging_data_set_id, **kwargs)
         return job_service.run_code(conf, project_id, staging_data_set_id,
                                     model, f)
-    elif model['category'] == 1:
-
+    else:
         train_cursor = staging_data_business.get_by_staging_data_set_id(
             staging_data_set_id)
         df_train = staging_data_service.mongo_to_df(train_cursor)
-
-        # TODO choose column to be label, or choose column to generate label
-        LABEL_COLUMN = "label"
-        df_train[LABEL_COLUMN] = (
-            df_train["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
-
-        # 添加一列 index，格式为string，作为"example_id_column"的输入
-        INDEX_COLUMN = 'index'
-        df_train[INDEX_COLUMN] = df_train.index.astype(str)
-
-        # TODO support two data set
-        # df_test = staging_data_service.mongo_to_df(test_cursor)
-        # df_test[LABEL_COLUMN] = (
-        #    df_test["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
-        # df_test['index'] = df_test.index.astype(str)
-
-        # 将连续型和类别型特征分离开，为input做准备
-        continuous_cols, categorical_cols = \
-            split_categorical_and_continuous(df_train, LABEL_COLUMN,
-                                             INDEX_COLUMN)
-        conf["feature_columns"] = [continuous_cols, categorical_cols]
-
-        input = {
-            'train': df_train,
-            # 'test': df_test,
-            'categorical_cols': categorical_cols,
-            'continuous_cols': continuous_cols + ['index'],
-            'label_col': LABEL_COLUMN
-        }
-
         f = models.custom_model
         model_fn = getattr(models, model.entry_function)
-        return job_service.run_code(conf, project_id, staging_data_set_id,
-                                    model, f, model_fn, input)
+
+        if model['category'] == 1:
+            LABEL_COLUMN = "label"
+            fit = conf.get('fit', None)
+            label_target = fit.pop('y', None)
+            df_train[LABEL_COLUMN] = (
+                df_train[label_target].apply(lambda x: ">50K" in x)).astype(int)
+
+            # 添加一列 index，格式为string，作为"example_id_column"的输入
+            params = conf.get('params', None)
+            index_col = params.get('example_id_column', None)
+            df_train[index_col] = df_train.index.astype(str)
+
+            # TODO support two data set
+            # df_test = staging_data_service.mongo_to_df(test_cursor)
+            # df_test[LABEL_COLUMN] = (
+            #    df_test["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
+            # df_test['index'] = df_test.index.astype(str)
+
+            # 将连续型和类别型特征分离开，为input做准备
+            continuous_cols, categorical_cols = \
+                split_categorical_and_continuous(df_train, [LABEL_COLUMN,
+                                                            index_col,
+                                                            label_target])
+            params["feature_columns"] = [continuous_cols, categorical_cols]
+
+            input = {
+                'train': df_train,
+                # 'test': df_test,
+                'categorical_cols': categorical_cols,
+                'continuous_cols': continuous_cols + ['index'],
+                'label_col': LABEL_COLUMN
+            }
+
+            return job_service.run_code(conf, project_id, staging_data_set_id,
+                                        model, f, model_fn, input)
+        if model['category'] == 2:
+            cols = list(df_train.columns.values)
+            input = {
+                'train': df_train,
+                'continuous_cols': cols,
+            }
+            return job_service.run_code(conf, project_id, staging_data_set_id,
+                                        model, f, model_fn, input)
 
 
-def run_multiple_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
+def run_multiple_model(conf, project_id, staging_data_set_id, model_id,
+                       **kwargs):
     """
     run model by model_id and the parameter config
 
@@ -173,6 +185,8 @@ def get_parameters_grid(conf):
     # for p in parameters_grid:
     #     print(p)
     return parameters_grid
+
+
 # ------------------------------ temp function ------------------------------e
 
 
@@ -264,20 +278,19 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
 
 
 def temp():
-
-    add_model_with_ownership(
-        'system',
-        False,
-        'keras_seq',
-        'keras_seq from keras',
-        0,
-        '/lib/keras_seq',
-        'keras_seq',
-        'keras_seq_to_str',
-        models.KERAS_SEQ_SPEC,
-        {'type': 'ndarray', 'n': None}
-    )
-
+    # add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'keras_seq',
+    #     'keras_seq from keras',
+    #     0,
+    #     '/lib/keras_seq',
+    #     'keras_seq',
+    #     'keras_seq_to_str',
+    #     models.KERAS_SEQ_SPEC,
+    #     {'type': 'ndarray', 'n': None}
+    # )
+    #
     add_model_with_ownership(
         'system',
         False,
@@ -288,24 +301,59 @@ def temp():
         'sdca_model_fn',
         'custom_model_to_str',
         models.SVM,
-        {'type': 'ndarray', 'n': None}
+        {'type': 'DataFrame'}
     )
+
+    # add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'kmean',
+    #     'custom kmean model',
+    #     2,
+    #     '/lib/kmean',
+    #     'kmeans_clustering_model_fn',
+    #     'custom_model_to_str',
+    #     models.Kmeans,
+    #     {'type': 'DataFrame'}
+    # )
 
 
 if __name__ == '__main__':
     pass
+    # conf = {
+    #     'params': {
+    #         "example_id_column": 'index',
+    #         "weight_column_name": None,
+    #         "model_dir": None,
+    #         "l1_regularization": 0.0,
+    #         "l2_regularization": 0.0,
+    #         "num_loss_partitions": 1,
+    #         "kernels": None,
+    #         "config": None,
+    #     },
+    #     'fit': {
+    #         "y": "income_bracket",
+    #         "steps": 30
+    #     },
+    #     'evaluate': {
+    #         'steps': 1
+    #     }
+    # }
+    # run_model(conf, "595f32e4e89bde8ba70738a3", "5965cda1d123ab8f604a8dd0",
+    #           "59671c02d123abb4cfe19766")
+
     conf = {
-        "example_id_column": 'index',
-        "weight_column_name": None,
-        "model_dir": None,
-        "l1_regularization": 0.0,
-        "l2_regularization": 0.5,
-        "num_loss_partitions": 1,
-        "kernels": None,
-        "config": None,
+        'params':
+            {
+                "num_clusters": 4,
+                "random_seed": 5,
+                "use_mini_batch": True,
+                "mini_batch_steps_per_iteration": 1,
+                "kmeans_plus_plus_num_retries": 2,
+                "relative_tolerance": None,
+            }
     }
     run_model(conf, "595f32e4e89bde8ba70738a3", "5965cda1d123ab8f604a8dd0",
-              "5964f16ad123ab7df77c80ba")
-    # temp()
+              "5966e1add123abaa9d9c13c3")
 
-
+    temp()

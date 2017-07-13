@@ -113,33 +113,7 @@ def get_fields_with_types(staging_data_set_id):
     :param staging_data_set_id:
     :return: [field_name, [type1, type2, ...]]
     """
-    mapper = Code("""
-        function() {
-            function isInt(n){
-                return n % 1 === 0;
-            }
-            for (var key in this) {
-                let type = typeof this[key]
-                if(type === 'number') {
-                    if(isInt(this[key])) {
-                        type = 'integer'
-                    } else {
-                        type = 'float'
-                    }
-                }
-                emit(key, type); 
-            }
-            //for (var key in this) { emit(key, null); }
-        }
-    """)
-
-    reducer = Code("""
-        function(key, stuff) { 
-        let obj = {}
-        stuff.forEach(e => obj[e] = null)
-        return obj; 
-        }
-    """)
+    mapper, reducer = data_service.field_mapper_reducer()
     result = staging_data_business. \
         get_fields_by_map_reduce(staging_data_set_id, mapper, reducer)
     # result = StagingData.objects(ListingId='126541').map_reduce(mapper, reducer, 'inline')

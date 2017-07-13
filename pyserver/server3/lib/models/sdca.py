@@ -161,7 +161,7 @@ def sdca_model_fn(features, labels, mode, params):
 
 
 SVM = {
-    'args': [
+    'params': [
         {
             "name": "example_id_column",
             "type": {
@@ -173,15 +173,6 @@ SVM = {
             "default": "index",
             "required": True
         },
-        # {
-        #     "name": "feature_columns",
-        #     "type": {
-        #         "key": "string_m",
-        #         "des": "features columns name "
-        #     },
-        #     "default": None,
-        #     "required": True
-        # },
         {
             "name": "weight_column_name",
             "type": {
@@ -228,16 +219,39 @@ SVM = {
             },
             "default": 1,
             "required": True
-        },
+        }
+    ],
+    'fit': [
         {
-            "name": "kernels",
+            "name": "y",
             "type": {
                 "key": "string",
-                "des": "A list of kernels for the SVM. Currently, no kernels are "
-                       "supported. Reserved for future use for non-linear SVMs."
+                "des": "A field use as y (output)"
             },
             "default": None,
-            "required": False
-        }
+            "required": True
+        },
+        {
+            "name": "step",
+            "type": {
+                "key": "int",
+                "des": "steps for training",
+                "range": None
+            },
+            "default": 30,
+            "required": True
+        },
+    ],
+    'evaluate': [
+        {
+            "name": "step",
+            "type": {
+                "key": "int",
+                "des": "steps for evaluate",
+                "range": None
+            },
+            "default": 1,
+            "required": True
+        },
     ]
 }
