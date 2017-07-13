@@ -110,7 +110,8 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
         argv.append(index_nan)
         argv.append(k)
     # result = toolkit_calculate(toolkit_id, *argv)
-    result = toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, fields, *argv)
+    result = toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id,
+                                    fields, *argv)
     # project_business.add_job_and_result_to_project(result, ObjectId(project_id))
     return result.to_mongo().to_dict()
 

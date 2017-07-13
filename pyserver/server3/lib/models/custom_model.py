@@ -21,6 +21,7 @@ def custom_model(params, model_fn, input, **kw):
     continuous_cols = input.pop('continuous_cols', None)
     label_col = input.pop('label_col', None)
     predict_x = kw.pop('predict_x', None)
+    project_id = kw.pop('project_id', None)
 
     if result_sds is None:
         raise RuntimeError('no result sds id passed to model')
@@ -32,6 +33,8 @@ def custom_model(params, model_fn, input, **kw):
         raise RuntimeError('no continuous_cols input')
     if label_col is None:
         raise RuntimeError('no label_col input')
+    if project_id is None:
+        raise RuntimeError('no project_id input')
 
     tf.logging.set_verbosity(tf.logging.INFO)
 
@@ -39,6 +42,7 @@ def custom_model(params, model_fn, input, **kw):
     mh = MetricsHandler()
     # pass result staging data set for logger to save results
     mh.result_sds_id = result_sds
+    mh.project_id = project_id
     logger = logging.getLogger('tensorflow')
     logger.setLevel(logging.DEBUG)
     logger.addHandler(mh)

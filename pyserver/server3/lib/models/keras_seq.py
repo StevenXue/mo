@@ -5,7 +5,7 @@ from keras import layers
 from keras.callbacks import LambdaCallback
 from keras.models import Sequential
 import tensorflow as tf
-# from server3.service import logger
+from server3.service import logger
 
 graph = tf.get_default_graph()
 
@@ -17,9 +17,11 @@ def keras_seq(conf, **kw):
     :return:
     """
     result_sds = kw.pop('result_sds', None)
+    project_id = kw.pop('project_id', None)
     if result_sds is None:
         raise RuntimeError('no result sds id passed to model')
-
+    if project_id is None:
+        raise RuntimeError('no project id passed to model')
     with graph.as_default():
         model = Sequential()
         # Dense(64) is a fully-connected layer with 64 hidden units.
@@ -50,26 +52,29 @@ def keras_seq(conf, **kw):
                       optimizer=comp['optimizer'],
                       metrics=comp['metrics'])
 
-        # batch_print_callback = LambdaCallback(on_epoch_end=
-        #                                       lambda epoch, logs:
-        #                                       logger.log_epoch_end(epoch, logs,
-        #                                                            result_sds))
+        batch_print_callback = LambdaCallback(on_epoch_end=
+                                              lambda epoch, logs:
+                                              logger.log_epoch_end(epoch, logs,
+                                                                   result_sds,
+                                                                   project_id))
 
         # training
         # TODO callback 改成异步，考虑 celery
-        model.fit(f['x_train'], f['y_train'],
-                  validation_data=(f['x_val'], f['y_val']),
-                  callbacks=[],
-                  verbose=0,
-                  **f['args'])
+        history = model.fit(f['x_train'], f['y_train'],
+                            validation_data=(f['x_val'], f['y_val']),
+                            callbacks=[batch_print_callback],
+                            verbose=0,
+                            **f['args'])
 
         # testing
         score = model.evaluate(e['x_test'], e['y_test'], **e['args'])
 
         weights = model.get_weights()
-
         config = model.get_config()
-        return score
+        logger.log_train_end(result_sds, weights=weights, config=config,
+                             score=score)
+
+        return {'score': score, 'history': history}
 
 
 def keras_seq_to_str(obj, head_str, **kw):
@@ -609,5 +614,3 @@ if __name__ == '__main__':
                       }
                       }
          }, result_sds='11')
-
-

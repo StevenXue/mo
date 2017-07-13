@@ -62,7 +62,7 @@ def split_categorical_and_continuous(df, label_col, index_col):
     fields = list(df.columns.values)
     fields.remove(label_col)
     fields.remove(index_col)
-    continuous_cols = [index_col]
+    continuous_cols = []
     categorical_cols = []
     for field in fields:
         dtype = df[field].dtype
@@ -123,7 +123,7 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
             'train': df_train,
             # 'test': df_test,
             'categorical_cols': categorical_cols,
-            'continuous_cols': continuous_cols,
+            'continuous_cols': continuous_cols + ['index'],
             'label_col': LABEL_COLUMN
         }
 

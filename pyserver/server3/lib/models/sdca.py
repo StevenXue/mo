@@ -85,7 +85,6 @@ def sdca_model_fn(features, labels, mode, params):
     #   Continuous Feature Columns 或  CATEGORICAL_COLUMNS
 
     #   feature_columns = params["feature_columns"]
-    print(params)
     feature_columns_realvalued = [tf.contrib.layers.real_valued_column(i) for i
                                   in params["feature_columns"][0]]
     feature_columns_sparse = [
