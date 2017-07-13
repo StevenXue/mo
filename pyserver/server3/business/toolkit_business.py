@@ -735,7 +735,20 @@ def create_public_data_process():
                                  target_py_code=inspect.getsource(preprocess_orig.variance_threshold),
                                  parameter_spec=[
                                      {
-                                         'name': 'input_shape',
+                                         'name': 'x_shape',
+                                         'type': {
+                                             'key': 'int_m',
+                                             'des': 'nD tensor with shape: (batch_size, ..., '
+                                                    'input_dim). The most common situation would be a '
+                                                    '2D input with shape (batch_size, input_dim).',
+                                             'range': None
+                                         },
+                                         'default': [None, None],
+                                         'required': True,
+                                         'len_range': [2, 2]
+                                     },
+                                     {
+                                         'name': 'y_shape',
                                          'type': {
                                              'key': 'int_m',
                                              'des': 'nD tensor with shape: (batch_size, ..., '
@@ -802,9 +815,9 @@ def create_public_data_process():
                                     target_py_code=inspect.getsource(preprocess_orig.select_k_best_pearson),
                                     parameter_spec=[
                                         {
-                                            'name': 'input_shape',
+                                            'name': 'x_input',
                                             'type': {
-                                                'key': 'int_m',
+                                                'key': 'transfer_box',
                                                 'des': 'nD tensor with shape: (batch_size, ..., '
                                                        'input_dim). The most common situation would be a '
                                                        '2D input with shape (batch_size, input_dim).',
@@ -813,17 +826,21 @@ def create_public_data_process():
                                             'default': [None, None],
                                             'required': True,
                                             'len_range': [2, 2]
+
                                         },
-                                        {
-                                            'name': 'k',
-                                            'type': {
-                                                'key': 'int',
-                                                'des': 'the number of selected features',
-                                                'range': [None, None]
-                                            },
-                                            'default': 2,
-                                            'required': True
-                                        }
+
+                                        # 'args': [
+                                        #     {
+                                        #         'name': 'k',
+                                        #         'type': {
+                                        #             'key': 'int',
+                                        #             'des': 'the number of selected features',
+                                        #             'range': [None, None]
+                                        #         },
+                                        #         'default': 2,
+                                        #         'required': True
+                                        #     }
+                                        # ],
                                     ])
     select_k_best_pearson = toolkit_repo.create(select_k_best_pearson)
     ownership_business.add(user, False, toolkit=select_k_best_pearson)
