@@ -36,10 +36,12 @@ def usr_story1_exploration(data, d_type, group_num=10):
     info_dict = {'type': d_type, 'gen_info': gen_info}
     if d_type == 'int' or d_type == 'float':
         arr_array = np.array(arr_temp)
+        print ('hahahaha')
         mean, std, min, max = (gen_info['mean'], gen_info['std'], int(gen_info['min']), int(gen_info['max']))
+        print ('hahahaha')
         interval = (max - min + 1) / group_num
         # 给出x轴
-        x_domain = np.arange(min, max+interval, interval)
+        x_domain = np.arange(min, max+interval, interval).round(1)
         freq_hist = {"freq_hist": arr_array}
         df = pd.DataFrame(freq_hist)
         # 给出y轴
@@ -62,7 +64,7 @@ def usr_story1_exploration(data, d_type, group_num=10):
 # 用来获取数据的基本信息（长度，均值，值域等）
 def generate_stats_info(data, d_type):
     if d_type == 'int':
-        return pd.DataFrame(data).describe().astype(int).to_dict()[0]
+        return pd.DataFrame(data).describe().astype(float).to_dict()[0]
     elif d_type == 'float':
         return pd.DataFrame(data).describe().astype(float).to_dict()[0]
     else:
