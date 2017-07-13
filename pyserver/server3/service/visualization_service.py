@@ -10,6 +10,7 @@
 """
 
 from itertools import groupby
+# import math
 from scipy import stats
 import pandas as pd
 import numpy as np
@@ -19,11 +20,11 @@ def usr_story1_exploration(data, d_type, group_num=10):
     # 转换，把所有键值对里的值变成一个数组返回(arr_temp)
     # print (type(data))
     if d_type == 'int':
-        arr_temp = [int(list(arr.values())[0]) for arr in data if list(arr.values())[0]]
+        arr_temp = [int(list(arr.values())[0]) for arr in data if isNaN(list(arr.values())[0]) == False and list(arr.values())[0] != '']
     elif d_type == 'float':
-        arr_temp = [float(list(arr.values())[0]) for arr in data if list(arr.values())[0]]
+        arr_temp = [float(list(arr.values())[0]) for arr in data if isNaN(list(arr.values())[0]) == False and list(arr.values())[0] != '']
     else:
-        arr_temp = [list(arr.values())[0] for arr in data if list(arr.values())[0]]
+        arr_temp = [list(arr.values())[0] for arr in data if isNaN(list(arr.values())[0]) == False and list(arr.values())[0] != '']
     print (arr_temp)
 
     # 生成的dict有4栏:
@@ -43,7 +44,7 @@ def usr_story1_exploration(data, d_type, group_num=10):
         df = pd.DataFrame(freq_hist)
         # 给出y轴
         y_domain = df.groupby(pd.cut(df.freq_hist, x_domain)).count().freq_hist.values/interval
-        print ('y_domain', y_domain)
+        # print ('y_domain', y_domain)
 
         # 注意x会比y多一个
         info_dict['freq_hist'] = {'x_domain': x_domain.tolist(), 'y_domain': y_domain.tolist()}
@@ -75,7 +76,11 @@ def hypo_test(arr, mean, std, x_range, type='norm'):
 
         # ks-test
         p_value = stats.shapiro(arr)[1]
-        print (stats.shapiro(arr))
+        # print (stats.shapiro(arr))
         flag = 1 if p_value >= 0.05 else 0
 
         return flag, p_value, arr_norm_draw.tolist()
+
+
+def isNaN(num):
+    return num != num
