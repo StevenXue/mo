@@ -75,7 +75,8 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
 # controller.run_code(conf, model)
 
 
-def run_multiple_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
+def run_multiple_model(conf, project_id, staging_data_set_id, model_id, hyper_parameters=None,
+                       **kwargs):
     """
     run model by model_id and the parameter config
 
@@ -84,38 +85,23 @@ def run_multiple_model(conf, project_id, staging_data_set_id, model_id, **kwargs
     :param staging_data_set_id:
     :param model_id:
     :param kwargs:
+    :param hyper_parameters:
     :return:
     """
-    pass
-    from server3.service.spark_service import hyper_parameters_tuning
-    parameters_grid = get_parameters_grid(conf)
-    result = hyper_parameters_tuning(parameters_grid)
+    from server3.service import spark_service
+    model = model_business.get_by_model_id(model_id)
+    # using conf and hyper_parameters to generate conf_grid
+    conf_grid = spark_service.get_conf_grid(conf, hyper_parameters=hyper_parameters)
+
+    if model['category'] == 0:
+        # get the conf with data
+        conf = manage_supervised_input(conf, staging_data_set_id, **kwargs)
+    result = spark_service.hyper_parameters_tuning(conf_grid, conf)
     return result
     # print("result", result)
     # job_service.run_code(conf, project_id, staging_data_set_id, model_id,
     #                      **kwargs)
     # controller.run_code(conf, model)
-
-
-# ------------------------------ temp function ------------------------------s
-def get_parameters_grid(conf):
-    import itertools
-    import copy
-    epochs = conf['fit']['args']['epochs']
-    batch_size = conf['fit']['args']['batch_size']
-
-    all_experiments = list(itertools.product(epochs, batch_size))
-    parameters_grid = []
-    for ex in all_experiments:
-        conf_template = copy.deepcopy(conf)
-        conf_template['fit']['args']['epochs'] = ex[0]
-        conf_template['fit']['args']['batch_size'] = ex[1]
-        parameters_grid.append(conf_template)
-    # print(all_experiments)
-    # for p in parameters_grid:
-    #     print(p)
-    return parameters_grid
-# ------------------------------ temp function ------------------------------e
 
 
 def model_to_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
