@@ -3,6 +3,8 @@ import os
 import csv
 import io
 
+import pandas as pd
+
 from server3.business import file_business
 from server3.business import user_business
 from server3.business import ownership_business
@@ -73,7 +75,13 @@ def save_file_and_get_size(file, path):
 
 
 # get file
-def file_loader(file_id, user_ID):
+def file_loader(file_id, user_ID, **kwargs):
+    """
+    read csv file to list of dict
+    :param file_id:
+    :param user_ID:
+    :return: list of dict
+    """
     file = file_business.get_by_id(file_id)
     # if user_ID != file,
     is_private = ownership_service.check_private(file, 'file')
@@ -81,19 +89,8 @@ def file_loader(file_id, user_ID):
     if is_private and not is_owned:
         raise Exception('file permission denied, private: %s, owned: %s' % (
             is_private, is_owned))
-    with open(file.uri, 'rU') as csv_data:
-        reader = csv.reader(csv_data)
-
-        # eliminate blank rows if they exist
-        rows = [row for row in reader if row]
-        headings = rows[0]  # get headings
-
-        table = []
-        for row in rows[1:]:
-            row_data = {}
-            for col_header, data_column in zip(headings, row):
-                row_data[col_header] = data_column
-            table.append(row_data)
+    table = pd.read_csv(file.uri, skipinitialspace=True, **kwargs)\
+        .to_dict('records')
     return table
 
 

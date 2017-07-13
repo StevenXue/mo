@@ -9,7 +9,7 @@ from server3.business import user_business
 from server3.service import file_service
 from server3.service import ownership_service
 from server3.utility import json_utility
-#import constants
+from server3 import constants
 
 def add_data_set(data_set_name, ds_description, user_ID, is_private):
     ds = data_set_business.add(data_set_name, ds_description)
@@ -41,8 +41,8 @@ def import_data(data_array, data_set_name, ds_description, user_ID, is_private):
 
 
 def import_data_from_file_id(file_id, data_set_name, ds_description, user_ID,
-                             is_private):
-    table = file_service.file_loader(file_id, user_ID)
+                             is_private, **kwargs):
+    table = file_service.file_loader(file_id, user_ID, **kwargs)
     return import_data(table, data_set_name, ds_description, user_ID,
                        is_private)
 

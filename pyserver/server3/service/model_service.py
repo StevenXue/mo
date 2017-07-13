@@ -8,16 +8,20 @@
 # @running  : python
 # Further to FIXME of None
 """
+import numpy as np
 
 from server3.business import model_business, ownership_business, user_business
-from server3.lib.models import ks
 from server3.service import job_service
 from server3.service.job_service import split_supervised_input
+from server3.lib import models
+from server3.service import staging_data_service
+from server3.business import staging_data_business
 
 
 def get_all_public_model():
-    models = [obj.model.to_mongo().to_dict() for obj in ownership_business.
-        list_ownership_by_type_and_private('model', False)]
+    models = [obj.model.to_mongo().to_dict() for obj in
+              ownership_business.list_ownership_by_type_and_private('model',
+                                                                    False)]
     print('models', len(models))
     return models
 
@@ -54,6 +58,21 @@ def add_model_with_ownership(user_ID, is_private, name, description, category,
     return model
 
 
+def split_categorical_and_continuous(df, label_col, index_col):
+    fields = list(df.columns.values)
+    fields.remove(label_col)
+    fields.remove(index_col)
+    continuous_cols = [index_col]
+    categorical_cols = []
+    for field in fields:
+        dtype = df[field].dtype
+        if dtype == np.int_ or dtype == np.float_:
+            continuous_cols.append(field)
+        else:
+            categorical_cols.append(field)
+    return [continuous_cols, categorical_cols]
+
+
 def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
     """
     run model by model_id and the parameter config
@@ -66,13 +85,50 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
     :return:
     """
     model = model_business.get_by_model_id(model_id)
-    f = model.entry_function
+    # import model function
+    f = getattr(models, model.entry_function)
     if model['category'] == 0:
-        conf = manage_supervised_input(conf, staging_data_set_id, **kwargs)
-    return job_service.run_code(conf, project_id, staging_data_set_id, model, f)
+        # keras nn
+        conf = manage_nn_input(conf, staging_data_set_id, **kwargs)
+        return job_service.run_code(conf, project_id, staging_data_set_id,
+                                    model, f)
+    elif model['category'] == 1:
 
+        train_cursor = staging_data_business.get_by_staging_data_set_id(
+            staging_data_set_id)
+        df_train = staging_data_service.mongo_to_df(train_cursor)
 
-# controller.run_code(conf, model)
+        # TODO choose column to be label, or choose column to generate label
+        LABEL_COLUMN = "label"
+        df_train[LABEL_COLUMN] = (
+            df_train["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
+
+        # 添加一列 index，格式为string，作为"example_id_column"的输入
+        INDEX_COLUMN = 'index'
+        df_train[INDEX_COLUMN] = df_train.index.astype(str)
+
+        # TODO support two data set
+        # df_test = staging_data_service.mongo_to_df(test_cursor)
+        # df_test[LABEL_COLUMN] = (
+        #    df_test["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
+        # df_test['index'] = df_test.index.astype(str)
+
+        # 将连续型和类别型特征分离开，为input做准备
+        continuous_cols, categorical_cols = \
+            split_categorical_and_continuous(df_train, LABEL_COLUMN, INDEX_COLUMN)
+
+        input = {
+            'train': df_train,
+            # 'test': df_test,
+            'categorical_cols': categorical_cols,
+            'continuous_cols': continuous_cols,
+            'label_col': LABEL_COLUMN
+        }
+
+        f = models.custom_model
+        model_fn = getattr(models, model.entry_function)
+        return job_service.run_code(conf, project_id, staging_data_set_id,
+                                    model, f, model_fn, input)
 
 
 def run_multiple_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
@@ -139,32 +195,7 @@ def model_to_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
                                 model, f, head_str)
 
 
-# controller.run_code(conf, model)
-
-
-def temp():
-    add_model_with_ownership(
-        'system',
-        False,
-        'keras_seq',
-        'keras_seq from keras',
-        0,
-        '/lib/keras_seq',
-        'keras_seq',
-        'keras_seq_to_str',
-        ks.KERAS_SEQ_SPEC,
-        {'type': 'ndarray', 'n': None}
-    )
-
-
-if __name__ == '__main__':
-    pass
-
-
-# temp()
-
-
-def manage_supervised_input(conf, staging_data_set_id, **kwargs):
+def manage_nn_input(conf, staging_data_set_id, **kwargs):
     """
     deal with input when supervised learning
     :param conf:
@@ -228,3 +259,53 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
     code_str += "y_test = obj['y_te']\n"
 
     return code_str
+
+
+def temp():
+
+    add_model_with_ownership(
+        'system',
+        False,
+        'keras_seq',
+        'keras_seq from keras',
+        0,
+        '/lib/keras_seq',
+        'keras_seq',
+        'keras_seq_to_str',
+        models.KERAS_SEQ_SPEC,
+        {'type': 'ndarray', 'n': None}
+    )
+
+    add_model_with_ownership(
+        'system',
+        False,
+        'sdca',
+        'custom sdca model',
+        1,
+        '/lib/sdca',
+        'sdca_model_fn',
+        'custom_model_to_str',
+        models.SVM,
+        {'type': 'ndarray', 'n': None}
+    )
+
+
+if __name__ == '__main__':
+    pass
+    conf = {
+        "example_id_column": 'index',
+        "feature_columns": [["age", "education_num", "capital_gain",
+                             "capital_loss", "hours_per_week"], ["race"]],
+        "weight_column_name": None,
+        "model_dir": None,
+        "l1_regularization": 0.0,
+        "l2_regularization": 0.5,
+        "num_loss_partitions": 1,
+        "kernels": None,
+        "config": None,
+    }
+    run_model(conf, "595f32e4e89bde8ba70738a3", "5965cda1d123ab8f604a8dd0",
+              "5964f16ad123ab7df77c80ba")
+    # temp()
+
+

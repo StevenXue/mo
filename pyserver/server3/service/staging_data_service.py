@@ -2,6 +2,7 @@
 import sys
 from bson import Code
 import numpy as np
+import pandas as pd
 
 from server3.business import staging_data_set_business
 from server3.business import staging_data_business
@@ -9,7 +10,7 @@ from server3.business import data_business
 from server3.service import data_service
 from server3.utility import data_utility
 from server3.utility import json_utility
-#import constants
+from server3 import constants
 
 
 # 使得 sys.getdefaultencoding() 的值为 'utf-8'
@@ -114,7 +115,20 @@ def get_fields_with_types(staging_data_set_id):
     """
     mapper = Code("""
         function() {
-            for (var key in this) { emit(key, typeof this[key]); }
+            function isInt(n){
+                return n % 1 === 0;
+            }
+            for (var key in this) {
+                let type = typeof this[key]
+                if(type === 'number') {
+                    if(isInt(this[key])) {
+                        type = 'integer'
+                    } else {
+                        type = 'float'
+                    }
+                }
+                emit(key, type); 
+            }
             //for (var key in this) { emit(key, null); }
         }
     """)
@@ -130,7 +144,6 @@ def get_fields_with_types(staging_data_set_id):
         get_fields_by_map_reduce(staging_data_set_id, mapper, reducer)
     # result = StagingData.objects(ListingId='126541').map_reduce(mapper, reducer, 'inline')
     # print isinstance(result, MapReduceDocument)
-    # print len(list(result))
     return [[mr_doc.key, list(mr_doc.value.keys())] for mr_doc in result]
     # for mr_doc in result:
     #     print mr_doc.key, mr_doc.value
@@ -158,6 +171,11 @@ def _get_fields_with_types(staging_data_set_id):
 
 
 def check_integrity(staging_data_set_id):
+    """
+    check_integrity
+    :param staging_data_set_id:
+    :return:
+    """
     data_objects = staging_data_business. \
         get_by_staging_data_set_id(staging_data_set_id)
     # convert mongoengine objects to dicts
@@ -167,6 +185,11 @@ def check_integrity(staging_data_set_id):
 
 
 def update_data(update):
+    """
+    update data row by row
+    :param update:
+    :return:
+    """
     for oid in update.keys():
         query = {}
         for q in update[oid]:
@@ -175,6 +198,11 @@ def update_data(update):
 
 
 def get_row_col_info(sds_id):
+    """
+    get_row_col_info
+    :param sds_id:
+    :return:
+    """
     sds = staging_data_business.get_by_staging_data_set_id(sds_id)
     row_n = len(sds)
     col_n = len(get_fields_with_types(sds_id))
@@ -182,17 +210,48 @@ def get_row_col_info(sds_id):
 
 
 def remove_staging_data_set_by_id(sds_id):
+    """
+    remove_staging_data_set_by_id
+    :param sds_id:
+    :return:
+    """
     staging_data_business.remove_by_staging_data_set_id(sds_id)
     return staging_data_set_business.remove_by_id(sds_id)
 
 
 def mongo_to_array(cursor, fields):
-    arrays = [[c[field] for field in fields] for c in cursor]
+    """
+    mongo data to ndarray
+    :param cursor:
+    :param fields:
+    :return:
+    """
+    arrays = [[c[field] for field in fields if field != '_id' and
+               field != 'staging_data_set'] for c in cursor]
     arrays = np.array(arrays)
     return arrays
 
 
+def mongo_to_df(cursor):
+    """
+    mongo data to data frame
+    :param cursor:
+    :return:
+    """
+    cursor = json_utility.me_obj_list_to_dict_list(cursor)
+    return pd.DataFrame.from_records(cursor, exclude=['_id',
+                                                      'staging_data_set'])
+
+
 def split_x_y(sds_id, x_fields, y_fields):
+    """
+    split data to x and y
+
+    :param sds_id:
+    :param x_fields:
+    :param y_fields:
+    :return:
+    """
     x = staging_data_business.get_by_staging_data_set_and_fields(sds_id,
                                                                  x_fields)
     x = mongo_to_array(x, x_fields)
@@ -203,6 +262,14 @@ def split_x_y(sds_id, x_fields, y_fields):
 
 
 def split_test_train(x_y_obj, schema='cv', ratio=0.3, trl=1000):
+    """
+    split data to test and train
+    :param x_y_obj:
+    :param schema:
+    :param ratio:
+    :param trl:
+    :return:
+    """
     x = x_y_obj.pop('x', np.array([]))
     y = x_y_obj.pop('y', np.array([]))
     if schema == 'cv':

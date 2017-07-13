@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
 from datetime import timedelta
 
-# import eventlet
-# eventlet.monkey_patch()
+import eventlet
+eventlet.monkey_patch()
 
 from flask import Flask
 from flask import jsonify
