@@ -64,21 +64,22 @@ def create_public_toolkit():
                   result_form=1,
                   entry_function='toolkit_average',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_average),
-                  parameter_spec=[
-                      {
-                          'name': 'input_shape',
+                  parameter_spec={
+                      "data": {
+                          'name': 'input',
                           'type': {
-                              'key': 'int_m',
+                              'key': 'select_box',
                               'des': 'nD tensor with shape: (batch_size, ..., '
                                      'input_dim). The most common situation would be a '
                                      '2D input with shape (batch_size, input_dim).',
                               'range': None
                           },
-                          'default': [None, 1],
+                          'default': None,
                           'required': True,
-                          'len_range': [2, 2]
-                      },
-                  ])
+                          'len_range': [1, 1],
+                          'data_type': ['int', 'float']
+                      }
+                  })
     AVG = toolkit_repo.create(AVG)
     ownership_business.add(user, False, toolkit=AVG)
 
@@ -88,21 +89,22 @@ def create_public_toolkit():
                      result_form=1,
                      entry_function='toolkit_median',
                      target_py_code=inspect.getsource(toolkit_orig.toolkit_median),
-                     parameter_spec=[
-                         {
-                             'name': 'input_shape',
+                     parameter_spec={
+                         "data": {
+                             'name': 'input',
                              'type': {
-                                 'key': 'int_m',
+                                 'key': 'select_box',
                                  'des': 'nD tensor with shape: (batch_size, ..., '
                                         'input_dim). The most common situation would be a '
                                         '2D input with shape (batch_size, input_dim).',
                                  'range': None
                              },
-                             'default': [None, 1],
+                             'default': None,
                              'required': True,
-                             'len_range': [2, 2]
-                         },
-                     ])
+                             'len_range': [1, 1],
+                             'data_type': ['int', 'float']
+                         }
+                     })
     MEDIAN = toolkit_repo.create(MEDIAN)
     ownership_business.add(user, False, toolkit=MEDIAN)
 
@@ -112,21 +114,22 @@ def create_public_toolkit():
                    result_form=1,
                    entry_function='toolkit_mode',
                    target_py_code=inspect.getsource(toolkit_orig.toolkit_mode),
-                   parameter_spec=[
-                       {
-                           'name': 'input_shape',
+                   parameter_spec={
+                       "data": {
+                           'name': 'input',
                            'type': {
-                               'key': 'int_m',
+                               'key': 'select_box',
                                'des': 'nD tensor with shape: (batch_size, ..., '
                                       'input_dim). The most common situation would be a '
                                       '2D input with shape (batch_size, input_dim).',
                                'range': None
                            },
-                           'default': [None, 1],
+                           'default': None,
                            'required': True,
-                           'len_range': [2, 2]
-                       },
-                   ])
+                           'len_range': [1, 1],
+                           'data_type': ['int', 'float']
+                       }
+                   })
     MODE = toolkit_repo.create(MODE)
     ownership_business.add(user, False, toolkit=MODE)
 
@@ -136,31 +139,34 @@ def create_public_toolkit():
                   result_form=3,
                   entry_function='toolkit_moving_average',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_moving_average),
-                  parameter_spec=[
-                      {
-                          'name': 'input_shape',
+                  parameter_spec={
+                      "data": {
+                          'name': 'input',
                           'type': {
-                              'key': 'int_m',
+                              'key': 'select_box',
                               'des': 'nD tensor with shape: (batch_size, ..., '
                                      'input_dim). The most common situation would be a '
                                      '2D input with shape (batch_size, input_dim).',
                               'range': None
                           },
-                          'default': [None, 1],
+                          'default': None,
                           'required': True,
-                          'len_range': [2, 2]
+                          'len_range': [1, 1],
+                          'data_type': ['int', 'float']
                       },
-                      {
-                          'name': 'window',
-                          'type': {
-                              'key': 'int',
-                              'des': 'the window of moving average',
-                              'range': [2, None]
-                          },
-                          'default': 3,
-                          'required': True
-                      }
-                  ])
+                      "args": [
+                          {
+                              'name': 'window',
+                              'type': {
+                                  'key': 'int',
+                                  'des': 'the window of moving average',
+                                  'range': [2, None]
+                              },
+                              'default': 3,
+                              'required': True
+                          }
+                      ]
+                  })
     SMA = toolkit_repo.create(SMA)
     ownership_business.add(user, False, toolkit=SMA)
 
@@ -170,21 +176,22 @@ def create_public_toolkit():
                     result_form=1,
                     entry_function='toolkit_range',
                     target_py_code=inspect.getsource(toolkit_orig.toolkit_range),
-                    parameter_spec=[
-                        {
-                            'name': 'input_shape',
+                    parameter_spec={
+                        "data": {
+                            'name': 'input',
                             'type': {
-                                'key': 'int_m',
+                                'key': 'select_box',
                                 'des': 'nD tensor with shape: (batch_size, ..., '
                                        'input_dim). The most common situation would be a '
                                        '2D input with shape (batch_size, input_dim).',
                                 'range': None
                             },
-                            'default': [None, 1],
+                            'default': None,
                             'required': True,
-                            'len_range': [2, 2]
-                        },
-                    ])
+                            'len_range': [1, 1],
+                            'data_type': ['int', 'float']
+                        }
+                    })
     RANGE = toolkit_repo.create(RANGE)
     ownership_business.add(user, False, toolkit=RANGE)
 
@@ -194,21 +201,22 @@ def create_public_toolkit():
                   result_form=1,
                   entry_function='toolkit_std',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_std),
-                  parameter_spec=[
-                      {
-                          'name': 'input_shape',
+                  parameter_spec={
+                      "data": {
+                          'name': 'input',
                           'type': {
-                              'key': 'int_m',
+                              'key': 'select_box',
                               'des': 'nD tensor with shape: (batch_size, ..., '
                                      'input_dim). The most common situation would be a '
                                      '2D input with shape (batch_size, input_dim).',
                               'range': None
                           },
-                          'default': [None, 1],
+                          'default': None,
                           'required': True,
-                          'len_range': [2, 2]
-                      },
-                  ])
+                          'len_range': [1, 1],
+                          'data_type': ['int', 'float']
+                      }
+                  })
     STD = toolkit_repo.create(STD)
     ownership_business.add(user, False, toolkit=STD)
 
@@ -218,21 +226,22 @@ def create_public_toolkit():
                   result_form=1,
                   entry_function='toolkit_variance',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_variance),
-                  parameter_spec=[
-                      {
-                          'name': 'input_shape',
+                  parameter_spec={
+                      "data": {
+                          'name': 'input',
                           'type': {
-                              'key': 'int_m',
+                              'key': 'select_box',
                               'des': 'nD tensor with shape: (batch_size, ..., '
                                      'input_dim). The most common situation would be a '
                                      '2D input with shape (batch_size, input_dim).',
                               'range': None
                           },
-                          'default': [None, 1],
+                          'default': None,
                           'required': True,
-                          'len_range': [2, 2]
-                      },
-                  ])
+                          'len_range': [1, 1],
+                          'data_type': ['int', 'float']
+                      }
+                  })
     VAR = toolkit_repo.create(VAR)
     ownership_business.add(user, False, toolkit=VAR)
 
@@ -243,19 +252,22 @@ def create_public_toolkit():
                       result_form=1,
                       entry_function='toolkit_pearson',
                       target_py_code=inspect.getsource(toolkit_orig.toolkit_pearson),
-                      parameter_spec=[
-                          {
-                              'name': 'input_shape',
+                      parameter_spec={
+                          "data": {
+                              'name': 'input',
                               'type': {
-                                  'key': 'int_m',
-                                  'des': '选取的第一列作为基准，选取的其他列均与第一列计算Pearson',
+                                  'key': 'select_box',
+                                  'des': 'nD tensor with shape: (batch_size, ..., '
+                                         'input_dim). The most common situation would be a '
+                                         '2D input with shape (batch_size, input_dim).',
                                   'range': None
                               },
-                              'default': [None, 2],
+                              'default': None,
                               'required': True,
-                              'len_range': [2, 2]
-                          },
-                      ])
+                              'len_range': [2, 2],
+                              'data_type': ['int', 'float']
+                          }
+                      })
     PEARSON = toolkit_repo.create(PEARSON)
     ownership_business.add(user, False, toolkit=PEARSON)
 
@@ -265,31 +277,34 @@ def create_public_toolkit():
                     result_form=2,
                     entry_function='k_mean',
                     target_py_code=inspect.getsource(toolkit_orig.k_mean),
-                    parameter_spec=[
-                        {
-                            'name': 'input_shape',
+                    parameter_spec={
+                        "data": {
+                            'name': 'input',
                             'type': {
-                                'key': 'int_m',
+                                'key': 'select_box',
                                 'des': 'nD tensor with shape: (batch_size, ..., '
                                        'input_dim). The most common situation would be a '
                                        '2D input with shape (batch_size, input_dim).',
                                 'range': None
                             },
-                            'default': [None, None],
+                            'default': None,
                             'required': True,
-                            'len_range': [2, 2]
+                            'len_range': [1, None],
+                            'data_type': ['int', 'float']
                         },
-                        {
-                            'name': 'k',
-                            'type': {
-                                'key': 'int',
-                                'des': 'the number of clustering numbers',
-                                'range': [2, None]
-                            },
-                            'default': 2,
-                            'required': True
-                        }
-                    ])
+                        "args": [
+                            {
+                                'name': 'k',
+                                'type': {
+                                    'key': 'int',
+                                    'des': 'the number of clustering numbers',
+                                    'range': [2, None]
+                                },
+                                'default': 2,
+                                'required': True
+                            }
+                        ]
+                    })
     KMEAN = toolkit_repo.create(KMEAN)
     ownership_business.add(user, False, toolkit=KMEAN)
 
@@ -299,31 +314,34 @@ def create_public_toolkit():
                   result_form=2,
                   entry_function='dimension_reduction_PCA',
                   target_py_code=inspect.getsource(toolkit_orig.dimension_reduction_PCA),
-                  parameter_spec=[
-                      {
-                          'name': 'input_shape',
+                  parameter_spec={
+                      "data": {
+                          'name': 'input',
                           'type': {
-                              'key': 'int_m',
+                              'key': 'select_box',
                               'des': 'nD tensor with shape: (batch_size, ..., '
                                      'input_dim). The most common situation would be a '
                                      '2D input with shape (batch_size, input_dim).',
                               'range': None
                           },
-                          'default': [None, None],
+                          'default': None,
                           'required': True,
-                          'len_range': [2, 2]
+                          'len_range': [2, None],
+                          'data_type': ['int', 'float']
                       },
-                      {
-                          'name': 'k',
-                          'type': {
-                              'key': 'int',
-                              'des': 'the number of clustering numbers',
-                              'range': [1, None]
-                          },
-                          'default': 2,
-                          'required': True
-                      }
-                  ])
+                      "args": [
+                          {
+                              'name': 'n_components',
+                              'type': {
+                                  'key': 'int',
+                                  'des': 'the number of clustering numbers',
+                                  'range': [1, None]
+                              },
+                              'default': 2,
+                              'required': True
+                          }
+                      ]
+                  })
     PCA = toolkit_repo.create(PCA)
     ownership_business.add(user, False, toolkit=PCA)
 
@@ -333,31 +351,34 @@ def create_public_toolkit():
                    result_form=2,
                    entry_function='dimension_reduction_TSNE',
                    target_py_code=inspect.getsource(toolkit_orig.dimension_reduction_TSNE),
-                   parameter_spec=[
-                       {
-                           'name': 'input_shape',
+                   parameter_spec={
+                       "data": {
+                           'name': 'input',
                            'type': {
-                               'key': 'int_m',
+                               'key': 'select_box',
                                'des': 'nD tensor with shape: (batch_size, ..., '
                                       'input_dim). The most common situation would be a '
                                       '2D input with shape (batch_size, input_dim).',
                                'range': None
                            },
-                           'default': [None, None],
+                           'default': None,
                            'required': True,
-                           'len_range': [2, 2]
+                           'len_range': [2, None],
+                           'data_type': ['int', 'float']
                        },
-                       {
-                           'name': 'k',
-                           'type': {
-                               'key': 'int',
-                               'des': 'the number of clustering numbers',
-                               'range': [1, None]
-                           },
-                           'default': 2,
-                           'required': True
-                       }
-                   ])
+                       "args": [
+                           {
+                               'name': 'n_components',
+                               'type': {
+                                   'key': 'int',
+                                   'des': 'the number of clustering numbers',
+                                   'range': [1, None]
+                               },
+                               'default': 2,
+                               'required': True
+                           }
+                       ]
+                   })
     TSNE = toolkit_repo.create(TSNE)
     ownership_business.add(user, False, toolkit=TSNE)
 
@@ -367,21 +388,22 @@ def create_public_toolkit():
                 result_form=1,
                 entry_function='toolkit_n',
                 target_py_code=inspect.getsource(toolkit_orig.toolkit_n),
-                parameter_spec=[
-                    {
-                        'name': 'input_shape',
+                parameter_spec={
+                    "data": {
+                        'name': 'input',
                         'type': {
-                            'key': 'int_m',
+                            'key': 'select_box',
                             'des': 'nD tensor with shape: (batch_size, ..., '
                                    'input_dim). The most common situation would be a '
                                    '2D input with shape (batch_size, input_dim).',
                             'range': None
                         },
-                        'default': [None, 1],
+                        'default': None,
                         'required': True,
-                        'len_range': [2, 2]
-                    },
-                ])
+                        'len_range': [1, 1],
+                        'data_type': ['int', 'float']
+                    }
+                })
     N = toolkit_repo.create(N)
     ownership_business.add(user, False, toolkit=N)
 
