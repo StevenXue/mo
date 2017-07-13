@@ -15,25 +15,11 @@ from mongoengine import IntField
 from mongoengine import DictField
 from mongoengine import ListField
 
-RESUlT_TYPE = (
-    (0, 'Regression',
-     1, 'Classifier')
-)
-
-RESUlT_TYPE1 = (
-    (0, '监督式学习',
-     1, '非监督式学习',
-     2, '半监督式学习')
-)
-
-RESUlT_TYPE2 = (
-    (0, 'Gradient descent',
-     1, 'Gradient boosting')
-)
-
-RESUlT_TYPE3 = (
-    (0, 'accuracy',
-     1, 'cross-entropy')
+MODEL_TYPE = (
+    (0, 'nn'),
+    (1, 'supervised'),
+    (2, 'unsupervised'),
+    (3, 'half_supervised')
 )
 
 
@@ -43,7 +29,7 @@ class Model(DynamicDocument):
     target_py_code = StringField(required=True)     # 显示路径
     entry_function = StringField(required=True)
     to_code_function = StringField(required=True)
-    category = IntField(required=True, choices=RESUlT_TYPE1)
+    category = IntField(required=True, choices=MODEL_TYPE)
     parameter_spec = DictField(required=True)
     input = DictField(required=True)
     # usage = IntField(choices=RESUlt_TYPE, required=True)    # 类型，用作何用途

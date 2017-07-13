@@ -8,7 +8,6 @@ Date: 2017.05.25
 from bson import ObjectId
 from flask import Blueprint
 from flask import jsonify
-from flask import make_response
 from flask import request
 
 from server3.business import staging_data_business
@@ -74,8 +73,7 @@ def get_data_set(sds_id):
     return jsonify({'response': data}), 200
 
 
-@staging_data_app.route('/staging_data_sets', methods=[
-    'POST'])
+@staging_data_app.route('/staging_data_sets', methods=['POST'])
 def add_staging_data_set_by_data_set_id():
     data = request.get_json()
 
@@ -93,8 +91,7 @@ def add_staging_data_set_by_data_set_id():
     return jsonify({'response': sds_json}), 200
 
 
-@staging_data_app.route('/staging_data_sets/types', methods=[
-    'PUT'])
+@staging_data_app.route('/staging_data_sets/types', methods=['PUT'])
 def convert_fields_type():
     data = request.get_json()
 
