@@ -1,19 +1,20 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
-import { Button, Select, Icon, message, Modal, Table, Radio, Collapse, Input} from 'antd';
+import { Button, Select, Icon, message, Modal, Table, Radio, Collapse, Input, Spin} from 'antd';
 const Panel = Collapse.Panel;
 
 import empty from './empty.ipynb';
 
 import { jupyterServer, flaskServer } from '../../../constants'
 import { Router, routerRedux } from 'dva/router'
-import Toolkits from './toolSteps'
+import Toolkits from '../toolkit/toolSteps'
 import JupyterNotebook from './jupyterNotebook'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/monokai.css'
-import Preprocess from './preprocess'
-import AutomatedModel from './autoModal';
+import Preprocess from '../preprocess/preprocess'
+import AutomatedModel from '../model/autoModal';
+import DataPreview from './dataPreview';
 //import Input from 'antd/lib/input/Input.d'
 
 const { Option, OptGroup } = Select
@@ -69,7 +70,8 @@ class ProjectDetail extends React.Component {
       notebook: empty,
       spawn_new: false,
       columns: [],
-      stagingDataID: ''
+      stagingDataID: '',
+      loading: false
   }
   }
 
@@ -109,6 +111,7 @@ class ProjectDetail extends React.Component {
     if (!dataSetId) {
       return
     }
+    this.setState({loading: true});
     fetch(flaskServer + '/data/data_sets/'+dataSetId+'?limit=10', {
         method: 'get',
         headers: {
@@ -123,8 +126,9 @@ class ProjectDetail extends React.Component {
         this.setState({
           dataSet: res.response,
           values,
-          fields: res.fields
-        })
+          fields: res.fields,
+          loading: false
+        });
       })
       .catch((err) => console.log('Error: /data/data_sets/', err))
   }
@@ -244,19 +248,31 @@ class ProjectDetail extends React.Component {
             </div>
           </div>
           <div>
-              <Collapse bordered={true} style={{marginTop: 30, width: '100%'}}>
-                <Panel header={"Preprocess"} key="1">
+            <Collapse bordered={true} style={{marginTop: 10, width: '100%'}}>
+              <Panel header={"Stage Data"} key="1">
+                <Spin spinning={this.state.loading}>
                   {this.state.dataSet.length > 0 &&
+                  <DataPreview dataSet={this.state.dataSet}
+                              project_id={this.props.location.query._id}/>
+                  }
+                </Spin>
+              </Panel>
+            </Collapse>
+          </div>
+          <div>
+              <Collapse bordered={true} style={{marginTop: 10, width: '100%'}}>
+                <Panel header={"Preprocess"} key="1">
+                  <Spin spinning={this.state.loading}>
                     <Preprocess dataSet={this.state.dataSet}
                                 fields={this.state.fields}
                                 project_id={this.props.location.query._id}
                                 passStaging={(value) => this.getStagingId(value)}/>
-                  }
+                  </Spin>
                 </Panel>
               </Collapse>
           </div>
           <div>
-            <Collapse bordered={true} style={{marginTop: 30, width: '100%'}}>
+            <Collapse bordered={true} style={{marginTop: 10, width: '100%'}}>
               <Panel header={"Data Exploration & Analysis"} key="1" >
                 <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                   <Toolkits project_id={this.props.location.query._id} />
@@ -265,7 +281,7 @@ class ProjectDetail extends React.Component {
             </Collapse>
           </div>
           <div>
-            <Collapse bordered={true} style={{marginTop: 30, width: '100%'}}>
+            <Collapse bordered={true} style={{marginTop: 10, width: '100%'}}>
               <Panel header={"Automated Modelling"} key="1" style={{width: '100%'}} >
                 <AutomatedModel project_id={this.props.location.query._id} />
               </Panel>

@@ -13,7 +13,7 @@ from flask import request
 from server3.service import data_service
 from server3.utility import json_utility
 from server3.business import data_business
-#import constants
+from server3 import constants
 
 PREFIX = '/data'
 
