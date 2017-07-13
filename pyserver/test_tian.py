@@ -2,14 +2,16 @@
 """
 """
 from mongoengine import connect
+import numpy as np
 from server3.repository import config
+from server3.service import toolkit_service, job_service, visualization_service
+
 # from server3.business import toolkit_business
 # from .business import staging_data_business, staging_data_set_business, model_business
-# from .service import toolkit_service, job_service
 # # from server3.entity.toolkit import Toolkit
 # from .entity.staging_data_set import StagingDataSet
 # from bson import ObjectId
-from server3.lib.data_manager import get_staging_data_pandas
+# from server3.lib.data_manager import get_staging_data_pandas
 
 connect(
     db=config.get_mongo_db(),
@@ -74,7 +76,10 @@ if __name__ == '__main__':
     # print toolkit_service.convert_json_and_calculate("5925b208e89bde050b6f02d8", "59303bda1c5ad41cdb2bba9b", "59301a628be34d0f7bd9cc5b", a, 2)
 
     # 转换dataFrame格式
-    print (get_staging_data_pandas("5951cf7244a6372a608ec4e4"))
+    # print (get_staging_data_pandas("5951cf7244a6372a608ec4e4"))
+
+    # 测量假设检验函数
+    result = visualization_service.usr_story1_exploration(np.arange(142, 157, 0.1), 'int', group_num=10)
 
 
 # import keras
