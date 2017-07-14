@@ -32,20 +32,13 @@
 # socketio = SocketIO(message_queue='redis://')
 # socketio.emit('log_epoch_end', {'step': 111, 'loss': 222, 'acc': 333},
 #               namespace='/log')
-from bson import ObjectId
-from flask import jsonify
-import json
-
-from server3.business import data_business
-from server3.utility import json_utility
-from datetime import datetime
-
-data = data_business.get_by_data_set_limit(ObjectId('5966eb29d123abad6fb9c8bb'),
-                                           10)
-print(data)
-data = [d.to_mongo() for d in data]
-# print(data)
-data = [json_utility.convert_to_json(d) for d in data]
-print(data)
-
-
+import numpy as np
+import tensorflow as tf
+# from tensorflow.python.framework import constant_op
+# from sklearn.datasets.samples_generator import make_blobs
+# X, y = make_blobs(n_samples=50, centers=4,
+#                   random_state=2, cluster_std=0.60,n_features=2)
+# print(constant_op.constant(X.astype(np.float32)))
+a = [[1],[2],[3]]
+b = [[4],[5],[6]]
+print(tf.concat((a,b), 1))

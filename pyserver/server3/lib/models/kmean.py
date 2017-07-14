@@ -183,7 +183,7 @@ def kmeans_clustering_model_fn(features, labels, mode, params, config):
 
 
 Kmeans = {
-    'custom': {
+    'estimator': {
         'args': [
             {
                 "name": "num_clusters",
@@ -232,6 +232,45 @@ Kmeans = {
                 "default": None,
                 "required": False
             }
+        ]
+    },
+    'fit': {
+        "data_fields": {
+            "name": "training_fields",
+            "type": {
+                "key": "select_box",
+                "des": "data fields for x",
+            },
+            "default": None,
+            "required": True,
+            "data_type": None,
+            "len_range": None
+        },
+        'args': [
+            {
+                "name": "step",
+                "type": {
+                    "key": "int",
+                    "des": "steps for training",
+                    "range": None
+                },
+                "default": 30,
+                "required": True
+            },
+        ]
+    },
+    'evaluate': {
+        'args': [
+            {
+                "name": "step",
+                "type": {
+                    "key": "int",
+                    "des": "steps for evaluate",
+                    "range": None
+                },
+                "default": 1,
+                "required": True
+            },
         ]
     }
 }

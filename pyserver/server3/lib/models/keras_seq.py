@@ -49,7 +49,7 @@ def keras_seq(conf, **kw):
 
         # define the metrics
         # compile
-        model.compile(**comp)
+        model.compile(**comp['args'])
 
         batch_print_callback = LambdaCallback(on_epoch_end=
                                               lambda epoch, logs:
@@ -417,8 +417,7 @@ KERAS_SEQ_SPEC = {
         },
     ],
     "compile": {
-        'args':
-            [
+        'args': [
                 {
                     "name": "loss",
                     "type": {
@@ -480,41 +479,18 @@ KERAS_SEQ_SPEC = {
             ],
     },
     "fit": {
-        "x_train": {
-            "name": "x_train",
+        "data_fields": {
+            "name": "training_fields",
             "type": {
-                "key": "data_set",
-                "des": "x_train",
+                "key": "transfer_box",
+                "des": "data fields for x and y",
             },
             "default": None,
-            "required": True
-        },
-        "y_train": {
-            "name": "y_train",
-            "type": {
-                "key": "data_set",
-                "des": "y_train",
-            },
-            "default": None,
-            "required": True
-        },
-        "x_val": {
-            "name": "x_val",
-            "type": {
-                "key": "data_set",
-                "des": "x_test",
-            },
-            "default": None,
-            "required": True
-        },
-        "y_val": {
-            "name": "y_val",
-            "type": {
-                "key": "data_set",
-                "des": "y_test",
-            },
-            "default": None,
-            "required": True
+            "required": True,
+            "x_data_type": None,
+            "y_data_type": None,
+            "x_len_range": None,
+            "y_len_range": None
         },
         "args": [
             {
@@ -538,24 +514,6 @@ KERAS_SEQ_SPEC = {
         ],
     },
     "evaluate": {
-        "x_test": {
-            "name": "x_test",
-            "type": {
-                "key": "data_set",
-                "des": "x_test",
-            },
-            "default": None,
-            "required": True
-        },
-        "y_test": {
-            "name": "y_test",
-            "type": {
-                "key": "data_set",
-                "des": "y_test",
-            },
-            "default": None,
-            "required": True
-        },
         "args": [
             {
                 "name": "batch_size",
@@ -583,36 +541,42 @@ if __name__ == '__main__':
     y_test = utils.to_categorical(np.random.randint(10, size=(100, 1)),
                                   num_classes=10)
     keras_seq(
-        {'layers': [{'name': 'Dense',
-                     'args': {'units': 64, 'activation': 'relu',
-                              'input_shape': [
-                                  20, ]}},
-                    {'name': 'Dropout',
-                     'args': {'rate': 0.5}},
-                    {'name': 'Dense',
-                     'args': {'units': 64, 'activation': 'relu'}},
-                    {'name': 'Dropout',
-                     'args': {'rate': 0.5}},
-                    {'name': 'Dense',
-                     'args': {'units': 10, 'activation': 'softmax'}}
-                    ],
-         'compile': {'loss': 'categorical_crossentropy',
-                     'optimizer': 'SGD',
-                     'metrics': ['accuracy']
-                     },
-         'fit': {'x_train': x_train,
-                 'y_train': y_train,
-                 'x_val': x_test,
-                 'y_val': y_test,
-                 'args': {
-                     'epochs': 20,
-                     'batch_size': 128
-                 }
-                 },
-         'evaluate': {'x_test': x_test,
-                      'y_test': y_test,
-                      'args': {
-                          'batch_size': 128
-                      }
-                      }
-         }, result_sds='11')
+        {
+            'layers': [{'name': 'Dense',
+                        'args': {'units': 64, 'activation': 'relu',
+                                 'input_shape': [
+                                     20, ]}},
+                       {'name': 'Dropout',
+                        'args': {'rate': 0.5}},
+                       {'name': 'Dense',
+                        'args': {'units': 64, 'activation': 'relu'}},
+                       {'name': 'Dropout',
+                        'args': {'rate': 0.5}},
+                       {'name': 'Dense',
+                        'args': {'units': 10, 'activation': 'softmax'}}
+                       ],
+            'compile': {
+                'args': {
+                    'loss': 'categorical_crossentropy',
+                    'optimizer': 'SGD',
+                    'metrics': ['accuracy']
+                }
+            },
+            'fit': {
+                'x_train': x_train,
+                'y_train': y_train,
+                'x_val': x_test,
+                'y_val': y_test,
+                'args': {
+                    'epochs': 20,
+                    'batch_size': 128
+                }
+            },
+            'evaluate': {
+                'x_test': x_test,
+                'y_test': y_test,
+                'args': {
+                    'batch_size': 128
+                }
+            }
+        }, result_sds='11')

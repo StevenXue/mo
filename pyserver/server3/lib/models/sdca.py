@@ -161,7 +161,7 @@ def sdca_model_fn(features, labels, mode, params):
 
 
 SVM = {
-    'params': {
+    'estimator': {
         'args': [
             {
                 "name": "example_id_column",
@@ -224,14 +224,18 @@ SVM = {
         ]
     },
     'fit': {
-        'y': {
-            "name": "y",
+        "data_fields": {
+            "name": "training_fields",
             "type": {
-                "key": "string",
-                "des": "A field use as y (output)"
+                "key": "transfer_box",
+                "des": "data fields for x and y",
             },
             "default": None,
-            "required": True
+            "required": True,
+            "x_data_type": None,
+            "y_data_type": None,
+            "x_len_range": None,
+            "y_len_range": [1, 1]
         },
         'args': [
 

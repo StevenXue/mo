@@ -1,6 +1,7 @@
 import logging
 
 import tensorflow as tf
+import numpy as np
 
 from server3.service.custom_log_handler import MetricsHandler
 
@@ -24,7 +25,7 @@ def custom_model(conf, model_fn, input, **kw):
     project_id = kw.pop('project_id', None)
     result_sds = kw.pop('result_sds', None)
 
-    params = conf.get('params', None)
+    est_params = conf.get('estimator', None)
     fit_params = conf.get('fit', {})
     eval_params = conf.get('evaluate', {})
 
@@ -57,12 +58,12 @@ def custom_model(conf, model_fn, input, **kw):
     estimator = tf.contrib.learn.Estimator(model_fn=model_fn,
                                            model_dir=None,
                                            config=None,
-                                           params=params)
+                                           params=est_params['args'])
     # fit
-    estimator.fit(input_fn=train_input_fn, **fit_params)
+    estimator.fit(input_fn=train_input_fn, **fit_params['args'])
     result = {}
     # evaluate
-    metrics = estimator.evaluate(input_fn=train_input_fn, **eval_params)
+    metrics = estimator.evaluate(input_fn=train_input_fn, **eval_params['args'])
     result.update({
         'eval_metrics': metrics
     })
@@ -81,11 +82,16 @@ def custom_model(conf, model_fn, input, **kw):
 def input_fn(df, continuous_cols, categorical_cols=None, label_col=None):
     # Creates a dictionary mapping from each continuous feature column name (k) to
     # the values of that column stored in a constant Tensor.
+    if categorical_cols is None and label_col is None:
+        continuous_cols = [[[x] for x in df[k].values.astype(np.float32)]
+                           for k in continuous_cols]
+        continuous_cols = tf.concat(continuous_cols, axis=1)
+        # continuous_cols = tf.constant(continuous_cols)
+        return continuous_cols, None
+
     continuous_cols = {k: tf.constant(df[k].values)
                        for k in continuous_cols}
 
-    if categorical_cols is None and label_col is None:
-        return continuous_cols
     # Creates a dictionary mapping from each categorical feature column name (k)
     # to the values of that column stored in a tf.SparseTensor.
     categorical_cols = {k: tf.SparseTensor(

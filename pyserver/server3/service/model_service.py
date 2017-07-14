@@ -93,6 +93,7 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
         return job_service.run_code(conf, project_id, staging_data_set_id,
                                     model, f)
     else:
+        # custom models
         train_cursor = staging_data_business.get_by_staging_data_set_id(
             staging_data_set_id)
         df_train = staging_data_service.mongo_to_df(train_cursor)
@@ -100,17 +101,23 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
         model_fn = getattr(models, model.entry_function)
 
         if model['category'] == 1:
-            LABEL_COLUMN = "label"
+            # choose one column to be label
+            label_column = "label_"
             fit = conf.get('fit', None)
-            label_target = fit.pop('y', None)
-            df_train[LABEL_COLUMN] = (
-                df_train[label_target].apply(lambda x: ">50K" in x)).astype(int)
+            label_target = fit.pop('y', [None])[0]
+            if df_train[label_target].dtype == np.int_ or \
+                            df_train[label_target].dtype == np.float_:
+                # if column is number use it directly as label
+                label_column = label_target
+            else:
+                # if column is string, make it categorical
+                df_train[label_column] = (
+                    df_train[label_target].astype('category').cat.codes)
 
             # 添加一列 index，格式为string，作为"example_id_column"的输入
-            params = conf.get('params', None)
+            params = conf.get('estimator', None)['args']
             index_col = params.get('example_id_column', None)
             df_train[index_col] = df_train.index.astype(str)
-
             # TODO support two data set
             # df_test = staging_data_service.mongo_to_df(test_cursor)
             # df_test[LABEL_COLUMN] = (
@@ -119,26 +126,25 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
 
             # 将连续型和类别型特征分离开，为input做准备
             continuous_cols, categorical_cols = \
-                split_categorical_and_continuous(df_train, [LABEL_COLUMN,
+                split_categorical_and_continuous(df_train, [label_column,
                                                             index_col,
                                                             label_target])
             params["feature_columns"] = [continuous_cols, categorical_cols]
-
             input = {
                 'train': df_train,
                 # 'test': df_test,
                 'categorical_cols': categorical_cols,
                 'continuous_cols': continuous_cols + ['index'],
-                'label_col': LABEL_COLUMN
+                'label_col': label_column
             }
-
             return job_service.run_code(conf, project_id, staging_data_set_id,
                                         model, f, model_fn, input)
         if model['category'] == 2:
-            cols = list(df_train.columns.values)
+            continuous_cols, categorical_cols = \
+                split_categorical_and_continuous(df_train, [])
             input = {
                 'train': df_train,
-                'continuous_cols': cols,
+                'continuous_cols': continuous_cols,
             }
             return job_service.run_code(conf, project_id, staging_data_set_id,
                                         model, f, model_fn, input)
@@ -278,20 +284,20 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
 
 
 def temp():
-    # add_model_with_ownership(
-    #     'system',
-    #     False,
-    #     'keras_seq',
-    #     'keras_seq from keras',
-    #     0,
-    #     '/lib/keras_seq',
-    #     'keras_seq',
-    #     'keras_seq_to_str',
-    #     models.KERAS_SEQ_SPEC,
-    #     {'type': 'ndarray', 'n': None}
-    # )
-    #
-    add_model_with_ownership(
+    print(add_model_with_ownership(
+        'system',
+        False,
+        'keras_seq',
+        'keras_seq from keras',
+        0,
+        '/lib/keras_seq',
+        'keras_seq',
+        'keras_seq_to_str',
+        models.KERAS_SEQ_SPEC,
+        {'type': 'ndarray', 'n': None}
+    ))
+
+    print(add_model_with_ownership(
         'system',
         False,
         'sdca',
@@ -302,58 +308,96 @@ def temp():
         'custom_model_to_str',
         models.SVM,
         {'type': 'DataFrame'}
-    )
+    ))
 
-    # add_model_with_ownership(
-    #     'system',
-    #     False,
-    #     'kmean',
-    #     'custom kmean model',
-    #     2,
-    #     '/lib/kmean',
-    #     'kmeans_clustering_model_fn',
-    #     'custom_model_to_str',
-    #     models.Kmeans,
-    #     {'type': 'DataFrame'}
-    # )
+    print(add_model_with_ownership(
+        'system',
+        False,
+        'kmean',
+        'custom kmean model',
+        2,
+        '/lib/kmean',
+        'kmeans_clustering_model_fn',
+        'custom_model_to_str',
+        models.Kmeans,
+        {'type': 'DataFrame'}
+    ))
+
+    print(add_model_with_ownership(
+        'system',
+        False,
+        'linear_classifier',
+        'custom linear classifier model',
+        1,
+        '/lib/linear_classifier',
+        'linear_classifier_model_fn',
+        'custom_model_to_str',
+        models.LinearClassifier,
+        {'type': 'DataFrame'}
+    ))
+
+    print(add_model_with_ownership(
+        'system',
+        False,
+        'linear_regression',
+        'custom linear regression model',
+        1,
+        '/lib/linear_regression',
+        'linear_regression_model_fn',
+        'custom_model_to_str',
+        models.LinearRegression,
+        {'type': 'DataFrame'}
+    ))
 
 
 if __name__ == '__main__':
     pass
+    conf = {
+        'estimator': {
+            'args': {
+                "example_id_column": 'index',
+                "weight_column_name": None,
+                "model_dir": None,
+                "l1_regularization": 0.0,
+                "l2_regularization": 0.0,
+                "num_loss_partitions": 1,
+                "kernels": None,
+                "config": None,
+            }
+        },
+        'fit': {
+            "y": ["income_bracket"],
+            "args": {
+                "steps": 30
+            }
+        },
+        'evaluate': {
+            'args': {
+                'steps': 1
+            }
+        }
+    }
+    run_model(conf, "595f32e4e89bde8ba70738a3", "5965cda1d123ab8f604a8dd0",
+              "5968649fd123abcd3d027710")
+
     # conf = {
-    #     'params': {
-    #         "example_id_column": 'index',
-    #         "weight_column_name": None,
-    #         "model_dir": None,
-    #         "l1_regularization": 0.0,
-    #         "l2_regularization": 0.0,
-    #         "num_loss_partitions": 1,
-    #         "kernels": None,
-    #         "config": None,
-    #     },
     #     'fit': {
-    #         "y": "income_bracket",
     #         "steps": 30
     #     },
     #     'evaluate': {
-    #         'steps': 1
-    #     }
+    #         'steps': 10
+    #     },
+    #     'params':
+    #         {
+    #             "num_clusters": 4,
+    #             "random_seed": 5,
+    #             "use_mini_batch": True,
+    #             "mini_batch_steps_per_iteration": 1,
+    #             "kmeans_plus_plus_num_retries": 2,
+    #             "relative_tolerance": None,
+    #         }
     # }
     # run_model(conf, "595f32e4e89bde8ba70738a3", "5965cda1d123ab8f604a8dd0",
-    #           "59671c02d123abb4cfe19766")
-
-    conf = {
-        'params':
-            {
-                "num_clusters": 4,
-                "random_seed": 5,
-                "use_mini_batch": True,
-                "mini_batch_steps_per_iteration": 1,
-                "kmeans_plus_plus_num_retries": 2,
-                "relative_tolerance": None,
-            }
-    }
-    run_model(conf, "595f32e4e89bde8ba70738a3", "5965cda1d123ab8f604a8dd0",
-              "5966e1add123abaa9d9c13c3")
+    #           "5966e1add123abaa9d9c13c3")
 
     temp()
