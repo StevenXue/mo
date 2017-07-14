@@ -19,11 +19,11 @@ import numpy as np
 def usr_story1_exploration(data, d_type, group_num=10):
     # 转换，把所有键值对里的值变成一个数组返回(arr_temp)
     # print (type(data))
-    if d_type == 'int':
+    if d_type == 'integer':
         arr_temp = [int(list(arr.values())[0]) for arr in data if isNaN(list(arr.values())[0]) == False and list(arr.values())[0] != '']
     elif d_type == 'float':
         arr_temp = [float(list(arr.values())[0]) for arr in data if isNaN(list(arr.values())[0]) == False and list(arr.values())[0] != '']
-    else:
+    elif d_type == 'string':
         arr_temp = [list(arr.values())[0] for arr in data if isNaN(list(arr.values())[0]) == False and list(arr.values())[0] != '']
     print ('arr_temp', arr_temp)
 
@@ -34,11 +34,9 @@ def usr_story1_exploration(data, d_type, group_num=10):
     # 假设检验的信息 'hypo_info'
     gen_info = generate_stats_info(arr_temp, d_type)
     info_dict = {'type': d_type, 'gen_info': gen_info}
-    if d_type == 'int' or d_type == 'float':
+    if d_type == 'integer' or d_type == 'float':
         arr_array = np.array(arr_temp)
-        print ('hahahaha')
         mean, std, min, max = (gen_info['mean'], gen_info['std'], int(gen_info['min']), int(gen_info['max']))
-        print ('hahahaha')
         interval = (max - min + 1) / group_num
         # 给出x轴
         x_domain = np.arange(min, max+interval, interval).round(1)
@@ -46,13 +44,15 @@ def usr_story1_exploration(data, d_type, group_num=10):
         df = pd.DataFrame(freq_hist)
         # 给出y轴
         y_domain = df.groupby(pd.cut(df.freq_hist, x_domain)).count().freq_hist.values/interval
-        # print ('y_domain', y_domain)
+        print ('y_domain', y_domain)
+        # y_domaining = [format(x, 4) for x in y_domain * 1000]
+        # print ('y_domain', y_domain.apply(lambda x: '%.3f' % x))
 
         # 注意x会比y多一个
-        info_dict['freq_hist'] = {'x_domain': x_domain.tolist(), 'y_domain': y_domain.tolist()}
+        info_dict['freq_hist'] = {'x_domain': x_domain.tolist(), 'y_domain': (y_domain*1000).round(3).tolist()}
         flag, p_value, standard_norm_value = hypo_test(arr_array, mean, std, x_domain, 'norm')
         info_dict['hypo'] = {'flag': flag, 'p_value': p_value, 'standard_norm_value': standard_norm_value}
-    else:
+    elif d_type == 'string':
         seta = set(arr_temp)
         info_dict['freq_hist'] = [{'text': el, 'value': arr_temp.count(el)} for el in seta if arr_temp.count(el) > 1]
         # info_dict['freq_hist'] = [{'name': key, 'value': len(list(group))} for key, group in groupby(arr_temp)]
@@ -88,8 +88,18 @@ def hypo_test(arr, mean, std, x_range, type='norm'):
         # print (stats.shapiro(arr))
         flag = 1 if p_value >= 0.05 else 0
 
-        return flag, p_value, arr_norm_draw.tolist()
+        return flag, p_value, (arr_norm_draw*1000).round(3).tolist()
 
 
 def isNaN(num):
     return num != num
+
+
+def format(f, n):
+    if round(f)==f:
+        m = len(str(f))-1-n
+        if f/(10**m) ==0.0:
+            return f
+        else:
+            return float(int(f)/(10**m)*(10**m))
+    return round(f, n - len(str(int(f)))) if len(str(f))>n+1 else f

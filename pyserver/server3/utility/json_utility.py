@@ -7,18 +7,19 @@ Date: 2017.05.17
 """
 import json
 import pandas as pd
+import simplejson
 
 from bson import ObjectId
 from datetime import datetime
 
 
-class JSONEncoder(json.JSONEncoder):
+class JSONEncoder(simplejson.JSONEncoder):
     def default(self, o):
         if isinstance(o, ObjectId):
             return str(o)
         elif isinstance(o, datetime):
             return str(o)
-        return json.JSONEncoder.default(self, o)
+        return self.default(o)
 
 
 def json_load(json_string):
@@ -29,8 +30,11 @@ def json_load(json_string):
 # convert bson to json
 # 将ObjectId去除，用于Restful API传递
 def convert_to_json(bson_obj):
-    new_json_obj = JSONEncoder().encode(bson_obj)
-    new_json_obj = json_load(new_json_obj)
+    new_json_obj = JSONEncoder(ignore_nan=True).encode(bson_obj)
+    # new_json_obj = json_load(new_json_obj)
+    # new_json_obj = simplejson.dumps(new_json_obj, ignore_nan=True)
+    new_json_obj = simplejson.loads(new_json_obj)
+
     return new_json_obj
 
 

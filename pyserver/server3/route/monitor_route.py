@@ -23,6 +23,7 @@ monitor_app = Blueprint("monitor_app", __name__, url_prefix=PREFIX)
 
 subscriptions = []
 
+
 @monitor_app.route('/events', methods=['POST'])
 def upload_events():
     # payload = request.form.get('data')

@@ -15,6 +15,7 @@ eventlet
 keras
 sklearn
 redis
+simplejson
 
 
 

@@ -1,11 +1,12 @@
 import logging
 
 import tensorflow as tf
+import numpy as np
 
 from server3.service.custom_log_handler import MetricsHandler
 
 
-def custom_model(params, model_fn, input, **kw):
+def custom_model(conf, model_fn, input, **kw):
     """
 
     :param model_fn:
@@ -14,24 +15,34 @@ def custom_model(params, model_fn, input, **kw):
     :param kw:
     :return:
     """
-    result_sds = kw.pop('result_sds', None)
     train = input.pop('train', None)
     test = input.pop('test', None)
     categorical_cols = input.pop('categorical_cols', None)
     continuous_cols = input.pop('continuous_cols', None)
     label_col = input.pop('label_col', None)
+
     predict_x = kw.pop('predict_x', None)
+    project_id = kw.pop('project_id', None)
+    result_sds = kw.pop('result_sds', None)
+
+    est_params = conf.get('estimator', None)
+    fit_params = conf.get('fit', {})
+    eval_params = conf.get('evaluate', {})
 
     if result_sds is None:
         raise RuntimeError('no result sds id passed to model')
     if train is None:
         raise RuntimeError('no train input')
-    if categorical_cols is None:
-        raise RuntimeError('no categorical_cols input')
     if continuous_cols is None:
         raise RuntimeError('no continuous_cols input')
-    if label_col is None:
-        raise RuntimeError('no label_col input')
+    if project_id is None:
+        raise RuntimeError('no project_id input')
+
+    def train_input_fn():
+        return input_fn(train, continuous_cols, categorical_cols, label_col)
+
+    def eval_input_fn():
+        return input_fn(test, continuous_cols, categorical_cols, label_col)
 
     tf.logging.set_verbosity(tf.logging.INFO)
 
@@ -39,30 +50,24 @@ def custom_model(params, model_fn, input, **kw):
     mh = MetricsHandler()
     # pass result staging data set for logger to save results
     mh.result_sds_id = result_sds
+    mh.project_id = project_id
     logger = logging.getLogger('tensorflow')
     logger.setLevel(logging.DEBUG)
     logger.addHandler(mh)
-
+    # init model
     estimator = tf.contrib.learn.Estimator(model_fn=model_fn,
                                            model_dir=None,
                                            config=None,
-                                           params=params)
-
-    def train_input_fn():
-        return input_fn(train, categorical_cols, continuous_cols, label_col)
-
-    def eval_input_fn():
-        return input_fn(test, categorical_cols, continuous_cols, label_col)
-
-    estimator.fit(input_fn=train_input_fn, steps=30)
+                                           params=est_params['args'])
+    # fit
+    estimator.fit(input_fn=train_input_fn, **fit_params['args'])
     result = {}
-    if test:
-        metrics = estimator.evaluate(input_fn=eval_input_fn, steps=1)
-        # loss = metrics['loss']
-        # accuracy = metrics['accuracy']
-        result.update({
-            'eval_metrics': metrics
-        })
+    # evaluate
+    metrics = estimator.evaluate(input_fn=train_input_fn, **eval_params['args'])
+    result.update({
+        'eval_metrics': metrics
+    })
+    # predict
     if predict_x:
         predictions = estimator.predict(predict_x, as_iterable=True)
         result['predictions'] = predictions
@@ -74,11 +79,19 @@ def custom_model(params, model_fn, input, **kw):
 #  features: A dict of `Tensor` keyed by column name.
 #  labels: `Tensor` of shape [batch_size, 1] or [batch_size] labels of
 #          dtype `int32` or `int64` in the range `[0, n_classes)`.
-def input_fn(df, categorical_cols, continuous_cols, label_col):
+def input_fn(df, continuous_cols, categorical_cols=None, label_col=None):
     # Creates a dictionary mapping from each continuous feature column name (k) to
     # the values of that column stored in a constant Tensor.
+    if categorical_cols is None and label_col is None:
+        continuous_cols = [[[x] for x in df[k].values.astype(np.float32)]
+                           for k in continuous_cols]
+        continuous_cols = tf.concat(continuous_cols, axis=1)
+        # continuous_cols = tf.constant(continuous_cols)
+        return continuous_cols, None
+
     continuous_cols = {k: tf.constant(df[k].values)
                        for k in continuous_cols}
+
     # Creates a dictionary mapping from each categorical feature column name (k)
     # to the values of that column stored in a tf.SparseTensor.
     categorical_cols = {k: tf.SparseTensor(
@@ -138,7 +151,6 @@ if __name__ == '__main__':
         df_test["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
     # 添加一列 index，格式为string，作为"example_id_column"的输入
     df_train['index'] = df_train.index.astype(str)
-    print(df_train)
     df_test['index'] = df_test.index.astype(str)
 
     # 将连续型和类别型特征分离开，为input做准备
@@ -167,6 +179,7 @@ if __name__ == '__main__':
         "kernels": None,
         "config": None,
     }
+
     sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
     from server3.lib.models import sdca_model_fn
 

@@ -46,6 +46,10 @@ def add(name, description, project, **kwargs):
     return staging_data_set_repo.create(staging_data_set)
 
 
+def update(sds_id, **update):
+    return staging_data_set_repo.update_one_by_id(sds_id, update)
+
+
 def remove_by_id(sds_id):
     """
     Remove a staging_data_set by its ObjectId

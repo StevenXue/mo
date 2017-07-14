@@ -145,7 +145,6 @@ def filter_fields(sds_id):
     try:
         updated_n = staging_data_business.\
             filter_data_set_fields(ObjectId(sds_id), fields)
-        print(updated_n)
         if updated_n > 0:
             res = 'success'
         else:

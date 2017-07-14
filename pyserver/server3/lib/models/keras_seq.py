@@ -5,8 +5,9 @@ from keras import layers
 from keras.callbacks import LambdaCallback
 from keras.models import Sequential
 import tensorflow as tf
-# from server3.service import logger
+from server3.service import logger
 
+global graph
 graph = tf.get_default_graph()
 
 
@@ -17,9 +18,11 @@ def keras_seq(conf, **kw):
     :return:
     """
     result_sds = kw.pop('result_sds', None)
+    project_id = kw.pop('project_id', None)
     if result_sds is None:
         raise RuntimeError('no result sds id passed to model')
-
+    if project_id is None:
+        raise RuntimeError('no project id passed to model')
     with graph.as_default():
         model = Sequential()
         # Dense(64) is a fully-connected layer with 64 hidden units.
@@ -46,30 +49,31 @@ def keras_seq(conf, **kw):
 
         # define the metrics
         # compile
-        model.compile(loss=comp['loss'],
-                      optimizer=comp['optimizer'],
-                      metrics=comp['metrics'])
+        model.compile(**comp['args'])
 
-        # batch_print_callback = LambdaCallback(on_epoch_end=
-        #                                       lambda epoch, logs:
-        #                                       logger.log_epoch_end(epoch, logs,
-        #                                                            result_sds))
+        batch_print_callback = LambdaCallback(on_epoch_end=
+                                              lambda epoch, logs:
+                                              logger.log_epoch_end(epoch, logs,
+                                                                   result_sds,
+                                                                   project_id))
 
         # training
         # TODO callback 改成异步，考虑 celery
-        model.fit(f['x_train'], f['y_train'],
-                  validation_data=(f['x_val'], f['y_val']),
-                  callbacks=[],
-                  verbose=0,
-                  **f['args'])
+        history = model.fit(f['x_train'], f['y_train'],
+                            validation_data=(f['x_val'], f['y_val']),
+                            callbacks=[batch_print_callback],
+                            verbose=0,
+                            **f['args'])
 
         # testing
         score = model.evaluate(e['x_test'], e['y_test'], **e['args'])
 
         weights = model.get_weights()
-
         config = model.get_config()
-        return score
+        logger.log_train_end(result_sds, weights=weights, config=config,
+                             score=score)
+
+        return {'score': score, 'history': history}
 
 
 def keras_seq_to_str(obj, head_str, **kw):
@@ -412,102 +416,81 @@ KERAS_SEQ_SPEC = {
             ],
         },
     ],
-    "compile": [
-        {
-            "name": "loss",
-            "type": {
-                "key": "choice",
-                "des": "A loss function (or objective function, or "
-                       "optimization score function) is one of the two "
-                       "parameters required to compile a model",
-                "range": ["mean_squared_error",
-                          "mean_absolute_error",
-                          "mean_absolute_percentage_error",
-                          "mean_squared_logarithmic_error",
-                          "squared_hinge",
-                          "hinge",
-                          "categorical_hinge",
-                          "logcosh",
-                          "categorical_crossentropy",
-                          "sparse_categorical_crossentropy",
-                          "binary_crossentropy",
-                          "kullback_leibler_divergence",
-                          "poisson",
-                          "cosine_proximity"]
-            },
-            "default": "categorical_crossentropy",
-            "required": True
-        },
-        {
-            "name": "optimizer",
-            "type": {
-                "key": "choice",
-                "des": "An optimizer is one of the two arguments required for "
-                       "compiling a Keras model",
-                "range": ["sgd",
-                          "rmsprop",
-                          "adagrad",
-                          "adadelta",
-                          "adam",
-                          "adamax",
-                          "nadam"]
-            },
-            "default": "sgd",
-            "required": True
-        },
-        {
-            "name": "metrics",
-            "type": {
-                "key": "choices",
-                "des": "A metric is a function that is used to judge the "
-                       "performance of your model",
-                "range": ["acc",
-                          "mse",
-                          "mae",
-                          "mape",
-                          "msle",
-                          "cosine"]
-            },
-            "default": [],
-            "required": False
-        },
-    ],
+    "compile": {
+        'args': [
+                {
+                    "name": "loss",
+                    "type": {
+                        "key": "choice",
+                        "des": "A loss function (or objective function, or "
+                               "optimization score function) is one of the two "
+                               "parameters required to compile a model",
+                        "range": ["mean_squared_error",
+                                  "mean_absolute_error",
+                                  "mean_absolute_percentage_error",
+                                  "mean_squared_logarithmic_error",
+                                  "squared_hinge",
+                                  "hinge",
+                                  "categorical_hinge",
+                                  "logcosh",
+                                  "categorical_crossentropy",
+                                  "sparse_categorical_crossentropy",
+                                  "binary_crossentropy",
+                                  "kullback_leibler_divergence",
+                                  "poisson",
+                                  "cosine_proximity"]
+                    },
+                    "default": "categorical_crossentropy",
+                    "required": True
+                },
+                {
+                    "name": "optimizer",
+                    "type": {
+                        "key": "choice",
+                        "des": "An optimizer is one of the two arguments required for "
+                               "compiling a Keras model",
+                        "range": ["sgd",
+                                  "rmsprop",
+                                  "adagrad",
+                                  "adadelta",
+                                  "adam",
+                                  "adamax",
+                                  "nadam"]
+                    },
+                    "default": "sgd",
+                    "required": True
+                },
+                {
+                    "name": "metrics",
+                    "type": {
+                        "key": "choices",
+                        "des": "A metric is a function that is used to judge the "
+                               "performance of your model",
+                        "range": ["acc",
+                                  "mse",
+                                  "mae",
+                                  "mape",
+                                  "msle",
+                                  "cosine"]
+                    },
+                    "default": [],
+                    "required": False
+                },
+            ],
+    },
     "fit": {
-        "x_train": {
-            "name": "x_train",
+        "data_fields": {
+            "name": "training_fields",
             "type": {
-                "key": "data_set",
-                "des": "x_train",
+                "key": "transfer_box",
+                "des": "data fields for x and y",
             },
             "default": None,
-            "required": True
-        },
-        "y_train": {
-            "name": "y_train",
-            "type": {
-                "key": "data_set",
-                "des": "y_train",
-            },
-            "default": None,
-            "required": True
-        },
-        "x_val": {
-            "name": "x_val",
-            "type": {
-                "key": "data_set",
-                "des": "x_test",
-            },
-            "default": None,
-            "required": True
-        },
-        "y_val": {
-            "name": "y_val",
-            "type": {
-                "key": "data_set",
-                "des": "y_test",
-            },
-            "default": None,
-            "required": True
+            "required": True,
+            "x_data_type": None,
+            "y_data_type": None,
+            "x_len_range": None,
+            "y_len_range": None
         },
         "args": [
             {
@@ -531,24 +514,6 @@ KERAS_SEQ_SPEC = {
         ],
     },
     "evaluate": {
-        "x_test": {
-            "name": "x_test",
-            "type": {
-                "key": "data_set",
-                "des": "x_test",
-            },
-            "default": None,
-            "required": True
-        },
-        "y_test": {
-            "name": "y_test",
-            "type": {
-                "key": "data_set",
-                "des": "y_test",
-            },
-            "default": None,
-            "required": True
-        },
         "args": [
             {
                 "name": "batch_size",
@@ -576,38 +541,42 @@ if __name__ == '__main__':
     y_test = utils.to_categorical(np.random.randint(10, size=(100, 1)),
                                   num_classes=10)
     keras_seq(
-        {'layers': [{'name': 'Dense',
-                     'args': {'units': 64, 'activation': 'relu',
-                              'input_shape': [
-                                  20, ]}},
-                    {'name': 'Dropout',
-                     'args': {'rate': 0.5}},
-                    {'name': 'Dense',
-                     'args': {'units': 64, 'activation': 'relu'}},
-                    {'name': 'Dropout',
-                     'args': {'rate': 0.5}},
-                    {'name': 'Dense',
-                     'args': {'units': 10, 'activation': 'softmax'}}
-                    ],
-         'compile': {'loss': 'categorical_crossentropy',
-                     'optimizer': 'SGD',
-                     'metrics': ['accuracy']
-                     },
-         'fit': {'x_train': x_train,
-                 'y_train': y_train,
-                 'x_val': x_test,
-                 'y_val': y_test,
-                 'args': {
-                     'epochs': 20,
-                     'batch_size': 128
-                 }
-                 },
-         'evaluate': {'x_test': x_test,
-                      'y_test': y_test,
-                      'args': {
-                          'batch_size': 128
-                      }
-                      }
-         }, result_sds='11')
-
-
+        {
+            'layers': [{'name': 'Dense',
+                        'args': {'units': 64, 'activation': 'relu',
+                                 'input_shape': [
+                                     20, ]}},
+                       {'name': 'Dropout',
+                        'args': {'rate': 0.5}},
+                       {'name': 'Dense',
+                        'args': {'units': 64, 'activation': 'relu'}},
+                       {'name': 'Dropout',
+                        'args': {'rate': 0.5}},
+                       {'name': 'Dense',
+                        'args': {'units': 10, 'activation': 'softmax'}}
+                       ],
+            'compile': {
+                'args': {
+                    'loss': 'categorical_crossentropy',
+                    'optimizer': 'SGD',
+                    'metrics': ['accuracy']
+                }
+            },
+            'fit': {
+                'x_train': x_train,
+                'y_train': y_train,
+                'x_val': x_test,
+                'y_val': y_test,
+                'args': {
+                    'epochs': 20,
+                    'batch_size': 128
+                }
+            },
+            'evaluate': {
+                'x_test': x_test,
+                'y_test': y_test,
+                'args': {
+                    'batch_size': 128
+                }
+            }
+        }, result_sds='11')

@@ -71,11 +71,13 @@ export default {
       let body = lodash.cloneDeep(payload)
       body['user_ID'] = user.user_ID
       body['file_id'] = file._id
-      body['names'] = body.names
-        .replace(/ /g, '')
-        .replace(/"/g, '')
-        .replace(/'/g, '')
-        .split(',')
+      if (body['names']) {
+        body['names'] = body.names
+          .replace(/ /g, '')
+          .replace(/"/g, '')
+          .replace(/'/g, '')
+          .split(',')
+      }
       const data = yield call(importData, body)
       if (data.success) {
         message.success('Import Success!')
