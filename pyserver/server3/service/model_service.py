@@ -89,9 +89,9 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
     f = getattr(models, model.entry_function)
     if model['category'] == 0:
         # keras nn
-        conf = manage_nn_input(conf, staging_data_set_id, **kwargs)
+        input = manage_nn_input(conf, staging_data_set_id, **kwargs)
         return job_service.run_code(conf, project_id, staging_data_set_id,
-                                    model, f)
+                                    model, f, input)
     else:
         # custom models
         train_cursor = staging_data_business.get_by_staging_data_set_id(
@@ -101,10 +101,16 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
         model_fn = getattr(models, model.entry_function)
 
         if model['category'] == 1:
-            # choose one column to be label
+            # get column spec
             label_column = "label_"
             fit = conf.get('fit', None)
-            label_target = fit.pop('y', [None])[0]
+            data_fields = fit.get('data_fields', [[None], [None]])
+            label_target = data_fields[1][0]
+            x_cols = data_fields[0]
+            # filter x columns
+            x_cols = list(df_train.columns.values) if not x_cols else x_cols
+            df_train = df_train.filter(items=x_cols)
+
             if df_train[label_target].dtype == np.int_ or \
                             df_train[label_target].dtype == np.float_:
                 # if column is number use it directly as label
@@ -134,12 +140,17 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
                 'train': df_train,
                 # 'test': df_test,
                 'categorical_cols': categorical_cols,
-                'continuous_cols': continuous_cols + ['index'],
+                'continuous_cols': continuous_cols +
+                                   ([index_col] if index_col else []),
                 'label_col': label_column
             }
             return job_service.run_code(conf, project_id, staging_data_set_id,
                                         model, f, model_fn, input)
         if model['category'] == 2:
+            fit = conf.get('fit', None)
+            x_cols = fit.get('data_fields', [])
+            x_cols = list(df_train.columns.values) if not x_cols else x_cols
+            df_train = df_train.filter(items=x_cols)
             continuous_cols, categorical_cols = \
                 split_categorical_and_continuous(df_train, [])
             input = {
@@ -224,18 +235,19 @@ def manage_nn_input(conf, staging_data_set_id, **kwargs):
     :param staging_data_set_id:
     :return:
     """
-    x_fields = conf['fit']['x_train']
-    y_fields = conf['fit']['y_train']
+    x_fields = conf['fit']['data_fields'][0]
+    y_fields = conf['fit']['data_fields'][1]
     schema = kwargs.pop('schema')
     obj = split_supervised_input(staging_data_set_id, x_fields, y_fields,
                                  schema)
-    conf['fit']['x_train'] = obj['x_tr']
-    conf['fit']['y_train'] = obj['y_tr']
-    conf['fit']['x_val'] = obj['x_te']
-    conf['fit']['y_val'] = obj['y_te']
-    conf['evaluate']['x_test'] = obj['x_te']
-    conf['evaluate']['y_test'] = obj['y_te']
-    return conf
+
+    # conf['fit']['x_train'] = obj['x_tr']
+    # conf['fit']['y_train'] = obj['y_tr']
+    # conf['fit']['x_val'] = obj['x_te']
+    # conf['fit']['y_val'] = obj['y_te']
+    # conf['evaluate']['x_test'] = obj['x_te']
+    # conf['evaluate']['y_test'] = obj['y_te']
+    return obj
 
 
 def line_split_for_long_fields(field_str):
@@ -355,18 +367,16 @@ if __name__ == '__main__':
     conf = {
         'estimator': {
             'args': {
-                "example_id_column": 'index',
+                "n_classes": 2,
                 "weight_column_name": None,
-                "model_dir": None,
-                "l1_regularization": 0.0,
-                "l2_regularization": 0.0,
-                "num_loss_partitions": 1,
-                "kernels": None,
-                "config": None,
+                "gradient_clip_norm": None,
+                "enable_centered_bias": False,
+                "_joint_weight": False,
+                "label_keys": None,
             }
         },
         'fit': {
-            "y": ["income_bracket"],
+            "data_fields": [[], ["income_bracket"]],
             "args": {
                 "steps": 30
             }
@@ -378,26 +388,9 @@ if __name__ == '__main__':
         }
     }
     run_model(conf, "595f32e4e89bde8ba70738a3", "5965cda1d123ab8f604a8dd0",
-              "5968649fd123abcd3d027710")
+              "59687822d123abcfbfe8cabd")
 
-    # conf = {
-    #     'fit': {
-    #         "steps": 30
-    #     },
-    #     'evaluate': {
-    #         'steps': 10
-    #     },
-    #     'params':
-    #         {
-    #             "num_clusters": 4,
-    #             "random_seed": 5,
-    #             "use_mini_batch": True,
-    #             "mini_batch_steps_per_iteration": 1,
-    #             "kmeans_plus_plus_num_retries": 2,
-    #             "relative_tolerance": None,
-    #         }
-    # }
-    # run_model(conf, "595f32e4e89bde8ba70738a3", "5965cda1d123ab8f604a8dd0",
-    #           "5966e1add123abaa9d9c13c3")
 
-    temp()
+
+
+    # temp()

@@ -38,7 +38,7 @@ def emit_log(event, n, logs, result_sds, project_id):
 def save_result(result_sds, **result):
     if result_sds is None:
         raise ValueError('no result sds id passed')
-    staging_data_set_business.update(result_sds, **result)
+    staging_data_set_business.update(result_sds['id'], **result)
 
 
 def emit_result():

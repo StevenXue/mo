@@ -6,12 +6,13 @@ from keras.callbacks import LambdaCallback
 from keras.models import Sequential
 import tensorflow as tf
 from server3.service import logger
+from server3.utility import json_utility
 
 global graph
 graph = tf.get_default_graph()
 
 
-def keras_seq(conf, **kw):
+def keras_seq(conf, input, **kw):
     """
     a general implementation of sequential model of keras
     :param conf: config dict
@@ -32,6 +33,12 @@ def keras_seq(conf, **kw):
         comp = conf['compile']
         f = conf['fit']
         e = conf['evaluate']
+        x_train = input['x_tr']
+        y_train = input['y_tr']
+        x_val = input['x_te']
+        y_val = input['y_te']
+        x_test = input['x_te']
+        y_test = input['y_te']
 
         # TODO add validator
         # op = comp['optimizer']
@@ -59,21 +66,21 @@ def keras_seq(conf, **kw):
 
         # training
         # TODO callback 改成异步，考虑 celery
-        history = model.fit(f['x_train'], f['y_train'],
-                            validation_data=(f['x_val'], f['y_val']),
+        history = model.fit(x_train, y_train,
+                            validation_data=(x_val, y_val),
                             callbacks=[batch_print_callback],
                             verbose=0,
                             **f['args'])
 
         # testing
-        score = model.evaluate(e['x_test'], e['y_test'], **e['args'])
-
+        score = model.evaluate(x_test, y_test, **e['args'])
         weights = model.get_weights()
         config = model.get_config()
-        logger.log_train_end(result_sds, weights=weights, config=config,
+        logger.log_train_end(result_sds,
+                             weights=[weight.tolist() for weight in weights],
+                             config=config,
                              score=score)
-
-        return {'score': score, 'history': history}
+        return {'score': score, 'history': history.history}
 
 
 def keras_seq_to_str(obj, head_str, **kw):
@@ -487,8 +494,8 @@ KERAS_SEQ_SPEC = {
             },
             "default": None,
             "required": True,
-            "x_data_type": None,
-            "y_data_type": None,
+            "x_data_type": ['integer', 'float'],
+            "y_data_type": ['integer', 'float'],
             "x_len_range": None,
             "y_len_range": None
         },
@@ -532,51 +539,3 @@ if __name__ == '__main__':
     # import json
     # print(json.dumps(KERAS_SEQ_SPEC))
     pass
-    from keras import utils
-
-    x_train = np.random.random((1000, 20))
-    y_train = utils.to_categorical(np.random.randint(10, size=(1000, 1)),
-                                   num_classes=10)
-    x_test = np.random.random((100, 20))
-    y_test = utils.to_categorical(np.random.randint(10, size=(100, 1)),
-                                  num_classes=10)
-    keras_seq(
-        {
-            'layers': [{'name': 'Dense',
-                        'args': {'units': 64, 'activation': 'relu',
-                                 'input_shape': [
-                                     20, ]}},
-                       {'name': 'Dropout',
-                        'args': {'rate': 0.5}},
-                       {'name': 'Dense',
-                        'args': {'units': 64, 'activation': 'relu'}},
-                       {'name': 'Dropout',
-                        'args': {'rate': 0.5}},
-                       {'name': 'Dense',
-                        'args': {'units': 10, 'activation': 'softmax'}}
-                       ],
-            'compile': {
-                'args': {
-                    'loss': 'categorical_crossentropy',
-                    'optimizer': 'SGD',
-                    'metrics': ['accuracy']
-                }
-            },
-            'fit': {
-                'x_train': x_train,
-                'y_train': y_train,
-                'x_val': x_test,
-                'y_val': y_test,
-                'args': {
-                    'epochs': 20,
-                    'batch_size': 128
-                }
-            },
-            'evaluate': {
-                'x_test': x_test,
-                'y_test': y_test,
-                'args': {
-                    'batch_size': 128
-                }
-            }
-        }, result_sds='11')

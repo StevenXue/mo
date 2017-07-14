@@ -60,13 +60,17 @@ def run_model(model_id):
     project_id = data['project_id']
     staging_data_set_id = data['staging_data_set_id']
     schema = data['schema']
-    try:
-        result = model_service.run_model(conf, project_id, staging_data_set_id,
-                                         model_id,
-                                         schema=schema)
-        result = json_utility.convert_to_json(result)
-    except Exception as e:
-        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    result = model_service.run_model(conf, project_id, staging_data_set_id,
+                                     model_id,
+                                     schema=schema)
+    result = json_utility.convert_to_json(result)
+    # try:
+    #     result = model_service.run_model(conf, project_id, staging_data_set_id,
+    #                                      model_id,
+    #                                      schema=schema)
+    #     result = json_utility.convert_to_json(result)
+    # except Exception as e:
+    #     return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
     return jsonify({'response': result}), 200
 
 

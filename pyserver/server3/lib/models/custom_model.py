@@ -83,12 +83,14 @@ def input_fn(df, continuous_cols, categorical_cols=None, label_col=None):
     # Creates a dictionary mapping from each continuous feature column name (k) to
     # the values of that column stored in a constant Tensor.
     if categorical_cols is None and label_col is None:
+        # unsupervised
         continuous_cols = [[[x] for x in df[k].values.astype(np.float32)]
                            for k in continuous_cols]
         continuous_cols = tf.concat(continuous_cols, axis=1)
         # continuous_cols = tf.constant(continuous_cols)
         return continuous_cols, None
 
+    # supervised
     continuous_cols = {k: tf.constant(df[k].values)
                        for k in continuous_cols}
 

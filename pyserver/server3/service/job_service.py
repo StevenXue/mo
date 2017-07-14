@@ -70,7 +70,6 @@ def create_model_job(project_id, staging_data_set_id, model_obj, *argv):
     :param project_id: project_id, staging_data_set_id, toolkit_id
     :param staging_data_set_id: project_id, staging_data_set_id, toolkit_id
     :param model_obj: project_id, staging_data_set_id, toolkit_id
-    :param fields: project_id, staging_data_set_id, toolkit_id
     :return:
     """
     def decorator(func):

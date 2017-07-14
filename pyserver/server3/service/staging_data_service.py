@@ -251,8 +251,6 @@ def split_test_train(x_y_obj, schema='cv', ratio=0.3, trl=1000):
             data_utility.k_fold_cross_validation(x, y, ratio)
         return {'x_tr': x_tr, 'y_tr': y_tr, 'x_te': x_te, 'y_te': y_te}
     if schema == 'seq':
-        print('split_test_train', x.shape)
-        print('split_test_train', y.shape)
         if ratio and not trl:
             trl = x.shape[0] * ratio
         if trl:

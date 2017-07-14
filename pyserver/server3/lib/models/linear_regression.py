@@ -210,7 +210,7 @@ residual after centered bias.",
     },
     'fit': {
         "data_fields": {
-            "name": "training_fields",
+            "name": "x_y_fields",
             "type": {
                 "key": "select_box",
                 "des": "data fields for x",

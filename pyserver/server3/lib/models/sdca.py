@@ -225,7 +225,7 @@ SVM = {
     },
     'fit': {
         "data_fields": {
-            "name": "training_fields",
+            "name": "x_y_fields",
             "type": {
                 "key": "transfer_box",
                 "des": "data fields for x and y",

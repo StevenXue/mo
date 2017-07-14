@@ -214,15 +214,17 @@ label vocabulary. Only supported for `n_classes` > 2."
     },
     'fit': {
         "data_fields": {
-            "name": "training_fields",
+            "name": "x_y_fields",
             "type": {
-                "key": "select_box",
+                "key": "transfer_box",
                 "des": "data fields for x",
             },
             "default": None,
             "required": True,
-            "data_type": None,
-            "len_range": None
+            "x_data_type": None,
+            "y_data_type": None,
+            "x_len_range": None,
+            "y_len_range": [1, 1]
         },
         'args': [
             {
