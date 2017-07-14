@@ -24,6 +24,7 @@ from server3.route import toolkit_route
 from server3.route import user_route
 from server3.route import monitor_route
 from server3.route import model_route
+from server3.route import visualization_route
 from server3.repository import config
 from server3.utility import json_utility
 from server3.sio import socketio
@@ -83,6 +84,7 @@ app.register_blueprint(toolkit_route.toolkit_app)
 app.register_blueprint(model_route.model_app)
 app.register_blueprint(user_route.user_app)
 app.register_blueprint(monitor_route.monitor_app)
+app.register_blueprint(visualization_route.visualization_app)
 
 
 if __name__ == '__main__':
