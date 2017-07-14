@@ -669,35 +669,22 @@ def create_public_data_process():
                                 },
                                 'default': None,
                                 'required': True,
-                                'len_range': [1, None],
+                                'len_range': [1, 1],
                                 'data_type': ['int', 'float']
-                            }
+                            },
+                            "args": [
+                                {
+                                    'name': 'threshold',
+                                    'type': {
+                                        'key': 'float',
+                                        'des': 'the threshold to judge if positive of negative',
+                                        'range': [None, None]
+                                    },
+                                    'default': 0,
+                                    'required': True
+                                }
+                            ]
                         })
-                        # parameter_spec=[
-                        #     {
-                        #         'name': 'input_shape',
-                        #         'type': {
-                        #             'key': 'int_m',
-                        #             'des': 'nD tensor with shape: (batch_size, ..., '
-                        #                    'input_dim). The most common situation would be a '
-                        #                    '2D input with shape (batch_size, input_dim).',
-                        #             'range': None
-                        #         },
-                        #         'default': [None, None],
-                        #         'required': True,
-                        #         'len_range': [2, 2]
-                        #     },
-                        #     {
-                        #         'name': 'threshold',
-                        #         'type': {
-                        #             'key': 'float',
-                        #             'des': 'the threshold to judge if positive of negative',
-                        #             'range': [None, None]
-                        #         },
-                        #         'default': 0,
-                        #         'required': True
-                        #     }
-                        # ])
     binarizer = toolkit_repo.create(binarizer)
     ownership_business.add(user, False, toolkit=binarizer)
 
@@ -707,21 +694,22 @@ def create_public_data_process():
                               result_form=2,
                               entry_function='one_hot_encoder',
                               target_py_code=inspect.getsource(preprocess_orig.one_hot_encoder),
-                              parameter_spec=[
-                                  {
-                                      'name': 'input_shape',
+                              parameter_spec={
+                                  "data": {
+                                      'name': 'input',
                                       'type': {
-                                          'key': 'int_m',
+                                          'key': 'select_box',
                                           'des': 'nD tensor with shape: (batch_size, ..., '
                                                  'input_dim). The most common situation would be a '
                                                  '2D input with shape (batch_size, input_dim).',
                                           'range': None
                                       },
-                                      'default': [None, 1],
+                                      'default': None,
                                       'required': True,
-                                      'len_range': [2, 2]
-                                  },
-                              ])
+                                      'len_range': [1, 1],
+                                      'data_type': ['int', 'float']
+                                  }
+                              })
     one_hot_encoder = toolkit_repo.create(one_hot_encoder)
     ownership_business.add(user, False, toolkit=one_hot_encoder)
 
@@ -731,46 +719,47 @@ def create_public_data_process():
                       result_form=2,
                       entry_function='imputer',
                       target_py_code=inspect.getsource(preprocess_orig.imputer),
-                      parameter_spec=[
-                          {
-                              'name': 'input_shape',
+                      parameter_spec={
+                          "data": {
+                              'name': 'input',
                               'type': {
-                                  'key': 'int_m',
+                                  'key': 'select_box',
                                   'des': 'nD tensor with shape: (batch_size, ..., '
                                          'input_dim). The most common situation would be a '
                                          '2D input with shape (batch_size, input_dim).',
                                   'range': None
                               },
-                              'default': [None, None],
+                              'default': None,
                               'required': True,
-                              'len_range': [2, 2]
-                          },
-                      ])
+                              'len_range': [1, None],
+                              'data_type': ['int', 'float']
+                          }
+                      })
     imputer = toolkit_repo.create(imputer)
     ownership_business.add(user, False, toolkit=imputer)
 
     polynomial_features = Toolkit(name='多项式数据转换',
-                                  description='多项式数据转换',
+                                  description='多项式数据转换, 默认为两次',
                                   category="数值转换",
                                   result_form=2,
                                   entry_function='polynomial_features',
                                   target_py_code=inspect.getsource(preprocess_orig.polynomial_features),
-                                  parameter_spec=[
-                                      {
-                                          'name': 'input_shape',
+                                  parameter_spec={
+                                      "data": {
+                                          'name': 'input',
                                           'type': {
-                                              'key': 'int_m',
+                                              'key': 'select_box',
                                               'des': 'nD tensor with shape: (batch_size, ..., '
                                                      'input_dim). The most common situation would be a '
-                                                     '2D input with shape (batch_size, input_dim).'
-                                                     'Default is 2(like 4 * 2)',
+                                                     '2D input with shape (batch_size, input_dim).',
                                               'range': None
                                           },
-                                          'default': [None, None],
+                                          'default': None,
                                           'required': True,
-                                          'len_range': [2, 2]
-                                      },
-                                  ])
+                                          'len_range': [1, None],
+                                          'data_type': ['int', 'float']
+                                      }
+                                  })
     polynomial_features = toolkit_repo.create(polynomial_features)
     ownership_business.add(user, False, toolkit=polynomial_features)
 
@@ -780,44 +769,34 @@ def create_public_data_process():
                                  result_form=3,
                                  entry_function='variance_threshold',
                                  target_py_code=inspect.getsource(preprocess_orig.variance_threshold),
-                                 parameter_spec=[
-                                     {
-                                         'name': 'x_shape',
+                                 parameter_spec={
+                                     "data": {
+                                         'name': 'input',
                                          'type': {
-                                             'key': 'int_m',
+                                             'key': 'select_box',
                                              'des': 'nD tensor with shape: (batch_size, ..., '
                                                     'input_dim). The most common situation would be a '
                                                     '2D input with shape (batch_size, input_dim).',
                                              'range': None
                                          },
-                                         'default': [None, None],
+                                         'default': None,
                                          'required': True,
-                                         'len_range': [2, 2]
+                                         'len_range': [1, None],
+                                         'data_type': ['int', 'float']
                                      },
-                                     {
-                                         'name': 'y_shape',
-                                         'type': {
-                                             'key': 'int_m',
-                                             'des': 'nD tensor with shape: (batch_size, ..., '
-                                                    'input_dim). The most common situation would be a '
-                                                    '2D input with shape (batch_size, input_dim).',
-                                             'range': None
-                                         },
-                                         'default': [None, None],
-                                         'required': True,
-                                         'len_range': [2, 2]
-                                     },
-                                     {
-                                         'name': 'threshold',
-                                         'type': {
-                                             'key': 'float',
-                                             'des': 'the threshold to judge if positive of negative',
-                                             'range': [None, None]
-                                         },
-                                         'default': 3,
-                                         'required': True
-                                     }
-                                 ])
+                                     "args": [
+                                         {
+                                             'name': 'threshold',
+                                             'type': {
+                                                 'key': 'float',
+                                                 'des': 'the threshold to judge if positive of negative',
+                                                 'range': [0, None]
+                                             },
+                                             'default': 1,
+                                             'required': True
+                                         }
+                                     ]
+                                 })
     variance_threshold = toolkit_repo.create(variance_threshold)
     ownership_business.add(user, False, toolkit=variance_threshold)
 
@@ -826,31 +805,37 @@ def create_public_data_process():
                                  result_form=3,
                                  entry_function='select_k_best_chi2',
                                  target_py_code=inspect.getsource(preprocess_orig.select_k_best_chi2),
-                                 parameter_spec=[
-                                     {
-                                         'name': 'input_shape',
+                                 parameter_spec={
+                                     "data": {
+                                         'name': 'input',
                                          'type': {
-                                             'key': 'int_m',
+                                             'key': 'transfer_box',
                                              'des': 'nD tensor with shape: (batch_size, ..., '
                                                     'input_dim). The most common situation would be a '
                                                     '2D input with shape (batch_size, input_dim).',
                                              'range': None
                                          },
-                                         'default': [None, None],
+                                         'default': None,
                                          'required': True,
-                                         'len_range': [2, 2]
+                                         'x_len_range': [2, None],
+                                         'y_len_range': [1, 1],
+
+                                         'x_data_type': ['int', 'float'],
+                                         'y_data_type': ['int', 'float']
                                      },
-                                     {
-                                         'name': 'k',
-                                         'type': {
-                                             'key': 'int',
-                                             'des': 'the number of selected features',
-                                             'range': [None, None]
-                                         },
-                                         'default': 2,
-                                         'required': True
-                                     }
-                                 ])
+                                     "args": [
+                                         {
+                                             'name': 'n_features',
+                                             'type': {
+                                                 'key': 'int',
+                                                 'des': 'the threshold to judge if positive of negative',
+                                                 'range': [1, None]
+                                             },
+                                             'default': 2,
+                                             'required': True
+                                         }
+                                     ]
+                                 })
     select_k_best_chi2 = toolkit_repo.create(select_k_best_chi2)
     ownership_business.add(user, False, toolkit=select_k_best_chi2)
 
@@ -860,9 +845,9 @@ def create_public_data_process():
                                     result_form=3,
                                     entry_function='select_k_best_pearson',
                                     target_py_code=inspect.getsource(preprocess_orig.select_k_best_pearson),
-                                    parameter_spec=[
-                                        {
-                                            'name': 'x_input',
+                                    parameter_spec={
+                                        "data": {
+                                            'name': 'input',
                                             'type': {
                                                 'key': 'transfer_box',
                                                 'des': 'nD tensor with shape: (batch_size, ..., '
@@ -870,25 +855,27 @@ def create_public_data_process():
                                                        '2D input with shape (batch_size, input_dim).',
                                                 'range': None
                                             },
-                                            'default': [None, None],
+                                            'default': None,
                                             'required': True,
-                                            'len_range': [2, 2]
+                                            'x_len_range': [2, None],
+                                            'y_len_range': [1, 1],
 
+                                            'x_data_type': ['int', 'float'],
+                                            'y_data_type': ['int', 'float']
                                         },
-
-                                        # 'args': [
-                                        #     {
-                                        #         'name': 'k',
-                                        #         'type': {
-                                        #             'key': 'int',
-                                        #             'des': 'the number of selected features',
-                                        #             'range': [None, None]
-                                        #         },
-                                        #         'default': 2,
-                                        #         'required': True
-                                        #     }
-                                        # ],
-                                    ])
+                                        "args": [
+                                            {
+                                                'name': 'n_features',
+                                                'type': {
+                                                    'key': 'int',
+                                                    'des': 'the threshold to judge if positive of negative',
+                                                    'range': [1, None]
+                                                },
+                                                'default': 2,
+                                                'required': True
+                                            }
+                                        ]
+                                    })
     select_k_best_pearson = toolkit_repo.create(select_k_best_pearson)
     ownership_business.add(user, False, toolkit=select_k_best_pearson)
 
@@ -898,119 +885,194 @@ def create_public_data_process():
                                 result_form=3,
                                 entry_function='select_k_best_mic',
                                 target_py_code=inspect.getsource(preprocess_orig.select_k_best_mic),
-                                parameter_spec=[
-                                    {
-                                        'name': 'input_shape',
+                                parameter_spec={
+                                    "data": {
+                                        'name': 'input',
                                         'type': {
-                                            'key': 'int_m',
+                                            'key': 'transfer_box',
                                             'des': 'nD tensor with shape: (batch_size, ..., '
                                                    'input_dim). The most common situation would be a '
                                                    '2D input with shape (batch_size, input_dim).',
                                             'range': None
                                         },
-                                        'default': [None, None],
+                                        'default': None,
                                         'required': True,
-                                        'len_range': [2, 2]
+                                        'x_len_range': [2, None],
+                                        'y_len_range': [1, 1],
+
+                                        'x_data_type': ['int', 'float'],
+                                        'y_data_type': ['int', 'float']
                                     },
-                                    {
-                                        'name': 'k',
-                                        'type': {
-                                            'key': 'int',
-                                            'des': 'the number of selected features',
-                                            'range': [None, None]
-                                        },
-                                        'default': 2,
-                                        'required': True
-                                    }
-                                ])
+                                    "args": [
+                                        {
+                                            'name': 'n_features',
+                                            'type': {
+                                                'key': 'int',
+                                                'des': 'the threshold to judge if positive of negative',
+                                                'range': [1, None]
+                                            },
+                                            'default': 2,
+                                            'required': True
+                                        }
+                                    ]
+                                })
     select_k_best_mic = toolkit_repo.create(select_k_best_mic)
     ownership_business.add(user, False, toolkit=select_k_best_mic)
 
-    REF = Toolkit(name='二值化',
-                  description='基于给定阈值，将定量特征按阈值划分',
+    REF = Toolkit(name='递归特征消除法',
+                  description='递归特征消除法, 返回特征选择后的数据, 参数estimator为基模型',
                   category="特征选取",
                   result_form=3,
                   entry_function='ref',
                   target_py_code=inspect.getsource(preprocess_orig.ref),
-                  parameter_spec=[
-                      {
-                          'name': 'input_shape',
+                  parameter_spec={
+                      "data": {
+                          'name': 'input',
                           'type': {
-                              'key': 'int_m',
-                              'des': '选取的第一列作为基准，选取的其他列均与第一列计算Pearson',
+                              'key': 'transfer_box',
+                              'des': 'nD tensor with shape: (batch_size, ..., '
+                                     'input_dim). The most common situation would be a '
+                                     '2D input with shape (batch_size, input_dim).',
                               'range': None
                           },
-                          'default': [None, None],
+                          'default': None,
                           'required': True,
-                          'len_range': [2, 2]
+                          'x_len_range': [2, None],
+                          'y_len_range': [1, 1],
+
+                          'x_data_type': ['int', 'float'],
+                          'y_data_type': ['int', 'float']
                       },
-                  ])
+                      "args": [
+                          {
+                              'name': 'n_features',
+                              'type': {
+                                  'key': 'int',
+                                  'des': 'the threshold to judge if positive of negative',
+                                  'range': [1, None]
+                              },
+                              'default': 2,
+                              'required': True
+                          }
+                      ]
+                  })
     REF = toolkit_repo.create(REF)
     ownership_business.add(user, False, toolkit=REF)
 
-    select_from_model_lr = Toolkit(name='二值化',
-                                   description='基于给定阈值，将定量特征按阈值划分',
+    select_from_model_lr = Toolkit(name='基于惩罚项的特征选择法',
+                                   description='带L1惩罚项的逻辑回归作为基模型的特征选择, 属于带惩罚的基模型，除了筛选出特征，同时也降维',
                                    category="特征选取",
                                    result_form=3,
                                    entry_function='select_from_model_lr',
                                    target_py_code=inspect.getsource(preprocess_orig.select_from_model_lr),
-                                   parameter_spec=[
-                                       {
-                                           'name': 'input_shape',
+                                   parameter_spec={
+                                       "data": {
+                                           'name': 'input',
                                            'type': {
-                                               'key': 'int_m',
-                                               'des': '选取的第一列作为基准，选取的其他列均与第一列计算Pearson',
+                                               'key': 'transfer_box',
+                                               'des': 'nD tensor with shape: (batch_size, ..., '
+                                                      'input_dim). The most common situation would be a '
+                                                      '2D input with shape (batch_size, input_dim).',
                                                'range': None
                                            },
-                                           'default': [None, None],
+                                           'default': None,
                                            'required': True,
-                                           'len_range': [2, 2]
+                                           'x_len_range': [2, None],
+                                           'y_len_range': [1, 1],
+
+                                           'x_data_type': ['int', 'float'],
+                                           'y_data_type': ['int', 'float']
                                        },
-                                   ])
+                                       "args": [
+                                           {
+                                               'name': 'n_features',
+                                               'type': {
+                                                   'key': 'int',
+                                                   'des': 'the threshold to judge if positive of negative',
+                                                   'range': [1, None]
+                                               },
+                                               'default': 2,
+                                               'required': True
+                                           }
+                                       ]
+                                   })
     select_from_model_lr = toolkit_repo.create(select_from_model_lr)
     ownership_business.add(user, False, toolkit=select_from_model_lr)
 
-    select_from_model_gbdt = Toolkit(name='二值化',
-                                     description='基于给定阈值，将定量特征按阈值划分',
+    select_from_model_gbdt = Toolkit(name='基于树模型的特征选择法',
+                                     description='基树模型中GBDT可用来作为基模型进行特征选择',
                                      category="特征选取",
                                      result_form=3,
                                      entry_function='select_from_model_gbdt',
                                      target_py_code=inspect.getsource(preprocess_orig.select_from_model_gbdt),
-                                     parameter_spec=[
-                                         {
-                                             'name': 'input_shape',
+                                     parameter_spec={
+                                         "data": {
+                                             'name': 'input',
                                              'type': {
-                                                 'key': 'int_m',
-                                                 'des': '选取的第一列作为基准，选取的其他列均与第一列计算Pearson',
+                                                 'key': 'transfer_box',
+                                                 'des': 'nD tensor with shape: (batch_size, ..., '
+                                                        'input_dim). The most common situation would be a '
+                                                        '2D input with shape (batch_size, input_dim).',
                                                  'range': None
                                              },
-                                             'default': [None, None],
+                                             'default': None,
                                              'required': True,
-                                             'len_range': [2, 2]
+                                             'x_len_range': [2, None],
+                                             'y_len_range': [1, 1],
+
+                                             'x_data_type': ['int', 'float'],
+                                             'y_data_type': ['int', 'float']
                                          },
-                                     ])
+                                         "args": [
+                                             {
+                                                 'name': 'n_features',
+                                                 'type': {
+                                                     'key': 'int',
+                                                     'des': 'the threshold to judge if positive of negative',
+                                                     'range': [1, None]
+                                                 },
+                                                 'default': 2,
+                                                 'required': True
+                                             }
+                                         ]
+                                     })
     select_from_model_gbdt = toolkit_repo.create(select_from_model_gbdt)
     ownership_business.add(user, False, toolkit=select_from_model_gbdt)
 
-    decomposition_pca = Toolkit(name='二值化',
-                                description='基于给定阈值，将定量特征按阈值划分',
+    decomposition_pca = Toolkit(name='降维-PCA(sk-learn)',
+                                description='主成分分析法，返回降维后的数据',
                                 category="降维/聚类",
                                 result_form=2,
                                 entry_function='decomposition_pca',
                                 target_py_code=inspect.getsource(preprocess_orig.decomposition_pca),
-                                parameter_spec=[
-                                    {
-                                        'name': 'input_shape',
+                                parameter_spec={
+                                    "data": {
+                                        'name': 'input',
                                         'type': {
-                                            'key': 'int_m',
-                                            'des': '选取的第一列作为基准，选取的其他列均与第一列计算Pearson',
+                                            'key': 'select_box',
+                                            'des': 'nD tensor with shape: (batch_size, ..., '
+                                                   'input_dim). The most common situation would be a '
+                                                   '2D input with shape (batch_size, input_dim).',
                                             'range': None
                                         },
-                                        'default': [None, None],
+                                        'default': None,
                                         'required': True,
-                                        'len_range': [2, 2]
+                                        'len_range': [2, None],
+                                        'data_type': ['int', 'float']
                                     },
-                                ])
+                                    "args": [
+                                        {
+                                            'name': 'n_components',
+                                            'type': {
+                                                'key': 'int',
+                                                'des': 'the number of clusters',
+                                                'range': [1, None]
+                                            },
+                                            'default': 2,
+                                            'required': True
+                                        }
+                                    ]
+                                })
     decomposition_pca = toolkit_repo.create(decomposition_pca)
     ownership_business.add(user, False, toolkit=decomposition_pca)
 
@@ -1020,19 +1082,37 @@ def create_public_data_process():
                   result_form=2,
                   entry_function='lda',
                   target_py_code=inspect.getsource(preprocess_orig.lda),
-                  parameter_spec=[
-                      {
-                          'name': 'input_shape',
+                  parameter_spec={
+                      "data": {
+                          'name': 'input',
                           'type': {
-                              'key': 'int_m',
-                              'des': '选取的第一列作为基准，选取的其他列均与第一列计算Pearson',
+                              'key': 'transfer_box',
+                              'des': 'nD tensor with shape: (batch_size, ..., '
+                                     'input_dim). The most common situation would be a '
+                                     '2D input with shape (batch_size, input_dim).',
                               'range': None
                           },
-                          'default': [None, None],
+                          'default': None,
                           'required': True,
-                          'len_range': [2, 2]
+                          'x_len_range': [2, None],
+                          'y_len_range': [1, 1],
+
+                          'x_data_type': ['int', 'float'],
+                          'y_data_type': ['int', 'float']
                       },
-                  ])
+                      "args": [
+                          {
+                              'name': 'n_components',
+                              'type': {
+                                  'key': 'int',
+                                  'des': 'the number of clusters',
+                                  'range': [1, None]
+                              },
+                              'default': 2,
+                              'required': True
+                          }
+                      ]
+                  })
     lda = toolkit_repo.create(lda)
     ownership_business.add(user, False, toolkit=lda)
 
@@ -1049,19 +1129,22 @@ def update_one_public_toolkit():
                   result_form=1,
                   entry_function='toolkit_mic',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_mic),
-                  parameter_spec=[
-                      {
-                          'name': 'input_shape',
+                  parameter_spec={
+                      "data": {
+                          'name': 'input',
                           'type': {
-                              'key': 'int_m',
-                              'des': '选取的第一列作为基准，选取的其他列均与第一列计算Pearson',
+                              'key': 'select_box',
+                              'des': 'nD tensor with shape: (batch_size, ..., '
+                                     'input_dim). The most common situation would be a '
+                                     '2D input with shape (batch_size, input_dim).',
                               'range': None
                           },
-                          'default': [None, None],
+                          'default': None,
                           'required': True,
-                          'len_range': [2, 2]
-                      },
-                  ])
+                          'len_range': [2, None],
+                          'data_type': ['int', 'float']
+                      }
+                  })
     MIC = toolkit_repo.create(MIC)
     ownership_business.add(user, False, toolkit=MIC)
 
