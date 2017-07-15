@@ -7,6 +7,7 @@ from keras.models import Sequential
 import tensorflow as tf
 from server3.service import logger
 from server3.utility import json_utility
+from server3.utility.str_utility import generate_args_str
 
 global graph
 graph = tf.get_default_graph()
@@ -95,6 +96,7 @@ def keras_seq_to_str(obj, head_str, **kw):
     # in the first layer, you must specify the expected input data shape:
     # here, 20-dimensional vectors.
     result_sds = kw.pop('result_sds', None)
+    project_id = kw.pop('project_id', None)
     if result_sds is None:
         raise RuntimeError('no result_sds created')
 
@@ -105,11 +107,11 @@ def keras_seq_to_str(obj, head_str, **kw):
     layer_names = set([l['name'] for l in ls])
     layer_import = ''
     for n in layer_names:
-        layer_import += 'from keras.layers import %s' % n
+        layer_import += 'from keras.layers import %s\n' % n
     str_model = 'from keras.models import Sequential\n'
     str_model += 'from keras.callbacks import LambdaCallback\n'
-    str_model += 'from libs.service import logger\n'
-    str_model += 'from libs.business import staging_data_set_business\n'
+    str_model += 'from server3.service import logger\n'
+    str_model += 'from server3.business import staging_data_set_business\n'
     str_model += layer_import
     str_model += head_str
     str_model += 'model = Sequential()\n'
@@ -124,26 +126,22 @@ def keras_seq_to_str(obj, head_str, **kw):
             str_model += 'model.add(%s())' % layer_name + '\n'
 
     # compile
-    str_model += "model.compile(loss='" + \
-                 get_value(comp, 'loss', 'categorical_crossentropy') + \
-                 "', optimizer='" + comp['optimizer'] + "', metrics= [" + \
-                 get_metrics(comp) + \
-                 "])\n"
+    comp_str = generate_args_str(comp['args'])
+    str_model += "model.compile(%s)\n" % comp_str
 
     str_model += "result_sds = staging_data_set_business.get_by_id('%s')\n" % \
                  result_sds['id']
-
+    str_model += "project_id = '%s'\n" % project_id
     # callback
     str_model += "batch_print_callback = LambdaCallback(on_epoch_end=lambda " \
                  "epoch, \\\nlogs: logger.log_epoch_end(epoch, " \
-                 "logs, result_sds))\n"
+                 "logs, result_sds, project_id))\n"
     # fit
     str_model += "model.fit(x_train, y_train,  validation_data=(x_test, " \
                  "y_test), \\\ncallbacks=[batch_print_callback], " + \
                  get_args(f)[:-2] + ")\n"
     str_model += "score = model.evaluate(x_test, y_test, " + get_args(e)[
                                                              :-2] + ")\n"
-
     return str_model
 
 

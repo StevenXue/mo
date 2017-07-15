@@ -5,6 +5,7 @@ import tensorflow as tf
 import numpy as np
 
 from server3.service.custom_log_handler import MetricsHandler
+from server3.utility.str_utility import generate_args_str
 
 
 def custom_model(conf, model_fn, input, **kw):
@@ -104,11 +105,6 @@ def custom_model_to_str(conf, head_str, **kw):
     str_model += 'custom_model_help(model_fn, input, project_id, result_sds, ' \
                  'feature_columns=feature_columns)'
     return str_model
-
-
-def generate_args_str(args):
-    array = ["%s=%s" % (k, v) for k, v in args.items()]
-    return ', '.join(array)
 
 
 # input_fn 返回 features 和 labels

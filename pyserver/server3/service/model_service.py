@@ -305,16 +305,16 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
     :param staging_data_set_id:
     :return:
     """
-    x_fields = conf['fit']['x_train']
-    y_fields = conf['fit']['y_train']
+    x_fields = conf['fit']['data_fields'][0]
+    y_fields = conf['fit']['data_fields'][1]
     schema = kwargs.pop('schema')
     # restore data to variable str
-    conf['fit']['x_train'] = 'x_train'
-    conf['fit']['y_train'] = 'y_train'
-    conf['fit']['x_val'] = 'x_test'
-    conf['fit']['y_val'] = 'y_test'
-    conf['evaluate']['x_test'] = 'x_test'
-    conf['evaluate']['y_test'] = 'x_test'
+    # conf['fit']['x_train'] = 'x_train'
+    # conf['fit']['y_train'] = 'y_train'
+    # conf['fit']['x_val'] = 'x_test'
+    # conf['fit']['y_val'] = 'y_test'
+    # conf['evaluate']['x_test'] = 'x_test'
+    # conf['evaluate']['y_test'] = 'x_test'
 
     code_str = "schema = '%s'\n" % schema
     # str += 'conf = %s\n' % conf
@@ -325,7 +325,7 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
     y_str = line_split_for_long_fields(y_str)
     code_str += x_str
     code_str += y_str
-    code_str += "from libs.service import job_service\n"
+    code_str += "from server3.service import job_service\n"
     code_str += "obj = job_service.split_supervised_input(" \
                 "staging_data_set_id, x_fields, y_fields, schema)\n"
     code_str += "x_train = obj['x_tr']\n"
