@@ -13,7 +13,7 @@ class MetricsHandler(logging.StreamHandler):
     """
     A handler class which use to catch log message for tensorflow
     """
-    result_sds_id = None
+    result_sds = None
     project_id = None
 
     def emit(self, record):
@@ -33,5 +33,5 @@ class MetricsHandler(logging.StreamHandler):
             n = log_obj.get('step', None)
             # when step n exists, log message
             if n:
-                logger.log_epoch_end(n, log_obj, self.result_sds_id,
+                logger.log_epoch_end(n, log_obj, self.result_sds,
                                      self.project_id)

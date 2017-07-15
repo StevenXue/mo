@@ -1,4 +1,5 @@
 import logging
+import inspect
 
 import tensorflow as tf
 import numpy as np
@@ -15,13 +16,7 @@ def custom_model(conf, model_fn, input, **kw):
     :param kw:
     :return:
     """
-    train = input.pop('train', None)
-    test = input.pop('test', None)
-    categorical_cols = input.pop('categorical_cols', None)
-    continuous_cols = input.pop('continuous_cols', None)
-    label_col = input.pop('label_col', None)
-
-    predict_x = kw.pop('predict_x', None)
+    # predict_x = kw.pop('predict_x', None)
     project_id = kw.pop('project_id', None)
     result_sds = kw.pop('result_sds', None)
 
@@ -31,25 +26,25 @@ def custom_model(conf, model_fn, input, **kw):
 
     if result_sds is None:
         raise RuntimeError('no result sds id passed to model')
-    if train is None:
-        raise RuntimeError('no train input')
-    if continuous_cols is None:
-        raise RuntimeError('no continuous_cols input')
     if project_id is None:
         raise RuntimeError('no project_id input')
 
-    def train_input_fn():
-        return input_fn(train, continuous_cols, categorical_cols, label_col)
+    # def eval_input_fn():
+    #     return input_fn(test, continuous_cols, categorical_cols, label_col)
+    return custom_model_help(model_fn, input, project_id, result_sds,
+                             est_params, fit_params,
+                             eval_params)
 
-    def eval_input_fn():
-        return input_fn(test, continuous_cols, categorical_cols, label_col)
 
+def custom_model_help(model_fn, input, project_id, result_sds,
+                      est_params=None, fit_params=None,
+                      eval_params=None, feature_columns=None):
     tf.logging.set_verbosity(tf.logging.INFO)
 
     # add handler to catch tensorflow log message
     mh = MetricsHandler()
     # pass result staging data set for logger to save results
-    mh.result_sds_id = result_sds
+    mh.result_sds = result_sds
     mh.project_id = project_id
     logger = logging.getLogger('tensorflow')
     logger.setLevel(logging.DEBUG)
@@ -59,47 +54,88 @@ def custom_model(conf, model_fn, input, **kw):
                                            model_dir=None,
                                            config=None,
                                            params=est_params['args'])
+
+    def train_input_fn():
+        return input_fn(**input)
+
     # fit
     estimator.fit(input_fn=train_input_fn, **fit_params['args'])
     result = {}
     # evaluate
-    metrics = estimator.evaluate(input_fn=train_input_fn, **eval_params['args'])
+    metrics = estimator.evaluate(input_fn=train_input_fn,
+                                 **eval_params['args'])
     result.update({
         'eval_metrics': metrics
     })
     # predict
-    if predict_x:
-        predictions = estimator.predict(predict_x, as_iterable=True)
-        result['predictions'] = predictions
+    # if predict_x:
+    #     predictions = estimator.predict(predict_x, as_iterable=True)
+    #     result['predictions'] = predictions
 
     return result
+
+
+def custom_model_to_str(conf, head_str, **kw):
+    project_id = kw.get('project_id', None)
+    result_sds = kw.get('result_sds', None)
+    est_params = conf.get('estimator', None)['args']
+    fit_params = conf.get('fit', {})
+    eval_params = conf.get('evaluate', {})
+    result_sds_id = result_sds['id']
+    str_model = ''
+    str_model += head_str
+    str_model += "project_id = '%s'\n" % project_id
+    str_model += "result_sds = staging_data_set_business.get_by_id('%s')\n" % \
+                 result_sds_id
+    est_params['feature_columns'] = 'FC'
+    est_params = str(est_params)
+    est_params = est_params.replace("'FC'", 'feature_columns')
+    str_model += inspect.getsource(input_fn)
+    custom_model_help_str = inspect.getsource(custom_model_help)
+    custom_model_help_str = \
+        custom_model_help_str.replace("est_params['args']", est_params)
+    custom_model_help_str = \
+        custom_model_help_str.replace("**fit_params['args']", generate_args_str(
+            fit_params['args']))
+    custom_model_help_str = \
+        custom_model_help_str.replace("**eval_params['args']",
+                                      generate_args_str(eval_params['args']))
+    str_model += custom_model_help_str
+    str_model += 'custom_model_help(model_fn, input, project_id, result_sds, ' \
+                 'feature_columns=feature_columns)'
+    return str_model
+
+
+def generate_args_str(args):
+    array = ["%s=%s" % (k, v) for k, v in args.items()]
+    return ', '.join(array)
 
 
 # input_fn 返回 features 和 labels
 #  features: A dict of `Tensor` keyed by column name.
 #  labels: `Tensor` of shape [batch_size, 1] or [batch_size] labels of
 #          dtype `int32` or `int64` in the range `[0, n_classes)`.
-def input_fn(df, continuous_cols, categorical_cols=None, label_col=None):
-    # Creates a dictionary mapping from each continuous feature column name (k) to
-    # the values of that column stored in a constant Tensor.
+def input_fn(train, continuous_cols, categorical_cols=None, label_col=None):
+    # Creates a dictionary mapping from each continuous feature column name (k)
+    # to the values of that column stored in a constant Tensor.
     if categorical_cols is None and label_col is None:
         # unsupervised
-        continuous_cols = [[[x] for x in df[k].values.astype(np.float32)]
+        continuous_cols = [[[x] for x in train[k].values.astype(np.float32)]
                            for k in continuous_cols]
         continuous_cols = tf.concat(continuous_cols, axis=1)
         # continuous_cols = tf.constant(continuous_cols)
         return continuous_cols, None
 
     # supervised
-    continuous_cols = {k: tf.constant(df[k].values)
+    continuous_cols = {k: tf.constant(train[k].values)
                        for k in continuous_cols}
 
     # Creates a dictionary mapping from each categorical feature column name (k)
     # to the values of that column stored in a tf.SparseTensor.
     categorical_cols = {k: tf.SparseTensor(
-        indices=[[i, 0] for i in range(df[k].size)],
-        values=df[k].values,
-        dense_shape=[df[k].size, 1])
+        indices=[[i, 0] for i in range(train[k].size)],
+        values=train[k].values,
+        dense_shape=[train[k].size, 1])
         for k in categorical_cols}
     # Merges the two dictionaries into one.
     # feature_cols = dict(continuous_cols.items() + categorical_cols.items())
@@ -107,7 +143,7 @@ def input_fn(df, continuous_cols, categorical_cols=None, label_col=None):
     feature_cols.update(categorical_cols)
 
     # Converts the label column into a constant Tensor.
-    label = tf.constant(df[label_col].values)
+    label = tf.constant(train[label_col].values)
     # Returns the feature columns and the label.
     return feature_cols, label
 

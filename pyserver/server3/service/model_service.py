@@ -8,6 +8,8 @@
 # @running  : python
 # Further to FIXME of None
 """
+import inspect
+
 import numpy as np
 
 from server3.business import model_business, ownership_business, user_business
@@ -86,9 +88,9 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
     """
     model = model_business.get_by_model_id(model_id)
     # import model function
-    f = getattr(models, model.entry_function)
     if model['category'] == 0:
         # keras nn
+        f = getattr(models, model.entry_function)
         input = manage_nn_input(conf, staging_data_set_id, **kwargs)
         return job_service.run_code(conf, project_id, staging_data_set_id,
                                     model, f, input)
@@ -101,62 +103,19 @@ def run_model(conf, project_id, staging_data_set_id, model_id, **kwargs):
         model_fn = getattr(models, model.entry_function)
 
         if model['category'] == 1:
-            # get column spec
-            label_column = "label_"
             fit = conf.get('fit', None)
-            data_fields = fit.get('data_fields', [[None], [None]])
-            label_target = data_fields[1][0]
-            x_cols = data_fields[0]
-            # filter x columns
-            x_cols = list(df_train.columns.values) if not x_cols else x_cols
-            df_train = df_train.filter(items=x_cols)
-
-            if df_train[label_target].dtype == np.int_ or \
-                            df_train[label_target].dtype == np.float_:
-                # if column is number use it directly as label
-                label_column = label_target
-            else:
-                # if column is string, make it categorical
-                df_train[label_column] = (
-                    df_train[label_target].astype('category').cat.codes)
-
-            # 添加一列 index，格式为string，作为"example_id_column"的输入
             params = conf.get('estimator', None)['args']
+            data_fields = fit.get('data_fields', [[None], [None]])
             index_col = params.get('example_id_column', None)
-            df_train[index_col] = df_train.index.astype(str)
-            # TODO support two data set
-            # df_test = staging_data_service.mongo_to_df(test_cursor)
-            # df_test[LABEL_COLUMN] = (
-            #    df_test["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
-            # df_test['index'] = df_test.index.astype(str)
-
-            # 将连续型和类别型特征分离开，为input做准备
-            continuous_cols, categorical_cols = \
-                split_categorical_and_continuous(df_train, [label_column,
-                                                            index_col,
-                                                            label_target])
-            params["feature_columns"] = [continuous_cols, categorical_cols]
-            input = {
-                'train': df_train,
-                # 'test': df_test,
-                'categorical_cols': categorical_cols,
-                'continuous_cols': continuous_cols +
-                                   ([index_col] if index_col else []),
-                'label_col': label_column
-            }
+            feature_columns, input = model_input_manager1(df_train, index_col,
+                                                          data_fields)
+            params['feature_columns'] = feature_columns
             return job_service.run_code(conf, project_id, staging_data_set_id,
                                         model, f, model_fn, input)
         if model['category'] == 2:
             fit = conf.get('fit', None)
             x_cols = fit.get('data_fields', [])
-            x_cols = list(df_train.columns.values) if not x_cols else x_cols
-            df_train = df_train.filter(items=x_cols)
-            continuous_cols, categorical_cols = \
-                split_categorical_and_continuous(df_train, [])
-            input = {
-                'train': df_train,
-                'continuous_cols': continuous_cols,
-            }
+            input = model_input_manager2(df_train, x_cols)
             return job_service.run_code(conf, project_id, staging_data_set_id,
                                         model, f, model_fn, input)
 
@@ -204,9 +163,6 @@ def get_parameters_grid(conf):
     return parameters_grid
 
 
-# ------------------------------ temp function ------------------------------e
-
-
 def model_to_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
     """
     run model by model_id and the parameter config
@@ -219,13 +175,98 @@ def model_to_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
     :return:
     """
     model = model_business.get_by_model_id(model_id)
-    f = model.to_code_function
-    head_str = None
+    f = getattr(models, model.to_code_function)
+
     if model['category'] == 0:
+        # keras nn
         head_str = manage_supervised_input_to_str(conf, staging_data_set_id,
                                                   **kwargs)
-    return job_service.run_code(conf, project_id, staging_data_set_id,
-                                model, f, head_str)
+        return job_service.run_code(conf, project_id, staging_data_set_id,
+                                    model, f, head_str)
+    else:
+        # custom models
+        head_str = ''
+        head_str += 'import logging\n'
+        head_str += 'import numpy as np\n'
+        head_str += 'import tensorflow as tf\n'
+        head_str += 'from server3.lib import models\n'
+        head_str += 'from server3.business import staging_data_set_business\n'
+        head_str += 'from server3.business import staging_data_business\n'
+        head_str += 'from server3.service import staging_data_service\n'
+        head_str += 'from server3.service.model_service import ' \
+                    'split_categorical_and_continuous\n'
+        head_str += 'from server3.service.custom_log_handler ' \
+                    'import MetricsHandler\n'
+        head_str += 'model_fn = models.%s\n' % model.entry_function
+        head_str += "train_cursor = staging_data_business." \
+                    "get_by_staging_data_set_id('%s')\n" \
+                    % staging_data_set_id
+        head_str += "df_train = staging_data_service.mongo_to_df(" \
+                    "train_cursor)\n"
+        fit = conf.get('fit', None)
+        if model['category'] == 1:
+            params = conf.get('estimator', None)['args']
+            data_fields = fit.get('data_fields', [[None], [None]])
+            index_col = params.get('example_id_column', None)
+            head_str += 'data_fields = %s\n' % data_fields
+            head_str += 'index_col = %s\n' % index_col
+            head_str += inspect.getsource(model_input_manager1)
+            head_str += "feature_columns, input = model_input_manager1(" \
+                        "df_train, index_col, data_fields)\n"
+        elif model['category'] == 2:
+            x_cols = fit.get('data_fields', [])
+            head_str += "x_cols = %s\n" % x_cols
+            head_str += inspect.getsource(model_input_manager2)
+            head_str += "input = model_input_manager1(df_train, x_cols)\n"
+        return job_service.run_code(conf, project_id, staging_data_set_id,
+                                    model, f, head_str)
+
+
+def model_input_manager1(df_train, index_col, data_fields):
+    # get column spec
+    label_column = "label_"
+    label_target = data_fields[1][0]
+    x_cols = data_fields[0]
+    # filter x columns
+    x_cols = list(df_train.columns.values) if not x_cols else x_cols
+    df_train = df_train.filter(items=x_cols)
+
+    if df_train[label_target].dtype == np.int_ or \
+                    df_train[label_target].dtype == np.float_:
+        # if column is number use it directly as label
+        label_column = label_target
+    else:
+        # if column is string, make it categorical
+        df_train[label_column] = (
+            df_train[label_target].astype('category').cat.codes)
+
+    # 添加一列 index，格式为string，作为"example_id_column"的输入
+    df_train[index_col] = df_train.index.astype(str)
+
+    # 将连续型和类别型特征分离开，为input做准备
+    continuous_cols, categorical_cols = \
+        split_categorical_and_continuous(df_train, [label_column,
+                                                    index_col,
+                                                    label_target])
+    return [continuous_cols, categorical_cols], {
+        'train': df_train,
+        # 'test': df_test,
+        'categorical_cols': categorical_cols,
+        'continuous_cols': continuous_cols +
+                           ([index_col] if index_col else []),
+        'label_col': label_column
+    }
+
+
+def model_input_manager2(df_train, x_cols):
+    x_cols = list(df_train.columns.values) if not x_cols else x_cols
+    df_train = df_train.filter(items=x_cols)
+    continuous_cols, categorical_cols = \
+        split_categorical_and_continuous(df_train, [])
+    return {
+        'train': df_train,
+        'continuous_cols': continuous_cols,
+    }
 
 
 def manage_nn_input(conf, staging_data_set_id, **kwargs):
@@ -293,6 +334,9 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
     code_str += "y_test = obj['y_te']\n"
 
     return code_str
+
+
+# ------------------------------ temp function ------------------------------e
 
 
 def temp():
@@ -387,8 +431,8 @@ if __name__ == '__main__':
             }
         }
     }
-    run_model(conf, "595f32e4e89bde8ba70738a3", "5965cda1d123ab8f604a8dd0",
-              "59687822d123abcfbfe8cabd")
+    model_to_code(conf, "595f32e4e89bde8ba70738a3", "5965cda1d123ab8f604a8dd0",
+                  "59687822d123abcfbfe8cabd")
 
 
 
