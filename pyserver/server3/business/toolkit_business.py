@@ -1062,10 +1062,10 @@ def create_public_data_process():
                                     },
                                     "args": [
                                         {
-                                            'name': 'n_components',
+                                            'name': 'n_features',
                                             'type': {
                                                 'key': 'int',
-                                                'des': 'the number of clusters',
+                                                'des': 'the threshold to judge if positive of negative',
                                                 'range': [1, None]
                                             },
                                             'default': 2,
