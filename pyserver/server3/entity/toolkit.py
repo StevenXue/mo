@@ -13,6 +13,7 @@ from mongoengine import DynamicDocument
 from mongoengine import StringField
 from mongoengine import DictField
 from mongoengine import IntField
+from mongoengine import ListField
 
 RESUlT_FORM = (
     (0, 'Direct Show',
@@ -41,8 +42,8 @@ class Toolkit(DynamicDocument):
 
     # status = DictField()
     # status = IntField(choices=STATUS, required=True)
-
+    fields = ListField()
+    tags = ListField()
     entry_function = StringField(required=True)
-    # 'run'
 
     parameter_spec = DictField()
