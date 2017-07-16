@@ -3,6 +3,7 @@
 """
 from mongoengine import connect
 import numpy as np
+from server3.lib import toolkit_orig, preprocess_orig
 from server3.repository import config
 from server3.service import toolkit_service, job_service, visualization_service
 
@@ -79,11 +80,18 @@ if __name__ == '__main__':
     # print (get_staging_data_pandas("5951cf7244a6372a608ec4e4"))
 
     # 测量假设检验函数
-    array = list(np.arange(142, 157, 0.1))
-    arr = []
-    for i in array:
-        arr.append({'a': str(i)})
-    result = visualization_service.usr_story1_exploration(arr, 'str', group_num=10)
+    # array = list(np.arange(142, 157, 0.1))
+    # arr = []
+    # for i in array:
+    #     arr.append({'a': str(i)})
+    # result = visualization_service.usr_story1_exploration(arr, 'str', group_num=10)
+    # print (result)
+
+    # 测getattr
+    print (hasattr(toolkit_orig, "toolkit_average"))
+    f = getattr(toolkit_orig, "toolkit_average")
+    print ('f', f)
+    result = f([1,2,3,4])
     print (result)
 
 # import keras
