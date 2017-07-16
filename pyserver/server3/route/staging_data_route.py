@@ -56,13 +56,16 @@ def get_data_set(sds_id):
             get_by_staging_data_set_id_limit(ObjectId(sds_id), int(limit))
         data = json_utility.me_obj_list_to_json_list(data)
         data = {'data': data}
+        columns = staging_data_service.get_fields_with_types(
+            ObjectId(sds_id))
 
         # FIXME
         info = {
             'field': 'Government',
             'tags': ['scheduled releases', 'open data datasets', 'city',
-                     'canada', 'public sevice'],
-            'related tasks': ['classification']
+                     'canada', 'public service'],
+            'related tasks': ['classification'],
+            'columns': columns
         }
         data.update(info)
 
@@ -145,7 +148,6 @@ def filter_fields(sds_id):
     try:
         updated_n = staging_data_business.\
             filter_data_set_fields(ObjectId(sds_id), fields)
-        print(updated_n)
         if updated_n > 0:
             res = 'success'
         else:

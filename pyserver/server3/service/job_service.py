@@ -25,8 +25,6 @@ from server3.service import staging_data_service
 from server3.lib import models
 from server3.repository import job_repo
 
-def test():
-    print("successful")
 
 def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
     """
@@ -72,7 +70,6 @@ def create_model_job(project_id, staging_data_set_id, model_obj, *argv):
     :param project_id: project_id, staging_data_set_id, toolkit_id
     :param staging_data_set_id: project_id, staging_data_set_id, toolkit_id
     :param model_obj: project_id, staging_data_set_id, toolkit_id
-    :param fields: project_id, staging_data_set_id, toolkit_id
     :return:
     """
     def decorator(func):
@@ -92,13 +89,15 @@ def create_model_job(project_id, staging_data_set_id, model_obj, *argv):
             # create result sds for model
             project_obj = project_business.get_by_id(project_id)
             sds_name = '%s_%s_result' % (model_obj['name'], job_obj['id'])
+            params = args[0]
             result_sds_obj = staging_data_set_business.add(sds_name, 'des',
                                                            project_obj,
                                                            job=job_obj,
-                                                           type='result')
-
+                                                           type='result',
+                                                           params=params)
             # run
-            func_result = func(*args, **kw, result_sds=result_sds_obj)
+            func_result = func(*args, **kw, result_sds=result_sds_obj,
+                               project_id=project_id)
             # update a job
             job_obj = job_business.end_job(job_obj)
 

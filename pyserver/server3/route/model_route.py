@@ -40,7 +40,7 @@ def get_all_model_info():
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}), 400)
     return jsonify({'message': 'get info success', 'response':
-                   json_utility.convert_to_json(result)}), 200
+        json_utility.convert_to_json(result)}), 200
 
 
 @model_app.route('/models/<string:model_id>', methods=['GET'])
@@ -60,14 +60,18 @@ def run_model(model_id):
     project_id = data['project_id']
     staging_data_set_id = data['staging_data_set_id']
     schema = data['schema']
-    model_service.run_model(conf, project_id, staging_data_set_id, model_id,
-                            schema=schema)
+    result = model_service.run_model(conf, project_id, staging_data_set_id,
+                                     model_id,
+                                     schema=schema)
+    result = json_utility.convert_to_json(result)
     # try:
-    #     model_service.run_model(conf, project_id, staging_data_set_id, model_id,
-    #                             schema=schema)
+    #     result = model_service.run_model(conf, project_id, staging_data_set_id,
+    #                                      model_id,
+    #                                      schema=schema)
+    #     result = json_utility.convert_to_json(result)
     # except Exception as e:
     #     return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
-    return jsonify({'response': 'success'}), 200
+    return jsonify({'response': result}), 200
 
 
 @model_app.route('/models/run_multiple/<string:model_id>', methods=['POST'])
@@ -77,7 +81,8 @@ def run_multiple_model(model_id):
     project_id = data['project_id']
     staging_data_set_id = data['staging_data_set_id']
     schema = data['schema']
-    model_service.run_multiple_model(conf, project_id, staging_data_set_id, model_id,
+    model_service.run_multiple_model(conf, project_id, staging_data_set_id,
+                                     model_id,
                                      schema=schema)
     return jsonify({'response': 'success'}), 200
 
