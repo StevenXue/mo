@@ -16,7 +16,8 @@ from minepy import MINE
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
-
+from server3.lib import toolkit_orig
+from server3.lib import preprocess_orig
 from server3.service import job_service
 from server3.business import toolkit_business, ownership_business, user_business, job_business, result_business, project_business
 from server3.utility import data_utility
@@ -58,9 +59,11 @@ def toolkit_calculate(project_id, staging_data_set_id, toolkit_id, fields, *argv
     # exec string
 
     # new code, use new decorator
-    code = toolkit_obj.target_py_code
-    exec(code)
-    func = locals()[toolkit_obj.entry_function]
+    # code = toolkit_obj.target_py_code
+    # exec(code)
+    # func = locals()[toolkit_obj.entry_function]
+
+    func = getattr(toolkit_orig, toolkit_obj.entry_function) if hasattr(toolkit_orig, toolkit_obj.entry_function) else getattr(preprocess_orig, toolkit_obj.entry_function)
     func = job_service.create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields)(func)
     result = func(*argv)
 
@@ -82,35 +85,50 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
             arg_filter.append(arr_temp)
         else:
             index_nan.append(data.index(arr))
+            # print ("nan number")
+            # index_nan = [i for i, x in enumerate(data) if x == arr_temp]
+    # print ("np.nan", index_nan)
     # argv = [arg_filter]
 
     # 临时救急，转文字为数字
-    argv_b = list(zip(*arg_filter))
-    argv_a = []
-    for arr in argv_b:
+    # argv_b = list(zip(*arg_filter))
+    # argv_a = []
+    # for arr in argv_b:
+    #     try:
+    #         float(arr[0])
+    #         argv_a.append(arr)
+    #     except ValueError:
+    #         hash_obj = {}
+    #         i = 1.0
+    #         temp = []
+    #         for item in arr:
+    #             if item in hash_obj:
+    #                 temp.append(hash_obj[item])
+    #             else:
+    #                 hash_obj[item] = i
+    #                 i += 1
+    #                 temp.append(hash_obj[item])
+    #         argv_a.append(temp)
+    # argv = [list(zip(*argv_a))]
+
+    # 正式的文字转数字
+    argv_before = list(zip(*arg_filter))
+    argv_after = []
+    for arr in argv_before:
         try:
             float(arr[0])
-            argv_a.append(arr)
+            argv_after.append(arr)
         except ValueError:
-            hash_obj = {}
-            i = 1.0
-            temp = []
-            for item in arr:
-                if item in hash_obj:
-                    temp.append(hash_obj[item])
-                else:
-                    hash_obj[item] = i
-                    i += 1
-                    temp.append(hash_obj[item])
-            argv_a.append(temp)
-    argv = [list(zip(*argv_a))]
+            argv_after.append(pd.Series(arr).astype('category').cat.codes)
+    argv = [list(zip(*argv_after))]
 
     # 正常
     if k:
         argv.append(index_nan)
         argv.append(k)
     # result = toolkit_calculate(toolkit_id, *argv)
-    result = toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, fields, *argv)
+    # result = toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, fields, *argv)
+    result = toolkit_calculate(project_id, staging_data_set_id, toolkit_id, fields, *argv)
     # project_business.add_job_and_result_to_project(result, ObjectId(project_id))
     return result.to_mongo().to_dict()
 
