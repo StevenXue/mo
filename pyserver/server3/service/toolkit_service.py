@@ -84,8 +84,7 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
         if np.nan not in arr_temp:
             arg_filter.append(arr_temp)
         else:
-            # index_nan.append(data.index(arr))
-            pass
+            index_nan.append(data.index(arr))
             # print ("nan number")
             # index_nan = [i for i, x in enumerate(data) if x == arr_temp]
     # print ("np.nan", index_nan)
