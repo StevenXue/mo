@@ -19,7 +19,8 @@ export default class ModelProcess extends React.Component {
       source: [],
       supervised: false,
       modelData: {},
-      divide: {}
+      divide: {},
+      dataSet: this.props.dataset_id
     }
   }
 
@@ -48,9 +49,14 @@ export default class ModelProcess extends React.Component {
     this.setState({source: s});
   }
 
+  componentWillReceiveProps(nextProps){
+    //console.log(nextProps);
+    this.setState({dataSet: nextProps.dataset_id});
+  }
+
 
   onSelectModel(values){
-    console.log(values);
+    //console.log(values);
     this.setState({selectedModel: values});
     fetch(flaskServer + '/model/models/' + values, {
       method: 'get',
@@ -81,17 +87,11 @@ export default class ModelProcess extends React.Component {
 
   handleChange(nextTargetKeys, direction, moveKeys) {
     this.setState({ targetKeys: nextTargetKeys });
-
-    console.log('targetKeys: ', this.state.targetKeys);
-    console.log('direction: ', direction);
-    console.log('moveKeys: ', moveKeys);
   }
 
   handleSelectChange(sourceSelectedKeys, targetSelectedKeys) {
     this.setState({ selectedKeys: [...sourceSelectedKeys, ...targetSelectedKeys] });
 
-    // console.log('sourceSelectedKeys: ', sourceSelectedKeys);
-    // console.log('targetSelectedKeys: ', targetSelectedKeys);
     let divide = {};
     divide['source'] = sourceSelectedKeys;
     divide['target'] = targetSelectedKeys
@@ -101,6 +101,7 @@ export default class ModelProcess extends React.Component {
   }
 
   onReceiveCode(code){
+    console.log(code);
     this.props.getCode(code);
   }
 
@@ -153,7 +154,7 @@ export default class ModelProcess extends React.Component {
           <div style={{width: '45%', height: 480}}>
             <ModelForms data={this.state.modelData}
                         divide={this.state.divide}
-                        dataset_id={this.props.dataset_id}
+                        dataset_id={this.state.dataSet}
                         project_id={this.props.project_id}
                         model_id={this.state.selectedModel}
                         jupyter={this.props.jupyter}

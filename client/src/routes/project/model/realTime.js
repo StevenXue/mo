@@ -39,7 +39,9 @@ export default class Curve extends React.Component{
   }
 
   componentWillReceiveProps(nextProps){
-    this.updateChart(nextProps.data);
+    if(!nextProps.end) {
+      this.updateChart(nextProps.data);
+    }
   }
 
   componentDidUpdate() {
@@ -276,4 +278,5 @@ export default class Curve extends React.Component{
 
 Curve.PropTypes = {
   data: React.PropTypes.object,
+  end: React.PropTypes.bool
 }
