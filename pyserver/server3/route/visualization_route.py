@@ -37,3 +37,9 @@ def usr1_visualization():
         return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
     return jsonify({'response': json_utility.convert_to_json(result)}), 200
 
+    # data = staging_data_business.get_by_staging_data_set_and_fields(ObjectId(staging_data_set_id), field)
+    # data = [d.to_mongo().to_dict() for d in data]
+    # result = visualization_service.usr_story1_exploration(data, type)
+    # # print ('result', result)
+    # return jsonify({'response': json_utility.convert_to_json(result)}), 200
+

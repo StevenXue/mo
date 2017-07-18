@@ -3,12 +3,11 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { jupyterServer, baseUrl, flaskServer} from '../../../constants'
 import empty from './empty.ipynb';
-import { Button, message, Modal} from 'antd';
+import { Button, message, Modal, Select, Spin} from 'antd';
 import { Notebook, createStore} from '../../../notebook/src/';
 import { setNotebook, recordResults, save, saveAs} from '../../../notebook/src/actions';
 import * as enchannelBackend from '../../../notebook/enchannel-notebook-backend';
 import style from './style.css';
-//import Curve from './curve';
 import CurveTest from '../model/realTime';
 import Model from '../model/modelProcess';
 import io from 'socket.io-client';
@@ -57,10 +56,12 @@ class JupyterNotebook extends React.Component {
       getOutput: false,
       spawned: false,
       visible: false,
-      ioData: {}
+      ioData: {},
+      loading: false,
+      selectedData: "",
+      columns: [],
+      data_set: []
     };
-
-    //this.store.subscribe(state => this.setState(state));
 
   }
 
@@ -69,20 +70,23 @@ class JupyterNotebook extends React.Component {
   }
 
   componentDidMount() {
-    // let defpath = this.props.notebookPath.path;
-    // console.log(defpath);
-    // let path = defpath.split("/");
-    // console.log(path);
-    // this.setState({name: path[path.length -1]});
     this.attachChannels()
-    //console.log(this.props.notebook_content);
     let socket = io.connect(flaskServer+ '/log');
 
     socket.on('log_epoch_end', (msg) => {
-      //console.log(msg);
-      //this.timer = setTimeout(()=> this.setState({ioData: msg}), 100);
       this.setState({ioData: msg});
     });
+
+    fetch(flaskServer + '/staging_data/staging_data_sets?project_id=' + this.props.project_id, {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then((response) => response.json())
+      .then((res) => {
+          this.setState({ data_set: res.response })
+        },
+      );
   }
 
   componentWillReceiveProps(nextProps) {
@@ -91,42 +95,28 @@ class JupyterNotebook extends React.Component {
     }
   }
 
-  componentDidUpdate() {
-  }
-
   componentWillUnmount() {
-    //const baseUrl = 'http://localhost:8888'
-    // const baseUrl = 'http://10.52.14.182:8888'
     const domain = baseUrl.split('://').slice(1).join('://')
     const wsUrl = `ws://${domain}`
 
-    // Create a connection options object
     let _connectionOptions = {
       baseUrl,
       wsUrl,
     };
 
     enchannelBackend.shutdown(_connectionOptions, this.state.kernalId).then((r) => {
-
     });
 
 
   }
 
   getResult(r){
-    //let rt = r.results
-    //console.log("result", r);
     r = r.split('\n');
     r = r.filter(Boolean);
-    //console.log(r);
     this.setState({output: r});
   }
 
   attachChannels () {
-    // Prompt the user for the baseUrl and wsUrl
-    //const baseUrl = jupyterServer;
-    //onst baseUrl = 'http://localhost:8888'
-    // const baseUrl = 'http://10.52.14.182:8888'
     const domain = baseUrl.split('://').slice(1).join('://')
     const wsUrl = `ws://${domain}`
 
@@ -161,7 +151,6 @@ class JupyterNotebook extends React.Component {
   createFileReader () {
     this.reader = new FileReader()
     this.reader.addEventListener('loadend', () => {
-      //console.log(this.reader.result);
       this.dispatch(setNotebook(JSON.parse(this.reader.result)));
     })
   }
@@ -179,7 +168,6 @@ class JupyterNotebook extends React.Component {
 
   onClickButton() {
     this.setState({
-      //forceSource: '%run mnist_1.0_softmax.py $[your training steps]',
       visible: true
     });
   }
@@ -190,9 +178,25 @@ class JupyterNotebook extends React.Component {
     });
   }
 
-  // onRenameNotebook(e) {
-  //   this.setState({fileName: e.target.value});
-  // }
+  onSelectDataSet (values) {
+    console.log(values);
+    let selected = this.state.data_set.filter((el) => el._id === values);
+    let selectedName = selected[0].name;
+    this.setState({ selectedData: values, selectedDataName: selectedName, loading: true })
+    fetch(flaskServer + '/staging_data/staging_data_sets/' + values, {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then((response) => response.json())
+      .then((res) => {
+          //console.log(res, selectedName, values);
+          let c = Object.keys(res.response.data[1]);
+          this.setState({columns: c, loading: false});
+        },
+      )
+      .catch((err) => console.log('Error: /staging_data/staging_data_sets/fields', err))
+  }
 
   saveTrigger(notebook){
     let ntb = notebook;
@@ -274,16 +278,11 @@ class JupyterNotebook extends React.Component {
   }
 
   renderResult() {
-    //console.log(this.state.output);
-    // let outputs = this.state.output;
-    // if(outputs.length !== 0) {
-    //   return (<Curve style={{height: '100%', width: '100%'}} dataString={this.state.output} />);
-    // }
     if(!isEmpty(this.state.ioData )) {
       return <CurveTest data={this.state.ioData}/>
     }
   }
-  // %run mnist_1.0_softmax.py
+
   renderNotebook(type) {
     if (this.state.channels) {
       return (
@@ -298,8 +297,6 @@ class JupyterNotebook extends React.Component {
           result={(r) => this.getResult(r)}
           saveTrigger={(notebook) => this.saveTrigger(notebook)}
           project_id={this.props.project_id}
-          dataset_id={this.props.dataset_id}
-          dataset_name={this.props.dataset_name}
           toOutput={this.state.getOutput}
         />
 
@@ -316,9 +313,6 @@ class JupyterNotebook extends React.Component {
           <input type="file" name="ipynb-file" ref="ipynb-file" id="ipynb-file" onChange={this.handleFileChange} />
         </a>
         <span style={{ marginLeft: 10 }}> {this.state.fileName}
-          {/*<input value={this.state.fileName}*/}
-                 {/*style={{border: 'none'}}*/}
-                  {/*onChange={(e) => this.onRenameNotebook(e)}/>*/}
         </span>
       </div>
     )
@@ -342,12 +336,29 @@ class JupyterNotebook extends React.Component {
                    visible={this.state.visible}
                    onOk={() => this.setState({visible: false})}
                    onCancel={() => this.setState({visible: false})}>
-              <Model style={{width: 1000, height: 450}}
-                     project_id={this.props.project_id}
-                     dataset_id={this.props.dataset_id}
-                     cols={this.props.columns}
-                     jupyter={true}
-                     getCode={(code) => this.onReceiveCode(code)}/>
+              <span style={{color: '#108ee9', marginLeft: 10}}>Choose Data</span>
+              <Select className="dataset-select"
+                      style={{ width: 150, marginTop: 10, marginLeft: 10}}
+                      onChange={(values) => this.onSelectDataSet(values)}
+                      value={this.state.selectedData}
+                      placeholder="Choose Data"
+                      allowClear>
+                {
+                  !isEmpty(this.state.data_set) && this.state.data_set.map((e) =>
+                    <Select.Option value={e._id} key={e._id}>
+                      {e.name}
+                    </Select.Option>
+                  )
+                }
+              </Select>
+              <Spin spinning={this.state.loading}>
+                <Model style={{width: 1000, height: 450}}
+                       project_id={this.props.project_id}
+                       dataset_id={this.state.selectedData}
+                       cols={this.state.columns}
+                       jupyter={true}
+                       getCode={(code) => this.onReceiveCode(code)}/>
+              </Spin>
             </Modal>
           </div>
           <div style={{ display: 'flex', flexDirection: 'row' }}>
@@ -366,8 +377,6 @@ class JupyterNotebook extends React.Component {
 
 JupyterNotebook.propTypes = {
   project_id: PropTypes.string,
-  dataset_id: PropTypes.string,
-  dataset_name: PropTypes.string,
   user_id: PropTypes.string,
   project_name: PropTypes.string,
   notebook_content: PropTypes.any,

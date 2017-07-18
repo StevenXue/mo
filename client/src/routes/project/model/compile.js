@@ -21,7 +21,7 @@ export default class Compile extends React.Component {
   componentDidMount(){
     console.log(this.props.compile);
     this.setState({compile: this.props.compile});
-    if(this.props.compile.length){
+    if(this.props.compile){
       let compile = this.props.compile;
       let values = {}
       compile.map((e) => {

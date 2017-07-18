@@ -19,50 +19,36 @@ export default class CustomFields extends React.Component {
   }
 
   componentWillReceiveProps(nextProps){
-    this.setState({fields: nextProps.fields});
+    this.setState({fields: nextProps.custom});
+  }
+
+  onChange(ref){
+    let value = parseInt(ReactDOM.findDOMNode(this.refs[ref.name]).value)
+
+    if(ref.type.key === 'int') {
+      value = parseInt(value);
+    }else if(ref.type.key === 'float') {
+      value = parseFloat(value);
+    }
+
+    this.props.getEstimator(ref.name, value);
   }
 
   renderParams(type){
     switch (type.type.key){
-      case 'choice':
-        return (
-          <Select defaultValue={type.default} ref={type.name} style={{width: 200}} onChange={(value) => this.onSelectSingle(type.name, value)}>
-            {
-              type.type.range.map((e) =>
-                <Option key={e} value={e}>
-                  {e}
-                </Option>
-              )
-            }
-          </Select>
-        );
-
-      case 'choices':
-        return (
-          <Select mode="multiple" defaultValue={type.default} ref={type.name} style={{width: 200}} onChange={(value) => this.onSelectMultiple(type.name, value)}>
-            {
-              type.type.range.map((e) =>
-                <Option key={e} value={e}>
-                  {e}
-                </Option>
-              )
-            }
-          </Select>
-        );
-
       case 'string':
         return (
-          <Input ref={type.name} style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+          <Input ref={type.name} style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}} onChange={() => this.onChange(type)} />
         );
 
       case 'int':
         return (
-          <Input ref={type.name} style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+          <Input ref={type.name} style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}} onChange={() => this.onChange(type)} />
         );
 
       case 'float':
         return (
-          <Input ref={type.name} style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+          <Input ref={type.name} style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}} onChange={() => this.onChange(type)} />
         );
 
       default:

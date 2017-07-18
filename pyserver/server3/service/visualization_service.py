@@ -19,13 +19,12 @@ import numpy as np
 def usr_story1_exploration(data, d_type, group_num=10):
     # 转换，把所有键值对里的值变成一个数组返回(arr_temp)
     # print (type(data))
-    if d_type == 'integer':
+    if d_type == 'integer' or d_type == 'int':
         arr_temp = [int(list(arr.values())[0]) for arr in data if isNaN(list(arr.values())[0]) == False and list(arr.values())[0] != '']
     elif d_type == 'float':
         arr_temp = [float(list(arr.values())[0]) for arr in data if isNaN(list(arr.values())[0]) == False and list(arr.values())[0] != '']
-    elif d_type == 'string':
+    elif d_type == 'string' or d_type == 'str':
         arr_temp = [list(arr.values())[0] for arr in data if isNaN(list(arr.values())[0]) == False and list(arr.values())[0] != '']
-    print ('arr_temp', arr_temp)
 
     # 生成的dict有4栏:
     # 数值类型 'type',

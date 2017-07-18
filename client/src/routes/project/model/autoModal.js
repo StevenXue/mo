@@ -22,6 +22,7 @@ export default class AutomatedModel extends React.Component {
       loading: false,
       statusStack: [true],
       columns: [],
+      //custom: {}
     }
   }
 
@@ -55,7 +56,7 @@ export default class AutomatedModel extends React.Component {
       },
     }).then((response) => response.json())
       .then((res) => {
-          //console.log(res, selectedName, values);
+
           this.setState({
             cols: res.response.col,
             row: res.response.row,
@@ -64,6 +65,7 @@ export default class AutomatedModel extends React.Component {
             tags: res.response.tags,
             loading: false
           });
+          console.log(res.response);
           let c = Object.keys(res.response.data[1]);
           this.setState({columns: c, loading: false});
         },
