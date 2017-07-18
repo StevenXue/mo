@@ -9,6 +9,21 @@ import Layer from './layer'
 import Compile from './compile'
 const Option = Select.Option;
 import Visual from './realTime';
+import Estimator from './customFields';
+
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+function isEmpty(obj) {
+  if (obj == null) return true;
+  if (obj.length > 0)    return false;
+  if (obj.length === 0)  return true;
+  if (typeof obj !== "object") return true;
+  for (var key in obj) {
+    if (hasOwnProperty.call(obj, key)) return false;
+  }
+
+  return true;
+}
 
 export default class ModelForms extends React.Component {
   constructor (props) {
@@ -27,27 +42,27 @@ export default class ModelForms extends React.Component {
       visible: false,
       ioData: {},
       end: false,
+      custom: {},
+      customParams: {}
     }
   }
 
-
   componentDidMount(){
-    console.log("is jupyter", this.props.jupyter);
+    //console.log("modal data", this.props.data)
     this.setState({
       layer: this.props.data.layers,
       compile: this.props.data.compile,
       evaluate: this.props.data.evaluate,
       fit: this.props.data.fit,
-      divide: this.props.divide
+      divide: this.props.divide,
+      custom: this.props.data.estimator,
     });
 
-    let socket = io.connect(flaskServer+ '/log');
-
+    let socket = io.connect(flaskServer+ '/log/' + this.props.project_id);
     socket.on('log_epoch_end', (msg) => {
-      //console.log(msg);
-      this.timer = setTimeout(()=> this.setState({ioData: msg}), 500);
-      //this.setState({ioData: msg});
+      this.setState({ioData: msg});
     });
+
   }
 
   componentWillReceiveProps(nextProps){
@@ -56,7 +71,8 @@ export default class ModelForms extends React.Component {
       compile: nextProps.data.compile,
       evaluate: nextProps.data.evaluate,
       fit: nextProps.data.fit,
-      divide: nextProps.divide
+      divide: nextProps.divide,
+      custom: nextProps.data.estimator
     });
   }
 
@@ -69,7 +85,6 @@ export default class ModelForms extends React.Component {
   getParams(index, value) {
     let layer = this.state.layerParams;
     layer[index] = value;
-    console.log(layer);
     this.setState({layerParams: layer});
   }
 
@@ -79,32 +94,78 @@ export default class ModelForms extends React.Component {
   }
 
   constructParams(){
+    //console.log(this.state.compileParams);
     let run_params = {};
     run_params['layers'] = this.state.layerParams;
-    run_params['compile'] = this.state.compileParams;
-    run_params['fit'] = {
-      'x_train': this.props.divide.source,
-      'y_train': this.props.divide.target,
-      'args': {
-        'batch_size': parseInt(ReactDOM.findDOMNode(this.refs.batch).value),
-        'epochs': parseInt(ReactDOM.findDOMNode(this.refs.epoch).value)
+    //run_params['compile'] = this.state.compileParams;
+    run_params['compile'] = {
+      'args' : {}
+    }
+
+    run_params['compile']['args'] = this.state.compileParams;
+    if(this.props.data.fit.data_fields.type.key === 'transfer_box'){
+      run_params['fit'] = {
+        'data_fields':[
+          this.props.divide.source,
+          this.props.divide.target
+        ],
+        'args': {
+        }
       }
-    };
-    run_params['evaluate'] = {
-      'x_test': this.props.divide.source,
-      'y_test': this.props.divide.target,
-      'args': {
-        'batch_size': parseInt(ReactDOM.findDOMNode(this.refs.batch_evaluate).value)
+    }else{
+      run_params['fit'] = {
+        'data_fields': this.props.divide.target,
+        'args': {
+        }
       }
     }
+
+    run_params['evaluate'] = {
+      'args': {}
+    };
+
+    this.state.fit['args'].map((e) =>{
+        run_params['fit']['args'][e.name] = parseInt(ReactDOM.findDOMNode(this.refs['fit_' + e.name]).value)
+      }
+    );
+
+    this.state.evaluate['args'].map((e) =>
+      run_params['evaluate']['args'][e.name] = parseInt(ReactDOM.findDOMNode(this.refs['evaluate_' + e.name]).value)
+    );
+
+    if(!isEmpty(this.state.custom)){
+      let customParams = this.state.customParams;
+      let keys = Object.keys(customParams);
+
+      run_params['estimator'] = {
+        'args' : []
+      }
+
+      this.state.custom['args'].map((el) =>
+        {
+          if(keys.indexOf(el.name) !== -1){
+            run_params.estimator.args.push({
+              [el.name] : customParams[el.name]
+            })
+          }else{
+            if(el.required === true || !customParams[el.name]){
+              console.log(el);
+              run_params.estimator.args.push({
+                [el.name] : el.default
+              })
+            }
+          }
+        }
+      )
+    }
+
     return run_params
   }
 
   onClickRun(){
     if(this.props.jupyter){
-      //console.log("get code");
-      //this.props.getCode("this is code");
       let run_params = this.constructParams();
+      console.log("jupyter", this.props.dataset_id);
       fetch(flaskServer + '/model/models/to_code/' + this.props.model_id, {
         method: 'post',
         headers: {
@@ -138,56 +199,92 @@ export default class ModelForms extends React.Component {
         }).then((response) => response.json())
           .then((res) => {
             if (res.response === 'success') {
-              //console.log("model result", res);
-              this.setState({end: true});
               message.success(res.response);
             }
-            this.setState({end: true});
+            this.setTimeout(this.setState({end: true}),500)
           })
       }
     }
 
   }
 
+  getEstimator(field, value){
+    let customParams = this.state.customParams;
+    customParams[field] = value;
+    this.setState({customParams});
+  }
+
   render() {
     return (
       <div style={{width: '100%', display:'flex', flexDirection: 'row'}}>
         <div style={{width: '50%', height: '100%'}}>
-          <p style={{color: '#108ee9'}}>Layer</p>
           <div>
-            { this.state.layer &&
-              this.state.layerStack.map((el) =>
-                <Layer layers={this.state.layer} key={el} getParams={(value) => this.getParams(el, value)}/>
-              )
+            <p style={{color: '#108ee9'}}>Layer</p>
+            {
+              !this.state.layer &&
+              <p >Layers not required</p>
             }
-            <Button style={{marginTop: 10}} size="small" onClick={() => this.addLayer()}>Add Layer</Button>
+            { this.state.layer &&
+              <div>
+                  {this.state.layerStack.map((el) =>
+                    <Layer layers={this.state.layer} key={el} getParams={(value) => this.getParams(el, value)}/>
+                  )}
+                <Button style={{marginTop: 10}} size="small" onClick={() => this.addLayer()}>Add Layer</Button>
+              </div>
+
+            }
           </div>
+          {
+            !isEmpty(this.state.custom) &&
+            <Estimator custom={this.state.custom['args']} getEstimator={(field, value) => this.getEstimator(field, value)} />
+          }
         </div>
-        <div style={{width: '40%'}}>
-          <p style={{color: '#108ee9'}}>Compile</p>
+        <div style={{width: '44%'}}>
           <div >
             { this.state.compile &&
-              <Compile compile={this.state.compile} getParams={(value) => this.getCompileParams(value)}/>
+              <div>
+                <p style={{color: '#108ee9'}}>Compile</p>
+                <Compile compile={this.state.compile['args']} getParams={(value) => this.getCompileParams(value)}/>
+              </div>
             }
           </div>
-            <p style={{color: '#108ee9', marginTop: 10}}>Fit</p>
-            <div style={{display: 'flex', flexDirection: 'row'}}>
-              <div>
-                <span>{"Batch Size: "}</span>
-                <Input ref='batch' style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
-              </div>
-              <div>
-                <span>{"Epoch: "}</span>
-                <Input ref='epoch' style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+          {!isEmpty(this.state.fit) &&
+            <div>
+              <p style={{color: '#108ee9', marginTop: 5}}>Fit</p>
+              <div >
+                {
+                  this.state.fit.args.map((el) => (
+                      <div key={'fit_'+ el.name}>
+                        <span style={{width: 100}}>{el.name + " : "}</span>
+                        <Input ref={'fit_'+ el.name}
+                               style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+                      </div>
+                    )
+                  )
+                }
               </div>
             </div>
+          }
           <div>
           </div>
-          <p style={{color: '#108ee9', marginTop: 10}}>Evaluate</p>
-          <div>
-            <span>{"Batch Size: "}</span>
-            <Input ref='batch_evaluate' style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
-          </div>
+          {
+            !isEmpty(this.state.evaluate) &&
+            <div>
+              <p style={{color: '#108ee9', marginTop: 5}}>Evaluate</p>
+              <div>
+                {
+                 this.state.evaluate.args.map((el) => (
+                   <div key={'fit_'+ el.name}>
+                     <span style={{width: 100}}>{el.name + " : "}</span>
+                      <Input ref={'evaluate_'+ el.name}
+                      style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+                   </div>
+                   )
+                 )
+                }
+              </div>
+            </div>
+          }
           <Button type='primary' style={{ marginTop: 30}} onClick={() => this.onClickRun()}>
             <Icon type="area-chart" />
             {this.state.end? "View":"Run"}
@@ -198,7 +295,7 @@ export default class ModelForms extends React.Component {
                  onOk={() => this.setState({visible: false})}
                  onCancel={() => this.setState({visible: false})}
                   >
-                  <Visual data={this.state.ioData}/>
+                  <Visual data={this.state.ioData} end={this.state.end}/>
           </Modal>
         </div>
       </div>

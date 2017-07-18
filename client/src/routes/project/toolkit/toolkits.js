@@ -266,11 +266,8 @@ export default class Toolkit extends React.Component {
       case  0:
         return(
           <div style={{marginTop: 10, marginLeft: 5, width: '25%'}}>
-            <Select className="toolkit"
-                    style={{ width: '100%' }}
-                    onChange={(e) => this.handleChange(e)}
-                    placeholder="Choose Method"
-                    allowClear>
+            <Select className="toolkit" style={{ width: '100%' }} onChange={(e) => this.handleChange(e)}
+                         placeholder="Choose Method" allowClear>
               {this.renderOptions()}
             </Select>
           </div>

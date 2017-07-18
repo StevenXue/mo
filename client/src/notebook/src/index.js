@@ -93,8 +93,6 @@ export class Notebook extends React.Component {
     if(prevState.notebook === undefined && this.props.spawn_new === true){
       let source = `# this is the id of the project you are editting \n` +
         `project_id = "${this.props.project_id}" \n` +
-        `dataset_id = "${this.props.dataset_id}" \n` +
-        `dataset_name = "${this.props.dataset_name}" \n` +
         "# you might need to use it some where in your code\n"+
         "import os\n"+
         "import sys\n"+
