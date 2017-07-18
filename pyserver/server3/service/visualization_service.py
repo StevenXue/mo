@@ -51,7 +51,7 @@ def usr_story1_exploration(data, d_type, group_num=10):
         info_dict['freq_hist'] = {'x_domain': x_domain.tolist(), 'y_domain': (y_domain*1000).round(3).tolist()}
         flag, p_value, standard_norm_value = hypo_test(arr_array, mean, std, x_domain, 'norm')
         info_dict['hypo'] = {'flag': flag, 'p_value': p_value, 'standard_norm_value': standard_norm_value}
-    elif d_type == 'string':
+    elif d_type == 'string' or d_type == 'str':
         seta = set(arr_temp)
         info_dict['freq_hist'] = [{'text': el, 'value': arr_temp.count(el)} for el in seta if arr_temp.count(el) > 1]
         # info_dict['freq_hist'] = [{'name': key, 'value': len(list(group))} for key, group in groupby(arr_temp)]
