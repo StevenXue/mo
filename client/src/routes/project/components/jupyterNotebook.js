@@ -71,7 +71,7 @@ class JupyterNotebook extends React.Component {
 
   componentDidMount() {
     this.attachChannels()
-    let socket = io.connect(flaskServer+ '/log');
+    let socket = io.connect(flaskServer+ '/log/' + this.props.project_id );
 
     socket.on('log_epoch_end', (msg) => {
       this.setState({ioData: msg});

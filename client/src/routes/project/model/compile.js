@@ -27,7 +27,7 @@ export default class Compile extends React.Component {
       compile.map((e) => {
         values[e.name] = e.default;
       });
-      console.log(values);
+      //console.log(values);
       this.setState({values});
     }
   }
