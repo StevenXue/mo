@@ -139,7 +139,7 @@ def keras_seq_to_str(obj, head_str, **kw):
     # fit
     str_model += "model.fit(x_train, y_train,  validation_data=(x_test, " \
                  "y_test), \\\ncallbacks=[batch_print_callback], " + \
-                 get_args(f)[:-2] + ")\n"
+                 get_args(f)[:-2] + ", verbose=0)\n"
     str_model += "score = model.evaluate(x_test, y_test, " + get_args(e)[
                                                              :-2] + ")\n"
     return str_model

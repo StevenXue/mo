@@ -193,6 +193,7 @@ def model_to_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
         head_str += 'from server3.business import staging_data_set_business\n'
         head_str += 'from server3.business import staging_data_business\n'
         head_str += 'from server3.service import staging_data_service\n'
+        head_str += "from server3.service import job_service\n"
         head_str += 'from server3.service.model_service import ' \
                     'split_categorical_and_continuous\n'
         head_str += 'from server3.service.custom_log_handler ' \
@@ -325,7 +326,6 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
     y_str = line_split_for_long_fields(y_str)
     code_str += x_str
     code_str += y_str
-    code_str += "from server3.service import job_service\n"
     code_str += "obj = job_service.split_supervised_input(" \
                 "staging_data_set_id, x_fields, y_fields, schema)\n"
     code_str += "x_train = obj['x_tr']\n"
