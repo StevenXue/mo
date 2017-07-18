@@ -7,6 +7,7 @@ Need to be FIXED, further think of how to save
 from mongoengine import connect
 
 from server3.repository import config
+
 connect(
     db=config.get_mongo_db(),
     username=config.get_mongo_user(),

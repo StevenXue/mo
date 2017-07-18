@@ -21,6 +21,7 @@ def log_train_end(*args, **kw):
 def save_log(event, n, logs, result_sds, project_id):
     if result_sds is None:
         raise ValueError('no result sds id')
+
     kw = {'n': n, 'event': event}
     kw.update(logs)
     staging_data_business.add(result_sds, kw)

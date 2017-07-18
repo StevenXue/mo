@@ -77,63 +77,63 @@ def convert_to_json(data):
     return json_utility.convert_to_json(data)
 
 
-# 从 Mongodb中读取数据并转到 pandas dataframe 或 Array格式
-
-import pandas as pd
-from pymongo import MongoClient
-
-
-def _connect_mongo(host, port, username, password, db):
-    """ A util for making a connection to mongo """
-
-    if username and password:
-        mongo_uri = 'mongodb://%s:%s@%s:%s/%s' % (
-        username, password, host, port, db)
-        conn = MongoClient(mongo_uri)
-    else:
-        conn = MongoClient(host, port)
-
-    return conn[db]
-
-
-def read_mongo(db, collection, field=None, query={}, host='localhost',
-               port=27017,
-               username=None, password=None, no_id=True, read_type="Array"):
-    """ Read from Mongo and Store into DataFrame """
-
-    # Connect to MongoDB
-    db = _connect_mongo(host=host, port=port, username=username,
-                        password=password, db=db)
-    if field is None:
-        cursor = db[collection].find(query)
-    else:
-        # 将要转得 field  从list 转到 dic，以便find函数使用
-        temp_ = dict(zip(field, [1] * len(field)))
-        # Make a query to the specific DB and Collection
-        cursor = db[collection].find(query, temp_)
-        # field 数
-        field_num = len(field)
-    # document 数
-    document_num = cursor.count()
-
-    if read_type == "DataFrame":
-        # Expand the cursor and construct the DataFrame
-        df = pd.DataFrame(list(cursor))
-
-        # Delete the _id
-        if no_id:
-            del df['_id']
-        return df
-    elif read_type == "Array":
-        arrays = []
-        cursor = [c for c in cursor]
-        #         arrays=[[c[field[i]] for c in cursor] for i in range(field_num)]
-        if field is None:
-            field = [k for k, v in cursor[0].items()]
-            field.remove("_id")
-            field_num = len(field)
-        arrays = [[c[field[i]] for c in cursor] for i in range(field_num)]
-        return arrays
+# # 从 Mongodb中读取数据并转到 pandas dataframe 或 Array格式
+#
+# import pandas as pd
+# from pymongo import MongoClient
+#
+#
+# def _connect_mongo(host, port, username, password, db):
+#     """ A util for making a connection to mongo """
+#
+#     if username and password:
+#         mongo_uri = 'mongodb://%s:%s@%s:%s/%s' % (
+#         username, password, host, port, db)
+#         conn = MongoClient(mongo_uri)
+#     else:
+#         conn = MongoClient(host, port)
+#
+#     return conn[db]
+#
+#
+# def read_mongo(db, collection, field=None, query={}, host='localhost',
+#                port=27017,
+#                username=None, password=None, no_id=True, read_type="Array"):
+#     """ Read from Mongo and Store into DataFrame """
+#
+#     # Connect to MongoDB
+#     db = _connect_mongo(host=host, port=port, username=username,
+#                         password=password, db=db)
+#     if field is None:
+#         cursor = db[collection].find(query)
+#     else:
+#         # 将要转得 field  从list 转到 dic，以便find函数使用
+#         temp_ = dict(zip(field, [1] * len(field)))
+#         # Make a query to the specific DB and Collection
+#         cursor = db[collection].find(query, temp_)
+#         # field 数
+#         field_num = len(field)
+#     # document 数
+#     document_num = cursor.count()
+#
+#     if read_type == "DataFrame":
+#         # Expand the cursor and construct the DataFrame
+#         df = pd.DataFrame(list(cursor))
+#
+#         # Delete the _id
+#         if no_id:
+#             del df['_id']
+#         return df
+#     elif read_type == "Array":
+#         arrays = []
+#         cursor = [c for c in cursor]
+#         #         arrays=[[c[field[i]] for c in cursor] for i in range(field_num)]
+#         if field is None:
+#             field = [k for k, v in cursor[0].items()]
+#             field.remove("_id")
+#             field_num = len(field)
+#         arrays = [[c[field[i]] for c in cursor] for i in range(field_num)]
+#         return arrays
 
 
 def get_staging_data_pandas(staging_data_set_id):
@@ -151,30 +151,31 @@ def get_staging_data_pandas(staging_data_set_id):
 
 
 if __name__ == '__main__':
-    # test  环境：win10，py3  所需包：pandas，pymongo，
-    # 1.启动mongodb服务
-    # 启动 cmd 后输入 mongod.exe --dbpath c:\data\db
-    # 2.csv传入 mongodb数据库中
-    # 上传 location.csv 文件到 mongodb中, db名取为 test ，collection名取为 location
-    # 新打开 一个cmd ，输入
-    # mongoimport --db test --collection location --type csv --file location.csv --headerline
-    # 3.mongodb 导出到 pandas.DataFrame
-    print("********************************")
-    print("DataFrame格式:")
-    print("用户特定请求某些field：")
-    print(read_mongo('test', 'location', ["Name", "Age", "City"],
-                     read_type="DataFrame"))
-    print("")
-    print("用户不指定field，返回所有：")
-    print(read_mongo('test', 'location', read_type="DataFrame"))
-    print("")
-    # # 4.mongodb 导出到 Array
-    print("****************")
-    print("Array格式:")
-    print("用户特定请求某些field：")
-    print(read_mongo('test', 'location', ["Name", "Age", "City"],
-                     read_type="Array"))
-    print("")
-    print("用户不指定field，返回所有：")
-    print(read_mongo('test', 'location', read_type="Array"))
-    print("")
+    pass
+    # # test  环境：win10，py3  所需包：pandas，pymongo，
+    # # 1.启动mongodb服务
+    # # 启动 cmd 后输入 mongod.exe --dbpath c:\data\db
+    # # 2.csv传入 mongodb数据库中
+    # # 上传 location.csv 文件到 mongodb中, db名取为 test ，collection名取为 location
+    # # 新打开 一个cmd ，输入
+    # # mongoimport --db test --collection location --type csv --file location.csv --headerline
+    # # 3.mongodb 导出到 pandas.DataFrame
+    # print("********************************")
+    # print("DataFrame格式:")
+    # print("用户特定请求某些field：")
+    # print(read_mongo('test', 'location', ["Name", "Age", "City"],
+    #                  read_type="DataFrame"))
+    # print("")
+    # print("用户不指定field，返回所有：")
+    # print(read_mongo('test', 'location', read_type="DataFrame"))
+    # print("")
+    # # # 4.mongodb 导出到 Array
+    # print("****************")
+    # print("Array格式:")
+    # print("用户特定请求某些field：")
+    # print(read_mongo('test', 'location', ["Name", "Age", "City"],
+    #                  read_type="Array"))
+    # print("")
+    # print("用户不指定field，返回所有：")
+    # print(read_mongo('test', 'location', read_type="Array"))
+    # print("")

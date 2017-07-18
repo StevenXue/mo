@@ -16,6 +16,7 @@ from server3.business import project_business
 from server3.utility import json_utility
 
 PREFIX = '/project'
+DEFAULT_CAT = ['model', 'toolkit']
 
 project_app = Blueprint("project_app", __name__, url_prefix=PREFIX)
 
@@ -52,6 +53,26 @@ def list_projects():
                                                      e.args)}), 400)
         return jsonify({'response': result}), 200
     return jsonify({'response': 'insufficient arguments'}), 400
+
+
+@project_app.route('/jobs/<string:project_id>', methods=['GET'])
+def get_jobs_of_project(project_id):
+    categories = request.args.get('categories')
+    if categories is None:
+        categories = DEFAULT_CAT
+    else:
+        categories = categories.split(',')
+    for c in categories:
+        if c not in DEFAULT_CAT:
+            raise NameError('categories arg error')
+    try:
+        history_jobs = project_service.get_all_jobs_of_project(project_id,
+                                                               categories)
+        history_jobs = json_utility.convert_to_json(history_jobs)
+    except Exception as e:
+        return (jsonify({'response': '%s: %s' % (str(Exception),
+                                                 e.args)}), 400)
+    return jsonify({'response': history_jobs}), 200
 
 
 @project_app.route('/projects', methods=['POST'])

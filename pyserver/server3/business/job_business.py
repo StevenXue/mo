@@ -29,6 +29,10 @@ def get_by_job_model(model):
     # return job_repo.read_by_model(job_obj)
 
 
+def get_by_project(project):
+    return job_repo.read_by_unique_field('project', project)
+
+
 def get_by_job_toolkit(toolkit):
     # job_obj = Job(toolkit=toolkit)
     return job_repo.read_by_unique_field('toolkit', toolkit)
@@ -47,7 +51,7 @@ def get_by_job_status(job_status):
     return job_repo.read_by_unique_field('job_status', job_status)
 
 
-def add_toolkit_job(toolkit_obj, staging_data_set_obj, *argv):
+def add_toolkit_job(toolkit_obj, staging_data_set_obj, project_obj, *argv):
     """toolkit is a obj"""
     # job = job_obj['staging_data_set'] or job_obj['model'] or job_obj['toolkit']
     # if not 0 < len(toolkit_obj.items()) <= 1:
@@ -56,11 +60,12 @@ def add_toolkit_job(toolkit_obj, staging_data_set_obj, *argv):
 
     job_obj = Job(status=0, toolkit=toolkit_obj,
                   staging_data_set=staging_data_set_obj,
+                  project=project_obj,
                   create_time=time, fields=argv if argv else None)
     return job_repo.create(job_obj)
 
 
-def add_model_job(model_obj, staging_data_set_obj, *argv):
+def add_model_job(model_obj, staging_data_set_obj, project_obj, **kwargs):
     """
 
     :param model_obj:
@@ -72,7 +77,8 @@ def add_model_job(model_obj, staging_data_set_obj, *argv):
 
     job_obj = Job(status=0, model=model_obj,
                   staging_data_set=staging_data_set_obj,
-                  create_time=now, fields=argv if argv else None)
+                  project=project_obj,
+                  create_time=now, **kwargs)
     return job_repo.create(job_obj)
 
 

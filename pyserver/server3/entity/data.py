@@ -3,11 +3,11 @@
 from mongoengine import DynamicDocument
 from mongoengine import ReferenceField
 
-from server3.entity.data_set import DataSet
+# from server3.entity import DataSet
 
 
 class Data(DynamicDocument):
-    data_set = ReferenceField(DataSet, required=True)
+    data_set = ReferenceField('DataSet', required=True)
     # value = FloatField()
     # time = DateTimeField()
 

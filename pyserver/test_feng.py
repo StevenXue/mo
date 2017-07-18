@@ -32,13 +32,9 @@
 # socketio = SocketIO(message_queue='redis://')
 # socketio.emit('log_epoch_end', {'step': 111, 'loss': 222, 'acc': 333},
 #               namespace='/log')
-import numpy as np
-import tensorflow as tf
-# from tensorflow.python.framework import constant_op
-# from sklearn.datasets.samples_generator import make_blobs
-# X, y = make_blobs(n_samples=50, centers=4,
-#                   random_state=2, cluster_std=0.60,n_features=2)
-# print(constant_op.constant(X.astype(np.float32)))
-a = [[1],[2],[3]]
-b = [[4],[5],[6]]
-print(tf.concat((a,b), 1))
+from bson import ObjectId
+from server3.business import project_business
+from server3.service import project_service
+from server3.utility import json_utility
+
+jobs = project_service.get_all_jobs_of_project(ObjectId("596e2c79d123ab3599649e28"))

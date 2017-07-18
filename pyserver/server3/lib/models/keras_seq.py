@@ -1,13 +1,12 @@
 # -*- coding: UTF-8 -*-
-# Generate dummy data
 import numpy as np
 from keras import layers
 from keras.callbacks import LambdaCallback
 from keras.models import Sequential
 import tensorflow as tf
 from server3.service import logger
-from server3.utility import json_utility
 from server3.utility.str_utility import generate_args_str
+from server3.lib.models.keras_callbacks import MyModelCheckpoint
 
 global graph
 graph = tf.get_default_graph()
@@ -59,17 +58,21 @@ def keras_seq(conf, input, **kw):
         # compile
         model.compile(**comp['args'])
 
+        # callback to save metrics
         batch_print_callback = LambdaCallback(on_epoch_end=
                                               lambda epoch, logs:
                                               logger.log_epoch_end(epoch, logs,
                                                                    result_sds,
                                                                    project_id))
+        # checkpoint to save best weight
+        checkpoint = MyModelCheckpoint(result_sds=result_sds, verbose=0,
+                                       save_best_only=True)
 
         # training
         # TODO callback 改成异步，考虑 celery
         history = model.fit(x_train, y_train,
                             validation_data=(x_val, y_val),
-                            callbacks=[batch_print_callback],
+                            callbacks=[batch_print_callback, checkpoint],
                             verbose=0,
                             **f['args'])
 
@@ -79,8 +82,10 @@ def keras_seq(conf, input, **kw):
         config = model.get_config()
         logger.log_train_end(result_sds,
                              weights=[weight.tolist() for weight in weights],
-                             config=config,
-                             score=score)
+                             model_config=config,
+                             score=score,
+                             history=history.history)
+
         return {'score': score, 'history': history.history}
 
 
@@ -423,65 +428,65 @@ KERAS_SEQ_SPEC = {
     ],
     "compile": {
         'args': [
-                {
-                    "name": "loss",
-                    "type": {
-                        "key": "choice",
-                        "des": "A loss function (or objective function, or "
-                               "optimization score function) is one of the two "
-                               "parameters required to compile a model",
-                        "range": ["mean_squared_error",
-                                  "mean_absolute_error",
-                                  "mean_absolute_percentage_error",
-                                  "mean_squared_logarithmic_error",
-                                  "squared_hinge",
-                                  "hinge",
-                                  "categorical_hinge",
-                                  "logcosh",
-                                  "categorical_crossentropy",
-                                  "sparse_categorical_crossentropy",
-                                  "binary_crossentropy",
-                                  "kullback_leibler_divergence",
-                                  "poisson",
-                                  "cosine_proximity"]
-                    },
-                    "default": "categorical_crossentropy",
-                    "required": True
+            {
+                "name": "loss",
+                "type": {
+                    "key": "choice",
+                    "des": "A loss function (or objective function, or "
+                           "optimization score function) is one of the two "
+                           "parameters required to compile a model",
+                    "range": ["mean_squared_error",
+                              "mean_absolute_error",
+                              "mean_absolute_percentage_error",
+                              "mean_squared_logarithmic_error",
+                              "squared_hinge",
+                              "hinge",
+                              "categorical_hinge",
+                              "logcosh",
+                              "categorical_crossentropy",
+                              "sparse_categorical_crossentropy",
+                              "binary_crossentropy",
+                              "kullback_leibler_divergence",
+                              "poisson",
+                              "cosine_proximity"]
                 },
-                {
-                    "name": "optimizer",
-                    "type": {
-                        "key": "choice",
-                        "des": "An optimizer is one of the two arguments required for "
-                               "compiling a Keras model",
-                        "range": ["sgd",
-                                  "rmsprop",
-                                  "adagrad",
-                                  "adadelta",
-                                  "adam",
-                                  "adamax",
-                                  "nadam"]
-                    },
-                    "default": "sgd",
-                    "required": True
+                "default": "categorical_crossentropy",
+                "required": True
+            },
+            {
+                "name": "optimizer",
+                "type": {
+                    "key": "choice",
+                    "des": "An optimizer is one of the two arguments required for "
+                           "compiling a Keras model",
+                    "range": ["sgd",
+                              "rmsprop",
+                              "adagrad",
+                              "adadelta",
+                              "adam",
+                              "adamax",
+                              "nadam"]
                 },
-                {
-                    "name": "metrics",
-                    "type": {
-                        "key": "choices",
-                        "des": "A metric is a function that is used to judge the "
-                               "performance of your model",
-                        "range": ["acc",
-                                  "mse",
-                                  "mae",
-                                  "mape",
-                                  "msle",
-                                  "cosine"]
-                    },
-                    "default": [],
-                    "required": False
+                "default": "sgd",
+                "required": True
+            },
+            {
+                "name": "metrics",
+                "type": {
+                    "key": "choices",
+                    "des": "A metric is a function that is used to judge the "
+                           "performance of your model",
+                    "range": ["acc",
+                              "mse",
+                              "mae",
+                              "mape",
+                              "msle",
+                              "cosine"]
                 },
-            ],
+                "default": [],
+                "required": False
+            },
+        ],
     },
     "fit": {
         "data_fields": {
