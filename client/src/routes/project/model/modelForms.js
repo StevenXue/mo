@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
-import { Button, Input, Spin, Select, Icon , message, Modal} from 'antd';
+import { Button, Input, Spin, Select, Icon , message, Modal, Popover} from 'antd';
 import io from 'socket.io-client';
 import { flaskServer } from '../../../constants';
 import Layer from './layer'
@@ -166,7 +166,7 @@ export default class ModelForms extends React.Component {
   onClickRun(){
     if(this.props.jupyter){
       let run_params = this.constructParams();
-      console.log("jupyter", this.props.dataset_id);
+      //console.log("jupyter", this.props.dataset_id);
       fetch(flaskServer + '/model/models/to_code/' + this.props.model_id, {
         method: 'post',
         headers: {
@@ -180,6 +180,7 @@ export default class ModelForms extends React.Component {
         })
       }).then((response) => response.json())
         .then((res) => {
+          this.setState({visible: false});
           this.props.getCode(res.response);
         })
     }else{
@@ -240,7 +241,7 @@ export default class ModelForms extends React.Component {
             <Estimator custom={this.state.custom['args']} getEstimator={(field, value) => this.getEstimator(field, value)} />
           }
         </div>
-        <div style={{width: '44%'}}>
+        <div style={{width: '46%'}}>
           <div >
             { this.state.compile &&
               <div>
@@ -256,9 +257,14 @@ export default class ModelForms extends React.Component {
                 {
                   this.state.fit.args.map((el) => (
                       <div key={'fit_'+ el.name}>
-                        <span style={{width: 100}}>{el.name + " : "}</span>
+                        <span style={{width: 150}}>{el.name + " : "}</span>
                         <Input ref={'fit_'+ el.name}
                                style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+                        <Popover content={<div>
+                          <p style={{width: 150}}>{el.type.des}</p>
+                        </div>} title="Description">
+                          <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5}}/>
+                        </Popover>
                       </div>
                     )
                   )
@@ -276,9 +282,14 @@ export default class ModelForms extends React.Component {
                 {
                  this.state.evaluate.args.map((el) => (
                    <div key={'fit_'+ el.name}>
-                     <span style={{width: 100}}>{el.name + " : "}</span>
+                     <span style={{width: 200}}>{el.name + " : "}</span>
                       <Input ref={'evaluate_'+ el.name}
                       style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+                     <Popover content={<div>
+                       <p style={{width: 150}}>{el.type.des}</p>
+                     </div>} title="Description">
+                       <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5}}/>
+                     </Popover>
                    </div>
                    )
                  )
@@ -287,8 +298,8 @@ export default class ModelForms extends React.Component {
             </div>
           }
           <Button type='primary' style={{ marginTop: 30}} onClick={() => this.onClickRun()}>
-            <Icon type="area-chart" />
-            {this.state.end? "View":"Run"}
+            <Icon type="area-chart" />{this.props.jupyter? "GetCode" : this.state.end? "View":"Run"}
+
           </Button>
           <Modal title="Result"
                  width={700}

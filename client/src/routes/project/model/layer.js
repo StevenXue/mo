@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
-import { Button, message, Input, Select, Modal, InputNumber} from 'antd';
+import { Button, message, Input, Select, Modal, Popover, Icon} from 'antd';
 import { flaskServer } from '../../../constants';
 const Option = Select.Option;
 
@@ -114,6 +114,11 @@ export default class Layer extends React.Component {
             choices.push(
               <div key={e.name} style={{display: 'flex', flexDirection: 'row', marginBottom: 20}}>
                 <span style={{color: '#108ee9' , fontSize: 14}}>{e.name + ": "}</span>
+                <Popover content={<div>
+                  <p style={{width: 150}}>{e.type.des}</p>
+                </div>} title="Description">
+                  <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5, color: '#767676'}}/>
+                </Popover>
                 <Input ref={e.name} style={{marginLeft: 10, width: 150, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
               </div>
             );
@@ -129,12 +134,18 @@ export default class Layer extends React.Component {
             choices.push(
               <div key={e.name} style={{display: 'flex', flexDirection: 'column', marginBottom: 20}}>
                 <div>
-                  <p style={{color: '#108ee9', fontSize: 14}}>{e.name + ': '}</p>
+                  <span style={{color: '#108ee9', fontSize: 14}}>{e.name + ': '}</span>
+                  <Popover content={<div>
+                    <p style={{width: 180}}>{e.type.des}</p>
+                  </div>} title="Description">
+                    <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5, color: '#767676'}}/>
+                  </Popover>
                   {
                     max !== 0 &&
                       <p style={{color: '#b3b3b3', fontSize: 12}}>{'at least ' + min + ' elements, at most ' + max + ' elements.'}</p>
                   }
                   <p style={{color: '#b3b3b3', fontSize: 12}}>{'multiple integer is required, divide by a comma'}</p>
+
                 </div>
                 <Input ref={e.name} style={{width: 150, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
               </div>
@@ -144,6 +155,11 @@ export default class Layer extends React.Component {
             choices.push(
               <div style={{width: 200, marginBottom: 20}} key={e.name}>
                 <span style={{color: '#108ee9', fontSize: 14}}>{e.name}</span>
+                <Popover content={<div>
+                  <p style={{width: 180}}>{e.type.des}</p>
+                </div>} title="Description">
+                  <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5, color: '#767676'}}/>
+                </Popover>
                 <Select defaultValue={e.default} ref={e.name} style={{width: 150}} onChange={(values) => this.onSelect(e.name, values)}>
                   {
                     e.type.range.map((el) =>
@@ -158,6 +174,11 @@ export default class Layer extends React.Component {
             choices.push(
               <div key={e.type.key} style={{display: 'flex', flexDirection: 'row', marginBottom: 20}}>
                 <span style={{color: '#108ee9', fontSize: 14}}>{e.name}</span>
+                <Popover content={<div>
+                  <p style={{width: 180}}>{e.type.des}</p>
+                </div>} title="Description">
+                  <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5, color: '#767676'}}/>
+                </Popover>
                 <Input ref={e.name} style={{width: 150, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
               </div>
             );

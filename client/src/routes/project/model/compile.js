@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
-import { Button, message, Transfer, Input, Spin, Select, Modal } from 'antd';
+import { Button, message, Transfer, Input, Spin, Icon, Popover, Select, Modal } from 'antd';
 import { flaskServer } from '../../../constants';
 const Option = Select.Option;
 
@@ -19,7 +19,7 @@ export default class Compile extends React.Component {
   }
 
   componentDidMount(){
-    console.log(this.props.compile);
+    //console.log(this.props.compile);
     this.setState({compile: this.props.compile});
     if(this.props.compile){
       let compile = this.props.compile;
@@ -54,7 +54,8 @@ export default class Compile extends React.Component {
     switch (type.type.key){
       case 'choice':
         return (
-          <Select defaultValue={type.default} ref={type.name} style={{width: 200}} onChange={(value) => this.onSelectSingle(type.name, value)}>
+          <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+          <Select defaultValue={type.default} ref={type.name} style={{width: 150}} onChange={(value) => this.onSelectSingle(type.name, value)}>
             {
               type.type.range.map((e) =>
                 <Option key={e} value={e}>
@@ -63,11 +64,18 @@ export default class Compile extends React.Component {
               )
             }
           </Select>
+            <Popover content={<div>
+              <p style={{width: 150}}>{type.type.des}</p>
+            </div>} title="Description">
+              <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5}}/>
+            </Popover>
+          </div>
         );
 
       case 'choices':
         return (
-          <Select mode="multiple" defaultValue={type.default} ref={type.name} style={{width: 200}} onChange={(value) => this.onSelectMultiple(type.name, value)}>
+          <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+          <Select mode="multiple" defaultValue={type.default} ref={type.name} style={{width: 150}} onChange={(value) => this.onSelectMultiple(type.name, value)}>
             {
               type.type.range.map((e) =>
                 <Option key={e} value={e}>
@@ -76,6 +84,12 @@ export default class Compile extends React.Component {
               )
             }
           </Select>
+            <Popover content={<div>
+              <p style={{width: 150}}>{type.type.des}</p>
+            </div>} title="Description">
+              <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5}}/>
+            </Popover>
+          </div>
         )
 
       default:
@@ -90,7 +104,7 @@ export default class Compile extends React.Component {
       <div style={{height: 'auto'}}>
         { this.state.compile.map((e) =>
           <div key={e.name} style={{display: 'flex', flexDirection: 'row', marginBottom: 5}}>
-            <div style={{width: 80}}>
+            <div style={{width: 100}}>
               <span>{e.name + ": "}</span>
             </div>
             {this.renderCompileParams(e)}
