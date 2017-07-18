@@ -43,7 +43,8 @@ export default class ModelForms extends React.Component {
       ioData: {},
       end: false,
       custom: {},
-      customParams: {}
+      customParams: {},
+      score: []
     }
   }
 
@@ -202,8 +203,11 @@ export default class ModelForms extends React.Component {
           .then((res) => {
             if (res.response === 'success') {
               message.success(res.response);
+              //let score = [];
+              //score res.response.score)
+              this.setState({score: res.response.score});
             }
-            this.setTimeout(this.setState({end: true}),2000)
+            this.setTimeout(this.setState({end: true}),2000);
           })
       }
     }
