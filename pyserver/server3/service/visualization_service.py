@@ -33,7 +33,7 @@ def usr_story1_exploration(data, d_type, group_num=10):
     # 假设检验的信息 'hypo_info'
     gen_info = generate_stats_info(arr_temp, d_type)
     info_dict = {'type': d_type, 'gen_info': gen_info}
-    if d_type == 'integer' or d_type == 'float':
+    if d_type == 'integer' or d_type == "int" or d_type == 'float':
         arr_array = np.array(arr_temp)
         mean, std, min, max = (gen_info['mean'], gen_info['std'], int(gen_info['min']), int(gen_info['max']))
         interval = (max - min + 1) / group_num
