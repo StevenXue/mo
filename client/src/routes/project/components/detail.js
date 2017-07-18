@@ -237,6 +237,7 @@ class ProjectDetail extends React.Component {
                   <Table style={{marginTop: 10}}
                          rowSelection={this.rowSelection}
                          dataSource={this.props.project.dataSets[this.state.data_prop]}
+                         rowKey={record => record._id}
                          columns={columns}
                          />
                 </Modal>
