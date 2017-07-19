@@ -82,19 +82,20 @@ def get_all_jobs_of_project(project_id, categories):
     jobs = project_business.get_by_id(project_id)['jobs']
     history_jobs = {c: [] for c in categories}
     for job in jobs:
-        j = job.to_mongo()
-        result_sds = [sds.to_mongo() for sds in
-                      staging_data_set_business.get_by_job_id(
-                          job['id'])]
+        job_info = job.to_mongo()
         keys = history_jobs.keys()
         for key in keys:
             if job[key]:
-                j[key] = {
+                result_sds = staging_data_set_business.get_by_job_id(
+                    job['id']).to_mongo()
+                job_info[key] = {
                     'name': job[key]['name'],
                     'parameter_spec': job[key]['parameter_spec'],
                 }
-                j['results'] = result_sds
-                history_jobs[key].append(j)
+                job_info['staging_data_set'] = job['staging_data_set']['name']
+                job_info['staging_data_set_id'] = job['staging_data_set']['id']
+                job_info['results'] = result_sds
+                history_jobs[key].append(job_info)
                 break
     return history_jobs
 

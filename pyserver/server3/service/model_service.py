@@ -343,7 +343,7 @@ def temp():
     print(add_model_with_ownership(
         'system',
         False,
-        'keras_seq',
+        'general_neural_network',
         'keras_seq from keras',
         0,
         '/lib/keras_seq',
@@ -356,7 +356,7 @@ def temp():
     print(add_model_with_ownership(
         'system',
         False,
-        'sdca',
+        'SVM',
         'custom sdca model',
         1,
         '/lib/sdca',
@@ -369,7 +369,7 @@ def temp():
     print(add_model_with_ownership(
         'system',
         False,
-        'kmean',
+        'kmeans_clustering',
         'custom kmean model',
         2,
         '/lib/kmean',

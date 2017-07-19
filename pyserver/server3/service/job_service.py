@@ -50,6 +50,14 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
                                                    *argv)
             # job_obj = job_business.add_toolkit_job(toolkit_obj, '123')
 
+            # create result sds for model
+            project_obj = project_business.get_by_id(project_id)
+            sds_name = '%s_%s_result' % (toolkit_obj['name'], job_obj['id'])
+            result_sds_obj = staging_data_set_business.add(sds_name, 'des',
+                                                           project_obj,
+                                                           job=job_obj,
+                                                           type='result')
+
             # calculate
             func_result = func(*args, **kw)
             # update a job
