@@ -42,9 +42,12 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
             # create a job
             toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
             staging_data_set_obj = staging_data_set_business.get_by_id(staging_data_set_id)
-
+            project_obj = project_business.get_by_id(project_id)
             argv = fields
-            job_obj = job_business.add_toolkit_job(toolkit_obj, staging_data_set_obj, *argv)
+            job_obj = job_business.add_toolkit_job(toolkit_obj,
+                                                   staging_data_set_obj,
+                                                   project_obj,
+                                                   *argv)
             # job_obj = job_business.add_toolkit_job(toolkit_obj, '123')
 
             # calculate
@@ -77,24 +80,27 @@ def create_model_job(project_id, staging_data_set_id, model_obj, *argv):
         def wrapper(*args, **kw):
             # create a job
             # model_obj = model_business.get_by_model_id(model_id)
+            print(args)
+            params = args[0]
             staging_data_set_obj = \
                 staging_data_set_business.get_by_id(staging_data_set_id)
+            project_obj = project_business.get_by_id(project_id)
 
             # create model job
             job_obj = job_business.add_model_job(model_obj,
-                                                 staging_data_set_obj, *argv)
+                                                 staging_data_set_obj,
+                                                 project_obj,
+                                                 params=params)
             # update a project
             from server3.service import project_service
             project_service.add_job_to_project(job_obj, ObjectId(project_id))
             # create result sds for model
             project_obj = project_business.get_by_id(project_id)
             sds_name = '%s_%s_result' % (model_obj['name'], job_obj['id'])
-            params = args[0]
             result_sds_obj = staging_data_set_business.add(sds_name, 'des',
                                                            project_obj,
                                                            job=job_obj,
-                                                           type='result',
-                                                           params=params)
+                                                           type='result')
             # run
             func_result = func(*args, **kw, result_sds=result_sds_obj,
                                project_id=project_id)
@@ -148,6 +154,11 @@ def run_code(conf, project_id, staging_data_set_id, model, f, *args):
     func = create_model_job(project_id, staging_data_set_id, model)(f)
     # run model with decorator
     return func(conf, *args)
+
+
+def list_by_project_id(project_id):
+    project = project_business.get_by_id(project_id)
+    return job_business.get_by_project(project)
 
 
 if __name__ == '__main__':

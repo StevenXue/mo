@@ -2,8 +2,8 @@
 from mongoengine import DynamicDocument
 from mongoengine import ReferenceField
 
-from server3.entity.staging_data_set import StagingDataSet
+# from server3.entity import StagingDataSet
 
 
 class StagingData(DynamicDocument):
-    staging_data_set = ReferenceField(StagingDataSet, required=True)
+    staging_data_set = ReferenceField('StagingDataSet', required=True)

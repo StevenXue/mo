@@ -101,7 +101,7 @@ export default class ModelProcess extends React.Component {
   }
 
   onReceiveCode(code){
-    console.log(code);
+    //console.log(code);
     this.props.getCode(code);
   }
 

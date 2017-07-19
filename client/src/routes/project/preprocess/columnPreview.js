@@ -141,9 +141,6 @@ class PreviewCard extends React.Component {
             min: 'dataMin',
             max: 'dataMax',
             position: 'right',
-            axisLabel: {
-              formatter: '{value}'
-            }
           }, {
             type: 'value',
             name: 'y',
@@ -156,7 +153,7 @@ class PreviewCard extends React.Component {
             type: 'line',
             label: {
               normal: {
-                show: true,
+                show: false,
                 position: 'top',
               }
             },

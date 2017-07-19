@@ -2,14 +2,15 @@
 from datetime import datetime
 
 from server3.service import job_service
-from server3.business import project_business, job_business
+from server3.business import project_business
+from server3.business import job_business
 from server3.business import user_business
 from server3.business import ownership_business
-from server3.business import job_business
 from server3.business import result_business
 from server3.business import data_set_business
-from server3.business.project_business import project_repo
 from server3.service import ownership_service
+from server3.business import staging_data_set_business
+from server3.utility import json_utility
 
 
 def create_project(name, description, user_ID, is_private):
@@ -44,7 +45,7 @@ def list_projects_by_user_ID(user_ID, order=-1):
     if not user_ID:
         raise ValueError('no user id')
     public_projects = ownership_service.get_all_public_objects('project')
-    owned_projects = ownership_service.\
+    owned_projects = ownership_service. \
         get_private_ownership_objects_by_user_ID(user_ID, 'project')
 
     if order == -1:
@@ -75,4 +76,27 @@ def add_job_and_result_to_project(result_obj, project_id):
     job_obj = job_service.get_job_from_result(result_obj)
     return project_business.add_and_update_one_by_id(project_id, result_obj,
                                                      job_obj)
+
+
+def get_all_jobs_of_project(project_id, categories):
+    jobs = project_business.get_by_id(project_id)['jobs']
+    history_jobs = {c: [] for c in categories}
+    for job in jobs:
+        j = job.to_mongo()
+        result_sds = [sds.to_mongo() for sds in
+                      staging_data_set_business.get_by_job_id(
+                          job['id'])]
+        keys = history_jobs.keys()
+        for key in keys:
+            if job[key]:
+                j[key] = {
+                    'name': job[key]['name'],
+                    'parameter_spec': job[key]['parameter_spec'],
+                }
+                j['results'] = result_sds
+                history_jobs[key].append(j)
+                break
+    return history_jobs
+
+
 

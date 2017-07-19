@@ -88,20 +88,13 @@ export class Notebook extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    // let order = this.state.notebook.get('cellOrder');
-    //console.log("cell order", order, order.size, this.state.notebook);
     if(prevState.notebook === undefined && this.props.spawn_new === true){
       let source = `# this is the id of the project you are editting \n` +
         `project_id = "${this.props.project_id}" \n` +
         "# you might need to use it some where in your code\n"+
         "import os\n"+
         "import sys\n"+
-        "module_path = os.path.abspath(os.path.join('..'))\n"+
-        "if module_path not in sys.path:\n"+
-        "    sys.path.append('../../../')\n"+
-        "from libs import lib\n"+
-        "from libs import service\n"+
-        "from libs.service import job_service"
+        "sys.path.append('../')\n"
       const cellOrder = this.state.notebook.get('cellOrder');
       let id = cellOrder.get(0, null);
       this.dispatch(updateCellSource(id, source));

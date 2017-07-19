@@ -16,7 +16,7 @@ from mongoengine import StringField
 from mongoengine import DynamicField
 from mongoengine import IntField
 
-from server3.entity.job import Job
+# from server3.entity import Job
 
 
 RESULT_TYPE = (
@@ -27,7 +27,7 @@ RESULT_TYPE = (
 
 
 class Result(Document):
-    job = ReferenceField(Job, required=True)
+    job = ReferenceField('Job', required=True)
     create_time = DateTimeField(required=True)
     description = StringField(max_length=140)
     result = DynamicField()
