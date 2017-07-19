@@ -6,7 +6,7 @@ from keras.models import Sequential
 import tensorflow as tf
 from server3.service import logger
 from server3.utility.str_utility import generate_args_str
-from server3.lib.models.keras_callbacks import MyModelCheckpoint
+from server3.lib.models.keras_callbacks import MongoModelCheckpoint
 
 global graph
 graph = tf.get_default_graph()
@@ -65,23 +65,26 @@ def keras_seq(conf, input, **kw):
                                                                    result_sds,
                                                                    project_id))
         # checkpoint to save best weight
-        checkpoint = MyModelCheckpoint(result_sds=result_sds, verbose=0,
-                                       save_best_only=True)
+        best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,
+                                               save_best_only=True)
+        # checkpoint to save latest weight
+        general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
+                                                  verbose=0)
 
         # training
         # TODO callback 改成异步，考虑 celery
         history = model.fit(x_train, y_train,
                             validation_data=(x_val, y_val),
-                            callbacks=[batch_print_callback, checkpoint],
+                            callbacks=[batch_print_callback, best_checkpoint,
+                                       general_checkpoint],
                             verbose=0,
                             **f['args'])
 
         # testing
         score = model.evaluate(x_test, y_test, **e['args'])
-        weights = model.get_weights()
+        # weights = model.get_weights()
         config = model.get_config()
         logger.log_train_end(result_sds,
-                             weights=[weight.tolist() for weight in weights],
                              model_config=config,
                              score=score,
                              history=history.history)
@@ -542,3 +545,4 @@ if __name__ == '__main__':
     # import json
     # print(json.dumps(KERAS_SEQ_SPEC))
     pass
+

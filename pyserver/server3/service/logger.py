@@ -42,6 +42,22 @@ def save_result(result_sds, **result):
     staging_data_set_business.update(result_sds['id'], **result)
 
 
+def save_weights_result(result_sds, max_to_keep, key, new_weight):
+    if result_sds is None:
+        raise ValueError('no result sds id passed')
+    result_sds.reload()
+    weights = getattr(result_sds, key,  None)
+    obj = {key: weights}
+    if not weights:
+        obj[key] = [new_weight]
+        staging_data_set_business.update(result_sds['id'], **obj)
+    else:
+        weights.append(new_weight)
+        weights = weights[-max_to_keep:]
+        obj[key] = weights
+        staging_data_set_business.update(result_sds['id'], **obj)
+
+
 def emit_result():
     pass
 # if __name__ == '__main__':

@@ -13,7 +13,7 @@ SUB_SET_PURPOSE =(
 
 class StagingDataSet(DynamicDocument):
     project = ReferenceField('Project', required=True)
-    name = StringField(max_length=50, required=True, unique_with='project')
+    name = StringField(max_length=100, required=True, unique_with='project')
     description = StringField(max_length=140)
     job = ReferenceField('Job')
     meta = {'allow_inheritance': True}
