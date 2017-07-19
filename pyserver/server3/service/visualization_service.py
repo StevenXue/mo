@@ -44,7 +44,7 @@ def usr_story1_exploration(data, d_type, group_num=10):
         # 给出y轴
         y_domain = df.groupby(pd.cut(df.freq_hist, x_domain)).count().freq_hist.values/interval
         print ('y_domain', y_domain)
-        # y_domaining = [format(x, 4) for x in y_domain * 1000]
+        # y_domaining = [format_round(x, 4) for x in y_domain * 1000]
         # print ('y_domain', y_domain.apply(lambda x: '%.3f' % x))
 
         # 注意x会比y多一个
@@ -94,10 +94,10 @@ def isNaN(num):
     return num != num
 
 
-def format(f, n):
-    if round(f)==f:
+def format_round(f, n):
+    if round(f) == f:
         m = len(str(f))-1-n
-        if f/(10**m) ==0.0:
+        if f/(10**m) == 0.0:
             return f
         else:
             return float(int(f)/(10**m)*(10**m))
