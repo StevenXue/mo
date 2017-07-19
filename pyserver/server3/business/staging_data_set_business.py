@@ -38,7 +38,7 @@ def get_by_job_id(job_id):
     """
     # project = Project(id=project_id)
     # return staging_data_set_repo.read_by_project(project)
-    return staging_data_set_repo.read_by_non_unique_field('job', job_id)
+    return staging_data_set_repo.read_by_unique_field('job', job_id)
 
 
 def add(name, description, project, **kwargs):
