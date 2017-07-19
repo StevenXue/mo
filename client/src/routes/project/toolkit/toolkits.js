@@ -57,7 +57,7 @@ export default class Toolkit extends React.Component {
         steps:[{
           title: params.toolkit.name,
         }, {
-          title: 'Choose Dataset',
+          title: 'Dataset: ' + params.staging_data_set,
         }, {
           title: 'Result',
         }]

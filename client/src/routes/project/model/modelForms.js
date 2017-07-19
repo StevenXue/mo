@@ -206,6 +206,7 @@ export default class ModelForms extends React.Component {
               //let score = [];
               //score res.response.score)
               this.setState({score: res.response.score});
+              this.props.modalSuccess();
             }
             this.setTimeout(this.setState({end: true}),2000);
           })

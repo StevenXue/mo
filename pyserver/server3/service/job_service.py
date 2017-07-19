@@ -77,7 +77,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
             # from server3.service import project_service
             # # update a project
             # project_service.add_job_and_result_to_project(result_obj, ObjectId(project_id))
-            return result_obj
+                return result_obj
         return wrapper
     return decorator
 

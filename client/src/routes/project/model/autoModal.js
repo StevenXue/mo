@@ -19,7 +19,7 @@ export default class AutomatedModel extends React.Component {
       field: '',
       tasks: [],
       row: 0,
-      loading: false,
+      loading: true,
       statusStack: [true],
       columns: [],
       //custom: {}
@@ -27,16 +27,26 @@ export default class AutomatedModel extends React.Component {
   }
 
   componentDidMount() {
-    fetch(flaskServer + '/staging_data/staging_data_sets?project_id=' + this.props.project_id, {
+    fetch(flaskServer + '/project/jobs/' + this.props.project_id + '?categories=model', {
       method: 'get',
       headers: {
         'Content-Type': 'application/json',
       },
     }).then((response) => response.json())
       .then((res) => {
-          this.setState({ data_set: res.response })
+          //this.setState({ data_set: res.response });
+          fetch(flaskServer + '/staging_data/staging_data_sets?project_id=' + this.props.project_id, {
+            method: 'get',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }).then((response) => response.json())
+            .then((res) => {
+                this.setState({ data_set: res.response, loading: false})
+              },
+            );
         },
-      )
+      );
   }
 
   addNewModel(){
@@ -56,7 +66,6 @@ export default class AutomatedModel extends React.Component {
       },
     }).then((response) => response.json())
       .then((res) => {
-
           this.setState({
             cols: res.response.col,
             row: res.response.row,
@@ -71,6 +80,12 @@ export default class AutomatedModel extends React.Component {
         },
       )
       .catch((err) => console.log('Error: /staging_data/staging_data_sets/fields', err))
+  }
+
+  deactivete(i){
+    let array = this.state.statusStack;
+    array[i] = false;
+    this.setState({statusStack: array});
   }
 
   render() {
@@ -158,6 +173,7 @@ export default class AutomatedModel extends React.Component {
                        key={i}
                        cols={this.state.columns}
                        jupyter={false}
+                       modalSuccess={() => this.deactivate(i)}
                        isActive={el}/>)
             }
           </div>
