@@ -3,6 +3,9 @@
 from server3.lib.models.keras_seq import KERAS_SEQ_SPEC
 from server3.lib.models.keras_seq import keras_seq
 from server3.lib.models.keras_seq import keras_seq_to_str
+# mlp
+from server3.lib.models.mlp import mlp
+from server3.lib.models.mlp import MLP
 # custom model
 from server3.lib.models.custom_model import custom_model
 from server3.lib.models.custom_model import custom_model_to_str

@@ -346,7 +346,7 @@ def temp():
         'general_neural_network',
         'keras_seq from keras',
         0,
-        '/lib/keras_seq',
+        '/lib/models/keras_seq',
         'keras_seq',
         'keras_seq_to_str',
         models.KERAS_SEQ_SPEC,
@@ -359,7 +359,7 @@ def temp():
         'SVM',
         'custom sdca model',
         1,
-        '/lib/sdca',
+        '/lib/models/svm',
         'sdca_model_fn',
         'custom_model_to_str',
         models.SVM,
@@ -372,7 +372,7 @@ def temp():
         'kmeans_clustering',
         'custom kmean model',
         2,
-        '/lib/kmean',
+        '/lib/models/kmean',
         'kmeans_clustering_model_fn',
         'custom_model_to_str',
         models.Kmeans,
@@ -385,7 +385,7 @@ def temp():
         'linear_classifier',
         'custom linear classifier model',
         1,
-        '/lib/linear_classifier',
+        '/lib/models/linear_classifier',
         'linear_classifier_model_fn',
         'custom_model_to_str',
         models.LinearClassifier,
@@ -398,42 +398,54 @@ def temp():
         'linear_regression',
         'custom linear regression model',
         1,
-        '/lib/linear_regression',
+        '/lib/models/linear_regression',
         'linear_regression_model_fn',
         'custom_model_to_str',
         models.LinearRegression,
         {'type': 'DataFrame'}
     ))
 
+    print(add_model_with_ownership(
+        'system',
+        False,
+        'Multilayer Perceptron',
+        'Multilayer Perceptron (MLP) for multi-class softmax classification',
+        0,
+        '/lib/models/mlp',
+        'mlp',
+        'mlp_to_str',
+        models.MLP,
+        {'type': 'ndarray', 'n': None}
+    ))
+
 
 if __name__ == '__main__':
     pass
-    conf = {
-        'estimator': {
-            'args': {
-                "n_classes": 2,
-                "weight_column_name": None,
-                "gradient_clip_norm": None,
-                "enable_centered_bias": False,
-                "_joint_weight": False,
-                "label_keys": None,
-            }
-        },
-        'fit': {
-            "data_fields": [[], ["income_bracket"]],
-            "args": {
-                "steps": 30
-            }
-        },
-        'evaluate': {
-            'args': {
-                'steps': 1
-            }
-        }
-    }
-    model_to_code(conf, "595f32e4e89bde8ba70738a3", "5965cda1d123ab8f604a8dd0",
-                  "59687822d123abcfbfe8cabd")
-
+    # conf = {
+    #     'estimator': {
+    #         'args': {
+    #             "n_classes": 2,
+    #             "weight_column_name": None,
+    #             "gradient_clip_norm": None,
+    #             "enable_centered_bias": False,
+    #             "_joint_weight": False,
+    #             "label_keys": None,
+    #         }
+    #     },
+    #     'fit': {
+    #         "data_fields": [[], ["income_bracket"]],
+    #         "args": {
+    #             "steps": 30
+    #         }
+    #     },
+    #     'evaluate': {
+    #         'args': {
+    #             'steps': 1
+    #         }
+    #     }
+    # }
+    # model_to_code(conf, "595f32e4e89bde8ba70738a3", "5965cda1d123ab8f604a8dd0",
+    #               "59687822d123abcfbfe8cabd")
 
 
 
