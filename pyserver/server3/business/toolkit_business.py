@@ -273,7 +273,7 @@ def create_public_toolkit():
 
     KMEAN = Toolkit(name='K平均数算法',
                     description='计算所选数据集合的k-mean, 把一个把数据空间划分为k个子集',
-                    category="降维/聚类",
+                    category="聚类",
                     result_form=2,
                     entry_function='k_mean',
                     target_py_code=inspect.getsource(toolkit_orig.k_mean),
@@ -310,7 +310,7 @@ def create_public_toolkit():
 
     PCA = Toolkit(name='降维PCA-主成分分析算法',
                   description='计算所选数据集合(多为数据)的降维，default自动降维，输入k可降到k维',
-                  category="降维/聚类",
+                  category="降维",
                   result_form=2,
                   entry_function='dimension_reduction_PCA',
                   target_py_code=inspect.getsource(toolkit_orig.dimension_reduction_PCA),
@@ -347,7 +347,7 @@ def create_public_toolkit():
 
     TSNE = Toolkit(name='降维TSNE-t_分布邻域嵌入算法',
                    description='计算所选数据集合(多维数据)的降维，default自动降维，输入k可降到k维，通常为了方便可视化，降至2维',
-                   category="降维/聚类",
+                   category="降维",
                    result_form=2,
                    entry_function='dimension_reduction_TSNE',
                    target_py_code=inspect.getsource(toolkit_orig.dimension_reduction_TSNE),
@@ -1041,7 +1041,7 @@ def create_public_data_process():
 
     decomposition_pca = Toolkit(name='降维-PCA(sk-learn)',
                                 description='主成分分析法，返回降维后的数据',
-                                category="降维/聚类",
+                                category="降维",
                                 result_form=2,
                                 entry_function='decomposition_pca',
                                 target_py_code=inspect.getsource(preprocess_orig.decomposition_pca),
@@ -1076,9 +1076,9 @@ def create_public_data_process():
     decomposition_pca = toolkit_repo.create(decomposition_pca)
     ownership_business.add(user, False, toolkit=decomposition_pca)
 
-    lda = Toolkit(name='二值化',
-                  description='基于给定阈值，将定量特征按阈值划分',
-                  category="降维/聚类",
+    lda = Toolkit(name='线性判别分析法（LDA）',
+                  description='线性判别分析法，返回降维后的数据，参数n_components为降维后的维数',
+                  category="降维",
                   result_form=2,
                   entry_function='lda',
                   target_py_code=inspect.getsource(preprocess_orig.lda),
