@@ -192,8 +192,10 @@ def k_mean(arr0, index, n_clusters=2):
     result = k_means.labels_
     label = data_utility.retrieve_nan_index(result.tolist(), index)
 
-    return {"分类label": label, "类别中心点": k_means.cluster_centers_.tolist(),
-            "距中心点距离总和": k_means.inertia_, "数据源": arr0}
+    return {"聚类数目": n_clusters,
+            "类标签": label,
+            "各类别中心坐标": k_means.cluster_centers_.tolist(),
+            "SSE(各类点距其中心点的距离总和)": k_means.inertia_}
 
 
 def k_mean_predict(arr0, list_points, n_clusters=2):

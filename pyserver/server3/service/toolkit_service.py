@@ -74,21 +74,24 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
                                fields, data, k):
     """convert json list"""
     col = list(data[0].keys())
-    # argv = [[json_utility.convert_string_to_number(obj[i]) for i in col] for obj in data]
-    # # 删掉所有的np.nan, to FIXME 要给出index
-    # # arg_filter = [[arr for arr in argv if np.nan not in arr]]
+    # 删掉所有的np.nan, to FIXME 要给出index
     index_nan = []
     arg_filter = []
-    for arr in data:
-        arr_temp = [data_utility.convert_string_to_number_with_poss(arr[i]) for i in col]
-        if np.nan not in arr_temp:
-            arg_filter.append(arr_temp)
+    # 以下是旧的产生index的方法
+    # for arr in data:
+    #     arr_temp = [data_utility.convert_string_to_number_with_poss(arr[i]) for i in col]
+    #     if np.nan not in arr_temp:
+    #         arg_filter.append(arr_temp)
+    #     else:
+    #         index_nan.append(data.index(arr))
+    #         # print ("nan number")
+    #         # index_nan = [i for i, x in enumerate(data) if x == arr_temp]
+    for index, item in enumerate(data):
+        temp = [data_utility.convert_string_to_number_with_poss(item[i]) for i in col]
+        if np.nan not in temp:
+            arg_filter.append(temp)
         else:
-            index_nan.append(data.index(arr))
-            # print ("nan number")
-            # index_nan = [i for i, x in enumerate(data) if x == arr_temp]
-    # print ("np.nan", index_nan)
-    # argv = [arg_filter]
+            index_nan.append(index)
 
     # 临时救急，转文字为数字
     # argv_b = list(zip(*arg_filter))
