@@ -39,19 +39,21 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
+            from server3.service import project_service
+
             # create a job
             toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
             staging_data_set_obj = staging_data_set_business.get_by_id(staging_data_set_id)
             project_obj = project_business.get_by_id(project_id)
+
             argv = fields
             job_obj = job_business.add_toolkit_job(toolkit_obj,
                                                    staging_data_set_obj,
                                                    project_obj,
                                                    *argv)
-            # job_obj = job_business.add_toolkit_job(toolkit_obj, '123')
-
-            # create result sds for model
-            project_obj = project_business.get_by_id(project_id)
+            # update a project
+            project_service.add_job_to_project(job_obj, ObjectId(project_id))
+            # create result sds for toolkit
             sds_name = '%s_%s_result' % (toolkit_obj['name'], job_obj['id'])
             result_sds_obj = staging_data_set_business.add(sds_name, 'des',
                                                            project_obj,
@@ -61,14 +63,20 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
             # calculate
             func_result = func(*args, **kw)
             # update a job
-            job_obj = job_business.end_job(job_obj)
+            job_business.end_job(job_obj)
 
             # create a result, future TODO => add description
             result_obj = result_business.add_result(func_result, job_obj, 0, "")
 
-            from server3.service import project_service
-            # update a project
-            project_service.add_job_and_result_to_project(result_obj, ObjectId(project_id))
+            # 判断是否存储结果到staging_data_set
+
+            if toolkit_obj.result_form == 2 or 1:
+
+
+            # 已经淘汰，没有result了
+            # from server3.service import project_service
+            # # update a project
+            # project_service.add_job_and_result_to_project(result_obj, ObjectId(project_id))
             return result_obj
         return wrapper
     return decorator
@@ -103,7 +111,6 @@ def create_model_job(project_id, staging_data_set_id, model_obj, *argv):
             from server3.service import project_service
             project_service.add_job_to_project(job_obj, ObjectId(project_id))
             # create result sds for model
-            project_obj = project_business.get_by_id(project_id)
             sds_name = '%s_%s_result' % (model_obj['name'], job_obj['id'])
             result_sds_obj = staging_data_set_business.add(sds_name, 'des',
                                                            project_obj,
