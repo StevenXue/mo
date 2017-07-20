@@ -27,10 +27,10 @@ from keras.models import Sequential
 SPARK_EXECUTOR_MEMORY = '4g'
 MASTER_ADDRESS = "spark://10.52.14.188:7077"
 
-SERVER3_PATH = "/Users/chen/myPoject/gitRepo/goldersgreen/pyserver/lib/server3.zip"
+# SERVER3_PATH = "/Users/chen/myPoject/gitRepo/goldersgreen/pyserver/lib/server3.zip"
 # KERAS_SEQ_PATH = '/Users/chen/myPoject/gitRepo/goldersgreen/server3/lib/models/keras_seq.py'
 SPARK_MODELS = \
-    '/Users/chen/myPoject/gitRepo/goldersgreen/pyserver/server3/lib/models/spark_models.py'
+    'server3/lib/models/spark_models.py'
 
 
 # ------------------------------ spark code ------------------------------
