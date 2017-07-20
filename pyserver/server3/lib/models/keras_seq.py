@@ -1,25 +1,29 @@
 # -*- coding: UTF-8 -*-
-# Generate dummy data
 import numpy as np
 from keras import layers
 from keras.callbacks import LambdaCallback
 from keras.models import Sequential
 import tensorflow as tf
-# from server3.service import logger
+from server3.service import logger
+from server3.utility.str_utility import generate_args_str
+from server3.lib.models.keras_callbacks import MongoModelCheckpoint
 
+global graph
 graph = tf.get_default_graph()
 
 
-def keras_seq(conf, **kw):
+def keras_seq(conf, input, **kw):
     """
     a general implementation of sequential model of keras
     :param conf: config dict
     :return:
     """
     result_sds = kw.pop('result_sds', None)
+    project_id = kw.pop('project_id', None)
     if result_sds is None:
         raise RuntimeError('no result sds id passed to model')
-
+    if project_id is None:
+        raise RuntimeError('no project id passed to model')
     with graph.as_default():
         model = Sequential()
         # Dense(64) is a fully-connected layer with 64 hidden units.
@@ -29,6 +33,12 @@ def keras_seq(conf, **kw):
         comp = conf['compile']
         f = conf['fit']
         e = conf['evaluate']
+        x_train = input['x_tr']
+        y_train = input['y_tr']
+        x_val = input['x_te']
+        y_val = input['y_te']
+        x_test = input['x_te']
+        y_test = input['y_te']
 
         # TODO add validator
         # op = comp['optimizer']
@@ -46,30 +56,39 @@ def keras_seq(conf, **kw):
 
         # define the metrics
         # compile
-        model.compile(loss=comp['loss'],
-                      optimizer=comp['optimizer'],
-                      metrics=comp['metrics'])
+        model.compile(**comp['args'])
 
-        # batch_print_callback = LambdaCallback(on_epoch_end=
-        #                                       lambda epoch, logs:
-        #                                       logger.log_epoch_end(epoch, logs,
-        #                                                            result_sds))
+        # callback to save metrics
+        batch_print_callback = LambdaCallback(on_epoch_end=
+                                              lambda epoch, logs:
+                                              logger.log_epoch_end(epoch, logs,
+                                                                   result_sds,
+                                                                   project_id))
+        # checkpoint to save best weight
+        best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,
+                                               save_best_only=True)
+        # checkpoint to save latest weight
+        general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
+                                                  verbose=0)
 
         # training
-        # TODO callback 改成异步，考虑 celery
-        model.fit(f['x_train'], f['y_train'],
-                  validation_data=(f['x_val'], f['y_val']),
-                  callbacks=[],
-                  verbose=0,
-                  **f['args'])
+        history = model.fit(x_train, y_train,
+                            validation_data=(x_val, y_val),
+                            callbacks=[batch_print_callback, best_checkpoint,
+                                       general_checkpoint],
+                            verbose=0,
+                            **f['args'])
 
         # testing
-        score = model.evaluate(e['x_test'], e['y_test'], **e['args'])
-
-        weights = model.get_weights()
-
+        score = model.evaluate(x_test, y_test, **e['args'])
+        # weights = model.get_weights()
         config = model.get_config()
-        return score
+        logger.log_train_end(result_sds,
+                             model_config=config,
+                             score=score,
+                             history=history.history)
+
+        return {'score': score, 'history': history.history}
 
 
 def keras_seq_to_str(obj, head_str, **kw):
@@ -84,6 +103,7 @@ def keras_seq_to_str(obj, head_str, **kw):
     # in the first layer, you must specify the expected input data shape:
     # here, 20-dimensional vectors.
     result_sds = kw.pop('result_sds', None)
+    project_id = kw.pop('project_id', None)
     if result_sds is None:
         raise RuntimeError('no result_sds created')
 
@@ -94,11 +114,11 @@ def keras_seq_to_str(obj, head_str, **kw):
     layer_names = set([l['name'] for l in ls])
     layer_import = ''
     for n in layer_names:
-        layer_import += 'from keras.layers import %s' % n
+        layer_import += 'from keras.layers import %s\n' % n
     str_model = 'from keras.models import Sequential\n'
     str_model += 'from keras.callbacks import LambdaCallback\n'
-    str_model += 'from libs.service import logger\n'
-    str_model += 'from libs.business import staging_data_set_business\n'
+    str_model += 'from server3.service import logger\n'
+    str_model += 'from server3.business import staging_data_set_business\n'
     str_model += layer_import
     str_model += head_str
     str_model += 'model = Sequential()\n'
@@ -113,26 +133,22 @@ def keras_seq_to_str(obj, head_str, **kw):
             str_model += 'model.add(%s())' % layer_name + '\n'
 
     # compile
-    str_model += "model.compile(loss='" + \
-                 get_value(comp, 'loss', 'categorical_crossentropy') + \
-                 "', optimizer='" + comp['optimizer'] + "', metrics= [" + \
-                 get_metrics(comp) + \
-                 "])\n"
+    comp_str = generate_args_str(comp['args'])
+    str_model += "model.compile(%s)\n" % comp_str
 
     str_model += "result_sds = staging_data_set_business.get_by_id('%s')\n" % \
                  result_sds['id']
-
+    str_model += "project_id = '%s'\n" % project_id
     # callback
     str_model += "batch_print_callback = LambdaCallback(on_epoch_end=lambda " \
                  "epoch, \\\nlogs: logger.log_epoch_end(epoch, " \
-                 "logs, result_sds))\n"
+                 "logs, result_sds, project_id))\n"
     # fit
     str_model += "model.fit(x_train, y_train,  validation_data=(x_test, " \
                  "y_test), \\\ncallbacks=[batch_print_callback], " + \
-                 get_args(f)[:-2] + ")\n"
+                 get_args(f)[:-2] + ", verbose=0)\n"
     str_model += "score = model.evaluate(x_test, y_test, " + get_args(e)[
                                                              :-2] + ")\n"
-
     return str_model
 
 
@@ -412,102 +428,81 @@ KERAS_SEQ_SPEC = {
             ],
         },
     ],
-    "compile": [
-        {
-            "name": "loss",
-            "type": {
-                "key": "choice",
-                "des": "A loss function (or objective function, or "
-                       "optimization score function) is one of the two "
-                       "parameters required to compile a model",
-                "range": ["mean_squared_error",
-                          "mean_absolute_error",
-                          "mean_absolute_percentage_error",
-                          "mean_squared_logarithmic_error",
-                          "squared_hinge",
-                          "hinge",
-                          "categorical_hinge",
-                          "logcosh",
-                          "categorical_crossentropy",
-                          "sparse_categorical_crossentropy",
-                          "binary_crossentropy",
-                          "kullback_leibler_divergence",
-                          "poisson",
-                          "cosine_proximity"]
+    "compile": {
+        'args': [
+            {
+                "name": "loss",
+                "type": {
+                    "key": "choice",
+                    "des": "A loss function (or objective function, or "
+                           "optimization score function) is one of the two "
+                           "parameters required to compile a model",
+                    "range": ["mean_squared_error",
+                              "mean_absolute_error",
+                              "mean_absolute_percentage_error",
+                              "mean_squared_logarithmic_error",
+                              "squared_hinge",
+                              "hinge",
+                              "categorical_hinge",
+                              "logcosh",
+                              "categorical_crossentropy",
+                              "sparse_categorical_crossentropy",
+                              "binary_crossentropy",
+                              "kullback_leibler_divergence",
+                              "poisson",
+                              "cosine_proximity"]
+                },
+                "default": "categorical_crossentropy",
+                "required": True
             },
-            "default": "categorical_crossentropy",
-            "required": True
-        },
-        {
-            "name": "optimizer",
-            "type": {
-                "key": "choice",
-                "des": "An optimizer is one of the two arguments required for "
-                       "compiling a Keras model",
-                "range": ["sgd",
-                          "rmsprop",
-                          "adagrad",
-                          "adadelta",
-                          "adam",
-                          "adamax",
-                          "nadam"]
+            {
+                "name": "optimizer",
+                "type": {
+                    "key": "choice",
+                    "des": "An optimizer is one of the two arguments required for "
+                           "compiling a Keras model",
+                    "range": ["sgd",
+                              "rmsprop",
+                              "adagrad",
+                              "adadelta",
+                              "adam",
+                              "adamax",
+                              "nadam"]
+                },
+                "default": "sgd",
+                "required": True
             },
-            "default": "sgd",
-            "required": True
-        },
-        {
-            "name": "metrics",
-            "type": {
-                "key": "choices",
-                "des": "A metric is a function that is used to judge the "
-                       "performance of your model",
-                "range": ["acc",
-                          "mse",
-                          "mae",
-                          "mape",
-                          "msle",
-                          "cosine"]
+            {
+                "name": "metrics",
+                "type": {
+                    "key": "choices",
+                    "des": "A metric is a function that is used to judge the "
+                           "performance of your model",
+                    "range": ["acc",
+                              "mse",
+                              "mae",
+                              "mape",
+                              "msle",
+                              "cosine"]
+                },
+                "default": [],
+                "required": False
             },
-            "default": [],
-            "required": False
-        },
-    ],
+        ],
+    },
     "fit": {
-        "x_train": {
-            "name": "x_train",
+        "data_fields": {
+            "name": "training_fields",
             "type": {
-                "key": "data_set",
-                "des": "x_train",
+                "key": "transfer_box",
+                "des": "data fields for x and y",
             },
             "default": None,
-            "required": True
-        },
-        "y_train": {
-            "name": "y_train",
-            "type": {
-                "key": "data_set",
-                "des": "y_train",
-            },
-            "default": None,
-            "required": True
-        },
-        "x_val": {
-            "name": "x_val",
-            "type": {
-                "key": "data_set",
-                "des": "x_test",
-            },
-            "default": None,
-            "required": True
-        },
-        "y_val": {
-            "name": "y_val",
-            "type": {
-                "key": "data_set",
-                "des": "y_test",
-            },
-            "default": None,
-            "required": True
+            "required": True,
+            "x_data_type": ['integer', 'float'],
+            "y_data_type": ['integer', 'float'],
+            "x_len_range": None,
+            "y_len_range": None
         },
         "args": [
             {
@@ -531,24 +526,6 @@ KERAS_SEQ_SPEC = {
         ],
     },
     "evaluate": {
-        "x_test": {
-            "name": "x_test",
-            "type": {
-                "key": "data_set",
-                "des": "x_test",
-            },
-            "default": None,
-            "required": True
-        },
-        "y_test": {
-            "name": "y_test",
-            "type": {
-                "key": "data_set",
-                "des": "y_test",
-            },
-            "default": None,
-            "required": True
-        },
         "args": [
             {
                 "name": "batch_size",
@@ -567,47 +544,4 @@ if __name__ == '__main__':
     # import json
     # print(json.dumps(KERAS_SEQ_SPEC))
     pass
-    from keras import utils
-
-    x_train = np.random.random((1000, 20))
-    y_train = utils.to_categorical(np.random.randint(10, size=(1000, 1)),
-                                   num_classes=10)
-    x_test = np.random.random((100, 20))
-    y_test = utils.to_categorical(np.random.randint(10, size=(100, 1)),
-                                  num_classes=10)
-    keras_seq(
-        {'layers': [{'name': 'Dense',
-                     'args': {'units': 64, 'activation': 'relu',
-                              'input_shape': [
-                                  20, ]}},
-                    {'name': 'Dropout',
-                     'args': {'rate': 0.5}},
-                    {'name': 'Dense',
-                     'args': {'units': 64, 'activation': 'relu'}},
-                    {'name': 'Dropout',
-                     'args': {'rate': 0.5}},
-                    {'name': 'Dense',
-                     'args': {'units': 10, 'activation': 'softmax'}}
-                    ],
-         'compile': {'loss': 'categorical_crossentropy',
-                     'optimizer': 'SGD',
-                     'metrics': ['accuracy']
-                     },
-         'fit': {'x_train': x_train,
-                 'y_train': y_train,
-                 'x_val': x_test,
-                 'y_val': y_test,
-                 'args': {
-                     'epochs': 20,
-                     'batch_size': 128
-                 }
-                 },
-         'evaluate': {'x_test': x_test,
-                      'y_test': y_test,
-                      'args': {
-                          'batch_size': 128
-                      }
-                      }
-         }, result_sds='11')
-
 

@@ -113,33 +113,7 @@ def get_fields_with_types(staging_data_set_id):
     :param staging_data_set_id:
     :return: [field_name, [type1, type2, ...]]
     """
-    mapper = Code("""
-        function() {
-            function isInt(n){
-                return n % 1 === 0;
-            }
-            for (var key in this) {
-                let type = typeof this[key]
-                if(type === 'number') {
-                    if(isInt(this[key])) {
-                        type = 'integer'
-                    } else {
-                        type = 'float'
-                    }
-                }
-                emit(key, type); 
-            }
-            //for (var key in this) { emit(key, null); }
-        }
-    """)
-
-    reducer = Code("""
-        function(key, stuff) { 
-        let obj = {}
-        stuff.forEach(e => obj[e] = null)
-        return obj; 
-        }
-    """)
+    mapper, reducer = data_service.field_mapper_reducer()
     result = staging_data_business. \
         get_fields_by_map_reduce(staging_data_set_id, mapper, reducer)
     # result = StagingData.objects(ListingId='126541').map_reduce(mapper, reducer, 'inline')
@@ -277,8 +251,6 @@ def split_test_train(x_y_obj, schema='cv', ratio=0.3, trl=1000):
             data_utility.k_fold_cross_validation(x, y, ratio)
         return {'x_tr': x_tr, 'y_tr': y_tr, 'x_te': x_te, 'y_te': y_te}
     if schema == 'seq':
-        print('split_test_train', x.shape)
-        print('split_test_train', y.shape)
         if ratio and not trl:
             trl = x.shape[0] * ratio
         if trl:

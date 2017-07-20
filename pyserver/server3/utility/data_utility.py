@@ -159,5 +159,5 @@ def multi_one_hot_encoder(matrix):
 
 def retrieve_nan_index(result, nan_index):
     for ind in nan_index:
-        result.insert(ind, [np.nan])
+        result.insert(ind, np.nan)
     return result

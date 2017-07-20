@@ -29,6 +29,18 @@ def get_by_project_id(project_id):
     return staging_data_set_repo.read_by_non_unique_field('project', project_id)
 
 
+def get_by_job_id(job_id):
+    """
+    Get stating_data_set by job's ObjectId
+
+    :param job_id: ObjectId
+    :return: staging_data_set object
+    """
+    # project = Project(id=project_id)
+    # return staging_data_set_repo.read_by_project(project)
+    return staging_data_set_repo.read_by_unique_field('job', job_id)
+
+
 def add(name, description, project, **kwargs):
     """
     Add a new staging_dat_set
@@ -44,6 +56,10 @@ def add(name, description, project, **kwargs):
     staging_data_set = StagingDataSet(name=name, description=description,
                                       project=project, **kwargs)
     return staging_data_set_repo.create(staging_data_set)
+
+
+def update(sds_id, **update):
+    return staging_data_set_repo.update_one_by_id(sds_id, update)
 
 
 def remove_by_id(sds_id):

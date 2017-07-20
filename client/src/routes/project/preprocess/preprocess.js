@@ -207,7 +207,7 @@ class Preprocess extends React.Component{
               <ColumnOperations
                 values={this.state.values}
                 stagedId={this.state.data_set}
-                dataSet={this.props.dataSet}
+                dataSet={this.state.dataSet}
                 fields={this.state.fields} />
             </Panel>
             }

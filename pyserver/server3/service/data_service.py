@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+import math
 from bson import Code
 from bson import ObjectId
 
@@ -10,6 +11,38 @@ from server3.service import file_service
 from server3.service import ownership_service
 from server3.utility import json_utility
 from server3 import constants
+
+
+def field_mapper_reducer():
+    mapper = Code("""
+            function() {
+                function isInt(n) {
+                    return n % 1 === 0;
+                }
+                for (var key in this) {
+                    let type = typeof this[key]
+                    if(type === 'number') {
+                        if(isInt(this[key])) {
+                            type = 'integer'
+                        } else {
+                            type = 'float'
+                        }
+                    }
+                    emit(key, type); 
+                }
+                //for (var key in this) { emit(key, null); }
+            }
+        """)
+
+    reducer = Code("""
+            function(key, stuff) { 
+                let obj = {}
+                stuff.forEach(e => obj[e] = null)
+                return obj; 
+            }
+        """)
+    return mapper, reducer
+
 
 def add_data_set(data_set_name, ds_description, user_ID, is_private):
     ds = data_set_business.add(data_set_name, ds_description)
@@ -66,20 +99,7 @@ def get_fields_with_types(data_set_id):
     :param data_set_id:
     :return: [field_name, [type1, type2, ...]]
     """
-    mapper = Code("""
-        function() {
-            for (var key in this) { emit(key, typeof this[key]); }
-            //for (var key in this) { emit(key, null); }
-        }
-    """)
-
-    reducer = Code("""
-        function(key, stuff) { 
-        let obj = {}
-        stuff.forEach(e => obj[e] = null)
-        return obj; 
-        }
-    """)
+    mapper, reducer = field_mapper_reducer()
     result = data_business. \
         get_fields_by_map_reduce(data_set_id, mapper, reducer)
     # result = StagingData.objects(ListingId='126541').map_reduce(mapper, reducer, 'inline')
@@ -104,7 +124,7 @@ def check_data_integrity(data_array, data_fields):
         oid = row['_id']
         for field in data_fields:
             if field[0] not in row or row[field[0]] == '' \
-                    or row[field[0]] == ' ':
+                    or row[field[0]] == ' ' or row[field[0]] is None:
                 if oid in missing:
                     missing[oid].append({field[0]: ''})
                 else:
