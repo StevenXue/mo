@@ -136,7 +136,7 @@ def run_multiple_model(conf, project_id, staging_data_set_id, model_id, hyper_pa
     # using conf and hyper_parameters to generate conf_grid
     conf_grid = spark_service.get_conf_grid(conf, hyper_parameters=hyper_parameters)
     # get the data
-    data = manage_nn_input(conf, staging_data_set_id, **kwargs)
+    data = manage_nn_input_temp(conf, staging_data_set_id, **kwargs)
     result = spark_service.hyper_parameters_tuning(conf_grid, data)
     return result
 
@@ -268,6 +268,28 @@ def manage_nn_input(conf, staging_data_set_id, **kwargs):
     # conf['evaluate']['x_test'] = obj['x_te']
     # conf['evaluate']['y_test'] = obj['y_te']
     return obj
+
+
+# temp
+def manage_nn_input_temp(conf, staging_data_set_id, **kwargs):
+    """
+    deal with input when supervised learning
+    :param conf:
+    :param staging_data_set_id:
+    :return:
+    """
+    x_fields = conf['fit']['x_train']
+    y_fields = conf['fit']['y_train']
+    schema = kwargs.pop('schema')
+    obj = split_supervised_input(staging_data_set_id, x_fields, y_fields,
+                                 schema)
+    conf['fit']['x_train'] = obj['x_tr']
+    conf['fit']['y_train'] = obj['y_tr']
+    conf['fit']['x_val'] = obj['x_te']
+    conf['fit']['y_val'] = obj['y_te']
+    conf['evaluate']['x_test'] = obj['x_te']
+    conf['evaluate']['y_test'] = obj['y_te']
+    return conf
 
 
 def line_split_for_long_fields(field_str):
