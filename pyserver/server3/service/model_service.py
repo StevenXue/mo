@@ -145,19 +145,12 @@ def run_multiple_model(conf, project_id, staging_data_set_id, model_id, hyper_pa
     :return:
     """
     from server3.service import spark_service
-    model = model_business.get_by_model_id(model_id)
     # using conf and hyper_parameters to generate conf_grid
     conf_grid = spark_service.get_conf_grid(conf, hyper_parameters=hyper_parameters)
-
-    if model['category'] == 0:
-        # get the conf with data
-        conf = manage_supervised_input(conf, staging_data_set_id, **kwargs)
-    result = spark_service.hyper_parameters_tuning(conf_grid, conf)
+    # get the data
+    data = manage_nn_input(conf, staging_data_set_id, **kwargs)
+    result = spark_service.hyper_parameters_tuning(conf_grid, data)
     return result
-    # print("result", result)
-    # job_service.run_code(conf, project_id, staging_data_set_id, model_id,
-    #                      **kwargs)
-    # controller.run_code(conf, model)
 
 
 def model_to_code(conf, project_id, staging_data_set_id, model_id, **kwargs):

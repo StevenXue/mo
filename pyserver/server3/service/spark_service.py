@@ -44,7 +44,7 @@ def CreateSparkContext():
     print("master = " + sc.master)
     SetLogger(sc)
     SetPath(sc)
-    return (sc)
+    return sc
 
 
 def SetLogger(sc):
@@ -60,41 +60,22 @@ def SetPath(sc):
 
 
 # for hyper parameters tuning
-def hyper_parameters_tuning(conf_grid, conf):
+def hyper_parameters_tuning(conf_grid, data):
     """
 
-    :param conf_grid:
-    :param conf: template conf with data
-    :param staging_data_set_id:
-    :param kwargs:
+    :param conf_grid: (array) multiple conf list
+    :param data: train and test data
     :return:
     """
-    def model_training(conf_obj, conf_with_data_bc):
-        # import logging
-        # logger = logging.getLogger('py4j')
-        # logger.error("My test info statement")
-        # log4jLogger = sc._jvm.org.apache.log4j
-        # LOGGER = log4jLogger.LogManager.getLogger(__name__)
-        # LOGGER.error("Started")
-        # from py file import code (if it has dependency, using zip to access it)
-        # from server3.lib.models.keras_seq import keras_seq
-
-        # staging_data_set_id 595cb76ed123ab59779604c3
-        # from server3.business.staging_data_set_business import get_by_id
-
+    def model_training(conf_obj, data_bc):
         # get data by broadcast
-        conf_obj["fit"]["x_train"] = conf_with_data_bc.value["fit"]["x_train"]
-        conf_obj["fit"]["y_train"] = conf_with_data_bc.value["fit"]["y_train"]
-        conf_obj["fit"]["x_val"] = conf_with_data_bc.value["fit"]["x_val"]
-        conf_obj["fit"]["y_val"] = conf_with_data_bc.value["fit"]["y_val"]
-        conf_obj["evaluate"]["x_test"] = conf_with_data_bc.value["evaluate"]["x_test"]
-        conf_obj["evaluate"]["y_test"] = conf_with_data_bc.value["evaluate"]["y_test"]
-        print("conf_obj_fit_x_train", conf_obj["fit"]["x_train"])
-
-        # LOGGER.warning(conf_obj["fit"]["x_train"])
-
-
-        result = spark_models.keras_seq(conf, result_sds="11")
+        conf_obj["fit"]["x_train"] = data_bc.value["fit"]["x_train"]
+        conf_obj["fit"]["y_train"] = data_bc.value["fit"]["y_train"]
+        conf_obj["fit"]["x_val"] = data_bc.value["fit"]["x_val"]
+        conf_obj["fit"]["y_val"] = data_bc.value["fit"]["y_val"]
+        conf_obj["evaluate"]["x_test"] = data_bc.value["evaluate"]["x_test"]
+        conf_obj["evaluate"]["y_test"] = data_bc.value["evaluate"]["y_test"]
+        result = spark_models.keras_seq(conf_obj, result_sds="objectId")
         conf_obj["fit"].pop("x_train")
         conf_obj["fit"].pop("y_train")
         conf_obj["fit"].pop("x_val")
@@ -111,43 +92,20 @@ def hyper_parameters_tuning(conf_grid, conf):
     sc = CreateSparkContext()
     # temp import with zip package
     import spark_models
-
     # parallelize parameters_grid to rdd
     print("conf_grid_len", len(conf_grid))
     print("conf_grid", conf_grid)
-
     # broadcast conf with data
-    conf_with_data_bc = sc.broadcast(conf)
-
+    data_bc = sc.broadcast(data)
     rdd = sc.parallelize(conf_grid, numSlices=len(conf_grid))
     # run models on spark cluster
-    results = rdd.map(lambda conf_obj: model_training(conf_obj, conf_with_data_bc))
+    results = rdd.map(lambda conf_obj: model_training(conf_obj, data_bc))
     res = results.collect()
     sc.stop()
     return res
 
 
 # ------------------------------ service ------------------------------s
-# def get_parameters_grid(conf, hyper_parameters):
-#     import itertools
-#     import copy
-#
-#     epochs = conf['fit']['args']['epochs']
-#     batch_size = conf['fit']['args']['batch_size']
-#
-#     all_experiments = list(itertools.product(epochs, batch_size))
-#     parameters_grid = []
-#     for ex in all_experiments:
-#         conf_template = copy.deepcopy(conf)
-#         conf_template['fit']['args']['epochs'] = ex[0]
-#         conf_template['fit']['args']['batch_size'] = ex[1]
-#         parameters_grid.append(conf_template)
-#     # print(all_experiments)
-#     # for p in parameters_grid:
-#     #     print(p)
-#     return parameters_grid
-
-
 def get_conf_grid(conf, hyper_parameters):
     """using template conf and hyper_parameters to generate conf grid
 
@@ -192,8 +150,6 @@ def get_conf_grid(conf, hyper_parameters):
             if e['layers'][layer_index].get("rate"):
                 conf_template['layers'][layer_index]['args']['rate'] = \
                     e['layers'][layer_index].get("rate")
-
-        # print("conf_template", conf_template)
         conf_grid.append(conf_template)
     return conf_grid
 
@@ -229,10 +185,7 @@ def hyper_parameters_to_grid(hyper_parameters):
         obj = {}
         for i in e:
             obj.update(**i)
-        # print("obj", obj)
         flat_grid.append(obj)
-    # print(flat_grid)
-
     # conbine flat grid and layer grid
     complete_grid = list(itertools.product(flat_grid, layers_grid))
     flat_complete_grid = []
@@ -241,11 +194,6 @@ def hyper_parameters_to_grid(hyper_parameters):
         for i in e:
             obj.update(**i)
         flat_complete_grid.append(obj)
-
-    # print("layers_grid len", len(layers_grid))
-    # print("flat_grid len", len(flat_grid))
-    # print("flat_complete_grid len", len(flat_complete_grid))
-    # print("flat_complete_grid", flat_complete_grid)
     return flat_complete_grid
 
 
@@ -403,4 +351,77 @@ if __name__ == "__main__":
     hyper_parameters_tuning(parametersGrid)
     pass
 
+
+# class SparkService():
+#     """to access spark cluster
+#
+#
+#     """
+#
+#     def __init__(self):
+#         pass
+#
+#     @staticmethod
+#     def create_spark_content(self):
+#         spark_conf = SparkConf() \
+#             .setAppName("hyperparameter_tuning") \
+#             .set("spark.ui.showConsoleProgress", "false") \
+#             .setMaster(MASTER_ADDRESS) \
+#             .set("spark.executor.memory", SPARK_EXECUTOR_MEMORY)
+#         sc = SparkContext(conf=spark_conf, pyFiles=[SPARK_MODELS])
+#         print("master = " + sc.master)
+#         self.SetLogger(sc)
+#         self.SetPath(sc)
+#         return sc
+#
+#     def SetLogger(sc):
+#         logger = sc._jvm.org.apache.log4j
+#         logger.LogManager.getLogger("org").setLevel(logger.Level.ERROR)
+#         logger.LogManager.getLogger("akka").setLevel(logger.Level.ERROR)
+#         logger.LogManager.getRootLogger().setLevel(logger.Level.ERROR)
+#
+#     def SetPath(sc):
+#         global Path
+#         Path = "file:/usr/local/spark/"
+#
+#     @staticmethod
+#     def model_training(self, conf_obj, data_bc, spark_models):
+#         # get data by broadcast
+#         conf_obj["fit"]["x_train"] = data_bc.value["fit"]["x_train"]
+#         conf_obj["fit"]["y_train"] = data_bc.value["fit"]["y_train"]
+#         conf_obj["fit"]["x_val"] = data_bc.value["fit"]["x_val"]
+#         conf_obj["fit"]["y_val"] = data_bc.value["fit"]["y_val"]
+#         conf_obj["evaluate"]["x_test"] = data_bc.value["evaluate"]["x_test"]
+#         conf_obj["evaluate"]["y_test"] = data_bc.value["evaluate"]["y_test"]
+#         result = spark_models.keras_seq(conf_obj, result_sds="objectId")
+#         conf_obj["fit"].pop("x_train")
+#         conf_obj["fit"].pop("y_train")
+#         conf_obj["fit"].pop("x_val")
+#         conf_obj["fit"].pop("y_val")
+#         conf_obj["evaluate"].pop("x_test")
+#         conf_obj["evaluate"].pop("y_test")
+#         return {
+#             "result": result,
+#             "conf": conf_obj,
+#         }
+#
+#     @classmethod
+#     def run_hyper_parameters_tuning(cls, conf_grid, data):
+#         print("begin_hyper_parameters_tuning")
+#         # create spark context
+#         sc = cls.create_spark_content()
+#         # temp import with zip package
+#         import spark_models
+#         # parallelize parameters_grid to rdd
+#         print("conf_grid_len", len(conf_grid))
+#         print("conf_grid", conf_grid)
+#         # broadcast conf with data
+#         data_bc = sc.broadcast(data)
+#         rdd = sc.parallelize(conf_grid, numSlices=len(conf_grid))
+#         # run models on spark cluster
+#         results = rdd.map(lambda conf_obj: cls.model_training(conf_obj,
+#                                                                data_bc, spark_models))
+#         res = results.collect()
+#         sc.stop()
+#         return res
 
