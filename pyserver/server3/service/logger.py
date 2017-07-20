@@ -1,4 +1,6 @@
 # -*- coding: UTF-8 -*-
+import eventlet
+eventlet.monkey_patch()
 from flask_socketio import SocketIO
 # from sio import socketio
 from server3.business import staging_data_business
@@ -18,7 +20,7 @@ def log_train_end(*args, **kw):
     # emit_result(*args)
 
 
-def save_log(event, n, logs, result_sds, project_id):
+def save_log_fn(event, n, logs, result_sds, project_id):
     if result_sds is None:
         raise ValueError('no result sds id')
 
@@ -36,13 +38,13 @@ def emit_log(event, n, logs, result_sds, project_id):
     # print('send by socket', n, logs)
 
 
-def save_result(result_sds, **result):
+def save_result_fn(result_sds, **result):
     if result_sds is None:
         raise ValueError('no result sds id passed')
     staging_data_set_business.update(result_sds['id'], **result)
 
 
-def save_weights_result(result_sds, max_to_keep, key, new_weight):
+def save_weights_result_fn(result_sds, max_to_keep, key, new_weight):
     if result_sds is None:
         raise ValueError('no result sds id passed')
     result_sds.reload()
@@ -56,6 +58,19 @@ def save_weights_result(result_sds, max_to_keep, key, new_weight):
         weights = weights[-max_to_keep:]
         obj[key] = weights
         staging_data_set_business.update(result_sds['id'], **obj)
+
+
+def save_log(event, n, logs, result_sds, project_id):
+    return eventlet.spawn(save_log_fn, event, n, logs, result_sds, project_id)
+
+
+def save_result(result_sds, **result):
+    return eventlet.spawn(save_result_fn, result_sds, **result)
+
+
+def save_weights_result(result_sds, max_to_keep, key, new_weight):
+    return eventlet.spawn(save_weights_result_fn, result_sds, max_to_keep, key,
+                          new_weight)
 
 
 def emit_result():

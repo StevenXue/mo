@@ -145,7 +145,6 @@ def get_staging_data_pandas(staging_data_set_id):
     """
     data = staging_data_business. \
         get_by_staging_data_set_id(ObjectId(staging_data_set_id))
-    print(data)
     data = convert_to_json([d.to_mongo() for d in list(data)])
     return pd.DataFrame(data)
 

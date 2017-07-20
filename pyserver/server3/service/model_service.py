@@ -24,7 +24,6 @@ def get_all_public_model():
     models = [obj.model.to_mongo().to_dict() for obj in
               ownership_business.list_ownership_by_type_and_private('model',
                                                                     False)]
-    print('models', len(models))
     return models
 
 
@@ -343,7 +342,7 @@ def temp():
     print(add_model_with_ownership(
         'system',
         False,
-        'general_neural_network',
+        'General Neural Network',
         'keras_seq from keras',
         0,
         '/lib/models/keras_seq',
@@ -369,7 +368,7 @@ def temp():
     print(add_model_with_ownership(
         'system',
         False,
-        'kmeans_clustering',
+        'Kmeans Clustering',
         'custom kmean model',
         2,
         '/lib/models/kmean',
@@ -382,7 +381,7 @@ def temp():
     print(add_model_with_ownership(
         'system',
         False,
-        'linear_classifier',
+        'Linear Classifier',
         'custom linear classifier model',
         1,
         '/lib/models/linear_classifier',
@@ -395,7 +394,7 @@ def temp():
     print(add_model_with_ownership(
         'system',
         False,
-        'linear_regression',
+        'Linear Regression',
         'custom linear regression model',
         1,
         '/lib/models/linear_regression',
