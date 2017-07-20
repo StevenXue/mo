@@ -45,13 +45,13 @@ def list_data_sets_by_user_ID():
 @data_app.route('/data_sets', methods=['POST'])
 def import_data_from_file_id():
     data = request.get_json()
-    user_ID = data['user_ID']
-    file_id = data['file_id']
-    data_set_name = data['data_set_name']
-    ds_description = data['ds_description']
-    is_private = data['is_private']
+    user_ID = data.pop('user_ID')
+    file_id = data.pop('file_id')
+    data_set_name = data.pop('data_set_name')
+    ds_description = data.pop('ds_description')
+    is_private = data.pop('is_private')
     is_private = str(is_private).lower() == 'true'
-    names = data.get('names', None)
+    names = data.pop('names', None)
 
     try:
         saved_ds = data_service.import_data_from_file_id(ObjectId(file_id),
@@ -59,7 +59,8 @@ def import_data_from_file_id():
                                                          ds_description,
                                                          user_ID,
                                                          is_private,
-                                                         names=names)
+                                                         names,
+                                                         **data)
         ds_json = json_utility.convert_to_json(saved_ds.to_mongo())
     except Exception as e:
         return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
@@ -71,19 +72,14 @@ def get_data_set(data_set_id):
     limit = request.args.get('limit')
     if not limit:
         limit = 100
-    data = data_business.get_by_data_set_limit(ObjectId(data_set_id),
-                                               int(limit))
-    data = json_utility.me_obj_list_to_json_list(data)
-    fields = data_service.get_fields_with_types(ObjectId(data_set_id))
-    fields = {e[0]: e[1] for e in fields}
-    # try:
-    #     data = data_business.get_by_data_set_limit(ObjectId(data_set_id),
-    #                                                int(limit))
-    #     data = json_utility.me_obj_list_to_json_list(data)
-    #     fields = data_service.get_fields_with_types(ObjectId(data_set_id))
-    #     fields = {e[0]: e[1] for e in fields}
-    # except Exception as e:
-    #     return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    try:
+        data = data_business.get_by_data_set_limit(ObjectId(data_set_id),
+                                                   int(limit))
+        data = json_utility.me_obj_list_to_json_list(data)
+        fields = data_service.get_fields_with_types(ObjectId(data_set_id))
+        fields = {e[0]: e[1] for e in fields}
+    except Exception as e:
+        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
     return jsonify({'response': data, 'fields': fields}), 200
 
 

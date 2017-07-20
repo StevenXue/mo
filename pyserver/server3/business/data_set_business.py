@@ -6,10 +6,10 @@ from server3.repository.data_set_repo import DataSetRepo
 data_set_repo = DataSetRepo(DataSet)
 
 
-def add(name, description):
+def add(name, description, **kwargs):
     if not name or not description:
         raise ValueError('no name or no description')
-    data_set = DataSet(name=name, description=description)
+    data_set = DataSet(name=name, description=description, **kwargs)
     return data_set_repo.create(data_set)
 
 
