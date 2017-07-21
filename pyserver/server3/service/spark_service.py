@@ -16,9 +16,8 @@ from pyspark import SparkConf
 
 from keras import layers
 from keras.models import Sequential
-import tensorflow as tf
 
-# graph = tf.get_default_graph()
+
 # ------------------------------ self package ------------------------------
 # sys.path.append("/Users/chen/myPoject/gitRepo/goldersgreen/")
 # sys.path.append("/root/project/git_repo/goldersgreen/server3")
@@ -26,24 +25,26 @@ import tensorflow as tf
 
 # ------------------------------ const ------------------------------
 SPARK_EXECUTOR_MEMORY = '4g'
-SERVER3_PATH = "/Users/chen/myPoject/gitRepo/goldersgreen/pyserver/lib/server3.zip"
-KERAS_SEQ_PATH = '/Users/chen/myPoject/gitRepo/goldersgreen/server3/lib/models/keras_seq.py'
-
 MASTER_ADDRESS = "spark://10.52.14.188:7077"
 
+SERVER3_PATH = "/Users/chen/myPoject/gitRepo/goldersgreen/pyserver/lib/server3.zip"
+# KERAS_SEQ_PATH = '/Users/chen/myPoject/gitRepo/goldersgreen/server3/lib/models/keras_seq.py'
+SPARK_MODELS = \
+    '/Users/chen/myPoject/gitRepo/goldersgreen/pyserver/server3/lib/models/spark_models.py'
 
-# ------------------------------ code ------------------------------
+
+# ------------------------------ spark code ------------------------------
 def CreateSparkContext():
     sparkConf = SparkConf() \
         .setAppName("hyperparameter_tuning") \
         .set("spark.ui.showConsoleProgress", "false") \
         .setMaster(MASTER_ADDRESS) \
         .set("spark.executor.memory", SPARK_EXECUTOR_MEMORY)
-    sc = SparkContext(conf=sparkConf, pyFiles=[SERVER3_PATH])
+    sc = SparkContext(conf=sparkConf, pyFiles=[SPARK_MODELS])
     print("master = " + sc.master)
     SetLogger(sc)
     SetPath(sc)
-    return (sc)
+    return sc
 
 
 def SetLogger(sc):
@@ -59,82 +60,214 @@ def SetPath(sc):
 
 
 # for hyper parameters tuning
-def hyper_parameters_tuning(parameters_grid):
-    def simple_keras_seq(conf, **kw):
-        """
-        a general implementation of sequential model of keras
-        :param conf: config dict
-        :return:
-        """
-        result_sds = kw.pop('result_sds', None)
-        if result_sds is None:
-            raise RuntimeError('no result sds id passed to model')
+def hyper_parameters_tuning(conf_grid, data):
+    """
 
-        model = Sequential()
-        # Dense(64) is a fully-connected layer with 64 hidden units.
-        # in the first layer, you must specify the expected input data shape:
-        # here, 20-dimensional vectors.
-        ls = conf['layers']
-        comp = conf['compile']
-        f = conf['fit']
-        e = conf['evaluate']
-
-        # TODO add validator
-        # op = comp['optimizer']
-
-        # loop to add layers
-        for l in ls:
-            # get layer class from keras
-            layer_class = getattr(layers, l['name'])
-            # add layer
-            model.add(layer_class(**l['args']))
-
-        # optimiser
-        # sgd_class = getattr(optimizers, op['name'])
-        # sgd = sgd_class(**op['args'])
-
-        # define the metrics
-        # compile
-        model.compile(loss=comp['loss'],
-                      optimizer=comp['optimizer'],
-                      metrics=comp['metrics'])
-
-        # training
-        # TODO callback 改成异步，考虑 celery
-        model.fit(f['x_train'], f['y_train'],
-                  validation_data=(f['x_val'], f['y_val']),
-                  verbose=0,
-                  **f['args'])
-
-        # testing
-        score = model.evaluate(e['x_test'], e['y_test'], **e['args'])
-
-        weights = model.get_weights()
-        config = model.get_config()
-        return score
-
-    def model_training(parameter):
-        # from py file import code (if it has dependency, using zip to access it)
-        # from server3.lib.models.keras_seq import keras_seq
-
-        # staging_data_set_id 595cb76ed123ab59779604c3
-        # from server3.business.staging_data_set_business import get_by_id
-        result = simple_keras_seq(parameter, result_sds="11")
+    :param conf_grid: (array) multiple conf list
+    :param data: train and test data
+    :return:
+    """
+    def model_training(conf_obj, data_bc):
+        # get data by broadcast
+        conf_obj["fit"]["x_train"] = data_bc.value["fit"]["x_train"]
+        conf_obj["fit"]["y_train"] = data_bc.value["fit"]["y_train"]
+        conf_obj["fit"]["x_val"] = data_bc.value["fit"]["x_val"]
+        conf_obj["fit"]["y_val"] = data_bc.value["fit"]["y_val"]
+        conf_obj["evaluate"]["x_test"] = data_bc.value["evaluate"]["x_test"]
+        conf_obj["evaluate"]["y_test"] = data_bc.value["evaluate"]["y_test"]
+        result = spark_models.keras_seq(conf_obj, result_sds="objectId")
+        conf_obj["fit"].pop("x_train")
+        conf_obj["fit"].pop("y_train")
+        conf_obj["fit"].pop("x_val")
+        conf_obj["fit"].pop("y_val")
+        conf_obj["evaluate"].pop("x_test")
+        conf_obj["evaluate"].pop("y_test")
         return {
             "result": result,
-            "epochs": parameter['fit']['args']['epochs'],
-            "batch_size": parameter['fit']['args']['batch_size']
+            "conf": conf_obj,
         }
 
     print("begin_hyper_parameters_tuning")
     # create spark context
     sc = CreateSparkContext()
+    # temp import with zip package
+    import spark_models
     # parallelize parameters_grid to rdd
-    rdd = sc.parallelize(parameters_grid, numSlices=len(parameters_grid))
+    print("conf_grid_len", len(conf_grid))
+    print("conf_grid", conf_grid)
+    # broadcast conf with data
+    data_bc = sc.broadcast(data)
+    rdd = sc.parallelize(conf_grid, numSlices=len(conf_grid))
     # run models on spark cluster
-    results = rdd.map(lambda parameter: model_training(parameter))
+    results = rdd.map(lambda conf_obj: model_training(conf_obj, data_bc))
     res = results.collect()
+    sc.stop()
     return res
+
+
+# ------------------------------ service ------------------------------s
+def get_conf_grid(conf, hyper_parameters):
+    """using template conf and hyper_parameters to generate conf grid
+
+    :param conf: (json) the template of conf
+    :param hyper_parameters: (json) the template of hyper_parameters
+    :return: conf grid (array) which contains a list of conf generated by hyper parameters
+    """
+    import copy
+    parameters_grid = hyper_parameters_to_grid(hyper_parameters)
+    conf_grid = []
+    print("transfer grid to conf")
+    for e in parameters_grid:
+        # get the conf template
+        conf_template = copy.deepcopy(conf)
+        # put the attributes of hyper parameters to conf
+        # epochs
+        if e.get('epochs'):
+            conf_template['fit']['args']['epochs'] = e.get('epochs')
+        # batch_size
+        if e.get("batch_size"):
+            conf_template['fit']['args']['batch_size'] = e.get('batch_size')
+            conf_template['evaluate']['args']['batch_size'] = e.get('batch_size')
+        if e.get("optimizer"):
+            conf_template['compile']['optimizer']["name"] = e.get('optimizer')
+        if e.get("lr"):
+            conf_template['compile']['optimizer']['args']['lr'] = e.get('lr')
+        if e.get('momentum'):
+            conf_template['compile']['optimizer']['args']['momentum'] = e.get('momentum')
+
+        # layer 层
+        # 隐含层神经元数量调优
+        for layer_index in range(0, len(conf_template['layers'])):
+            if e['layers'][layer_index].get("units"):
+                conf_template['layers'][layer_index]['args']['units'] = \
+                    e['layers'][layer_index].get("units")
+            if e['layers'][layer_index].get("activation"):
+                conf_template['layers'][layer_index]['args']['activation'] = \
+                    e['layers'][layer_index].get("activation")
+            if e['layers'][layer_index].get("init"):
+                conf_template['layers'][layer_index]['args']['init'] = \
+                    e['layers'][layer_index].get("init")
+            if e['layers'][layer_index].get("rate"):
+                conf_template['layers'][layer_index]['args']['rate'] = \
+                    e['layers'][layer_index].get("rate")
+        conf_grid.append(conf_template)
+    return conf_grid
+
+
+def hyper_parameters_to_grid(hyper_parameters):
+    """transfer the hyper parameters json to grid which contains all possible of conf attributes
+
+    :param hyper_parameters: (json) the template of hyper_parameters
+    :return: hyper parameters grid (array) which contains a list of hyper parameters
+    """
+    import itertools
+    # get the hyperparameters if it exist
+    args = []
+    add_hy_to_array('epochs', hyper_parameters['epochs'], args)
+    add_hy_to_array('batch_size', hyper_parameters['batch_size'], args)
+    add_hy_to_array('optimizer', hyper_parameters['optimizer'], args)
+    add_hy_to_array('lr', hyper_parameters['lr'], args)
+    add_hy_to_array('momentum', hyper_parameters['momentum'], args)
+
+    # layer 层
+    layers_grid = get_grid_of_layer(hyper_parameters['layers'])
+    # add_hy_to_array('init_mode', hyper_parameters['init_mode'], args)
+    # add_hy_to_array('activation', hyper_parameters['activation'], args)
+    # add_hy_to_array('dropout_rate', hyper_parameters['dropout_rate'], args)
+    # add_hy_to_array('weight_constraint', hyper_parameters['weight_constraint'], args)
+    # add_hy_to_array('neurons', hyper_parameters['neurons'], args)
+
+    # get all experiment
+    grid = list(itertools.product(*args))
+    # flat the experiment
+    flat_grid = []
+    for e in grid:
+        obj = {}
+        for i in e:
+            obj.update(**i)
+        flat_grid.append(obj)
+    # conbine flat grid and layer grid
+    complete_grid = list(itertools.product(flat_grid, layers_grid))
+    flat_complete_grid = []
+    for e in complete_grid:
+        obj = {}
+        for i in e:
+            obj.update(**i)
+        flat_complete_grid.append(obj)
+    return flat_complete_grid
+
+
+def get_grid_of_layer(layers_json):
+    """transfer the layer json to grid which contains all possible of layer attributes
+
+    :param layers_json: (json) the template of layers in hyper_parameters
+    :return: layer hyper paremeters grid (array) which contains a list of of layers in
+    hyper parameters
+    """
+    import itertools
+    # get the hyperparameters if it exist
+    layers_args = []
+    for layer in layers_json:
+        args = []
+        add_hy_to_array('units', layer['args'].get('units'), args)
+        add_hy_to_array('activation', layer['args'].get('activation'), args)
+        add_hy_to_array('init', layer['args'].get('init'), args)
+        add_hy_to_array('rate', layer['args'].get('rate'), args)
+
+        grid = list(itertools.product(*args))
+
+        flat_grid = []
+        for e in grid:
+            obj = {}
+            for i in e:
+                obj.update(**i)
+            # print("obj", obj)
+            flat_grid.append(obj)
+        # print(flat_grid)
+        layers_args.append(flat_grid)
+    layers_grid = list(itertools.product(*layers_args))
+    new_grid = []
+    for e in layers_grid:
+        new_grid.append({
+            "layers": e
+        })
+    return new_grid
+
+
+def transfer(key, value):
+    """help function used to convert key-array to key-value
+    eg: transfer(a,[1,2]) -> [{a:1},{a:2}]
+    :param key: (string) key
+    :param value: (array) value
+    :return: (array) which may contains several key-value
+    """
+    new_array = []
+    # if the value is not array
+    if type(value) == list:
+        for i in value:
+            new_array.append({
+                key: i
+            })
+        return new_array
+    else:
+        return [{key: value}]
+
+
+def add_hy_to_array(key, value, args):
+    """add hyper parameters attributes to array before itertools
+
+    :param key: (string) key of hyper parameters
+    :param value: (array) value of hyper parameters
+    :param args: (array) [[h1:1,h1:2],[h2:1,h2:2]]
+    :return:
+    """
+    # if the attribute not exist
+    if value:
+        obj_array = transfer(key, value)
+        # if empty array
+        if obj_array:
+            args.append(obj_array)
+# ------------------------------ service ------------------------------e
 
 
 if __name__ == "__main__":
@@ -217,3 +350,78 @@ if __name__ == "__main__":
     ]
     hyper_parameters_tuning(parametersGrid)
     pass
+
+
+# class SparkService():
+#     """to access spark cluster
+#
+#
+#     """
+#
+#     def __init__(self):
+#         pass
+#
+#     @staticmethod
+#     def create_spark_content(self):
+#         spark_conf = SparkConf() \
+#             .setAppName("hyperparameter_tuning") \
+#             .set("spark.ui.showConsoleProgress", "false") \
+#             .setMaster(MASTER_ADDRESS) \
+#             .set("spark.executor.memory", SPARK_EXECUTOR_MEMORY)
+#         sc = SparkContext(conf=spark_conf, pyFiles=[SPARK_MODELS])
+#         print("master = " + sc.master)
+#         self.SetLogger(sc)
+#         self.SetPath(sc)
+#         return sc
+#
+#     def SetLogger(sc):
+#         logger = sc._jvm.org.apache.log4j
+#         logger.LogManager.getLogger("org").setLevel(logger.Level.ERROR)
+#         logger.LogManager.getLogger("akka").setLevel(logger.Level.ERROR)
+#         logger.LogManager.getRootLogger().setLevel(logger.Level.ERROR)
+#
+#     def SetPath(sc):
+#         global Path
+#         Path = "file:/usr/local/spark/"
+#
+#     @staticmethod
+#     def model_training(self, conf_obj, data_bc, spark_models):
+#         # get data by broadcast
+#         conf_obj["fit"]["x_train"] = data_bc.value["fit"]["x_train"]
+#         conf_obj["fit"]["y_train"] = data_bc.value["fit"]["y_train"]
+#         conf_obj["fit"]["x_val"] = data_bc.value["fit"]["x_val"]
+#         conf_obj["fit"]["y_val"] = data_bc.value["fit"]["y_val"]
+#         conf_obj["evaluate"]["x_test"] = data_bc.value["evaluate"]["x_test"]
+#         conf_obj["evaluate"]["y_test"] = data_bc.value["evaluate"]["y_test"]
+#         result = spark_models.keras_seq(conf_obj, result_sds="objectId")
+#         conf_obj["fit"].pop("x_train")
+#         conf_obj["fit"].pop("y_train")
+#         conf_obj["fit"].pop("x_val")
+#         conf_obj["fit"].pop("y_val")
+#         conf_obj["evaluate"].pop("x_test")
+#         conf_obj["evaluate"].pop("y_test")
+#         return {
+#             "result": result,
+#             "conf": conf_obj,
+#         }
+#
+#     @classmethod
+#     def run_hyper_parameters_tuning(cls, conf_grid, data):
+#         print("begin_hyper_parameters_tuning")
+#         # create spark context
+#         sc = cls.create_spark_content()
+#         # temp import with zip package
+#         import spark_models
+#         # parallelize parameters_grid to rdd
+#         print("conf_grid_len", len(conf_grid))
+#         print("conf_grid", conf_grid)
+#         # broadcast conf with data
+#         data_bc = sc.broadcast(data)
+#         rdd = sc.parallelize(conf_grid, numSlices=len(conf_grid))
+#         # run models on spark cluster
+#         results = rdd.map(lambda conf_obj: cls.model_training(conf_obj,
+#                                                                data_bc, spark_models))
+#         res = results.collect()
+#         sc.stop()
+#         return res
+
