@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 from datetime import datetime
 
+from mongoengine import DoesNotExist
+
 from server3.service import job_service
 from server3.business import project_business
 from server3.business import job_business
@@ -86,11 +88,13 @@ def get_all_jobs_of_project(project_id, categories):
         keys = history_jobs.keys()
         for key in keys:
             if job[key]:
-                result_sds = staging_data_set_business.get_by_job_id(
-                    job['id']).to_mongo()
+                try:
+                    result_sds = staging_data_set_business.get_by_job_id(
+                        job['id']).to_mongo()
+                except DoesNotExist:
+                    result_sds = None
                 job_info[key] = {
                     'name': job[key]['name'],
-                    'parameter_spec': job[key]['parameter_spec'],
                 }
                 job_info['staging_data_set'] = job['staging_data_set']['name']
                 job_info['staging_data_set_id'] = job['staging_data_set']['id']
@@ -98,6 +102,3 @@ def get_all_jobs_of_project(project_id, categories):
                 history_jobs[key].append(job_info)
                 break
     return history_jobs
-
-
-

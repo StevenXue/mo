@@ -158,6 +158,8 @@ export default class ModelProcess extends React.Component {
                         project_id={this.props.project_id}
                         model_id={this.state.selectedModel}
                         jupyter={this.props.jupyter}
+                        isActive={this.props.isActive}
+                        modalSuccess={() => this.props.modalSuccess()}
                         getCode={(code) => this.onReceiveCode(code)}/>
           </div>
           </div>
@@ -169,5 +171,6 @@ export default class ModelProcess extends React.Component {
 ModelProcess.PropTypes = {
   dataset_id: PropTypes.string,
   project_id: PropTypes.string,
-  cols: PropTypes.array
+  cols: PropTypes.array,
+  isActive: PropTypes.bool
 }

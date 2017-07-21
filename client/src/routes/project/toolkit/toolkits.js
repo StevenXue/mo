@@ -5,8 +5,6 @@ const Step = Steps.Step;
 import { jupyterServer, flaskServer } from '../../../constants';
 import { Router, routerRedux } from 'dva/router';
 import ReactJson from 'react-json-view';
-const mockResult = [['device_node_id', 'unicode'], ['productor', 'unicode'], ['name', 'unicode'], ['f1', 'unicode'], ['device_model', 'unicode'], ['local_device_id', 'unicode'], ['asset_code', 'unicode'], ['staging_data_set', 'ObjectId'], ['version', 'unicode'], ['station_id', 'unicode'], ['device_type', 'unicode'], ['_id', 'ObjectId']]
-
 let hasOwnProperty = Object.prototype.hasOwnProperty;
 
 function isEmpty(obj) {
@@ -49,11 +47,28 @@ export default class Toolkit extends React.Component {
   }
 
   componentDidMount () {
-    this.fetchData(this.props)
+    if(this.props.params[this.props.section_id]) {
+      let params = this.props.params[this.props.section_id]
+      this.setState({
+        current: 2,
+        checkedCols: params.fields
+      });
+      this.setState({
+        steps:[{
+          title: params.toolkit.name,
+        }, {
+          title: 'Dataset: ' + params.staging_data_set,
+        }, {
+          title: 'Result',
+        }]
+      });
+    }else {
+      this.fetchData(this.props);
+    }
   }
 
   componentWillReceiveProps (nextProps) {
-    this.fetchData(nextProps)
+    this.fetchData(nextProps);
   }
 
   fetchData(props) {
@@ -141,7 +156,7 @@ export default class Toolkit extends React.Component {
       checked.pop()
     }
     this.setState({ checkedCols: checked });
-    console.log(this.state.checkedCols);
+    // console.log(this.state.checkedCols);
   }
 
   onRunClick () {
@@ -378,5 +393,6 @@ Toolkit.PropTypes = {
   project_id: PropTypes.string,
   isActive: PropTypes.bool,
   onReceiveResult: PropTypes.func,
+  params: PropTypes.array
 }
 

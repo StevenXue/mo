@@ -75,7 +75,7 @@ def save_file_and_get_size(file, path):
 
 
 # get file
-def file_loader(file_id, user_ID, **kwargs):
+def file_loader(file_id, user_ID, names):
     """
     read csv file to list of dict
     :param file_id:
@@ -89,7 +89,7 @@ def file_loader(file_id, user_ID, **kwargs):
     if is_private and not is_owned:
         raise Exception('file permission denied, private: %s, owned: %s' % (
             is_private, is_owned))
-    table = pd.read_csv(file.uri, skipinitialspace=True, **kwargs)\
+    table = pd.read_csv(file.uri, skipinitialspace=True, names=names)\
         .to_dict('records')
     return table
 

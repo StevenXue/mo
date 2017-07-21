@@ -107,7 +107,6 @@ def create_model_job(project_id, staging_data_set_id, model_obj, *argv):
         def wrapper(*args, **kw):
             # create a job
             # model_obj = model_business.get_by_model_id(model_id)
-            print(args)
             params = args[0]
             staging_data_set_obj = \
                 staging_data_set_business.get_by_id(staging_data_set_id)
