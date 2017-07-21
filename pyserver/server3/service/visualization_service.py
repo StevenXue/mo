@@ -15,6 +15,9 @@ from scipy import stats
 import pandas as pd
 import numpy as np
 
+from server3.utility import data_utility
+
+
 
 def usr_story1_exploration(data, d_type, group_num=10):
     # 转换，把所有键值对里的值变成一个数组返回(arr_temp)
@@ -43,7 +46,6 @@ def usr_story1_exploration(data, d_type, group_num=10):
         df = pd.DataFrame(freq_hist)
         # 给出y轴
         y_domain = df.groupby(pd.cut(df.freq_hist, x_domain)).count().freq_hist.values/interval
-        print ('y_domain', y_domain)
         # y_domaining = [format_round(x, 4) for x in y_domain * 1000]
         # print ('y_domain', y_domain.apply(lambda x: '%.3f' % x))
 
@@ -94,6 +96,41 @@ def hypo_test(arr, mean, std, x_range, type='norm'):
         return flag, p_value, (arr_norm_draw*1000).round(3).tolist()
 
 
+def usr_story2_exploration(data, d_type):
+    if d_type == "聚类":
+        cols = data["fields"]
+        # 暂时支持3个栏位以上的
+        print("2")
+        if len(cols) > 2:
+            # nan的所有位置
+            nan_index = [index for index, item in enumerate(data["labels"]) if isNaN(item)]
+            scatter_without_nan = [item for index, item in enumerate(data["scatter"]) if not isNaN(item)]
+            scatter = data_utility.retrieve_nan_index(t_sne(scatter_without_nan), nan_index)
+            centers = t_sne(data["centers"])
+            # print(data.pop("scatter", None))
+            # print("type", type(data))
+            #
+            # data.pop("scatter")
+            # data.pop("centers")
+            # print("\n\n\n4", data)
+            data["scatter"] = scatter
+            data["centers"] = centers
+
+            scatter_zip = list(zip(*scatter_without_nan))
+            temp = {}
+            for arr in scatter_zip:
+                name = cols.pop(0)
+                temp.update({name: freq_hist(arr)})
+            data.update({"hist_freq": temp})
+
+    return data
+
+
+
+
+
+
+
 def isNaN(num):
     return num != num
 
@@ -106,3 +143,27 @@ def format_round(f, n):
         else:
             return float(int(f)/(10**m)*(10**m))
     return round(f, n - len(str(int(f)))) if len(str(f))>n+1 else f
+
+
+def t_sne(arr):
+    from sklearn.manifold import TSNE
+    matrix = np.array(arr)
+    t_sne = TSNE(n_components=2, random_state=0)
+    np.set_printoptions(suppress=True)
+    result = t_sne.fit_transform(matrix).tolist()
+    return result
+
+
+def freq_hist(arr, group_num=5):
+    arr_array = np.array(arr)
+    min = arr_array.min()
+    max = arr_array.max()
+    interval = (max - min + 1) / group_num
+    # 给出x轴
+    x_domain = np.arange(min, max + interval, interval).round(1)
+    freq_hist = {"freq_hist": arr_array}
+    df = pd.DataFrame(freq_hist)
+    # 给出y轴
+    y_domain = df.groupby(pd.cut(df.freq_hist, x_domain)).count().freq_hist.values
+    # 注意x会比y多一个
+    return {'x_domain': x_domain.tolist(), 'y_domain': (y_domain * 1000).round(3).tolist()}
