@@ -171,6 +171,20 @@ def update_data(update):
         staging_data_business.update_by_id(oid, query)
 
 
+# 新增加一个栏位用来加字段，字段的value在array里面
+def add_new_key_value(sds_id, key, array):
+    """
+        update data row by row
+        :param update:
+        :return:
+    """
+    # get staging data的所有id
+    ids = staging_data_business.get_by_staging_data_set_id(sds_id)
+    for oid in ids:
+        query = {key: array.pop(0)}
+        staging_data_business.update_by_id(oid.id, query)
+
+
 def get_row_col_info(sds_id):
     """
     get_row_col_info
