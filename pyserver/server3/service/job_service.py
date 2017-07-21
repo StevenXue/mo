@@ -23,6 +23,7 @@ from server3.business import model_business
 from server3.service import staging_data_service
 from server3.service import logger_service
 
+from server3.utility import data_utility
 from server3.lib import models
 from server3.repository import job_repo
 
@@ -68,7 +69,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
             # TODO 以下部分全部为特殊处理start/
             if toolkit_obj.category == "聚类" or 1:
                 labels = list(cols.values())[0]
-                json = {"scatter": args[0], "labels": labels,
+                json = {"scatter": data_utility.retrieve_nan_index(args[0], args[1]), "labels": labels,
                         "pie": [{'text': el, 'value': labels.count(el)} for el in set(labels)],
                         "centers": result.pop("各类别中心坐标"),
                         "general_info": result}
