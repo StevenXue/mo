@@ -44,12 +44,13 @@ export default class ModelForms extends React.Component {
       end: false,
       custom: {},
       customParams: {},
-      score: []
+      score: [],
+      isActive: true,
+      params: this.props.params
     }
   }
 
   componentDidMount(){
-    //console.log("modal data", this.props.data)
     this.setState({
       layer: this.props.data.layers,
       compile: this.props.data.compile,
@@ -57,8 +58,8 @@ export default class ModelForms extends React.Component {
       fit: this.props.data.fit,
       divide: this.props.divide,
       custom: this.props.data.estimator,
+      isActive: this.props.isActive
     });
-
     let socket = io.connect(flaskServer+ '/log/' + this.props.project_id);
     socket.on('log_epoch_end', (msg) => {
       this.setTimeout(
@@ -74,7 +75,9 @@ export default class ModelForms extends React.Component {
       evaluate: nextProps.data.evaluate,
       fit: nextProps.data.fit,
       divide: nextProps.divide,
-      custom: nextProps.data.estimator
+      custom: nextProps.data.estimator,
+      isActive: nextProps.isActive,
+      params: nextProps.params
     });
   }
 
@@ -91,15 +94,12 @@ export default class ModelForms extends React.Component {
   }
 
   getCompileParams(value) {
-    console.log("chosen", value);
     this.setState({compileParams: value});
   }
 
   constructParams(){
-    //console.log(this.state.compileParams);
     let run_params = {};
     run_params['layers'] = this.state.layerParams;
-    //run_params['compile'] = this.state.compileParams;
     run_params['compile'] = {
       'args' : {}
     }
@@ -151,7 +151,6 @@ export default class ModelForms extends React.Component {
             })
           }else{
             if(el.required === true || !customParams[el.name]){
-              console.log(el);
               run_params.estimator.args.push({
                 [el.name] : el.default
               })
@@ -167,7 +166,6 @@ export default class ModelForms extends React.Component {
   onClickRun(){
     if(this.props.jupyter){
       let run_params = this.constructParams();
-      //console.log("jupyter", this.props.dataset_id);
       fetch(flaskServer + '/model/models/to_code/' + this.props.model_id, {
         method: 'post',
         headers: {
@@ -203,11 +201,9 @@ export default class ModelForms extends React.Component {
           .then((res) => {
             if (res.response === 'success') {
               message.success(res.response);
-              //let score = [];
-              //score res.response.score)
               this.setState({score: res.response.score});
-              this.props.modalSuccess();
             }
+            this.props.modalSuccess();
             this.setTimeout(this.setState({end: true}),2000);
           })
       }
@@ -221,90 +217,148 @@ export default class ModelForms extends React.Component {
     this.setState({customParams});
   }
 
+  renderLayers() {
+    if (this.props.params) {
+      return (
+        <div>
+          {
+            this.state.params['params']['layers'].map((el) =>
+              <Layer layers={this.state.layer}
+                     key={Math.random()}
+                     isActive={this.state.isActive}
+                     getParams={(value) => this.getParams(el, value)}
+                     params={el}/>)
+          }
+        </div>
+      )
+    } else {
+      return (
+        <div>
+          {
+            !this.state.layer &&
+            <p >Layers not required</p>
+          }
+          {
+            this.state.layer &&
+            <div>
+              {this.state.layerStack.map((el) =>
+                <Layer layers={this.state.layer} key={el} isActive={this.state.isActive}
+                       getParams={(value) => this.getParams(el, value)}/>
+              )}
+              {this.state.isActive &&
+              <Button style={{marginTop: 10}} size="small" onClick={() => this.addLayer()}>Add Layer</Button>
+              }
+            </div>
+          }
+        </div>
+      )
+    }
+  }
+
+  renderEstimator(){
+    return(
+      <div>
+      {
+      !isEmpty(this.state.custom) &&
+        <Estimator custom={this.state.custom['args']} isActive={this.state.isActive} getEstimator={(field, value) => this.getEstimator(field, value)} />
+      }
+      </div>
+    )
+  }
+
+  renderCompile(){
+    return(
+      <div>
+        { this.state.compile &&
+        <div>
+          <p style={{color: '#108ee9'}}>Compile</p>
+          <Compile compile={this.state.compile['args']} isActive={this.state.isActive} getParams={(value) => this.getCompileParams(value)}/>
+        </div>
+        }
+      </div>
+    )
+  }
+
+  renderFit(){
+    return(
+      <div>
+        {!isEmpty(this.state.fit) &&
+        <div>
+          <p style={{color: '#108ee9', marginTop: 5}}>Fit</p>
+          <div >
+            {
+              this.state.fit.args.map((el) => (
+                  <div key={'fit_'+ el.name}>
+                    <span style={{width: 150}}>{el.name + " : "}</span>
+                    <Input ref={'fit_'+ el.name} disabled={!this.state.isActive}
+                           style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+                    <Popover content={<div>
+                      <p style={{width: 150}}>{el.type.des}</p>
+                    </div>} title="Description">
+                      <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5}}/>
+                    </Popover>
+                  </div>
+                )
+              )
+            }
+          </div>
+        </div>
+        }
+      </div>
+    )
+  }
+
+  renderEvaluate(){
+    return(
+      <div>
+        {
+          !isEmpty(this.state.evaluate) &&
+          <div>
+            <p style={{color: '#108ee9', marginTop: 5}}>Evaluate</p>
+            <div>
+              {
+                this.state.evaluate.args.map((el) => (
+                    <div key={'eva_'+ el.name}>
+                      <span style={{width: 200}}>{el.name + " : "}</span>
+                      <Input ref={'evaluate_'+ el.name}
+                             disabled={!this.state.isActive}
+                             style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+                      <Popover content={<div>
+                        <p style={{width: 150}}>{el.type.des}</p>
+                      </div>} title="Description">
+                        <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5}}/>
+                      </Popover>
+                    </div>
+                  )
+                )
+              }
+            </div>
+          </div>
+        }
+      </div>
+    )
+  }
+
   render() {
     return (
       <div style={{width: '100%', display:'flex', flexDirection: 'row'}}>
         <div style={{width: '50%', height: '100%'}}>
           <div>
             <p style={{color: '#108ee9'}}>Layer</p>
-            {
-              !this.state.layer &&
-              <p >Layers not required</p>
-            }
-            { this.state.layer &&
-              <div>
-                  {this.state.layerStack.map((el) =>
-                    <Layer layers={this.state.layer} key={el} getParams={(value) => this.getParams(el, value)}/>
-                  )}
-                <Button style={{marginTop: 10}} size="small" onClick={() => this.addLayer()}>Add Layer</Button>
-              </div>
-
-            }
+            {this.renderLayers()}
           </div>
-          {
-            !isEmpty(this.state.custom) &&
-            <Estimator custom={this.state.custom['args']} getEstimator={(field, value) => this.getEstimator(field, value)} />
-          }
+          {this.renderEstimator()}
         </div>
         <div style={{width: '46%'}}>
           <div >
-            { this.state.compile &&
-              <div>
-                <p style={{color: '#108ee9'}}>Compile</p>
-                <Compile compile={this.state.compile['args']} getParams={(value) => this.getCompileParams(value)}/>
-              </div>
-            }
+            {this.renderCompile()}
           </div>
-          {!isEmpty(this.state.fit) &&
-            <div>
-              <p style={{color: '#108ee9', marginTop: 5}}>Fit</p>
-              <div >
-                {
-                  this.state.fit.args.map((el) => (
-                      <div key={'fit_'+ el.name}>
-                        <span style={{width: 150}}>{el.name + " : "}</span>
-                        <Input ref={'fit_'+ el.name}
-                               style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
-                        <Popover content={<div>
-                          <p style={{width: 150}}>{el.type.des}</p>
-                        </div>} title="Description">
-                          <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5}}/>
-                        </Popover>
-                      </div>
-                    )
-                  )
-                }
-              </div>
-            </div>
-          }
+            {this.renderFit()}
           <div>
           </div>
-          {
-            !isEmpty(this.state.evaluate) &&
-            <div>
-              <p style={{color: '#108ee9', marginTop: 5}}>Evaluate</p>
-              <div>
-                {
-                 this.state.evaluate.args.map((el) => (
-                   <div key={'fit_'+ el.name}>
-                     <span style={{width: 200}}>{el.name + " : "}</span>
-                      <Input ref={'evaluate_'+ el.name}
-                      style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
-                     <Popover content={<div>
-                       <p style={{width: 150}}>{el.type.des}</p>
-                     </div>} title="Description">
-                       <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5}}/>
-                     </Popover>
-                   </div>
-                   )
-                 )
-                }
-              </div>
-            </div>
-          }
+            {this.renderEvaluate()}
           <Button type='primary' style={{ marginTop: 30}} onClick={() => this.onClickRun()}>
             <Icon type="area-chart" />{this.props.jupyter? "GetCode" : this.state.end? "View":"Run"}
-
           </Button>
           <Modal title="Result"
                  width={700}

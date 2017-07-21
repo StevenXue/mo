@@ -20,9 +20,10 @@ export default class AutomatedModel extends React.Component {
       tasks: [],
       row: 0,
       loading: true,
-      statusStack: [true],
+      statusStack: [],
       columns: [],
       //custom: {}
+      params: []
     }
   }
 
@@ -34,17 +35,29 @@ export default class AutomatedModel extends React.Component {
       },
     }).then((response) => response.json())
       .then((res) => {
-          //this.setState({ data_set: res.response });
+          this.setState({ params: res.response.model });
+          if(res.response.model.length === 0){
+            let statusStack = [true];
+            this.setState({statusStack});
+          }else{
+            let statusStack = [];
+            let l = res.response.model.length;
+            for(let i = 0; i < l; i++ ){
+              statusStack.push(false);
+            }
+            this.setState({statusStack});
+          }
+
           fetch(flaskServer + '/staging_data/staging_data_sets?project_id=' + this.props.project_id, {
             method: 'get',
             headers: {
               'Content-Type': 'application/json',
             },
           }).then((response) => response.json())
-            .then((res) => {
+            .then((res) =>
                 this.setState({ data_set: res.response, loading: false})
-              },
             );
+
         },
       );
   }
@@ -82,7 +95,8 @@ export default class AutomatedModel extends React.Component {
       .catch((err) => console.log('Error: /staging_data/staging_data_sets/fields', err))
   }
 
-  deactivete(i){
+  deactivate(i){
+    console.log("success automodal");
     let array = this.state.statusStack;
     array[i] = false;
     this.setState({statusStack: array});
@@ -173,6 +187,7 @@ export default class AutomatedModel extends React.Component {
                        key={i}
                        cols={this.state.columns}
                        jupyter={false}
+                       params={this.state.params[i]}
                        modalSuccess={() => this.deactivate(i)}
                        isActive={el}/>)
             }
