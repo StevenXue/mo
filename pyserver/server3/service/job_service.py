@@ -58,7 +58,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
 
             # calculate
             result, cols = func(*args, **kw)
-            results = {**result, **cols}
+            results = {**result, **cols, **{"fields": fields}}
             # create result sds for toolkit
             sds_name = '%s_%s_result' % (toolkit_obj['name'], job_obj['id'])
             result_sds_obj = staging_data_set_business.add(sds_name, 'des',
@@ -72,7 +72,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
                 json = {"scatter": data_utility.retrieve_nan_index(args[0], args[1]), "labels": labels,
                         "pie": [{'text': el, 'value': labels.count(el)} for el in set(labels)],
                         "centers": result.pop("各类别中心坐标"),
-                        "general_info": result}
+                        "general_info": result,
+                        "fields": fields}
 
             # 判断是否存储结果到staging_data_set, 默认result_form2
             if toolkit_obj.result_form == 2 or 1:
