@@ -5,7 +5,7 @@ import warnings
 import numpy as np
 from keras.callbacks import ModelCheckpoint
 
-from server3.service import logger
+from server3.service import logger_service
 
 
 class MongoModelCheckpoint(ModelCheckpoint):
