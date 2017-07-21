@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 from keras.callbacks import LambdaCallback
-from keras.layers import Dense, Dropout
+from keras.layers import Dense, Dropout, Conv2D, MaxPooling2D, Flatten
 from keras.models import Sequential
 from keras.optimizers import SGD
 
@@ -8,7 +8,7 @@ from server3.lib.models.keras_callbacks import MongoModelCheckpoint
 from server3.service import logger
 
 
-def mlp(conf, input, **kw):
+def convnet(conf, input, **kw):
     result_sds = kw.pop('result_sds', None)
     project_id = kw.pop('project_id', None)
     f = conf['fit']
@@ -19,19 +19,24 @@ def mlp(conf, input, **kw):
     y_val = input['y_te']
     x_test = input['x_te']
     y_test = input['y_te']
-    input_len = x_train.shape[1]
-    output_len = y_train.shape[1]
+    input_shape = x_train.shape[1:]
+    output_units = y_train.shape[-1]
 
     model = Sequential()
+    model.add(Conv2D(32, (3, 3), activation='relu', input_shape=input_shape))
+    model.add(Conv2D(32, (3, 3), activation='relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.25))
 
-    # Dense(64) is a fully-connected layer with 64 hidden units.
-    # in the first layer, you must specify the expected input data shape:
-    # here, 20-dimensional vectors.
-    model.add(Dense(64, activation='relu', input_dim=input_len))
+    model.add(Conv2D(64, (3, 3), activation='relu'))
+    model.add(Conv2D(64, (3, 3), activation='relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.25))
+
+    model.add(Flatten())
+    model.add(Dense(256, activation='relu'))
     model.add(Dropout(0.5))
-    model.add(Dense(64, activation='relu'))
-    model.add(Dropout(0.5))
-    model.add(Dense(output_len, activation='softmax'))
+    model.add(Dense(output_units, activation='softmax'))
 
     sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 
@@ -54,7 +59,6 @@ def mlp(conf, input, **kw):
                                               verbose=0)
 
     # training
-    # TODO callback 改成异步，考虑 celery
     history = model.fit(x_train, y_train,
                         validation_data=(x_val, y_val),
                         callbacks=[batch_print_callback, best_checkpoint,
@@ -64,7 +68,6 @@ def mlp(conf, input, **kw):
 
     score = model.evaluate(x_test, y_test, **e['args'])
 
-    # weights = model.get_weights()
     config = model.get_config()
     logger.log_train_end(result_sds,
                          model_config=config,
@@ -74,11 +77,11 @@ def mlp(conf, input, **kw):
     return {'score': score, 'history': history.history}
 
 
-def mlp_to_str():
+def convnet_to_str():
     pass
 
 
-MLP = {
+CONVNET = {
     "fit": {
         "data_fields": {
             "name": "training_fields",

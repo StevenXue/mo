@@ -6,6 +6,11 @@ from server3.lib.models.keras_seq import keras_seq_to_str
 # mlp
 from server3.lib.models.mlp import mlp
 from server3.lib.models.mlp import MLP
+from server3.lib.models.mlp import mlp_to_str
+# convnet
+from server3.lib.models.convnet import convnet
+from server3.lib.models.convnet import CONVNET
+from server3.lib.models.convnet import convnet_to_str
 # custom model
 from server3.lib.models.custom_model import custom_model
 from server3.lib.models.custom_model import custom_model_to_str
