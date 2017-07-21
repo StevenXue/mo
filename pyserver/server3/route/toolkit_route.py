@@ -111,6 +111,7 @@ def get_by_staging_data_set_and_fields():
                                                             staging_data_set_id,
                                                             toolkit_id, fields,
                                                             data, k)
+        # result.update({"fields": fields})
     except Exception as e:
         return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
     return jsonify({'response': json_utility.convert_to_json(result)}), 200
