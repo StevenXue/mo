@@ -19,12 +19,10 @@ from server3.utility import json_utility
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
-
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'csv'])
+ALLOWED_EXTENSIONS = {'zip', 'csv'}
 PREFIX = '/file'
 UPLOAD_URL = '/uploads/'
 REQUEST_FILE_NAME = 'uploaded_file'
-
 
 file_app = Blueprint("file_app", __name__, url_prefix=PREFIX)
 
@@ -53,7 +51,8 @@ def upload_file():
             try:
                 url_base = PREFIX + UPLOAD_URL
                 saved_file = file_service.add_file(file, url_base,
-                                             user_ID, is_private, description)
+                                                   user_ID, is_private,
+                                                   description)
                 file_json = json_utility.convert_to_json(saved_file.to_mongo())
             except Exception as e:
                 return make_response(jsonify({'response': '%s: %s' % (str(
@@ -80,7 +79,7 @@ def list_files_by_user_ID():
         }
     except Exception as e:
         return make_response(jsonify({'response': '%s: %s' % (str(
-                             Exception), e.args)}), 400)
+            Exception), e.args)}), 400)
     return make_response(jsonify({'response': result}), 200)
 
 

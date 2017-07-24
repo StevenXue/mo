@@ -2,6 +2,7 @@
 import os
 import csv
 import io
+import zipfile
 
 import pandas as pd
 
@@ -33,7 +34,11 @@ def add_file(file, url_base, user_ID, is_private=False, description=''):
     file_url = url_base + user.user_ID + '/' + file.filename
     save_directory = UPLOAD_FOLDER + user.user_ID + '/'
     # TODO need to be undo when failed
-    file_size, file_uri = save_file_and_get_size(file, save_directory)
+    if file.filename.rsplit('.', 1)[1].lower() == 'zip':
+        file_size, file_uri = extract_file_and_get_size(file, save_directory)
+    else:
+        file_size, file_uri = save_file_and_get_size(file, save_directory)
+
     saved_file = file_business.add(file.filename, file_size, file_url,
                                    file_uri, description)
     if saved_file:
@@ -71,7 +76,17 @@ def save_file_and_get_size(file, path):
     if not os.path.exists(path):
         os.makedirs(path)
     file.save(os.path.join(path, file.filename))
-    return os.stat(os.path.join(path)).st_size, path + file.filename
+    uri = path + file.filename
+    return os.stat(os.path.join(uri)).st_size, uri
+
+
+def extract_file_and_get_size(file, path):
+    with zipfile.ZipFile(file) as my_zip:
+        my_zip.extractall(path)
+        # assume there's one and only one folder in zip
+        folder_name = my_zip.namelist()[0]
+        uri = path + folder_name
+        return os.stat(os.path.join(uri)).st_size, uri
 
 
 # get file
@@ -89,7 +104,7 @@ def file_loader(file_id, user_ID, names):
     if is_private and not is_owned:
         raise Exception('file permission denied, private: %s, owned: %s' % (
             is_private, is_owned))
-    table = pd.read_csv(file.uri, skipinitialspace=True, names=names)\
+    table = pd.read_csv(file.uri, skipinitialspace=True, names=names) \
         .to_dict('records')
     return table
 
@@ -98,7 +113,7 @@ def list_files_by_user_ID(user_ID, order=-1):
     if not user_ID:
         raise ValueError('no user id')
     public_files = ownership_service.get_all_public_objects('file')
-    owned_files = ownership_service.\
+    owned_files = ownership_service. \
         get_private_ownership_objects_by_user_ID(user_ID, 'file')
 
     if order == -1:
