@@ -126,11 +126,6 @@ def usr_story2_exploration(data, d_type):
     return data
 
 
-
-
-
-
-
 def isNaN(num):
     return num != num
 
