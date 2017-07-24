@@ -71,7 +71,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
                 labels = list(cols.values())[0]
                 json = {"scatter": data_utility.retrieve_nan_index(args[0], args[1]), "labels": labels,
                         "pie": [{'text': el, 'value': labels.count(el)} for el in set(labels)],
-                        "centers": result.pop("各类别中心坐标"),
+                        "centers": result.pop("Centroids of Clusters"),
                         "general_info": result,
                         "fields": fields}
 
