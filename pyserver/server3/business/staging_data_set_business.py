@@ -70,4 +70,3 @@ def remove_by_id(sds_id):
     :return: None
     """
     return staging_data_set_repo.delete_by_id(sds_id)
-

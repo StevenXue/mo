@@ -5,7 +5,7 @@ from keras.models import Sequential
 from keras.optimizers import SGD
 
 from server3.lib.models.keras_callbacks import MongoModelCheckpoint
-from server3.service import logger
+from server3.service import logger_service
 
 
 def convnet(conf, input, **kw):

@@ -134,7 +134,8 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
     result = toolkit_calculate(project_id, staging_data_set_id, toolkit_id, fields, *argv)
 
     # project_business.add_job_and_result_to_project(result, ObjectId(project_id))
-    return result.to_mongo().to_dict()
+    # return result.to_mongo().to_dict()
+    return result
 
 
 def add_toolkit_with_ownership(name, description, target_py_code,

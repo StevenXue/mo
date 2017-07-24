@@ -9,3 +9,5 @@ gen
 
 # ignore all .pyc files
 *.pyc
+/pyserver/gunicorn_run_flask.sh
+/pyserver/jupyter.sh

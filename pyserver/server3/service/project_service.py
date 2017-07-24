@@ -88,7 +88,6 @@ def get_all_jobs_of_project(project_id, categories):
         keys = history_jobs.keys()
         for key in keys:
             if job[key]:
-                print(job['id'])
                 try:
                     result_sds = staging_data_set_business.get_by_job_id(
                         job['id']).to_mongo()

@@ -4,7 +4,7 @@ from keras import layers
 from keras.callbacks import LambdaCallback
 from keras.models import Sequential
 import tensorflow as tf
-from server3.service import logger
+from server3.service import logger_service
 from server3.utility.str_utility import generate_args_str
 from server3.lib.models.keras_callbacks import MongoModelCheckpoint
 

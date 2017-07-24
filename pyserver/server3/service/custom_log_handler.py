@@ -1,7 +1,7 @@
 import logging
 import re
 
-from server3.service import logger
+from server3.service import logger_service
 
 # regex to match scientific number
 sci_re = '-?\d+\.?\d*(?:[Ee]-?\d+)?'
