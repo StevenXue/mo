@@ -14,22 +14,31 @@ export default class Compile extends React.Component {
       visible: false,
       args: [],
       selected: '',
-      values: {}
+      values: {},
+      isActive: this.props.isActive,
+      isView: false
     }
   }
 
   componentDidMount(){
     //console.log(this.props.compile);
-    this.setState({compile: this.props.compile});
-    if(this.props.compile){
-      let compile = this.props.compile;
-      let values = {}
-      compile.map((e) => {
-        values[e.name] = e.default;
-      });
-      //console.log(values);
-      this.setState({values});
+    if(this.props.params) {
+      this.setState({isView: true});
+    }else{
+      this.setState({compile: this.props.compile});
+      if(this.props.compile){
+        let compile = this.props.compile;
+        let values = {}
+        compile.map((e) => {
+          values[e.name] = e.default;
+        });
+        this.setState({values});
+      }
     }
+  }
+
+  componentWillReceiveProps(nextProps){
+    this.setState({isActive: nextProps.isActive});
   }
 
   onSelectSingle(field, value){
@@ -102,14 +111,23 @@ export default class Compile extends React.Component {
   render(){
     return(
       <div style={{height: 'auto'}}>
-        { this.state.compile.map((e) =>
-          <div key={e.name} style={{display: 'flex', flexDirection: 'row', marginBottom: 5}}>
-            <div style={{width: 100}}>
-              <span>{e.name + ": "}</span>
+        {this.state.isView? (
+          Object.keys(this.props.params.args).map((e) =>
+            <div key={e}>
+              <span>{e + ": "}</span>
+              <span style={{color: '#00AAAA'}}>{this.props.params.args[e]}</span>
             </div>
-            {this.renderCompileParams(e)}
-          </div>
-        )}
+          )
+        ):
+          ( this.state.compile.map((e) =>
+            <div key={e.name} style={{display: 'flex', flexDirection: 'row', marginBottom: 5}}>
+              <div style={{width: 100}}>
+                <span>{e.name + ": "}</span>
+              </div>
+              {this.renderCompileParams(e)}
+            </div>
+          ))
+        }
       </div>
     )
   }

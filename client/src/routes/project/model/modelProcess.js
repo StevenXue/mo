@@ -64,22 +64,24 @@ export default class ModelProcess extends React.Component {
   }
 
   componentWillReceiveProps(nextProps){
-    //console.log(nextProps);
+    //console.log(nextProps.params);
     this.setState({
       dataSet: nextProps.dataset_id,
       isActive: nextProps.isActive,
-      modelName: nextProps.params.model.name
     });
-    let data_fields = nextProps.params['params']['fit']['data_fields']
-    if( data_fields.length === 2 ){
-      this.setState({
-        selectedKeys: data_fields[0],
-        targetKeys: data_fields[1]
-      });
-    }else{
-      this.setState({
-        targetKeys: data_fields[0]
-      });
+    if(nextProps.params) {
+      this.setState({modelName: nextProps.params.model.name});
+      let data_fields = nextProps.params['params']['fit']['data_fields']
+      if (data_fields.length === 2) {
+        this.setState({
+          selectedKeys: data_fields[0],
+          targetKeys: data_fields[1]
+        });
+      } else {
+        this.setState({
+          targetKeys: data_fields[0]
+        });
+      }
     }
   }
 
@@ -141,7 +143,7 @@ export default class ModelProcess extends React.Component {
 
   render(){
     return(
-        <div style={{width: 1100, height:480, margin: 10 , padding: 10, backgroundColor: 'white' }}>
+        <div style={{width: 1100, height: this.state.isActive? 450:300, margin: 10 , padding: 10, backgroundColor: 'white' }}>
           <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
           <div style={{width: '35%', height: 480}}>
             <span style={{color: '#108ee9'}}>Choose Modelling Method</span>

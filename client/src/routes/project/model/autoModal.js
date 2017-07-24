@@ -35,13 +35,16 @@ export default class AutomatedModel extends React.Component {
       },
     }).then((response) => response.json())
       .then((res) => {
-          this.setState({ params: res.response.model });
+          let params = res.response.model;
+          params = params.filter((e) => e.status === 200);
+          // console.log(params);
+          this.setState({ params });
           if(res.response.model.length === 0){
             let statusStack = [true];
             this.setState({statusStack});
           }else{
             let statusStack = [];
-            let l = res.response.model.length;
+            let l = params.length;
             for(let i = 0; i < l; i++ ){
               statusStack.push(false);
             }
@@ -181,7 +184,7 @@ export default class AutomatedModel extends React.Component {
           <div style={{ height: 480, overflowY: 'auto', marginTop: 5, backgroundColor: '#fafafa' }}>
             {
               this.state.statusStack.map((el, i) =>
-                <Model style={{width: 1200, height: 450}}
+                <Model style={{width: 1200, height: el? 450: 300}}
                        project_id={this.props.project_id}
                        dataset_id={this.state.selectedData}
                        key={i}

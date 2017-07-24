@@ -1,15 +1,16 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import PropTypes from 'prop-types'
-import { connect } from 'dva'
+import PropTypes from 'prop-types';
+import { connect } from 'dva';
 import { Button, Input, Spin, Select, Icon , message, Modal, Popover} from 'antd';
 import io from 'socket.io-client';
 import { flaskServer } from '../../../constants';
-import Layer from './layer'
-import Compile from './compile'
+import Layer from './layer';
+import Compile from './compile';
 const Option = Select.Option;
 import Visual from './realTime';
 import Estimator from './customFields';
+import Curve from './curve';
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -65,6 +66,10 @@ export default class ModelForms extends React.Component {
       this.setTimeout(
         this.setState({ioData: msg}), 500);
     });
+    if(this.props.params){
+      this.setState({end: true});
+      console.log(this.state.params);
+    }
 
   }
 
@@ -267,61 +272,52 @@ export default class ModelForms extends React.Component {
   }
 
   renderCompile(){
-    return(
-      <div>
-        { this.state.compile &&
+    if (this.props.params) {
+      return (
         <div>
           <p style={{color: '#108ee9'}}>Compile</p>
-          <Compile compile={this.state.compile['args']} isActive={this.state.isActive} getParams={(value) => this.getCompileParams(value)}/>
+          <Compile isActive={this.state.isActive}
+                   params={this.state.params['params']['compile']}/>
         </div>
-        }
-      </div>
-    )
+      )
+    }else {
+      return (
+        <div>
+          { this.state.compile &&
+          <div>
+            <p style={{color: '#108ee9'}}>Compile</p>
+            <Compile compile={this.state.compile['args']} isActive={this.state.isActive}
+                     getParams={(value) => this.getCompileParams(value)}/>
+          </div>
+          }
+        </div>
+      )
+    }
   }
 
   renderFit(){
-    return(
-      <div>
-        {!isEmpty(this.state.fit) &&
+    if (this.props.params) {
+      return (
         <div>
           <p style={{color: '#108ee9', marginTop: 5}}>Fit</p>
-          <div >
-            {
-              this.state.fit.args.map((el) => (
-                  <div key={'fit_'+ el.name}>
-                    <span style={{width: 150}}>{el.name + " : "}</span>
-                    <Input ref={'fit_'+ el.name} disabled={!this.state.isActive}
-                           style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
-                    <Popover content={<div>
-                      <p style={{width: 150}}>{el.type.des}</p>
-                    </div>} title="Description">
-                      <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5}}/>
-                    </Popover>
-                  </div>
-                )
-              )
-            }
-          </div>
+          {Object.keys(this.state.params['params']['fit']['args']).map((e) => <div key={"fit_" + e}>
+            <span>{e + ": "}</span>
+            <span style={{color: '#00AAAA'}}>{this.state.params['params']['fit']['args'][e]}</span>
+          </div>)}
         </div>
-        }
-      </div>
-    )
-  }
-
-  renderEvaluate(){
-    return(
-      <div>
-        {
-          !isEmpty(this.state.evaluate) &&
+      )
+    }else {
+      return (
+        <div>
+          {!isEmpty(this.state.fit) &&
           <div>
-            <p style={{color: '#108ee9', marginTop: 5}}>Evaluate</p>
-            <div>
+            <p style={{color: '#108ee9', marginTop: 5}}>Fit</p>
+            <div >
               {
-                this.state.evaluate.args.map((el) => (
-                    <div key={'eva_'+ el.name}>
-                      <span style={{width: 200}}>{el.name + " : "}</span>
-                      <Input ref={'evaluate_'+ el.name}
-                             disabled={!this.state.isActive}
+                this.state.fit.args.map((el) => (
+                    <div key={'fit_' + el.name}>
+                      <span style={{width: 150}}>{el.name + " : "}</span>
+                      <Input ref={'fit_' + el.name} disabled={!this.state.isActive}
                              style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
                       <Popover content={<div>
                         <p style={{width: 150}}>{el.type.des}</p>
@@ -334,9 +330,53 @@ export default class ModelForms extends React.Component {
               }
             </div>
           </div>
-        }
-      </div>
-    )
+          }
+        </div>
+      )
+    }
+  }
+
+  renderEvaluate(){
+    if(this.props.params) {
+      return (
+        <div>
+          <p style={{color: '#108ee9', marginTop: 5}}>Evaluate</p>
+          {Object.keys(this.state.params['params']['evaluate']['args']).map((e) => <div key={"eva_" + e}>
+            <span>{e + ": "}</span>
+            <span style={{color: '#00AAAA'}}>{this.state.params['params']['evaluate']['args'][e]}</span>
+          </div>)}
+        </div>
+      )
+    }else {
+      return (
+        <div>
+          {
+            !isEmpty(this.state.evaluate) &&
+            <div>
+              <p style={{color: '#108ee9', marginTop: 5}}>Evaluate</p>
+              <div>
+                {
+                  this.state.evaluate.args.map((el) => (
+                      <div key={'eva_' + el.name}>
+                        <span style={{width: 200}}>{el.name + " : "}</span>
+                        <Input ref={'evaluate_' + el.name}
+                               disabled={!this.state.isActive}
+                               style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+                        <Popover content={<div>
+                          <p style={{width: 150}}>{el.type.des}</p>
+                        </div>} title="Description">
+                          <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5}}/>
+                        </Popover>
+                      </div>
+                    )
+                  )
+                }
+              </div>
+            </div>
+          }
+        </div>
+      )
+    }
   }
 
   render() {
@@ -357,7 +397,7 @@ export default class ModelForms extends React.Component {
           <div>
           </div>
             {this.renderEvaluate()}
-          <Button type='primary' style={{ marginTop: 30}} onClick={() => this.onClickRun()}>
+          <Button type='primary' style={{ marginTop: 10}} onClick={() => this.onClickRun()}>
             <Icon type="area-chart" />{this.props.jupyter? "GetCode" : this.state.end? "View":"Run"}
           </Button>
           <Modal title="Result"
@@ -366,7 +406,10 @@ export default class ModelForms extends React.Component {
                  onOk={() => this.setState({visible: false})}
                  onCancel={() => this.setState({visible: false})}
                   >
-                  <Visual data={this.state.ioData} end={this.state.end}/>
+            {this.props.params?
+              <Curve data={this.state.params['results']['history']}/>:
+              <Visual data={this.state.ioData} end={this.state.end}/>
+            }
           </Modal>
         </div>
       </div>

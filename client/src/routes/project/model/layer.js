@@ -204,12 +204,35 @@ export default class Layer extends React.Component {
     return choices
   }
 
+  renderParams(){
+    return(
+      Object.keys(this.props.params.args).map((e) =>
+      <div key={e}>
+        <span>{e + ": "}</span>
+        <span style={{color: '#00AAAA'}}>{this.props.params.args[e]}</span>
+      </div>
+      )
+    )
+  }
+
   render(){
     return(
     <div >{
       this.state.isView? (
         <div style={{width: '100%', marginTop: 10}}>
-          <span>{this.props.params.name}</span>
+          <span style={{width: 180}}>{this.props.params.name}</span>
+          <Button type="primary"
+                  style={{marginLeft: 10}}
+                  size="small"
+                  onClick={() => this.setState({visible: true})}>parameter</Button>
+          <Modal
+            title="View Parameters"
+            visible={this.state.visible}
+            onOk={() => this.handleOk()}
+            onCancel={() => this.handleCancel()}
+          >
+            {this.renderParams()}
+          </Modal>
         </div>
       ):
       (
