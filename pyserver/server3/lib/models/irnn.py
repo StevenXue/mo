@@ -1,17 +1,19 @@
 # -*- coding: UTF-8 -*-
 from keras.callbacks import LambdaCallback
 from keras.layers import Dense, Dropout, Conv2D, MaxPooling2D, Flatten
-from keras.models import Sequential
+# from keras.models import Sequential
 from keras.optimizers import SGD
 from keras.datasets import mnist
-from keras.models import Sequential
+# from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras.layers import SimpleRNN
 from keras import initializers
 from keras.optimizers import RMSprop
 
 from server3.lib.models.keras_callbacks import MongoModelCheckpoint
-from server3.service import logger
+from server3.service import logger_service
+from server3.lib import Sequential
+from server3.lib import graph
 
 
 num_classes = 10
@@ -36,50 +38,52 @@ def convnet(conf, input, **kw):
     input_shape = x_train.shape[1:]
     output_units = y_train.shape[-1]
 
-    model = Sequential()
-    model.add(SimpleRNN(hidden_units,
-                        kernel_initializer=initializers.RandomNormal(
-                            stddev=0.001),
-                        recurrent_initializer=initializers.Identity(gain=1.0),
-                        activation='relu',
-                        input_shape=x_train.shape[1:]))
-    model.add(Dense(num_classes))
-    model.add(Activation('softmax'))
-    rmsprop = RMSprop(lr=learning_rate)
-    model.compile(loss='categorical_crossentropy',
-                  optimizer=rmsprop,
-                  metrics=['accuracy'])
-    # callback to save metrics
-    batch_print_callback = LambdaCallback(on_epoch_end=
-                                          lambda epoch, logs:
-                                          logger.log_epoch_end(epoch, logs,
-                                                               result_sds,
-                                                               project_id))
+    with graph.as_default():
+        model = Sequential()
+        model.add(SimpleRNN(hidden_units,
+                            kernel_initializer=initializers.RandomNormal(
+                                stddev=0.001),
+                            recurrent_initializer=initializers.Identity(gain=1.0),
+                            activation='relu',
+                            input_shape=x_train.shape[1:]))
+        model.add(Dense(num_classes))
+        model.add(Activation('softmax'))
+        rmsprop = RMSprop(lr=learning_rate)
+        model.compile(loss='categorical_crossentropy',
+                      optimizer=rmsprop,
+                      metrics=['accuracy'])
+        # callback to save metrics
+        batch_print_callback = LambdaCallback(on_epoch_end=
+                                              lambda epoch, logs:
+                                              logger_service.log_epoch_end(epoch,
+                                                                           logs,
+                                                                           result_sds,
+                                                                           project_id))
 
-    # checkpoint to save best weight
-    best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,
-                                           save_best_only=True)
-    # checkpoint to save latest weight
-    general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
-                                              verbose=0)
+        # checkpoint to save best weight
+        best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,
+                                               save_best_only=True)
+        # checkpoint to save latest weight
+        general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
+                                                  verbose=0)
 
-    # training
-    history = model.fit(x_train, y_train,
-                        validation_data=(x_val, y_val),
-                        callbacks=[batch_print_callback, best_checkpoint,
-                                   general_checkpoint],
-                        verbose=0,
-                        **f['args'])
+        # training
+        history = model.fit(x_train, y_train,
+                            validation_data=(x_val, y_val),
+                            callbacks=[batch_print_callback, best_checkpoint,
+                                       general_checkpoint],
+                            verbose=0,
+                            **f['args'])
 
-    score = model.evaluate(x_test, y_test, **e['args'])
+        score = model.evaluate(x_test, y_test, **e['args'])
 
-    config = model.get_config()
-    logger.log_train_end(result_sds,
-                         model_config=config,
-                         score=score,
-                         history=history.history)
+        config = model.get_config()
+        logger_service.log_train_end(result_sds,
+                                     model_config=config,
+                                     score=score,
+                                     history=history.history)
 
-    return {'score': score, 'history': history.history}
+        return {'score': score, 'history': history.history}
 
 
 def convnet_to_str():

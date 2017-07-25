@@ -195,10 +195,10 @@ if __name__ == '__main__':
                           "capital_loss", "hours_per_week", "index"]
     input = {
         'train': df_train,
-        'test': df_test,
+        # 'test': df_test,
         'categorical_cols': CATEGORICAL_COLUMNS,
-        'continuous_cols': CONTINUOUS_COLUMNS,
-        'label_col': LABEL_COLUMN
+        # 'continuous_cols': CONTINUOUS_COLUMNS,
+        # 'label_col': LABEL_COLUMN
     }
 
     params = {
@@ -213,6 +213,29 @@ if __name__ == '__main__':
         "kernels": None,
         "config": None,
     }
+    # conf = {
+    #     'estimator': {
+    #         'args': {
+    #             "n_classes": 2,
+    #             "weight_column_name": None,
+    #             "gradient_clip_norm": None,
+    #             "enable_centered_bias": False,
+    #             "_joint_weight": False,
+    #             "label_keys": None,
+    #         }
+    #     },
+    #     'fit': {
+    #         "data_fields": [[], ["income_bracket"]],
+    #         "args": {
+    #             "steps": 30
+    #         }
+    #     },
+    #     'evaluate': {
+    #         'args': {
+    #             'steps': 1
+    #         }
+    #     }
+    # }
 
     sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
     from server3.lib.models import sdca_model_fn

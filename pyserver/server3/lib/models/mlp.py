@@ -1,11 +1,13 @@
 # -*- coding: UTF-8 -*-
 from keras.callbacks import LambdaCallback
 from keras.layers import Dense, Dropout
-from keras.models import Sequential
 from keras.optimizers import SGD
 
 from server3.lib.models.keras_callbacks import MongoModelCheckpoint
 from server3.service import logger_service
+
+from server3.lib import Sequential
+from server3.lib import graph
 
 
 def mlp(conf, input, **kw):
@@ -21,57 +23,57 @@ def mlp(conf, input, **kw):
     y_test = input['y_te']
     input_len = x_train.shape[1]
     output_len = y_train.shape[1]
+    with graph.as_default():
+        model = Sequential()
 
-    model = Sequential()
+        # Dense(64) is a fully-connected layer with 64 hidden units.
+        # in the first layer, you must specify the expected input data shape:
+        # here, 20-dimensional vectors.
+        model.add(Dense(64, activation='relu', input_dim=input_len))
+        model.add(Dropout(0.5))
+        model.add(Dense(64, activation='relu'))
+        model.add(Dropout(0.5))
+        model.add(Dense(output_len, activation='softmax'))
 
-    # Dense(64) is a fully-connected layer with 64 hidden units.
-    # in the first layer, you must specify the expected input data shape:
-    # here, 20-dimensional vectors.
-    model.add(Dense(64, activation='relu', input_dim=input_len))
-    model.add(Dropout(0.5))
-    model.add(Dense(64, activation='relu'))
-    model.add(Dropout(0.5))
-    model.add(Dense(output_len, activation='softmax'))
+        sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 
-    sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+        model.compile(loss='categorical_crossentropy',
+                      optimizer=sgd,
+                      metrics=['accuracy'])
 
-    model.compile(loss='categorical_crossentropy',
-                  optimizer=sgd,
-                  metrics=['accuracy'])
+        # callback to save metrics
+        batch_print_callback = LambdaCallback(on_epoch_end=
+                                              lambda epoch, logs:
+                                              logger_service.log_epoch_end(
+                                                  epoch, logs,
+                                                  result_sds,
+                                                  project_id))
 
-    # callback to save metrics
-    batch_print_callback = LambdaCallback(on_epoch_end=
-                                          lambda epoch, logs:
-                                          logger.log_epoch_end(epoch, logs,
-                                                               result_sds,
-                                                               project_id))
+        # checkpoint to save best weight
+        best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,
+                                               save_best_only=True)
+        # checkpoint to save latest weight
+        general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
+                                                  verbose=0)
 
-    # checkpoint to save best weight
-    best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,
-                                           save_best_only=True)
-    # checkpoint to save latest weight
-    general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
-                                              verbose=0)
+        # training
+        # TODO callback 改成异步，考虑 celery
+        history = model.fit(x_train, y_train,
+                            validation_data=(x_val, y_val),
+                            callbacks=[batch_print_callback, best_checkpoint,
+                                       general_checkpoint],
+                            verbose=0,
+                            **f['args'])
 
-    # training
-    # TODO callback 改成异步，考虑 celery
-    history = model.fit(x_train, y_train,
-                        validation_data=(x_val, y_val),
-                        callbacks=[batch_print_callback, best_checkpoint,
-                                   general_checkpoint],
-                        verbose=0,
-                        **f['args'])
+        score = model.evaluate(x_test, y_test, **e['args'])
+        # weights = model.get_weights()
+        config = model.get_config()
+        logger_service.log_train_end(result_sds,
+                                     model_config=config,
+                                     score=score,
+                                     history=history.history)
 
-    score = model.evaluate(x_test, y_test, **e['args'])
-
-    # weights = model.get_weights()
-    config = model.get_config()
-    logger.log_train_end(result_sds,
-                         model_config=config,
-                         score=score,
-                         history=history.history)
-
-    return {'score': score, 'history': history.history}
+        return {'score': score, 'history': history.history}
 
 
 def mlp_to_str():

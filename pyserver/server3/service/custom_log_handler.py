@@ -33,5 +33,5 @@ class MetricsHandler(logging.StreamHandler):
             n = log_obj.get('step', None)
             # when step n exists, log message
             if n:
-                logger.log_epoch_end(n, log_obj, self.result_sds,
-                                     self.project_id)
+                logger_service.log_epoch_end(n, log_obj, self.result_sds,
+                                             self.project_id)
