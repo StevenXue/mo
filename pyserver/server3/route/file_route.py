@@ -19,7 +19,6 @@ from server3.utility import json_utility
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
-ALLOWED_EXTENSIONS = {'zip', 'csv'}
 PREFIX = '/file'
 UPLOAD_URL = '/uploads/'
 REQUEST_FILE_NAME = 'uploaded_file'
@@ -27,16 +26,12 @@ REQUEST_FILE_NAME = 'uploaded_file'
 file_app = Blueprint("file_app", __name__, url_prefix=PREFIX)
 
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
 @file_app.route('/files', methods=['POST'])
 def upload_file():
     user_ID = request.form['user_ID']
     is_private = request.form['if_private']
     description = request.form['description']
+    type = request.form['type']
     # convert string to bool
     is_private = str(is_private).lower() == 'true'
 
@@ -47,16 +42,21 @@ def upload_file():
         file = request.files[REQUEST_FILE_NAME]
         if file.filename == '':
             return make_response(jsonify({'response': 'no selected file'}), 400)
-        if file and allowed_file(file.filename):
-            try:
-                url_base = PREFIX + UPLOAD_URL
-                saved_file = file_service.add_file(file, url_base,
-                                                   user_ID, is_private,
-                                                   description)
-                file_json = json_utility.convert_to_json(saved_file.to_mongo())
-            except Exception as e:
-                return make_response(jsonify({'response': '%s: %s' % (str(
-                    Exception), e.args)}), 400)
+        if file and file_service.allowed_file(file.filename):
+            url_base = PREFIX + UPLOAD_URL
+            saved_file = file_service.add_file(file, url_base,
+                                               user_ID, is_private,
+                                               description, type)
+            file_json = json_utility.convert_to_json(saved_file.to_mongo())
+            # try:
+            #     url_base = PREFIX + UPLOAD_URL
+            #     saved_file = file_service.add_file(file, url_base,
+            #                                        user_ID, is_private,
+            #                                        description, type)
+            #     file_json = json_utility.convert_to_json(saved_file.to_mongo())
+            # except Exception as e:
+            #     return make_response(jsonify({'response': '%s: %s' % (str(
+            #         Exception), e.args)}), 400)
             return make_response(jsonify({'response': file_json}), 200)
         else:
             return make_response(jsonify({'response': 'file is not allowed'}),

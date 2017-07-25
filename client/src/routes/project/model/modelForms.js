@@ -61,6 +61,7 @@ export default class ModelForms extends React.Component {
 
     let socket = io.connect(flaskServer+ '/log/' + this.props.project_id);
     socket.on('log_epoch_end', (msg) => {
+
       this.setTimeout(
         this.setState({ioData: msg}), 500);
     });

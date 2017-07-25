@@ -11,11 +11,14 @@ from server3.business import user_business
 from server3.business import ownership_business
 from server3.service import ownership_service
 from server3.repository import config
+from server3.constants import ALLOWED_EXTENSIONS
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
+IGNORED_FILES = ['__MACOSX/']
 
 
-def add_file(file, url_base, user_ID, is_private=False, description=''):
+def add_file(file, url_base, user_ID, is_private=False, description='',
+             type='table'):
     """
     add file by all file attributes
     :param file: file instance
@@ -31,16 +34,20 @@ def add_file(file, url_base, user_ID, is_private=False, description=''):
     user = user_business.get_by_user_ID(user_ID)
     if not user:
         raise NameError('no user found')
-    file_url = url_base + user.user_ID + '/' + file.filename
     save_directory = UPLOAD_FOLDER + user.user_ID + '/'
     # TODO need to be undo when failed
-    if file.filename.rsplit('.', 1)[1].lower() == 'zip':
-        file_size, file_uri = extract_file_and_get_size(file, save_directory)
+    filename_array = file.filename.rsplit('.', 1)
+    extension = filename_array[1].lower()
+    if extension == 'zip':
+        file_size, file_uri, folder_name = \
+            extract_file_and_get_size(file, save_directory)
+        file_url = url_base + user.user_ID + '/' + folder_name
     else:
         file_size, file_uri = save_file_and_get_size(file, save_directory)
+        file_url = url_base + user.user_ID + '/' + file.filename
 
     saved_file = file_business.add(file.filename, file_size, file_url,
-                                   file_uri, description)
+                                   file_uri, description, extension, type)
     if saved_file:
         if not ownership_business.add(user, is_private,
                                       file=saved_file):
@@ -81,12 +88,28 @@ def save_file_and_get_size(file, path):
 
 
 def extract_file_and_get_size(file, path):
-    with zipfile.ZipFile(file) as my_zip:
-        my_zip.extractall(path)
-        # assume there's one and only one folder in zip
-        folder_name = my_zip.namelist()[0]
-        uri = path + folder_name
-        return os.stat(os.path.join(uri)).st_size, uri
+    folder_name = safe_unzip(file, path)
+    uri = path + folder_name
+    return os.stat(os.path.join(uri)).st_size, uri, folder_name
+
+
+def safe_unzip(zip_file, extractpath='.'):
+    with zipfile.ZipFile(zip_file, 'r') as zf:
+        for member in zf.infolist():
+            if member.filename in IGNORED_FILES:
+                continue
+            if not allowed_file_or_folder(member.filename):
+                raise TypeError(
+                    '{} is not allowed file type'.format(member.filename))
+            member_path = os.path.join(extractpath, member.filename)
+            abspath = os.path.abspath(member_path)
+            if abspath.startswith(os.path.abspath(extractpath)):
+                if os.path.exists(abspath):
+                    raise IOError('{} exists'.format(member_path))
+                zf.extract(member, extractpath)
+        # FIXME assume there's one and only one folder in zip and all files
+        # in that folder
+        return zf.namelist()[0]
 
 
 # get file
@@ -120,6 +143,16 @@ def list_files_by_user_ID(user_ID, order=-1):
         public_files.reverse()
         owned_files.reverse()
     return public_files, owned_files
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def allowed_file_or_folder(filename):
+    return '__MACOSX' in filename or '.' not in filename or \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def remove_file_by_uri(uri):
