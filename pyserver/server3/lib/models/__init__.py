@@ -7,6 +7,10 @@ from server3.lib.models.keras_seq import keras_seq_to_str
 from server3.lib.models.mlp import mlp
 from server3.lib.models.mlp import MLP
 from server3.lib.models.mlp import mlp_to_str
+# image classifier
+from server3.lib.models.image_classifier import IMAGE_CLASSIFIER
+from server3.lib.models.image_classifier import image_classifier
+from server3.lib.models.image_classifier import image_classifier_to_str
 # convnet
 from server3.lib.models.convnet import convnet
 from server3.lib.models.convnet import CONVNET

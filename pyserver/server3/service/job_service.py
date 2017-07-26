@@ -93,7 +93,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
     return decorator
 
 
-def create_model_job(project_id, staging_data_set_id, model_obj, *argv):
+def create_model_job(project_id, staging_data_set_id, model_obj, **kwargs):
     """
     help model to create a job before model runs,
     as well as save the job & create a result after toolkit runs
@@ -108,15 +108,21 @@ def create_model_job(project_id, staging_data_set_id, model_obj, *argv):
             # create a job
             # model_obj = model_business.get_by_model_id(model_id)
             params = args[0]
-            staging_data_set_obj = \
-                staging_data_set_business.get_by_id(staging_data_set_id)
+            file_id = kwargs.get('file_id')
+            staging_data_set_obj = None
+            if staging_data_set_id:
+                staging_data_set_obj = \
+                    staging_data_set_business.get_by_id(staging_data_set_id)
             project_obj = project_business.get_by_id(project_id)
+
+            file_dict = {'file': ObjectId(file_id)} if file_id else {}
 
             # create model job
             job_obj = job_business.add_model_job(model_obj,
                                                  staging_data_set_obj,
                                                  project_obj,
-                                                 params=params)
+                                                 params=params,
+                                                 **file_dict)
             # update a project
             from server3.service import project_service
             project_service.add_job_to_project(job_obj, ObjectId(project_id))
@@ -165,7 +171,7 @@ def split_supervised_input(staging_data_set_id, x_fields, y_fields, schema):
 #     return func(conf, *args)
 
 
-def run_code(conf, project_id, staging_data_set_id, model, f, *args):
+def run_code(conf, project_id, staging_data_set_id, model, f, *args, **kwargs):
     """
     run supervised learning code
     :param conf:
@@ -176,7 +182,7 @@ def run_code(conf, project_id, staging_data_set_id, model, f, *args):
     :return:
     """
     # add decorator
-    func = create_model_job(project_id, staging_data_set_id, model)(f)
+    func = create_model_job(project_id, staging_data_set_id, model, **kwargs)(f)
     # run model with decorator
     return func(conf, *args)
 

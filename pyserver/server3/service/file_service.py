@@ -15,6 +15,7 @@ from server3.constants import ALLOWED_EXTENSIONS
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 IGNORED_FILES = ['__MACOSX/']
+PASSED_FILES = ['__MACOSX', '.DS_Store']
 
 
 def add_file(file, url_base, user_ID, is_private=False, description='',
@@ -151,7 +152,7 @@ def allowed_file(filename):
 
 
 def allowed_file_or_folder(filename):
-    return '__MACOSX' in filename or '.' not in filename or \
+    return any(x in filename for x in PASSED_FILES) or '.' not in filename or \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 

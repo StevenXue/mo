@@ -24,9 +24,7 @@ def keras_seq(conf, input, **kw):
         raise RuntimeError('no project id passed to model')
     with graph.as_default():
         model = Sequential()
-        # Dense(64) is a fully-connected layer with 64 hidden units.
-        # in the first layer, you must specify the expected input data shape:
-        # here, 20-dimensional vectors.
+
         ls = conf['layers']
         comp = conf['compile']
         f = conf['fit']
