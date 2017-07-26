@@ -18,7 +18,6 @@ import numpy as np
 from server3.utility import data_utility
 
 
-
 def usr_story1_exploration(data, d_type, group_num=10):
     # 转换，把所有键值对里的值变成一个数组返回(arr_temp)
     # print (type(data))
@@ -60,10 +59,6 @@ def usr_story1_exploration(data, d_type, group_num=10):
         info_dict['hypo'] = {}
 
     return info_dict
-
-
-def usr_story2_exploration_clustering():
-    pass
 
 
 # 用来获取数据的基本信息（长度，均值，值域等）
