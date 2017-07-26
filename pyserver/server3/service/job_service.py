@@ -27,7 +27,7 @@ from server3.lib import models
 from server3.repository import job_repo
 
 
-def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
+def create_toolkit_job_temp(project_id, staging_data_set_id, toolkit_id, fields):
     """
     help toolkit to create a job before toolkit runs,
     as well as save the job & create a result after toolkit runs
@@ -85,7 +85,86 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
             # update a job
             job_business.end_job(job_obj)
             # 已经淘汰，没有result了
-            # from server3.service import project_service
+            # # update a project
+            # project_service.add_job_and_result_to_project(result_obj, ObjectId(project_id))
+            return {"visual_sds_id": str(result_sds_obj.id), "result": results}
+        return wrapper
+    return decorator
+
+
+def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
+    """
+    help toolkit to create a job before toolkit runs,
+    as well as save the job & create a result after toolkit runs
+    :param project_id: project_id, staging_data_set_id, toolkit_id
+    :param staging_data_set_id: project_id, staging_data_set_id, toolkit_id
+    :param toolkit_id: project_id, staging_data_set_id, toolkit_id
+    :param fields: project_id, staging_data_set_id, toolkit_id
+    :return:
+    """
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kw):
+            from server3.service import project_service
+
+            # create a job
+            toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
+            staging_data_set_obj = staging_data_set_business.get_by_id(staging_data_set_id)
+            project_obj = project_business.get_by_id(project_id)
+
+            argv = fields
+            job_obj = job_business.add_toolkit_job(toolkit_obj,
+                                                   staging_data_set_obj,
+                                                   project_obj,
+                                                   *argv)
+            # update a project
+            project_service.add_job_to_project(job_obj, ObjectId(project_id))
+
+            # calculate
+            result = list(func(*args, **kw))
+
+            # 新设计的存取方式
+            results = {"fields": fields}
+            gen_info = {}
+            result_spec = toolkit_obj.result_spec
+            for arg in result_spec["args"]:
+                value = result.pop(0)
+                results.update({arg["name"]: value})
+                if arg["if_add_column"]:
+                    staging_data_service.add_new_key_value(staging_data_set_id, arg["name"], value)
+                if arg["attribute"] == "label":
+                    labels = value
+                elif arg["attribute"] == "general_info":
+                    gen_info.update({arg["name"]: value})
+            if result_spec["if_reserved"]:
+                # create result sds for toolkit
+                sds_name = '%s_%s_result' % (toolkit_obj['name'], job_obj['id'])
+                result_sds_obj = staging_data_set_business.add(sds_name, 'des',
+                                                               project_obj,
+                                                               job=job_obj,
+                                                               type='result')
+                logger_service.save_result(result_sds_obj, **{"result": results})
+            # TODO 以下部分全部为特殊处理start/
+
+            if toolkit_obj.category == 0:
+                json = {"scatter": data_utility.retrieve_nan_index(args[0], args[1]), "labels": labels,
+                        "pie": [{'text': el, 'value': labels.count(el)} for el in set(labels)],
+                        "centers": results["Centroids of Clusters"],
+                        "general_info": gen_info,
+                        "fields": fields}
+                logger_service.save_result(result_sds_obj, **{"visualization": json})
+
+            # # 判断是否存储结果到staging_data_set, 默认result_form2
+            # if toolkit_obj.result_form == 2 or 1:
+            #     # 存储可视化信息到sds里面
+            #     logger_service.save_result(result_sds_obj, **{"result": results, "visualization": json})
+            #     # FIXME 目前只有一列，以后会有多类信息
+            #     staging_data_service.add_new_key_value(staging_data_set_id, list(cols.keys())[0], list(cols.values())[0])
+            # TODO 以上部分全部为特殊处理end/
+
+            # update a job
+            job_business.end_job(job_obj)
+            # 已经淘汰，没有result了
             # # update a project
             # project_service.add_job_and_result_to_project(result_obj, ObjectId(project_id))
             return {"visual_sds_id": str(result_sds_obj.id), "result": results}
