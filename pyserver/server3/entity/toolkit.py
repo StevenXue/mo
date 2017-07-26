@@ -15,10 +15,14 @@ from mongoengine import DictField
 from mongoengine import IntField
 from mongoengine import ListField
 
-RESUlT_FORM = (
-    (0, 'Direct Show',
-     1, 'Add New Column',
-     2, 'Add New Staging Data')
+# RESUlT_FORM = (
+#     (0, 'Direct Show',
+#      1, 'Add New Staging Data as well as adding New Column',
+#      2, 'Add New Staging Data without adding New Column')
+# )
+
+CATEGORY_FORM = (
+    (0, '聚类')
 )
 
 
@@ -33,7 +37,10 @@ class Toolkit(DynamicDocument):
     description = StringField(max_length=140)
     # input_data = ListField()
     category = StringField(required=True)
-    result_form = IntField(required=True, choices=RESUlT_FORM)
+
+    # TODO 已经转移到result_type里了
+    # result_form = IntField(required=True, choices=RESUlT_FORM)
+
     # target_py = StringField(max_length=25, unique=True)
     target_py_code = StringField(required=True)
 
@@ -47,3 +54,4 @@ class Toolkit(DynamicDocument):
     entry_function = StringField(required=True)
 
     parameter_spec = DictField()
+    result_spec = DictField()
