@@ -1,7 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
+import classnames from 'classnames'
 import { Button, Select, Icon, message, Modal, Table, Radio, Collapse, Input, Spin } from 'antd'
+
+import style from './detail.css'
 
 const Panel = Collapse.Panel
 
@@ -79,15 +82,15 @@ class ProjectDetail extends React.Component {
   componentDidMount () {
     console.log('Project mounted, project id: ', this.state.project_id)
     this.props.dispatch({ type: 'project/listDataSets' })
-
-    setTimeout(() => {
-      this.props.dispatch({ type: 'app/runTour' })
-    }, 1000)
   }
 
   componentWillUnmount () {
     console.log('disconnect')
     this.setState({ to_disconnect: true })
+  }
+
+  runTour () {
+    this.props.dispatch({ type: 'app/runTour' })
   }
 
   rowSelection = {
@@ -217,34 +220,6 @@ class ProjectDetail extends React.Component {
       )
   }
 
-  //joyride
-
-  // addSteps (steps) {
-  //   let newSteps = steps
-  //
-  //   if (!Array.isArray(newSteps)) {
-  //     newSteps = [newSteps]
-  //   }
-  //
-  //   if (!newSteps.length) {
-  //     return
-  //   }
-  //
-  //   // Force setState to be synchronous to keep step order.
-  //   this.setState(currentState => {
-  //     currentState.steps = currentState.steps.concat(newSteps)
-  //     return currentState
-  //   })
-  // }
-
-  // callback(data) {
-  //   console.log('joyride callback', data); //eslint-disable-line no-console
-  //
-  //   this.setState({
-  //     selector: data.type === 'tooltip:before' ? data.step.selector : '',
-  //   });
-  // }
-
   renderOptions (key) {
     return this.props.project.dataSets[key].map((e) => <Option key={e._id} value={e._id}>{e.name}</Option>)
   }
@@ -255,8 +230,14 @@ class ProjectDetail extends React.Component {
       <div className="content-inner">
         <div>
           <div>
-            <h2>{this.state.projectName}</h2>
+            <h2>
+              {this.state.projectName}
+              <Button className={classnames(style.rightCornerButton)}
+                shape="circle" icon="question" onClick={() => this.runTour()}
+              />
+            </h2>
             <h4 style={{ marginTop: 10 }}>{'project id: ' + this.props.location.query._id}</h4>
+
             <div style={{ display: 'flex', flexDirection: 'column', marginTop: 20 }}>
               <div>
                 <Modal title="Choose DataSet"
@@ -276,7 +257,7 @@ class ProjectDetail extends React.Component {
                   />
                 </Modal>
                 <div style={{ display: 'flex', flexDirection: 'row' }}>
-                  <Button className='data-choose-button' type='primary' style={{ width: 120 }}
+                  <Button className={classnames(style.dataChooseButton)} type='primary' style={{ width: 120 }}
                           onClick={() => this.handleChoose()}>Choose Data</Button>
                 </div>
               </div>

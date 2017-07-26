@@ -9,7 +9,7 @@ const defaultSteps = [
   {
     title: 'Trigger Action',
     text: 'It can be `click` (default) or `hover` <i>(reverts to click on touch devices</i>.',
-    selector: '.data-choose-button',
+    selector: '[class*="dataChooseButton"]',
     position: 'top',
   },
   {
@@ -17,19 +17,10 @@ const defaultSteps = [
     text: 'Can be advanced by clicking an element through the overlay hole.',
     selector: '.notebook-start-button',
     position: 'bottom',
-    style: {
-      beacon: {
-        offsetY: 20
-      },
-      button: {
-        display: 'none',
-      }
-    }
   },
 ]
 
 let joyRide = {
-  autoStart: false,
   joyrideOverlay: true,
   joyrideType: 'continuous',
   isRunning: false,
