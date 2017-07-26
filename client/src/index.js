@@ -1,4 +1,6 @@
 import './index.html'
+import '../node_modules/react-joyride/lib/react-joyride-compiled.css'
+import './index.css'
 import 'babel-polyfill'
 import dva from 'dva'
 import createLoading from 'dva-loading'
