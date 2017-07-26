@@ -273,8 +273,7 @@ def create_public_toolkit():
 
     KMEAN = Toolkit(name='K平均数算法',
                     description='计算所选数据集合的k-mean, 把一个把数据空间划分为k个子集',
-                    category="聚类",
-                    result_form=2,
+                    category=0,
                     entry_function='k_mean',
                     target_py_code=inspect.getsource(toolkit_orig.k_mean),
                     parameter_spec={
@@ -302,6 +301,39 @@ def create_public_toolkit():
                                 },
                                 'default': 2,
                                 'required': True
+                            }
+                        ]
+                    },
+                    result_spec={
+                        "if_reserved": 1,
+                        "args": [
+                            {
+                                "name": "Clustering Label",
+                                "des": "原始数据的每一行元素，对应分类的分类标签",
+                                # "type": "list",
+                                # 在存列的时候，要记得传进来的时候验证是不是list
+                                "if_add_column": 1,
+                                "attribute": "label",
+                                "usage": ["pie", "scatter"]
+                            },
+                            {
+                                "name": "Number of Clusters",
+                                "des": "聚类的数量",
+                                "if_add_column": 0,
+                                "attribute": "general_info"
+                            },
+                            {
+                                "name": "Centroids of Clusters",
+                                "des": "每个类的中心点",
+                                "if_add_column": 0,
+                                "attribute": "position",
+                                "usage": ["scatter"]
+                            },
+                            {
+                                "name": "SSE",
+                                "des": "每个到其中心点的距离之和",
+                                "if_add_column": 0,
+                                "attribute": "general_info"
                             }
                         ]
                     })
