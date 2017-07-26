@@ -40,6 +40,7 @@
     "react-draft-wysiwyg": "^1.8.1",
     "react-helmet": "^5.0.0",
     "react-highlight": "^0.7.0",
+    "react-joyride": "^1.10.1",
     "react-json-view": "^1.9.4",
     "react-jupyter": "^0.1.0",
     "react-jupyter-display-area": "^0.2.1",

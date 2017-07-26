@@ -4,16 +4,38 @@ import { connect } from 'dva'
 import { Layout } from '../components'
 import { classnames, config, menu } from '../utils'
 import { Helmet } from 'react-helmet'
+import Joyride from 'react-joyride'
 import '../themes/index.less'
 import './app.less'
 import NProgress from 'nprogress'
+
 const { prefix } = config
 
 const { Header, Bread, Footer, Sider, styles } = Layout
 let lastHref
+let joyride
 
-const App = ({ children, location, dispatch, app, loading }) => {
-  const { user, siderFold, darkTheme, isNavbar, menuPopoverVisible, navOpenKeys } = app
+const App = ({
+               children,
+               location,
+               dispatch,
+               app,
+               loading,
+             }) => {
+  const {
+    user,
+    siderFold,
+    darkTheme,
+    isNavbar,
+    menuPopoverVisible,
+    navOpenKeys,
+    joyrideOverlay,
+    joyrideType,
+    isRunning,
+    steps,
+    stepIndex,
+  } = app
+
   const href = window.location.href
 
   if (lastHref !== href) {
@@ -32,6 +54,7 @@ const App = ({ children, location, dispatch, app, loading }) => {
     isNavbar,
     menuPopoverVisible,
     navOpenKeys,
+
     switchMenuPopover () {
       dispatch({ type: 'app/switchMenuPopver' })
     },
@@ -73,26 +96,40 @@ const App = ({ children, location, dispatch, app, loading }) => {
 
   return (
     <div>
+      <Joyride
+        ref={c => (joyride = c)}
+        callback={(data) => dispatch({ type: 'app/callback', payload: data })}
+        debug={true}
+        // disableOverlay={selector === '.card-tickets'}
+        run={isRunning}
+        showOverlay={joyrideOverlay}
+        showSkipButton={true}
+        showStepsProgress={true}
+        stepIndex={stepIndex}
+        steps={steps}
+        type={joyrideType}
+      />
       <Helmet>
         <title>GOLDER'S GREEN</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="icon" href={logo} type="image/x-icon" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link rel="icon" href={logo} type="image/x-icon"/>
         {iconFontJS && <script src={iconFontJS}></script>}
-        {iconFontCSS && <link rel="stylesheet" href={iconFontCSS} />}
+        {iconFontCSS && <link rel="stylesheet" href={iconFontCSS}/>}
       </Helmet>
-      <div className={classnames(styles.layout, { [styles.fold]: isNavbar ? false : siderFold }, { [styles.withnavbar]: isNavbar })}>
+      <div
+        className={classnames(styles.layout, { [styles.fold]: isNavbar ? false : siderFold }, { [styles.withnavbar]: isNavbar })}>
         {!isNavbar ? <aside className={classnames(styles.sider, { [styles.light]: !darkTheme })}>
           <Sider {...siderProps} />
         </aside> : ''}
         <div className={styles.main}>
           <Header {...headerProps} />
-          <Bread {...breadProps} location={location} />
+          <Bread {...breadProps} location={location}/>
           <div className={styles.container}>
             <div className={styles.content}>
               {children}
             </div>
           </div>
-          <Footer />
+          <Footer/>
         </div>
       </div>
     </div>

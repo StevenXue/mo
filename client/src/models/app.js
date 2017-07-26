@@ -5,6 +5,38 @@ import { queryURL } from '../utils'
 import { config } from '../utils'
 const { prefix } = config
 
+const defaultSteps = [
+  {
+    title: 'Trigger Action',
+    text: 'It can be `click` (default) or `hover` <i>(reverts to click on touch devices</i>.',
+    selector: '.data-choose-button',
+    position: 'top',
+  },
+  {
+    title: 'Our Mission',
+    text: 'Can be advanced by clicking an element through the overlay hole.',
+    selector: '.notebook-start-button',
+    position: 'bottom',
+    style: {
+      beacon: {
+        offsetY: 20
+      },
+      button: {
+        display: 'none',
+      }
+    }
+  },
+]
+
+let joyRide = {
+  autoStart: false,
+  joyrideOverlay: true,
+  joyrideType: 'continuous',
+  isRunning: false,
+  stepIndex: 0,
+  steps: defaultSteps,
+}
+
 export default {
   namespace: 'app',
   state: {
@@ -14,6 +46,7 @@ export default {
     darkTheme: localStorage.getItem(`${prefix}darkTheme`) === 'true',
     isNavbar: document.body.clientWidth < 769,
     navOpenKeys: JSON.parse(localStorage.getItem(`${prefix}navOpenKeys`)) || [],
+    ...joyRide
   },
   subscriptions: {
 
@@ -86,6 +119,37 @@ export default {
 
   },
   reducers: {
+
+    runTour (state) {
+      return {
+        ...state,
+        isRunning: true
+      }
+    },
+
+    addSteps (state, { payload: steps }) {
+      let newSteps = steps
+      if (!Array.isArray(newSteps)) {
+        newSteps = [newSteps]
+      }
+
+      if (!newSteps.length) {
+        return
+      }
+
+      state.steps = state.steps.concat(newSteps)
+      return state
+    },
+
+    callback(state, { payload: data }) {
+      console.log('joyride callback', data); //eslint-disable-line no-console
+
+      return {
+        ...state,
+        selector: data.type === 'tooltip:before' ? data.step.selector : ''
+      }
+    },
+
     querySuccess (state, { payload: user }) {
       return {
         ...state,
