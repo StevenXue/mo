@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 import eventlet
-# eventlet.monkey_patch()
+eventlet.monkey_patch()
 
 from datetime import timedelta
 

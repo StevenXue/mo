@@ -6,7 +6,7 @@ import styles from './VideoPlayer.less'
 const VideoPlayer = (props) => {
   return (
     <div>
-      <ReactPlayer url={[{src: props.src}]} width={410} height={310} playing controls />
+      <ReactPlayer url={props.src} width={410} height={310} playing controls />
     </div>
   )
 }
