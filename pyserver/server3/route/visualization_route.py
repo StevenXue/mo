@@ -8,7 +8,7 @@ Date: 2017.05.24
 from bson import ObjectId
 from flask import Blueprint
 from flask import jsonify
-from flask import make_response
+# from flask import make_response
 from flask import request
 
 from server3.service import visualization_service
