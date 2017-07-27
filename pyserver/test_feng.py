@@ -56,4 +56,4 @@ def slugify(value, allow_unicode=False):
     value = re.sub(r'[^\w\s-]', '', value).strip()
     return re.sub(r'[-\s]+', '-', value)
 
-print(slugify('ls adj-_a(CM)'))
+print(slugify('ls.adj-_a(CM)'))

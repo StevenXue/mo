@@ -43,20 +43,15 @@ def upload_file():
         if file.filename == '':
             return make_response(jsonify({'response': 'no selected file'}), 400)
         if file and file_service.allowed_file(file.filename):
-            url_base = PREFIX + UPLOAD_URL
-            saved_file = file_service.add_file(file, url_base,
-                                               user_ID, is_private,
-                                               description, type)
-            file_json = json_utility.convert_to_json(saved_file.to_mongo())
-            # try:
-            #     url_base = PREFIX + UPLOAD_URL
-            #     saved_file = file_service.add_file(file, url_base,
-            #                                        user_ID, is_private,
-            #                                        description, type)
-            #     file_json = json_utility.convert_to_json(saved_file.to_mongo())
-            # except Exception as e:
-            #     return make_response(jsonify({'response': '%s: %s' % (str(
-            #         Exception), e.args)}), 400)
+            try:
+                url_base = PREFIX + UPLOAD_URL
+                saved_file = file_service.add_file(file, url_base,
+                                                   user_ID, is_private,
+                                                   description, type)
+                file_json = json_utility.convert_to_json(saved_file.to_mongo())
+            except Exception as e:
+                return make_response(jsonify({'response': '%s: %s' % (str(
+                    Exception), e.args)}), 400)
             return make_response(jsonify({'response': file_json}), 200)
         else:
             return make_response(jsonify({'response': 'file is not allowed'}),

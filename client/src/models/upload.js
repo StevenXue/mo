@@ -42,6 +42,7 @@ export default {
       formData.append('uploaded_file', payload.upload[0]);
       formData.append('description', payload.description);
       formData.append('if_private', payload.isPrivate);
+      formData.append('type', payload.type);
       formData.append('user_ID', user.user_ID);
 
       const data = yield call(uploadFile, formData)
@@ -58,7 +59,7 @@ export default {
         //   yield put(routerRedux.push('/project'))
         // }
       } else {
-        console.log('error', data);
+        console.log('error', data, formData);
         throw data
       }
     },
