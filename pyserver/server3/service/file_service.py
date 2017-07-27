@@ -12,6 +12,7 @@ from server3.business import ownership_business
 from server3.service import ownership_service
 from server3.repository import config
 from server3.constants import ALLOWED_EXTENSIONS
+from server3.utility import str_utility
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 IGNORED_FILES = ['__MACOSX/']
@@ -128,6 +129,13 @@ def file_loader(file_id, user_ID, names):
     if is_private and not is_owned:
         raise Exception('file permission denied, private: %s, owned: %s' % (
             is_private, is_owned))
+    if not names:
+        # if no names get the first line of csv as names
+        with open(file.uri) as f:
+            reader = csv.reader(f)
+            names = next(reader)  # gets the first line
+    # convert invalid characters in names
+    names = [str_utility.slugify(n) for n in names]
     table = pd.read_csv(file.uri, skipinitialspace=True, names=names) \
         .to_dict('records')
     return table

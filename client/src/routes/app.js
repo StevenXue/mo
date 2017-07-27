@@ -97,10 +97,10 @@ const App = ({
   return (
     <div>
       <Joyride
-        ref={c => (joyride = c)}
+        ref={c => (app.joyride = c)}
         autoStart={true}
         callback={(data) => dispatch({ type: 'app/callback', payload: data })}
-        debug={true}
+        debug={false}
         // disableOverlay={selector === '.card-tickets'}
         run={isRunning}
         showOverlay={joyrideOverlay}
