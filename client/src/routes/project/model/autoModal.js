@@ -10,26 +10,26 @@ import modelling from '../../../media/videos/modelling.mp4'
 
 const steps = [
   {
-    title: 'Choose Data',
-    text: 'Click to choose your data set to use in this project',
+    title: 'Choose Dataset for Modelling',
+    text: 'Click to choose your data set to use as input of model',
     selector: '.modelling_dataset',
-    position: 'bottom',
+    position: 'top',
     style: stepStyle,
   },
   {
-    title: 'Data Preview Area',
-    text: 'After choose your data set, you can have a preview in this area',
+    title: 'Choose Model and Input',
+    text: 'Choose the model you want to training, and choose the input columns',
     selector: '.choose_model_and_input',
-    position: 'bottom',
+    position: 'top',
     style: stepStyle,
   },
   {
-    title: 'Preprocess Area',
+    title: 'Choose Parameters',
     text: <TourArea
-      text='You set here, such as missing value completion and column filtering'
+      text='Choose the parameters for modelling'
       src={modelling}/>,
     selector: '.choose_params',
-    position: 'bottom',
+    position: 'top',
     style: stepStyle,
   },
 ]
