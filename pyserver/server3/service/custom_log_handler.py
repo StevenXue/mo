@@ -1,7 +1,7 @@
 import logging
 import re
 
-from server3.service import logger
+from server3.service import logger_service
 
 # regex to match scientific number
 sci_re = '-?\d+\.?\d*(?:[Ee]-?\d+)?'
@@ -33,5 +33,5 @@ class MetricsHandler(logging.StreamHandler):
             n = log_obj.get('step', None)
             # when step n exists, log message
             if n:
-                logger.log_epoch_end(n, log_obj, self.result_sds,
-                                     self.project_id)
+                logger_service.log_epoch_end(n, log_obj, self.result_sds,
+                                             self.project_id)

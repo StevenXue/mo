@@ -7,15 +7,11 @@ import pandas as pd
 from server3.business import staging_data_set_business
 from server3.business import staging_data_business
 from server3.business import data_business
+from server3.business import data_set_business
 from server3.service import data_service
 from server3.utility import data_utility
 from server3.utility import json_utility
 from server3 import constants
-
-
-# 使得 sys.getdefaultencoding() 的值为 'utf-8'
-# reload(sys)                      # reload 才能调用 setdefaultencoding 方法
-# sys.setdefaultencoding('utf-8')  # 设置 'utf-8'
 
 
 def get_by_query_str(staging_data_set_id, **kwargs):
@@ -51,7 +47,11 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
     # project = project_business.get_by_id(project_id)
 
     # create new staging data set
-    sds = staging_data_set_business.add(sds_name, sds_description, project_id)
+    ds = data_set_business.get_by_id(data_set_id).to_mongo()
+    ds.pop('name')
+    ds.pop('description')
+    sds = staging_data_set_business.add(sds_name, sds_description, project_id,
+                                        **ds)
     # copy data from data(raw) to staging data
     # get all data objects by data_set id
     try:
@@ -171,6 +171,20 @@ def update_data(update):
         staging_data_business.update_by_id(oid, query)
 
 
+# 新增加一个栏位用来加字段，字段的value在array里面
+def add_new_key_value(sds_id, key, array):
+    """
+        update data row by row
+        :param update:
+        :return:
+    """
+    # get staging data的所有id
+    ids = staging_data_business.get_by_staging_data_set_id(sds_id)
+    for oid in ids:
+        query = {key: array.copy().pop(0)}
+        staging_data_business.update_by_id(oid.id, query)
+
+
 def get_row_col_info(sds_id):
     """
     get_row_col_info
@@ -263,6 +277,4 @@ def split_test_train(x_y_obj, schema='cv', ratio=0.3, trl=1000):
         # if trl:
         #     return {'x_tr': x[:trl], 'y_tr': y[:trl],
         #             'x_te': x[trl:], 'y_te': y[trl:]}
-    # raise NameError('arg error')
-
-
+        # raise NameError('arg error')

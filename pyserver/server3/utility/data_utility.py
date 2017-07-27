@@ -6,7 +6,7 @@ Author: Zhaofeng Li, Tianyi Zhang
 Date: 2017.06.09
 """
 import numpy as np
-
+import math
 
 # int, float
 def convert_data_array_by_fields(array, field_type_arrays):
@@ -161,3 +161,7 @@ def retrieve_nan_index(result, nan_index):
     for ind in nan_index:
         result.insert(ind, np.nan)
     return result
+
+
+def find_nan_index(data):
+    return [index for index, item in enumerate(data) if math.isnan(item)]

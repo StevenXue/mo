@@ -2,14 +2,12 @@
 import numpy as np
 from keras import layers
 from keras.callbacks import LambdaCallback
-from keras.models import Sequential
-import tensorflow as tf
-from server3.service import logger
+from server3.service import logger_service
 from server3.utility.str_utility import generate_args_str
 from server3.lib.models.keras_callbacks import MongoModelCheckpoint
 
-global graph
-graph = tf.get_default_graph()
+from server3.lib import Sequential
+from server3.lib import graph
 
 
 def keras_seq(conf, input, **kw):
@@ -61,9 +59,10 @@ def keras_seq(conf, input, **kw):
         # callback to save metrics
         batch_print_callback = LambdaCallback(on_epoch_end=
                                               lambda epoch, logs:
-                                              logger.log_epoch_end(epoch, logs,
-                                                                   result_sds,
-                                                                   project_id))
+                                              logger_service.log_epoch_end(
+                                                  epoch, logs,
+                                                  result_sds,
+                                                  project_id))
         # checkpoint to save best weight
         best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,
                                                save_best_only=True)
@@ -83,10 +82,10 @@ def keras_seq(conf, input, **kw):
         score = model.evaluate(x_test, y_test, **e['args'])
         # weights = model.get_weights()
         config = model.get_config()
-        logger.log_train_end(result_sds,
-                             model_config=config,
-                             score=score,
-                             history=history.history)
+        logger_service.log_train_end(result_sds,
+                                     model_config=config,
+                                     score=score,
+                                     history=history.history)
 
         return {'score': score, 'history': history.history}
 
@@ -117,7 +116,7 @@ def keras_seq_to_str(obj, head_str, **kw):
         layer_import += 'from keras.layers import %s\n' % n
     str_model = 'from keras.models import Sequential\n'
     str_model += 'from keras.callbacks import LambdaCallback\n'
-    str_model += 'from server3.service import logger\n'
+    str_model += 'from server3.service import logger_service\n'
     str_model += 'from server3.business import staging_data_set_business\n'
     str_model += layer_import
     str_model += head_str
@@ -141,7 +140,7 @@ def keras_seq_to_str(obj, head_str, **kw):
     str_model += "project_id = '%s'\n" % project_id
     # callback
     str_model += "batch_print_callback = LambdaCallback(on_epoch_end=lambda " \
-                 "epoch, \\\nlogs: logger.log_epoch_end(epoch, " \
+                 "epoch, \\\nlogs: logger_service.log_epoch_end(epoch, " \
                  "logs, result_sds, project_id))\n"
     # fit
     str_model += "model.fit(x_train, y_train,  validation_data=(x_test, " \
@@ -544,4 +543,3 @@ if __name__ == '__main__':
     # import json
     # print(json.dumps(KERAS_SEQ_SPEC))
     pass
-

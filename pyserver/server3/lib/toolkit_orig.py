@@ -191,11 +191,10 @@ def k_mean(arr0, index, n_clusters=2):
     k_means = KMeans(n_clusters).fit(matrix)
     result = k_means.labels_
     label = data_utility.retrieve_nan_index(result.tolist(), index)
-
-    return {"聚类数目": n_clusters,
-            "类标签": label,
-            "各类别中心坐标": k_means.cluster_centers_.tolist(),
-            "SSE(各类点距其中心点的距离总和)": k_means.inertia_}
+    # return {"Number of Clusters": n_clusters,
+    #         "Centroids of Clusters": k_means.cluster_centers_.tolist(),
+    #         "SSE(Sum of Squared Errors)": k_means.inertia_}, {"Clustering Labels": label}
+    return label, n_clusters, k_means.cluster_centers_.tolist(), k_means.inertia_
 
 
 def k_mean_predict(arr0, list_points, n_clusters=2):

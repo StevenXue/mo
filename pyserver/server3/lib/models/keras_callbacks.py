@@ -5,7 +5,7 @@ import warnings
 import numpy as np
 from keras.callbacks import ModelCheckpoint
 
-from server3.service import logger
+from server3.service import logger_service
 
 
 class MongoModelCheckpoint(ModelCheckpoint):
@@ -61,10 +61,11 @@ class MongoModelCheckpoint(ModelCheckpoint):
                                      current, self.result_sds))
                         self.best = current
                         weights = self.model.get_weights()
-                        logger.save_weights_result(self.result_sds, 5,
-                                                   'best_weights',
-                                                   {'epoch': epoch,
-                                                    'weights': [weight.tolist()
+                        logger_service.save_weights_result(self.result_sds, 5,
+                                                           'best_weights',
+                                                           {'epoch': epoch,
+                                                            'weights': [
+                                                                weight.tolist()
                                                                 for
                                                                 weight in
                                                                 weights]})
@@ -77,10 +78,10 @@ class MongoModelCheckpoint(ModelCheckpoint):
                     print('Epoch %05d: saving model to staging data set %s' % (
                         epoch, self.result_sds))
                 weights = self.model.get_weights()
-                logger.save_weights_result(self.result_sds, 5,
-                                           'latest_weights',
-                                           {'epoch': epoch,
-                                            'weights': [weight.tolist()
-                                                        for
-                                                        weight in
-                                                        weights]})
+                logger_service.save_weights_result(self.result_sds, 5,
+                                                   'latest_weights',
+                                                   {'epoch': epoch,
+                                                    'weights': [weight.tolist()
+                                                                for
+                                                                weight in
+                                                                weights]})

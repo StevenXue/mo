@@ -9,3 +9,9 @@
 # from .toolkit_backup import STD
 # from .toolkit_backup import VARIENCE
 # from lib import toolkit_code
+
+from keras.models import Sequential
+import tensorflow as tf
+
+# global graph
+graph = tf.get_default_graph()
