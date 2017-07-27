@@ -136,13 +136,16 @@ def select_k_best_mic(arr0, target, index, k):
     from minepy import MINE
     matrix = np.array(arr0)
     target = np.array(target)
+
     def mic(x, y):
         m = MINE()
         m.compute_score(x, y)
         return (m.mic(), 0.5)
-    temp = feature_selection.SelectKBest(lambda X, Y: np.array(map(lambda x:mic(x, Y), X.T)).T[0], k=2).fit_transform(matrix, target)
-    result = data_utility.retrieve_nan_index(temp.tolist(), index)
-    return result
+    temp = feature_selection.SelectKBest(lambda X, Y: np.array(list(map(lambda x: mic(x, Y), X.T))).T[0], k=k).fit(matrix, target)
+    scores = temp.scores_.tolist()
+    indx = temp.get_support().tolist()
+    result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
+    return scores, indx, result
 
 
 # 递归特征消除法，返回特征选择后的数据
