@@ -19,10 +19,60 @@ import 'codemirror/theme/monokai.css'
 import Preprocess from '../preprocess/preprocess'
 import AutomatedModel from '../model/autoModal'
 import DataPreview from './dataPreview'
+import { stepStyle } from '../../../constants'
+import { TourArea } from '../../../components'
+import chooseData from '../../../media/videos/choose_data.mp4'
+
 //import Input from 'antd/lib/input/Input.d'
 
 const { Option, OptGroup } = Select
 const RadioGroup = Radio.Group
+
+const defaultSteps = [
+  {
+    title: 'Choose Data',
+    text:  <TourArea text='Click to choose your data set to use in this project' src={chooseData} />,
+    selector: '[class*="dataChooseButton"]',
+    position: 'bottom',
+    style: stepStyle
+  },
+  {
+    title: 'Data Preview Area',
+    text: 'After choose your data set, you can have a preview in this area',
+    selector: '.data-preview-collapse',
+    position: 'bottom',
+    style: stepStyle
+  },
+  {
+    title: 'Preprocess Area',
+    text: 'You can do some preprocess for your data set here, such as missing value completion and column filtering',
+    selector: '.preprocess-collapse',
+    position: 'bottom',
+    style: stepStyle
+  },
+  {
+    title: 'Data Exploration & Analysis Area',
+    text: 'You can do some exploration and analysis to have better vision on your data. Feature Selection is also a' +
+    ' great feature in this area',
+    selector: '.exploration-collapse',
+    position: 'top',
+    style: stepStyle
+  },
+  {
+    title: 'Automated Modelling Area',
+    text: 'By click you mouse, automated modelling process can be done here, coding is not needed',
+    selector: '.model-collapse',
+    position: 'top',
+    style: stepStyle
+  },
+  {
+    title: 'Start Notebook',
+    text: 'Click to start a jupyter notebook',
+    selector: '.notebook-start-button',
+    position: 'top',
+    style: stepStyle
+  },
+]
 
 let hasOwnProperty = Object.prototype.hasOwnProperty
 
@@ -89,9 +139,8 @@ class ProjectDetail extends React.Component {
     this.setState({ to_disconnect: true })
   }
 
-  runTour () {
-    this.props.dispatch({ type: 'app/resetJoyride' })
-    this.props.dispatch({ type: 'app/runTour' })
+  runTour (steps) {
+    this.props.dispatch({ type: 'app/resetAndRun', payload: steps })
   }
 
   rowSelection = {
@@ -234,7 +283,7 @@ class ProjectDetail extends React.Component {
             <h2>
               {this.state.projectName}
               <Button className={classnames(style.rightCornerButton)}
-                      shape="circle" icon="question" onClick={() => this.runTour()}
+                      shape="circle" icon="question" onClick={() => this.runTour(defaultSteps)}
               />
             </h2>
             <h4 style={{ marginTop: 10 }}>{'project id: ' + this.props.location.query._id}</h4>
@@ -301,7 +350,7 @@ class ProjectDetail extends React.Component {
             <div>
               <Collapse className='model-collapse' bordered={true} style={{ marginTop: 10, width: '100%' }}>
                 <Panel header={'Automated Modelling'} key="1" style={{ width: '100%' }}>
-                  <AutomatedModel project_id={this.props.location.query._id}/>
+                  <AutomatedModel project_id={this.props.location.query._id} runTour={(steps) => this.runTour(steps)} />
                 </Panel>
               </Collapse>
             </div>

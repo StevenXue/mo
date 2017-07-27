@@ -69,7 +69,7 @@ let joyRide = {
   joyrideType: 'continuous',
   isRunning: false,
   stepIndex: 0,
-  steps: defaultSteps,
+  steps: [],
 }
 
 export default {
@@ -159,6 +159,14 @@ export default {
       app.joyride.reset(true)
     },
 
+    *resetAndRun ({
+                    payload,
+                  }, { put, select }) {
+      yield put({ type: 'resetJoyride' })
+      yield put({ type: 'setSetps', payload })
+      yield put({ type: 'runTour' })
+    },
+
   },
   reducers: {
 
@@ -180,6 +188,20 @@ export default {
       }
 
       state.steps = state.steps.concat(newSteps)
+      return state
+    },
+
+    setSetps (state, { payload: steps }) {
+      let newSteps = steps
+      if (!Array.isArray(newSteps)) {
+        newSteps = [newSteps]
+      }
+
+      if (!newSteps.length) {
+        return
+      }
+
+      state.steps = newSteps
       return state
     },
 
