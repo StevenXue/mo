@@ -121,9 +121,11 @@ def select_k_best_pearson(arr0, target, index, k):
     from scipy.stats import pearsonr
     matrix = np.array(arr0)
     target = np.array(target)
-    temp = feature_selection.SelectKBest(lambda X, Y: np.array(map(lambda x:pearsonr(x, Y), X.T)).T[0], k=k).fit_transform(matrix, target)
-    result = data_utility.retrieve_nan_index(temp.tolist(), index)
-    return result
+    temp = feature_selection.SelectKBest(lambda X, Y: np.array(list(map(lambda x: pearsonr(x, Y), X.T))).T[0], k=k).fit(matrix, target)
+    scores = temp.scores_.tolist()
+    indx = temp.get_support().tolist()
+    result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
+    return scores, indx, result
 
 
 # 特征选择
