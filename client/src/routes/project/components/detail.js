@@ -90,6 +90,7 @@ class ProjectDetail extends React.Component {
   }
 
   runTour () {
+    this.props.dispatch({ type: 'app/resetJoyride' })
     this.props.dispatch({ type: 'app/runTour' })
   }
 
@@ -233,7 +234,7 @@ class ProjectDetail extends React.Component {
             <h2>
               {this.state.projectName}
               <Button className={classnames(style.rightCornerButton)}
-                shape="circle" icon="question" onClick={() => this.runTour()}
+                      shape="circle" icon="question" onClick={() => this.runTour()}
               />
             </h2>
             <h4 style={{ marginTop: 10 }}>{'project id: ' + this.props.location.query._id}</h4>
@@ -263,45 +264,47 @@ class ProjectDetail extends React.Component {
               </div>
             </div>
           </div>
-          <div>
-            <Collapse className='data-preview-collapse' bordered={true} style={{ marginTop: 10, width: '100%' }}>
-              <Panel header={'Stage Data'} key="1">
-                <Spin spinning={this.state.loading}>
-                  {this.state.dataSet.length > 0 &&
-                  <DataPreview dataSet={this.state.dataSet}
-                               project_id={this.props.location.query._id}/>
-                  }
-                </Spin>
-              </Panel>
-            </Collapse>
-          </div>
-          <div>
-            <Collapse className='preprocess-collapse' bordered={true} style={{ marginTop: 10, width: '100%' }}>
-              <Panel header={'Preprocess'} key="1">
-                <Spin spinning={this.state.loading}>
-                  <Preprocess dataSet={this.state.dataSet}
-                              fields={this.state.fields}
-                              project_id={this.props.location.query._id}
-                              passStaging={(value) => this.getStagingId(value)}/>
-                </Spin>
-              </Panel>
-            </Collapse>
-          </div>
-          <div>
-            <Collapse bordered={true} style={{ marginTop: 10, width: '100%' }}>
-              <Panel header={'Data Exploration & Analysis'} key="1">
-                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-                  <Toolkits project_id={this.props.location.query._id}/>
-                </div>
-              </Panel>
-            </Collapse>
-          </div>
-          <div>
-            <Collapse bordered={true} style={{ marginTop: 10, width: '100%' }}>
-              <Panel header={'Automated Modelling'} key="1" style={{ width: '100%' }}>
-                <AutomatedModel project_id={this.props.location.query._id}/>
-              </Panel>
-            </Collapse>
+          <div className='operation-area'>
+            <div>
+              <Collapse className='data-preview-collapse' bordered={true} style={{ marginTop: 10, width: '100%' }}>
+                <Panel header={'Stage Data'} key="1">
+                  <Spin spinning={this.state.loading}>
+                    {this.state.dataSet.length > 0 &&
+                    <DataPreview dataSet={this.state.dataSet}
+                                 project_id={this.props.location.query._id}/>
+                    }
+                  </Spin>
+                </Panel>
+              </Collapse>
+            </div>
+            <div>
+              <Collapse className='preprocess-collapse' bordered={true} style={{ marginTop: 10, width: '100%' }}>
+                <Panel header={'Preprocess'} key="1">
+                  <Spin spinning={this.state.loading}>
+                    <Preprocess dataSet={this.state.dataSet}
+                                fields={this.state.fields}
+                                project_id={this.props.location.query._id}
+                                passStaging={(value) => this.getStagingId(value)}/>
+                  </Spin>
+                </Panel>
+              </Collapse>
+            </div>
+            <div>
+              <Collapse bordered={true} style={{ marginTop: 10, width: '100%' }}>
+                <Panel header={'Data Exploration & Analysis'} key="1">
+                  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                    <Toolkits project_id={this.props.location.query._id}/>
+                  </div>
+                </Panel>
+              </Collapse>
+            </div>
+            <div>
+              <Collapse bordered={true} style={{ marginTop: 10, width: '100%' }}>
+                <Panel header={'Automated Modelling'} key="1" style={{ width: '100%' }}>
+                  <AutomatedModel project_id={this.props.location.query._id}/>
+                </Panel>
+              </Collapse>
+            </div>
           </div>
           <Button className='notebook-start-button' type='primary' style={{ marginTop: 20, width: 120 }}
                   onClick={() => this.startNotebook()}>

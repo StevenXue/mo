@@ -5,22 +5,40 @@ import { queryURL } from '../utils'
 import { config } from '../utils'
 const { prefix } = config
 
+const stepStyle = {
+  mainColor: '#108ee9',
+  beacon: {
+    inner: '#108ee9',
+    outer: '#108ee9',
+  },
+}
+
 const defaultSteps = [
   {
-    title: 'Trigger Action',
-    text: 'It can be `click` (default) or `hover` <i>(reverts to click on touch devices</i>.',
+    title: 'Choose Data',
+    text: 'Click to choose your data set to use in this project',
     selector: '[class*="dataChooseButton"]',
     position: 'top',
+    style: stepStyle
   },
   {
-    title: 'Our Mission',
-    text: 'Can be advanced by clicking an element through the overlay hole.',
+    title: 'Operation Area',
+    text: 'Explore your data or training your model here',
+    selector: '.operation-area',
+    position: 'top',
+    style: stepStyle
+  },
+  {
+    title: 'Start Notebook',
+    text: 'Click to start a jupyter notebook',
     selector: '.notebook-start-button',
     position: 'bottom',
+    style: stepStyle
   },
 ]
 
 let joyRide = {
+  joyride: undefined,
   joyrideOverlay: true,
   joyrideType: 'continuous',
   isRunning: false,
@@ -108,6 +126,13 @@ export default {
       }
     },
 
+    *resetJoyride ({
+                     payload,
+                   }, { put, select }) {
+      const { app } = yield(select(_ => _))
+      app.joyride.reset(true)
+    },
+
   },
   reducers: {
 
@@ -133,7 +158,7 @@ export default {
     },
 
     callback(state, { payload: data }) {
-      console.log('joyride callback', data); //eslint-disable-line no-console
+      // console.log('joyride callback', data);
 
       return {
         ...state,

@@ -32,9 +32,28 @@
 # socketio = SocketIO(message_queue='redis://')
 # socketio.emit('log_epoch_end', {'step': 111, 'loss': 222, 'acc': 333},
 #               namespace='/log')
-from bson import ObjectId
-from server3.business import project_business
-from server3.service import project_service
-from server3.utility import json_utility
+# from bson import ObjectId
+# from server3.business import project_business
+# from server3.service import project_service
+# from server3.utility import json_utility
+#
+# jobs = project_service.get_all_jobs_of_project(ObjectId("596e2c79d123ab3599649e28"))
+import unicodedata
+import re
 
-jobs = project_service.get_all_jobs_of_project(ObjectId("596e2c79d123ab3599649e28"))
+
+def slugify(value, allow_unicode=False):
+    """
+    Convert to ASCII if 'allow_unicode' is False. Convert spaces to hyphens.
+    Remove characters that aren't alphanumerics, underscores, or hyphens.
+    Convert to lowercase. Also strip leading and trailing whitespace.
+    """
+    value = str(value)
+    if allow_unicode:
+        value = unicodedata.normalize('NFKC', value)
+    else:
+        value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
+    value = re.sub(r'[^\w\s-]', '', value).strip()
+    return re.sub(r'[-\s]+', '-', value)
+
+print(slugify('ls adj-_a(CM)'))
