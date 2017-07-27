@@ -85,21 +85,33 @@ def polynomial_features(arr0, index):
 # 方差选择法
 def variance_threshold(arr0, index, threshold):
     matrix = np.array(arr0)
-    temp = feature_selection.VarianceThreshold(threshold=threshold).fit_transform(matrix)
-    result = data_utility.retrieve_nan_index(temp.tolist(), index)
-    return result
+    temp = feature_selection.VarianceThreshold(threshold=threshold).fit(matrix)
+    scores = [np.var(el) for el in matrix.T]
+    indx = temp.get_support().tolist()
+    result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
+    return scores, indx, result
 
 
 # 特征选择
 # 卡方检验法
 # 需要多加考虑下
-def select_k_best_chi2(arr0, target, index, k):
+# def select_k_best_chi2(arr0, target, index, k):
+# def select_k_best_chi2(arr0, index, k):
+#     from sklearn.feature_selection import chi2
+#     matrix = np.array(arr0)
+#     target = np.array(target)
+#     temp = feature_selection.SelectKBest(chi2, k=k).fit_transform(matrix, target)
+#     result = data_utility.retrieve_nan_index(temp.tolist(), index)
+#     return result
+def select_k_best_chi2(arr0, index, k):
     from sklearn.feature_selection import chi2
-    matrix = np.array(arr0)
-    target = np.array(target)
-    temp = feature_selection.SelectKBest(chi2, k=k).fit_transform(matrix, target)
-    result = data_utility.retrieve_nan_index(temp.tolist(), index)
-    return result
+    target = np.array(arr0[0])
+    matrix = np.array(arr0[1:])
+    temp = feature_selection.SelectKBest(chi2, k=k).fit(matrix, target)
+    scores = temp.scores_.tolist()
+    indx = temp.get_support().tolist()
+    result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
+    return scores, indx, result
 
 
 # 特征选择
