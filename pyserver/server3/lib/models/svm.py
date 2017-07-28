@@ -1,14 +1,6 @@
-import numpy as np
-import tensorflow as tf
-from tensorflow.contrib.linear_optimizer.python import sdca_optimizer
-from tensorflow.contrib.learn.python.learn.estimators import linear
 from tensorflow.contrib import layers
-from tensorflow.contrib.framework import deprecated
-from tensorflow.contrib.framework import deprecated_arg_values
-from tensorflow.contrib.learn.python.learn.estimators import estimator
 from tensorflow.contrib.learn.python.learn.estimators import head as head_lib
 from tensorflow.contrib.learn.python.learn.estimators import linear
-from tensorflow.contrib.learn.python.learn.estimators import prediction_key
 from tensorflow.contrib.linear_optimizer.python import sdca_optimizer
 from tensorflow.python.ops import variable_scope
 from tensorflow.python.framework import sparse_tensor
@@ -17,6 +9,9 @@ from tensorflow.python.ops import array_ops
 from tensorflow.python.framework import dtypes
 from tensorflow.contrib.framework.python.ops import \
     variables as contrib_variables
+from tensorflow.python.ops import array_ops
+from tensorflow.python.framework import constant_op
+from tensorflow.python.framework import sparse_tensor
 
 
 def _add_bias_column(feature_columns, columns_to_tensors, bias_variable,
@@ -49,8 +44,21 @@ def _add_bias_column(feature_columns, columns_to_tensors, bias_variable,
                                                      dtype=dtypes.float32)
     columns_to_variables[bias_column] = [bias_variable]
 
+def parse_tensor_or_dict(features):
+    if isinstance(features, dict):
+        return array_ops.concat([features[k] for k in sorted(features.keys())],
+                                1)
+    return features
 
-def sdca_model_fn(features, labels, mode, params):
+def example_id_column(features):
+    # if feature is a dict
+    if isinstance(features, dict):
+        lenth = list(features.values())[0].get_shape().as_list()
+        results = list(map(str, list(range(lenth[0]))))
+        features['index'] = constant_op.constant(results)
+    print(features['index'])
+
+def svm_model_fn(features, labels, mode, params):
     """A model_fn for linear models that use the SDCA optimizer.
     Args:
       features: A dict of `Tensor` keyed by column name.
@@ -62,12 +70,14 @@ def sdca_model_fn(features, labels, mode, params):
         The following hyperparameters are expected:
         * head: A `Head` instance. Type must be one of `_BinarySvmHead`,
             `_RegressionHead` or `_BinaryLogisticHead`.
-        * feature_columns: An iterable containing all the feature columns used by
+        * feature_columns: An iterable containing all the feature columns
+        used by
             the model.
         * optimizer: An `SDCAOptimizer` instance.
         * weight_column_name: A string defining the weight feature column, or
             None if there are no weights.
-        * update_weights_hook: A `SessionRunHook` object or None. Used to update
+        * update_weights_hook: A `SessionRunHook` object or None. Used to
+        update
             model weights.
     Returns:
       A `ModelFnOps` instance.
@@ -77,24 +87,16 @@ def sdca_model_fn(features, labels, mode, params):
         `_RegressionHead` nor `_MultiClassHead`.
       ValueError: If mode is not any of the `ModeKeys`.
     """
+
+    feature_columns = [layers.real_valued_column(i) for i in features.keys()]
+    example_id_column(features)
+
     head = head_lib.binary_svm_head(
         weight_column_name=params["weight_column_name"],
         enable_centered_bias=False)
 
-    #   能否将  params["feature_columns"] 里面设置为 string格式，然后在内部建立
-    #   Continuous Feature Columns 或  CATEGORICAL_COLUMNS
-
-    #   feature_columns = params["feature_columns"]
-    feature_columns_realvalued = [tf.contrib.layers.real_valued_column(i) for i
-                                  in params["feature_columns"][0]]
-    feature_columns_sparse = [
-        tf.contrib.layers.sparse_column_with_hash_bucket(i,
-                                                         hash_bucket_size=100) \
-        for i in params["feature_columns"][1]]
-    feature_columns = feature_columns_realvalued + feature_columns_sparse
-
     optimizer = sdca_optimizer.SDCAOptimizer(
-        example_id_column=params["example_id_column"],
+        example_id_column="index",
         num_loss_partitions=params["num_loss_partitions"],
         symmetric_l1_regularization=params["l1_regularization"],
         symmetric_l2_regularization=params["l2_regularization"])
@@ -111,10 +113,12 @@ def sdca_model_fn(features, labels, mode, params):
                   head_lib._BinarySvmHead):  # pylint: disable=protected-access
         loss_type = "hinge_loss"
     elif isinstance(head,
-                    head_lib._BinaryLogisticHead):  # pylint: disable=protected-access
+                    head_lib._BinaryLogisticHead):  # pylint:
+        # disable=protected-access
         loss_type = "logistic_loss"
     elif isinstance(head,
-                    head_lib._RegressionHead):  # pylint: disable=protected-access
+                    head_lib._RegressionHead):  # pylint:
+        # disable=protected-access
         assert head.logits_dimension == 1, ("SDCA only applies for "
                                             "logits_dimension=1.")
         loss_type = "squared_loss"
