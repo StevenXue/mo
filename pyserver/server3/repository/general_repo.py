@@ -56,6 +56,17 @@ class Repo:
         """
         return Repo.read(self, {field_name: field_value})
 
+    def read_by_non_unique_field_subset(self, field_name,
+                                                  field_value, subset):
+        """
+        general function to query the db by non unique field, thus return a list
+        :param field_name:str
+        :param field_value:
+        :return: a list of objects corresponding to the query
+        """
+        return Repo.read(self, {field_name: field_value}).only(*subset)
+
+
     def read_by_non_unique_field_limit(self, field_name, field_value, limit):
         """
         general function to query the db by non unique field, thus return a list

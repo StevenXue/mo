@@ -1,4 +1,6 @@
 # -*- coding: UTF-8 -*-
+# https://keras.io/getting-started/sequential-model-guide/#examples
+# Multilayer Perceptron (MLP) for multi-class softmax classification
 from keras.callbacks import LambdaCallback
 from keras.layers import Dense, Dropout
 from keras.optimizers import SGD
