@@ -170,8 +170,8 @@ def ref(arr0, index, k):
     # matrix = np.array(arr0)
     # target = np.array(target)
     temp = feature_selection.RFE(estimator=LogisticRegression(), n_features_to_select=k).fit(matrix, target)
-    scores = temp.ranking_
-    indx = temp.support_
+    scores = temp.ranking_.tolist()
+    indx = temp.support_.tolist()
     result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
     return scores, indx, result
 
@@ -189,7 +189,7 @@ def select_from_model_lr(arr0, index, threthold=0.1):
     # target = np.array(target)
     temp = feature_selection.SelectFromModel(LogisticRegression(penalty="l1", C=threthold)).fit(matrix, target)
     indx = temp._get_support_mask().tolist()
-    scores = get_importance(temp.estimator_)
+    scores = get_importance(temp.estimator_).tolist()
     # threthold = temp.threshold_
     result = data_utility.retrieve_nan_index(temp.trantolist(), index)
     return scores, indx, result
@@ -206,14 +206,15 @@ def select_from_model_lr(arr0, index, threthold=0.1):
 #     scores = get_importance(temp.estimator_)
 #     result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
 #     return scores, indx, result
+# TODO k木有用多啊
 def select_from_model_gbdt(arr0, index, k):
     from sklearn.ensemble import GradientBoostingClassifier
     arr = np.array(arr0)
     target = arr[:, 0]
     matrix = arr[:, 1:]
-    temp = feature_selection.SelectFromModel(GradientBoostingClassifier()).fit_transform(matrix, target)
+    temp = feature_selection.SelectFromModel(GradientBoostingClassifier()).fit(matrix, target)
     indx = temp._get_support_mask().tolist()
-    scores = get_importance(temp.estimator_)
+    scores = get_importance(temp.estimator_).tolist()
     result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
     return scores, indx, result
 
