@@ -92,10 +92,9 @@ def hypo_test(arr, mean, std, x_range, type='norm'):
 
 
 def usr_story2_exploration(data, d_type):
-    if d_type == "聚类":
+    if d_type == 0:
         cols = data["fields"]
         # 暂时支持3个栏位以上的
-        print("2")
         if len(cols) > 2:
             # nan的所有位置
             nan_index = [index for index, item in enumerate(data["labels"]) if isNaN(item)]
@@ -117,6 +116,8 @@ def usr_story2_exploration(data, d_type):
                 name = cols.pop(0)
                 temp.update({name: freq_hist(arr)})
             data.update({"hist_freq": temp})
+    elif d_type == 1:
+        pass
 
     return data
 
