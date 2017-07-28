@@ -7,7 +7,7 @@ from server3.lib import toolkit_orig, preprocess_orig
 from server3.repository import config
 from server3.service import toolkit_service, job_service, visualization_service
 
-# from server3.business import toolkit_business
+from server3.business import toolkit_business
 # from .business import staging_data_business, staging_data_set_business, model_business
 # # from server3.entity.toolkit import Toolkit
 # from .entity.staging_data_set import StagingDataSet
@@ -43,7 +43,9 @@ def test(a,b,c=3):
 if __name__ == '__main__':
     '# 创建所有的public toolkit'
     # toolkit_business.create_public_toolkit()
+    # toolkit_business.create_public_data_process()
     # toolkit_business.update_one_public_toolkit()
+
 
     # 删除一个public toolkit和它的ownership
     # 593a27a88be34db7c6e24349
@@ -88,40 +90,8 @@ if __name__ == '__main__':
     # print (result)
 
     # 测getattr
-    print (hasattr(toolkit_orig, "toolkit_average"))
-    f = getattr(toolkit_orig, "toolkit_average")
-    print ('f', f)
-    result = f([1,2,3,4])
-    print (result)
-
-# import keras
-# from keras.models import Sequential
-# from keras.layers import Dense, Dropout, Activation
-# from keras.optimizers import SGD
-#
-# # Generate dummy data
-# import numpy as np
-# x_train = np.random.random((1000, 20))
-# y_train = keras.utils.to_categorical(np.random.randint(10, size=(1000, 1)), num_classes=10)
-# x_test = np.random.random((100, 20))
-# y_test = keras.utils.to_categorical(np.random.randint(10, size=(100, 1)), num_classes=10)
-#
-# model = Sequential()
-# # Dense(64) is a fully-connected layer with 64 hidden units.
-# # in the first layer, you must specify the expected input data shape:
-# # here, 20-dimensional vectors.
-# model.add(Dense(64, activation='relu', input_dim=20))
-# model.add(Dropout(0.5))
-# model.add(Dense(64, activation='relu'))
-# model.add(Dropout(0.5))
-# model.add(Dense(10, activation='softmax'))
-#
-# sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-# model.compile(loss='categorical_crossentropy',
-#               optimizer='sgd',
-#               metrics=['accuracy'])
-#
-# model.fit(x_train, y_train,
-#           epochs=20,
-#           batch_size=1)
-# score = model.evaluate(x_test, y_test, batch_size=128, verbose=0)
+    # print (hasattr(toolkit_orig, "toolkit_average"))
+    # f = getattr(toolkit_orig, "toolkit_average")
+    # print ('f', f)
+    # result = f([1,2,3,4])
+    # print (result)
