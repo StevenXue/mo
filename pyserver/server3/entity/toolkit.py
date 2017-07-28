@@ -22,7 +22,8 @@ from mongoengine import ListField
 # )
 
 CATEGORY_FORM = (
-    (0, '聚类')
+    (0, '聚类',
+     1, '特征选取')
 )
 
 
