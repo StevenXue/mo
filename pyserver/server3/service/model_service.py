@@ -136,11 +136,10 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
 
             df_x = staging_data_service.mongo_to_df(x_cursor)
             df_y = staging_data_service.mongo_to_df(y_cursor)
-            print(df_x, df_y)
             input = {
                 'model_name': model.name,
-                'df_feature': df_x,
-                'df_label': df_y
+                'df_features': df_x,
+                'df_labels': df_y
             }
             # return 1
             # feature_columns, input = model_input_manager1(df_train, index_col,
@@ -161,8 +160,8 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
             df_train = staging_data_service.mongo_to_df(train_cursor)
             input = {
                 'model_name': model.name,
-                'df_feature': df_x,
-                'df_label': None
+                'df_features': df_x,
+                'df_labels': None
             }
             # input = model_input_manager2(df_train, x_cols)
             return job_service.run_code(conf, project_id, data_source_id,
@@ -475,18 +474,30 @@ def temp():
     #     {'type': 'ndarray', 'n': None}
     # ))
 
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Image Classifier',
+    #     'Training a small convnet from scratch: 80% accuracy in 40 lines '
+    #     'of code',
+    #     ModelType['folder_input'],
+    #     '/lib/models/image_classifier',
+    #     'image_classifier',
+    #     'image_classifier_to_str',
+    #     models.IMAGE_CLASSIFIER,
+    #     {'type': 'folder'}
+    # ))
     print(add_model_with_ownership(
         'system',
         False,
-        'Image Classifier',
-        'Training a small convnet from scratch: 80% accuracy in 40 lines '
-        'of code',
-        ModelType['folder_input'],
-        '/lib/models/image_classifier',
-        'image_classifier',
-        'image_classifier_to_str',
-        models.IMAGE_CLASSIFIER,
-        {'type': 'folder'}
+        'Linear Regressor',
+        'Custom linear regression model',
+        ModelType['custom_supervised'],
+        'server3/lib/models/linear_regressor.py',
+        'linear_regressor_model_fn',
+        'linear_regressor_to_str',
+        models.LinearRegressor,
+        {'type': 'DataFrame'}
     ))
 
 
@@ -495,31 +506,31 @@ if __name__ == '__main__':
     # import os
     # import sys
     # sys.path.append('/Users/zhaofengli/Documents/goldersgreen/goldersgreen/pyserver/')
-    conf = {
-        'estimator':{
-            'args': {
-                "example_id_column": 'index',
-                "weight_column_name": None,
-                "model_dir": None,
-                "l1_regularization": 0.0,
-                "l2_regularization": 0.5,
-                "num_loss_partitions": 1,
-            }
-        },
-        'fit': {
-            'data_fields': [['MV', 'NOX'], ['CRIM']],
-            "args": {
-                "batch_size": 16,
-                "epochs": 50
-            }
-        },
-        'evaluate': {
-            'args': {
-                'batch_size': 16
-            }
-        }
-    }
-    run_model(conf, "595f32e4e89bde8ba70738a3", "5979da380c11f32674eb2788",
-              "59687821d123abcfbfe8cab9")
+    # conf = {
+    #     'estimator':{
+    #         'args': {
+    #             "example_id_column": 'index',
+    #             "weight_column_name": None,
+    #             "model_dir": None,
+    #             "l1_regularization": 0.0,
+    #             "l2_regularization": 0.5,
+    #             "num_loss_partitions": 1,
+    #         }
+    #     },
+    #     'fit': {
+    #         'data_fields': [['MV', 'NOX'], ['CRIM']],
+    #         "args": {
+    #             "batch_size": 16,
+    #             "epochs": 50
+    #         }
+    #     },
+    #     'evaluate': {
+    #         'args': {
+    #             'batch_size': 16
+    #         }
+    #     }
+    # }
+    # run_model(conf, "595f32e4e89bde8ba70738a3", "5979da380c11f32674eb2788",
+    #           "59687821d123abcfbfe8cab9")
 
-    # temp()
+    temp()
