@@ -610,8 +610,7 @@ def create_public_data_process():
 
     standard_scaler = Toolkit(name='无量纲化-正太分布',
                               description='标准化，基于特征矩阵的列，将特征值转换至服从标准正态分布',
-                              category="数值转换",
-                              result_form=2,
+                              category=2,
                               entry_function='standard_scaler',
                               target_py_code=inspect.getsource(preprocess_orig.standard_scaler),
                               parameter_spec={
@@ -635,8 +634,7 @@ def create_public_data_process():
 
     min_max_scaler = Toolkit(name='无量纲化-(0, 1)分布',
                              description='区间缩放，基于最大最小值，将特征值转换到[0, 1]区间上',
-                             category="数值转换",
-                             result_form=2,
+                             category=2,
                              entry_function='min_max_scaler',
                              target_py_code=inspect.getsource(preprocess_orig.min_max_scaler),
                              parameter_spec={
@@ -660,8 +658,7 @@ def create_public_data_process():
 
     normalizer = Toolkit(name='归一化',
                          description='基于特征矩阵的行，将样本向量转换为"单位向量"',
-                         category="数值转换",
-                         result_form=2,
+                         category=2,
                          entry_function='normalizer',
                          target_py_code=inspect.getsource(preprocess_orig.normalizer),
                          parameter_spec={
@@ -685,8 +682,7 @@ def create_public_data_process():
 
     binarizer = Toolkit(name='二值化',
                         description='基于给定阈值，将定量特征按阈值划分',
-                        category="数值转换",
-                        result_form=2,
+                        category=2,
                         entry_function='binarizer',
                         target_py_code=inspect.getsource(preprocess_orig.binarizer),
                         parameter_spec={
@@ -722,8 +718,7 @@ def create_public_data_process():
 
     one_hot_encoder = Toolkit(name='哑编码',
                               description='将定性数据编码为定量数据',
-                              category="数值转换",
-                              result_form=2,
+                              category=2,
                               entry_function='one_hot_encoder',
                               target_py_code=inspect.getsource(preprocess_orig.one_hot_encoder),
                               parameter_spec={
@@ -747,8 +742,7 @@ def create_public_data_process():
 
     imputer = Toolkit(name='缺失值计算',
                       description='计算缺失值，缺失值可填充为均值等',
-                      category="数值转换",
-                      result_form=2,
+                      category=2,
                       entry_function='imputer',
                       target_py_code=inspect.getsource(preprocess_orig.imputer),
                       parameter_spec={
@@ -772,8 +766,7 @@ def create_public_data_process():
 
     polynomial_features = Toolkit(name='多项式数据转换',
                                   description='多项式数据转换, 默认为两次',
-                                  category="数值转换",
-                                  result_form=2,
+                                  category=2,
                                   entry_function='polynomial_features',
                                   target_py_code=inspect.getsource(preprocess_orig.polynomial_features),
                                   parameter_spec={
@@ -1242,8 +1235,7 @@ def create_public_data_process():
 
     decomposition_pca = Toolkit(name='降维-PCA(sk-learn)',
                                 description='主成分分析法，返回降维后的数据',
-                                category="降维",
-                                result_form=2,
+                                category=3,
                                 entry_function='decomposition_pca',
                                 target_py_code=inspect.getsource(preprocess_orig.decomposition_pca),
                                 parameter_spec={
@@ -1279,8 +1271,7 @@ def create_public_data_process():
 
     lda = Toolkit(name='线性判别分析法（LDA）',
                   description='线性判别分析法，返回降维后的数据，参数n_components为降维后的维数',
-                  category="降维",
-                  result_form=2,
+                  category=3,
                   entry_function='lda',
                   target_py_code=inspect.getsource(preprocess_orig.lda),
                   parameter_spec={
