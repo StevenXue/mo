@@ -12,6 +12,7 @@
 # -----------------------
 import numpy as np
 from sklearn import preprocessing, feature_selection, decomposition
+from sklearn.feature_selection.from_model import _get_feature_importances as get_importance
 from server3.utility import data_utility
 # -----------------------
 
@@ -85,21 +86,33 @@ def polynomial_features(arr0, index):
 # 方差选择法
 def variance_threshold(arr0, index, threshold):
     matrix = np.array(arr0)
-    temp = feature_selection.VarianceThreshold(threshold=threshold).fit_transform(matrix)
-    result = data_utility.retrieve_nan_index(temp.tolist(), index)
-    return result
+    temp = feature_selection.VarianceThreshold(threshold=threshold).fit(matrix)
+    scores = [np.var(el) for el in matrix.T]
+    indx = temp.get_support().tolist()
+    result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
+    return scores, indx, result
 
 
 # 特征选择
 # 卡方检验法
 # 需要多加考虑下
-def select_k_best_chi2(arr0, target, index, k):
+# def select_k_best_chi2(arr0, target, index, k):
+# def select_k_best_chi2(arr0, index, k):
+#     from sklearn.feature_selection import chi2
+#     matrix = np.array(arr0)
+#     target = np.array(target)
+#     temp = feature_selection.SelectKBest(chi2, k=k).fit_transform(matrix, target)
+#     result = data_utility.retrieve_nan_index(temp.tolist(), index)
+#     return result
+def select_k_best_chi2(arr0, index, k):
     from sklearn.feature_selection import chi2
-    matrix = np.array(arr0)
-    target = np.array(target)
-    temp = feature_selection.SelectKBest(chi2, k=k).fit_transform(matrix, target)
-    result = data_utility.retrieve_nan_index(temp.tolist(), index)
-    return result
+    target = np.array(arr0[0])
+    matrix = np.array(arr0[1:])
+    temp = feature_selection.SelectKBest(chi2, k=k).fit(matrix, target)
+    scores = temp.scores_.tolist()
+    indx = temp.get_support().tolist()
+    result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
+    return scores, indx, result
 
 
 # 特征选择
@@ -109,9 +122,11 @@ def select_k_best_pearson(arr0, target, index, k):
     from scipy.stats import pearsonr
     matrix = np.array(arr0)
     target = np.array(target)
-    temp = feature_selection.SelectKBest(lambda X, Y: np.array(map(lambda x:pearsonr(x, Y), X.T)).T[0], k=k).fit_transform(matrix, target)
-    result = data_utility.retrieve_nan_index(temp.tolist(), index)
-    return result
+    temp = feature_selection.SelectKBest(lambda X, Y: np.array(list(map(lambda x: pearsonr(x, Y), X.T))).T[0], k=k).fit(matrix, target)
+    scores = temp.scores_.tolist()
+    indx = temp.get_support().tolist()
+    result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
+    return scores, indx, result
 
 
 # 特征选择
@@ -122,13 +137,16 @@ def select_k_best_mic(arr0, target, index, k):
     from minepy import MINE
     matrix = np.array(arr0)
     target = np.array(target)
+
     def mic(x, y):
         m = MINE()
         m.compute_score(x, y)
         return (m.mic(), 0.5)
-    temp = feature_selection.SelectKBest(lambda X, Y: np.array(map(lambda x:mic(x, Y), X.T)).T[0], k=2).fit_transform(matrix, target)
-    result = data_utility.retrieve_nan_index(temp.tolist(), index)
-    return result
+    temp = feature_selection.SelectKBest(lambda X, Y: np.array(list(map(lambda x: mic(x, Y), X.T))).T[0], k=k).fit(matrix, target)
+    scores = temp.scores_.tolist()
+    indx = temp.get_support().tolist()
+    result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
+    return scores, indx, result
 
 
 # 递归特征消除法，返回特征选择后的数据
@@ -138,21 +156,26 @@ def ref(arr0, target, index, k):
     from sklearn.linear_model import LogisticRegression
     matrix = np.array(arr0)
     target = np.array(target)
-    temp = feature_selection.RFE(estimator=LogisticRegression(), n_features_to_select=k).fit_transform(matrix, target)
-    result = data_utility.retrieve_nan_index(temp.tolist(), index)
-    return result
+    temp = feature_selection.RFE(estimator=LogisticRegression(), n_features_to_select=k).fit(matrix, target)
+    scores = temp.ranking_
+    indx = temp.support_
+    result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
+    return scores, indx, result
 
 
 # 基于惩罚项的特征选择法
 # 带L1惩罚项的逻辑回归作为基模型的特征选择
 # 带惩罚的基模型，除了筛选出特征，同时也降维
-def select_from_model_lr(arr0, target, index, k):
+def select_from_model_lr(arr0, target, index, threthold=0.1):
     from sklearn.linear_model import LogisticRegression
     matrix = np.array(arr0)
     target = np.array(target)
-    temp = feature_selection.SelectFromModel(LogisticRegression(penalty="l1", C=0.1)).fit_transform(matrix, target)
-    result = data_utility.retrieve_nan_index(temp.tolist(), index)
-    return result
+    temp = feature_selection.SelectFromModel(LogisticRegression(penalty="l1", C=threthold)).fit(matrix, target)
+    indx = temp._get_support_mask().tolist()
+    scores = get_importance(temp.estimator_)
+    # threthold = temp.threshold_
+    result = data_utility.retrieve_nan_index(temp.trantolist(), index)
+    return scores, indx, result
 
 
 # 基于树模型的特征选择法
@@ -162,8 +185,10 @@ def select_from_model_gbdt(arr0, target, index, k):
     matrix = np.array(arr0)
     target = np.array(target)
     temp = feature_selection.SelectFromModel(GradientBoostingClassifier()).fit_transform(matrix, target)
-    result = data_utility.retrieve_nan_index(temp.tolist(), index)
-    return result
+    indx = temp._get_support_mask().tolist()
+    scores = get_importance(temp.estimator_)
+    result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
+    return scores, indx, result
 
 
 # 降维-主成分分析法（PCA）
