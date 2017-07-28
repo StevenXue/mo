@@ -166,11 +166,11 @@ def ref(arr0, target, index, k):
 # 基于惩罚项的特征选择法
 # 带L1惩罚项的逻辑回归作为基模型的特征选择
 # 带惩罚的基模型，除了筛选出特征，同时也降维
-def select_from_model_lr(arr0, target, index):
+def select_from_model_lr(arr0, target, index, threthold=0.1):
     from sklearn.linear_model import LogisticRegression
     matrix = np.array(arr0)
     target = np.array(target)
-    temp = feature_selection.SelectFromModel(LogisticRegression(penalty="l1", C=0.1)).fit(matrix, target)
+    temp = feature_selection.SelectFromModel(LogisticRegression(penalty="l1", C=threthold)).fit(matrix, target)
     indx = temp._get_support_mask().tolist()
     scores = get_importance(temp.estimator_)
     # threthold = temp.threshold_
