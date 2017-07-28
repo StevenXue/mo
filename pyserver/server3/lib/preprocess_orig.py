@@ -156,21 +156,26 @@ def ref(arr0, target, index, k):
     from sklearn.linear_model import LogisticRegression
     matrix = np.array(arr0)
     target = np.array(target)
-    temp = feature_selection.RFE(estimator=LogisticRegression(), n_features_to_select=k).fit_transform(matrix, target)
-    result = data_utility.retrieve_nan_index(temp.tolist(), index)
-    return result
+    temp = feature_selection.RFE(estimator=LogisticRegression(), n_features_to_select=k).fit(matrix, target)
+    scores = temp.ranking_
+    indx = temp.support_
+    result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
+    return scores, indx, result
 
 
 # 基于惩罚项的特征选择法
 # 带L1惩罚项的逻辑回归作为基模型的特征选择
 # 带惩罚的基模型，除了筛选出特征，同时也降维
-def select_from_model_lr(arr0, target, index, k):
+def select_from_model_lr(arr0, target, index):
     from sklearn.linear_model import LogisticRegression
     matrix = np.array(arr0)
     target = np.array(target)
-    temp = feature_selection.SelectFromModel(LogisticRegression(penalty="l1", C=0.1)).fit_transform(matrix, target)
-    result = data_utility.retrieve_nan_index(temp.tolist(), index)
-    return result
+    temp = feature_selection.SelectFromModel(LogisticRegression(penalty="l1", C=0.1)).fit(matrix, target)
+    indx = temp._get_support_mask().tolist()
+    scores = get_importance(temp.estimator_)
+    # threthold = temp.threshold_
+    result = data_utility.retrieve_nan_index(temp.trantolist(), index)
+    return scores, indx, result
 
 
 # 基于树模型的特征选择法
