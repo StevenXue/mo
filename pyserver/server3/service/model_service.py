@@ -111,28 +111,66 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
                                     model, f, input, file_id=data_source_id)
     else:
         # custom models
-        train_cursor = staging_data_business.get_by_staging_data_set_id(
-            data_source_id)
-        df_train = staging_data_service.mongo_to_df(train_cursor)
+
         f = models.custom_model
         model_fn = getattr(models, model.entry_function)
 
         if model['category'] == ModelType['custom_supervised']:
             fit = conf.get('fit', None)
             params = conf.get('estimator', None)['args']
-            data_fields = fit.get('data_fields', [[None], [None]])
+            data_fields = fit.get('data_fields', [[], []])
             index_col = params.get('example_id_column', None)
-            feature_columns, input = model_input_manager1(df_train, index_col,
-                                                          data_fields)
-            params['feature_columns'] = feature_columns
+
+            # to data frame
+            if not is_array_and_not_empty(
+                    data_fields[0]) or not is_array_and_not_empty(
+                    data_fields[1]):
+                raise ValueError('fields array empty')
+
+            x_cursor = staging_data_business. \
+                    get_by_staging_data_set_id_limited_fields(data_source_id,
+                                                              data_fields[0])
+            y_cursor = staging_data_business. \
+                get_by_staging_data_set_id_limited_fields(data_source_id,
+                                                          data_fields[1])
+
+            df_x = staging_data_service.mongo_to_df(x_cursor)
+            df_y = staging_data_service.mongo_to_df(y_cursor)
+            print(df_x, df_y)
+            input = {
+                'model_name': model.name,
+                'df_feature': df_x,
+                'df_label': df_y
+            }
+            # return 1
+            # feature_columns, input = model_input_manager1(df_train, index_col,
+            #                                               data_fields)
+            # params['feature_columns'] = feature_columns
             return job_service.run_code(conf, project_id, data_source_id,
                                         model, f, model_fn, input)
         if model['category'] == ModelType['unsupervised']:
             fit = conf.get('fit', None)
             x_cols = fit.get('data_fields', [])
-            input = model_input_manager2(df_train, x_cols)
+
+            # to data frame
+            if not is_array_and_not_empty(x_cols) :
+                raise ValueError('field list empty')
+            train_cursor = staging_data_business. \
+                get_by_staging_data_set_id_limited_fields(data_source_id,
+                                                          x_cols)
+            df_train = staging_data_service.mongo_to_df(train_cursor)
+            input = {
+                'model_name': model.name,
+                'df_feature': df_x,
+                'df_label': None
+            }
+            # input = model_input_manager2(df_train, x_cols)
             return job_service.run_code(conf, project_id, data_source_id,
                                         model, f, model_fn, input)
+
+
+def is_array_and_not_empty(x):
+    return isinstance(x, list) and len(x) > 0
 
 
 def run_multiple_model(conf, project_id, staging_data_set_id, model_id,
@@ -458,7 +496,18 @@ if __name__ == '__main__':
     # import sys
     # sys.path.append('/Users/zhaofengli/Documents/goldersgreen/goldersgreen/pyserver/')
     conf = {
+        'estimator':{
+            'args': {
+                "example_id_column": 'index',
+                "weight_column_name": None,
+                "model_dir": None,
+                "l1_regularization": 0.0,
+                "l2_regularization": 0.5,
+                "num_loss_partitions": 1,
+            }
+        },
         'fit': {
+            'data_fields': [['MV', 'NOX'], ['CRIM']],
             "args": {
                 "batch_size": 16,
                 "epochs": 50
@@ -470,7 +519,7 @@ if __name__ == '__main__':
             }
         }
     }
-    run_model(conf, "595f32e4e89bde8ba70738a3", "597752add123abc021a9badd",
-              "59774f49d123abbdc5d86896")
+    run_model(conf, "595f32e4e89bde8ba70738a3", "5979da380c11f32674eb2788",
+              "59687821d123abcfbfe8cab9")
 
     # temp()
