@@ -16,7 +16,7 @@ from server3.lib.models.custom_model import custom_model
 from server3.lib.models.custom_model import custom_model_to_str
 ## svm
 from server3.lib.models.svm import SVM
-from server3.lib.models.svm import sdca_model_fn
+from server3.lib.models.svm import svm_model_fn
 ## kmean
 from server3.lib.models.kmean import kmeans_clustering_model_fn
 from server3.lib.models.kmean import Kmeans
