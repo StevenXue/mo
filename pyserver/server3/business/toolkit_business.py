@@ -1014,19 +1014,7 @@ def create_public_data_process():
 
                                            'x_data_type': ['int', 'float'],
                                            'y_data_type': ['int', 'float']
-                                       },
-                                       "args": [
-                                           {
-                                               'name': 'n_features',
-                                               'type': {
-                                                   'key': 'int',
-                                                   'des': 'the threshold to judge if positive of negative',
-                                                   'range': [1, None]
-                                               },
-                                               'default': 2,
-                                               'required': True
-                                           }
-                                       ]
+                                       }
                                    })
     select_from_model_lr = toolkit_repo.create(select_from_model_lr)
     ownership_business.add(user, False, toolkit=select_from_model_lr)
