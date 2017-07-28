@@ -38,22 +38,7 @@
 # from server3.utility import json_utility
 #
 # jobs = project_service.get_all_jobs_of_project(ObjectId("596e2c79d123ab3599649e28"))
-import unicodedata
-import re
-
-
-def slugify(value, allow_unicode=False):
-    """
-    Convert to ASCII if 'allow_unicode' is False. Convert spaces to hyphens.
-    Remove characters that aren't alphanumerics, underscores, or hyphens.
-    Convert to lowercase. Also strip leading and trailing whitespace.
-    """
-    value = str(value)
-    if allow_unicode:
-        value = unicodedata.normalize('NFKC', value)
-    else:
-        value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
-    value = re.sub(r'[^\w\s-]', '', value).strip()
-    return re.sub(r'[-\s]+', '-', value)
-
-print(slugify('ls.adj-_a(CM)'))
+from server3.utility import json_utility
+from flask import jsonify
+result = {'eval_metrics': 30}
+print(jsonify(1))
