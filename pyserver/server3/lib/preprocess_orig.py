@@ -106,8 +106,9 @@ def variance_threshold(arr0, index, threshold):
 #     return result
 def select_k_best_chi2(arr0, index, k):
     from sklearn.feature_selection import chi2
-    target = np.array(arr0[0])
-    matrix = np.array(arr0[1:])
+    arr = np.array(arr0)
+    target = arr[:, 0]
+    matrix = arr[:, 1:]
     temp = feature_selection.SelectKBest(chi2, k=k).fit(matrix, target)
     scores = temp.scores_.tolist()
     indx = temp.get_support().tolist()
@@ -118,10 +119,14 @@ def select_k_best_chi2(arr0, index, k):
 # 特征选择
 # 选择K个最好的特征，返回特征选择后的数据
 # 皮尔森互信息法, 需要多加考虑下
-def select_k_best_pearson(arr0, target, index, k):
+# def select_k_best_pearson(arr0, target, index, k):
+def select_k_best_pearson(arr0, index, k):
     from scipy.stats import pearsonr
-    matrix = np.array(arr0)
-    target = np.array(target)
+    arr = np.array(arr0)
+    target = arr[:, 0]
+    matrix = arr[:, 1:]
+    # matrix = np.array(arr0)
+    # target = np.array(target)
     temp = feature_selection.SelectKBest(lambda X, Y: np.array(list(map(lambda x: pearsonr(x, Y), X.T))).T[0], k=k).fit(matrix, target)
     scores = temp.scores_.tolist()
     indx = temp.get_support().tolist()
