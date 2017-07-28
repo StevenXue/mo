@@ -100,7 +100,6 @@ def usr_story2_exploration(data, d_type):
     if d_type == "聚类":
         cols = data["fields"]
         # 暂时支持3个栏位以上的
-        print("2")
         if len(cols) > 2:
             # nan的所有位置
             nan_index = [index for index, item in enumerate(data["labels"]) if isNaN(item)]
