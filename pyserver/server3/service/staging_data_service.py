@@ -181,7 +181,7 @@ def add_new_key_value(sds_id, key, array):
     # get staging data的所有id
     ids = staging_data_business.get_by_staging_data_set_id(sds_id)
     for oid in ids:
-        query = {key: array.pop(0)}
+        query = {key: array.copy().pop(0)}
         staging_data_business.update_by_id(oid.id, query)
 
 
