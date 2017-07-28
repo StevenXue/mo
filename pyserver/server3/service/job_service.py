@@ -152,7 +152,15 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
                         "centers": results["Centroids of Clusters"],
                         "general_info": gen_info,
                         "fields": fields}
-                logger_service.save_result(result_sds_obj, **{"visualization": json})
+            elif toolkit_obj.category == 1:
+                json = {"Y_target": fields[0],
+                        "X_fields": fields[1:],
+                        "labels": labels,
+                        "bar": results["scores"]
+                        }
+            else:
+                json = {}
+            logger_service.save_result(result_sds_obj, **{"visualization": json})
 
             # # 判断是否存储结果到staging_data_set, 默认result_form2
             # if toolkit_obj.result_form == 2 or 1:
