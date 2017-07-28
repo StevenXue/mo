@@ -185,8 +185,10 @@ def select_from_model_gbdt(arr0, target, index, k):
     matrix = np.array(arr0)
     target = np.array(target)
     temp = feature_selection.SelectFromModel(GradientBoostingClassifier()).fit_transform(matrix, target)
-    result = data_utility.retrieve_nan_index(temp.tolist(), index)
-    return result
+    indx = temp._get_support_mask().tolist()
+    scores = get_importance(temp.estimator_)
+    result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
+    return scores, indx, result
 
 
 # 降维-主成分分析法（PCA）
