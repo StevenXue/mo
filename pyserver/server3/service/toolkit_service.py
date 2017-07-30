@@ -49,7 +49,8 @@ def toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, fields, 
 
 
 # for database 调用toolkit code tag for zhaofeng
-def toolkit_calculate(project_id, staging_data_set_id, toolkit_id, fields, *argv):
+def toolkit_calculate(project_id, staging_data_set_id,
+                      toolkit_id, fields, *argv):
     toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
 
     # old code with old-fashioned decorator
@@ -62,9 +63,10 @@ def toolkit_calculate(project_id, staging_data_set_id, toolkit_id, fields, *argv
     # code = toolkit_obj.target_py_code
     # exec(code)
     # func = locals()[toolkit_obj.entry_function]
-
+    # TODO
     func = getattr(toolkit_orig, toolkit_obj.entry_function) if hasattr(toolkit_orig, toolkit_obj.entry_function) else getattr(preprocess_orig, toolkit_obj.entry_function)
-    func = job_service.create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields)(func)
+    func = job_service.create_toolkit_job(project_id, staging_data_set_id,
+                                          toolkit_id, fields)(func)
     result = func(*argv)
 
     return result
