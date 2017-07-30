@@ -2,53 +2,49 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import classnames from 'classnames'
+import { Router, routerRedux } from 'dva/router'
 import { Button, Select, Icon, message, Modal, Table, Radio, Collapse, Input, Spin } from 'antd'
 
-import style from './detail.css'
-
-const Panel = Collapse.Panel
-
-import empty from './empty.ipynb'
-
 import { jupyterServer, flaskServer } from '../../../constants'
-import { Router, routerRedux } from 'dva/router'
 import Toolkits from '../toolkit/toolSteps'
 import JupyterNotebook from './jupyterNotebook'
-import 'codemirror/lib/codemirror.css'
-import 'codemirror/theme/monokai.css'
 import Preprocess from '../preprocess/preprocess'
 import AutomatedModel from '../model/autoModal'
 import DataPreview from './dataPreview'
 import { stepStyle } from '../../../constants'
 import { TourArea } from '../../../components'
 import chooseData from '../../../media/videos/choose_data.mp4'
+import empty from './empty.ipynb'
+import style from './detail.css'
+// 全局css，在index里去import
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/theme/monokai.css'
 
 //import Input from 'antd/lib/input/Input.d'
-
-const { Option, OptGroup } = Select
-const RadioGroup = Radio.Group
+const { Panel } = Collapse
+const { Option } = Select
 
 const defaultSteps = [
   {
     title: 'Choose Data',
-    text:  <TourArea text='Click to choose your data set to use in this project' src={chooseData} />,
+    text: <TourArea text='Click to choose your data set to use in this project' src={chooseData}/>,
     selector: '[class*="dataChooseButton"]',
     position: 'bottom',
-    style: stepStyle
+    style: stepStyle,
   },
   {
     title: 'Data Preview Area',
     text: 'After choose your data set, you can have a preview in this area',
     selector: '.data-preview-collapse',
     position: 'bottom',
-    style: stepStyle
+    style: stepStyle,
   },
   {
     title: 'Preprocess Area',
     text: 'You can do some preprocess for your data set here, such as missing value completion and column filtering',
     selector: '.preprocess-collapse',
     position: 'bottom',
-    style: stepStyle
+    style: stepStyle,
   },
   {
     title: 'Data Exploration & Analysis Area',
@@ -56,21 +52,21 @@ const defaultSteps = [
     ' great feature in this area',
     selector: '.exploration-collapse',
     position: 'top',
-    style: stepStyle
+    style: stepStyle,
   },
   {
     title: 'Automated Modelling Area',
     text: 'By click you mouse, automated modelling process can be done here, coding is not needed',
     selector: '.model-collapse',
     position: 'top',
-    style: stepStyle
+    style: stepStyle,
   },
   {
     title: 'Start Notebook',
     text: 'Click to start a jupyter notebook',
     selector: '.notebook-start-button',
     position: 'top',
-    style: stepStyle
+    style: stepStyle,
   },
 ]
 
@@ -131,6 +127,7 @@ class ProjectDetail extends React.Component {
 
   componentDidMount () {
     console.log('Project mounted, project id: ', this.state.project_id)
+    this.props.dispatch({ type: 'project/query' })
     this.props.dispatch({ type: 'project/listDataSets' })
   }
 
@@ -261,9 +258,8 @@ class ProjectDetail extends React.Component {
       },
     }).then((response) => response.json())
       .then((res) => {
-          let c = Object.keys(res.response.data[1])
           this.setState({
-            columns: c,
+            columns: Object.keys(res.response.data[1]),
             stagingDataID: value,
           })
         },
@@ -350,7 +346,7 @@ class ProjectDetail extends React.Component {
             <div>
               <Collapse className='model-collapse' bordered={true} style={{ marginTop: 10, width: '100%' }}>
                 <Panel header={'Automated Modelling'} key="1" style={{ width: '100%' }}>
-                  <AutomatedModel project_id={this.props.location.query._id} runTour={(steps) => this.runTour(steps)} />
+                  <AutomatedModel project_id={this.props.location.query._id} runTour={(steps) => this.runTour(steps)}/>
                 </Panel>
               </Collapse>
             </div>
