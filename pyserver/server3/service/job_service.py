@@ -27,7 +27,7 @@ from server3.lib import models
 from server3.repository import job_repo
 
 
-def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
+def create_toolkit_job_temp(project_id, staging_data_set_id, toolkit_id, fields):
     """
     help toolkit to create a job before toolkit runs,
     as well as save the job & create a result after toolkit runs
@@ -85,7 +85,6 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
             # update a job
             job_business.end_job(job_obj)
             # 已经淘汰，没有result了
-            # from server3.service import project_service
             # # update a project
             # project_service.add_job_and_result_to_project(result_obj, ObjectId(project_id))
             return {"visual_sds_id": str(result_sds_obj.id), "result": results}
@@ -93,7 +92,95 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
     return decorator
 
 
-def create_model_job(project_id, staging_data_set_id, model_obj, *argv):
+def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
+    """
+    help toolkit to create a job before toolkit runs,
+    as well as save the job & create a result after toolkit runs
+    :param project_id: project_id, staging_data_set_id, toolkit_id
+    :param staging_data_set_id: project_id, staging_data_set_id, toolkit_id
+    :param toolkit_id: project_id, staging_data_set_id, toolkit_id
+    :param fields: project_id, staging_data_set_id, toolkit_id
+    :return:
+    """
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kw):
+            from server3.service import project_service
+
+            # create a job
+            toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
+            staging_data_set_obj = staging_data_set_business.get_by_id(staging_data_set_id)
+            project_obj = project_business.get_by_id(project_id)
+
+            argv = fields
+            job_obj = job_business.add_toolkit_job(toolkit_obj,
+                                                   staging_data_set_obj,
+                                                   project_obj,
+                                                   *argv)
+            # update a project
+            project_service.add_job_to_project(job_obj, ObjectId(project_id))
+
+            # calculate
+            result = list(func(*args, **kw))
+
+            # 新设计的存取方式
+            results = {"fields": fields}
+            gen_info = {}
+            result_spec = toolkit_obj.result_spec
+            for arg in result_spec["args"]:
+                value = result.pop(0)
+                results.update({arg["name"]: value})
+                if arg["if_add_column"]:
+                    staging_data_service.add_new_key_value(staging_data_set_id, arg["name"], value)
+                if arg["attribute"] == "label":
+                    labels = value
+                elif arg["attribute"] == "general_info":
+                    gen_info.update({arg["name"]: value})
+            if result_spec["if_reserved"]:
+                # create result sds for toolkit
+                sds_name = '%s_%s_result' % (toolkit_obj['name'], job_obj['id'])
+                result_sds_obj = staging_data_set_business.add(sds_name, 'des',
+                                                               project_obj,
+                                                               job=job_obj,
+                                                               type='result')
+                logger_service.save_result(result_sds_obj, **{"result": results})
+            # TODO 以下部分全部为特殊处理start/
+
+            if toolkit_obj.category == 0:
+                json = {"scatter": data_utility.retrieve_nan_index(args[0], args[1]), "labels": labels,
+                        "pie": [{'text': el, 'value': labels.count(el)} for el in set(labels)],
+                        "centers": results["Centroids of Clusters"],
+                        "general_info": gen_info,
+                        "fields": fields}
+            elif toolkit_obj.category == 1:
+                json = {"Y_target": fields[0],
+                        "X_fields": fields[1:],
+                        "labels": labels,
+                        "bar": results["scores"]
+                        }
+            else:
+                json = {}
+            logger_service.save_result(result_sds_obj, **{"visualization": json})
+
+            # # 判断是否存储结果到staging_data_set, 默认result_form2
+            # if toolkit_obj.result_form == 2 or 1:
+            #     # 存储可视化信息到sds里面
+            #     logger_service.save_result(result_sds_obj, **{"result": results, "visualization": json})
+            #     # FIXME 目前只有一列，以后会有多类信息
+            #     staging_data_service.add_new_key_value(staging_data_set_id, list(cols.keys())[0], list(cols.values())[0])
+            # TODO 以上部分全部为特殊处理end/
+
+            # update a job
+            job_business.end_job(job_obj)
+            # 已经淘汰，没有result了
+            # # update a project
+            # project_service.add_job_and_result_to_project(result_obj, ObjectId(project_id))
+            return {"visual_sds_id": str(result_sds_obj.id), "result": results}
+        return wrapper
+    return decorator
+
+
+def create_model_job(project_id, staging_data_set_id, model_obj, **kwargs):
     """
     help model to create a job before model runs,
     as well as save the job & create a result after toolkit runs
@@ -108,15 +195,21 @@ def create_model_job(project_id, staging_data_set_id, model_obj, *argv):
             # create a job
             # model_obj = model_business.get_by_model_id(model_id)
             params = args[0]
-            staging_data_set_obj = \
-                staging_data_set_business.get_by_id(staging_data_set_id)
+            file_id = kwargs.get('file_id')
+            staging_data_set_obj = None
+            if staging_data_set_id:
+                staging_data_set_obj = \
+                    staging_data_set_business.get_by_id(staging_data_set_id)
             project_obj = project_business.get_by_id(project_id)
+
+            file_dict = {'file': ObjectId(file_id)} if file_id else {}
 
             # create model job
             job_obj = job_business.add_model_job(model_obj,
                                                  staging_data_set_obj,
                                                  project_obj,
-                                                 params=params)
+                                                 params=params,
+                                                 **file_dict)
             # update a project
             from server3.service import project_service
             project_service.add_job_to_project(job_obj, ObjectId(project_id))
@@ -165,7 +258,7 @@ def split_supervised_input(staging_data_set_id, x_fields, y_fields, schema):
 #     return func(conf, *args)
 
 
-def run_code(conf, project_id, staging_data_set_id, model, f, *args):
+def run_code(conf, project_id, staging_data_set_id, model, f, *args, **kwargs):
     """
     run supervised learning code
     :param conf:
@@ -176,7 +269,7 @@ def run_code(conf, project_id, staging_data_set_id, model, f, *args):
     :return:
     """
     # add decorator
-    func = create_model_job(project_id, staging_data_set_id, model)(f)
+    func = create_model_job(project_id, staging_data_set_id, model, **kwargs)(f)
     # run model with decorator
     return func(conf, *args)
 

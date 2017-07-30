@@ -145,7 +145,7 @@ export default class ModelProcess extends React.Component {
     return(
         <div style={{width: 1100, height: this.state.isActive? 450:300, margin: 10 , padding: 10, backgroundColor: 'white' }}>
           <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-          <div style={{width: '35%', height: 480}}>
+          <div className='choose_model_and_input' style={{width: '35%', height: 480}}>
             <span style={{color: '#108ee9'}}>Choose Modelling Method</span>
             <br/>
             {
@@ -210,7 +210,7 @@ export default class ModelProcess extends React.Component {
                 </div>)
             }
           </div>
-          <div style={{width: '45%', height: 480}}>
+          <div className='choose_params' style={{width: '45%', height: 480}}>
             <ModelForms data={this.state.modelData}
                         divide={this.state.divide}
                         dataset_id={this.state.dataSet}

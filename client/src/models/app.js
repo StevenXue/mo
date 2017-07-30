@@ -1,9 +1,76 @@
+import React from 'react'
 import { query, logout } from '../services/app'
 import { routerRedux } from 'dva/router'
 import { parse } from 'qs'
 import { queryURL } from '../utils'
 import { config } from '../utils'
+import { mainColor } from '../constants'
+import { TourArea } from '../components'
+import chooseData from '../media/videos/choose_data.mp4'
 const { prefix } = config
+
+const stepStyle = {
+  mainColor: mainColor,
+  beacon: {
+    inner: mainColor,
+    outer: mainColor,
+  },
+}
+
+const defaultSteps = [
+  {
+    title: 'Choose Data',
+    text:  <TourArea text='Click to choose your data set to use in this project' src={chooseData} />,
+    selector: '[class*="dataChooseButton"]',
+    position: 'bottom',
+    style: stepStyle
+  },
+  {
+    title: 'Data Preview Area',
+    text: 'After choose your data set, you can have a preview in this area',
+    selector: '.data-preview-collapse',
+    position: 'bottom',
+    style: stepStyle
+  },
+  {
+    title: 'Preprocess Area',
+    text: 'You can do some preprocess for your data set here, such as missing value completion and column filtering',
+    selector: '.preprocess-collapse',
+    position: 'bottom',
+    style: stepStyle
+  },
+  {
+    title: 'Data Exploration & Analysis Area',
+    text: 'You can do some exploration and analysis to have better vision on your data. Feature Selection is also a' +
+    ' great feature in this area',
+    selector: '.exploration-collapse',
+    position: 'top',
+    style: stepStyle
+  },
+  {
+    title: 'Automated Modelling Area',
+    text: 'By click you mouse, automated modelling process can be done here, coding is not needed',
+    selector: '.model-collapse',
+    position: 'top',
+    style: stepStyle
+  },
+  {
+    title: 'Start Notebook',
+    text: 'Click to start a jupyter notebook',
+    selector: '.notebook-start-button',
+    position: 'top',
+    style: stepStyle
+  },
+]
+
+let joyRide = {
+  joyride: undefined,
+  joyrideOverlay: true,
+  joyrideType: 'continuous',
+  isRunning: false,
+  stepIndex: 0,
+  steps: [],
+}
 
 export default {
   namespace: 'app',
@@ -14,6 +81,7 @@ export default {
     darkTheme: localStorage.getItem(`${prefix}darkTheme`) === 'true',
     isNavbar: document.body.clientWidth < 769,
     navOpenKeys: JSON.parse(localStorage.getItem(`${prefix}navOpenKeys`)) || [],
+    ...joyRide
   },
   subscriptions: {
 
@@ -84,8 +152,68 @@ export default {
       }
     },
 
+    *resetJoyride ({
+                     payload,
+                   }, { put, select }) {
+      const { app } = yield(select(_ => _))
+      app.joyride.reset(true)
+    },
+
+    *resetAndRun ({
+                    payload,
+                  }, { put, select }) {
+      yield put({ type: 'resetJoyride' })
+      yield put({ type: 'setSetps', payload })
+      yield put({ type: 'runTour' })
+    },
+
   },
   reducers: {
+
+    runTour (state) {
+      return {
+        ...state,
+        isRunning: true
+      }
+    },
+
+    addSteps (state, { payload: steps }) {
+      let newSteps = steps
+      if (!Array.isArray(newSteps)) {
+        newSteps = [newSteps]
+      }
+
+      if (!newSteps.length) {
+        return
+      }
+
+      state.steps = state.steps.concat(newSteps)
+      return state
+    },
+
+    setSetps (state, { payload: steps }) {
+      let newSteps = steps
+      if (!Array.isArray(newSteps)) {
+        newSteps = [newSteps]
+      }
+
+      if (!newSteps.length) {
+        return
+      }
+
+      state.steps = newSteps
+      return state
+    },
+
+    callback(state, { payload: data }) {
+      // console.log('joyride callback', data);
+
+      return {
+        ...state,
+        selector: data.type === 'tooltip:before' ? data.step.selector : ''
+      }
+    },
+
     querySuccess (state, { payload: user }) {
       return {
         ...state,

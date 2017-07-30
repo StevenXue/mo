@@ -273,8 +273,7 @@ def create_public_toolkit():
 
     KMEAN = Toolkit(name='K平均数算法',
                     description='计算所选数据集合的k-mean, 把一个把数据空间划分为k个子集',
-                    category="聚类",
-                    result_form=2,
+                    category=0,
                     entry_function='k_mean',
                     target_py_code=inspect.getsource(toolkit_orig.k_mean),
                     parameter_spec={
@@ -302,6 +301,39 @@ def create_public_toolkit():
                                 },
                                 'default': 2,
                                 'required': True
+                            }
+                        ]
+                    },
+                    result_spec={
+                        "if_reserved": True,
+                        "args": [
+                            {
+                                "name": "Clustering Label",
+                                "des": "原始数据的每一行元素，对应分类的分类标签",
+                                # "type": "list",
+                                # 在存列的时候，要记得传进来的时候验证是不是list
+                                "if_add_column": True,
+                                "attribute": "label",
+                                "usage": ["pie", "scatter"]
+                            },
+                            {
+                                "name": "Number of Clusters",
+                                "des": "聚类的数量",
+                                "if_add_column": False,
+                                "attribute": "general_info"
+                            },
+                            {
+                                "name": "Centroids of Clusters",
+                                "des": "每个类的中心点",
+                                "if_add_column": False,
+                                "attribute": "position",
+                                "usage": ["scatter"]
+                            },
+                            {
+                                "name": "SSE",
+                                "des": "每个到其中心点的距离之和",
+                                "if_add_column": False,
+                                "attribute": "general_info"
                             }
                         ]
                     })
@@ -578,8 +610,7 @@ def create_public_data_process():
 
     standard_scaler = Toolkit(name='无量纲化-正太分布',
                               description='标准化，基于特征矩阵的列，将特征值转换至服从标准正态分布',
-                              category="数值转换",
-                              result_form=2,
+                              category=2,
                               entry_function='standard_scaler',
                               target_py_code=inspect.getsource(preprocess_orig.standard_scaler),
                               parameter_spec={
@@ -603,8 +634,7 @@ def create_public_data_process():
 
     min_max_scaler = Toolkit(name='无量纲化-(0, 1)分布',
                              description='区间缩放，基于最大最小值，将特征值转换到[0, 1]区间上',
-                             category="数值转换",
-                             result_form=2,
+                             category=2,
                              entry_function='min_max_scaler',
                              target_py_code=inspect.getsource(preprocess_orig.min_max_scaler),
                              parameter_spec={
@@ -628,8 +658,7 @@ def create_public_data_process():
 
     normalizer = Toolkit(name='归一化',
                          description='基于特征矩阵的行，将样本向量转换为"单位向量"',
-                         category="数值转换",
-                         result_form=2,
+                         category=2,
                          entry_function='normalizer',
                          target_py_code=inspect.getsource(preprocess_orig.normalizer),
                          parameter_spec={
@@ -653,8 +682,7 @@ def create_public_data_process():
 
     binarizer = Toolkit(name='二值化',
                         description='基于给定阈值，将定量特征按阈值划分',
-                        category="数值转换",
-                        result_form=2,
+                        category=2,
                         entry_function='binarizer',
                         target_py_code=inspect.getsource(preprocess_orig.binarizer),
                         parameter_spec={
@@ -690,8 +718,7 @@ def create_public_data_process():
 
     one_hot_encoder = Toolkit(name='哑编码',
                               description='将定性数据编码为定量数据',
-                              category="数值转换",
-                              result_form=2,
+                              category=2,
                               entry_function='one_hot_encoder',
                               target_py_code=inspect.getsource(preprocess_orig.one_hot_encoder),
                               parameter_spec={
@@ -715,8 +742,7 @@ def create_public_data_process():
 
     imputer = Toolkit(name='缺失值计算',
                       description='计算缺失值，缺失值可填充为均值等',
-                      category="数值转换",
-                      result_form=2,
+                      category=2,
                       entry_function='imputer',
                       target_py_code=inspect.getsource(preprocess_orig.imputer),
                       parameter_spec={
@@ -740,8 +766,7 @@ def create_public_data_process():
 
     polynomial_features = Toolkit(name='多项式数据转换',
                                   description='多项式数据转换, 默认为两次',
-                                  category="数值转换",
-                                  result_form=2,
+                                  category=2,
                                   entry_function='polynomial_features',
                                   target_py_code=inspect.getsource(preprocess_orig.polynomial_features),
                                   parameter_spec={
@@ -765,8 +790,7 @@ def create_public_data_process():
 
     variance_threshold = Toolkit(name='方差选择法',
                                  description='选取合适的特征，方差选择法',
-                                 category="特征选取",
-                                 result_form=3,
+                                 category=1,
                                  entry_function='variance_threshold',
                                  target_py_code=inspect.getsource(preprocess_orig.variance_threshold),
                                  parameter_spec={
@@ -796,13 +820,38 @@ def create_public_data_process():
                                              'required': True
                                          }
                                      ]
+                                 },
+                                 result_spec={
+                                     "if_reserved": True,
+                                     "args": [
+                                         {
+                                             "name": "scores",
+                                             "des": "每类特征得到的评分估算",
+                                             "if_add_column": False,
+                                             "attribute": "value",
+                                             "usage": ["bar"]
+                                         },
+                                         {
+                                             "name": "index",
+                                             "des": "每类特征是否取用的标签",
+                                             "if_add_column": False,
+                                             "attribute": "label",
+                                             "usage": ["bar", "table"]
+                                         },
+                                         {
+                                             "name": "result",
+                                             "des": "筛选出的所有特征值",
+                                             "if_add_column": False,
+                                             "attribute": "value",
+                                         }
+                                     ]
                                  })
     variance_threshold = toolkit_repo.create(variance_threshold)
     ownership_business.add(user, False, toolkit=variance_threshold)
 
     select_k_best_chi2 = Toolkit(name='卡方选择法',
                                  description='选择K个最好的特征，返回选择特征后的数据',
-                                 result_form=3,
+                                 category=1,
                                  entry_function='select_k_best_chi2',
                                  target_py_code=inspect.getsource(preprocess_orig.select_k_best_chi2),
                                  parameter_spec={
@@ -835,14 +884,38 @@ def create_public_data_process():
                                              'required': True
                                          }
                                      ]
+                                 },
+                                 result_spec={
+                                     "if_reserved": True,
+                                     "args": [
+                                         {
+                                             "name": "scores",
+                                             "des": "每类特征得到的评分估算",
+                                             "if_add_column": False,
+                                             "attribute": "value",
+                                             "usage": ["bar"]
+                                         },
+                                         {
+                                             "name": "index",
+                                             "des": "每类特征是否取用的标签",
+                                             "if_add_column": False,
+                                             "attribute": "label",
+                                             "usage": ["bar", "table"]
+                                         },
+                                         {
+                                             "name": "result",
+                                             "des": "筛选出的所有特征值",
+                                             "if_add_column": False,
+                                             "attribute": "value",
+                                         }
+                                     ]
                                  })
     select_k_best_chi2 = toolkit_repo.create(select_k_best_chi2)
     ownership_business.add(user, False, toolkit=select_k_best_chi2)
 
     select_k_best_pearson = Toolkit(name='相关系数选择法',
                                     description='选择K个最好的特征，返回选择特征后的数据',
-                                    category="特征选取",
-                                    result_form=3,
+                                    category=1,
                                     entry_function='select_k_best_pearson',
                                     target_py_code=inspect.getsource(preprocess_orig.select_k_best_pearson),
                                     parameter_spec={
@@ -875,14 +948,38 @@ def create_public_data_process():
                                                 'required': True
                                             }
                                         ]
+                                    },
+                                    result_spec={
+                                        "if_reserved": True,
+                                        "args": [
+                                            {
+                                                "name": "scores",
+                                                "des": "每类特征得到的评分估算",
+                                                "if_add_column": False,
+                                                "attribute": "value",
+                                                "usage": ["bar"]
+                                            },
+                                            {
+                                                "name": "index",
+                                                "des": "每类特征是否取用的标签",
+                                                "if_add_column": False,
+                                                "attribute": "label",
+                                                "usage": ["bar", "table"]
+                                            },
+                                            {
+                                                "name": "result",
+                                                "des": "筛选出的所有特征值",
+                                                "if_add_column": False,
+                                                "attribute": "value",
+                                            }
+                                        ]
                                     })
     select_k_best_pearson = toolkit_repo.create(select_k_best_pearson)
     ownership_business.add(user, False, toolkit=select_k_best_pearson)
 
     select_k_best_mic = Toolkit(name='互信息选择法',
                                 description='选择K个最好的特征，返回选择特征后的数据',
-                                category="特征选取",
-                                result_form=3,
+                                category=1,
                                 entry_function='select_k_best_mic',
                                 target_py_code=inspect.getsource(preprocess_orig.select_k_best_mic),
                                 parameter_spec={
@@ -915,14 +1012,38 @@ def create_public_data_process():
                                             'required': True
                                         }
                                     ]
+                                },
+                                result_spec={
+                                    "if_reserved": True,
+                                    "args": [
+                                        {
+                                            "name": "scores",
+                                            "des": "每类特征得到的评分估算",
+                                            "if_add_column": False,
+                                            "attribute": "value",
+                                            "usage": ["bar"]
+                                        },
+                                        {
+                                            "name": "index",
+                                            "des": "每类特征是否取用的标签",
+                                            "if_add_column": False,
+                                            "attribute": "label",
+                                            "usage": ["bar", "table"]
+                                        },
+                                        {
+                                            "name": "result",
+                                            "des": "筛选出的所有特征值",
+                                            "if_add_column": False,
+                                            "attribute": "value",
+                                        }
+                                    ]
                                 })
     select_k_best_mic = toolkit_repo.create(select_k_best_mic)
     ownership_business.add(user, False, toolkit=select_k_best_mic)
 
     REF = Toolkit(name='递归特征消除法',
                   description='递归特征消除法, 返回特征选择后的数据, 参数estimator为基模型',
-                  category="特征选取",
-                  result_form=3,
+                  category=1,
                   entry_function='ref',
                   target_py_code=inspect.getsource(preprocess_orig.ref),
                   parameter_spec={
@@ -955,14 +1076,38 @@ def create_public_data_process():
                               'required': True
                           }
                       ]
+                  },
+                  result_spec={
+                      "if_reserved": True,
+                      "args": [
+                          {
+                              "name": "scores",
+                              "des": "每类特征得到的评分估算",
+                              "if_add_column": False,
+                              "attribute": "value",
+                              "usage": ["bar"]
+                          },
+                          {
+                              "name": "index",
+                              "des": "每类特征是否取用的标签",
+                              "if_add_column": False,
+                              "attribute": "label",
+                              "usage": ["bar", "table"]
+                          },
+                          {
+                              "name": "result",
+                              "des": "筛选出的所有特征值",
+                              "if_add_column": False,
+                              "attribute": "value",
+                          }
+                      ]
                   })
     REF = toolkit_repo.create(REF)
     ownership_business.add(user, False, toolkit=REF)
 
     select_from_model_lr = Toolkit(name='基于惩罚项的特征选择法',
                                    description='带L1惩罚项的逻辑回归作为基模型的特征选择, 属于带惩罚的基模型，除了筛选出特征，同时也降维',
-                                   category="特征选取",
-                                   result_form=3,
+                                   category=1,
                                    entry_function='select_from_model_lr',
                                    target_py_code=inspect.getsource(preprocess_orig.select_from_model_lr),
                                    parameter_spec={
@@ -985,14 +1130,39 @@ def create_public_data_process():
                                        },
                                        "args": [
                                            {
-                                               'name': 'n_features',
+                                               'name': 'threshold',
                                                'type': {
-                                                   'key': 'int',
+                                                   'key': 'float',
                                                    'des': 'the threshold to judge if positive of negative',
-                                                   'range': [1, None]
+                                                   'range': [0, None]
                                                },
-                                               'default': 2,
+                                               'default': 1,
                                                'required': True
+                                           }
+                                       ]
+                                   },
+                                   result_spec={
+                                       "if_reserved": True,
+                                       "args": [
+                                           {
+                                               "name": "scores",
+                                               "des": "每类特征得到的评分估算",
+                                               "if_add_column": False,
+                                               "attribute": "value",
+                                               "usage": ["bar"]
+                                           },
+                                           {
+                                               "name": "index",
+                                               "des": "每类特征是否取用的标签",
+                                               "if_add_column": False,
+                                               "attribute": "label",
+                                               "usage": ["bar", "table"]
+                                           },
+                                           {
+                                               "name": "result",
+                                               "des": "筛选出的所有特征值",
+                                               "if_add_column": False,
+                                               "attribute": "value",
                                            }
                                        ]
                                    })
@@ -1001,8 +1171,7 @@ def create_public_data_process():
 
     select_from_model_gbdt = Toolkit(name='基于树模型的特征选择法',
                                      description='基树模型中GBDT可用来作为基模型进行特征选择',
-                                     category="特征选取",
-                                     result_form=3,
+                                     category=1,
                                      entry_function='select_from_model_gbdt',
                                      target_py_code=inspect.getsource(preprocess_orig.select_from_model_gbdt),
                                      parameter_spec={
@@ -1035,14 +1204,38 @@ def create_public_data_process():
                                                  'required': True
                                              }
                                          ]
+                                     },
+                                     result_spec={
+                                         "if_reserved": True,
+                                         "args": [
+                                             {
+                                                 "name": "scores",
+                                                 "des": "每类特征得到的评分估算",
+                                                 "if_add_column": False,
+                                                 "attribute": "value",
+                                                 "usage": ["bar"]
+                                             },
+                                             {
+                                                 "name": "index",
+                                                 "des": "每类特征是否取用的标签",
+                                                 "if_add_column": False,
+                                                 "attribute": "label",
+                                                 "usage": ["bar", "table"]
+                                             },
+                                             {
+                                                 "name": "result",
+                                                 "des": "筛选出的所有特征值",
+                                                 "if_add_column": False,
+                                                 "attribute": "value",
+                                             }
+                                         ]
                                      })
     select_from_model_gbdt = toolkit_repo.create(select_from_model_gbdt)
     ownership_business.add(user, False, toolkit=select_from_model_gbdt)
 
     decomposition_pca = Toolkit(name='降维-PCA(sk-learn)',
                                 description='主成分分析法，返回降维后的数据',
-                                category="降维",
-                                result_form=2,
+                                category=3,
                                 entry_function='decomposition_pca',
                                 target_py_code=inspect.getsource(preprocess_orig.decomposition_pca),
                                 parameter_spec={
@@ -1078,8 +1271,7 @@ def create_public_data_process():
 
     lda = Toolkit(name='线性判别分析法（LDA）',
                   description='线性判别分析法，返回降维后的数据，参数n_components为降维后的维数',
-                  category="降维",
-                  result_form=2,
+                  category=3,
                   entry_function='lda',
                   target_py_code=inspect.getsource(preprocess_orig.lda),
                   parameter_spec={

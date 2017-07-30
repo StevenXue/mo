@@ -100,18 +100,33 @@ def get_by_staging_data_set_and_fields():
     project_id = data.get('project_id')
     # 初始值为0
     k = data.get('k')
+    # TODO 这里需要该，以后输入是一个conf，替代k
     if k is not None:
-        k = int(k)
-    try:
-        data = staging_data_business.get_by_staging_data_set_and_fields(
-            ObjectId(staging_data_set_id), fields)
-        data = [d.to_mongo().to_dict() for d in data]
+        # k = int(k)
+        try:
+            k = int(k)
+        except ValueError:
+            k = float(k)
 
-        result = toolkit_service.convert_json_and_calculate(project_id,
-                                                            staging_data_set_id,
-                                                            toolkit_id, fields,
-                                                            data, k)
-        # result.update({"fields": fields})
-    except Exception as e:
-        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    # try:
+    #     data = staging_data_business.get_by_staging_data_set_and_fields(
+    #         ObjectId(staging_data_set_id), fields)
+    #     data = [d.to_mongo().to_dict() for d in data]
+    #
+    #     result = toolkit_service.convert_json_and_calculate(project_id,
+    #                                                         staging_data_set_id,
+    #                                                         toolkit_id, fields,
+    #                                                         data, k)
+    #     # result.update({"fields": fields})
+    # except Exception as e:
+    #     return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    # return jsonify({'response': json_utility.convert_to_json(result)}), 200
+    data = staging_data_business.get_by_staging_data_set_and_fields(
+        ObjectId(staging_data_set_id), fields)
+    data = [d.to_mongo().to_dict() for d in data]
+
+    result = toolkit_service.convert_json_and_calculate(project_id,
+                                                        staging_data_set_id,
+                                                        toolkit_id, fields,
+                                                        data, k)
     return jsonify({'response': json_utility.convert_to_json(result)}), 200

@@ -1,4 +1,6 @@
 # -*- coding: UTF-8 -*-
+# https://keras.io/getting-started/sequential-model-guide/#examples
+# VGG-like convnet
 from keras.callbacks import LambdaCallback
 from keras.layers import Dense, Dropout, Conv2D, MaxPooling2D, Flatten
 # from keras.models import Sequential

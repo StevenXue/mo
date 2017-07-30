@@ -64,7 +64,7 @@ def get_jobs_of_project(project_id):
         categories = categories.split(',')
     for c in categories:
         if c not in DEFAULT_CAT:
-            raise NameError('categories arg error')
+            raise ValueError('categories arg error')
     try:
         history_jobs = project_service.get_all_jobs_of_project(project_id,
                                                                categories)

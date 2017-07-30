@@ -120,6 +120,25 @@ class FileModal extends Component {
             </FormItem>
             <FormItem
               {...formItemLayout}
+              label="File Content"
+              hasFeedback
+            >
+              {getFieldDecorator('type', {
+                initialValue: 'table',
+                rules: [
+                  { required: true, message: 'please choose file content type' },
+                ],
+              })(
+                <Select >
+                  <Option value="table">table</Option>
+                  <Option value="image">image</Option>
+                  <Option value="text">text</Option>
+                  <Option value="audio">audio</Option>
+                </Select>
+              )}
+            </FormItem>
+            <FormItem
+              {...formItemLayout}
               label="Privacy"
               hasFeedback
             >

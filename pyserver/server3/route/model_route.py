@@ -58,9 +58,11 @@ def run_model(model_id):
     data = request.get_json()
     conf = data['conf']
     project_id = data['project_id']
-    staging_data_set_id = data['staging_data_set_id']
-    schema = data['schema']
-    result = model_service.run_model(conf, project_id, staging_data_set_id,
+    staging_data_set_id = data.get('staging_data_set_id')
+    file_id = data.get('file_id')
+    schema = data.get('schema')
+    result = model_service.run_model(conf, project_id, staging_data_set_id or
+                                     file_id,
                                      model_id,
                                      schema=schema)
     result = json_utility.convert_to_json(result)

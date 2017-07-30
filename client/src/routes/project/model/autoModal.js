@@ -2,10 +2,37 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
-import Model from './modelProcess.js';
-import { Button, message, Radio, Input, Card, Spin, Select, Tag, Icon} from 'antd';
-import { flaskServer } from '../../../constants';
+import Model from './modelProcess.js'
+import { Button, message, Radio, Input, Card, Spin, Select, Tag, Icon } from 'antd'
+import { flaskServer, stepStyle } from '../../../constants'
+import { TourArea } from '../../../components'
+import modelling from '../../../media/videos/modelling.mp4'
 
+const steps = [
+  {
+    title: 'Choose Dataset for Modelling',
+    text: 'Click to choose your data set to use as input of model',
+    selector: '.modelling_dataset',
+    position: 'top',
+    style: stepStyle,
+  },
+  {
+    title: 'Choose Model and Input',
+    text: 'Choose the model you want to training, and choose the input columns',
+    selector: '.choose_model_and_input',
+    position: 'top',
+    style: stepStyle,
+  },
+  {
+    title: 'Choose Parameters',
+    text: <TourArea
+      text='Choose the parameters for modelling'
+      src={modelling}/>,
+    selector: '.choose_params',
+    position: 'top',
+    style: stepStyle,
+  },
+]
 
 export default class AutomatedModel extends React.Component {
   constructor (props) {
@@ -27,7 +54,7 @@ export default class AutomatedModel extends React.Component {
     }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     fetch(flaskServer + '/project/jobs/' + this.props.project_id + '?categories=model', {
       method: 'get',
       headers: {
@@ -65,10 +92,10 @@ export default class AutomatedModel extends React.Component {
       );
   }
 
-  addNewModel(){
-    let array = this.state.statusStack;
-    array.push(true);
-    this.setState({statusStack: array});
+  addNewModel () {
+    let array = this.state.statusStack
+    array.push(true)
+    this.setState({ statusStack: array })
   }
 
   onSelectDataSet (values) {
@@ -88,18 +115,17 @@ export default class AutomatedModel extends React.Component {
             tasks: res.response['related tasks'],
             field: res.response.field,
             tags: res.response.tags,
-            loading: false
-          });
-          console.log(res.response);
-          let c = Object.keys(res.response.data[1]);
-          this.setState({columns: c, loading: false});
+            loading: false,
+          })
+          console.log(res.response)
+          let c = Object.keys(res.response.data[1])
+          this.setState({ columns: c, loading: false })
         },
       )
       .catch((err) => console.log('Error: /staging_data/staging_data_sets/fields', err))
   }
 
-  deactivate(i){
-    console.log("success automodal");
+  deactivete(i){
     let array = this.state.statusStack;
     array[i] = false;
     this.setState({statusStack: array});
@@ -108,98 +134,109 @@ export default class AutomatedModel extends React.Component {
   render() {
     return(
       <Spin spinning={this.state.loading}>
-      <div style={{width: '100%', display: 'flex', flexDirection: 'row', overflowX: 'auto'}}>
-        <div style={{width: '25%', marginTop: 10, marginLeft: 10, display: 'flex', height: 500,flexDirection: 'column',
-          alignItems: 'center'}}>
-          <span style={{color: '#108ee9'}}>Choose Dataset for modelling</span>
-          <Select className="dataset-select"
-                  style={{ width: '90%', marginTop: 10 }}
-                  onChange={(values) => this.onSelectDataSet(values)}
-                  value={this.state.selectedData}
-                  placeholder="Choose DataSet"
-                  allowClear>
-            {
-              this.state.data_set.map((e) =>
-                <Select.Option value={e._id} key={e._id}>
-                  {e.name}
-                </Select.Option>
-              )
-            }
-          </Select>
-          {this.state.cols !== 0 &&
-          <div style={{marginTop: 15, marginLeft: 10}}>
-            <Spin spinning={this.state.loading}>
-            <span style={{color: '#108ee9'}}>Dataset Info</span>
-            <div>
-              <span>{"Number of Fields: "}</span>
-              <span style={{color: '#00AAAA'}}>{this.state.cols}</span>
-            </div>
-            <div>
-              <span>{"Number of Records: "}</span>
-              <span style={{color: '#00AAAA'}}>{this.state.row}</span>
-            </div>
-            <div style={{backgroundColor: '#49a9ee', height: 1, marginTop: 5, width: '80%'}} />
-            <div style={{marginTop: 10}}>
-              <span>{"Category: "}</span>
-              <Tag style={{margin: 5}}>
-                {this.state.field}
-              </Tag>
-            </div>
-            <div style={{marginTop: 10}}>
-              <span>{"Tags: "}</span>
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'row', overflowX: 'auto' }}>
+          <div className='modelling_dataset' style={{
+            width: '25%', marginTop: 10, marginLeft: 10, display: 'flex', height: 500, flexDirection: 'column',
+            alignItems: 'center',
+          }}>
+            <span style={{ color: '#108ee9' }}>Choose Dataset for modelling</span>
+            <Select className="dataset-select"
+                    style={{ width: '90%', marginTop: 10 }}
+                    onChange={(values) => this.onSelectDataSet(values)}
+                    value={this.state.selectedData}
+                    placeholder="Choose DataSet"
+                    allowClear>
               {
-                  this.state.tags.map((e) =>
-                    <Tag style={{margin: 5}} key={e}>
-                      {e}
-                    </Tag>
-                    )
-              }
-            </div>
-            <div style={{marginTop: 10}}>
-              <span>{"Related Tasks: "}</span>
-              {
-                this.state.tasks.map((e) =>
-                  <Tag style={{margin: 5}} key={e}>
-                    {e}
-                  </Tag>
+                this.state.data_set.map((e) =>
+                  <Select.Option value={e._id} key={e._id}>
+                    {e.name}
+                  </Select.Option>,
                 )
               }
+            </Select>
+            {this.state.cols !== 0 &&
+            <div style={{ marginTop: 15, marginLeft: 10 }}>
+              <Spin spinning={this.state.loading}>
+                <span style={{ color: '#108ee9' }}>Dataset Info</span>
+                <div>
+                  <span>{'Number of Fields: '}</span>
+                  <span style={{ color: '#00AAAA' }}>{this.state.cols}</span>
+                </div>
+                <div>
+                  <span>{'Number of Records: '}</span>
+                  <span style={{ color: '#00AAAA' }}>{this.state.row}</span>
+                </div>
+                <div style={{ backgroundColor: '#49a9ee', height: 1, marginTop: 5, width: '80%' }}/>
+                <div style={{ marginTop: 10 }}>
+                  <span>{'Category: '}</span>
+                  <Tag style={{ margin: 5 }}>
+                    {this.state.field}
+                  </Tag>
+                </div>
+                <div style={{ marginTop: 10 }}>
+                  <span>{'Tags: '}</span>
+                  {
+                    this.state.tags.map((e) =>
+                      <Tag style={{ margin: 5 }} key={e}>
+                        {e}
+                      </Tag>,
+                    )
+                  }
+                </div>
+                <div style={{ marginTop: 10 }}>
+                  <span>{'Related Tasks: '}</span>
+                  {
+                    this.state.tasks.map((e) =>
+                      <Tag style={{ margin: 5 }} key={e}>
+                        {e}
+                      </Tag>,
+                    )
+                  }
+                </div>
+              </Spin>
             </div>
-            </Spin>
-          </div>
-          }
-        </div>
-        <div style={{width: 1, backgroundColor: '#EDEDED', height: 500}} />
-        <div style={{width: '70%', marginLeft: 10, height: 500, display: 'flex', flexDirection: 'row', overflowX: 'auto'}}>
-          <div style={{display: 'flex', flexDirection: 'column', marginLeft: 10}}>
-          <div style={{marginLeft: 10}}>
-            <span>Models</span>
-            { this.state.selectedData !== '' &&
-            <Button type='normal' disabled={this.state.selectedData ==='' && true} size='small' style={{marginLeft: 10}} onClick={() => this.addNewModel()}>
-              Add New Section
-            </Button>
             }
           </div>
+          <div style={{ width: 1, backgroundColor: '#EDEDED', height: 500 }}/>
+          <div style={{
+            width: '70%',
+            marginLeft: 10,
+            height: 500,
+            display: 'flex',
+            flexDirection: 'row',
+            overflowX: 'auto',
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 10, width: '100%' }}>
+              <div style={{ marginLeft: 10 }}>
+                <span>Models</span>
+                {this.state.selectedData !== '' &&
+                <Button type='normal' disabled={this.state.selectedData === '' && true} size='small'
+                        style={{ marginLeft: 10 }} onClick={() => this.addNewModel()}>
+                  Add New Section
+                </Button>}
+                <Button style={{ float: 'right', marginRight: 10 }}
+                        shape="circle" icon="question" onClick={() => this.props.runTour(steps)}
+                />
+              </div>
 
           <div style={{ height: 480, overflowY: 'auto', marginTop: 5, backgroundColor: '#fafafa' }}>
             {
               this.state.statusStack.map((el, i) =>
-                <Model style={{width: 1200, height: el? 450: 300}}
+                <Model style={{width: 1200, height: el?450: 300}}
                        project_id={this.props.project_id}
                        dataset_id={this.state.selectedData}
                        key={i}
                        cols={this.state.columns}
-                       jupyter={false}
-                       params={this.state.params[i]}
+                       jupyter={false}params={this.state.params[i]}
                        modalSuccess={() => this.deactivate(i)}
                        isActive={el}/>)
             }
           </div>
 
-        </div>
-        </div>
+            </div>
+          </div>
 
-      </div>
+        </div>
       </Spin>
     )
   }
@@ -207,5 +244,5 @@ export default class AutomatedModel extends React.Component {
 }
 
 AutomatedModel.PropTypes = {
-  project_id: PropTypes.string
+  project_id: PropTypes.string,
 }

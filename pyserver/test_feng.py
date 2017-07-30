@@ -32,9 +32,13 @@
 # socketio = SocketIO(message_queue='redis://')
 # socketio.emit('log_epoch_end', {'step': 111, 'loss': 222, 'acc': 333},
 #               namespace='/log')
-from bson import ObjectId
-from server3.business import project_business
-from server3.service import project_service
+# from bson import ObjectId
+# from server3.business import project_business
+# from server3.service import project_service
+# from server3.utility import json_utility
+#
+# jobs = project_service.get_all_jobs_of_project(ObjectId("596e2c79d123ab3599649e28"))
 from server3.utility import json_utility
-
-jobs = project_service.get_all_jobs_of_project(ObjectId("596e2c79d123ab3599649e28"))
+from flask import jsonify
+result = {'eval_metrics': 30}
+print(jsonify(1))

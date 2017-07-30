@@ -68,7 +68,7 @@ def import_data(data_array, data_set_name, ds_description, user_ID,
         if '_id' in data:
             data['_id_1'] = data.pop('_id')
 
-        data = {key.replace('.', '_'): value for key, value in data.items()}
+        # data = {key.replace('.', '_'): value for key, value in data.items()}
 
         new_data_array.append(data)
 

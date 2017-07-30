@@ -181,7 +181,7 @@ def add_new_key_value(sds_id, key, array):
     # get staging data的所有id
     ids = staging_data_business.get_by_staging_data_set_id(sds_id)
     for oid in ids:
-        query = {key: array.pop(0)}
+        query = {key: array.copy().pop(0)}
         staging_data_business.update_by_id(oid.id, query)
 
 
@@ -227,8 +227,7 @@ def mongo_to_df(cursor):
     :return:
     """
     cursor = json_utility.me_obj_list_to_dict_list(cursor)
-    return pd.DataFrame.from_records(cursor, exclude=['_id',
-                                                      'staging_data_set'])
+    return pd.DataFrame.from_records(cursor, exclude=['_id'])
 
 
 def split_x_y(sds_id, x_fields, y_fields):

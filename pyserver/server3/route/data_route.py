@@ -52,18 +52,25 @@ def import_data_from_file_id():
     is_private = data.pop('is_private')
     is_private = str(is_private).lower() == 'true'
     names = data.pop('names', None)
-
-    try:
-        saved_ds = data_service.import_data_from_file_id(ObjectId(file_id),
-                                                         data_set_name,
-                                                         ds_description,
-                                                         user_ID,
-                                                         is_private,
-                                                         names,
-                                                         **data)
-        ds_json = json_utility.convert_to_json(saved_ds.to_mongo())
-    except Exception as e:
-        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    saved_ds = data_service.import_data_from_file_id(ObjectId(file_id),
+                                                     data_set_name,
+                                                     ds_description,
+                                                     user_ID,
+                                                     is_private,
+                                                     names,
+                                                     **data)
+    ds_json = json_utility.convert_to_json(saved_ds.to_mongo())
+    # try:
+    #     saved_ds = data_service.import_data_from_file_id(ObjectId(file_id),
+    #                                                      data_set_name,
+    #                                                      ds_description,
+    #                                                      user_ID,
+    #                                                      is_private,
+    #                                                      names,
+    #                                                      **data)
+    #     ds_json = json_utility.convert_to_json(saved_ds.to_mongo())
+    # except Exception as e:
+    #     return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
     return jsonify({'response': ds_json}), 200
 
 
