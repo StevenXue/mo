@@ -7,7 +7,7 @@ const svgSpriteDirs = [
 
 export default {
   entry: 'src/index.js',
-  //disableCSSModules: true,
+  disableCSSModules: false,
   svgSpriteLoaderDirs: svgSpriteDirs,
   "theme": "./theme.config.js",
   "env": {

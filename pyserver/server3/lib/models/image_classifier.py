@@ -37,79 +37,163 @@ data/
 '''
 
 from keras.preprocessing.image import ImageDataGenerator
-from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D
 from keras.layers import Activation, Dropout, Flatten, Dense
 from keras import backend as K
+from keras.callbacks import LambdaCallback
+
+from server3.lib import Sequential
+from server3.lib import graph
+from server3.service import logger_service
+from server3.lib.models.keras_callbacks import MongoModelCheckpoint
 
 
-# dimensions of our images.
-img_width, img_height = 150, 150
+def image_classifier(conf, input, **kw):
+    # extract conf
+    f = conf['fit']['args']
+    e = conf['evaluate']['args']
+    epochs = f['epochs']
+    batch_size = f['batch_size']
+    # extract kw
+    result_sds = kw.pop('result_sds', None)
+    project_id = kw.pop('project_id', None)
+    # extract input
+    train_data_dir = input['train_data_dir']
+    validation_data_dir = input['validation_data_dir']
+    nb_train_samples = input['nb_train_samples']
+    nb_validation_samples = input['nb_validation_samples']
 
-train_data_dir = 'data/train'
-validation_data_dir = 'data/validation'
-nb_train_samples = 2000
-nb_validation_samples = 800
-epochs = 50
-batch_size = 16
+    # dimensions of our images.
+    # use 150, 150 as default
+    img_width, img_height = 150, 150
 
-if K.image_data_format() == 'channels_first':
-    input_shape = (3, img_width, img_height)
-else:
-    input_shape = (img_width, img_height, 3)
+    if K.image_data_format() == 'channels_first':
+        input_shape = (3, img_width, img_height)
+    else:
+        input_shape = (img_width, img_height, 3)
 
-model = Sequential()
-model.add(Conv2D(32, (3, 3), input_shape=input_shape))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
+    with graph.as_default():
 
-model.add(Conv2D(32, (3, 3)))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
+        model = Sequential()
+        model.add(Conv2D(32, (3, 3), input_shape=input_shape))
+        model.add(Activation('relu'))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
 
-model.add(Conv2D(64, (3, 3)))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(Conv2D(32, (3, 3)))
+        model.add(Activation('relu'))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
 
-model.add(Flatten())
-model.add(Dense(64))
-model.add(Activation('relu'))
-model.add(Dropout(0.5))
-model.add(Dense(1))
-model.add(Activation('sigmoid'))
+        model.add(Conv2D(64, (3, 3)))
+        model.add(Activation('relu'))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
 
-model.compile(loss='binary_crossentropy',
-              optimizer='rmsprop',
-              metrics=['accuracy'])
+        model.add(Flatten())
+        model.add(Dense(64))
+        model.add(Activation('relu'))
+        model.add(Dropout(0.5))
+        model.add(Dense(1))
+        model.add(Activation('sigmoid'))
 
-# this is the augmentation configuration we will use for training
-train_datagen = ImageDataGenerator(
-    rescale=1. / 255,
-    shear_range=0.2,
-    zoom_range=0.2,
-    horizontal_flip=True)
+        model.compile(loss='binary_crossentropy',
+                      optimizer='rmsprop',
+                      metrics=['accuracy'])
 
-# this is the augmentation configuration we will use for testing:
-# only rescaling
-test_datagen = ImageDataGenerator(rescale=1. / 255)
+        # this is the augmentation configuration we will use for training
+        train_datagen = ImageDataGenerator(
+            rescale=1. / 255,
+            shear_range=0.2,
+            zoom_range=0.2,
+            horizontal_flip=True)
 
-train_generator = train_datagen.flow_from_directory(
-    train_data_dir,
-    target_size=(img_width, img_height),
-    batch_size=batch_size,
-    class_mode='binary')
+        # this is the augmentation configuration we will use for testing:
+        # only rescaling
+        test_datagen = ImageDataGenerator(rescale=1. / 255)
 
-validation_generator = test_datagen.flow_from_directory(
-    validation_data_dir,
-    target_size=(img_width, img_height),
-    batch_size=batch_size,
-    class_mode='binary')
+        train_generator = train_datagen.flow_from_directory(
+            train_data_dir,
+            target_size=(img_width, img_height),
+            batch_size=batch_size,
+            class_mode='binary')
 
-model.fit_generator(
-    train_generator,
-    steps_per_epoch=nb_train_samples // batch_size,
-    epochs=epochs,
-    validation_data=validation_generator,
-    validation_steps=nb_validation_samples // batch_size)
+        validation_generator = test_datagen.flow_from_directory(
+            validation_data_dir,
+            target_size=(img_width, img_height),
+            batch_size=batch_size,
+            class_mode='binary')
 
-model.save_weights('first_try.h5')
+        # callback to save metrics
+        batch_print_callback = LambdaCallback(on_epoch_end=
+                                              lambda epoch, logs:
+                                              logger_service.log_epoch_end(
+                                                  epoch, logs,
+                                                  result_sds,
+                                                  project_id))
+
+        # checkpoint to save best weight
+        best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,
+                                               save_best_only=True)
+        # checkpoint to save latest weight
+        general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
+                                                  verbose=0)
+
+        history = model.fit_generator(
+            train_generator,
+            steps_per_epoch=nb_train_samples // batch_size,
+            epochs=epochs,
+            validation_data=validation_generator,
+            validation_steps=nb_validation_samples // batch_size,
+            callbacks=[batch_print_callback, best_checkpoint,
+                       general_checkpoint],
+        )
+
+        # model.save_weights('first_try.h5')
+        config = model.get_config()
+        logger_service.log_train_end(result_sds,
+                                     model_config=config,
+                                     # score=score,
+                                     history=history.history)
+
+        return {'history': history.history}
+
+
+def image_classifier_to_str():
+    pass
+
+
+IMAGE_CLASSIFIER = {
+    "fit": {
+        "args": [
+            {
+                "name": "batch_size",
+                "type": {
+                    "key": "int",
+                    "des": "Number of samples per gradient update",
+                    "range": None
+                },
+                "default": 32
+            },
+            {
+                "name": "epochs",
+                "type": {
+                    "key": "int",
+                    "des": "Number of epochs to train the model",
+                    "range": None
+                },
+                "default": 10
+            },
+        ],
+    },
+    "evaluate": {
+        "args": [
+            {
+                "name": "batch_size",
+                "type": {
+                    "key": "int",
+                    "des": "Number of samples per gradient update",
+                    "range": None
+                },
+                "default": 32
+            },
+        ]
+    }
+}
