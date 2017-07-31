@@ -154,16 +154,23 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
                         "general_info": gen_info,
                         "fields": fields}
             elif toolkit_obj.category == 1:
+                from scipy.stats import pearsonr
+                # from minepy import MINE
+                # 特殊处理 TODO
+                data = list(zip(*args[0]))
                 json = {"Y_target": fields[0],
                         "X_fields": fields[1:],
                         "labels": labels,
                         "bar": results["scores"],
-                        "general_info": {"Selected Features": "%s out of %s" % (len(filter(lambda x: x is True), labels),
-                                                                               len(fields[1:])),
+                        "general_info": {"Selected Features": "%s out of %s" % (len(list(filter(lambda x: x is True, labels))),
+                                                                                len(fields[1:])),
                                          "Selected Fields": list(compress(fields[1:], labels)),
                                          "Number of NaN": len(args[1])},
-                        "scatter": {"y_domain": args[0][:, 0],
-                                    "x_domain": list(zip(*args[0][:, 1:]))}
+                        "scatter": {"y_domain": list(data[0]),
+                                    "x_domain": list(data[1:]),
+                                    "pearsonr": [pearsonr(el, list(data[0]))[0] for el in list(data[1:])],
+                                    # "mic": [MINE(alpha=0.6, c=15, est="mic_approx").compute_score(el, list(data[0]).mic()) for el in list(data[1:])]}
+                                    "mic": [None for el in list(data[1:])]}
                         }
             else:
                 json = {}
