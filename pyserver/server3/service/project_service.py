@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 from datetime import datetime
+from copy import deepcopy
 
 from mongoengine import DoesNotExist
 
@@ -71,16 +72,34 @@ def remove_project_by_id(project_id):
 
 
 def add_job_to_project(job_obj, project_id):
+    """
+    add job to project
+    :param job_obj:
+    :param project_id:
+    :return:
+    """
     return project_business.insert_job_by_id(project_id, job_obj)
 
 
 def add_job_and_result_to_project(result_obj, project_id):
+    """
+    add job and result to project
+    :param result_obj:
+    :param project_id:
+    :return:
+    """
     job_obj = job_service.get_job_from_result(result_obj)
     return project_business.add_and_update_one_by_id(project_id, result_obj,
                                                      job_obj)
 
 
 def get_all_jobs_of_project(project_id, categories):
+    """
+    get all jobs and job info of a project
+    :param project_id:
+    :param categories:
+    :return:
+    """
     jobs = project_business.get_by_id(project_id)['jobs']
     history_jobs = {c: [] for c in categories}
     for job in jobs:
@@ -102,3 +121,32 @@ def get_all_jobs_of_project(project_id, categories):
                 history_jobs[key].append(job_info)
                 break
     return history_jobs
+
+
+def fork(project_id):
+    """
+
+    :param project_id:
+    :return:
+    """
+    project = project_business.get_by_id(project_id)
+
+    # copy and save project
+    project_cp = deepcopy(project)
+    project_cp.id = None
+    project_cp.jobs = []
+    project_business.add_by_obj(project_cp)
+
+    # copy jobs and save them
+    jobs = project['jobs']
+    jobs_cp = []
+    for job in jobs:
+        j = deepcopy(job)
+        j.id = None
+        jobs_cp.append(j)
+    job_business.add_many(jobs_cp)
+
+    project_cp.jobs = jobs_cp
+    project_cp.reload()
+
+    print(project.to_mongo())
