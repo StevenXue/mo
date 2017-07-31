@@ -47,9 +47,10 @@ export default class AutomatedModel extends React.Component {
       tasks: [],
       row: 0,
       loading: true,
-      statusStack: [true],
+      statusStack: [],
       columns: [],
       //custom: {}
+      params: []
     }
   }
 
@@ -61,19 +62,34 @@ export default class AutomatedModel extends React.Component {
       },
     }).then((response) => response.json())
       .then((res) => {
-          //this.setState({ data_set: res.response });
+          let params = res.response.model;
+          params = params.filter((e) => e.status === 200);
+          // console.log(params);
+          this.setState({ params });
+          if(res.response.model.length === 0){
+            let statusStack = [true];
+            this.setState({statusStack});
+          }else{
+            let statusStack = [];
+            let l = params.length;
+            for(let i = 0; i < l; i++ ){
+              statusStack.push(false);
+            }
+            this.setState({statusStack});
+          }
+
           fetch(flaskServer + '/staging_data/staging_data_sets?project_id=' + this.props.project_id, {
             method: 'get',
             headers: {
               'Content-Type': 'application/json',
             },
           }).then((response) => response.json())
-            .then((res) => {
-                this.setState({ data_set: res.response, loading: false })
-              },
-            )
+            .then((res) =>
+                this.setState({ data_set: res.response, loading: false})
+            );
+
         },
-      )
+      );
   }
 
   addNewModel () {
@@ -83,8 +99,8 @@ export default class AutomatedModel extends React.Component {
   }
 
   onSelectDataSet (values) {
-    let selected = this.state.data_set.filter((el) => el._id === values)
-    let selectedName = selected[0].name
+    let selected = this.state.data_set.filter((el) => el._id === values);
+    let selectedName = selected[0].name;
     this.setState({ selectedData: values, selectedDataName: selectedName, loading: true })
     fetch(flaskServer + '/staging_data/staging_data_sets/' + values, {
       method: 'get',
@@ -109,14 +125,14 @@ export default class AutomatedModel extends React.Component {
       .catch((err) => console.log('Error: /staging_data/staging_data_sets/fields', err))
   }
 
-  deactivete (i) {
-    let array = this.state.statusStack
-    array[i] = false
-    this.setState({ statusStack: array })
+  deactivete(i){
+    let array = this.state.statusStack;
+    array[i] = false;
+    this.setState({statusStack: array});
   }
 
-  render () {
-    return (
+  render() {
+    return(
       <Spin spinning={this.state.loading}>
         <div style={{ width: '100%', display: 'flex', flexDirection: 'row', overflowX: 'auto' }}>
           <div className='modelling_dataset' style={{
@@ -203,19 +219,19 @@ export default class AutomatedModel extends React.Component {
                 />
               </div>
 
-              <div style={{ height: 480, overflowY: 'auto', marginTop: 5, backgroundColor: '#fafafa' }}>
-                {
-                  this.state.statusStack.map((el, i) =>
-                    <Model style={{ width: 1200, height: 450 }}
-                           project_id={this.props.project_id}
-                           dataset_id={this.state.selectedData}
-                           key={i}
-                           cols={this.state.columns}
-                           jupyter={false}
-                           modalSuccess={() => this.deactivate(i)}
-                           isActive={el}/>)
-                }
-              </div>
+          <div style={{ height: 480, overflowY: 'auto', marginTop: 5, backgroundColor: '#fafafa' }}>
+            {
+              this.state.statusStack.map((el, i) =>
+                <Model style={{width: 1200, height: el?450: 300}}
+                       project_id={this.props.project_id}
+                       dataset_id={this.state.selectedData}
+                       key={i}
+                       cols={this.state.columns}
+                       jupyter={false}params={this.state.params[i]}
+                       modalSuccess={() => this.deactivate(i)}
+                       isActive={el}/>)
+            }
+          </div>
 
             </div>
           </div>
