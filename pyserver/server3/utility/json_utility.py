@@ -8,19 +8,45 @@ Date: 2017.05.17
 import json
 import pandas as pd
 import simplejson
+import numpy as np
 
 from bson import ObjectId
 from datetime import datetime
 
 
 class JSONEncoder(simplejson.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, ObjectId):
-            return str(o)
-        elif isinstance(o, datetime):
-            return str(o)
-        return self.default(o)
+    # def default(self, o):
+    #     if isinstance(o, ObjectId):
+    #         return str(o)
+    #     elif isinstance(o, datetime):
+    #         return str(o)
+    #     elif isinstance(o, np.integer):
+    #         return int(o)
+    #     elif isinstance(o, np.floating):
+    #         return float(o)
+    #     elif isinstance(o, np.ndarray):
+    #         return o.tolist()
+    #     return self.default(self, o)
 
+    # arbitrary iterators
+    def default(self, o):
+        try:
+            iterable = iter(o)
+        except TypeError:
+            if isinstance(o, ObjectId):
+                return str(o)
+            elif isinstance(o, datetime):
+                return str(o)
+            elif isinstance(o, np.integer):
+                return int(o)
+            elif isinstance(o, np.floating):
+                return float(o)
+            elif isinstance(o, np.ndarray):
+                return o.tolist()
+        else:
+            return list(iterable)
+        # Let the base class default method raise the TypeError
+        return JSONEncoder.default(self, o)
 
 def json_load(json_string):
     json_obj = json.loads(json_string)
@@ -30,11 +56,10 @@ def json_load(json_string):
 # convert bson to json
 # 将ObjectId去除，用于Restful API传递
 def convert_to_json(bson_obj):
-    new_json_obj = JSONEncoder(ignore_nan=True).encode(bson_obj)
+    json_obj = JSONEncoder(ignore_nan=True).encode(bson_obj)
     # new_json_obj = json_load(new_json_obj)
     # new_json_obj = simplejson.dumps(new_json_obj, ignore_nan=True)
-    new_json_obj = simplejson.loads(new_json_obj)
-
+    new_json_obj = simplejson.loads(json_obj)
     return new_json_obj
 
 

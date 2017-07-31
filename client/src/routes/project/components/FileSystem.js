@@ -51,8 +51,8 @@ class FileSystem extends React.Component {
   }
 
   renderTabContent(key) {
-    return <div className='full-width' style={{ display: 'flex', flexDirection: 'row' }}>
-      <div style={{ width: '100%'}}>
+    return<div className='full-width' style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
+      <div style={{ width: 500}}>
         {this.renderCards(key)}
       </div>
     </div>
