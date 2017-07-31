@@ -425,3 +425,143 @@ if __name__ == "__main__":
 #         sc.stop()
 #         return res
 
+TEST_CONF = {"layers": [{"name": "Dense",
+                         "args": {"units": 64, "activation": "relu",
+                                  "input_shape": [
+                                      20, ],
+                                  "init": "uniform"
+                                  }
+                         },
+                        {"name": "Dropout",
+                         "args": {"rate": 0.5}},
+                        {"name": "Dense",
+                         "args": {"units": 64, "activation": "relu"}},
+                        {"name": "Dropout",
+                         "args": {"rate": 0.5}},
+                        {"name": "Dense",
+                         "args": {"units": 10, "activation": "softmax"}}
+                        ],
+             "compile": {"loss": "categorical_crossentropy",
+                         "optimizer": {"name": "SGD",
+                                       "args": {"lr": 0.01, "momentum": 0}},
+                         "metrics": ["accuracy"]
+                         },
+             "fit": {"x_train": "x_train",
+                     "y_train": "y_train",
+                     "x_val": "x_test",
+                     "y_val": "y_test",
+                     "args": {
+                         "epochs": 20,
+                         "batch_size": 128
+                     }
+                     },
+             "evaluate": {"x_test": "x_test",
+                          "y_test": "y_test",
+                          "args": {
+                              "batch_size": 128
+                          }
+                          }
+             }
+
+"""
+CONSTANT = {
+    # test conf template for backend use
+    "TEST_CONF": {
+        "layers": [
+            {
+                "name": "Dense",
+                "args": {
+                    "units": {
+                        "distribute": "choice",
+                        "value": [256, 512]
+                    },
+                    "activation": {
+                        "distribute": "choice",
+                        "value": ["relu"]
+                    },
+                    "input_shape": [20],
+                    # 初始化uniform什么意思？
+                    "init": "uniform"
+                }
+            },
+            {
+                "name": "Dropout",
+                "args": {
+                    "rate": {
+                        "distribute": "uniform",
+                        "value": [0, 1]
+                    }
+                }
+            }
+        ],
+        "compile": {
+            # 这个是什么？ 损失函数
+            "loss": {
+                "distribute": "choice",
+                "value": ["categorical_crossentropy"]
+            },
+            # 不同optimizer拥有不同的args怎么解决，暂时在函数载入的时候忽略没用的args,
+            # eg: 只当sgd才使用momentum
+            # 场景：使用3种optimizer, 为每种optimizer提供不同的lr,momentum无法实现
+            "optimizer": {
+                "name": "SGD",
+                "args": {
+                    "lr": {
+                        "distribute": "choice",
+                        "value": [0.01]
+                    },
+                    "momentum": {
+                        "distribute": "choice",
+                        "value": [0]
+                    }
+                }
+            },
+            "metrics": {
+                "distribute": "choice",
+                "value": ["accuracy"]
+            }
+        },
+        "fit": {
+            "args": {
+                "epochs": {
+                    "distribute": "choice",
+                    "value": [20]
+                },
+                "batch_size": {
+                    "distribute": "choice",
+                    "value": [128]
+                }
+            }
+        },
+        "evaluate": {
+            "args": {
+                "batch_size": {
+                    "distribute": "choice",
+                    "value": [128]
+                }
+            }
+        }
+    },
+
+    # spark models json for frontend use
+    "SPARK_MODELS": {
+        "layers": [
+            {
+                "name": "Dense",
+                "args": [
+                    {
+                        "name": "units",
+                        "type": DISTRIBUTE,
+                        "default": 32,
+                        "required": True
+                    },
+                    ACTIVATION,
+                    INPUT_SHAPE
+                ],
+            }
+        ]
+
+    }
+}
+
+"""
