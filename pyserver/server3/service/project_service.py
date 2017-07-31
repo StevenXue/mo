@@ -81,6 +81,7 @@ def add_job_to_project(job_obj, project_id):
     return project_business.insert_job_by_id(project_id, job_obj)
 
 
+# 增加result_obj和job_obj到project
 def add_job_and_result_to_project(result_obj, project_id):
     """
     add job and result to project
