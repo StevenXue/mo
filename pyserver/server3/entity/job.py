@@ -33,11 +33,11 @@ STATUS = (
 class Job(Document):
     model = ReferenceField('Model')
     toolkit = ReferenceField('Toolkit')
-    staging_data_set = ReferenceField('StagingDataSet', required=True)
-    # staging_data_set = StringField('StagingDataSet')
+    staging_data_set = ReferenceField('StagingDataSet')
     status = IntField(choices=STATUS, required=True)
     fields = ListField()
     create_time = DateTimeField(required=True)
     updated_time = DateTimeField()
     project = ReferenceField('Project', reverse_delete_rule=CASCADE)
     params = DictField()
+    file = ReferenceField('File')

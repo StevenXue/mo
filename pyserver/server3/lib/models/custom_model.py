@@ -59,7 +59,7 @@ def custom_model_help(model_fn, input, project_id, result_sds,
 
 
     input_fn = get_input_fn(model_name=input['model_name'],
-                            df_features=input['df_fetures'],
+                            df_features=input['df_features'],
                             df_labels=input['df_labels'])
 
 

@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Select, Icon, message, Checkbox, Input, Steps} from 'antd'
+import { Button, Select, Icon, message, Checkbox, Input, Steps, Modal} from 'antd'
 const Step = Steps.Step;
 import { jupyterServer, flaskServer } from '../../../constants';
 import { Router, routerRedux } from 'dva/router';
 import ReactJson from 'react-json-view';
+import VisualizationPanel from './visualizationPanel';
 let hasOwnProperty = Object.prototype.hasOwnProperty;
-
 function isEmpty(obj) {
   if (obj == null) return true;
   if (obj.length > 0)    return false;
@@ -35,7 +35,9 @@ export default class Toolkit extends React.Component {
       selectedName: '',
       selectedData: '',
       current: 0,
+      visible: false,
       resultJson: {},
+      visual_sds_id: "",
       steps : [{
         title: 'Choose ToolKit',
       }, {
@@ -160,10 +162,7 @@ export default class Toolkit extends React.Component {
   }
 
   onRunClick () {
-    // let check = this.state.checkedCols.join(',')
     let kValue;
-    //console.log(this.state.resultJson.length);
-    //console.log('input', document.getElementById('k值').value)
     if(document.getElementById('k值')) {
       kValue = document.getElementById('k值').value;
       this.setState({constant: kValue});
@@ -189,7 +188,8 @@ export default class Toolkit extends React.Component {
         this.props.onReceiveResult(this.props.section_id);
         this.setState({
           resultJson: responseObj,
-          toolkit: ''
+          toolkit: '',
+          visual_sds_id: res.response.visual_sds_id
         });
         }
       )
@@ -242,6 +242,7 @@ export default class Toolkit extends React.Component {
       return col.map((el) =>
         <div style={{ marginTop: 10 }}>
           <Checkbox onChange={(e) => this.onCheckCol(e)}
+                    key={el[0]}
                     id={el[0]}>{el[0] + '(' + el[1] + ')'}</Checkbox>
         </div>,
       )
@@ -329,8 +330,19 @@ export default class Toolkit extends React.Component {
             <div style={{marginTop: 10, marginLeft: '30%', height: 200, overflowY: 'auto'}}>
               {
                 !isEmpty(this.state.resultJson) &&
+                  <div>
                     <ReactJson src={ this.state.resultJson } style={{width: '100%', height: 400}}/>
+                  </div>
               }
+              <Button onClick={() => this.setState({visible: true})}>Visualization</Button>
+              <Modal title="Result"
+                     width={1000}
+                     visible={this.state.visible}
+                     onOk={() => this.setState({visible: false})}
+                     onCancel={() => this.setState({visible: false})}
+              >
+                <VisualizationPanel visual_sds_id={this.state.visual_sds_id} />
+              </Modal>
             </div>
           </div>
         )

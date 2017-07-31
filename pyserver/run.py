@@ -1,19 +1,23 @@
 # -*- coding: UTF-8 -*-
-from datetime import timedelta
-
 import eventlet
-eventlet.monkey_patch()
+eventlet.sleep()
+eventlet.monkey_patch(thread=False)
+
+# from eventlet import import_patched
+# import_patched('flask_socketio')
+from datetime import timedelta
 
 from flask import Flask
 from flask import jsonify
-from flask import request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import get_jwt_claims
 from flask_socketio import SocketIO
-from flask_socketio import emit
-from flask_socketio import socketio as sio
+
+# from flask_socketio import SocketIO
+# from flask_socketio import emit
+# from flask_socketio import socketio as sio
 
 from server3.route import file_route
 from server3.route import ownership_route
@@ -27,7 +31,8 @@ from server3.route import model_route
 from server3.route import visualization_route
 from server3.repository import config
 from server3.utility import json_utility
-from server3.sio import socketio
+
+# from server3.sio import socketio
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
@@ -36,9 +41,9 @@ app.secret_key = 'super-super-secret'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
 
-
-socketio.init_app(app, logger=True, engineio_logger=True, async_mode='eventlet',
-                  message_queue='redis://')
+socketio = SocketIO(app, logger=True, engineio_logger=True,
+                    async_mode='eventlet',
+                    message_queue='redis://')
 
 CORS(app, supports_credentials=True)
 
@@ -75,6 +80,7 @@ def refresh_token():
     claims = get_jwt_claims()
     return jsonify({'user': claims['user']}), 200
 
+
 app.register_blueprint(file_route.file_app)
 app.register_blueprint(ownership_route.ownership_app)
 app.register_blueprint(project_route.project_app)
@@ -85,7 +91,6 @@ app.register_blueprint(model_route.model_app)
 app.register_blueprint(user_route.user_app)
 app.register_blueprint(monitor_route.monitor_app)
 app.register_blueprint(visualization_route.visualization_app)
-
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000, debug=True)

@@ -15,12 +15,24 @@ export default class Layer extends React.Component {
       visible: false,
       selected: '',
       args: [],
-      temps: {}
+      temps: {},
+      params: this.props.params,
+      isActive: this.props.isActive,
+      isView: false
     }
   }
 
   componentDidMount(){
-    this.setState({layers: this.props.layers});
+    //console.log(this.props.params);
+    if(this.props.params) {
+      this.setState({isView: true});
+    }else{
+      this.setState({layers: this.props.layers});
+    }
+  }
+
+  componentWillReceiveProps(nextProps){
+    this.setState({isActive: nextProps.isActive});
   }
 
   handleOk(){
@@ -119,7 +131,7 @@ export default class Layer extends React.Component {
                 </div>} title="Description">
                   <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5, color: '#767676'}}/>
                 </Popover>
-                <Input ref={e.name} style={{marginLeft: 10, width: 150, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+                <Input disabled={!this.state.isActive} ref={e.name} style={{marginLeft: 10, width: 150, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
               </div>
             );
             break;
@@ -147,7 +159,7 @@ export default class Layer extends React.Component {
                   <p style={{color: '#b3b3b3', fontSize: 12}}>{'multiple integer is required, divide by a comma'}</p>
 
                 </div>
-                <Input ref={e.name} style={{width: 150, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+                <Input disabled={!this.state.isActive} ref={e.name} style={{width: 150, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
               </div>
             );
             break;
@@ -160,7 +172,7 @@ export default class Layer extends React.Component {
                 </div>} title="Description">
                   <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5, color: '#767676'}}/>
                 </Popover>
-                <Select defaultValue={e.default} ref={e.name} style={{width: 150}} onChange={(values) => this.onSelect(e.name, values)}>
+                <Select disabled={!this.state.isActive} defaultValue={e.default} ref={e.name} style={{width: 150}} onChange={(values) => this.onSelect(e.name, values)}>
                   {
                     e.type.range.map((el) =>
                       <Option value={el} key={el}>{el}</Option>
@@ -192,31 +204,62 @@ export default class Layer extends React.Component {
     return choices
   }
 
+  renderParams(){
+    return(
+      Object.keys(this.props.params.args).map((e) =>
+      <div key={e}>
+        <span>{e + ": "}</span>
+        <span style={{color: '#00AAAA'}}>{this.props.params.args[e]}</span>
+      </div>
+      )
+    )
+  }
+
   render(){
     return(
-    <div >
-      <div style={{width: '100%', marginTop: 10}}>
-        <Select placeholder="Choose Layer" style={{width: '60%'}} onChange={(value) => this.changeLayerType(value)}>
-          {
-            this.state.layers.map((e) =>
-              <Option value={e.name} key={e.name}>{e.name}</Option>
-            )
-          }
-        </Select>
-        <Button type="primary"
-                disabled={this.state.selected === '' && true}
-                style={{marginLeft: 5}}
-                size="small"
-                onClick={() => this.setState({visible: true})}>parameters</Button>
-        <Modal
-          title="Set Parameters"
-          visible={this.state.visible}
-          onOk={() => this.handleOk()}
-          onCancel={() => this.handleCancel()}
-        >
-          {this.renderLayerParams()}
-        </Modal>
-      </div>
+    <div >{
+      this.state.isView? (
+        <div style={{width: '100%', marginTop: 10}}>
+          <span style={{width: 180}}>{this.props.params.name}</span>
+          <Button type="primary"
+                  style={{marginLeft: 10}}
+                  size="small"
+                  onClick={() => this.setState({visible: true})}>parameter</Button>
+          <Modal
+            title="View Parameters"
+            visible={this.state.visible}
+            onOk={() => this.handleOk()}
+            onCancel={() => this.handleCancel()}
+          >
+            {this.renderParams()}
+          </Modal>
+        </div>
+      ):
+      (
+        <div style={{width: '100%', marginTop: 10}}>
+          <Select placeholder="Choose Layer" style={{width: '60%'}} disabled={!this.state.isActive}
+                  onChange={(value) => this.changeLayerType(value)}>
+            {
+              this.state.layers.map((e) =>
+                <Option value={e.name} key={e.name}>{e.name}</Option>
+              )
+            }
+          </Select>
+          <Button type="primary"
+                  disabled={this.state.selected === '' && true}
+                  style={{marginLeft: 5}}
+                  size="small"
+                  onClick={() => this.setState({visible: true})}>parameters</Button>
+          <Modal
+            title="Set Parameters"
+            visible={this.state.visible}
+            onOk={() => this.handleOk()}
+            onCancel={() => this.handleCancel()}
+          >
+            {this.renderLayerParams()}
+          </Modal>
+        </div>
+      )}
     </div>
     )
   }

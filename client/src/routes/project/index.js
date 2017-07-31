@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Router, routerRedux } from 'dva/router'
 import { connect } from 'dva'
 import { FileSystem } from './components'
-import styles from './index.less'
+import './index.less'
 import { color } from '../../utils'
 
 const bodyStyle = {
