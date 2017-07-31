@@ -13,6 +13,7 @@
 import functools
 
 from bson import ObjectId
+from itertools import compress
 
 from server3.business import toolkit_business
 from server3.business import job_business
@@ -144,8 +145,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
                                                                job=job_obj,
                                                                type='result')
                 logger_service.save_result(result_sds_obj, **{"result": results})
-            # TODO 以下部分全部为特殊处理start/
 
+            # TODO 以下部分全部为特殊处理start/
             if toolkit_obj.category == 0:
                 json = {"scatter": data_utility.retrieve_nan_index(args[0], args[1]), "labels": labels,
                         "pie": [{'text': el, 'value': labels.count(el)} for el in set(labels)],
@@ -153,28 +154,32 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields):
                         "general_info": gen_info,
                         "fields": fields}
             elif toolkit_obj.category == 1:
+                from scipy.stats import pearsonr
+                # from minepy import MINE
+                # 特殊处理 TODO
+                data = list(zip(*args[0]))
                 json = {"Y_target": fields[0],
                         "X_fields": fields[1:],
                         "labels": labels,
-                        "bar": results["scores"]
+                        "bar": results["scores"],
+                        "general_info": {"Selected Features": "%s out of %s" % (len(list(filter(lambda x: x is True, labels))),
+                                                                                len(fields[1:])),
+                                         "Selected Fields": list(compress(fields[1:], labels)),
+                                         "Number of NaN": len(args[1])},
+                        "scatter": {"y_domain": list(data[0]),
+                                    "x_domain": list(data[1:]),
+                                    "pearsonr": [pearsonr(el, list(data[0]))[0] for el in list(data[1:])],
+                                    # "mic": [MINE(alpha=0.6, c=15, est="mic_approx").compute_score(el, list(data[0]).mic()) for el in list(data[1:])]}
+                                    "mic": [None for el in list(data[1:])]}
                         }
             else:
                 json = {}
             logger_service.save_result(result_sds_obj, **{"visualization": json})
 
-            # # 判断是否存储结果到staging_data_set, 默认result_form2
-            # if toolkit_obj.result_form == 2 or 1:
-            #     # 存储可视化信息到sds里面
-            #     logger_service.save_result(result_sds_obj, **{"result": results, "visualization": json})
-            #     # FIXME 目前只有一列，以后会有多类信息
-            #     staging_data_service.add_new_key_value(staging_data_set_id, list(cols.keys())[0], list(cols.values())[0])
             # TODO 以上部分全部为特殊处理end/
 
             # update a job
             job_business.end_job(job_obj)
-            # 已经淘汰，没有result了
-            # # update a project
-            # project_service.add_job_and_result_to_project(result_obj, ObjectId(project_id))
             return {"visual_sds_id": str(result_sds_obj.id), "result": results}
         return wrapper
     return decorator
