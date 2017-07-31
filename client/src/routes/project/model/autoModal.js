@@ -136,7 +136,7 @@ export default class AutomatedModel extends React.Component {
       <Spin spinning={this.state.loading}>
         <div style={{ width: '100%', display: 'flex', flexDirection: 'row', overflowX: 'auto' }}>
           <div className='modelling_dataset' style={{
-            width: '25%', marginTop: 10, marginLeft: 10, display: 'flex', height: 500, flexDirection: 'column',
+            width: '25%', marginTop: 10, marginLeft: 10, display: 'flex', height: '100%', flexDirection: 'column',
             alignItems: 'center',
           }}>
             <span style={{ color: '#108ee9' }}>Choose Dataset for modelling</span>
