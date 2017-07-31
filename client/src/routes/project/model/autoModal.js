@@ -4,9 +4,8 @@ import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import Model from './modelProcess.js'
 import { Button, message, Radio, Input, Card, Spin, Select, Tag, Icon } from 'antd'
-import { flaskServer, stepStyle } from '../../../constants'
+import { flaskServer, stepStyle, assetsUrl } from '../../../constants'
 import { TourArea } from '../../../components'
-import modelling from '../../../media/videos/modelling.mp4'
 
 const steps = [
   {
@@ -27,7 +26,7 @@ const steps = [
     title: 'Choose Parameters',
     text: <TourArea
       text='Choose the parameters for modelling'
-      src={modelling}/>,
+      src={assetsUrl+'/videos/modelling.mp4'}/>,
     selector: '.choose_params',
     position: 'top',
     style: stepStyle,
