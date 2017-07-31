@@ -19,7 +19,8 @@ MODEL_TYPE = (
     (0, 'nn'),
     (1, 'supervised'),
     (2, 'unsupervised'),
-    (3, 'half_supervised')
+    (3, 'half_supervised'),
+    (4, 'folder_input')
 )
 
 

@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
-import { Button, message, Transfer, Input, Spin, Select, Modal, Icon, Popover } from 'antd';
+import { Button, message, Transfer, Input, Spin, Select, Modal, Icon, Popover, Checkbox } from 'antd';
 import { flaskServer } from '../../../constants';
 const Option = Select.Option;
 
@@ -23,15 +23,18 @@ export default class CustomFields extends React.Component {
   }
 
   onChange(ref){
-    let value = parseInt(ReactDOM.findDOMNode(this.refs[ref.name]).value)
-
+    let value = parseInt(ReactDOM.findDOMNode(this.refs[ref.name]).value);
     if(ref.type.key === 'int') {
       value = parseInt(value);
     }else if(ref.type.key === 'float') {
       value = parseFloat(value);
     }
-
     this.props.getEstimator(ref.name, value);
+  }
+
+  onCheck(e, ref){
+    console.log(e.target.checked, ref.name);
+    this.props.getEstimator(ref.name, e.target.checked);
   }
 
   renderParams(type){
@@ -64,6 +67,21 @@ export default class CustomFields extends React.Component {
         return (
           <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
             <Input ref={type.name} style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}} onChange={() => this.onChange(type)} />
+            <Popover content={<div>
+              <p style={{width: 150}}>{type.type.des}</p>
+            </div>} title="Description">
+              <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5, color: '#767676'}}/>
+            </Popover>
+          </div>
+        );
+
+      case 'bool':
+        return (
+          <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+            <Checkbox
+              ref = {type.name}
+              onChange={(e) => this.onCheck(e, type)}
+            />
             <Popover content={<div>
               <p style={{width: 150}}>{type.type.des}</p>
             </div>} title="Description">
