@@ -1,4 +1,5 @@
 FILL_BLANK = 'BLANK_GRID'
+ALLOWED_EXTENSIONS = {'zip', 'csv', 'png', 'jpg', 'jpeg', 'txt'}
 PARAMETER_SPEC = [
     {
         "name": "validation",

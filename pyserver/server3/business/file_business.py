@@ -6,9 +6,10 @@ from server3.repository.file_repo import FileRepo
 file_repo = FileRepo(File)
 
 
-def add(file_name, file_size, url, uri, description):
+def add(file_name, file_size, url, uri, description, extension, type):
     file_obj = File(name=file_name, size=file_size, url=url, uri=uri,
-                    upload_time=datetime.utcnow(), description=description)
+                    upload_time=datetime.utcnow(), description=description,
+                    extension=extension, type=type)
     return file_repo.create(file_obj)
 
 

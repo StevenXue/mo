@@ -100,8 +100,14 @@ def get_by_staging_data_set_and_fields():
     project_id = data.get('project_id')
     # 初始值为0
     k = data.get('k')
+    # TODO 这里需要该，以后输入是一个conf，替代k
     if k is not None:
-        k = int(k)
+        # k = int(k)
+        try:
+            k = int(k)
+        except ValueError:
+            k = float(k)
+
     # try:
     #     data = staging_data_business.get_by_staging_data_set_and_fields(
     #         ObjectId(staging_data_set_id), fields)

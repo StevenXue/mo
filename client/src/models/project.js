@@ -29,7 +29,6 @@ export default {
           user: user,
         }
       })
-
       const data = yield call(query, user.user_ID)
       if (data) {
         yield put({

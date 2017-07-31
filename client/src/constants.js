@@ -1,6 +1,6 @@
 module.exports = {
   jupyterServer: 'http://localhost:8888/api/contents/',
-  //jupyterServer: 'http://10.52.14.182:8888/api/contents/',
+  // jupyterServer: 'http://10.52.14.182:8888/api/contents/',
 
   // server api
   flaskServer: 'http://localhost:5000',
@@ -8,5 +8,15 @@ module.exports = {
 
   //jupyter
   baseUrl: 'http://localhost:8888',
-  //baseUrl: 'http://10.52.14.182:8888'
+  // baseUrl: 'http://10.52.14.182:8888',
+
+  mainColor: '#108ee9',
+
+  stepStyle: {
+    mainColor: '#108ee9',
+    beacon: {
+      inner: '#108ee9',
+      outer: '#108ee9',
+    },
+  }
 }
