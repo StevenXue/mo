@@ -1,11 +1,11 @@
 # -*- coding: UTF-8 -*-
 """
-use hyperas to tune hyperparameters
+use hyperas to tune hyperparameters of NN models
 
 Author: Bingwei Chen
 Date: 2017.07.28
 
-1. define the JSON to frontend
+1. define JSON give to frontend to generate UI
 2. JSON template got from frontend(ok)
 3. transfer JSON to hyperas model string (ok)
 4. transfer string model code
@@ -88,7 +88,7 @@ def conf_to_python_file(conf):
     model_function_str = function_name + model_str
 
     temp_file = './my_temp_model.py'
-    write_temp_files(import_str+model_function_str, temp_file)
+    write_temp_files(import_str + model_function_str, temp_file)
     return
 
 
@@ -161,7 +161,8 @@ def conf_to_model_str(conf):
 
     # evaluate
     evaluate = conf["evaluate"]
-    evaluate_str = "score, acc = model.evaluate(x_test, y_test, %s)\n" % args_to_str(evaluate["args"])
+    evaluate_str = "score, acc = model.evaluate(x_test, y_test, %s)\n" % args_to_str(
+        evaluate["args"])
     model_str += evaluate_str
 
     # return value
@@ -267,6 +268,45 @@ def write_temp_files(tmp_str, path='./temp_model.py'):
     return
 
 
+SELECT_CHIOCE = {
+    'name': "choice",
+    'des': "Choice distribution, "
+           "Returns one of the options, which should be a list or tuple.",
+    'default': ["../default"],
+    "eg": "../type[range]"
+}
+
+
+DISTRIBUTE = {
+    "name": "distribute_choice",
+    "type": {
+        'key': 'choice',
+        'des': 'distribute choice for hyperparameters tuning',
+        'range': [
+            {
+                'name': "uniform",
+                'type': {
+                    'key': 'join_low_high',
+                    'des': 'Uniform distribution, Returns a value uniformly between low and high.',
+                },
+                'default': "0, 1",
+                'eg': "0, 1"
+            },
+            {
+                'name': "choice",
+                'type': {
+                    'key': 'multiple',
+                    'des': "Choice distribution, "
+                           "Returns one of the options, which should be a list or tuple.",
+                },
+                'default': None,
+                "eg": [256, 512, 1024]
+            }
+        ]
+    },
+}
+
+
 ACTIVATION = {
     'name': 'activation',
     'type': {
@@ -286,6 +326,27 @@ ACTIVATION = {
                   'linear']
     },
     'default': 'linear',
+
+    "distribute": {
+        'name': "activation_distribute",
+        'type': {
+            'key': 'choice_m',
+            'des': "Choice distribution, "
+                   "Returns one of the options, which should be a list or tuple.",
+            'range': ['softmax',
+                      'elu',
+                      'selu',
+                      'softplus',
+                      'softsign',
+                      'relu',
+                      'tanh',
+                      'sigmoid',
+                      'hard_sigmoid',
+                      'linear']
+        },
+        'default': ["linear"],
+        "eg": ['sigmoid', 'hard_sigmoid', 'linear']
+    }
 }
 
 INPUT_SHAPE = {
@@ -302,34 +363,7 @@ INPUT_SHAPE = {
     'len_range': None
 }
 
-DISTRIBUTE = {
-    'name': 'distribute',
-    'type': {
-        'key': 'choice',
-        'des': 'Distribute of the value of hyperparameters.',
-        'range': [
-            {
-                'name': "uniform",
-                'type': {
-                    'key': 'range',
-                    'des': 'Uniform distribute',
-                    'range': None
-                }
 
-            },
-            {
-                'name': "choice",
-                'type': {
-                    'key': 'range',
-                    'des': 'choice distribute',
-                    'range': None
-                }
-            }
-        ]
-    }
-}
-
-# tips: no default value
 CONSTANT = {
     "MNIST_CONF": {
         "layers": [
@@ -479,27 +513,334 @@ CONSTANT = {
         }
     },
 
-    # TODO spark models json for frontend use
-    "SPARK_MODELS": {
+    # TODO models json for frontend use to generate UI
+
+    "KERAS_SEQ_SPEC": {
         "layers": [
             {
                 "name": "Dense",
                 "args": [
                     {
                         "name": "units",
-                        "type": DISTRIBUTE,
+                        "type": {
+                            "key": "int",
+                            "des": "Just your regular densely-connected NN layer",
+                            "range": None
+                        },
                         "default": 32,
-                        "required": True
+                        "required": True,
+
+                        "distribute": DISTRIBUTE
                     },
                     ACTIVATION,
                     INPUT_SHAPE
                 ],
-            }
-        ]
-
+            },
+            {
+                "name": "Dropout",
+                "args": [
+                    {
+                        "name": "rate",
+                        "type": {
+                            "key": "float",
+                            "des": "Fraction of the input units to drop",
+                            "range": [0, 1]
+                        },
+                        "default": None,
+                        "required": True,
+                        "distribute": DISTRIBUTE
+                    },
+                    {
+                        "name": "noise_shape",
+                        "type": {
+                            "key": "int_m",
+                            "des": "1D integer tensor representing the shape of "
+                                   "the binary dropout mask that will be "
+                                   "multiplied with the input.",
+                            "range": None
+                        },
+                        "default": None,
+                        "required": False,
+                        "len_range": [3, 3]
+                    },
+                    {
+                        "name": "seed",
+                        "type": {
+                            "key": "int",
+                            "des": "A Python integer to use as random seed",
+                            "range": None
+                        },
+                        "default": None,
+                        "required": False,
+                    },
+                ],
+            },
+            {
+                "name": "Flatten",
+                "args": [],
+            },
+            {
+                "name": "Reshape",
+                "args": [
+                    {
+                        "name": "target_shape",
+                        "type": {
+                            "key": "int_m",
+                            "des": "nD tensor with shape: (batch_size, ..., "
+                                   "input_dim). The most common situation would be "
+                                   "a 2D input with shape (batch_size, input_dim).",
+                            "range": None
+                        },
+                        "default": None,
+                        "required": True,
+                        "len_range": None
+                    },
+                    INPUT_SHAPE
+                ],
+            },
+            {
+                "name": "Conv1D",
+                "args": [
+                    {
+                        "name": "filters",
+                        "type": {
+                            "key": "int",
+                            "des": "the dimensionality of the output space (i.e. "
+                                   "the number output of filters in the "
+                                   "convolution)",
+                            "range": None
+                        },
+                        "default": None,
+                        "required": True,
+                    },
+                    {
+                        "name": "kernel_size",
+                        "type": {
+                            "key": "int",
+                            "des": "An integer specifying the length of the 1D "
+                                   "convolution window.",
+                            "range": None
+                        },
+                        "default": None,
+                        "required": True,
+                    },
+                    ACTIVATION,
+                    INPUT_SHAPE
+                ],
+            },
+            {
+                "name": "Conv2D",
+                "args": [
+                    {
+                        "name": "filters",
+                        "type": {
+                            "key": "int",
+                            "des": "the dimensionality of the output space (i.e. "
+                                   "the number output of filters in the "
+                                   "convolution)",
+                            "range": None
+                        },
+                        "default": None,
+                        "required": True,
+                    },
+                    {
+                        "name": "kernel_size",
+                        "type": {
+                            "key": "int_m",
+                            "des": "An tuple/list of 2 integers, specifying the "
+                                   "strides of the convolution along the width and "
+                                   "height.",
+                            "range": None
+                        },
+                        "default": None,
+                        "required": True,
+                        "len_range": [2, 2]
+                    },
+                    ACTIVATION,
+                    INPUT_SHAPE
+                ],
+            },
+            {
+                "name": "MaxPooling2D",
+                "args": [
+                    {
+                        "name": "pool_size",
+                        "type": {
+                            "key": "int_m",
+                            "des": "tuple of 2 integers, factors by which to "
+                                   "downscale (vertical, horizontal). (2, 2) will "
+                                   "halve the input in both spatial dimension. ",
+                            "range": None
+                        },
+                        "default": None,
+                        "required": False,
+                        "len_range": [2, 2]
+                    },
+                    {
+                        "name": "strides",
+                        "type": {
+                            "key": "int_m",
+                            "des": "tuple of 2 integers, or None. Strides values."
+                                   " If None, it will default to pool_size",
+                            "range": None
+                        },
+                        "default": None,
+                        "required": False,
+                        "len_range": [2, 2]
+                    },
+                    {
+                        "name": "padding",
+                        "type": {
+                            "key": "choice",
+                            "des": "",
+                            "range": ["valid", "same"]
+                        },
+                        "default": "valid",
+                        "required": False,
+                    },
+                    {
+                        "name": "data_format",
+                        "type": {
+                            "key": "choice",
+                            "des": "The ordering of the dimensions in the inputs",
+                            "range": ["channels_last", "channels_first"]
+                        },
+                        "default": "channels_last",
+                        "required": False,
+                    },
+                    {
+                        "name": "input_shape",
+                        "type": {
+                            "key": "int_m",
+                            "des": "4D tensor",
+                            "range": None
+                        },
+                        "default": None,
+                        "required": False,
+                        "len_range": [4, 4]
+                    }
+                ],
+            },
+        ],
+        "compile": {
+            'args': [
+                {
+                    "name": "loss",
+                    "type": {
+                        "key": "choice",
+                        "des": "A loss function (or objective function, or "
+                               "optimization score function) is one of the two "
+                               "parameters required to compile a model",
+                        "range": ["mean_squared_error",
+                                  "mean_absolute_error",
+                                  "mean_absolute_percentage_error",
+                                  "mean_squared_logarithmic_error",
+                                  "squared_hinge",
+                                  "hinge",
+                                  "categorical_hinge",
+                                  "logcosh",
+                                  "categorical_crossentropy",
+                                  "sparse_categorical_crossentropy",
+                                  "binary_crossentropy",
+                                  "kullback_leibler_divergence",
+                                  "poisson",
+                                  "cosine_proximity"]
+                    },
+                    "default": "categorical_crossentropy",
+                    "required": True,
+                    "distribute": {
+                        'name': "choice",
+                        'des': "Choice distribution, "
+                               "Returns one of the options, which should be a list or tuple.",
+                        'default': ["../default"],
+                        "eg": "../type[range]"
+                    }
+                },
+                {
+                    "name": "optimizer",
+                    "type": {
+                        "key": "choice",
+                        "des": "An optimizer is one of the two arguments required for "
+                               "compiling a Keras model",
+                        "range": ["sgd",
+                                  "rmsprop",
+                                  "adagrad",
+                                  "adadelta",
+                                  "adam",
+                                  "adamax",
+                                  "nadam"]
+                    },
+                    "default": "sgd",
+                    "required": True
+                },
+                {
+                    "name": "metrics",
+                    "type": {
+                        "key": "choices",
+                        "des": "A metric is a function that is used to judge the "
+                               "performance of your model",
+                        "range": ["acc",
+                                  "mse",
+                                  "mae",
+                                  "mape",
+                                  "msle",
+                                  "cosine"]
+                    },
+                    "default": [],
+                    "required": False
+                },
+            ],
+        },
+        "fit": {
+            "data_fields": {
+                "name": "training_fields",
+                "type": {
+                    "key": "transfer_box",
+                    "des": "data fields for x and y",
+                },
+                "default": None,
+                "required": True,
+                "x_data_type": ['integer', 'float'],
+                "y_data_type": ['integer', 'float'],
+                "x_len_range": None,
+                "y_len_range": None
+            },
+            "args": [
+                {
+                    "name": "batch_size",
+                    "type": {
+                        "key": "int",
+                        "des": "Number of samples per gradient update",
+                        "range": None
+                    },
+                    "default": 32
+                },
+                {
+                    "name": "epochs",
+                    "type": {
+                        "key": "int",
+                        "des": "Number of epochs to train the model",
+                        "range": None
+                    },
+                    "default": 10
+                },
+            ],
+        },
+        "evaluate": {
+            "args": [
+                {
+                    "name": "batch_size",
+                    "type": {
+                        "key": "int",
+                        "des": "Number of samples per gradient update",
+                        "range": None
+                    },
+                    "default": 32
+                },
+            ]
+        }
     }
 }
-
 
 if __name__ == "__main__":
     train_hyperas_model()
