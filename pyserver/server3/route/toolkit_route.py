@@ -99,19 +99,28 @@ def get_by_staging_data_set_and_fields():
     project_id = data.get('project_id')
     conf = data.get('conf')
 
+    # conf初步操作
+    flag = isinstance(conf["data_fields"][0], (list, tuple))
+    x_fields = conf["data_fields"][0] if flag else conf["data_fields"]
+    y_fields = conf["data_fields"][1] if flag else None
+    data = staging_data_business.get_by_staging_data_set_and_fields(ObjectId(staging_data_set_id), x_fields)
+    target = staging_data_business.get_by_staging_data_set_and_fields(ObjectId(staging_data_set_id), y_fields) if flag else None
+
+    # 数据库转to_mongo和to_dict
+    data = [d.to_mongo().to_dict() for d in data]
+    target = [d.to_mongo().to_dict() for d in target] if target is not None else None
+
+    # 拿到conf
+    args = conf('args')
+
+    result = toolkit_service.convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
+                                                        [x_fields, y_fields], data, target,
+                                                        args)
+    result.update({"fields": [x_fields, y_fields]})
+    return jsonify({'response': json_utility.convert_to_json(result)}), 200
+
     # 上线前需要改成try形式
     # try:
     # except Exception as e:
     #     return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
     # return jsonify({'response': json_utility.convert_to_json(result)}), 200
-
-    # conf初步操作
-    data = staging_data_business.get_by_staging_data_set_and_fields(ObjectId(staging_data_set_id), fields)
-    data = [d.to_mongo().to_dict() for d in data]
-
-    result = toolkit_service.convert_json_and_calculate(project_id,
-                                                        staging_data_set_id,
-                                                        toolkit_id, fields,
-                                                        data, k)
-    result.update({"fields": fields})
-    return jsonify({'response': json_utility.convert_to_json(result)}), 200
