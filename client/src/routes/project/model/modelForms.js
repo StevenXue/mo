@@ -286,6 +286,7 @@ export default class ModelForms extends React.Component {
   renderCompile(){
     if (this.props.params) {
       return (
+        this.state.params['params']['compile'] &&
         <div>
           <p style={{color: '#108ee9'}}>Compile</p>
           <Compile isActive={this.state.isActive}
