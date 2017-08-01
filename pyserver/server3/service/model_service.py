@@ -388,6 +388,7 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
 
 
 def temp():
+    pass
     # print(add_model_with_ownership(
     #     'system',
     #     False,
@@ -408,48 +409,9 @@ def temp():
     #     'custom sdca model',
     #     ModelType['custom_supervised'],
     #     '/lib/models/svm',
-    #     'sdca_model_fn',
+    #     'svm_model_fn',
     #     'custom_model_to_str',
     #     models.SVM,
-    #     {'type': 'DataFrame'}
-    # ))
-    #
-    # print(add_model_with_ownership(
-    #     'system',
-    #     False,
-    #     'Kmeans Clustering',
-    #     'custom kmean model',
-    #     ModelType['unsupervised'],
-    #     '/lib/models/kmean',
-    #     'kmeans_clustering_model_fn',
-    #     'custom_model_to_str',
-    #     models.Kmeans,
-    #     {'type': 'DataFrame'}
-    # ))
-    #
-    # print(add_model_with_ownership(
-    #     'system',
-    #     False,
-    #     'Linear Classifier',
-    #     'custom linear classifier model',
-    #     ModelType['custom_supervised'],
-    #     '/lib/models/linear_classifier',
-    #     'linear_classifier_model_fn',
-    #     'custom_model_to_str',
-    #     models.LinearClassifier,
-    #     {'type': 'DataFrame'}
-    # ))
-    #
-    # print(add_model_with_ownership(
-    #     'system',
-    #     False,
-    #     'Linear Regression',
-    #     'custom linear regression model',
-    #     ModelType['custom_supervised'],
-    #     '/lib/models/linear_regression',
-    #     'linear_regression_model_fn',
-    #     'custom_model_to_str',
-    #     models.LinearRegression,
     #     {'type': 'DataFrame'}
     # ))
     #
@@ -465,7 +427,7 @@ def temp():
     #     models.MLP,
     #     {'type': 'ndarray', 'n': None}
     # ))
-
+    #
     # print(add_model_with_ownership(
     #     'system',
     #     False,
@@ -479,18 +441,44 @@ def temp():
     #     models.IMAGE_CLASSIFIER,
     #     {'type': 'folder'}
     # ))
-    print(add_model_with_ownership(
-        'system',
-        False,
-        'Linear Regressor',
-        'Custom linear regression model',
-        ModelType['custom_supervised'],
-        'server3/lib/models/linear_regressor.py',
-        'linear_regressor_model_fn',
-        'linear_regressor_to_str',
-        models.LinearRegressor,
-        {'type': 'DataFrame'}
-    ))
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Linear Regressor',
+    #     'Custom linear regression model',
+    #     ModelType['custom_supervised'],
+    #     'server3/lib/models/linear_regressor.py',
+    #     'linear_regressor_model_fn',
+    #     'linear_regressor_to_str',
+    #     models.LinearRegressor,
+    #     {'type': 'DataFrame'}
+    # ))
+
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Linear Classifier',
+    #     'Custom linear classifier model',
+    #     ModelType['custom_supervised'],
+    #     'server3/lib/models/linear_classifier.py',
+    #     'linear_classifier_model_fn',
+    #     'custom_model_to_str',
+    #     models.LinearClassifier,
+    #     {'type': 'DataFrame'}
+    # ))
+
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Kmeans Clustering',
+    #     'custom kmean model',
+    #     ModelType['unsupervised'],
+    #     'server3/lib/models/kmeans_cluster.py',
+    #     'kmeans_clustering_model_fn',
+    #     'custom_model_to_str',
+    #     models.KmeansCluster,
+    #     {'type': 'DataFrame'}
+    # ))
 
 
 if __name__ == '__main__':

@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 import eventlet
+# eventlet.sleep()
 # eventlet.monkey_patch()
 from flask_socketio import SocketIO
 # from sio import socketio
