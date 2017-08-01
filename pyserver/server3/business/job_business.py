@@ -89,6 +89,10 @@ def add_model_train_job(model_obj, staging_data_set_obj):
     return job_repo.create(job_obj)
 
 
+def add_many(objects):
+    return job_repo.create_many(objects)
+
+
 def end_job(job_obj):
     time = datetime.utcnow()
     return job_repo.update_one_by_id_status_and_time(job_obj.id, 200, time)

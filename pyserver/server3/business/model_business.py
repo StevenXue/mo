@@ -47,8 +47,8 @@ def add(name, description, category,
     return model_repo.create(model)
 
 
-def remove(model_obj):
-    model_repo.delete_by_id(model_obj.id)
+def remove_by_id(model_id):
+    return model_repo.delete_by_id(model_id)
 
 
 def update_one_public_model():

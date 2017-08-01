@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 from datetime import datetime
+from copy import deepcopy
 
 from mongoengine import DoesNotExist
 
@@ -71,17 +72,35 @@ def remove_project_by_id(project_id):
 
 
 def add_job_to_project(job_obj, project_id):
+    """
+    add job to project
+    :param job_obj:
+    :param project_id:
+    :return:
+    """
     return project_business.insert_job_by_id(project_id, job_obj)
 
 
 # 增加result_obj和job_obj到project
 def add_job_and_result_to_project(result_obj, project_id):
+    """
+    add job and result to project
+    :param result_obj:
+    :param project_id:
+    :return:
+    """
     job_obj = job_service.get_job_from_result(result_obj)
     return project_business.add_and_update_one_by_id(project_id, result_obj,
                                                      job_obj)
 
 
 def get_all_jobs_of_project(project_id, categories):
+    """
+    get all jobs and job info of a project
+    :param project_id:
+    :param categories:
+    :return:
+    """
     jobs = project_business.get_by_id(project_id)['jobs']
     history_jobs = {c: [] for c in categories}
     for job in jobs:
@@ -97,9 +116,48 @@ def get_all_jobs_of_project(project_id, categories):
                 job_info[key] = {
                     'name': job[key]['name'],
                 }
-                job_info['staging_data_set'] = job['staging_data_set']['name']
-                job_info['staging_data_set_id'] = job['staging_data_set']['id']
+                if job['staging_data_set']:
+                    job_info['staging_data_set'] = \
+                        job['staging_data_set']['name']
+                    job_info['staging_data_set_id'] = \
+                        job['staging_data_set']['id']
+                else:
+                    job_info['staging_data_set'] = None
+                    job_info['staging_data_set_id'] = None
                 job_info['results'] = result_sds
                 history_jobs[key].append(job_info)
                 break
     return history_jobs
+
+
+def fork(project_id):
+    """
+
+    :param project_id:
+    :return:
+    """
+    # get project
+    project = project_business.get_by_id(project_id)
+    # get ownership
+    ownership = ownership_business.get_ownership_by_user_and_owned_item()
+    # copy and save project
+    project_cp = deepcopy(project)
+    project_cp.id = None
+    project_business.add_by_obj(project_cp)
+
+    # copy jobs and save them
+    # jobs = project['jobs']
+    # jobs_cp = []
+    # for job in jobs:
+    #     j = deepcopy(job)
+    #     j.id = None
+    #     j.project = project_cp
+    #     jobs_cp.append(j)
+    # job_business.add_many(jobs_cp)
+    # # save to
+    # project_cp.jobs = jobs_cp
+    # project_cp.reload()
+
+    # copy staging data sets by project and bind to project
+
+    print(project.to_mongo())
