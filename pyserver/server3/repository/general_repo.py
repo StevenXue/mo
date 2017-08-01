@@ -66,7 +66,6 @@ class Repo:
         """
         return Repo.read(self, {field_name: field_value}).only(*subset)
 
-
     def read_by_non_unique_field_limit(self, field_name, field_value, limit):
         """
         general function to query the db by non unique field, thus return a list

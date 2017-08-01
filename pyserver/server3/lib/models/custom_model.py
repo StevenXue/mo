@@ -1,12 +1,12 @@
 # import logging
-# import inspect
+import inspect
 
 import tensorflow as tf
+import pandas as pd
+
 from tensorflow.python.framework import constant_op
 from tensorflow.python.framework import dtypes
 from server3.utility.str_utility import generate_args_str
-import pandas as pd
-
 
 
 def custom_model(conf, model_fn, input, **kw):
@@ -57,11 +57,9 @@ def custom_model_help(model_fn, input, project_id, result_sds,
                                            config=None,
                                            params=est_params['args'])
 
-
     input_fn = get_input_fn(model_name=input['model_name'],
                             df_features=input['df_features'],
                             df_labels=input['df_labels'])
-
 
     # fit
     estimator.fit(input_fn=input_fn, **fit_params['args'])
@@ -96,7 +94,6 @@ def custom_model_to_str(conf, head_str, **kw):
     est_params['feature_columns'] = 'FC'
     est_params = str(est_params)
     est_params = est_params.replace("'FC'", 'feature_columns')
-    str_model += inspect.getsource(input_fn)
     custom_model_help_str = inspect.getsource(custom_model_help)
     custom_model_help_str = \
         custom_model_help_str.replace("est_params['args']", est_params)
@@ -109,9 +106,6 @@ def custom_model_to_str(conf, head_str, **kw):
                                       generate_args_str(eval_params['args']))
     str_model += custom_model_help_str
     str_model += 'custom_model_help(model_fn, input, project_id, result_sds, ' \
-                 '' \
-                 '' \
-                 '' \
                  'feature_columns=feature_columns)'
     return str_model
 

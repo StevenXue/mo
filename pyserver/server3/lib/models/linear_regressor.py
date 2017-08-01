@@ -229,7 +229,7 @@ LinearRegressor = {
         },
         'args': [
             {
-                "name": "step",
+                "name": "steps",
                 "type": {
                     "key": "int",
                     "des": "steps for training",
@@ -243,7 +243,7 @@ LinearRegressor = {
     'evaluate': {
         'args': [
             {
-                "name": "step",
+                "name": "steps",
                 "type": {
                     "key": "int",
                     "des": "steps for evaluate",

@@ -264,7 +264,7 @@ KmeansCluster = {
         },
         'args': [
             {
-                "name": "step",
+                "name": "steps",
                 "type": {
                     "key": "int",
                     "des": "steps for training",
@@ -278,7 +278,7 @@ KmeansCluster = {
     'evaluate': {
         'args': [
             {
-                "name": "step",
+                "name": "steps",
                 "type": {
                     "key": "int",
                     "des": "steps for evaluate",
