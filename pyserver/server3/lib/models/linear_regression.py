@@ -222,7 +222,7 @@ residual after centered bias.",
         },
         'args': [
             {
-                "name": "step",
+                "name": "steps",
                 "type": {
                     "key": "int",
                     "des": "steps for training",
@@ -236,7 +236,7 @@ residual after centered bias.",
     'evaluate': {
         'args': [
             {
-                "name": "step",
+                "name": "steps",
                 "type": {
                     "key": "int",
                     "des": "steps for evaluate",

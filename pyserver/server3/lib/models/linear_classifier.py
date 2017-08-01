@@ -224,7 +224,7 @@ label vocabulary. Only supported for `n_classes` > 2."
         },
         'args': [
             {
-                "name": "step",
+                "name": "steps",
                 "type": {
                     "key": "int",
                     "des": "steps for training",
@@ -238,7 +238,7 @@ label vocabulary. Only supported for `n_classes` > 2."
     'evaluate': {
         'args': [
             {
-                "name": "step",
+                "name": "steps",
                 "type": {
                     "key": "int",
                     "des": "steps for evaluate",

@@ -116,8 +116,14 @@ def get_all_jobs_of_project(project_id, categories):
                 job_info[key] = {
                     'name': job[key]['name'],
                 }
-                job_info['staging_data_set'] = job['staging_data_set']['name']
-                job_info['staging_data_set_id'] = job['staging_data_set']['id']
+                if job['staging_data_set']:
+                    job_info['staging_data_set'] = \
+                        job['staging_data_set']['name']
+                    job_info['staging_data_set_id'] = \
+                        job['staging_data_set']['id']
+                else:
+                    job_info['staging_data_set'] = None
+                    job_info['staging_data_set_id'] = None
                 job_info['results'] = result_sds
                 history_jobs[key].append(job_info)
                 break
@@ -130,24 +136,28 @@ def fork(project_id):
     :param project_id:
     :return:
     """
+    # get project
     project = project_business.get_by_id(project_id)
-
+    # get ownership
+    ownership = ownership_business.get_ownership_by_user_and_owned_item()
     # copy and save project
     project_cp = deepcopy(project)
     project_cp.id = None
-    project_cp.jobs = []
     project_business.add_by_obj(project_cp)
 
     # copy jobs and save them
-    jobs = project['jobs']
-    jobs_cp = []
-    for job in jobs:
-        j = deepcopy(job)
-        j.id = None
-        jobs_cp.append(j)
-    job_business.add_many(jobs_cp)
+    # jobs = project['jobs']
+    # jobs_cp = []
+    # for job in jobs:
+    #     j = deepcopy(job)
+    #     j.id = None
+    #     j.project = project_cp
+    #     jobs_cp.append(j)
+    # job_business.add_many(jobs_cp)
+    # # save to
+    # project_cp.jobs = jobs_cp
+    # project_cp.reload()
 
-    project_cp.jobs = jobs_cp
-    project_cp.reload()
+    # copy staging data sets by project and bind to project
 
     print(project.to_mongo())
