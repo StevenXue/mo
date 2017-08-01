@@ -1318,7 +1318,6 @@ def update_one_public_toolkit():
     MIC = Toolkit(name='最大互信息数',
                   description='计算所选数据集合的最大互信息数, 表达第一个所选值域与其他值域变量之间的相关系数',
                   category=4,
-                  result_form=1,
                   entry_function='toolkit_mic',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_mic),
                   parameter_spec={
