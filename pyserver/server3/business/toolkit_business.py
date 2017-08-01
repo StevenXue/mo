@@ -60,7 +60,7 @@ def create_public_toolkit():
 
     AVG = Toolkit(name='平均值',
                   description='计算所选数据集合的平均值',
-                  category="描述性统计",
+                  category=4,
                   result_form=1,
                   entry_function='toolkit_average',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_average),
@@ -85,7 +85,7 @@ def create_public_toolkit():
 
     MEDIAN = Toolkit(name='中位数',
                      description='计算所选数据集合的中位数',
-                     category="描述性统计",
+                     category=4,
                      result_form=1,
                      entry_function='toolkit_median',
                      target_py_code=inspect.getsource(toolkit_orig.toolkit_median),
@@ -110,7 +110,7 @@ def create_public_toolkit():
 
     MODE = Toolkit(name='众数',
                    description='计算所选数据集合的众数',
-                   category="描述性统计",
+                   category=4,
                    result_form=1,
                    entry_function='toolkit_mode',
                    target_py_code=inspect.getsource(toolkit_orig.toolkit_mode),
@@ -135,7 +135,7 @@ def create_public_toolkit():
 
     SMA = Toolkit(name='移动平均值',
                   description='计算所选数据集合的移动平均值',
-                  category="描述性统计",
+                  category=4,
                   result_form=3,
                   entry_function='toolkit_moving_average',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_moving_average),
@@ -172,7 +172,7 @@ def create_public_toolkit():
 
     RANGE = Toolkit(name='全距',
                     description='计算所选数据集合的最大/最小值之差',
-                    category="描述性统计",
+                    category=4,
                     result_form=1,
                     entry_function='toolkit_range',
                     target_py_code=inspect.getsource(toolkit_orig.toolkit_range),
@@ -197,7 +197,7 @@ def create_public_toolkit():
 
     STD = Toolkit(name='标准差',
                   description='计算所选数据集合的标准差',
-                  category="描述性统计",
+                  category=4,
                   result_form=1,
                   entry_function='toolkit_std',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_std),
@@ -222,7 +222,7 @@ def create_public_toolkit():
 
     VAR = Toolkit(name='方差',
                   description='计算所选数据集合的方差',
-                  category="描述性统计",
+                  category=4,
                   result_form=1,
                   entry_function='toolkit_variance',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_variance),
@@ -248,7 +248,7 @@ def create_public_toolkit():
     # Result_orm 重新设计
     PEARSON = Toolkit(name='皮尔森相关系数',
                       description='计算所选数据集合的皮尔森相关系数, 表达两变量之间(线性)相关系数',
-                      category="统计推断",
+                      category=4,
                       result_form=1,
                       entry_function='toolkit_pearson',
                       target_py_code=inspect.getsource(toolkit_orig.toolkit_pearson),
@@ -342,7 +342,7 @@ def create_public_toolkit():
 
     PCA = Toolkit(name='降维PCA-主成分分析算法',
                   description='计算所选数据集合(多为数据)的降维，default自动降维，输入k可降到k维',
-                  category="降维",
+                  category=3,
                   result_form=2,
                   entry_function='dimension_reduction_PCA',
                   target_py_code=inspect.getsource(toolkit_orig.dimension_reduction_PCA),
@@ -379,7 +379,7 @@ def create_public_toolkit():
 
     TSNE = Toolkit(name='降维TSNE-t_分布邻域嵌入算法',
                    description='计算所选数据集合(多维数据)的降维，default自动降维，输入k可降到k维，通常为了方便可视化，降至2维',
-                   category="降维",
+                   category=3,
                    result_form=2,
                    entry_function='dimension_reduction_TSNE',
                    target_py_code=inspect.getsource(toolkit_orig.dimension_reduction_TSNE),
@@ -416,7 +416,7 @@ def create_public_toolkit():
 
     N = Toolkit(name='数据量',
                 description='返回数据个数',
-                category="描述性统计",
+                category=4,
                 result_form=1,
                 entry_function='toolkit_n',
                 target_py_code=inspect.getsource(toolkit_orig.toolkit_n),
@@ -441,7 +441,7 @@ def create_public_toolkit():
 
     IQR = Toolkit(name='IQR',
                   description='数据列的IQR',
-                  category="描述性统计",
+                  category=4,
                   result_form=1,
                   entry_function='toolkit_IQR',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_IQR),
@@ -466,7 +466,7 @@ def create_public_toolkit():
 
     CV = Toolkit(name='变异系数',
                  description='返回数据变异系数',
-                 category="描述性统计",
+                 category=4,
                  result_form=1,
                  entry_function='toolkit_cv',
                  target_py_code=inspect.getsource(toolkit_orig.toolkit_cv),
@@ -491,7 +491,7 @@ def create_public_toolkit():
 
     MAX = Toolkit(name='最大值',
                   description='返回数据最大值',
-                  category="描述性统计",
+                  category=4,
                   result_form=1,
                   entry_function='toolkit_max',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_max),
@@ -516,7 +516,7 @@ def create_public_toolkit():
 
     MIN = Toolkit(name='最小值',
                   description='返回数据最小值',
-                  category="描述性统计",
+                  category=4,
                   result_form=1,
                   entry_function='toolkit_min',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_min),
@@ -552,7 +552,7 @@ def create_public_toolkit():
     # Result_Form 重新设计
     CORRELATION = Toolkit(name='数据互相关',
                           description='返回数据correlation',
-                          category="统计推断",
+                          category=4,
                           result_form=1,
                           entry_function='toolkit_correlation',
                           target_py_code=inspect.getsource(toolkit_orig.toolkit_correlation),
@@ -578,7 +578,7 @@ def create_public_toolkit():
     # Result_Form 重新设计
     COV = Toolkit(name='数据协方差',
                   description='返回数据协方差',
-                  category="统计推断",
+                  category=4,
                   result_form=1,
                   entry_function='toolkit_cov',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_cov),
@@ -1317,8 +1317,7 @@ def update_one_public_toolkit():
     # Result_Form 重新设计
     MIC = Toolkit(name='最大互信息数',
                   description='计算所选数据集合的最大互信息数, 表达第一个所选值域与其他值域变量之间的相关系数',
-                  category="统计推断",
-                  result_form=1,
+                  category=4,
                   entry_function='toolkit_mic',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_mic),
                   parameter_spec={
