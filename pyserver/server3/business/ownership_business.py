@@ -34,6 +34,10 @@ def get_ownership_by_owned_item(owned_item, item_type):
 #     return ownership_repo.delete_by_user_and_item(user, owned_item, item_type)
 
 
+def update_by_id(ownership_id, **update):
+    ownership_repo.update_one_by_id(ownership_id, update)
+
+
 def list_ownership_by_user(user):
     return ownership_repo.read_by_non_unique_field('user', user)
 
