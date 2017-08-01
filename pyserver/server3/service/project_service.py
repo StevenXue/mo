@@ -103,14 +103,18 @@ def get_all_jobs_of_project(project_id, categories):
     """
     jobs = project_business.get_by_id(project_id)['jobs']
     history_jobs = {c: [] for c in categories}
+    print(history_jobs)
     for job in jobs:
         job_info = job.to_mongo()
         keys = history_jobs.keys()
         for key in keys:
             if job[key]:
                 try:
+                    # result_sds = staging_data_set_business.get_by_job_id(
+                    #     job['id']).to_mongo()
                     result_sds = staging_data_set_business.get_by_job_id(
-                        job['id']).to_mongo()
+                        job['id'])
+                    result_sds = dir(result_sds)
                 except DoesNotExist:
                     result_sds = None
                 job_info[key] = {
@@ -125,6 +129,7 @@ def get_all_jobs_of_project(project_id, categories):
                     job_info['staging_data_set'] = None
                     job_info['staging_data_set_id'] = None
                 job_info['results'] = result_sds
+                print(job_info)
                 history_jobs[key].append(job_info)
                 break
     return history_jobs

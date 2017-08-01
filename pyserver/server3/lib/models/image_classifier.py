@@ -144,6 +144,7 @@ def image_classifier(conf, input, **kw):
             validation_steps=nb_validation_samples // batch_size,
             callbacks=[batch_print_callback, best_checkpoint,
                        general_checkpoint],
+            verbose=0
         )
 
         # model.save_weights('first_try.h5')

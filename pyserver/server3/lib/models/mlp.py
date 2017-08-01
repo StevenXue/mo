@@ -59,7 +59,6 @@ def mlp(conf, input, **kw):
                                                   verbose=0)
 
         # training
-        # TODO callback 改成异步，考虑 celery
         history = model.fit(x_train, y_train,
                             validation_data=(x_val, y_val),
                             callbacks=[batch_print_callback, best_checkpoint,
