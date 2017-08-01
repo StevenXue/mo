@@ -196,6 +196,11 @@ def run_multiple_model(conf, project_id, staging_data_set_id, model_id,
     return result
 
 
+def run_hyperas_model(conf, project_id, data_source_id, model_id, **kwargs):
+    from server3.lib.models.hyperas_model import train_hyperas_model
+    train_hyperas_model(conf=conf, data_source_id=data_source_id, **kwargs)
+
+
 def model_to_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
     """
     run model by model_id and the parameter config
