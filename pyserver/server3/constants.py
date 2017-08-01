@@ -91,5 +91,25 @@ PARAMETER_SPEC = [
         },
         "default": None,
         'required': True
+    },
+    {
+        'name': 'x_train',
+        'type': {
+            'key': 'join_low_high',
+            "des": "blablabla",
+            'range': [0, 1]
+        },
+        "default": "0, 1",
+        'required': True
+    },
+    {
+        'name': 'x_train',
+        'type': {
+            'key': 'multiple',
+            "des": "blablabla",
+            'range': ["aa", 1]
+        },
+        "default": None,
+        'required': True
     }
 ]
