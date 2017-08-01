@@ -1,6 +1,11 @@
 #coding=utf-8
 
 try:
+    import inspect
+except:
+    pass
+
+try:
     from keras.datasets import mnist
 except:
     pass
@@ -51,50 +56,43 @@ except:
     pass
 
 try:
-    from my_temp_model import model_function
+    from my_temp_model import model_function, my_data_function_template
+except:
+    pass
+
+try:
+    from server3.service.model_service import manage_nn_input
 except:
     pass
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 from hyperas.distributions import conditional
 
-'''
-Data providing function:
+conf = {'layers': [{'name': 'Dense', 'args': {'units': 64, 'activation': 'relu', 'input_shape': [3]}}, {'name': 'Dropout', 'args': {'rate': {'distribute': 'uniform', 'value': '0, 0.8'}}}, {'name': 'Dense', 'args': {'units': 64, 'activation': 'relu'}}, {'name': 'Dropout', 'args': {'rate': 0.5}}, {'name': 'Dense', 'args': {'units': 2, 'activation': 'softmax'}}], 'compile': {'loss': 'categorical_crossentropy', 'metrics': ['accuracy']}, 'fit': {'data_fields': [['age', 'capital_gain', 'education_num'], ['capital_loss', 'hours_per_week']], 'args': {'batch_size': 128, 'epochs': 20}}, 'evaluate': {'args': {'batch_size': 128}}}
+data_source_id = '5965cda1d123ab8f604a8dd0'
+kwargs = {'schema': 'seq'}
 
-This function is separated from model() so that hyperopt
-won't reload data for each evaluation run.
-'''
-(x_train, y_train), (x_test, y_test) = mnist.load_data()
-x_train = x_train.reshape(60000, 784)
-x_test = x_test.reshape(10000, 784)
-x_train = x_train.astype('float32')
-x_test = x_test.astype('float32')
-x_train /= 255
-x_test /= 255
-nb_classes = 10
-y_train = np_utils.to_categorical(y_train, nb_classes)
-y_test = np_utils.to_categorical(y_test, nb_classes)
-
+from server3.service.model_service import manage_nn_input
+input = manage_nn_input(conf, data_source_id, **kwargs)
+x_train = input["x_tr"]
+y_train = input["y_tr"]
+x_test = input["x_te"]
+y_test = input["y_te"]
 
 
 def keras_fmin_fnct(space):
 
     model = Sequential()
-    model.add(Dense(units=512, input_shape=[784], activation='relu'))
+    model.add(Dense(units=64, activation='relu', input_shape=[3]))
     model.add(Dropout(rate=space['rate']))
-    model.add(Dense(units=space['units'], activation='relu'))
-    model.add(Dropout(rate=space['rate_1']))
-    model.add(Dense(units=10, activation='softmax'))
-    model.compile(optimizer=RMSprop(lr=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
-    model.fit(x_train, y_train,  validation_data=(x_test, y_test), epochs=space['epochs'], batch_size=space['batch_size'], verbose=0)
-    score, acc = model.evaluate(x_test, y_test, batch_size=space['batch_size_1'])
+    model.add(Dense(units=64, activation='relu'))
+    model.add(Dropout(rate=0.5))
+    model.add(Dense(units=2, activation='softmax'))
+    model.compile(optimizer=SGD(), loss='categorical_crossentropy', metrics=['accuracy'])
+    model.fit(x_train, y_train,  validation_data=(x_test, y_test), batch_size=128, epochs=20, verbose=0)
+    score, acc = model.evaluate(x_test, y_test, batch_size=128)
     return {'loss': -acc, 'status': STATUS_OK, 'model': model}
 
 def get_space():
     return {
-        'rate': hp.uniform('rate', 0, 0.2),
-        'units': hp.choice('units', [256, 512, 1024]),
-        'rate_1': hp.uniform('rate_1', 0, 1),
-        'epochs': hp.choice('epochs', [1]),
-        'batch_size': hp.choice('batch_size', [64, 128]),
-        'batch_size_1': hp.choice('batch_size_1', [64]),
+        'rate': hp.uniform('rate', 0, 0.8),
     }

@@ -15,6 +15,7 @@ cause:
 2. function principle, from big function to small
 
 """
+import inspect
 from keras.datasets import mnist
 from keras.utils import np_utils
 
@@ -33,15 +34,16 @@ from keras.optimizers import SGD
 from keras.optimizers import RMSprop
 
 
-def train_hyperas_model():
+def train_hyperas_model(conf, data_source_id, **kwargs):
     # generate my_temp_model python file
-    conf1 = CONSTANT["MNIST_CONF"]
-    conf_to_python_file(conf1)
+    # conf1 = CONSTANT["MNIST_CONF"]
+    conf_to_python_file(conf, data_source_id, **kwargs)
 
+    from my_temp_model import model_function, my_data_function_template
+    model = model_function
+    data = my_data_function_template
     X_train, Y_train, X_test, Y_test = data()
 
-    from my_temp_model import model_function
-    model = model_function
     best_run, best_model = optim.minimize(model=model,
                                           data=data,
                                           algo=tpe.suggest,
@@ -49,46 +51,26 @@ def train_hyperas_model():
                                           trials=Trials())
 
     print("Evalutation of best performing model:")
-    print(best_model.evaluate(X_test, Y_test))
+    print("best score and acc", best_model.evaluate(X_test, Y_test))
 
 
-def data():
-    '''
-    Data providing function:
-
-    This function is separated from model() so that hyperopt
-    won't reload data for each evaluation run.
-    '''
-    (x_train, y_train), (x_test, y_test) = mnist.load_data()
-    x_train = x_train.reshape(60000, 784)
-    x_test = x_test.reshape(10000, 784)
-    x_train = x_train.astype('float32')
-    x_test = x_test.astype('float32')
-    x_train /= 255
-    x_test /= 255
-    nb_classes = 10
-    y_train = np_utils.to_categorical(y_train, nb_classes)
-    y_test = np_utils.to_categorical(y_test, nb_classes)
-
-    return x_train, y_train, x_test, y_test
-
-
-def conf_to_python_file(conf):
+def conf_to_python_file(conf, data_source_id, **kwargs):
     """conf to python file
 
     :param conf:
     :return:
     """
     import_str = conf_to_import_str(conf)
-
-    # function name
+    # model function: function name
     function_name = 'def model_function(x_train, y_train, x_test, y_test):\n'
     model_str = conf_to_model_str(conf)
     model_str = get_indent(model_str)
     model_function_str = function_name + model_str
+    # data function
+    data_function_str = conf_to_data_function_str(conf, data_source_id, **kwargs)
 
     temp_file = './my_temp_model.py'
-    write_temp_files(import_str + model_function_str, temp_file)
+    write_temp_files(import_str + data_function_str + model_function_str, temp_file)
     return
 
 
@@ -166,7 +148,7 @@ def conf_to_model_str(conf):
     model_str += evaluate_str
 
     # return value
-    return_str = "return {'loss': -acc, 'status': STATUS_OK, 'model': model}"
+    return_str = "return {'loss': -acc, 'status': STATUS_OK, 'model': model}\n\n"
     model_str += return_str
     return model_str
 
@@ -190,9 +172,15 @@ def function_to_string(obj):
                 }
             }
 
+    sometimes is string like "SGD"
+
     :param obj: obj of the function
     :return:
     """
+    if type(obj) is str:
+        function_str = '%s()' % obj
+        return function_str
+
     name = obj["name"]
     args = obj["args"]
     args_str = args_to_str(args)
@@ -253,6 +241,53 @@ def arg_to_string(key, value):
         else:
             arg_str = str(key) + '=' + str(value) + ', '
     return arg_str
+
+
+# data function need be generate
+def my_data_function_template():
+    conf = {}
+    data_source_id = {}
+    kwargs = {}
+
+    from server3.service.model_service import manage_nn_input
+    input = manage_nn_input(conf, data_source_id, **kwargs)
+    x_train = input["x_tr"]
+    y_train = input["y_tr"]
+    x_test = input["x_te"]
+    y_test = input["y_te"]
+    return x_train, y_train, x_test, y_test
+
+
+def conf_to_data_function_str(conf, data_source_id, **kwarg):
+    data_function_str = inspect.getsource(my_data_function_template)
+    conf_str = "conf = %s" % str(conf)
+    data_source_id_str = "data_source_id = '%s'" % data_source_id
+    kwarg_str = "kwargs = %s" % str({**kwarg})
+    data_function_str = data_function_str.replace("conf = {}", conf_str)
+    data_function_str = data_function_str.replace("data_source_id = {}", data_source_id_str)
+    data_function_str = data_function_str.replace("kwargs = {}", kwarg_str)
+    return data_function_str + "\n\n"
+
+
+# def data():
+#     '''
+#     Data providing function:
+#
+#     This function is separated from model() so that hyperopt
+#     won't reload data for each evaluation run.
+#     '''
+#     (x_train, y_train), (x_test, y_test) = mnist.load_data()
+#     x_train = x_train.reshape(60000, 784)
+#     x_test = x_test.reshape(10000, 784)
+#     x_train = x_train.astype('float32')
+#     x_test = x_test.astype('float32')
+#     x_train /= 255
+#     x_test /= 255
+#     nb_classes = 10
+#     y_train = np_utils.to_categorical(y_train, nb_classes)
+#     y_test = np_utils.to_categorical(y_test, nb_classes)
+#
+#     return x_train, y_train, x_test, y_test
 
 
 def write_temp_files(tmp_str, path='./temp_model.py'):
@@ -843,4 +878,77 @@ CONSTANT = {
 }
 
 if __name__ == "__main__":
-    train_hyperas_model()
+    MODEL_TEMPLATE = {
+        "conf": {
+            "layers": [
+                {
+                    "name": "Dense",
+                    "args": {
+                        "units": 64,
+                        "activation": "relu",
+                        "input_shape": [
+                            3
+                        ]
+                    }
+                },
+                {
+                    "name": "Dropout",
+                    "args": {
+                        "rate": {
+                            "distribute": "uniform",
+                            "value": "0, 0.8"
+                        }
+                    }
+                },
+                {
+                    "name": "Dense",
+                    "args": {
+                        "units": 64,
+                        "activation": "relu"
+                    }
+                },
+                {
+                    "name": "Dropout",
+                    "args": {
+                        "rate": 0.5
+                    }
+                },
+                {
+                    "name": "Dense",
+                    "args": {
+                        "units": 2,
+                        "activation": "softmax"
+                    }
+                }
+            ],
+            "compile": {
+
+                    "loss": "categorical_crossentropy",
+                    "optimizer": "SGD",
+                    "metrics": ["accuracy"]
+
+            },
+            "fit": {
+                "data_fields": [["age", "capital_gain", "education_num"],
+                                ["capital_loss", "hours_per_week"]],
+                "args": {
+                    "batch_size": 128,
+                    "epochs": 20
+                }
+            },
+            "evaluate": {
+                "args": {
+                    "batch_size": 128
+                }
+            }
+        },
+        "project_id": "5965e5fae89bde79f3f0e920",
+        "staging_data_set_id": "5965cda1d123ab8f604a8dd0",
+        "schema": "seq"
+    }
+    conf = MODEL_TEMPLATE["conf"]
+    data_source_id = "5965cda1d123ab8f604a8dd0"
+    kwargs = {
+        "schema": "seq"
+    }
+    train_hyperas_model(conf, data_source_id, **kwargs)
