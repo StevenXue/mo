@@ -18,3 +18,5 @@ class Project(Document):
     datasets = ListField(ReferenceField('DataSet'))
     jobs = ListField(ReferenceField('Job'))
     results = ListField(ReferenceField('Result'))
+    # if forked project, which project fork from
+    source_project = ReferenceField('Project')

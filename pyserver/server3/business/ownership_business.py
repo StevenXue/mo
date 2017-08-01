@@ -18,12 +18,12 @@ def add(user, is_private, **owned_obj):
     return ownership_repo.create(ownership_obj)
 
 
-def get_ownerships_by_owned_item(owned_item, item_type):
-    return ownership_repo.read_by_non_unique_field(item_type, owned_item)
+# def get_ownerships_by_owned_item(owned_item, item_type):
+#     return ownership_repo.read_by_non_unique_field(item_type, owned_item)
 
 
-def get_ownership_by_user_and_owned_item(user, owned_item, item_type):
-    return ownership_repo.read_by_user_and_item(user, owned_item, item_type)
+def get_ownership_by_owned_item(owned_item, item_type):
+    return ownership_repo.read_by_item(item_type, owned_item)
 
 
 # def remove_ownerships_by_owned_item(owned_item, item_type):
