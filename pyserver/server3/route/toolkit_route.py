@@ -103,19 +103,18 @@ def get_by_staging_data_set_and_fields():
     flag = isinstance(conf["data_fields"][0], (list, tuple))
     x_fields = conf["data_fields"][0] if flag else conf["data_fields"]
     y_fields = conf["data_fields"][1] if flag else None
-    data = staging_data_business.get_by_staging_data_set_and_fields(ObjectId(staging_data_set_id), x_fields)
-    target = staging_data_business.get_by_staging_data_set_and_fields(ObjectId(staging_data_set_id), y_fields) if flag else None
+    fields = x_fields + y_fields if flag else x_fields
+    data = staging_data_business.get_by_staging_data_set_and_fields(ObjectId(staging_data_set_id), fields)
 
     # 数据库转to_mongo和to_dict
     data = [d.to_mongo().to_dict() for d in data]
-    target = [d.to_mongo().to_dict() for d in target] if target is not None else None
 
     # 拿到conf
-    args = conf('args')
+    fields = [x_fields, y_fields]
+    args = conf.get('args')
 
     result = toolkit_service.convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
-                                                        [x_fields, y_fields], data, target,
-                                                        args)
+                                                        fields, data, args)
     result.update({"fields": [x_fields, y_fields]})
     return jsonify({'response': json_utility.convert_to_json(result)}), 200
 

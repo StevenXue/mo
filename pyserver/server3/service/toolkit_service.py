@@ -49,21 +49,10 @@ def toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, fields, 
 
 
 # for database 调用toolkit code tag for zhaofeng
-def toolkit_calculate(project_id, staging_data_set_id,
-                      toolkit_id, fields, *argv):
+def toolkit_calculate(project_id, staging_data_set_id, toolkit_id,
+                      fields, *argv, **kwargs):
     toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
 
-    # old code with old-fashioned decorator
-    # prefix = "@job_service.create_toolkit_job(\"%s\")\n" % toolkit_id
-    # code = toolkit_obj.target_py_code
-    # string = prefix + code + '\nresult = %s(*argv)' % toolkit_obj.entry_function
-    # exec string
-
-    # new code, use new decorator
-    # code = toolkit_obj.target_py_code
-    # exec(code)
-    # func = locals()[toolkit_obj.entry_function]
-    # TODO
     func = getattr(toolkit_orig, toolkit_obj.entry_function) if hasattr(toolkit_orig, toolkit_obj.entry_function) else getattr(preprocess_orig, toolkit_obj.entry_function)
     func = job_service.create_toolkit_job(project_id, staging_data_set_id,
                                           toolkit_id, fields)(func)
@@ -73,48 +62,19 @@ def toolkit_calculate(project_id, staging_data_set_id,
 
 
 def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
-                               fields, data, k):
+                               fields, data, args):
     """convert json list"""
-    col = list(data[0].keys())
-    # 删掉所有的np.nan, to FIXME 要给出index
+    col1, col2 = fields
+    # 去除NaN
     index_nan = []
     arg_filter = []
-    # 以下是旧的产生index的方法
-    # for arr in data:
-    #     arr_temp = [data_utility.convert_string_to_number_with_poss(arr[i]) for i in col]
-    #     if np.nan not in arr_temp:
-    #         arg_filter.append(arr_temp)
-    #     else:
-    #         index_nan.append(data.index(arr))
-    #         # print ("nan number")
-    #         # index_nan = [i for i, x in enumerate(data) if x == arr_temp]
+
     for index, item in enumerate(data):
-        temp = [data_utility.convert_string_to_number_with_poss(item[i]) for i in col]
+        temp = [data_utility.convert_string_to_number_with_poss(item[i]) for i in col1 + col2]
         if np.nan not in temp:
             arg_filter.append(temp)
         else:
             index_nan.append(index)
-
-    # 临时救急，转文字为数字
-    # argv_b = list(zip(*arg_filter))
-    # argv_a = []
-    # for arr in argv_b:
-    #     try:
-    #         float(arr[0])
-    #         argv_a.append(arr)
-    #     except ValueError:
-    #         hash_obj = {}
-    #         i = 1.0
-    #         temp = []
-    #         for item in arr:
-    #             if item in hash_obj:
-    #                 temp.append(hash_obj[item])
-    #             else:
-    #                 hash_obj[item] = i
-    #                 i += 1
-    #                 temp.append(hash_obj[item])
-    #         argv_a.append(temp)
-    # argv = [list(zip(*argv_a))]
 
     # 正式的文字转数字
     argv_before = list(zip(*arg_filter))
@@ -131,11 +91,8 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
     if k:
         argv.append(index_nan)
         argv.append(k)
-    # result = toolkit_calculate(toolkit_id, *argv)
     # result = toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, fields, *argv)
     result = toolkit_calculate(project_id, staging_data_set_id, toolkit_id, fields, *argv)
-
-    # project_business.add_job_and_result_to_project(result, ObjectId(project_id))
     # return result.to_mongo().to_dict()
     return result
 
