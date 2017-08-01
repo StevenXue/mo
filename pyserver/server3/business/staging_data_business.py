@@ -1,4 +1,6 @@
 # -*- coding: UTF-8 -*-
+from copy import deepcopy
+
 from bson import ObjectId
 
 from server3.entity.staging_data import StagingData
@@ -58,6 +60,11 @@ def add_many(staging_data_set, data_array):
     return staging_data_repo.\
         create_many([StagingData(staging_data_set=staging_data_set, **doc) for
                      doc in data_array])
+
+
+def add_many_obj(data_obj_array):
+    if data_obj_array:
+        return staging_data_repo.create_many(data_obj_array)
 
 
 def get_first_one_by_staging_data_set_id(staging_data_set_id):
@@ -146,3 +153,16 @@ def remove_data_by_ids(sd_ids):
 
 def remove_data_by_id(sd_id):
     return staging_data_repo.delete_by_id(sd_id)
+
+
+def copy_staging_data(staging_data, staging_data_set):
+    sd_cp = deepcopy(staging_data)
+    sd_cp.id = None
+    sd_cp.staging_data_set = staging_data_set
+    return sd_cp
+
+
+def copy_staging_data_by_staging_data_set_id(sds):
+    sd_array = get_by_staging_data_set_id(sds['id'])
+    sd_array_cp = [copy_staging_data(sd, sds) for sd in sd_array]
+    return add_many_obj(sd_array_cp)
