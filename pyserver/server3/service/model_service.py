@@ -100,26 +100,24 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
     if model['category'] == ModelType['neural_network']:
         # keras nn
         f = getattr(models, model.entry_function)
-        input = manage_nn_input(conf, data_source_id, **kwargs)
+        input_dict = manage_nn_input(conf, data_source_id, **kwargs)
         return job_service.run_code(conf, project_id, data_source_id,
-                                    model, f, input)
+                                    model, f, input_dict)
     elif model['category'] == ModelType['folder_input']:
         # input from folder
         f = getattr(models, model.entry_function)
-        input = model_input_manager3(conf, data_source_id, **kwargs)
+        input_dict = model_input_manager3(conf, data_source_id, **kwargs)
         return job_service.run_code(conf, project_id, None,
-                                    model, f, input, file_id=data_source_id)
+                                    model, f, input_dict,
+                                    file_id=data_source_id)
     else:
         # custom models
 
         f = models.custom_model
         model_fn = getattr(models, model.entry_function)
-
+        fit = conf.get('fit', None)
         if model['category'] == ModelType['custom_supervised']:
-            fit = conf.get('fit', None)
-            params = conf.get('estimator', None)['args']
             data_fields = fit.get('data_fields', [[], []])
-            index_col = params.get('example_id_column', None)
 
             # to data frame
             if not is_array_and_not_empty(
@@ -128,44 +126,38 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
                 raise ValueError('fields array empty')
 
             x_cursor = staging_data_business. \
-                    get_by_staging_data_set_id_limited_fields(data_source_id,
-                                                              data_fields[0])
+                get_by_staging_data_set_id_limited_fields(data_source_id,
+                                                          data_fields[0])
             y_cursor = staging_data_business. \
                 get_by_staging_data_set_id_limited_fields(data_source_id,
                                                           data_fields[1])
 
             df_x = staging_data_service.mongo_to_df(x_cursor)
             df_y = staging_data_service.mongo_to_df(y_cursor)
-            input = {
+            input_dict = {
                 'model_name': model.name,
                 'df_features': df_x,
                 'df_labels': df_y
             }
-            # return 1
-            # feature_columns, input = model_input_manager1(df_train, index_col,
-            #                                               data_fields)
-            # params['feature_columns'] = feature_columns
             return job_service.run_code(conf, project_id, data_source_id,
-                                        model, f, model_fn, input)
+                                        model, f, model_fn, input_dict)
         if model['category'] == ModelType['unsupervised']:
-            fit = conf.get('fit', None)
             x_cols = fit.get('data_fields', [])
 
             # to data frame
-            if not is_array_and_not_empty(x_cols) :
+            if not is_array_and_not_empty(x_cols):
                 raise ValueError('field list empty')
             train_cursor = staging_data_business. \
                 get_by_staging_data_set_id_limited_fields(data_source_id,
                                                           x_cols)
-            df_train = staging_data_service.mongo_to_df(train_cursor)
-            input = {
+            df_x = staging_data_service.mongo_to_df(train_cursor)
+            input_dict = {
                 'model_name': model.name,
                 'df_features': df_x,
                 'df_labels': None
             }
-            # input = model_input_manager2(df_train, x_cols)
             return job_service.run_code(conf, project_id, data_source_id,
-                                        model, f, model_fn, input)
+                                        model, f, model_fn, input_dict)
 
 
 def is_array_and_not_empty(x):

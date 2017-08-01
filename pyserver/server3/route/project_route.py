@@ -65,13 +65,16 @@ def get_jobs_of_project(project_id):
     for c in categories:
         if c not in DEFAULT_CAT:
             raise ValueError('categories arg error')
-    try:
-        history_jobs = project_service.get_all_jobs_of_project(project_id,
-                                                               categories)
-        history_jobs = json_utility.convert_to_json(history_jobs)
-    except Exception as e:
-        return (jsonify({'response': '%s: %s' % (str(Exception),
-                                                 e.args)}), 400)
+    history_jobs = project_service.get_all_jobs_of_project(project_id,
+                                                           categories)
+    history_jobs = json_utility.convert_to_json(history_jobs)
+    # try:
+    #     history_jobs = project_service.get_all_jobs_of_project(project_id,
+    #                                                            categories)
+    #     history_jobs = json_utility.convert_to_json(history_jobs)
+    # except Exception as e:
+    #     return (jsonify({'response': '%s: %s' % (str(Exception),
+    #                                              e.args)}), 400)
     return jsonify({'response': history_jobs}), 200
 
 

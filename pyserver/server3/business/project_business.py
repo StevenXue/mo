@@ -31,6 +31,10 @@ def add(name, description, create_time):
     return project_repo.create(project_obj)
 
 
+def add_by_obj(obj):
+    return project_repo.create(obj)
+
+
 def get_by_id(object_id):
     """
     Get a project object by its ObjectId

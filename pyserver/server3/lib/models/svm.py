@@ -56,7 +56,7 @@ def example_id_column(features):
         lenth = list(features.values())[0].get_shape().as_list()
         results = list(map(str, list(range(lenth[0]))))
         features['index'] = constant_op.constant(results)
-    print(features['index'])
+    # print(features['index'])
 
 def svm_model_fn(features, labels, mode, params):
     """A model_fn for linear models that use the SDCA optimizer.
@@ -91,8 +91,10 @@ def svm_model_fn(features, labels, mode, params):
     feature_columns = [layers.real_valued_column(i) for i in features.keys()]
     example_id_column(features)
 
+    weight_column_name = params.get("weight_column_name")
+
     head = head_lib.binary_svm_head(
-        weight_column_name=params["weight_column_name"],
+        weight_column_name=weight_column_name,
         enable_centered_bias=False)
 
     optimizer = sdca_optimizer.SDCAOptimizer(
@@ -100,8 +102,6 @@ def svm_model_fn(features, labels, mode, params):
         num_loss_partitions=params["num_loss_partitions"],
         symmetric_l1_regularization=params["l1_regularization"],
         symmetric_l2_regularization=params["l2_regularization"])
-
-    weight_column_name = params["weight_column_name"]
 
     chief_hook = linear._SdcaUpdateWeightsHook()
     update_weights_hook = chief_hook
@@ -244,7 +244,7 @@ SVM = {
         'args': [
 
             {
-                "name": "step",
+                "name": "steps",
                 "type": {
                     "key": "int",
                     "des": "steps for training",
@@ -258,7 +258,7 @@ SVM = {
     'evaluate': {
         'args': [
             {
-                "name": "step",
+                "name": "steps",
                 "type": {
                     "key": "int",
                     "des": "steps for evaluate",
