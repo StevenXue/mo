@@ -124,7 +124,7 @@ export default class AutomatedModel extends React.Component {
       .catch((err) => console.log('Error: /staging_data/staging_data_sets/fields', err))
   }
 
-  deactivete (i) {
+  deactivate (i) {
     let array = this.state.statusStack
     array[i] = false
     this.setState({ statusStack: array })
@@ -217,7 +217,6 @@ export default class AutomatedModel extends React.Component {
                         shape="circle" icon="question" onClick={() => this.props.runTour(steps)}
                 />
               </div>
-
               <div style={{ height: 480, overflowY: 'auto', marginTop: 5, backgroundColor: '#fafafa' }}>
                 {
                   this.state.statusStack.map((el, i) =>
