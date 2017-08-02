@@ -172,7 +172,7 @@ def select_from_model_lr(arr0, target, index, threthold=0.1):
 
 # 基于树模型的特征选择法
 # 树模型中GBDT可用来作为基模型进行特征选择
-def select_from_model_gbdt(arr0, target, index, k):
+def select_from_model_gbdt(arr0, target, index, n_features):
     from sklearn.ensemble import GradientBoostingClassifier
     matrix = np.array(arr0)
     target = np.array(target)
