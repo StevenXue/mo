@@ -87,5 +87,4 @@ class MongoModelCheckpoint(ModelCheckpoint):
 
 
 def weight_to_list(weight):
-    print(weight.shape)
     return weight.tolist()
