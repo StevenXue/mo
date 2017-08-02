@@ -159,12 +159,7 @@ def dimension_reduction_PCA(arr0, index, n_components='mle'):
     pca = PCA(n_components=n_components, svd_solver=svd_solver).fit(matrix)
     result = pca.fit_transform(matrix)
     label = data_utility.retrieve_nan_index(result.tolist(), index)
-    return {"降维后数据值": label,
-            "维度": pca.components_.tolist(),
-            "待定": pca.explained_variance_.tolist(),
-            "待定1": pca.explained_variance_ratio_.tolist(),
-            "待定2": pca.mean_.tolist(),
-            "误差方差": pca.noise_variance_}
+    return label, pca.components_.tolist(), pca.explained_variance_.tolist(), pca.explained_variance_ratio_.tolist(), pca.mean_.tolist(), pca.noise_variance_
 
 
 # 降维TSNE-t_分布邻域嵌入算法
@@ -174,7 +169,7 @@ def dimension_reduction_TSNE(arr0, index, n_components=2):
     np.set_printoptions(suppress=True)
     result = t_sne.fit_transform(matrix)
     label = data_utility.retrieve_nan_index(result.tolist(), index)
-    return {"降维后数据值": label}
+    return label
 
 
 # K平均数算法
