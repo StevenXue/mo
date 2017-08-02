@@ -49,16 +49,18 @@ export default class ModelProcess extends React.Component {
     this.setState({source: s});
     if(this.props.params){
       this.setState({modelName: this.props.params.model.name});
-      let data_fields = this.props.params['params']['fit']['data_fields']
-      if( data_fields.length === 2 ){
-        this.setState({
-          selectedKeys: data_fields[0],
-          targetKeys: data_fields[1]
-        });
-      }else{
-        this.setState({
-          targetKeys: data_fields[0]
-        });
+      let data_fields = []
+      if(this.props.params['params']['fit']['data_fields']) {
+        if (data_fields.length === 2) {
+          this.setState({
+            selectedKeys: data_fields[0],
+            targetKeys: data_fields[1]
+          });
+        } else {
+          this.setState({
+            targetKeys: data_fields[0]
+          });
+        }
       }
     }
   }
@@ -71,16 +73,18 @@ export default class ModelProcess extends React.Component {
     });
     if(nextProps.params) {
       this.setState({modelName: nextProps.params.model.name});
-      let data_fields = nextProps.params['params']['fit']['data_fields']
-      if (data_fields.length === 2) {
-        this.setState({
-          selectedKeys: data_fields[0],
-          targetKeys: data_fields[1]
-        });
-      } else {
-        this.setState({
-          targetKeys: data_fields[0]
-        });
+      let data_fields = []
+      if(nextProps.params['params']['fit']['data_fields']) {
+        if (data_fields.length === 2) {
+          this.setState({
+            selectedKeys: data_fields[0],
+            targetKeys: data_fields[1]
+          });
+        } else {
+          this.setState({
+            targetKeys: data_fields[0]
+          });
+        }
       }
     }
   }

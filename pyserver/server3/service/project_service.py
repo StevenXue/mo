@@ -12,11 +12,12 @@ from server3.business import ownership_business
 from server3.business import result_business
 from server3.business import data_set_business
 from server3.service import ownership_service
+from server3.service import staging_data_service
 from server3.business import staging_data_set_business
 from server3.utility import json_utility
 
 
-def create_project(name, description, user_ID, is_private):
+def create_project(name, description, user_ID, is_private=True):
     """
     Create a new project
 
@@ -108,11 +109,11 @@ def get_all_jobs_of_project(project_id, categories):
         keys = history_jobs.keys()
         for key in keys:
             if job[key]:
-                try:
-                    result_sds = staging_data_set_business.get_by_job_id(
-                        job['id']).to_mongo()
-                except DoesNotExist:
-                    result_sds = None
+                # try:
+                #     result_sds = staging_data_set_business.get_by_job_id(
+                #         job['id']).to_mongo()
+                # except DoesNotExist:
+                #     result_sds = None
                 job_info[key] = {
                     'name': job[key]['name'],
                 }
@@ -124,40 +125,64 @@ def get_all_jobs_of_project(project_id, categories):
                 else:
                     job_info['staging_data_set'] = None
                     job_info['staging_data_set_id'] = None
-                job_info['results'] = result_sds
+                # job_info['results'] = result_sds
                 history_jobs[key].append(job_info)
                 break
     return history_jobs
 
 
-def fork(project_id):
-    """
+def publish_project(project_id):
+    project = project_business.get_by_id(project_id)
+    ow = ownership_business.get_ownership_by_owned_item(project, 'project')
+    return ownership_business.update_by_id(ow['id'], private=False)
 
+
+def fork(project_id, new_user_ID):
+    """
+    fork project
     :param project_id:
     :return:
     """
     # get project
     project = project_business.get_by_id(project_id)
-    # get ownership
-    ownership = ownership_business.get_ownership_by_user_and_owned_item()
+
+    # get ownership, and check privacy
+    ownership = ownership_business.get_ownership_by_owned_item(
+        project, 'project')
+    if ownership.private is True:
+        raise NameError('forked project is private, fork failed')
+
     # copy and save project
-    project_cp = deepcopy(project)
-    project_cp.id = None
-    project_business.add_by_obj(project_cp)
+    project_cp = project_business.copy(project)
 
-    # copy jobs and save them
-    # jobs = project['jobs']
-    # jobs_cp = []
-    # for job in jobs:
-    #     j = deepcopy(job)
-    #     j.id = None
-    #     j.project = project_cp
-    #     jobs_cp.append(j)
-    # job_business.add_many(jobs_cp)
-    # # save to
-    # project_cp.jobs = jobs_cp
-    # project_cp.reload()
+    # get user object
+    user = user_business.get_by_user_ID(new_user_ID)
+    # create ownership relation
+    ownership_business.add(user, True, project=project_cp)
 
-    # copy staging data sets by project and bind to project
+    # copy jobs and save
+    jobs = project.jobs
+    jobs_cp = []
+    for job in jobs:
+        # copy staging data set by job and bind to project
+        if hasattr(job, 'staging_data_set') and job.staging_data_set:
+            sds_cp = staging_data_service.copy_staging_data_set(
+                job.staging_data_set, project_cp)
+        else:
+            sds_cp = None
+        # copy job
+        job_cp = job_business.copy_job(job, project_cp, sds_cp)
+        jobs_cp.append(job_cp)
+        # copy result staging data set by job and bind to project
+        try:
+            result_sds = staging_data_set_business.get_by_job_id(job['id'])
+            staging_data_service.copy_staging_data_set(result_sds, project_cp,
+                                                       belonged_job=job_cp)
+        except DoesNotExist:
+            pass
 
-    print(project.to_mongo())
+    project_business.update_by_id(
+        project_cp['id'],
+        jobs=jobs_cp)
+    project_cp.reload()
+    return project_cp
