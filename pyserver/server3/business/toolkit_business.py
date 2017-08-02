@@ -444,7 +444,7 @@ def create_public_toolkit():
                                   'des': 'the number of clustering numbers',
                                   'range': [1, None]
                               },
-                              'default': 2,
+                              'default': 'mle',
                               'required': True
                           }
                       ]
@@ -1011,10 +1011,10 @@ def create_public_data_process():
                                      },
                                      "args": [
                                          {
-                                             'name': 'n_features',
+                                             'name': 'k',
                                              'type': {
                                                  'key': 'int',
-                                                 'des': 'the threshold to judge if positive of negative',
+                                                 'des': 'select k best, k is number of features selected',
                                                  'range': [1, None]
                                              },
                                              'default': 2,
@@ -1075,10 +1075,10 @@ def create_public_data_process():
                                         },
                                         "args": [
                                             {
-                                                'name': 'n_features',
+                                                'name': 'k',
                                                 'type': {
                                                     'key': 'int',
-                                                    'des': 'the threshold to judge if positive of negative',
+                                                    'des': 'select k best, k is number of features selected',
                                                     'range': [1, None]
                                                 },
                                                 'default': 2,
@@ -1139,10 +1139,10 @@ def create_public_data_process():
                                     },
                                     "args": [
                                         {
-                                            'name': 'n_features',
+                                            'name': 'k',
                                             'type': {
                                                 'key': 'int',
-                                                'des': 'the threshold to judge if positive of negative',
+                                                'des': 'select k best, k is number of features selected',
                                                 'range': [1, None]
                                             },
                                             'default': 2,
@@ -1206,7 +1206,7 @@ def create_public_data_process():
                               'name': 'n_features',
                               'type': {
                                   'key': 'int',
-                                  'des': 'the threshold to judge if positive of negative',
+                                  'des': 'select k best, k is number of features selected',
                                   'range': [1, None]
                               },
                               'default': 2,
@@ -1331,10 +1331,10 @@ def create_public_data_process():
                                          },
                                          "args": [
                                              {
-                                                 'name': 'n_features',
+                                                 'name': 'k',
                                                  'type': {
                                                      'key': 'int',
-                                                     'des': 'the threshold to judge if positive of negative',
+                                                     'des': 'select k best, k is number of features selected',
                                                      'range': [1, None]
                                                  },
                                                  'default': 2,
@@ -1395,7 +1395,7 @@ def create_public_data_process():
                                             'name': 'n_features',
                                             'type': {
                                                 'key': 'int',
-                                                'des': 'the threshold to judge if positive of negative',
+                                                'des': 'the number of de-features',
                                                 'range': [1, None]
                                             },
                                             'default': 2,
@@ -1431,10 +1431,10 @@ def create_public_data_process():
                       },
                       "args": [
                           {
-                              'name': 'n_components',
+                              'name': 'n_features',
                               'type': {
                                   'key': 'int',
-                                  'des': 'the number of clusters',
+                                  'des': 'the number of de-features',
                                   'range': [1, None]
                               },
                               'default': 2,

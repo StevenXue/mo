@@ -172,7 +172,7 @@ def select_from_model_lr(arr0, target, index, threthold=0.1):
 
 # 基于树模型的特征选择法
 # 树模型中GBDT可用来作为基模型进行特征选择
-def select_from_model_gbdt(arr0, target, index, n_features):
+def select_from_model_gbdt(arr0, target, index, k):
     from sklearn.ensemble import GradientBoostingClassifier
     matrix = np.array(arr0)
     target = np.array(target)
@@ -186,7 +186,7 @@ def select_from_model_gbdt(arr0, target, index, n_features):
 # 降维-主成分分析法（PCA）
 # 主成分分析法，返回降维后的数据
 # 参数n_components为主成分数目
-def decomposition_pca(arr0, index, n_components):
+def decomposition_pca(arr0, index, n_features):
     matrix = np.array(arr0)
     temp = decomposition.PCA(n_components=n_components).fit_transform(matrix)
     result = data_utility.retrieve_nan_index(temp.tolist(), index)
@@ -196,7 +196,7 @@ def decomposition_pca(arr0, index, n_components):
 # 降维-线性判别分析法（LDA）
 # 线性判别分析法，返回降维后的数据
 # 参数n_components为降维后的维数
-def lda(arr0, target, index, n_components):
+def lda(arr0, target, index, n_features):
     from sklearn.lda import LDA
     matrix = np.array(arr0)
     target = np.array(target)
