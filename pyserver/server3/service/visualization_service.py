@@ -98,7 +98,7 @@ def usr_story2_exploration(data, d_type, sds_id):
     print("sds-id", sds_id, str(sds_id))
     if d_type == 0:
         cols = data["fields"]
-        # 暂时支持3个栏位以上的
+        # TODO 暂时只支持3个栏位以上的
         if len(cols) > 2:
             # nan的所有位置
             nan_index = [index for index, item in enumerate(data["labels"]) if isNaN(item)]
@@ -118,6 +118,9 @@ def usr_story2_exploration(data, d_type, sds_id):
     elif d_type == 1:
         table_data = json_utility.me_obj_list_to_dict_list(staging_data_business.get_by_staging_data_set_id_limit(ObjectId(sds_id), 5))
         data.update({"table": table_data})
+    elif d_type == 4:
+        pass
+
     return data
 
 
