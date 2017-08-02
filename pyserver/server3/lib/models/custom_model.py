@@ -107,7 +107,6 @@ def custom_model_to_str(conf, head_str, **kw):
     str_model += custom_model_help_str
     str_model += 'print(custom_model_help(model_fn, input_dict, project_id, ' \
                  'result_sds))'
-    print(str_model)
     return str_model
 
 

@@ -112,7 +112,6 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
                                     file_id=data_source_id)
     else:
         # custom models
-
         f = models.custom_model
         model_fn = getattr(models, model.entry_function)
         fit = conf.get('fit', None)
@@ -336,10 +335,13 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
     y_str = line_split_for_long_fields(y_str)
     code_str += x_str
     code_str += y_str
+    code_str += "kwargs = %s\n" % str(kwargs)
     code_str += "obj = job_service.split_supervised_input(" \
-                "staging_data_set_id, x_fields, y_fields, schema)\n"
+                "staging_data_set_id, x_fields, y_fields, schema, **kwargs)\n"
     code_str += "x_train = obj['x_tr']\n"
     code_str += "y_train = obj['y_tr']\n"
+    code_str += "x_val = obj['x_te']\n"
+    code_str += "y_val = obj['y_te']\n"
     code_str += "x_test = obj['x_te']\n"
     code_str += "y_test = obj['y_te']\n"
 

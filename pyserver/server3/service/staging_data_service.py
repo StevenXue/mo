@@ -15,7 +15,6 @@ from server3.utility import data_utility
 from server3.utility import json_utility
 from server3 import constants
 
-
 DEFAULT_RATIO = 0.5
 
 
@@ -267,11 +266,13 @@ def split_test_train(x_y_obj, schema='cv', **kwargs):
     if schema == 'cv':
         ratio = ratio or DEFAULT_RATIO
         x_tr, x_te, y_tr, y_te = \
-            data_utility.k_fold_cross_validation(x, y, ratio)
+            data_utility.k_fold_cross_validation(x, y, float(ratio))
         return {'x_tr': x_tr, 'y_tr': y_tr, 'x_te': x_te, 'y_te': y_te}
     if schema == 'seq':
-        divide_row = divide_row or x.shape[0] * ratio \
-                     or x.shape[0] * DEFAULT_RATIO
+        if ratio:
+            ratio = float(ratio)
+        divide_row = divide_row or x.shape[0] * ratio or x.shape[0] * DEFAULT_RATIO
+        divide_row = int(divide_row)
         return {'x_tr': x[:divide_row, :], 'y_tr': y[:divide_row, :],
                 'x_te': x[divide_row:, :], 'y_te': y[divide_row:, :]}
     if schema == 'rand':
