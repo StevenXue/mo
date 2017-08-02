@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 import eventlet
-eventlet.sleep(1.0)
+eventlet.sleep()
 eventlet.monkey_patch(thread=False)
 
 # from eventlet import import_patched

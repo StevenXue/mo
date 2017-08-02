@@ -321,7 +321,7 @@ def manage_nn_input(conf, staging_data_set_id, **kwargs):
     y_fields = conf['fit']['data_fields'][1]
     schema = kwargs.pop('schema')
     obj = split_supervised_input(staging_data_set_id, x_fields, y_fields,
-                                 schema)
+                                 schema, **kwargs)
     return obj
 
 

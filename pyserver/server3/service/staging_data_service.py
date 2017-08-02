@@ -16,6 +16,9 @@ from server3.utility import json_utility
 from server3 import constants
 
 
+DEFAULT_RATIO = 0.5
+
+
 def get_by_query_str(staging_data_set_id, **kwargs):
     # query_str = dict(query_str_in_mongodb_form)
     # query_str['staging_data_set'] = staging_data_set_id
@@ -250,27 +253,27 @@ def split_x_y(sds_id, x_fields, y_fields):
     return {'x': x, 'y': y}
 
 
-def split_test_train(x_y_obj, schema='cv', ratio=0.3, trl=1000):
+def split_test_train(x_y_obj, schema='cv', **kwargs):
     """
     split data to test and train
     :param x_y_obj:
     :param schema:
-    :param ratio:
-    :param trl:
     :return:
     """
     x = x_y_obj.pop('x', np.array([]))
     y = x_y_obj.pop('y', np.array([]))
+    ratio = kwargs.get('ratio')
+    divide_row = kwargs.get('divide_row')
     if schema == 'cv':
+        ratio = ratio or DEFAULT_RATIO
         x_tr, x_te, y_tr, y_te = \
             data_utility.k_fold_cross_validation(x, y, ratio)
         return {'x_tr': x_tr, 'y_tr': y_tr, 'x_te': x_te, 'y_te': y_te}
     if schema == 'seq':
-        if ratio and not trl:
-            trl = x.shape[0] * ratio
-        if trl:
-            return {'x_tr': x[:trl, :], 'y_tr': y[:trl, :],
-                    'x_te': x[trl:, :], 'y_te': y[trl:, :]}
+        divide_row = divide_row or x.shape[0] * ratio \
+                     or x.shape[0] * DEFAULT_RATIO
+        return {'x_tr': x[:divide_row, :], 'y_tr': y[:divide_row, :],
+                'x_te': x[divide_row:, :], 'y_te': y[divide_row:, :]}
     if schema == 'rand':
         pass
         # if ratio and not trl:
