@@ -479,16 +479,64 @@ def temp():
     #     models.IMAGE_CLASSIFIER,
     #     {'type': 'folder'}
     # ))
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Linear Regressor',
+    #     'Custom linear regression model',
+    #     ModelType['custom_supervised'],
+    #     'server3/lib/models/linear_regressor.py',
+    #     'linear_regressor_model_fn',
+    #     'linear_regressor_to_str',
+    #     models.LinearRegressor,
+    #     {'type': 'DataFrame'}
+    # ))
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Image CNN Classifier',
+    #     'Image CNN Classifier',
+    #     ModelType['folder_input'],
+    #     'server3/lib/models/nn/image_cnn_classifier_vgg16.py',
+    #     'image_cnn_classifier',
+    #     'image_cnn_classifier_to_str',
+    #     models.IMAGE_CNN_CLASSIFIER,
+    #     {'type': 'DataFrame'}
+    # ))
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Image Hierarchical RNN Classifier',
+    #     'Image Hierarchical RNN Classifier',
+    #     ModelType['folder_input'],
+    #     'server3/lib/models/nn/image_hierarchical_rnn_classifier.py',
+    #     'image_hierarchical_rnn_classifier',
+    #     'image_hierarchical_rnn_classifier_to_str',
+    #     models.IMAGE_HIERARCHICAL_RNN_CLASSIFIER,
+    #     {'type': 'DataFrame'}
+    # ))
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Image MLP Classifier',
+    #     'Image MLP Classifier',
+    #     ModelType['folder_input'],
+    #     'server3/lib/models/nn/image_mlp_classifier.py',
+    #     'image_mlp_classifier',
+    #     'image_mlp_classifier_to_str',
+    #     models.IMAGE_MLP_CLASSIFIER,
+    #     {'type': 'DataFrame'}
+    # ))
     print(add_model_with_ownership(
         'system',
         False,
-        'Linear Regressor',
-        'Custom linear regression model',
-        ModelType['custom_supervised'],
-        'server3/lib/models/linear_regressor.py',
-        'linear_regressor_model_fn',
-        'linear_regressor_to_str',
-        models.LinearRegressor,
+        'Image CNN Classifier VGG16',
+        'Image CNN Classifier VGG16',
+        ModelType['folder_input'],
+        'server3/lib/models/nn/image_cnn_classifier_vgg16.py',
+        'image_cnn_classifier_vgg16',
+        'image_cnn_classifier_vgg16_to_str',
+        models.IMAGE_CNN_CLASSIFIER_VGG16,
         {'type': 'DataFrame'}
     ))
 
