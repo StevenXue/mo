@@ -34,5 +34,22 @@ from server3.lib.models.linear_regressor import linear_regressor_model_fn
 from server3.lib.models.linear_regressor import linear_regressor_to_str
 from server3.lib.models.linear_regressor import LinearRegressor
 
-
 from server3.lib.models.keras_callbacks import MongoModelCheckpoint
+
+from server3.lib.models.nn.image_cnn_classifier_vgg16 import IMAGE_CNN_CLASSIFIER_VGG16
+from server3.lib.models.nn.image_cnn_classifier_vgg16 import image_cnn_classifier_vgg16
+from server3.lib.models.nn.image_cnn_classifier_vgg16 import image_cnn_classifier_vgg16_to_str
+
+# from server3.lib.models.nn.image_hierarchical_rnn_classifier import \
+#     IMAGE_HIERARCHICAL_RNN_CLASSIFIER
+# from server3.lib.models.nn.image_hierarchical_rnn_classifier import \
+#     image_hierarchical_rnn_classifier
+# # from server3.lib.models.nn.image_hierarchical_rnn_classifier
+# # image_hierarchical_rnn_classifier_to_str
+#
+# from server3.lib.models.nn.image_mlp_classifier import \
+#     IMAGE_MLP_CLASSIFIER
+# from server3.lib.models.nn.image_mlp_classifier import \
+#     image_mlp_classifier
+# # from server3.lib.models.nn.image_mlp_classifier
+# # image_mlp_classifier_to_str
