@@ -53,7 +53,7 @@ def toolkit_mode(arr0):
 
 
 # 移动平均值
-def toolkit_moving_average(arr0, index, window):
+def toolkit_moving_average(arr0, window):
     ret = np.cumsum(np.array(arr0), dtype=float)
     ret[window:] = ret[window:] - ret[:-window]
     return {"移动平均值": list(ret[window - 1:] / window)}
