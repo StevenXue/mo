@@ -88,7 +88,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                         "bar": results["scores"],
                         "general_info": {"Selected Features": "%s out of %s" % (len(list(filter(lambda x: x is True, labels))),
                                                                                 len(fields[0])),
-                                         "Selected Fields": list(compress(fields[0], labels)),
+                                         "Selected Fields": " ".join(str(el) for el in list(compress(fields[0], labels))),
                                          "Number of NaN": len(args[2])},
                         "scatter": {"y_domain": target,
                                     "x_domain": data,
