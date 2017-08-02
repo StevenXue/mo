@@ -258,6 +258,7 @@ export default class ModelForms extends React.Component {
   }
 
   renderEstimator(){
+    console.log(this.state.custom);
     if (this.props.params) {
       return(
           this.state.params['params']['estimator'] &&

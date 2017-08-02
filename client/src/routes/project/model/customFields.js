@@ -6,20 +6,6 @@ import { Button, message, Transfer, Input, Spin, Select, Modal, Icon, Popover, C
 import { flaskServer } from '../../../constants';
 const Option = Select.Option;
 
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-
-function isEmpty(obj) {
-  if (obj == null) return true;
-  if (obj.length > 0)    return false;
-  if (obj.length === 0)  return true;
-  if (typeof obj !== "object") return true;
-  for (var key in obj) {
-    if (hasOwnProperty.call(obj, key)) return false;
-  }
-
-  return true;
-}
-
 export default class CustomFields extends React.Component {
   constructor (props) {
     super(props)
@@ -124,11 +110,10 @@ export default class CustomFields extends React.Component {
   }
 
   renderView(){
-    let params = this.props.params.args;
     return(
       <div>
-        {
-          Object.keys(params).map((e) =>
+        {this.props.params &&
+          Object.keys(this.props.params.args).map((e) =>
             <div key={e}>
               <span>{e + ": "}</span>
               <span style={{color: '#00AAAA'}}>{this.props.params.args[e]}</span>
@@ -145,6 +130,7 @@ export default class CustomFields extends React.Component {
         <p style={{color: '#108ee9'}}>Estimator</p>
         {
           this.props.params?
+            this.renderView():
           (this.state.fields.map((e) =>
             <div key={e.name} style={{display: 'flex', flexDirection: 'row', marginBottom: 10}}>
               <div style={{width: 150}}>
@@ -152,7 +138,7 @@ export default class CustomFields extends React.Component {
               </div>
               {this.renderParams(e)}
             </div>
-          )):this.renderView()
+          ))
         }
       </div>
     )
