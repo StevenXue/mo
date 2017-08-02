@@ -118,50 +118,18 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
         fit = conf.get('fit', None)
         if model['category'] == ModelType['custom_supervised']:
             data_fields = fit.get('data_fields', [[], []])
-
-            # to data frame
-            if not is_array_and_not_empty(
-                    data_fields[0]) or not is_array_and_not_empty(
-                    data_fields[1]):
-                raise ValueError('fields array empty')
-
-            x_cursor = staging_data_business. \
-                get_by_staging_data_set_id_limited_fields(data_source_id,
-                                                          data_fields[0])
-            y_cursor = staging_data_business. \
-                get_by_staging_data_set_id_limited_fields(data_source_id,
-                                                          data_fields[1])
-
-            df_x = staging_data_service.mongo_to_df(x_cursor)
-            df_y = staging_data_service.mongo_to_df(y_cursor)
-            input_dict = {
-                'model_name': model.name,
-                'df_features': df_x,
-                'df_labels': df_y
-            }
+            input_dict = model_input_manager_custom_supervised(data_fields,
+                                                               data_source_id,
+                                                               model.name)
             return job_service.run_code(conf, project_id, data_source_id,
                                         model, f, model_fn, input_dict)
         if model['category'] == ModelType['unsupervised']:
             x_cols = fit.get('data_fields', [])
-
-            # to data frame
-            if not is_array_and_not_empty(x_cols):
-                raise ValueError('field list empty')
-            train_cursor = staging_data_business. \
-                get_by_staging_data_set_id_limited_fields(data_source_id,
-                                                          x_cols)
-            df_x = staging_data_service.mongo_to_df(train_cursor)
-            input_dict = {
-                'model_name': model.name,
-                'df_features': df_x,
-                'df_labels': None
-            }
+            input_dict = model_input_manager_unsupervised(x_cols,
+                                                          data_source_id,
+                                                          model.name)
             return job_service.run_code(conf, project_id, data_source_id,
                                         model, f, model_fn, input_dict)
-
-
-def is_array_and_not_empty(x):
-    return isinstance(x, list) and len(x) > 0
 
 
 def run_multiple_model(conf, project_id, staging_data_set_id, model_id,
@@ -188,13 +156,13 @@ def run_multiple_model(conf, project_id, staging_data_set_id, model_id,
     return result
 
 
-def model_to_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
+def model_to_code(conf, project_id, data_source_id, model_id, **kwargs):
     """
     run model by model_id and the parameter config
 
     :param conf:
     :param project_id:
-    :param staging_data_set_id:
+    :param data_source_id:
     :param model_id:
     :param kwargs:
     :return:
@@ -204,16 +172,19 @@ def model_to_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
 
     if model['category'] == 0:
         # keras nn
-        head_str = manage_supervised_input_to_str(conf, staging_data_set_id,
+        head_str = manage_supervised_input_to_str(conf, data_source_id,
                                                   **kwargs)
-        return job_service.run_code(conf, project_id, staging_data_set_id,
+        return job_service.run_code(conf, project_id, data_source_id,
                                     model, f, head_str)
     else:
         # custom models
         head_str = ''
         head_str += 'import logging\n'
         head_str += 'import numpy as np\n'
+        head_str += 'import pandas as pd\n'
         head_str += 'import tensorflow as tf\n'
+        head_str += 'from tensorflow.python.framework import constant_op\n'
+        head_str += 'from tensorflow.python.framework import dtypes\n'
         head_str += 'from server3.lib import models\n'
         head_str += 'from server3.business import staging_data_set_business\n'
         head_str += 'from server3.business import staging_data_business\n'
@@ -224,74 +195,65 @@ def model_to_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
         head_str += 'from server3.service.custom_log_handler ' \
                     'import MetricsHandler\n'
         head_str += 'model_fn = models.%s\n' % model.entry_function
-        head_str += "train_cursor = staging_data_business." \
-                    "get_by_staging_data_set_id('%s')\n" \
-                    % staging_data_set_id
-        head_str += "df_train = staging_data_service.mongo_to_df(" \
-                    "train_cursor)\n"
+        head_str += "data_source_id = '%s'\n" % data_source_id
+        head_str += "model_name = '%s'\n" % model.name
         fit = conf.get('fit', None)
         if model['category'] == 1:
-            params = conf.get('estimator', None)['args']
-            data_fields = fit.get('data_fields', [[None], [None]])
-            index_col = params.get('example_id_column', None)
+            data_fields = fit.get('data_fields', [[], []])
             head_str += 'data_fields = %s\n' % data_fields
-            head_str += 'index_col = %s\n' % index_col
-            head_str += inspect.getsource(model_input_manager1)
-            head_str += "feature_columns, input = model_input_manager1(" \
-                        "df_train, index_col, data_fields)\n"
+            head_str += inspect.getsource(model_input_manager_custom_supervised)
+            head_str += "input_dict = model_input_manager_custom_supervised(" \
+                        "data_fields, data_source_id, model_name)\n"
         elif model['category'] == 2:
             x_cols = fit.get('data_fields', [])
             head_str += "x_cols = %s\n" % x_cols
-            head_str += inspect.getsource(model_input_manager2)
-            head_str += "input = model_input_manager2(df_train, x_cols)\n"
-        return job_service.run_code(conf, project_id, staging_data_set_id,
+            head_str += inspect.getsource(model_input_manager_unsupervised)
+            head_str += "input_dict = model_input_manager_unsupervised(x_cols, " \
+                        "data_source_id, model_name)\n"
+        return job_service.run_code(conf, project_id, data_source_id,
                                     model, f, head_str)
 
 
-def model_input_manager1(df_train, index_col, data_fields):
-    # get column spec
-    label_column = "label_"
-    label_target = data_fields[1][0]
-    x_cols = data_fields[0]
-    # filter x columns
-    x_cols = list(df_train.columns.values) if not x_cols else x_cols
-    df_train = df_train.filter(items=x_cols)
+def model_input_manager_custom_supervised(data_fields, data_source_id,
+                                          model_name):
+    def is_array_and_not_empty(x):
+        return isinstance(x, list) and len(x) > 0
+    # to data frame
+    if not is_array_and_not_empty(
+            data_fields[0]) or not is_array_and_not_empty(
+            data_fields[1]):
+        raise ValueError('fields array empty')
 
-    if df_train[label_target].dtype == np.int_ or \
-                    df_train[label_target].dtype == np.float_:
-        # if column is number use it directly as label
-        label_column = label_target
-    else:
-        # if column is string, make it categorical
-        df_train[label_column] = (
-            df_train[label_target].astype('category').cat.codes)
+    x_cursor = staging_data_business. \
+        get_by_staging_data_set_id_limited_fields(data_source_id,
+                                                  data_fields[0])
+    y_cursor = staging_data_business. \
+        get_by_staging_data_set_id_limited_fields(data_source_id,
+                                                  data_fields[1])
 
-    # 添加一列 index，格式为string，作为"example_id_column"的输入
-    df_train[index_col] = df_train.index.astype(str)
-
-    # 将连续型和类别型特征分离开，为input做准备
-    continuous_cols, categorical_cols = \
-        split_categorical_and_continuous(df_train, [label_column,
-                                                    index_col,
-                                                    label_target])
-    return [continuous_cols, categorical_cols], {
-        'train': df_train,
-        # 'test': df_test,
-        'categorical_cols': categorical_cols,
-        'continuous_cols': continuous_cols +
-                           ([index_col] if index_col else []),
-        'label_col': label_column
+    df_x = staging_data_service.mongo_to_df(x_cursor)
+    df_y = staging_data_service.mongo_to_df(y_cursor)
+    return {
+        'model_name': model_name,
+        'df_features': df_x,
+        'df_labels': df_y
     }
 
 
-def model_input_manager2(df_train, x_cols):
-    x_cols = list(df_train.columns.values) if not x_cols else x_cols
-    df_train = df_train.filter(items=x_cols)
-    continuous_cols, categorical_cols = \
-        split_categorical_and_continuous(df_train, [])
+def model_input_manager_unsupervised(x_cols, data_source_id, model_name):
+    def is_array_and_not_empty(x):
+        return isinstance(x, list) and len(x) > 0
+    # to data frame
+    if not is_array_and_not_empty(x_cols):
+        raise ValueError('field list empty')
+    train_cursor = staging_data_business. \
+        get_by_staging_data_set_id_limited_fields(data_source_id,
+                                                  x_cols)
+    df_x = staging_data_service.mongo_to_df(train_cursor)
     return {
-        'train': df_train,
-        'continuous_cols': continuous_cols,
+        'model_name': model_name,
+        'df_features': df_x,
+        'df_labels': None
     }
 
 
@@ -449,7 +411,7 @@ def temp():
     #     ModelType['custom_supervised'],
     #     'server3/lib/models/linear_regressor.py',
     #     'linear_regressor_model_fn',
-    #     'linear_regressor_to_str',
+    #     'custom_model_to_str',
     #     models.LinearRegressor,
     #     {'type': 'DataFrame'}
     # ))

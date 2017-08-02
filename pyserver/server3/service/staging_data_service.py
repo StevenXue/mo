@@ -289,7 +289,6 @@ def copy_staging_data_set(sds, belonged_project, **kwargs):
     copy_staging_data_set
     :param sds:
     :param belonged_project:
-    :param belonged_job:
     :return:
     """
     belonged_job = None

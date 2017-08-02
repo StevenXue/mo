@@ -92,9 +92,8 @@ def custom_model_to_str(conf, head_str, **kw):
     str_model += "project_id = '%s'\n" % project_id
     str_model += "result_sds = staging_data_set_business.get_by_id('%s')\n" % \
                  result_sds_id
-    est_params['feature_columns'] = 'FC'
+    str_model += inspect.getsource(get_input_fn)
     est_params = str(est_params)
-    est_params = est_params.replace("'FC'", 'feature_columns')
     custom_model_help_str = inspect.getsource(custom_model_help)
     custom_model_help_str = \
         custom_model_help_str.replace("est_params['args']", est_params)
@@ -106,8 +105,9 @@ def custom_model_to_str(conf, head_str, **kw):
         custom_model_help_str.replace("**eval_params['args']",
                                       generate_args_str(eval_params['args']))
     str_model += custom_model_help_str
-    str_model += 'custom_model_help(model_fn, input, project_id, result_sds, ' \
-                 'feature_columns=feature_columns)'
+    str_model += 'print(custom_model_help(model_fn, input_dict, project_id, ' \
+                 'result_sds))'
+    print(str_model)
     return str_model
 
 
