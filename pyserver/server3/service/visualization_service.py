@@ -105,12 +105,7 @@ def usr_story2_exploration(data, d_type, sds_id):
             scatter_without_nan = [item for index, item in enumerate(data["scatter"]) if not isNaN(item)]
             scatter = data_utility.retrieve_nan_index(t_sne(scatter_without_nan), nan_index)
             centers = t_sne(data["centers"])
-            # print(data.pop("scatter", None))
-            # print("type", type(data))
-            #
-            # data.pop("scatter")
-            # data.pop("centers")
-            # print("\n\n\n4", data)
+
             data["scatter"] = scatter
             data["centers"] = centers
 
@@ -121,7 +116,7 @@ def usr_story2_exploration(data, d_type, sds_id):
                 temp.update({name: freq_hist(arr)})
             data.update({"hist_freq": temp})
     elif d_type == 1:
-        table_data = json_utility.me_obj_list_to_dict_list(staging_data_business.get_by_staging_data_set_id_limit(ObjectId(sds_id), 10))
+        table_data = json_utility.me_obj_list_to_dict_list(staging_data_business.get_by_staging_data_set_id_limit(ObjectId(sds_id), 5))
         data.update({"table": table_data})
     return data
 

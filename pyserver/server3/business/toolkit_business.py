@@ -151,6 +151,11 @@ def create_public_toolkit():
                                "name": "mode",
                                "des": "所选范围的样本的众数",
                                "if_add_column": False
+                           },
+                           {
+                               "name": "number",
+                               "des": "众数的个数",
+                               "if_add_column": False
                            }
                        ]
                    })
@@ -542,7 +547,7 @@ def create_public_toolkit():
                       "if_reserved": False,
                       "args": [
                           {
-                              "name": "IQR",
+                              "name": "四分位距",
                               "des": "所选范围的样本死分数",
                               "if_add_column": False
                           }
