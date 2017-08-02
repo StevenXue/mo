@@ -5,7 +5,7 @@ from mongoengine import StringField
 from mongoengine import IntField
 from mongoengine import ListField
 
-SUB_SET_PURPOSE =(
+SUB_SET_PURPOSE = (
     (0, 'training'),
     (1, 'testing')
 )

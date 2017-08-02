@@ -146,20 +146,16 @@ export default class ModelForms extends React.Component {
       let keys = Object.keys(customParams);
 
       run_params['estimator'] = {
-        'args' : []
+        'args' : {}
       }
 
       this.state.custom['args'].map((el) =>
         {
           if(keys.indexOf(el.name) !== -1){
-            run_params.estimator.args.push({
-              [el.name] : customParams[el.name]
-            })
+            run_params.estimator.args[el.name]  = customParams[el.name]
           }else{
             if(el.required === true || !customParams[el.name]){
-              run_params.estimator.args.push({
-                [el.name] : el.default
-              })
+              run_params.estimator.args[el.name] = el.default
             }
           }
         }
@@ -170,8 +166,9 @@ export default class ModelForms extends React.Component {
   }
 
   onClickRun(){
+    let run_params = this.constructParams();
+    //let complete = this.checkParams(run_params);
     if(this.props.jupyter){
-      let run_params = this.constructParams();
       fetch(flaskServer + '/model/models/to_code/' + this.props.model_id, {
         method: 'post',
         headers: {
@@ -191,7 +188,6 @@ export default class ModelForms extends React.Component {
     }else{
       this.setState({visible: true});
       if(!this.state.end){
-        let run_params = this.constructParams();
         fetch(flaskServer + '/model/models/run/' + this.props.model_id, {
           method: 'post',
           headers: {
@@ -228,7 +224,7 @@ export default class ModelForms extends React.Component {
       return (
         <div>
           {
-            this.state.params['params']['layers'].map((el) =>
+            this.state.params['params']['layers'] && this.state.params['params']['layers'].map((el) =>
               <Layer layers={this.state.layer}
                      key={Math.random()}
                      isActive={this.state.isActive}
@@ -262,19 +258,35 @@ export default class ModelForms extends React.Component {
   }
 
   renderEstimator(){
-    return(
-      <div>
-      {
-      !isEmpty(this.state.custom) &&
-        <Estimator custom={this.state.custom['args']} isActive={this.state.isActive} getEstimator={(field, value) => this.getEstimator(field, value)} />
+    if (this.props.params) {
+      return(
+          this.state.params['params']['estimator'] &&
+            <div>
+              <p style={{color: '#108ee9'}}>Compile</p>
+              <Estimator isActive={this.state.isActive}
+                         params={this.state.params['params']['estimator']}/>
+            </div>
+
+      )
+    }else {
+      return (
+        <div>
+          {
+            !isEmpty(this.state.custom) &&
+            <Estimator custom={this.state.custom['args']}
+                       isActive={this.state.isActive}
+                       getEstimator={(field, value) => this.getEstimator(field, value)}/>
+          }
+        </div>
+        );
       }
-      </div>
-    )
-  }
+    }
+
 
   renderCompile(){
     if (this.props.params) {
       return (
+        this.state.params['params']['compile'] &&
         <div>
           <p style={{color: '#108ee9'}}>Compile</p>
           <Compile isActive={this.state.isActive}
@@ -408,7 +420,7 @@ export default class ModelForms extends React.Component {
                  onCancel={() => this.setState({visible: false})}
                   >
             {this.props.params?
-              <Curve data={this.state.params['results']['history']}/>:
+              (this.state.params['results'] && <Curve data={this.state.params['results']['history']}/>):
               <Visual data={this.state.ioData} end={this.state.end}/>
             }
           </Modal>
