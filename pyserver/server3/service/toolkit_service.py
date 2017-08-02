@@ -9,6 +9,7 @@
 # Further to FIXME of None
 '''
 import functools
+from bson import ObjectId
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
@@ -49,14 +50,16 @@ def toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, fields, 
 
 
 # for database 调用toolkit code tag for zhaofeng
-def toolkit_calculate(project_id, staging_data_set_id, toolkit_id,
+def toolkit_calculate(project_id, staging_data_set_id, toolkit_obj,
                       fields, *argv, **kwargs):
-    toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
+    if hasattr(toolkit_orig, toolkit_obj.entry_function):
+        func = getattr(toolkit_orig, toolkit_obj.entry_function)
+    else:
+        func = getattr(preprocess_orig, toolkit_obj.entry_function)
 
-    func = getattr(toolkit_orig, toolkit_obj.entry_function) if hasattr(toolkit_orig, toolkit_obj.entry_function) else getattr(preprocess_orig, toolkit_obj.entry_function)
     func = job_service.create_toolkit_job(project_id, staging_data_set_id,
-                                          toolkit_id, fields)(func)
-    result = func(*argv)
+                                          toolkit_obj, fields)(func)
+    result = func(*argv, **kwargs)
 
     return result
 
@@ -68,7 +71,6 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
     # 去除NaN
     index_nan = []
     arg_filter = []
-
     for index, item in enumerate(data):
         temp = [data_utility.convert_string_to_number_with_poss(item[i]) for i in col1 + col2]
         if np.nan not in temp:
@@ -85,14 +87,21 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
             argv_after.append(arr)
         except ValueError:
             argv_after.append(pd.Series(arr).astype('category').cat.codes)
-    argv = [list(zip(*argv_after))]
 
-    # 正常
-    if k:
+    # 准备input
+    argv = [list(zip(*argv_after[:len(col1)]))]
+    if col2 is not None:
+        argv.append(argv_after[len(col1):][0])
+
+    toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
+    if toolkit_obj.category != 4:
         argv.append(index_nan)
-        argv.append(k)
-    # result = toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, fields, *argv)
-    result = toolkit_calculate(project_id, staging_data_set_id, toolkit_id, fields, *argv)
+
+    # toolkit_temp应该支持数据库接入
+    if args:
+        result = toolkit_calculate(project_id, staging_data_set_id, toolkit_obj, fields, *argv, **args)
+    else:
+        toolkit_calculate(project_id, staging_data_set_id, toolkit_obj, fields, *argv)
     # return result.to_mongo().to_dict()
     return result
 
