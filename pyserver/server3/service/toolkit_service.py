@@ -68,11 +68,12 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
                                fields, data, args):
     """convert json list"""
     col1, col2 = fields
+    columns = col1 + col2 if col2 is not None else col1
     # 去除NaN
     index_nan = []
     arg_filter = []
     for index, item in enumerate(data):
-        temp = [data_utility.convert_string_to_number_with_poss(item[i]) for i in col1 + col2]
+        temp = [data_utility.convert_string_to_number_with_poss(item[i]) for i in columns]
         if np.nan not in temp:
             arg_filter.append(temp)
         else:
