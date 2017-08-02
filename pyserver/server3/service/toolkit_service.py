@@ -102,7 +102,7 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
     if args:
         result = toolkit_calculate(project_id, staging_data_set_id, toolkit_obj, fields, *argv, **args)
     else:
-        toolkit_calculate(project_id, staging_data_set_id, toolkit_obj, fields, *argv)
+        result = toolkit_calculate(project_id, staging_data_set_id, toolkit_obj, fields, *argv)
     # return result.to_mongo().to_dict()
     return result
 

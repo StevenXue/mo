@@ -186,12 +186,12 @@ def dimension_reduction_TSNE(arr0, index, n_components=2):
 
 
 # K平均数算法
-def k_mean(arr0, index, n_clusters=2):
+def k_mean(arr0, index, k=2):
     matrix = np.array(arr0)
-    k_means = KMeans(n_clusters).fit(matrix)
+    k_means = KMeans(k).fit(matrix)
     result = k_means.labels_
     label = data_utility.retrieve_nan_index(result.tolist(), index)
-    return label, n_clusters, k_means.cluster_centers_.tolist(), k_means.inertia_
+    return label, k, k_means.cluster_centers_.tolist(), k_means.inertia_
 
 
 def k_mean_predict(arr0, list_points, n_clusters=2):
