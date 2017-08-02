@@ -4,18 +4,6 @@ import { BarChart, PieChart, Scatter } from '../visualization';
 import { jupyterServer, flaskServer } from '../../../constants';
 import { Button, Input, Spin, Select, Icon , message, Modal, Popover} from 'antd';
 
-let hasOwnProperty = Object.prototype.hasOwnProperty;
-function isEmpty(obj) {
-  if (obj == null) return true;
-  if (obj.length > 0)    return false;
-  if (obj.length === 0)  return true;
-  if (typeof obj !== "object") return true;
-  for (let key in obj) {
-    if (hasOwnProperty.call(obj, key)) return false;
-  }
-
-  return true;
-}
 
 export default class VisualizationPanel extends React.Component {
   constructor (props) {

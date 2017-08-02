@@ -93,10 +93,7 @@ export default class Toolkit extends React.Component {
   handleChange (e) {
     let selected = this.state.toolkits.filter((el) => el._id === e);
     let selectedName = selected[0].name;
-    let toolkit = this.state.toolkits
-    let target = toolkit.filter((el) => el._id === e)
-    console.log(target);
-    let extra = []
+    let target = this.state.toolkits.filter((el) => el._id === e)
     let parameterSpec = target[0].parameter_spec
     let type = parameterSpec.data.type.key;
     this.setState({type});
@@ -108,9 +105,6 @@ export default class Toolkit extends React.Component {
         }
       });
     }
-    // if (parameterSpec.args) {
-    //   extra.push('k值')
-    // }
 
     let selectable = '';
 
@@ -137,7 +131,6 @@ export default class Toolkit extends React.Component {
     let selectedName = selected[0].name;
     console.log(selectedName);
     this.setState({ selectedData: values, selectedDataName: selectedName })
-    //this.setState({dataColumns: mockResult});
     fetch(flaskServer + '/staging_data/staging_data_sets/fields?staging_data_set_id=' + values, {
       method: 'get',
       headers: {
@@ -160,7 +153,6 @@ export default class Toolkit extends React.Component {
       checked.pop()
     }
     this.setState({ checkedCols: checked });
-    // console.log(this.state.checkedCols);
   }
 
   onRunClick () {
@@ -234,9 +226,9 @@ export default class Toolkit extends React.Component {
       if(this.state.checkedCols.length === 0 && this.state.type === 'select_box'){
         message.error("please choose data fields");
       }else{
-        // const current = this.state.current + 1;
-        // this.setState({ current });
-        this.onRunClick();
+        const current = this.state.current + 1;
+        this.setState({ current });
+        //this.onRunClick();
       }
 
     }
@@ -366,7 +358,7 @@ export default class Toolkit extends React.Component {
           <div style={{marginTop: 10, marginLeft: '46%', display: 'flex', flexDirection: 'row'}}>
             <div style={{width: '40%'}}>
               <p>Chosen Input Constant:</p>
-              <p style={{color: '#00AAAA'}}>{this.state.constant}</p>
+              <p style={{color: '#00AAAA'}}>{this.state.constant[Object.Keys(this.state.constant)[0]]}</p>
               <p>Selected Fields:</p>
               {this.renderSelections()}
             </div>
