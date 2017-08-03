@@ -219,7 +219,7 @@ LinearRegressor = {
         "data_fields": {
             "name": "x_y_fields",
             "type": {
-                "key": "select_box",
+                "key": "transfer_box",
                 "des": "data fields for x",
             },
             "default": None,

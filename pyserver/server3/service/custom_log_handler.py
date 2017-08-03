@@ -30,8 +30,11 @@ class MetricsHandler(logging.StreamHandler):
         for s in sec:
             log_obj.update({'sec': s})
         if log_obj:
-            n = log_obj.get('step', None)
+            n = log_obj.pop('step', None)
             # when step n exists, log message
             if n:
                 logger_service.log_epoch_end(n, log_obj, self.result_sds,
                                              self.project_id)
+
+# {'n': 601.0, 'event': 'epoch', 'loss': 65.256, 'sec': '0.049'}
+# {'n': 18, 'event': 'epoch', 'loss': 59.358048087523386, 'acc': 0.98023715415019763}
