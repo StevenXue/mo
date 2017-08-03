@@ -62,6 +62,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
             for arg in result_spec["args"]:
                 value = result.pop(0)
                 results.update({arg["name"]: value})
+                # TODO 需要支持多列
                 if arg["if_add_column"]:
                     if len(value.shape) == 1:
                         # TODO
@@ -181,10 +182,11 @@ def get_job_from_result(result_obj):
     return result_business.get_result_by_id(result_obj['id']).job
 
 
-def split_supervised_input(staging_data_set_id, x_fields, y_fields, schema):
+def split_supervised_input(staging_data_set_id, x_fields, y_fields, schema,
+                           **kwargs):
     obj = staging_data_service.split_x_y(staging_data_set_id, x_fields,
                                          y_fields)
-    return staging_data_service.split_test_train(obj, schema=schema)
+    return staging_data_service.split_test_train(obj, schema=schema, **kwargs)
 
 
 # def to_code(conf, project_id, staging_data_set_id, model, *args):

@@ -1,7 +1,8 @@
 # -*- coding: UTF-8 -*-
 import eventlet
 # eventlet.sleep()
-# eventlet.monkey_patch()
+# eventlet.monkey_patch(thread=False)
+
 from flask_socketio import SocketIO
 # from sio import socketio
 from server3.business import staging_data_business
