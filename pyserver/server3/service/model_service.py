@@ -353,18 +353,18 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
 
 def temp():
     pass
-    # print(add_model_with_ownership(
-    #     'system',
-    #     False,
-    #     'General Neural Network',
-    #     'keras_seq from keras',
-    #     ModelType['neural_network'],
-    #     '/lib/models/keras_seq',
-    #     'keras_seq',
-    #     'keras_seq_to_str',
-    #     models.KERAS_SEQ_SPEC,
-    #     {'type': 'ndarray', 'n': None}
-    # ))
+    print(add_model_with_ownership(
+        'system',
+        False,
+        'General Neural Network',
+        'keras_seq from keras',
+        ModelType['neural_network'],
+        'server3/lib/models/keras_seq',
+        'keras_seq',
+        'keras_seq_to_str',
+        models.KERAS_SEQ_SPEC,
+        {'type': 'ndarray', 'n': None}
+    ))
     #
     # print(add_model_with_ownership(
     #     'system',
@@ -372,7 +372,7 @@ def temp():
     #     'SVM',
     #     'custom sdca model',
     #     ModelType['custom_supervised'],
-    #     '/lib/models/svm',
+    #     'server3/lib/models/svm',
     #     'svm_model_fn',
     #     'custom_model_to_str',
     #     models.SVM,
@@ -385,7 +385,7 @@ def temp():
     #     'Multilayer Perceptron',
     #     'Multilayer Perceptron (MLP) for multi-class softmax classification',
     #     ModelType['neural_network'],
-    #     '/lib/models/mlp',
+    #     'server3/lib/models/mlp',
     #     'mlp',
     #     'mlp_to_str',
     #     models.MLP,
@@ -399,7 +399,7 @@ def temp():
     #     'Training a small convnet from scratch: 80% accuracy in 40 lines '
     #     'of code',
     #     ModelType['folder_input'],
-    #     '/lib/models/image_classifier',
+    #     'server3/lib/models/image_classifier',
     #     'image_classifier',
     #     'image_classifier_to_str',
     #     models.IMAGE_CLASSIFIER,
@@ -443,19 +443,19 @@ def temp():
     #     models.KmeansCluster,
     #     {'type': 'DataFrame'}
     # ))
-    print(add_model_with_ownership(
-        'system',
-        False,
-        'Image CNN Classifier VGG16',
-        'Image CNN Classifier VGG16',
-        ModelType['folder_input'],
-        'server3/lib/models/nn/image_classifier_vgg16.py',
-        'image_cnn_classifier_vgg16',
-        'image_cnn_classifier_vgg16_to_str',
-        models.IMAGE_CNN_CLASSIFIER_VGG16,
-        {
-            'type': 'DataFrame'}
-    ))
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Image CNN Classifier VGG16',
+    #     'Image CNN Classifier VGG16',
+    #     ModelType['folder_input'],
+    #     'server3/lib/models/nn/image_classifier_vgg16.py',
+    #     'image_cnn_classifier_vgg16',
+    #     'image_cnn_classifier_vgg16_to_str',
+    #     models.IMAGE_CNN_CLASSIFIER_VGG16,
+    #     {
+    #         'type': 'DataFrame'}
+    # ))
 
 if __name__ == '__main__':
     pass

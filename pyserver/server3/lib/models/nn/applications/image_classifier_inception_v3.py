@@ -51,8 +51,8 @@ def image_classifier_inception_v3(conf, input, **kw):
     with graph.as_default():
         # load the inception_v3 network
         base_model = applications.InceptionV3(weights='imagenet',
-                                               include_top=False,
-                                   input_shape=input_shape)
+                                              include_top=False,
+                                              input_shape=input_shape)
 
         # build the top of cnn network
         top_model = Sequential()
