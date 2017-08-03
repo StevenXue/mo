@@ -62,10 +62,12 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
             for arg in result_spec["args"]:
                 value = result.pop(0)
                 results.update({arg["name"]: value})
-                # TODO 需要支持多列
                 if arg["if_add_column"]:
-                    # strr = "%s_col" % toolkit_obj.name
-                    staging_data_service.add_new_key_value(staging_data_set_id, arg["name"], value)
+                    # if len(value[0]) == 1:
+                    #     strr = "%s_%s_col" % (arg["name"], toolkit_obj.name)
+                    #     staging_data_service.add_new_key_value(staging_data_set_id, strr, value)
+                    # else:
+                    print('value', value)
                 if arg["attribute"] == "label":
                     labels = value
                 elif arg["attribute"] == "general_info":
