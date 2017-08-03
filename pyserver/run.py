@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 import eventlet
-eventlet.sleep(1.0)
-eventlet.monkey_patch(thread=False)
+eventlet.monkey_patch(socket=True)
 
 # from eventlet import import_patched
 # import_patched('flask_socketio')

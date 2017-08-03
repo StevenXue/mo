@@ -61,12 +61,15 @@ export default class ModelForms extends React.Component {
       custom: this.props.data.estimator,
       isActive: this.props.isActive
     });
+
     let socket = io.connect(flaskServer+ '/log/' + this.props.project_id);
     socket.on('log_epoch_end', (msg) => {
+      this.setState({ioData: msg})
 
-      this.setTimeout(
-        this.setState({ioData: msg}), 500);
+      // this.setTimeout(
+      //   this.setState({ioData: msg}), 500);
     });
+
     if(this.props.params){
       this.setState({end: true});
       console.log(this.state.params);
@@ -206,7 +209,8 @@ export default class ModelForms extends React.Component {
               this.setState({score: res.response.score});
             }
             this.props.modalSuccess();
-            this.setTimeout(this.setState({end: true}),2000);
+            this.setState({end: true})
+            // setTimeout(this.setState({end: true}),2000);
           })
       }
     }
