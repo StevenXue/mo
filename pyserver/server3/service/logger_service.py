@@ -1,15 +1,10 @@
 # -*- coding: UTF-8 -*-
 import eventlet
-# eventlet.sleep()
-# eventlet.monkey_patch(thread=False)
 
 from flask_socketio import SocketIO
 # from sio import socketio
 from server3.business import staging_data_business
 from server3.business import staging_data_set_business
-
-
-# def log_train_start(step, logs):
 
 
 def log_epoch_end(*args):
@@ -50,7 +45,7 @@ def save_weights_result_fn(result_sds, max_to_keep, key, new_weight):
     if result_sds is None:
         raise ValueError('no result sds id passed')
     result_sds.reload()
-    weights = getattr(result_sds, key,  None)
+    weights = getattr(result_sds, key, None)
     obj = {key: weights}
     if not weights:
         obj[key] = [new_weight]
@@ -63,19 +58,21 @@ def save_weights_result_fn(result_sds, max_to_keep, key, new_weight):
 
 
 def save_log(event, n, logs, result_sds, project_id):
-    return eventlet.spawn(save_log_fn, event, n, logs, result_sds, project_id)
+    eventlet.spawn_n(save_log_fn, event, n, logs, result_sds, project_id)
 
 
 def save_result(result_sds, **result):
-    return eventlet.spawn(save_result_fn, result_sds, **result)
+    eventlet.spawn_n(save_result_fn, result_sds, **result)
 
 
 def save_weights_result(result_sds, max_to_keep, key, new_weight):
-    return eventlet.spawn(save_weights_result_fn, result_sds, max_to_keep, key,
-                          new_weight)
+    eventlet.spawn_n(save_weights_result_fn, result_sds, max_to_keep,
+                     key,
+                     new_weight)
 
 
 def emit_result():
     pass
+
 # if __name__ == '__main__':
 #     emit_log(1, {'loss': 0.3}, {'id': '11'})
