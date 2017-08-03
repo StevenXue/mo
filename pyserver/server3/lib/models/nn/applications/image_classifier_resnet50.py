@@ -1,15 +1,17 @@
 # -*- coding: UTF-8 -*-
-from server3.lib.models.keras_callbacks import MongoModelCheckpoint
-from server3.service import logger_service
-from server3.lib import graph
 from keras.preprocessing.image import ImageDataGenerator
-from keras.layers import Activation, Dropout, Flatten, Dense
+from keras.layers import Dropout, Flatten, Dense
 from keras import backend as K
-from keras.callbacks import LambdaCallback
 from keras import applications
-from keras.models import Sequential
 from keras.models import Model
 import os
+
+from keras.callbacks import LambdaCallback
+from server3.lib.models.keras_callbacks import MongoModelCheckpoint
+from server3.service import logger_service
+
+from server3.lib import Sequential
+from server3.lib import graph
 
 # Todo: change this path in the  resnet50 model file
 WEIGHTS_PATH_NO_TOP = ''
