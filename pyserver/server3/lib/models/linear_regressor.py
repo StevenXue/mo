@@ -139,10 +139,6 @@ def linear_regressor_model_fn(features, labels, mode, params, config=None):
             logits=logits)
 
 
-def linear_regressor_to_str():
-    pass
-
-
 LinearRegressor = {
     'estimator': {
         'args': [
