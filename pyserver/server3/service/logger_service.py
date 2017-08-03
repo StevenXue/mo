@@ -7,9 +7,6 @@ from server3.business import staging_data_business
 from server3.business import staging_data_set_business
 
 
-# def log_train_start(step, logs):
-
-
 def log_epoch_end(*args):
     save_log('epoch', *args)
     emit_log('epoch', *args)

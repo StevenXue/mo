@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 import eventlet
 eventlet.monkey_patch(thread=False)
-eventlet.import_patched('_threading_local')
+eventlet.import_patched('pymongo')
 
 from datetime import timedelta
 
