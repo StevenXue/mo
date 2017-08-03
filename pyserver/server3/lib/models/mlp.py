@@ -63,18 +63,18 @@ def mlp_main(result_sds, project_id, x_train, y_train, x_val, y_val,
                                               project_id))
 
     # checkpoint to save best weight
-    best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,
+    best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=1,
                                            save_best_only=True)
     # checkpoint to save latest weight
     general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
-                                              verbose=0)
+                                              verbose=1)
 
     # training
     history = model.fit(x_train, y_train,
                         validation_data=(x_val, y_val),
                         callbacks=[batch_print_callback, best_checkpoint,
                                    general_checkpoint],
-                        verbose=0,
+                        verbose=1,
                         **f['args'])
 
     score = model.evaluate(x_test, y_test, **e['args'])

@@ -1,9 +1,8 @@
 # -*- coding: UTF-8 -*-
 import eventlet
-eventlet.monkey_patch(socket=True)
+eventlet.monkey_patch(thread=False)
+eventlet.import_patched('_threading_local')
 
-# from eventlet import import_patched
-# import_patched('flask_socketio')
 from datetime import timedelta
 
 from flask import Flask
@@ -13,10 +12,6 @@ from flask_jwt_extended import JWTManager
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import get_jwt_claims
 from flask_socketio import SocketIO
-
-# from flask_socketio import SocketIO
-# from flask_socketio import emit
-# from flask_socketio import socketio as sio
 
 from server3.route import file_route
 from server3.route import ownership_route
