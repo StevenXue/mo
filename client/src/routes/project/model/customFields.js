@@ -10,7 +10,9 @@ export default class CustomFields extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      fields: this.props.custom
+      fields: this.props.custom,
+      params: this.props.params,
+      isActive: this.props.isActive
     }
   }
 
@@ -19,17 +21,28 @@ export default class CustomFields extends React.Component {
   }
 
   componentWillReceiveProps(nextProps){
-    this.setState({fields: nextProps.custom});
+    this.setState({
+      fields: nextProps.custom,
+      params: nextProps.params,
+      isActive: nextProps.isActive
+    });
   }
 
   onChange(ref){
-    let value = parseInt(ReactDOM.findDOMNode(this.refs[ref.name]).value);
+    let value = ReactDOM.findDOMNode(this.refs[ref.name]).value;
+    console.log(ref.name, value);
     if(ref.type.key === 'int') {
       value = parseInt(value);
     }else if(ref.type.key === 'float') {
       value = parseFloat(value);
     }
-    this.props.getEstimator(ref.name, value);
+
+    if(value){
+      this.props.getEstimator(ref.name, value);
+    }else if(value = null && ref.required){
+      message.error("please fill in field" + ref.name);
+    }
+
   }
 
   onCheck(e, ref){
@@ -42,7 +55,7 @@ export default class CustomFields extends React.Component {
       case 'string':
         return (
           <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-            <Input ref={type.name} style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}} onChange={() => this.onChange(type)} />
+            <Input ref={type.name} disabled={!this.state.isActive} style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}} onChange={() => this.onChange(type)} />
             <Popover content={<div>
                   <p style={{width: 150}}>{type.type.des}</p>
                 </div>} title="Description">
@@ -96,18 +109,37 @@ export default class CustomFields extends React.Component {
 
   }
 
+  renderView(){
+    return(
+      <div>
+        {this.props.params &&
+          Object.keys(this.props.params.args).map((e) =>
+            <div key={e}>
+              <span>{e + ": "}</span>
+              <span style={{color: '#00AAAA'}}>{this.props.params.args[e]}</span>
+            </div>
+          )
+        }
+      </div>
+    )
+  }
+
   render(){
     return(
       <div>
         <p style={{color: '#108ee9'}}>Estimator</p>
-        { this.state.fields.map((e) =>
-          <div key={e.name} style={{display: 'flex', flexDirection: 'row', marginBottom: 10}}>
-            <div style={{width: 150}}>
-              <p style={{float: 'left'}}>{e.name}</p>
+        {
+          this.props.params?
+            this.renderView():
+          (this.state.fields.map((e) =>
+            <div key={e.name} style={{display: 'flex', flexDirection: 'row', marginBottom: 10}}>
+              <div style={{width: 150}}>
+                <p style={{float: 'left'}}>{e.name}</p>
+              </div>
+              {this.renderParams(e)}
             </div>
-            {this.renderParams(e)}
-          </div>
-        )}
+          ))
+        }
       </div>
     )
   }

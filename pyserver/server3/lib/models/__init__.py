@@ -22,14 +22,12 @@ from server3.lib.models.custom_model import custom_model_to_str
 from server3.lib.models.svm import SVM
 from server3.lib.models.svm import svm_model_fn
 ## kmean
-from server3.lib.models.kmean import kmeans_clustering_model_fn
-from server3.lib.models.kmean import Kmeans
-## linear
+from server3.lib.models.kmeans_cluster import kmeans_cluster_model_fn
+from server3.lib.models.kmeans_cluster import KmeansCluster
+## linear classifier
 from server3.lib.models.linear_classifier import linear_classifier_model_fn
 from server3.lib.models.linear_classifier import LinearClassifier
-from server3.lib.models.linear_regression import linear_regression_model_fn
-from server3.lib.models.linear_regression import LinearRegression
-
+## linear regressor
 from server3.lib.models.linear_regressor import linear_regressor_model_fn
 from server3.lib.models.linear_regressor import linear_regressor_to_str
 from server3.lib.models.linear_regressor import LinearRegressor

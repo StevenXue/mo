@@ -1,5 +1,7 @@
 # -*- coding: UTF-8 -*-
 import sys
+from copy import deepcopy
+
 from bson import Code
 import numpy as np
 import pandas as pd
@@ -277,3 +279,22 @@ def split_test_train(x_y_obj, schema='cv', ratio=0.3, trl=1000):
         #     return {'x_tr': x[:trl], 'y_tr': y[:trl],
         #             'x_te': x[trl:], 'y_te': y[trl:]}
         # raise NameError('arg error')
+
+
+def copy_staging_data_set(sds, belonged_project, **kwargs):
+    """
+    copy_staging_data_set
+    :param sds:
+    :param belonged_project:
+    :param belonged_job:
+    :return:
+    """
+    belonged_job = None
+    if 'belonged_job' in kwargs:
+        belonged_job = kwargs.pop('belonged_job')
+    if kwargs:
+        raise TypeError('Unrecognized keyword arguments: ' + str(kwargs))
+    sds_cp = staging_data_set_business.copy_staging_data_set(
+        sds, belonged_project, belonged_job)
+    staging_data_business.copy_staging_data_by_staging_data_set_id(sds_cp)
+    return sds_cp

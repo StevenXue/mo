@@ -8,6 +8,7 @@
 # @running  : python
 # Further to FIXME of None
 """
+from copy import deepcopy
 
 from datetime import datetime
 
@@ -105,3 +106,13 @@ def update_job(job_obj):
 
 def remove_by_id(file_id):
     return job_repo.delete_by_id(file_id)
+
+
+def copy_job(job, belonged_project, staging_data_set):
+    j = deepcopy(job)
+    j.id = None
+    j.project = belonged_project
+    if staging_data_set:
+        j.staging_data_set = staging_data_set
+    job_repo.create(j)
+    return j
