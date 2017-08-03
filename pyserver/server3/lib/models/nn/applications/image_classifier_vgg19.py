@@ -75,7 +75,7 @@ def image_classifier_vgg19(conf, input, **kw):
             top_model.add(Dense(num_classes, activation='softmax'))
             model = Model(inputs=base_model.input,
                           outputs=top_model(base_model.output))
-            for layer in model.layers[:18]:
+            for layer in model.layers[:-2]:
                 layer.trainable = False
             model.compile(loss='categorical_crossentropy',
                           optimizer='rmsprop',
