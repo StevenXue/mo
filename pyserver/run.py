@@ -35,7 +35,9 @@ app.secret_key = 'super-super-secret'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
 
-socketio = SocketIO(app, logger=True, engineio_logger=True,
+socketio = SocketIO(app,
+                    logger=True,
+                    engineio_logger=True,
                     async_mode='eventlet',
                     message_queue='redis://')
 
