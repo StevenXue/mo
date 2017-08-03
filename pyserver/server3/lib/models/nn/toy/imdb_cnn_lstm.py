@@ -1,10 +1,8 @@
 from keras.preprocessing import sequence
-from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation
 from keras.layers import Embedding
 from keras.layers import LSTM
 from keras.layers import Conv1D, MaxPooling1D
-from keras.datasets import imdb
 
 from keras.callbacks import LambdaCallback
 from server3.lib.models.keras_callbacks import MongoModelCheckpoint
