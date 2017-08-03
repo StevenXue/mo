@@ -1,13 +1,13 @@
 # -*- coding: UTF-8 -*-
 from server3.lib.models.keras_callbacks import MongoModelCheckpoint
 from server3.service import logger_service
+from server3.lib import Sequential
 from server3.lib import graph
 from keras.preprocessing.image import ImageDataGenerator
 from keras.layers import Activation, Dropout, Flatten, Dense
 from keras import backend as K
 from keras.callbacks import LambdaCallback
 from keras import applications
-from keras.models import Sequential
 from keras.models import Model
 import os
 
@@ -48,9 +48,9 @@ def image_classifier_inception_v3(conf, input, **kw):
 
     with graph.as_default():
         # load the inception_v3 network
-        base_model = applications.InceptionV3()nception_v3(weights='imagenet',
-                                               include_top=False,
-                                   input_shape=input_shape)
+        base_model = applications.InceptionV3(weights='imagenet',
+                                              include_top=False,
+                                              input_shape=input_shape)
 
         # build the top of cnn network
         top_model = Sequential()

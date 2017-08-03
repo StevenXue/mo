@@ -209,6 +209,7 @@ ACTIVATION = {
                   'linear']
     },
     'default': 'linear',
+    'required': True
 }
 
 INPUT_SHAPE = {
