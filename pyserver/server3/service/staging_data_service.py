@@ -218,10 +218,19 @@ def mongo_to_array(cursor, fields):
     :param fields:
     :return:
     """
-    arrays = [[c[field] for field in fields if field != '_id' and
-               field != 'staging_data_set'] for c in cursor]
+    arrays = convert_array(cursor, fields)
     arrays = np.array(arrays)
     return arrays
+
+
+def convert_array(data, columns):
+    data_array = []
+    for item in data:
+        temp = [data_utility.convert_string_to_number_with_poss(item[i])
+                for i in columns
+                if item[i] != '_id' and item[i] != 'staging_data_set']
+        data_array.append(temp)
+    return data_array
 
 
 def mongo_to_df(cursor):
@@ -243,12 +252,12 @@ def split_x_y(sds_id, x_fields, y_fields):
     :param y_fields:
     :return:
     """
-    x = staging_data_business.get_by_staging_data_set_and_fields(sds_id,
-                                                                 x_fields)
-    x = mongo_to_array(x, x_fields)
-    y = staging_data_business.get_by_staging_data_set_and_fields(sds_id,
-                                                                 y_fields)
-    y = mongo_to_array(y, y_fields)
+    data = staging_data_business. \
+        get_by_staging_data_set_and_fields(sds_id,
+                                           x_fields + y_fields,
+                                           allow_nan=False)
+    x = mongo_to_array(data, x_fields)
+    y = mongo_to_array(data, y_fields)
     return {'x': x, 'y': y}
 
 

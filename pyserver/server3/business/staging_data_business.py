@@ -119,7 +119,7 @@ def get_by_staging_data_set_id_limit(staging_data_set_id, limit):
                                                             limit)
 
 
-def get_by_staging_data_set_and_fields(staging_data_set_id, fields):
+def get_by_staging_data_set_and_fields(staging_data_set_id, fields, **kwargs):
     """
     Get specific fields of a staging_data_set
 
@@ -129,7 +129,8 @@ def get_by_staging_data_set_and_fields(staging_data_set_id, fields):
     """
     staging_data = StagingData(staging_data_set=staging_data_set_id)
     return staging_data_repo.read_by_staging_data_set_and_fields(staging_data,
-                                                                 fields)
+                                                                 fields,
+                                                                 **kwargs)
 
 
 def update_by_id(data_id, update_query):
