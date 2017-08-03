@@ -66,7 +66,7 @@ def image_classifier_xception(conf, input, **kw):
                           outputs=top_model(base_model.output))
             # set the first 25 layers (up to the last conv block)
             # to non-trainable (weights will not be updated)
-            for layer in model.layers[:21]:
+            for layer in model.layers[:-2]:
                 layer.trainable = False
 
             model.compile(loss='binary_crossentropy',
