@@ -443,7 +443,19 @@ def temp():
     #     models.KmeansCluster,
     #     {'type': 'DataFrame'}
     # ))
-
+    print(add_model_with_ownership(
+        'system',
+        False,
+        'Image CNN Classifier VGG16',
+        'Image CNN Classifier VGG16',
+        ModelType['folder_input'],
+        'server3/lib/models/nn/image_classifier_vgg16.py',
+        'image_cnn_classifier_vgg16',
+        'image_cnn_classifier_vgg16_to_str',
+        models.IMAGE_CNN_CLASSIFIER_VGG16,
+        {
+            'type': 'DataFrame'}
+    ))
 
 if __name__ == '__main__':
     pass
