@@ -9,12 +9,10 @@ Some configurations won't converge.
 from what you see with CNNs/MLPs/etc.
 '''
 from keras.preprocessing import sequence
-from keras.models import Sequential
-from keras.layers import Dense, Embedding
+from keras.layers import Embedding
 from keras.layers import LSTM
 from keras.callbacks import LambdaCallback
-from keras.layers import Dense, Dropout
-from keras.optimizers import RMSprop
+from keras.layers import Dense
 
 from server3.lib.models.keras_callbacks import MongoModelCheckpoint
 from server3.service import logger_service
