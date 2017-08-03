@@ -27,17 +27,19 @@ export default class ModelProcess extends React.Component {
   }
 
   componentDidMount(){
-    fetch(flaskServer + '/model/models/public', {
-      method: 'get',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then((response) => response.json())
-      .then((res) => {
+    if(this.props.isActive) {
+      fetch(flaskServer + '/model/models/public', {
+        method: 'get',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).then((response) => response.json())
+        .then((res) => {
           let dict = [];
           res.response.forEach((e) => dict.push({'name': e.name, '_id': e._id}));
           this.setState({models: dict});
-      });
+        });
+    }
     let s = [];
     this.props.cols.map((e) =>
       s.push({
@@ -52,16 +54,17 @@ export default class ModelProcess extends React.Component {
       let data_fields = []
       if(this.props.params['params']['fit']['data_fields']) {
         data_fields = this.props.params['params']['fit']['data_fields'];
-        if (data_fields.length === 2) {
-          this.setState({
-            selectedKeys: data_fields[0],
-            targetKeys: data_fields[1]
-          });
-        } else {
-          this.setState({
-            targetKeys: data_fields[0]
-          });
-        }
+        // if (data_fields.length === 2) {
+          if (data_fields[0] instanceof Array) {
+            this.setState({
+              selectedKeys: data_fields[0],
+              targetKeys: data_fields[1]
+            });
+          } else {
+            this.setState({
+              targetKeys: data_fields
+            });
+          }
       }
     }
   }
@@ -77,14 +80,15 @@ export default class ModelProcess extends React.Component {
       let data_fields = []
       if(nextProps.params['params']['fit']['data_fields']) {
         data_fields = nextProps.params['params']['fit']['data_fields'];
-        if (data_fields.length === 2) {
+        // if (data_fields.length === 2) {
+        if (data_fields[0] instanceof Array) {
           this.setState({
             selectedKeys: data_fields[0],
             targetKeys: data_fields[1]
           });
         } else {
           this.setState({
-            targetKeys: data_fields[0]
+            targetKeys: data_fields
           });
         }
       }
