@@ -388,6 +388,7 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
 
 
 def temp():
+    pass
     # print(add_model_with_ownership(
     #     'system',
     #     False,
@@ -408,48 +409,9 @@ def temp():
     #     'custom sdca model',
     #     ModelType['custom_supervised'],
     #     '/lib/models/svm',
-    #     'sdca_model_fn',
+    #     'svm_model_fn',
     #     'custom_model_to_str',
     #     models.SVM,
-    #     {'type': 'DataFrame'}
-    # ))
-    #
-    # print(add_model_with_ownership(
-    #     'system',
-    #     False,
-    #     'Kmeans Clustering',
-    #     'custom kmean model',
-    #     ModelType['unsupervised'],
-    #     '/lib/models/kmean',
-    #     'kmeans_clustering_model_fn',
-    #     'custom_model_to_str',
-    #     models.Kmeans,
-    #     {'type': 'DataFrame'}
-    # ))
-    #
-    # print(add_model_with_ownership(
-    #     'system',
-    #     False,
-    #     'Linear Classifier',
-    #     'custom linear classifier model',
-    #     ModelType['custom_supervised'],
-    #     '/lib/models/linear_classifier',
-    #     'linear_classifier_model_fn',
-    #     'custom_model_to_str',
-    #     models.LinearClassifier,
-    #     {'type': 'DataFrame'}
-    # ))
-    #
-    # print(add_model_with_ownership(
-    #     'system',
-    #     False,
-    #     'Linear Regression',
-    #     'custom linear regression model',
-    #     ModelType['custom_supervised'],
-    #     '/lib/models/linear_regression',
-    #     'linear_regression_model_fn',
-    #     'custom_model_to_str',
-    #     models.LinearRegression,
     #     {'type': 'DataFrame'}
     # ))
     #
@@ -465,7 +427,7 @@ def temp():
     #     models.MLP,
     #     {'type': 'ndarray', 'n': None}
     # ))
-
+    #
     # print(add_model_with_ownership(
     #     'system',
     #     False,
@@ -491,40 +453,30 @@ def temp():
     #     models.LinearRegressor,
     #     {'type': 'DataFrame'}
     # ))
+
     # print(add_model_with_ownership(
     #     'system',
     #     False,
-    #     'Image CNN Classifier',
-    #     'Image CNN Classifier',
-    #     ModelType['folder_input'],
-    #     'server3/lib/models/nn/image_cnn_classifier_vgg16.py',
-    #     'image_cnn_classifier',
-    #     'image_cnn_classifier_to_str',
-    #     models.IMAGE_CNN_CLASSIFIER,
+    #     'Linear Classifier',
+    #     'Custom linear classifier model',
+    #     ModelType['custom_supervised'],
+    #     'server3/lib/models/linear_classifier.py',
+    #     'linear_classifier_model_fn',
+    #     'custom_model_to_str',
+    #     models.LinearClassifier,
     #     {'type': 'DataFrame'}
     # ))
+
     # print(add_model_with_ownership(
     #     'system',
     #     False,
-    #     'Image Hierarchical RNN Classifier',
-    #     'Image Hierarchical RNN Classifier',
-    #     ModelType['folder_input'],
-    #     'server3/lib/models/nn/image_hierarchical_rnn_classifier.py',
-    #     'image_hierarchical_rnn_classifier',
-    #     'image_hierarchical_rnn_classifier_to_str',
-    #     models.IMAGE_HIERARCHICAL_RNN_CLASSIFIER,
-    #     {'type': 'DataFrame'}
-    # ))
-    # print(add_model_with_ownership(
-    #     'system',
-    #     False,
-    #     'Image MLP Classifier',
-    #     'Image MLP Classifier',
-    #     ModelType['folder_input'],
-    #     'server3/lib/models/nn/image_mlp_classifier.py',
-    #     'image_mlp_classifier',
-    #     'image_mlp_classifier_to_str',
-    #     models.IMAGE_MLP_CLASSIFIER,
+    #     'Kmeans Clustering',
+    #     'custom kmean model',
+    #     ModelType['unsupervised'],
+    #     'server3/lib/models/kmeans_cluster.py',
+    #     'kmeans_clustering_model_fn',
+    #     'custom_model_to_str',
+    #     models.KmeansCluster,
     #     {'type': 'DataFrame'}
     # ))
     print(add_model_with_ownership(
@@ -537,9 +489,9 @@ def temp():
         'image_cnn_classifier_vgg16',
         'image_cnn_classifier_vgg16_to_str',
         models.IMAGE_CNN_CLASSIFIER_VGG16,
-        {'type': 'DataFrame'}
+        {
+            'type': 'DataFrame'}
     ))
-
 
 if __name__ == '__main__':
     pass

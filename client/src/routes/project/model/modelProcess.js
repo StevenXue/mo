@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import { Button, message, Transfer, Input, Spin, Select, Card, Tag} from 'antd';
+
 import { flaskServer } from '../../../constants'
 import ModelForms from './modelForms';
-import ReactEcharts from 'echarts-for-react';
 
 export default class ModelProcess extends React.Component {
   constructor (props) {
@@ -49,16 +49,19 @@ export default class ModelProcess extends React.Component {
     this.setState({source: s});
     if(this.props.params){
       this.setState({modelName: this.props.params.model.name});
-      let data_fields = this.props.params['params']['fit']['data_fields']
-      if( data_fields.length === 2 ){
-        this.setState({
-          selectedKeys: data_fields[0],
-          targetKeys: data_fields[1]
-        });
-      }else{
-        this.setState({
-          targetKeys: data_fields[0]
-        });
+      let data_fields = []
+      if(this.props.params['params']['fit']['data_fields']) {
+        data_fields = this.props.params['params']['fit']['data_fields'];
+        if (data_fields.length === 2) {
+          this.setState({
+            selectedKeys: data_fields[0],
+            targetKeys: data_fields[1]
+          });
+        } else {
+          this.setState({
+            targetKeys: data_fields[0]
+          });
+        }
       }
     }
   }
@@ -71,16 +74,19 @@ export default class ModelProcess extends React.Component {
     });
     if(nextProps.params) {
       this.setState({modelName: nextProps.params.model.name});
-      let data_fields = nextProps.params['params']['fit']['data_fields']
-      if (data_fields.length === 2) {
-        this.setState({
-          selectedKeys: data_fields[0],
-          targetKeys: data_fields[1]
-        });
-      } else {
-        this.setState({
-          targetKeys: data_fields[0]
-        });
+      let data_fields = []
+      if(nextProps.params['params']['fit']['data_fields']) {
+        data_fields = nextProps.params['params']['fit']['data_fields'];
+        if (data_fields.length === 2) {
+          this.setState({
+            selectedKeys: data_fields[0],
+            targetKeys: data_fields[1]
+          });
+        } else {
+          this.setState({
+            targetKeys: data_fields[0]
+          });
+        }
       }
     }
   }
@@ -193,7 +199,7 @@ export default class ModelProcess extends React.Component {
                 <div>
                   <p>Input: </p>
                   {
-                    this.state.selectedKeys.map((e) =>
+                    this.state.selectedKeys && this.state.selectedKeys.map((e) =>
                       <Tag style={{margin: 5}} key={e}>
                         {e}
                       </Tag>
@@ -201,7 +207,7 @@ export default class ModelProcess extends React.Component {
                   }
                   <p>Onput: </p>
                   {
-                    this.state.targetKeys.map((e) =>
+                    this.state.targetKeys && this.state.targetKeys.map((e) =>
                       <Tag style={{margin: 5}} key={e}>
                         {e}
                       </Tag>

@@ -94,39 +94,32 @@ def upload_code():
 @toolkit_app.route('/toolkits/staging_data_set', methods=['POST'])
 def get_by_staging_data_set_and_fields():
     data = request.get_json()
-    fields = data.get('fields')
     staging_data_set_id = data.get('staging_data_set_id')
     toolkit_id = data.get('toolkit_id')
     project_id = data.get('project_id')
-    # 初始值为0
-    k = data.get('k')
-    # TODO 这里需要该，以后输入是一个conf，替代k
-    if k is not None:
-        # k = int(k)
-        try:
-            k = int(k)
-        except ValueError:
-            k = float(k)
+    conf = data.get('conf')
 
+    # conf初步操作
+    flag = isinstance(conf["data_fields"][0], (list, tuple))
+    x_fields = conf["data_fields"][0] if flag else conf["data_fields"]
+    y_fields = conf["data_fields"][1] if flag else None
+    fields = x_fields + y_fields if flag else x_fields
+    data = staging_data_business.get_by_staging_data_set_and_fields(ObjectId(staging_data_set_id), fields)
+
+    # 数据库转to_mongo和to_dict
+    data = [d.to_mongo().to_dict() for d in data]
+
+    # 拿到conf
+    fields = [x_fields, y_fields]
+    args = conf.get('args')
+
+    result = toolkit_service.convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
+                                                        fields, data, args)
+    result.update({"fields": [x_fields, y_fields]})
+    return jsonify({'response': json_utility.convert_to_json(result)}), 200
+
+    # 上线前需要改成try形式
     # try:
-    #     data = staging_data_business.get_by_staging_data_set_and_fields(
-    #         ObjectId(staging_data_set_id), fields)
-    #     data = [d.to_mongo().to_dict() for d in data]
-    #
-    #     result = toolkit_service.convert_json_and_calculate(project_id,
-    #                                                         staging_data_set_id,
-    #                                                         toolkit_id, fields,
-    #                                                         data, k)
-    #     # result.update({"fields": fields})
     # except Exception as e:
     #     return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
     # return jsonify({'response': json_utility.convert_to_json(result)}), 200
-    data = staging_data_business.get_by_staging_data_set_and_fields(
-        ObjectId(staging_data_set_id), fields)
-    data = [d.to_mongo().to_dict() for d in data]
-
-    result = toolkit_service.convert_json_and_calculate(project_id,
-                                                        staging_data_set_id,
-                                                        toolkit_id, fields,
-                                                        data, k)
-    return jsonify({'response': json_utility.convert_to_json(result)}), 200
