@@ -23,7 +23,6 @@ from server3.lib.models.linear_classifier import linear_classifier_model_fn
 from server3.lib.models.linear_classifier import LinearClassifier
 ## linear regressor
 from server3.lib.models.linear_regressor import linear_regressor_model_fn
-from server3.lib.models.linear_regressor import linear_regressor_to_str
 from server3.lib.models.mlp import MLP
 
 ## svm

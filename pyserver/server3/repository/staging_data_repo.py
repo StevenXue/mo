@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-
+import math
 from server3.repository.general_repo import Repo
 
 
@@ -12,9 +12,13 @@ class StagingDataRepo(Repo):
 
     def read_first_one_by_staging_data_set_id(self, staging_data_set_id):
         return Repo.read_first_one(self, {'staging_data_set':
-                                          staging_data_set_id})
+                                              staging_data_set_id})
 
-    def read_by_staging_data_set_and_fields(self, staging_data, fields):
-        return Repo.read(self, {'staging_data_set':
-                                staging_data.staging_data_set}).fields(
+    def read_by_staging_data_set_and_fields(self, staging_data, fields,
+                                            allow_nan=True):
+        query = {'staging_data_set': staging_data.staging_data_set}
+        if allow_nan is False:
+            for field in fields:
+                query.update({field: {'$ne': math.nan}})
+        return Repo.read(self, query).fields(
             **{field: 1 for field in fields}).exclude('id')

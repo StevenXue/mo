@@ -29,6 +29,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
 # 后端直接传输了，不一定要restful api
 # @toolkit_app.route('/analysis_calculate', methods=['POST'])
 # def analysis_calculate():
@@ -104,7 +105,8 @@ def get_by_staging_data_set_and_fields():
     x_fields = conf["data_fields"][0] if flag else conf["data_fields"]
     y_fields = conf["data_fields"][1] if flag else None
     fields = x_fields + y_fields if flag else x_fields
-    data = staging_data_business.get_by_staging_data_set_and_fields(ObjectId(staging_data_set_id), fields)
+    data = staging_data_business.get_by_staging_data_set_and_fields(
+        ObjectId(staging_data_set_id), fields)
 
     # 数据库转to_mongo和to_dict
     data = [d.to_mongo().to_dict() for d in data]
@@ -113,7 +115,9 @@ def get_by_staging_data_set_and_fields():
     fields = [x_fields, y_fields]
     args = conf.get('args')
 
-    result = toolkit_service.convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
+    result = toolkit_service.convert_json_and_calculate(project_id,
+                                                        staging_data_set_id,
+                                                        toolkit_id,
                                                         fields, data, args)
     result.update({"fields": [x_fields, y_fields]})
     return jsonify({'response': json_utility.convert_to_json(result)}), 200

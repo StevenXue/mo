@@ -58,23 +58,42 @@ def upload_file():
                                  400)
 
 
+# @file_app.route('/files', methods=['GET'])
+# def list_files_by_user_ID():
+#     user_ID = request.args.get('user_ID')
+#     if not user_ID:
+#         jsonify({'response': 'insufficient args'}), 400
+#     try:
+#         public_files, owned_files = file_service.list_files_by_user_ID(user_ID,
+#                                                                        -1)
+#         public_files = json_utility.me_obj_list_to_json_list(public_files)
+#         owned_files = json_utility.me_obj_list_to_json_list(owned_files)
+#         result = {
+#             'public_files': public_files,
+#             'owned_files': owned_files
+#         }
+#     except Exception as e:
+#         return make_response(jsonify({'response': '%s: %s' % (str(
+#             Exception), e.args)}), 400)
+#     return make_response(jsonify({'response': result}), 200)
+
+
 @file_app.route('/files', methods=['GET'])
 def list_files_by_user_ID():
     user_ID = request.args.get('user_ID')
+    extension = request.args.get('extension')
     if not user_ID:
         jsonify({'response': 'insufficient args'}), 400
-    try:
-        public_files, owned_files = file_service.list_files_by_user_ID(user_ID,
-                                                                       -1)
-        public_files = json_utility.me_obj_list_to_json_list(public_files)
-        owned_files = json_utility.me_obj_list_to_json_list(owned_files)
-        result = {
-            'public_files': public_files,
-            'owned_files': owned_files
-        }
-    except Exception as e:
-        return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}), 400)
+    public_files, owned_files = \
+        file_service.list_file_by_extension(user_ID,
+                                            extension=extension,
+                                            order=-1)
+    public_files = json_utility.me_obj_list_to_json_list(public_files)
+    owned_files = json_utility.me_obj_list_to_json_list(owned_files)
+    result = {
+        'public_files': public_files,
+        'owned_files': owned_files
+    }
     return make_response(jsonify({'response': result}), 200)
 
 
