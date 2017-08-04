@@ -248,7 +248,7 @@ def add_new_column(value, index, name, staging_data_set_id):
             else:
                 obj = dict(zip(name_list, arr))
             col_value.append(obj)
-        staging_data_business.add_many(ObjectId(staging_data_set_id), col_value)
+        staging_data_service.add_new_keys_value(staging_data_set_id, col_value)
 
 
 if __name__ == '__main__':
