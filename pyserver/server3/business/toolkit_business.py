@@ -82,7 +82,8 @@ def create_public_toolkit():
                           {
                               "name": "average",
                               "des": "所选范围的样本的平均值",
-                              "if_add_column": False
+                              "if_add_column": False,
+                              "attribute": "value"
                           }
                       ]
                   })
@@ -116,7 +117,8 @@ def create_public_toolkit():
                              {
                                  "name": "median",
                                  "des": "所选范围的样本的中位数",
-                                 "if_add_column": False
+                                 "if_add_column": False,
+                                 "attribute": "value"
                              }
                          ]
                      })
@@ -150,12 +152,14 @@ def create_public_toolkit():
                            {
                                "name": "mode",
                                "des": "所选范围的样本的众数",
-                               "if_add_column": False
+                               "if_add_column": False,
+                               "attribute": "value"
                            },
                            {
                                "name": "number",
                                "des": "众数的个数",
-                               "if_add_column": False
+                               "if_add_column": False,
+                               "attribute": "value"
                            }
                        ]
                    })
@@ -202,7 +206,8 @@ def create_public_toolkit():
                           {
                               "name": "simple moving average",
                               "des": "所选范围的样本的移动平均值",
-                              "if_add_column": False
+                              "if_add_column": False,
+                              "attribute": "value"
                           }
                       ]
                   })
@@ -236,7 +241,8 @@ def create_public_toolkit():
                             {
                                 "name": "range",
                                 "des": "所选范围的样本的全距(即数据的范围)",
-                                "if_add_column": False
+                                "if_add_column": False,
+                                "attribute": "value"
                             }
                         ]
                     })
@@ -270,7 +276,8 @@ def create_public_toolkit():
                           {
                               "name": "std",
                               "des": "所选范围的样本的标准差",
-                              "if_add_column": False
+                              "if_add_column": False,
+                              "attribute": "value"
                           }
                       ]
                   })
@@ -305,7 +312,8 @@ def create_public_toolkit():
                           {
                               "name": "variance",
                               "des": "所选范围的样本的方差",
-                              "if_add_column": False
+                              "if_add_column": False,
+                              "attribute": "value"
                           }
                       ]
                   })
@@ -340,7 +348,8 @@ def create_public_toolkit():
                               {
                                   "name": "pearson",
                                   "des": "所选范围的样本的皮尔森相关系数",
-                                  "if_add_column": False
+                                  "if_add_column": False,
+                                  "attribute": "value"
                               }
                           ]
                       })
@@ -448,6 +457,17 @@ def create_public_toolkit():
                               'required': True
                           }
                       ]
+                  },
+                  result_spec={
+                      "if_reserved": True,
+                      "args": [
+                          {
+                              "name": "降维结果",
+                              "des": "所选范围的样本的降维后的结果",
+                              "if_add_column": True,
+                              "attribute": "value"
+                          }
+                      ]
                   })
     PCA = toolkit_repo.create(PCA)
     ownership_business.add(user, False, toolkit=PCA)
@@ -484,6 +504,17 @@ def create_public_toolkit():
                                'required': True
                            }
                        ]
+                   },
+                   result_spec={
+                       "if_reserved": True,
+                       "args": [
+                           {
+                               "name": "降维结果",
+                               "des": "所选范围的样本的降维后的结果",
+                               "if_add_column": True,
+                               "attribute": "value"
+                           }
+                       ]
                    })
     TSNE = toolkit_repo.create(TSNE)
     ownership_business.add(user, False, toolkit=TSNE)
@@ -515,7 +546,8 @@ def create_public_toolkit():
                         {
                             "name": "number",
                             "des": "所选范围的样本个数",
-                            "if_add_column": False
+                            "if_add_column": False,
+                            "attribute": "value"
                         }
                     ]
                 })
@@ -549,7 +581,8 @@ def create_public_toolkit():
                           {
                               "name": "四分位距",
                               "des": "所选范围的样本死分数",
-                              "if_add_column": False
+                              "if_add_column": False,
+                              "attribute": "value"
                           }
                       ]
                   })
@@ -583,7 +616,8 @@ def create_public_toolkit():
                          {
                              "name": "cv",
                              "des": "所选范围的样本的变异系数",
-                             "if_add_column": False
+                             "if_add_column": False,
+                             "attribute": "value"
                          }
                      ]
                  })
@@ -617,7 +651,8 @@ def create_public_toolkit():
                           {
                               "name": "max",
                               "des": "所选范围的样本的最大值",
-                              "if_add_column": False
+                              "if_add_column": False,
+                              "attribute": "value"
                           }
                       ]
                   })
@@ -651,7 +686,8 @@ def create_public_toolkit():
                           {
                               "name": "min",
                               "des": "所选范围的样本的最小值",
-                              "if_add_column": False
+                              "if_add_column": False,
+                              "attribute": "value"
                           }
                       ]
                   })
@@ -696,7 +732,8 @@ def create_public_toolkit():
                                   {
                                       "name": "correlation",
                                       "des": "所选范围的样本的互相关系数",
-                                      "if_add_column": False
+                                      "if_add_column": False,
+                                      "attribute": "value"
                                   }
                               ]
                           })
@@ -731,7 +768,8 @@ def create_public_toolkit():
                           {
                               "name": "cov",
                               "des": "所选范围的样本协方差",
-                              "if_add_column": False
+                              "if_add_column": False,
+                              "attribute": "value"
                           }
                       ]
                   })
