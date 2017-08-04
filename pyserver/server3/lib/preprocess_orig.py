@@ -166,7 +166,7 @@ def select_from_model_lr(arr0, target, index, threthold=0.1):
     indx = temp._get_support_mask().tolist()
     scores = get_importance(temp.estimator_).tolist()
     # threthold = temp.threshold_
-    result = data_utility.retrieve_nan_index(temp.trantolist(), index)
+    result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
     return scores, indx, result
 
 
@@ -183,20 +183,10 @@ def select_from_model_gbdt(arr0, target, index, k):
     return scores, indx, result
 
 
-# 降维-主成分分析法（PCA）
-# 主成分分析法，返回降维后的数据
-# 参数n_components为主成分数目
-def decomposition_pca(arr0, index, n_features):
-    matrix = np.array(arr0)
-    temp = decomposition.PCA(n_components=n_components).fit_transform(matrix)
-    result = data_utility.retrieve_nan_index(temp.tolist(), index)
-    return result
-
-
 # 降维-线性判别分析法（LDA）
 # 线性判别分析法，返回降维后的数据
 # 参数n_components为降维后的维数
-def lda(arr0, target, index, n_features):
+def lda(arr0, target, index, n_components):
     from sklearn.lda import LDA
     matrix = np.array(arr0)
     target = np.array(target)
