@@ -40,8 +40,8 @@ def image_classifier_resnet50(conf, input, **kw):
                         'different folder')
 
     # dimensions of our images.
-    # use 150, 150 as default
-    img_width, img_height = 150, 150
+    # use 224, 224 as default
+    img_width, img_height = 224, 224
 
     if K.image_data_format() == 'channels_first':
         input_shape = (3, img_width, img_height)

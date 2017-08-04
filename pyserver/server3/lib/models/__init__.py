@@ -29,6 +29,17 @@ from server3.lib.models.mlp import MLP
 from server3.lib.models.svm import SVM
 from server3.lib.models.svm import svm_model_fn
 
+## randomforest
+from server3.lib.models.randomforest import RandomForest
+from server3.lib.models.randomforest import random_forest_model_fn
+
+## logistic regressor
+from server3.lib.models.logistic_regressor import LogisticRegressor
+from server3.lib.models.logistic_regressor import logistic_regressor_model_fn
+
+## gmm cluster
+from server3.lib.models.gmm_cluster import GMMCluster
+from server3.lib.models.gmm_cluster import gmm_cluster_model_fn
 
 # mlp
 from server3.lib.models.mlp import mlp
