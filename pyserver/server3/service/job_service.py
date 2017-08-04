@@ -46,11 +46,16 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
             # create a job
             staging_data_set_obj = staging_data_set_business.get_by_id(staging_data_set_id)
             project_obj = project_business.get_by_id(project_id)
-
+            job_spec = {
+                "fields": {
+                    "source": fields[0],
+                    "target": fields[1]},
+                "params": kw
+            }
             job_obj = job_business.add_toolkit_job(toolkit_obj,
                                                    staging_data_set_obj,
                                                    project_obj,
-                                                   *fields)
+                                                   **job_spec)
             # update a project
             project_service.add_job_to_project(job_obj, ObjectId(project_id))
 
