@@ -157,7 +157,7 @@ def dimension_reduction_PCA(arr0, index, n_components='mle'):
     matrix = np.array(arr0)
     svd_solver = 'auto'
     pca = PCA(n_components=n_components, svd_solver=svd_solver).fit(matrix)
-    result = pca.fit_transform(matrix)
+    result = pca.transform(matrix)
     label = data_utility.retrieve_nan_index(result.tolist(), index)
     return label, pca.components_.tolist(), pca.explained_variance_.tolist(), pca.explained_variance_ratio_.tolist(), pca.mean_.tolist(), pca.noise_variance_
 
