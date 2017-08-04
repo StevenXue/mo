@@ -38,6 +38,6 @@ class Job(Document):
     fields = ListField()
     create_time = DateTimeField(required=True)
     updated_time = DateTimeField()
-    project = ReferenceField('Project', reverse_delete_rule=CASCADE)
+    project = ReferenceField('Project')
     params = DictField()
     file = ReferenceField('File')
