@@ -68,9 +68,9 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 if arg["if_add_column"]:
                     strr = "%s_%s_col" % (arg["name"], toolkit_obj.name)
                     add_new_column(value, args[-1], strr, staging_data_set_id)
-                if arg["attribute"] == "label":
+                if hasattr(arg, "attribute") and arg["attribute"] == "label":
                     labels = value
-                elif arg["attribute"] == "general_info":
+                elif hasattr(arg, "attribute") and arg["attribute"] == "general_info":
                     gen_info.update({arg["name"]: value})
 
             if toolkit_obj.category == 0:
@@ -116,7 +116,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                                                                type='result')
                 logger_service.save_result(result_sds_obj, **{"result": results})
                 logger_service.save_result(result_sds_obj, **{"visualization": json})
-                return {"visual_sds_id": str(result_sds_obj.id), "result": results}
+                return {"visual_sds_id": str(result_sds_obj.id) if json else None,
+                        "result": results}
 
             return {"result": results}
         return wrapper
