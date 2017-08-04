@@ -73,9 +73,9 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 if arg["if_add_column"]:
                     strr = "%s_%s_col" % (arg["name"], toolkit_obj.name)
                     add_new_column(value, args[-1], strr, staging_data_set_id)
-                if hasattr(arg, "attribute") and arg["attribute"] == "label":
+                if arg.get("attribute", False) and arg["attribute"] == "label":
                     labels = value
-                elif hasattr(arg, "attribute") and arg["attribute"] == "general_info":
+                elif arg.get("attribute", False) and arg["attribute"] == "general_info":
                     gen_info.update({arg["name"]: value})
 
             if toolkit_obj.category == 0:
@@ -248,7 +248,7 @@ def add_new_column(value, index, name, staging_data_set_id):
             else:
                 obj = dict(zip(name_list, arr))
             col_value.append(obj)
-        staging_data_business.add_many(ObjectId(staging_data_set_id), name, col_value)
+        staging_data_business.add_many(ObjectId(staging_data_set_id), col_value)
 
 
 if __name__ == '__main__':
