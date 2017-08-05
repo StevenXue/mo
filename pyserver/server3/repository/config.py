@@ -20,11 +20,16 @@ config_url = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 
 config.read(config_url, encoding='utf-8')
 
-mongo = 'DEFAULT'
+# mongo = 'DEFAULT'
+mongo = 'EXTERNAL'
 
 
 def get_mongo_host():
     return config.get(mongo, 'HOST')
+
+
+def get_mongo_port():
+    return int(config.get(mongo, 'PORT'))
 
 
 def get_mongo_user():

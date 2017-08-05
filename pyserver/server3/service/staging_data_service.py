@@ -239,8 +239,9 @@ def mongo_to_df(cursor):
     :param cursor:
     :return:
     """
+    print(cursor)
     cursor = json_utility.me_obj_list_to_dict_list(cursor)
-    return pd.DataFrame.from_records(cursor, exclude=['_id'])
+    return pd.DataFrame.from_records(cursor)
 
 
 def split_x_y(sds_id, x_fields, y_fields):
