@@ -69,7 +69,7 @@ def convert_string_to_number_with_poss(s):
     :param s: input string
     :return: np.nan(not a number), int or float, or string
     """
-    if s == "":
+    if s == "" or s != s:
         return np.nan
     else:
         try:

@@ -19,6 +19,7 @@ from server3.business import toolkit_business
 from server3.business import job_business
 from server3.business import result_business
 from server3.business import project_business
+from server3.business import staging_data_business
 from server3.business import staging_data_set_business
 from server3.service import staging_data_service
 from server3.service import logger_service
@@ -45,16 +46,23 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
             # create a job
             staging_data_set_obj = staging_data_set_business.get_by_id(staging_data_set_id)
             project_obj = project_business.get_by_id(project_id)
-
+            job_spec = {
+                "fields": {
+                    "source": fields[0],
+                    "target": fields[1]},
+                "params": kw
+            }
             job_obj = job_business.add_toolkit_job(toolkit_obj,
                                                    staging_data_set_obj,
                                                    project_obj,
-                                                   *fields)
+                                                   **job_spec)
             # update a project
             project_service.add_job_to_project(job_obj, ObjectId(project_id))
 
             # calculate
-            result = list(func(*args, **kw))
+            func_rst = func(*args, **kw)
+            result = list(func_rst) if isinstance(func_rst, tuple) else [func_rst]
+
             # 新设计的存取方式
             results = {"fields": fields}
             gen_info = {}
@@ -63,18 +71,15 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 value = result.pop(0)
                 results.update({arg["name"]: value})
                 if arg["if_add_column"]:
-                    # if len(value[0]) == 1:
-                    #     strr = "%s_%s_col" % (arg["name"], toolkit_obj.name)
-                    #     staging_data_service.add_new_key_value(staging_data_set_id, strr, value)
-                    # else:
-                    print('value', value)
-                if arg["attribute"] == "label":
+                    strr = "%s_%s_col" % (arg["name"], toolkit_obj.name)
+                    add_new_column(value, args[-1], strr, staging_data_set_id)
+                if arg.get("attribute", False) and arg["attribute"] == "label":
                     labels = value
-                elif arg["attribute"] == "general_info":
+                elif arg.get("attribute", False) and arg["attribute"] == "general_info":
                     gen_info.update({arg["name"]: value})
 
             if toolkit_obj.category == 0:
-                json = {"scatter": data_utility.retrieve_nan_index(args[0], args[1]), "labels": labels,
+                json = {"scatter": data_utility.retrieve_nan_index(args[0], args[-1]), "labels": labels,
                         "pie": [{'text': el, 'value': labels.count(el)} for el in set(labels)],
                         "centers": results["Centroids of Clusters"],
                         "general_info": gen_info,
@@ -116,7 +121,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                                                                type='result')
                 logger_service.save_result(result_sds_obj, **{"result": results})
                 logger_service.save_result(result_sds_obj, **{"visualization": json})
-                return {"visual_sds_id": str(result_sds_obj.id), "result": results}
+                return {"visual_sds_id": str(result_sds_obj.id) if json else None,
+                        "result": results}
 
             return {"result": results}
         return wrapper
@@ -221,6 +227,28 @@ def run_code(conf, project_id, staging_data_set_id, model, f, *args, **kwargs):
 def list_by_project_id(project_id):
     project = project_business.get_by_id(project_id)
     return job_business.get_by_project(project)
+
+
+def add_new_column(value, index, name, staging_data_set_id):
+    inn = 0
+    while inn in index:
+        inn = inn + 1
+    if not isinstance(value[inn], list):
+        staging_data_service.add_new_key_value(staging_data_set_id, name, value)
+    else:
+        length = len(value[inn])
+        name_list = []
+        col_value = []
+        for i in range(length):
+             name_list.append(name + str(i))
+        for arr in value:
+            if arr != arr:
+                rows = [arr]*length
+                obj = dict(zip(name_list, rows))
+            else:
+                obj = dict(zip(name_list, arr))
+            col_value.append(obj)
+        staging_data_service.add_new_keys_value(staging_data_set_id, col_value)
 
 
 if __name__ == '__main__':

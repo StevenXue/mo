@@ -114,7 +114,6 @@ def get_by_staging_data_set_and_fields():
     # 拿到conf
     fields = [x_fields, y_fields]
     args = conf.get('args')
-
     result = toolkit_service.convert_json_and_calculate(project_id,
                                                         staging_data_set_id,
                                                         toolkit_id,

@@ -391,18 +391,18 @@ def manage_folder_input_to_str(conf, file_id, **kwargs):
 
 def temp():
     pass
-    print(add_model_with_ownership(
-        'system',
-        False,
-        'General Neural Network',
-        'keras_seq from keras',
-        ModelType['neural_network'],
-        'server3/lib/models/keras_seq',
-        'keras_seq',
-        'keras_seq_to_str',
-        models.KERAS_SEQ_SPEC,
-        {'type': 'ndarray', 'n': None}
-    ))
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'General Neural Network',
+    #     'keras_seq from keras',
+    #     ModelType['neural_network'],
+    #     '/lib/models/keras_seq',
+    #     'keras_seq',
+    #     'keras_seq_to_str',
+    #     models.KERAS_SEQ_SPEC,
+    #     {'type': 'ndarray', 'n': None}
+    # ))
     #
     # print(add_model_with_ownership(
     #     'system',
@@ -410,7 +410,7 @@ def temp():
     #     'SVM',
     #     'custom sdca model',
     #     ModelType['custom_supervised'],
-    #     'server3/lib/models/svm',
+    #     '/lib/models/svm',
     #     'svm_model_fn',
     #     'custom_model_to_str',
     #     models.SVM,
@@ -423,7 +423,7 @@ def temp():
     #     'Multilayer Perceptron',
     #     'Multilayer Perceptron (MLP) for multi-class softmax classification',
     #     ModelType['neural_network'],
-    #     'server3/lib/models/mlp',
+    #     '/lib/models/mlp',
     #     'mlp',
     #     'mlp_to_str',
     #     models.MLP,
@@ -437,7 +437,7 @@ def temp():
     #     'Training a small convnet from scratch: 80% accuracy in 40 lines '
     #     'of code',
     #     ModelType['folder_input'],
-    #     'server3/lib/models/image_classifier',
+    #     '/lib/models/image_classifier',
     #     'image_classifier',
     #     'image_classifier_to_str',
     #     models.IMAGE_CLASSIFIER,
@@ -484,16 +484,109 @@ def temp():
     # print(add_model_with_ownership(
     #     'system',
     #     False,
-    #     'Image CNN Classifier VGG16',
-    #     'Image CNN Classifier VGG16',
+    #     'Image Classifier VGG16',
+    #     'Image Classifier VGG16',
     #     ModelType['folder_input'],
     #     'server3/lib/models/nn/image_classifier_vgg16.py',
-    #     'image_cnn_classifier_vgg16',
-    #     'image_cnn_classifier_vgg16_to_str',
-    #     models.IMAGE_CNN_CLASSIFIER_VGG16,
+    #     'image_classifier_vgg16',
+    #     'image_classifier_vgg16_to_str',
+    #     models.IMAGE_CLASSIFIER_VGG16,
     #     {
     #         'type': 'DataFrame'}
     # ))
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Image Classifier VGG19',
+    #     'Image Classifier VGG19',
+    #     ModelType['folder_input'],
+    #     'server3/lib/models/nn/image_classifier_vgg19.py',
+    #     'image_classifier_vgg19',
+    #     'image_classifier_vgg19_to_str',
+    #     models.IMAGE_CLASSIFIER_VGG19,
+    #     {
+    #         'type': 'DataFrame'}
+    # ))
+
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Image Classifier ResNet50',
+    #     'Image Classifier ResNet50',
+    #     ModelType['folder_input'],
+    #     'server3/lib/models/nn/image_classifier_resnet50.py',
+    #     'image_classifier_resnet50',
+    #     'image_classifier_resnet50_to_str',
+    #     models.IMAGE_CLASSIFIER_RESNET50,
+    #     {
+    #         'type': 'DataFrame'}
+    # ))
+    #
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Image Classifier Inception V3',
+    #     'Image Classifier Inception V3',
+    #     ModelType['folder_input'],
+    #     'server3/lib/models/nn/image_classifier_inception_v3.py',
+    #     'image_classifier_inception_v3',
+    #     'image_classifier_inception_v3_to_str',
+    #     models.IMAGE_CLASSIFIER_INCEPTION_V3,
+    #     {
+    #         'type': 'DataFrame'}
+    # ))
+    #
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Image Classifier Xception',
+    #     'Image Classifier Xception',
+    #     ModelType['folder_input'],
+    #     'server3/lib/models/nn/image_classifier_xception.py',
+    #     'image_classifier_xception',
+    #     'image_classifier_xception_to_str',
+    #     models.IMAGE_CLASSIFIER_XCEPTION,
+    #     {
+    #         'type': 'DataFrame'}
+    # ))
+    print(add_model_with_ownership(
+        'system',
+        False,
+        'Random Forest',
+        'custom Random Forest model',
+        ModelType['custom_supervised'],
+        '/lib/models/randomforest.py',
+        'randomforest_model_fn',
+        'custom_model_to_str',
+        models.RandomForest,
+        {'type': 'DataFrame'}
+    ))
+
+    print(add_model_with_ownership(
+        'system',
+        False,
+        'Logistic Regressor',
+        'custom Logistic Regressor model',
+        ModelType['custom_supervised'],
+        '/lib/models/logistic_regressor.py',
+        'logistic_regressor_model_fn',
+        'custom_model_to_str',
+        models.LogisticRegressor,
+        {'type': 'DataFrame'}
+    ))
+
+    print(add_model_with_ownership(
+        'system',
+        False,
+        'Gaussian Mixture Model',
+        'custom GMM model',
+        ModelType['unsupervised'],
+        '/lib/models/gmm_cluster.py',
+        'gmm_cluster_model_fn',
+        'custom_model_to_str',
+        models.GMMCluster,
+        {'type': 'DataFrame'}
+    ))
 
 
 if __name__ == '__main__':

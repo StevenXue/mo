@@ -35,7 +35,7 @@ class Job(Document):
     toolkit = ReferenceField('Toolkit')
     staging_data_set = ReferenceField('StagingDataSet')
     status = IntField(choices=STATUS, required=True)
-    fields = ListField()
+    fields = DictField()
     create_time = DateTimeField(required=True)
     updated_time = DateTimeField()
     project = ReferenceField('Project')
