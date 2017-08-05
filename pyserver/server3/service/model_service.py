@@ -130,7 +130,8 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
     elif model['category'] == ModelType['folder_input']:
         # input from folder
         f = getattr(models, model.entry_function)
-        input_dict = model_input_manager_folder_input(conf, data_source_id, **kwargs)
+        input_dict = model_input_manager_folder_input(conf, data_source_id,
+                                                      **kwargs)
         return job_service.run_code(conf, project_id, None,
                                     model, f, input_dict,
                                     file_id=data_source_id)
@@ -224,21 +225,21 @@ def model_input_manager_custom_supervised(data_fields, data_source_id,
                                           model_name):
     def is_array_and_not_empty(x):
         return isinstance(x, list) and len(x) > 0
+
     # to data frame
     if not is_array_and_not_empty(
             data_fields[0]) or not is_array_and_not_empty(
-            data_fields[1]):
+        data_fields[1]):
         raise ValueError('fields array empty')
 
-    x_cursor = staging_data_business. \
-        get_by_staging_data_set_id_limited_fields(data_source_id,
-                                                  data_fields[0])
-    y_cursor = staging_data_business. \
-        get_by_staging_data_set_id_limited_fields(data_source_id,
-                                                  data_fields[1])
-
-    df_x = staging_data_service.mongo_to_df(x_cursor)
-    df_y = staging_data_service.mongo_to_df(y_cursor)
+    data = staging_data_business. \
+        get_by_staging_data_set_and_fields(data_source_id,
+                                           data_fields[0] +
+                                           data_fields[1],
+                                           allow_nan=False)
+    data = staging_data_service.mongo_to_df(data)
+    df_x = data[data_fields[0]]
+    df_y = data[data_fields[1]]
     return {
         'model_name': model_name,
         'df_features': df_x,
@@ -249,12 +250,14 @@ def model_input_manager_custom_supervised(data_fields, data_source_id,
 def model_input_manager_unsupervised(x_cols, data_source_id, model_name):
     def is_array_and_not_empty(x):
         return isinstance(x, list) and len(x) > 0
+
     # to data frame
     if not is_array_and_not_empty(x_cols):
         raise ValueError('field list empty')
     train_cursor = staging_data_business. \
-        get_by_staging_data_set_id_limited_fields(data_source_id,
-                                                  x_cols)
+        get_by_staging_data_set_and_fields(data_source_id,
+                                           x_cols,
+                                           allow_nan=False)
     df_x = staging_data_service.mongo_to_df(train_cursor)
     return {
         'model_name': model_name,
@@ -491,6 +494,7 @@ def temp():
     #     {
     #         'type': 'DataFrame'}
     # ))
+
 
 if __name__ == '__main__':
     pass

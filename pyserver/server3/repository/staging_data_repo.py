@@ -14,11 +14,13 @@ class StagingDataRepo(Repo):
         return Repo.read_first_one(self, {'staging_data_set':
                                               staging_data_set_id})
 
-    def read_by_staging_data_set_and_fields(self, staging_data, fields,
+    def read_by_staging_data_set_and_fields(self, staging_data_set_id, fields,
                                             allow_nan=True):
-        query = {'staging_data_set': staging_data.staging_data_set}
+        query = {'staging_data_set': staging_data_set_id}
         if allow_nan is False:
             for field in fields:
+                # FIXME when field is integer in string will cause error
                 query.update({field: {'$ne': math.nan}})
+        # print(query)
         return Repo.read(self, query).fields(
             **{field: 1 for field in fields}).exclude('id')
