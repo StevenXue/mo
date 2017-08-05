@@ -144,11 +144,11 @@ def select_k_best_mic(arr0, target, index, k):
 # 递归特征消除法，返回特征选择后的数据
 # 参数estimator为基模型
 # 参数n_features_to_select为选择的特征个数
-def ref(arr0, target, index, k):
+def ref(arr0, target, index, n_features):
     from sklearn.linear_model import LogisticRegression
     matrix = np.array(arr0)
     target = np.array(target)
-    temp = feature_selection.RFE(estimator=LogisticRegression(), n_features_to_select=k).fit(matrix, target)
+    temp = feature_selection.RFE(estimator=LogisticRegression(), n_features_to_select=n_features).fit(matrix, target)
     scores = temp.ranking_.tolist()
     indx = temp.support_.tolist()
     result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
