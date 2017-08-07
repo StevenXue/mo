@@ -72,7 +72,6 @@ export default class ModelForms extends React.Component {
 
     if(this.props.params){
       this.setState({end: true});
-      console.log(this.state.params);
     }
 
   }
@@ -92,13 +91,20 @@ export default class ModelForms extends React.Component {
 
   addLayer(){
     let s = this.state.layerStack;
-    s.push(s.length);
+    if(s.length === 0) {
+      s.push(0)
+    }else{
+      s.push(s[s.length - 1] + 1);
+    }
+    console.log(s);
     this.setState({layerStack: s});
   }
 
   getParams(index, value) {
     let layer = this.state.layerParams;
+    value['index'] = index;
     layer[index] = value;
+    console.log(value);
     this.setState({layerParams: layer});
   }
 
@@ -170,50 +176,50 @@ export default class ModelForms extends React.Component {
 
   onClickRun(){
     let run_params = this.constructParams();
-    //let complete = this.checkParams(run_params);
-    if(this.props.jupyter){
-      fetch(flaskServer + '/model/models/to_code/' + this.props.model_id, {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          conf: run_params,
-          project_id: this.props.project_id,
-          staging_data_set_id: this.props.dataset_id,
-          schema: "seq"
-        })
-      }).then((response) => response.json())
-        .then((res) => {
-          this.setState({visible: false});
-          this.props.getCode(res.response);
-        })
-    }else{
-      this.setState({visible: true});
-      if(!this.state.end){
-        fetch(flaskServer + '/model/models/run/' + this.props.model_id, {
-          method: 'post',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            conf: run_params,
-            project_id: this.props.project_id,
-            staging_data_set_id: this.props.dataset_id,
-            schema: "seq"
-          })
-        }).then((response) => response.json())
-          .then((res) => {
-            if (res.response === 'success') {
-              message.success(res.response);
-              this.setState({score: res.response.score});
-            }
-            this.props.modalSuccess();
-            this.setState({end: true})
-            // setTimeout(this.setState({end: true}),2000);
-          })
-      }
-    }
+    console.log(run_params);
+    // if(this.props.jupyter){
+    //   fetch(flaskServer + '/model/models/to_code/' + this.props.model_id, {
+    //     method: 'post',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({
+    //       conf: run_params,
+    //       project_id: this.props.project_id,
+    //       staging_data_set_id: this.props.dataset_id,
+    //       schema: "seq"
+    //     })
+    //   }).then((response) => response.json())
+    //     .then((res) => {
+    //       this.setState({visible: false});
+    //       this.props.getCode(res.response);
+    //     })
+    // }else{
+    //   this.setState({visible: true});
+    //   if(!this.state.end){
+    //     fetch(flaskServer + '/model/models/run/' + this.props.model_id, {
+    //       method: 'post',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify({
+    //         conf: run_params,
+    //         project_id: this.props.project_id,
+    //         staging_data_set_id: this.props.dataset_id,
+    //         schema: "seq"
+    //       })
+    //     }).then((response) => response.json())
+    //       .then((res) => {
+    //         if (res.response === 'success') {
+    //           message.success(res.response);
+    //           this.setState({score: res.response.score});
+    //         }
+    //         this.props.modalSuccess();
+    //         this.setState({end: true})
+    //         // setTimeout(this.setState({end: true}),2000);
+    //       })
+    //   }
+    // }
 
   }
 
@@ -221,6 +227,16 @@ export default class ModelForms extends React.Component {
     let customParams = this.state.customParams;
     customParams[field] = value;
     this.setState({customParams});
+  }
+
+  onDeleteLayer(i){
+    let layerStack = this.state.layerStack;
+    let layerParams = this.state.layerParams;
+    console.log(layerStack, layerParams);
+    layerStack = layerStack.filter((el) => el!== i);
+    layerParams = layerParams.filter((el) => el.index !== i);
+    console.log(layerStack, layerParams);
+    this.setState({layerStack, layerParams});
   }
 
   renderLayers() {
@@ -248,8 +264,13 @@ export default class ModelForms extends React.Component {
             this.state.layer &&
             <div>
               {this.state.layerStack.map((el) =>
-                <Layer layers={this.state.layer} key={el} isActive={this.state.isActive}
+                <div key={el} style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                  <Icon type="close" style={{ fontSize: 10, color: '#CC241C' }} onClick={() => this.onDeleteLayer(el)} />
+                  <div style={{width: '90%', marginLeft: 5}}>
+                  <Layer layers={this.state.layer} isActive={this.state.isActive}
                        getParams={(value) => this.getParams(el, value)}/>
+                  </div>
+                </div>
               )}
               {this.state.isActive &&
               <Button style={{marginTop: 10}} size="small" onClick={() => this.addLayer()}>Add Layer</Button>

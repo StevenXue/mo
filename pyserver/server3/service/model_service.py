@@ -84,53 +84,6 @@ def split_categorical_and_continuous(df, exclude_cols):
     return continuous_cols, categorical_cols
 
 
-def run_model(conf, project_id, data_source_id, model_id, **kwargs):
-    """
-    run model by model_id and the parameter config
-
-    :param conf:
-    :param project_id:
-    :param data_source_id:
-    :param model_id:
-    :param kwargs:
-    :return:
-    """
-    model = model_business.get_by_model_id(model_id)
-    # import model function
-    if model['category'] == ModelType['neural_network']:
-        # keras nn
-        f = getattr(models, model.entry_function)
-        input_dict = manage_nn_input(conf, data_source_id, **kwargs)
-        return job_service.run_code(conf, project_id, data_source_id,
-                                    model, f, input_dict)
-    elif model['category'] == ModelType['folder_input']:
-        # input from folder
-        f = getattr(models, model.entry_function)
-        input_dict = model_input_manager3(conf, data_source_id, **kwargs)
-        return job_service.run_code(conf, project_id, None,
-                                    model, f, input_dict,
-                                    file_id=data_source_id)
-    else:
-        # custom models
-        f = models.custom_model
-        model_fn = getattr(models, model.entry_function)
-        fit = conf.get('fit', None)
-        if model['category'] == ModelType['custom_supervised']:
-            data_fields = fit.get('data_fields', [[], []])
-            input_dict = model_input_manager_custom_supervised(data_fields,
-                                                               data_source_id,
-                                                               model.name)
-            return job_service.run_code(conf, project_id, data_source_id,
-                                        model, f, model_fn, input_dict)
-        if model['category'] == ModelType['unsupervised']:
-            x_cols = fit.get('data_fields', [])
-            input_dict = model_input_manager_unsupervised(x_cols,
-                                                          data_source_id,
-                                                          model.name)
-            return job_service.run_code(conf, project_id, data_source_id,
-                                        model, f, model_fn, input_dict)
-
-
 def run_multiple_model(conf, project_id, staging_data_set_id, model_id,
                        hyper_parameters=None,
                        **kwargs):
@@ -155,6 +108,54 @@ def run_multiple_model(conf, project_id, staging_data_set_id, model_id,
     return result
 
 
+def run_model(conf, project_id, data_source_id, model_id, **kwargs):
+    """
+    run model by model_id and the parameter config
+
+    :param conf:
+    :param project_id:
+    :param data_source_id:
+    :param model_id:
+    :param kwargs:
+    :return:
+    """
+    model = model_business.get_by_model_id(model_id)
+    # import model function
+    if model['category'] == ModelType['neural_network']:
+        # keras nn
+        f = getattr(models, model.entry_function)
+        input_dict = manage_nn_input(conf, data_source_id, **kwargs)
+        return job_service.run_code(conf, project_id, data_source_id,
+                                    model, f, input_dict)
+    elif model['category'] == ModelType['folder_input']:
+        # input from folder
+        f = getattr(models, model.entry_function)
+        input_dict = model_input_manager_folder_input(conf, data_source_id,
+                                                      **kwargs)
+        return job_service.run_code(conf, project_id, None,
+                                    model, f, input_dict,
+                                    file_id=data_source_id)
+    else:
+        # custom models
+        f = models.custom_model
+        model_fn = getattr(models, model.entry_function)
+        fit = conf.get('fit', None)
+        if model['category'] == ModelType['custom_supervised']:
+            data_fields = fit.get('data_fields', [[], []])
+            input_dict = model_input_manager_custom_supervised(data_fields,
+                                                               data_source_id,
+                                                               model.name)
+            return job_service.run_code(conf, project_id, data_source_id,
+                                        model, f, model_fn, input_dict)
+        if model['category'] == ModelType['unsupervised']:
+            x_cols = fit.get('data_fields', [])
+            input_dict = model_input_manager_unsupervised(x_cols,
+                                                          data_source_id,
+                                                          model.name)
+            return job_service.run_code(conf, project_id, data_source_id,
+                                        model, f, model_fn, input_dict)
+
+
 def model_to_code(conf, project_id, data_source_id, model_id, **kwargs):
     """
     run model by model_id and the parameter config
@@ -175,6 +176,13 @@ def model_to_code(conf, project_id, data_source_id, model_id, **kwargs):
                                                   **kwargs)
         return job_service.run_code(conf, project_id, data_source_id,
                                     model, f, head_str)
+    elif model['category'] == ModelType['folder_input']:
+        # input from folder
+        head_str = manage_folder_input_to_str(conf, data_source_id,
+                                              **kwargs)
+        return job_service.run_code(conf, project_id, None,
+                                    model, f, head_str,
+                                    file_id=data_source_id)
     else:
         # custom models
         head_str = ''
@@ -217,21 +225,21 @@ def model_input_manager_custom_supervised(data_fields, data_source_id,
                                           model_name):
     def is_array_and_not_empty(x):
         return isinstance(x, list) and len(x) > 0
+
     # to data frame
     if not is_array_and_not_empty(
             data_fields[0]) or not is_array_and_not_empty(
-            data_fields[1]):
+        data_fields[1]):
         raise ValueError('fields array empty')
 
-    x_cursor = staging_data_business. \
-        get_by_staging_data_set_id_limited_fields(data_source_id,
-                                                  data_fields[0])
-    y_cursor = staging_data_business. \
-        get_by_staging_data_set_id_limited_fields(data_source_id,
-                                                  data_fields[1])
-
-    df_x = staging_data_service.mongo_to_df(x_cursor)
-    df_y = staging_data_service.mongo_to_df(y_cursor)
+    data = staging_data_business. \
+        get_by_staging_data_set_and_fields(data_source_id,
+                                           data_fields[0] +
+                                           data_fields[1],
+                                           allow_nan=False)
+    data = staging_data_service.mongo_to_df(data)
+    df_x = data[data_fields[0]]
+    df_y = data[data_fields[1]]
     return {
         'model_name': model_name,
         'df_features': df_x,
@@ -242,12 +250,14 @@ def model_input_manager_custom_supervised(data_fields, data_source_id,
 def model_input_manager_unsupervised(x_cols, data_source_id, model_name):
     def is_array_and_not_empty(x):
         return isinstance(x, list) and len(x) > 0
+
     # to data frame
     if not is_array_and_not_empty(x_cols):
         raise ValueError('field list empty')
     train_cursor = staging_data_business. \
-        get_by_staging_data_set_id_limited_fields(data_source_id,
-                                                  x_cols)
+        get_by_staging_data_set_and_fields(data_source_id,
+                                           x_cols,
+                                           allow_nan=False)
     df_x = staging_data_service.mongo_to_df(train_cursor)
     return {
         'model_name': model_name,
@@ -256,7 +266,7 @@ def model_input_manager_unsupervised(x_cols, data_source_id, model_name):
     }
 
 
-def model_input_manager3(conf, file_id, **kwargs):
+def model_input_manager_folder_input(conf, file_id, **kwargs):
     file = file_business.get_by_id(file_id)
     input = {
         'train_data_dir': (file['uri'] + 'train/'),
@@ -344,6 +354,34 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
     code_str += "y_val = obj['y_te']\n"
     code_str += "x_test = obj['x_te']\n"
     code_str += "y_test = obj['y_te']\n"
+
+    return code_str
+
+
+def manage_folder_input_to_str(conf, file_id, **kwargs):
+    """
+    deal with input when supervised learning
+    :param conf:
+    :param staging_data_set_id:
+    :return:
+    """
+    file = file_business.get_by_id(file_id)
+    input = {
+        'train_data_dir': (file['uri'] + 'train/'),
+        'validation_data_dir': (file['uri'] + 'validation/')
+    }
+    input['nb_train_samples'] = sum(
+        [len(files) for r, d, files in
+         os.walk(input['train_data_dir'])])
+    input['nb_validation_samples'] = sum(
+        [len(files) for r, d, files in
+         os.walk(input['validation_data_dir'])])
+    code_str = ''
+    code_str += "train_data_dir = '%s'\n" % input['train_data_dir']
+    code_str += "validation_data_dir = '%s'\n" % input['validation_data_dir']
+    code_str += "nb_train_samples = %s\n" % input['nb_train_samples']
+    code_str += "nb_validation_samples = %s\n" % input[
+        'nb_validation_samples']
 
     return code_str
 
@@ -549,6 +587,7 @@ def temp():
         models.GMMCluster,
         {'type': 'DataFrame'}
     ))
+
 
 if __name__ == '__main__':
     pass

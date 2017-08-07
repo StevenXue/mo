@@ -122,6 +122,9 @@ export default class Compile extends React.Component {
           ( this.state.compile.map((e) =>
             <div key={e.name} style={{display: 'flex', flexDirection: 'row', marginBottom: 5}}>
               <div style={{width: 100}}>
+                { e.required &&
+                <span style={{color: '#108ee9', fontSize: 14}}>{"* "}</span>
+                }
                 <span>{e.name + ": "}</span>
               </div>
               {this.renderCompileParams(e)}

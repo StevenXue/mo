@@ -61,7 +61,7 @@ class FileSystem extends React.Component {
   renderCards(key){
     let cards = this.props.project.projects[key];
     return cards.map((e) =>
-      <Card key={e.name} title={e.name} extra={
+      <Card key={e._id} title={e.name} extra={
         <a>
         <Button type="danger" style={{marginTop: -5}} onClick={() => this.onClickDelete(event, e._id, true)}>
           DELETE
