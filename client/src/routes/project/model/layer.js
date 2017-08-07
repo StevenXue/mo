@@ -125,13 +125,16 @@ export default class Layer extends React.Component {
           case 'int':
             choices.push(
               <div key={e.name} style={{display: 'flex', flexDirection: 'row', marginBottom: 20}}>
+                { e.required &&
+                <span style={{color: '#108ee9', fontSize: 14}}>{"* "}</span>
+                }
                 <span style={{color: '#108ee9' , fontSize: 14}}>{e.name + ": "}</span>
                 <Popover content={<div>
                   <p style={{width: 150}}>{e.type.des}</p>
                 </div>} title="Description">
                   <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5, color: '#767676'}}/>
                 </Popover>
-                <Input disabled={!this.state.isActive} ref={e.name} style={{marginLeft: 10, width: 150, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+                <Input placeholder={e.default} disabled={!this.state.isActive} ref={e.name} style={{marginLeft: 10, width: 150, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
               </div>
             );
             break;
@@ -146,6 +149,9 @@ export default class Layer extends React.Component {
             choices.push(
               <div key={e.name} style={{display: 'flex', flexDirection: 'column', marginBottom: 20}}>
                 <div>
+                  { e.required &&
+                  <span style={{color: '#108ee9', fontSize: 14}}>{"* "}</span>
+                  }
                   <span style={{color: '#108ee9', fontSize: 14}}>{e.name + ': '}</span>
                   <Popover content={<div>
                     <p style={{width: 180}}>{e.type.des}</p>
@@ -159,13 +165,16 @@ export default class Layer extends React.Component {
                   <p style={{color: '#b3b3b3', fontSize: 12}}>{'multiple integer is required, divide by a comma'}</p>
 
                 </div>
-                <Input disabled={!this.state.isActive} ref={e.name} style={{width: 150, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+                <Input placeholder={e.default} disabled={!this.state.isActive} ref={e.name} style={{width: 150, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
               </div>
             );
             break;
           case 'choice':
             choices.push(
               <div style={{width: 200, marginBottom: 20}} key={e.name}>
+                { e.required &&
+                <span style={{color: '#108ee9', fontSize: 14}}>{"* "}</span>
+                }
                 <span style={{color: '#108ee9', fontSize: 14}}>{e.name}</span>
                 <Popover content={<div>
                   <p style={{width: 180}}>{e.type.des}</p>
@@ -185,13 +194,16 @@ export default class Layer extends React.Component {
           case 'float':
             choices.push(
               <div key={e.type.key} style={{display: 'flex', flexDirection: 'row', marginBottom: 20}}>
+                { e.required &&
+                <span style={{color: '#108ee9', fontSize: 14}}>{"* "}</span>
+                }
                 <span style={{color: '#108ee9', fontSize: 14}}>{e.name}</span>
                 <Popover content={<div>
                   <p style={{width: 180}}>{e.type.des}</p>
                 </div>} title="Description">
                   <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5, color: '#767676'}}/>
                 </Popover>
-                <Input ref={e.name} style={{width: 150, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+                <Input ref={e.name} placeholder={e.default} style={{width: 150, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
               </div>
             );
             break;

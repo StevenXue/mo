@@ -1,6 +1,5 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import ReactEcharts from 'echarts-for-react';
+import React from 'react'
+import ReactEcharts from 'echarts-for-react'
 
 const getOption = (props) => {
   return {
