@@ -1408,42 +1408,6 @@ def create_public_data_process():
     select_from_model_gbdt = toolkit_repo.create(select_from_model_gbdt)
     ownership_business.add(user, False, toolkit=select_from_model_gbdt)
 
-    decomposition_pca = Toolkit(name='降维-PCA(sk-learn)',
-                                description='主成分分析法，返回降维后的数据',
-                                category=3,
-                                entry_function='decomposition_pca',
-                                target_py_code=inspect.getsource(preprocess_orig.decomposition_pca),
-                                parameter_spec={
-                                    "data": {
-                                        'name': 'input',
-                                        'type': {
-                                            'key': 'select_box',
-                                            'des': 'nD tensor with shape: (batch_size, ..., '
-                                                   'input_dim). The most common situation would be a '
-                                                   '2D input with shape (batch_size, input_dim).',
-                                            'range': None
-                                        },
-                                        'default': None,
-                                        'required': True,
-                                        'len_range': [2, None],
-                                        'data_type': ['int', 'float']
-                                    },
-                                    "args": [
-                                        {
-                                            'name': 'n_features',
-                                            'type': {
-                                                'key': 'int',
-                                                'des': 'the number of de-features',
-                                                'range': [1, None]
-                                            },
-                                            'default': 2,
-                                            'required': True
-                                        }
-                                    ]
-                                })
-    decomposition_pca = toolkit_repo.create(decomposition_pca)
-    ownership_business.add(user, False, toolkit=decomposition_pca)
-
     lda = Toolkit(name='线性判别分析法（LDA）',
                   description='线性判别分析法，返回降维后的数据，参数n_components为降维后的维数',
                   category=3,
