@@ -16,6 +16,8 @@ keras
 sklearn
 redis
 simplejson
+hyperas
+hyperopt
 
 
 

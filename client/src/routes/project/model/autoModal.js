@@ -117,8 +117,8 @@ export default class AutomatedModel extends React.Component {
             loading: false,
           })
           console.log(res.response)
-          let c = Object.keys(res.response.data[1])
-          this.setState({ columns: c, loading: false })
+          //let c = Object.keys(res.response.data[1])
+          this.setState({ columns: res.response.columns, loading: false })
         },
       )
       .catch((err) => console.log('Error: /staging_data/staging_data_sets/fields', err))
@@ -135,7 +135,7 @@ export default class AutomatedModel extends React.Component {
       <Spin spinning={this.state.loading}>
         <div style={{ width: '100%', display: 'flex', flexDirection: 'row', overflowX: 'auto' }}>
           <div className='modelling_dataset' style={{
-            width: '25%', marginTop: 10, marginLeft: 10, display: 'flex', height: '100%', flexDirection: 'column',
+            width: '20%', marginTop: 10, marginLeft: 10, display: 'flex', height: '100%', flexDirection: 'column',
             alignItems: 'center',
           }}>
             <span style={{ color: '#108ee9' }}>Choose Dataset for modelling</span>

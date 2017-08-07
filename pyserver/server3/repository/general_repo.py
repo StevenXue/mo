@@ -12,6 +12,7 @@ connect(
     username=config.get_mongo_user(),
     password=config.get_mongo_pass(),
     host=config.get_mongo_host(),
+    port=config.get_mongo_port(),
 )
 
 

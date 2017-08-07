@@ -41,20 +41,21 @@ export default class ModelProcess extends React.Component {
         });
     }
     let s = [];
+    //console.log(this.props.cols);
     this.props.cols.map((e) =>
       s.push({
-        key: e,
-        title: e,
+        key: e[0],
+        title: e[0],
         disabled: false
       })
     );
     this.setState({source: s});
+
     if(this.props.params){
       this.setState({modelName: this.props.params.model.name});
       let data_fields = []
       if(this.props.params['params']['fit']['data_fields']) {
         data_fields = this.props.params['params']['fit']['data_fields'];
-        // if (data_fields.length === 2) {
           if (data_fields[0] instanceof Array) {
             this.setState({
               selectedKeys: data_fields[0],
@@ -70,7 +71,6 @@ export default class ModelProcess extends React.Component {
   }
 
   componentWillReceiveProps(nextProps){
-    //console.log(nextProps.params);
     this.setState({
       dataSet: nextProps.dataset_id,
       isActive: nextProps.isActive,
@@ -92,12 +92,21 @@ export default class ModelProcess extends React.Component {
           });
         }
       }
+    }else{
+      let s = [];
+      nextProps.cols.map((e) =>
+        s.push({
+          key: e[0],
+          title: e[0],
+          disabled: false
+        })
+      );
+      this.setState({source: s});
     }
   }
 
 
   onSelectModel(values){
-    //console.log(values);
     this.setState({selectedModel: values});
     let t = this.state.models.filter((e) => e._id === values );
     this.setState({modelName: t[0][name]});
@@ -112,16 +121,7 @@ export default class ModelProcess extends React.Component {
         if(res.response.category === 2){
           disable = true
         }
-        let s = [];
-        this.props.cols.map((e) =>
-          s.push({
-            key: e,
-            title: e,
-            disabled: disable
-          })
-        );
         this.setState({
-          source: s,
           supervised: disable,
           modelData: res.response.parameter_spec
         });
@@ -129,7 +129,7 @@ export default class ModelProcess extends React.Component {
 
   }
 
-  handleChange(nextTargetKeys, direction, moveKeys) {
+  handleChange(nextTargetKeys) {
     this.setState({ targetKeys: nextTargetKeys });
   }
 
