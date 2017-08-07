@@ -466,6 +466,36 @@ def create_public_toolkit():
                               "des": "所选范围的样本的降维后的结果",
                               "if_add_column": True,
                               "attribute": "value"
+                          },
+                          {
+                              "name": "components",
+                              "des": "所选范围的样本的降维后的结果",
+                              "if_add_column": False,
+                              "attribute": "value"
+                          },
+                          {
+                              "name": "explained_variance",
+                              "des": "所选范围的样本的降维后的结果",
+                              "if_add_column": False,
+                              "attribute": "bar"
+                          },
+                          {
+                              "name": "explained_variance_ratio_",
+                              "des": "所选范围的样本的降维后的结果",
+                              "if_add_column": False,
+                              "attribute": "pie"
+                          },
+                          {
+                              "name": "mean_",
+                              "des": "所选范围的样本的降维后的结果",
+                              "if_add_column": False,
+                              "attribute": "general_info"
+                          },
+                          {
+                              "name": "noise_variance",
+                              "des": "所选范围的样本的降维后的结果",
+                              "if_add_column": False,
+                              "attribute": "general_info"
                           }
                       ]
                   })
@@ -513,6 +543,12 @@ def create_public_toolkit():
                                "des": "所选范围的样本的降维后的结果",
                                "if_add_column": True,
                                "attribute": "value"
+                           },
+                           {
+                               "name": "kl_divergence",
+                               "des": "所选范围的样本的降维后的结果",
+                               "if_add_column": False,
+                               "attribute": "general_info"
                            }
                        ]
                    })
@@ -1017,7 +1053,7 @@ def create_public_data_process():
                                              "name": "result",
                                              "des": "筛选出的所有特征值",
                                              "if_add_column": False,
-                                             "attribute": "value",
+                                             "attribute": "",
                                          }
                                      ]
                                  })
@@ -1441,6 +1477,47 @@ def create_public_data_process():
                               },
                               'default': 2,
                               'required': True
+                          }
+                      ]
+                  },
+                  result_spec={
+                      "if_reserved": True,
+                      "args": [
+                          {
+                              "name": "label",
+                              "des": "降维后的栏位信息",
+                              "if_add_column": True,
+                              "attribute": "value"
+                          },
+                          {
+                              "name": "coef",
+                              "des": "每类特征是相关系数",
+                              "if_add_column": False,
+                              "attribute": "value"
+                          },
+                          {
+                              "name": "mean",
+                              "des": "每类特征是数值平均值",
+                              "if_add_column": False,
+                              "attribute": "value"
+                          },
+                          {
+                              "name": "priors",
+                              "des": "array-like, shape = [n_classes], Class priors (sum to 1).",
+                              "if_add_column": False,
+                              "attribute": "general_info"
+                          },
+                          {
+                              "name": "scalings",
+                              "des": "array-like, shape = [rank, n_classes - 1], Scaling of the features in the space spanned by the class centroids.",
+                              "if_add_column": False,
+                              "attribute": "value"
+                          },
+                          {
+                              "name": "xbar",
+                              "des": "Overall mean",
+                              "if_add_column": False,
+                              "attribute": "value"
                           }
                       ]
                   })

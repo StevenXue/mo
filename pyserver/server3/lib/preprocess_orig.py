@@ -190,6 +190,12 @@ def lda(arr0, target, index, n_components):
     from sklearn.lda import LDA
     matrix = np.array(arr0)
     target = np.array(target)
-    temp = LDA(n_components=n_components).fit_transform(matrix, target)
-    result = data_utility.retrieve_nan_index(temp.tolist(), index)
-    return result
+    temp = LDA(n_components=n_components).fit(matrix, target)
+    coef = temp.coef_
+    # covariance = temp.covariance_
+    mean = temp.means_
+    priors = temp.priors_
+    scalings = temp.scalings_
+    xbar = temp.xbar_
+    label = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
+    return label, coef, mean, priors, scalings, xbar

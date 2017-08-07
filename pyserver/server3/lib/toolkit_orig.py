@@ -168,10 +168,9 @@ def dimension_reduction_TSNE(arr0, index, n_components=2):
     t_sne = TSNE(n_components=n_components, random_state=0)
     np.set_printoptions(suppress=True)
     result = t_sne.fit(matrix)
-    embedding = result.embedding_
     kl_divergence = result.kl_divergence_
     label = data_utility.retrieve_nan_index(t_sne.fit_transform(matrix).tolist(), index)
-    return label, embedding, kl_divergence
+    return label, kl_divergence
 
 
 # K平均数算法
