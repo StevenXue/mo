@@ -36,3 +36,6 @@ from server3.lib.models.linear_regressor import LinearRegressor
 
 
 from server3.lib.models.keras_callbacks import MongoModelCheckpoint
+
+# hyperas
+from server3.lib.models.hyperas_model import HYPERAS_SPEC
