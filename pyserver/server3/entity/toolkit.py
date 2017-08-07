@@ -25,7 +25,8 @@ CATEGORY_FORM = (
     (0, '聚类',
      1, '特征选取',
      2, '数值转换',
-     3, '降维')
+     3, '降维',
+     4, '描述性统计')
 )
 
 
@@ -35,23 +36,12 @@ class Toolkit(DynamicDocument):
         list of variables and its type on below
     """
 
-    # object_id = StringField(max_length=20, unique=True)
     name = StringField(max_length=50, unique=True, required=True)
     description = StringField(max_length=140)
-    # input_data = ListField()
     category = IntField(required=True)
 
-    # TODO 已经转移到result_type里了
     # result_form = IntField(required=True, choices=RESUlT_FORM)
-
-    # target_py = StringField(max_length=25, unique=True)
     target_py_code = StringField(required=True)
-
-    # ownership_ref = StringField(max_length=20, unique=True)
-    # ownership_ref = ReferenceField('Ownership')
-
-    # status = DictField()
-    # status = IntField(choices=STATUS, required=True)
     fields = ListField()
     tags = ListField()
     entry_function = StringField(required=True)

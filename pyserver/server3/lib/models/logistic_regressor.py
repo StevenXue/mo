@@ -147,7 +147,7 @@ LogisticRegressor = {
         },
         'args': [
             {
-                "name": "step",
+                "name": "steps",
                 "type": {
                     "key": "int",
                     "des": "steps for training",
@@ -161,7 +161,7 @@ LogisticRegressor = {
     'evaluate': {
         'args': [
             {
-                "name": "step",
+                "name": "steps",
                 "type": {
                     "key": "int",
                     "des": "steps for evaluate",

@@ -87,6 +87,30 @@ def split_categorical_and_continuous(df, exclude_cols):
     return continuous_cols, categorical_cols
 
 
+def run_multiple_model(conf, project_id, staging_data_set_id, model_id,
+                       hyper_parameters=None,
+                       **kwargs):
+    """
+    run model by model_id and the parameter config
+
+    :param conf: conf of model with multiple set of parameters (hyper parameters)
+    :param project_id:
+    :param staging_data_set_id:
+    :param model_id:
+    :param kwargs:
+    :param hyper_parameters:
+    :return:
+    """
+    from server3.service import spark_service
+    # using conf and hyper_parameters to generate conf_grid
+    conf_grid = spark_service.get_conf_grid(conf,
+                                            hyper_parameters=hyper_parameters)
+    # get the data
+    data = manage_nn_input_temp(conf, staging_data_set_id, **kwargs)
+    result = spark_service.hyper_parameters_tuning(conf_grid, data)
+    return result
+
+
 def run_model(conf, project_id, data_source_id, model_id, **kwargs):
     """
     run model by model_id and the parameter config
@@ -103,72 +127,36 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
     if model['category'] == ModelType['neural_network']:
         # keras nn
         f = getattr(models, model.entry_function)
-        input = manage_nn_input(conf, data_source_id, **kwargs)
+        input_dict = manage_nn_input(conf, data_source_id, **kwargs)
         return job_service.run_code(conf, project_id, data_source_id,
-                                    model, f, input)
+                                    model, f, input_dict)
     elif model['category'] == ModelType['folder_input']:
         # input from folder
         f = getattr(models, model.entry_function)
-        input = model_input_manager3(conf, data_source_id, **kwargs)
+        input_dict = model_input_manager_folder_input(conf, data_source_id,
+                                                      **kwargs)
         return job_service.run_code(conf, project_id, None,
-                                    model, f, input, file_id=data_source_id)
+                                    model, f, input_dict,
+                                    file_id=data_source_id)
     else:
         # custom models
-
         f = models.custom_model
         model_fn = getattr(models, model.entry_function)
-
+        fit = conf.get('fit', None)
         if model['category'] == ModelType['custom_supervised']:
-            fit = conf.get('fit', None)
-            params = conf.get('estimator', None)['args']
             data_fields = fit.get('data_fields', [[], []])
-            index_col = params.get('example_id_column', None)
-
-            # to data frame
-            if not is_array_and_not_empty(
-                    data_fields[0]) or not is_array_and_not_empty(
-                    data_fields[1]):
-                raise ValueError('fields array empty')
-
-            x_cursor = staging_data_business. \
-                    get_by_staging_data_set_id_limited_fields(data_source_id,
-                                                              data_fields[0])
-            y_cursor = staging_data_business. \
-                get_by_staging_data_set_id_limited_fields(data_source_id,
-                                                          data_fields[1])
-
-            df_x = staging_data_service.mongo_to_df(x_cursor)
-            df_y = staging_data_service.mongo_to_df(y_cursor)
-            input = {
-                'model_name': model.name,
-                'df_features': df_x,
-                'df_labels': df_y
-            }
-            # return 1
-            # feature_columns, input = model_input_manager1(df_train, index_col,
-            #                                               data_fields)
-            # params['feature_columns'] = feature_columns
+            input_dict = model_input_manager_custom_supervised(data_fields,
+                                                               data_source_id,
+                                                               model.name)
             return job_service.run_code(conf, project_id, data_source_id,
-                                        model, f, model_fn, input)
+                                        model, f, model_fn, input_dict)
         if model['category'] == ModelType['unsupervised']:
-            fit = conf.get('fit', None)
             x_cols = fit.get('data_fields', [])
-
-            # to data frame
-            if not is_array_and_not_empty(x_cols) :
-                raise ValueError('field list empty')
-            train_cursor = staging_data_business. \
-                get_by_staging_data_set_id_limited_fields(data_source_id,
-                                                          x_cols)
-            df_train = staging_data_service.mongo_to_df(train_cursor)
-            input = {
-                'model_name': model.name,
-                'df_features': df_x,
-                'df_labels': None
-            }
-            # input = model_input_manager2(df_train, x_cols)
+            input_dict = model_input_manager_unsupervised(x_cols,
+                                                          data_source_id,
+                                                          model.name)
             return job_service.run_code(conf, project_id, data_source_id,
-                                        model, f, model_fn, input)
+                                        model, f, model_fn, input_dict)
 
 
 def is_array_and_not_empty(x):
@@ -204,13 +192,13 @@ def run_hyperas_model(conf, project_id, data_source_id, model_id, **kwargs):
     train_hyperas_model(conf=conf, data_source_id=data_source_id, **kwargs)
 
 
-def model_to_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
+def model_to_code(conf, project_id, data_source_id, model_id, **kwargs):
     """
     run model by model_id and the parameter config
 
     :param conf:
     :param project_id:
-    :param staging_data_set_id:
+    :param data_source_id:
     :param model_id:
     :param kwargs:
     :return:
@@ -220,16 +208,26 @@ def model_to_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
 
     if model['category'] == 0:
         # keras nn
-        head_str = manage_supervised_input_to_str(conf, staging_data_set_id,
+        head_str = manage_supervised_input_to_str(conf, data_source_id,
                                                   **kwargs)
-        return job_service.run_code(conf, project_id, staging_data_set_id,
+        return job_service.run_code(conf, project_id, data_source_id,
                                     model, f, head_str)
+    elif model['category'] == ModelType['folder_input']:
+        # input from folder
+        head_str = manage_folder_input_to_str(conf, data_source_id,
+                                              **kwargs)
+        return job_service.run_code(conf, project_id, None,
+                                    model, f, head_str,
+                                    file_id=data_source_id)
     else:
         # custom models
         head_str = ''
         head_str += 'import logging\n'
         head_str += 'import numpy as np\n'
+        head_str += 'import pandas as pd\n'
         head_str += 'import tensorflow as tf\n'
+        head_str += 'from tensorflow.python.framework import constant_op\n'
+        head_str += 'from tensorflow.python.framework import dtypes\n'
         head_str += 'from server3.lib import models\n'
         head_str += 'from server3.business import staging_data_set_business\n'
         head_str += 'from server3.business import staging_data_business\n'
@@ -240,78 +238,71 @@ def model_to_code(conf, project_id, staging_data_set_id, model_id, **kwargs):
         head_str += 'from server3.service.custom_log_handler ' \
                     'import MetricsHandler\n'
         head_str += 'model_fn = models.%s\n' % model.entry_function
-        head_str += "train_cursor = staging_data_business." \
-                    "get_by_staging_data_set_id('%s')\n" \
-                    % staging_data_set_id
-        head_str += "df_train = staging_data_service.mongo_to_df(" \
-                    "train_cursor)\n"
+        head_str += "data_source_id = '%s'\n" % data_source_id
+        head_str += "model_name = '%s'\n" % model.name
         fit = conf.get('fit', None)
         if model['category'] == 1:
-            params = conf.get('estimator', None)['args']
-            data_fields = fit.get('data_fields', [[None], [None]])
-            index_col = params.get('example_id_column', None)
+            data_fields = fit.get('data_fields', [[], []])
             head_str += 'data_fields = %s\n' % data_fields
-            head_str += 'index_col = %s\n' % index_col
-            head_str += inspect.getsource(model_input_manager1)
-            head_str += "feature_columns, input = model_input_manager1(" \
-                        "df_train, index_col, data_fields)\n"
+            head_str += inspect.getsource(model_input_manager_custom_supervised)
+            head_str += "input_dict = model_input_manager_custom_supervised(" \
+                        "data_fields, data_source_id, model_name)\n"
         elif model['category'] == 2:
             x_cols = fit.get('data_fields', [])
             head_str += "x_cols = %s\n" % x_cols
-            head_str += inspect.getsource(model_input_manager2)
-            head_str += "input = model_input_manager2(df_train, x_cols)\n"
-        return job_service.run_code(conf, project_id, staging_data_set_id,
+            head_str += inspect.getsource(model_input_manager_unsupervised)
+            head_str += "input_dict = model_input_manager_unsupervised(x_cols, " \
+                        "data_source_id, model_name)\n"
+        return job_service.run_code(conf, project_id, data_source_id,
                                     model, f, head_str)
 
 
-def model_input_manager1(df_train, index_col, data_fields):
-    # get column spec
-    label_column = "label_"
-    label_target = data_fields[1][0]
-    x_cols = data_fields[0]
-    # filter x columns
-    x_cols = list(df_train.columns.values) if not x_cols else x_cols
-    df_train = df_train.filter(items=x_cols)
+def model_input_manager_custom_supervised(data_fields, data_source_id,
+                                          model_name):
+    def is_array_and_not_empty(x):
+        return isinstance(x, list) and len(x) > 0
 
-    if df_train[label_target].dtype == np.int_ or \
-                    df_train[label_target].dtype == np.float_:
-        # if column is number use it directly as label
-        label_column = label_target
-    else:
-        # if column is string, make it categorical
-        df_train[label_column] = (
-            df_train[label_target].astype('category').cat.codes)
+    # to data frame
+    if not is_array_and_not_empty(
+            data_fields[0]) or not is_array_and_not_empty(
+        data_fields[1]):
+        raise ValueError('fields array empty')
 
-    # 添加一列 index，格式为string，作为"example_id_column"的输入
-    df_train[index_col] = df_train.index.astype(str)
-
-    # 将连续型和类别型特征分离开，为input做准备
-    continuous_cols, categorical_cols = \
-        split_categorical_and_continuous(df_train, [label_column,
-                                                    index_col,
-                                                    label_target])
-    return [continuous_cols, categorical_cols], {
-        'train': df_train,
-        # 'test': df_test,
-        'categorical_cols': categorical_cols,
-        'continuous_cols': continuous_cols +
-                           ([index_col] if index_col else []),
-        'label_col': label_column
-    }
-
-
-def model_input_manager2(df_train, x_cols):
-    x_cols = list(df_train.columns.values) if not x_cols else x_cols
-    df_train = df_train.filter(items=x_cols)
-    continuous_cols, categorical_cols = \
-        split_categorical_and_continuous(df_train, [])
+    data = staging_data_business. \
+        get_by_staging_data_set_and_fields(data_source_id,
+                                           data_fields[0] +
+                                           data_fields[1],
+                                           allow_nan=False)
+    data = staging_data_service.mongo_to_df(data)
+    df_x = data[data_fields[0]]
+    df_y = data[data_fields[1]]
     return {
-        'train': df_train,
-        'continuous_cols': continuous_cols,
+        'model_name': model_name,
+        'df_features': df_x,
+        'df_labels': df_y
     }
 
 
-def model_input_manager3(conf, file_id, **kwargs):
+def model_input_manager_unsupervised(x_cols, data_source_id, model_name):
+    def is_array_and_not_empty(x):
+        return isinstance(x, list) and len(x) > 0
+
+    # to data frame
+    if not is_array_and_not_empty(x_cols):
+        raise ValueError('field list empty')
+    train_cursor = staging_data_business. \
+        get_by_staging_data_set_and_fields(data_source_id,
+                                           x_cols,
+                                           allow_nan=False)
+    df_x = staging_data_service.mongo_to_df(train_cursor)
+    return {
+        'model_name': model_name,
+        'df_features': df_x,
+        'df_labels': None
+    }
+
+
+def model_input_manager_folder_input(conf, file_id, **kwargs):
     file = file_business.get_by_id(file_id)
     input = {
         'train_data_dir': (file['uri'] + 'train/'),
@@ -337,7 +328,7 @@ def manage_nn_input(conf, staging_data_set_id, **kwargs):
     y_fields = conf['fit']['data_fields'][1]
     schema = kwargs.pop('schema')
     obj = split_supervised_input(staging_data_set_id, x_fields, y_fields,
-                                 schema)
+                                 schema, **kwargs)
     return obj
 
 
@@ -390,12 +381,43 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
     y_str = line_split_for_long_fields(y_str)
     code_str += x_str
     code_str += y_str
+    code_str += "kwargs = %s\n" % str(kwargs)
     code_str += "obj = job_service.split_supervised_input(" \
-                "staging_data_set_id, x_fields, y_fields, schema)\n"
+                "staging_data_set_id, x_fields, y_fields, schema, **kwargs)\n"
     code_str += "x_train = obj['x_tr']\n"
     code_str += "y_train = obj['y_tr']\n"
+    code_str += "x_val = obj['x_te']\n"
+    code_str += "y_val = obj['y_te']\n"
     code_str += "x_test = obj['x_te']\n"
     code_str += "y_test = obj['y_te']\n"
+
+    return code_str
+
+
+def manage_folder_input_to_str(conf, file_id, **kwargs):
+    """
+    deal with input when supervised learning
+    :param conf:
+    :param staging_data_set_id:
+    :return:
+    """
+    file = file_business.get_by_id(file_id)
+    input = {
+        'train_data_dir': (file['uri'] + 'train/'),
+        'validation_data_dir': (file['uri'] + 'validation/')
+    }
+    input['nb_train_samples'] = sum(
+        [len(files) for r, d, files in
+         os.walk(input['train_data_dir'])])
+    input['nb_validation_samples'] = sum(
+        [len(files) for r, d, files in
+         os.walk(input['validation_data_dir'])])
+    code_str = ''
+    code_str += "train_data_dir = '%s'\n" % input['train_data_dir']
+    code_str += "validation_data_dir = '%s'\n" % input['validation_data_dir']
+    code_str += "nb_train_samples = %s\n" % input['nb_train_samples']
+    code_str += "nb_validation_samples = %s\n" % input[
+        'nb_validation_samples']
 
     return code_str
 
@@ -404,6 +426,7 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
 
 
 def temp():
+    pass
     # print(add_model_with_ownership(
     #     'system',
     #     False,
@@ -424,48 +447,9 @@ def temp():
     #     'custom sdca model',
     #     ModelType['custom_supervised'],
     #     '/lib/models/svm',
-    #     'sdca_model_fn',
+    #     'svm_model_fn',
     #     'custom_model_to_str',
     #     models.SVM,
-    #     {'type': 'DataFrame'}
-    # ))
-    #
-    # print(add_model_with_ownership(
-    #     'system',
-    #     False,
-    #     'Kmeans Clustering',
-    #     'custom kmean model',
-    #     ModelType['unsupervised'],
-    #     '/lib/models/kmean',
-    #     'kmeans_clustering_model_fn',
-    #     'custom_model_to_str',
-    #     models.Kmeans,
-    #     {'type': 'DataFrame'}
-    # ))
-    #
-    # print(add_model_with_ownership(
-    #     'system',
-    #     False,
-    #     'Linear Classifier',
-    #     'custom linear classifier model',
-    #     ModelType['custom_supervised'],
-    #     '/lib/models/linear_classifier',
-    #     'linear_classifier_model_fn',
-    #     'custom_model_to_str',
-    #     models.LinearClassifier,
-    #     {'type': 'DataFrame'}
-    # ))
-    #
-    # print(add_model_with_ownership(
-    #     'system',
-    #     False,
-    #     'Linear Regression',
-    #     'custom linear regression model',
-    #     ModelType['custom_supervised'],
-    #     '/lib/models/linear_regression',
-    #     'linear_regression_model_fn',
-    #     'custom_model_to_str',
-    #     models.LinearRegression,
     #     {'type': 'DataFrame'}
     # ))
     #
@@ -481,7 +465,7 @@ def temp():
     #     models.MLP,
     #     {'type': 'ndarray', 'n': None}
     # ))
-
+    #
     # print(add_model_with_ownership(
     #     'system',
     #     False,
@@ -503,10 +487,155 @@ def temp():
     #     ModelType['custom_supervised'],
     #     'server3/lib/models/linear_regressor.py',
     #     'linear_regressor_model_fn',
+    #     'custom_model_to_str',
+    #     models.LinearRegressor,
+    #     {'type': 'DataFrame'}
+    # ))
+
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Linear Classifier',
+    #     'Custom linear classifier model',
+    #     ModelType['custom_supervised'],
+    #     'server3/lib/models/linear_classifier.py',
+    #     'linear_classifier_model_fn',
+    #     'custom_model_to_str',
+    #     models.LinearClassifier,
+    #     {'type': 'DataFrame'}
+    # ))
+
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Kmeans Clustering',
+    #     'custom kmean model',
+    #     ModelType['unsupervised'],
+    #     'server3/lib/models/kmeans_cluster.py',
+    #     'kmeans_clustering_model_fn',
+    #     'custom_model_to_str',
+    #     models.KmeansCluster,
+    #     {'type': 'DataFrame'}
+    # ))
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Image Classifier VGG16',
+    #     'Image Classifier VGG16',
+    #     ModelType['folder_input'],
+    #     'server3/lib/models/nn/image_classifier_vgg16.py',
+    #     'image_classifier_vgg16',
+    #     'image_classifier_vgg16_to_str',
+    #     models.IMAGE_CLASSIFIER_VGG16,
+    #     {
+    #         'type': 'DataFrame'}
+    # ))
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Image Classifier VGG19',
+    #     'Image Classifier VGG19',
+    #     ModelType['folder_input'],
+    #     'server3/lib/models/nn/image_classifier_vgg19.py',
+    #     'image_classifier_vgg19',
+    #     'image_classifier_vgg19_to_str',
+    #     models.IMAGE_CLASSIFIER_VGG19,
+    #     {
+    #         'type': 'DataFrame'}
+    # ))
+
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Image Classifier ResNet50',
+    #     'Image Classifier ResNet50',
+    #     ModelType['folder_input'],
+    #     'server3/lib/models/nn/image_classifier_resnet50.py',
+    #     'image_classifier_resnet50',
+    #     'image_classifier_resnet50_to_str',
+    #     models.IMAGE_CLASSIFIER_RESNET50,
+    #     {
+    #         'type': 'DataFrame'}
+    # ))
+    #
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Image Classifier Inception V3',
+    #     'Image Classifier Inception V3',
+    #     ModelType['folder_input'],
+    #     'server3/lib/models/nn/image_classifier_inception_v3.py',
+    #     'image_classifier_inception_v3',
+    #     'image_classifier_inception_v3_to_str',
+    #     models.IMAGE_CLASSIFIER_INCEPTION_V3,
+    #     {
+    #         'type': 'DataFrame'}
+    # ))
+    #
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Image Classifier Xception',
+    #     'Image Classifier Xception',
+    #     ModelType['folder_input'],
+    #     'server3/lib/models/nn/image_classifier_xception.py',
+    #     'image_classifier_xception',
+    #     'image_classifier_xception_to_str',
+    #     models.IMAGE_CLASSIFIER_XCEPTION,
+    #     {
+    #         'type': 'DataFrame'}
+    # ))
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Linear Regressor',
+    #     'Custom linear regression model',
+    #     ModelType['custom_supervised'],
+    #     'server3/lib/models/linear_regressor.py',
+    #     'linear_regressor_model_fn',
     #     'linear_regressor_to_str',
     #     models.LinearRegressor,
     #     {'type': 'DataFrame'}
     # ))
+    print(add_model_with_ownership(
+        'system',
+        False,
+        'Random Forest',
+        'custom Random Forest model',
+        ModelType['custom_supervised'],
+        '/lib/models/randomforest.py',
+        'randomforest_model_fn',
+        'custom_model_to_str',
+        models.RandomForest,
+        {'type': 'DataFrame'}
+    ))
+
+    print(add_model_with_ownership(
+        'system',
+        False,
+        'Logistic Regressor',
+        'custom Logistic Regressor model',
+        ModelType['custom_supervised'],
+        '/lib/models/logistic_regressor.py',
+        'logistic_regressor_model_fn',
+        'custom_model_to_str',
+        models.LogisticRegressor,
+        {'type': 'DataFrame'}
+    ))
+
+    print(add_model_with_ownership(
+        'system',
+        False,
+        'Gaussian Mixture Model',
+        'custom GMM model',
+        ModelType['unsupervised'],
+        '/lib/models/gmm_cluster.py',
+        'gmm_cluster_model_fn',
+        'custom_model_to_str',
+        models.GMMCluster,
+        {'type': 'DataFrame'}
+    ))
+
     print(add_model_with_ownership(
         'system',
         False,

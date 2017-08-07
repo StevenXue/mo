@@ -139,10 +139,6 @@ def linear_regressor_model_fn(features, labels, mode, params, config=None):
             logits=logits)
 
 
-def linear_regressor_to_str():
-    pass
-
-
 LinearRegressor = {
     'estimator': {
         'args': [
@@ -219,7 +215,7 @@ LinearRegressor = {
         "data_fields": {
             "name": "x_y_fields",
             "type": {
-                "key": "select_box",
+                "key": "transfer_box",
                 "des": "data fields for x",
             },
             "default": None,
@@ -229,7 +225,7 @@ LinearRegressor = {
         },
         'args': [
             {
-                "name": "step",
+                "name": "steps",
                 "type": {
                     "key": "int",
                     "des": "steps for training",
@@ -243,7 +239,7 @@ LinearRegressor = {
     'evaluate': {
         'args': [
             {
-                "name": "step",
+                "name": "steps",
                 "type": {
                     "key": "int",
                     "des": "steps for evaluate",

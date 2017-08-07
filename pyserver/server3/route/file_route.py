@@ -43,38 +43,53 @@ def upload_file():
         if file.filename == '':
             return make_response(jsonify({'response': 'no selected file'}), 400)
         if file and file_service.allowed_file(file.filename):
-            try:
-                url_base = PREFIX + UPLOAD_URL
-                saved_file = file_service.add_file(file, url_base,
-                                                   user_ID, is_private,
-                                                   description, type)
-                file_json = json_utility.convert_to_json(saved_file.to_mongo())
-            except Exception as e:
-                return make_response(jsonify({'response': '%s: %s' % (str(
-                    Exception), e.args)}), 400)
+            url_base = PREFIX + UPLOAD_URL
+            saved_file = file_service.add_file(file, url_base,
+                                               user_ID, is_private,
+                                               description, type)
+            file_json = json_utility.convert_to_json(saved_file.to_mongo())
             return make_response(jsonify({'response': file_json}), 200)
         else:
             return make_response(jsonify({'response': 'file is not allowed'}),
                                  400)
 
 
+# @file_app.route('/files', methods=['GET'])
+# def list_files_by_user_ID():
+#     user_ID = request.args.get('user_ID')
+#     if not user_ID:
+#         jsonify({'response': 'insufficient args'}), 400
+#     try:
+#         public_files, owned_files = file_service.list_files_by_user_ID(user_ID,
+#                                                                        -1)
+#         public_files = json_utility.me_obj_list_to_json_list(public_files)
+#         owned_files = json_utility.me_obj_list_to_json_list(owned_files)
+#         result = {
+#             'public_files': public_files,
+#             'owned_files': owned_files
+#         }
+#     except Exception as e:
+#         return make_response(jsonify({'response': '%s: %s' % (str(
+#             Exception), e.args)}), 400)
+#     return make_response(jsonify({'response': result}), 200)
+
+
 @file_app.route('/files', methods=['GET'])
 def list_files_by_user_ID():
     user_ID = request.args.get('user_ID')
+    extension = request.args.get('extension')
     if not user_ID:
         jsonify({'response': 'insufficient args'}), 400
-    try:
-        public_files, owned_files = file_service.list_files_by_user_ID(user_ID,
-                                                                       -1)
-        public_files = json_utility.me_obj_list_to_json_list(public_files)
-        owned_files = json_utility.me_obj_list_to_json_list(owned_files)
-        result = {
-            'public_files': public_files,
-            'owned_files': owned_files
-        }
-    except Exception as e:
-        return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}), 400)
+    public_files, owned_files = \
+        file_service.list_file_by_extension(user_ID,
+                                            extension=extension,
+                                            order=-1)
+    public_files = json_utility.me_obj_list_to_json_list(public_files)
+    owned_files = json_utility.me_obj_list_to_json_list(owned_files)
+    result = {
+        'public_files': public_files,
+        'owned_files': owned_files
+    }
     return make_response(jsonify({'response': result}), 200)
 
 

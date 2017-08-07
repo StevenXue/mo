@@ -61,15 +61,17 @@ export default class ModelForms extends React.Component {
       custom: this.props.data.estimator,
       isActive: this.props.isActive
     });
+
     let socket = io.connect(flaskServer+ '/log/' + this.props.project_id);
     socket.on('log_epoch_end', (msg) => {
+      this.setState({ioData: msg})
 
-      this.setTimeout(
-        this.setState({ioData: msg}), 500);
+      // this.setTimeout(
+      //   this.setState({ioData: msg}), 500);
     });
+
     if(this.props.params){
       this.setState({end: true});
-      console.log(this.state.params);
     }
 
   }
@@ -89,13 +91,20 @@ export default class ModelForms extends React.Component {
 
   addLayer(){
     let s = this.state.layerStack;
-    s.push(s.length);
+    if(s.length === 0) {
+      s.push(0)
+    }else{
+      s.push(s[s.length - 1] + 1);
+    }
+    console.log(s);
     this.setState({layerStack: s});
   }
 
   getParams(index, value) {
     let layer = this.state.layerParams;
+    value['index'] = index;
     layer[index] = value;
+    console.log(value);
     this.setState({layerParams: layer});
   }
 
@@ -146,20 +155,16 @@ export default class ModelForms extends React.Component {
       let keys = Object.keys(customParams);
 
       run_params['estimator'] = {
-        'args' : []
+        'args' : {}
       }
 
       this.state.custom['args'].map((el) =>
         {
           if(keys.indexOf(el.name) !== -1){
-            run_params.estimator.args.push({
-              [el.name] : customParams[el.name]
-            })
+            run_params.estimator.args[el.name]  = customParams[el.name]
           }else{
             if(el.required === true || !customParams[el.name]){
-              run_params.estimator.args.push({
-                [el.name] : el.default
-              })
+              run_params.estimator.args[el.name] = el.default
             }
           }
         }
@@ -170,50 +175,51 @@ export default class ModelForms extends React.Component {
   }
 
   onClickRun(){
-    if(this.props.jupyter){
-      let run_params = this.constructParams();
-      fetch(flaskServer + '/model/models/to_code/' + this.props.model_id, {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          conf: run_params,
-          project_id: this.props.project_id,
-          staging_data_set_id: this.props.dataset_id,
-          schema: "seq"
-        })
-      }).then((response) => response.json())
-        .then((res) => {
-          this.setState({visible: false});
-          this.props.getCode(res.response);
-        })
-    }else{
-      this.setState({visible: true});
-      if(!this.state.end){
-        let run_params = this.constructParams();
-        fetch(flaskServer + '/model/models/run/' + this.props.model_id, {
-          method: 'post',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            conf: run_params,
-            project_id: this.props.project_id,
-            staging_data_set_id: this.props.dataset_id,
-            schema: "seq"
-          })
-        }).then((response) => response.json())
-          .then((res) => {
-            if (res.response === 'success') {
-              message.success(res.response);
-              this.setState({score: res.response.score});
-            }
-            this.props.modalSuccess();
-            this.setTimeout(this.setState({end: true}),2000);
-          })
-      }
-    }
+    let run_params = this.constructParams();
+    console.log(run_params);
+    // if(this.props.jupyter){
+    //   fetch(flaskServer + '/model/models/to_code/' + this.props.model_id, {
+    //     method: 'post',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({
+    //       conf: run_params,
+    //       project_id: this.props.project_id,
+    //       staging_data_set_id: this.props.dataset_id,
+    //       schema: "seq"
+    //     })
+    //   }).then((response) => response.json())
+    //     .then((res) => {
+    //       this.setState({visible: false});
+    //       this.props.getCode(res.response);
+    //     })
+    // }else{
+    //   this.setState({visible: true});
+    //   if(!this.state.end){
+    //     fetch(flaskServer + '/model/models/run/' + this.props.model_id, {
+    //       method: 'post',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify({
+    //         conf: run_params,
+    //         project_id: this.props.project_id,
+    //         staging_data_set_id: this.props.dataset_id,
+    //         schema: "seq"
+    //       })
+    //     }).then((response) => response.json())
+    //       .then((res) => {
+    //         if (res.response === 'success') {
+    //           message.success(res.response);
+    //           this.setState({score: res.response.score});
+    //         }
+    //         this.props.modalSuccess();
+    //         this.setState({end: true})
+    //         // setTimeout(this.setState({end: true}),2000);
+    //       })
+    //   }
+    // }
 
   }
 
@@ -223,12 +229,22 @@ export default class ModelForms extends React.Component {
     this.setState({customParams});
   }
 
+  onDeleteLayer(i){
+    let layerStack = this.state.layerStack;
+    let layerParams = this.state.layerParams;
+    console.log(layerStack, layerParams);
+    layerStack = layerStack.filter((el) => el!== i);
+    layerParams = layerParams.filter((el) => el.index !== i);
+    console.log(layerStack, layerParams);
+    this.setState({layerStack, layerParams});
+  }
+
   renderLayers() {
     if (this.props.params) {
       return (
         <div>
           {
-            this.state.params['params']['layers'].map((el) =>
+            this.state.params['params']['layers'] && this.state.params['params']['layers'].map((el) =>
               <Layer layers={this.state.layer}
                      key={Math.random()}
                      isActive={this.state.isActive}
@@ -248,8 +264,13 @@ export default class ModelForms extends React.Component {
             this.state.layer &&
             <div>
               {this.state.layerStack.map((el) =>
-                <Layer layers={this.state.layer} key={el} isActive={this.state.isActive}
+                <div key={el} style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                  <Icon type="close" style={{ fontSize: 10, color: '#CC241C' }} onClick={() => this.onDeleteLayer(el)} />
+                  <div style={{width: '90%', marginLeft: 5}}>
+                  <Layer layers={this.state.layer} isActive={this.state.isActive}
                        getParams={(value) => this.getParams(el, value)}/>
+                  </div>
+                </div>
               )}
               {this.state.isActive &&
               <Button style={{marginTop: 10}} size="small" onClick={() => this.addLayer()}>Add Layer</Button>
@@ -262,19 +283,36 @@ export default class ModelForms extends React.Component {
   }
 
   renderEstimator(){
-    return(
-      <div>
-      {
-      !isEmpty(this.state.custom) &&
-        <Estimator custom={this.state.custom['args']} isActive={this.state.isActive} getEstimator={(field, value) => this.getEstimator(field, value)} />
+    console.log(this.state.custom);
+    if (this.props.params) {
+      return(
+          this.state.params['params']['estimator'] &&
+            <div>
+              <p style={{color: '#108ee9'}}>Compile</p>
+              <Estimator isActive={this.state.isActive}
+                         params={this.state.params['params']['estimator']}/>
+            </div>
+
+      )
+    }else {
+      return (
+        <div>
+          {
+            !isEmpty(this.state.custom) &&
+            <Estimator custom={this.state.custom['args']}
+                       isActive={this.state.isActive}
+                       getEstimator={(field, value) => this.getEstimator(field, value)}/>
+          }
+        </div>
+        );
       }
-      </div>
-    )
-  }
+    }
+
 
   renderCompile(){
     if (this.props.params) {
       return (
+        this.state.params['params']['compile'] &&
         <div>
           <p style={{color: '#108ee9'}}>Compile</p>
           <Compile isActive={this.state.isActive}
@@ -408,7 +446,7 @@ export default class ModelForms extends React.Component {
                  onCancel={() => this.setState({visible: false})}
                   >
             {this.props.params?
-              <Curve data={this.state.params['results']['history']}/>:
+              (this.state.params['results'] && <Curve data={this.state.params['results']['history']}/>):
               <Visual data={this.state.ioData} end={this.state.end}/>
             }
           </Modal>

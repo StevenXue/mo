@@ -9,6 +9,7 @@
 # Further to FIXME of None
 """
 # -*- coding: UTF-8 -*-
+from copy import deepcopy
 
 from server3.entity.project import Project
 # from server3.repository import job_repo
@@ -29,6 +30,10 @@ def add(name, description, create_time):
     project_obj = Project(name=name, description=description,
                           create_time=create_time)
     return project_repo.create(project_obj)
+
+
+def add_by_obj(obj):
+    return project_repo.create(obj)
 
 
 def get_by_id(object_id):
@@ -63,7 +68,19 @@ def insert_job_by_id(project_id, job_obj):
                                                     {'jobs': job_obj})
 
 
+def update_by_id(project_id, **update):
+    return project_repo.update_one_by_id(project_id, update)
+
+
 def add_and_update_one_by_id(project_id, result_obj, job_obj):
     return project_repo.insert_to_list_fields_by_id(project_id,
                                                     {'results': result_obj,
-                                                  'jobs': job_obj})
+                                                     'jobs': job_obj})
+
+
+def copy(project):
+    project_cp = deepcopy(project)
+    project_cp.id = None
+    project_cp.jobs = []
+    project_repo.create(project_cp)
+    return project_cp

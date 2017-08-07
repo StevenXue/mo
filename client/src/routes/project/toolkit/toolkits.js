@@ -1,32 +1,46 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import { Button, Select, Icon, message, Checkbox, Input, Steps, Modal} from 'antd'
+import { Button, Select, message, Checkbox, Input, Steps, Modal, Transfer} from 'antd'
 const Step = Steps.Step;
-import { jupyterServer, flaskServer } from '../../../constants';
 import { Router, routerRedux } from 'dva/router';
-import ReactJson from 'react-json-view';
-import VisualizationPanel from './visualizationPanel';
-let hasOwnProperty = Object.prototype.hasOwnProperty;
-function isEmpty(obj) {
-  if (obj == null) return true;
-  if (obj.length > 0)    return false;
-  if (obj.length === 0)  return true;
-  if (typeof obj !== "object") return true;
-  for (let key in obj) {
-    if (hasOwnProperty.call(obj, key)) return false;
-  }
+//import ReactJson from 'react-json-view';
+import JSONTree from 'react-json-tree'
 
-  return true;
-}
+import { jupyterServer, flaskServer } from '../../../constants';
+import { isEmpty } from '../../../utils/utils'
+import VisualizationPanel from './visualizationPanel';
+import ParamsSeletor from './paramSelector'
+
+const theme = {
+  scheme: 'google',
+  author: 'seth wright (http://sethawright.com)',
+  base00: '#1d1f21',
+  base01: '#282a2e',
+  base02: '#373b41',
+  base03: '#969896',
+  base04: '#b4b7b4',
+  base05: '#c5c8c6',
+  base06: '#e0e0e0',
+  base07: '#ffffff',
+  base08: '#CC342B',
+  base09: '#F96A38',
+  base0A: '#FBA922',
+  base0B: '#198844',
+  base0C: '#3971ED',
+  base0D: '#3971ED',
+  base0E: '#A36AC7',
+  base0F: '#3971ED'
+};
 
 export default class Toolkit extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       toolkits: [],
-      selectable: 0,
-      extraInput: [],
-      constant: '',
+      selectable: [],
+      selectableType: [],
+      constant: {},
       data_set: [],
       selectedDataName: '',
       dataColumns: [],
@@ -36,8 +50,13 @@ export default class Toolkit extends React.Component {
       selectedData: '',
       current: 0,
       visible: false,
-      resultJson: {},
+      resultJson:  {},
       visual_sds_id: "",
+      type: "select_box",
+      targetKeys:[],
+      selectedKeys: [],
+      divide: [],
+      description: [],
       steps : [{
         title: 'Choose ToolKit',
       }, {
@@ -50,11 +69,19 @@ export default class Toolkit extends React.Component {
 
   componentDidMount () {
     if(this.props.params[this.props.section_id]) {
+      this.setState({current: 2});
       let params = this.props.params[this.props.section_id]
-      this.setState({
-        current: 2,
-        checkedCols: params.fields
-      });
+      if( params.fields.target === null ) {
+        this.setState({
+          checkedCols: params.fields.source,
+          type: 'select_box'
+        });
+      }else{
+        this.setState({
+          divide: [params.fields.source, params.fields.target],
+          type: 'transfer_box'
+        });
+      }
       this.setState({
         steps:[{
           title: params.toolkit.name,
@@ -91,90 +118,111 @@ export default class Toolkit extends React.Component {
         'Content-Type': 'application/json',
       },
     }).then((response) => response.json())
-      .then((res) => {
+      .then((res) =>
           this.setState({ data_set: res.response })
-        },
       );
   }
 
   handleChange (e) {
-    //console.log(this.state.toolkits);
     let selected = this.state.toolkits.filter((el) => el._id === e);
     let selectedName = selected[0].name;
-    let toolkit = this.state.toolkits
-    let target = toolkit.filter((el) => el._id === e)
-    let extra = []
+    let target = this.state.toolkits.filter((el) => el._id === e)
     let parameterSpec = target[0].parameter_spec
-    if ('k' in parameterSpec) {
-      extra.push('k值')
-    }
-    let selectable = 0
+    let type = parameterSpec.data.type.key;
+    this.setState({type});
 
-    if ('input_data' in parameterSpec) {
-      if (parameterSpec.input_data.type && parameterSpec.input_data.type === 'list') {
-        selectable = parameterSpec.input_data.dimension
+    let selectable = [];
+    let description = [];
+    let info = '';
+    let selectableType = [];
+    if(parameterSpec.data.len_range) {
+      selectable.push([parameterSpec.data.len_range[0], parameterSpec.data.len_range[1]])
+      if(parameterSpec.data.len_range[0] === parameterSpec.data.len_range[1]){
+        info = 'Choose ' + parameterSpec.data.len_range[0];
+      }else{
+        info = 'Choose no less then ' +parameterSpec.data.len_range[0];
+        if(parameterSpec.data.len_range[1]){
+          info = info + " and no more then " + parameterSpec.data.len_range[1];
+        }
       }
+      selectableType.push(parameterSpec.data.data_type);
+      info = info + ' fields.\n';
+      description.push(info);
+      description.push(`chosen data type should be ${parameterSpec.data.data_type}.\n`)
+    }else if(parameterSpec.data.x_len_range){
+      selectable.push(parameterSpec.data.x_len_range);
+      if(parameterSpec.data.x_len_range[0] === parameterSpec.data.x_len_range[1]){
+        info = 'Choose ' + parameterSpec.data.len_range[0] + ' source fields.\n';
+      }else{
+        info = 'Choose no less then ' +parameterSpec.data.x_len_range[0];
+        if(parameterSpec.data.x_len_range[1]){
+          info = info + " and no more then " + parameterSpec.data.x_len_range[1];
+        }
+        info = info + ' source fields.\n'
+      }
+      description.push(info);
+      description.push(` source type should be ${parameterSpec.data.x_data_type}. \n`);
+
+      selectable.push(parameterSpec.data.y_len_range);
+      if(parameterSpec.data.y_len_range[0] === parameterSpec.data.y_len_range[1]){
+        info = 'Choose ' + parameterSpec.data.y_len_range[0] + ' target fields.\n';
+      }else{
+        info = 'Choose no less then ' +parameterSpec.data.y_len_range[0];
+        if(parameterSpec.data.y_len_range[1]){
+          info = info + " and no more then " + parameterSpec.data.y_len_range[1];
+        }
+        info = info + ' target fields.\n'
+      }
+      description.push(info);
+      description.push(` target type should be ${parameterSpec.data.y_data_type}. \n`);
+
+      console.log(parameterSpec.data.x_data_type, parameterSpec.data.y_data_type);
+      selectableType.push(parameterSpec.data.x_data_type);
+      selectableType.push(parameterSpec.data.y_data_type);
     }
 
-    if (selectable === null) {
-      selectable = '任意'
+    if(parameterSpec.args) {
+      let name = parameterSpec.args[0].name;
+      this.setState({
+        constant: {
+          [name]: 0
+        }
+      });
+      description.push(`${parameterSpec.args.length} constants is required.\n`)
+    }else{
+      this.setState({
+        constant: {}
+      });
     }
+
+    console.log(selectableType);
 
     this.setState({
       toolkit: e,
       selectable,
-      extraInput: extra,
+      selectableType,
+      description,
       selectedName
     })
 
   }
 
-  onSelectDataSet (values) {
-    let selected = this.state.data_set.filter((el) => el._id === values);
-    let selectedName = selected[0].name;
-    console.log(selectedName);
-    this.setState({ selectedData: values, selectedDataName: selectedName })
-    //this.setState({dataColumns: mockResult});
-    fetch(flaskServer + '/staging_data/staging_data_sets/fields?staging_data_set_id=' + values, {
-      method: 'get',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then((response) => response.json())
-      .then((res) => {
-        this.setState({ dataColumns: res.response })
-        },
-      )
-      .catch((err) => console.log('Error: /staging_data/staging_data_sets/fields', err))
-  }
-
-  onCheckCol (e) {
-    let c = e.target.id
-    let max = this.state.selectable
-    let checked = this.state.checkedCols
-    if (e.target.checked === true) {
-      checked.push(c)
-    } else {
-      checked.pop()
-    }
-    this.setState({ checkedCols: checked });
-    // console.log(this.state.checkedCols);
-  }
-
   onRunClick () {
-    let kValue;
-    if(document.getElementById('k值')) {
-      kValue = document.getElementById('k值').value;
-      this.setState({constant: kValue});
-    }
+
     let body = {
       'staging_data_set_id': this.state.selectedData,
-      'fields': this.state.checkedCols,
+      "conf": {
+        "args": this.state.constant
+      },
       'toolkit_id': this.state.toolkit,
       'project_id': this.props.project_id
     };
-    kValue && (body['k'] = kValue)
-    //console.log('body', body);
+    if(this.state.type === 'select_box'){
+      body['conf']['data_fields'] = this.state.checkedCols
+    }else{
+      body['conf']['data_fields'] = this.state.divide
+    }
+
     fetch(flaskServer + '/toolkit/toolkits/staging_data_set', {
       method: 'post',
       headers: {
@@ -220,7 +268,7 @@ export default class Toolkit extends React.Component {
           title: 'Result',
         }]
       });
-      if(this.state.checkedCols.length === 0){
+      if(this.state.checkedCols.length === 0 && this.state.type === 'select_box'){
         message.error("please choose data fields");
       }else{
         const current = this.state.current + 1;
@@ -236,102 +284,85 @@ export default class Toolkit extends React.Component {
     this.setState({ current });
   }
 
-  renderCheckBoxTable () {
-    let col = this.state.dataColumns
-    if (col.length !== 0) {
-      return col.map((el) =>
-        <div style={{ marginTop: 10 }}>
-          <Checkbox onChange={(e) => this.onCheckCol(e)}
-                    key={el[0]}
-                    id={el[0]}>{el[0] + '(' + el[1] + ')'}</Checkbox>
-        </div>,
-      )
-    } else {
-      return null
-    }
-  }
-
-  renderInputs () {
-    let fields = this.state.extraInput
-    if (fields.length !== 0) {
-      return fields.map((e) =>
-        <div style={{ marginTop: 10 }}>
-          <Input placeholder={e} id={e}/>
-        </div>,
-      )
-    } else {
-      return null
-    }
-  }
-
-  renderOptions () {
-    if(this.state.toolkits) {
-      let toolkit = this.state.toolkits;
-      return toolkit.map((e) =>
-        <Select.Option value={e._id} key={e.name}>
-          {e.name}
-        </Select.Option>)
-    }else{
-      return null;
-    }
+  setData(value){
+    console.log(value);
+    Object.keys(value).map((e) => {
+      this.setState({[e]: value[e]})
+    });
+    //console.log(this.state);
   }
 
   renderStepContent(){
-    let count = this.state.current;
-    switch(count){
+    switch(this.state.current){
       case  0:
         return(
           <div style={{marginTop: 10, marginLeft: 5, width: '25%'}}>
             <Select className="toolkit" style={{ width: '100%' }} onChange={(e) => this.handleChange(e)}
                          placeholder="Choose Method" allowClear>
-              {this.renderOptions()}
+              {
+                this.state.toolkits && this.state.toolkits.map((e) =>
+                <Select.Option value={e._id} key={e.name}>
+                  {e.name}
+                </Select.Option>)
+              }
             </Select>
           </div>
         );
 
       case 1:
         return (
-          <div style={{marginTop: 10, marginLeft: '40%', width: '25%'}}>
-            <Select className="dataset-select"
-                    style={{ width: '100%', marginTop: 10 }}
-                    onChange={(values) => this.onSelectDataSet(values)}
-                    value={this.state.selectedData}
-                    placeholder="Choose DataSet"
-                    allowClear>
+          <div style={{marginTop: 10, display: 'flex', flexDirection: 'row'}}>
+            <div style={{ width: '40%'}}>
               {
-                this.state.data_set.map((e) =>
-                  <Select.Option value={e._id} key={e._id}>
-                    {e.name}
-                  </Select.Option>
+                this.state.description.length !== 0 &&
+                this.state.description.map((el) =>
+                  <p key={el}>
+                    {el}
+                  </p>
                 )
               }
-            </Select>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ marginLeft: -20 }}>
-                <h4 style={{marginLeft: 20, marginTop: 10}}>{"choose " + this.state.selectable + " fields"}</h4>
-                {this.renderInputs()}
-                <div style={{ height: 300, overflowY: 'auto', marginBottom: 10}}>
-                  {this.renderCheckBoxTable()}
-                </div>
-              </div>
+            </div>
+            <div>
+             <ParamsSeletor data_set={this.state.data_set}
+                            type={this.state.type}
+                            selectableType={this.state.selectableType}
+                            constant={this.state.constant}
+                            setData={(value) => this.setData(value)}
+                            selectable={this.state.selectable}/>
             </div>
           </div>
         )
 
       case 2:
         return (
-          <div style={{marginTop: 10, marginLeft: '46%', display: 'flex', flexDirection: 'row'}}>
+          <div style={{marginTop: 10, display: 'flex', flexDirection: 'row'}}>
+            <div style={{ width: '48%'}}>
+              {
+                this.state.description.length !== 0 &&
+                this.state.description.map((el) =>
+                  <p key={el}>
+                    {el}
+                  </p>
+                )
+              }
+            </div>
             <div style={{width: '40%'}}>
               <p>Chosen Input Constant:</p>
-              <p style={{color: '#00AAAA'}}>{this.state.constant}</p>
+              {
+                Object.keys(this.state.constant)&&
+                <p style={{color: '#00AAAA'}}>{this.state.constant[Object.keys(this.state.constant)[0]]}</p>
+              }
               <p>Selected Fields:</p>
               {this.renderSelections()}
             </div>
-            <div style={{marginTop: 10, marginLeft: '30%', height: 200, overflowY: 'auto'}}>
+            <div style={{marginTop: 10, height: 250}}>
               {
                 !isEmpty(this.state.resultJson) &&
-                  <div>
-                    <ReactJson src={ this.state.resultJson } style={{width: '100%', height: 400}}/>
+                  <div style={{height: 200, overflowY: 'auto'}}>
+                    <JSONTree data={ this.state.resultJson }
+                              style={{width: '100%', height: 400}}
+                              theme={theme}
+                              invertTheme={true} />
                   </div>
               }
               <Button onClick={() => this.setState({visible: true})}>Visualization</Button>
@@ -350,8 +381,30 @@ export default class Toolkit extends React.Component {
   }
 
   renderSelections(){
-    let selectedCols = this.state.checkedCols;
-    return selectedCols.map((el) => <p style={{color: '#00AAAA'}}>{el}</p>)
+    //`console.log(this.state.type);
+    if(this.state.type === 'select_box') {
+      let selectedCols = this.state.checkedCols;
+      return selectedCols.map((el) => <p style={{color: '#00AAAA'}}>{el}</p>)
+    }else if(this.state.type === 'transfer_box'){
+      return(
+        <div style={{display: 'flex', flexDirection: 'row'}}>
+          <div>
+            <p>Source</p>
+            {
+              this.state.divide[0] &&
+              this.state.divide[0].map((el) => <p style={{color: '#00AAAA'}} key={el}>{el}</p>)
+            }
+          </div>
+          <div style={{marginLeft: 20}}>
+            <p>Target</p>
+            {
+              this.state.divide[1] &&
+              this.state.divide[1].map((el) => <p style={{color: '#00AAAA'}} key={el}>{el}</p>)
+            }
+          </div>
+        </div>
+      )
+    }
   }
 
   render () {

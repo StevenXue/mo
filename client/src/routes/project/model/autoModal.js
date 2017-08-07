@@ -4,9 +4,8 @@ import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import Model from './modelProcess.js'
 import { Button, message, Radio, Input, Card, Spin, Select, Tag, Icon } from 'antd'
-import { flaskServer, stepStyle } from '../../../constants'
+import { flaskServer, stepStyle, assetsUrl } from '../../../constants'
 import { TourArea } from '../../../components'
-import modelling from '../../../media/videos/modelling.mp4'
 
 const steps = [
   {
@@ -27,7 +26,7 @@ const steps = [
     title: 'Choose Parameters',
     text: <TourArea
       text='Choose the parameters for modelling'
-      src={modelling}/>,
+      src={assetsUrl + '/videos/modelling.mp4'}/>,
     selector: '.choose_params',
     position: 'top',
     style: stepStyle,
@@ -50,7 +49,7 @@ export default class AutomatedModel extends React.Component {
       statusStack: [],
       columns: [],
       //custom: {}
-      params: []
+      params: [],
     }
   }
 
@@ -62,20 +61,20 @@ export default class AutomatedModel extends React.Component {
       },
     }).then((response) => response.json())
       .then((res) => {
-          let params = res.response.model;
-          params = params.filter((e) => e.status === 200);
+          let params = res.response.model
+          params = params.filter((e) => e.status === 200)
           // console.log(params);
-          this.setState({ params });
-          if(res.response.model.length === 0){
-            let statusStack = [true];
-            this.setState({statusStack});
-          }else{
-            let statusStack = [];
-            let l = params.length;
-            for(let i = 0; i < l; i++ ){
-              statusStack.push(false);
+          this.setState({ params })
+          if (res.response.model.length === 0) {
+            let statusStack = [true]
+            this.setState({ statusStack })
+          } else {
+            let statusStack = []
+            let l = params.length
+            for (let i = 0; i < l; i++) {
+              statusStack.push(false)
             }
-            this.setState({statusStack});
+            this.setState({ statusStack })
           }
 
           fetch(flaskServer + '/staging_data/staging_data_sets?project_id=' + this.props.project_id, {
@@ -85,11 +84,11 @@ export default class AutomatedModel extends React.Component {
             },
           }).then((response) => response.json())
             .then((res) =>
-                this.setState({ data_set: res.response, loading: false})
-            );
+              this.setState({ data_set: res.response, loading: false }),
+            )
 
         },
-      );
+      )
   }
 
   addNewModel () {
@@ -99,8 +98,8 @@ export default class AutomatedModel extends React.Component {
   }
 
   onSelectDataSet (values) {
-    let selected = this.state.data_set.filter((el) => el._id === values);
-    let selectedName = selected[0].name;
+    let selected = this.state.data_set.filter((el) => el._id === values)
+    let selectedName = selected[0].name
     this.setState({ selectedData: values, selectedDataName: selectedName, loading: true })
     fetch(flaskServer + '/staging_data/staging_data_sets/' + values, {
       method: 'get',
@@ -118,25 +117,25 @@ export default class AutomatedModel extends React.Component {
             loading: false,
           })
           console.log(res.response)
-          let c = Object.keys(res.response.data[1])
-          this.setState({ columns: c, loading: false })
+          //let c = Object.keys(res.response.data[1])
+          this.setState({ columns: res.response.columns, loading: false })
         },
       )
       .catch((err) => console.log('Error: /staging_data/staging_data_sets/fields', err))
   }
 
-  deactivete(i){
-    let array = this.state.statusStack;
-    array[i] = false;
-    this.setState({statusStack: array});
+  deactivate (i) {
+    let array = this.state.statusStack
+    array[i] = false
+    this.setState({ statusStack: array })
   }
 
-  render() {
-    return(
+  render () {
+    return (
       <Spin spinning={this.state.loading}>
         <div style={{ width: '100%', display: 'flex', flexDirection: 'row', overflowX: 'auto' }}>
           <div className='modelling_dataset' style={{
-            width: '25%', marginTop: 10, marginLeft: 10, display: 'flex', height: 500, flexDirection: 'column',
+            width: '20%', marginTop: 10, marginLeft: 10, display: 'flex', height: '100%', flexDirection: 'column',
             alignItems: 'center',
           }}>
             <span style={{ color: '#108ee9' }}>Choose Dataset for modelling</span>
@@ -218,20 +217,19 @@ export default class AutomatedModel extends React.Component {
                         shape="circle" icon="question" onClick={() => this.props.runTour(steps)}
                 />
               </div>
-
-          <div style={{ height: 480, overflowY: 'auto', marginTop: 5, backgroundColor: '#fafafa' }}>
-            {
-              this.state.statusStack.map((el, i) =>
-                <Model style={{width: 1200, height: el?450: 300}}
-                       project_id={this.props.project_id}
-                       dataset_id={this.state.selectedData}
-                       key={i}
-                       cols={this.state.columns}
-                       jupyter={false}params={this.state.params[i]}
-                       modalSuccess={() => this.deactivate(i)}
-                       isActive={el}/>)
-            }
-          </div>
+              <div style={{ height: 480, overflowY: 'auto', marginTop: 5, backgroundColor: '#fafafa' }}>
+                {
+                  this.state.statusStack.map((el, i) =>
+                    <Model style={{ width: 1200, height: el ? 450 : 300 }}
+                           project_id={this.props.project_id}
+                           dataset_id={this.state.selectedData}
+                           key={i}
+                           cols={this.state.columns}
+                           jupyter={false} params={this.state.params[i]}
+                           modalSuccess={() => this.deactivate(i)}
+                           isActive={el}/>)
+                }
+              </div>
 
             </div>
           </div>

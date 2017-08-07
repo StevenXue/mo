@@ -11,9 +11,8 @@ import JupyterNotebook from './jupyterNotebook'
 import Preprocess from '../preprocess/preprocess'
 import AutomatedModel from '../model/autoModal'
 import DataPreview from './dataPreview'
-import { stepStyle } from '../../../constants'
+import { stepStyle, assetsUrl } from '../../../constants'
 import { TourArea } from '../../../components'
-import chooseData from '../../../media/videos/choose_data.mp4'
 import empty from './empty.ipynb'
 import style from './detail.css'
 // 全局css，在index里去import
@@ -27,7 +26,7 @@ const { Option } = Select
 const defaultSteps = [
   {
     title: 'Choose Data',
-    text: <TourArea text='Click to choose your data set to use in this project' src={chooseData}/>,
+    text: <TourArea text='Click to choose your data set to use in this project' src={assetsUrl+'/videos/choose_data.mp4'}/>,
     selector: '[class*="dataChooseButton"]',
     position: 'bottom',
     style: stepStyle,

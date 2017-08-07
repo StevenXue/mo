@@ -28,9 +28,6 @@ toolkit_repo = ToolkitRepo(Toolkit)
 
 
 def get_by_toolkit_name(toolkit_name):
-    # toolkit_obj = Toolkit(name=toolkit_name)
-    # print 'toolkit_obj', toolkit_obj.name
-    # return toolkit_repo.read_by_toolkit_name(toolkit_obj)
     return toolkit_repo.read_by_unique_field('name', toolkit_name)
 
 
@@ -60,8 +57,7 @@ def create_public_toolkit():
 
     AVG = Toolkit(name='平均值',
                   description='计算所选数据集合的平均值',
-                  category="描述性统计",
-                  result_form=1,
+                  category=4,
                   entry_function='toolkit_average',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_average),
                   parameter_spec={
@@ -79,14 +75,24 @@ def create_public_toolkit():
                           'len_range': [1, 1],
                           'data_type': ['int', 'float']
                       }
+                  },
+                  result_spec={
+                      "if_reserved": False,
+                      "args": [
+                          {
+                              "name": "average",
+                              "des": "所选范围的样本的平均值",
+                              "if_add_column": False,
+                              "attribute": "value"
+                          }
+                      ]
                   })
     AVG = toolkit_repo.create(AVG)
     ownership_business.add(user, False, toolkit=AVG)
 
     MEDIAN = Toolkit(name='中位数',
                      description='计算所选数据集合的中位数',
-                     category="描述性统计",
-                     result_form=1,
+                     category=4,
                      entry_function='toolkit_median',
                      target_py_code=inspect.getsource(toolkit_orig.toolkit_median),
                      parameter_spec={
@@ -104,14 +110,24 @@ def create_public_toolkit():
                              'len_range': [1, 1],
                              'data_type': ['int', 'float']
                          }
+                     },
+                     result_spec={
+                         "if_reserved": False,
+                         "args": [
+                             {
+                                 "name": "median",
+                                 "des": "所选范围的样本的中位数",
+                                 "if_add_column": False,
+                                 "attribute": "value"
+                             }
+                         ]
                      })
     MEDIAN = toolkit_repo.create(MEDIAN)
     ownership_business.add(user, False, toolkit=MEDIAN)
 
     MODE = Toolkit(name='众数',
                    description='计算所选数据集合的众数',
-                   category="描述性统计",
-                   result_form=1,
+                   category=4,
                    entry_function='toolkit_mode',
                    target_py_code=inspect.getsource(toolkit_orig.toolkit_mode),
                    parameter_spec={
@@ -129,13 +145,30 @@ def create_public_toolkit():
                            'len_range': [1, 1],
                            'data_type': ['int', 'float']
                        }
+                   },
+                   result_spec={
+                       "if_reserved": False,
+                       "args": [
+                           {
+                               "name": "mode",
+                               "des": "所选范围的样本的众数",
+                               "if_add_column": False,
+                               "attribute": "value"
+                           },
+                           {
+                               "name": "number",
+                               "des": "众数的个数",
+                               "if_add_column": False,
+                               "attribute": "value"
+                           }
+                       ]
                    })
     MODE = toolkit_repo.create(MODE)
     ownership_business.add(user, False, toolkit=MODE)
 
     SMA = Toolkit(name='移动平均值',
                   description='计算所选数据集合的移动平均值',
-                  category="描述性统计",
+                  category=4,
                   result_form=3,
                   entry_function='toolkit_moving_average',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_moving_average),
@@ -166,14 +199,24 @@ def create_public_toolkit():
                               'required': True
                           }
                       ]
+                  },
+                  result_spec={
+                      "if_reserved": False,
+                      "args": [
+                          {
+                              "name": "simple moving average",
+                              "des": "所选范围的样本的移动平均值",
+                              "if_add_column": False,
+                              "attribute": "value"
+                          }
+                      ]
                   })
     SMA = toolkit_repo.create(SMA)
     ownership_business.add(user, False, toolkit=SMA)
 
     RANGE = Toolkit(name='全距',
                     description='计算所选数据集合的最大/最小值之差',
-                    category="描述性统计",
-                    result_form=1,
+                    category=4,
                     entry_function='toolkit_range',
                     target_py_code=inspect.getsource(toolkit_orig.toolkit_range),
                     parameter_spec={
@@ -191,14 +234,24 @@ def create_public_toolkit():
                             'len_range': [1, 1],
                             'data_type': ['int', 'float']
                         }
+                    },
+                    result_spec={
+                        "if_reserved": False,
+                        "args": [
+                            {
+                                "name": "range",
+                                "des": "所选范围的样本的全距(即数据的范围)",
+                                "if_add_column": False,
+                                "attribute": "value"
+                            }
+                        ]
                     })
     RANGE = toolkit_repo.create(RANGE)
     ownership_business.add(user, False, toolkit=RANGE)
 
     STD = Toolkit(name='标准差',
                   description='计算所选数据集合的标准差',
-                  category="描述性统计",
-                  result_form=1,
+                  category=4,
                   entry_function='toolkit_std',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_std),
                   parameter_spec={
@@ -216,13 +269,24 @@ def create_public_toolkit():
                           'len_range': [1, 1],
                           'data_type': ['int', 'float']
                       }
+                  },
+                  result_spec={
+                      "if_reserved": False,
+                      "args": [
+                          {
+                              "name": "std",
+                              "des": "所选范围的样本的标准差",
+                              "if_add_column": False,
+                              "attribute": "value"
+                          }
+                      ]
                   })
     STD = toolkit_repo.create(STD)
     ownership_business.add(user, False, toolkit=STD)
 
     VAR = Toolkit(name='方差',
                   description='计算所选数据集合的方差',
-                  category="描述性统计",
+                  category=4,
                   result_form=1,
                   entry_function='toolkit_variance',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_variance),
@@ -241,6 +305,17 @@ def create_public_toolkit():
                           'len_range': [1, 1],
                           'data_type': ['int', 'float']
                       }
+                  },
+                  result_spec={
+                      "if_reserved": False,
+                      "args": [
+                          {
+                              "name": "variance",
+                              "des": "所选范围的样本的方差",
+                              "if_add_column": False,
+                              "attribute": "value"
+                          }
+                      ]
                   })
     VAR = toolkit_repo.create(VAR)
     ownership_business.add(user, False, toolkit=VAR)
@@ -248,8 +323,7 @@ def create_public_toolkit():
     # Result_orm 重新设计
     PEARSON = Toolkit(name='皮尔森相关系数',
                       description='计算所选数据集合的皮尔森相关系数, 表达两变量之间(线性)相关系数',
-                      category="统计推断",
-                      result_form=1,
+                      category=4,
                       entry_function='toolkit_pearson',
                       target_py_code=inspect.getsource(toolkit_orig.toolkit_pearson),
                       parameter_spec={
@@ -267,6 +341,17 @@ def create_public_toolkit():
                               'len_range': [2, 2],
                               'data_type': ['int', 'float']
                           }
+                      },
+                      result_spec={
+                          "if_reserved": False,
+                          "args": [
+                              {
+                                  "name": "pearson",
+                                  "des": "所选范围的样本的皮尔森相关系数",
+                                  "if_add_column": False,
+                                  "attribute": "value"
+                              }
+                          ]
                       })
     PEARSON = toolkit_repo.create(PEARSON)
     ownership_business.add(user, False, toolkit=PEARSON)
@@ -293,7 +378,7 @@ def create_public_toolkit():
                         },
                         "args": [
                             {
-                                'name': 'k',
+                                'name': 'n_clusters',
                                 'type': {
                                     'key': 'int',
                                     'des': 'the number of clustering numbers',
@@ -342,8 +427,7 @@ def create_public_toolkit():
 
     PCA = Toolkit(name='降维PCA-主成分分析算法',
                   description='计算所选数据集合(多为数据)的降维，default自动降维，输入k可降到k维',
-                  category="降维",
-                  result_form=2,
+                  category=3,
                   entry_function='dimension_reduction_PCA',
                   target_py_code=inspect.getsource(toolkit_orig.dimension_reduction_PCA),
                   parameter_spec={
@@ -369,8 +453,49 @@ def create_public_toolkit():
                                   'des': 'the number of clustering numbers',
                                   'range': [1, None]
                               },
-                              'default': 2,
+                              'default': 'mle',
                               'required': True
+                          }
+                      ]
+                  },
+                  result_spec={
+                      "if_reserved": True,
+                      "args": [
+                          {
+                              "name": "降维结果",
+                              "des": "所选范围的样本的降维后的结果",
+                              "if_add_column": True,
+                              "attribute": "value"
+                          },
+                          {
+                              "name": "components",
+                              "des": "所选范围的样本的降维后的结果",
+                              "if_add_column": False,
+                              "attribute": "value"
+                          },
+                          {
+                              "name": "explained_variance",
+                              "des": "所选范围的样本的降维后的结果",
+                              "if_add_column": False,
+                              "attribute": "bar"
+                          },
+                          {
+                              "name": "explained_variance_ratio_",
+                              "des": "所选范围的样本的降维后的结果",
+                              "if_add_column": False,
+                              "attribute": "pie"
+                          },
+                          {
+                              "name": "mean_",
+                              "des": "所选范围的样本的降维后的结果",
+                              "if_add_column": False,
+                              "attribute": "general_info"
+                          },
+                          {
+                              "name": "noise_variance",
+                              "des": "所选范围的样本的降维后的结果",
+                              "if_add_column": False,
+                              "attribute": "general_info"
                           }
                       ]
                   })
@@ -379,8 +504,7 @@ def create_public_toolkit():
 
     TSNE = Toolkit(name='降维TSNE-t_分布邻域嵌入算法',
                    description='计算所选数据集合(多维数据)的降维，default自动降维，输入k可降到k维，通常为了方便可视化，降至2维',
-                   category="降维",
-                   result_form=2,
+                   category=3,
                    entry_function='dimension_reduction_TSNE',
                    target_py_code=inspect.getsource(toolkit_orig.dimension_reduction_TSNE),
                    parameter_spec={
@@ -410,14 +534,30 @@ def create_public_toolkit():
                                'required': True
                            }
                        ]
+                   },
+                   result_spec={
+                       "if_reserved": True,
+                       "args": [
+                           {
+                               "name": "降维结果",
+                               "des": "所选范围的样本的降维后的结果",
+                               "if_add_column": True,
+                               "attribute": "value"
+                           },
+                           {
+                               "name": "kl_divergence",
+                               "des": "所选范围的样本的降维后的结果",
+                               "if_add_column": False,
+                               "attribute": "general_info"
+                           }
+                       ]
                    })
     TSNE = toolkit_repo.create(TSNE)
     ownership_business.add(user, False, toolkit=TSNE)
 
     N = Toolkit(name='数据量',
                 description='返回数据个数',
-                category="描述性统计",
-                result_form=1,
+                category=4,
                 entry_function='toolkit_n',
                 target_py_code=inspect.getsource(toolkit_orig.toolkit_n),
                 parameter_spec={
@@ -435,14 +575,24 @@ def create_public_toolkit():
                         'len_range': [1, 1],
                         'data_type': ['int', 'float']
                     }
+                },
+                result_spec={
+                    "if_reserved": False,
+                    "args": [
+                        {
+                            "name": "number",
+                            "des": "所选范围的样本个数",
+                            "if_add_column": False,
+                            "attribute": "value"
+                        }
+                    ]
                 })
     N = toolkit_repo.create(N)
     ownership_business.add(user, False, toolkit=N)
 
     IQR = Toolkit(name='IQR',
                   description='数据列的IQR',
-                  category="描述性统计",
-                  result_form=1,
+                  category=4,
                   entry_function='toolkit_IQR',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_IQR),
                   parameter_spec={
@@ -460,14 +610,24 @@ def create_public_toolkit():
                           'len_range': [1, 1],
                           'data_type': ['int', 'float']
                       }
+                  },
+                  result_spec={
+                      "if_reserved": False,
+                      "args": [
+                          {
+                              "name": "四分位距",
+                              "des": "所选范围的样本死分数",
+                              "if_add_column": False,
+                              "attribute": "value"
+                          }
+                      ]
                   })
     IQR = toolkit_repo.create(IQR)
     ownership_business.add(user, False, toolkit=IQR)
 
     CV = Toolkit(name='变异系数',
                  description='返回数据变异系数',
-                 category="描述性统计",
-                 result_form=1,
+                 category=4,
                  entry_function='toolkit_cv',
                  target_py_code=inspect.getsource(toolkit_orig.toolkit_cv),
                  parameter_spec={
@@ -485,14 +645,24 @@ def create_public_toolkit():
                          'len_range': [1, 1],
                          'data_type': ['int', 'float']
                      }
+                 },
+                 result_spec={
+                     "if_reserved": False,
+                     "args": [
+                         {
+                             "name": "cv",
+                             "des": "所选范围的样本的变异系数",
+                             "if_add_column": False,
+                             "attribute": "value"
+                         }
+                     ]
                  })
     CV = toolkit_repo.create(CV)
     ownership_business.add(user, False, toolkit=CV)
 
     MAX = Toolkit(name='最大值',
                   description='返回数据最大值',
-                  category="描述性统计",
-                  result_form=1,
+                  category=4,
                   entry_function='toolkit_max',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_max),
                   parameter_spec={
@@ -510,14 +680,24 @@ def create_public_toolkit():
                           'len_range': [1, 1],
                           'data_type': ['int', 'float']
                       }
+                  },
+                  result_spec={
+                      "if_reserved": False,
+                      "args": [
+                          {
+                              "name": "max",
+                              "des": "所选范围的样本的最大值",
+                              "if_add_column": False,
+                              "attribute": "value"
+                          }
+                      ]
                   })
     MAX = toolkit_repo.create(MAX)
     ownership_business.add(user, False, toolkit=MAX)
 
     MIN = Toolkit(name='最小值',
                   description='返回数据最小值',
-                  category="描述性统计",
-                  result_form=1,
+                  category=4,
                   entry_function='toolkit_min',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_min),
                   parameter_spec={
@@ -535,6 +715,17 @@ def create_public_toolkit():
                           'len_range': [1, 1],
                           'data_type': ['int', 'float']
                       }
+                  },
+                  result_spec={
+                      "if_reserved": False,
+                      "args": [
+                          {
+                              "name": "min",
+                              "des": "所选范围的样本的最小值",
+                              "if_add_column": False,
+                              "attribute": "value"
+                          }
+                      ]
                   })
     MIN = toolkit_repo.create(MIN)
     ownership_business.add(user, False, toolkit=MIN)
@@ -552,8 +743,7 @@ def create_public_toolkit():
     # Result_Form 重新设计
     CORRELATION = Toolkit(name='数据互相关',
                           description='返回数据correlation',
-                          category="统计推断",
-                          result_form=1,
+                          category=4,
                           entry_function='toolkit_correlation',
                           target_py_code=inspect.getsource(toolkit_orig.toolkit_correlation),
                           parameter_spec={
@@ -571,6 +761,17 @@ def create_public_toolkit():
                                   'len_range': [2, 2],
                                   'data_type': ['int', 'float']
                               }
+                          },
+                          result_spec={
+                              "if_reserved": False,
+                              "args": [
+                                  {
+                                      "name": "correlation",
+                                      "des": "所选范围的样本的互相关系数",
+                                      "if_add_column": False,
+                                      "attribute": "value"
+                                  }
+                              ]
                           })
     CORRELATION = toolkit_repo.create(CORRELATION)
     ownership_business.add(user, False, toolkit=CORRELATION)
@@ -578,8 +779,7 @@ def create_public_toolkit():
     # Result_Form 重新设计
     COV = Toolkit(name='数据协方差',
                   description='返回数据协方差',
-                  category="统计推断",
-                  result_form=1,
+                  category=4,
                   entry_function='toolkit_cov',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_cov),
                   parameter_spec={
@@ -597,6 +797,17 @@ def create_public_toolkit():
                           'len_range': [2, 2],
                           'data_type': ['int', 'float']
                       }
+                  },
+                  result_spec={
+                      "if_reserved": False,
+                      "args": [
+                          {
+                              "name": "cov",
+                              "des": "所选范围的样本协方差",
+                              "if_add_column": False,
+                              "attribute": "value"
+                          }
+                      ]
                   })
     COV = toolkit_repo.create(COV)
     ownership_business.add(user, False, toolkit=COV)
@@ -842,7 +1053,7 @@ def create_public_data_process():
                                              "name": "result",
                                              "des": "筛选出的所有特征值",
                                              "if_add_column": False,
-                                             "attribute": "value",
+                                             "attribute": "",
                                          }
                                      ]
                                  })
@@ -874,10 +1085,10 @@ def create_public_data_process():
                                      },
                                      "args": [
                                          {
-                                             'name': 'n_features',
+                                             'name': 'k',
                                              'type': {
                                                  'key': 'int',
-                                                 'des': 'the threshold to judge if positive of negative',
+                                                 'des': 'select k best, k is number of features selected',
                                                  'range': [1, None]
                                              },
                                              'default': 2,
@@ -938,10 +1149,10 @@ def create_public_data_process():
                                         },
                                         "args": [
                                             {
-                                                'name': 'n_features',
+                                                'name': 'k',
                                                 'type': {
                                                     'key': 'int',
-                                                    'des': 'the threshold to judge if positive of negative',
+                                                    'des': 'select k best, k is number of features selected',
                                                     'range': [1, None]
                                                 },
                                                 'default': 2,
@@ -1002,10 +1213,10 @@ def create_public_data_process():
                                     },
                                     "args": [
                                         {
-                                            'name': 'n_features',
+                                            'name': 'k',
                                             'type': {
                                                 'key': 'int',
-                                                'des': 'the threshold to judge if positive of negative',
+                                                'des': 'select k best, k is number of features selected',
                                                 'range': [1, None]
                                             },
                                             'default': 2,
@@ -1069,7 +1280,7 @@ def create_public_data_process():
                               'name': 'n_features',
                               'type': {
                                   'key': 'int',
-                                  'des': 'the threshold to judge if positive of negative',
+                                  'des': 'select k best, k is number of features selected',
                                   'range': [1, None]
                               },
                               'default': 2,
@@ -1194,10 +1405,10 @@ def create_public_data_process():
                                          },
                                          "args": [
                                              {
-                                                 'name': 'n_features',
+                                                 'name': 'k',
                                                  'type': {
                                                      'key': 'int',
-                                                     'des': 'the threshold to judge if positive of negative',
+                                                     'des': 'select k best, k is number of features selected',
                                                      'range': [1, None]
                                                  },
                                                  'default': 2,
@@ -1233,42 +1444,6 @@ def create_public_data_process():
     select_from_model_gbdt = toolkit_repo.create(select_from_model_gbdt)
     ownership_business.add(user, False, toolkit=select_from_model_gbdt)
 
-    decomposition_pca = Toolkit(name='降维-PCA(sk-learn)',
-                                description='主成分分析法，返回降维后的数据',
-                                category=3,
-                                entry_function='decomposition_pca',
-                                target_py_code=inspect.getsource(preprocess_orig.decomposition_pca),
-                                parameter_spec={
-                                    "data": {
-                                        'name': 'input',
-                                        'type': {
-                                            'key': 'select_box',
-                                            'des': 'nD tensor with shape: (batch_size, ..., '
-                                                   'input_dim). The most common situation would be a '
-                                                   '2D input with shape (batch_size, input_dim).',
-                                            'range': None
-                                        },
-                                        'default': None,
-                                        'required': True,
-                                        'len_range': [2, None],
-                                        'data_type': ['int', 'float']
-                                    },
-                                    "args": [
-                                        {
-                                            'name': 'n_features',
-                                            'type': {
-                                                'key': 'int',
-                                                'des': 'the threshold to judge if positive of negative',
-                                                'range': [1, None]
-                                            },
-                                            'default': 2,
-                                            'required': True
-                                        }
-                                    ]
-                                })
-    decomposition_pca = toolkit_repo.create(decomposition_pca)
-    ownership_business.add(user, False, toolkit=decomposition_pca)
-
     lda = Toolkit(name='线性判别分析法（LDA）',
                   description='线性判别分析法，返回降维后的数据，参数n_components为降维后的维数',
                   category=3,
@@ -1294,14 +1469,55 @@ def create_public_data_process():
                       },
                       "args": [
                           {
-                              'name': 'n_components',
+                              'name': 'n_features',
                               'type': {
                                   'key': 'int',
-                                  'des': 'the number of clusters',
+                                  'des': 'the number of de-features',
                                   'range': [1, None]
                               },
                               'default': 2,
                               'required': True
+                          }
+                      ]
+                  },
+                  result_spec={
+                      "if_reserved": True,
+                      "args": [
+                          {
+                              "name": "label",
+                              "des": "降维后的栏位信息",
+                              "if_add_column": True,
+                              "attribute": "value"
+                          },
+                          {
+                              "name": "coef",
+                              "des": "每类特征是相关系数",
+                              "if_add_column": False,
+                              "attribute": "value"
+                          },
+                          {
+                              "name": "mean",
+                              "des": "每类特征是数值平均值",
+                              "if_add_column": False,
+                              "attribute": "value"
+                          },
+                          {
+                              "name": "priors",
+                              "des": "array-like, shape = [n_classes], Class priors (sum to 1).",
+                              "if_add_column": False,
+                              "attribute": "general_info"
+                          },
+                          {
+                              "name": "scalings",
+                              "des": "array-like, shape = [rank, n_classes - 1], Scaling of the features in the space spanned by the class centroids.",
+                              "if_add_column": False,
+                              "attribute": "value"
+                          },
+                          {
+                              "name": "xbar",
+                              "des": "Overall mean",
+                              "if_add_column": False,
+                              "attribute": "value"
                           }
                       ]
                   })
@@ -1317,8 +1533,7 @@ def update_one_public_toolkit():
     # Result_Form 重新设计
     MIC = Toolkit(name='最大互信息数',
                   description='计算所选数据集合的最大互信息数, 表达第一个所选值域与其他值域变量之间的相关系数',
-                  category="统计推断",
-                  result_form=1,
+                  category=4,
                   entry_function='toolkit_mic',
                   target_py_code=inspect.getsource(toolkit_orig.toolkit_mic),
                   parameter_spec={

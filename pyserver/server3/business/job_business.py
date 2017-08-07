@@ -8,6 +8,7 @@
 # @running  : python
 # Further to FIXME of None
 """
+from copy import deepcopy
 
 from datetime import datetime
 
@@ -51,7 +52,7 @@ def get_by_job_status(job_status):
     return job_repo.read_by_unique_field('job_status', job_status)
 
 
-def add_toolkit_job(toolkit_obj, staging_data_set_obj, project_obj, *argv):
+def add_toolkit_job(toolkit_obj, staging_data_set_obj, project_obj, **kwargs):
     """toolkit is a obj"""
     # job = job_obj['staging_data_set'] or job_obj['model'] or job_obj['toolkit']
     # if not 0 < len(toolkit_obj.items()) <= 1:
@@ -61,7 +62,7 @@ def add_toolkit_job(toolkit_obj, staging_data_set_obj, project_obj, *argv):
     job_obj = Job(status=0, toolkit=toolkit_obj,
                   staging_data_set=staging_data_set_obj,
                   project=project_obj,
-                  create_time=time, fields=argv if argv else None)
+                  create_time=time, **kwargs)
     return job_repo.create(job_obj)
 
 
@@ -89,6 +90,10 @@ def add_model_train_job(model_obj, staging_data_set_obj):
     return job_repo.create(job_obj)
 
 
+def add_many(objects):
+    return job_repo.create_many(objects)
+
+
 def end_job(job_obj):
     time = datetime.utcnow()
     return job_repo.update_one_by_id_status_and_time(job_obj.id, 200, time)
@@ -101,3 +106,13 @@ def update_job(job_obj):
 
 def remove_by_id(file_id):
     return job_repo.delete_by_id(file_id)
+
+
+def copy_job(job, belonged_project, staging_data_set):
+    j = deepcopy(job)
+    j.id = None
+    j.project = belonged_project
+    if staging_data_set:
+        j.staging_data_set = staging_data_set
+    job_repo.create(j)
+    return j

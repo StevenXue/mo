@@ -65,14 +65,34 @@ def get_jobs_of_project(project_id):
     for c in categories:
         if c not in DEFAULT_CAT:
             raise ValueError('categories arg error')
-    try:
-        history_jobs = project_service.get_all_jobs_of_project(project_id,
-                                                               categories)
-        history_jobs = json_utility.convert_to_json(history_jobs)
-    except Exception as e:
-        return (jsonify({'response': '%s: %s' % (str(Exception),
-                                                 e.args)}), 400)
+    history_jobs = project_service.get_all_jobs_of_project(project_id,
+                                                           categories)
+    history_jobs = json_utility.convert_to_json(history_jobs)
+    # try:
+    #     history_jobs = project_service.get_all_jobs_of_project(project_id,
+    #                                                            categories)
+    #     history_jobs = json_utility.convert_to_json(history_jobs)
+    # except Exception as e:
+    #     return (jsonify({'response': '%s: %s' % (str(Exception),
+    #                                              e.args)}), 400)
     return jsonify({'response': history_jobs}), 200
+
+
+@project_app.route('/fork/<string:project_id>', methods=['POST'])
+def project_fork(project_id):
+    user_ID = request.args.get('user_ID')
+    if not user_ID:
+        raise ValueError('no user ID arg')
+    new_project = project_service.fork(project_id, user_ID)
+    new_project = json_utility.convert_to_json(new_project.to_mongo())
+    return jsonify({'response': new_project}), 200
+
+
+@project_app.route('/publish/<string:project_id>', methods=['PUT'])
+def project_publish(project_id):
+    update_num = project_service.publish_project(project_id)
+    update_num = json_utility.convert_to_json(update_num)
+    return jsonify({'response': update_num}), 200
 
 
 @project_app.route('/projects', methods=['POST'])

@@ -1,10 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Select } from 'antd';
-import {jupyterServer } from '../../../constants';
 import { Router , routerRedux} from 'dva/router';
 import Jupyter from 'react-jupyter';
+// import { Model } from 'keras-js';
+import {jupyterServer } from '../../../constants';
 
+
+const model = new Model({
+  filepaths: {
+    model: './model/resnet50.json',
+    weights: './model/resnet50_weights.json',
+    metadata: './model/resnet50_metadata.json'
+  },
+  filesystem: true
+})
 
 export default class ProjectDetail extends React.Component {
   constructor(props) {
@@ -31,7 +41,29 @@ export default class ProjectDetail extends React.Component {
 
 
   componentDidMount() {
-
+    // console.log(model);
+    // model.ready()
+    //   .then(() => {
+    //     // input data object keyed by names of the input layers
+    //     // or `input` for Sequential models
+    //     // values are the flattened Float32Array data
+    //     // (input tensor shapes are specified in the model config)
+    //     const inputData = {
+    //       'input_1': new Float32Array(data)
+    //     }
+    //
+    //     // make predictions
+    //     return model.predict(inputData)
+    //   })
+    //   .then(outputData => {
+    //     // outputData is an object keyed by names of the output layers
+    //     // or `output` for Sequential models
+    //     // e.g.,
+    //     // outputData['fc1000']
+    //   })
+    //   .catch(err => {
+    //     // handle error
+    //   })
   }
 
   handleClick() {

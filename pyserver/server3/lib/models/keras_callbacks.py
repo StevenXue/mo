@@ -7,6 +7,8 @@ from keras.callbacks import ModelCheckpoint
 
 from server3.service import logger_service
 
+MAX_WEIGHT_LEN = 1000
+
 
 class MongoModelCheckpoint(ModelCheckpoint):
     def __init__(self, result_sds, monitor='val_loss', verbose=0,
@@ -61,14 +63,12 @@ class MongoModelCheckpoint(ModelCheckpoint):
                                      current, self.result_sds))
                         self.best = current
                         weights = self.model.get_weights()
-                        logger_service.save_weights_result(self.result_sds, 5,
-                                                           'best_weights',
-                                                           {'epoch': epoch,
-                                                            'weights': [
-                                                                weight.tolist()
-                                                                for
-                                                                weight in
-                                                                weights]})
+                        logger_service.save_weights_result(
+                            self.result_sds, 5,
+                            'latest_weights',
+                            {'epoch': epoch,
+                             'weights': [weight_to_list(weight) for weight in
+                                         weights]})
                     else:
                         if self.verbose > 0:
                             print('Epoch %05d: %s did not improve' %
@@ -78,10 +78,13 @@ class MongoModelCheckpoint(ModelCheckpoint):
                     print('Epoch %05d: saving model to staging data set %s' % (
                         epoch, self.result_sds))
                 weights = self.model.get_weights()
-                logger_service.save_weights_result(self.result_sds, 5,
-                                                   'latest_weights',
-                                                   {'epoch': epoch,
-                                                    'weights': [weight.tolist()
-                                                                for
-                                                                weight in
-                                                                weights]})
+                logger_service.save_weights_result(
+                    self.result_sds, 5,
+                    'latest_weights',
+                    {'epoch': epoch,
+                     'weights': [weight_to_list(weight) for weight in
+                                 weights]})
+
+
+def weight_to_list(weight):
+    return weight.tolist()

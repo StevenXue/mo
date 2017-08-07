@@ -4,64 +4,8 @@ import { routerRedux } from 'dva/router'
 import { parse } from 'qs'
 import { queryURL } from '../utils'
 import { config } from '../utils'
-import { mainColor } from '../constants'
-import { TourArea } from '../components'
-import chooseData from '../media/videos/choose_data.mp4'
 const { prefix } = config
 
-const stepStyle = {
-  mainColor: mainColor,
-  beacon: {
-    inner: mainColor,
-    outer: mainColor,
-  },
-}
-
-const defaultSteps = [
-  {
-    title: 'Choose Data',
-    text:  <TourArea text='Click to choose your data set to use in this project' src={chooseData} />,
-    selector: '[class*="dataChooseButton"]',
-    position: 'bottom',
-    style: stepStyle
-  },
-  {
-    title: 'Data Preview Area',
-    text: 'After choose your data set, you can have a preview in this area',
-    selector: '.data-preview-collapse',
-    position: 'bottom',
-    style: stepStyle
-  },
-  {
-    title: 'Preprocess Area',
-    text: 'You can do some preprocess for your data set here, such as missing value completion and column filtering',
-    selector: '.preprocess-collapse',
-    position: 'bottom',
-    style: stepStyle
-  },
-  {
-    title: 'Data Exploration & Analysis Area',
-    text: 'You can do some exploration and analysis to have better vision on your data. Feature Selection is also a' +
-    ' great feature in this area',
-    selector: '.exploration-collapse',
-    position: 'top',
-    style: stepStyle
-  },
-  {
-    title: 'Automated Modelling Area',
-    text: 'By click you mouse, automated modelling process can be done here, coding is not needed',
-    selector: '.model-collapse',
-    position: 'top',
-    style: stepStyle
-  },
-  {
-    title: 'Start Notebook',
-    text: 'Click to start a jupyter notebook',
-    selector: '.notebook-start-button',
-    position: 'top',
-    style: stepStyle
-  },
-]
 
 let joyRide = {
   joyride: undefined,
