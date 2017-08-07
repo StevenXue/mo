@@ -198,4 +198,4 @@ def lda(arr0, target, index, n_components):
     scalings = temp.scalings_
     xbar = temp.xbar_
     label = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
-    return label, coef, mean, priors, scalings, xbar
+    return label, coef.tolist(), mean.tolist(), priors.tolist(), scalings.tolist(), xbar.tolist()
