@@ -8,6 +8,7 @@ export default {
   namespace: 'upload',
 
   state: {
+    uploading: false,
     visible: false,
     panelVisible: false,
     files: {
@@ -44,11 +45,12 @@ export default {
       formData.append('if_private', payload.isPrivate);
       formData.append('type', payload.type);
       formData.append('user_ID', user.user_ID);
-
+      yield put({ type: 'setUploading', payload: true })
       const data = yield call(uploadFile, formData)
       if (data.success) {
         console.log('upload success');
         message.success('upload success')
+        yield put({ type: 'setUploading', payload: false })
         yield put({ type: 'hideModal' })
 
         // const from = queryURL('from')
@@ -101,6 +103,10 @@ export default {
         //   ...pagination,
         // }
       }
+    },
+
+    setUploading (state, {payload: uploading}) {
+      return { ...state, uploading }
     },
 
     showModal (state, action) {

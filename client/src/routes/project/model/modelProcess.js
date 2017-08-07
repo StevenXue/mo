@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import { Button, message, Transfer, Input, Spin, Select, Card, Tag} from 'antd';
+
 import { flaskServer } from '../../../constants'
 import ModelForms from './modelForms';
-import ReactEcharts from 'echarts-for-react';
 
 export default class ModelProcess extends React.Component {
   constructor (props) {
@@ -27,67 +27,86 @@ export default class ModelProcess extends React.Component {
   }
 
   componentDidMount(){
-    fetch(flaskServer + '/model/models/public', {
-      method: 'get',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then((response) => response.json())
-      .then((res) => {
+    if(this.props.isActive) {
+      fetch(flaskServer + '/model/models/public', {
+        method: 'get',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).then((response) => response.json())
+        .then((res) => {
           let dict = [];
           res.response.forEach((e) => dict.push({'name': e.name, '_id': e._id}));
           this.setState({models: dict});
-      });
+        });
+    }
     let s = [];
+    //console.log(this.props.cols);
     this.props.cols.map((e) =>
       s.push({
-        key: e,
-        title: e,
+        key: e[0],
+        title: e[0],
         disabled: false
       })
     );
     this.setState({source: s});
+
     if(this.props.params){
       this.setState({modelName: this.props.params.model.name});
-      let data_fields = this.props.params['params']['fit']['data_fields']
-      if( data_fields.length === 2 ){
-        this.setState({
-          selectedKeys: data_fields[0],
-          targetKeys: data_fields[1]
-        });
-      }else{
-        this.setState({
-          targetKeys: data_fields[0]
-        });
+      let data_fields = []
+      if(this.props.params['params']['fit']['data_fields']) {
+        data_fields = this.props.params['params']['fit']['data_fields'];
+          if (data_fields[0] instanceof Array) {
+            this.setState({
+              selectedKeys: data_fields[0],
+              targetKeys: data_fields[1]
+            });
+          } else {
+            this.setState({
+              targetKeys: data_fields
+            });
+          }
       }
     }
   }
 
   componentWillReceiveProps(nextProps){
-    //console.log(nextProps.params);
     this.setState({
       dataSet: nextProps.dataset_id,
       isActive: nextProps.isActive,
     });
     if(nextProps.params) {
       this.setState({modelName: nextProps.params.model.name});
-      let data_fields = nextProps.params['params']['fit']['data_fields']
-      if (data_fields.length === 2) {
-        this.setState({
-          selectedKeys: data_fields[0],
-          targetKeys: data_fields[1]
-        });
-      } else {
-        this.setState({
-          targetKeys: data_fields[0]
-        });
+      let data_fields = []
+      if(nextProps.params['params']['fit']['data_fields']) {
+        data_fields = nextProps.params['params']['fit']['data_fields'];
+        // if (data_fields.length === 2) {
+        if (data_fields[0] instanceof Array) {
+          this.setState({
+            selectedKeys: data_fields[0],
+            targetKeys: data_fields[1]
+          });
+        } else {
+          this.setState({
+            targetKeys: data_fields
+          });
+        }
       }
+    }else{
+      let s = [];
+      nextProps.cols.map((e) =>
+        s.push({
+          key: e[0],
+          title: e[0],
+          disabled: false
+        })
+      );
+      this.setState({source: s});
     }
   }
 
 
   onSelectModel(values){
-    //console.log(values);
     this.setState({selectedModel: values});
     let t = this.state.models.filter((e) => e._id === values );
     this.setState({modelName: t[0][name]});
@@ -102,16 +121,7 @@ export default class ModelProcess extends React.Component {
         if(res.response.category === 2){
           disable = true
         }
-        let s = [];
-        this.props.cols.map((e) =>
-          s.push({
-            key: e,
-            title: e,
-            disabled: disable
-          })
-        );
         this.setState({
-          source: s,
           supervised: disable,
           modelData: res.response.parameter_spec
         });
@@ -119,7 +129,7 @@ export default class ModelProcess extends React.Component {
 
   }
 
-  handleChange(nextTargetKeys, direction, moveKeys) {
+  handleChange(nextTargetKeys) {
     this.setState({ targetKeys: nextTargetKeys });
   }
 
@@ -143,9 +153,9 @@ export default class ModelProcess extends React.Component {
 
   render(){
     return(
-        <div style={{width: 1100, height: this.state.isActive? 450:300, margin: 10 , padding: 10, backgroundColor: 'white' }}>
-          <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-          <div className='choose_model_and_input' style={{width: '35%', height: 480}}>
+        <div style={{width: '100%', height: this.state.isActive? 450:300, margin: 10 , padding: 10, backgroundColor: 'white' }}>
+          <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%', height: '100%'}}>
+          <div className='choose_model_and_input' style={{width: '35%', height: '100%'}}>
             <span style={{color: '#108ee9'}}>Choose Modelling Method</span>
             <br/>
             {
@@ -193,7 +203,7 @@ export default class ModelProcess extends React.Component {
                 <div>
                   <p>Input: </p>
                   {
-                    this.state.selectedKeys.map((e) =>
+                    this.state.selectedKeys && this.state.selectedKeys.map((e) =>
                       <Tag style={{margin: 5}} key={e}>
                         {e}
                       </Tag>
@@ -201,7 +211,7 @@ export default class ModelProcess extends React.Component {
                   }
                   <p>Onput: </p>
                   {
-                    this.state.targetKeys.map((e) =>
+                    this.state.targetKeys && this.state.targetKeys.map((e) =>
                       <Tag style={{margin: 5}} key={e}>
                         {e}
                       </Tag>
@@ -210,7 +220,7 @@ export default class ModelProcess extends React.Component {
                 </div>)
             }
           </div>
-          <div className='choose_params' style={{width: '45%', height: 480}}>
+          <div className='choose_params' style={{width: '45%', height: '100%'}}>
             <ModelForms data={this.state.modelData}
                         divide={this.state.divide}
                         dataset_id={this.state.dataSet}

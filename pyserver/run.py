@@ -1,10 +1,8 @@
 # -*- coding: UTF-8 -*-
 import eventlet
-eventlet.sleep()
 eventlet.monkey_patch(thread=False)
+eventlet.import_patched('mongoengine')
 
-# from eventlet import import_patched
-# import_patched('flask_socketio')
 from datetime import timedelta
 
 from flask import Flask
@@ -14,10 +12,6 @@ from flask_jwt_extended import JWTManager
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import get_jwt_claims
 from flask_socketio import SocketIO
-
-# from flask_socketio import SocketIO
-# from flask_socketio import emit
-# from flask_socketio import socketio as sio
 
 from server3.route import file_route
 from server3.route import ownership_route
@@ -41,7 +35,9 @@ app.secret_key = 'super-super-secret'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
 
-socketio = SocketIO(app, logger=True, engineio_logger=True,
+socketio = SocketIO(app,
+                    logger=True,
+                    engineio_logger=True,
                     async_mode='eventlet',
                     message_queue='redis://')
 

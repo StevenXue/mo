@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+from copy import deepcopy
 
 from server3.entity.staging_data_set import StagingDataSet
 from server3.entity.project import Project
@@ -70,3 +71,21 @@ def remove_by_id(sds_id):
     :return: None
     """
     return staging_data_set_repo.delete_by_id(sds_id)
+
+
+def copy_staging_data_set(sds, belonged_project=None, belonged_job=None):
+    """
+    copy_staging_data_set
+    :param sds:
+    :param belonged_project:
+    :param belonged_job:
+    :return:
+    """
+    sds_cp = deepcopy(sds)
+    sds_cp.id = None
+    sds_cp.project = belonged_project
+    if belonged_job:
+        sds_cp.job = belonged_job
+    staging_data_set_repo.create(sds_cp)
+    return sds_cp
+

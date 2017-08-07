@@ -1,5 +1,7 @@
 # -*- coding: UTF-8 -*-
 import sys
+from copy import deepcopy
+
 from bson import Code
 import numpy as np
 import pandas as pd
@@ -12,6 +14,8 @@ from server3.service import data_service
 from server3.utility import data_utility
 from server3.utility import json_utility
 from server3 import constants
+
+DEFAULT_RATIO = 0.5
 
 
 def get_by_query_str(staging_data_set_id, **kwargs):
@@ -185,6 +189,18 @@ def add_new_key_value(sds_id, key, array):
         staging_data_business.update_by_id(oid.id, query)
 
 
+# 新增多个栏位用来加字段，字段的value和key在dict里面
+def add_new_keys_value(sds_id, lst_dicts):
+    """
+        update data row by row
+        :param update:
+        :return:
+    """
+    # get staging data的所有id
+    ids = staging_data_business.get_by_staging_data_set_id(sds_id)
+    for oid in ids:
+        staging_data_business.update_by_id(oid.id, lst_dicts.pop(0))
+
 def get_row_col_info(sds_id):
     """
     get_row_col_info
@@ -214,10 +230,19 @@ def mongo_to_array(cursor, fields):
     :param fields:
     :return:
     """
-    arrays = [[c[field] for field in fields if field != '_id' and
-               field != 'staging_data_set'] for c in cursor]
+    arrays = convert_array(cursor, fields)
     arrays = np.array(arrays)
     return arrays
+
+
+def convert_array(data, columns):
+    data_array = []
+    for item in data:
+        temp = [data_utility.convert_string_to_number_with_poss(item[i])
+                for i in columns
+                if item[i] != '_id' and item[i] != 'staging_data_set']
+        data_array.append(temp)
+    return data_array
 
 
 def mongo_to_df(cursor):
@@ -226,8 +251,9 @@ def mongo_to_df(cursor):
     :param cursor:
     :return:
     """
+    print(cursor)
     cursor = json_utility.me_obj_list_to_dict_list(cursor)
-    return pd.DataFrame.from_records(cursor, exclude=['_id'])
+    return pd.DataFrame.from_records(cursor)
 
 
 def split_x_y(sds_id, x_fields, y_fields):
@@ -239,36 +265,40 @@ def split_x_y(sds_id, x_fields, y_fields):
     :param y_fields:
     :return:
     """
-    x = staging_data_business.get_by_staging_data_set_and_fields(sds_id,
-                                                                 x_fields)
-    x = mongo_to_array(x, x_fields)
-    y = staging_data_business.get_by_staging_data_set_and_fields(sds_id,
-                                                                 y_fields)
-    y = mongo_to_array(y, y_fields)
+    data = staging_data_business. \
+        get_by_staging_data_set_and_fields(sds_id,
+                                           x_fields + y_fields,
+                                           allow_nan=False)
+    x = mongo_to_array(data, x_fields)
+    y = mongo_to_array(data, y_fields)
     return {'x': x, 'y': y}
 
 
-def split_test_train(x_y_obj, schema='cv', ratio=0.3, trl=1000):
+def split_test_train(x_y_obj, schema='cv', **kwargs):
     """
     split data to test and train
     :param x_y_obj:
     :param schema:
-    :param ratio:
-    :param trl:
     :return:
     """
     x = x_y_obj.pop('x', np.array([]))
     y = x_y_obj.pop('y', np.array([]))
+    ratio = kwargs.get('ratio')
+    divide_row = kwargs.get('divide_row')
     if schema == 'cv':
+        ratio = ratio or DEFAULT_RATIO
         x_tr, x_te, y_tr, y_te = \
-            data_utility.k_fold_cross_validation(x, y, ratio)
+            data_utility.k_fold_cross_validation(x, y, float(ratio))
         return {'x_tr': x_tr, 'y_tr': y_tr, 'x_te': x_te, 'y_te': y_te}
     if schema == 'seq':
-        if ratio and not trl:
-            trl = x.shape[0] * ratio
-        if trl:
-            return {'x_tr': x[:trl, :], 'y_tr': y[:trl, :],
-                    'x_te': x[trl:, :], 'y_te': y[trl:, :]}
+        if not divide_row and ratio:
+            ratio = float(ratio)
+            divide_row = x.shape[0] * ratio
+        else:
+            divide_row = divide_row or x.shape[0] * DEFAULT_RATIO
+        divide_row = int(divide_row)
+        return {'x_tr': x[:divide_row, :], 'y_tr': y[:divide_row, :],
+                'x_te': x[divide_row:, :], 'y_te': y[divide_row:, :]}
     if schema == 'rand':
         pass
         # if ratio and not trl:
@@ -277,3 +307,21 @@ def split_test_train(x_y_obj, schema='cv', ratio=0.3, trl=1000):
         #     return {'x_tr': x[:trl], 'y_tr': y[:trl],
         #             'x_te': x[trl:], 'y_te': y[trl:]}
         # raise NameError('arg error')
+
+
+def copy_staging_data_set(sds, belonged_project, **kwargs):
+    """
+    copy_staging_data_set
+    :param sds:
+    :param belonged_project:
+    :return:
+    """
+    belonged_job = None
+    if 'belonged_job' in kwargs:
+        belonged_job = kwargs.pop('belonged_job')
+    if kwargs:
+        raise TypeError('Unrecognized keyword arguments: ' + str(kwargs))
+    sds_cp = staging_data_set_business.copy_staging_data_set(
+        sds, belonged_project, belonged_job)
+    staging_data_business.copy_staging_data_by_staging_data_set_id(sds_cp)
+    return sds_cp

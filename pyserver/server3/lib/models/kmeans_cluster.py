@@ -148,9 +148,11 @@ def kmeans_cluster_model_fn(features, labels, mode, params, config):
         params.get('num_clusters'),
         initial_clusters=clustering_ops.RANDOM_INIT,
         distance_metric=clustering_ops.SQUARED_EUCLIDEAN_DISTANCE,
-        use_mini_batch=params.get('use_mini_batch'),
-        mini_batch_steps_per_iteration=params.get(
-            'mini_batch_steps_per_iteration'),
+        use_mini_batch=False,
+        mini_batch_steps_per_iteration= 1,
+        # use_mini_batch = params.get('use_mini_batch'),
+        # mini_batch_steps_per_iteration=params.get(
+        #     'mini_batch_steps_per_iteration'),
         random_seed=params.get('random_seed'),
         kmeans_plus_plus_num_retries=params.get(
             'kmeans_plus_plus_num_retries')).training_graph()
@@ -210,16 +212,6 @@ KmeansCluster = {
                 "required": True
             },
             {
-                "name": "use_mini_batch",
-                "type": {
-                    "key": "bool",
-                    "des": "If true, use the mini-batch k-means algorithm. "
-                           "Else assume full batch."
-                },
-                "default": None,
-                "required": False
-            },
-            {
                 "name": "kmeans_plus_plus_num_retries",
                 "type": {
                     "key": "int",
@@ -232,7 +224,7 @@ KmeansCluster = {
                            "points.",
                     "range": None
                 },
-                "default": 1,
+                "default": 2,
                 "required": True
             },
             {
@@ -264,7 +256,7 @@ KmeansCluster = {
         },
         'args': [
             {
-                "name": "step",
+                "name": "steps",
                 "type": {
                     "key": "int",
                     "des": "steps for training",
@@ -278,7 +270,7 @@ KmeansCluster = {
     'evaluate': {
         'args': [
             {
-                "name": "step",
+                "name": "steps",
                 "type": {
                     "key": "int",
                     "des": "steps for evaluate",

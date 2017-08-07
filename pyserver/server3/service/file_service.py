@@ -42,7 +42,7 @@ def add_file(file, url_base, user_ID, is_private=False, description='',
     extension = filename_array[1].lower()
     if extension == 'zip':
         file_size, file_uri, folder_name = \
-            extract_file_and_get_size(file, save_directory)
+            extract_files_and_get_size(file, save_directory)
         file_url = url_base + user.user_ID + '/' + folder_name
     else:
         file_size, file_uri = save_file_and_get_size(file, save_directory)
@@ -74,8 +74,25 @@ def remove_file_by_id(file_id):
     return file_business.remove_by_id(file_id)
 
 
-# def list_files_by_user(user):
-#     return file_business.list_by_user(user)
+def list_file_by_extension(user_ID, extension=None, order=-1):
+    public_files, owned_files = list_files_by_user_ID(user_ID, order)
+    if extension:
+        public_files = [pf for pf in public_files if pf.extension == extension]
+        owned_files = [of for of in owned_files if of.extension == extension]
+    return public_files, owned_files
+
+
+def list_files_by_user_ID(user_ID, order=-1):
+    if not user_ID:
+        raise ValueError('no user id')
+    public_files = ownership_service.get_all_public_objects('file')
+    owned_files = ownership_service. \
+        get_private_ownership_objects_by_user_ID(user_ID, 'file')
+
+    if order == -1:
+        public_files.reverse()
+        owned_files.reverse()
+    return public_files, owned_files
 
 
 #######################################################################
@@ -89,10 +106,23 @@ def save_file_and_get_size(file, path):
     return os.stat(os.path.join(uri)).st_size, uri
 
 
-def extract_file_and_get_size(file, path):
+def extract_files_and_get_size(file, path):
     folder_name = safe_unzip(file, path)
     uri = path + folder_name
-    return os.stat(os.path.join(uri)).st_size, uri, folder_name
+    return get_tree_size(os.path.join(uri)), uri, folder_name
+
+
+def get_tree_size(path):
+    """
+    Return total size of files in given path and subdirs.
+    """
+    total = 0
+    for entry in os.scandir(path):
+        if entry.is_dir(follow_symlinks=False):
+            total += get_tree_size(entry.path)
+        else:
+            total += entry.stat(follow_symlinks=False).st_size
+    return total
 
 
 def safe_unzip(zip_file, extractpath='.'):
@@ -140,19 +170,6 @@ def file_loader(file_id, user_ID, names):
     table = pd.read_csv(file.uri, skipinitialspace=True, names=names,
                         skiprows=0).to_dict('records')
     return table
-
-
-def list_files_by_user_ID(user_ID, order=-1):
-    if not user_ID:
-        raise ValueError('no user id')
-    public_files = ownership_service.get_all_public_objects('file')
-    owned_files = ownership_service. \
-        get_private_ownership_objects_by_user_ID(user_ID, 'file')
-
-    if order == -1:
-        public_files.reverse()
-        owned_files.reverse()
-    return public_files, owned_files
 
 
 def allowed_file(filename):

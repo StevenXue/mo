@@ -3,7 +3,6 @@
 Need to be FIXED, further think of how to save
 """
 # TODO
-
 from mongoengine import connect
 
 from server3.repository import config
@@ -13,6 +12,7 @@ connect(
     username=config.get_mongo_user(),
     password=config.get_mongo_pass(),
     host=config.get_mongo_host(),
+    port=config.get_mongo_port(),
 )
 
 
@@ -65,7 +65,6 @@ class Repo:
         :return: a list of objects corresponding to the query
         """
         return Repo.read(self, {field_name: field_value}).only(*subset)
-
 
     def read_by_non_unique_field_limit(self, field_name, field_value, limit):
         """

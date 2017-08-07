@@ -7,7 +7,7 @@ const getOption = (props) => {
   let color = ['#c23531', '#2f4554', '#61a0a8', '#d48265', '#91c7ae', '#749f83', '#ca8622', '#bda29a', '#6e7074', '#546570', '#c4ccd3'];
   let baseOption = {
     title: {
-      text: '大规模散点图'
+      text: '散点图'
     },
     tooltip : {
       trigger: 'axis',
@@ -21,16 +21,6 @@ const getOption = (props) => {
         }
       },
       zlevel: 1
-    },
-    toolbox: {
-      show : true,
-      feature : {
-        mark : {show: true},
-        dataZoom : {show: true},
-        dataView : {show: true, readOnly: false},
-        restore : {show: true},
-        saveAsImage : {show: true}
-      }
     },
     xAxis : [
       {

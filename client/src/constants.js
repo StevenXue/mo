@@ -10,6 +10,9 @@ module.exports = {
   baseUrl: 'http://localhost:8888',
   // baseUrl: 'http://10.52.14.182:8888',
 
+  // assets
+  assetsUrl: 'http://10.52.14.182:3090',
+
   mainColor: '#108ee9',
 
   stepStyle: {

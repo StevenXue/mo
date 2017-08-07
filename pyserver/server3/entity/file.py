@@ -7,7 +7,7 @@ from mongoengine import IntField
 
 # zip will be automatically unzip as a folder
 EXTENSION = ('csv', 'zip')
-FILE_TYPE = ('table', 'image', 'text', 'audio')
+FILE_TYPE = ('table', 'image', 'text', 'audio', 'video')
 
 
 class File(Document):

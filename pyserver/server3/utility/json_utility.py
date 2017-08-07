@@ -48,6 +48,7 @@ class JSONEncoder(simplejson.JSONEncoder):
         # Let the base class default method raise the TypeError
         return JSONEncoder.default(self, o)
 
+
 def json_load(json_string):
     json_obj = json.loads(json_string)
     return json_obj

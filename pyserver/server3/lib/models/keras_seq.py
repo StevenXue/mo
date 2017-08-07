@@ -114,7 +114,10 @@ def keras_seq_to_str(obj, head_str, **kw):
         layer_import += 'from keras.layers import %s\n' % n
     str_model = 'from keras.models import Sequential\n'
     str_model += 'from keras.callbacks import LambdaCallback\n'
+    str_model += 'from server3.lib.models.keras_callbacks import ' \
+                 'MongoModelCheckpoint\n'
     str_model += 'from server3.service import logger_service\n'
+    str_model += 'from server3.service import job_service\n'
     str_model += 'from server3.business import staging_data_set_business\n'
     str_model += layer_import
     str_model += head_str
@@ -140,10 +143,15 @@ def keras_seq_to_str(obj, head_str, **kw):
     str_model += "batch_print_callback = LambdaCallback(on_epoch_end=lambda " \
                  "epoch, \\\nlogs: logger_service.log_epoch_end(epoch, " \
                  "logs, result_sds, project_id))\n"
+    str_model += "best_checkpoint = MongoModelCheckpoint(" \
+                 "result_sds=result_sds, verbose=0, save_best_only=True)\n"
+    str_model += "general_checkpoint = MongoModelCheckpoint(" \
+                 "result_sds=result_sds, verbose=0)\n"
     # fit
     str_model += "model.fit(x_train, y_train,  validation_data=(x_test, " \
-                 "y_test), \\\ncallbacks=[batch_print_callback], " + \
-                 get_args(f)[:-2] + ", verbose=0)\n"
+                 "y_test), \\\ncallbacks=[batch_print_callback, " \
+                 "best_checkpoint, general_checkpoint], " + \
+                 get_args(f)[:-2] + ")\n"
     str_model += "score = model.evaluate(x_test, y_test, " + get_args(e)[
                                                              :-2] + ")\n"
     return str_model
@@ -201,6 +209,7 @@ ACTIVATION = {
                   'linear']
     },
     'default': 'linear',
+    'required': True
 }
 
 INPUT_SHAPE = {
