@@ -26,7 +26,10 @@ ModelType = {
     'custom_supervised': 1,
     'unsupervised': 2,
     'half_supervised': 3,
-    'folder_input': 4
+    'folder_input': 4,
+
+    'hyperas': 5
+
 }
 
 
@@ -492,17 +495,29 @@ def temp():
     #     models.IMAGE_CLASSIFIER,
     #     {'type': 'folder'}
     # ))
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Linear Regressor',
+    #     'Custom linear regression model',
+    #     ModelType['custom_supervised'],
+    #     'server3/lib/models/linear_regressor.py',
+    #     'linear_regressor_model_fn',
+    #     'linear_regressor_to_str',
+    #     models.LinearRegressor,
+    #     {'type': 'DataFrame'}
+    # ))
     print(add_model_with_ownership(
         'system',
         False,
-        'Linear Regressor',
-        'Custom linear regression model',
-        ModelType['custom_supervised'],
+        'Hyperas Model',
+        'Hyperas Model for hyperparameters tuning',
+        ModelType['hyperas'],
         'server3/lib/models/linear_regressor.py',
         'linear_regressor_model_fn',
         'linear_regressor_to_str',
-        models.LinearRegressor,
-        {'type': 'DataFrame'}
+        models.HYPERAS_SPEC,
+        {'type': 'ndarray', 'n': None}
     ))
 
 

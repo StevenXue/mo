@@ -14,6 +14,7 @@ cause:
 1. data function use import global_variable to achieve get data
 2. function principle, from big function to small
 
+1. optimizer can not support distribute
 """
 import inspect
 from keras.datasets import mnist
@@ -67,10 +68,12 @@ def conf_to_python_file(conf, data_source_id, **kwargs):
     model_str = get_indent(model_str)
     model_function_str = function_name + model_str
     # data function
-    data_function_str = conf_to_data_function_str(conf, data_source_id, **kwargs)
+    data_function_str = conf_to_data_function_str(conf, data_source_id,
+                                                  **kwargs)
 
     temp_file = './my_temp_model.py'
-    write_temp_files(import_str + data_function_str + model_function_str, temp_file)
+    write_temp_files(import_str + data_function_str + model_function_str,
+                     temp_file)
     return
 
 
@@ -190,7 +193,8 @@ def function_to_string(obj):
         for v in name["value"]:
             part_str = '%s(%s), ' % (v, args_str)
             function_in_str += part_str
-        function_str = '{{%s([%s])}}' % (name["distribute"], function_in_str[:-2])
+        function_str = '{{%s([%s])}}' % (
+            name["distribute"], function_in_str[:-2])
     else:
         function_str = '%s(%s)' % (name, args_str)
     return function_str
@@ -233,7 +237,8 @@ def arg_to_string(key, value):
     """
     if (type(value) is dict) and "distribute" in value:
         # distribute value: units={{choice([256, 512])}}
-        arg_str = '%s={{%s(%s)}}, ' % (key, value["distribute"], str(value["value"]))
+        arg_str = '%s={{%s(%s)}}, ' % (
+            key, value["distribute"], str(value["value"]))
     else:
         # normal value: input_shape="uniform"
         if type(value) is str:
@@ -264,7 +269,8 @@ def conf_to_data_function_str(conf, data_source_id, **kwarg):
     data_source_id_str = "data_source_id = '%s'" % data_source_id
     kwarg_str = "kwargs = %s" % str({**kwarg})
     data_function_str = data_function_str.replace("conf = {}", conf_str)
-    data_function_str = data_function_str.replace("data_source_id = {}", data_source_id_str)
+    data_function_str = data_function_str.replace("data_source_id = {}",
+                                                  data_source_id_str)
     data_function_str = data_function_str.replace("kwargs = {}", kwarg_str)
     return data_function_str + "\n\n"
 
@@ -311,7 +317,6 @@ SELECT_CHIOCE = {
     "eg": "../type[range]"
 }
 
-
 DISTRIBUTE = {
     "name": "distribute_choice",
     "type": {
@@ -340,7 +345,6 @@ DISTRIBUTE = {
         ]
     },
 }
-
 
 ACTIVATION = {
     'name': 'activation',
@@ -384,6 +388,24 @@ ACTIVATION = {
     }
 }
 
+LEARNING_RATE = {
+    "name": "lr",
+    "type": {
+        "key": "float",
+        "des": "the learning rate of NN optimizers"
+    },
+    "distribute": DISTRIBUTE
+}
+
+MOMENTUM = {
+    "name": "momentum",
+    "type": {
+        "key": "float",
+        "des": "the learning rate of NN optimizers"
+    },
+    "distribute": DISTRIBUTE
+}
+
 INPUT_SHAPE = {
     'name': 'input_shape',
     'type': {
@@ -396,6 +418,366 @@ INPUT_SHAPE = {
     'default': None,
     'required': False,
     'len_range': None
+}
+
+
+HYPERAS_SPEC = {
+    "layers": [
+        {
+            "name": "Dense",
+            "args": [
+                {
+                    "name": "units",
+                    "type": {
+                        "key": "int",
+                        "des": "Just your regular densely-connected NN layer",
+                        "range": None
+                    },
+                    "default": 32,
+                    "required": True,
+
+                    "distribute": DISTRIBUTE
+                },
+                ACTIVATION,
+                INPUT_SHAPE
+            ],
+        },
+        {
+            "name": "Dropout",
+            "args": [
+                {
+                    "name": "rate",
+                    "type": {
+                        "key": "float",
+                        "des": "Fraction of the input units to drop",
+                        "range": [0, 1]
+                    },
+                    "default": None,
+                    "required": True,
+                    "distribute": DISTRIBUTE
+                },
+                {
+                    "name": "noise_shape",
+                    "type": {
+                        "key": "int_m",
+                        "des": "1D integer tensor representing the shape of "
+                               "the binary dropout mask that will be "
+                               "multiplied with the input.",
+                        "range": None
+                    },
+                    "default": None,
+                    "required": False,
+                    "len_range": [3, 3]
+                },
+                {
+                    "name": "seed",
+                    "type": {
+                        "key": "int",
+                        "des": "A Python integer to use as random seed",
+                        "range": None
+                    },
+                    "default": None,
+                    "required": False,
+                },
+            ],
+        },
+        {
+            "name": "Flatten",
+            "args": [],
+        },
+        {
+            "name": "Reshape",
+            "args": [
+                {
+                    "name": "target_shape",
+                    "type": {
+                        "key": "int_m",
+                        "des": "nD tensor with shape: (batch_size, ..., "
+                               "input_dim). The most common situation would be "
+                               "a 2D input with shape (batch_size, input_dim).",
+                        "range": None
+                    },
+                    "default": None,
+                    "required": True,
+                    "len_range": None
+                },
+                INPUT_SHAPE
+            ],
+        },
+        {
+            "name": "Conv1D",
+            "args": [
+                {
+                    "name": "filters",
+                    "type": {
+                        "key": "int",
+                        "des": "the dimensionality of the output space (i.e. "
+                               "the number output of filters in the "
+                               "convolution)",
+                        "range": None
+                    },
+                    "default": None,
+                    "required": True,
+                },
+                {
+                    "name": "kernel_size",
+                    "type": {
+                        "key": "int",
+                        "des": "An integer specifying the length of the 1D "
+                               "convolution window.",
+                        "range": None
+                    },
+                    "default": None,
+                    "required": True,
+                },
+                ACTIVATION,
+                INPUT_SHAPE
+            ],
+        },
+        {
+            "name": "Conv2D",
+            "args": [
+                {
+                    "name": "filters",
+                    "type": {
+                        "key": "int",
+                        "des": "the dimensionality of the output space (i.e. "
+                               "the number output of filters in the "
+                               "convolution)",
+                        "range": None
+                    },
+                    "default": None,
+                    "required": True,
+                },
+                {
+                    "name": "kernel_size",
+                    "type": {
+                        "key": "int_m",
+                        "des": "An tuple/list of 2 integers, specifying the "
+                               "strides of the convolution along the width and "
+                               "height.",
+                        "range": None
+                    },
+                    "default": None,
+                    "required": True,
+                    "len_range": [2, 2]
+                },
+                ACTIVATION,
+                INPUT_SHAPE
+            ],
+        },
+        {
+            "name": "MaxPooling2D",
+            "args": [
+                {
+                    "name": "pool_size",
+                    "type": {
+                        "key": "int_m",
+                        "des": "tuple of 2 integers, factors by which to "
+                               "downscale (vertical, horizontal). (2, 2) will "
+                               "halve the input in both spatial dimension. ",
+                        "range": None
+                    },
+                    "default": None,
+                    "required": False,
+                    "len_range": [2, 2]
+                },
+                {
+                    "name": "strides",
+                    "type": {
+                        "key": "int_m",
+                        "des": "tuple of 2 integers, or None. Strides values."
+                               " If None, it will default to pool_size",
+                        "range": None
+                    },
+                    "default": None,
+                    "required": False,
+                    "len_range": [2, 2]
+                },
+                {
+                    "name": "padding",
+                    "type": {
+                        "key": "choice",
+                        "des": "",
+                        "range": ["valid", "same"]
+                    },
+                    "default": "valid",
+                    "required": False,
+                },
+                {
+                    "name": "data_format",
+                    "type": {
+                        "key": "choice",
+                        "des": "The ordering of the dimensions in the inputs",
+                        "range": ["channels_last", "channels_first"]
+                    },
+                    "default": "channels_last",
+                    "required": False,
+                },
+                {
+                    "name": "input_shape",
+                    "type": {
+                        "key": "int_m",
+                        "des": "4D tensor",
+                        "range": None
+                    },
+                    "default": None,
+                    "required": False,
+                    "len_range": [4, 4]
+                }
+            ],
+        },
+    ],
+    "compile": {
+        'args': [
+            {
+                "name": "loss",
+                "type": {
+                    "key": "choice",
+                    "des": "A loss function (or objective function, or "
+                           "optimization score function) is one of the two "
+                           "parameters required to compile a model",
+                    "range": ["mean_squared_error",
+                              "mean_absolute_error",
+                              "mean_absolute_percentage_error",
+                              "mean_squared_logarithmic_error",
+                              "squared_hinge",
+                              "hinge",
+                              "categorical_hinge",
+                              "logcosh",
+                              "categorical_crossentropy",
+                              "sparse_categorical_crossentropy",
+                              "binary_crossentropy",
+                              "kullback_leibler_divergence",
+                              "poisson",
+                              "cosine_proximity"]
+                },
+                "default": "categorical_crossentropy",
+                "required": True,
+
+                "distribute": {
+                    'name': "loss_distribute",
+                    'type': {
+                        'key': 'choice_m',
+                        'des': "Choice distribution, "
+                               "Returns one of the options, which should be a list or tuple.",
+                        'range': ["mean_squared_error",
+                                  "mean_absolute_error",
+                                  "mean_absolute_percentage_error",
+                                  "mean_squared_logarithmic_error",
+                                  "squared_hinge",
+                                  "hinge",
+                                  "categorical_hinge",
+                                  "logcosh",
+                                  "categorical_crossentropy",
+                                  "sparse_categorical_crossentropy",
+                                  "binary_crossentropy",
+                                  "kullback_leibler_divergence",
+                                  "poisson",
+                                  "cosine_proximity"]
+                    },
+                    'default': ["categorical_crossentropy"],
+                    "eg": ["mean_squared_error",
+                           "mean_absolute_error",
+                           "mean_absolute_percentage_error"]
+                }
+
+            },
+            {
+                "name": "optimizer",
+                "type": {
+                    "key": "choice_child",
+                    "des": "An optimizer is one of the two arguments required for "
+                           "compiling a Keras model",
+                    "range": [
+                        {
+                            "name": "SGD",
+                            "args": [
+                                LEARNING_RATE,
+                                MOMENTUM
+                            ]
+                        },
+                        {
+                            "name": "Rmsprop",
+                            "args": [
+                                LEARNING_RATE,
+                            ]
+                        },
+                        "adagrad",
+                        "adadelta",
+                        "adam",
+                        "adamax",
+                        "nadam"]
+                },
+                "default": "sgd",
+                "required": True,
+            },
+            {
+                "name": "metrics",
+                "type": {
+                    "key": "choices",
+                    "des": "A metric is a function that is used to judge the "
+                           "performance of your model",
+                    "range": ["acc",
+                              "mse",
+                              "mae",
+                              "mape",
+                              "msle",
+                              "cosine"]
+                },
+                "default": [],
+                "required": False
+            },
+        ],
+    },
+    "fit": {
+        "data_fields": {
+            "name": "training_fields",
+            "type": {
+                "key": "transfer_box",
+                "des": "data fields for x and y",
+            },
+            "default": None,
+            "required": True,
+            "x_data_type": ['integer', 'float'],
+            "y_data_type": ['integer', 'float'],
+            "x_len_range": None,
+            "y_len_range": None
+        },
+        "args": [
+            {
+                "name": "batch_size",
+                "type": {
+                    "key": "int",
+                    "des": "Number of samples per gradient update",
+                    "range": None
+                },
+                "default": 32
+            },
+            {
+                "name": "epochs",
+                "type": {
+                    "key": "int",
+                    "des": "Number of epochs to train the model",
+                    "range": None
+                },
+                "default": 10
+            },
+        ],
+    },
+    "evaluate": {
+        "args": [
+            {
+                "name": "batch_size",
+                "type": {
+                    "key": "int",
+                    "des": "Number of samples per gradient update",
+                    "range": None
+                },
+                "default": 32
+            },
+        ]
+    }
 }
 
 
@@ -783,30 +1165,63 @@ CONSTANT = {
                     },
                     "default": "categorical_crossentropy",
                     "required": True,
+
                     "distribute": {
-                        'name': "choice",
-                        'des': "Choice distribution, "
-                               "Returns one of the options, which should be a list or tuple.",
-                        'default': ["../default"],
-                        "eg": "../type[range]"
+                        'name': "loss_distribute",
+                        'type': {
+                            'key': 'choice_m',
+                            'des': "Choice distribution, "
+                                   "Returns one of the options, which should be a list or tuple.",
+                            'range': ["mean_squared_error",
+                                      "mean_absolute_error",
+                                      "mean_absolute_percentage_error",
+                                      "mean_squared_logarithmic_error",
+                                      "squared_hinge",
+                                      "hinge",
+                                      "categorical_hinge",
+                                      "logcosh",
+                                      "categorical_crossentropy",
+                                      "sparse_categorical_crossentropy",
+                                      "binary_crossentropy",
+                                      "kullback_leibler_divergence",
+                                      "poisson",
+                                      "cosine_proximity"]
+                        },
+                        'default': ["categorical_crossentropy"],
+                        "eg": ["mean_squared_error",
+                               "mean_absolute_error",
+                               "mean_absolute_percentage_error"]
                     }
+
                 },
                 {
                     "name": "optimizer",
                     "type": {
-                        "key": "choice",
+                        "key": "choice_child",
                         "des": "An optimizer is one of the two arguments required for "
                                "compiling a Keras model",
-                        "range": ["sgd",
-                                  "rmsprop",
-                                  "adagrad",
-                                  "adadelta",
-                                  "adam",
-                                  "adamax",
-                                  "nadam"]
+                        "range": [
+                            {
+                                "name": "SGD",
+                                "args": [
+                                    LEARNING_RATE,
+                                    MOMENTUM
+                                ]
+                            },
+                            {
+                                "name": "Rmsprop",
+                                "args": [
+                                    LEARNING_RATE,
+                                ]
+                            },
+                            "adagrad",
+                            "adadelta",
+                            "adam",
+                            "adamax",
+                            "nadam"]
                     },
                     "default": "sgd",
-                    "required": True
+                    "required": True,
                 },
                 {
                     "name": "metrics",
@@ -923,9 +1338,9 @@ if __name__ == "__main__":
             ],
             "compile": {
 
-                    "loss": "categorical_crossentropy",
-                    "optimizer": "SGD",
-                    "metrics": ["accuracy"]
+                "loss": "categorical_crossentropy",
+                "optimizer": "SGD",
+                "metrics": ["accuracy"]
 
             },
             "fit": {
