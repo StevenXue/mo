@@ -87,30 +87,6 @@ def split_categorical_and_continuous(df, exclude_cols):
     return continuous_cols, categorical_cols
 
 
-def run_multiple_model(conf, project_id, staging_data_set_id, model_id,
-                       hyper_parameters=None,
-                       **kwargs):
-    """
-    run model by model_id and the parameter config
-
-    :param conf: conf of model with multiple set of parameters (hyper parameters)
-    :param project_id:
-    :param staging_data_set_id:
-    :param model_id:
-    :param kwargs:
-    :param hyper_parameters:
-    :return:
-    """
-    from server3.service import spark_service
-    # using conf and hyper_parameters to generate conf_grid
-    conf_grid = spark_service.get_conf_grid(conf,
-                                            hyper_parameters=hyper_parameters)
-    # get the data
-    data = manage_nn_input_temp(conf, staging_data_set_id, **kwargs)
-    result = spark_service.hyper_parameters_tuning(conf_grid, data)
-    return result
-
-
 def run_model(conf, project_id, data_source_id, model_id, **kwargs):
     """
     run model by model_id and the parameter config
@@ -189,7 +165,7 @@ def run_multiple_model(conf, project_id, staging_data_set_id, model_id,
 
 def run_hyperas_model(conf, project_id, data_source_id, model_id, **kwargs):
     from server3.lib.models.hyperas_model import train_hyperas_model
-    train_hyperas_model(conf=conf, data_source_id=data_source_id, **kwargs)
+    return train_hyperas_model(conf=conf, data_source_id=data_source_id, **kwargs)
 
 
 def model_to_code(conf, project_id, data_source_id, model_id, **kwargs):
@@ -597,44 +573,44 @@ def temp():
     #     models.LinearRegressor,
     #     {'type': 'DataFrame'}
     # ))
-    print(add_model_with_ownership(
-        'system',
-        False,
-        'Random Forest',
-        'custom Random Forest model',
-        ModelType['custom_supervised'],
-        '/lib/models/randomforest.py',
-        'randomforest_model_fn',
-        'custom_model_to_str',
-        models.RandomForest,
-        {'type': 'DataFrame'}
-    ))
-
-    print(add_model_with_ownership(
-        'system',
-        False,
-        'Logistic Regressor',
-        'custom Logistic Regressor model',
-        ModelType['custom_supervised'],
-        '/lib/models/logistic_regressor.py',
-        'logistic_regressor_model_fn',
-        'custom_model_to_str',
-        models.LogisticRegressor,
-        {'type': 'DataFrame'}
-    ))
-
-    print(add_model_with_ownership(
-        'system',
-        False,
-        'Gaussian Mixture Model',
-        'custom GMM model',
-        ModelType['unsupervised'],
-        '/lib/models/gmm_cluster.py',
-        'gmm_cluster_model_fn',
-        'custom_model_to_str',
-        models.GMMCluster,
-        {'type': 'DataFrame'}
-    ))
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Random Forest',
+    #     'custom Random Forest model',
+    #     ModelType['custom_supervised'],
+    #     '/lib/models/randomforest.py',
+    #     'randomforest_model_fn',
+    #     'custom_model_to_str',
+    #     models.RandomForest,
+    #     {'type': 'DataFrame'}
+    # ))
+    #
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Logistic Regressor',
+    #     'custom Logistic Regressor model',
+    #     ModelType['custom_supervised'],
+    #     '/lib/models/logistic_regressor.py',
+    #     'logistic_regressor_model_fn',
+    #     'custom_model_to_str',
+    #     models.LogisticRegressor,
+    #     {'type': 'DataFrame'}
+    # ))
+    #
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Gaussian Mixture Model',
+    #     'custom GMM model',
+    #     ModelType['unsupervised'],
+    #     '/lib/models/gmm_cluster.py',
+    #     'gmm_cluster_model_fn',
+    #     'custom_model_to_str',
+    #     models.GMMCluster,
+    #     {'type': 'DataFrame'}
+    # ))
 
     print(add_model_with_ownership(
         'system',
