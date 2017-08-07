@@ -53,6 +53,9 @@ def train_hyperas_model(conf, data_source_id, **kwargs):
 
     print("Evalutation of best performing model:")
     print("best score and acc", best_model.evaluate(X_test, Y_test))
+    return {
+        "best score and acc": best_model.evaluate(X_test, Y_test)
+    }
 
 
 def conf_to_python_file(conf, data_source_id, **kwargs):
@@ -128,7 +131,7 @@ def conf_to_model_str(conf):
         model_str += 'model.add(%s)\n' % function_to_string(l)
 
     # compile
-    comp = conf["compile"]
+    comp = conf["compile"]["args"]
 
     optimizer = comp.pop("optimizer")  # get optimizer
     optimizer_str = 'optimizer=%s, ' % function_to_string(optimizer)
@@ -829,14 +832,16 @@ CONSTANT = {
             }
         ],
         "compile": {
-            "loss": "categorical_crossentropy",
-            "optimizer": {
-                "name": "RMSprop",
-                "args": {
-                    "lr": 0.001
-                }
-            },
-            "metrics": ["accuracy"]
+            "args": {
+                "loss": "categorical_crossentropy",
+                "optimizer": {
+                    "name": "RMSprop",
+                    "args": {
+                        "lr": 0.001
+                    }
+                },
+                "metrics": ["accuracy"]
+            }
         },
         "fit": {
             "args": {
