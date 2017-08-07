@@ -3,20 +3,6 @@ import ReactDOM from 'react-dom';
 import ReactEcharts from 'echarts-for-react';
 let colors = ['#5793f3', '#d14a61', '#675bba'];
 
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-
-function isEmpty(obj) {
-  if (obj == null) return true;
-  if (obj.length > 0)    return false;
-  if (obj.length === 0)  return true;
-  if (typeof obj !== "object") return true;
-  for (var key in obj) {
-    if (hasOwnProperty.call(obj, key)) return false;
-  }
-
-  return true;
-}
-
 export default class Curve extends React.Component{
   static propTypes = {
     dataString: React.PropTypes.any,
