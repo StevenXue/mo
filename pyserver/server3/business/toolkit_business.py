@@ -465,7 +465,7 @@ def create_public_toolkit():
                               "name": "降维结果",
                               "des": "所选范围的样本的降维后的结果",
                               "if_add_column": True,
-                              "attribute": "value"
+                              "attribute": "label"
                           },
                           {
                               "name": "components",
@@ -489,7 +489,7 @@ def create_public_toolkit():
                               "name": "mean_",
                               "des": "所选范围的样本的降维后的结果",
                               "if_add_column": False,
-                              "attribute": "general_info"
+                              "attribute": "value"
                           },
                           {
                               "name": "noise_variance",
@@ -542,7 +542,7 @@ def create_public_toolkit():
                                "name": "降维结果",
                                "des": "所选范围的样本的降维后的结果",
                                "if_add_column": True,
-                               "attribute": "value"
+                               "attribute": "label"
                            },
                            {
                                "name": "kl_divergence",
@@ -1487,7 +1487,7 @@ def create_public_data_process():
                               "name": "label",
                               "des": "降维后的栏位信息",
                               "if_add_column": True,
-                              "attribute": "value"
+                              "attribute": "label"
                           },
                           {
                               "name": "coef",
