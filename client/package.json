@@ -22,7 +22,6 @@
     "express": "^4.15.3",
     "immutable": "^3.7.6",
     "install": "^0.10.1",
-    "keras-js": "^0.3.0",
     "less": "^2.7.2",
     "less-loader": "^4.0.4",
     "lodash": "^4.17.4",
