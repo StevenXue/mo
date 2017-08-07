@@ -8,6 +8,7 @@ export default {
   namespace: 'upload',
 
   state: {
+    uploading: false,
     visible: false,
     panelVisible: false,
     files: {
@@ -42,12 +43,14 @@ export default {
       formData.append('uploaded_file', payload.upload[0]);
       formData.append('description', payload.description);
       formData.append('if_private', payload.isPrivate);
+      formData.append('type', payload.type);
       formData.append('user_ID', user.user_ID);
-
+      yield put({ type: 'setUploading', payload: true })
       const data = yield call(uploadFile, formData)
       if (data.success) {
         console.log('upload success');
         message.success('upload success')
+        yield put({ type: 'setUploading', payload: false })
         yield put({ type: 'hideModal' })
 
         // const from = queryURL('from')
@@ -58,7 +61,7 @@ export default {
         //   yield put(routerRedux.push('/project'))
         // }
       } else {
-        console.log('error', data);
+        console.log('error', data, formData);
         throw data
       }
     },
@@ -71,6 +74,13 @@ export default {
       let body = lodash.cloneDeep(payload)
       body['user_ID'] = user.user_ID
       body['file_id'] = file._id
+      if (body['names']) {
+        body['names'] = body.names
+          .replace(/ /g, '')
+          .replace(/"/g, '')
+          .replace(/'/g, '')
+          .split(',')
+      }
       const data = yield call(importData, body)
       if (data.success) {
         message.success('Import Success!')
@@ -93,6 +103,10 @@ export default {
         //   ...pagination,
         // }
       }
+    },
+
+    setUploading (state, {payload: uploading}) {
+      return { ...state, uploading }
     },
 
     showModal (state, action) {

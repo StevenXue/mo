@@ -1,9 +1,20 @@
+import React from 'react'
 import { query, logout } from '../services/app'
 import { routerRedux } from 'dva/router'
 import { parse } from 'qs'
 import { queryURL } from '../utils'
 import { config } from '../utils'
 const { prefix } = config
+
+
+let joyRide = {
+  joyride: undefined,
+  joyrideOverlay: true,
+  joyrideType: 'continuous',
+  isRunning: false,
+  stepIndex: 0,
+  steps: [],
+}
 
 export default {
   namespace: 'app',
@@ -14,6 +25,7 @@ export default {
     darkTheme: localStorage.getItem(`${prefix}darkTheme`) === 'true',
     isNavbar: document.body.clientWidth < 769,
     navOpenKeys: JSON.parse(localStorage.getItem(`${prefix}navOpenKeys`)) || [],
+    ...joyRide
   },
   subscriptions: {
 
@@ -84,8 +96,68 @@ export default {
       }
     },
 
+    *resetJoyride ({
+                     payload,
+                   }, { put, select }) {
+      const { app } = yield(select(_ => _))
+      app.joyride.reset(true)
+    },
+
+    *resetAndRun ({
+                    payload,
+                  }, { put, select }) {
+      yield put({ type: 'resetJoyride' })
+      yield put({ type: 'setSetps', payload })
+      yield put({ type: 'runTour' })
+    },
+
   },
   reducers: {
+
+    runTour (state) {
+      return {
+        ...state,
+        isRunning: true
+      }
+    },
+
+    addSteps (state, { payload: steps }) {
+      let newSteps = steps
+      if (!Array.isArray(newSteps)) {
+        newSteps = [newSteps]
+      }
+
+      if (!newSteps.length) {
+        return
+      }
+
+      state.steps = state.steps.concat(newSteps)
+      return state
+    },
+
+    setSetps (state, { payload: steps }) {
+      let newSteps = steps
+      if (!Array.isArray(newSteps)) {
+        newSteps = [newSteps]
+      }
+
+      if (!newSteps.length) {
+        return
+      }
+
+      state.steps = newSteps
+      return state
+    },
+
+    callback(state, { payload: data }) {
+      // console.log('joyride callback', data);
+
+      return {
+        ...state,
+        selector: data.type === 'tooltip:before' ? data.step.selector : ''
+      }
+    },
+
     querySuccess (state, { payload: user }) {
       return {
         ...state,

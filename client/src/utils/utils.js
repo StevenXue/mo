@@ -1,6 +1,6 @@
-var hasOwnProperty = Object.prototype.hasOwnProperty;
+let hasOwnProperty = Object.prototype.hasOwnProperty;
 
-export function isEmpty(obj) {
+function isEmpty(obj) {
   if (obj == null) return true;
   if (obj.length > 0)    return false;
   if (obj.length === 0)  return true;
@@ -11,3 +11,5 @@ export function isEmpty(obj) {
 
   return true;
 }
+
+export { isEmpty }
