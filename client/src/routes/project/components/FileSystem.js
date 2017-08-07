@@ -51,8 +51,8 @@ class FileSystem extends React.Component {
   }
 
   renderTabContent(key) {
-    return <div className='full-width' style={{ display: 'flex', flexDirection: 'row' }}>
-      <div style={{ width: '100%'}}>
+    return<div className='full-width' style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
+      <div style={{ width: 500}}>
         {this.renderCards(key)}
       </div>
     </div>
@@ -61,7 +61,7 @@ class FileSystem extends React.Component {
   renderCards(key){
     let cards = this.props.project.projects[key];
     return cards.map((e) =>
-      <Card key={e.name} title={e.name} extra={
+      <Card key={e._id} title={e.name} extra={
         <a>
         <Button type="danger" style={{marginTop: -5}} onClick={() => this.onClickDelete(event, e._id, true)}>
           DELETE

@@ -67,7 +67,7 @@ class FileModal extends Component {
       labelCol: { span: 6 },
       wrapperCol: { span: 14 },
     };
-
+    const upload = this.props.upload
     return (
       <span>
         <span onClick={this.showModelHandler}>
@@ -75,7 +75,7 @@ class FileModal extends Component {
         </span>
         <Modal
           title="文件上传"
-          visible={this.props.upload.visible}
+          visible={upload.visible}
           // onOk={this.okHandler}
           onCancel={this.hideModelHandler}
           footer={null}
@@ -120,6 +120,25 @@ class FileModal extends Component {
             </FormItem>
             <FormItem
               {...formItemLayout}
+              label="File Content"
+              hasFeedback
+            >
+              {getFieldDecorator('type', {
+                initialValue: 'table',
+                rules: [
+                  { required: true, message: 'please choose file content type' },
+                ],
+              })(
+                <Select >
+                  <Option value="table">table</Option>
+                  <Option value="image">image</Option>
+                  <Option value="text">text</Option>
+                  <Option value="audio">audio</Option>
+                </Select>
+              )}
+            </FormItem>
+            <FormItem
+              {...formItemLayout}
               label="Privacy"
               hasFeedback
             >
@@ -138,7 +157,7 @@ class FileModal extends Component {
             <FormItem
               wrapperCol={{ span: 12, offset: 6 }}
             >
-              <Button type="primary" htmlType="submit">Submit</Button>
+              <Button type="primary" htmlType="submit" loading={upload.uploading}>Submit</Button>
             </FormItem>
           </Form>
         </Modal>
