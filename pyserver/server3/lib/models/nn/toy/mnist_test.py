@@ -33,32 +33,34 @@ def get_mnist_data():
 
 
 if __name__ == '__main__':
-    import mnist_mlp
-    import mnist_cnn
-    import mnist_irnn
-    import mnist_hierarchical_rnn
+    # import mnist_mlp
+    # import mnist_cnn
+    # import mnist_irnn
+    # import mnist_hierarchical_rnn
     x_train, y_train, x_test, y_test = get_mnist_data()
-    input = {
-        'x_tr': x_train,
-        'y_tr': y_train,
-        'x_te': x_test,
-        'y_te': y_test,
-    }
-    conf = {
-        'fit': {
-            "args": {
-                "batch_size": 32,
-                "epochs": 5,
-            },
-        },
-        'evaluate': {
-            'args': {
-                'verbose': 1
-            }
-        }
-    }
-    # result = mnist_mlp.mnist_mlp(conf=conf, input=input)
-    # result = mnist_cnn.mnist_cnn(conf=conf, input=input)
-    # result = mnist_irnn.mnist_irnn(conf=conf, input=input)
-    result = mnist_hierarchical_rnn.mnist_hierarchical_rnn(conf=conf, input=input)
-    print(result['score'])
+    print(y_train[0])
+
+    # input = {
+    #     'x_tr': x_train,
+    #     'y_tr': y_train,
+    #     'x_te': x_test,
+    #     'y_te': y_test,
+    # }
+    # conf = {
+    #     'fit': {
+    #         "args": {
+    #             "batch_size": 32,
+    #             "epochs": 5,
+    #         },
+    #     },
+    #     'evaluate': {
+    #         'args': {
+    #             'verbose': 1
+    #         }
+    #     }
+    # }
+    # # result = mnist_mlp.mnist_mlp(conf=conf, input=input)
+    # # result = mnist_cnn.mnist_cnn(conf=conf, input=input)
+    # # result = mnist_irnn.mnist_irnn(conf=conf, input=input)
+    # result = mnist_hierarchical_rnn.mnist_hierarchical_rnn(conf=conf, input=input)
+    # print(result['score'])
