@@ -105,27 +105,21 @@ def get_all_jobs_of_project(project_id, categories):
     jobs = project_business.get_by_id(project_id)['jobs']
     history_jobs = {c: [] for c in categories}
     for job in jobs:
-        job_info = job.to_mongo()
-        keys = history_jobs.keys()
-        for key in keys:
+        # keys = history_jobs.keys()
+        for key in categories:
             if job[key]:
-                # try:
-                #     result_sds = staging_data_set_business.get_by_job_id(
-                #         job['id']).to_mongo()
-                # except DoesNotExist:
-                #     result_sds = None
+                job_info = job.to_mongo()
+                try:
+                    result_sds = staging_data_set_business.get_by_job_id(job['id']).to_mongo()
+                except DoesNotExist:
+                    result_sds = None
                 job_info[key] = {
                     'name': job[key]['name'],
                 }
-                if job['staging_data_set']:
-                    job_info['staging_data_set'] = \
-                        job['staging_data_set']['name']
-                    job_info['staging_data_set_id'] = \
-                        job['staging_data_set']['id']
-                else:
-                    job_info['staging_data_set'] = None
-                    job_info['staging_data_set_id'] = None
-                # job_info['results'] = result_sds
+                job_info['staging_data_set'] = job['staging_data_set']['name'] if job['staging_data_set'] else None
+                job_info['staging_data_set_id'] = job['staging_data_set']['id'] if job['staging_data_set'] else None
+                job_info['results'] = result_sds if result_sds and "result" in result_sds else None
+                job_info['results_staging_data_set_id'] = result_sds['_id'] if result_sds else None
                 history_jobs[key].append(job_info)
                 break
     return history_jobs
