@@ -157,7 +157,7 @@ def dimension_reduction_PCA(arr0, index, n_components='mle'):
     matrix = np.array(arr0)
     svd_solver = 'auto'
     pca = PCA(n_components=n_components, svd_solver=svd_solver).fit(matrix)
-    result = pca.fit_transform(matrix)
+    result = pca.transform(matrix)
     label = data_utility.retrieve_nan_index(result.tolist(), index)
     return label, pca.components_.tolist(), pca.explained_variance_.tolist(), pca.explained_variance_ratio_.tolist(), pca.mean_.tolist(), pca.noise_variance_
 
@@ -167,9 +167,10 @@ def dimension_reduction_TSNE(arr0, index, n_components=2):
     matrix = np.array(arr0)
     t_sne = TSNE(n_components=n_components, random_state=0)
     np.set_printoptions(suppress=True)
-    result = t_sne.fit_transform(matrix)
-    label = data_utility.retrieve_nan_index(result.tolist(), index)
-    return label
+    result = t_sne.fit(matrix)
+    kl_divergence = result.kl_divergence_
+    label = data_utility.retrieve_nan_index(t_sne.fit_transform(matrix).tolist(), index)
+    return label, kl_divergence
 
 
 # K平均数算法

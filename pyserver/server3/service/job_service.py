@@ -11,6 +11,7 @@
 
 
 import functools
+import numpy as np
 
 from bson import ObjectId
 from itertools import compress
@@ -106,8 +107,29 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                                     "mic": [None for el in data]},
                         "category": toolkit_obj.category
                         }
-            else:
-                json = {}
+            elif toolkit_obj.category == 3:
+                flag = toolkit_obj.parameter_spec["data"]["type"]["key"] == "transfer_box"
+                data = list(zip(*args[0]))
+
+                if flag:
+                    data.append(args[1])
+                lab = list(zip(*labels))
+                var1 = [np.var(da) for da in data]
+                var2 = [np.var(da) for da in lab]
+                x_domain = fields[0] + fields[1] + ["New Colunm"]*len(lab) if fields[1] else fields[0] + ["New Colunm"]*len(lab)
+                y_domain = var1 + var2
+                json = {
+                    "table1": {"X_fields": fields[0],
+                               "Y_fields": fields[1],
+                               "data": args[0]},
+                    "table2": {"data": labels},
+                    "bar": {"x_domain": x_domain,
+                            "y_domain": y_domain},
+                    "pie1": {"x_domain": fields[0],
+                             "y_domain": var1[:-1] if flag else var1},
+                    "pie2": {"y_domain": var2},
+                    "general_info": gen_info
+                }
 
             # update a job
             job_business.end_job(job_obj)
@@ -172,7 +194,7 @@ def create_model_job(project_id, staging_data_set_id, model_obj, **kwargs):
             func_result = func(*args, **kw, result_sds=result_sds_obj,
                                project_id=project_id)
             # update a job
-            job_obj = job_business.end_job(job_obj)
+            job_business.end_job(job_obj)
 
             # create a result
             # result_obj = result_business.add_result(func_result, job_obj, 0, "")

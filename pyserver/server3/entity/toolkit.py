@@ -40,7 +40,6 @@ class Toolkit(DynamicDocument):
     description = StringField(max_length=140)
     category = IntField(required=True)
 
-    # TODO 已经转移到result_type里了
     # result_form = IntField(required=True, choices=RESUlT_FORM)
     target_py_code = StringField(required=True)
     fields = ListField()
