@@ -9,6 +9,9 @@ export default {
   entry: 'src/index.js',
   disableCSSModules: false,
   svgSpriteLoaderDirs: svgSpriteDirs,
+  // module: {
+  //   noParse: /node_modules\/weblas\/dist\/weblas.js/,
+  // },
   "theme": "./theme.config.js",
   "env": {
       "development": {
@@ -19,7 +22,7 @@ export default {
           "transform-object-rest-spread",
           "transform-runtime",
   		    ["import", { "libraryName": "antd", "style": true }]
-        ]
+        ],
       },
       "production": {
         // "presets": ["babel-preset-es2015", "babel-preset-es2016", "babel-preset-es2017"].map(require.resolve),
