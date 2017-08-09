@@ -226,7 +226,7 @@ RandomForest = {
                            "examples with their prediction."
                 },
                 "default": None,
-                "required": True
+                "required": False
             },
             {
                 "name": "num_classes",
