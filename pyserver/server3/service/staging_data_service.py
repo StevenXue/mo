@@ -5,6 +5,7 @@ from copy import deepcopy
 from bson import Code
 import numpy as np
 import pandas as pd
+from mongoengine import DoesNotExist
 
 from server3.business import staging_data_set_business
 from server3.business import staging_data_business
@@ -317,12 +318,16 @@ def copy_staging_data_set(sds, belonged_project, **kwargs):
     :param belonged_project:
     :return:
     """
-    belonged_job = None
-    if 'belonged_job' in kwargs:
-        belonged_job = kwargs.pop('belonged_job')
-    if kwargs:
-        raise TypeError('Unrecognized keyword arguments: ' + str(kwargs))
-    sds_cp = staging_data_set_business.copy_staging_data_set(
-        sds, belonged_project, belonged_job)
-    staging_data_business.copy_staging_data_by_staging_data_set_id(sds_cp)
-    return sds_cp
+    try:
+        staging_data_set_business.get_by_name_and_project(
+            sds.name, belonged_project)
+    except DoesNotExist:
+        belonged_job = None
+        if 'belonged_job' in kwargs:
+            belonged_job = kwargs.pop('belonged_job')
+        if kwargs:
+            raise TypeError('Unrecognized keyword arguments: ' + str(kwargs))
+        sds_cp = staging_data_set_business.copy_staging_data_set(
+            sds, belonged_project, belonged_job)
+        staging_data_business.copy_staging_data_by_staging_data_set_id(sds_cp)
+        return sds_cp

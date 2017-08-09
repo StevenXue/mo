@@ -37,22 +37,18 @@ def get_project(project_id):
 def list_projects():
     user_ID = request.args.get('user_ID')
     if user_ID:
-        try:
-            public_projects, owned_projects = project_service.\
-                list_projects_by_user_ID(user_ID, -1)
-            public_projects = json_utility.\
-                me_obj_list_to_json_list(public_projects)
-            owned_projects = json_utility.\
-                me_obj_list_to_json_list(owned_projects)
-            result = {
-                'public_projects': public_projects,
-                'owned_projects': owned_projects
-            }
-        except Exception as e:
-            return (jsonify({'response': '%s: %s' % (str(Exception),
-                                                     e.args)}), 400)
+        public_projects, owned_projects = project_service. \
+            list_projects_by_user_ID(user_ID, -1)
+        public_projects = json_utility. \
+            me_obj_list_to_json_list(public_projects)
+        owned_projects = json_utility. \
+            me_obj_list_to_json_list(owned_projects)
+        result = {
+            'public_projects': public_projects,
+            'owned_projects': owned_projects
+        }
         return jsonify({'response': result}), 200
-    return jsonify({'response': 'insufficient arguments'}), 400
+    return jsonify({'response': 'no user_ID arg'}), 400
 
 
 @project_app.route('/jobs/<string:project_id>', methods=['GET'])
@@ -120,10 +116,11 @@ def create_project():
 
 @project_app.route('/projects/<string:project_id>', methods=['DELETE'])
 def remove_project(project_id):
+    user_ID = request.args.get('user_ID')
     if not project_id:
         return jsonify({'response': 'no project_id arg'}), 400
-    try:
-        result = project_service.remove_project_by_id(ObjectId(project_id))
-    except Exception as e:
-        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    if not user_ID:
+        return jsonify({'response': 'no user_ID arg'}), 400
+    result = project_service.remove_project_by_id(ObjectId(project_id),
+                                                  user_ID)
     return jsonify({'response': result}), 200

@@ -22,7 +22,7 @@ PREFIX = '/model'
 
 model_app = Blueprint("model_app", __name__, url_prefix=PREFIX)
 
-ALLOWED_EXTENSIONS = set(['py'])
+ALLOWED_EXTENSIONS = {'py'}
 # UPLOAD_URL = '/uploads/'
 REQUEST_FILE_NAME = 'uploaded_code'
 

@@ -21,6 +21,7 @@ from server3.service import staging_data_service
 from server3.business import file_business
 from server3.business import staging_data_business
 
+# TODO 根据entity生成
 ModelType = {
     'neural_network': 0,
     'custom_supervised': 1,

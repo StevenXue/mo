@@ -26,18 +26,14 @@ def list_data_sets_by_user_ID():
     if not user_ID:
         jsonify({'response': 'insufficient args'}), 400
     if user_ID:
-        try:
-            public_ds, owned_ds = data_service.\
-                list_data_sets_by_user_ID(user_ID, -1)
-            public_ds = json_utility.me_obj_list_to_json_list(public_ds)
-            owned_ds = json_utility.me_obj_list_to_json_list(owned_ds)
-            result = {
-                'public_ds': public_ds,
-                'owned_ds': owned_ds
-            }
-        except Exception as e:
-            return jsonify({'response': '%s: %s' % (str(Exception),
-                                                    e.args)}), 400
+        public_ds, owned_ds = data_service. \
+            list_data_sets_by_user_ID(user_ID, -1)
+        public_ds = json_utility.me_obj_list_to_json_list(public_ds)
+        owned_ds = json_utility.me_obj_list_to_json_list(owned_ds)
+        result = {
+            'public_ds': public_ds,
+            'owned_ds': owned_ds
+        }
         return jsonify({'response': result}), 200
     return jsonify({'response': 'insufficient arguments'}), 400
 

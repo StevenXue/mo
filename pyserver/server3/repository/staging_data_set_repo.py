@@ -16,3 +16,10 @@ class StagingDataSetRepo(Repo):
     def read_by_non_unique_field_without_result(self, field_name, field_value):
         return Repo.read(self, {field_name: field_value,
                                 'type': {'$ne': 'result'}})
+
+    def read_by_name_and_project(self, name, project):
+        return Repo.read_unique_one(self, {'name': name, 'project': project})
+
+    def update_by_name_and_project(self, name, project, field, value):
+        return Repo.update_unique_one(self, {'name': name, 'project': project},
+                                      {field: value})

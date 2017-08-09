@@ -33,7 +33,7 @@ class Repo:
         return self.__instance.objects(**query).first()
 
     def read_unique_one(self, query):
-        return self.__instance.objects.get(**query)
+            return self.__instance.objects.get(**query)
 
     def read_by_unique_field(self, field_name, field_value):
         """
@@ -88,6 +88,9 @@ class Repo:
         modified_obj = self.__instance.objects(id=obj_id).modify(**update)
         # print '3', type(modified_obj)
         return modified_obj.reload()
+
+    def update_unique_one(self, query, update):
+        return self.__instance.objects.get(**query).modify(**update)
 
     def update_unset_fields_by_non_unique_field(self, field_name, field_value,
                                                 fields):
