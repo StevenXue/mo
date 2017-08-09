@@ -54,11 +54,17 @@ export default class Compile extends React.Component {
 
   onSelectMultiple(field, value){
     let values = this.state.values;
-    values[field] = value;
+    if(field === 'loss' && values['hype_loss']){
+      values['loss']['value'] = value
+    }else {
+      values[field] = value;
+    }
     this.setState({
       values
     });
-    this.props.getParams(values);
+    let v = lodash.cloneDeep(values);
+    delete v['hype_loss'];
+    this.props.getParams(v);
   }
 
   checkButton(name){
@@ -82,12 +88,17 @@ export default class Compile extends React.Component {
         this.setState({values});
       }
     });
+    this.props.setHype(true);
     console.log(this.state.values);
   }
 
   onClickHypeLoss(){
     let values = this.state.values;
     values['hype_loss'] = true;
+    values['loss'] = {
+      'distribute': 'choice'
+    }
+    this.props.setHype(true);
     this.setState({values});
   }
 
@@ -124,14 +135,15 @@ export default class Compile extends React.Component {
     if(type === 'multiple') {
       v = v.split(", ");
     }
-    console.log(v);
+    //console.log(v);
     values[parent]['args'][child]['args'][value] = v;
    //console.log(values);
     this.setState({values});
     let values_correct = lodash.cloneDeep(values);
     values_correct[parent]['args'][child] = values[parent]['args'][child]['args'];
-    console.log(values_correct);
-    this.props.getParams(v);
+    //console.log(values_correct);
+    delete values_correct['hype_loss']
+    this.props.getParams(values_correct);
   }
 
   setInputValue(parent, child){
@@ -275,7 +287,7 @@ export default class Compile extends React.Component {
                         defaultValue={type.distribute.default}
                         ref={type.name}
                         style={{width: 120}}
-                        onChange={(value) => this.onSelectSingle(type.name, value)}>
+                        onChange={(value) => this.onSelectMultiple(type.name, value)}>
                   {
                     type.type.range.map((e) =>
                       <Option key={e} value={e}>
