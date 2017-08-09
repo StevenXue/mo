@@ -22,8 +22,7 @@ from server3.business import result_business
 from server3.business import project_business
 from server3.business import staging_data_business
 from server3.business import staging_data_set_business
-from server3.service import staging_data_service
-from server3.service import logger_service
+from server3.service import staging_data_service, logger_service, visualization_service
 
 from server3.utility import data_utility
 from server3.lib import models
@@ -75,7 +74,6 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 if arg["if_add_column"]:
                     strr = "%s_%s_col" % (arg["name"], toolkit_obj.name)
                     try:
-                        error = 0
                         add_new_column(value, args[-1], strr, staging_data_set_id)
                     except:
                         error_flag = 1
@@ -119,15 +117,53 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 data = list(zip(*args[0]))
                 result = list(zip(*labels))
                 merge_data = data + result
+                merge_data = list(zip(*merge_data))
                 lab_fields = ["New Col" + str(i) for i in range(len(result))]
                 merge_fields = fields[0] + lab_fields
+
+                inn = 0
+                while inn in args[-1]:
+                    inn = inn + 1
+                flag_str1 = isinstance(args[0][inn][0], str)
+                flag_str2 = isinstance(labels[inn][0], str)
+                bar1 = []
+                bar2 = [ ]
+                for el in fields[0]:
+                    indx = fields[0].index(el)
+                    raw_d = data[indx]
+
+                    if not flag_str1 and len(set(raw_d)) > 5:
+                        bar1_tmp = visualization_service.freq_hist(raw_d, multip=1)
+                    else:
+                        seta = set(raw_d)
+                        x_domain = [el for el in seta]
+                        y_domain = [raw_d.count(el) for el in seta]
+                        bar1_tmp = {'x_domain': x_domain, 'y_domain': y_domain}
+                    bar1_tmp.update({"field": el})
+                    bar1.append(bar1_tmp)
+
+                for el in lab_fields:
+                    indx = lab_fields.index(el)
+                    raw_re = result[indx]
+
+                    if not flag_str2 and len(set(raw_re)) > 5:
+                        bar2_tmp = visualization_service.freq_hist(raw_re, multip=1)
+                    else:
+                        seta = set(raw_re)
+                        x_domain = [el for el in seta]
+                        y_domain = [raw_re.count(el) for el in seta]
+                        bar2_tmp = {'x_domain': x_domain, 'y_domain': y_domain}
+                    bar2_tmp.update({"field": el})
+                    bar2.append(bar2_tmp)
+
                 json = {"category": toolkit_obj.category,
                         "table": {
                             "Field1": fields[0],
                             "Field2": lab_fields,
                             "data": [dict(zip(merge_fields, arr)) for arr in merge_data]
-                        }
-                        }
+                        },
+                        "bar1": bar1,
+                        "bar2": bar2}
 
             elif toolkit_obj.category == 3:
                 if error_flag:
