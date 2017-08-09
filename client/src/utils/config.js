@@ -26,6 +26,8 @@ module.exports = {
     // dataImport: '/data/import_data_from_file_id',
     dataSets: '/data/data_sets',
     projects: '/project/projects',
+    publish: '/project/publish',
+    fork : '/project/fork',
     // projectCreate: '/project/create_project',
     getDataFields: '/data/data_sets/fields'
   },
