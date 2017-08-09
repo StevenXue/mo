@@ -127,29 +127,35 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                     inn = inn + 1
                 flag_str1 = isinstance(args[0][inn][0], str)
                 flag_str2 = isinstance(labels[inn][0], str)
-                bars = []
+                bar1 = []
+                bar2 = [ ]
                 for el in fields[0]:
                     indx = fields[0].index(el)
                     raw_d = data[indx]
-                    raw_re = result[indx]
 
-                    if not flag_str1:
-                        bar1 = visualization_service.freq_hist(raw_d, multip=1)
+                    if not flag_str1 or len(set(raw_d)) > 5:
+                        bar1_tmp = visualization_service.freq_hist(raw_d, multip=1)
                     else:
                         seta = set(raw_d)
                         x_domain = [el for el in seta]
                         y_domain = [raw_d.count(el) for el in seta]
-                        bar1 = {'x_domain': x_domain, 'y_domain': y_domain}
+                        bar1_tmp = {'x_domain': x_domain, 'y_domain': y_domain}
+                    bar1_tmp.update({"field": el})
+                    bar1.append(bar1_tmp)
 
-                    if not flag_str2:
-                        bar2 = visualization_service.freq_hist(raw_re, multip=1)
+                for el in lab_fields:
+                    indx = lab_fields.index(el)
+                    raw_re = result[indx]
+
+                    if not flag_str2 or len(set(raw_re)) > 5:
+                        bar2_tmp = visualization_service.freq_hist(raw_re, multip=1)
                     else:
                         seta = set(raw_re)
                         x_domain = [el for el in seta]
                         y_domain = [raw_re.count(el) for el in seta]
-                        bar2 = {'x_domain': x_domain, 'y_domain': y_domain}
-
-                    bars.append({"field": el, "bar1": bar1, "bar2": bar2})
+                        bar2_tmp = {'x_domain': x_domain, 'y_domain': y_domain}
+                    bar2_tmp.update({"field": el})
+                    bar2.append(bar2_tmp)
 
                 json = {"category": toolkit_obj.category,
                         "table": {
@@ -157,7 +163,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                             "Field2": lab_fields,
                             "data": [dict(zip(merge_fields, arr)) for arr in merge_data]
                         },
-                        "bars": bars}
+                        "bar1": bar1,
+                        "bar2": bar2}
 
             elif toolkit_obj.category == 3:
                 if error_flag:
