@@ -5,16 +5,15 @@ let color = ['#c23531', '#2f4554', '#61a0a8', '#d48265', '#91c7ae', '#749f83', '
 const getOption = (props) => {
   return  {
     title : {
-      text: 'cluster',
       x:'center'
     },
     tooltip : {
       trigger: 'item',
-      formatter: "{a} <br/>{b} : {c} ({d}%)"
+      formatter: "{b} : {c} ({d}%)"
     },
     series : [
       {
-        name: 'cluster',
+        name: 'all',
         type: 'pie',
         radius : '70%',
         center: ['50%', '60%'],

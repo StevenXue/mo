@@ -373,7 +373,7 @@ export default class ParamsSeletor extends React.Component {
             {
               this.state.checkedCols.length !== 0 &&
               this.state.checkedCols.map((e) =>
-              <Tag style={{marginBottom: 3 }}>{e}</Tag>
+              <Tag style={{marginBottom: 3 }} key={e}>{e}</Tag>
               )
             }
           </div>
@@ -384,7 +384,7 @@ export default class ParamsSeletor extends React.Component {
               {
                 this.state.target.length !== 0 &&
                 this.state.target.map((e) =>
-                  <Tag style={{marginBottom: 3 }}>{e}</Tag>
+                  <Tag style={{marginBottom: 3 }} key={e}>{e}</Tag>
                 )
               }
             </div>
@@ -397,7 +397,7 @@ export default class ParamsSeletor extends React.Component {
             {
               this.state.source.length !== 0 &&
               this.state.source.map((e) =>
-                <Tag style={{marginBottom: 3 }}>{e}</Tag>
+                <Tag style={{marginBottom: 3 }} key={e}>{e}</Tag>
               )
             }
           </div>
@@ -411,8 +411,8 @@ export default class ParamsSeletor extends React.Component {
         <div style={{display: 'flex', flexDirection: 'column' }}>
           {
             this.state.steps.map((el, index) =>
-              <div>
-                <div key={el} style={{display: 'flex', flexDirection: 'row'}}>
+              <div key={el}>
+                <div style={{display: 'flex', flexDirection: 'row'}}>
                   <span style={{width:200, display:'block'}}>{el}</span>
                   <Button disabled={this.checkEnable(index)}
                           onClick={() => this.openModal(el)}

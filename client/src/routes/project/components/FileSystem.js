@@ -1,14 +1,11 @@
-import React from 'react';
-import { Card, Button, Tabs} from 'antd';
-import PropTypes from 'prop-types';
-import { connect } from 'dva';
-import { request } from '../../../utils';
-import lodash from 'lodash';
-import { Router , routerRedux} from 'dva/router';
-import './FileSystem.css';
-import ProjectModal from './ProjectModal';
-import { showTime } from '../../../utils/time';
-import { jupyterServer, flaskServer } from '../../../constants';
+import React from 'react'
+import { Button, Card, Tabs } from 'antd'
+import PropTypes from 'prop-types'
+import { connect } from 'dva'
+import './FileSystem.css'
+import ProjectModal from './ProjectModal'
+import { showTime } from '../../../utils/time'
+import { flaskServer } from '../../../constants'
 
 const TabPane = Tabs.TabPane;
 
@@ -21,7 +18,6 @@ class FileSystem extends React.Component {
   }
 
   componentDidMount(){
-    // this.fetchData()
     this.props.dispatch({ type: 'project/query' })
   }
 
@@ -50,6 +46,17 @@ class FileSystem extends React.Component {
     }
   }
 
+  onClickProjectOp(event, key, _id) {
+    event.stopPropagation();
+    event.preventDefault();
+    if(key === 'owned_projects'){
+      console.log('publish')
+      this.props.dispatch({ type: 'project/publish' , payload: _id});
+    }else{
+      this.props.dispatch({ type: 'project/fork' , payload: _id});
+    }
+  }
+
   renderTabContent(key) {
     return<div className='full-width' style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
       <div style={{ width: 500}}>
@@ -63,9 +70,14 @@ class FileSystem extends React.Component {
     return cards.map((e) =>
       <Card key={e._id} title={e.name} extra={
         <a>
-        <Button type="danger" style={{marginTop: -5}} onClick={() => this.onClickDelete(event, e._id, true)}>
-          DELETE
-        </Button>
+          <Button type="primary" style={{marginTop: -5}} onClick={(event) => this.onClickProjectOp(event, key, e._id)}>
+            {
+              key === 'owned_projects'? "Publish":"Fork"
+            }
+          </Button>
+          <Button type="danger" style={{marginTop: -5, marginLeft: 5}} onClick={(event) => this.onClickDelete(event, e._id)}>
+            DELETE
+          </Button>
         </a>
       } style={{ width: 500 }}>
         <div onClick={() => this.toProjectDetail(e.name, e._id, false)} style={{cursor: 'pointer'}}>

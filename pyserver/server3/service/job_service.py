@@ -74,6 +74,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 if arg["if_add_column"]:
                     strr = "%s_%s_col" % (arg["name"], toolkit_obj.name)
                     try:
+                        error = 0
                         add_new_column(value, args[-1], strr, staging_data_set_id)
                     except:
                         error_flag = 1

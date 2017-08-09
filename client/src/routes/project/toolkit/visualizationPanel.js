@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BarChart, PieChart, Scatter, Table, SimpleScatter } from '../visualization';
+import { BarChart, PieChart, Scatter, Table, SimpleScatter, SimpleTable } from '../visualization';
 import { jupyterServer, flaskServer } from '../../../constants';
 import { Button, Input, Spin, Select, Icon , message, Modal, Popover} from 'antd';
 import { isEmpty } from '../../../utils/utils'
@@ -56,6 +56,16 @@ export default class VisualizationPanel extends React.Component {
     let data = {'x_domain': this.state.responseBody['scatter']['x_domain'][i],
       'y_domain': this.state.responseBody['scatter']['y_domain']}
     this.setState({scatterData: data});
+  }
+
+  renderArray(value){
+    if( value instanceof Array) {
+      return value.map((e) =>
+        <div>
+          <span key={e} style={{color: "#00AAAA"}}>{e}</span>
+          <br/>
+        </div>)
+    }
   }
 
   renderPanel() {
@@ -179,22 +189,37 @@ export default class VisualizationPanel extends React.Component {
       case 3:
         return(
           <div style={{display: 'flex', flexDirection: 'column'}}>
-            <div style={{display: 'flex', flexDirection: 'row'}}>
-              <div className="table_one">
+            <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+              <div className="table_one" >
+                <SimpleTable data={{table: this.state.responseBody['table1']['data'],
+                  target: this.state.responseBody['table1']['Y_fields']}} />
               </div>
-              <div className="description">
+              <div className="description" style={{width: '30%', textAlign: 'center'}}>
+                {
+                  !isEmpty(this.state.responseBody['general_info']) &&
+                  Object.keys(this.state.responseBody['general_info']).map((e) =>
+                    <div key={e}>
+                      <span>{e + ": "}</span>
+                      {
+                        this.renderArray(this.state.responseBody['general_info'][e])
+                      }
+                    </div>
+                  )
+                }
               </div>
-              <div className="table_two">
+              <div className="table_two" style={{width: 'auto'}}>
+                <SimpleTable data={{table: this.state.responseBody['table2']['data']}} />
               </div>
             </div>
             <div style={{display: 'flex', flexDirection: 'row'}}>
-              <div className="pie_one">
-                <PieChart data={{'pie': this.state.responseBody['pie1']}}/>
+              <div className="pie_one" style={{width: '30%', height: 300}}>
+                <PieChart data={{'pie': this.state.responseBody['pie1']}} />
               </div>
-              <div className="bar_chart">
+              <div className="bar_chart" style={{width: '40%', height: 300}}>
+                <BarChart data={this.state.responseBody['bar']} />
               </div>
-              <div className="pie_two">
-                <PieChart data={{'pie': this.state.responseBody['pie2']}}/>
+              <div className="pie_two" style={{width: '30%', height: 300}}>
+                <PieChart data={{'pie': this.state.responseBody['pie2']}} />
               </div>
             </div>
           </div>
