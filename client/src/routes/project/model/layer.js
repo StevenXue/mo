@@ -61,10 +61,14 @@ export default class Layer extends React.Component {
           layer['args'][e.name] = {};
           layer['args'][e.name]['distribute'] = e.hype_paramter;
           console.log(e.name + "-" + e.hype_paramter)
-          let v = ReactDOM.findDOMNode(this.refs[e.name + "-" + e.hype_paramter]);
-          //console.log(v);
-          layer['args'][e.name]['value'] = v.value;
+          let v = ReactDOM.findDOMNode(this.refs[e.name + "-" + e.hype_paramter]).value;
+          if(e.hype_paramter === 'choice'){
+            v = v.replace(/\s+/g, "");
+            v = v.split(",")
+          }
+          layer['args'][e.name]['value'] = v;
         }
+
       }else{
         let target = ReactDOM.findDOMNode(this.refs[e.name]);
         if (target.value) {
