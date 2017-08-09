@@ -125,7 +125,7 @@ class ProjectDetail extends React.Component {
   }
 
   componentDidMount () {
-    console.log('Project mounted, project id: ', this.state.project_id)
+    //console.log('Project mounted, project id: ', this.state.project_id)
     this.props.dispatch({ type: 'project/query' })
     this.props.dispatch({ type: 'project/listDataSets' })
   }
@@ -159,8 +159,6 @@ class ProjectDetail extends React.Component {
   }
 
   dataOp (dataSetId) {
-    // let dataSetId = this.props.project.selectedDSIds[0];
-    // let dataSetId = this.props.project.selectedDSIds
     if (!dataSetId) {
       return
     }
@@ -197,13 +195,6 @@ class ProjectDetail extends React.Component {
     } else if (info.file.status === 'error') {
       message.error(`${info.file.name} file upload failed.`)
     }
-  }
-
-  handleChoose () {
-    this.setState({
-      visible: true,
-    })
-    //console.log(this.props.project.dataSets[this.state.data_prop]);
   }
 
   getNotebook (content) {
@@ -303,7 +294,7 @@ class ProjectDetail extends React.Component {
                 </Modal>
                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                   <Button className={classnames(style.dataChooseButton)} type='primary' style={{ width: 120 }}
-                          onClick={() => this.handleChoose()}>Choose Data</Button>
+                          onClick={() => this.setState({visible: true})}>Choose Data</Button>
                 </div>
               </div>
             </div>

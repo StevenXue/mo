@@ -5,6 +5,7 @@ import { connect } from 'dva'
 import { Button, message, Transfer, Input, Spin, Select, Card, Tag} from 'antd';
 
 import { flaskServer } from '../../../constants'
+import { isEmpty } from '../../../utils/utils'
 import ModelForms from './modelForms';
 
 export default class ModelProcess extends React.Component {
@@ -22,7 +23,8 @@ export default class ModelProcess extends React.Component {
       modelData: {},
       divide: {},
       dataSet: this.props.dataset_id,
-      isActive: this.props.isActive
+      isActive: this.props.isActive,
+      description: ''
     }
   }
 
@@ -40,16 +42,6 @@ export default class ModelProcess extends React.Component {
           this.setState({models: dict});
         });
     }
-    let s = [];
-    //console.log(this.props.cols);
-    this.props.cols.map((e) =>
-      s.push({
-        key: e[0],
-        title: e[0],
-        disabled: false
-      })
-    );
-    this.setState({source: s});
 
     if(this.props.params){
       this.setState({modelName: this.props.params.model.name});
@@ -93,23 +85,15 @@ export default class ModelProcess extends React.Component {
         }
       }
     }else{
-      let s = [];
-      nextProps.cols.map((e) =>
-        s.push({
-          key: e[0],
-          title: e[0],
-          disabled: false
-        })
-      );
-      this.setState({source: s});
+      this.setState({source: nextProps.cols});
     }
   }
 
 
   onSelectModel(values){
     this.setState({selectedModel: values});
-    let t = this.state.models.filter((e) => e._id === values );
-    this.setState({modelName: t[0][name]});
+    let model = this.state.models.filter((e) => e._id === values );
+    this.setState({modelName: model[0][name]});
     fetch(flaskServer + '/model/models/' + values, {
       method: 'get',
       headers: {
@@ -121,34 +105,128 @@ export default class ModelProcess extends React.Component {
         if(res.response.category === 2){
           disable = true
         }
+        console.log(res.response);
         this.setState({
           supervised: disable,
-          modelData: res.response.parameter_spec
+          modelData: res.response.parameter_spec,
+          description: res.response.description
         });
       });
 
   }
 
-  handleChange(nextTargetKeys) {
-    this.setState({ targetKeys: nextTargetKeys });
+  selectTarget(value) {
+    if (value.length <= this.state.modelData.fit.data_fields.y_len_range[1] &&
+      value.length >= this.state.modelData.fit.data_fields.y_len_range[0]) {
+        this.setState({
+          targetKeys: value,
+          divide: {'source': this.state.selectedKeys, 'target': value}
+        })
+    }else{
+      message.error("Please choose correct amount of target fields");
+    }
   }
 
-  handleSelectChange(sourceSelectedKeys, targetSelectedKeys) {
-    this.setState({ selectedKeys: [...sourceSelectedKeys, ...targetSelectedKeys] });
-    let divide = {};
-    divide['source'] = sourceSelectedKeys;
-    divide['target'] = targetSelectedKeys
-    this.setState({
-      divide
-    })
-  }
+  renderSelections(){
+    let source = []
+    if(this.state.selectedModel && !isEmpty(this.state.modelData)) {
+      if (this.state.supervised) {
+        console.log("supervised");
+        let type = this.state.modelData.fit.data_fields.data_type;
+        let temp = []
+        if(type !== null) {
+          temp = this.state.source.filter((e) => type.indexOf(e[1][1]) !== -1);
+          source = temp.map((e) => e[0]);
+        }else{
+          source = this.state.source.map((e) => e[0]);
+        }
+        return(
+          <div>
+            <span>{"Select Data Fields: "}</span>
+            <Select
+              mode="multiple"
+              style={{width: '80%'}}
+              placeholder="Please select Input"
+              value={this.state.targetKeys}
+              onChange={(value) =>
+                this.setState({
+                  targetKeys: value,
+                  divide: {'source': [], 'target': value}
+                })}>
+              {
+                source.map((e) =>
+                  <Select.Option value={e} key={e}>
+                    {e}
+                  </Select.Option>
+                )
+              }
+            </Select>
+          </div>
+        )
 
-  onReceiveCode(code){
-    this.props.getCode(code);
-  }
-
-  modalSuccess(){
-    this.props.modalSuccess();
+      } else {
+        console.log(this.state.source);
+        let x_type = this.state.modelData.fit.data_fields.x_data_type;
+        let y_type = this.state.modelData.fit.data_fields.y_data_type;
+        if(x_type !== null) {
+          let temp = this.state.source.filter((e) => x_type.indexOf(e[1][1]) !== -1);
+          source = temp.map((e) => e[0]);
+        }else{
+          source = this.state.source.map((e) => e[0]);
+        }
+        let target = []
+        if(y_type !== null) {
+          let temp_out = this.state.source.filter((e) => y_type.indexOf(e[1][1]) !== -1);
+          target = temp_out.map((e) => e[0]);
+          target = target.filter((e) => this.state.selectedKeys.indexOf(e) === -1);
+        }else{
+          target = this.state.source.map((e) => e[0]);
+          target = target.filter((e) => this.state.selectedKeys.indexOf(e) === -1);
+        }
+        return (
+          <div>
+            <div>
+              <span>{"Select Input Data: "}</span>
+              <Select
+                mode="multiple"
+                style={{width: '80%'}}
+                placeholder="Please select Input"
+                value={this.state.selectedKeys}
+                onChange={(value) =>
+                  this.setState({
+                    selectedKeys: value,
+                    divide: {'source': value, 'target': this.state.targetKeys}
+                })}>
+                {
+                  source.map((e) =>
+                    <Select.Option value={e} key={e}>
+                      {e}
+                    </Select.Option>
+                  )
+                }
+              </Select>
+            </div>
+            <div>
+              <span>{"Select Output Data: "}</span>
+              <Select
+                mode="multiple"
+                style={{width: '80%'}}
+                placeholder="Please select Output"
+                value={this.state.targetKeys}
+                onChange={(value) => this.selectTarget(value)}>
+                {
+                  target.map((e) =>
+                    <Select.Option value={e} key={e}>
+                      {e}
+                    </Select.Option>
+                  )
+                }
+              </Select>
+            </div>
+          </div>
+        )
+      }
+    }
   }
 
   render(){
@@ -175,6 +253,10 @@ export default class ModelProcess extends React.Component {
                 }
               </Select>:<span style={{color: '#00AAAA'}}>{this.state.modelName}</span>
             }
+            <div style={{marginTop: 10}}>
+              <span style={{color: '#108ee9'}}>{"Model Description: "}</span>
+              <p>{this.state.description}</p>
+            </div>
             <div style={{marginTop: 10, marginBottom: 10}}>
               { this.state.supervised ?
                 <div >
@@ -184,22 +266,8 @@ export default class ModelProcess extends React.Component {
               }
             </div>
             {this.state.isActive ?
-              (this.state.selectedModel !== '' &&
-              <Transfer
-                dataSource={this.state.source}
-                titles={['Input', 'Output']}
-                targetKeys={this.state.targetKeys}
-                selectedKeys={this.state.selectedKeys}
-                listStyle={{
-                  width: '40%',
-                  height: 300,
-                  fontSize: 10,
-                }}
-                onChange={(nextTargetKeys, direction, moveKeys) => this.handleChange(nextTargetKeys, direction, moveKeys)}
-                onSelectChange={(sourceSelectedKeys, targetSelectedKeys) => this.handleSelectChange(sourceSelectedKeys, targetSelectedKeys)}
-                render={item => item.title}
-              />)
-              : (
+                this.renderSelections()
+               : (
                 <div>
                   <p>Input: </p>
                   {
@@ -209,7 +277,7 @@ export default class ModelProcess extends React.Component {
                       </Tag>
                     )
                   }
-                  <p>Onput: </p>
+                  <p>Output: </p>
                   {
                     this.state.targetKeys && this.state.targetKeys.map((e) =>
                       <Tag style={{margin: 5}} key={e}>
@@ -220,7 +288,7 @@ export default class ModelProcess extends React.Component {
                 </div>)
             }
           </div>
-          <div className='choose_params' style={{width: '45%', height: '100%'}}>
+          <div className='choose_params' style={{width: '60%', height: '100%'}}>
             <ModelForms data={this.state.modelData}
                         divide={this.state.divide}
                         dataset_id={this.state.dataSet}
@@ -229,8 +297,8 @@ export default class ModelProcess extends React.Component {
                         jupyter={this.props.jupyter}
                         isActive={this.props.isActive}
                         params={this.props.params}
-                        modalSuccess={() => this.modalSuccess()}
-                        getCode={(code) => this.onReceiveCode(code)}/>
+                        modalSuccess={() => this.props.modalSuccess()}
+                        getCode={(code) => this.props.getCode(code)}/>
           </div>
           </div>
         </div>
@@ -239,6 +307,8 @@ export default class ModelProcess extends React.Component {
 }
 
 ModelProcess.PropTypes = {
+  modalSuccess: PropTypes.func,
+  getCode: PropTypes.func,
   dataset_id: PropTypes.string,
   project_id: PropTypes.string,
   cols: PropTypes.array,
