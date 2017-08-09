@@ -2,7 +2,7 @@ import lodash from 'lodash'
 import { parse } from 'qs'
 import { message } from 'antd'
 import { Router, routerRedux } from 'dva/router'
-import { query, create, edit, listDataSets } from '../services/project'
+import { query, create, edit, listDataSets, publishProject, forkProject , listFiles } from '../services/project'
 
 export default {
 
@@ -13,6 +13,11 @@ export default {
       public_ds: [],
       owned_ds: [],
     },
+    fileList: {
+      public_files: [],
+      owned_files: [],
+    },
+    files:[],
     projects: {
       public_projects: [],
       owned_projects: [],
@@ -57,17 +62,79 @@ export default {
       )
     },
 
+    *fork ({ payload }, { call, put, select }) {
+      const user = yield select(state => state['app'].user)
+      console.log("fork", payload, user.user_ID);
+      const data = yield call(forkProject, payload, user.user_ID)
+      if (data.success) {
+        const res = yield call(query, user.user_ID)
+        if (res) {
+          yield put({
+            type: 'querySuccess',
+            payload: {
+              projects: res.response,
+            },
+          })
+        } else {
+          console.log('error', res)
+          throw res
+        }
+      } else {
+        console.log('error', data)
+        throw data
+      }
+    },
 
+    *publish ({ payload }, { call, put, select }) {
+      console.log("to detail", payload);
+      const data = yield call(publishProject, payload)
+      const user = yield select(state => state['app'].user)
+      if (data.success) {
+        const res = yield call(query, user.user_ID)
+        if (res) {
+          yield put({
+            type: 'querySuccess',
+            payload: {
+              projects: res.response,
+            },
+          })
+        } else {
+          console.log('error', res)
+          throw res
+        }
+      } else {
+        console.log('error', data)
+        throw data
+      }
+    },
 
     *listDataSets ({ payload }, { call, put, select }) {
       const user = yield select(state => state['app'].user)
       const data = yield call(listDataSets, user.user_ID)
-      console.log('listDataSets', data)
       if (data.success) {
         yield put({
           type: 'querySuccess',
           payload: {
             dataSets: data.response,
+          },
+        })
+      } else {
+        console.log('error', data)
+        throw data
+      }
+    },
+
+    *listFiles ({ payload }, { call, put, select }) {
+      const user = yield select(state => state['app'].user)
+      const data = yield call(listFiles, user.user_ID)
+
+      if (data.success) {
+        console.log(data.response);
+        yield put({
+          type: 'querySuccess',
+          payload: {
+            FileList: data.response,
+            files: data.response['owned_files'].concat(data.response['public_files'])
           },
         })
       } else {
