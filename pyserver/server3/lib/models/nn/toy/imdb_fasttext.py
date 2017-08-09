@@ -1,15 +1,14 @@
 import numpy as np
-from keras.preprocessing import sequence
+from keras.callbacks import LambdaCallback
 from keras.layers import Dense
 from keras.layers import Embedding
 from keras.layers import GlobalAveragePooling1D
-
-from keras.callbacks import LambdaCallback
-from server3.lib.models.keras_callbacks import MongoModelCheckpoint
-from server3.service import logger_service
+from keras.preprocessing import sequence
 
 from server3.lib import Sequential
 from server3.lib import graph
+from server3.service import logger_service
+from server3.service.keras_callbacks import MongoModelCheckpoint
 
 
 def imdb_fasttext(conf, input, **kw):

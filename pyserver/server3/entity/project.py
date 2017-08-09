@@ -21,3 +21,4 @@ class Project(Document):
     results = ListField(ReferenceField('Result', reverse_delete_rule=PULL))
     # if forked project, which project fork from
     source_project = ReferenceField('Project')
+    user_name = StringField(max_length=50)

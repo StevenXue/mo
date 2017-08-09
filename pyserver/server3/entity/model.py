@@ -33,6 +33,7 @@ class Model(DynamicDocument):
     category = IntField(required=True, choices=MODEL_TYPE)
     parameter_spec = DictField(required=True)
     input = DictField(required=True)
+    user_name = StringField(max_length=50)
     # usage = IntField(choices=RESUlt_TYPE, required=True)    # 类型，用作何用途
     # classification = IntField(choices=RESUlt_TYPE1, required=True)  # model分类
     # input_data = DictField(required=True)

@@ -30,7 +30,14 @@ def get_private_ownership_objects_by_user_ID(user_ID, owned_type):
 def get_all_public_objects(owned_type):
     ownerships = ownership_business.list_ownership_by_type_and_private(
         owned_type, False)
-    return [os[owned_type] for os in ownerships if owned_type in os]
+    return [get_owned_item_with_user(os, owned_type) for os in ownerships if
+            owned_type in os]
+
+
+def get_owned_item_with_user(os, owned_type):
+    item = os[owned_type]
+    item['user_name'] = os.user.name
+    return item
 
 
 def list_by_user_ID(user_ID):
