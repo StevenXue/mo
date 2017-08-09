@@ -67,6 +67,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
             results = {"fields": fields}
             gen_info = {}
             result_spec = toolkit_obj.result_spec
+            error_flag = 0
+
             for arg in result_spec["args"]:
                 value = result.pop(0)
                 results.update({arg["name"]: value})
@@ -75,7 +77,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                     try:
                         add_new_column(value, args[-1], strr, staging_data_set_id)
                     except:
-                        error = 1
+                        error_flag = 1
 
                 if arg.get("attribute", False) and arg["attribute"] == "label":
                     labels = value
@@ -118,7 +120,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
 
 
             elif toolkit_obj.category == 3:
-                if error:
+                if error_flag:
                     json = {}
                 else:
                     flag = toolkit_obj.parameter_spec["data"]["type"]["key"] == "transfer_box"
@@ -147,7 +149,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                         "bar": {"x_domain": x_domain,
                                 "y_domain": y_domain},
                         "pie1": [{"text": fields[0][i], "value": temp[i]} for i in range(len(temp))],
-                        "pie2": [{"text": var2[i], "value": lab_fields[i]} for i in range(len(var2))],
+                        "pie2": [{"text": lab_fields[i], "value": var2[i]} for i in range(len(var2))],
                         "general_info": gen_info,
                         "category": toolkit_obj.category}
 
