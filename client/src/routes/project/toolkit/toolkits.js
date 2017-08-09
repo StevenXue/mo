@@ -57,6 +57,7 @@ export default class Toolkit extends React.Component {
       selectedKeys: [],
       divide: [],
       description: [],
+      runable: false,
       steps : [{
         title: 'Choose ToolKit',
       }, {
@@ -89,7 +90,9 @@ export default class Toolkit extends React.Component {
           title: 'Dataset: ' + params.staging_data_set,
         }, {
           title: 'Result',
-        }]
+        }],
+        resultJson: params.results,
+        visual_sds_id: params.results_staging_data_set_id
       });
     }else {
       this.fetchData(this.props);
@@ -208,7 +211,6 @@ export default class Toolkit extends React.Component {
   }
 
   onRunClick () {
-
     let body = {
       'staging_data_set_id': this.state.selectedData,
       "conf": {
@@ -289,7 +291,6 @@ export default class Toolkit extends React.Component {
     Object.keys(value).map((e) => {
       this.setState({[e]: value[e]})
     });
-    //console.log(this.state);
   }
 
   renderStepContent(){
@@ -322,7 +323,7 @@ export default class Toolkit extends React.Component {
                 )
               }
             </div>
-            <div>
+            <div style={{ width: '30%'}}>
              <ParamsSeletor data_set={this.state.data_set}
                             type={this.state.type}
                             selectableType={this.state.selectableType}
@@ -430,7 +431,7 @@ export default class Toolkit extends React.Component {
             this.state.current < steps.length - 1 && this.state.current !== 0
             &&
             <div>
-              <Button style={{ marginTop: 10, marginLeft: '40%' }} type="primary" onClick={() => this.next()}>Next</Button>
+              <Button style={{ marginTop: 10, marginLeft: '40%' }} disabled={!this.state.runable} type="primary" onClick={() => this.next()}>Next</Button>
               <Button style={{ marginLeft: 8, marginTop: 10 }} onClick={() => this.prev()}>
                 Previous
               </Button>
