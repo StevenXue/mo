@@ -35,11 +35,14 @@ export default class CustomFields extends React.Component {
       value = parseInt(value);
     }else if(ref.type.key === 'float') {
       value = parseFloat(value);
+    }else if(ref.type.key === 'int_m') {
+      value = value.replace(/\s+/g, "");
+      value = value.split(',');
     }
 
     if(value){
       this.props.getEstimator(ref.name, value);
-    }else if(value = null && ref.required){
+    }else if(value === null && ref.required){
       message.error("please fill in field" + ref.name);
     }
 
@@ -69,6 +72,21 @@ export default class CustomFields extends React.Component {
         );
 
       case 'int':
+        return (
+          <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+            <Input ref={type.name}
+                   placeholder={type.default}
+                   style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}
+                   onChange={() => this.onChange(type)} />
+            <Popover content={<div>
+              <p style={{width: 150}}>{type.type.des}</p>
+            </div>} title="Description">
+              <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5, color: '#767676'}}/>
+            </Popover>
+          </div>
+        );
+
+      case 'int_m':
         return (
           <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
             <Input ref={type.name}
