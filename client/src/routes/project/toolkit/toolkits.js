@@ -185,12 +185,12 @@ export default class Toolkit extends React.Component {
     }
 
     if(parameterSpec.args) {
-      let name = parameterSpec.args[0].name;
-      this.setState({
-        constant: {
-          [name]: 0
-        }
-      });
+      parameterSpec.args.map((e) => {
+        let name = e.name;
+        let constant = this.state.constant;
+        constant[name] = e.default;
+        this.setState({constant});
+      })
       description.push(`${parameterSpec.args.length} constants is required.\n`)
     }else{
       this.setState({
