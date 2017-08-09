@@ -109,6 +109,9 @@ def remove_by_id(file_id):
 
 
 def copy_job(job, belonged_project, staging_data_set):
+    # from server3.entity.job import Job
+    # if not isinstance(job, Job):
+    #     return
     j = deepcopy(job)
     j.id = None
     j.project = belonged_project

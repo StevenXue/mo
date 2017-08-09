@@ -6,10 +6,10 @@ from keras.layers import Dense, Dropout, Conv2D, MaxPooling2D, Flatten
 # from keras.models import Sequential
 from keras.optimizers import SGD
 
-from server3.lib.models.keras_callbacks import MongoModelCheckpoint
-from server3.service import logger_service
 from server3.lib import Sequential
 from server3.lib import graph
+from server3.service import logger_service
+from server3.service.keras_callbacks import MongoModelCheckpoint
 
 
 def convnet(conf, input, **kw):

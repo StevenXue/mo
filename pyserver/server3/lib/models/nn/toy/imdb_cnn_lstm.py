@@ -1,15 +1,14 @@
-from keras.preprocessing import sequence
+from keras.callbacks import LambdaCallback
+from keras.layers import Conv1D, MaxPooling1D
 from keras.layers import Dense, Dropout, Activation
 from keras.layers import Embedding
 from keras.layers import LSTM
-from keras.layers import Conv1D, MaxPooling1D
-
-from keras.callbacks import LambdaCallback
-from server3.lib.models.keras_callbacks import MongoModelCheckpoint
-from server3.service import logger_service
+from keras.preprocessing import sequence
 
 from server3.lib import Sequential
 from server3.lib import graph
+from server3.service import logger_service
+from server3.service.keras_callbacks import MongoModelCheckpoint
 
 
 def imdb_cnn_lstm(conf, input, **kw):

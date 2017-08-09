@@ -1,10 +1,12 @@
+const mainColor = '#108ee9'
+
 module.exports = {
   jupyterServer: 'http://localhost:8888/api/contents/',
   // jupyterServer: 'http://10.52.14.182:8888/api/contents/',
 
   // server api
   flaskServer: 'http://localhost:5000',
-  //flaskServer: 'http://10.52.14.182:5000',
+  // flaskServer: 'http://10.52.14.182:5000',
 
   //jupyter
   baseUrl: 'http://localhost:8888',
@@ -13,13 +15,13 @@ module.exports = {
   // assets
   assetsUrl: 'http://10.52.14.182:3090',
 
-  mainColor: '#108ee9',
+  mainColor,
 
   stepStyle: {
-    mainColor: '#108ee9',
+    mainColor,
     beacon: {
-      inner: '#108ee9',
-      outer: '#108ee9',
+      inner: mainColor,
+      outer: mainColor,
     },
   }
 }

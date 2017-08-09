@@ -5,13 +5,26 @@ import PropTypes from 'prop-types'
 import { request } from '../../../utils'
 import lodash from 'lodash'
 import { Router, routerRedux } from 'dva/router'
-import './FileSystem.css'
+
+// import { Model, testUtils } from 'keras-js';
+// import * as utils from './utils'
+
 import FileModal from './FileModal'
 import { showTime } from '../../../utils/time';
 import { jupyterServer, flaskServer } from '../../../constants'
 import ImportPanel from './ImportPanel'
+import './FileSystem.css'
 
 const TabPane = Tabs.TabPane;
+
+// const model = new Model({
+//   filepaths: {
+//     model: flaskServer+'/static/resnet50.json',
+//     weights: flaskServer+'/static/resnet50_weights.buf',
+//     metadata: flaskServer+'/static/resnet50_metadata.json'
+//   },
+//   // filesystem: true
+// })
 
 class FileSystem extends React.Component {
   constructor (props) {
@@ -22,6 +35,59 @@ class FileSystem extends React.Component {
   }
 
   componentDidMount () {
+    // console.log('model', model)
+    // function getIntermediateResults() {
+    //   let results = []
+    //   for (let [name, layer] of model.modelLayersMap.entries()) {
+    //     const layerClass = layer.layerClass || ''
+    //     if (layerClass === 'InputLayer') continue
+    //     let images = []
+    //     if (layer.result && layer.result.tensor.shape.length === 3) {
+    //       images = utils.unroll3Dtensor(layer.result.tensor)
+    //     } else if (layer.result && layer.result.tensor.shape.length === 2) {
+    //       images = [utils.image2Dtensor(layer.result.tensor)]
+    //     } else if (layer.result && layer.result.tensor.shape.length === 1) {
+    //       images = [utils.image1Dtensor(layer.result.tensor)]
+    //     }
+    //     results.push({ name, layerClass, images })
+    //   }
+    //   return results
+    // }
+    // model.ready()
+    //   .then(() => {
+    //     // input data object keyed by names of the input layers
+    //     // or `input` for Sequential models
+    //     // values are the flattened Float32Array data
+    //     // (input tensor shapes are specified in the model config)
+    //     let shape = [224, 224, 3]
+    //     // let x = ndarray(new Float32Array(shape[0]*shape[1]*shape[2]), shape)
+    //     // for (let i = 0; i < shape[0]; ++i) {
+    //     //   for (let j = 0; j < shape[1]; ++j) {
+    //     //     for (let k = 0; k < shape[2]; ++k) {
+    //     //       x.set(i, j, Math.random())
+    //     //     }
+    //     //   }
+    //     // }
+    //     const inputData = {
+    //       'input_1': new Float32Array(shape[0]*shape[1]*shape[2])
+    //     }
+    //
+    //     // make predictions
+    //     return model.predict(inputData)
+    //   })
+    //   .then(outputData => {
+    //     // outputData is an object keyed by names of the output layers
+    //     // or `output` for Sequential models
+    //     // e.g.,
+    //     // outputData['fc1000']
+    //     console.log('intermediate results', getIntermediateResults())
+    //     console.log('output', outputData)
+    //     console.log('output', model)
+    //   })
+    //   .catch(err => {
+    //     // handle error
+    //     console.log('error', err)
+    //   })
     this.props.dispatch({ type: 'upload/fetch' })
   }
 

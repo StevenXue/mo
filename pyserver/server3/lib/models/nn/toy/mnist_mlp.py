@@ -3,11 +3,10 @@ from keras.callbacks import LambdaCallback
 from keras.layers import Dense, Dropout
 from keras.optimizers import RMSprop
 
-from server3.lib.models.keras_callbacks import MongoModelCheckpoint
-from server3.service import logger_service
-
 from server3.lib import Sequential
 from server3.lib import graph
+from server3.service import logger_service
+from server3.service.keras_callbacks import MongoModelCheckpoint
 
 
 def mnist_mlp(conf, input, **kw):

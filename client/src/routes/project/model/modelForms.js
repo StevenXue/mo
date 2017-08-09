@@ -12,7 +12,8 @@ import Compile from './compile';
 import Visual from './realTime';
 import Estimator from './customFields';
 import Curve from './curve';
-import { isEmpty } from '../../../utils/utils';
+
+import { isEmpty} from '../../../utils/utils';
 
 export default class ModelForms extends React.Component {
   constructor (props) {

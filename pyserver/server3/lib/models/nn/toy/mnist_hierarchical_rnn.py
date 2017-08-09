@@ -1,11 +1,12 @@
 # -*- coding: UTF-8 -*-
 from keras.callbacks import LambdaCallback
-from keras.models import Model
 from keras.layers import Input, Dense, TimeDistributed
 from keras.layers import LSTM
-from server3.lib.models.keras_callbacks import MongoModelCheckpoint
-from server3.service import logger_service
+from keras.models import Model
+
 from server3.lib import graph
+from server3.service import logger_service
+from server3.service.keras_callbacks import MongoModelCheckpoint
 
 
 def mnist_hierarchical_rnn(conf, input, **kw):

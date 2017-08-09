@@ -79,7 +79,7 @@ class AutomatedModel extends React.Component {
             this.setState({ statusStack })
           }
 
-          fetch(flaskServer + '/staging_data/staging_data_sets?project_id=' + this.props.project_id, {
+          fetch(flaskServer + '/staging_data/staging_data_sets?without_result=true&project_id=' + this.props.project_id, {
             method: 'get',
             headers: {
               'Content-Type': 'application/json',

@@ -35,10 +35,11 @@ def get_fields_with_types():
 @staging_data_app.route('/staging_data_sets', methods=['GET'])
 def list_staging_data_sets_by_project_id():
     project_id = request.args.get('project_id')
-
+    without_result = request.args.get('without_result')
+    without_result = str(without_result).lower() == 'true'
     try:
         data = staging_data_service.list_staging_data_sets_by_project_id(
-            ObjectId(project_id))
+            ObjectId(project_id), without_result)
         data = [d.to_mongo() for d in data]
         data = json_utility.convert_to_json(data)
     except Exception as e:

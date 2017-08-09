@@ -31,8 +31,8 @@ STATUS = (
 
 
 class Job(Document):
-    model = ReferenceField('Model')
-    toolkit = ReferenceField('Toolkit')
+    model = ReferenceField('Model', reverse_delete_rule=CASCADE)
+    toolkit = ReferenceField('Toolkit', reverse_delete_rule=CASCADE)
     staging_data_set = ReferenceField('StagingDataSet')
     status = IntField(choices=STATUS, required=True)
     fields = DictField()
