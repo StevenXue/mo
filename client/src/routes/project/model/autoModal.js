@@ -136,6 +136,17 @@ class AutomatedModel extends React.Component {
     this.setState({ statusStack: array })
   }
 
+  renderAddButton(){
+    if(this.state.selectedData !== '' || this.state.selectedFile !== '') {
+      return (
+        <Button type='normal' size='small'
+                style={{marginLeft: 10}} onClick={() => this.addNewModel()}>
+          Add New Section
+        </Button>
+      )
+    }
+  }
+
   render () {
     return (
       <Spin spinning={this.state.loading}>
@@ -232,11 +243,9 @@ class AutomatedModel extends React.Component {
             <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 10, width: '100%' }}>
               <div style={{ marginLeft: 10 }}>
                 <span>Models</span>
-                {this.state.selectedData !== '' || this.state.selectedFile !== '' &&
-                <Button type='normal'  size='small'
-                        style={{ marginLeft: 10 }} onClick={() => this.addNewModel()}>
-                  Add New Section
-                </Button>}
+                {
+                  this.renderAddButton()
+                }
                 <Button style={{ float: 'right', marginRight: 10 }}
                         shape="circle" icon="question" onClick={() => this.props.runTour(steps)}
                 />

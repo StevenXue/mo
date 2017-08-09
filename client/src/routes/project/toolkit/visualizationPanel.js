@@ -184,7 +184,14 @@ export default class VisualizationPanel extends React.Component {
         )
 
       case 2:
-        return null
+        return (
+        <div style={{display: 'flex', flexDirection: 'row'}}>
+          <div className="left-table">
+          </div>
+          <div className="right-charts">
+          </div>
+        </div>
+        )
 
       case 3:
         return(

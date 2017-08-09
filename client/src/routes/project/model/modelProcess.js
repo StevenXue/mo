@@ -7,6 +7,7 @@ import { Button, message, Transfer, Input, Spin, Select, Card, Tag} from 'antd';
 import { flaskServer } from '../../../constants'
 import { isEmpty } from '../../../utils/utils'
 import ModelForms from './modelForms';
+import Spliter from './spliter';
 
 export default class ModelProcess extends React.Component {
   constructor (props) {
@@ -26,8 +27,9 @@ export default class ModelProcess extends React.Component {
       dataSet: this.props.dataset_id,
       isActive: this.props.isActive,
       description: '',
-      selectedFile: this.props.selectedFile,
+      selectedFile: '',
       isImage: false,
+      spliter:{}
     }
   }
 
@@ -62,6 +64,12 @@ export default class ModelProcess extends React.Component {
             });
           }
       }
+    }else{
+      this.setState({
+        source: this.props.cols,
+        selectedFile: this.selectedFile,
+        dataSet: this.props.dataset_id,
+      });
     }
   }
 
@@ -69,14 +77,15 @@ export default class ModelProcess extends React.Component {
     this.setState({
       dataSet: nextProps.dataset_id,
       isActive: nextProps.isActive,
-      selectedFile: nextProps.selectedFile
+      selectedFile: nextProps.selectedFile,
+      source: nextProps.cols
     });
 
-    if(nextProps.selectedFile !== ''){
+    if(nextProps.selectedFile !== '' || nextProps.dataset_id === ''){
       let models = this.state.allModels;
       models = models.filter((e) => e.category === 4);
       models = models.map((e) => ({'name': e.name, '_id': e._id}));
-      this.setState({models, isImage: true});
+      this.setState({models, isImage: true, selectedModel: '', modelName: ''});
     }else{
       let models = this.state.allModels;
       models = models.filter((e) => e.category !== 4);
@@ -101,8 +110,6 @@ export default class ModelProcess extends React.Component {
           });
         }
       }
-    }else{
-      this.setState({source: nextProps.cols});
     }
   }
 
@@ -133,15 +140,28 @@ export default class ModelProcess extends React.Component {
   }
 
   selectTarget(value) {
-    if (value.length <= this.state.modelData.fit.data_fields.y_len_range[1] &&
-      value.length >= this.state.modelData.fit.data_fields.y_len_range[0]) {
+    console.log(this.state.modelData.fit);
+    if(this.state.modelData.fit.data_fields.y_len_range !== null) {
+      if (value.length <= this.state.modelData.fit.data_fields.y_len_range[1] &&
+        value.length >= this.state.modelData.fit.data_fields.y_len_range[0]) {
         this.setState({
           targetKeys: value,
           divide: {'source': this.state.selectedKeys, 'target': value}
         })
+      } else {
+        message.error("Please choose correct amount of target fields");
+      }
     }else{
-      message.error("Please choose correct amount of target fields");
+      this.setState({
+        targetKeys: value,
+        divide: {'source': this.state.selectedKeys, 'target': value}
+      })
     }
+  }
+
+  getSpliter(value){
+    console.log(value);
+    this.setState({spliter: value});
   }
 
   renderSelections(){
@@ -310,6 +330,12 @@ export default class ModelProcess extends React.Component {
                   }
                 </div>)
             }
+            <div>
+              {
+                !this.state.isImage &&
+                <Spliter isActive={this.state.isActive} getParams={(value) => this.getSpliter(value)}/>
+              }
+            </div>
           </div>
           <div className='choose_params' style={{width: '60%', height: '100%'}}>
             <ModelForms data={this.state.modelData}
@@ -320,6 +346,7 @@ export default class ModelProcess extends React.Component {
                         jupyter={this.props.jupyter}
                         isActive={this.props.isActive}
                         params={this.props.params}
+                        spliter={this.state.spliter}
                         selectedFile={this.state.selectedFile}
                         modalSuccess={() => this.props.modalSuccess()}
                         getCode={(code) => this.props.getCode(code)}/>

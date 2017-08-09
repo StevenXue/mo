@@ -119,10 +119,7 @@ def usr_story2_exploration(data, d_type, sds_id):
         table_data = json_utility.me_obj_list_to_dict_list(staging_data_business.get_by_staging_data_set_id_limit(ObjectId(sds_id), 5))
         data.update({"table": table_data})
     elif d_type == 2:
-        data.update({
-            "1": None,
-            "2": None
-        })
+        pass
     else:
         pass
 
@@ -152,7 +149,7 @@ def t_sne(arr):
     return result
 
 
-def freq_hist(arr, group_num=5):
+def freq_hist(arr, group_num=5, multip=1000):
     arr_array = np.array(arr)
     min = arr_array.min()
     max = arr_array.max()
@@ -162,6 +159,6 @@ def freq_hist(arr, group_num=5):
     freq_hist = {"freq_hist": arr_array}
     df = pd.DataFrame(freq_hist)
     # 给出y轴
-    y_domain = df.groupby(pd.cut(df.freq_hist, x_domain)).count().freq_hist.values
+    y_domain = df.groupby(pd.cut(df.freq_hist, x_domain, right=False)).count().freq_hist.values
     # 注意x会比y多一个
-    return {'x_domain': x_domain.tolist(), 'y_domain': (y_domain * 1000).round(3).tolist()}
+    return {'x_domain': x_domain.tolist(), 'y_domain': (y_domain * multip).round(3).tolist()}

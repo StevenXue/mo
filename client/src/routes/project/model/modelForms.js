@@ -3,28 +3,17 @@ import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types';
 import { connect } from 'dva';
 import { Button, Input, Spin, Select, Icon , message, Modal, Popover} from 'antd';
+const Option = Select.Option;
 import io from 'socket.io-client';
+
 import { flaskServer } from '../../../constants';
 import Layer from './layer';
 import Compile from './compile';
-const Option = Select.Option;
 import Visual from './realTime';
 import Estimator from './customFields';
 import Curve from './curve';
 
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-
-function isEmpty(obj) {
-  if (obj == null) return true;
-  if (obj.length > 0) return false;
-  if (obj.length === 0) return true;
-  if (typeof obj !== "object") return true;
-  for (var key in obj) {
-    if (hasOwnProperty.call(obj, key)) return false;
-  }
-
-  return true;
-}
+import { isEmpty} from '../../../utils/utils';
 
 export default class ModelForms extends React.Component {
   constructor (props) {
@@ -49,11 +38,13 @@ export default class ModelForms extends React.Component {
       isActive: true,
       params: this.props.params,
       selectedFile: '',
+      spliter: {}
     }
   }
 
   componentDidMount(){
     this.setState({
+      spliter: this.props.spliter,
       layer: this.props.data.layers,
       compile: this.props.data.compile,
       evaluate: this.props.data.evaluate,
@@ -77,6 +68,7 @@ export default class ModelForms extends React.Component {
 
   componentWillReceiveProps(nextProps){
     this.setState({
+      spliter: nextProps.spliter,
       layer: nextProps.data.layers,
       compile: nextProps.data.compile,
       evaluate: nextProps.data.evaluate,
@@ -183,18 +175,16 @@ export default class ModelForms extends React.Component {
     let run_params = this.constructParams();
     let params = {};
     if(this.state.fit.data_fields) {
-      params = {
+      params = Object.assign({
         conf: run_params,
         project_id: this.props.project_id,
         staging_data_set_id: this.props.dataset_id,
-        schema: "seq"
-      };
+      }, this.state.spliter);
     }else{
       params = {
         conf: run_params,
         project_id: this.props.project_id,
         file_id: this.state.selectedFile,
-        schema: "seq"
       };
     }
     console.log(params);
