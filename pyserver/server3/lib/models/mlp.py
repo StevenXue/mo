@@ -4,6 +4,7 @@
 import inspect
 
 from keras.callbacks import LambdaCallback
+from keras.callbacks import ModelCheckpoint
 from keras.layers import Dense, Dropout
 from keras.optimizers import SGD
 
@@ -17,6 +18,7 @@ from server3.utility.str_utility import generate_args_str
 def mlp(conf, input, **kw):
     result_sds = kw.pop('result_sds', None)
     project_id = kw.pop('project_id', None)
+    result_dir = kw.pop('result_dir', None)
     f = conf['fit']
     e = conf['evaluate']
     x_train = input['x_tr']
@@ -27,11 +29,11 @@ def mlp(conf, input, **kw):
     y_test = input['y_te']
 
     with graph.as_default():
-        return mlp_main(result_sds, project_id, x_train, y_train, x_val,
-                        y_val, x_test, y_test, f, e)
+        return mlp_main(result_sds, project_id, result_dir, x_train, y_train,
+                        x_val, y_val, x_test, y_test, f, e)
 
 
-def mlp_main(result_sds, project_id, x_train, y_train, x_val, y_val,
+def mlp_main(result_sds, project_id, result_dir, x_train, y_train, x_val, y_val,
              x_test, y_test, f=None, e=None):
     input_len = x_train.shape[1]
     output_len = y_train.shape[1]
@@ -62,11 +64,17 @@ def mlp_main(result_sds, project_id, x_train, y_train, x_val, y_val,
                                               project_id))
 
     # checkpoint to save best weight
-    best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=1,
-                                           save_best_only=True)
+    # best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,
+    #                                        save_best_only=True)
+    best_checkpoint = ModelCheckpoint(
+        result_dir + 'best.{epoch:02d}-{val_loss:.2f}.hdf5',
+        verbose=1, save_best_only=True)
     # checkpoint to save latest weight
-    general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
-                                              verbose=1)
+    # general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
+    #                                           verbose=0)
+    general_checkpoint = ModelCheckpoint(
+        result_dir + 'latest.{epoch:02d}-{val_loss:.2f}.hdf5',
+        verbose=1)
 
     # training
     history = model.fit(x_train, y_train,
@@ -83,7 +91,7 @@ def mlp_main(result_sds, project_id, x_train, y_train, x_val, y_val,
                                  model_config=config,
                                  score=score,
                                  history=history.history)
-
+    model.save(result_dir + 'final.{epoch:02d}-{val_loss:.2f}.hdf5')
     return {'score': score, 'history': history.history}
 
 

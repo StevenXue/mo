@@ -20,6 +20,11 @@ from server3.lib import models
 from server3.service import staging_data_service
 from server3.business import file_business
 from server3.business import staging_data_business
+from server3.business import project_business
+from server3.repository import config
+
+user_directory = config.get_file_prop('UPLOAD_FOLDER')
+# user_directory = 'user_directory/'
 
 # TODO 根据entity生成
 ModelType = {
@@ -125,9 +130,17 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
     if model['category'] == ModelType['neural_network']:
         # keras nn
         f = getattr(models, model.entry_function)
+        project = project_business.get_by_id(project_id)
+        ownership = ownership_business.get_ownership_by_owned_item(project,
+                                                                   'project')
+        result_dir = '{0}{1}/{2}/'.format(user_directory, ownership.user.user_ID,
+                                          project.name)
+        # print(result_dir)
+        # kwargs['result_dir'] = result_dir
         input_dict = manage_nn_input(conf, data_source_id, **kwargs)
         return job_service.run_code(conf, project_id, data_source_id,
-                                    model, f, input_dict)
+                                    model, f, input_dict,
+                                    result_dir=result_dir)
     elif model['category'] == ModelType['folder_input']:
         # input from folder
         f = getattr(models, model.entry_function)
@@ -444,18 +457,18 @@ def temp():
     #     models.IMAGE_CLASSIFIER,
     #     {'type': 'folder'}
     # ))
-    print(add_model_with_ownership(
-        'system',
-        False,
-        'Linear Regressor',
-        'Custom linear regression model',
-        ModelType['custom_supervised'],
-        'server3/lib/models/linear_regressor.py',
-        'linear_regressor_model_fn',
-        'custom_model_to_str',
-        models.LinearRegressor,
-        {'type': 'DataFrame'}
-    ))
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Linear Regressor',
+    #     'Custom linear regression model',
+    #     ModelType['custom_supervised'],
+    #     'server3/lib/models/linear_regressor.py',
+    #     'linear_regressor_model_fn',
+    #     'custom_model_to_str',
+    #     models.LinearRegressor,
+    #     {'type': 'DataFrame'}
+    # ))
 
     # print(add_model_with_ownership(
     #     'system',

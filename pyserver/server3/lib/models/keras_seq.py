@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 from keras import layers
 from keras.callbacks import LambdaCallback
+from keras.callbacks import ModelCheckpoint
 
 from server3.lib import Sequential
 from server3.lib import graph
@@ -17,6 +18,7 @@ def keras_seq(conf, input, **kw):
     """
     result_sds = kw.pop('result_sds', None)
     project_id = kw.pop('project_id', None)
+    result_dir = kw.pop('result_dir', None)
     if result_sds is None:
         raise RuntimeError('no result sds id passed to model')
     if project_id is None:
@@ -60,12 +62,19 @@ def keras_seq(conf, input, **kw):
                                                   epoch, logs,
                                                   result_sds,
                                                   project_id))
+
         # checkpoint to save best weight
-        best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,
-                                               save_best_only=True)
+        # best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,
+        #                                        save_best_only=True)
+        best_checkpoint = ModelCheckpoint(
+            result_dir + 'best.{epoch:02d}-{val_loss:.2f}.hdf5',
+            verbose=0, save_best_only=True)
         # checkpoint to save latest weight
-        general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
-                                                  verbose=0)
+        # general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
+        #                                           verbose=0)
+        general_checkpoint = ModelCheckpoint(
+            result_dir + 'latest.{epoch:02d}-{val_loss:.2f}.hdf5',
+            verbose=0)
 
         # training
         history = model.fit(x_train, y_train,
@@ -83,7 +92,7 @@ def keras_seq(conf, input, **kw):
                                      model_config=config,
                                      score=score,
                                      history=history.history)
-
+        model.save(result_dir + 'final.{epoch:02d}-{val_loss:.2f}.hdf5')
         return {'score': score, 'history': history.history}
 
 
