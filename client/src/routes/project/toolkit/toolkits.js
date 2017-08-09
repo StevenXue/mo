@@ -57,7 +57,7 @@ export default class Toolkit extends React.Component {
       selectedKeys: [],
       divide: [],
       description: [],
-      runable: false,
+      runnable: false,
       steps : [{
         title: 'Choose ToolKit',
       }, {
@@ -185,12 +185,13 @@ export default class Toolkit extends React.Component {
     }
 
     if(parameterSpec.args) {
-      let name = parameterSpec.args[0].name;
-      this.setState({
-        constant: {
-          [name]: 0
-        }
-      });
+      parameterSpec.args.map((e) => {
+        let name = e.name;
+        let constant = this.state.constant;
+        constant[name] = e.type;
+        this.setState({constant});
+        console.log(constant);
+      })
       description.push(`${parameterSpec.args.length} constants is required.\n`)
     }else{
       this.setState({
@@ -431,7 +432,7 @@ export default class Toolkit extends React.Component {
             this.state.current < steps.length - 1 && this.state.current !== 0
             &&
             <div>
-              <Button style={{ marginTop: 10, marginLeft: '40%' }} disabled={!this.state.runable} type="primary" onClick={() => this.next()}>Next</Button>
+              <Button style={{ marginTop: 10, marginLeft: '40%' }} disabled={!this.state.runnable} type="primary" onClick={() => this.next()}>Next</Button>
               <Button style={{ marginLeft: 8, marginTop: 10 }} onClick={() => this.prev()}>
                 Previous
               </Button>

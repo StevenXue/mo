@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
+import lodash from 'lodash';
 import { connect } from 'dva'
 import { Button, Input, Icon, Popover, Select } from 'antd';
 import { flaskServer } from '../../../constants';
@@ -107,12 +108,12 @@ export default class Compile extends React.Component {
   onChangeLtwo(parent, child, value){
     let values = this.state.values;
     console.log(parent, child, value);
-    if(values[parent]['args'][child]['args']['selected'] !== value){
+    if(values[parent]['args'][child]['args']['distribute'] !== value){
       delete values[parent]['args'][child]['args'];
       values[parent]['args'][child]['args'] = {}
     }
     values[parent]['args'][child]['args'][value] = 0
-    values[parent]['args'][child]['args']['selected'] = value
+    values[parent]['args'][child]['args']['distribute'] = value
     this.setState({values});
     console.log(values);
   }
@@ -121,12 +122,16 @@ export default class Compile extends React.Component {
     let values = this.state.values;
     let v = ReactDOM.findDOMNode(this.refs[parent + "-" + child + "-" + value]).value
     if(type === 'multiple') {
-      v = v.split(",");
+      v = v.split(", ");
     }
+    console.log(v);
     values[parent]['args'][child]['args'][value] = v;
-    //console.log(values);
+   //console.log(values);
     this.setState({values});
-    this.props.getParams(values);
+    let values_correct = lodash.cloneDeep(values);
+    values_correct[parent]['args'][child] = values[parent]['args'][child]['args'];
+    console.log(values_correct);
+    this.props.getParams(v);
   }
 
   setInputValue(parent, child){
@@ -147,7 +152,7 @@ export default class Compile extends React.Component {
   }
 
   renderHypeInputs(parent, child){
-    let editing = this.state.values[parent]['args'][child]['args']['selected'];
+    let editing = this.state.values[parent]['args'][child]['args']['distribute'];
     let type = ''
     this.state.values[parent]['args'][child]['range'].map((el) => {
       if (el.name === editing){
@@ -221,7 +226,7 @@ export default class Compile extends React.Component {
                           <div>
                             <Select ref={this.state.values[type.name]['args'][el.name]}
                                     style={{width: 100}}
-                                    value={this.state.values[type.name]['args'][el.name]['args']['selected']}
+                                    value={this.state.values[type.name]['args'][el.name]['args']['distribute']}
                                     onChange={(value) => this.onChangeLtwo(type.name, el.name, value)}>
                               {
                                 this.state.values[type.name]['args'][el.name]['range'].map((e) =>
@@ -233,7 +238,7 @@ export default class Compile extends React.Component {
                             </Select>
                             <div>
                               {
-                                this.state.values[type.name]['args'][el.name]['args']['selected'] &&
+                                this.state.values[type.name]['args'][el.name]['args']['distribute'] &&
                                 this.renderHypeInputs(type.name, el.name)
                               }
                             </div>

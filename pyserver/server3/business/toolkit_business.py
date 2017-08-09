@@ -1718,7 +1718,7 @@ def update_one_public_toolkit():
                           'default': None,
                           'required': True,
                           'len_range': [1, 1],
-                          'data_type': ['int', 'float']
+                          'data_type': ['int', 'float', 'string']
                       },
                       "args": [
                           {
@@ -1734,10 +1734,11 @@ def update_one_public_toolkit():
                           {
                               'name': 'labels',
                               'type': {
-                                  'key': '"string_m',
+                                  'key': 'string_m',
                                   'des': 'multiple labels',
                               },
-                              'default': [],
+                              'default': None,
+                              'len_range': None,
                               'required': False
                           }
                       ]

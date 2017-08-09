@@ -30,7 +30,8 @@ from server3.utility import json_utility
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
-app = Flask(__name__, static_url_path='')
+app = Flask(__name__, static_url_path='/static',
+            static_folder='user_directory/model')
 app.secret_key = 'super-super-secret'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)

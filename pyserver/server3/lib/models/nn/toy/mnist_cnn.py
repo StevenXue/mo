@@ -1,13 +1,13 @@
 # -*- coding: UTF-8 -*-
-from keras.callbacks import LambdaCallback
 import keras
-from keras.layers import Dense, Dropout, Flatten
+from keras.callbacks import LambdaCallback
 from keras.layers import Conv2D, MaxPooling2D
-from server3.lib.models.keras_callbacks import MongoModelCheckpoint
-from server3.service import logger_service
+from keras.layers import Dense, Dropout, Flatten
 
 from server3.lib import Sequential
 from server3.lib import graph
+from server3.service import logger_service
+from server3.service.keras_callbacks import MongoModelCheckpoint
 
 
 def mnist_cnn(conf, input, **kw):

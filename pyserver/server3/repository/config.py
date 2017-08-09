@@ -15,13 +15,14 @@ else:
     import configparser
     config = configparser.ConfigParser()
 
+from server3.constants import MONGO
+
 config_url = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                           'config.ini')
 
 config.read(config_url, encoding='utf-8')
 
-# mongo = 'DEFAULT'
-mongo = 'EXTERNAL'
+mongo = MONGO
 
 
 def get_mongo_host():

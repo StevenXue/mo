@@ -123,3 +123,5 @@ PARAMETER_SPEC = [
         'required': True
     }
 ]
+# MONGO = 'EXTERNAL'
+MONGO = 'DEFAULT'

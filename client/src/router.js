@@ -31,15 +31,6 @@ const Routers = function ({ history, app }) {
           },
         },
         {
-          path: 'upload/:name',
-          getComponent (nextState, cb) {
-            require.ensure([], require => {
-              registerModel(app, require('./models/upload'))
-              cb(null, require('./routes/upload/components/detail'))
-            }, 'fileUpload-detail')
-          },
-        },
-        {
           path: 'project',
           getComponent (nextState, cb) {
             require.ensure([], require => {
@@ -53,6 +44,7 @@ const Routers = function ({ history, app }) {
           getComponent (nextState, cb) {
             require.ensure([], require => {
               registerModel(app, require('./models/project'))
+              registerModel(app, require('./models/predict'))
               cb(null, require('./routes/project/components/detail'))
             }, 'project')
           },

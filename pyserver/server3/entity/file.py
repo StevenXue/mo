@@ -19,5 +19,6 @@ class File(Document):
     extension = StringField(choices=EXTENSION)
     type = StringField(choices=FILE_TYPE)
     description = StringField(max_length=140)
+    user_name = StringField(max_length=50)
 
 

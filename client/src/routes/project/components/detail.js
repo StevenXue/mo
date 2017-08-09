@@ -9,6 +9,7 @@ import Toolkits from '../toolkit/toolSteps'
 import JupyterNotebook from './jupyterNotebook'
 import Preprocess from '../preprocess/preprocess'
 import AutomatedModel from '../model/autoModal'
+import Predict from '../predict/predict'
 import DataPreview from './dataPreview'
 import { stepStyle, assetsUrl } from '../../../constants'
 import { TourArea } from '../../../components'
@@ -321,6 +322,13 @@ class ProjectDetail extends React.Component {
                 </Panel>
               </Collapse>
             </div>
+            <Collapse className='model-predict' bordered={true} style={{ marginTop: 10, width: '100%' }}>
+              <Panel header={'Predict'} key="5">
+                <Spin spinning={this.state.loading}>
+                  <Predict />
+                </Spin>
+              </Panel>
+            </Collapse>
           </div>
           <Button className='notebook-start-button' type='primary' style={{ marginTop: 20, width: 120 }}
                   onClick={() => this.startNotebook()}>
