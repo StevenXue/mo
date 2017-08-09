@@ -274,7 +274,7 @@ class ProjectDetail extends React.Component {
               />
             </h2>
             <h4 style={{ marginTop: 10 }}>{'project id: ' + this.props.location.query._id}</h4>
-
+            <Button type='primary' style={{ marginTop: 10, width: 120}}>Publish Project</Button>
             <div style={{ display: 'flex', flexDirection: 'column', marginTop: 20 }}>
               <div>
                 <Modal title="Choose DataSet"
