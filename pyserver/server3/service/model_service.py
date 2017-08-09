@@ -21,6 +21,7 @@ from server3.service import staging_data_service
 from server3.business import file_business
 from server3.business import staging_data_business
 
+# TODO 根据entity生成
 ModelType = {
     'neural_network': 0,
     'custom_supervised': 1,
@@ -455,18 +456,18 @@ def temp():
     #     models.IMAGE_CLASSIFIER,
     #     {'type': 'folder'}
     # ))
-    # print(add_model_with_ownership(
-    #     'system',
-    #     False,
-    #     'Linear Regressor',
-    #     'Custom linear regression model',
-    #     ModelType['custom_supervised'],
-    #     'server3/lib/models/linear_regressor.py',
-    #     'linear_regressor_model_fn',
-    #     'custom_model_to_str',
-    #     models.LinearRegressor,
-    #     {'type': 'DataFrame'}
-    # ))
+    print(add_model_with_ownership(
+        'system',
+        False,
+        'Linear Regressor',
+        'Custom linear regression model',
+        ModelType['custom_supervised'],
+        'server3/lib/models/linear_regressor.py',
+        'linear_regressor_model_fn',
+        'custom_model_to_str',
+        models.LinearRegressor,
+        {'type': 'DataFrame'}
+    ))
 
     # print(add_model_with_ownership(
     #     'system',
@@ -658,4 +659,4 @@ if __name__ == '__main__':
     # run_model(conf, "595f32e4e89bde8ba70738a3", "5979da380c11f32674eb2788",
     #           "59687821d123abcfbfe8cab9")
 
-    temp()
+    # temp()

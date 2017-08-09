@@ -18,16 +18,21 @@ def get_by_id(sds_id):
     return staging_data_set_repo.read_by_id(sds_id)
 
 
-def get_by_project_id(project_id):
+def get_by_project_id(project_id, without_result):
     """
     Get stating_data_set by project's ObjectId
 
     :param project_id: ObjectId
     :return: staging_data_set object
     """
-    # project = Project(id=project_id)
-    # return staging_data_set_repo.read_by_project(project)
+    if without_result:
+        return staging_data_set_repo.read_by_non_unique_field_without_result(
+            'project', project_id)
     return staging_data_set_repo.read_by_non_unique_field('project', project_id)
+
+
+def get_by_name_and_project(name, project):
+    return staging_data_set_repo.read_by_name_and_project(name, project)
 
 
 def get_by_job_id(job_id):
@@ -61,6 +66,11 @@ def add(name, description, project, **kwargs):
 
 def update(sds_id, **update):
     return staging_data_set_repo.update_one_by_id(sds_id, update)
+
+
+def update_job_by_name_and_project(name, project, job):
+    return staging_data_set_repo.update_by_name_and_project(name, project,
+                                                            'job', job)
 
 
 def remove_by_id(sds_id):
