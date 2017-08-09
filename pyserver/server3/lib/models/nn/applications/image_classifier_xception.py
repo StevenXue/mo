@@ -6,6 +6,8 @@ from keras import applications
 from keras.models import Model
 import os
 
+from server3.lib.models.metrics import custom_metrcis
+
 from keras.callbacks import LambdaCallback
 from server3.lib.models.keras_callbacks import MongoModelCheckpoint
 from server3.service import logger_service
@@ -71,7 +73,11 @@ def image_classifier_xception(conf, input, **kw):
 
             model.compile(loss='binary_crossentropy',
                           optimizer='rmsprop',
-                          metrics=['accuracy'])
+                          metrics=['accuracy',
+                                   custom_metrcis.matthews_correlation,
+                                   custom_metrcis.precision,
+                                   custom_metrcis.recall,
+                                   custom_metrcis.fmeasure])
         else:
             top_model.add(Dense(num_classes, activation='softmax'))
             model = Model(inputs=base_model.input,

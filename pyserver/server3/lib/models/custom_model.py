@@ -63,14 +63,19 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
                             df_labels=input_data['df_labels'])
 
     # fit
-    estimator.fit(input_fn=input_fn, **fit_params['args'])
     result = {}
-    # evaluate
-    metrics = estimator.evaluate(input_fn=input_fn,
-                                 **eval_params['args'])
-    result.update({
-        'eval_metrics': metrics
-    })
+    evaluation_times = max(fit_params['args']['steps'] / 100, 1)
+    while evaluation_times > 0:
+        fit_params['args']['steps'] = 100
+        estimator.fit(input_fn=input_fn, **fit_params['args'])
+        # evaluate
+        metrics = estimator.evaluate(input_fn=input_fn,
+                                     **eval_params['args'])
+        result.update({
+            'eval_metrics': metrics
+        })
+        evaluation_times -= 1
+
     # predict
     predict_feature = input_data.get('predict', None)
     if predict_feature:

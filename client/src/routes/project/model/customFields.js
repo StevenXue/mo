@@ -35,11 +35,19 @@ export default class CustomFields extends React.Component {
       value = parseInt(value);
     }else if(ref.type.key === 'float') {
       value = parseFloat(value);
+    }else if(ref.type.key === 'int_m') {
+      value = value.replace(/\s+/g, "");
+      value = value.split(',');
+      value = value.map((el) => parseInt(el))
+    }else if(ref.type.key === 'float_m') {
+      value = value.replace(/\s+/g, "");
+      value = value.split(',');
+      value = value.map((el) => parseFloat(el))
     }
 
     if(value){
       this.props.getEstimator(ref.name, value);
-    }else if(value = null && ref.required){
+    }else if(value === null && ref.required){
       message.error("please fill in field" + ref.name);
     }
 
@@ -55,7 +63,11 @@ export default class CustomFields extends React.Component {
       case 'string':
         return (
           <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-            <Input ref={type.name} disabled={!this.state.isActive} style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}} onChange={() => this.onChange(type)} />
+            <Input ref={type.name}
+                   placeholder={type.default}
+                   disabled={!this.state.isActive}
+                   style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}
+                   onChange={() => this.onChange(type)} />
             <Popover content={<div>
                   <p style={{width: 150}}>{type.type.des}</p>
                 </div>} title="Description">
@@ -67,7 +79,40 @@ export default class CustomFields extends React.Component {
       case 'int':
         return (
           <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-            <Input ref={type.name} style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}} onChange={() => this.onChange(type)} />
+            <Input ref={type.name}
+                   placeholder={type.default}
+                   style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}
+                   onChange={() => this.onChange(type)} />
+            <Popover content={<div>
+              <p style={{width: 150}}>{type.type.des}</p>
+            </div>} title="Description">
+              <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5, color: '#767676'}}/>
+            </Popover>
+          </div>
+        );
+
+      case 'int_m':
+        return (
+          <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+            <Input ref={type.name}
+                   placeholder={type.default}
+                   style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}
+                   onChange={() => this.onChange(type)} />
+            <Popover content={<div>
+              <p style={{width: 150}}>{type.type.des}</p>
+            </div>} title="Description">
+              <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5, color: '#767676'}}/>
+            </Popover>
+          </div>
+        );
+
+      case 'float_m':
+        return (
+          <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+            <Input ref={type.name}
+                   placeholder={type.default}
+                   style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}
+                   onChange={() => this.onChange(type)} />
             <Popover content={<div>
               <p style={{width: 150}}>{type.type.des}</p>
             </div>} title="Description">
@@ -79,7 +124,10 @@ export default class CustomFields extends React.Component {
       case 'float':
         return (
           <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-            <Input ref={type.name} style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}} onChange={() => this.onChange(type)} />
+            <Input ref={type.name}
+                   placeholder={type.default}
+                   style={{width: 50, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}
+                   onChange={() => this.onChange(type)} />
             <Popover content={<div>
               <p style={{width: 150}}>{type.type.des}</p>
             </div>} title="Description">

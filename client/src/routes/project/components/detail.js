@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import classnames from 'classnames'
-import { Router, routerRedux } from 'dva/router'
 import { Button, Select, Icon, message, Modal, Table, Radio, Collapse, Input, Spin } from 'antd'
 
 import { jupyterServer, flaskServer } from '../../../constants'
@@ -13,6 +12,7 @@ import AutomatedModel from '../model/autoModal'
 import DataPreview from './dataPreview'
 import { stepStyle, assetsUrl } from '../../../constants'
 import { TourArea } from '../../../components'
+import { isEmpty } from '../../../utils/utils'
 import empty from './empty.ipynb'
 import style from './detail.css'
 // 全局css，在index里去import
@@ -69,24 +69,6 @@ const defaultSteps = [
   },
 ]
 
-let hasOwnProperty = Object.prototype.hasOwnProperty
-
-function isEmpty (obj) {
-
-  if (obj == null) return true
-
-  if (obj.length > 0) return false
-  if (obj.length === 0) return true
-
-  if (typeof obj !== 'object') return true
-
-  for (let key in obj) {
-    if (hasOwnProperty.call(obj, key)) return false
-  }
-
-  return true
-}
-
 const columns = [{
   title: '名称',
   dataIndex: 'name',
@@ -125,7 +107,7 @@ class ProjectDetail extends React.Component {
   }
 
   componentDidMount () {
-    console.log('Project mounted, project id: ', this.state.project_id)
+    //console.log('Project mounted, project id: ', this.state.project_id)
     this.props.dispatch({ type: 'project/query' })
     this.props.dispatch({ type: 'project/listDataSets' })
   }
@@ -159,8 +141,6 @@ class ProjectDetail extends React.Component {
   }
 
   dataOp (dataSetId) {
-    // let dataSetId = this.props.project.selectedDSIds[0];
-    // let dataSetId = this.props.project.selectedDSIds
     if (!dataSetId) {
       return
     }
@@ -197,13 +177,6 @@ class ProjectDetail extends React.Component {
     } else if (info.file.status === 'error') {
       message.error(`${info.file.name} file upload failed.`)
     }
-  }
-
-  handleChoose () {
-    this.setState({
-      visible: true,
-    })
-    //console.log(this.props.project.dataSets[this.state.data_prop]);
   }
 
   getNotebook (content) {
@@ -282,7 +255,6 @@ class ProjectDetail extends React.Component {
               />
             </h2>
             <h4 style={{ marginTop: 10 }}>{'project id: ' + this.props.location.query._id}</h4>
-
             <div style={{ display: 'flex', flexDirection: 'column', marginTop: 20 }}>
               <div>
                 <Modal title="Choose DataSet"
@@ -303,7 +275,7 @@ class ProjectDetail extends React.Component {
                 </Modal>
                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                   <Button className={classnames(style.dataChooseButton)} type='primary' style={{ width: 120 }}
-                          onClick={() => this.handleChoose()}>Choose Data</Button>
+                          onClick={() => this.setState({visible: true})}>Choose Data</Button>
                 </div>
               </div>
             </div>

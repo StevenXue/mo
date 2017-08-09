@@ -11,6 +11,7 @@
 
 
 import functools
+import numpy as np
 
 from bson import ObjectId
 from itertools import compress
@@ -62,23 +63,29 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
             # calculate
             func_rst = func(*args, **kw)
             result = list(func_rst) if isinstance(func_rst, tuple) else [func_rst]
-            print("result", result)
-
             # 新设计的存取方式
             results = {"fields": fields}
             gen_info = {}
             result_spec = toolkit_obj.result_spec
+            error_flag = 0
+
             for arg in result_spec["args"]:
                 value = result.pop(0)
                 results.update({arg["name"]: value})
                 if arg["if_add_column"]:
                     strr = "%s_%s_col" % (arg["name"], toolkit_obj.name)
-                    add_new_column(value, args[-1], strr, staging_data_set_id)
+                    try:
+                        error = 0
+                        add_new_column(value, args[-1], strr, staging_data_set_id)
+                    except:
+                        error_flag = 1
+
                 if arg.get("attribute", False) and arg["attribute"] == "label":
                     labels = value
                 elif arg.get("attribute", False) and arg["attribute"] == "general_info":
                     gen_info.update({arg["name"]: value})
 
+            # 可视化计算
             if toolkit_obj.category == 0:
                 json = {"scatter": data_utility.retrieve_nan_index(args[0], args[-1]), "labels": labels,
                         "pie": [{'text': el, 'value': labels.count(el)} for el in set(labels)],
@@ -86,6 +93,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                         "general_info": gen_info,
                         "fields": fields[0],
                         "category": toolkit_obj.category}
+
             elif toolkit_obj.category == 1:
                 from scipy.stats import pearsonr
                 # from minepy import MINE
@@ -105,8 +113,54 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                                     # "mic": [MINE(alpha=0.6, c=15, est="mic_approx").compute_score(el,
                                     # list(data[0]).mic()) for el in list(data[1:])]}
                                     "mic": [None for el in data]},
-                        "category": toolkit_obj.category
+                        "category": toolkit_obj.category}
+
+            elif toolkit_obj.category == 2:
+                data = list(zip(*args[0]))
+                result = list(zip(*labels))
+                merge_data = data + result
+                lab_fields = ["New Col" + str(i) for i in range(len(result))]
+                merge_fields = fields[0] + lab_fields
+                json = {"category": toolkit_obj.category,
+                        "table": {
+                            "Field1": fields[0],
+                            "Field2": lab_fields,
+                            "data": [dict(zip(merge_fields, arr)) for arr in merge_data]
                         }
+                        }
+
+            elif toolkit_obj.category == 3:
+                if error_flag:
+                    json = {}
+                else:
+                    flag = toolkit_obj.parameter_spec["data"]["type"]["key"] == "transfer_box"
+                    data = list(zip(*args[0]))
+
+                    if flag:
+                        data.append(args[1])
+                    lab = list(zip(*labels))
+                    lab_fields = ["New Col" + str(i) for i in range(len(lab))]
+                    var1 = [np.var(da) for da in data]
+                    var2 = [np.var(da) for da in lab]
+                    merge_fields = fields[0] + fields[1] if fields[1] else fields[0]
+                    x_domain = merge_fields + ["_empty"] + lab_fields
+                    y_domain = var1 + [0] + var2
+
+                    temp = var1[:-1] if flag else var1
+                    json = {
+                        "table1": {"X_fields": fields[0],
+                                   "Y_fields": fields[1],
+                                   "data": [dict(zip(merge_fields, arr)) for arr in list(zip(*data))]
+                                   },
+                        "table2": {"data": [dict(zip(lab_fields, arr)) for arr in labels],
+                                   "fields": lab_fields},
+                        "bar": {"x_domain": x_domain,
+                                "y_domain": y_domain},
+                        "pie1": [{"text": fields[0][i], "value": temp[i]} for i in range(len(temp))],
+                        "pie2": [{"text": lab_fields[i], "value": var2[i]} for i in range(len(var2))],
+                        "general_info": gen_info,
+                        "category": toolkit_obj.category}
+
             else:
                 json = {}
 
@@ -173,7 +227,7 @@ def create_model_job(project_id, staging_data_set_id, model_obj, **kwargs):
             func_result = func(*args, **kw, result_sds=result_sds_obj,
                                project_id=project_id)
             # update a job
-            job_obj = job_business.end_job(job_obj)
+            job_business.end_job(job_obj)
 
             # create a result
             # result_obj = result_business.add_result(func_result, job_obj, 0, "")

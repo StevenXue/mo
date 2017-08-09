@@ -465,7 +465,7 @@ def create_public_toolkit():
                               "name": "降维结果",
                               "des": "所选范围的样本的降维后的结果",
                               "if_add_column": True,
-                              "attribute": "value"
+                              "attribute": "label"
                           },
                           {
                               "name": "components",
@@ -489,7 +489,7 @@ def create_public_toolkit():
                               "name": "mean_",
                               "des": "所选范围的样本的降维后的结果",
                               "if_add_column": False,
-                              "attribute": "general_info"
+                              "attribute": "value"
                           },
                           {
                               "name": "noise_variance",
@@ -542,7 +542,7 @@ def create_public_toolkit():
                                "name": "降维结果",
                                "des": "所选范围的样本的降维后的结果",
                                "if_add_column": True,
-                               "attribute": "value"
+                               "attribute": "label"
                            },
                            {
                                "name": "kl_divergence",
@@ -839,6 +839,17 @@ def create_public_data_process():
                                       'len_range': [1, None],
                                       'data_type': ['int', 'float']
                                   }
+                              },
+                              result_spec={
+                                  "if_reserved": True,
+                                  "args": [
+                                      {
+                                          "name": "standerd_scalar",
+                                          "des": "数值转换，对所选数据做标准化处理",
+                                          "if_add_column": True,
+                                          "attribute": "label"
+                                      }
+                                  ]
                               })
     standard_scaler = toolkit_repo.create(standard_scaler)
     ownership_business.add(user, False, toolkit=standard_scaler)
@@ -863,6 +874,17 @@ def create_public_data_process():
                                      'len_range': [1, None],
                                      'data_type': ['int', 'float']
                                  }
+                             },
+                             result_spec={
+                                 "if_reserved": True,
+                                 "args": [
+                                     {
+                                         "name": "min_max_scaler",
+                                         "des": "数值转换，对所选数据做标准化处理",
+                                         "if_add_column": True,
+                                         "attribute": "label"
+                                     }
+                                 ]
                              })
     min_max_scaler = toolkit_repo.create(min_max_scaler)
     ownership_business.add(user, False, toolkit=min_max_scaler)
@@ -887,6 +909,17 @@ def create_public_data_process():
                                  'len_range': [1, None],
                                  'data_type': ['int', 'float']
                              }
+                         },
+                         result_spec={
+                             "if_reserved": True,
+                             "args": [
+                                 {
+                                     "name": "normalizer",
+                                     "des": "数值转换，对所选数据做标准化处理",
+                                     "if_add_column": True,
+                                     "attribute": "label"
+                                 }
+                             ]
                          })
     normalizer = toolkit_repo.create(normalizer)
     ownership_business.add(user, False, toolkit=normalizer)
@@ -923,6 +956,17 @@ def create_public_data_process():
                                     'required': True
                                 }
                             ]
+                        },
+                        result_spec={
+                            "if_reserved": True,
+                            "args": [
+                                {
+                                    "name": "binarizer",
+                                    "des": "数值转换，对所选数据做标准化处理",
+                                    "if_add_column": True,
+                                    "attribute": "label"
+                                }
+                            ]
                         })
     binarizer = toolkit_repo.create(binarizer)
     ownership_business.add(user, False, toolkit=binarizer)
@@ -947,6 +991,17 @@ def create_public_data_process():
                                       'len_range': [1, 1],
                                       'data_type': ['int', 'float']
                                   }
+                              },
+                              result_spec={
+                                  "if_reserved": True,
+                                  "args": [
+                                      {
+                                          "name": "one_hot_encoder",
+                                          "des": "数值转换，对所选数据做标准化处理",
+                                          "if_add_column": True,
+                                          "attribute": "label"
+                                      }
+                                  ]
                               })
     one_hot_encoder = toolkit_repo.create(one_hot_encoder)
     ownership_business.add(user, False, toolkit=one_hot_encoder)
@@ -971,6 +1026,17 @@ def create_public_data_process():
                               'len_range': [1, None],
                               'data_type': ['int', 'float']
                           }
+                      },
+                      result_spec={
+                          "if_reserved": True,
+                          "args": [
+                              {
+                                  "name": "imputer",
+                                  "des": "数值转换，对所选数据做标准化处理",
+                                  "if_add_column": True,
+                                  "attribute": "label"
+                              }
+                          ]
                       })
     imputer = toolkit_repo.create(imputer)
     ownership_business.add(user, False, toolkit=imputer)
@@ -995,6 +1061,17 @@ def create_public_data_process():
                                           'len_range': [1, None],
                                           'data_type': ['int', 'float']
                                       }
+                                  },
+                                  result_spec={
+                                      "if_reserved": True,
+                                      "args": [
+                                          {
+                                              "name": "polynomial_features",
+                                              "des": "数值转换，对所选数据做标准化处理",
+                                              "if_add_column": True,
+                                              "attribute": "label"
+                                          }
+                                      ]
                                   })
     polynomial_features = toolkit_repo.create(polynomial_features)
     ownership_business.add(user, False, toolkit=polynomial_features)
@@ -1487,7 +1564,7 @@ def create_public_data_process():
                               "name": "label",
                               "des": "降维后的栏位信息",
                               "if_add_column": True,
-                              "attribute": "value"
+                              "attribute": "label"
                           },
                           {
                               "name": "coef",
@@ -1524,13 +1601,6 @@ def create_public_data_process():
     lda = toolkit_repo.create(lda)
     ownership_business.add(user, False, toolkit=lda)
 
-
-def update_one_public_toolkit():
-    """
-        数据库建一个toolkit的collection, 记载public的数据分析工具包简介
-    """
-    user = user_business.get_by_user_ID('system')
-    # Result_Form 重新设计
     MIC = Toolkit(name='最大互信息数',
                   description='计算所选数据集合的最大互信息数, 表达第一个所选值域与其他值域变量之间的相关系数',
                   category=4,
@@ -1550,10 +1620,141 @@ def update_one_public_toolkit():
                           'required': True,
                           'len_range': [2, None],
                           'data_type': ['int', 'float']
-                      }
+                      },
+                      "args": [
+                          {
+                              'name': 'alpha',
+                              'type': {
+                                  'key': 'float',
+                                  'des': 'the number of clustering numbers',
+                                  'range': [0, 1]
+                              },
+                              'default': 0.6,
+                              'required': False
+                          },
+                          {
+                              'name': 'c',
+                              'type': {
+                                  'key': 'int',
+                                  'des': 'the number of clustering numbers',
+                                  'range': [0, 15]
+                              },
+                              'default': 15,
+                              'required': False
+                          }
+                      ]
+                  },
+                  result_spec={
+                      "if_reserved": False,
+                      "args": [
+                          {
+                              "name": "mic_result",
+                              "des": "所选范围的样本的MIC的结果",
+                              "if_add_column": False,
+                              "attribute": "label"
+                          }
+                      ]
                   })
     MIC = toolkit_repo.create(MIC)
     ownership_business.add(user, False, toolkit=MIC)
+
+
+def update_one_public_toolkit():
+    """
+        数据库建一个toolkit的collection, 记载public的数据分析工具包简介
+    """
+    user = user_business.get_by_user_ID('system')
+
+    DUM = Toolkit(name='类别转数字',
+                  description='将一组类别属性的数据，转化成几列数字组成的矩阵',
+                  category=2,
+                  entry_function='get_dummy',
+                  target_py_code=inspect.getsource(preprocess_orig.get_dummy),
+                  parameter_spec={
+                      "data": {
+                          'name': 'input',
+                          'type': {
+                              'key': 'select_box',
+                              'des': 'nD tensor with shape: (batch_size, ..., '
+                                     'input_dim). The most common situation would be a '
+                                     '2D input with shape (batch_size, input_dim).',
+                              'range': None
+                          },
+                          'default': None,
+                          'required': True,
+                          'len_range': [1, 1],
+                          'data_type': ['int', 'float', 'str']
+                      }
+                  },
+                  result_spec={
+                      "if_reserved": True,
+                      "args": [
+                          {
+                              "name": "result",
+                              "des": "所选范围的样本的dummy的结果",
+                              "if_add_column": True,
+                              "attribute": "label"
+                          }
+                      ]
+                  })
+    DUM = toolkit_repo.create(DUM)
+    ownership_business.add(user, False, toolkit=DUM)
+
+    CUT = Toolkit(name='数字转类别方法',
+                  description='将一组数据，转化成类别',
+                  category=2,
+                  entry_function='pandas_cut',
+                  target_py_code=inspect.getsource(preprocess_orig.pandas_cut),
+                  parameter_spec={
+                      "data": {
+                          'name': 'input',
+                          'type': {
+                              'key': 'select_box',
+                              'des': 'nD tensor with shape: (batch_size, ..., '
+                                     'input_dim). The most common situation would be a '
+                                     '2D input with shape (batch_size, input_dim).',
+                              'range': None
+                          },
+                          'default': None,
+                          'required': True,
+                          'len_range': [1, 1],
+                          'data_type': ['int', 'float']
+                      },
+                      "args": [
+                          {
+                              'name': 'bins',
+                              'type': {
+                                  'key': 'int',
+                                  'des': 'the number of bins',
+                                  'range': [2, None]
+                              },
+                              'default': 3,
+                              'required': True
+                          },
+                          {
+                              'name': 'labels',
+                              'type': {
+                                  'key': '"string_m',
+                                  'des': 'multiple labels',
+                              },
+                              'default': [],
+                              'required': False
+                          }
+                      ]
+                  },
+                  result_spec={
+                      "if_reserved": True,
+                      "args": [
+                          {
+                              "name": "result",
+                              "des": "continuous to category",
+                              "if_add_column": True,
+                              "attribute": "label"
+                          }
+                      ]
+                  })
+    CUT = toolkit_repo.create(CUT)
+    ownership_business.add(user, False, toolkit=CUT)
 
 
 def remove_one_public_toolkit():
