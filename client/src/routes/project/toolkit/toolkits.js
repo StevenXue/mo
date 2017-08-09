@@ -374,7 +374,7 @@ export default class Toolkit extends React.Component {
                      onCancel={() => this.setState({visible: false})}
               >
                 {/*<VisualizationPanel visual_sds_id={this.state.visual_sds_id} />*/}
-                <VisualizationPanel visual_sds_id={"598a6ec2e89bde77ae24c03a"} />
+                <VisualizationPanel visual_sds_id={"598a8300e89bdea49c6ac5da"} />
               </Modal>
             </div>
           </div>
