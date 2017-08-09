@@ -76,12 +76,13 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                         add_new_column(value, args[-1], strr, staging_data_set_id)
                     except:
                         error = 1
-                print("error1", error)
+
                 if arg.get("attribute", False) and arg["attribute"] == "label":
                     labels = value
                 elif arg.get("attribute", False) and arg["attribute"] == "general_info":
                     gen_info.update({arg["name"]: value})
 
+            # 可视化计算
             if toolkit_obj.category == 0:
                 json = {"scatter": data_utility.retrieve_nan_index(args[0], args[-1]), "labels": labels,
                         "pie": [{'text': el, 'value': labels.count(el)} for el in set(labels)],
@@ -111,7 +112,10 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                                     "mic": [None for el in data]},
                         "category": toolkit_obj.category}
             elif toolkit_obj.category == 2:
-                json = {"category": toolkit_obj.category}
+                lab_fields = ["New Col" + str(i) for i in range(len(lab))]
+                json = {"category": toolkit_obj.category,
+                        "table": None}
+
 
             elif toolkit_obj.category == 3:
                 if error:
