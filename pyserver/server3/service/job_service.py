@@ -8,7 +8,7 @@
 # @running  : python
 # Further to FIXME of None
 """
-
+import os
 
 import functools
 import numpy as np
@@ -236,6 +236,7 @@ def create_model_job(project_id, staging_data_set_id, model_obj, **kwargs):
             # model_obj = model_business.get_by_model_id(model_id)
             params = args[0]
             file_id = kwargs.get('file_id')
+            result_dir = kwargs.get('result_dir')
             staging_data_set_obj = None
             if staging_data_set_id:
                 staging_data_set_obj = \
@@ -260,6 +261,10 @@ def create_model_job(project_id, staging_data_set_id, model_obj, **kwargs):
                                                            job=job_obj,
                                                            type='result')
             # run
+            if result_dir:
+                result_dir += str(job_obj['id']) + '/'
+                os.makedirs(result_dir)
+                kw['result_dir'] = result_dir
             func_result = func(*args, **kw, result_sds=result_sds_obj,
                                project_id=project_id)
             # update a job

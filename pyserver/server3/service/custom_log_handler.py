@@ -2,6 +2,9 @@ import logging
 import re
 
 from server3.service import logger_service
+from server3.repository import config
+
+UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
 # regex to match scientific number
 sci_re = '-?\d+\.?\d*(?:[Ee]-?\d+)?'
