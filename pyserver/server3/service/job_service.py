@@ -63,7 +63,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
             # calculate
             func_rst = func(*args, **kw)
             result = list(func_rst) if isinstance(func_rst, tuple) else [func_rst]
-
+            print("result", result)
             # 新设计的存取方式
             results = {"fields": fields}
             gen_info = {}
@@ -86,6 +86,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                         "general_info": gen_info,
                         "fields": fields[0],
                         "category": toolkit_obj.category}
+
             elif toolkit_obj.category == 1:
                 from scipy.stats import pearsonr
                 # from minepy import MINE
@@ -106,6 +107,9 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                                     # list(data[0]).mic()) for el in list(data[1:])]}
                                     "mic": [None for el in data]},
                         "category": toolkit_obj.category}
+            elif toolkit_obj.category == 2:
+                json = {"category": toolkit_obj.category}
+
             elif toolkit_obj.category == 3:
                 flag = toolkit_obj.parameter_spec["data"]["type"]["key"] == "transfer_box"
                 data = list(zip(*args[0]))
@@ -118,17 +122,18 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 var2 = [np.var(da) for da in lab]
                 x_domain = fields[0] + fields[1] + ["_empty"] + lab_fields if fields[1] else fields[0] + ["_empty"] + lab_fields
                 y_domain = var1 + ["_empty"] + var2
+
+                temp = var1[:-1] if flag else var1
                 json = {
                     "table1": {"X_fields": fields[0],
                                "Y_fields": fields[1],
                                "data": list(zip(*data))},
-                    "table2": {"data": labels},
+                    "table2": {"data": labels,
+                               "fields": lab_fields},
                     "bar": {"x_domain": x_domain,
                             "y_domain": y_domain},
-                    "pie1": {"x_domain": fields[0],
-                             "y_domain": var1[:-1] if flag else var1},
-                    "pie2": {"y_domain": var2,
-                             "x_domain": lab_fields},
+                    "pie1": [dict(zip(fields[0], temp)],
+                    "pie2": [dict(zip(var2, lab_fields))],
                     "general_info": gen_info,
                     "category": toolkit_obj.category}
 
