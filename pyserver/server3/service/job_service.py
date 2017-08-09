@@ -132,20 +132,21 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                     indx = fields[0].index(el)
                     raw_d = data[indx]
                     raw_re = result[indx]
+
                     if not flag_str1:
                         bar1 = visualization_service.freq_hist(raw_d, multip=1)
                     else:
                         seta = set(raw_d)
-                        x_domain = [el for el in seta if raw_d.count(el)>1]
-                        y_domain = [raw_d.count(el) for el in seta if raw_d.count(el) > 1]
+                        x_domain = [el for el in seta]
+                        y_domain = [raw_d.count(el) for el in seta]
                         bar1 = {'x_domain': x_domain, 'y_domain': y_domain}
 
                     if not flag_str2:
                         bar2 = visualization_service.freq_hist(raw_re, multip=1)
                     else:
                         seta = set(raw_re)
-                        x_domain = [el for el in seta if raw_re.count(el) > 1]
-                        y_domain = [raw_d.count(el) for el in seta if raw_re.count(el) > 1]
+                        x_domain = [el for el in seta]
+                        y_domain = [raw_re.count(el) for el in seta]
                         bar2 = {'x_domain': x_domain, 'y_domain': y_domain}
 
                     bars.append({"field": el, "bar1": bar1, "bar2": bar2})
