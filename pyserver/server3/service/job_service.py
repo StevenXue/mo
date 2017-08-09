@@ -113,11 +113,20 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                                     # list(data[0]).mic()) for el in list(data[1:])]}
                                     "mic": [None for el in data]},
                         "category": toolkit_obj.category}
-            elif toolkit_obj.category == 2:
-                lab_fields = ["New Col" + str(i) for i in range(len(lab))]
-                json = {"category": toolkit_obj.category,
-                        "table": None}
 
+            elif toolkit_obj.category == 2:
+                data = list(zip(*args[0]))
+                result = list(zip(*labels))
+                merge_data = data + result
+                lab_fields = ["New Col" + str(i) for i in range(len(result))]
+                merge_fields = fields[0] + lab_fields
+                json = {"category": toolkit_obj.category,
+                        "table": {
+                            "Field1": fields[0],
+                            "Field2": lab_fields,
+                            "data": [dict(zip(merge_fields, arr)) for arr in merge_data]
+                        }
+                        }
 
             elif toolkit_obj.category == 3:
                 if error_flag:
@@ -136,8 +145,6 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                     x_domain = merge_fields + ["_empty"] + lab_fields
                     y_domain = var1 + [0] + var2
 
-                    print("out of range", var2)
-                    print("out of range", lab_fields)
                     temp = var1[:-1] if flag else var1
                     json = {
                         "table1": {"X_fields": fields[0],
