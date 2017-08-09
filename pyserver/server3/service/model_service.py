@@ -443,18 +443,18 @@ def temp():
     #     models.IMAGE_CLASSIFIER,
     #     {'type': 'folder'}
     # ))
-    # print(add_model_with_ownership(
-    #     'system',
-    #     False,
-    #     'Linear Regressor',
-    #     'Custom linear regression model',
-    #     ModelType['custom_supervised'],
-    #     'server3/lib/models/linear_regressor.py',
-    #     'linear_regressor_model_fn',
-    #     'custom_model_to_str',
-    #     models.LinearRegressor,
-    #     {'type': 'DataFrame'}
-    # ))
+    print(add_model_with_ownership(
+        'system',
+        False,
+        'Linear Regressor',
+        'Custom linear regression model',
+        ModelType['custom_supervised'],
+        'server3/lib/models/linear_regressor.py',
+        'linear_regressor_model_fn',
+        'custom_model_to_str',
+        models.LinearRegressor,
+        {'type': 'DataFrame'}
+    ))
 
     # print(add_model_with_ownership(
     #     'system',
@@ -549,44 +549,44 @@ def temp():
     #     {
     #         'type': 'DataFrame'}
     # ))
-    print(add_model_with_ownership(
-        'system',
-        False,
-        'Random Forest',
-        'custom Random Forest model',
-        ModelType['custom_supervised'],
-        '/lib/models/randomforest.py',
-        'randomforest_model_fn',
-        'custom_model_to_str',
-        models.RandomForest,
-        {'type': 'DataFrame'}
-    ))
-
-    print(add_model_with_ownership(
-        'system',
-        False,
-        'Logistic Regressor',
-        'custom Logistic Regressor model',
-        ModelType['custom_supervised'],
-        '/lib/models/logistic_regressor.py',
-        'logistic_regressor_model_fn',
-        'custom_model_to_str',
-        models.LogisticRegressor,
-        {'type': 'DataFrame'}
-    ))
-
-    print(add_model_with_ownership(
-        'system',
-        False,
-        'Gaussian Mixture Model',
-        'custom GMM model',
-        ModelType['unsupervised'],
-        '/lib/models/gmm_cluster.py',
-        'gmm_cluster_model_fn',
-        'custom_model_to_str',
-        models.GMMCluster,
-        {'type': 'DataFrame'}
-    ))
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Random Forest',
+    #     'custom Random Forest model',
+    #     ModelType['custom_supervised'],
+    #     '/lib/models/randomforest.py',
+    #     'randomforest_model_fn',
+    #     'custom_model_to_str',
+    #     models.RandomForest,
+    #     {'type': 'DataFrame'}
+    # ))
+    #
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Logistic Regressor',
+    #     'custom Logistic Regressor model',
+    #     ModelType['custom_supervised'],
+    #     '/lib/models/logistic_regressor.py',
+    #     'logistic_regressor_model_fn',
+    #     'custom_model_to_str',
+    #     models.LogisticRegressor,
+    #     {'type': 'DataFrame'}
+    # ))
+    #
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Gaussian Mixture Model',
+    #     'custom GMM model',
+    #     ModelType['unsupervised'],
+    #     '/lib/models/gmm_cluster.py',
+    #     'gmm_cluster_model_fn',
+    #     'custom_model_to_str',
+    #     models.GMMCluster,
+    #     {'type': 'DataFrame'}
+    # ))
 
 
 if __name__ == '__main__':

@@ -238,7 +238,7 @@ class Predict extends React.Component {
                   </div>
                 </div>
               </div>
-              <div className="column is-2 controls-column" style={{width: '20%'}}>
+              <div className="column is-2 controls-column" style={{width: '25%'}}>
                 {/*<mdl-switch v-model="useGpu" disabled={predict.modelLoading}>use GPU</mdl-switch>*/}
               </div>
               <div className="column output-column">
@@ -254,7 +254,6 @@ class Predict extends React.Component {
                            }}
                       />
                     </div>)}
-
                 </div>
               </div>
             </div>,
