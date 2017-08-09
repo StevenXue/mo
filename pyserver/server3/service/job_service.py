@@ -63,7 +63,6 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
             # calculate
             func_rst = func(*args, **kw)
             result = list(func_rst) if isinstance(func_rst, tuple) else [func_rst]
-            print("result", result)
             # 新设计的存取方式
             results = {"fields": fields}
             gen_info = {}
@@ -120,20 +119,24 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 lab_fields = ["New Col" + str(i) for i in range(len(lab))]
                 var1 = [np.var(da) for da in data]
                 var2 = [np.var(da) for da in lab]
-                x_domain = fields[0] + fields[1] + ["_empty"] + lab_fields if fields[1] else fields[0] + ["_empty"] + lab_fields
-                y_domain = var1 + ["_empty"] + var2
+                merge_fields = fields[0] + fields[1] if fields[1] else fields[0]
+                x_domain = merge_fields + ["_empty"] + lab_fields
+                y_domain = var1 + [0] + var2
 
+                print("out of range", var2)
+                print("out of range", lab_fields)
                 temp = var1[:-1] if flag else var1
                 json = {
                     "table1": {"X_fields": fields[0],
                                "Y_fields": fields[1],
-                               "data": list(zip(*data))},
-                    "table2": {"data": labels,
+                               "data": [dict(zip(merge_fields, arr)) for arr in list(zip(*data))]
+                               },
+                    "table2": {"data": [dict(zip(lab_fields, arr)) for arr in labels],
                                "fields": lab_fields},
                     "bar": {"x_domain": x_domain,
                             "y_domain": y_domain},
-                    "pie1": [dict(zip(fields[0], temp)],
-                    "pie2": [dict(zip(var2, lab_fields))],
+                    "pie1": [{"text": fields[0][i], "value": temp[i]} for i in range(len(temp))],
+                    "pie2": [{"text": var2[i], "value": lab_fields[i]} for i in range(len(var2))],
                     "general_info": gen_info,
                     "category": toolkit_obj.category}
 
