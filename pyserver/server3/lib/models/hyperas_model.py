@@ -40,7 +40,13 @@ def train_hyperas_model(conf, data_source_id, **kwargs):
     # conf1 = CONSTANT["MNIST_CONF"]
     conf_to_python_file(conf, data_source_id, **kwargs)
 
-    from my_temp_model import model_function, my_data_function_template
+    # from my_temp_model import model_function, my_data_function_template
+    my_temp_model = __import__("my_temp_model")
+    # import my_temp_model
+    model_function = getattr(my_temp_model, "model_function")
+    my_data_function_template = \
+        getattr(my_temp_model, "my_data_function_template")
+
     model = model_function
     data = my_data_function_template
     X_train, Y_train, X_test, Y_test = data()
@@ -52,9 +58,11 @@ def train_hyperas_model(conf, data_source_id, **kwargs):
                                           trials=Trials())
 
     print("Evalutation of best performing model:")
-    print("best score and acc", best_model.evaluate(X_test, Y_test))
+    score, acc = best_model.evaluate(X_test, Y_test)
+    print("best score and acc", score, acc)
     return {
-        "best score and acc": best_model.evaluate(X_test, Y_test)
+        "score": score,
+        "acc": acc
     }
 
 
@@ -423,7 +431,6 @@ INPUT_SHAPE = {
     'len_range': None
 }
 
-
 HYPERAS_SPEC = {
     "layers": [
         {
@@ -712,7 +719,7 @@ HYPERAS_SPEC = {
                         "adamax",
                         "nadam"]
                 },
-                "default": "sgd",
+                "default": "SGD",
                 "required": True,
             },
             {
@@ -782,7 +789,6 @@ HYPERAS_SPEC = {
         ]
     }
 }
-
 
 CONSTANT = {
     "MNIST_CONF": {
@@ -934,370 +940,180 @@ CONSTANT = {
             }
         }
     },
-
-    # TODO models json for frontend use to generate UI
-
-    "KERAS_SEQ_SPEC": {
-        "layers": [
-            {
-                "name": "Dense",
-                "args": [
-                    {
-                        "name": "units",
-                        "type": {
-                            "key": "int",
-                            "des": "Just your regular densely-connected NN layer",
-                            "range": None
-                        },
-                        "default": 32,
-                        "required": True,
-
-                        "distribute": DISTRIBUTE
-                    },
-                    ACTIVATION,
-                    INPUT_SHAPE
-                ],
-            },
-            {
-                "name": "Dropout",
-                "args": [
-                    {
-                        "name": "rate",
-                        "type": {
-                            "key": "float",
-                            "des": "Fraction of the input units to drop",
-                            "range": [0, 1]
-                        },
-                        "default": None,
-                        "required": True,
-                        "distribute": DISTRIBUTE
-                    },
-                    {
-                        "name": "noise_shape",
-                        "type": {
-                            "key": "int_m",
-                            "des": "1D integer tensor representing the shape of "
-                                   "the binary dropout mask that will be "
-                                   "multiplied with the input.",
-                            "range": None
-                        },
-                        "default": None,
-                        "required": False,
-                        "len_range": [3, 3]
-                    },
-                    {
-                        "name": "seed",
-                        "type": {
-                            "key": "int",
-                            "des": "A Python integer to use as random seed",
-                            "range": None
-                        },
-                        "default": None,
-                        "required": False,
-                    },
-                ],
-            },
-            {
-                "name": "Flatten",
-                "args": [],
-            },
-            {
-                "name": "Reshape",
-                "args": [
-                    {
-                        "name": "target_shape",
-                        "type": {
-                            "key": "int_m",
-                            "des": "nD tensor with shape: (batch_size, ..., "
-                                   "input_dim). The most common situation would be "
-                                   "a 2D input with shape (batch_size, input_dim).",
-                            "range": None
-                        },
-                        "default": None,
-                        "required": True,
-                        "len_range": None
-                    },
-                    INPUT_SHAPE
-                ],
-            },
-            {
-                "name": "Conv1D",
-                "args": [
-                    {
-                        "name": "filters",
-                        "type": {
-                            "key": "int",
-                            "des": "the dimensionality of the output space (i.e. "
-                                   "the number output of filters in the "
-                                   "convolution)",
-                            "range": None
-                        },
-                        "default": None,
-                        "required": True,
-                    },
-                    {
-                        "name": "kernel_size",
-                        "type": {
-                            "key": "int",
-                            "des": "An integer specifying the length of the 1D "
-                                   "convolution window.",
-                            "range": None
-                        },
-                        "default": None,
-                        "required": True,
-                    },
-                    ACTIVATION,
-                    INPUT_SHAPE
-                ],
-            },
-            {
-                "name": "Conv2D",
-                "args": [
-                    {
-                        "name": "filters",
-                        "type": {
-                            "key": "int",
-                            "des": "the dimensionality of the output space (i.e. "
-                                   "the number output of filters in the "
-                                   "convolution)",
-                            "range": None
-                        },
-                        "default": None,
-                        "required": True,
-                    },
-                    {
-                        "name": "kernel_size",
-                        "type": {
-                            "key": "int_m",
-                            "des": "An tuple/list of 2 integers, specifying the "
-                                   "strides of the convolution along the width and "
-                                   "height.",
-                            "range": None
-                        },
-                        "default": None,
-                        "required": True,
-                        "len_range": [2, 2]
-                    },
-                    ACTIVATION,
-                    INPUT_SHAPE
-                ],
-            },
-            {
-                "name": "MaxPooling2D",
-                "args": [
-                    {
-                        "name": "pool_size",
-                        "type": {
-                            "key": "int_m",
-                            "des": "tuple of 2 integers, factors by which to "
-                                   "downscale (vertical, horizontal). (2, 2) will "
-                                   "halve the input in both spatial dimension. ",
-                            "range": None
-                        },
-                        "default": None,
-                        "required": False,
-                        "len_range": [2, 2]
-                    },
-                    {
-                        "name": "strides",
-                        "type": {
-                            "key": "int_m",
-                            "des": "tuple of 2 integers, or None. Strides values."
-                                   " If None, it will default to pool_size",
-                            "range": None
-                        },
-                        "default": None,
-                        "required": False,
-                        "len_range": [2, 2]
-                    },
-                    {
-                        "name": "padding",
-                        "type": {
-                            "key": "choice",
-                            "des": "",
-                            "range": ["valid", "same"]
-                        },
-                        "default": "valid",
-                        "required": False,
-                    },
-                    {
-                        "name": "data_format",
-                        "type": {
-                            "key": "choice",
-                            "des": "The ordering of the dimensions in the inputs",
-                            "range": ["channels_last", "channels_first"]
-                        },
-                        "default": "channels_last",
-                        "required": False,
-                    },
-                    {
-                        "name": "input_shape",
-                        "type": {
-                            "key": "int_m",
-                            "des": "4D tensor",
-                            "range": None
-                        },
-                        "default": None,
-                        "required": False,
-                        "len_range": [4, 4]
-                    }
-                ],
-            },
-        ],
-        "compile": {
-            'args': [
-                {
-                    "name": "loss",
-                    "type": {
-                        "key": "choice",
-                        "des": "A loss function (or objective function, or "
-                               "optimization score function) is one of the two "
-                               "parameters required to compile a model",
-                        "range": ["mean_squared_error",
-                                  "mean_absolute_error",
-                                  "mean_absolute_percentage_error",
-                                  "mean_squared_logarithmic_error",
-                                  "squared_hinge",
-                                  "hinge",
-                                  "categorical_hinge",
-                                  "logcosh",
-                                  "categorical_crossentropy",
-                                  "sparse_categorical_crossentropy",
-                                  "binary_crossentropy",
-                                  "kullback_leibler_divergence",
-                                  "poisson",
-                                  "cosine_proximity"]
-                    },
-                    "default": "categorical_crossentropy",
-                    "required": True,
-
-                    "distribute": {
-                        'name': "loss_distribute",
-                        'type': {
-                            'key': 'choice_m',
-                            'des': "Choice distribution, "
-                                   "Returns one of the options, which should be a list or tuple.",
-                            'range': ["mean_squared_error",
-                                      "mean_absolute_error",
-                                      "mean_absolute_percentage_error",
-                                      "mean_squared_logarithmic_error",
-                                      "squared_hinge",
-                                      "hinge",
-                                      "categorical_hinge",
-                                      "logcosh",
-                                      "categorical_crossentropy",
-                                      "sparse_categorical_crossentropy",
-                                      "binary_crossentropy",
-                                      "kullback_leibler_divergence",
-                                      "poisson",
-                                      "cosine_proximity"]
-                        },
-                        'default': ["categorical_crossentropy"],
-                        "eg": ["mean_squared_error",
-                               "mean_absolute_error",
-                               "mean_absolute_percentage_error"]
-                    }
-
-                },
-                {
-                    "name": "optimizer",
-                    "type": {
-                        "key": "choice_child",
-                        "des": "An optimizer is one of the two arguments required for "
-                               "compiling a Keras model",
-                        "range": [
-                            {
-                                "name": "SGD",
-                                "args": [
-                                    LEARNING_RATE,
-                                    MOMENTUM
-                                ]
-                            },
-                            {
-                                "name": "Rmsprop",
-                                "args": [
-                                    LEARNING_RATE,
-                                ]
-                            },
-                            "adagrad",
-                            "adadelta",
-                            "adam",
-                            "adamax",
-                            "nadam"]
-                    },
-                    "default": "sgd",
-                    "required": True,
-                },
-                {
-                    "name": "metrics",
-                    "type": {
-                        "key": "choices",
-                        "des": "A metric is a function that is used to judge the "
-                               "performance of your model",
-                        "range": ["acc",
-                                  "mse",
-                                  "mae",
-                                  "mape",
-                                  "msle",
-                                  "cosine"]
-                    },
-                    "default": [],
-                    "required": False
-                },
-            ],
-        },
-        "fit": {
-            "data_fields": {
-                "name": "training_fields",
-                "type": {
-                    "key": "transfer_box",
-                    "des": "data fields for x and y",
-                },
-                "default": None,
-                "required": True,
-                "x_data_type": ['integer', 'float'],
-                "y_data_type": ['integer', 'float'],
-                "x_len_range": None,
-                "y_len_range": None
-            },
-            "args": [
-                {
-                    "name": "batch_size",
-                    "type": {
-                        "key": "int",
-                        "des": "Number of samples per gradient update",
-                        "range": None
-                    },
-                    "default": 32
-                },
-                {
-                    "name": "epochs",
-                    "type": {
-                        "key": "int",
-                        "des": "Number of epochs to train the model",
-                        "range": None
-                    },
-                    "default": 10
-                },
-            ],
-        },
-        "evaluate": {
-            "args": [
-                {
-                    "name": "batch_size",
-                    "type": {
-                        "key": "int",
-                        "des": "Number of samples per gradient update",
-                        "range": None
-                    },
-                    "default": 32
-                },
-            ]
-        }
-    }
 }
 
 if __name__ == "__main__":
+    test = {
+        "conf":{
+            "layers":[
+                {
+                    "name":"Dense",
+                    "args":{
+                        "units":{
+                            "distribute":"uniform",
+                            "value":"0, 1"
+                        },
+                        "activation": {
+                            "distribute": "choice",
+                            "value": ["relu"]
+                        },
+                        "input_shape": [
+                            3
+                        ]
+
+                    },
+                    "index":0
+                },
+                {
+                    "name":"Dropout",
+                    "args":{
+                        "rate":{
+                            "distribute":"choice",
+                            "value":[0.1, 0.2, 0.4]
+                        }
+                    },
+                    "index":1
+                },
+                {
+                    "name":"Dense",
+                    "args":{
+                        "units":64,
+                        "activation":"softmax"
+                    },
+                    "index":2
+                }
+            ],
+            "compile":{
+                "args":{
+                    "loss":[
+                        "categorical_crossentropy",
+                        "hinge"
+                    ],
+                    "optimizer":{
+                        "hyped":True,
+                        "name":"SGD",
+                        "range":[
+                            {
+                                "distribute":{
+                                    "name":"distribute_choice",
+                                    "type":{
+                                        "des":"distribute choice for hyperparameters tuning",
+                                        "key":"choice",
+                                        "range":[
+                                            {
+                                                "default":"0, 1",
+                                                "eg":"0, 1",
+                                                "name":"uniform",
+                                                "type":{
+                                                    "des":"Uniform distribution, Returns a value uniformly between low and high.",
+                                                    "key":"join_low_high"
+                                                }
+                                            },
+                                            {
+                                                "default":None,
+                                                "eg":[
+                                                    256,
+                                                    512,
+                                                    1024
+                                                ],
+                                                "name":"choice",
+                                                "type":{
+                                                    "des":"Choice distribution, Returns one of the options, which should be a list or tuple.",
+                                                    "key":"multiple"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                "name":"lr",
+                                "type":{
+                                    "des":"the learning rate of NN optimizers",
+                                    "key":"float"
+                                }
+                            },
+                            {
+                                "distribute":{
+                                    "name":"distribute_choice",
+                                    "type":{
+                                        "des":"distribute choice for hyperparameters tuning",
+                                        "key":"choice",
+                                        "range":[
+                                            {
+                                                "default":"0, 1",
+                                                "eg":"0, 1",
+                                                "name":"uniform",
+                                                "type":{
+                                                    "des":"Uniform distribution, Returns a value uniformly between low and high.",
+                                                    "key":"join_low_high"
+                                                }
+                                            },
+                                            {
+                                                "default":None,
+                                                "eg":[
+                                                    256,
+                                                    512,
+                                                    1024
+                                                ],
+                                                "name":"choice",
+                                                "type":{
+                                                    "des":"Choice distribution, Returns one of the options, which should be a list or tuple.",
+                                                    "key":"multiple"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                "name":"momentum",
+                                "type":{
+                                    "des":"the learning rate of NN optimizers",
+                                    "key":"float"
+                                }
+                            }
+                        ],
+                        "args":{
+                            "lr":{
+
+                                "value":"0, 1",
+                                "distribute":"uniform",
+                                "uniform": 0
+
+                            },
+                            "momentum":10
+                        }
+                    },
+                    "metrics":[
+                        "acc"
+                    ],
+                    "hype_loss":True
+                }
+            },
+            "fit":{
+                "data_fields":[
+                    [
+                        "alm",
+                        "erl",
+                        "gvh"
+                    ],
+                    [
+                        "mit",
+                        "nuc"
+                    ]
+                ],
+                "args":{
+                    "batch_size":100,
+                    "epochs":10
+                }
+            },
+            "evaluate":{
+                "args":{
+                    "batch_size":100
+                }
+            }
+        },
+        "project_id":"598accd4e89bdeaf80e7206f",
+        "staging_data_set_id":"598af547e89bdec0f544b427",
+        "schema":"seq"
+    }
     MODEL_TEMPLATE = {
         "conf": {
             "layers": [
@@ -1366,9 +1182,11 @@ if __name__ == "__main__":
         "staging_data_set_id": "5965cda1d123ab8f604a8dd0",
         "schema": "seq"
     }
-    conf = MODEL_TEMPLATE["conf"]
-    data_source_id = "5965cda1d123ab8f604a8dd0"
+    conf = test["conf"]
+    data_source_id = "598af547e89bdec0f544b427"
     kwargs = {
         "schema": "seq"
     }
     train_hyperas_model(conf, data_source_id, **kwargs)
+
+

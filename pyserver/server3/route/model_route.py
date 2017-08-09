@@ -99,7 +99,7 @@ def run_hyperas_model(model_id):
 
     result = model_service.run_hyperas_model(conf, project_id, staging_data_set_id,
                                              model_id, schema=schema)
-
+    result = json_utility.convert_to_json(result)
     return jsonify({'response': result}), 200
 
 
