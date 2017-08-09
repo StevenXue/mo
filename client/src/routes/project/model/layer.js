@@ -50,8 +50,13 @@ export default class Layer extends React.Component {
       if(e.hyped) {
         console.log(e);
         if(e.name === 'activation') {
-          let v = e.hype_paramter;
-          layer['args'][e.name] = v;
+          let v = []
+          if(e.hype_paramter) {
+            v = e.hype_paramter;
+          }else{
+            v = e.distribute.default;
+          }
+          layer['args']['activation'] = v;
         }else{
           layer['args'][e.name] = {};
           layer['args'][e.name]['distribute'] = e.hype_paramter;
