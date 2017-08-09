@@ -172,6 +172,19 @@ export default class VisualizationPanel extends React.Component {
             }
           </div>
         )
+
+      case 2:
+        return null
+
+      case 3:
+        return(
+          <div style={{display: 'flex', flexDirection: 'column'}}>
+            <div>
+            </div>
+            <div>
+            </div>
+          </div>
+        );
     }
   }
 
