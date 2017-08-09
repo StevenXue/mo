@@ -18,15 +18,16 @@ def get_by_id(sds_id):
     return staging_data_set_repo.read_by_id(sds_id)
 
 
-def get_by_project_id(project_id):
+def get_by_project_id(project_id, without_result):
     """
     Get stating_data_set by project's ObjectId
 
     :param project_id: ObjectId
     :return: staging_data_set object
     """
-    # project = Project(id=project_id)
-    # return staging_data_set_repo.read_by_project(project)
+    if without_result:
+        return staging_data_set_repo.read_by_non_unique_field_without_result(
+            'project', project_id)
     return staging_data_set_repo.read_by_non_unique_field('project', project_id)
 
 

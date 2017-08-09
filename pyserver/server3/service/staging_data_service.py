@@ -25,14 +25,16 @@ def get_by_query_str(staging_data_set_id, **kwargs):
     return staging_data_business.get_by_query_str(**kwargs)
 
 
-def list_staging_data_sets_by_project_id(project_id):
+def list_staging_data_sets_by_project_id(project_id, without_result=False):
     """
     Get the list of staging_data_set by project id
     
     :param project_id: 
+    :param without_result:
     :return: list of staging_data_set objects
     """
-    sds_objects = staging_data_set_business.get_by_project_id(project_id)
+    sds_objects = staging_data_set_business.get_by_project_id(
+        project_id, without_result)
     return sds_objects
 
 
@@ -251,7 +253,6 @@ def mongo_to_df(cursor):
     :param cursor:
     :return:
     """
-    print(cursor)
     cursor = json_utility.me_obj_list_to_dict_list(cursor)
     return pd.DataFrame.from_records(cursor)
 
