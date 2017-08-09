@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 from datetime import datetime
 from copy import deepcopy
+import shutil
 
 from mongoengine import DoesNotExist
 
@@ -15,6 +16,9 @@ from server3.service import ownership_service
 from server3.service import staging_data_service
 from server3.business import staging_data_set_business
 from server3.utility import json_utility
+from server3.repository import config
+
+UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
 
 def create_project(name, description, user_ID, is_private=True):
@@ -58,7 +62,7 @@ def list_projects_by_user_ID(user_ID, order=-1):
     return public_projects, owned_projects
 
 
-def remove_project_by_id(project_id):
+def remove_project_by_id(project_id, user_ID):
     """
     remove project by its object_id
     :param project_id: object_id of project to remove
@@ -69,6 +73,13 @@ def remove_project_by_id(project_id):
         job_business.remove_by_id(job['id'])
     for result in project['results']:
         result_business.remove_by_id(result['id'])
+    ownership = ownership_business.get_ownership_by_owned_item(project,
+                                                               'project')
+    if user_ID != ownership.user.user_ID:
+        print(user_ID, ownership.user.user_ID)
+        raise ValueError('project not belong to this user, cannot delete')
+    project_directory = UPLOAD_FOLDER + user_ID + '/' + project.name
+    shutil.rmtree(project_directory)
     return project_business.remove_by_id(project_id)
 
 
@@ -145,33 +156,48 @@ def fork(project_id, new_user_ID):
         project, 'project')
     if ownership.private is True:
         raise NameError('forked project is private, fork failed')
-
-    # copy and save project
-    project_cp = project_business.copy(project)
-
+    if ownership.user.user_ID == new_user_ID:
+        raise NameError('you are forking your self project')
     # get user object
     user = user_business.get_by_user_ID(new_user_ID)
+    # copy and save project
+    project_cp = project_business.copy(project)
     # create ownership relation
     ownership_business.add(user, True, project=project_cp)
+
+    # copy staging data sets
+    sds_array = staging_data_set_business.get_by_project_id(project_id, False)
+    for sds in sds_array:
+        staging_data_service.copy_staging_data_set(sds, project_cp)
 
     # copy jobs and save
     jobs = project.jobs
     jobs_cp = []
     for job in jobs:
-        # copy staging data set by job and bind to project
+        # get source sds
         if hasattr(job, 'staging_data_set') and job.staging_data_set:
-            sds_cp = staging_data_service.copy_staging_data_set(
-                job.staging_data_set, project_cp)
+            sds_cp = staging_data_set_business.get_by_name_and_project(
+                job.staging_data_set.name,
+                job.staging_data_set.project
+            )
+            # sds_cp = staging_data_service.copy_staging_data_set(
+            #     job.staging_data_set, project_cp)
         else:
             sds_cp = None
         # copy job
         job_cp = job_business.copy_job(job, project_cp, sds_cp)
+        if not job_cp:
+            continue
         jobs_cp.append(job_cp)
         # copy result staging data set by job and bind to project
         try:
+            # get result sds
             result_sds = staging_data_set_business.get_by_job_id(job['id'])
-            staging_data_service.copy_staging_data_set(result_sds, project_cp,
-                                                       belonged_job=job_cp)
+            # bind job to sds
+            staging_data_set_business.update_job_by_name_and_project(
+                result_sds.name, result_sds.project, job_cp)
+            # staging_data_service.copy_staging_data_set(result_sds, project_cp,
+            #                                            belonged_job=job_cp)
         except DoesNotExist:
             pass
 

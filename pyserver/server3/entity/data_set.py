@@ -13,6 +13,7 @@ class DataSet(Document):
     related_field = StringField(max_length=100)
     tags = ListField(StringField(max_length=50))
     related_tasks = StringField(max_length=50)
+    user_name = StringField(max_length=50)
 
 
 
