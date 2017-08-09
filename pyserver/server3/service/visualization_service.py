@@ -119,10 +119,7 @@ def usr_story2_exploration(data, d_type, sds_id):
         table_data = json_utility.me_obj_list_to_dict_list(staging_data_business.get_by_staging_data_set_id_limit(ObjectId(sds_id), 5))
         data.update({"table": table_data})
     elif d_type == 2:
-        data.update({
-            "1": None,
-            "2": None
-        })
+        pass
     else:
         pass
 
