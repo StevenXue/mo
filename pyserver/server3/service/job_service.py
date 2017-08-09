@@ -105,8 +105,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                                     # "mic": [MINE(alpha=0.6, c=15, est="mic_approx").compute_score(el,
                                     # list(data[0]).mic()) for el in list(data[1:])]}
                                     "mic": [None for el in data]},
-                        "category": toolkit_obj.category
-                        }
+                        "category": toolkit_obj.category}
             elif toolkit_obj.category == 3:
                 flag = toolkit_obj.parameter_spec["data"]["type"]["key"] == "transfer_box"
                 data = list(zip(*args[0]))
@@ -114,22 +113,27 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 if flag:
                     data.append(args[1])
                 lab = list(zip(*labels))
+                lab_fields = ["New Col" + str(i) for i in range(len(lab))]
                 var1 = [np.var(da) for da in data]
                 var2 = [np.var(da) for da in lab]
-                x_domain = fields[0] + fields[1] + ["New Colunm"]*len(lab) if fields[1] else fields[0] + ["New Colunm"]*len(lab)
-                y_domain = var1 + var2
+                x_domain = fields[0] + fields[1] + ["_empty"] + lab_fields if fields[1] else fields[0] + ["_empty"] + lab_fields
+                y_domain = var1 + ["_empty"] + var2
                 json = {
                     "table1": {"X_fields": fields[0],
                                "Y_fields": fields[1],
-                               "data": args[0]},
+                               "data": list(zip(*data))},
                     "table2": {"data": labels},
                     "bar": {"x_domain": x_domain,
                             "y_domain": y_domain},
                     "pie1": {"x_domain": fields[0],
                              "y_domain": var1[:-1] if flag else var1},
-                    "pie2": {"y_domain": var2},
-                    "general_info": gen_info
-                }
+                    "pie2": {"y_domain": var2,
+                             "x_domain": lab_fields},
+                    "general_info": gen_info,
+                    "category": toolkit_obj.category}
+
+            else:
+                json = {"category": toolkit_obj.category}
 
             # update a job
             job_business.end_job(job_obj)
