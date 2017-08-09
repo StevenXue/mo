@@ -213,15 +213,17 @@ LinearRegressor = {
     },
     'fit': {
         "data_fields": {
-            "name": "x_y_fields",
+            "name": "training_fields",
             "type": {
                 "key": "transfer_box",
-                "des": "data fields for x",
+                "des": "data fields for x and y",
             },
             "default": None,
             "required": True,
-            "data_type": None,
-            "len_range": None
+            "x_data_type": ["integer", "float"],
+            "y_data_type": ["integer", "float"],
+            "x_len_range": None,
+            "y_len_range": None
         },
         'args': [
             {
