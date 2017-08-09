@@ -1,13 +1,12 @@
 # -*- coding: UTF-8 -*-
-import numpy as np
 from keras import layers
 from keras.callbacks import LambdaCallback
-from server3.service import logger_service
-from server3.utility.str_utility import generate_args_str
-from server3.lib.models.keras_callbacks import MongoModelCheckpoint
 
 from server3.lib import Sequential
 from server3.lib import graph
+from server3.service import logger_service
+from server3.service.keras_callbacks import MongoModelCheckpoint
+from server3.utility.str_utility import generate_args_str
 
 
 def keras_seq(conf, input, **kw):
