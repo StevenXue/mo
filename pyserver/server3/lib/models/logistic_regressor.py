@@ -121,7 +121,7 @@ LogisticRegressor = {
             {
                 "name": "thresholds",
                 "type": {
-                    "key": "int_m",
+                    "key": "float_m",
                     "des": "List of floating point thresholds to "
                            "use for accuracy, precision, and recall "
                            "metrics.If `None`, defaults to `[0.5]`."
