@@ -38,6 +38,8 @@ export default class CustomFields extends React.Component {
     }else if(ref.type.key === 'int_m') {
       value = value.replace(/\s+/g, "");
       value = value.split(',');
+      value = value.map((el) => parseInt(el))
+      console.log(value);
     }
 
     if(value){
