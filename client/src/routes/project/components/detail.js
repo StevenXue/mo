@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import classnames from 'classnames'
-import { Router, routerRedux } from 'dva/router'
 import { Button, Select, Icon, message, Modal, Table, Radio, Collapse, Input, Spin } from 'antd'
 
 import { jupyterServer, flaskServer } from '../../../constants'
@@ -14,6 +13,7 @@ import Predict from '../predict/predict'
 import DataPreview from './dataPreview'
 import { stepStyle, assetsUrl } from '../../../constants'
 import { TourArea } from '../../../components'
+import { isEmpty } from '../../../utils/utils'
 import empty from './empty.ipynb'
 import style from './detail.css'
 // 全局css，在index里去import
@@ -69,24 +69,6 @@ const defaultSteps = [
     style: stepStyle,
   },
 ]
-
-let hasOwnProperty = Object.prototype.hasOwnProperty
-
-function isEmpty (obj) {
-
-  if (obj == null) return true
-
-  if (obj.length > 0) return false
-  if (obj.length === 0) return true
-
-  if (typeof obj !== 'object') return true
-
-  for (let key in obj) {
-    if (hasOwnProperty.call(obj, key)) return false
-  }
-
-  return true
-}
 
 const columns = [{
   title: '名称',
@@ -274,7 +256,6 @@ class ProjectDetail extends React.Component {
               />
             </h2>
             <h4 style={{ marginTop: 10 }}>{'project id: ' + this.props.location.query._id}</h4>
-            <Button type='primary' style={{ marginTop: 10, width: 120}}>Publish Project</Button>
             <div style={{ display: 'flex', flexDirection: 'column', marginTop: 20 }}>
               <div>
                 <Modal title="Choose DataSet"
