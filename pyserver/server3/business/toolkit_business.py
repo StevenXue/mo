@@ -839,6 +839,16 @@ def create_public_data_process():
                                       'len_range': [1, None],
                                       'data_type': ['int', 'float']
                                   }
+                              },
+                              result_spec={
+                                  "if_reserved": True,
+                                  "args": [
+                                      {
+                                          "name": "standerd_scalar",
+                                          "des": "数值转换，对所选数据做标准化处理",
+                                          "if_add_column": True
+                                      }
+                                  ]
                               })
     standard_scaler = toolkit_repo.create(standard_scaler)
     ownership_business.add(user, False, toolkit=standard_scaler)
@@ -863,6 +873,16 @@ def create_public_data_process():
                                      'len_range': [1, None],
                                      'data_type': ['int', 'float']
                                  }
+                             },
+                             result_spec={
+                                 "if_reserved": True,
+                                 "args": [
+                                     {
+                                         "name": "min_max_scaler",
+                                         "des": "数值转换，对所选数据做标准化处理",
+                                         "if_add_column": True
+                                     }
+                                 ]
                              })
     min_max_scaler = toolkit_repo.create(min_max_scaler)
     ownership_business.add(user, False, toolkit=min_max_scaler)
@@ -887,6 +907,16 @@ def create_public_data_process():
                                  'len_range': [1, None],
                                  'data_type': ['int', 'float']
                              }
+                         },
+                         result_spec={
+                             "if_reserved": True,
+                             "args": [
+                                 {
+                                     "name": "normalizer",
+                                     "des": "数值转换，对所选数据做标准化处理",
+                                     "if_add_column": True
+                                 }
+                             ]
                          })
     normalizer = toolkit_repo.create(normalizer)
     ownership_business.add(user, False, toolkit=normalizer)
@@ -923,6 +953,16 @@ def create_public_data_process():
                                     'required': True
                                 }
                             ]
+                        },
+                        result_spec={
+                            "if_reserved": True,
+                            "args": [
+                                {
+                                    "name": "binarizer",
+                                    "des": "数值转换，对所选数据做标准化处理",
+                                    "if_add_column": True
+                                }
+                            ]
                         })
     binarizer = toolkit_repo.create(binarizer)
     ownership_business.add(user, False, toolkit=binarizer)
@@ -947,6 +987,16 @@ def create_public_data_process():
                                       'len_range': [1, 1],
                                       'data_type': ['int', 'float']
                                   }
+                              },
+                              result_spec={
+                                  "if_reserved": True,
+                                  "args": [
+                                      {
+                                          "name": "one_hot_encoder",
+                                          "des": "数值转换，对所选数据做标准化处理",
+                                          "if_add_column": True
+                                      }
+                                  ]
                               })
     one_hot_encoder = toolkit_repo.create(one_hot_encoder)
     ownership_business.add(user, False, toolkit=one_hot_encoder)
@@ -971,6 +1021,16 @@ def create_public_data_process():
                               'len_range': [1, None],
                               'data_type': ['int', 'float']
                           }
+                      },
+                      result_spec={
+                          "if_reserved": True,
+                          "args": [
+                              {
+                                  "name": "imputer",
+                                  "des": "数值转换，对所选数据做标准化处理",
+                                  "if_add_column": True
+                              }
+                          ]
                       })
     imputer = toolkit_repo.create(imputer)
     ownership_business.add(user, False, toolkit=imputer)
@@ -995,6 +1055,16 @@ def create_public_data_process():
                                           'len_range': [1, None],
                                           'data_type': ['int', 'float']
                                       }
+                                  },
+                                  result_spec={
+                                      "if_reserved": True,
+                                      "args": [
+                                          {
+                                              "name": "polynomial_features",
+                                              "des": "数值转换，对所选数据做标准化处理",
+                                              "if_add_column": True
+                                          }
+                                      ]
                                   })
     polynomial_features = toolkit_repo.create(polynomial_features)
     ownership_business.add(user, False, toolkit=polynomial_features)
