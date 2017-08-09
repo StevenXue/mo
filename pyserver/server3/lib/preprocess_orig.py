@@ -85,14 +85,14 @@ def polynomial_features(arr0, index):
 # 返回get dummy的值
 def get_dummy(arr0, index):
     series = pd.DataFrame(arr0)
-    value = get_dummies(series).values
+    value = pd.get_dummies(series).values
     result = data_utility.retrieve_nan_index(value.tolist(), index)
     return result
 
 
-def pandas_cut(arr0, index, bins, labels):
-    temp = pd.cut(arr0, bins, labels=False)
-    result = data_utility.retrieve_nan_index(temp.tolist(), index)
+def pandas_cut(arr0, index, bins, labels=False):
+    temp = pd.cut(np.array(arr0).flatten(), bins, labels=labels)
+    result = data_utility.retrieve_nan_index(list(temp), index)
     return result
 
 
