@@ -174,48 +174,48 @@ export default class ModelForms extends React.Component {
   onClickRun(){
     let run_params = this.constructParams();
     console.log(run_params);
-    if(this.props.jupyter){
-      fetch(flaskServer + '/model/models/to_code/' + this.props.model_id, {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          conf: run_params,
-          project_id: this.props.project_id,
-          staging_data_set_id: this.props.dataset_id,
-          schema: "seq"
-        })
-      }).then((response) => response.json())
-        .then((res) => {
-          this.setState({visible: false});
-          this.props.getCode(res.response);
-        })
-    }else{
-      this.setState({visible: true});
-      if(!this.state.end){
-        fetch(flaskServer + '/model/models/run/' + this.props.model_id, {
-          method: 'post',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            conf: run_params,
-            project_id: this.props.project_id,
-            staging_data_set_id: this.props.dataset_id,
-            schema: "seq"
-          })
-        }).then((response) => response.json())
-          .then((res) => {
-            if (res.response === 'success') {
-              message.success(res.response);
-              this.setState({score: res.response.score});
-            }
-            this.props.modalSuccess();
-            this.setState({end: true});
-          })
-      }
-    }
+    // if(this.props.jupyter){
+    //   fetch(flaskServer + '/model/models/to_code/' + this.props.model_id, {
+    //     method: 'post',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({
+    //       conf: run_params,
+    //       project_id: this.props.project_id,
+    //       staging_data_set_id: this.props.dataset_id,
+    //       schema: "seq"
+    //     })
+    //   }).then((response) => response.json())
+    //     .then((res) => {
+    //       this.setState({visible: false});
+    //       this.props.getCode(res.response);
+    //     })
+    // }else{
+    //   this.setState({visible: true});
+    //   if(!this.state.end){
+    //     fetch(flaskServer + '/model/models/run/' + this.props.model_id, {
+    //       method: 'post',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify({
+    //         conf: run_params,
+    //         project_id: this.props.project_id,
+    //         staging_data_set_id: this.props.dataset_id,
+    //         schema: "seq"
+    //       })
+    //     }).then((response) => response.json())
+    //       .then((res) => {
+    //         if (res.response === 'success') {
+    //           message.success(res.response);
+    //           this.setState({score: res.response.score});
+    //         }
+    //         this.props.modalSuccess();
+    //         this.setState({end: true});
+    //       })
+    //   }
+    // }
 
   }
 
