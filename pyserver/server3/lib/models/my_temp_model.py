@@ -4,15 +4,13 @@ from hyperopt import Trials, STATUS_OK, tpe
 from keras.layers import Dense
 from keras.layers import Dropout
 from keras.layers import Dense
-from keras.layers import Dropout
-from keras.layers import Dense
 from keras.optimizers import SGD
 from keras.optimizers import RMSprop
 
 
 def my_data_function_template():
-    conf = {'layers': [{'name': 'Dense', 'args': {'units': 64, 'activation': 'relu', 'input_shape': [3]}}, {'name': 'Dropout', 'args': {'rate': {'distribute': 'uniform', 'value': '0, 0.8'}}}, {'name': 'Dense', 'args': {'units': 64, 'activation': 'relu'}}, {'name': 'Dropout', 'args': {'rate': 0.5}}, {'name': 'Dense', 'args': {'units': 2, 'activation': 'softmax'}}], 'compile': {'loss': 'categorical_crossentropy', 'metrics': ['accuracy']}, 'fit': {'data_fields': [['age', 'capital_gain', 'education_num'], ['capital_loss', 'hours_per_week']], 'args': {'batch_size': 128, 'epochs': 20}}, 'evaluate': {'args': {'batch_size': 128}}}
-    data_source_id = '5965cda1d123ab8f604a8dd0'
+    conf = {'layers': [{'name': 'Dense', 'args': {'units': {'distribute': 'uniform', 'value': '0, 1'}, 'activation': {'distribute': 'choice', 'value': ['relu']}, 'input_shape': [3]}, 'index': 0}, {'name': 'Dropout', 'args': {'rate': {'distribute': 'choice', 'value': [0.1, 0.2, 0.4]}}, 'index': 1}, {'name': 'Dense', 'args': {'units': 64, 'activation': 'softmax'}, 'index': 2}], 'compile': {'args': {'loss': ['categorical_crossentropy', 'hinge'], 'metrics': ['acc'], 'hype_loss': True}}, 'fit': {'data_fields': [['alm', 'erl', 'gvh'], ['mit', 'nuc']], 'args': {'batch_size': 100, 'epochs': 10}}, 'evaluate': {'args': {'batch_size': 100}}}
+    data_source_id = '598af547e89bdec0f544b427'
     kwargs = {'schema': 'seq'}
 
     from server3.service.model_service import manage_nn_input
@@ -26,14 +24,12 @@ def my_data_function_template():
 
 def model_function(x_train, y_train, x_test, y_test):
     model = Sequential()
-    model.add(Dense(units=64, activation='relu', input_shape=[3]))
-    model.add(Dropout(rate={{uniform(0, 0.8)}}))
-    model.add(Dense(units=64, activation='relu'))
-    model.add(Dropout(rate=0.5))
-    model.add(Dense(units=2, activation='softmax'))
-    model.compile(optimizer=SGD(), loss='categorical_crossentropy', metrics=['accuracy'])
-    model.fit(x_train, y_train,  validation_data=(x_test, y_test), batch_size=128, epochs=20, verbose=0)
-    score, acc = model.evaluate(x_test, y_test, batch_size=128)
+    model.add(Dense(units={{uniform(0, 1)}}, activation={{choice(['relu'])}}, input_shape=[3]))
+    model.add(Dropout(rate={{choice([0.1, 0.2, 0.4])}}))
+    model.add(Dense(units=64, activation='softmax'))
+    model.compile(optimizer=SGD(lr={{uniform(0, 1)}}, momentum=10), loss=['categorical_crossentropy', 'hinge'], metrics=['acc'], hype_loss=True)
+    model.fit(x_train, y_train,  validation_data=(x_test, y_test), batch_size=100, epochs=10, verbose=0)
+    score, acc = model.evaluate(x_test, y_test, batch_size=100)
     return {'loss': -acc, 'status': STATUS_OK, 'model': model}
     
     
