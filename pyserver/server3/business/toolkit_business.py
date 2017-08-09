@@ -846,7 +846,8 @@ def create_public_data_process():
                                       {
                                           "name": "standerd_scalar",
                                           "des": "数值转换，对所选数据做标准化处理",
-                                          "if_add_column": True
+                                          "if_add_column": True,
+                                          "attribute": "label"
                                       }
                                   ]
                               })
@@ -880,7 +881,8 @@ def create_public_data_process():
                                      {
                                          "name": "min_max_scaler",
                                          "des": "数值转换，对所选数据做标准化处理",
-                                         "if_add_column": True
+                                         "if_add_column": True,
+                                         "attribute": "label"
                                      }
                                  ]
                              })
@@ -914,7 +916,8 @@ def create_public_data_process():
                                  {
                                      "name": "normalizer",
                                      "des": "数值转换，对所选数据做标准化处理",
-                                     "if_add_column": True
+                                     "if_add_column": True,
+                                     "attribute": "label"
                                  }
                              ]
                          })
@@ -960,7 +963,8 @@ def create_public_data_process():
                                 {
                                     "name": "binarizer",
                                     "des": "数值转换，对所选数据做标准化处理",
-                                    "if_add_column": True
+                                    "if_add_column": True,
+                                    "attribute": "label"
                                 }
                             ]
                         })
@@ -994,7 +998,8 @@ def create_public_data_process():
                                       {
                                           "name": "one_hot_encoder",
                                           "des": "数值转换，对所选数据做标准化处理",
-                                          "if_add_column": True
+                                          "if_add_column": True,
+                                          "attribute": "label"
                                       }
                                   ]
                               })
@@ -1028,7 +1033,8 @@ def create_public_data_process():
                               {
                                   "name": "imputer",
                                   "des": "数值转换，对所选数据做标准化处理",
-                                  "if_add_column": True
+                                  "if_add_column": True,
+                                  "attribute": "label"
                               }
                           ]
                       })
@@ -1062,7 +1068,8 @@ def create_public_data_process():
                                           {
                                               "name": "polynomial_features",
                                               "des": "数值转换，对所选数据做标准化处理",
-                                              "if_add_column": True
+                                              "if_add_column": True,
+                                              "attribute": "label"
                                           }
                                       ]
                                   })
