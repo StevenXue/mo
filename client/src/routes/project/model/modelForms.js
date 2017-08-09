@@ -47,7 +47,8 @@ export default class ModelForms extends React.Component {
       customParams: {},
       score: [],
       isActive: true,
-      params: this.props.params
+      params: this.props.params,
+      selectedFile: '',
     }
   }
 
@@ -59,15 +60,13 @@ export default class ModelForms extends React.Component {
       fit: this.props.data.fit,
       divide: this.props.divide,
       custom: this.props.data.estimator,
-      isActive: this.props.isActive
+      isActive: this.props.isActive,
+      selectedFile: this.props.selectedFile
     });
 
     let socket = io.connect(flaskServer+ '/log/' + this.props.project_id);
     socket.on('log_epoch_end', (msg) => {
       this.setState({ioData: msg})
-
-      // this.setTimeout(
-      //   this.setState({ioData: msg}), 500);
     });
 
     if(this.props.params){
@@ -85,7 +84,8 @@ export default class ModelForms extends React.Component {
       divide: nextProps.divide,
       custom: nextProps.data.estimator,
       isActive: nextProps.isActive,
-      params: nextProps.params
+      params: nextProps.params,
+      selectedFile: nextProps.selectedFile
     });
   }
 
@@ -120,20 +120,25 @@ export default class ModelForms extends React.Component {
     }
 
     run_params['compile']['args'] = this.state.compileParams;
-    if(this.props.data.fit.data_fields.type.key === 'transfer_box'){
-      run_params['fit'] = {
-        'data_fields':[
-          this.props.divide.source,
-          this.props.divide.target
-        ],
-        'args': {
+
+    if(this.state.fit.data_fields) {
+      if (this.state.fit.data_fields.type.key === 'transfer_box') {
+        run_params['fit'] = {
+          'data_fields': [
+            this.state.divide.source,
+            this.state.divide.target
+          ],
+          'args': {}
+        }
+      } else {
+        run_params['fit'] = {
+          'data_fields': this.state.divide.target,
+          'args': {}
         }
       }
     }else{
       run_params['fit'] = {
-        'data_fields': this.props.divide.target,
-        'args': {
-        }
+        'args': {}
       }
     }
 
@@ -176,50 +181,56 @@ export default class ModelForms extends React.Component {
 
   onClickRun(){
     let run_params = this.constructParams();
-    console.log(run_params);
-    // if(this.props.jupyter){
-    //   fetch(flaskServer + '/model/models/to_code/' + this.props.model_id, {
-    //     method: 'post',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //       conf: run_params,
-    //       project_id: this.props.project_id,
-    //       staging_data_set_id: this.props.dataset_id,
-    //       schema: "seq"
-    //     })
-    //   }).then((response) => response.json())
-    //     .then((res) => {
-    //       this.setState({visible: false});
-    //       this.props.getCode(res.response);
-    //     })
-    // }else{
-    //   this.setState({visible: true});
-    //   if(!this.state.end){
-    //     fetch(flaskServer + '/model/models/run/' + this.props.model_id, {
-    //       method: 'post',
-    //       headers: {
-    //         'Content-Type': 'application/json',
-    //       },
-    //       body: JSON.stringify({
-    //         conf: run_params,
-    //         project_id: this.props.project_id,
-    //         staging_data_set_id: this.props.dataset_id,
-    //         schema: "seq"
-    //       })
-    //     }).then((response) => response.json())
-    //       .then((res) => {
-    //         if (res.response === 'success') {
-    //           message.success(res.response);
-    //           this.setState({score: res.response.score});
-    //         }
-    //         this.props.modalSuccess();
-    //         this.setState({end: true})
-    //         // setTimeout(this.setState({end: true}),2000);
-    //       })
-    //   }
-    // }
+    let params = {};
+    if(this.state.fit.data_fields) {
+      params = {
+        conf: run_params,
+        project_id: this.props.project_id,
+        staging_data_set_id: this.props.dataset_id,
+        schema: "seq"
+      };
+    }else{
+      params = {
+        conf: run_params,
+        project_id: this.props.project_id,
+        file_id: this.state.selectedFile,
+        schema: "seq"
+      };
+    }
+    console.log(params);
+
+    if(this.props.jupyter){
+      fetch(flaskServer + '/model/models/to_code/' + this.props.model_id, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(params)
+      }).then((response) => response.json())
+        .then((res) => {
+          this.setState({visible: false});
+          this.props.getCode(res.response);
+        })
+    }else{
+      this.setState({visible: true});
+      if(!this.state.end){
+        fetch(flaskServer + '/model/models/run/' + this.props.model_id, {
+          method: 'post',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(params)
+        }).then((response) => response.json())
+          .then((res) => {
+            if (res.response === 'success') {
+              message.success(res.response);
+              this.setState({score: res.response.score});
+            }
+            this.props.modalSuccess();
+            this.setState({end: true});
+          })
+      }
+    }
 
   }
 
@@ -263,12 +274,13 @@ export default class ModelForms extends React.Component {
           {
             this.state.layer &&
             <div>
-              {this.state.layerStack.map((el) =>
+              {this.state.layerStack.map((el, index) =>
                 <div key={el} style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
                   <Icon type="close" style={{ fontSize: 10, color: '#CC241C' }} onClick={() => this.onDeleteLayer(el)} />
                   <div style={{width: '90%', marginLeft: 5}}>
                   <Layer layers={this.state.layer} isActive={this.state.isActive}
-                       getParams={(value) => this.getParams(el, value)}/>
+                         index={index}
+                         getParams={(value) => this.getParams(el, value)}/>
                   </div>
                 </div>
               )}
@@ -283,7 +295,6 @@ export default class ModelForms extends React.Component {
   }
 
   renderEstimator(){
-    console.log(this.state.custom);
     if (this.props.params) {
       return(
           this.state.params['params']['estimator'] &&

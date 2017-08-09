@@ -4,6 +4,8 @@ import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import { Button, message, Input, Select, Modal, Popover, Icon} from 'antd';
 import { flaskServer } from '../../../constants';
+import lodash from 'lodash';
+
 const Option = Select.Option;
 
 
@@ -22,12 +24,15 @@ export default class Layer extends React.Component {
     }
   }
 
+  componentWillMount(){
+    console.log("layer index", this.props.index);
+  }
+
   componentDidMount(){
-    //console.log(this.props.params);
     if(this.props.params) {
       this.setState({isView: true});
     }else{
-      this.setState({layers: this.props.layers});
+      this.setState({layers: lodash.cloneDeep(this.props.layers)});
     }
   }
 
@@ -36,43 +41,63 @@ export default class Layer extends React.Component {
   }
 
   handleOk(){
+    //console.log("args",this.state.args);
     let layer = {}
     layer['name'] = this.state.selected;
     layer['args'] = {};
     let success = true;
     this.state.args.forEach((e) => {
-      //console.log(e.name);
-      let target = ReactDOM.findDOMNode(this.refs[e.name]);
-      if(target.value){
-       // console.log(target.value);
-        if(e.type.key === 'int'){
-          layer['args'][e.name] = parseInt(target.value);
-        }else if(e.type.key === 'int_m'){
-          let v = target.value;
-          v = v.replace(/\s+/g,"");
-          let array = v.split(',');
-          layer['args'][e.name] = array.filter(e => e).map((el) => parseInt(el));
-        }else if(e.type.key === 'float'){
-          layer['args'][e.name] = parseFloat(target.value);
-        }else if(e.type.key === 'choice') {
-          let temps = this.state.temps;
-          layer['args'][e.name] = temps[e.name];
+      if(e.hyped) {
+        console.log(e);
+        if(e.name === 'activation') {
+          let v = e.hype_paramter;
+          layer['args'][e.name] = v;
         }else{
-          layer['args'][e.name] = target.value;
+          layer['args'][e.name] = {};
+          layer['args'][e.name]['distribute'] = e.hype_paramter;
+          console.log(e.name + "-" + e.hype_paramter)
+          let v = ReactDOM.findDOMNode(this.refs[e.name + "-" + e.hype_paramter]);
+          //console.log(v);
+          layer['args'][e.name]['value'] = v.value;
         }
       }else{
-        //console.log(e.name, 'no value');
-        if(e.required && e.default === null){
-          message.error(e.name + ' is required');
-          success = false
-        }else if(e.required === false && e.default === null){
-          delete layer['args'][e.name]
-        }else{
-          if(e.type.key === 'choice') {
-            let temps = this.state.temps;
-            layer['args'][e.name] = temps[e.name];
-          }else {
-            layer['args'][e.name] = e.default
+        let target = ReactDOM.findDOMNode(this.refs[e.name]);
+        if (target.value) {
+          switch (e.type.key) {
+            case 'int':
+              layer['args'][e.name] = parseInt(target.value);
+              break;
+            case 'int_m':
+              let v = target.value;
+              v = v.replace(/\s+/g, "");
+              let array = v.split(',');
+              layer['args'][e.name] = array.filter(e => e).map((el) => parseInt(el));
+              break;
+            case e.type.key === 'float':
+              layer['args'][e.name] = parseFloat(target.value);
+              break;
+            case e.type.key === 'choice':
+              let temps = this.state.temps;
+              layer['args'][e.name] = temps[e.name];
+              break
+            default:
+              layer['args'][e.name] = target.value;
+              break
+          }
+
+        } else {
+          if (e.required && e.default === null) {
+            message.error(e.name + ' is required');
+            success = false
+          } else if (e.required === false && e.default === null) {
+            delete layer['args'][e.name]
+          } else {
+            if (e.type.key === 'choice') {
+              let temps = this.state.temps;
+              layer['args'][e.name] = temps[e.name];
+            } else {
+              layer['args'][e.name] = e.default
+            }
           }
         }
       }
@@ -94,24 +119,77 @@ export default class Layer extends React.Component {
 
   changeLayerType(value){
     this.setState({selected: value});
-    //console.log(value);
     let options = this.state.layers.filter((el) => el.name === value);
     let args = options[0].args;
-    //console.log(options, args);
     this.setState({
       args
     });
-    //this.props.getType(value);
+    console.log("layer index", this.props.index, args);
   }
 
   onSelect(field, value){
     let temps = this.state.temps;
     temps[field] = value;
-    //console.log(field, value);
     this.setState({
       temps
     });
-    console.log(temps)
+  }
+
+  onClickHype(item, index){
+    let args = this.state.args;
+    item['hyped'] = true;
+    args[index] = item;
+    this.setState({args});
+    //console.log(args)
+  }
+
+  onSelectHype(item,index,values){
+    let args = this.state.args;
+    item['hype_paramter'] = values;
+    args[index] = item;
+    this.setState({args});
+   // console.log(args);
+  }
+
+  renderHype(index){
+    //console.log(this.state.args[index]);
+    if(this.state.args[index]['hype_paramter']) {
+      let hype_param = this.state.args[index]['hype_paramter'];
+      let type = this.state.args[index]['distribute']['type']['range'].filter((e) => e.name === hype_param)
+      switch (type[0].type.key) {
+        case 'join_low_high':
+          console.log(this.state.args[index]['name'] + "-" + type[0].name);
+          return(
+            <div>
+              <Input ref={this.state.args[index]['name'] + "-" + type[0].name}
+                     disabled={!this.state.isActive}
+                     style={{width: 150, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+              <Popover content={
+                <div>
+                  <p style={{width: 150}}>{type[0].type.des}</p>
+                </div>
+              } title="Description">
+                <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5, color: '#767676'}}/>
+              </Popover>
+            </div>
+          )
+
+        case 'multiple':
+          console.log(this.state.args[index]['name'] + "-" + type[0].name);
+          return <div>
+            <Input ref={this.state.args[index]['name'] + "-" + type[0].name}
+                   disabled={!this.state.isActive}
+                   style={{width: 150, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+            <Popover content={
+              <div>
+                <p style={{width: 150}}>{type[0].type.des}</p>
+              </div>
+            } title="Description">
+              <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5, color: '#767676'}}/>
+            </Popover>
+          </div>
+      }
+    }
   }
 
   renderLayerParams(){
@@ -120,21 +198,57 @@ export default class Layer extends React.Component {
     //console.log("args", args);
     if(this.state.args) {
       //console.log("args", args);
-      args.forEach((e) => {
+      args.forEach((e, index) => {
         switch (e.type.key) {
           case 'int':
             choices.push(
               <div key={e.name} style={{display: 'flex', flexDirection: 'row', marginBottom: 20}}>
-                { e.required &&
+                {
+                  e.required &&
                 <span style={{color: '#108ee9', fontSize: 14}}>{"* "}</span>
                 }
                 <span style={{color: '#108ee9' , fontSize: 14}}>{e.name + ": "}</span>
-                <Popover content={<div>
-                  <p style={{width: 150}}>{e.type.des}</p>
-                </div>} title="Description">
+                <Popover content={
+                    <div>
+                      <p style={{width: 150}}>{e.type.des}</p>
+                    </div>
+                    } title="Description">
                   <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5, color: '#767676'}}/>
                 </Popover>
-                <Input placeholder={e.default} disabled={!this.state.isActive} ref={e.name} style={{marginLeft: 10, width: 150, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+                { e.hyped ?
+                  <div style={{marginLeft: 10}}>
+                    <Select disabled={!this.state.isActive} ref={e.name} style={{width: 150}}
+                      onChange={(values) => this.onSelectHype(e, index, values)}
+                    >
+                      {
+                        e.distribute.type.range.map((el) =>
+                          <Option value={el.name} key={Math.random()}>{el.name}</Option>
+                        )
+                      }
+                    </Select>
+                    {
+                      this.renderHype(index)
+                    }
+                  </div>:
+                  <Input placeholder={e.default}
+                         disabled={!this.state.isActive}
+                         ref={e.name}
+                         style={{
+                           marginLeft: 10,
+                           width: 150,
+                           border: 'none',
+                           borderRadius: 0,
+                           borderBottom: '1px solid #108ee9'
+                         }}/>
+                }
+                {
+                  e.distribute &&
+                    <Button size={'small'}
+                            onClick={() => this.onClickHype(e, index)}
+                            style={{marginLeft: 10}}>
+                      {"HYPE IT!"}
+                    </Button>
+                }
               </div>
             );
             break;
@@ -166,12 +280,19 @@ export default class Layer extends React.Component {
 
                 </div>
                 <Input placeholder={e.default} disabled={!this.state.isActive} ref={e.name} style={{width: 150, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+                {
+                  e.distribute &&
+                  <Button size={'small'}
+                          style={{marginLeft: 10}}>
+                    {"HYPE IT!"}
+                  </Button>
+                }
               </div>
             );
             break;
           case 'choice':
             choices.push(
-              <div style={{width: 200, marginBottom: 20}} key={e.name}>
+              <div style={{width: 300, marginBottom: 20}} key={e.name}>
                 { e.required &&
                 <span style={{color: '#108ee9', fontSize: 14}}>{"* "}</span>
                 }
@@ -181,13 +302,39 @@ export default class Layer extends React.Component {
                 </div>} title="Description">
                   <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5, color: '#767676'}}/>
                 </Popover>
-                <Select disabled={!this.state.isActive} defaultValue={e.default} ref={e.name} style={{width: 150}} onChange={(values) => this.onSelect(e.name, values)}>
-                  {
-                    e.type.range.map((el) =>
-                      <Option value={el} key={el}>{el}</Option>
-                    )
+                <div style={{display: 'flex', flexDirection: 'row'}}>
+                  { e.hyped ?
+                    <div style={{marginLeft: 10}}>
+                      <Select mode={'multiple'}
+                              defaultValue={e.distribute.default}
+                              disabled={!this.state.isActive} ref={e.name+'_distribute'}
+                              style={{width: 150}}
+                              onChange={(values) => this.onSelectHype(e, index, values)}
+                      >
+                        {
+                          e.distribute.type.range.map((el) =>
+                            <Option value={el} key={Math.random()}>{el}</Option>
+                          )
+                        }
+                      </Select>
+                    </div>:
+                    <Select disabled={!this.state.isActive} defaultValue={e.default} ref={e.name} style={{width: 150}} onChange={(values) => this.onSelect(e.name, values)}>
+                      {
+                        e.type.range.map((el) =>
+                          <Option value={el} key={el}>{el}</Option>
+                        )
+                      }
+                    </Select>
                   }
-                </Select>
+                  {
+                    e.distribute &&
+                    <Button size={'small'}
+                            onClick={() => this.onClickHype(e, index)}
+                            style={{marginLeft: 10}}>
+                      {"HYPE IT!"}
+                    </Button>
+                  }
+                </div>
               </div>
             )
             break;
@@ -203,7 +350,40 @@ export default class Layer extends React.Component {
                 </div>} title="Description">
                   <Icon type="info-circle" style={{fontSize: 12, marginLeft: 5, color: '#767676'}}/>
                 </Popover>
-                <Input ref={e.name} placeholder={e.default} style={{width: 150, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}}/>
+                { e.hyped ?
+                  <div style={{marginLeft: 10}}>
+                    <Select disabled={!this.state.isActive} ref={e.name+'_distribute'} style={{width: 150}}
+                            onChange={(values) => this.onSelectHype(e, index, values)}
+                    >
+                      {
+                        e.distribute.type.range.map((el) =>
+                          <Option value={el.name} key={Math.random()}>{el.name}</Option>
+                        )
+                      }
+                    </Select>
+                    {
+                      this.renderHype(index)
+                    }
+                  </div>:
+                  <Input placeholder={e.default}
+                         disabled={!this.state.isActive}
+                         ref={e.name}
+                         style={{
+                           marginLeft: 10,
+                           width: 150,
+                           border: 'none',
+                           borderRadius: 0,
+                           borderBottom: '1px solid #108ee9'
+                         }}/>
+                }
+                {
+                  e.distribute && !e.hyped &&
+                  <Button size={'small'}
+                          onClick={() => this.onClickHype(e, index)}
+                          style={{marginLeft: 10}}>
+                    {"HYPE IT!"}
+                  </Button>
+                }
               </div>
             );
             break;
@@ -262,7 +442,7 @@ export default class Layer extends React.Component {
                   style={{marginLeft: 5}}
                   size="small"
                   onClick={() => this.setState({visible: true})}>parameters</Button>
-          <Modal
+          <Modal key={this.props.index}
             title="Set Parameters"
             visible={this.state.visible}
             onOk={() => this.handleOk()}
