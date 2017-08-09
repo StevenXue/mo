@@ -179,9 +179,23 @@ export default class VisualizationPanel extends React.Component {
       case 3:
         return(
           <div style={{display: 'flex', flexDirection: 'column'}}>
-            <div>
+            <div style={{display: 'flex', flexDirection: 'row'}}>
+              <div className="table_one">
+              </div>
+              <div className="description">
+              </div>
+              <div className="table_two">
+              </div>
             </div>
-            <div>
+            <div style={{display: 'flex', flexDirection: 'row'}}>
+              <div className="pie_one">
+                <PieChart data={{'pie': this.state.responseBody['pie1']}}/>
+              </div>
+              <div className="bar_chart">
+              </div>
+              <div className="pie_two">
+                <PieChart data={{'pie': this.state.responseBody['pie2']}}/>
+              </div>
             </div>
           </div>
         );
