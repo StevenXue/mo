@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
-import { Button, Input, Select, Tag, Transfer, Modal, Checkbox } from 'antd'
+import { Button, Input, Select, Tag, Transfer, Modal, Checkbox, message } from 'antd'
 import { flaskServer } from '../../../constants';
 import { isEmpty } from '../../../utils/utils'
 
@@ -24,7 +24,7 @@ export default class ParamsSeletor extends React.Component {
       targetKeys: [],
       selectedKeys: [],
       target: [],
-      source: []
+      source: [],
     }
   }
 
@@ -134,14 +134,51 @@ export default class ParamsSeletor extends React.Component {
     switch (this.state.editing) {
       case 'Select Target Fields':
         if(this.state.steps.indexOf('Select Target Fields') !== this.state.steps.length -1){
-          this.setState({editing: 'Enter Parameters'});
-        }
-        if(this.props.type === 'transfer_box') {
-          this.props.setData({divide: [this.state.source, this.state.target]});
+          if(this.props.type === 'transfer_box') {
+            if(this.state.target.length <= this.props.selectable[1][1]
+              && this.state.target.length <= this.props.selectable[1][0]) {
+              this.props.setData({divide: [this.state.source, this.state.target]});
+              this.setState({editing: 'Enter Parameters'});
+            }else{
+              message.error('please select correct amount of source fields');
+            }
+          }else{
+            if(this.state.checkedCols.length <= this.props.selectable[0][1]
+              && this.state.checkedCols.length <= this.props.selectable[0][0]) {
+              this.setState({editing: 'Enter Parameters'});
+            }else{
+              message.error('please select correct amount of source fields');
+            }
+          }
+        }else{
+          if(this.state.checkedCols.length <= this.props.selectable[0][1]
+            && this.state.checkedCols.length <= this.props.selectable[0][0]) {
+            console.log("hi");
+            this.props.setData({
+              checkedCols: this.state.checkedCols,
+              runable: true
+            });
+          }else{
+            message.error('please select correct amount of source fields');
+          }
         }
         return
       case 'Select Source Fields':
-        this.setState({editing: 'Select Target Fields', targetKeys: []});
+        if( this.props.selectable[0][1] !== null ){
+          if(this.state.source.length <= this.props.selectable[0][1]
+            && this.state.source.length <= this.props.selectable[0][0]) {
+            this.setState({editing: 'Select Target Fields', targetKeys: []});
+          }else{
+            message.error('please select correct amount of source fields');
+          }
+        }else{
+          if(this.state.source.length >= this.props.selectable[0][0]) {
+            this.setState({editing: 'Select Target Fields', targetKeys: []});
+          }else{
+            message.error('please select correct amount of source fields');
+          }
+        }
+
         return
 
       case 'Enter Parameters':
@@ -150,7 +187,10 @@ export default class ParamsSeletor extends React.Component {
           {
             constant[el] = parseInt(ReactDOM.findDOMNode(this.refs[el]).value);
           });
-        this.props.setData({constant: constant});
+        this.props.setData({
+          constant: constant,
+          runable: true
+        });
         return
 
     }
@@ -179,6 +219,17 @@ export default class ParamsSeletor extends React.Component {
         )
       }else if(this.state.type === 'transfer_box'){
         console.log(this.props.selectableType);
+        let type = this.props.selectableType[0];
+        let types = type.map((e) => {
+          if (e === 'integer') {
+            return 'int'
+          }else{
+            return e
+          }
+        });
+
+        col = col.filter((el) => types.indexOf(el[1][1]) !== -1)
+
         let source = [];
         col.map((e) =>
           source.push({
@@ -189,6 +240,15 @@ export default class ParamsSeletor extends React.Component {
 
         if(this.state.editing === 'Select Target Fields'){
           let selected = this.state.source;
+          type = this.props.selectableType[1];
+          types = type.map((e) => {
+            if (e === 'integer') {
+              return 'int'
+            }else{
+              return e
+            }
+          });
+          col = col.filter((el) => types.indexOf(el[1][1]) !== -1)
           let temp = col.map((e) => e[0]);
           temp = temp.filter((el) => selected.indexOf(el) === -1 || selected.indexOf(el) === -1);
           source = temp.map((el) => (
@@ -251,7 +311,7 @@ export default class ParamsSeletor extends React.Component {
           <div>
             <span>{"Select Data"}</span>
             <Select className="dataset-select"
-                    style={{ width: '100%', marginTop: 10 }}
+                    style={{ width: 200, marginTop: 10, marginLeft: 10}}
                     onChange={(values) => this.onSelectDataSet(values)}
                     value={this.state.selectedData}
                     placeholder="Choose DataSet"

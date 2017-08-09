@@ -290,64 +290,27 @@ boston_label = pd.DataFrame(data= boston['target'],
                      columns= ['target'])
 
 
-# # 测试 linear_regressor
-#
-# input = {
-#     'model_name': 'linear_regressor',
-#     'df_fetures': boston_feature,
-#     'df_labels': boston_label,
-# }
-# params = {
-#     'estimator': {
-#         'args': {
-#             "dimension": 13,
-#             "weight_column_name": None,
-#             "gradient_clip_norm": None,
-#             "enable_centered_bias": False,
-#             "_joint_weight": False,
-#             "label_dimension": 1,
-#         }
-#     },
-#     'fit': {
-#         "args": {
-#             "steps": 30
-#         }
-#     },
-#     'evaluate': {
-#         'args': {
-#             'steps': 1
-#         }
-#     }
-# }
-# sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
-# from server3.lib.models.linear_regressor import linear_regressor_model_fn
-# result = custom_model(params, linear_regressor_model_fn, input, result_sds=sds)
-# print(result)
+# 测试 linear_regressor
 
-
-# 测试 Random forest
 input = {
-    'model_name': 'Randomforest',
-    'df_fetures': boston_feature,
+    'model_name': 'linear_regressor',
+    'df_features': boston_feature,
     'df_labels': boston_label,
 }
 params = {
     'estimator': {
         'args': {
-            "weights_name":None,
-            "keys_name":None,
-            "num_classes":1,
-            "num_features":13,
-            "num_trees":3,
-            "max_nodes":1000,
-            "regression":True,
-            "early_stopping_rounds":100,
-            "split_after_samples":20
+            "dimension": 13,
+            "weight_column_name": None,
+            "gradient_clip_norm": None,
+            "enable_centered_bias": False,
+            "_joint_weight": False,
+            "label_dimension": 1,
         }
     },
     'fit': {
         "args": {
-            "steps": 30
+            "steps": 1000
         }
     },
     'evaluate': {
@@ -356,8 +319,45 @@ params = {
         }
     }
 }
-
 sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
-from server3.lib.models.randomforest import random_forest_model_fn
-result = custom_model(params, random_forest_model_fn, input, result_sds=sds)
+from server3.lib.models.linear_regressor import linear_regressor_model_fn
+result = custom_model(params, linear_regressor_model_fn, input, result_sds=sds)
 print(result)
+
+
+# # 测试 Random forest
+# input = {
+#     'model_name': 'Randomforest',
+#     'df_features': boston_feature,
+#     'df_labels': boston_label,
+# }
+# params = {
+#     'estimator': {
+#         'args': {
+#             "weights_name":None,
+#             "keys_name":None,
+#             "num_classes":1,
+#             "num_features":13,
+#             "num_trees":3,
+#             "max_nodes":1000,
+#             "regression":True,
+#             "early_stopping_rounds":100,
+#             "split_after_samples":20
+#         }
+#     },
+#     'fit': {
+#         "args": {
+#             "steps": 300
+#         }
+#     },
+#     'evaluate': {
+#         'args': {
+#             'steps': 1
+#         }
+#     }
+# }
+#
+# sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
+# from server3.lib.models.randomforest import random_forest_model_fn
+# result = custom_model(params, random_forest_model_fn, input, result_sds=sds)
+# print(result)
