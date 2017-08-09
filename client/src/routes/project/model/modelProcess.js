@@ -12,6 +12,7 @@ export default class ModelProcess extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
+      allModels: [],
       models: [],
       selectedModel: '',
       modelName: '',
@@ -24,7 +25,9 @@ export default class ModelProcess extends React.Component {
       divide: {},
       dataSet: this.props.dataset_id,
       isActive: this.props.isActive,
-      description: ''
+      description: '',
+      selectedFile: this.props.selectedFile,
+      isImage: false,
     }
   }
 
@@ -39,7 +42,7 @@ export default class ModelProcess extends React.Component {
         .then((res) => {
           let dict = [];
           res.response.forEach((e) => dict.push({'name': e.name, '_id': e._id}));
-          this.setState({models: dict});
+          this.setState({models: dict, allModels: res.response});
         });
     }
 
@@ -66,7 +69,21 @@ export default class ModelProcess extends React.Component {
     this.setState({
       dataSet: nextProps.dataset_id,
       isActive: nextProps.isActive,
+      selectedFile: nextProps.selectedFile
     });
+
+    if(nextProps.selectedFile !== ''){
+      let models = this.state.allModels;
+      models = models.filter((e) => e.category === 4);
+      models = models.map((e) => ({'name': e.name, '_id': e._id}));
+      this.setState({models, isImage: true});
+    }else{
+      let models = this.state.allModels;
+      models = models.filter((e) => e.category !== 4);
+      models = models.map((e) => ({'name': e.name, '_id': e._id}));
+      this.setState({models, isImage: false});
+    }
+
     if(nextProps.params) {
       this.setState({modelName: nextProps.params.model.name});
       let data_fields = []
@@ -129,74 +146,31 @@ export default class ModelProcess extends React.Component {
 
   renderSelections(){
     let source = []
-    if(this.state.selectedModel && !isEmpty(this.state.modelData)) {
-      if (this.state.supervised) {
-        console.log("supervised");
-        let type = this.state.modelData.fit.data_fields.data_type;
-        let temp = []
-        if(type !== null) {
-          temp = this.state.source.filter((e) => type.indexOf(e[1][1]) !== -1);
-          source = temp.map((e) => e[0]);
-        }else{
-          source = this.state.source.map((e) => e[0]);
-        }
-        return(
-          <div>
-            <span>{"Select Data Fields: "}</span>
-            <Select
-              mode="multiple"
-              style={{width: '80%'}}
-              placeholder="Please select Input"
-              value={this.state.targetKeys}
-              onChange={(value) =>
-                this.setState({
-                  targetKeys: value,
-                  divide: {'source': [], 'target': value}
-                })}>
-              {
-                source.map((e) =>
-                  <Select.Option value={e} key={e}>
-                    {e}
-                  </Select.Option>
-                )
-              }
-            </Select>
-          </div>
-        )
-
-      } else {
-        console.log(this.state.source);
-        let x_type = this.state.modelData.fit.data_fields.x_data_type;
-        let y_type = this.state.modelData.fit.data_fields.y_data_type;
-        if(x_type !== null) {
-          let temp = this.state.source.filter((e) => x_type.indexOf(e[1][1]) !== -1);
-          source = temp.map((e) => e[0]);
-        }else{
-          source = this.state.source.map((e) => e[0]);
-        }
-        let target = []
-        if(y_type !== null) {
-          let temp_out = this.state.source.filter((e) => y_type.indexOf(e[1][1]) !== -1);
-          target = temp_out.map((e) => e[0]);
-          target = target.filter((e) => this.state.selectedKeys.indexOf(e) === -1);
-        }else{
-          target = this.state.source.map((e) => e[0]);
-          target = target.filter((e) => this.state.selectedKeys.indexOf(e) === -1);
-        }
-        return (
-          <div>
+    if(!this.state.isImage) {
+      if (this.state.selectedModel && !isEmpty(this.state.modelData)) {
+        if (this.state.supervised) {
+          console.log("supervised");
+          let type = this.state.modelData.fit.data_fields.data_type;
+          let temp = []
+          if (type !== null) {
+            temp = this.state.source.filter((e) => type.indexOf(e[1][1]) !== -1);
+            source = temp.map((e) => e[0]);
+          } else {
+            source = this.state.source.map((e) => e[0]);
+          }
+          return (
             <div>
-              <span>{"Select Input Data: "}</span>
+              <span>{"Select Data Fields: "}</span>
               <Select
                 mode="multiple"
                 style={{width: '80%'}}
                 placeholder="Please select Input"
-                value={this.state.selectedKeys}
+                value={this.state.targetKeys}
                 onChange={(value) =>
                   this.setState({
-                    selectedKeys: value,
-                    divide: {'source': value, 'target': this.state.targetKeys}
-                })}>
+                    targetKeys: value,
+                    divide: {'source': [], 'target': value}
+                  })}>
                 {
                   source.map((e) =>
                     <Select.Option value={e} key={e}>
@@ -206,26 +180,75 @@ export default class ModelProcess extends React.Component {
                 }
               </Select>
             </div>
+          )
+
+        } else {
+          console.log(this.state.source);
+          let x_type = this.state.modelData.fit.data_fields.x_data_type;
+          let y_type = this.state.modelData.fit.data_fields.y_data_type;
+          if (x_type !== null) {
+            let temp = this.state.source.filter((e) => x_type.indexOf(e[1][1]) !== -1);
+            source = temp.map((e) => e[0]);
+          } else {
+            source = this.state.source.map((e) => e[0]);
+          }
+          let target = []
+          if (y_type !== null) {
+            let temp_out = this.state.source.filter((e) => y_type.indexOf(e[1][1]) !== -1);
+            target = temp_out.map((e) => e[0]);
+            target = target.filter((e) => this.state.selectedKeys.indexOf(e) === -1);
+          } else {
+            target = this.state.source.map((e) => e[0]);
+            target = target.filter((e) => this.state.selectedKeys.indexOf(e) === -1);
+          }
+          return (
             <div>
-              <span>{"Select Output Data: "}</span>
-              <Select
-                mode="multiple"
-                style={{width: '80%'}}
-                placeholder="Please select Output"
-                value={this.state.targetKeys}
-                onChange={(value) => this.selectTarget(value)}>
-                {
-                  target.map((e) =>
-                    <Select.Option value={e} key={e}>
-                      {e}
-                    </Select.Option>
-                  )
-                }
-              </Select>
+              <div>
+                <span>{"Select Input Data: "}</span>
+                <Select
+                  mode="multiple"
+                  style={{width: '80%'}}
+                  placeholder="Please select Input"
+                  value={this.state.selectedKeys}
+                  onChange={(value) =>
+                    this.setState({
+                      selectedKeys: value,
+                      divide: {'source': value, 'target': this.state.targetKeys}
+                    })}>
+                  {
+                    source.map((e) =>
+                      <Select.Option value={e} key={e}>
+                        {e}
+                      </Select.Option>
+                    )
+                  }
+                </Select>
+              </div>
+              <div>
+                <span>{"Select Output Data: "}</span>
+                <Select
+                  mode="multiple"
+                  style={{width: '80%'}}
+                  placeholder="Please select Output"
+                  value={this.state.targetKeys}
+                  onChange={(value) => this.selectTarget(value)}>
+                  {
+                    target.map((e) =>
+                      <Select.Option value={e} key={e}>
+                        {e}
+                      </Select.Option>
+                    )
+                  }
+                </Select>
+              </div>
             </div>
-          </div>
-        )
+          )
+        }
       }
+    }else{
+      return <div>
+        <span>{"Input is file"}</span>
+      </div>
     }
   }
 
@@ -297,6 +320,7 @@ export default class ModelProcess extends React.Component {
                         jupyter={this.props.jupyter}
                         isActive={this.props.isActive}
                         params={this.props.params}
+                        selectedFile={this.state.selectedFile}
                         modalSuccess={() => this.props.modalSuccess()}
                         getCode={(code) => this.props.getCode(code)}/>
           </div>

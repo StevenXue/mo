@@ -4,6 +4,8 @@ import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import { Button, message, Input, Select, Modal, Popover, Icon} from 'antd';
 import { flaskServer } from '../../../constants';
+import lodash from 'lodash';
+
 const Option = Select.Option;
 
 
@@ -22,11 +24,15 @@ export default class Layer extends React.Component {
     }
   }
 
+  componentWillMount(){
+    console.log("layer index", this.props.index);
+  }
+
   componentDidMount(){
     if(this.props.params) {
       this.setState({isView: true});
     }else{
-      this.setState({layers: this.props.layers});
+      this.setState({layers: lodash.cloneDeep(this.props.layers)});
     }
   }
 
@@ -43,12 +49,13 @@ export default class Layer extends React.Component {
     this.state.args.forEach((e) => {
       if(e.hyped) {
         console.log(e);
-        if(e.name === 'activition') {
+        if(e.name === 'activation') {
           let v = e.hype_paramter;
           layer['args'][e.name] = v;
         }else{
           layer['args'][e.name] = {};
           layer['args'][e.name]['distribute'] = e.hype_paramter;
+          console.log(e.name + "-" + e.hype_paramter)
           let v = ReactDOM.findDOMNode(this.refs[e.name + "-" + e.hype_paramter]);
           //console.log(v);
           layer['args'][e.name]['value'] = v.value;
@@ -117,6 +124,7 @@ export default class Layer extends React.Component {
     this.setState({
       args
     });
+    console.log("layer index", this.props.index, args);
   }
 
   onSelect(field, value){
@@ -150,6 +158,7 @@ export default class Layer extends React.Component {
       let type = this.state.args[index]['distribute']['type']['range'].filter((e) => e.name === hype_param)
       switch (type[0].type.key) {
         case 'join_low_high':
+          console.log(this.state.args[index]['name'] + "-" + type[0].name);
           return(
             <div>
               <Input ref={this.state.args[index]['name'] + "-" + type[0].name}
@@ -166,6 +175,7 @@ export default class Layer extends React.Component {
           )
 
         case 'multiple':
+          console.log(this.state.args[index]['name'] + "-" + type[0].name);
           return <div>
             <Input ref={this.state.args[index]['name'] + "-" + type[0].name}
                    disabled={!this.state.isActive}
@@ -432,7 +442,7 @@ export default class Layer extends React.Component {
                   style={{marginLeft: 5}}
                   size="small"
                   onClick={() => this.setState({visible: true})}>parameters</Button>
-          <Modal
+          <Modal key={this.props.index}
             title="Set Parameters"
             visible={this.state.visible}
             onOk={() => this.handleOk()}
