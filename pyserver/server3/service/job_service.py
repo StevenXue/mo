@@ -72,7 +72,11 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 results.update({arg["name"]: value})
                 if arg["if_add_column"]:
                     strr = "%s_%s_col" % (arg["name"], toolkit_obj.name)
-                    add_new_column(value, args[-1], strr, staging_data_set_id)
+                    try:
+                        add_new_column(value, args[-1], strr, staging_data_set_id)
+                    except:
+                        error = 1
+                print("error1", error)
                 if arg.get("attribute", False) and arg["attribute"] == "label":
                     labels = value
                 elif arg.get("attribute", False) and arg["attribute"] == "general_info":
@@ -110,38 +114,41 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 json = {"category": toolkit_obj.category}
 
             elif toolkit_obj.category == 3:
-                flag = toolkit_obj.parameter_spec["data"]["type"]["key"] == "transfer_box"
-                data = list(zip(*args[0]))
+                if error:
+                    json = {}
+                else:
+                    flag = toolkit_obj.parameter_spec["data"]["type"]["key"] == "transfer_box"
+                    data = list(zip(*args[0]))
 
-                if flag:
-                    data.append(args[1])
-                lab = list(zip(*labels))
-                lab_fields = ["New Col" + str(i) for i in range(len(lab))]
-                var1 = [np.var(da) for da in data]
-                var2 = [np.var(da) for da in lab]
-                merge_fields = fields[0] + fields[1] if fields[1] else fields[0]
-                x_domain = merge_fields + ["_empty"] + lab_fields
-                y_domain = var1 + [0] + var2
+                    if flag:
+                        data.append(args[1])
+                    lab = list(zip(*labels))
+                    lab_fields = ["New Col" + str(i) for i in range(len(lab))]
+                    var1 = [np.var(da) for da in data]
+                    var2 = [np.var(da) for da in lab]
+                    merge_fields = fields[0] + fields[1] if fields[1] else fields[0]
+                    x_domain = merge_fields + ["_empty"] + lab_fields
+                    y_domain = var1 + [0] + var2
 
-                print("out of range", var2)
-                print("out of range", lab_fields)
-                temp = var1[:-1] if flag else var1
-                json = {
-                    "table1": {"X_fields": fields[0],
-                               "Y_fields": fields[1],
-                               "data": [dict(zip(merge_fields, arr)) for arr in list(zip(*data))]
-                               },
-                    "table2": {"data": [dict(zip(lab_fields, arr)) for arr in labels],
-                               "fields": lab_fields},
-                    "bar": {"x_domain": x_domain,
-                            "y_domain": y_domain},
-                    "pie1": [{"text": fields[0][i], "value": temp[i]} for i in range(len(temp))],
-                    "pie2": [{"text": var2[i], "value": lab_fields[i]} for i in range(len(var2))],
-                    "general_info": gen_info,
-                    "category": toolkit_obj.category}
+                    print("out of range", var2)
+                    print("out of range", lab_fields)
+                    temp = var1[:-1] if flag else var1
+                    json = {
+                        "table1": {"X_fields": fields[0],
+                                   "Y_fields": fields[1],
+                                   "data": [dict(zip(merge_fields, arr)) for arr in list(zip(*data))]
+                                   },
+                        "table2": {"data": [dict(zip(lab_fields, arr)) for arr in labels],
+                                   "fields": lab_fields},
+                        "bar": {"x_domain": x_domain,
+                                "y_domain": y_domain},
+                        "pie1": [{"text": fields[0][i], "value": temp[i]} for i in range(len(temp))],
+                        "pie2": [{"text": var2[i], "value": lab_fields[i]} for i in range(len(var2))],
+                        "general_info": gen_info,
+                        "category": toolkit_obj.category}
 
             else:
-                json = {"category": toolkit_obj.category}
+                json = {}
 
             # update a job
             job_business.end_job(job_obj)
