@@ -8,17 +8,16 @@ Some configurations won't converge.
 - LSTM loss decrease patterns during training can be quite different
 from what you see with CNNs/MLPs/etc.
 '''
-from keras.preprocessing import sequence
-from keras.layers import Embedding
-from keras.layers import LSTM
 from keras.callbacks import LambdaCallback
 from keras.layers import Dense
-
-from server3.lib.models.keras_callbacks import MongoModelCheckpoint
-from server3.service import logger_service
+from keras.layers import Embedding
+from keras.layers import LSTM
+from keras.preprocessing import sequence
 
 from server3.lib import Sequential
 from server3.lib import graph
+from server3.service import logger_service
+from server3.service.keras_callbacks import MongoModelCheckpoint
 
 
 def imdb_lstm(conf, input, **kw):

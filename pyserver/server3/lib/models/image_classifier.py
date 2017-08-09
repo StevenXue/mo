@@ -36,17 +36,17 @@ data/
 ```
 '''
 import inspect
-from keras.preprocessing.image import ImageDataGenerator
-from keras.layers import Conv2D, MaxPooling2D
-from keras.layers import Activation, Dropout, Flatten, Dense
+
 from keras import backend as K
 from keras.callbacks import LambdaCallback
+from keras.layers import Activation, Dropout, Flatten, Dense
+from keras.layers import Conv2D, MaxPooling2D
+from keras.preprocessing.image import ImageDataGenerator
 
 from server3.lib import Sequential
 from server3.lib import graph
 from server3.service import logger_service
-from server3.lib.models.keras_callbacks import MongoModelCheckpoint
-from server3.utility.str_utility import generate_args_str
+from server3.service.keras_callbacks import MongoModelCheckpoint
 
 
 def image_classifier(conf, input, **kw):

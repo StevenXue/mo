@@ -1,18 +1,17 @@
-from keras.preprocessing.image import ImageDataGenerator
-from keras.layers import Dropout, Flatten, Dense
-from keras import backend as K
-from keras import applications
-from keras.models import Model
 import os
 
-from server3.lib.models.metrics import custom_metrcis
-
+from keras import applications
+from keras import backend as K
 from keras.callbacks import LambdaCallback
-from server3.lib.models.keras_callbacks import MongoModelCheckpoint
-from server3.service import logger_service
+from keras.layers import Dropout, Flatten, Dense
+from keras.models import Model
+from keras.preprocessing.image import ImageDataGenerator
 
 from server3.lib import Sequential
 from server3.lib import graph
+from server3.lib.models.metrics import custom_metrcis
+from server3.service import logger_service
+from server3.service.keras_callbacks import MongoModelCheckpoint
 
 # Todo: change this path in the  inception_v3 model file
 WEIGHTS_PATH_NO_TOP = ''
