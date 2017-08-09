@@ -183,13 +183,35 @@ export default class ParamsSeletor extends React.Component {
 
       case 'Enter Parameters':
         let constant = {};
+        let runnable = true;
         Object.keys(this.state.constant).map((el) =>
           {
-            constant[el] = parseInt(ReactDOM.findDOMNode(this.refs[el]).value);
+            let value;
+            switch (this.state.constant[el]['key']) {
+              case 'int':
+                constant[el] = parseInt(ReactDOM.findDOMNode(this.refs[el]).value);
+                break;
+              case 'string_m':
+                value = ReactDOM.findDOMNode(this.refs[el]).value;
+                value = value.replace(/\s+/g, "");
+                value = value.split(',');
+                constant[el] = value;
+                if(constant['bins']){
+                  if(value.length !== constant['bins'] && value[0] !== ""){
+                    runnable = false;
+                    message.error('numbers of lables must be the same as bins');
+                  }
+                }
+                break
+              default:
+                value = ReactDOM.findDOMNode(this.refs[el]).value;
+                constant[el] = value
+            }
           });
+        console.log(runnable);
         this.props.setData({
           constant: constant,
-          runable: true
+          runnable: runnable
         });
         return
 
