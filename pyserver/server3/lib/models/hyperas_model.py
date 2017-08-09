@@ -57,6 +57,15 @@ def train_hyperas_model(conf, data_source_id, **kwargs):
                                           max_evals=5,
                                           trials=Trials())
 
+    temp_file = "./my_temp_model.py"
+    import os
+    try:
+        pass
+        os.remove(temp_file)
+        os.remove(temp_file + 'c')
+    except OSError:
+        pass
+
     print("Evalutation of best performing model:")
     score, acc = best_model.evaluate(X_test, Y_test)
     print("best score and acc", score, acc)
@@ -307,7 +316,7 @@ def conf_to_data_function_str(conf, data_source_id, **kwarg):
 #     return x_train, y_train, x_test, y_test
 
 
-def write_temp_files(tmp_str, path='./temp_model.py'):
+def write_temp_files(tmp_str, path='./temp_model111.py'):
     """ write python string to temp file
 
     :param tmp_str:
