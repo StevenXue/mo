@@ -38,7 +38,8 @@ export default class ModelForms extends React.Component {
       isActive: true,
       params: this.props.params,
       selectedFile: '',
-      spliter: {}
+      spliter: {},
+      hyped: false,
     }
   }
 
@@ -173,6 +174,10 @@ export default class ModelForms extends React.Component {
 
   onClickRun(){
     let run_params = this.constructParams();
+    console.log(this.state.hyped, run_params);
+    if(run_params['compile']['loss']['distribute'] || run_params['compile']['optimizer']['distribute']){
+      console.log('hype');
+    }
     let params = {};
     if(this.state.fit.data_fields) {
       params = Object.assign({
@@ -204,7 +209,13 @@ export default class ModelForms extends React.Component {
     }else{
       this.setState({visible: true});
       if(!this.state.end){
-        fetch(flaskServer + '/model/models/run/' + this.props.model_id, {
+        let url = '';
+        if(this.state.hyped){
+          url = flaskServer + 'model/models/run_hyperas_model/' + this.props.model_id
+        }else{
+          url = flaskServer + '/model/models/run/' + this.props.model_id
+        }
+        fetch(url, {
           method: 'post',
           headers: {
             'Content-Type': 'application/json',
@@ -269,6 +280,7 @@ export default class ModelForms extends React.Component {
                   <Icon type="close" style={{ fontSize: 10, color: '#CC241C' }} onClick={() => this.onDeleteLayer(el)} />
                   <div style={{width: '90%', marginLeft: 5}}>
                   <Layer layers={this.state.layer} isActive={this.state.isActive}
+                         setHype={(value) => this.setState({hyped: value})}
                          index={index}
                          getParams={(value) => this.getParams(el, value)}/>
                   </div>
@@ -327,6 +339,7 @@ export default class ModelForms extends React.Component {
           <div>
             <p style={{color: '#108ee9'}}>Compile</p>
             <Compile compile={this.state.compile['args']} isActive={this.state.isActive}
+                     setHype={(value) => this.setState({hyped: value})}
                      getParams={(value) => this.getCompileParams(value)}/>
           </div>
           }
