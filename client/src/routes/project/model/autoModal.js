@@ -1,10 +1,9 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import Model from './modelProcess.js'
-import { Button, message, Radio, Input, Card, Spin, Select, Tag, Icon } from 'antd'
-import { flaskServer, stepStyle, assetsUrl } from '../../../constants'
+import { Button, Select, Spin, Tag } from 'antd'
+import { assetsUrl, flaskServer, stepStyle } from '../../../constants'
 import { TourArea } from '../../../components'
 
 const steps = [
@@ -33,7 +32,7 @@ const steps = [
   },
 ]
 
-export default class AutomatedModel extends React.Component {
+class AutomatedModel extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -48,12 +47,15 @@ export default class AutomatedModel extends React.Component {
       loading: true,
       statusStack: [],
       columns: [],
-      //custom: {}
+      selectedFile: '',
       params: [],
+
     }
   }
 
   componentDidMount () {
+    this.props.dispatch({ type: 'project/listFiles' })
+
     fetch(flaskServer + '/project/jobs/' + this.props.project_id + '?categories=model', {
       method: 'get',
       headers: {
@@ -91,16 +93,20 @@ export default class AutomatedModel extends React.Component {
       )
   }
 
-  addNewModel () {
+  addNewModel() {
     let array = this.state.statusStack
     array.push(true)
     this.setState({ statusStack: array })
   }
 
+  onSelectFile(values){
+    this.setState({selectedFile: values, selectedData: '', selectedDataName: ''});
+  }
+
   onSelectDataSet (values) {
     let selected = this.state.data_set.filter((el) => el._id === values)
     let selectedName = selected[0].name
-    this.setState({ selectedData: values, selectedDataName: selectedName, loading: true })
+    this.setState({ selectedData: values, selectedDataName: selectedName, loading: true , selectedFile: ''})
     fetch(flaskServer + '/staging_data/staging_data_sets/' + values, {
       method: 'get',
       headers: {
@@ -138,9 +144,10 @@ export default class AutomatedModel extends React.Component {
             width: '20%', marginTop: 10, marginLeft: 10, display: 'flex', height: '100%', flexDirection: 'column',
             alignItems: 'center',
           }}>
-            <span style={{ color: '#108ee9' }}>Choose Dataset for modelling</span>
+            <span style={{ color: '#108ee9' }}>Choose Source for modelling</span>
+            <span style={{float: 'left'}}>{"Choose Dataset:"}</span>
             <Select className="dataset-select"
-                    style={{ width: '90%', marginTop: 10 }}
+                    style={{width: '90%'}}
                     onChange={(values) => this.onSelectDataSet(values)}
                     value={this.state.selectedData}
                     placeholder="Choose DataSet"
@@ -153,6 +160,23 @@ export default class AutomatedModel extends React.Component {
                 )
               }
             </Select>
+            <span style={{float: 'left', marginTop: 10}}>{"Or Choose File:"}</span>
+            <Select className="dataset-select"
+                    style={{width: '90%'}}
+                    onChange={(values) => this.onSelectFile(values)}
+                    value={this.state.selectedFile}
+                    placeholder="Choose DataSet"
+                    allowClear>
+              {
+                this.props.project.files &&
+                this.props.project.files.map((e) =>
+                  <Select.Option value={e._id} key={e._id}>
+                    {e.name}
+                  </Select.Option>,
+                )
+              }
+            </Select>
+
             {this.state.cols !== 0 &&
             <div style={{ marginTop: 15, marginLeft: 10 }}>
               <Spin spinning={this.state.loading}>
@@ -208,8 +232,8 @@ export default class AutomatedModel extends React.Component {
             <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 10, width: '100%' }}>
               <div style={{ marginLeft: 10 }}>
                 <span>Models</span>
-                {this.state.selectedData !== '' &&
-                <Button type='normal' disabled={this.state.selectedData === '' && true} size='small'
+                {this.state.selectedData !== '' || this.state.selectedFile !== '' &&
+                <Button type='normal'  size='small'
                         style={{ marginLeft: 10 }} onClick={() => this.addNewModel()}>
                   Add New Section
                 </Button>}
@@ -221,6 +245,7 @@ export default class AutomatedModel extends React.Component {
                 {
                   this.state.statusStack.map((el, i) =>
                     <Model style={{ width: 1200, height: el ? 450 : 300 }}
+                           selectedFile={this.state.selectedFile}
                            project_id={this.props.project_id}
                            dataset_id={this.state.selectedData}
                            key={i}
@@ -244,3 +269,5 @@ export default class AutomatedModel extends React.Component {
 AutomatedModel.PropTypes = {
   project_id: PropTypes.string,
 }
+
+export default connect(({ project }) => ({ project }))(AutomatedModel)
