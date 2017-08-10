@@ -15,8 +15,11 @@ from tensorflow.python.ops import init_ops
 from tensorflow.contrib import metrics as metrics_lib
 from tensorflow.contrib.learn.python.learn.estimators import constants
 from tensorflow.contrib.learn.python.learn.estimators import metric_key
-from tensorflow.contrib.learn.python.learn.estimators import model_fn as model_fn_lib
+from tensorflow.contrib.learn.python.learn.estimators import \
+    model_fn as model_fn_lib
 from tensorflow.python.ops import math_ops
+from tensorflow.contrib.metrics.python.ops.confusion_matrix_ops import \
+    confusion_matrix
 
 
 def _make_logistic_eval_metric_ops(labels, predictions, thresholds):
@@ -49,10 +52,20 @@ def _make_logistic_eval_metric_ops(labels, predictions, thresholds):
     metrics[metric_key.MetricKey.AUC] = metrics_lib.streaming_auc(
         labels=labels_tensor, predictions=predictions)
 
+    print(labels_tensor[:,0])
+    metrics['confusion_matrix'] = confusion_matrix(
+        labels=array_ops.squeeze(labels_tensor),
+        predictions=array_ops.squeeze(predictions),
+        num_classes=2)
+
     for threshold in thresholds:
         predictions_at_threshold = math_ops.to_float(
             math_ops.greater_equal(predictions, threshold),
             name='predictions_at_threshold_%f' % threshold)
+
+        print(labels_tensor)
+        print(predictions_at_threshold)
+
         metrics[metric_key.MetricKey.ACCURACY_MEAN % threshold] = (
             metrics_lib.streaming_accuracy(labels=labels_tensor,
                                            predictions=predictions_at_threshold))
@@ -66,6 +79,7 @@ def _make_logistic_eval_metric_ops(labels, predictions, thresholds):
                                          predictions=predictions_at_threshold))
 
     return metrics
+
 
 def parse_tensor_or_dict(features):
     if isinstance(features, dict):

@@ -1,4 +1,7 @@
 from keras import backend as K
+from tensorflow.contrib.metrics.python.ops.confusion_matrix_ops import \
+    confusion_matrix
+import tensorflow as tf
 
 
 def matthews_correlation(y_true, y_pred):
@@ -101,3 +104,26 @@ def fmeasure(y_true, y_pred):
     Here it is only computed as a batch-wise average, not globally.
     """
     return fbeta_score(y_true, y_pred, beta=1)
+
+
+# def a_confusion_matrics(num_classes):
+#     def confusion_matrics(y_true, y_pred):
+#         print(y_true)
+#         print(y_pred)
+#         y_true_argmax = tf.cast(tf.argmax(y_true, axis=1), tf.float32)
+#         y_pred_argmax = tf.cast(tf.argmax(y_pred, axis=1), tf.float32)
+#         y_true= tf.transpose(y_true_argmax)
+#         print(y_true)
+#         y_pred= tf.transpose(y_pred_argmax)
+#         print(y_pred)
+#         return confusion_matrix(
+#             labels=y_true,
+#             predictions=y_pred,
+#             num_classes=num_classes,
+#         )
+#     return confusion_matrics
+#
+# def check_matrics(y_true, y_pred):
+#     y_true_argmax = tf.cast(tf.argmax(y_true, axis=1), tf.float32)
+#     y_pred_argmax = tf.cast(tf.argmax(y_pred, axis=1), tf.float32)
+#     return y_true_argmax

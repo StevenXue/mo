@@ -60,6 +60,7 @@ def image_classifier_inception_v3(conf, input, **kw):
         # top_model.add(Dense(256, activation='relu'))
         top_model.add(Dropout(0.5))
 
+        # binary class
         if num_classes == 2:
             top_model.add(Dense(1, activation='sigmoid'))
             model = Model(inputs=base_model.input,
@@ -68,13 +69,14 @@ def image_classifier_inception_v3(conf, input, **kw):
             for layer in model.layers[:-2]:
                 layer.trainable = False
 
+
             model.compile(loss='binary_crossentropy',
                           optimizer='rmsprop',
                           metrics=['accuracy',
                                    custom_metrcis.matthews_correlation,
                                    custom_metrcis.precision,
                                    custom_metrcis.recall,
-                                   custom_metrcis.fmeasure
+                                   custom_metrcis.fmeasure,
                                    ])
         else:
             top_model.add(Dense(num_classes, activation='softmax'))
@@ -95,16 +97,22 @@ def image_classifier_inception_v3(conf, input, **kw):
         # this is the augmentation configuration we will use for testing:
         # only rescaling
         test_datagen = ImageDataGenerator(rescale=1. / 255)
+
+        if num_classes == 2:
+            class_mode = 'binary'
+        else:
+            class_mode = 'categorical'
+
         train_generator = train_datagen.flow_from_directory(
             train_data_dir,
             target_size=(img_width, img_height),
             batch_size=batch_size,
-            class_mode='binary')
+            class_mode=class_mode)
         validation_generator = test_datagen.flow_from_directory(
             validation_data_dir,
             target_size=(img_width, img_height),
             batch_size=batch_size,
-            class_mode='binary')
+            class_mode=class_mode)
         # callback to save metrics
         batch_print_callback = LambdaCallback(on_epoch_end=
                                               lambda epoch, logs:

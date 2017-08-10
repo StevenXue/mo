@@ -12,10 +12,7 @@ from tensorflow.contrib.learn.python.learn.estimators import constants
 from tensorflow.contrib.learn.python.learn.estimators import \
     model_fn as model_fn_lib
 from tensorflow.contrib.learn.python.learn.estimators import prediction_key
-
-from tensorflow.contrib.tensor_forest.client import eval_metrics
 from tensorflow.contrib.tensor_forest.python import tensor_forest
-
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import math_ops
@@ -24,6 +21,13 @@ from tensorflow.python.platform import tf_logging as logging
 from tensorflow.python.training import basic_session_run_hooks
 from tensorflow.python.training import monitored_session
 from tensorflow.python.training import session_run_hook
+from tensorflow.contrib.tensor_forest.client \
+    import eval_metrics
+from tensorflow.contrib import metrics as metrics_lib
+from tensorflow.contrib.learn.python.learn.estimators import metric_key
+from tensorflow.contrib.metrics.python.ops.confusion_matrix_ops import \
+    confusion_matrix
+import tensorflow as tf
 
 
 class TensorForestLossHook(session_run_hook.SessionRunHook):
@@ -37,18 +41,37 @@ class TensorForestLossHook(session_run_hook.SessionRunHook):
         # non-decreasing
         self.steps = 0
 
+        # eval
+        self._estimator = None
+
+
     def before_run(self, run_context):
         return session_run_hook.SessionRunArgs(
             {
                 'global_step': contrib_framework.get_global_step(),
                 'current_loss':
                     run_context.session.graph.get_operation_by_name(
-                        'rf_training_loss').outputs[0]})
+                        'rf_training_loss').outputs[0],
+                'confusion_matrix_print':
+                    run_context.session.graph.get_operation_by_name(
+                        'confusion_matrix_print').outputs[0],
+                'regression_ornot':
+                    run_context.session.graph.get_operation_by_name(
+                        'regression_ornot').outputs[0],
+            })
 
     def after_run(self, run_context, run_values):
         current_loss = run_values.results['current_loss']
         current_step = run_values.results['global_step']
+        global_step = run_values.results['global_step']
+        regression_ornot = run_values.results['regression_ornot']
         self.steps += 1
+        if global_step % 100 == 0 and not regression_ornot:
+            confusion_matrix_print = run_values.results[
+                'confusion_matrix_print']
+            logging.info('train_confusion_matrix = '
+                         + str(confusion_matrix_print))
+            # logging.info(confusion_matrix_print)
         # Guard against the global step going backwards, which might happen
         # if we recover from something.
         if self.last_step == -1 or self.last_step > current_step:
@@ -84,9 +107,13 @@ class EveryCheckpointPreSaveListener(
 
 def random_forest_model_fn(features, labels, mode, params, config):
     """Function that returns predictions, training loss, and training op."""
+    labels_tensor = labels
+    if isinstance(labels, dict) and len(labels) == 1:
+        labels_tensor = labels.values()[0]
 
     weights_name = params["weights_name"]
     keys_name = params["keys_name"]
+    num_classes = tf.identity(params['num_classes'], name='num_classes')
     params_toGraphs = tensor_forest.ForestHParams(
         num_classes=params['num_classes'], num_features=params['num_features'],
         num_trees=params['num_trees'], max_nodes=params['max_nodes'],
@@ -123,9 +150,11 @@ def random_forest_model_fn(features, labels, mode, params, config):
     graph_builder = graph_builder_class(params_toGraphs,
                                         device_assigner=dev_assn)
     inference = {}
+    predictions = {}
     output_alternatives = None
-    if (mode == model_fn_lib.ModeKeys.EVAL or
-                mode == model_fn_lib.ModeKeys.INFER):
+    # if (mode == model_fn_lib.ModeKeys.EVAL or
+    #             mode == model_fn_lib.ModeKeys.INFER):
+    if True:
         inference[eval_metrics.INFERENCE_PROB_NAME] = (
             graph_builder.inference_graph(features))
 
@@ -184,12 +213,39 @@ def random_forest_model_fn(features, labels, mode, params, config):
             training_loss = graph_builder.training_loss(
                 features, labels, name='rf_training_loss')
 
+    # 命名以传到 hook 中
+    if not params['regression']:
+        confusion_matrix_print = confusion_matrix(
+            labels=labels_tensor,
+            predictions=predictions['classes'],
+            num_classes=num_classes, )
+
+        confusion_matrix_print = tf.identity(confusion_matrix_print,
+                                             name='confusion_matrix_print')
+    else:
+        confusion_matrix_print = tf.identity(0,
+                                             name='confusion_matrix_print')
+
+    regression_ornot = tf.identity(params['regression'],
+                                            name='regression_ornot')
     # Put weights back in
     if weights is not None:
         features[weights_name] = weights
 
     if early_stopping_rounds:
         training_hooks.append(TensorForestLossHook(early_stopping_rounds))
+
+    metrics = {}
+    # metrics[metric_key.MetricKey.AUC] = metrics_lib.streaming_auc(
+    #     labels=labels_tensor,
+    #     predictions=inference[eval_metrics.INFERENCE_PRED_NAME]
+    # )
+    if not params_toGraphs.regression:
+        metrics['eval_confusion_matrix'] = confusion_matrix(
+            labels=labels_tensor,
+            predictions=predictions['classes'],
+            num_classes=params['num_classes'],
+        )
 
     return model_fn_lib.ModelFnOps(
         mode=mode,
@@ -198,6 +254,7 @@ def random_forest_model_fn(features, labels, mode, params, config):
         train_op=training_graph,
         training_hooks=training_hooks,
         scaffold=scaffold,
+        eval_metric_ops=metrics,
         output_alternatives=output_alternatives)
 
 

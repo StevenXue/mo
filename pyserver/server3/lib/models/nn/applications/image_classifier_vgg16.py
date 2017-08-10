@@ -97,16 +97,21 @@ def image_classifier_vgg16(conf, input, **kw):
         # this is the augmentation configuration we will use for testing:
         # only rescaling
         test_datagen = ImageDataGenerator(rescale=1. / 255)
+        if num_classes == 2:
+            class_mode = 'binary'
+        else:
+            class_mode = 'categorical'
+
         train_generator = train_datagen.flow_from_directory(
             train_data_dir,
             target_size=(img_width, img_height),
             batch_size=batch_size,
-            class_mode='binary')
+            class_mode=class_mode)
         validation_generator = test_datagen.flow_from_directory(
             validation_data_dir,
             target_size=(img_width, img_height),
             batch_size=batch_size,
-            class_mode='binary')
+            class_mode=class_mode)
         # callback to save metrics
         batch_print_callback = LambdaCallback(on_epoch_end=
                                               lambda epoch, logs:
