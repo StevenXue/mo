@@ -136,7 +136,7 @@ export default class ParamsSeletor extends React.Component {
         if(this.state.steps.indexOf('Select Target Fields') !== this.state.steps.length -1){
           if(this.props.type === 'transfer_box') {
             if(this.state.target.length <= this.props.selectable[1][1]
-              && this.state.target.length <= this.props.selectable[1][0]) {
+              && this.state.target.length >= this.props.selectable[1][0]) {
               this.props.setData({divide: [this.state.source, this.state.target]});
               this.setState({editing: 'Enter Parameters'});
             }else{
@@ -152,10 +152,6 @@ export default class ParamsSeletor extends React.Component {
               }
             }else{
               if (this.state.checkedCols.length >= this.props.selectable[0][0]) {
-                // this.props.setData({
-                //   checkedCols: this.state.checkedCols,
-                //   runnable: true
-                // });
                 this.setState({editing: 'Enter Parameters'});
               } else {
                 message.error('please select correct amount of source fields');
@@ -190,7 +186,7 @@ export default class ParamsSeletor extends React.Component {
       case 'Select Source Fields':
         if( this.props.selectable[0][1] !== null ){
           if(this.state.source.length <= this.props.selectable[0][1]
-            && this.state.source.length <= this.props.selectable[0][0]) {
+            && this.state.source.length >= this.props.selectable[0][0]) {
             this.setState({editing: 'Select Target Fields', targetKeys: []});
           }else{
             message.error('please select correct amount of source fields');
