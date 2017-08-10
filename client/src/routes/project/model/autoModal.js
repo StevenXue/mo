@@ -253,7 +253,7 @@ class AutomatedModel extends React.Component {
               <div style={{ height: 480, overflowY: 'auto', marginTop: 5, backgroundColor: '#fafafa' }}>
                 {
                   this.state.statusStack.map((el, i) =>
-                    <Model style={{ width: 1200, height: el ? 450 : 300 }}
+                    <Model style={{ width: 1200, height: 450 }}
                            selectedFile={this.state.selectedFile}
                            project_id={this.props.project_id}
                            dataset_id={this.state.selectedData}
