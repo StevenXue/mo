@@ -80,4 +80,5 @@ def update_one_public_model():
 
 
 if __name__ == '__main__':
+    remove_by_id("598b3426d845c052e72ffa11")
     pass
