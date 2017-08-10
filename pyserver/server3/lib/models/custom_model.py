@@ -65,7 +65,7 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
     # input_data 已分割 为训练集和测试集
     X_train, X_test, y_train, y_test = \
         input_data['x_tr'], input_data['x_te'],\
-        input_data['y_tr'], input_data['y_tr']
+        input_data['y_tr'], input_data['y_te']
 
     train_input_fn = get_input_fn(model_name=input_data['model_name'],
                                   df_features=X_train,
@@ -103,6 +103,12 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
         every_n_steps=100,
         metrics=validation_metrics)
 
+    tra__monitor = tf.contrib.learn.monitors.ValidationMonitor(
+        input_fn=train_input_fn,
+        eval_steps=1,
+        every_n_steps=100,
+        metrics=validation_metrics)
+
     # init model
     estimator = \
         tf.contrib.learn.Estimator(model_fn=model_fn,
@@ -110,7 +116,7 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
                                    config=
                                    tf.contrib.learn.RunConfig(
                                        save_checkpoints_steps=
-                                       val_monitor._every_n_steps),
+                                       100),
                                    params=est_params[
                                        'args'])
 
@@ -130,9 +136,8 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
     #     evaluation_times -= 1
 
     # fit
-
     estimator.fit(input_fn=train_input_fn,
-                  monitors=[val_monitor],
+                  monitors=[val_monitor, tra__monitor],
                   **fit_params['args'])
     # evaluate
     metrics = estimator.evaluate(input_fn=eval_input_fn,

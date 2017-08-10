@@ -193,6 +193,8 @@ from sklearn.datasets import load_iris
 iris = load_iris()
 
 ids = np.where((iris.target == 0) | (iris.target == 1))
+
+
 train_x = iris.data[ids]
 train_y = iris.target[ids]
 
@@ -201,6 +203,16 @@ iris_feature = pd.DataFrame(data= np.c_[train_x],
 
 iris_label = pd.DataFrame(data= train_y,
                      columns= ['target'])
+
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(
+    iris_feature, iris_label,
+    test_size=0.20,
+    random_state=42)
+#
+
+
 #
 #
 # # # # # 测试 Random forest
@@ -277,59 +289,25 @@ iris_label = pd.DataFrame(data= train_y,
 
 
 # # 测试 Linear_classifier
-#
-# input = {
-#     'model_name': 'Linear_classifier',
-#     'df_features': iris_feature,
-#     'df_labels': iris_label,
-# }
-# params = {
-#     'estimator': {
-#         'args': {
-#             "dimension": 4,
-#             "n_classes": 2,
-#             "weight_column_name": None,
-#             "gradient_clip_norm": None,
-#             "enable_centered_bias": False,
-#             "_joint_weight": False,
-#             "label_keys": None,
-#         }
-#     },
-#     'fit': {
-#         "args": {
-#             "steps": 300
-#         }
-#     },
-#     'evaluate': {
-#         'args': {
-#             'steps': 1
-#         }
-#     }
-# }
-#
-# sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
-# from server3.lib.models.linear_classifier import linear_classifier_model_fn
-# result = custom_model(params, linear_classifier_model_fn, input, result_sds=sds)
-# print(result)
-
-# # 测试 svm
 
 input = {
-    'model_name': 'svm',
-    'df_features': iris_feature,
-    'df_labels': iris_label,
+    'model_name': 'Linear_classifier',
+    'x_tr': X_train,
+    'x_te': X_test,
+    'y_tr': y_train,
+    'y_te': y_test,
 }
+
 params = {
     'estimator': {
         'args': {
             "dimension": 4,
+            "num_classes": 2,
             "weight_column_name": None,
-            "model_dir": None,
-            "l1_regularization": 0.0,
-            "l2_regularization": 0.0,
-            "num_loss_partitions": 1,
-            "kernels": None,
-            "config": None,
+            "gradient_clip_norm": None,
+            "enable_centered_bias": False,
+            "_joint_weight": False,
+            "label_keys": None,
         }
     },
     'fit': {
@@ -345,9 +323,46 @@ params = {
 }
 
 sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
-from server3.lib.models.svm import svm_model_fn
-result = custom_model(params, svm_model_fn, input, result_sds=sds)
+from server3.lib.models.linear_classifier import linear_classifier_model_fn
+result = custom_model(params, linear_classifier_model_fn, input, result_sds=sds)
 print(result)
+
+# # 测试 svm
+
+# input = {
+#     'model_name': 'svm',
+#     'df_features': iris_feature,
+#     'df_labels': iris_label,
+# }
+# params = {
+#     'estimator': {
+#         'args': {
+#             "dimension": 4,
+#             "weight_column_name": None,
+#             "model_dir": None,
+#             "l1_regularization": 0.0,
+#             "l2_regularization": 0.0,
+#             "num_loss_partitions": 1,
+#             "kernels": None,
+#             "config": None,
+#         }
+#     },
+#     'fit': {
+#         "args": {
+#             "steps": 300
+#         }
+#     },
+#     'evaluate': {
+#         'args': {
+#             'steps': 1
+#         }
+#     }
+# }
+#
+# sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
+# from server3.lib.models.svm import svm_model_fn
+# result = custom_model(params, svm_model_fn, input, result_sds=sds)
+# print(result)
 
 
 #################
@@ -363,14 +378,22 @@ print(result)
 #                      columns= boston['feature_names'] )
 # boston_label = pd.DataFrame(data= boston['target'],
 #                      columns= ['target'])
+
+
+# 测试 linear_regressor
+# from sklearn.model_selection import train_test_split
 #
-#
-# # 测试 linear_regressor
+# X_train, X_test, y_train, y_test = train_test_split(
+#     boston_feature, boston_label,
+#     test_size=0.20,
+#     random_state=42)
 #
 # input = {
 #     'model_name': 'linear_regressor',
-#     'df_features': boston_feature,
-#     'df_labels': boston_label,
+#     'x_tr': X_train,
+#     'x_te': X_test,
+#     'y_tr': y_train,
+#     'y_te': y_test,
 # }
 # params = {
 #     'estimator': {
