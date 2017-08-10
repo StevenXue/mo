@@ -274,7 +274,7 @@ export default class ModelProcess extends React.Component {
 
   render(){
     return(
-        <div style={{width: '100%', height: this.state.isActive? 450:300, margin: 10 , padding: 10, backgroundColor: 'white' }}>
+        <div style={{width: '100%', height: this.state.isActive? 450:400, margin: 10 , padding: 10, backgroundColor: 'white' }}>
           <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%', height: '100%'}}>
           <div className='choose_model_and_input' style={{width: '35%', height: '100%'}}>
             <span style={{color: '#108ee9'}}>Choose Modelling Method</span>

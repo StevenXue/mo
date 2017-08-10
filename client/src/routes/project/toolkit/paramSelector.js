@@ -136,37 +136,57 @@ export default class ParamsSeletor extends React.Component {
         if(this.state.steps.indexOf('Select Target Fields') !== this.state.steps.length -1){
           if(this.props.type === 'transfer_box') {
             if(this.state.target.length <= this.props.selectable[1][1]
-              && this.state.target.length <= this.props.selectable[1][0]) {
+              && this.state.target.length >= this.props.selectable[1][0]) {
               this.props.setData({divide: [this.state.source, this.state.target]});
               this.setState({editing: 'Enter Parameters'});
             }else{
               message.error('please select correct amount of source fields');
             }
           }else{
-            if(this.state.checkedCols.length <= this.props.selectable[0][1]
-              && this.state.checkedCols.length <= this.props.selectable[0][0]) {
-              this.setState({editing: 'Enter Parameters'});
+            if (this.props.selectable[0][1] !== null) {
+              if (this.state.checkedCols.length <= this.props.selectable[0][1]
+                && this.state.checkedCols.length >= this.props.selectable[0][0]) {
+                this.setState({editing: 'Enter Parameters'});
+              } else {
+                message.error('please select correct amount of source fields');
+              }
             }else{
-              message.error('please select correct amount of source fields');
+              if (this.state.checkedCols.length >= this.props.selectable[0][0]) {
+                this.setState({editing: 'Enter Parameters'});
+              } else {
+                message.error('please select correct amount of source fields');
+              }
             }
           }
-        }else{
-          if(this.state.checkedCols.length <= this.props.selectable[0][1]
-            && this.state.checkedCols.length <= this.props.selectable[0][0]) {
-            console.log("hi");
-            this.props.setData({
-              checkedCols: this.state.checkedCols,
-              runnable: true
-            });
+        }else {
+          if (this.props.selectable[0][1] !== null){
+            if (this.state.checkedCols.length <= this.props.selectable[0][1]
+              && this.state.checkedCols.length >= this.props.selectable[0][0]) {
+              this.props.setData({
+                checkedCols: this.state.checkedCols,
+                runnable: true
+              });
+            } else {
+              console.log(this.props.selectable[0], "hi");
+              message.error('please select correct amount of source fields');
+            }
           }else{
-            message.error('please select correct amount of source fields');
+            if (this.state.checkedCols.length >= this.props.selectable[0][0]) {
+              this.props.setData({
+                checkedCols: this.state.checkedCols,
+                runnable: true
+              });
+            } else {
+              console.log(this.props.selectable[0], "hi 2");
+              message.error('please select correct amount of source fields');
+            }
           }
         }
         return
       case 'Select Source Fields':
         if( this.props.selectable[0][1] !== null ){
           if(this.state.source.length <= this.props.selectable[0][1]
-            && this.state.source.length <= this.props.selectable[0][0]) {
+            && this.state.source.length >= this.props.selectable[0][0]) {
             this.setState({editing: 'Select Target Fields', targetKeys: []});
           }else{
             message.error('please select correct amount of source fields');
