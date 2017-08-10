@@ -17,6 +17,8 @@ cause:
 1. optimizer can not support distribute
 """
 import inspect
+import os
+
 from keras.datasets import mnist
 from keras.utils import np_utils
 
@@ -37,18 +39,11 @@ from keras.optimizers import RMSprop
 
 def train_hyperas_model(conf, data_source_id, **kwargs):
     # generate my_temp_model python file
-    # conf1 = CONSTANT["MNIST_CONF"]
     conf_to_python_file(conf, data_source_id, **kwargs)
 
-    # from my_temp_model import model_function, my_data_function_template
-    my_temp_model = __import__("my_temp_model")
-    # import my_temp_model
-    model_function = getattr(my_temp_model, "model_function")
-    my_data_function_template = \
-        getattr(my_temp_model, "my_data_function_template")
-
-    model = model_function
-    data = my_data_function_template
+    import my_temp_model
+    model = my_temp_model.model_function
+    data = my_temp_model.my_data_function_template
     X_train, Y_train, X_test, Y_test = data()
 
     best_run, best_model = optim.minimize(model=model,
@@ -58,7 +53,6 @@ def train_hyperas_model(conf, data_source_id, **kwargs):
                                           trials=Trials())
 
     temp_file = "./my_temp_model.py"
-    import os
     try:
         pass
         os.remove(temp_file)
@@ -337,33 +331,36 @@ SELECT_CHIOCE = {
     "eg": "../type[range]"
 }
 
+UNIFORM = {
+    'name': "uniform",
+    'type': {
+        'key': 'join_low_high',
+        'des': 'Uniform distribution, Returns a value uniformly between low and high.',
+    },
+    'default': "0, 1",
+    'eg': "0, 1"
+}
+
+CHOICE = {
+    'name': "choice",
+    'type': {
+        'key': 'multiple',
+        'des': "Choice distribution, "
+               "Returns one of the options, which should be a list or tuple.",
+    },
+    'default': None,
+    "eg": [256, 512, 1024]
+}
+
 DISTRIBUTE = {
     "name": "distribute_choice",
     "type": {
         'key': 'choice',
         'des': 'distribute choice for hyperparameters tuning',
         'range': [
-            {
-                'name': "uniform",
-                'type': {
-                    'key': 'join_low_high',
-                    'des': 'Uniform distribution, Returns a value uniformly between low and high.',
-                },
-                'default': "0, 1",
-                'eg': "0, 1"
-            },
-            {
-                'name': "choice",
-                'type': {
-                    'key': 'multiple',
-                    'des': "Choice distribution, "
-                           "Returns one of the options, which should be a list or tuple.",
-                },
-                'default': None,
-                "eg": [256, 512, 1024]
-            }
+            UNIFORM, CHOICE
         ]
-    },
+    }
 }
 
 ACTIVATION = {
@@ -455,7 +452,16 @@ HYPERAS_SPEC = {
                     "default": 32,
                     "required": True,
 
-                    "distribute": DISTRIBUTE
+                    "distribute": {
+                        "name": "distribute_choice",
+                        "type": {
+                            'key': 'choice',
+                            'des': 'distribute choice for hyperparameters tuning',
+                            'range': [
+                                CHOICE
+                            ]
+                        }
+                    }
                 },
                 ACTIVATION,
                 INPUT_SHAPE
@@ -953,14 +959,14 @@ CONSTANT = {
 
 if __name__ == "__main__":
     test = {
-        "conf":{
-            "layers":[
+        "conf": {
+            "layers": [
                 {
-                    "name":"Dense",
-                    "args":{
-                        "units":{
-                            "distribute":"uniform",
-                            "value":"0, 1"
+                    "name": "Dense",
+                    "args": {
+                        "units": {
+                            "distribute": "uniform",
+                            "value": "0, 1"
                         },
                         "activation": {
                             "distribute": "choice",
@@ -971,133 +977,133 @@ if __name__ == "__main__":
                         ]
 
                     },
-                    "index":0
+                    "index": 0
                 },
                 {
-                    "name":"Dropout",
-                    "args":{
-                        "rate":{
-                            "distribute":"choice",
-                            "value":[0.1, 0.2, 0.4]
+                    "name": "Dropout",
+                    "args": {
+                        "rate": {
+                            "distribute": "choice",
+                            "value": [0.1, 0.2, 0.4]
                         }
                     },
-                    "index":1
+                    "index": 1
                 },
                 {
-                    "name":"Dense",
-                    "args":{
-                        "units":64,
-                        "activation":"softmax"
+                    "name": "Dense",
+                    "args": {
+                        "units": 64,
+                        "activation": "softmax"
                     },
-                    "index":2
+                    "index": 2
                 }
             ],
-            "compile":{
-                "args":{
-                    "loss":[
+            "compile": {
+                "args": {
+                    "loss": [
                         "categorical_crossentropy",
                         "hinge"
                     ],
-                    "optimizer":{
-                        "hyped":True,
-                        "name":"SGD",
-                        "range":[
+                    "optimizer": {
+                        "hyped": True,
+                        "name": "SGD",
+                        "range": [
                             {
-                                "distribute":{
-                                    "name":"distribute_choice",
-                                    "type":{
-                                        "des":"distribute choice for hyperparameters tuning",
-                                        "key":"choice",
-                                        "range":[
+                                "distribute": {
+                                    "name": "distribute_choice",
+                                    "type": {
+                                        "des": "distribute choice for hyperparameters tuning",
+                                        "key": "choice",
+                                        "range": [
                                             {
-                                                "default":"0, 1",
-                                                "eg":"0, 1",
-                                                "name":"uniform",
-                                                "type":{
-                                                    "des":"Uniform distribution, Returns a value uniformly between low and high.",
-                                                    "key":"join_low_high"
+                                                "default": "0, 1",
+                                                "eg": "0, 1",
+                                                "name": "uniform",
+                                                "type": {
+                                                    "des": "Uniform distribution, Returns a value uniformly between low and high.",
+                                                    "key": "join_low_high"
                                                 }
                                             },
                                             {
-                                                "default":None,
-                                                "eg":[
+                                                "default": None,
+                                                "eg": [
                                                     256,
                                                     512,
                                                     1024
                                                 ],
-                                                "name":"choice",
-                                                "type":{
-                                                    "des":"Choice distribution, Returns one of the options, which should be a list or tuple.",
-                                                    "key":"multiple"
+                                                "name": "choice",
+                                                "type": {
+                                                    "des": "Choice distribution, Returns one of the options, which should be a list or tuple.",
+                                                    "key": "multiple"
                                                 }
                                             }
                                         ]
                                     }
                                 },
-                                "name":"lr",
-                                "type":{
-                                    "des":"the learning rate of NN optimizers",
-                                    "key":"float"
+                                "name": "lr",
+                                "type": {
+                                    "des": "the learning rate of NN optimizers",
+                                    "key": "float"
                                 }
                             },
                             {
-                                "distribute":{
-                                    "name":"distribute_choice",
-                                    "type":{
-                                        "des":"distribute choice for hyperparameters tuning",
-                                        "key":"choice",
-                                        "range":[
+                                "distribute": {
+                                    "name": "distribute_choice",
+                                    "type": {
+                                        "des": "distribute choice for hyperparameters tuning",
+                                        "key": "choice",
+                                        "range": [
                                             {
-                                                "default":"0, 1",
-                                                "eg":"0, 1",
-                                                "name":"uniform",
-                                                "type":{
-                                                    "des":"Uniform distribution, Returns a value uniformly between low and high.",
-                                                    "key":"join_low_high"
+                                                "default": "0, 1",
+                                                "eg": "0, 1",
+                                                "name": "uniform",
+                                                "type": {
+                                                    "des": "Uniform distribution, Returns a value uniformly between low and high.",
+                                                    "key": "join_low_high"
                                                 }
                                             },
                                             {
-                                                "default":None,
-                                                "eg":[
+                                                "default": None,
+                                                "eg": [
                                                     256,
                                                     512,
                                                     1024
                                                 ],
-                                                "name":"choice",
-                                                "type":{
-                                                    "des":"Choice distribution, Returns one of the options, which should be a list or tuple.",
-                                                    "key":"multiple"
+                                                "name": "choice",
+                                                "type": {
+                                                    "des": "Choice distribution, Returns one of the options, which should be a list or tuple.",
+                                                    "key": "multiple"
                                                 }
                                             }
                                         ]
                                     }
                                 },
-                                "name":"momentum",
-                                "type":{
-                                    "des":"the learning rate of NN optimizers",
-                                    "key":"float"
+                                "name": "momentum",
+                                "type": {
+                                    "des": "the learning rate of NN optimizers",
+                                    "key": "float"
                                 }
                             }
                         ],
-                        "args":{
-                            "lr":{
+                        "args": {
+                            "lr": {
 
-                                "value":"0, 1",
-                                "distribute":"uniform",
+                                "value": "0, 1",
+                                "distribute": "uniform",
                                 "uniform": 0
 
                             },
-                            "momentum":10
+                            "momentum": 10
                         }
                     },
-                    "metrics":[
+                    "metrics": [
                         "acc"
                     ],
-                    "hype_loss":True
+                    "hype_loss": True
                 }
             },
-            "fit":{
-                "data_fields":[
+            "fit": {
+                "data_fields": [
                     [
                         "alm",
                         "erl",
@@ -1108,20 +1114,20 @@ if __name__ == "__main__":
                         "nuc"
                     ]
                 ],
-                "args":{
-                    "batch_size":100,
-                    "epochs":10
+                "args": {
+                    "batch_size": 100,
+                    "epochs": 10
                 }
             },
-            "evaluate":{
-                "args":{
-                    "batch_size":100
+            "evaluate": {
+                "args": {
+                    "batch_size": 100
                 }
             }
         },
-        "project_id":"598accd4e89bdeaf80e7206f",
-        "staging_data_set_id":"598af547e89bdec0f544b427",
-        "schema":"seq"
+        "project_id": "598accd4e89bdeaf80e7206f",
+        "staging_data_set_id": "598af547e89bdec0f544b427",
+        "schema": "seq"
     }
     MODEL_TEMPLATE = {
         "conf": {
@@ -1197,5 +1203,3 @@ if __name__ == "__main__":
         "schema": "seq"
     }
     train_hyperas_model(conf, data_source_id, **kwargs)
-
-
