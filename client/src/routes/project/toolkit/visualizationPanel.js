@@ -13,7 +13,9 @@ export default class VisualizationPanel extends React.Component {
       responseBody: {},
       dataSelected: {},
       selected: '',
-      scatterData: {}
+      scatterData: {},
+      selectedColOne: 0,
+      selectedColTwo: 0
 
     }
   }
@@ -34,6 +36,10 @@ export default class VisualizationPanel extends React.Component {
           loading: false,
           responseBody: res.response,
         });
+
+        if(res.responseBody.category === 2){
+          this.setState({selectedColOne: 0, selectedColTwo: 0})
+        }
 
         if(res.response.hist_freq){
           let label = Object.keys(res.response.hist_freq);
@@ -66,6 +72,18 @@ export default class VisualizationPanel extends React.Component {
           <br/>
         </div>)
     }
+  }
+
+  renderColSelection(chart){
+    let titles = chart.map((e, index) => ({
+      'index': index,
+      'name': e.field
+    }))
+    return titles.map((e) =>
+      <Select.Option value={e.index} key={e.index}>
+        {e.name}
+      </Select.Option>
+    )
   }
 
   renderPanel() {
@@ -192,15 +210,31 @@ export default class VisualizationPanel extends React.Component {
           </div>
           <div className="right-charts">
             <div style={{width: 300, height: 300}}>
-              <p style={{fontSize: 14, textAlign: 'center'}}>{this.state.responseBody['bar1'][0]['field']}</p>
+              <Select style={{width: 100, marginTop: 5, marginLeft: 20}}
+                      onChange={(values) => this.onSelectBarOne(values)}
+                      allowClear={false}
+                      value={this.state.selectedColOne}
+                      placeholder="Choose Field">
+                {
+                  this.renderColSelection(this.state.responseBody['bar1'])
+                }
+              </Select>
               { this.state.responseBody['bar1']&&
-                <BarChart data={this.state.responseBody['bar1'][0]}/>
+                <BarChart data={this.state.responseBody['bar1'][this.state.selectedColOne]}/>
               }
             </div>
             <div style={{marginTop: 50, width: 300, height: 300}}>
-              <p style={{fontSize: 14, textAlign: 'center'}}>{this.state.responseBody['bar2'][0]['field']}</p>
+              <Select style={{width: 100, marginTop: 5, marginLeft: 20}}
+                      onChange={(values) => this.onSelectBarTwo(values)}
+                      allowClear={false}
+                      value={this.state.selectedColTwo}
+                      placeholder="Choose Field">
+                {
+                  this.renderColSelection(this.state.responseBody['bar2'])
+                }
+              </Select>
               { this.state.responseBody['bar2']&&
-              <BarChart data={this.state.responseBody['bar2'][0]}/>
+              <BarChart data={this.state.responseBody['bar2'][this.state.selectedColTwo]}/>
               }
             </div>
           </div>
