@@ -2,6 +2,7 @@ import React from 'react'
 import ReactEcharts from 'echarts-for-react'
 
 const getOption = (props) => {
+  //console.log(props.data);
   return {
     color: ['#3398DB'],
     tooltip : {

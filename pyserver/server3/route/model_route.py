@@ -88,6 +88,21 @@ def run_multiple_model(model_id):
     return jsonify({'response': result}), 200
 
 
+# temp test for hyperas model
+@model_app.route('/models/run_hyperas_model/<string:model_id>', methods=['POST'])
+def run_hyperas_model(model_id):
+    data = request.get_json()
+    conf = data['conf']
+    project_id = data['project_id']
+    staging_data_set_id = data['staging_data_set_id']
+    schema = data['schema']
+
+    result = model_service.run_hyperas_model(conf, project_id, staging_data_set_id,
+                                             model_id, schema=schema)
+    result = json_utility.convert_to_json(result)
+    return jsonify({'response': result}), 200
+
+
 @model_app.route('/models/to_code/<string:model_id>', methods=['POST'])
 def model_to_code(model_id):
     data = request.get_json()
@@ -111,3 +126,71 @@ def model_to_code(model_id):
     # except Exception as e:
     #     return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
     return jsonify({'response': code}), 200
+
+
+# keras model
+MODEL_TEMPLATE = {
+    "conf": {
+        "layers": [
+            {
+                "name": "Dense",
+                "args": {
+                    "units": 64,
+                    "activation": "relu",
+                    "input_shape": [
+                        3
+                    ]
+                }
+            },
+            {
+                "name": "Dropout",
+                "args": {
+                    "rate": 0.5
+                }
+            },
+            {
+                "name": "Dense",
+                "args": {
+                    "units": 64,
+                    "activation": "relu"
+                }
+            },
+            {
+                "name": "Dropout",
+                "args": {
+                    "rate": 0.5
+                }
+            },
+            {
+                "name": "Dense",
+                "args": {
+                    "units": 2,
+                    "activation": "softmax"
+                }
+            }
+        ],
+        "compile": {
+            "args": {
+                "loss": "categorical_crossentropy",
+                "optimizer": "SGD",
+                "metrics": ["accuracy"]
+            }
+        },
+        "fit": {
+            "data_fields": [["age", "capital_gain", "education_num"],
+                            ["capital_loss", "hours_per_week"]],
+            "args": {
+                "batch_size": 128,
+                "epochs": 20
+            }
+        },
+        "evaluate": {
+            "args": {
+                "batch_size": 128
+            }
+        }
+    },
+    "project_id": "5965e5fae89bde79f3f0e920",
+    "staging_data_set_id": "5965cda1d123ab8f604a8dd0",
+    "schema": "seq"
+}

@@ -111,6 +111,16 @@ PARAMETER_SPEC = [
         },
         "default": None,
         'required': True
+    },
+    {
+        'name': 'x_train',
+        'type': {
+            'key': 'chioce_child',
+            "des": "blablabla",
+            'range': ["aa", 1]
+        },
+        "default": None,
+        'required': True
     }
 ]
 # MONGO = 'EXTERNAL'

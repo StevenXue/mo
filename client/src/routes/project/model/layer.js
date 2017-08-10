@@ -56,7 +56,10 @@ export default class Layer extends React.Component {
           }else{
             v = e.distribute.default;
           }
-          layer['args']['activation'] = v;
+          layer['args']['activation'] = {
+            'distribute': 'choice',
+            'value': v
+          };
         }else{
           layer['args'][e.name] = {};
           layer['args'][e.name]['distribute'] = e.hype_paramter;
@@ -149,6 +152,7 @@ export default class Layer extends React.Component {
     item['hyped'] = true;
     args[index] = item;
     this.setState({args});
+    this.props.setHype(true);
     //console.log(args)
   }
 
