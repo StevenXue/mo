@@ -143,23 +143,47 @@ export default class ParamsSeletor extends React.Component {
               message.error('please select correct amount of source fields');
             }
           }else{
-            if(this.state.checkedCols.length <= this.props.selectable[0][1]
-              && this.state.checkedCols.length <= this.props.selectable[0][0]) {
-              this.setState({editing: 'Enter Parameters'});
+            if (this.props.selectable[0][1] !== null) {
+              if (this.state.checkedCols.length <= this.props.selectable[0][1]
+                && this.state.checkedCols.length >= this.props.selectable[0][0]) {
+                this.setState({editing: 'Enter Parameters'});
+              } else {
+                message.error('please select correct amount of source fields');
+              }
             }else{
-              message.error('please select correct amount of source fields');
+              if (this.state.checkedCols.length >= this.props.selectable[0][0]) {
+                // this.props.setData({
+                //   checkedCols: this.state.checkedCols,
+                //   runnable: true
+                // });
+                this.setState({editing: 'Enter Parameters'});
+              } else {
+                message.error('please select correct amount of source fields');
+              }
             }
           }
-        }else{
-          if(this.state.checkedCols.length <= this.props.selectable[0][1]
-            && this.state.checkedCols.length <= this.props.selectable[0][0]) {
-            console.log("hi");
-            this.props.setData({
-              checkedCols: this.state.checkedCols,
-              runnable: true
-            });
+        }else {
+          if (this.props.selectable[0][1] !== null){
+            if (this.state.checkedCols.length <= this.props.selectable[0][1]
+              && this.state.checkedCols.length >= this.props.selectable[0][0]) {
+              this.props.setData({
+                checkedCols: this.state.checkedCols,
+                runnable: true
+              });
+            } else {
+              console.log(this.props.selectable[0], "hi");
+              message.error('please select correct amount of source fields');
+            }
           }else{
-            message.error('please select correct amount of source fields');
+            if (this.state.checkedCols.length >= this.props.selectable[0][0]) {
+              this.props.setData({
+                checkedCols: this.state.checkedCols,
+                runnable: true
+              });
+            } else {
+              console.log(this.props.selectable[0], "hi 2");
+              message.error('please select correct amount of source fields');
+            }
           }
         }
         return
