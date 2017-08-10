@@ -90,4 +90,4 @@ app.register_blueprint(monitor_route.monitor_app)
 app.register_blueprint(visualization_route.visualization_app)
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000, debug=False)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
