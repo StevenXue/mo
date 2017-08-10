@@ -94,7 +94,7 @@ import numpy as np
 #######################
 # 测试 多 分类：
 
-# 生成测试数据
+# # 生成测试数据
 # import numpy as np
 # import pandas as pd
 # from sklearn.datasets import load_iris
@@ -107,12 +107,13 @@ import numpy as np
 #                      columns= ['target'])
 
 
-# 测试 Random forest
+# # # # 测试 Random forest
 # input = {
 #     'model_name': 'Randomforest',
-#     'df_fetures': iris_feature,
+#     'df_features': iris_feature,
 #     'df_labels': iris_label,
 # }
+#
 # params = {
 #     'estimator': {
 #         'args': {
@@ -129,7 +130,7 @@ import numpy as np
 #     },
 #     'fit': {
 #         "args": {
-#             "steps": 30
+#             "steps": 300
 #         }
 #     },
 #     'evaluate': {
@@ -138,18 +139,18 @@ import numpy as np
 #         }
 #     }
 # }
-#
+# #
 # sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
 # from server3.lib.models.randomforest import random_forest_model_fn
 # result = custom_model(params, random_forest_model_fn, input, result_sds=sds)
 # print(result)
-
-
-# 测试 Linear_classifier
-
+#
+#
+# # # 测试 Linear_classifier
+#
 # input = {
-#     'model_name': 'Linear_classifierr',
-#     'df_fetures': iris_feature,
+#     'model_name': 'Linear_classifier',
+#     'df_features': iris_feature,
 #     'df_labels': iris_label,
 # }
 # params = {
@@ -166,7 +167,7 @@ import numpy as np
 #     },
 #     'fit': {
 #         "args": {
-#             "steps": 30
+#             "steps": 300
 #         }
 #     },
 #     'evaluate': {
@@ -182,47 +183,82 @@ import numpy as np
 # print(result)
 
 #################
-# # 测试 二 分类：
+# 测试 二 分类：
+
+# 生成测试数据
+import numpy as np
+import pandas as pd
+from sklearn.datasets import load_iris
+
+iris = load_iris()
+
+ids = np.where((iris.target == 0) | (iris.target == 1))
+train_x = iris.data[ids]
+train_y = iris.target[ids]
+
+iris_feature = pd.DataFrame(data= np.c_[train_x],
+                     columns= ["sepal_length","sepal_width","petal_length","petal_width"])
+
+iris_label = pd.DataFrame(data= train_y,
+                     columns= ['target'])
 #
-# # 生成测试数据
-# import numpy as np
-# import pandas as pd
-# from sklearn.datasets import load_iris
 #
-# iris = load_iris()
+# # # # # 测试 Random forest
+# input = {
+#     'model_name': 'Randomforest',
+#     'df_features': iris_feature,
+#     'df_labels': iris_label,
+# }
 #
-# ids = np.where((iris.target == 0) | (iris.target == 1))
-# train_x = iris.data[ids]
-# train_y = iris.target[ids]
+# params = {
+#     'estimator': {
+#         'args': {
+#             "weights_name":None,
+#             "keys_name":None,
+#             "num_classes":2,
+#             "num_features":4,
+#             "num_trees":3,
+#             "max_nodes":1000,
+#             "early_stopping_rounds":100,
+#             "regression":False,
+#             "split_after_samples":20
+#         }
+#     },
+#     'fit': {
+#         "args": {
+#             "steps": 300
+#         }
+#     },
+#     'evaluate': {
+#         'args': {
+#             'steps': 1
+#         }
+#     }
+# }
 #
-# iris_feature = pd.DataFrame(data= np.c_[train_x],
-#                      columns= ["sepal_length","sepal_width","petal_length","petal_width"])
+# sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
+# from server3.lib.models.randomforest import random_forest_model_fn
+# result = custom_model(params, random_forest_model_fn, input, result_sds=sds)
+# print(result)
 #
-# iris_label = pd.DataFrame(data= train_y,
-#                      columns= ['target'])
+
 
 # # 测试 logistic_regressor
 #
 # input = {
 #     'model_name': 'logistic_regressor',
-#     'df_fetures': iris_feature,
+#     'df_features': iris_feature,
 #     'df_labels': iris_label,
 # }
 # params = {
 #     'estimator': {
 #         'args': {
-#             "dimension": 4,
-#             "n_classes": 3,
-#             "weight_column_name": None,
-#             "gradient_clip_norm": None,
-#             "enable_centered_bias": False,
-#             "_joint_weight": False,
-#             "label_keys": None,
+#
 #         }
 #     },
 #     'fit': {
 #         "args": {
-#             "steps": 30
+#             "steps": 300
 #         }
 #     },
 #     'evaluate': {
@@ -237,29 +273,31 @@ import numpy as np
 # result = custom_model(params, logistic_regressor_model_fn, input, result_sds=sds)
 # print(result)
 
-# # 测试 svm
+
+
+
+# # 测试 Linear_classifier
 #
 # input = {
-#     'model_name': 'logistic_regressor',
-#     'df_fetures': iris_feature,
+#     'model_name': 'Linear_classifier',
+#     'df_features': iris_feature,
 #     'df_labels': iris_label,
 # }
 # params = {
 #     'estimator': {
 #         'args': {
 #             "dimension": 4,
+#             "n_classes": 2,
 #             "weight_column_name": None,
-#             "model_dir": None,
-#             "l1_regularization": 0.0,
-#             "l2_regularization": 0.5,
-#             "num_loss_partitions": 1,
-#             "kernels": None,
-#             "config": None,
+#             "gradient_clip_norm": None,
+#             "enable_centered_bias": False,
+#             "_joint_weight": False,
+#             "label_keys": None,
 #         }
 #     },
 #     'fit': {
 #         "args": {
-#             "steps": 30
+#             "steps": 300
 #         }
 #     },
 #     'evaluate': {
@@ -270,47 +308,33 @@ import numpy as np
 # }
 #
 # sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
-# from server3.lib.models.svm import svm_model_fn
-# result = custom_model(params, svm_model_fn, input, result_sds=sds)
+# from server3.lib.models.linear_classifier import linear_classifier_model_fn
+# result = custom_model(params, linear_classifier_model_fn, input, result_sds=sds)
 # print(result)
 
-
-#################
-# # 测试 回归：
-# 生成测试数据
-
-import numpy as np
-import pandas as pd
-from sklearn.datasets import load_boston
-
-boston = load_boston()
-boston_feature = pd.DataFrame(data= np.c_[boston['data']],
-                     columns= boston['feature_names'] )
-boston_label = pd.DataFrame(data= boston['target'],
-                     columns= ['target'])
-
-
-# 测试 linear_regressor
+# # 测试 svm
 
 input = {
-    'model_name': 'linear_regressor',
-    'df_features': boston_feature,
-    'df_labels': boston_label,
+    'model_name': 'svm',
+    'df_features': iris_feature,
+    'df_labels': iris_label,
 }
 params = {
     'estimator': {
         'args': {
-            "dimension": 13,
+            "dimension": 4,
             "weight_column_name": None,
-            "gradient_clip_norm": None,
-            "enable_centered_bias": False,
-            "_joint_weight": False,
-            "label_dimension": 1,
+            "model_dir": None,
+            "l1_regularization": 0.0,
+            "l2_regularization": 0.0,
+            "num_loss_partitions": 1,
+            "kernels": None,
+            "config": None,
         }
     },
     'fit': {
         "args": {
-            "steps": 1000
+            "steps": 300
         }
     },
     'evaluate': {
@@ -319,10 +343,61 @@ params = {
         }
     }
 }
+
 sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
-from server3.lib.models.linear_regressor import linear_regressor_model_fn
-result = custom_model(params, linear_regressor_model_fn, input, result_sds=sds)
+from server3.lib.models.svm import svm_model_fn
+result = custom_model(params, svm_model_fn, input, result_sds=sds)
 print(result)
+
+
+#################
+# # 测试 回归：
+# 生成测试数据
+
+# import numpy as np
+# import pandas as pd
+# from sklearn.datasets import load_boston
+#
+# boston = load_boston()
+# boston_feature = pd.DataFrame(data= np.c_[boston['data']],
+#                      columns= boston['feature_names'] )
+# boston_label = pd.DataFrame(data= boston['target'],
+#                      columns= ['target'])
+#
+#
+# # 测试 linear_regressor
+#
+# input = {
+#     'model_name': 'linear_regressor',
+#     'df_features': boston_feature,
+#     'df_labels': boston_label,
+# }
+# params = {
+#     'estimator': {
+#         'args': {
+#             "dimension": 13,
+#             "weight_column_name": None,
+#             "gradient_clip_norm": None,
+#             "enable_centered_bias": False,
+#             "_joint_weight": False,
+#             "label_dimension": 1,
+#         }
+#     },
+#     'fit': {
+#         "args": {
+#             "steps": 1000
+#         }
+#     },
+#     'evaluate': {
+#         'args': {
+#             'steps': 1
+#         }
+#     }
+# }
+# sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
+# from server3.lib.models.linear_regressor import linear_regressor_model_fn
+# result = custom_model(params, linear_regressor_model_fn, input, result_sds=sds)
+# print(result)
 
 
 # # 测试 Random forest

@@ -3,11 +3,14 @@ import inspect
 
 import tensorflow as tf
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
 from tensorflow.python.framework import constant_op
 from tensorflow.python.framework import dtypes
 from server3.utility.str_utility import generate_args_str
 from server3.service.custom_log_handler import MetricsHandler
+from tensorflow.contrib.learn.python.learn import monitors
+from tensorflow.contrib.learn.python.learn.estimators import estimator
 
 
 def custom_model(conf, model_fn, input_data, **kw):
@@ -52,29 +55,94 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
     logger = logging.getLogger('tensorflow')
     logger.setLevel(logging.DEBUG)
     logger.addHandler(mh)
-    # init model
-    estimator = tf.contrib.learn.Estimator(model_fn=model_fn,
-                                           model_dir=None,
-                                           config=None,
-                                           params=est_params['args'])
 
-    input_fn = get_input_fn(model_name=input_data['model_name'],
-                            df_features=input_data['df_features'],
-                            df_labels=input_data['df_labels'])
+    # input_data 是一整个数据集，分割 为训练集和测试集
+    # X_train, X_test, y_train, y_test = train_test_split(
+    #     input_data['df_features'], input_data['df_labels'],
+    #     test_size=0.20,
+    #     random_state=42)
+
+    # input_data 已分割 为训练集和测试集
+    X_train, X_test, y_train, y_test = \
+        input_data['x_tr'], input_data['x_te'],\
+        input_data['y_tr'], input_data['y_tr']
+
+    train_input_fn = get_input_fn(model_name=input_data['model_name'],
+                                  df_features=X_train,
+                                  df_labels=y_train)
+    eval_input_fn = get_input_fn(model_name=input_data['model_name'],
+                                 df_features=X_test,
+                                 df_labels=y_test)
+    if ((input_data['model_name'] in ['Linear_classifier', 'Randomforest'])
+        and est_params['args']['num_classes'] == 2) or input_data[
+        'model_name'] == 'svm':
+        validation_metrics = {
+            "accuracy":
+                tf.contrib.learn.MetricSpec(
+                    metric_fn=tf.contrib.metrics.streaming_accuracy,
+                    prediction_key=None),
+            "precision":
+                tf.contrib.learn.MetricSpec(
+                    metric_fn=tf.contrib.metrics.streaming_precision,
+                    prediction_key=None),
+            "recall":
+                tf.contrib.learn.MetricSpec(
+                    metric_fn=tf.contrib.metrics.streaming_recall,
+                    prediction_key=None),
+            "confusion_matrix":
+                tf.contrib.learn.MetricSpec(
+                    metric_fn=tf.contrib.metrics.confusion_matrix,
+                    prediction_key=None)
+        }
+    else:
+        validation_metrics = {}
+
+    val_monitor = tf.contrib.learn.monitors.ValidationMonitor(
+        input_fn=eval_input_fn,
+        eval_steps=1,
+        every_n_steps=100,
+        metrics=validation_metrics)
+
+    # init model
+    estimator = \
+        tf.contrib.learn.Estimator(model_fn=model_fn,
+                                   model_dir=None,
+                                   config=
+                                   tf.contrib.learn.RunConfig(
+                                       save_checkpoints_steps=
+                                       val_monitor._every_n_steps),
+                                   params=est_params[
+                                       'args'])
 
     # fit
+    # result = {}
+    # evaluation_times = max(fit_params['args']['steps'] / 100, 1)
+    # while evaluation_times > 0:
+    #     fit_params['args']['steps'] = 100
+    #     estimator.fit(input_fn=train_input_fn, monitors=[
+    # validation_monitor], **fit_params['args'])
+    #     # evaluate
+    #     metrics = estimator.evaluate(input_fn=eval_input_fn,
+    #                                  **eval_params['args'])
+    #     result.update({
+    #         'eval_metrics': metrics
+    #     })
+    #     evaluation_times -= 1
+
+    # fit
+
+    estimator.fit(input_fn=train_input_fn,
+                  monitors=[val_monitor],
+                  **fit_params['args'])
+    # evaluate
+    metrics = estimator.evaluate(input_fn=eval_input_fn,
+                                 metrics=validation_metrics,
+                                 **eval_params['args'])
+
     result = {}
-    evaluation_times = max(fit_params['args']['steps'] / 100, 1)
-    while evaluation_times > 0:
-        fit_params['args']['steps'] = 100
-        estimator.fit(input_fn=input_fn, **fit_params['args'])
-        # evaluate
-        metrics = estimator.evaluate(input_fn=input_fn,
-                                     **eval_params['args'])
-        result.update({
-            'eval_metrics': metrics
-        })
-        evaluation_times -= 1
+    result.update({
+        'eval_metrics': metrics
+    })
 
     # predict
     predict_feature = input_data.get('predict', None)
