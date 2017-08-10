@@ -174,10 +174,6 @@ export default class ModelForms extends React.Component {
 
   onClickRun(){
     let run_params = this.constructParams();
-    console.log(this.state.hyped, run_params);
-    if(run_params['compile']['loss']['distribute'] || run_params['compile']['optimizer']['distribute']){
-      console.log('hype');
-    }
     let params = {};
     if(this.state.fit.data_fields) {
       params = Object.assign({
@@ -211,7 +207,7 @@ export default class ModelForms extends React.Component {
       if(!this.state.end){
         let url = '';
         if(this.state.hyped){
-          url = flaskServer + 'model/models/run_hyperas_model/' + this.props.model_id
+          url = flaskServer + '/model/models/run_hyperas_model/' + this.props.model_id
         }else{
           url = flaskServer + '/model/models/run/' + this.props.model_id
         }
