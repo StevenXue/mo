@@ -147,8 +147,6 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
                                                           data_source_id,
                                                           model.name,
                                                           **kwargs)
-            print(input_dict)
-            return
             return job_service.run_code(conf, project_id, data_source_id,
                                         model, f, model_fn, input_dict)
 
@@ -688,4 +686,4 @@ if __name__ == '__main__':
     # run_model(conf, "595f32e4e89bde8ba70738a3", "5979da380c11f32674eb2788",
     #           "59687821d123abcfbfe8cab9")
 
-    temp()
+    # temp()
