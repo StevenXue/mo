@@ -72,3 +72,6 @@ from server3.lib.models.svm import SVM
 from server3.lib.models.svm import svm_model_fn
 
 
+
+# hyperas
+from server3.lib.models.hyperas_model import HYPERAS_SPEC

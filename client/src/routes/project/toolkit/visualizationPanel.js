@@ -185,10 +185,24 @@ export default class VisualizationPanel extends React.Component {
 
       case 2:
         return (
-        <div style={{display: 'flex', flexDirection: 'row'}}>
+        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
           <div className="left-table">
+            <SimpleTable data={{table: this.state.responseBody['table']['data'],
+                                  target: this.state.responseBody['table']['Field2']}}/>
           </div>
           <div className="right-charts">
+            <div style={{width: 300, height: 300}}>
+              <p style={{fontSize: 14, textAlign: 'center'}}>{this.state.responseBody['bar1'][0]['field']}</p>
+              { this.state.responseBody['bar1']&&
+                <BarChart data={this.state.responseBody['bar1'][0]}/>
+              }
+            </div>
+            <div style={{marginTop: 50, width: 300, height: 300}}>
+              <p style={{fontSize: 14, textAlign: 'center'}}>{this.state.responseBody['bar2'][0]['field']}</p>
+              { this.state.responseBody['bar2']&&
+              <BarChart data={this.state.responseBody['bar2'][0]}/>
+              }
+            </div>
           </div>
         </div>
         )
