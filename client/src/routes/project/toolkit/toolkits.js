@@ -184,6 +184,8 @@ export default class Toolkit extends React.Component {
       selectableType.push(parameterSpec.data.y_data_type);
     }
 
+    this.setState({constant: {}});
+
     if(parameterSpec.args) {
       parameterSpec.args.map((e) => {
         let name = e.name;
@@ -198,8 +200,6 @@ export default class Toolkit extends React.Component {
         constant: {}
       });
     }
-
-    console.log(selectableType);
 
     this.setState({
       toolkit: e,
