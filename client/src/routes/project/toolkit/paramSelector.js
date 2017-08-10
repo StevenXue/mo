@@ -156,7 +156,7 @@ export default class ParamsSeletor extends React.Component {
             console.log("hi");
             this.props.setData({
               checkedCols: this.state.checkedCols,
-              runable: true
+              runnable: true
             });
           }else{
             message.error('please select correct amount of source fields');
