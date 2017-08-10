@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from server3.service.model_service import run_multiple_model
+# from server3.service.model_service import run_multiple_model
 
 hyper_parameters = {
     # 训练周期数（epochs）和批大小（batch_size）调优
@@ -53,269 +53,437 @@ hyper_parameters = {
     ],
 }
 
-
-# layer 层参数
-# init_mode, activation, dropout_rate, weight_constraint, neurons
-
-
-def generate_conf():
-    # 获取数据
-    from keras import utils
-    import numpy as np
-    x_train = np.random.random((1000, 20))
-    y_train = utils.to_categorical(np.random.randint(10, size=(1000, 1)),
-                                   num_classes=10)
-    x_test = np.random.random((100, 20))
-    y_test = utils.to_categorical(np.random.randint(10, size=(100, 1)),
-                                  num_classes=10)
-    # x_train = []
-    # y_train = []
-    # x_test = []
-    # y_test = []
-    TEST_CONF = {"layers": [{"name": "Dense",
-                             "args": {"units": 64, "activation": "relu",
-                                      "input_shape": [
-                                          20, ],
-                                      "init": "uniform"
-                                      }
-                             },
-                            {"name": "Dropout",
-                             "args": {"rate": 0.5}},
-                            {"name": "Dense",
-                             "args": {"units": 64, "activation": "relu"}},
-                            {"name": "Dropout",
-                             "args": {"rate": 0.5}},
-                            {"name": "Dense",
-                             "args": {"units": 10, "activation": "softmax"}}
-                            ],
-                 "compile": {"loss": "categorical_crossentropy",
-                             "optimizer": {"name": "SGD",
-                                           "args": {"lr": 0.01, "momentum": 0}},
-                             "metrics": ["accuracy"]
-                             },
-                 "fit": {"x_train": x_train,
-                         "y_train": y_train,
-                         "x_val": x_test,
-                         "y_val": y_test,
-                         "args": {
-                             "epochs": 20,
-                             "batch_size": 128
-                         }
-                         },
-                 "evaluate": {"x_test": x_test,
-                              "y_test": y_test,
-                              "args": {
-                                  "batch_size": 128
-                              }
-                              }
-                 }
-    # question: is the value of batch size same as the fit
-    return TEST_CONF
-
-
-if __name__ == "__main__":
-    result = run_multiple_model(generate_conf(), None, None, None,
-                                hyper_parameters=hyper_parameters)
-    for r in result:
-        print(r)
-
-
-
-
-
-
-
-test = {
-    "conf": {
-        "layers": [
-            {
-                "name": "Dense",
-                "args": {
-                    "units": {
-                        "distribute": "uniform",
-                        "value": "0, 1"
-                    },
-                    "activation": {
-                        "distribute": "choice",
-                        "value": ["relu"]
-                    },
-                    "input_shape": [
-                        3
-                    ]
-                },
-                "index": 0
-            },
-            {
-                "name": "Dropout",
-                "args": {
-                    "rate": {
-                        "distribute": "choice",
-                        "value": "0.1, 0.2, 0.4"
-                    }
-                },
-                "index": 1
-            },
-            {
-                "name": "Dense",
-                "args": {
-                    "units": 64,
-                    "activation": "softmax"
-                },
-                "index": 2
-            }
-        ],
-        "compile": {
-            "args": {
-                "loss": [
-                    "categorical_crossentropy",
-                    "hinge"
-                ],
-                "optimizer": {
-                    "hyped": True,
-                    "name": "SGD",
-                    "range": [
-                        {
-                            "distribute": {
-                                "name": "distribute_choice",
-                                "type": {
-                                    "des": "distribute choice for hyperparameters tuning",
-                                    "key": "choice",
-                                    "range": [
-                                        {
-                                            "default": "0, 1",
-                                            "eg": "0, 1",
-                                            "name": "uniform",
-                                            "type": {
-                                                "des": "Uniform distribution, Returns a value uniformly between low and high.",
-                                                "key": "join_low_high"
-                                            }
-                                        },
-                                        {
-                                            "default": None,
-                                            "eg": [
-                                                256,
-                                                512,
-                                                1024
-                                            ],
-                                            "name": "choice",
-                                            "type": {
-                                                "des": "Choice distribution, Returns one of the options, which should be a list or tuple.",
-                                                "key": "multiple"
-                                            }
-                                        }
-                                    ]
-                                }
-                            },
-                            "name": "lr",
-                            "type": {
-                                "des": "the learning rate of NN optimizers",
-                                "key": "float"
-                            }
-                        },
-                        {
-                            "distribute": {
-                                "name": "distribute_choice",
-                                "type": {
-                                    "des": "distribute choice for hyperparameters tuning",
-                                    "key": "choice",
-                                    "range": [
-                                        {
-                                            "default": "0, 1",
-                                            "eg": "0, 1",
-                                            "name": "uniform",
-                                            "type": {
-                                                "des": "Uniform distribution, Returns a value uniformly between low and high.",
-                                                "key": "join_low_high"
-                                            }
-                                        },
-                                        {
-                                            "default": None,
-                                            "eg": [
-                                                256,
-                                                512,
-                                                1024
-                                            ],
-                                            "name": "choice",
-                                            "type": {
-                                                "des": "Choice distribution, Returns one of the options, which should be a list or tuple.",
-                                                "key": "multiple"
-                                            }
-                                        }
-                                    ]
-                                }
-                            },
-                            "name": "momentum",
-                            "type": {
-                                "des": "the learning rate of NN optimizers",
-                                "key": "float"
-                            }
-                        }
-                    ],
-                    "args": {
-                        "lr": {
-                            "hyped": True,
-                            "range": [
-                                {
-                                    "default": "0, 1",
-                                    "eg": "0, 1",
-                                    "name": "uniform",
-                                    "type": {
-                                        "des": "Uniform distribution, Returns a value uniformly between low and high.",
-                                        "key": "join_low_high"
-                                    }
-                                },
-                                {
-                                    "default": None,
-                                    "eg": [
-                                        256,
-                                        512,
-                                        1024
-                                    ],
-                                    "name": "choice",
-                                    "type": {
-                                        "des": "Choice distribution, Returns one of the options, which should be a list or tuple.",
-                                        "key": "multiple"
-                                    }
-                                }
-                            ],
-                            "args": {
-                                "uniform": "0, 1",
-                                "selected": "uniform"
-                            }
-                        },
-                        "momentum": 10
-                    }
-                },
-                "metrics": [
-                    "acc"
-                ],
-                "hype_loss": True
-            }
-        },
-        "fit": {
-            "data_fields": [
-                [
-                    "alm",
-                    "erl",
-                    "gvh"
-                ],
-                [
-                    "mit",
-                    "nuc"
-                ]
-            ],
-            "args": {
-                "batch_size": 100,
-                "epochs": 10
-            }
-        },
-        "evaluate": {
-            "args": {
-                "batch_size": 100
-            }
-        }
-    },
-    "project_id": "598accd4e89bdeaf80e7206f",
-    "staging_data_set_id": "598af547e89bdec0f544b427",
-    "schema": "seq"
-}
+#
+# # layer 层参数
+# # init_mode, activation, dropout_rate, weight_constraint, neurons
+#
+#
+# def generate_conf():
+#     # 获取数据
+#     from keras import utils
+#     import numpy as np
+#     x_train = np.random.random((1000, 20))
+#     y_train = utils.to_categorical(np.random.randint(10, size=(1000, 1)),
+#                                    num_classes=10)
+#     x_test = np.random.random((100, 20))
+#     y_test = utils.to_categorical(np.random.randint(10, size=(100, 1)),
+#                                   num_classes=10)
+#     # x_train = []
+#     # y_train = []
+#     # x_test = []
+#     # y_test = []
+#     TEST_CONF = {"layers": [{"name": "Dense",
+#                              "args": {"units": 64, "activation": "relu",
+#                                       "input_shape": [
+#                                           20, ],
+#                                       "init": "uniform"
+#                                       }
+#                              },
+#                             {"name": "Dropout",
+#                              "args": {"rate": 0.5}},
+#                             {"name": "Dense",
+#                              "args": {"units": 64, "activation": "relu"}},
+#                             {"name": "Dropout",
+#                              "args": {"rate": 0.5}},
+#                             {"name": "Dense",
+#                              "args": {"units": 10, "activation": "softmax"}}
+#                             ],
+#                  "compile": {"loss": "categorical_crossentropy",
+#                              "optimizer": {"name": "SGD",
+#                                            "args": {"lr": 0.01, "momentum": 0}},
+#                              "metrics": ["accuracy"]
+#                              },
+#                  "fit": {"x_train": x_train,
+#                          "y_train": y_train,
+#                          "x_val": x_test,
+#                          "y_val": y_test,
+#                          "args": {
+#                              "epochs": 20,
+#                              "batch_size": 128
+#                          }
+#                          },
+#                  "evaluate": {"x_test": x_test,
+#                               "y_test": y_test,
+#                               "args": {
+#                                   "batch_size": 128
+#                               }
+#                               }
+#                  }
+#     # question: is the value of batch size same as the fit
+#     return TEST_CONF
+#
+#
+# if __name__ == "__main__":
+#     result = run_multiple_model(generate_conf(), None, None, None,
+#                                 hyper_parameters=hyper_parameters)
+#     for r in result:
+#         print(r)
+#
+#
+#
+#
+#
+#
+#
+# test = {
+#     "conf": {
+#         "layers": [
+#             {
+#                 "name": "Dense",
+#                 "args": {
+#                     "units": {
+#                         "distribute": "uniform",
+#                         "value": "0, 1"
+#                     },
+#                     "activation": {
+#                         "distribute": "choice",
+#                         "value": ["relu"]
+#                     },
+#                     "input_shape": [
+#                         3
+#                     ]
+#                 },
+#                 "index": 0
+#             },
+#             {
+#                 "name": "Dropout",
+#                 "args": {
+#                     "rate": {
+#                         "distribute": "choice",
+#                         "value": "0.1, 0.2, 0.4"
+#                     }
+#                 },
+#                 "index": 1
+#             },
+#             {
+#                 "name": "Dense",
+#                 "args": {
+#                     "units": 64,
+#                     "activation": "softmax"
+#                 },
+#                 "index": 2
+#             }
+#         ],
+#         "compile": {
+#             "args": {
+#                 "loss": [
+#                     "categorical_crossentropy",
+#                     "hinge"
+#                 ],
+#                 "optimizer": {
+#                     "hyped": True,
+#                     "name": "SGD",
+#                     "range": [
+#                         {
+#                             "distribute": {
+#                                 "name": "distribute_choice",
+#                                 "type": {
+#                                     "des": "distribute choice for hyperparameters tuning",
+#                                     "key": "choice",
+#                                     "range": [
+#                                         {
+#                                             "default": "0, 1",
+#                                             "eg": "0, 1",
+#                                             "name": "uniform",
+#                                             "type": {
+#                                                 "des": "Uniform distribution, Returns a value uniformly between low and high.",
+#                                                 "key": "join_low_high"
+#                                             }
+#                                         },
+#                                         {
+#                                             "default": None,
+#                                             "eg": [
+#                                                 256,
+#                                                 512,
+#                                                 1024
+#                                             ],
+#                                             "name": "choice",
+#                                             "type": {
+#                                                 "des": "Choice distribution, Returns one of the options, which should be a list or tuple.",
+#                                                 "key": "multiple"
+#                                             }
+#                                         }
+#                                     ]
+#                                 }
+#                             },
+#                             "name": "lr",
+#                             "type": {
+#                                 "des": "the learning rate of NN optimizers",
+#                                 "key": "float"
+#                             }
+#                         },
+#                         {
+#                             "distribute": {
+#                                 "name": "distribute_choice",
+#                                 "type": {
+#                                     "des": "distribute choice for hyperparameters tuning",
+#                                     "key": "choice",
+#                                     "range": [
+#                                         {
+#                                             "default": "0, 1",
+#                                             "eg": "0, 1",
+#                                             "name": "uniform",
+#                                             "type": {
+#                                                 "des": "Uniform distribution, Returns a value uniformly between low and high.",
+#                                                 "key": "join_low_high"
+#                                             }
+#                                         },
+#                                         {
+#                                             "default": None,
+#                                             "eg": [
+#                                                 256,
+#                                                 512,
+#                                                 1024
+#                                             ],
+#                                             "name": "choice",
+#                                             "type": {
+#                                                 "des": "Choice distribution, Returns one of the options, which should be a list or tuple.",
+#                                                 "key": "multiple"
+#                                             }
+#                                         }
+#                                     ]
+#                                 }
+#                             },
+#                             "name": "momentum",
+#                             "type": {
+#                                 "des": "the learning rate of NN optimizers",
+#                                 "key": "float"
+#                             }
+#                         }
+#                     ],
+#                     "args": {
+#                         "lr": {
+#                             "hyped": True,
+#                             "range": [
+#                                 {
+#                                     "default": "0, 1",
+#                                     "eg": "0, 1",
+#                                     "name": "uniform",
+#                                     "type": {
+#                                         "des": "Uniform distribution, Returns a value uniformly between low and high.",
+#                                         "key": "join_low_high"
+#                                     }
+#                                 },
+#                                 {
+#                                     "default": None,
+#                                     "eg": [
+#                                         256,
+#                                         512,
+#                                         1024
+#                                     ],
+#                                     "name": "choice",
+#                                     "type": {
+#                                         "des": "Choice distribution, Returns one of the options, which should be a list or tuple.",
+#                                         "key": "multiple"
+#                                     }
+#                                 }
+#                             ],
+#                             "args": {
+#                                 "uniform": "0, 1",
+#                                 "selected": "uniform"
+#                             }
+#                         },
+#                         "momentum": 10
+#                     }
+#                 },
+#                 "metrics": [
+#                     "acc"
+#                 ],
+#                 "hype_loss": True
+#             }
+#         },
+#         "fit": {
+#             "data_fields": [
+#                 [
+#                     "alm",
+#                     "erl",
+#                     "gvh"
+#                 ],
+#                 [
+#                     "mit",
+#                     "nuc"
+#                 ]
+#             ],
+#             "args": {
+#                 "batch_size": 100,
+#                 "epochs": 10
+#             }
+#         },
+#         "evaluate": {
+#             "args": {
+#                 "batch_size": 100
+#             }
+#         }
+#     },
+#     "project_id": "598accd4e89bdeaf80e7206f",
+#     "staging_data_set_id": "598af547e89bdec0f544b427",
+#     "schema": "seq"
+# }
+#
+#
+# test12 = {
+#     "conf":{
+#         "layers":[
+#             {
+#                 "name":"Dense",
+#                 "args":{
+#                     "units":{
+#                         "distribute":"uniform",
+#                         "value":"0, 64"
+#                     },
+#                     "activation":{
+#                         "distribute":"choice",
+#                         "value":[
+#                             "linear",
+#                             "relu"
+#                         ]
+#                     },
+#                     "input_shape":[
+#                         4
+#                     ]
+#                 },
+#                 "index":0
+#             },
+#             {
+#                 "name":"Dropout",
+#                 "args":{
+#                     "rate":{
+#                         "distribute":"uniform",
+#                         "value":"0, 0.5"
+#                     }
+#                 },
+#                 "index":1
+#             }
+#         ],
+#         "compile":{
+#             "args":{
+#                 "loss":{
+#                     "distribute":"choice",
+#                     "value":[
+#                         "categorical_crossentropy",
+#                         "squared_hinge"
+#                     ]
+#                 },
+#                 "optimizer":{
+#                     "hyped":true,
+#                     "name":"SGD",
+#                     "range":[
+#                         {
+#                             "distribute":{
+#                                 "name":"distribute_choice",
+#                                 "type":{
+#                                     "des":"distribute choice for hyperparameters tuning",
+#                                     "key":"choice",
+#                                     "range":[
+#                                         {
+#                                             "default":"0, 1",
+#                                             "eg":"0, 1",
+#                                             "name":"uniform",
+#                                             "type":{
+#                                                 "des":"Uniform distribution, Returns a value uniformly between low and high.",
+#                                                 "key":"join_low_high"
+#                                             }
+#                                         },
+#                                         {
+#                                             "default":null,
+#                                             "eg":[
+#                                                 256,
+#                                                 512,
+#                                                 1024
+#                                             ],
+#                                             "name":"choice",
+#                                             "type":{
+#                                                 "des":"Choice distribution, Returns one of the options, which should be a list or tuple.",
+#                                                 "key":"multiple"
+#                                             }
+#                                         }
+#                                     ]
+#                                 }
+#                             },
+#                             "name":"lr",
+#                             "type":{
+#                                 "des":"the learning rate of NN optimizers",
+#                                 "key":"float"
+#                             }
+#                         },
+#                         {
+#                             "distribute":{
+#                                 "name":"distribute_choice",
+#                                 "type":{
+#                                     "des":"distribute choice for hyperparameters tuning",
+#                                     "key":"choice",
+#                                     "range":[
+#                                         {
+#                                             "default":"0, 1",
+#                                             "eg":"0, 1",
+#                                             "name":"uniform",
+#                                             "type":{
+#                                                 "des":"Uniform distribution, Returns a value uniformly between low and high.",
+#                                                 "key":"join_low_high"
+#                                             }
+#                                         },
+#                                         {
+#                                             "default":null,
+#                                             "eg":[
+#                                                 256,
+#                                                 512,
+#                                                 1024
+#                                             ],
+#                                             "name":"choice",
+#                                             "type":{
+#                                                 "des":"Choice distribution, Returns one of the options, which should be a list or tuple.",
+#                                                 "key":"multiple"
+#                                             }
+#                                         }
+#                                     ]
+#                                 }
+#                             },
+#                             "name":"momentum",
+#                             "type":{
+#                                 "des":"the learning rate of NN optimizers",
+#                                 "key":"float"
+#                             }
+#                         }
+#                     ],
+#                     "args":{
+#                         "lr":0.01,
+#                         "momentum":{
+#                             "uniform":"0, 10",
+#                             "distribute":"uniform"
+#                         }
+#                     }
+#                 },
+#                 "metrics":[
+#                     "acc"
+#                 ]
+#             }
+#         },
+#         "fit":{
+#             "data_fields":[
+#                 [
+#                     "alm",
+#                     "erl",
+#                     "gvh",
+#                     "mcg"
+#                 ],
+#                 [
+#                     "mit",
+#                     "nuc"
+#                 ]
+#             ],
+#             "args":{
+#                 "batch_size":128,
+#                 "epochs":10
+#             }
+#         },
+#         "evaluate":{
+#             "args":{
+#                 "batch_size":128
+#             }
+#         }
+#     },
+#     "project_id":"598b0222e89bdec0f544be60",
+#     "staging_data_set_id":"598b023ee89bdec0f544be62",
+#     "schema":"seq",
+#     "divide_row":1000
+# }
