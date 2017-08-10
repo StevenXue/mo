@@ -331,36 +331,6 @@ SELECT_CHIOCE = {
     "eg": "../type[range]"
 }
 
-DISTRIBUTE = {
-    "name": "distribute_choice",
-    "type": {
-        'key': 'choice',
-        'des': 'distribute choice for hyperparameters tuning',
-        'range': [
-            {
-                'name': "uniform",
-                'type': {
-                    'key': 'join_low_high',
-                    'des': 'Uniform distribution, Returns a value uniformly between low and high.',
-                },
-                'default': "0, 1",
-                'eg': "0, 1"
-            },
-            {
-                'name': "choice",
-                'type': {
-                    'key': 'multiple',
-                    'des': "Choice distribution, "
-                           "Returns one of the options, which should be a list or tuple.",
-                },
-                'default': None,
-                "eg": [256, 512, 1024]
-            }
-        ]
-    },
-}
-
-
 UNIFORM = {
     'name': "uniform",
     'type': {
@@ -370,7 +340,6 @@ UNIFORM = {
     'default': "0, 1",
     'eg': "0, 1"
 }
-
 
 CHOICE = {
     'name': "choice",
@@ -383,6 +352,16 @@ CHOICE = {
     "eg": [256, 512, 1024]
 }
 
+DISTRIBUTE = {
+    "name": "distribute_choice",
+    "type": {
+        'key': 'choice',
+        'des': 'distribute choice for hyperparameters tuning',
+        'range': [
+            UNIFORM, CHOICE
+        ]
+    }
+}
 
 ACTIVATION = {
     'name': 'activation',
@@ -473,7 +452,16 @@ HYPERAS_SPEC = {
                     "default": 32,
                     "required": True,
 
-                    "distribute": DISTRIBUTE
+                    "distribute": {
+                        "name": "distribute_choice",
+                        "type": {
+                            'key': 'choice',
+                            'des': 'distribute choice for hyperparameters tuning',
+                            'range': [
+                                CHOICE
+                            ]
+                        }
+                    }
                 },
                 ACTIVATION,
                 INPUT_SHAPE
