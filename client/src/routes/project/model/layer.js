@@ -75,6 +75,7 @@ export default class Layer extends React.Component {
       }else{
         let target = ReactDOM.findDOMNode(this.refs[e.name]);
         if (target.value) {
+          console.log(e.name, e.type.key, target.value);
           switch (e.type.key) {
             case 'int':
               layer['args'][e.name] = parseInt(target.value);
@@ -85,10 +86,10 @@ export default class Layer extends React.Component {
               let array = v.split(',');
               layer['args'][e.name] = array.filter(e => e).map((el) => parseInt(el));
               break;
-            case e.type.key === 'float':
+            case 'float':
               layer['args'][e.name] = parseFloat(target.value);
               break;
-            case e.type.key === 'choice':
+            case 'choice':
               let temps = this.state.temps;
               layer['args'][e.name] = temps[e.name];
               break
