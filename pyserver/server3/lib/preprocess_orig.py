@@ -91,6 +91,8 @@ def get_dummy(arr0, index):
 
 
 def pandas_cut(arr0, index, bins, labels=False):
+    if labels == [""]:
+        labels = False
     temp = pd.cut(np.array(arr0).flatten(), bins, labels=labels)
     result = data_utility.retrieve_nan_index(list(temp), index)
     return result
@@ -172,11 +174,11 @@ def ref(arr0, target, index, n_features):
 # 基于惩罚项的特征选择法
 # 带L1惩罚项的逻辑回归作为基模型的特征选择
 # 带惩罚的基模型，除了筛选出特征，同时也降维
-def select_from_model_lr(arr0, target, index, threthold=0.1):
+def select_from_model_lr(arr0, target, index):
     from sklearn.linear_model import LogisticRegression
     matrix = np.array(arr0)
     target = np.array(target)
-    temp = feature_selection.SelectFromModel(LogisticRegression(penalty="l1", C=threthold)).fit(matrix, target)
+    temp = feature_selection.SelectFromModel(LogisticRegression(penalty="l1", C=0.1)).fit(matrix, target)
     indx = temp._get_support_mask().tolist()
     scores = get_importance(temp.estimator_).tolist()
     # threthold = temp.threshold_

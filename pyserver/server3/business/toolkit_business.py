@@ -1415,19 +1415,7 @@ def create_public_data_process():
 
                                            'x_data_type': ['int', 'float'],
                                            'y_data_type': ['int', 'float']
-                                       },
-                                       "args": [
-                                           {
-                                               'name': 'threshold',
-                                               'type': {
-                                                   'key': 'float',
-                                                   'des': 'the threshold to judge if positive of negative',
-                                                   'range': [0, None]
-                                               },
-                                               'default': 1,
-                                               'required': True
-                                           }
-                                       ]
+                                       }
                                    },
                                    result_spec={
                                        "if_reserved": True,
