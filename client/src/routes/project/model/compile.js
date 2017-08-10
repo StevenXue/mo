@@ -136,12 +136,12 @@ export default class Compile extends React.Component {
       v = v.split(", ");
     }
     //console.log(v);
-    values[parent]['args'][child]['args'][value] = v;
+    values[parent]['args'][child]['args']['value'] = v;
    //console.log(values);
     this.setState({values});
     let values_correct = lodash.cloneDeep(values);
     values_correct[parent]['args'][child] = values[parent]['args'][child]['args'];
-    //console.log(values_correct);
+    console.log(values_correct);
     delete values_correct['hype_loss']
     this.props.getParams(values_correct);
   }
@@ -229,7 +229,7 @@ export default class Compile extends React.Component {
               <div>
                 {
                   this.state.values[type.name]['range'].map((el) =>
-                    <div key={Math.random()} style={{display: 'flex', flexDirection: 'row', marginLeft: -80, alignItems:'flex-start', marginTop: 5}}>
+                    <div key={type.name + "-" + el.name} style={{display: 'flex', flexDirection: 'row', marginLeft: -80, alignItems:'flex-start', marginTop: 5}}>
                       <div style={{width: 80}} >{el.name + ": "}</div>
                       {
                         this.state.values[type.name]['args']&&
