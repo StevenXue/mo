@@ -17,7 +17,6 @@ from server3.lib.models.keras_seq import KERAS_SEQ_SPEC
 from server3.lib.models.keras_seq import keras_seq
 from server3.lib.models.keras_seq import keras_seq_to_str
 from server3.lib.models.kmeans_cluster import KmeansCluster
-from server3.lib.models.kmeans_cluster import KmeansCluster
 ## kmean
 from server3.lib.models.kmeans_cluster import kmeans_cluster_model_fn
 from server3.lib.models.linear_classifier import LinearClassifier

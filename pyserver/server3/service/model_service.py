@@ -12,6 +12,7 @@ import inspect
 import os
 
 import numpy as np
+import pandas as pd
 
 from server3.business import model_business, ownership_business, user_business
 from server3.service import job_service
@@ -112,10 +113,9 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
         project = project_business.get_by_id(project_id)
         ownership = ownership_business.get_ownership_by_owned_item(project,
                                                                    'project')
-        result_dir = '{0}{1}/{2}/'.format(user_directory, ownership.user.user_ID,
+        result_dir = '{0}{1}/{2}/'.format(user_directory,
+                                          ownership.user.user_ID,
                                           project.name)
-        # print(result_dir)
-        # kwargs['result_dir'] = result_dir
         input_dict = manage_nn_input(conf, data_source_id, **kwargs)
         return job_service.run_code(conf, project_id, data_source_id,
                                     model, f, input_dict,
@@ -137,14 +137,18 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
             data_fields = fit.get('data_fields', [[], []])
             input_dict = model_input_manager_custom_supervised(data_fields,
                                                                data_source_id,
-                                                               model.name)
+                                                               model.name,
+                                                               **kwargs)
             return job_service.run_code(conf, project_id, data_source_id,
                                         model, f, model_fn, input_dict)
         if model['category'] == ModelType['unsupervised']:
             x_cols = fit.get('data_fields', [])
             input_dict = model_input_manager_unsupervised(x_cols,
                                                           data_source_id,
-                                                          model.name)
+                                                          model.name,
+                                                          **kwargs)
+            print(input_dict)
+            return
             return job_service.run_code(conf, project_id, data_source_id,
                                         model, f, model_fn, input_dict)
 
@@ -179,7 +183,8 @@ def run_multiple_model(conf, project_id, staging_data_set_id, model_id,
 
 def run_hyperas_model(conf, project_id, data_source_id, model_id, **kwargs):
     from server3.lib.models.hyperas_model import train_hyperas_model
-    return train_hyperas_model(conf=conf, data_source_id=data_source_id, **kwargs)
+    return train_hyperas_model(conf=conf, data_source_id=data_source_id,
+                               **kwargs)
 
 
 def model_to_code(conf, project_id, data_source_id, model_id, **kwargs):
@@ -247,8 +252,23 @@ def model_to_code(conf, project_id, data_source_id, model_id, **kwargs):
                                     model, f, head_str)
 
 
+def manage_nn_input(conf, staging_data_set_id, **kwargs):
+    """
+    deal with input when supervised learning
+    :param conf:
+    :param staging_data_set_id:
+    :return:
+    """
+    x_fields = conf['fit']['data_fields'][0]
+    y_fields = conf['fit']['data_fields'][1]
+    schema = kwargs.pop('schema')
+    obj = split_supervised_input(staging_data_set_id, x_fields, y_fields,
+                                 schema, **kwargs)
+    return obj
+
+
 def model_input_manager_custom_supervised(data_fields, data_source_id,
-                                          model_name):
+                                          model_name, **kwargs):
     def is_array_and_not_empty(x):
         return isinstance(x, list) and len(x) > 0
 
@@ -263,17 +283,22 @@ def model_input_manager_custom_supervised(data_fields, data_source_id,
                                            data_fields[0] +
                                            data_fields[1],
                                            allow_nan=False)
+
     data = staging_data_service.mongo_to_df(data)
     df_x = data[data_fields[0]]
     df_y = data[data_fields[1]]
+    schema = kwargs.pop('schema')
+    obj = staging_data_service.split_test_train({'x': df_x, 'y': df_y},
+                                                schema,
+                                                **kwargs)
     return {
         'model_name': model_name,
-        'df_features': df_x,
-        'df_labels': df_y
+        **obj
     }
 
 
-def model_input_manager_unsupervised(x_cols, data_source_id, model_name):
+def model_input_manager_unsupervised(x_cols, data_source_id, model_name,
+                                     **kwargs):
     def is_array_and_not_empty(x):
         return isinstance(x, list) and len(x) > 0
 
@@ -285,10 +310,16 @@ def model_input_manager_unsupervised(x_cols, data_source_id, model_name):
                                            x_cols,
                                            allow_nan=False)
     df_x = staging_data_service.mongo_to_df(train_cursor)
+    schema = kwargs.pop('schema')
+    obj = staging_data_service.split_test_train({'x': df_x,
+                                                 'y': pd.DataFrame([[]])},
+                                                schema,
+                                                **kwargs)
+    obj.pop('y_tr')
+    obj.pop('y_te')
     return {
         'model_name': model_name,
-        'df_features': df_x,
-        'df_labels': None
+        **obj
     }
 
 
@@ -305,21 +336,6 @@ def model_input_manager_folder_input(conf, file_id, **kwargs):
         [len(files) for r, d, files in
          os.walk(input['validation_data_dir'])])
     return input
-
-
-def manage_nn_input(conf, staging_data_set_id, **kwargs):
-    """
-    deal with input when supervised learning
-    :param conf:
-    :param staging_data_set_id:
-    :return:
-    """
-    x_fields = conf['fit']['data_fields'][0]
-    y_fields = conf['fit']['data_fields'][1]
-    schema = kwargs.pop('schema')
-    obj = split_supervised_input(staging_data_set_id, x_fields, y_fields,
-                                 schema, **kwargs)
-    return obj
 
 
 # temp
@@ -502,7 +518,7 @@ def temp():
     #     'custom kmean model',
     #     ModelType['unsupervised'],
     #     'server3/lib/models/kmeans_cluster.py',
-    #     'kmeans_clustering_model_fn',
+    #     'kmeans_cluster_model_fn',
     #     'custom_model_to_str',
     #     models.KmeansCluster,
     #     {'type': 'DataFrame'}

@@ -26,6 +26,9 @@ from server3.service import staging_data_service, logger_service, visualization_
 
 from server3.utility import data_utility
 from server3.lib import models
+from server3.repository import config
+
+user_directory = config.get_file_prop('UPLOAD_FOLDER')
 
 
 def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
@@ -288,6 +291,11 @@ def split_supervised_input(staging_data_set_id, x_fields, y_fields, schema,
                                          y_fields)
     return staging_data_service.split_test_train(obj, schema=schema, **kwargs)
 
+
+def get_results_by_job_id_and_user_ID(job_id, user_ID):
+    project_name = job_business.get_by_job_id(job_id)['project']['name']
+    result_dir = '{}{}/{}{}'.format(user_directory, user_ID, project_name,
+                                   job_id)
 
 # def to_code(conf, project_id, staging_data_set_id, model, *args):
 #     """
