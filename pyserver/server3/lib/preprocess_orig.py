@@ -95,6 +95,7 @@ def pandas_cut(arr0, index, bins, labels=False):
         labels = False
     temp = pd.cut(np.array(arr0).flatten(), bins, labels=labels)
     result = data_utility.retrieve_nan_index(list(temp), index)
+    print("re", result)
     return result
 
 
