@@ -11,7 +11,7 @@ from server3.utility.str_utility import generate_args_str
 from server3.service.custom_log_handler import MetricsHandler
 from tensorflow.contrib.learn.python.learn import monitors
 from tensorflow.contrib.learn.python.learn.estimators import estimator
-
+from server3.lib.models.modified_tf_file.monitors import ValidationMonitor
 
 def custom_model(conf, model_fn, input_data, **kw):
     """
@@ -97,17 +97,19 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
     else:
         validation_metrics = {}
 
-    val_monitor = tf.contrib.learn.monitors.ValidationMonitor(
+    val_monitor = ValidationMonitor(
         input_fn=eval_input_fn,
         eval_steps=1,
         every_n_steps=100,
-        metrics=validation_metrics)
+        metrics=validation_metrics,
+        name='val')
 
-    tra__monitor = tf.contrib.learn.monitors.ValidationMonitor(
+    tra__monitor = ValidationMonitor(
         input_fn=train_input_fn,
         eval_steps=1,
         every_n_steps=100,
-        metrics=validation_metrics)
+        metrics=validation_metrics,
+        name='tra')
 
     # init model
     estimator = \
