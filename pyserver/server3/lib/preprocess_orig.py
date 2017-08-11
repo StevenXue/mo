@@ -82,6 +82,7 @@ def polynomial_features(arr0, index):
     result = data_utility.retrieve_nan_index(temp.tolist(), index)
     return result
 
+
 # 返回get dummy的值
 def get_dummy(arr0, index):
     series = pd.DataFrame(arr0)
@@ -90,6 +91,7 @@ def get_dummy(arr0, index):
     return result
 
 
+# FIXME
 def pandas_cut(arr0, index, bins, labels=False):
     if labels == [""]:
         labels = False
