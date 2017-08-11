@@ -6,7 +6,7 @@ const Step = Steps.Step;
 import { Router, routerRedux } from 'dva/router';
 //import ReactJson from 'react-json-view';
 import JSONTree from 'react-json-tree'
-
+import { connect } from 'dva'
 import { jupyterServer, flaskServer } from '../../../constants';
 import { isEmpty } from '../../../utils/utils'
 import VisualizationPanel from './visualizationPanel';
@@ -33,7 +33,7 @@ const theme = {
   base0F: '#3971ED'
 };
 
-export default class Toolkit extends React.Component {
+class Toolkit extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -41,7 +41,6 @@ export default class Toolkit extends React.Component {
       selectable: [],
       selectableType: [],
       constant: {},
-      data_set: [],
       selectedDataName: '',
       dataColumns: [],
       checkedCols: [],
@@ -113,16 +112,6 @@ export default class Toolkit extends React.Component {
       .then((res) => {
           this.setState({ toolkits: res.response })
         },
-      );
-
-    fetch(flaskServer + '/staging_data/staging_data_sets?project_id=' + this.props.project_id, {
-      method: 'get',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then((response) => response.json())
-      .then((res) =>
-          this.setState({ data_set: res.response })
       );
   }
 
@@ -325,7 +314,7 @@ export default class Toolkit extends React.Component {
               }
             </div>
             <div style={{ width: '30%'}}>
-             <ParamsSeletor data_set={this.state.data_set}
+             <ParamsSeletor data_set={this.props.project.stagingData}
                             type={this.state.type}
                             selectableType={this.state.selectableType}
                             constant={this.state.constant}
@@ -462,4 +451,6 @@ Toolkit.PropTypes = {
   onReceiveResult: PropTypes.func,
   params: PropTypes.array
 }
+
+export default connect(({ project }) => ({ project }))(Toolkit)
 

@@ -22,6 +22,7 @@ module.exports = {
     user: '/user/:id',
     dashboard: '/dashboard',
     files: '/file/files',
+    getStagingData: '/staging_data/staging_data_sets',
     // fileList: '/file/list_files_by_user_ID',
     // dataImport: '/data/import_data_from_file_id',
     dataSets: '/data/data_sets',

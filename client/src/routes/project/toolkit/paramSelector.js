@@ -6,11 +6,10 @@ import { Button, Input, Select, Tag, Transfer, Modal, Checkbox, message } from '
 import { flaskServer } from '../../../constants';
 import { isEmpty } from '../../../utils/utils'
 
-export default class ParamsSeletor extends React.Component {
+class ParamsSeletcor extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      data_set: this.props.data_set,
       constant: this.props.constant,
       type: this.props.type,
       dataColumns: [],
@@ -46,7 +45,7 @@ export default class ParamsSeletor extends React.Component {
   }
 
   onSelectDataSet (values) {
-    let selected = this.state.data_set.filter((el) => el._id === values);
+    let selected = this.props.project.stagingData.filter((el) => el._id === values);
     let selectedName = selected[0].name;
     this.setState({ selectedData: values, selectedDataName: selectedName })
     fetch(flaskServer + '/staging_data/staging_data_sets/fields?staging_data_set_id=' + values, {
@@ -359,7 +358,7 @@ export default class ParamsSeletor extends React.Component {
                     placeholder="Choose DataSet"
                     allowClear>
                 {
-                  this.state.data_set.map((e) =>
+                  this.props.project.stagingData.map((e) =>
                     <Select.Option value={e._id} key={e._id}>
                     {e.name}
                     </Select.Option>
@@ -482,3 +481,5 @@ export default class ParamsSeletor extends React.Component {
   }
 
 }
+
+export default connect(({ project }) => ({ project }))(ParamsSeletcor)
