@@ -176,7 +176,7 @@ export default class ModelForms extends React.Component {
   onClickRun(){
     let run_params = this.constructParams();
     let params = {};
-    if(this.state.selectedFile !== '') {
+    if(this.state.selectedFile === '') {
       params = Object.assign({
         conf: run_params,
         project_id: this.props.project_id,
