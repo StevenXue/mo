@@ -37,14 +37,17 @@ export default class VisualizationPanel extends React.Component {
           responseBody: res.response,
         });
 
-        if(res.responseBody.category === 2){
+        console.log(res.response);
+
+        if(res.response.category && res.response.category === 2){
           this.setState({selectedColOne: 0, selectedColTwo: 0})
         }
 
         if(res.response.hist_freq){
           let label = Object.keys(res.response.hist_freq);
           this.setState({dataSelected: res.response.hist_freq[label[0]]})
-          console.log(this.state.responseBody['hist_freq']);
+          console.log(res.response, label);
+          this.setState({selected: Object.keys(res.response.hist_freq)[0]})
         }
       });
   }
@@ -95,6 +98,19 @@ export default class VisualizationPanel extends React.Component {
               {
                 this.state.responseBody['centers'] &&
                 <Scatter style={{height: '100%'}} data={this.state.responseBody} />
+              }
+              {
+                !isEmpty(this.state.responseBody) &&
+                <div>
+                  <div >
+                    <span style={{ marginLeft: 20 }}>Number of Clusters: </span>
+                    <span style={{color: "#00AAAA"}}>{this.state.responseBody['general_info']['Number of Clusters']}</span>
+                  </div>
+                  <div >
+                    <span style={{ marginLeft: 20 }}>SSE: </span>
+                    <span style={{color: "#00AAAA"}}>{this.state.responseBody['general_info']['SSE']}</span>
+                  </div>
+                </div>
               }
             </div>
             <div className="right-container" style={{width: '40%', display: 'flex', flexDirection: 'column'}}>

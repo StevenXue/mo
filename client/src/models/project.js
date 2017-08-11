@@ -2,7 +2,7 @@ import lodash from 'lodash'
 import { parse } from 'qs'
 import { message } from 'antd'
 import { Router, routerRedux } from 'dva/router'
-import { query, create, edit, listDataSets, publishProject, forkProject , listFiles } from '../services/project'
+import { query, create, edit, listDataSets, publishProject, forkProject , listFiles, getStagedData, convertToStaging } from '../services/project'
 
 export default {
 
@@ -23,6 +23,7 @@ export default {
       owned_projects: [],
     },
     selectedDSIds: [],
+    stagingData: []
   },
 
   effects: {
@@ -120,6 +121,36 @@ export default {
         })
       } else {
         console.log('error', data)
+        throw data
+      }
+    },
+
+    *getStagingDatasets ({ payload }, { call, put, select }) {
+      let body = lodash.cloneDeep(payload)
+      console.log("fetch staging data");
+      const data = yield call(getStagedData, body)
+      if (data.success) {
+        yield put({
+          type: 'querySuccess',
+          payload: {
+            stagingData: data.response,
+          },
+        })
+      } else {
+        console.log('error', data)
+        throw data
+      }
+    },
+
+    *toStagingData ({ payload }, { call, put, select }) {
+      const data = yield call(convertToStaging, payload)
+      if (data.success) {
+        yield put({
+          type: 'getStagingDatasets',
+          payload: payload.project_id
+        });
+      } else {
+        console.log('error', data, payload)
         throw data
       }
     },

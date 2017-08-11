@@ -27,7 +27,7 @@ export default class ModelProcess extends React.Component {
       dataSet: this.props.dataset_id,
       isActive: this.props.isActive,
       description: '',
-      selectedFile: '',
+      selectedFile: this.props.selectedFile,
       isImage: false,
       spliter:{}
     }
@@ -47,6 +47,8 @@ export default class ModelProcess extends React.Component {
           this.setState({models: dict, allModels: res.response});
         });
     }
+
+    this.checkIfFile(this.props);
 
     if(this.props.params){
       this.setState({modelName: this.props.params.model.name});
@@ -78,20 +80,12 @@ export default class ModelProcess extends React.Component {
       dataSet: nextProps.dataset_id,
       isActive: nextProps.isActive,
       selectedFile: nextProps.selectedFile,
-      source: nextProps.cols
+      source: nextProps.cols,
+      selectedModel: '',
+      modelName: ''
     });
 
-    if(nextProps.selectedFile !== '' || nextProps.dataset_id === ''){
-      let models = this.state.allModels;
-      models = models.filter((e) => e.category === 4);
-      models = models.map((e) => ({'name': e.name, '_id': e._id}));
-      this.setState({models, isImage: true, selectedModel: '', modelName: ''});
-    }else{
-      let models = this.state.allModels;
-      models = models.filter((e) => e.category !== 4);
-      models = models.map((e) => ({'name': e.name, '_id': e._id}));
-      this.setState({models, isImage: false});
-    }
+    this.checkIfFile(nextProps);
 
     if(nextProps.params) {
       this.setState({modelName: nextProps.params.model.name});
@@ -110,6 +104,21 @@ export default class ModelProcess extends React.Component {
           });
         }
       }
+    }
+  }
+
+  checkIfFile(props){
+    console.log(props.selectedFile);
+    if(props.selectedFile !== '' || props.dataset_id === ''){
+      let models = this.state.allModels;
+      models = models.filter((e) => e.category === 4);
+      models = models.map((e) => ({'name': e.name, '_id': e._id}));
+      this.setState({models, isImage: true, selectedFile: props.selectedFile});
+    }else{
+      let models = this.state.allModels;
+      models = models.filter((e) => e.category !== 4);
+      models = models.map((e) => ({'name': e.name, '_id': e._id}));
+      this.setState({models, isImage: false, selectedFile: props.selectedFile});
     }
   }
 
@@ -203,7 +212,6 @@ export default class ModelProcess extends React.Component {
           )
 
         } else {
-          console.log(this.state.source);
           let x_type = this.state.modelData.fit.data_fields.x_data_type;
           let y_type = this.state.modelData.fit.data_fields.y_data_type;
           if (x_type !== null) {
@@ -282,7 +290,7 @@ export default class ModelProcess extends React.Component {
             {
               this.state.isActive?
               <Select className="dataset-select"
-                      style={{width: 250, marginTop: 10}}
+                      style={{width: 150, marginTop: 10}}
                       onChange={(values) => this.onSelectModel(values)}
                       value={this.state.selectedModel}
                       placeholder="Choose Model"

@@ -30,22 +30,13 @@ class Preprocess extends React.Component{
       visible: false,
       previewCols: [],
       previewDs: [],
-      data_set: [],
+     // data_set: [],
       fields: {}
     }
   }
 
-  componentDidMount(){
-    fetch(flaskServer + '/staging_data/staging_data_sets?project_id=' + this.props.project_id, {
-      method: 'get',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then((response) => response.json())
-      .then((res) => {
-          this.setState({ data_set: res.response });
-        },
-      );
+  componentWillReceiveProps(nextProps){
+    console.log(nextProps.project);
   }
 
   missingDataOp(data, fields){
@@ -180,7 +171,7 @@ class Preprocess extends React.Component{
                   placeholder="Choose DataSet"
                   allowClear>
             {
-              this.state.data_set.map((e) =>
+              this.props.project.stagingData.map((e) =>
                 <Select.Option value={e._id} key={e._id}>
                   {e.name}
                 </Select.Option>
@@ -206,7 +197,7 @@ class Preprocess extends React.Component{
             <Panel header={"Columns Review"} key="3" style={{width: '100%'}}>
               <ColumnOperations
                 values={this.state.values}
-                stagedId={this.state.data_set}
+                stagedId={this.props.project.stagingData}
                 dataSet={this.state.dataSet}
                 fields={this.state.fields} />
             </Panel>

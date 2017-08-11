@@ -55,7 +55,7 @@ export default class ModelForms extends React.Component {
       isActive: this.props.isActive,
       selectedFile: this.props.selectedFile
     });
-
+    console.log(this.props.selectedFile);
     let socket = io.connect(flaskServer+ '/log/' + this.props.project_id);
     socket.on('log_epoch_end', (msg) => {
       this.setState({ioData: msg})
@@ -68,6 +68,7 @@ export default class ModelForms extends React.Component {
   }
 
   componentWillReceiveProps(nextProps){
+    console.log("modelForms", nextProps);
     this.setState({
       spliter: nextProps.spliter,
       layer: nextProps.data.layers,
@@ -175,7 +176,7 @@ export default class ModelForms extends React.Component {
   onClickRun(){
     let run_params = this.constructParams();
     let params = {};
-    if(this.state.fit.data_fields) {
+    if(this.state.selectedFile !== '') {
       params = Object.assign({
         conf: run_params,
         project_id: this.props.project_id,
