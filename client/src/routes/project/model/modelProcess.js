@@ -290,7 +290,7 @@ export default class ModelProcess extends React.Component {
             {
               this.state.isActive?
               <Select className="dataset-select"
-                      style={{width: 150, marginTop: 10}}
+                      style={{width: 200, marginTop: 10}}
                       onChange={(values) => this.onSelectModel(values)}
                       value={this.state.selectedModel}
                       placeholder="Choose Model"
