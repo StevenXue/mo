@@ -108,9 +108,9 @@ class ProjectDetail extends React.Component {
   }
 
   componentDidMount () {
-    //console.log('Project mounted, project id: ', this.state.project_id)
     this.props.dispatch({ type: 'project/query' })
     this.props.dispatch({ type: 'project/listDataSets' })
+    this.props.dispatch({ type: 'project/getStagingDatasets', payload: this.props.location.query._id});
   }
 
   componentWillUnmount () {
@@ -146,7 +146,7 @@ class ProjectDetail extends React.Component {
       return
     }
     this.setState({ loading: true })
-    fetch(flaskServer + '/data/data_sets/' + dataSetId + '?limit=10', {
+    fetch(flaskServer + '/data/data_sets/' + dataSetId + '?limit=5', {
         method: 'get',
         headers: {
           'Content-Type': 'application/json',

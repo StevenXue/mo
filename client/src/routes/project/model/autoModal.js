@@ -164,7 +164,7 @@ class AutomatedModel extends React.Component {
                     placeholder="Choose DataSet"
                     allowClear>
               {
-                this.state.data_set.map((e) =>
+                this.props.project.stagingData.map((e) =>
                   <Select.Option value={e._id} key={e._id}>
                     {e.name}
                   </Select.Option>,

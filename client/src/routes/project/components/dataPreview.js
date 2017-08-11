@@ -13,7 +13,6 @@ class DataPreview extends React.Component {
     this.state = {
       values: {},
       loading: false,
-      stagedId: []
     }
 
   }
@@ -33,30 +32,13 @@ class DataPreview extends React.Component {
       description = document.getElementById('stage_description').value;
     }
 
-    this.setState({loading: true});
-    fetch(flaskServer + '/staging_data/staging_data_sets', {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          'project_id': this.props.project_id,
-          'staging_data_set_name': name,
-          'staging_data_set_description': description,
-          'data_set_id': dataSetId,
-        }),
-      },
-    ).then((response) => response.json())
-      .then((res) => {
-        let t = this.state.stagedId;
-        t.push(res.response._id);
-        //this.props.passStaging(res.response._id);
-        this.setState({
-          stagedId: t
-        });
-        message.success('successfully added to staging data set');
-      })
-      .catch((err) => console.log('Error: /staging_data/staging_data_sets', err))
+    let body = {
+      'project_id': this.props.project_id,
+      'staging_data_set_name': name,
+      'staging_data_set_description': description,
+      'data_set_id': dataSetId,
+    };
+    this.props.dispatch({ type: 'project/toStagingData', payload: body});
   }
 
   render() {
