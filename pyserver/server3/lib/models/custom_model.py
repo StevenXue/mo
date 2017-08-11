@@ -12,6 +12,7 @@ from server3.service.custom_log_handler import MetricsHandler
 from tensorflow.contrib.learn.python.learn import monitors
 from tensorflow.contrib.learn.python.learn.estimators import estimator
 from server3.lib.models.modified_tf_file.monitors import ValidationMonitor
+from tensorflow.contrib.learn.python.learn import metric_spec
 
 def custom_model(conf, model_fn, input_data, **kw):
     """
@@ -77,20 +78,20 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
         and est_params['args']['num_classes'] == 2) or input_data[
         'model_name'] == 'svm':
         validation_metrics = {
-            "accuracy":
-                tf.contrib.learn.MetricSpec(
+            "acc":
+                metric_spec.MetricSpec(
                     metric_fn=tf.contrib.metrics.streaming_accuracy,
                     prediction_key=None),
             "precision":
-                tf.contrib.learn.MetricSpec(
+                metric_spec.MetricSpec(
                     metric_fn=tf.contrib.metrics.streaming_precision,
                     prediction_key=None),
             "recall":
-                tf.contrib.learn.MetricSpec(
+                metric_spec.MetricSpec(
                     metric_fn=tf.contrib.metrics.streaming_recall,
                     prediction_key=None),
             "confusion_matrix":
-                tf.contrib.learn.MetricSpec(
+                metric_spec.MetricSpec(
                     metric_fn=tf.contrib.metrics.confusion_matrix,
                     prediction_key=None)
         }
