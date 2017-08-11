@@ -46,6 +46,7 @@ class ParamsSeletcor extends React.Component {
 
   onSelectDataSet (values) {
     let selected = this.props.project.stagingData.filter((el) => el._id === values);
+    console.log("selected data");
     let selectedName = selected[0].name;
     this.setState({ selectedData: values, selectedDataName: selectedName })
     fetch(flaskServer + '/staging_data/staging_data_sets/fields?staging_data_set_id=' + values, {

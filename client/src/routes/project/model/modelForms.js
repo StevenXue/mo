@@ -68,7 +68,6 @@ export default class ModelForms extends React.Component {
   }
 
   componentWillReceiveProps(nextProps){
-    console.log("modelForms", nextProps);
     this.setState({
       spliter: nextProps.spliter,
       layer: nextProps.data.layers,
