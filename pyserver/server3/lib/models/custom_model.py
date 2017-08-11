@@ -9,9 +9,12 @@ from tensorflow.python.framework import constant_op
 from tensorflow.python.framework import dtypes
 from server3.utility.str_utility import generate_args_str
 from server3.service.custom_log_handler import MetricsHandler
-from tensorflow.contrib.learn.python.learn import monitors
 from tensorflow.contrib.learn.python.learn.estimators import estimator
+
 from server3.lib.models.modified_tf_file.monitors import ValidationMonitor
+
+# 修改了 metric_spec 的部分内容，查询lux 即可找到
+# 部署时请更改相关代码
 from tensorflow.contrib.learn.python.learn import metric_spec
 
 def custom_model(conf, model_fn, input_data, **kw):
