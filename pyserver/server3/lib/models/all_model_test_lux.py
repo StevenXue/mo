@@ -210,7 +210,7 @@ X_train, X_test, y_train, y_test = train_test_split(
     iris_feature, iris_label,
     test_size=0.20,
     random_state=42)
-#
+# #
 
 
 #
@@ -288,7 +288,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 
 
-# # 测试 Linear_classifier
+# 测试 Linear_classifier
 
 input = {
     'model_name': 'Linear_classifier',
@@ -328,12 +328,16 @@ result = custom_model(params, linear_classifier_model_fn, input, result_sds=sds)
 print(result)
 
 # # 测试 svm
-
+#
 # input = {
 #     'model_name': 'svm',
-#     'df_features': iris_feature,
-#     'df_labels': iris_label,
+#     'x_tr': X_train,
+#     'x_te': X_test,
+#     'y_tr': y_train,
+#     'y_te': y_test,
 # }
+#
+#
 # params = {
 #     'estimator': {
 #         'args': {
@@ -378,7 +382,13 @@ print(result)
 #                      columns= boston['feature_names'] )
 # boston_label = pd.DataFrame(data= boston['target'],
 #                      columns= ['target'])
-
+#
+# from sklearn.model_selection import train_test_split
+#
+# X_train, X_test, y_train, y_test = train_test_split(
+#     boston_feature, boston_label,
+#     test_size=0.20,
+#     random_state=42)
 
 # 测试 linear_regressor
 # from sklearn.model_selection import train_test_split
@@ -424,11 +434,15 @@ print(result)
 
 
 # # 测试 Random forest
+#
 # input = {
 #     'model_name': 'Randomforest',
-#     'df_features': boston_feature,
-#     'df_labels': boston_label,
+#     'x_tr': X_train,
+#     'x_te': X_test,
+#     'y_tr': y_train,
+#     'y_te': y_test,
 # }
+#
 # params = {
 #     'estimator': {
 #         'args': {
