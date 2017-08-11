@@ -1,268 +1,387 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import ReactEcharts from 'echarts-for-react';
-let colors = ['#5793f3', '#d14a61', '#675bba'];
+import React from 'react'
+import ReactDOM from 'react-dom'
+import ReactEcharts from 'echarts-for-react'
 
-export default class Curve extends React.Component{
+let colors = ['#5793f3', '#d14a61', '#675bba']
+
+let metircs = ['acc', 'precision', 'recall']
+
+export default class Curve extends React.Component {
   static propTypes = {
     dataString: React.PropTypes.any,
-  };
+  }
 
-  constructor(props) {
-    super(props);
-    this.state= {
+  constructor (props) {
+    super(props)
+    let metrics_state = {}
+    metircs.forEach((m) => {
+      metrics_state[m] = []
+      metrics_state['val_' + m] = []
+    })
+    this.state = {
       trainStep: [],
       trainAcc: [],
       trainLoss: [],
-      testStep:[],
-      testAcc:[],
+      testStep: [],
+      testAcc: [],
       testLoss: [],
       render: true,
+      ...metrics_state
     }
   }
 
-  componentDidMount(){
+  componentDidMount () {
   }
 
-  componentWillReceiveProps(nextProps){
-    if(!nextProps.end) {
-      this.updateChart(nextProps.data);
+  componentWillReceiveProps (nextProps) {
+    if (!nextProps.end) {
+      this.updateChart(nextProps.data)
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate () {
 
   }
 
-  updateChart(ioData){
-    let step = this.state.trainStep;
-    let loss = this.state.trainLoss;
-    let acc = this.state.trainAcc;
-    let test_loss = this.state.testLoss;
-    let test_acc = this.state.testAcc;
-    step.push(ioData.n);
-    acc.push(ioData.acc);
-    loss.push(ioData.loss);
-    test_acc.push(ioData.val_acc);
-    test_loss.push(ioData.val_loss);
+  updateChart (ioData) {
+
+    let trainStep = this.state.trainStep
+    let testStep = this.state.testStep
+    let loss = this.state.trainLoss
+    let test_loss = this.state.testLoss
+    if (ioData.loss) {
+      if (!trainStep.includes(ioData.n)) {
+        trainStep.push(ioData.n)
+        loss.push(ioData.loss)
+        for (let metric of metircs) {
+          ioData[metric] &&
+          this.state[metric].push(ioData[metric])
+        }
+      }
+    }
+    if (ioData.val_loss) {
+      if (!testStep.includes(ioData.n)) {
+        testStep.push(ioData.n)
+        test_loss.push(ioData.val_loss)
+        for (let metric of metircs) {
+          metric = 'val_' + metric
+          ioData[metric] &&
+          this.state[metric].push(ioData[metric])
+        }
+      }
+    }
     this.setState({
-      trainStep: step,
-      trainAcc: acc,
+      trainStep,
       trainLoss: loss,
-      testStep: step,
-      testAcc: test_acc,
-      testLoss: test_loss
+      testStep,
+      testLoss: test_loss,
+      ...this.state
     })
   }
 
-  getOptionAccuracy() {
-    let options = {
+  // getOptionAccuracy() {
+  //   let options = {
+  //     title: {
+  //       text: "train accuracy"
+  //     },
+  //     calculable : false,
+  //     tooltip: {
+  //       trigger: 'axis',
+  //       axisPointer: {
+  //         animation: false
+  //       }
+  //     },
+  //     animation: false,
+  //     grid: {
+  //       top: 70,
+  //       bottom: 50
+  //     },
+  //     xAxis:[
+  //       {
+  //         type: 'category',
+  //         axisTick: {
+  //           alignWithLabel: true
+  //         },
+  //         axisLine: {
+  //           onZero: false,
+  //           lineStyle: {
+  //             color: colors[1]
+  //           }
+  //         },
+  //         axisPointer: {
+  //           label: {
+  //             formatter: function (params) {
+  //               return 'accuracy' + params.value
+  //                 + (params.seriesData.length ? '：' + params.seriesData[0].data : '');
+  //             }
+  //           }
+  //         },
+  //         boundaryGap: 0,
+  //         data: this.state.trainStep
+  //       },
+  //       {
+  //         type: 'category',
+  //         axisTick: {
+  //           alignWithLabel: true
+  //         },
+  //         axisLine: {
+  //           onZero: false,
+  //           lineStyle: {
+  //             color: colors[0]
+  //           }
+  //         },
+  //         axisPointer: {
+  //           label: {
+  //             formatter: function (params) {
+  //               return 'accuracy' + params.value
+  //                 + (params.seriesData.length ? '：' + params.seriesData[0].data : '');
+  //             }
+  //           }
+  //         },
+  //         boundaryGap: 0,
+  //         data: this.state.testStep
+  //       }
+  //     ],
+  //     yAxis:
+  //       {
+  //         type: 'value',
+  //         min: 'dataMin'
+  //       }
+  //     ,
+  //     series:[
+  //       {
+  //         name: 'train data',
+  //         type: 'line',
+  //         smooth: true,
+  //         xAxisIndex: 0,
+  //         data: this.state.trainAcc,
+  //         animation: false
+  //       },
+  //       {
+  //         name: 'test data',
+  //         type: 'line',
+  //         smooth: true,
+  //         xAxisIndex: 1,
+  //         data: this.state.testAcc,
+  //         animation: false
+  //       }
+  //     ]
+  //   }
+  //   return options
+  // }
+
+  getOptionMetric (metric) {
+    return {
       title: {
-        text: "train accuracy"
+        text: `train ${metric}`,
       },
-      calculable : false,
+      calculable: false,
       tooltip: {
         trigger: 'axis',
         axisPointer: {
-          animation: false
-        }
+          animation: false,
+        },
       },
       animation: false,
       grid: {
         top: 70,
-        bottom: 50
+        bottom: 50,
       },
-      xAxis:[
+      xAxis: [
         {
           type: 'category',
           axisTick: {
-            alignWithLabel: true
+            alignWithLabel: true,
           },
           axisLine: {
             onZero: false,
             lineStyle: {
-              color: colors[1]
-            }
+              color: colors[1],
+            },
           },
           axisPointer: {
             label: {
               formatter: function (params) {
-                return 'accuracy' + params.value
-                  + (params.seriesData.length ? '：' + params.seriesData[0].data : '');
-              }
-            }
+                return metric + params.value
+                  + (params.seriesData.length ? '：' + params.seriesData[0].data : '')
+              },
+            },
           },
           boundaryGap: 0,
-          data: this.state.trainStep
+          data: this.state.trainStep,
         },
-        {
-          type: 'category',
-          axisTick: {
-            alignWithLabel: true
-          },
-          axisLine: {
-            onZero: false,
-            lineStyle: {
-              color: colors[0]
-            }
-          },
-          axisPointer: {
-            label: {
-              formatter: function (params) {
-                return 'accuracy' + params.value
-                  + (params.seriesData.length ? '：' + params.seriesData[0].data : '');
-              }
-            }
-          },
-          boundaryGap: 0,
-          data: this.state.testStep
-        }
+        // {
+        //   type: 'category',
+        //   axisTick: {
+        //     alignWithLabel: true
+        //   },
+        //   axisLine: {
+        //     onZero: false,
+        //     lineStyle: {
+        //       color: colors[0]
+        //     }
+        //   },
+        //   axisPointer: {
+        //     label: {
+        //       formatter: function (params) {
+        //         return metric + params.value
+        //           + (params.seriesData.length ? '：' + params.seriesData[0].data : '');
+        //       }
+        //     }
+        //   },
+        //   boundaryGap: 0,
+        //   data: this.state.testStep
+        // }
       ],
       yAxis:
         {
           type: 'value',
-          min: 'dataMin'
+          min: 'dataMin',
         }
       ,
-      series:[
+      series: [
         {
           name: 'train data',
           type: 'line',
           smooth: true,
           xAxisIndex: 0,
-          data: this.state.trainAcc,
-          animation: false
+          data: this.state[metric],
+          animation: false,
         },
         {
           name: 'test data',
           type: 'line',
           smooth: true,
-          xAxisIndex: 1,
-          data: this.state.testAcc,
-          animation: false
-        }
-      ]
+          // xAxisIndex: 1,
+          data: this.state['val_' + metric],
+          animation: false,
+        },
+      ],
     }
-    return options
   }
 
-  getOptionLoss() {
-    let options = {
+  getOptionLoss () {
+    return {
       title: {
-        text: "train loss"
+        text: 'train loss',
       },
       tooltip: {
         trigger: 'axis',
         axisPointer: {
-          animation: false
-        }
+          animation: false,
+        },
       },
-      calculable : false,
+      calculable: false,
       animation: false,
-      xAxis:[
+      xAxis: [
         {
           type: 'category',
           axisTick: {
-            alignWithLabel: true
+            alignWithLabel: true,
           },
           axisLine: {
             onZero: false,
             lineStyle: {
-              color: colors[2]
-            }
+              color: colors[2],
+            },
           },
           axisPointer: {
             label: {
               formatter: function (params) {
                 return 'loss' + params.value
-                  + (params.seriesData.length ? '：' + params.seriesData[0].data : '');
-              }
-            }
+                  + (params.seriesData.length ? '：' + params.seriesData[0].data : '')
+              },
+            },
           },
           boundaryGap: 0,
           data: this.state.trainStep,
         },
-        {
-          type: 'category',
-          axisTick: {
-            alignWithLabel: true
-          },
-          axisLine: {
-            onZero: false,
-            lineStyle: {
-              color: colors[2]
-            }
-          },
-          axisPointer: {
-            label: {
-              formatter: function (params) {
-                return 'loss' + params.value
-                  + (params.seriesData.length ? '：' + params.seriesData[0].data : '');
-              }
-            }
-          },
-          boundaryGap: 0,
-          data: this.state.testStep,
-        }],
+        // {
+        //   type: 'category',
+        //   axisTick: {
+        //     alignWithLabel: true
+        //   },
+        //   axisLine: {
+        //     onZero: false,
+        //     lineStyle: {
+        //       color: colors[2]
+        //     }
+        //   },
+        //   axisPointer: {
+        //     label: {
+        //       formatter: function (params) {
+        //         return 'loss' + params.value
+        //           + (params.seriesData.length ? '：' + params.seriesData[0].data : '');
+        //       }
+        //     }
+        //   },
+        //   boundaryGap: 0,
+        //   data: this.state.testStep,
+        // }
+      ],
       yAxis:
         {
           type: 'value',
-          min: 'dataMin'
+          min: 'dataMin',
         }
       ,
-      series:[
+      series: [
         {
           name: 'train data',
           type: 'line',
           smooth: true,
           data: this.state.trainLoss,
-          animation: false
+          animation: false,
         },
         {
           name: 'test data',
           type: 'line',
           smooth: true,
-          xAxisIndex: 1,
+          // xAxisIndex: 1,
           data: this.state.testLoss,
-          animation: false
-        }]
+          animation: false,
+        }],
     }
-    return options;
   }
 
-  renderCharts(){
-    if(this.state.render === true){
-      //console.log("render");
-      return(<div>
-          <ReactEcharts
-            lazyUpdate={true}
-            notMerge={true}
-            animation={false}
-            option={this.getOptionAccuracy()}
-          />
+  renderCharts () {
+    if (this.state.render === true) {
+      return (<div>
           <ReactEcharts
             lazyUpdate={true}
             notMerge={true}
             animation={false}
             option={this.getOptionLoss()}
           />
+          {metircs.map((metric) => {
+            if (this.state[metric].length > 0 || this.state['val_' + metric].length > 0) {
+              console.log(metric, this.state[metric])
+              return <ReactEcharts
+                key={metric}
+                lazyUpdate={true}
+                notMerge={true}
+                animation={false}
+                option={this.getOptionMetric(metric)}
+              />
+            }
+          })}
         </div>
-      )}
+      )
+    }
   }
 
-
-  render(){
-    return(
-      <div >
+  render () {
+    return (
+      <div>
         {
           this.renderCharts()
         }
       </div>
-    );
+    )
   }
 }
 
 Curve.PropTypes = {
   data: React.PropTypes.object,
-  end: React.PropTypes.bool
+  end: React.PropTypes.bool,
 }

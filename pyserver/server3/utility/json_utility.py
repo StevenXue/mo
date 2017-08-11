@@ -37,12 +37,10 @@ class JSONEncoder(simplejson.JSONEncoder):
                 return str(o)
             elif isinstance(o, datetime):
                 return str(o)
-            elif isinstance(o, np.integer):
-                return int(o)
-            elif isinstance(o, np.floating):
-                return float(o)
             elif isinstance(o, np.ndarray):
                 return o.tolist()
+            elif isinstance(o, np.generic):
+                return np.asscalar(o)
         else:
             return list(iterable)
         # Let the base class default method raise the TypeError
