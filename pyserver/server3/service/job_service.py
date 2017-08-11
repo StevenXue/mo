@@ -119,6 +119,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
 
             elif toolkit_obj.category == 2:
                 data = list(zip(*args[0]))
+                # TODO
+                print("labels", labels)
                 result = list(zip(*labels))
                 merge_data = data + result
                 merge_data = list(zip(*merge_data))
@@ -131,7 +133,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 flag_str1 = isinstance(args[0][inn][0], str)
                 flag_str2 = isinstance(labels[inn][0], str)
                 bar1 = []
-                bar2 = [ ]
+                bar2 = []
                 for el in fields[0]:
                     indx = fields[0].index(el)
                     raw_d = data[indx]
