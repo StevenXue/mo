@@ -3,7 +3,7 @@
 # https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib
 # /factorization/python/ops/gmm_ops.py
 from tensorflow.contrib import framework
-from tensorflow.contrib.factorization.python.ops import gmm_ops
+# from tensorflow.contrib.factorization.python.ops import gmm_ops
 from tensorflow.contrib.framework.python.ops import variables
 from tensorflow.contrib.learn.python.learn.estimators import \
     model_fn as model_fn_lib
@@ -12,7 +12,7 @@ from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import state_ops
 from tensorflow.python.ops.control_flow_ops import with_dependencies
-
+from server3.lib.models.modified_tf_file import gmm_ops
 
 def parse_tensor_or_dict(features):
     if isinstance(features, dict):

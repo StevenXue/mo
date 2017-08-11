@@ -211,7 +211,7 @@ export default class VisualizationPanel extends React.Component {
           <div className="right-charts">
             <div style={{width: 300, height: 300}}>
               <Select style={{width: 100, marginTop: 5, marginLeft: 20}}
-                      onChange={(values) => this.onSelectBarOne(values)}
+                      onChange={(values) => this.setState({selectedColOne: values})}
                       allowClear={false}
                       value={this.state.selectedColOne}
                       placeholder="Choose Field">
@@ -225,7 +225,7 @@ export default class VisualizationPanel extends React.Component {
             </div>
             <div style={{marginTop: 50, width: 300, height: 300}}>
               <Select style={{width: 100, marginTop: 5, marginLeft: 20}}
-                      onChange={(values) => this.onSelectBarTwo(values)}
+                      onChange={(values) => this.setState({selectedColTwo: values})}
                       allowClear={false}
                       value={this.state.selectedColTwo}
                       placeholder="Choose Field">

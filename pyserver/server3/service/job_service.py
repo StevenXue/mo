@@ -22,7 +22,8 @@ from server3.business import result_business
 from server3.business import project_business
 from server3.business import staging_data_business
 from server3.business import staging_data_set_business
-from server3.service import staging_data_service, logger_service, visualization_service
+from server3.service import staging_data_service, logger_service, \
+    visualization_service
 
 from server3.utility import data_utility
 from server3.lib import models
@@ -41,13 +42,15 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
     :param fields: project_id, staging_data_set_id, toolkit_id
     :return:
     """
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
             from server3.service import project_service
 
             # create a job
-            staging_data_set_obj = staging_data_set_business.get_by_id(staging_data_set_id)
+            staging_data_set_obj = staging_data_set_business.get_by_id(
+                staging_data_set_id)
             project_obj = project_business.get_by_id(project_id)
             job_spec = {
                 "fields": {
@@ -65,7 +68,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
             # calculate
             func_rst = func(*args, **kw)
             result = list(func_rst) if isinstance(func_rst, tuple) else [func_rst]
-            print("result", result)
+            print("show", result)
+
             # 新设计的存取方式
             results = {"fields": fields}
             gen_info = {}
@@ -78,19 +82,24 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 if arg["if_add_column"]:
                     strr = "%s_%s_col" % (arg["name"], toolkit_obj.name)
                     try:
-                        add_new_column(value, args[-1], strr, staging_data_set_id)
+                        add_new_column(value, args[-1], strr,
+                                       staging_data_set_id)
                     except:
                         error_flag = 1
 
                 if arg.get("attribute", False) and arg["attribute"] == "label":
                     labels = value
-                elif arg.get("attribute", False) and arg["attribute"] == "general_info":
+                elif arg.get("attribute", False) and arg[
+                    "attribute"] == "general_info":
                     gen_info.update({arg["name"]: value})
 
             # 可视化计算
             if toolkit_obj.category == 0:
-                json = {"scatter": data_utility.retrieve_nan_index(args[0], args[-1]), "labels": labels,
-                        "pie": [{'text': el, 'value': labels.count(el)} for el in set(labels)],
+                json = {"scatter": data_utility.retrieve_nan_index(args[0],
+                                                                   args[-1]),
+                        "labels": labels,
+                        "pie": [{'text': el, 'value': labels.count(el)} for el
+                                in set(labels)],
                         "centers": results["Centroids of Clusters"],
                         "general_info": gen_info,
                         "fields": fields[0],
@@ -105,13 +114,17 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                         "X_fields": fields[0],
                         "labels": labels,
                         "bar": results["scores"],
-                        "general_info": {"Selected Features": "%s out of %s" % (len(list(filter(lambda x: x is True, labels))),
-                                                                                len(fields[0])),
-                                         "Selected Fields": " ".join(str(el) for el in list(compress(fields[0], labels))),
+                        "general_info": {"Selected Features": "%s out of %s" % (
+                        len(list(filter(lambda x: x is True, labels))),
+                        len(fields[0])),
+                                         "Selected Fields": " ".join(
+                                             str(el) for el in
+                                             list(compress(fields[0], labels))),
                                          "Number of NaN": len(args[2])},
                         "scatter": {"y_domain": target,
                                     "x_domain": data,
-                                    "pearsonr": [pearsonr(el, target)[0] for el in data],
+                                    "pearsonr": [pearsonr(el, target)[0] for el
+                                                 in data],
                                     # "mic": [MINE(alpha=0.6, c=15, est="mic_approx").compute_score(el,
                                     # list(data[0]).mic()) for el in list(data[1:])]}
                                     "mic": [None for el in data]},
@@ -139,7 +152,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                     raw_d = data[indx]
 
                     if not flag_str1 and len(set(raw_d)) > 5:
-                        bar1_tmp = visualization_service.freq_hist(raw_d, multip=1)
+                        bar1_tmp = visualization_service.freq_hist(raw_d,
+                                                                   multip=1)
                     else:
                         seta = set(raw_d)
                         x_domain = [el for el in seta]
@@ -153,7 +167,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                     raw_re = result[indx]
 
                     if not flag_str2 and len(set(raw_re)) > 5:
-                        bar2_tmp = visualization_service.freq_hist(raw_re, multip=1)
+                        bar2_tmp = visualization_service.freq_hist(raw_re,
+                                                                   multip=1)
                     else:
                         seta = set(raw_re)
                         x_domain = [el for el in seta]
@@ -166,7 +181,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                         "table": {
                             "Field1": fields[0],
                             "Field2": lab_fields,
-                            "data": [dict(zip(merge_fields, arr)) for arr in merge_data]
+                            "data": [dict(zip(merge_fields, arr)) for arr in
+                                     merge_data]
                         },
                         "bar1": bar1,
                         "bar2": bar2}
@@ -175,7 +191,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 if error_flag:
                     json = {}
                 else:
-                    flag = toolkit_obj.parameter_spec["data"]["type"]["key"] == "transfer_box"
+                    flag = toolkit_obj.parameter_spec["data"]["type"][
+                               "key"] == "transfer_box"
                     data = list(zip(*args[0]))
 
                     if flag:
@@ -184,7 +201,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                     lab_fields = ["New Col" + str(i) for i in range(len(lab))]
                     var1 = [np.var(da) for da in data]
                     var2 = [np.var(da) for da in lab]
-                    merge_fields = fields[0] + fields[1] if fields[1] else fields[0]
+                    merge_fields = fields[0] + fields[1] if fields[1] else \
+                    fields[0]
                     x_domain = merge_fields + ["_empty"] + lab_fields
                     y_domain = var1 + [0] + var2
 
@@ -192,14 +210,19 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                     json = {
                         "table1": {"X_fields": fields[0],
                                    "Y_fields": fields[1],
-                                   "data": [dict(zip(merge_fields, arr)) for arr in list(zip(*data))]
+                                   "data": [dict(zip(merge_fields, arr)) for arr
+                                            in list(zip(*data))]
                                    },
-                        "table2": {"data": [dict(zip(lab_fields, arr)) for arr in labels],
-                                   "fields": lab_fields},
+                        "table2": {
+                            "data": [dict(zip(lab_fields, arr)) for arr in
+                                     labels],
+                            "fields": lab_fields},
                         "bar": {"x_domain": x_domain,
                                 "y_domain": y_domain},
-                        "pie1": [{"text": fields[0][i], "value": temp[i]} for i in range(len(temp))],
-                        "pie2": [{"text": lab_fields[i], "value": var2[i]} for i in range(len(var2))],
+                        "pie1": [{"text": fields[0][i], "value": temp[i]} for i
+                                 in range(len(temp))],
+                        "pie2": [{"text": lab_fields[i], "value": var2[i]} for i
+                                 in range(len(var2))],
                         "general_info": gen_info,
                         "category": toolkit_obj.category}
 
@@ -216,13 +239,18 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                                                                project_obj,
                                                                job=job_obj,
                                                                type='result')
-                logger_service.save_result(result_sds_obj, **{"result": results})
-                logger_service.save_result(result_sds_obj, **{"visualization": json})
-                return {"visual_sds_id": str(result_sds_obj.id) if json else None,
-                        "result": results}
+                logger_service.save_result(result_sds_obj,
+                                           **{"result": results})
+                logger_service.save_result(result_sds_obj,
+                                           **{"visualization": json})
+                return {
+                    "visual_sds_id": str(result_sds_obj.id) if json else None,
+                    "result": results}
 
             return {"result": results}
+
         return wrapper
+
     return decorator
 
 
@@ -235,6 +263,7 @@ def create_model_job(project_id, staging_data_set_id, model_obj, **kwargs):
     :param model_obj: project_id, staging_data_set_id, toolkit_id
     :return:
     """
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
@@ -280,7 +309,9 @@ def create_model_job(project_id, staging_data_set_id, model_obj, **kwargs):
             # result_obj = result_business.add_result(func_result, job_obj, 0, "")
 
             return func_result
+
         return wrapper
+
     return decorator
 
 
@@ -297,8 +328,9 @@ def split_supervised_input(staging_data_set_id, x_fields, y_fields, schema,
 
 def get_results_by_job_id_and_user_ID(job_id, user_ID):
     project_name = job_business.get_by_job_id(job_id)['project']['name']
-    result_dir = '{}{}/{}{}'.format(user_directory, user_ID, project_name,
-                                   job_id)
+    result_dir = '{}{}/{}/{}'.format(user_directory, user_ID, project_name,
+                                    job_id)
+
 
 # def to_code(conf, project_id, staging_data_set_id, model, *args):
 #     """
@@ -347,10 +379,10 @@ def add_new_column(value, index, name, staging_data_set_id):
         name_list = []
         col_value = []
         for i in range(length):
-             name_list.append(name + str(i))
+            name_list.append(name + str(i))
         for arr in value:
             if arr != arr:
-                rows = [arr]*length
+                rows = [arr] * length
                 obj = dict(zip(name_list, rows))
             else:
                 obj = dict(zip(name_list, arr))

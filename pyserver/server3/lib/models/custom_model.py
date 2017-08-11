@@ -9,9 +9,30 @@ from tensorflow.python.framework import constant_op
 from tensorflow.python.framework import dtypes
 from server3.utility.str_utility import generate_args_str
 from server3.service.custom_log_handler import MetricsHandler
-from tensorflow.contrib.learn.python.learn import monitors
 from tensorflow.contrib.learn.python.learn.estimators import estimator
 
+from server3.lib.models.modified_tf_file.monitors import ValidationMonitor
+
+# 修改了 metric_spec 的部分内容，
+# 源代码为
+
+# 部署时请更改为以下代码
+#         if isinstance(dict_or_tensor, dict):
+#           if len(dict_or_tensor) != 1:
+#
+#             # lux change 增加了一个判断 来获取字典中的分类的classes结果
+#             if 'classes' in dict_or_tensor.keys():
+#               return six.next(six.itervalues(
+#                     {'prediction': dict_or_tensor['classes']}))
+#             #
+#             else:
+#               raise ValueError('MetricSpec without specified ' + name + '_key'
+#                              ' requires ' + name + 's tensor or single element'
+#                              ' dict, got %s' % dict_or_tensor)
+#           return six.next(six.itervalues(dict_or_tensor))
+#         return dict_or_tensor
+
+from tensorflow.contrib.learn.python.learn import metric_spec
 
 def custom_model(conf, model_fn, input_data, **kw):
     """
@@ -65,7 +86,7 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
     # input_data 已分割 为训练集和测试集
     X_train, X_test, y_train, y_test = \
         input_data['x_tr'], input_data['x_te'],\
-        input_data['y_tr'], input_data['y_tr']
+        input_data['y_tr'], input_data['y_te']
 
     train_input_fn = get_input_fn(model_name=input_data['model_name'],
                                   df_features=X_train,
@@ -77,31 +98,39 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
         and est_params['args']['num_classes'] == 2) or input_data[
         'model_name'] == 'svm':
         validation_metrics = {
-            "accuracy":
-                tf.contrib.learn.MetricSpec(
+            "acc":
+                metric_spec.MetricSpec(
                     metric_fn=tf.contrib.metrics.streaming_accuracy,
                     prediction_key=None),
             "precision":
-                tf.contrib.learn.MetricSpec(
+                metric_spec.MetricSpec(
                     metric_fn=tf.contrib.metrics.streaming_precision,
                     prediction_key=None),
             "recall":
-                tf.contrib.learn.MetricSpec(
+                metric_spec.MetricSpec(
                     metric_fn=tf.contrib.metrics.streaming_recall,
                     prediction_key=None),
             "confusion_matrix":
-                tf.contrib.learn.MetricSpec(
+                metric_spec.MetricSpec(
                     metric_fn=tf.contrib.metrics.confusion_matrix,
                     prediction_key=None)
         }
     else:
         validation_metrics = {}
 
-    val_monitor = tf.contrib.learn.monitors.ValidationMonitor(
+    val_monitor = ValidationMonitor(
         input_fn=eval_input_fn,
         eval_steps=1,
         every_n_steps=100,
-        metrics=validation_metrics)
+        metrics=validation_metrics,
+        name='val')
+
+    tra__monitor = ValidationMonitor(
+        input_fn=train_input_fn,
+        eval_steps=1,
+        every_n_steps=100,
+        metrics=validation_metrics,
+        name='tra')
 
     # init model
     estimator = \
@@ -110,7 +139,7 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
                                    config=
                                    tf.contrib.learn.RunConfig(
                                        save_checkpoints_steps=
-                                       val_monitor._every_n_steps),
+                                       100),
                                    params=est_params[
                                        'args'])
 
@@ -130,9 +159,8 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
     #     evaluation_times -= 1
 
     # fit
-
     estimator.fit(input_fn=train_input_fn,
-                  monitors=[val_monitor],
+                  monitors=[val_monitor, tra__monitor],
                   **fit_params['args'])
     # evaluate
     metrics = estimator.evaluate(input_fn=eval_input_fn,

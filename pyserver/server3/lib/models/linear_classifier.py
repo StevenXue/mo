@@ -68,19 +68,18 @@ def linear_classifier_model_fn(features, labels, mode, params, config=None):
       ValueError: If mode is not any of the `ModeKeys`.
     """
 
-    if params["n_classes"]>2:
+    if params["num_classes"]>2:
         head = head_lib.multi_class_head(
-            params["n_classes"],
+            params["num_classes"],
             weight_column_name=params["weight_column_name"],
             enable_centered_bias=params["enable_centered_bias"],
             label_keys=params["label_keys"],
-            metric_class_ids=range(0, params["n_classes"]))
+            metric_class_ids=range(0, params["num_classes"]))
     else:
         head = head_lib.multi_class_head(
-            params["n_classes"],
+            params["num_classes"],
             weight_column_name=params["weight_column_name"],
-            enable_centered_bias=params["enable_centered_bias"],
-            label_keys=params["label_keys"])
+            enable_centered_bias=params["enable_centered_bias"])
 
     feature_columns = [layers.real_valued_column(i) for i in features.keys()]
 
