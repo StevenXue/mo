@@ -173,6 +173,8 @@ def file_loader(file_id, user_ID, names):
                         skiprows=[0])
     print(table)
     table = table.to_dict('records')
+    from server3.utility import json_utility
+    table = json_utility.convert_to_json(table)
     print(table)
     return table
 

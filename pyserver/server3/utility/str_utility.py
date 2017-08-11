@@ -8,6 +8,11 @@ def generate_args_str(args):
     return ', '.join(array)
 
 
+# def remove_dot(string):
+#     string.replace('.', '')
+#     return string
+
+
 def slugify(value, allow_unicode=False):
     """
     Convert to ASCII if 'allow_unicode' is False. Convert spaces to hyphens.
