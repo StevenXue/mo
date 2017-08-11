@@ -13,8 +13,25 @@ from tensorflow.contrib.learn.python.learn.estimators import estimator
 
 from server3.lib.models.modified_tf_file.monitors import ValidationMonitor
 
-# 修改了 metric_spec 的部分内容，查询lux 即可找到
-# 部署时请更改相关代码
+# 修改了 metric_spec 的部分内容，
+# 源代码为
+
+# 部署时请更改为以下代码
+#         if isinstance(dict_or_tensor, dict):
+#           if len(dict_or_tensor) != 1:
+#
+#             # lux change 增加了一个判断 来获取字典中的分类的classes结果
+#             if 'classes' in dict_or_tensor.keys():
+#               return six.next(six.itervalues(
+#                     {'prediction': dict_or_tensor['classes']}))
+#             #
+#             else:
+#               raise ValueError('MetricSpec without specified ' + name + '_key'
+#                              ' requires ' + name + 's tensor or single element'
+#                              ' dict, got %s' % dict_or_tensor)
+#           return six.next(six.itervalues(dict_or_tensor))
+#         return dict_or_tensor
+
 from tensorflow.contrib.learn.python.learn import metric_spec
 
 def custom_model(conf, model_fn, input_data, **kw):
