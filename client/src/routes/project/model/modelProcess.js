@@ -69,7 +69,7 @@ export default class ModelProcess extends React.Component {
     }else{
       this.setState({
         source: this.props.cols,
-        selectedFile: this.selectedFile,
+        selectedFile: this.props.selectedFile,
         dataSet: this.props.dataset_id,
       });
     }

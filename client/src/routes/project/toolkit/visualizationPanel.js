@@ -41,6 +41,11 @@ export default class VisualizationPanel extends React.Component {
 
         if(res.response.category && res.response.category === 2){
           this.setState({selectedColOne: 0, selectedColTwo: 0})
+        }else if(res.response.category && res.response.category === 1){
+          this.setState({selected: res.response.X_fields[0]});
+          let data = {'x_domain': this.state.responseBody['scatter']['x_domain'][0],
+            'y_domain': this.state.responseBody['scatter']['y_domain']}
+          this.setState({scatterData: data});
         }
 
         if(res.response.hist_freq){
@@ -102,7 +107,7 @@ export default class VisualizationPanel extends React.Component {
               {
                 !isEmpty(this.state.responseBody) &&
                 <div>
-                  <div >
+                  <div style={{ marginLeft: 10, marginTop: -40}}>
                     <span style={{ marginLeft: 20 }}>Number of Clusters: </span>
                     <span style={{color: "#00AAAA"}}>{this.state.responseBody['general_info']['Number of Clusters']}</span>
                   </div>
@@ -190,13 +195,20 @@ export default class VisualizationPanel extends React.Component {
                   }
                 </div>
                 <div style={{width: '30%', display: 'flex', flexDirection: 'column', marginTop: 20}}>
-                  <div style={{margin: 5}}>
-                    <div style={{height: 10, width: '50%', backgroundColor: '#C6DFB5'}}/>
+                  <div style={{margin: 2}}>
+                    <div style={{height: 20, width: '50%', backgroundColor: '#C6DFB5'}}/>
                     <span>Target</span>
                   </div>
-                  <div style={{margin: 5}}>
-                    <div style={{height: 10, width: '50%', backgroundColor: '#DBDBDB'}}/>
+                  <div style={{margin: 2}}>
+                    <div style={{height: 20, width: '50%', backgroundColor: '#DBDBDB'}}/>
                     <span>Fields</span>
+                    {/*<span style={{color: 'rgba(192, 149, 122, 1)'}}>{text}</span>*/}
+                  </div>
+                  <div style={{margin: 2}}>
+                    <div style={{height: 20, width: '50%', backgroundColor: '#DBDBDB'}}>
+                      <span style={{color: 'rgba(192, 149, 122, 1)', marginLeft: 5}}>{'text'}</span>
+                    </div>
+                    <span>Selected Fields</span>
                   </div>
                   {
                     !isEmpty(this.state.responseBody) &&
