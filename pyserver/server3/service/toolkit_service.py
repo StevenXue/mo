@@ -23,12 +23,33 @@ from server3.service import job_service
 from server3.business import toolkit_business, ownership_business, user_business, job_business, result_business, project_business
 from server3.utility import data_utility
 
+TOOLKIT_CATEGORY_DICT = {
+    0: '聚类',
+    1: '特征选取',
+    2: '数值转换',
+    3: '降维',
+    4: '描述性统计'
+}
+
 
 def get_all_public_toolkit():
     list_toolkit = []
     for obj in ownership_business.list_ownership_by_type_and_private('toolkit', False):
         list_toolkit.append(obj.toolkit.to_mongo().to_dict())
     return list_toolkit
+
+
+def get_all_public_toolkit_by_category():
+    toolkit_category_dict = {}
+    for obj in ownership_business.list_ownership_by_type_and_private('toolkit', False):
+        string = TOOLKIT_CATEGORY_DICT[obj.toolkit.category]
+        toolkit_obj = obj.toolkit.to_mongo()
+        toolkit_obj.pop("target_py_code")
+        if string in toolkit_category_dict:
+            toolkit_category_dict[string].append(toolkit_obj)
+        else:
+            toolkit_category_dict[string] = [toolkit_obj]
+    return toolkit_category_dict
 
 
 def list_public_toolkit_name():
