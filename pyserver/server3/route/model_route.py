@@ -5,6 +5,8 @@ Blueprint for analysis
 Author: Zhaofeng Li
 Date: 2017.06.30
 """
+import re
+
 from bson import ObjectId
 from flask import Blueprint
 from flask import jsonify
@@ -18,6 +20,8 @@ from server3.business import model_business
 from server3.business import toolkit_business
 from server3.business import staging_data_business
 from server3.utility import json_utility
+from server3.constants import PORT
+
 
 PREFIX = '/model'
 
@@ -37,7 +41,7 @@ def allowed_file(filename):
 def get_all_model_info():
     result = model_service.get_all_public_model()
     return jsonify({'message': 'get info success', 'response':
-        json_utility.convert_to_json(result)}), 200
+        json_utility.convert_to_json(result)})
 
 
 @model_app.route('/models/<string:model_id>', methods=['GET'])
@@ -47,7 +51,7 @@ def get_model(model_id):
         model = json_utility.convert_to_json(model.to_mongo())
     except Exception as e:
         return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
-    return jsonify({'response': model}), 200
+    return jsonify({'response': model})
 
 
 @model_app.route('/models/run/<string:model_id>', methods=['POST'])
@@ -67,7 +71,7 @@ def run_model(model_id):
                                      divide_row=divide_row,
                                      ratio=ratio)
     result = json_utility.convert_to_json(result)
-    return jsonify({'response': result}), 200
+    return jsonify({'response': result})
 
 
 @model_app.route('/models/run_multiple/<string:model_id>', methods=['POST'])
@@ -79,14 +83,17 @@ def run_multiple_model(model_id):
     schema = data['schema']
 
     hyper_parameters = data['hyper_parameters']
-    result = model_service.run_multiple_model(conf, project_id, staging_data_set_id, model_id,
-                                     schema=schema, hyper_parameters=hyper_parameters)
+    result = model_service.run_multiple_model(conf, project_id,
+                                              staging_data_set_id, model_id,
+                                              schema=schema,
+                                              hyper_parameters=hyper_parameters)
     print("result length", len(result))
-    return jsonify({'response': result}), 200
+    return jsonify({'response': result})
 
 
 # temp test for hyperas model
-@model_app.route('/models/run_hyperas_model/<string:model_id>', methods=['POST'])
+@model_app.route('/models/run_hyperas_model/<string:model_id>',
+                 methods=['POST'])
 def run_hyperas_model(model_id):
     data = request.get_json()
     conf = data['conf']
@@ -94,10 +101,11 @@ def run_hyperas_model(model_id):
     staging_data_set_id = data['staging_data_set_id']
     schema = data['schema']
 
-    result = model_service.run_hyperas_model(conf, project_id, staging_data_set_id,
+    result = model_service.run_hyperas_model(conf, project_id,
+                                             staging_data_set_id,
                                              model_id, schema=schema)
     result = json_utility.convert_to_json(result)
-    return jsonify({'response': result}), 200
+    return jsonify({'response': result})
 
 
 @model_app.route('/models/to_code/<string:model_id>', methods=['POST'])
@@ -116,12 +124,40 @@ def model_to_code(model_id):
                                        schema=schema,
                                        divide_row=divide_row,
                                        ratio=ratio)
-    return jsonify({'response': code}), 200
+    return jsonify({'response': code})
 
 
 @model_app.route('/result/<string:job_id>')
-def model_result(job_id):
-    result_dir, filename = model_service.get_results_dir_by_job_id(job_id)
+def encode_model_result(job_id):
+    """
+    encode hdf5 weights for keras-js
+    :param job_id:
+    :return:
+    """
+    result_dir, h5_filename = model_service.get_results_dir_by_job_id(job_id)
+    model_service.encode_h5_for_keras_js(result_dir + h5_filename)
+    prefix = re.sub('\.hdf5$', '', h5_filename)
+    origin = request.remote_addr
+    port = PORT
+    return jsonify({'response': {
+        'model': '{}:{}/model/result/{}/model.json'.format(
+            origin, port, job_id),
+        'weights': '{}:{}/model/result/{}/{}_weights.buf'.format(
+            origin, port, job_id, prefix),
+        'metadata': '{}:{}/model/result/{}/{}_metadata.json'.format(
+            origin, port, job_id, prefix),
+    }})
+
+
+@model_app.route('/result/<string:job_id>/<filename>')
+def model_result(job_id, filename):
+    """
+    api for get model result file content
+    :param job_id:
+    :param filename:
+    :return:
+    """
+    result_dir, h5_filename = model_service.get_results_dir_by_job_id(job_id)
     return send_from_directory(result_dir, filename)
 
 
