@@ -93,11 +93,9 @@ def get_dummy(arr0, index):
 
 # FIXME
 def pandas_cut(arr0, index, bins, labels=False):
-    if labels == [""]:
-        labels = False
+    labels = False if labels == [""] else labels
     temp = pd.cut(np.array(arr0).flatten(), bins, labels=labels)
     result = data_utility.retrieve_nan_index(list(temp), index)
-    print("re", result)
     return result
 
 
