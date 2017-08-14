@@ -10,6 +10,7 @@ from flask import Blueprint
 from flask import jsonify
 from flask import make_response
 from flask import request
+from flask import send_from_directory
 
 from server3.service import model_service
 from server3.service import staging_data_service
@@ -115,13 +116,13 @@ def model_to_code(model_id):
                                        schema=schema,
                                        divide_row=divide_row,
                                        ratio=ratio)
-    # try:
-    #     code = model_service.model_to_code(conf, project_id,
-    #                                        staging_data_set_id,
-    #                                        model_id, schema=schema)
-    # except Exception as e:
-    #     return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
     return jsonify({'response': code}), 200
+
+
+@model_app.route('/result/<string:job_id>')
+def model_result(job_id):
+    result_dir, filename = model_service.get_results_dir_by_job_id(job_id)
+    return send_from_directory(result_dir, filename)
 
 
 # keras model
