@@ -49,7 +49,9 @@ def allowed_file(filename):
 @toolkit_app.route('/toolkits/public', methods=['GET'])
 def get_all_toolkit_info():
     try:
-        result = toolkit_service.get_all_public_toolkit()
+        # 新增方法按照category分类
+        # result = toolkit_service.get_all_public_toolkit()
+        result = toolkit_service.get_all_public_toolkit_by_category()
     except Exception as e:
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}), 400)
