@@ -430,7 +430,7 @@ def manage_folder_input_to_str(conf, file_id, **kwargs):
     return code_str
 
 
-def get_results_by_job_id_and_user_ID(job_id, checkpoint='final'):
+def get_results_dir_by_job_id(job_id, checkpoint='final'):
     """
 
     :param job_id:
@@ -442,9 +442,10 @@ def get_results_by_job_id_and_user_ID(job_id, checkpoint='final'):
     ownership = ownership_business.get_ownership_by_owned_item(project,
                                                                'project')
     user_ID = ownership.user.user_ID
-    result_dir = '{}{}/{}/{}/{}.hdf5'.format(user_directory, user_ID,
-                                             project_name, job_id, checkpoint)
-    return result_dir
+    result_dir = '{}{}/{}/{}/'.format(user_directory, user_ID,
+                                             project_name, job_id)
+    filename = '{}.hdf5'.format(checkpoint)
+    return result_dir, filename
 
 
 # ------------------------------ temp function ------------------------------e

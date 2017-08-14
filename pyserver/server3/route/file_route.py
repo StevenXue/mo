@@ -38,20 +38,19 @@ def upload_file():
     if request.method == 'POST':
         # check if the post request has the file part
         if REQUEST_FILE_NAME not in request.files:
-            return make_response(jsonify({'response': 'no file part'}), 400)
+            return jsonify({'response': 'no file part'}), 400
         file = request.files[REQUEST_FILE_NAME]
         if file.filename == '':
-            return make_response(jsonify({'response': 'no selected file'}), 400)
+            return jsonify({'response': 'no selected file'}), 400
         if file and file_service.allowed_file(file.filename):
             url_base = PREFIX + UPLOAD_URL
             saved_file = file_service.add_file(file, url_base,
                                                user_ID, is_private,
                                                description, type)
             file_json = json_utility.convert_to_json(saved_file.to_mongo())
-            return make_response(jsonify({'response': file_json}), 200)
+            return jsonify({'response': file_json})
         else:
-            return make_response(jsonify({'response': 'file is not allowed'}),
-                                 400)
+            return jsonify({'response': 'file is not allowed'}), 400
 
 
 # @file_app.route('/files', methods=['GET'])
@@ -79,7 +78,7 @@ def list_files_by_user_ID():
     user_ID = request.args.get('user_ID')
     extension = request.args.get('extension')
     if not user_ID:
-        jsonify({'response': 'insufficient args'}), 400
+        return jsonify({'response': 'insufficient args'}), 400
     public_files, owned_files = \
         file_service.list_file_by_extension(user_ID,
                                             extension=extension,
@@ -90,7 +89,7 @@ def list_files_by_user_ID():
         'public_files': public_files,
         'owned_files': owned_files
     }
-    return make_response(jsonify({'response': result}), 200)
+    return jsonify({'response': result})
 
 
 @file_app.route('/files/<string:file_id>', methods=['DELETE'])
@@ -98,9 +97,9 @@ def remove_file_by_id(file_id):
     try:
         result = file_service.remove_file_by_id(ObjectId(file_id))
     except Exception as e:
-        return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}), 400)
-    return make_response(jsonify({'response': result}), 200)
+        return jsonify({'response': '%s: %s' % (str(
+            Exception), e.args)})
+    return jsonify({'response': result})
 
 
 @file_app.route(UPLOAD_URL + '<user_ID>/<filename>')

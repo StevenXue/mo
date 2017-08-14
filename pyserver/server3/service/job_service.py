@@ -258,10 +258,10 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
 def create_model_job(project_id, staging_data_set_id, model_obj, **kwargs):
     """
     help model to create a job before model runs,
-    as well as save the job & create a result after toolkit runs
-    :param project_id: project_id, staging_data_set_id, toolkit_id
-    :param staging_data_set_id: project_id, staging_data_set_id, toolkit_id
-    :param model_obj: project_id, staging_data_set_id, toolkit_id
+    as well as save the job & create a result after model runs
+    :param project_id:
+    :param staging_data_set_id:
+    :param model_obj:
     :return:
     """
 
@@ -277,6 +277,7 @@ def create_model_job(project_id, staging_data_set_id, model_obj, **kwargs):
             if staging_data_set_id:
                 staging_data_set_obj = \
                     staging_data_set_business.get_by_id(staging_data_set_id)
+
             project_obj = project_business.get_by_id(project_id)
 
             file_dict = {'file': ObjectId(file_id)} if file_id else {}
@@ -306,8 +307,7 @@ def create_model_job(project_id, staging_data_set_id, model_obj, **kwargs):
             # update a job
             job_business.end_job(job_obj)
 
-            # create a result
-            # result_obj = result_business.add_result(func_result, job_obj, 0, "")
+            func_result['job_id'] = str(job_obj.id)
 
             return func_result
 
