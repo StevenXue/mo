@@ -24,7 +24,7 @@ from server3.business import staging_data_business
 from server3.business import staging_data_set_business
 from server3.service import staging_data_service, logger_service, \
     visualization_service
-
+from server3.business import ownership_business
 from server3.utility import data_utility
 from server3.lib import models
 from server3.repository import config
@@ -67,7 +67,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
 
             # calculate
             func_rst = func(*args, **kw)
-            result = list(func_rst) if isinstance(func_rst, tuple) else [func_rst]
+            result = list(func_rst) if isinstance(func_rst, tuple) else [
+                func_rst]
             print("show", result)
 
             # 新设计的存取方式
@@ -115,8 +116,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                         "labels": labels,
                         "bar": results["scores"],
                         "general_info": {"Selected Features": "%s out of %s" % (
-                        len(list(filter(lambda x: x is True, labels))),
-                        len(fields[0])),
+                            len(list(filter(lambda x: x is True, labels))),
+                            len(fields[0])),
                                          "Selected Fields": " ".join(
                                              str(el) for el in
                                              list(compress(fields[0], labels))),
@@ -202,7 +203,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                     var1 = [np.var(da) for da in data]
                     var2 = [np.var(da) for da in lab]
                     merge_fields = fields[0] + fields[1] if fields[1] else \
-                    fields[0]
+                        fields[0]
                     x_domain = merge_fields + ["_empty"] + lab_fields
                     y_domain = var1 + [0] + var2
 
@@ -324,27 +325,6 @@ def split_supervised_input(staging_data_set_id, x_fields, y_fields, schema,
     obj = staging_data_service.split_x_y(staging_data_set_id, x_fields,
                                          y_fields)
     return staging_data_service.split_test_train(obj, schema=schema, **kwargs)
-
-
-def get_results_by_job_id_and_user_ID(job_id, user_ID):
-    project_name = job_business.get_by_job_id(job_id)['project']['name']
-    result_dir = '{}{}/{}/{}'.format(user_directory, user_ID, project_name,
-                                    job_id)
-
-
-# def to_code(conf, project_id, staging_data_set_id, model, *args):
-#     """
-#     convert config to code string
-#
-#     :param conf:
-#     :param project_id:
-#     :param staging_data_set_id:
-#     :param model:
-#     :return:
-#     """
-#     func = getattr(models, model.to_code_function)
-#     func = create_model_job(project_id, staging_data_set_id, model)(func)
-#     return func(conf, *args)
 
 
 def run_code(conf, project_id, staging_data_set_id, model, f, *args, **kwargs):

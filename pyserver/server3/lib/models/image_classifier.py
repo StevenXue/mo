@@ -86,6 +86,7 @@ def model_main(result_sds, project_id, train_data_dir,
                nb_validation_samples, input_shape,
                img_width, img_height,
                epochs, batch_size):
+    print(train_data_dir)
     model = Sequential()
     model.add(Conv2D(32, (3, 3), input_shape=input_shape))
     model.add(Activation('relu'))

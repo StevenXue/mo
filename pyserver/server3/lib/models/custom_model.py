@@ -15,7 +15,13 @@ from server3.lib.models.modified_tf_file.monitors import ValidationMonitor
 
 # 修改了 metric_spec 的部分内容，
 # 源代码为
-
+# if isinstance(dict_or_tensor, dict):
+#     if len(dict_or_tensor) != 1:
+#         raise ValueError('MetricSpec without specified ' + name + '_key'
+#                                                                   ' requires ' + name + 's tensor or single element'
+#                                                                                         ' dict, got %s' % dict_or_tensor)
+#     return six.next(six.itervalues(dict_or_tensor))
+# return dict_or_tensor
 # 部署时请更改为以下代码
 #         if isinstance(dict_or_tensor, dict):
 #           if len(dict_or_tensor) != 1:
@@ -33,6 +39,7 @@ from server3.lib.models.modified_tf_file.monitors import ValidationMonitor
 #         return dict_or_tensor
 
 from tensorflow.contrib.learn.python.learn import metric_spec
+
 
 def custom_model(conf, model_fn, input_data, **kw):
     """
@@ -85,7 +92,7 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
 
     # input_data 已分割 为训练集和测试集
     X_train, X_test, y_train, y_test = \
-        input_data['x_tr'], input_data['x_te'],\
+        input_data['x_tr'], input_data['x_te'], \
         input_data['y_tr'], input_data['y_te']
 
     train_input_fn = get_input_fn(model_name=input_data['model_name'],
@@ -94,9 +101,9 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
     eval_input_fn = get_input_fn(model_name=input_data['model_name'],
                                  df_features=X_test,
                                  df_labels=y_test)
-    if ((input_data['model_name'] in ['Linear_classifier', 'Randomforest'])
-        and est_params['args']['num_classes'] == 2) or input_data[
-        'model_name'] == 'svm':
+    if ((input_data['model_name'] in ['Linear Classifier', 'Random Forest'])
+        and est_params['args']['num_classes'] == 2) or \
+                    input_data['model_name'] == 'SVM':
         validation_metrics = {
             "acc":
                 metric_spec.MetricSpec(

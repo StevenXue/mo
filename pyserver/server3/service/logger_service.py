@@ -8,6 +8,7 @@ from server3.business import staging_data_set_business
 
 
 def log_epoch_end(*args):
+    print(args)
     save_log('epoch', *args)
     emit_log('epoch', *args)
 
