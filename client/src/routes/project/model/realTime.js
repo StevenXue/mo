@@ -173,7 +173,7 @@ export default class Curve extends React.Component {
   getOptionMetric (metric) {
     return {
       title: {
-        text: `train ${metric}`,
+        text: `${metric}`,
       },
       calculable: false,
       tooltip: {
@@ -263,7 +263,7 @@ export default class Curve extends React.Component {
   getOptionLoss () {
     return {
       title: {
-        text: 'train loss',
+        text: 'loss',
       },
       tooltip: {
         trigger: 'axis',

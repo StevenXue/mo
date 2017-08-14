@@ -34,7 +34,9 @@ def image_classifier_vgg16(conf, input, **kw):
     nb_validation_samples = input['nb_validation_samples']
 
     # 通过train_data_dir下的文件夹数目得到分类数量
-    num_classes = len(os.listdir(train_data_dir))
+    l = os.listdir(train_data_dir)
+    l.remove('.DS_Store')
+    num_classes = len(l)
     if num_classes < 2:
         raise Exception('classes should be more than 1, put your '
                         'different classes images file into '
@@ -132,8 +134,7 @@ def image_classifier_vgg16(conf, input, **kw):
             epochs=epochs,
             validation_data=validation_generator,
             validation_steps=nb_validation_samples // batch_size,
-            callbacks=[batch_print_callback, best_checkpoint,
-                       general_checkpoint],
+            callbacks=[batch_print_callback],
         )
         # model.save_weights('first_try.h5')
         config = model.get_config()
@@ -141,8 +142,7 @@ def image_classifier_vgg16(conf, input, **kw):
                                      model_config=config,
                                      # score=score,
                                      history=history.history)
-        return {
-            'history': history.history}
+        return {'history': history.history}
 
 
 def image_classifier_vgg16_to_str():

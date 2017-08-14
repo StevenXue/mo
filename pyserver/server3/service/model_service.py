@@ -22,6 +22,7 @@ from server3.service import staging_data_service
 from server3.business import file_business
 from server3.business import staging_data_business
 from server3.business import project_business
+from server3.business import job_business
 from server3.repository import config
 
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
@@ -125,6 +126,7 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
         f = getattr(models, model.entry_function)
         input_dict = model_input_manager_folder_input(conf, data_source_id,
                                                       **kwargs)
+        print(input_dict)
         return job_service.run_code(conf, project_id, None,
                                     model, f, input_dict,
                                     file_id=data_source_id)
@@ -323,9 +325,10 @@ def model_input_manager_unsupervised(x_cols, data_source_id, model_name,
 
 def model_input_manager_folder_input(conf, file_id, **kwargs):
     file = file_business.get_by_id(file_id)
+    print(file['uri'])
     input = {
-        'train_data_dir': (file['uri'] + 'train/'),
-        'validation_data_dir': (file['uri'] + 'validation/')
+        'train_data_dir': file['uri'] + 'train/',
+        'validation_data_dir': file['uri'] + 'validation/'
     }
     input['nb_train_samples'] = sum(
         [len(files) for r, d, files in
@@ -410,6 +413,7 @@ def manage_folder_input_to_str(conf, file_id, **kwargs):
         'train_data_dir': (file['uri'] + 'train/'),
         'validation_data_dir': (file['uri'] + 'validation/')
     }
+    print(input)
     input['nb_train_samples'] = sum(
         [len(files) for r, d, files in
          os.walk(input['train_data_dir'])])
@@ -424,6 +428,23 @@ def manage_folder_input_to_str(conf, file_id, **kwargs):
         'nb_validation_samples']
 
     return code_str
+
+
+def get_results_by_job_id_and_user_ID(job_id, checkpoint='final'):
+    """
+
+    :param job_id:
+    :param checkpoint:
+    :return:
+    """
+    project = job_business.get_by_job_id(job_id).project
+    project_name = project.name
+    ownership = ownership_business.get_ownership_by_owned_item(project,
+                                                               'project')
+    user_ID = ownership.user.user_ID
+    result_dir = '{}{}/{}/{}/{}.hdf5'.format(user_directory, user_ID,
+                                             project_name, job_id, checkpoint)
+    return result_dir
 
 
 # ------------------------------ temp function ------------------------------e
