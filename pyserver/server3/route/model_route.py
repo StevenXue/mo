@@ -34,11 +34,7 @@ def allowed_file(filename):
 
 @model_app.route('/models/public', methods=['GET'])
 def get_all_model_info():
-    try:
-        result = model_service.get_all_public_model()
-    except Exception as e:
-        return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}), 400)
+    result = model_service.get_all_public_model()
     return jsonify({'message': 'get info success', 'response':
         json_utility.convert_to_json(result)}), 200
 
