@@ -152,7 +152,10 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 # 曾经两表合并，现在不需要了
                 # merge_data = list(zip(*(data + result)))
                 if len(result) == len(fields[0]):
-                    lab_fields = ["New Col" + str(i) for i in range(len(result))]
+                    lab_fields = ["New_Col_" + str(fields[0][i]) for i in range(len(result))]
+                else:
+                    lab_fields = ["New_Col_" + str(fields[0][0]) + str(i) for i in range(len(result))]
+
                 # merge_fields = fields[0] + lab_fields
 
                 flag_str1 = isinstance(args[0][inn][0], str)
