@@ -126,97 +126,73 @@ class PreviewCard extends React.Component {
             interval: interval,
             //data: data.freq_hist.x_domain
           },
-          yAxis: {
+          yAxis: [{
             type: 'value',
             min: 'dataMin',
             max: 'dataMax',
-            // position: 'right',
+            position: 'right',
           },
-          //   {
-          //   type: 'value',
-          //   min: 'dataMin',
-          //   max: 'dataMax',
-          //   position: 'left'
-          // }
-
-          series:
             {
-              name: 'y',
-              type: 'custom',
-              //yAxisIndex: 0,
-              renderItem: function (params, api) {
-                return {
-                  type: 'polyline',
-                  shape: {
-                    points: data_custom_line,
-                    smooth: 'spline'
-                  },
-                  style: api.style()
-                }
-              },
-              encode: {
-                x: 0,
-                y: 1,
-                tooltip: 2,
-                label: 2
-              },
-              data: data_custom_line
-            }
-          //   {
-          //   name: 'hypo',
-          //   type: 'line',
-          //   label: {
-          //     normal: {
-          //       show: false,
-          //       position: 'top',
-          //     }
-          //   },
-          //   lineStyle: {
-          //     normal: {
-          //       width: 3,
-          //       shadowColor: 'rgba(0,0,0,0.4)',
-          //       shadowBlur: 10,
-          //       shadowOffsetY: 10
-          //     }
-          //   },
-          //   data: data.hypo.standard_norm_value
-          // }
-          // , {
-          //   name: 'height',
-          //   type: 'custom',
-          //   yAxisIndex: 1,
-          //   renderItem: function (params, api) {
-          //     var yValue = api.value(2);
-          //     var start = api.coord([api.value(0), yValue]);
-          //     var size = api.size([api.value(1) - api.value(0), yValue]);
-          //     var style = api.style();
-          //
-          //     return {
-          //       type: 'rect',
-          //       shape: {
-          //         x: start[0] + 1,
-          //         y: start[1],
-          //         width: size[0] - 2,
-          //         height: size[1]
-          //       },
-          //       style: style
-          //     }
-          //   },
-          //   label: {
-          //     normal: {
-          //       show: true,
-          //       position: 'outsideTop'
-          //     }
-          //   },
-          //   encode: {
-          //     x: [0, 1],
-          //     y: 2,
-          //     tooltip: 2,
-          //     label: 2
-          //   },
-          //   data: data_custom_bar
-          // }
+            type: 'value',
+            min: 'dataMin',
+            max: 'dataMax',
+            position: 'left'
+          }
+          ],
+          series:
+            [{
+            type: 'line',
+            label: {
+              normal: {
+                show: false,
+                position: 'top',
+              }
+            },
+            lineStyle: {
+              normal: {
+                width: 3,
+                shadowColor: 'rgba(0,0,0,0.4)',
+                shadowBlur: 10,
+                shadowOffsetY: 10
+              }
+            },
+            data: data_custom_line
+          }
+          , {
+            name: 'height',
+            type: 'custom',
+            yAxisIndex: 1,
+            renderItem: function (params, api) {
+              var yValue = api.value(2);
+              var start = api.coord([api.value(0), yValue]);
+              var size = api.size([api.value(1) - api.value(0), yValue]);
+              var style = api.style();
 
+              return {
+                type: 'rect',
+                shape: {
+                  x: start[0] + 1,
+                  y: start[1],
+                  width: size[0] - 2,
+                  height: size[1]
+                },
+                style: style
+              }
+            },
+            label: {
+              normal: {
+                show: true,
+                position: 'outsideTop'
+              }
+            },
+            encode: {
+              x: [0, 1],
+              y: 2,
+              tooltip: 2,
+              label: 2
+            },
+            data: data_custom_bar
+          }]
         };
 
         this.setState({options});
