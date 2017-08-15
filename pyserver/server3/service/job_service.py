@@ -73,8 +73,12 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
             print("show", result)
 
             # 新设计的存取方式
-            results = {"fields": fields}
-            gen_info = {}
+            results = {
+                "fields": {
+                    "source": fields[0],
+                    "target": fields[1]}
+            }
+            gen_info = []
             result_spec = toolkit_obj.result_spec
             error_flag = 0
 
@@ -91,9 +95,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
 
                 if arg.get("attribute", False) and arg["attribute"] == "label":
                     labels = value
-                elif arg.get("attribute", False) and arg[
-                    "attribute"] == "general_info":
-                    gen_info.update({arg["name"]: value})
+                elif arg.get("attribute", False) and arg["attribute"] == "general_info":
+                    gen_info.append({arg["name"]: {"value": value, "description": arg["des"]}})
 
             # 可视化计算
             # 聚类分析
