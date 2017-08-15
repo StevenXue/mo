@@ -2,7 +2,7 @@ import lodash from 'lodash'
 import { parse } from 'qs'
 import { message } from 'antd'
 import { Router, routerRedux } from 'dva/router'
-import { query, create, edit, listDataSets, publishProject, forkProject , listFiles, getStagedData, convertToStaging } from '../services/project'
+import { query, create, edit, listDataSets, publishProject, forkProject , listFiles, getStagedData, convertToStaging, listToolkits } from '../services/project'
 
 export default {
 
@@ -22,6 +22,7 @@ export default {
       public_projects: [],
       owned_projects: [],
     },
+    toolkits:{},
     selectedDSIds: [],
     stagingData: []
   },
@@ -151,6 +152,22 @@ export default {
         });
       } else {
         console.log('error', data, payload)
+        throw data
+      }
+    },
+
+    *listToolkit ({ payload }, { call, put, select }) {
+      const data = yield call(listToolkits)
+      console.log("listing toolkit", data.response)
+      if (data.success) {
+        yield put({
+          type: 'querySuccess',
+          payload: {
+            toolkits: data.response
+          },
+        })
+      } else {
+        console.log('error', data)
         throw data
       }
     },
