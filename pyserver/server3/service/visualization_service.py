@@ -76,7 +76,7 @@ def hypo_test(arr, mean, std, x_range, type='norm'):
         p_value = stats.shapiro(arr)[1]
         flag = 1 if p_value >= 0.05 else 0
 
-        return flag, p_value, (arr_norm_draw*1000).round(3).tolist()
+        return flag, p_value, arr_norm_draw.round(3).tolist()
 
 
 def usr_story2_exploration(data, d_type, sds_id):
