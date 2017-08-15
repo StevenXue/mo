@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import { Button, Select, message, Checkbox, Input, Steps, Modal, Transfer} from 'antd'
+import { Button, Select, message, Spin, Steps, Modal, Cascader} from 'antd'
+const { Option, OptGroup } = Select;
 const Step = Steps.Step;
 import { Router, routerRedux } from 'dva/router';
 //import ReactJson from 'react-json-view';
@@ -57,6 +58,7 @@ class Toolkit extends React.Component {
       divide: [],
       description: [],
       runnable: false,
+      loading: false,
       steps : [{
         title: 'Choose ToolKit',
       }, {
@@ -94,32 +96,24 @@ class Toolkit extends React.Component {
         visual_sds_id: params.results_staging_data_set_id
       });
     }else {
-      this.fetchData(this.props);
     }
   }
 
-  componentWillReceiveProps (nextProps) {
-    this.fetchData(nextProps);
-  }
-
-  fetchData(props) {
-    fetch(flaskServer + '/toolkit/toolkits/public', {
-      method: 'get',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then((response) => response.json())
-      .then((res) => {
-          this.setState({ toolkits: res.response })
-        },
-      );
-  }
-
-  handleChange (e) {
-    let selected = this.state.toolkits.filter((el) => el._id === e);
+  handleChange (values) {
+    console.log(values[1]);
+    let all = [];
+    Object.keys(this.props.project.toolkits).forEach((el) => {
+        if(all.length === 0){
+          all = this.props.project.toolkits[el];
+        }else{
+          all = all.concat(this.props.project.toolkits[el]);
+        }
+      }
+    );
+    let selected = all.filter((el) => el._id === values[1]);
     let selectedName = selected[0].name;
-    let target = this.state.toolkits.filter((el) => el._id === e)
-    let parameterSpec = target[0].parameter_spec
+
+    let parameterSpec = selected[0].parameter_spec
     let type = parameterSpec.data.type.key;
     this.setState({type});
 
@@ -191,7 +185,7 @@ class Toolkit extends React.Component {
     }
 
     this.setState({
-      toolkit: e,
+      toolkit: values[1],
       selectable,
       selectableType,
       description,
@@ -201,6 +195,7 @@ class Toolkit extends React.Component {
   }
 
   onRunClick () {
+    this.setState({loading: true});
     let body = {
       'staging_data_set_id': this.state.selectedData,
       "conf": {
@@ -227,13 +222,16 @@ class Toolkit extends React.Component {
         let responseObj = res.response.result;
         this.props.onReceiveResult(this.props.section_id);
         this.setState({
+          loading: false,
           resultJson: responseObj,
           toolkit: '',
           visual_sds_id: res.response.visual_sds_id
         });
         }
       )
-      .catch((err) => message.error(err))
+      .catch((err) =>
+        {this.setState({loading: false});
+        message.error(err)})
 
   }
 
@@ -283,20 +281,32 @@ class Toolkit extends React.Component {
     });
   }
 
+  constructOptions(){
+    let parent =  Object.keys(this.props.project.toolkits).map((e) =>
+      (
+        {
+          value: e,
+          label: e,
+          children: this.props.project.toolkits[e].map((el) => ({
+            value: el._id,
+            label: el.name
+          }))
+        }
+      )
+    )
+
+    return parent
+  }
+
   renderStepContent(){
     switch(this.state.current){
       case  0:
         return(
           <div style={{marginTop: 10, marginLeft: 5, width: '25%'}}>
-            <Select className="toolkit" style={{ width: '100%' }} onChange={(e) => this.handleChange(e)}
-                         placeholder="Choose Method" allowClear>
-              {
-                this.state.toolkits && this.state.toolkits.map((e) =>
-                <Select.Option value={e._id} key={e.name}>
-                  {e.name}
-                </Select.Option>)
-              }
-            </Select>
+            <Cascader style={{ width: '100%' }}
+                      options={this.constructOptions()}
+                      onChange={(values) => this.handleChange(values)}
+                      placeholder="Please select" />
           </div>
         );
 
@@ -347,24 +357,31 @@ class Toolkit extends React.Component {
               {this.renderSelections()}
             </div>
             <div style={{marginTop: 10, height: 250}}>
-              {
-                !isEmpty(this.state.resultJson) &&
-                  <div style={{height: 200, overflowY: 'auto'}}>
-                    <JSONTree data={ this.state.resultJson }
-                              style={{width: '100%', height: 400}}
-                              theme={theme}
-                              invertTheme={true} />
-                  </div>
-              }
-              <Button onClick={() => this.setState({visible: true})}>Visualization</Button>
-              <Modal title="Result"
-                     width={1000}
-                     visible={this.state.visible}
-                     onOk={() => this.setState({visible: false})}
-                     onCancel={() => this.setState({visible: false})}
-              >
-                <VisualizationPanel visual_sds_id={this.state.visual_sds_id} />
-              </Modal>
+              <Spin spinning={this.state.loading}>
+                {
+                  !isEmpty(this.state.resultJson) &&
+                    <div style={{height: 200, overflowY: 'auto'}}>
+                      <JSONTree data={ this.state.resultJson }
+                                style={{width: '100%', height: 400}}
+                                theme={theme}
+                                invertTheme={true} />
+                    </div>
+                }
+                <Button onClick={() => this.setState({visible: true})}>Visualization</Button>
+                <Modal title="Result Visualizations"
+                       width={1200}
+                       visible={this.state.visible}
+                       onOk={() => this.setState({visible: false})}
+                       onCancel={() => this.setState({visible: false})}
+                       footer={[
+                         <Button key="submit" type="primary" size="large" onClick={() => this.setState({visible: false})}>
+                           OK
+                         </Button>
+                       ]}
+                  >
+                  <VisualizationPanel visual_sds_id={this.state.visual_sds_id} />
+                </Modal>
+              </Spin>
             </div>
           </div>
         )
@@ -453,4 +470,3 @@ Toolkit.PropTypes = {
 }
 
 export default connect(({ project }) => ({ project }))(Toolkit)
-
