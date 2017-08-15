@@ -819,7 +819,7 @@ def create_public_data_process():
     """
     user = user_business.get_by_user_ID('system')
 
-    standard_scaler = Toolkit(name='无量纲化-正太分布',
+    standard_scaler = Toolkit(name='无量纲化-正态分布',
                               description='标准化，基于特征矩阵的列，将特征值转换至服从标准正态分布',
                               category=2,
                               entry_function='standard_scaler',
