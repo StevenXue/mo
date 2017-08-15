@@ -454,6 +454,11 @@ export default class ModelForms extends React.Component {
                  visible={this.state.visible}
                  onOk={() => this.setState({visible: false})}
                  onCancel={() => this.setState({visible: false})}
+                 footer={[
+                   <Button key="submit" type="primary" size="large" onClick={() => this.setState({visible: false})}>
+                     OK
+                   </Button>
+                 ]}
                   >
             {this.props.params?
               (this.state.params['results'] && <Curve data={this.state.params['results']['history']}/>):
