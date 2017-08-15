@@ -2,7 +2,17 @@ import React from 'react'
 import ReactEcharts from 'echarts-for-react'
 
 const getOption = (props) => {
-  //console.log(props.data);
+  let y_domain = props.data.y_domain;
+  let x_domain
+
+  if(props.type == 'dr'){
+    x_domain = props.data.x_domain;
+    let index = x_domain.indexOf('_empty');
+    x_domain[index] = ''
+  }else{
+    x_domain = props.data.x_domain;
+  }
+
   return {
     color: ['#3398DB'],
     tooltip : {
@@ -11,6 +21,7 @@ const getOption = (props) => {
         type : 'shadow'
       }
     },
+    zlevel: 0,
     grid: {
       left: '3%',
       right: '4%',
@@ -20,7 +31,11 @@ const getOption = (props) => {
     xAxis : [
       {
         type : 'category',
-        data : props.data.x_domain,
+        data : x_domain,
+        axisLabel:{
+          rotate: 10,
+          interval: 0
+        },
         axisTick: {
           alignWithLabel: true
         }
@@ -35,8 +50,8 @@ const getOption = (props) => {
       {
         name:'value',
         type:'bar',
-        barWidth: '60%',
-        data:props.data.y_domain
+        barCategoryGap:'40%',
+        data:y_domain
       }
     ]
   }

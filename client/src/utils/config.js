@@ -29,6 +29,7 @@ module.exports = {
     projects: '/project/projects',
     publish: '/project/publish',
     fork : '/project/fork',
+    toolkits: '/toolkit/toolkits/public',
     // projectCreate: '/project/create_project',
     getDataFields: '/data/data_sets/fields'
   },
