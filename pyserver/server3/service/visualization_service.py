@@ -158,10 +158,17 @@ def freq_hist(arr, group_num=10, multip=1):
     return {'x_domain': x_domain.tolist(), 'y_domain': (y_domain * multip).round(3).tolist()}
 
 
-def frequency_histogram(arr):
-    arr = np.array(arr)
-
-
+def find_step(start, stop, count):
+    step0 = abs(stop - start) / count
+    step1 = math.pow(10, math.floor(math.log(step0) / math.log(10, math.e)))
+    error = step0 / step1
+    if error >= math.sqrt(50):
+        step1 *= 10
+    elif error >= math.sqrt(10):
+        step1 *= 5
+    elif error >= math.sqrt(2):
+        step1 *= 2
+    return step1
 
 
 def list_to_interval():
