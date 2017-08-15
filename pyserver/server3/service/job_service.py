@@ -114,6 +114,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 # from minepy import MINE
                 data = list(zip(*args[0]))
                 target = args[1]
+
                 json = {"Y_target": fields[1],
                         "X_fields": fields[0],
                         "labels": labels,
