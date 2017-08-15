@@ -43,6 +43,7 @@ export default {
     stagingData: [],
     predictLoading: false,
     predictEnd: false,
+    predictModelType: 6,
   },
 
   effects: {
@@ -270,6 +271,13 @@ export default {
       return { ...state, ...action.payload }
     },
 
+    setActiveKey (state, { payload: activeKey }) {
+      return {
+        ...state,
+        activeKey,
+      }
+    },
+
     selectPredictImage (state, { payload: predictImages }) {
       return { ...state, predictImages }
     },
@@ -290,6 +298,12 @@ export default {
       }
     },
 
+    setPredictInfo (state, action) {
+      return {
+        ...state,
+        ...action.payload,
+      }
+    },
   },
 
 }

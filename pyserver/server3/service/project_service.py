@@ -126,6 +126,7 @@ def get_all_jobs_of_project(project_id, categories):
                     result_sds = None
                 job_info[key] = {
                     'name': job[key]['name'],
+                    'category': job[key]['category'],
                 }
                 job_info['staging_data_set'] = job['staging_data_set']['name'] if job['staging_data_set'] else None
                 job_info['staging_data_set_id'] = job['staging_data_set']['id'] if job['staging_data_set'] else None
