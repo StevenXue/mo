@@ -1,10 +1,7 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
-import PropTypes from 'prop-types'
-import { connect } from 'dva'
-import { Button, message, Table, Radio, Input, Spin, Popover} from 'antd';
+import { Spin } from 'antd'
 import { flaskServer } from '../../../constants'
-import ReactEcharts from 'echarts-for-react';
+import ReactEcharts from 'echarts-for-react'
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -117,37 +114,39 @@ class PreviewCard extends React.Component {
           grid: {
             containLabel: true
           },
+          legend: {
+            data: ['假设分布值','次']
+          },
           xAxis: {
             type: 'value',
             min: 'dataMin',
             max: 'dataMax',
             interval: interval,
-            //data: data.freq_hist.x_domain
           },
           yAxis: [{
             type: 'value',
+            name: '假设分布',
             min: 'dataMin',
             max: 'dataMax',
-            position: 'right',
-          },
-            {
+            position: 'left',
+          }, {
             type: 'value',
-              name: '次',
+            name: '次',
             min: 'dataMin',
             max: 'dataMax',
-            position: 'left'
+            position: 'right'
           }
           ],
           series:
             [{
-            type: 'line',
+              type: 'line',
               smooth: true,
-            label: {
-              normal: {
-                show: false,
-                position: 'top',
-              }
-            },
+              label: {
+                normal: {
+                  show: false,
+                  position: 'top',
+                }
+              },
             lineStyle: {
               normal: {
                 width: 3,

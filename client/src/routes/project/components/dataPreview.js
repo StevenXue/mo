@@ -57,6 +57,7 @@ class DataPreview extends React.Component {
     return(
       <div>
         <p style={{marginLeft: 20}}>Preview your chosen dataset here, remember to rename your chosen dataset and we will make a copy for you for further operations.</p>
+        <Spin spinning={this.props.project.loading}>
         <div>
           <Table style={{marginTop: 5, width: '100%'}}
                  dataSource={this.props.dataSet}
@@ -80,6 +81,7 @@ class DataPreview extends React.Component {
             </Button>
           </div>
         </div>
+        </Spin>
       </div>
     )
   }
