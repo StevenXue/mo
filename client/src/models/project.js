@@ -28,6 +28,7 @@ export default {
       public_files: [],
       owned_files: [],
     },
+    loading: false,
     files: [],
     predictFileList: {
       public_files: [],
@@ -39,6 +40,7 @@ export default {
       public_projects: [],
       owned_projects: [],
     },
+    toolkits:{},
     selectedDSIds: [],
     stagingData: [],
     predictLoading: false,
@@ -163,19 +165,38 @@ export default {
     },
 
     * toStagingData ({ payload }, { call, put, select }) {
+      yield put({ type: 'loadingStart' })
       const data = yield call(convertToStaging, payload)
       if (data.success) {
         yield put({
           type: 'getStagingDatasets',
-          payload: payload.project_id,
-        })
+          payload: payload.project_id
+        });
+        yield put({ type: 'loadingEnd' })
+        message.success("dataset has been successfully staged");
       } else {
         console.log('error', data, payload)
         throw data
       }
     },
 
-    * listFiles ({ payload }, { call, put, select }) {
+    *listToolkit ({ payload }, { call, put, select }) {
+      const data = yield call(listToolkits)
+      console.log("listing toolkit", data.response)
+      if (data.success) {
+        yield put({
+          type: 'querySuccess',
+          payload: {
+            toolkits: data.response
+          },
+        })
+      } else {
+        console.log('error', data)
+        throw data
+      }
+    },
+
+    *listFiles ({ payload }, { call, put, select }) {
       const user = yield select(state => state['app'].user)
       const predict = payload['predict']
       const extension = payload['extension']
@@ -260,6 +281,14 @@ export default {
 
     showModal (state, action) {
       return { ...state, ...action.payload, modalVisible: true }
+    },
+
+    loadingStart (state, action) {
+      return { ...state, loading: true }
+    },
+
+    loadingEnd (state, action) {
+      return { ...state, loading: false }
     },
 
     hideModal (state) {

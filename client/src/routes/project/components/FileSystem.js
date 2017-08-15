@@ -54,11 +54,11 @@ class FileSystem extends React.Component {
   }
 
   renderTabContent (key) {
-    return <div className='full-width' style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
-      <div style={{ width: 500 }}>
+    return(
+    <div className='full-width' style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', width: '100%' }}>
         {this.renderCards(key)}
-      </div>
     </div>
+    )
   }
 
   renderCards (key) {
@@ -77,7 +77,7 @@ class FileSystem extends React.Component {
             DELETE
           </Button>
         </a>
-      } style={{ width: 500 }}>
+      } style={{ width: 400 , marginLeft: 5}}>
         <div onClick={() => this.toProjectDetail(e.name, e._id, false)} style={{ cursor: 'pointer' }}>
           <p>Description: {e.description}</p>
           <p>Create Time: {showTime(e.create_time)}</p>

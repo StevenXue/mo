@@ -71,14 +71,15 @@ def convert_string_to_number_with_poss(s):
     """
     if s == "" or s != s:
         return np.nan
-    else:
+    try:
+        float(s)
         try:
-            return int(s)
+            int(s)
+            return int(s) if int(s) == float(s) else float(s)
         except ValueError:
-            try:
-                return float(s)
-            except ValueError:
-                return s
+            return float(s)
+    except ValueError:
+        return s
 
 
 def k_fold_cross_validation(data_train, data_target, ratio=0.1):

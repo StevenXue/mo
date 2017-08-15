@@ -1,11 +1,7 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
-import PropTypes from 'prop-types'
-import { connect } from 'dva'
-import { Button, message, Table, Radio, Input, Spin, Popover} from 'antd';
+import { Spin } from 'antd'
 import { flaskServer } from '../../../constants'
-import ReactEcharts from 'echarts-for-react';
-//import WordCloud from 'react-d3-cloud';
+import ReactEcharts from 'echarts-for-react'
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -31,7 +27,8 @@ class PreviewCard extends React.Component {
       options: {},
       //textCloud: [],
       isGuassian: 'Gaussian distribution',
-      pValue: 0
+      pValue: 0,
+      barType: 0
     }
   }
 
@@ -49,7 +46,7 @@ class PreviewCard extends React.Component {
     let options = {};
     if(data) {
       console.log(data);
-      if (data.type === 'string' || data.type === 'str') {
+      if (data.bar_type === 0) {
         let x = [];
         let y = [];
         data.freq_hist.map((el) => {
@@ -91,72 +88,66 @@ class PreviewCard extends React.Component {
           series : [
             {
               type:'bar',
-              //barWidth: '60%',
               data: y
             }
           ]
         };
         this.setState({options});
       } else {
-        if(data.hypo.flag === 1) {
+        if(data.hypo.flag === 0) {
           this.setState({isGuassian: "Not Gaussian distribution"});
         }
         this.setState({pValue: data.hypo.p_value})
+        console.log(data);
+        let interval = data.freq_hist.x_domain[1] - data.freq_hist.x_domain[0]
+        let data_custom_bar = data.freq_hist.y_domain.map((el, index) => (
+          [data.freq_hist.x_domain[index], data.freq_hist.x_domain[index + 1], el]
+        ))
+        let data_custom_line = data.freq_hist.x_domain.map((el, index) => (
+          [el, data.hypo.standard_norm_value[index]]
+        ))
+
+        console.log(data_custom_line);
         options = {
-          title: {
-          },
           tooltip: {
             trigger: 'axis'
-          },
-          toolbox: {
-            feature: {
-              dataView: {
-                show: true,
-                readOnly: false
-              },
-              restore: {
-                show: true
-              },
-              saveAsImage: {
-                show: true
-              }
-            }
           },
           grid: {
             containLabel: true
           },
           legend: {
-            data: ['hypo','y']
+            data: ['假设分布值','次']
           },
-          xAxis: [{
-            type: 'category',
-            axisTick: {
-              alignWithLabel: true
-            },
-            data: data.freq_hist.x_domain
-          }],
+          xAxis: {
+            type: 'value',
+            min: 'dataMin',
+            max: 'dataMax',
+            interval: interval,
+          },
           yAxis: [{
             type: 'value',
-            name: 'hypo',
+            name: '假设分布',
             min: 'dataMin',
             max: 'dataMax',
-            position: 'right',
+            position: 'left',
           }, {
             type: 'value',
-            name: 'y',
+            name: '次',
             min: 'dataMin',
             max: 'dataMax',
-            position: 'left'
-          }],
-          series: [{
-            name: 'hypo',
-            type: 'line',
-            label: {
-              normal: {
-                show: false,
-                position: 'top',
-              }
-            },
+            position: 'right'
+          }
+          ],
+          series:
+            [{
+              type: 'line',
+              smooth: true,
+              label: {
+                normal: {
+                  show: false,
+                  position: 'top',
+                }
+              },
             lineStyle: {
               normal: {
                 width: 3,
@@ -165,22 +156,49 @@ class PreviewCard extends React.Component {
                 shadowOffsetY: 10
               }
             },
-            data: data.hypo.standard_norm_value
-          }, {
-            name: 'y',
-            type: 'bar',
+            data: data_custom_line
+          }
+          , {
+            name: 'height',
+            type: 'custom',
             yAxisIndex: 1,
+            renderItem: function (params, api) {
+              var yValue = api.value(2);
+              var start = api.coord([api.value(0), yValue]);
+              var size = api.size([api.value(1) - api.value(0), yValue]);
+              var style = api.style();
+
+              return {
+                type: 'rect',
+                shape: {
+                  x: start[0] + 1,
+                  y: start[1],
+                  width: size[0] - 2,
+                  height: size[1]
+                },
+                style: style
+              }
+            },
             label: {
               normal: {
                 show: true,
-                position: 'top'
+                position: 'outsideTop'
               }
             },
-            data: data.freq_hist.y_domain
+            encode: {
+              x: [0, 1],
+              y: 2,
+              tooltip: 2,
+              label: 2
+            },
+            data: data_custom_bar
           }]
         };
 
-        this.setState({options});
+        this.setState({
+          options,
+          barType: data.bar_type
+        });
       }
     }
   }
@@ -191,8 +209,10 @@ class PreviewCard extends React.Component {
       <div>
         {!isEmpty(this.state.options)&&
           <div>
-            <span style={{color: '#00AAAA'}}>{this.state.isGuassian}</span>
-            <br/>
+            {
+              this.state.barType === 1 &&
+              <span style={{color: '#00AAAA'}}>{this.state.isGuassian}</span>
+            }
             <span>{"P value: "}</span>
             <span style={{color: '#00AAAA'}}>{this.state.pValue}</span>
             <ReactEcharts
@@ -202,16 +222,6 @@ class PreviewCard extends React.Component {
               lazyUpdate={true}/>
           </div>
         }
-        {/*{ this.state.textCloud.length !== 0 &&*/}
-          {/*<div style={{height: 300, width: 400}}>*/}
-          {/*<WordCloud*/}
-            {/*height={300}*/}
-            {/*width={400}*/}
-            {/*data={this.state.textCloud}*/}
-            {/*fontSizeMapper={word => Math.log2(word.value) * 5}*/}
-            {/*/>*/}
-          {/*</div>*/}
-        {/*}*/}
       </div>
     )
   }
