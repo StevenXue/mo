@@ -172,7 +172,7 @@ class ImagePredict extends React.Component {
                           style={{ width: 200 }}
                           onChange={this.imageURLSelect}>
                     {predictImage.imageURLSelectList.map((e) =>
-                      <Select.Option value={e.value}>{e.name}</Select.Option>
+                      <Select.Option value={e.value} key={e.value}>{e.name}</Select.Option>
                     )}
                   </Select>
                 </div>

@@ -29,7 +29,8 @@ const { Option } = Select
 const defaultSteps = [
   {
     title: 'Choose Data',
-    text: <TourArea text='Click to choose your data set to use in this project' src={assetsUrl+'/videos/choose_data.mp4'}/>,
+    text: <TourArea text='Click to choose your data set to use in this project'
+                    src={assetsUrl + '/videos/choose_data.mp4'}/>,
     selector: '[class*="dataChooseButton"]',
     position: 'bottom',
     style: stepStyle,
@@ -112,7 +113,7 @@ class ProjectDetail extends React.Component {
   componentDidMount () {
     this.props.dispatch({ type: 'project/query' })
     this.props.dispatch({ type: 'project/listDataSets' })
-    this.props.dispatch({ type: 'project/getStagingDatasets', payload: this.props.location.query._id});
+    this.props.dispatch({ type: 'project/getStagingDatasets', payload: this.props.location.query._id })
   }
 
   componentWillUnmount () {
@@ -241,12 +242,23 @@ class ProjectDetail extends React.Component {
       )
   }
 
+  onClickCollapse () {
+    console.log('onClickCollapse')
+    let key = this.props.project.activeKey
+    if (!key) {
+      key = '5'
+    } else {
+      key = undefined
+    }
+    this.props.dispatch({ type: 'project/setActiveKey', payload: key })
+  }
+
   renderOptions (key) {
     return this.props.project.dataSets[key].map((e) => <Option key={e._id} value={e._id}>{e.name}</Option>)
   }
 
   render () {
-
+    console.log('this.props.project.predictModelType', this.props.project.predictModelType)
     return (
       <div className="content-inner">
         <div>
@@ -278,7 +290,7 @@ class ProjectDetail extends React.Component {
                 </Modal>
                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                   <Button className={classnames(style.dataChooseButton)} type='primary' style={{ width: 120 }}
-                          onClick={() => this.setState({visible: true})}>Choose Data</Button>
+                          onClick={() => this.setState({ visible: true })}>Choose Data</Button>
                 </div>
               </div>
             </div>
@@ -286,7 +298,7 @@ class ProjectDetail extends React.Component {
           <div className='operation-area'>
             <div>
               <Collapse className='data-preview-collapse' bordered={true} style={{ marginTop: 10, width: '100%' }}>
-                <Panel header={'Stage Data'} key="1">
+                <Panel className='data-preview-collapse' header={'Stage Data'} key="1">
                   <Spin spinning={this.state.loading}>
                     {this.state.dataSet.length > 0 &&
                     <DataPreview dataSet={this.state.dataSet}
@@ -324,11 +336,14 @@ class ProjectDetail extends React.Component {
                 </Panel>
               </Collapse>
             </div>
-            <Collapse className='model-predict' bordered={true} style={{ marginTop: 10, width: '100%' }}>
+            <Collapse className='model-predict' id="model-predict" bordered={true} style={{ marginTop: 10, width: '100%' }}
+                      activeKey={this.props.project.activeKey}
+                      onChange={() => this.onClickCollapse()}
+            >
               <Panel header={'Predict'} key="5">
-                <Spin spinning={this.state.loading}>
-                  <NeuralStyle project_id={this.state.project_id} />
-                </Spin>
+                {this.props.project.predictModelType === 4 ? <ImagePredict/>
+                  : <NeuralStyle project_id={this.state.project_id}/>
+                }
               </Panel>
             </Collapse>
           </div>

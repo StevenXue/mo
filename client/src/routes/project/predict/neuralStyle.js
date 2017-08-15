@@ -68,7 +68,7 @@ class NeuralStyle extends React.Component {
         </h3>
         <div className="top-container">
           <div className="input-container">
-            <div className="input-label">{'Enter a valid image URL or select an image from the dropdown:'}</div>
+            <div className="input-label">{'Upload your images: '}</div>
             <Upload {...props}>
               <Button>
                 <Icon type="upload"/> upload
