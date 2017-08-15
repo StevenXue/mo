@@ -10,7 +10,7 @@
 """
 
 from itertools import groupby
-# import math
+import math
 from scipy import stats
 import pandas as pd
 import numpy as np
@@ -71,7 +71,7 @@ def hypo_test(arr, mean, std, x_range, type='norm'):
         # 根据x, 产生概率密度函数，真是的正太分布，用于作图, 需要tolist()
         arr_norm_draw = np.exp(-((x_range - mean) ** 2) / (2 * std ** 2)) / (std * np.sqrt(2 * np.pi))
         # p_value = stats.kstest(arr, 'norm', args=(mean, std))[1]
-        
+
         # ks-test
         p_value = stats.shapiro(arr)[1]
         flag = 1 if p_value >= 0.05 else 0
