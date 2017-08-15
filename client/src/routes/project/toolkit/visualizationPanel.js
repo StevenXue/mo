@@ -1,7 +1,7 @@
 import React from 'react'
 import { BarChart, Histogram, PieChart, Scatter, SimpleScatter, SimpleTable, Table } from '../visualization'
 import { flaskServer } from '../../../constants'
-import { Card, Select, Spin } from 'antd'
+import { Card, Select, Spin, Popover, Icon} from 'antd'
 import { isEmpty } from '../../../utils/utils'
 import './toolkit.css'
 
@@ -80,6 +80,10 @@ export default class VisualizationPanel extends React.Component {
           <span key={e} style={{color: "#00AAAA"}}>{e}</span>
           <br/>
         </div>)
+    }else{
+      return(
+      <span style={{color: "#00AAAA"}}>{value}</span>
+      )
     }
   }
 
@@ -359,12 +363,20 @@ export default class VisualizationPanel extends React.Component {
                         <span>选做目标的栏位</span>
                       </div>
                     {
-                      !isEmpty(this.state.responseBody['general_info']) &&
-                      Object.keys(this.state.responseBody['general_info']).map((e) =>
-                        <div key={e}>
-                          <span>{e + ': '}</span>
+                      this.state.responseBody['general_info'].length !== 0 &&
+                      this.state.responseBody['general_info'].map((e) =>
+                        <div key={Object.keys(e)[0]}>
+                          <span>{Object.keys(e)[0] + ': '}</span>
+                          <Popover content={
+                            <div>
+                              <p style={{width: 100}}>{e[Object.keys(e)[0]]['description']}</p>
+                            </div>
+                          } title="Description">
+                            <Icon type="question-circle-o" style={{fontSize: 10, marginLeft:3, color: '#767676'}}/>
+                          </Popover>
+                          <br/>
                           {
-                            this.renderArray(this.state.responseBody['general_info'][e])
+                            this.renderArray(e[Object.keys(e)[0]]['value'])
                           }
                         </div>
                       )
