@@ -1466,7 +1466,7 @@ def create_public_data_process():
                                              'y_len_range': [1, 1],
 
                                              'x_data_type': ['int', 'float'],
-                                             'y_data_type': ['int', 'float']
+                                             'y_data_type': ['int']
                                          },
                                          "args": [
                                              {
