@@ -27,7 +27,8 @@ class PreviewCard extends React.Component {
       options: {},
       //textCloud: [],
       isGuassian: 'Gaussian distribution',
-      pValue: 0
+      pValue: 0,
+      barType: 0
     }
   }
 
@@ -45,7 +46,7 @@ class PreviewCard extends React.Component {
     let options = {};
     if(data) {
       console.log(data);
-      if (data.type === 'string' || data.type === 'str') {
+      if (data.bar_type === 0) {
         let x = [];
         let y = [];
         data.freq_hist.map((el) => {
@@ -194,7 +195,10 @@ class PreviewCard extends React.Component {
           }]
         };
 
-        this.setState({options});
+        this.setState({
+          options,
+          barType: data.bar_type
+        });
       }
     }
   }
@@ -205,8 +209,10 @@ class PreviewCard extends React.Component {
       <div>
         {!isEmpty(this.state.options)&&
           <div>
-            <span style={{color: '#00AAAA'}}>{this.state.isGuassian}</span>
-            <br/>
+            {
+              this.state.barType === 1 &&
+              <span style={{color: '#00AAAA'}}>{this.state.isGuassian}</span>
+            }
             <span>{"P value: "}</span>
             <span style={{color: '#00AAAA'}}>{this.state.pValue}</span>
             <ReactEcharts
