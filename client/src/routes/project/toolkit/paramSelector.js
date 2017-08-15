@@ -298,6 +298,7 @@ class ParamsSeletcor extends React.Component {
             ));
         }
         return(
+          <div style={{marginLeft: -100, width: 500}}>
           <Transfer
             dataSource={source}
             titles={['All', 'Target']}
@@ -323,6 +324,7 @@ class ParamsSeletcor extends React.Component {
             }}
             render={item => item['name']}
           />
+          </div>
         )
       }
     } else {

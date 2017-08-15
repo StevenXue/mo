@@ -352,7 +352,7 @@ export default class VisualizationPanel extends React.Component {
                     target: this.state.responseBody['table1']['Y_fields']
                   }}/>
                 </div>
-                <div className="description" style={{width: '30%', textAlign: 'center'}}>
+                <div className="description" style={{width: '30%', marginLeft: 50, textAlign: 'left'}}>
                   {
                     !isEmpty(this.state.responseBody['general_info']) &&
                     Object.keys(this.state.responseBody['general_info']).map((e) =>
