@@ -141,7 +141,7 @@ def freq_hist(arr, group_num=10, multip=1):
     step = find_step(_min, _max, group_num)
     # 给出x轴
     # x_domain = np.arange(_min, _max + interval, interval).round(1)
-    x_domain = np.arange(math.ceil(_min/step)*step, math.floor(_max/step)*step, step)
+    x_domain = np.arange(math.floor(_min/step)*step, math.ceil(_max/step)*step+step, step)
 
     freq_hist = {"freq_hist": arr_array}
     df = pd.DataFrame(freq_hist)
