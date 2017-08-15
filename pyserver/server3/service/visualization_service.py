@@ -47,10 +47,10 @@ def usr_story1_exploration(data, d_type, group_num=10):
         freq_hist = {"freq_hist": arr_array}
         df = pd.DataFrame(freq_hist)
         # 给出y轴
-        y_domain = df.groupby(pd.cut(df.freq_hist, x_domain)).count().freq_hist.values
+        y_domain = df.groupby(pd.cut(df.freq_hist, x_domain, right=False)).count().freq_hist.values
 
         # 注意x会比y多一个
-        info_dict['freq_hist'] = {'x_domain': x_domain.tolist(), 'y_domain': (y_domain*1000).round(3).tolist()}
+        info_dict['freq_hist'] = {'x_domain': x_domain.tolist(), 'y_domain': y_domain.round(3).tolist()}
         flag, p_value, standard_norm_value = hypo_test(arr_array, mean, std, x_domain, 'norm')
         info_dict['hypo'] = {'flag': flag, 'p_value': p_value, 'standard_norm_value': standard_norm_value}
     elif d_type == 'string' or d_type == 'str':
@@ -79,13 +79,10 @@ def hypo_test(arr, mean, std, x_range, type='norm'):
 
         # 根据x, 产生概率密度函数，真是的正太分布，用于作图, 需要tolist()
         arr_norm_draw = np.exp(-((x_range - mean) ** 2) / (2 * std ** 2)) / (std * np.sqrt(2 * np.pi))
-
         # p_value = stats.kstest(arr, 'norm', args=(mean, std))[1]
-        # print (stats.kstest(arr, 'norm', args=(mean, std)))
-
+        
         # ks-test
         p_value = stats.shapiro(arr)[1]
-        # print (stats.shapiro(arr))
         flag = 1 if p_value >= 0.05 else 0
 
         return flag, p_value, (arr_norm_draw*1000).round(3).tolist()
@@ -146,7 +143,7 @@ def t_sne(arr):
     return result
 
 
-def freq_hist(arr, group_num=5, multip=1000):
+def freq_hist(arr, group_num=10, multip=1):
     arr_array = np.array(arr)
     min = arr_array.min()
     max = arr_array.max()
@@ -159,6 +156,12 @@ def freq_hist(arr, group_num=5, multip=1000):
     y_domain = df.groupby(pd.cut(df.freq_hist, x_domain, right=False)).count().freq_hist.values
     # 注意x会比y多一个
     return {'x_domain': x_domain.tolist(), 'y_domain': (y_domain * multip).round(3).tolist()}
+
+
+def frequency_histogram(arr):
+    arr = np.array(arr)
+
+
 
 
 def list_to_interval():
