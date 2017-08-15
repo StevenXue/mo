@@ -41,13 +41,22 @@ def usr_story1_exploration(data, d_type, group_num=10):
     if d_type == 'integer' or d_type == "int" or d_type == 'float':
         mean, std, min, max = (gen_info['mean'], gen_info['std'], int(gen_info['min']), int(gen_info['max']))
         arr_array = np.array(arr_temp)
-        info_dict['freq_hist'] = freq_hist(arr_array, group_num)
-        flag, p_value, standard_norm_value = hypo_test(arr_array, mean, std, info_dict['freq_hist']['x_domain'], 'norm')
-        info_dict['hypo'] = {'flag': flag, 'p_value': p_value, 'standard_norm_value': standard_norm_value}
+        if len(set(arr_temp)) > 5:
+            info_dict['freq_hist'] = freq_hist(arr_array, group_num)
+            flag, p_value, standard_norm_value = hypo_test(arr_array, mean, std, info_dict['freq_hist']['x_domain'], 'norm')
+            info_dict['hypo'] = {'flag': flag, 'p_value': p_value, 'standard_norm_value': standard_norm_value}
+            info_dict.update({"bar_type": 1})
+        else:
+            info_dict['hypo'] = {'flag': 0, 'p_value': 'NAN'}
+            seta = set(arr_temp)
+            info_dict['freq_hist'] = [{'text': el, 'value': arr_temp.count(el)} for el in seta]
+            info_dict.update({"bar_type": 0})
+
     elif d_type == 'string' or d_type == 'str':
         seta = set(arr_temp)
         info_dict['freq_hist'] = [{'text': el, 'value': arr_temp.count(el)} for el in seta if arr_temp.count(el) > 1]
         info_dict['hypo'] = {}
+        info_dict.update({"bar_type": 0})
 
     return info_dict
 
