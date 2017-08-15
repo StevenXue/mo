@@ -39,18 +39,9 @@ def usr_story1_exploration(data, d_type, group_num=10):
     gen_info = generate_stats_info(arr_temp, d_type)
     info_dict = {'type': d_type, 'gen_info': gen_info}
     if d_type == 'integer' or d_type == "int" or d_type == 'float':
-        arr_array = np.array(arr_temp)
         mean, std, min, max = (gen_info['mean'], gen_info['std'], int(gen_info['min']), int(gen_info['max']))
-        interval = (max - min + 1) / group_num
-        # 给出x轴
-        x_domain = np.arange(min, max+interval, interval).round(1)
-        freq_hist = {"freq_hist": arr_array}
-        df = pd.DataFrame(freq_hist)
-        # 给出y轴
-        y_domain = df.groupby(pd.cut(df.freq_hist, x_domain, right=False)).count().freq_hist.values
-
-        # 注意x会比y多一个
-        info_dict['freq_hist'] = {'x_domain': x_domain.tolist(), 'y_domain': y_domain.round(3).tolist()}
+        arr_array = np.array(arr_temp)
+        info_dict['freq_hist'] = freq_hist(arr_array, group_num)
         flag, p_value, standard_norm_value = hypo_test(arr_array, mean, std, x_domain, 'norm')
         info_dict['hypo'] = {'flag': flag, 'p_value': p_value, 'standard_norm_value': standard_norm_value}
     elif d_type == 'string' or d_type == 'str':
