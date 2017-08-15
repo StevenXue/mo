@@ -367,7 +367,9 @@ class Toolkit extends React.Component {
                                 invertTheme={true} />
                     </div>
                 }
-                <Button onClick={() => this.setState({visible: true})}>Visualization</Button>
+                { this.state.visual_sds_id &&
+                  <Button onClick={() => this.setState({visible: true})}>Visualization</Button>
+                }
                 <Modal title="Result Visualizations"
                        width={1200}
                        visible={this.state.visible}
