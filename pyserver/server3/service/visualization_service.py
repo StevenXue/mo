@@ -47,9 +47,7 @@ def usr_story1_exploration(data, d_type, group_num=10):
         freq_hist = {"freq_hist": arr_array}
         df = pd.DataFrame(freq_hist)
         # 给出y轴
-        y_domain = df.groupby(pd.cut(df.freq_hist, x_domain)).count().freq_hist.values/interval
-        # y_domaining = [format_round(x, 4) for x in y_domain * 1000]
-        # print ('y_domain', y_domain.apply(lambda x: '%.3f' % x))
+        y_domain = df.groupby(pd.cut(df.freq_hist, x_domain)).count().freq_hist.values
 
         # 注意x会比y多一个
         info_dict['freq_hist'] = {'x_domain': x_domain.tolist(), 'y_domain': (y_domain*1000).round(3).tolist()}
@@ -58,7 +56,6 @@ def usr_story1_exploration(data, d_type, group_num=10):
     elif d_type == 'string' or d_type == 'str':
         seta = set(arr_temp)
         info_dict['freq_hist'] = [{'text': el, 'value': arr_temp.count(el)} for el in seta if arr_temp.count(el) > 1]
-        # info_dict['freq_hist'] = [{'name': key, 'value': len(list(group))} for key, group in groupby(arr_temp)]
         info_dict['hypo'] = {}
 
     return info_dict
@@ -99,7 +96,7 @@ def usr_story2_exploration(data, d_type, sds_id):
     if d_type == 0:
         cols = data["fields"]
         # TODO 暂时只支持3个栏位以上的
-        if len(cols) > 2:
+        if len(cols) >= 2:
             # nan的所有位置
             nan_index = [index for index, item in enumerate(data["labels"]) if isNaN(item)]
             scatter_without_nan = [item for index, item in enumerate(data["scatter"]) if not isNaN(item)]
