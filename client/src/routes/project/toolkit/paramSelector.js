@@ -228,7 +228,6 @@ class ParamsSeletcor extends React.Component {
                 constant[el] = value
             }
           });
-        console.log(runnable);
         this.props.setData({
           constant: constant,
           runnable: runnable
