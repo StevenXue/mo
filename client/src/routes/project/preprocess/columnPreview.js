@@ -101,8 +101,6 @@ class PreviewCard extends React.Component {
         }
         this.setState({pValue: data.hypo.p_value})
         console.log(data);
-        let min = data.freq_hist.x_domain[0]
-        let max = data.freq_hist.x_domain[data.freq_hist.x_domain.length -1 ]
         let interval = data.freq_hist.x_domain[1] - data.freq_hist.x_domain[0]
         let data_custom_bar = data.freq_hist.y_domain.map((el, index) => (
           [data.freq_hist.x_domain[index], data.freq_hist.x_domain[index + 1], el]
@@ -134,6 +132,7 @@ class PreviewCard extends React.Component {
           },
             {
             type: 'value',
+              name: '次',
             min: 'dataMin',
             max: 'dataMax',
             position: 'left'
@@ -142,6 +141,7 @@ class PreviewCard extends React.Component {
           series:
             [{
             type: 'line',
+              smooth: true,
             label: {
               normal: {
                 show: false,
