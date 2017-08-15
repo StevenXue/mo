@@ -162,3 +162,7 @@ def freq_hist(arr, group_num=5, multip=1000):
     y_domain = df.groupby(pd.cut(df.freq_hist, x_domain, right=False)).count().freq_hist.values
     # 注意x会比y多一个
     return {'x_domain': x_domain.tolist(), 'y_domain': (y_domain * multip).round(3).tolist()}
+
+
+def list_to_interval():
+    pass
