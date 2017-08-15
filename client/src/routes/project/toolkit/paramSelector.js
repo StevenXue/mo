@@ -263,8 +263,8 @@ class ParamsSeletcor extends React.Component {
         console.log(this.props.selectableType);
         let type = this.props.selectableType[0];
         let types = type.map((e) => {
-          if (e === 'integer') {
-            return 'int'
+          if (e === 'int') {
+            return 'integer'
           }else{
             return e
           }
