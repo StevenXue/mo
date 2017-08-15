@@ -244,17 +244,17 @@ export default class VisualizationPanel extends React.Component {
                   }
                 </Card>
                 <Card title="图例和其它参数" style={{width: '30%', display: 'flex', flexDirection: 'column', margin: 5}}>
-                  <div style={{margin: 2}}>
-                    <div style={{height: 20, width: '50%', backgroundColor: '#C6DFB5'}}/>
+                  <div style={{marginLeft: 20, marginBottom: 10}}>
+                    <div style={{height: 20, width: 100, backgroundColor: '#C6DFB5'}}/>
                     <span>选做目标的栏位</span>
                   </div>
-                  <div style={{margin: 2}}>
-                    <div style={{height: 20, width: '50%', backgroundColor: '#DBDBDB'}}/>
+                  <div style={{marginLeft: 20, marginBottom: 10}}>
+                    <div style={{height: 20, width: 100, backgroundColor: '#DBDBDB'}}/>
                     <span>被选择的栏位</span>
                     {/*<span style={{color: 'rgba(192, 149, 122, 1)'}}>{text}</span>*/}
                   </div>
-                  <div style={{margin: 2}}>
-                    <div style={{height: 20, width: '50%', backgroundColor: '#DBDBDB'}}>
+                  <div style={{marginLeft: 20, marginBottom: 10}}>
+                    <div style={{height: 20, width: 100, backgroundColor: '#DBDBDB'}}>
                       <span style={{color: 'rgba(192, 149, 122, 1)', marginLeft: 5}}>{'text'}</span>
                     </div>
                     <span>与目标有关的栏位</span>
@@ -352,18 +352,24 @@ export default class VisualizationPanel extends React.Component {
                     target: this.state.responseBody['table1']['Y_fields']
                   }}/>
                 </div>
-                <div className="description" style={{width: '30%', textAlign: 'center'}}>
-                  {
-                    !isEmpty(this.state.responseBody['general_info']) &&
-                    Object.keys(this.state.responseBody['general_info']).map((e) =>
-                      <div key={e}>
-                        <span>{e + ': '}</span>
-                        {
-                          this.renderArray(this.state.responseBody['general_info'][e])
-                        }
+                <div className="description" style={{width: '30%', marginLeft: 70, textAlign: 'left'}}>
+                  <div>
+                      <div style={{ marginBottom: 10}}>
+                        <div style={{height: 20, width: 100, backgroundColor: '#C6DFB5'}}/>
+                        <span>选做目标的栏位</span>
                       </div>
-                    )
-                  }
+                    {
+                      !isEmpty(this.state.responseBody['general_info']) &&
+                      Object.keys(this.state.responseBody['general_info']).map((e) =>
+                        <div key={e}>
+                          <span>{e + ': '}</span>
+                          {
+                            this.renderArray(this.state.responseBody['general_info'][e])
+                          }
+                        </div>
+                      )
+                    }
+                  </div>
                 </div>
                 <div className="table_two" style={{width: 'auto'}}>
                   <p>降维后</p>
@@ -376,7 +382,7 @@ export default class VisualizationPanel extends React.Component {
                 <PieChart data={{'pie': this.state.responseBody['pie1']}} />
               </Card>
               <Card title="降维前后各栏位方差大小" className="bar_chart" style={{width: '40%', margin: 5}}>
-                  <p>{"The empty field in the chart divides original columns with generated columns"}</p>
+                  <p>{"空白栏位用于分隔转换前和转换后数据"}</p>
                   <div style={{marginTop: -20}}>
                     <BarChart data={this.state.responseBody['bar']} type="dr"/>
                   </div>

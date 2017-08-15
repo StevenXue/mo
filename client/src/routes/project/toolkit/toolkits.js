@@ -167,16 +167,14 @@ class Toolkit extends React.Component {
       selectableType.push(parameterSpec.data.y_data_type);
     }
 
-    this.setState({constant: {}});
-
+    let constant = {};
     if(parameterSpec.args) {
       parameterSpec.args.map((e) => {
         let name = e.name;
-        let constant = this.state.constant;
         constant[name] = e.type;
-        this.setState({constant});
         console.log(constant);
       })
+      this.setState({constant});
       description.push(`${parameterSpec.args.length} constants is required.\n`)
     }else{
       this.setState({
@@ -367,7 +365,9 @@ class Toolkit extends React.Component {
                                 invertTheme={true} />
                     </div>
                 }
-                <Button onClick={() => this.setState({visible: true})}>Visualization</Button>
+                { this.state.visual_sds_id &&
+                  <Button onClick={() => this.setState({visible: true})}>Visualization</Button>
+                }
                 <Modal title="Result Visualizations"
                        width={1200}
                        visible={this.state.visible}

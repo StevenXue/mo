@@ -228,7 +228,6 @@ class ParamsSeletcor extends React.Component {
                 constant[el] = value
             }
           });
-        console.log(runnable);
         this.props.setData({
           constant: constant,
           runnable: runnable
@@ -245,8 +244,8 @@ class ParamsSeletcor extends React.Component {
       if(this.state.type === 'select_box') {
         let type = this.props.selectableType[0];
         let types = type.map((e) => {
-          if (e === 'integer') {
-            return 'int'
+          if (e === 'int') {
+            return 'integer'
           }else{
             return e
           }
@@ -263,8 +262,8 @@ class ParamsSeletcor extends React.Component {
         console.log(this.props.selectableType);
         let type = this.props.selectableType[0];
         let types = type.map((e) => {
-          if (e === 'integer') {
-            return 'int'
+          if (e === 'int') {
+            return 'integer'
           }else{
             return e
           }
@@ -283,9 +282,10 @@ class ParamsSeletcor extends React.Component {
         if(this.state.editing === 'Select Target Fields'){
           let selected = this.state.source;
           type = this.props.selectableType[1];
+          console.log("type", type);
           types = type.map((e) => {
-            if (e === 'integer') {
-              return 'int'
+            if (e === 'int') {
+              return 'integer'
             }else{
               return e
             }
@@ -298,6 +298,7 @@ class ParamsSeletcor extends React.Component {
             ));
         }
         return(
+          <div style={{marginLeft: -100, width: 500}}>
           <Transfer
             dataSource={source}
             titles={['All', 'Target']}
@@ -323,6 +324,7 @@ class ParamsSeletcor extends React.Component {
             }}
             render={item => item['name']}
           />
+          </div>
         )
       }
     } else {
