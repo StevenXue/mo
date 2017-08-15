@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import classnames from 'classnames'
-import { Button, Select, Icon, message, Modal, Table, Radio, Collapse, Input, Spin } from 'antd'
+import { Button, Select, Icon, message, Modal, Table, Collapse, Spin, Popover } from 'antd'
 
 import { jupyterServer, flaskServer } from '../../../constants'
 import Toolkits from '../toolkit/toolSteps'
@@ -13,14 +13,13 @@ import Predict from '../predict/predict'
 import DataPreview from './dataPreview'
 import { stepStyle, assetsUrl } from '../../../constants'
 import { TourArea } from '../../../components'
-import { isEmpty } from '../../../utils/utils'
+import { isEmpty, toolkit_info} from '../../../utils/utils'
 import empty from './empty.ipynb'
 import style from './detail.css'
 // 全局css，在index里去import
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/monokai.css'
 
-//import Input from 'antd/lib/input/Input.d'
 const { Panel } = Collapse
 const { Option } = Select
 
@@ -110,6 +109,7 @@ class ProjectDetail extends React.Component {
   componentDidMount () {
     this.props.dispatch({ type: 'project/query' })
     this.props.dispatch({ type: 'project/listDataSets' })
+    this.props.dispatch({ type: 'project/listToolkit'})
     this.props.dispatch({ type: 'project/getStagingDatasets', payload: this.props.location.query._id});
   }
 
@@ -301,7 +301,7 @@ class ProjectDetail extends React.Component {
                     <Preprocess dataSet={this.state.dataSet}
                                 fields={this.state.fields}
                                 project_id={this.props.location.query._id}
-                                passStaging={(value) => this.getStagingId(value)}/>
+                                passStaging={(value) => this.getStagingId(value)} />
                   </Spin>
                 </Panel>
               </Collapse>
@@ -309,9 +309,24 @@ class ProjectDetail extends React.Component {
             <div>
               <Collapse className='exploration-collapse' bordered={true} style={{ marginTop: 10, width: '100%' }}>
                 <Panel header={'Data Exploration & Analysis'} key="1">
-                  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-                    <Toolkits project_id={this.props.location.query._id}/>
+                  <div className={classnames(style.descriptions)}>
+                    <span style={{fontSize:14}}>{"There are currently 5 types of toolkits available: "}</span>
+                    {
+                      Object.keys(toolkit_info).map((el) =>
+                        <div key={el} style={{marginLeft: 10}}>
+                          <span style={{fontSize:14}}>{el}</span>
+                          <Popover content={
+                            <div>
+                              <p style={{width: 150}}>{toolkit_info[el]}</p>
+                            </div>
+                          } title="Description">
+                            <Icon type="question-circle-o" style={{fontSize: 10, marginLeft:3, color: '#767676'}}/>
+                          </Popover>
+                          <span>{", "}</span>
+                      </div>)
+                    }
                   </div>
+                  <Toolkits project_id={this.props.location.query._id} />
                 </Panel>
               </Collapse>
             </div>
