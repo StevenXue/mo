@@ -467,11 +467,15 @@ class ModelForms extends React.Component {
           <Modal title="Result"
                  width={700}
                  visible={this.state.visible}
-                 onOk={() => this.setState({ visible: false })}
-                 onCancel={() => this.setState({ visible: false })}
-          >
-            {this.props.params ? (this.state.params['results'] &&
-              <Curve data={this.state.params['results']['history']}/>) :
+                 onOk={() => this.setState({visible: false})}
+                 onCancel={() => this.setState({visible: false})}
+                  footer={[
+                   <Button key="submit" type="primary" size="large" onClick={() => this.setState({visible: false})}>
+                     OK
+                   </Button>
+                 ]}>
+            {this.props.params?
+              (this.state.params['results'] && <Curve data={this.state.params['results']['history']}/>):
               <Visual data={this.state.ioData} end={this.state.end}/>
             }
           </Modal>

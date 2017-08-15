@@ -1466,20 +1466,8 @@ def create_public_data_process():
                                              'y_len_range': [1, 1],
 
                                              'x_data_type': ['int', 'float'],
-                                             'y_data_type': ['int', 'float']
-                                         },
-                                         "args": [
-                                             {
-                                                 'name': 'k',
-                                                 'type': {
-                                                     'key': 'int',
-                                                     'des': 'select k best, k is number of features selected',
-                                                     'range': [1, None]
-                                                 },
-                                                 'default': 2,
-                                                 'required': True
-                                             }
-                                         ]
+                                             'y_data_type': ['int']
+                                         }
                                      },
                                      result_spec={
                                          "if_reserved": True,

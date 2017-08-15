@@ -5,3 +5,13 @@
 .dataChooseButton {
 
 }
+
+.descriptions {
+  margin-left: 100px;
+  display: inline-flex;
+  margin-bottom: 50px;
+}
+
+.descriptions_section {
+  width: 20% ;
+}

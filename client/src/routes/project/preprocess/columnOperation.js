@@ -17,11 +17,19 @@ export default class ColumnOperations extends React.Component {
       values: this.props.values,
       deleted: {},
       stagedId: this.props.stagedId,
+      dataSet: this.props.dataSet
     }
   }
 
-  componentDidMount(){
-    console.log(this.props.dataSet);
+  componentWillReceiveProps(nextProps){
+    this.setState({
+      loading: false,
+      fields: nextProps.fields,
+      values: nextProps.values,
+      deleted: {},
+      stagedId: nextProps.stagedId,
+      dataSet: nextProps.dataSet
+    });
   }
 
   onClickEditCols(){
@@ -41,7 +49,7 @@ export default class ColumnOperations extends React.Component {
           'Content-Type': 'application/json',
         },
         body:JSON.stringify({
-          'staging_data_set_id': this.props.dataSet,
+          'staging_data_set_id': this.state.dataSet,
           'f_t_arrays': f_t_arrays
         })
       }).then((response) => {
@@ -53,7 +61,7 @@ export default class ColumnOperations extends React.Component {
         this.setState({loading: false});
       });
     }else {
-      fetch(flaskServer + '/staging_data/staging_data_sets/fields/' + this.props.dataSet, {
+      fetch(flaskServer + '/staging_data/staging_data_sets/fields/' + this.state.dataSet, {
         method: 'put',
         headers: {
           'Content-Type': 'application/json',
@@ -68,7 +76,7 @@ export default class ColumnOperations extends React.Component {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              'staging_data_set_id': this.props.dataSet,
+              'staging_data_set_id': this.state.dataSet,
               'f_t_arrays': f_t_arrays
             })
           }).then((response) => {
@@ -127,7 +135,7 @@ export default class ColumnOperations extends React.Component {
   renderColumnCards(){
     let columns;
     let dataSet = this.state.fields;
-    if(this.props.dataSet !== '') {
+    if(this.state.dataSet !== '') {
       columns = Object.keys(dataSet).filter((el) => el !== 'data_set');
       columns = columns.filter((el) => el !== '_id');
       columns = columns.filter((el) => el !== 'staging_data_set');
@@ -138,7 +146,7 @@ export default class ColumnOperations extends React.Component {
                 <Card style={{ margin: 5, display:'flex', flexDirection: 'column'}} key={e} >
                   <div style={{float: 'right', marginTop: -20, marginRight: -20}}>
                     <Popover content={
-                      <ColumnPreview stagedDs={this.props.dataSet} name={e} type={dataSet[e]}/>
+                      <ColumnPreview stagedDs={this.state.dataSet} name={e} type={dataSet[e]}/>
                     } title={e} trigger="click" >
                       <Button size="small" >
                         <span style={{fontSize: '12px'}}>VIEW</span>

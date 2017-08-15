@@ -140,7 +140,7 @@ class ParamsSeletcor extends React.Component {
               this.props.setData({divide: [this.state.source, this.state.target]});
               this.setState({editing: 'Enter Parameters'});
             }else{
-              message.error('please select correct amount of source fields');
+              message.error('please select correct amount of target fields');
             }
           }else{
             if (this.props.selectable[0][1] !== null) {
@@ -148,42 +148,75 @@ class ParamsSeletcor extends React.Component {
                 && this.state.checkedCols.length >= this.props.selectable[0][0]) {
                 this.setState({editing: 'Enter Parameters'});
               } else {
-                message.error('please select correct amount of source fields');
+                message.error('please select correct amount of target fields');
               }
             }else{
               if (this.state.checkedCols.length >= this.props.selectable[0][0]) {
                 this.setState({editing: 'Enter Parameters'});
               } else {
-                message.error('please select correct amount of source fields');
+                message.error('please select correct amount of target fields');
               }
             }
           }
         }else {
-          if (this.props.selectable[0][1] !== null){
-            if (this.state.checkedCols.length <= this.props.selectable[0][1]
-              && this.state.checkedCols.length >= this.props.selectable[0][0]) {
+          if(this.props.type === 'transfer_box') {
+            if(this.state.target.length <= this.props.selectable[1][1]
+              && this.state.target.length >= this.props.selectable[1][0]) {
               this.props.setData({
-                checkedCols: this.state.checkedCols,
+                divide: [this.state.source, this.state.target],
                 runnable: true
               });
-            } else {
-              console.log(this.props.selectable[0], "hi");
-              message.error('please select correct amount of source fields');
+            }else{
+              message.error('please select correct amount of target fields');
             }
           }else{
-            if (this.state.checkedCols.length >= this.props.selectable[0][0]) {
-              this.props.setData({
-                checkedCols: this.state.checkedCols,
-                runnable: true
-              });
-            } else {
-              console.log(this.props.selectable[0], "hi 2");
-              message.error('please select correct amount of source fields');
+            if (this.props.selectable[0][1] !== null) {
+              if (this.state.checkedCols.length <= this.props.selectable[0][1]
+                && this.state.checkedCols.length >= this.props.selectable[0][0]) {
+                this.props.setData({
+                        checkedCols: this.state.checkedCols,
+                        runnable: true
+                      });
+              } else {
+                message.error('please select correct amount of target fields');
+              }
+            }else{
+              if (this.state.checkedCols.length >= this.props.selectable[0][0]) {
+                this.props.setData({
+                        checkedCols: this.state.checkedCols,
+                        runnable: true
+                      });
+              } else {
+                message.error('please select correct amount of target fields');
+              }
             }
           }
+          // if (this.props.selectable[0][1] !== null){
+          //   if (this.state.checkedCols.length <= this.props.selectable[0][1]
+          //     && this.state.checkedCols.length >= this.props.selectable[0][0]) {
+          //     this.props.setData({
+          //       checkedCols: this.state.checkedCols,
+          //       runnable: true
+          //     });
+          //   } else {
+          //     console.log(this.props.selectable[0], "hi");
+          //     message.error('please select correct amount of target fields');
+          //   }
+          // }else{
+          //   if (this.state.checkedCols.length >= this.props.selectable[0][0]) {
+          //     this.props.setData({
+          //       checkedCols: this.state.checkedCols,
+          //       runnable: true
+          //     });
+          //   } else {
+          //     message.error('please select correct amount of target fields');
+          //   }
+          // }
+
         }
         return
       case 'Select Source Fields':
+        console.log("select source fields");
         if( this.props.selectable[0][1] !== null ){
           if(this.state.source.length <= this.props.selectable[0][1]
             && this.state.source.length >= this.props.selectable[0][0]) {
@@ -228,7 +261,6 @@ class ParamsSeletcor extends React.Component {
                 constant[el] = value
             }
           });
-        console.log(runnable);
         this.props.setData({
           constant: constant,
           runnable: runnable
@@ -240,13 +272,13 @@ class ParamsSeletcor extends React.Component {
 
   renderCheckBoxTable() {
     let col = this.state.dataColumns;
-    console.log(col);
+    //console.log(col);
     if (col.length !== 0) {
       if(this.state.type === 'select_box') {
         let type = this.props.selectableType[0];
         let types = type.map((e) => {
-          if (e === 'integer') {
-            return 'int'
+          if (e === 'int') {
+            return 'integer'
           }else{
             return e
           }
@@ -260,11 +292,11 @@ class ParamsSeletcor extends React.Component {
           </div>,
         )
       }else if(this.state.type === 'transfer_box'){
-        console.log(this.props.selectableType);
+        //console.log(this.props.selectableType);
         let type = this.props.selectableType[0];
         let types = type.map((e) => {
-          if (e === 'integer') {
-            return 'int'
+          if (e === 'int') {
+            return 'integer'
           }else{
             return e
           }
@@ -283,9 +315,10 @@ class ParamsSeletcor extends React.Component {
         if(this.state.editing === 'Select Target Fields'){
           let selected = this.state.source;
           type = this.props.selectableType[1];
+          console.log("type", type);
           types = type.map((e) => {
-            if (e === 'integer') {
-              return 'int'
+            if (e === 'int') {
+              return 'integer'
             }else{
               return e
             }
@@ -298,6 +331,7 @@ class ParamsSeletcor extends React.Component {
             ));
         }
         return(
+          <div style={{marginLeft: -100, width: 500}}>
           <Transfer
             dataSource={source}
             titles={['All', 'Target']}
@@ -323,6 +357,7 @@ class ParamsSeletcor extends React.Component {
             }}
             render={item => item['name']}
           />
+          </div>
         )
       }
     } else {

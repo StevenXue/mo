@@ -2,7 +2,7 @@ import { request, config } from '../utils'
 import { jupyterServer } from '../constants'
 
 const { api, CORS } = config
-const { dataSets, projects, getDataFields, publish, fork, files, getStagingData, neuralStyle } = api
+const { dataSets, projects, getDataFields, publish, fork, files, getStagingData, neuralStyle, toolkits } = api
 
 export async function query (user_ID) {
   let query = `?user_ID=${user_ID}`
@@ -16,6 +16,13 @@ export async function publishProject (project_id) {
   return request({
     url: CORS + publish + '/' + project_id,
     method: 'put',
+  })
+}
+
+export async function listToolkits () {
+  return request({
+    url: CORS + toolkits,
+    method: 'get',
   })
 }
 
