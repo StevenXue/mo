@@ -96,6 +96,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                     gen_info.update({arg["name"]: value})
 
             # 可视化计算
+            # 聚类分析
             if toolkit_obj.category == 0:
                 json = {"scatter": data_utility.retrieve_nan_index(args[0],
                                                                    args[-1]),
@@ -107,6 +108,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                         "fields": fields[0],
                         "category": toolkit_obj.category}
 
+            # 特征选取
             elif toolkit_obj.category == 1:
                 from scipy.stats import pearsonr
                 # from minepy import MINE
@@ -132,6 +134,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                                     "mic": [None for el in data]},
                         "category": toolkit_obj.category}
 
+            # 数值转换
             elif toolkit_obj.category == 2:
                 inn = 0
                 while inn in args[-1]:
@@ -142,10 +145,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
 
                 result_be = labels if flag_shape else np.array(labels).reshape([-1, 1]).tolist()
 
-                print("result_be", result_be)
                 data = list(zip(*args[0]))
                 result = list(zip(*result_be))
-                print("result", result)
 
                 # 曾经两表合并，现在不需要了
                 # merge_data = list(zip(*(data + result)))
@@ -199,6 +200,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                         "bar1": bar1,
                         "bar2": bar2}
 
+            # 降维
             elif toolkit_obj.category == 3:
                 if error_flag:
                     json = {}
