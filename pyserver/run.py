@@ -38,6 +38,7 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
 
 socketio = SocketIO(app,
                     logger=True,
+                    ping_timeout=600,
                     engineio_logger=True,
                     async_mode='eventlet',
                     message_queue='redis://')

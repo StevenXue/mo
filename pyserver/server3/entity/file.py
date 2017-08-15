@@ -4,9 +4,12 @@ from mongoengine import Document
 from mongoengine import StringField
 from mongoengine import DateTimeField
 from mongoengine import IntField
+from mongoengine import BooleanField
+
+from server3.constants import ALLOWED_EXTENSIONS
 
 # zip will be automatically unzip as a folder
-EXTENSION = ('csv', 'zip')
+EXTENSION = tuple(ALLOWED_EXTENSIONS)
 FILE_TYPE = ('table', 'image', 'text', 'audio', 'video')
 
 
@@ -20,5 +23,6 @@ class File(Document):
     type = StringField(choices=FILE_TYPE)
     description = StringField(max_length=140)
     user_name = StringField(max_length=50)
+    predict = BooleanField()
 
 

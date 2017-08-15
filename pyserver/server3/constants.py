@@ -3,6 +3,7 @@ MONGO = 'DEFAULT'
 PORT = 5000
 FILL_BLANK = 'BLANK_GRID'
 ALLOWED_EXTENSIONS = {'zip', 'csv', 'png', 'jpg', 'jpeg', 'txt'}
+PREDICT_FOLDER = 'predict_data/'
 PARAMETER_SPEC = [
     {
         "name": "validation",
