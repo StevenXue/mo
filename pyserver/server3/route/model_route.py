@@ -64,8 +64,8 @@ def run_model(model_id):
     schema = data.get('schema')
     divide_row = data.get('divide_row')
     ratio = data.get('ratio')
-    result = model_service.run_model(conf, project_id, staging_data_set_id or
-                                     file_id,
+    result = model_service.run_model(conf, project_id,
+                                     staging_data_set_id or file_id,
                                      model_id,
                                      schema=schema,
                                      divide_row=divide_row,
@@ -138,14 +138,14 @@ def encode_model_result(job_id):
     model_service.encode_h5_for_keras_js(result_dir + h5_filename)
     prefix = re.sub('\.hdf5$', '', h5_filename)
     origin = request.remote_addr
-    port = PORT
+    url_base = 'http://{origin}:{port}'.format(origin=origin, port=PORT)
     return jsonify({'response': {
-        'model': '{}:{}/model/result/{}/model.json'.format(
-            origin, port, job_id),
-        'weights': '{}:{}/model/result/{}/{}_weights.buf'.format(
-            origin, port, job_id, prefix),
-        'metadata': '{}:{}/model/result/{}/{}_metadata.json'.format(
-            origin, port, job_id, prefix),
+        'model': '{}/model/result/{}/model.json'.format(
+            url_base, job_id),
+        'weights': '{}/model/result/{}/{}_weights.buf'.format(
+            url_base, job_id, prefix),
+        'metadata': '{}/model/result/{}/{}_metadata.json'.format(
+            url_base, job_id, prefix),
     }})
 
 
