@@ -186,73 +186,98 @@ import numpy as np
 # 测试 二 分类：
 
 # 生成测试数据
+# import numpy as np
+# import pandas as pd
+# from sklearn.datasets import load_iris
+#
+# iris = load_iris()
+#
+# ids = np.where((iris.target == 0) | (iris.target == 1))
+#
+#
+# train_x = iris.data[ids]
+# train_y = iris.target[ids]
+#
+# iris_feature = pd.DataFrame(data= np.c_[train_x],
+#                      columns= ["sepal_length","sepal_width","petal_length","petal_width"])
+#
+# iris_label = pd.DataFrame(data= train_y,
+#                      columns= ['target'])
+#
+# from sklearn.model_selection import train_test_split
+#
+# X_train, X_test, y_train, y_test = train_test_split(
+#     iris_feature, iris_label,
+#     test_size=0.20,
+#     random_state=42)
+# # #
+#
+# print(y_test)
+#
+#
+
 import numpy as np
 import pandas as pd
-from sklearn.datasets import load_iris
+from time import time
+from sklearn.metrics import f1_score
 
-iris = load_iris()
+# Read student data
+student_data = pd.read_csv("student_data_number.csv")
+# print(student_data)
 
-ids = np.where((iris.target == 0) | (iris.target == 1))
+feature = pd.DataFrame(data= student_data,
+                     columns= ["address_R","address_U","famsize_GT3","famsize_LE3"])
 
-
-train_x = iris.data[ids]
-train_y = iris.target[ids]
-
-iris_feature = pd.DataFrame(data= np.c_[train_x],
-                     columns= ["sepal_length","sepal_width","petal_length","petal_width"])
-
-iris_label = pd.DataFrame(data= train_y,
-                     columns= ['target'])
-
+label = pd.DataFrame(data= student_data,
+                     columns= ["passed"])
 from sklearn.model_selection import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(
-    iris_feature, iris_label,
+    feature, label,
     test_size=0.20,
     random_state=42)
-# #
-
-
-#
-#
+print(y_test)
 # # # # # 测试 Random forest
-# input = {
-#     'model_name': 'Randomforest',
-#     'df_features': iris_feature,
-#     'df_labels': iris_label,
-# }
-#
-# params = {
-#     'estimator': {
-#         'args': {
-#             "weights_name":None,
-#             "keys_name":None,
-#             "num_classes":2,
-#             "num_features":4,
-#             "num_trees":3,
-#             "max_nodes":1000,
-#             "early_stopping_rounds":100,
-#             "regression":False,
-#             "split_after_samples":20
-#         }
-#     },
-#     'fit': {
-#         "args": {
-#             "steps": 300
-#         }
-#     },
-#     'evaluate': {
-#         'args': {
-#             'steps': 1
-#         }
-#     }
-# }
-#
-# sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
-# from server3.lib.models.randomforest import random_forest_model_fn
-# result = custom_model(params, random_forest_model_fn, input, result_sds=sds)
-# print(result)
-#
+input = {
+    'model_name': 'Randomforest',
+    'x_tr': X_train,
+    'x_te': X_test,
+    'y_tr': y_train,
+    'y_te': y_test,
+}
+
+
+params = {
+    'estimator': {
+        'args': {
+            "weights_name":None,
+            "keys_name":None,
+            "num_classes":2,
+            "num_features":4,
+            "num_trees":3,
+            "max_nodes":1000,
+            "early_stopping_rounds":100,
+            "regression":False,
+            "split_after_samples":20
+        }
+    },
+    'fit': {
+        "args": {
+            "steps": 300
+        }
+    },
+    'evaluate': {
+        'args': {
+            'steps': 1
+        }
+    }
+}
+
+sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
+from server3.lib.models.randomforest import random_forest_model_fn
+result = custom_model(params, random_forest_model_fn, input, result_sds=sds)
+print(result)
+# #
 
 
 # # 测试 logistic_regressor
@@ -290,42 +315,42 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 # 测试 Linear_classifier
 
-input = {
-    'model_name': 'Linear_classifier',
-    'x_tr': X_train,
-    'x_te': X_test,
-    'y_tr': y_train,
-    'y_te': y_test,
-}
-
-params = {
-    'estimator': {
-        'args': {
-            "dimension": 4,
-            "num_classes": 2,
-            "weight_column_name": None,
-            "gradient_clip_norm": None,
-            "enable_centered_bias": False,
-            "_joint_weight": False,
-            "label_keys": None,
-        }
-    },
-    'fit': {
-        "args": {
-            "steps": 300
-        }
-    },
-    'evaluate': {
-        'args': {
-            'steps': 1
-        }
-    }
-}
-
-sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
-from server3.lib.models.linear_classifier import linear_classifier_model_fn
-result = custom_model(params, linear_classifier_model_fn, input, result_sds=sds)
-print(result)
+# input = {
+#     'model_name': 'Linear_classifier',
+#     'x_tr': X_train,
+#     'x_te': X_test,
+#     'y_tr': y_train,
+#     'y_te': y_test,
+# }
+#
+# params = {
+#     'estimator': {
+#         'args': {
+#             "dimension": 4,
+#             "num_classes": 2,
+#             "weight_column_name": None,
+#             "gradient_clip_norm": None,
+#             "enable_centered_bias": False,
+#             "_joint_weight": False,
+#             "label_keys": None,
+#         }
+#     },
+#     'fit': {
+#         "args": {
+#             "steps": 300
+#         }
+#     },
+#     'evaluate': {
+#         'args': {
+#             'steps': 1
+#         }
+#     }
+# }
+#
+# sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
+# from server3.lib.models.linear_classifier import linear_classifier_model_fn
+# result = custom_model(params, linear_classifier_model_fn, input, result_sds=sds)
+# print(result)
 
 # # 测试 svm
 #

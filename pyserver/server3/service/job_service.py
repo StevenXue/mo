@@ -28,6 +28,7 @@ from server3.business import ownership_business
 from server3.utility import data_utility
 from server3.lib import models
 from server3.repository import config
+from server3.utility import json_utility
 
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 
@@ -99,7 +100,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 json = {"scatter": data_utility.retrieve_nan_index(args[0],
                                                                    args[-1]),
                         "labels": labels,
-                        "pie": [{'text': el, 'value': labels.count(el)} for el
+                        "pie": [{'name': el, 'value': labels.count(el)} for el
                                 in set(labels)],
                         "centers": results["Centroids of Clusters"],
                         "general_info": gen_info,
@@ -132,20 +133,28 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                         "category": toolkit_obj.category}
 
             elif toolkit_obj.category == 2:
-                data = list(zip(*args[0]))
-                # TODO
-                print("labels", labels)
-                result = list(zip(*labels))
-                merge_data = data + result
-                merge_data = list(zip(*merge_data))
-                lab_fields = ["New Col" + str(i) for i in range(len(result))]
-                merge_fields = fields[0] + lab_fields
-
                 inn = 0
                 while inn in args[-1]:
                     inn = inn + 1
+                # 由于出来的数据格式不一致，判断是否为二维数据(是=>1, 不是=>2)
+                flag_shape = 1 if isinstance(labels[inn], list) else 0
+                # print("flag_shape", arg[0][inn], isinstance(args[0][inn], list))
+
+                result_be = labels if flag_shape else np.array(labels).reshape([-1, 1]).tolist()
+
+                print("result_be", result_be)
+                data = list(zip(*args[0]))
+                result = list(zip(*result_be))
+                print("result", result)
+
+                # 曾经两表合并，现在不需要了
+                # merge_data = list(zip(*(data + result)))
+
+                lab_fields = ["New Col" + str(i) for i in range(len(result))]
+                # merge_fields = fields[0] + lab_fields
+
                 flag_str1 = isinstance(args[0][inn][0], str)
-                flag_str2 = isinstance(labels[inn][0], str)
+                flag_str2 = isinstance(result_be[inn][0], str)
                 bar1 = []
                 bar2 = []
                 for el in fields[0]:
@@ -153,14 +162,13 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                     raw_d = data[indx]
 
                     if not flag_str1 and len(set(raw_d)) > 5:
-                        bar1_tmp = visualization_service.freq_hist(raw_d,
-                                                                   multip=1)
+                        bar1_tmp = visualization_service.freq_hist(raw_d, multip=1)
                     else:
                         seta = set(raw_d)
                         x_domain = [el for el in seta]
                         y_domain = [raw_d.count(el) for el in seta]
                         bar1_tmp = {'x_domain': x_domain, 'y_domain': y_domain}
-                    bar1_tmp.update({"field": el})
+                    bar1_tmp.update({"field": el, "title": "数据分布直方图(栏位转换前)"})
                     bar1.append(bar1_tmp)
 
                 for el in lab_fields:
@@ -168,22 +176,25 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                     raw_re = result[indx]
 
                     if not flag_str2 and len(set(raw_re)) > 5:
-                        bar2_tmp = visualization_service.freq_hist(raw_re,
-                                                                   multip=1)
+                        bar2_tmp = visualization_service.freq_hist(raw_re, multip=1)
                     else:
                         seta = set(raw_re)
                         x_domain = [el for el in seta]
                         y_domain = [raw_re.count(el) for el in seta]
                         bar2_tmp = {'x_domain': x_domain, 'y_domain': y_domain}
-                    bar2_tmp.update({"field": el})
+                    bar2_tmp.update({"field": el, "title": "数据分布直方图(栏位转换后)"})
                     bar2.append(bar2_tmp)
 
                 json = {"category": toolkit_obj.category,
-                        "table": {
-                            "Field1": fields[0],
-                            "Field2": lab_fields,
-                            "data": [dict(zip(merge_fields, arr)) for arr in
-                                     merge_data]
+                        "table1": {
+                            "title": "原始数据",
+                            "field": fields[0],
+                            "data": [dict(zip(fields[0], arr)) for arr in args[0]]
+                        },
+                        "table2": {
+                            "title": "转换后数据",
+                            "field": lab_fields,
+                            "data": [dict(zip(lab_fields, arr)) for arr in result_be]
                         },
                         "bar1": bar1,
                         "bar2": bar2}
@@ -220,9 +231,9 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                             "fields": lab_fields},
                         "bar": {"x_domain": x_domain,
                                 "y_domain": y_domain},
-                        "pie1": [{"text": fields[0][i], "value": temp[i]} for i
+                        "pie1": [{"name": fields[0][i], "value": temp[i]} for i
                                  in range(len(temp))],
-                        "pie2": [{"text": lab_fields[i], "value": var2[i]} for i
+                        "pie2": [{"name": lab_fields[i], "value": var2[i]} for i
                                  in range(len(var2))],
                         "general_info": gen_info,
                         "category": toolkit_obj.category}
@@ -240,10 +251,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                                                                project_obj,
                                                                job=job_obj,
                                                                type='result')
-                logger_service.save_result(result_sds_obj,
-                                           **{"result": results})
-                logger_service.save_result(result_sds_obj,
-                                           **{"visualization": json})
+                logger_service.save_result(result_sds_obj, **{"result": json_utility.convert_to_json(results)})
+                logger_service.save_result(result_sds_obj, **{"visualization": json})
                 return {
                     "visual_sds_id": str(result_sds_obj.id) if json else None,
                     "result": results}
