@@ -17,6 +17,7 @@ export default {
       public_files: [],
       owned_files: [],
     },
+    loading: false,
     files:[],
     projects: {
       public_projects: [],
@@ -144,12 +145,15 @@ export default {
     },
 
     *toStagingData ({ payload }, { call, put, select }) {
+      yield put({ type: 'loadingStart' })
       const data = yield call(convertToStaging, payload)
       if (data.success) {
         yield put({
           type: 'getStagingDatasets',
           payload: payload.project_id
         });
+        yield put({ type: 'loadingEnd' })
+        message.success("dataset has been successfully staged");
       } else {
         console.log('error', data, payload)
         throw data
@@ -224,6 +228,14 @@ export default {
 
     showModal (state, action) {
       return { ...state, ...action.payload, modalVisible: true }
+    },
+
+    loadingStart (state, action) {
+      return { ...state, loading: true }
+    },
+
+    loadingEnd (state, action) {
+      return { ...state, loading: false }
     },
 
     hideModal (state) {
