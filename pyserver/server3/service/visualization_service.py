@@ -42,7 +42,7 @@ def usr_story1_exploration(data, d_type, group_num=10):
         mean, std, min, max = (gen_info['mean'], gen_info['std'], int(gen_info['min']), int(gen_info['max']))
         arr_array = np.array(arr_temp)
         info_dict['freq_hist'] = freq_hist(arr_array, group_num)
-        flag, p_value, standard_norm_value = hypo_test(arr_array, mean, std, x_domain, 'norm')
+        flag, p_value, standard_norm_value = hypo_test(arr_array, mean, std, info_dict['freq_hist']['x_domain'], 'norm')
         info_dict['hypo'] = {'flag': flag, 'p_value': p_value, 'standard_norm_value': standard_norm_value}
     elif d_type == 'string' or d_type == 'str':
         seta = set(arr_temp)
@@ -136,11 +136,11 @@ def t_sne(arr):
 
 def freq_hist(arr, group_num=10, multip=1):
     arr_array = np.array(arr)
-    min = arr_array.min()
-    max = arr_array.max()
-    interval = (max - min + 1) / group_num
+    _min = arr_array.min()
+    _max = arr_array.max()
+    interval = find_step(_min, _max, group_num)
     # 给出x轴
-    x_domain = np.arange(min, max + interval, interval).round(1)
+    x_domain = np.arange(_min, _max + interval, interval).round(1)
     freq_hist = {"freq_hist": arr_array}
     df = pd.DataFrame(freq_hist)
     # 给出y轴
