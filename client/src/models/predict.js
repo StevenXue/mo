@@ -44,28 +44,6 @@ export default {
   },
 
   effects: {
-    *query ({ payload }, { call, put, select }) {
-      const user = yield select(state => state['app'].user)
-      yield put({
-        type: 'querySuccess',
-        payload: {
-          user: user,
-        }
-      })
-      const data = yield call(query, user.user_ID)
-      if (data) {
-        yield put({
-          type: 'querySuccess',
-          payload: {
-            projects: data.response,
-          },
-        })
-      } else {
-        console.log('error', data)
-        throw data
-      }
-    },
-
 
   },
 
