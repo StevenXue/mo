@@ -21,7 +21,7 @@ from server3.business import toolkit_business
 from server3.business import staging_data_business
 from server3.utility import json_utility
 from server3.constants import PORT
-
+from server3.lib.models.nn import neural_style_transfer
 
 PREFIX = '/model'
 
@@ -159,6 +159,32 @@ def model_result(job_id, filename):
     """
     result_dir, h5_filename = model_service.get_results_dir_by_job_id(job_id)
     return send_from_directory(result_dir, filename)
+
+
+@model_app.route('/neural_style', methods=['POST'])
+def neural_style():
+    """
+    api for get model result file content
+    :return:
+    """
+    PREFIX = '/file'
+    UPLOAD_URL = '/uploads/'
+    url_base = PREFIX + UPLOAD_URL
+
+    data = request.get_json()
+    urls = data.get('urls')
+    user_ID = data.get('user_ID')
+    project_id = data.get('project_id')
+    file_url = url_base + user_ID + '/'
+    save_directory = '/'.join(urls[0].split('/')[:-1]) + '/result'
+    args = {
+        'base_image_path': urls[0],
+        'style_reference_image_path': urls[1],
+        'result_prefix': save_directory,
+    }
+    url = neural_style_transfer.neural_style_transfer(args, project_id,
+                                                      file_url)
+    return jsonify({'response': url})
 
 
 # keras model

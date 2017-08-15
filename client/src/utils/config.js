@@ -30,6 +30,7 @@ module.exports = {
     publish: '/project/publish',
     fork : '/project/fork',
     // projectCreate: '/project/create_project',
-    getDataFields: '/data/data_sets/fields'
+    getDataFields: '/data/data_sets/fields',
+    neuralStyle: '/model/neural_style'
   },
 }

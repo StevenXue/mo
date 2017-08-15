@@ -16,6 +16,7 @@ from flask import send_from_directory
 from server3.repository import config
 from server3.service import file_service
 from server3.utility import json_utility
+from server3.constants import PREDICT_FOLDER
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
@@ -77,11 +78,14 @@ def upload_file():
 def list_files_by_user_ID():
     user_ID = request.args.get('user_ID')
     extension = request.args.get('extension')
+    predict = request.args.get('predict')
+    predict = str(predict).lower() == 'true'
     if not user_ID:
         return jsonify({'response': 'insufficient args'}), 400
     public_files, owned_files = \
         file_service.list_file_by_extension(user_ID,
                                             extension=extension,
+                                            predict=predict,
                                             order=-1)
     public_files = json_utility.me_obj_list_to_json_list(public_files)
     owned_files = json_utility.me_obj_list_to_json_list(owned_files)
@@ -104,5 +108,34 @@ def remove_file_by_id(file_id):
 
 @file_app.route(UPLOAD_URL + '<user_ID>/<filename>')
 def uploaded_file(user_ID, filename):
-    path = '%s%s/' % (UPLOAD_FOLDER, user_ID)
+    predict = request.args.get('predict')
+    predict = str(predict).lower() == 'true'
+    path = '{}{}/'.format(UPLOAD_FOLDER, user_ID)
+    if predict:
+        path += PREDICT_FOLDER
+    print(path)
     return send_from_directory(path, filename)
+
+
+@file_app.route('/predict', methods=['POST'])
+def upload_predict_image():
+    # user_ID = request.form.get('user_ID')
+    # if not user_ID:
+    #     return jsonify({'response': 'no user_ID'}), 400
+    user_ID = request.args.get('user_ID')
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if REQUEST_FILE_NAME not in request.files:
+            return jsonify({'response': 'no file part'}), 400
+        file = request.files[REQUEST_FILE_NAME]
+        if file.filename == '':
+            return jsonify({'response': 'no selected file'}), 400
+        if file and file_service.allowed_file(file.filename):
+            url_base = PREFIX + UPLOAD_URL
+            saved_file = file_service.add_file(file, url_base,
+                                               user_ID, is_private=True,
+                                               type='image', predict=True)
+            file_json = json_utility.convert_to_json(saved_file.to_mongo())
+            return jsonify({'response': file_json})
+        else:
+            return jsonify({'response': 'file is not allowed'}), 400

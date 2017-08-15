@@ -21,7 +21,6 @@ class ImagePredict extends React.Component {
   }
 
   componentDidMount () {
-
     this.predictImage.model.ready().then(() => {
       this.dispatch({ type: 'predictImage/setModelLoading', payload: false })
       this.drawArchitectureDiagramPaths()
@@ -77,8 +76,8 @@ class ImagePredict extends React.Component {
       url,
       img => {
         if (img.type === 'error') {
-          this.imageLoadingError = true
-          this.imageLoading = false
+          this.dispatch({ type: 'predictImage/setImageLoadingError', payload: true })
+          this.dispatch({ type: 'predictImage/setImageLoading', payload: false })
         } else {
           // load image data onto input canvas
           const ctx = document.getElementById('input-canvas').getContext('2d')

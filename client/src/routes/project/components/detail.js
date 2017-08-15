@@ -11,6 +11,7 @@ import Preprocess from '../preprocess/preprocess'
 import AutomatedModel from '../model/autoModal'
 import Predict from '../predict/predict'
 import ImagePredict from '../predict/imagePredict'
+import NeuralStyle from '../predict/neuralStyle'
 import DataPreview from './dataPreview'
 import { stepStyle, assetsUrl } from '../../../constants'
 import { TourArea } from '../../../components'
@@ -326,7 +327,7 @@ class ProjectDetail extends React.Component {
             <Collapse className='model-predict' bordered={true} style={{ marginTop: 10, width: '100%' }}>
               <Panel header={'Predict'} key="5">
                 <Spin spinning={this.state.loading}>
-                  <ImagePredict />
+                  <NeuralStyle project_id={this.state.project_id} />
                 </Spin>
               </Panel>
             </Collapse>

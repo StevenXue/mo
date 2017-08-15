@@ -6,6 +6,8 @@ from flask_socketio import SocketIO
 from server3.business import staging_data_business
 from server3.business import staging_data_set_business
 
+socketio = SocketIO(message_queue='redis://')
+
 
 def log_epoch_end(*args):
     print(args)
@@ -30,10 +32,11 @@ def save_log_fn(event, n, logs, result_sds, project_id):
 def emit_log(event, n, logs, result_sds, project_id):
     kw = {'n': n, 'event': event}
     kw.update(logs)
-    # add sds id to namespace
-    socketio = SocketIO(message_queue='redis://')
     socketio.emit('log_epoch_end', kw, namespace='/log/%s' % project_id)
-    # print('send by socket', n, logs)
+
+
+def emit_message(message, project_id):
+    socketio.emit('send_message', message, namespace='/log/%s' % project_id)
 
 
 def save_result_fn(result_sds, **result):
