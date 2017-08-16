@@ -323,8 +323,8 @@ def create_model_job(project_id, staging_data_set_id, model_obj, **kwargs):
                                project_id=project_id)
             # update a job
             job_business.end_job(job_obj)
-
-            func_result['job_id'] = str(job_obj.id)
+            if isinstance(func_result, dict):
+                func_result['job_id'] = str(job_obj['id'])
 
             return func_result
 
