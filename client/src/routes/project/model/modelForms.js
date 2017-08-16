@@ -58,7 +58,7 @@ class ModelForms extends React.Component {
       selectedFile: this.props.selectedFile,
       dataset_id: this.props.dataset_id
     })
-    console.log(this.props.selectedFile)
+    //console.log(this.props.selectedFile)
     let socket = io.connect(flaskServer + '/log/' + this.props.project_id)
     socket.on('log_epoch_end', (msg) => {
       console.log('receive msg', msg)
@@ -66,6 +66,7 @@ class ModelForms extends React.Component {
     })
 
     if (this.props.params) {
+      console.log(this.props.params);
       this.setState({ end: true })
     }
 
@@ -177,6 +178,7 @@ class ModelForms extends React.Component {
   }
 
   onClickRun () {
+    console.log(this.props.params['results'])
     if (this.props.jupyter) {
       console.log(this.state.dataset_id);
       let run_params = this.constructParams()
@@ -509,7 +511,7 @@ class ModelForms extends React.Component {
                    </Button>
                  ]}>
             {this.props.params?
-              (this.state.params['results'] && <Curve data={this.state.params['results']['history']}/>):
+              (this.state.params['results']['history'] && <Curve data={this.state.params['results']['history']}/>):
               <Visual data={this.state.ioData} end={this.state.end}/>
             }
           </Modal>
