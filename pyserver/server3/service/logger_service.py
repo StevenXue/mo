@@ -5,18 +5,28 @@ from flask_socketio import SocketIO
 # from sio import socketio
 from server3.business import staging_data_business
 from server3.business import staging_data_set_business
+from server3.utility import json_utility
 
 socketio = SocketIO(message_queue='redis://')
 
+# epoch = 0
+
 
 def log_epoch_end(*args):
+    # global epoch
+    # epoch = epoch + 1
     print(args)
     save_log('epoch', *args)
     emit_log('epoch', *args)
 
 
 def log_batch_end(*args):
-    print(*args)
+    pass
+    # global epoch
+    # args = list(args)
+    # args = json_utility.convert_to_json(args)
+    # args[0] = '{}/{}'.format(epoch, args[0])
+    # print(*args)
     # emit_log('batch', *args)
 
 
