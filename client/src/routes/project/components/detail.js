@@ -258,7 +258,6 @@ class ProjectDetail extends React.Component {
   }
 
   render () {
-    console.log('this.props.project.predictModelType', this.props.project.predictModelType)
     return (
       <div className="content-inner">
         <div>
