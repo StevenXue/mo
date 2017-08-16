@@ -10,9 +10,11 @@
 """
 import inspect
 import os
+import sys
 
 import numpy as np
 import pandas as pd
+import eventlet
 
 from server3.business import model_business, ownership_business, user_business
 from server3.service import job_service
@@ -24,6 +26,7 @@ from server3.business import staging_data_business
 from server3.business import project_business
 from server3.business import job_business
 from server3.repository import config
+from server3 import encoder as keras_encoder
 
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 # user_directory = 'user_directory/'
@@ -107,16 +110,17 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
     :return:
     """
     model = model_business.get_by_model_id(model_id)
+    project = project_business.get_by_id(project_id)
+    ownership = ownership_business.get_ownership_by_owned_item(project,
+                                                               'project')
+    result_dir = '{0}{1}/{2}/'.format(user_directory,
+                                      ownership.user.user_ID,
+                                      project.name)
     # import model function
     if model['category'] == ModelType['neural_network']:
         # keras nn
         f = getattr(models, model.entry_function)
-        project = project_business.get_by_id(project_id)
-        ownership = ownership_business.get_ownership_by_owned_item(project,
-                                                                   'project')
-        result_dir = '{0}{1}/{2}/'.format(user_directory,
-                                          ownership.user.user_ID,
-                                          project.name)
+
         input_dict = manage_nn_input(conf, data_source_id, **kwargs)
         return job_service.run_code(conf, project_id, data_source_id,
                                     model, f, input_dict,
@@ -129,7 +133,8 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
         print(input_dict)
         return job_service.run_code(conf, project_id, None,
                                     model, f, input_dict,
-                                    file_id=data_source_id)
+                                    file_id=data_source_id,
+                                    result_dir=result_dir)
     else:
         # custom models
         f = models.custom_model
@@ -142,7 +147,8 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
                                                                model.name,
                                                                **kwargs)
             return job_service.run_code(conf, project_id, data_source_id,
-                                        model, f, model_fn, input_dict)
+                                        model, f, model_fn, input_dict,
+                                        result_dir=result_dir)
         if model['category'] == ModelType['unsupervised']:
             x_cols = fit.get('data_fields', [])
             input_dict = model_input_manager_unsupervised(x_cols,
@@ -150,7 +156,8 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
                                                           model.name,
                                                           **kwargs)
             return job_service.run_code(conf, project_id, data_source_id,
-                                        model, f, model_fn, input_dict)
+                                        model, f, model_fn, input_dict,
+                                        result_dir=result_dir)
 
 
 def is_array_and_not_empty(x):
@@ -223,7 +230,9 @@ def model_to_code(conf, project_id, data_source_id, model_id, **kwargs):
         head_str += 'import tensorflow as tf\n'
         head_str += 'from tensorflow.python.framework import constant_op\n'
         head_str += 'from tensorflow.python.framework import dtypes\n'
+        head_str += 'from tensorflow.contrib.learn.python.learn import metric_spec\n'
         head_str += 'from server3.lib import models\n'
+        head_str += 'from server3.lib.models.modified_tf_file.monitors import ValidationMonitor\n'
         head_str += 'from server3.business import staging_data_set_business\n'
         head_str += 'from server3.business import staging_data_business\n'
         head_str += 'from server3.service import staging_data_service\n'
@@ -235,13 +244,14 @@ def model_to_code(conf, project_id, data_source_id, model_id, **kwargs):
         head_str += 'model_fn = models.%s\n' % model.entry_function
         head_str += "data_source_id = '%s'\n" % data_source_id
         head_str += "model_name = '%s'\n" % model.name
+        head_str += "kwargs = %s\n" % kwargs
         fit = conf.get('fit', None)
         if model['category'] == 1:
             data_fields = fit.get('data_fields', [[], []])
             head_str += 'data_fields = %s\n' % data_fields
             head_str += inspect.getsource(model_input_manager_custom_supervised)
             head_str += "input_dict = model_input_manager_custom_supervised(" \
-                        "data_fields, data_source_id, model_name)\n"
+                        "data_fields, data_source_id, model_name, **kwargs)\n"
         elif model['category'] == 2:
             x_cols = fit.get('data_fields', [])
             head_str += "x_cols = %s\n" % x_cols
@@ -430,7 +440,7 @@ def manage_folder_input_to_str(conf, file_id, **kwargs):
     return code_str
 
 
-def get_results_by_job_id_and_user_ID(job_id, checkpoint='final'):
+def get_results_dir_by_job_id(job_id, checkpoint='final'):
     """
 
     :param job_id:
@@ -442,9 +452,16 @@ def get_results_by_job_id_and_user_ID(job_id, checkpoint='final'):
     ownership = ownership_business.get_ownership_by_owned_item(project,
                                                                'project')
     user_ID = ownership.user.user_ID
-    result_dir = '{}{}/{}/{}/{}.hdf5'.format(user_directory, user_ID,
-                                             project_name, job_id, checkpoint)
-    return result_dir
+    result_dir = '{}{}/{}/{}/'.format(user_directory, user_ID,
+                                      project_name, job_id)
+    filename = '{}.hdf5'.format(checkpoint)
+    return result_dir, filename
+
+
+def encode_h5_for_keras_js(weights_hdf5_filepath):
+    encoder = keras_encoder.Encoder(weights_hdf5_filepath)
+    encoder.serialize()
+    encoder.save()
 
 
 # ------------------------------ temp function ------------------------------e

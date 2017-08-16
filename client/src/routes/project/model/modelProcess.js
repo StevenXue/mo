@@ -108,13 +108,13 @@ export default class ModelProcess extends React.Component {
   }
 
   checkIfFile(props){
-    console.log(props.selectedFile);
-    if(props.selectedFile !== '' || props.dataset_id === ''){
+    console.log(props.selectedFile, props.dataset_id);
+    if(props.selectedFile && props.selectedFile !== ''){
       let models = this.state.allModels;
       models = models.filter((e) => e.category === 4);
       models = models.map((e) => ({'name': e.name, '_id': e._id}));
       this.setState({models, isImage: true, selectedFile: props.selectedFile});
-    }else{
+    }else if(props.dataset_id && props.dataset_id !== '' ){
       let models = this.state.allModels;
       models = models.filter((e) => e.category !== 4);
       models = models.map((e) => ({'name': e.name, '_id': e._id}));
@@ -126,7 +126,7 @@ export default class ModelProcess extends React.Component {
   onSelectModel(values){
     this.setState({selectedModel: values});
     let model = this.state.models.filter((e) => e._id === values );
-    this.setState({modelName: model[0][name]});
+    this.setState({modelName: model[0]['name']});
     fetch(flaskServer + '/model/models/' + values, {
       method: 'get',
       headers: {
@@ -150,15 +150,23 @@ export default class ModelProcess extends React.Component {
 
   selectTarget(value) {
     console.log(this.state.modelData.fit);
+    let previous = this.state.targetKeys;
     if(this.state.modelData.fit.data_fields.y_len_range !== null) {
-      if (value.length <= this.state.modelData.fit.data_fields.y_len_range[1] &&
-        value.length >= this.state.modelData.fit.data_fields.y_len_range[0]) {
+      if(previous.length < value.length) {
+        if (value.length <= this.state.modelData.fit.data_fields.y_len_range[1] &&
+          value.length >= this.state.modelData.fit.data_fields.y_len_range[0]) {
+          this.setState({
+            targetKeys: value,
+            divide: {'source': this.state.selectedKeys, 'target': value}
+          })
+        } else {
+          message.error("Please choose correct amount of target fields");
+        }
+      }else{
         this.setState({
           targetKeys: value,
           divide: {'source': this.state.selectedKeys, 'target': value}
         })
-      } else {
-        message.error("Please choose correct amount of target fields");
       }
     }else{
       this.setState({

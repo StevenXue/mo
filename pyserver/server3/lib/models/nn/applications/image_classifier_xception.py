@@ -34,7 +34,9 @@ def image_classifier_xception(conf, input, **kw):
     nb_validation_samples = input['nb_validation_samples']
 
     # 通过train_data_dir下的文件夹数目得到分类数量
-    num_classes = len(os.listdir(train_data_dir))
+    l = os.listdir(train_data_dir)
+    l.remove('.DS_Store')
+    num_classes = len(l)
     if num_classes < 2:
         raise Exception('classes should be more than 1, put your '
                         'different classes images file into '

@@ -4,13 +4,16 @@ import ReactEcharts from 'echarts-for-react'
 const getOption = (props) => {
   let y_domain = props.data.y_domain;
   let x_domain
+  let name;
 
   if(props.type == 'dr'){
     x_domain = props.data.x_domain;
     let index = x_domain.indexOf('_empty');
     x_domain[index] = ''
+    name = '方差'
   }else{
     x_domain = props.data.x_domain;
+    name = ''
   }
 
   return {
@@ -43,6 +46,7 @@ const getOption = (props) => {
     ],
     yAxis : [
       {
+        name: name,
         type : 'value'
       }
     ],
