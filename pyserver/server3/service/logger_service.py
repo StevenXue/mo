@@ -15,6 +15,11 @@ def log_epoch_end(*args):
     emit_log('epoch', *args)
 
 
+def log_batch_end(*args):
+    print(*args)
+    # emit_log('batch', *args)
+
+
 def log_train_end(*args, **kw):
     save_result(*args, **kw)
     # emit_result(*args)

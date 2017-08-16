@@ -122,7 +122,14 @@ def image_classifier_vgg16(conf, input, **kw):
                                               logger_service.log_epoch_end(
                                                   epoch, logs,
                                                   result_sds,
-                                                  project_id))
+                                                  project_id),
+                                              on_batch_end=
+                                              lambda epoch, logs:
+                                              logger_service.log_batch_end(
+                                                  epoch, logs,
+                                                  result_sds,
+                                                  project_id)
+                                              )
 
         # checkpoint to save best weight
         # best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,
