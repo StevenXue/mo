@@ -24,7 +24,7 @@ def neural_style_transfer(args, project_id, file_url):
     # content_weight
     content_weight = args.get('content_weight', 0.025)
     # Style weight.
-    style_weight = args.get('style_weight', 1.0)
+    style_weight = args.get('style_weight', 2.0)
     # Total Variation weight.
     total_variation_weight = args.get('tv_weight', 1.0)
 
@@ -250,5 +250,11 @@ def neural_style_transfer(args, project_id, file_url):
 #         '../../../../user_directory/user_0607/predict_data/xzdw.jpg',
 #     'result_prefix': '../../../../user_directory/user_0607/predict_data/',
 # }
-#
+# args = {
+#     'base_image_path': './neural_style_transfer/base_img/base.jpg',
+#     'style_reference_image_path':
+#         './neural_style_transfer/style_img/style.jpg',
+#     'result_prefix': './neural_style_transfer/result/result',
+# }
 # neural_style_transfer(args, '', '')
+
