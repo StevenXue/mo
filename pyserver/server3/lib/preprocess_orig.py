@@ -91,6 +91,13 @@ def get_dummy(arr0, index):
     return result
 
 
+# 把string转化为数字类别
+def str_to_categories(arr0, index):
+    value = pd.Series(arr0).astype('category').cat.codes.values
+    result = data_utility.retrieve_nan_index(value.tolist(), index)
+    return result
+
+
 # FIXME
 def pandas_cut(arr0, index, bins, labels=False):
     labels = False if labels == [""] else labels
