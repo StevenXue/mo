@@ -176,11 +176,17 @@ export default class ModelForms extends React.Component {
     let run_params = this.constructParams();
     let params = {};
     if(this.state.selectedFile === '') {
+      let spliter = {}
+      if(isEmpty(this.state.spliter)){
+        spliter['schema'] = 'seq';
+      }else{
+        spliter = this.state.spliter
+      }
       params = Object.assign({
         conf: run_params,
         project_id: this.props.project_id,
         staging_data_set_id: this.props.dataset_id,
-      }, this.state.spliter);
+      }, spliter);
     }else{
       params = {
         conf: run_params,
