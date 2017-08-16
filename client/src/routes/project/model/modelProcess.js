@@ -43,7 +43,7 @@ export default class ModelProcess extends React.Component {
       }).then((response) => response.json())
         .then((res) => {
           let dict = [];
-          res.response.forEach((e) => dict.push({'name': e.name, '_id': e._id}));
+          res.response.forEach((e) => dict.push({'name': e.name, '_id': e._id, 'category': e.category}));
           this.setState({models: dict, allModels: res.response});
         });
     }
@@ -289,6 +289,7 @@ export default class ModelProcess extends React.Component {
   }
 
   render(){
+    let model = this.state.models.find(m => m._id === this.state.selectedModel)
     return(
         <div style={{width: '100%', height: this.state.isActive? 450:400, margin: 10 , padding: 10, backgroundColor: 'white' }}>
           <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%', height: '100%'}}>
@@ -359,6 +360,7 @@ export default class ModelProcess extends React.Component {
                         dataset_id={this.state.dataSet}
                         project_id={this.props.project_id}
                         model_id={this.state.selectedModel}
+                        model_type={model?model['category']:undefined}
                         jupyter={this.props.jupyter}
                         isActive={this.props.isActive}
                         params={this.props.params}

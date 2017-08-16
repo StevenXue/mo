@@ -47,6 +47,7 @@ export default {
     predictLoading: false,
     predictEnd: false,
     predictModelType: 6,
+    activeKeys: []
   },
 
   effects: {
@@ -301,10 +302,10 @@ export default {
       return { ...state, ...action.payload }
     },
 
-    setActiveKey (state, { payload: activeKey }) {
+    setActiveKey (state, { payload: activeKeys }) {
       return {
         ...state,
-        activeKey,
+        activeKeys,
       }
     },
 
