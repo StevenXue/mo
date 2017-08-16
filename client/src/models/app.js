@@ -54,6 +54,7 @@ export default {
           type: 'querySuccess',
           payload: data.user,
         })
+        // FIXME regex can't catch whole url
         const from = queryURL('from')
         if (from) {
           yield put(routerRedux.push(from))
@@ -65,10 +66,8 @@ export default {
       } else {
         if (location.pathname !== '/login') {
           let from = location.pathname
-          if (location.pathname === '/dashboard') {
-            from = '/dashboard'
-          }
-          window.location = `${location.origin}/login?from=${from}`
+          // window.location = `${location.origin}/login?from=${from}`
+          window.location = `${location.origin}/login`
         }
       }
     },

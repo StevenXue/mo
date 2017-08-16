@@ -85,7 +85,9 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 value = result.pop(0)
                 results.update({arg["name"]: value})
                 if arg["if_add_column"]:
-                    strr = "%s_%s_col" % (arg["name"], toolkit_obj.name)
+                    # 不能使用中文名
+                    # strr = "%s_%s_col" % (arg["name"], toolkit_obj.name)
+                    strr = "%s_%s_col" % (arg["name"], toolkit_obj.entry_function)
                     try:
                         add_new_column(value, args[-1], strr,
                                        staging_data_set_id)
@@ -323,8 +325,8 @@ def create_model_job(project_id, staging_data_set_id, model_obj, **kwargs):
                                project_id=project_id)
             # update a job
             job_business.end_job(job_obj)
-
-            func_result['job_id'] = str(job_obj.id)
+            if isinstance(func_result, dict):
+                func_result['job_id'] = str(job_obj['id'])
 
             return func_result
 
