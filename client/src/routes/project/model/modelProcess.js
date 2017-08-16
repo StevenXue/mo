@@ -126,7 +126,7 @@ export default class ModelProcess extends React.Component {
   onSelectModel(values){
     this.setState({selectedModel: values});
     let model = this.state.models.filter((e) => e._id === values );
-    this.setState({modelName: model[0][name]});
+    this.setState({modelName: model[0]['name']});
     fetch(flaskServer + '/model/models/' + values, {
       method: 'get',
       headers: {
