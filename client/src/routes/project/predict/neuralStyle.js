@@ -107,8 +107,8 @@ class NeuralStyle extends React.Component {
                   type='primary'
                   loading={this.props.project.predictLoading}>Predict</Button>
           {this.state.ioData && [
-            <Icon type="caret-down" style={{ fontSize: 60 }}/>,
-            <div className='image-container output-image-container'>
+            <Icon type="caret-down" style={{ fontSize: 60 }} key='caret-down'/>,
+            <div className='image-container output-image-container' key='image-container output-image-container'>
               {predictImages.length >= 1 &&
               <img src={flaskServer + this.state.ioData.url} alt="source image"
                    className='output-image'/>}

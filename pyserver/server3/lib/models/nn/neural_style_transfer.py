@@ -3,6 +3,7 @@ from scipy.misc import imsave
 import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
 import time
+import eventlet
 
 from keras.applications import vgg19
 from keras import backend as K
@@ -235,6 +236,7 @@ def neural_style_transfer(args, project_id, file_url):
         }, project_id)
         print('Image saved as', fname)
         print('Iteration %d completed in %ds' % (i, end_time - start_time))
+        # eventlet.sleep()
     return {
         'url': url,
         'n': iterations

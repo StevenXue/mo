@@ -130,7 +130,10 @@ def get_all_jobs_of_project(project_id, categories):
                 }
                 job_info['staging_data_set'] = job['staging_data_set']['name'] if job['staging_data_set'] else None
                 job_info['staging_data_set_id'] = job['staging_data_set']['id'] if job['staging_data_set'] else None
-                job_info['results'] = result_sds['result'] if result_sds and "result" in result_sds else None
+                if key == 'model':
+                    job_info['results'] = result_sds
+                else:
+                    job_info['results'] = result_sds['result'] if result_sds and "result" in result_sds else None
                 job_info['results_staging_data_set_id'] = result_sds['_id'] if result_sds else None
                 history_jobs[key].append(job_info)
                 break

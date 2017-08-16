@@ -14,6 +14,7 @@ import sys
 
 import numpy as np
 import pandas as pd
+import eventlet
 
 from server3.business import model_business, ownership_business, user_business
 from server3.service import job_service
@@ -109,16 +110,17 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
     :return:
     """
     model = model_business.get_by_model_id(model_id)
+    project = project_business.get_by_id(project_id)
+    ownership = ownership_business.get_ownership_by_owned_item(project,
+                                                               'project')
+    result_dir = '{0}{1}/{2}/'.format(user_directory,
+                                      ownership.user.user_ID,
+                                      project.name)
     # import model function
     if model['category'] == ModelType['neural_network']:
         # keras nn
         f = getattr(models, model.entry_function)
-        project = project_business.get_by_id(project_id)
-        ownership = ownership_business.get_ownership_by_owned_item(project,
-                                                                   'project')
-        result_dir = '{0}{1}/{2}/'.format(user_directory,
-                                          ownership.user.user_ID,
-                                          project.name)
+
         input_dict = manage_nn_input(conf, data_source_id, **kwargs)
         return job_service.run_code(conf, project_id, data_source_id,
                                     model, f, input_dict,
@@ -131,7 +133,8 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
         print(input_dict)
         return job_service.run_code(conf, project_id, None,
                                     model, f, input_dict,
-                                    file_id=data_source_id)
+                                    file_id=data_source_id,
+                                    result_dir=result_dir)
     else:
         # custom models
         f = models.custom_model
@@ -144,7 +147,8 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
                                                                model.name,
                                                                **kwargs)
             return job_service.run_code(conf, project_id, data_source_id,
-                                        model, f, model_fn, input_dict)
+                                        model, f, model_fn, input_dict,
+                                        result_dir=result_dir)
         if model['category'] == ModelType['unsupervised']:
             x_cols = fit.get('data_fields', [])
             input_dict = model_input_manager_unsupervised(x_cols,
@@ -152,7 +156,8 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
                                                           model.name,
                                                           **kwargs)
             return job_service.run_code(conf, project_id, data_source_id,
-                                        model, f, model_fn, input_dict)
+                                        model, f, model_fn, input_dict,
+                                        result_dir=result_dir)
 
 
 def is_array_and_not_empty(x):
