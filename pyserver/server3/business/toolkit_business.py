@@ -204,7 +204,7 @@ def create_public_toolkit():
                       "if_reserved": False,
                       "args": [
                           {
-                              "name": "simple moving average",
+                              "name": "simple_moving_average",
                               "des": "所选范围的样本的移动平均值",
                               "if_add_column": False,
                               "attribute": "value"
@@ -462,7 +462,7 @@ def create_public_toolkit():
                       "if_reserved": True,
                       "args": [
                           {
-                              "name": "降维结果",
+                              "name": "dimension_reduction_result",
                               "des": "所选范围的样本的降维后的结果",
                               "if_add_column": True,
                               "attribute": "label"
@@ -539,7 +539,7 @@ def create_public_toolkit():
                        "if_reserved": True,
                        "args": [
                            {
-                               "name": "降维结果",
+                               "name": "dimension_reduction_result",
                                "des": "所选范围的样本的降维后的结果",
                                "if_add_column": True,
                                "attribute": "label"
@@ -615,7 +615,7 @@ def create_public_toolkit():
                       "if_reserved": False,
                       "args": [
                           {
-                              "name": "四分位距",
+                              "name": "IQR_range",
                               "des": "所选范围的样本死分数",
                               "if_add_column": False,
                               "attribute": "value"
@@ -906,7 +906,7 @@ def create_public_data_process():
                                  },
                                  'default': None,
                                  'required': True,
-                                 'len_range': [1, None],
+                                 'len_range': [2, None],
                                  'data_type': ['int', 'float']
                              }
                          },
