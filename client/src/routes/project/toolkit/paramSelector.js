@@ -372,7 +372,7 @@ class ParamsSeletcor extends React.Component {
         <div style={{ marginTop: 5, display: 'flex', flexDirection: 'row'}} key={e}>
           <span>{e + " "}</span>
           <Input placeholder={e} ref={e} style={{width: 100, marginLeft: 10}} />
-          <Button onClick={() => this.onClickConfirm()}>Confirm</Button>
+          <Button type='primary' onClick={() => this.onClickConfirm()}>Confirm</Button>
         </div>,
       )
     } else {
@@ -408,7 +408,7 @@ class ParamsSeletcor extends React.Component {
         return (
           <div>
             {this.renderCheckBoxTable()}
-            <Button style={{marginTop: 5}} onClick={() => this.onClickConfirm()}>Confirm Selection</Button>
+            <Button style={{marginTop: 5}} type='primary' onClick={() => this.onClickConfirm()}>Confirm Selection</Button>
           </div>
         )
 
@@ -416,7 +416,7 @@ class ParamsSeletcor extends React.Component {
         return (
           <div>
             {this.renderCheckBoxTable()}
-            <Button style={{marginTop: 5}} onClick={() => this.onClickConfirm()}>Confirm Selection</Button>
+            <Button style={{marginTop: 5}} type='primary' onClick={() => this.onClickConfirm()}>Confirm Selection</Button>
           </div>
         );
 

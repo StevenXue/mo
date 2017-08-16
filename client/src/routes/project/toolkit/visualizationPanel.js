@@ -230,7 +230,7 @@ export default class VisualizationPanel extends React.Component {
                   {
                     !isEmpty(this.state.scatterData) &&
                       <div style={{height: 270, marginTop: -20}}>
-                        <SimpleScatter data={this.state.scatterData} />
+                        <SimpleScatter data={this.state.scatterData} yName={this.state.responseBody.Y_target[0]} xName={this.state.selected}/>
                       </div>
                   }
                   {

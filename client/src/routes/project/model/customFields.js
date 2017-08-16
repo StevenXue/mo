@@ -182,6 +182,9 @@ export default class CustomFields extends React.Component {
           (this.state.fields.map((e) =>
             <div key={e.name} style={{display: 'flex', flexDirection: 'row', marginBottom: 10}}>
               <div style={{width: 150}}>
+                { e.required &&
+                <span style={{color: '#108ee9', fontSize: 14}}>{"* "}</span>
+                }
                 <p style={{float: 'left'}}>{e.name}</p>
               </div>
               {this.renderParams(e)}

@@ -174,30 +174,28 @@ class ModelForms extends React.Component {
   }
 
   onClickRun () {
-    let run_params = this.constructParams()
-    let params = {}
-    if (this.state.selectedFile === '') {
-      let spliter = {}
-      if(isEmpty(this.state.spliter)){
-        spliter['schema'] = 'seq';
-      }else{
-        spliter = this.state.spliter
-      }
-      params = Object.assign({
-        conf: run_params,
-        project_id: this.props.project_id,
-        staging_data_set_id: this.props.dataset_id,
-      }, spliter)
-    } else {
-      params = {
-        conf: run_params,
-        project_id: this.props.project_id,
-        file_id: this.state.selectedFile,
-      }
-    }
-    console.log(params)
-
     if (this.props.jupyter) {
+      let run_params = this.constructParams()
+      let params = {}
+      if (this.state.selectedFile === '') {
+        let spliter = {}
+        if (isEmpty(this.state.spliter)) {
+          spliter['schema'] = 'seq';
+        } else {
+          spliter = this.state.spliter
+        }
+        params = Object.assign({
+          conf: run_params,
+          project_id: this.props.project_id,
+          staging_data_set_id: this.props.dataset_id,
+        }, spliter)
+      } else {
+        params = {
+          conf: run_params,
+          project_id: this.props.project_id,
+          file_id: this.state.selectedFile,
+        }
+      }
       fetch(flaskServer + '/model/models/to_code/' + this.props.model_id, {
         method: 'post',
         headers: {
@@ -212,6 +210,27 @@ class ModelForms extends React.Component {
     } else {
       this.setState({ visible: true })
       if (!this.state.end) {
+        let run_params = this.constructParams()
+        let params = {}
+        if (this.state.selectedFile === '') {
+          let spliter = {}
+          if (isEmpty(this.state.spliter)) {
+            spliter['schema'] = 'seq';
+          } else {
+            spliter = this.state.spliter
+          }
+          params = Object.assign({
+            conf: run_params,
+            project_id: this.props.project_id,
+            staging_data_set_id: this.props.dataset_id,
+          }, spliter)
+        } else {
+          params = {
+            conf: run_params,
+            project_id: this.props.project_id,
+            file_id: this.state.selectedFile,
+          }
+        }
         let url = ''
         if (this.state.hyped) {
           url = flaskServer + '/model/models/run_hyperas_model/' + this.props.model_id
@@ -233,6 +252,8 @@ class ModelForms extends React.Component {
             this.props.modalSuccess()
             this.setState({ end: true })
           })
+      }else{
+        this.setState({ visible: true })
       }
     }
 
@@ -463,12 +484,13 @@ class ModelForms extends React.Component {
           <div>
           </div>
           {this.renderEvaluate()}
-          <Button type='primary' style={{ marginTop: 10 }} onClick={() => this.onClickRun()}>
+          <Button type='primary' style={{ marginTop: 10, width: 100 }} onClick={() => this.onClickRun()}>
             <Icon type="area-chart"/>{this.props.jupyter ? 'GetCode' : this.state.end ? 'View' : 'Run'}
           </Button>
           <br/>
           {this.state.end &&
-          <Button type='primary' style={{ marginTop: 10 }} onClick={() => this.onClickPredict()}>
+          <Button type='primary' style={{ marginTop: 10, width: 100 }} onClick={() => this.onClickPredict()}>
+            <Icon type="bulb" />
             Predict
           </Button>}
           <Modal title="Result"

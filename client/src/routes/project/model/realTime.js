@@ -1,6 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { Spin } from 'antd';
 import ReactEcharts from 'echarts-for-react'
+
+import { isEmpty } from '../../../utils/utils'
 
 let colors = ['#5793f3', '#d14a61', '#675bba']
 
@@ -26,6 +29,7 @@ export default class Curve extends React.Component {
       testAcc: [],
       testLoss: [],
       render: true,
+      spinning: true,
       ...metrics_state
     }
   }
@@ -34,8 +38,12 @@ export default class Curve extends React.Component {
   }
 
   componentWillReceiveProps (nextProps) {
+    console.log("nextProps", nextProps.data);
     if (!nextProps.end) {
       this.updateChart(nextProps.data)
+    }
+    if(!isEmpty(nextProps.data)){
+      this.setState({spinning: false});
     }
   }
 
@@ -44,7 +52,6 @@ export default class Curve extends React.Component {
   }
 
   updateChart (ioData) {
-
     let trainStep = this.state.trainStep
     let testStep = this.state.testStep
     let loss = this.state.trainLoss
@@ -210,8 +217,9 @@ export default class Curve extends React.Component {
   }
 
   renderCharts () {
-    if (this.state.render === true) {
-      return (<div>
+    if (this.state.spinning === false) {
+      return (
+        <div>
           <div style={{ marginBottom: 10}}>
             <div style={{height: 1, width: 100, backgroundColor: '#df060b'}}/>
             <span>Train</span>
@@ -246,6 +254,9 @@ export default class Curve extends React.Component {
   render () {
     return (
       <div>
+        <div>
+          <Spin size='default' spinning={this.state.spinning} tip='Train session in progress, please wait for learning curves to be visualized....'/>
+        </div>
         {
           this.renderCharts()
         }

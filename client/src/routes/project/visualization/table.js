@@ -85,7 +85,7 @@ export default (props) => {
   return (
   <div style={{width: '100%'}}>
     <Table size='default'
-                scroll={{ x: '200%' }}
+                scroll={{ x: getWidth(props) }}
                 rowKey={record => record._id}
                 columns={getColumns(props)}
                 dataSource={getData(props)}

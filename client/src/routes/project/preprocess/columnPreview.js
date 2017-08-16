@@ -82,7 +82,6 @@ class PreviewCard extends React.Component {
             {
               name: '次数',
               type : 'value',
-              min: 'dataMin',
               max: 'dataMax',
             }
           ],
