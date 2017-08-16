@@ -147,7 +147,7 @@ export default class ColumnOperations extends React.Component {
                   <div style={{float: 'right', marginTop: -20, marginRight: -20}}>
                     <Popover content={
                       <ColumnPreview stagedDs={this.state.dataSet} name={e} type={dataSet[e]}/>
-                    } title={e} trigger="click" >
+                    } style={{top: 20 }} title={e} trigger="click" >
                       <Button size="small" >
                         <span style={{fontSize: '12px'}}>VIEW</span>
                       </Button>

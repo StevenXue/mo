@@ -185,7 +185,7 @@ class ProjectDetail extends React.Component {
 
   getNotebook (content) {
     for (let i = 0; 0 < content.length; i++) {
-      if (content[i]['type'] === 'notebook') {
+      if (content[i] && content[i]['type'] === 'notebook') {
         // console.log(content[i]);
         return content[i]
       }
@@ -201,6 +201,7 @@ class ProjectDetail extends React.Component {
         // console.log(content);
         let notebook_content = {}
         if (content.length) {
+          console.log(content);
           notebook_content = this.getNotebook(content)
         }
         if (isEmpty(notebook_content)) {

@@ -41,6 +41,7 @@ class ModelForms extends React.Component {
       selectedFile: '',
       spliter: {},
       hyped: false,
+      dataset_id: ''
     }
   }
 
@@ -55,6 +56,7 @@ class ModelForms extends React.Component {
       custom: this.props.data.estimator,
       isActive: this.props.isActive,
       selectedFile: this.props.selectedFile,
+      dataset_id: this.props.dataset_id
     })
     console.log(this.props.selectedFile)
     let socket = io.connect(flaskServer + '/log/' + this.props.project_id)
@@ -81,6 +83,7 @@ class ModelForms extends React.Component {
       isActive: nextProps.isActive,
       params: nextProps.params,
       selectedFile: nextProps.selectedFile,
+      dataset_id: nextProps.dataset_id
     })
   }
 
@@ -175,9 +178,10 @@ class ModelForms extends React.Component {
 
   onClickRun () {
     if (this.props.jupyter) {
+      console.log(this.state.dataset_id);
       let run_params = this.constructParams()
       let params = {}
-      if (this.state.selectedFile === '') {
+      if (this.state.selectedFile === '' || !this.state.selectedFile) {
         let spliter = {}
         if (isEmpty(this.state.spliter)) {
           spliter['schema'] = 'seq';
@@ -187,7 +191,7 @@ class ModelForms extends React.Component {
         params = Object.assign({
           conf: run_params,
           project_id: this.props.project_id,
-          staging_data_set_id: this.props.dataset_id,
+          staging_data_set_id: this.state.dataset_id,
         }, spliter)
       } else {
         params = {
@@ -196,6 +200,7 @@ class ModelForms extends React.Component {
           file_id: this.state.selectedFile,
         }
       }
+      console.log(this.props.jupyter, params);
       fetch(flaskServer + '/model/models/to_code/' + this.props.model_id, {
         method: 'post',
         headers: {
@@ -222,7 +227,7 @@ class ModelForms extends React.Component {
           params = Object.assign({
             conf: run_params,
             project_id: this.props.project_id,
-            staging_data_set_id: this.props.dataset_id,
+            staging_data_set_id: this.state.dataset_id,
           }, spliter)
         } else {
           params = {
