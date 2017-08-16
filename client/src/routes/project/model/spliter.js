@@ -149,6 +149,7 @@ export default class Spliter extends React.Component {
     return(
       <div>
         <p style={{color: '#108ee9', marginTop: 5}}>Spliter</p>
+        <span>{'Select a portion of dataset to be training set.'}</span>
         <div>
           <span>{'Select Spliter: '}</span>
           <Select placeholder="Choose Spliter"

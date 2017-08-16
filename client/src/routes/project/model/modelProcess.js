@@ -150,15 +150,23 @@ export default class ModelProcess extends React.Component {
 
   selectTarget(value) {
     console.log(this.state.modelData.fit);
+    let previous = this.state.targetKeys;
     if(this.state.modelData.fit.data_fields.y_len_range !== null) {
-      if (value.length <= this.state.modelData.fit.data_fields.y_len_range[1] &&
-        value.length >= this.state.modelData.fit.data_fields.y_len_range[0]) {
+      if(previous.length < value.length) {
+        if (value.length <= this.state.modelData.fit.data_fields.y_len_range[1] &&
+          value.length >= this.state.modelData.fit.data_fields.y_len_range[0]) {
+          this.setState({
+            targetKeys: value,
+            divide: {'source': this.state.selectedKeys, 'target': value}
+          })
+        } else {
+          message.error("Please choose correct amount of target fields");
+        }
+      }else{
         this.setState({
           targetKeys: value,
           divide: {'source': this.state.selectedKeys, 'target': value}
         })
-      } else {
-        message.error("Please choose correct amount of target fields");
       }
     }else{
       this.setState({
