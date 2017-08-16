@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { connect } from 'dva'
 import PropTypes from 'prop-types';
 import { jupyterServer, baseUrl, flaskServer} from '../../../constants'
 import empty from './empty.ipynb';
@@ -70,6 +71,9 @@ class JupyterNotebook extends React.Component {
   }
 
   componentDidMount() {
+
+    //console.log("in jupyter"this.props.project.stagingData);
+
     this.attachChannels()
     let socket = io.connect(flaskServer+ '/log/' + this.props.project_id );
 
@@ -180,8 +184,9 @@ class JupyterNotebook extends React.Component {
 
   onSelectDataSet (values) {
     console.log(values);
-    let selected = this.state.data_set.filter((el) => el._id === values);
+    let selected = this.props.project.stagingData.filter((el) => el._id === values);
     let selectedName = selected[0].name;
+    console.log(values, selectedName);
     this.setState({ selectedData: values, selectedDataName: selectedName, loading: true })
     fetch(flaskServer + '/staging_data/staging_data_sets/' + values, {
       method: 'get',
@@ -190,9 +195,7 @@ class JupyterNotebook extends React.Component {
       },
     }).then((response) => response.json())
       .then((res) => {
-          //console.log(res, selectedName, values);
-          let c = Object.keys(res.response.data[1]);
-          this.setState({columns: c, loading: false});
+          this.setState({columns: res.response.columns, loading: false});
         },
       )
       .catch((err) => console.log('Error: /staging_data/staging_data_sets/fields', err))
@@ -336,25 +339,27 @@ class JupyterNotebook extends React.Component {
                    visible={this.state.visible}
                    onOk={() => this.setState({visible: false})}
                    onCancel={() => this.setState({visible: false})}>
-              <span style={{color: '#108ee9', marginLeft: 10}}>Choose Data</span>
+              <span style={{color: '#108ee9', marginLeft: 20}}>Choose Data</span>
               <Select className="dataset-select"
-                      style={{ width: 150, marginTop: 10, marginLeft: 10}}
+                      style={{ width: 150, marginTop: 10, marginLeft: 20}}
                       onChange={(values) => this.onSelectDataSet(values)}
                       value={this.state.selectedData}
                       placeholder="Choose Data"
                       allowClear>
                 {
-                  !isEmpty(this.state.data_set) && this.state.data_set.map((e) =>
+                  this.props.project.stagingData.map((e) =>
                     <Select.Option value={e._id} key={e._id}>
                       {e.name}
                     </Select.Option>
                   )
                 }
               </Select>
+              <div style={{height: 1, width: '80%', background: '#108ee9', margin: 20}} />
               <Spin spinning={this.state.loading}>
                 <Model style={{width: 1000, height: 450}}
                        project_id={this.props.project_id}
                        dataset_id={this.state.selectedData}
+                       isActive={true}
                        cols={this.state.columns}
                        jupyter={true}
                        getCode={(code) => this.onReceiveCode(code)}/>
@@ -384,4 +389,4 @@ JupyterNotebook.propTypes = {
   notebook_name: PropTypes.string
 }
 
-export default JupyterNotebook
+export default connect(({ project }) => ({ project }))(JupyterNotebook)

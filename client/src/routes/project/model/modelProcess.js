@@ -108,13 +108,13 @@ export default class ModelProcess extends React.Component {
   }
 
   checkIfFile(props){
-    console.log(props.selectedFile);
-    if(props.selectedFile !== '' || props.dataset_id === ''){
+    console.log(props.selectedFile, props.dataset_id);
+    if(props.selectedFile && props.selectedFile !== ''){
       let models = this.state.allModels;
       models = models.filter((e) => e.category === 4);
       models = models.map((e) => ({'name': e.name, '_id': e._id}));
       this.setState({models, isImage: true, selectedFile: props.selectedFile});
-    }else{
+    }else if(props.dataset_id && props.dataset_id !== '' ){
       let models = this.state.allModels;
       models = models.filter((e) => e.category !== 4);
       models = models.map((e) => ({'name': e.name, '_id': e._id}));
