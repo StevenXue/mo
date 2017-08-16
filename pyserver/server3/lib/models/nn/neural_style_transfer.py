@@ -7,8 +7,10 @@ import time
 from keras.applications import vgg19
 from keras import backend as K
 
+from server3.service import logger_service
 
-def neural_style_transfer(args):
+
+def neural_style_transfer(args, project_id, file_url):
     # Path to the image to transform.
     base_image_path = args.get('base_image_path')
     # Path to the style reference image.
@@ -214,7 +216,7 @@ def neural_style_transfer(args):
     #  image
     # so as to minimize the neural style loss
     x = preprocess_image(base_image_path)
-
+    url = ''
     for i in range(iterations):
         print('Start of iteration', i)
         start_time = time.time()
@@ -226,14 +228,25 @@ def neural_style_transfer(args):
         fname = result_prefix + '_at_iteration_%d.png' % i
         imsave(fname, img)
         end_time = time.time()
+        url = file_url + 'result_at_iteration_{}.png?predict=true'.format(i)
+        logger_service.emit_message({
+            'url': url,
+            'n': i
+        }, project_id)
         print('Image saved as', fname)
         print('Iteration %d completed in %ds' % (i, end_time - start_time))
-
-
-args = {
-    'base_image_path': './neural_style_transfer/base_img/base.jpg',
-    'style_reference_image_path': './neural_style_transfer/style_img/style.jpg',
-    'result_prefix': './neural_style_transfer/result/result',
+    return {
+        'url': url,
+        'n': iterations
     }
 
-neural_style_transfer(args)
+# args = {
+#     'base_image_path': '../../../../user_directory/user_0607/predict_data'
+#                        '/artwork'
+#                        '-deathwing6-full.jpg',
+#     'style_reference_image_path':
+#         '../../../../user_directory/user_0607/predict_data/xzdw.jpg',
+#     'result_prefix': '../../../../user_directory/user_0607/predict_data/',
+# }
+#
+# neural_style_transfer(args, '', '')

@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 import os
 import csv
-import io
 import zipfile
 
 import pandas as pd
@@ -12,6 +11,7 @@ from server3.business import ownership_business
 from server3.service import ownership_service
 from server3.repository import config
 from server3.constants import ALLOWED_EXTENSIONS
+from server3.constants import PREDICT_FOLDER
 from server3.utility import str_utility
 from server3.utility import json_utility
 
@@ -21,7 +21,7 @@ PASSED_FILES = ['__MACOSX', '.DS_Store']
 
 
 def add_file(file, url_base, user_ID, is_private=False, description='',
-             type='table'):
+             type='table', predict=False):
     """
     add file by all file attributes
     :param file: file instance
@@ -29,6 +29,8 @@ def add_file(file, url_base, user_ID, is_private=False, description='',
     :param user_ID: user_ID
     :param is_private: true or false
     :param description: description of file
+    :param type:
+    :param predict:
     :return:
     """
     if not user_ID:
@@ -37,20 +39,30 @@ def add_file(file, url_base, user_ID, is_private=False, description='',
     user = user_business.get_by_user_ID(user_ID)
     if not user:
         raise NameError('no user found')
+
     save_directory = UPLOAD_FOLDER + user.user_ID + '/'
+    file_url = url_base + user.user_ID + '/'
+    if predict:
+        save_directory += PREDICT_FOLDER
+
     # TODO need to be undo when failed
     filename_array = file.filename.rsplit('.', 1)
     extension = filename_array[1].lower()
     if extension == 'zip':
         file_size, file_uri, folder_name = \
             extract_files_and_get_size(file, save_directory)
-        file_url = url_base + user.user_ID + '/' + folder_name
+        file_url += folder_name
     else:
         file_size, file_uri = save_file_and_get_size(file, save_directory)
-        file_url = url_base + user.user_ID + '/' + file.filename
+        file_url += file.filename
 
+    if predict:
+        file_url += '?predict=true'
+
+    # create file entity in database
     saved_file = file_business.add(file.filename, file_size, file_url,
-                                   file_uri, description, extension, type)
+                                   file_uri, description, extension, type,
+                                   predict=predict)
     if saved_file:
         if not ownership_business.add(user, is_private,
                                       file=saved_file):
@@ -75,12 +87,29 @@ def remove_file_by_id(file_id):
     return file_business.remove_by_id(file_id)
 
 
-def list_file_by_extension(user_ID, extension=None, order=-1):
+# TODO 优化逻辑
+def list_file_by_extension(user_ID, extension=None, predict=False, order=-1):
     public_files, owned_files = list_files_by_user_ID(user_ID, order)
     if extension:
-        public_files = [pf for pf in public_files if pf.extension == extension]
-        owned_files = [of for of in owned_files if of.extension == extension]
+        public_files = [pf for pf in public_files
+                        if pf.extension == extension and
+                        check_predict(pf, 'predict', predict)]
+        owned_files = [of for of in owned_files
+                       if of.extension == extension and
+                       check_predict(of, 'predict', predict)]
+    else:
+        public_files = [pf for pf in public_files
+                        if check_predict(pf, 'predict', predict)]
+        owned_files = [of for of in owned_files
+                       if check_predict(of, 'predict', predict)]
     return public_files, owned_files
+
+
+def check_predict(o, attr, value):
+    predict = False
+    if hasattr(o, attr) and o[attr] is True:
+        predict = True
+    return value is predict
 
 
 def list_files_by_user_ID(user_ID, order=-1):

@@ -31,6 +31,7 @@ module.exports = {
     fork : '/project/fork',
     toolkits: '/toolkit/toolkits/public',
     // projectCreate: '/project/create_project',
-    getDataFields: '/data/data_sets/fields'
+    getDataFields: '/data/data_sets/fields',
+    neuralStyle: '/model/neural_style'
   },
 }

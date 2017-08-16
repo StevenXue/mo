@@ -68,12 +68,14 @@ def mlp_main(result_sds, project_id, result_dir, x_train, y_train, x_val, y_val,
     #                                        save_best_only=True)
     best_checkpoint = ModelCheckpoint(
         result_dir + 'best.hdf5',
+        save_weights_only=True,
         verbose=1, save_best_only=True)
     # checkpoint to save latest weight
     # general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
     #                                           verbose=0)
     general_checkpoint = ModelCheckpoint(
         result_dir + 'latest.hdf5',
+        save_weights_only=True,
         verbose=1)
 
     # training
@@ -91,7 +93,10 @@ def mlp_main(result_sds, project_id, result_dir, x_train, y_train, x_val, y_val,
                                  model_config=config,
                                  score=score,
                                  history=history.history)
-    model.save(result_dir + 'final.hdf5')
+    model.save_weights(result_dir + 'final.hdf5')
+    with open(result_dir + 'model.json', 'w') as f:
+        f.write(model.to_json())
+
     return {'score': score, 'history': history.history}
 
 
