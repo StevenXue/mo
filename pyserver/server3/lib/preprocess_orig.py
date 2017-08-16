@@ -91,6 +91,10 @@ def get_dummy(arr0, index):
     return result
 
 
+def str_to_categories(arr0, index):
+    pass
+
+
 # FIXME
 def pandas_cut(arr0, index, bins, labels=False):
     labels = False if labels == [""] else labels
