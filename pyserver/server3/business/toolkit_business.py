@@ -1596,29 +1596,7 @@ def create_public_data_process():
                           'required': True,
                           'len_range': [2, None],
                           'data_type': ['int', 'float']
-                      },
-                      "args": [
-                          {
-                              'name': 'alpha',
-                              'type': {
-                                  'key': 'float',
-                                  'des': 'the number of clustering numbers',
-                                  'range': [0, 1]
-                              },
-                              'default': 0.6,
-                              'required': False
-                          },
-                          {
-                              'name': 'c',
-                              'type': {
-                                  'key': 'int',
-                                  'des': 'the number of clustering numbers',
-                                  'range': [0, 15]
-                              },
-                              'default': 15,
-                              'required': False
-                          }
-                      ]
+                      }
                   },
                   result_spec={
                       "if_reserved": False,
