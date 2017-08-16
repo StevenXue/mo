@@ -126,7 +126,6 @@ class PreviewCard extends React.Component {
           },
           yAxis: [{
             type: 'value',
-            name: '假设分布',
             min: 'dataMin',
             max: 'dataMax',
             position: 'left',
