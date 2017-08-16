@@ -123,12 +123,12 @@ def image_classifier_vgg16(conf, input, **kw):
                                                   epoch, logs,
                                                   result_sds,
                                                   project_id),
-                                              # on_batch_end=
-                                              # lambda batch, logs:
-                                              # logger_service.log_batch_end(
-                                              #     batch, logs,
-                                              #     result_sds,
-                                              #     project_id)
+                                              on_batch_end=
+                                              lambda batch, logs:
+                                              logger_service.log_batch_end(
+                                                  batch, logs,
+                                                  result_sds,
+                                                  project_id)
                                               )
 
         # checkpoint to save best weight

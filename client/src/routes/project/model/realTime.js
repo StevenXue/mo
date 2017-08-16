@@ -7,7 +7,7 @@ import { isEmpty } from '../../../utils/utils'
 
 let colors = ['#5793f3', '#050806', '#df060b', '#675bba']
 
-let metircs = ['acc', 'precision', 'recall']
+let metircs = ['loss', 'acc', 'precision', 'recall']
 
 export default class Curve extends React.Component {
   static propTypes = {
@@ -28,6 +28,7 @@ export default class Curve extends React.Component {
       val_loss: [],
       render: true,
       spinning: true,
+      // batch: 0/0,
       ...metrics_state
     }
   }
@@ -75,6 +76,7 @@ export default class Curve extends React.Component {
         }
       }
     }
+    ioData.batch && (this.state.batch = ioData.batch)
     this.setState({
       trainStep,
       loss,
@@ -186,12 +188,8 @@ export default class Curve extends React.Component {
             <div style={{ height: 1, width: 100, backgroundColor: '#050806' }}/>
             <span>Test</span>
           </div>
-          <ReactEcharts
-            lazyUpdate={true}
-            notMerge={true}
-            animation={false}
-            option={this.getOptionMetric('loss')}
-          />
+          {this.state.batch &&
+          <h4>{this.state.batch}</h4>}
           {metircs.map((metric) => {
             if (this.state[metric].length > 0 || this.state['val_' + metric].length > 0) {
               console.log(metric, this.state[metric])

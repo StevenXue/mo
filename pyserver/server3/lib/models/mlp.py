@@ -61,6 +61,12 @@ def mlp_main(result_sds, project_id, result_dir, x_train, y_train, x_val, y_val,
                                           logger_service.log_epoch_end(
                                               epoch, logs,
                                               result_sds,
+                                              project_id),
+                                          on_batch_end=
+                                          lambda batch, logs:
+                                          logger_service.log_batch_end(
+                                              batch, logs,
+                                              result_sds,
                                               project_id))
 
     # checkpoint to save best weight
