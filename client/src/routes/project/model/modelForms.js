@@ -252,7 +252,8 @@ class ModelForms extends React.Component {
           .then((res) => {
             if (res.response === 'success') {
               message.success(res.response)
-              this.setState({ score: res.response.score })
+              this.setState({ score: res.response.score,
+              jobId: res.response.job_id})
             }
             this.props.modalSuccess()
             this.setState({ end: true })
@@ -461,12 +462,22 @@ class ModelForms extends React.Component {
   }
 
   onClickPredict () {
-    let run_params = this.props.params || this.constructParams()
-    this.props.dispatch({ type: 'project/setActiveKey', payload: '5' })
+    let run_params = this.props.params
+    this.props.dispatch({ type: 'project/setActiveKey', payload: [...this.props.project.activeKeys, '5'] })
+    let predictModelType
+    let predictJobId
+    if (run_params) {
+      predictModelType = run_params.model.category
+      predictJobId = run_params._id
+    } else {
+      // run_params =  this.constructParams()
+      predictModelType = this.props.model_type
+      predictJobId = this.state.jobId
+    }
     this.props.dispatch({
       type: 'project/setPredictInfo', payload: {
-        predictModelType: run_params.model.category,
-        predictJobId: run_params._id,
+        predictModelType,
+        predictJobId,
       },
     })
   }
