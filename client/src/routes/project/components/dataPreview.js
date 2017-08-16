@@ -41,18 +41,24 @@ class DataPreview extends React.Component {
     this.props.dispatch({ type: 'project/toStagingData', payload: body});
   }
 
+  getWidth(columns){
+    return 100 * columns.length
+  }
+
   render() {
     let dsColumns;
     if(this.props.dataSet.length > 0) {
-      dsColumns = Object.keys(this.props.dataSet[0])
-        .filter((el) => el !== 'data_set')
-        .map((e) => ({
-            title: <div>{e}</div>,
-            width: 200,
-            dataIndex: e,
-            key: e
-          })
-        )
+      dsColumns = Object.keys(this.props.dataSet[0]).filter((el) => el !== 'data_set');
+      dsColumns = dsColumns.filter((el) => el!== "_id");
+      dsColumns = dsColumns.filter((el) => el!== 'staging_dataset_id')
+      dsColumns = dsColumns.map((e) => ({
+          title: <div>{e}</div>,
+          width: 100,
+          dataIndex: e,
+          key: e
+        })
+      )
+
     }
     return(
       <div>
@@ -62,7 +68,7 @@ class DataPreview extends React.Component {
           <Table style={{marginTop: 5, width: '100%'}}
                  dataSource={this.props.dataSet}
                  columns={dsColumns}
-                 scroll={{x: '200%', y: '100%'}}/>
+                 scroll={{x: this.getWidth(dsColumns), y: '100%'}}/>
           <div style={{marginBottom: 10, width: 200, marginLeft: 20}}>
             <Input placeholder="enter statge data name"
                    id="stage_data_name"
