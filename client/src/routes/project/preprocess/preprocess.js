@@ -1,11 +1,11 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
-import { Button, message, Table, Radio, Input, Collapse, Select, Tabs, Spin, Modal, Popover} from 'antd';
+import { Button, Collapse, message, Modal, Select, Spin, Table, Tabs } from 'antd'
 import { flaskServer } from '../../../constants'
-import ColumnOperations from './columnOperation';
-import FillMissing from './fillMissing';
+//import { filterId } from '../../../utils/utils'
+import ColumnOperations from './columnOperation'
+import FillMissing from './fillMissing'
 
 const Panel = Collapse.Panel;
 const TabPane = Tabs.TabPane;
@@ -84,9 +84,6 @@ class Preprocess extends React.Component{
       });
 
       console.log('missing_dict', missing_dict);
-
-      //console.log("row", original.data_array_filled, "raw_missing", original.missing, "missing_dict", missing_dict);
-
       message.success('calculation finished');
 
     }
@@ -94,29 +91,35 @@ class Preprocess extends React.Component{
 
 
   openPreview(){
-    this.setState({loading: true});
-    fetch(flaskServer + '/staging_data/staging_data_sets/' + this.state.dataSet, {
-      method: 'get'
-    }).then((response) => response.json())
-      .then((res) => {
-        let preview = res.response.data;
-        let cols = Object.keys(preview[0])
-          .filter((el) => el !== 'data_set')
-          .map((e) => ({
-              title: <div>{e}</div>,
-              width: 200,
-              height: 50,
-              dataIndex: e,
-              key: e,
-            })
-          );
-        this.setState({
-          previewDs: preview,
-          previewCols:cols,
-          visible: true,
-          loading: false
-        });
-      })
+    if(this.state.dataSet !== '') {
+      this.setState({loading: true});
+      fetch(flaskServer + '/staging_data/staging_data_sets/' + this.state.dataSet, {
+        method: 'get'
+      }).then((response) => response.json())
+        .then((res) => {
+          let preview = res.response.data;
+          //console.log(filterId(preview))
+          let cols = Object.keys(preview[0])
+            .filter((el) => el !== '_id')
+          cols = cols.filter((el) =>  el !== 'staging_data_set')
+          //console.log(cols)
+          let previewCols = cols.map((e) => ({
+                title: <div>{e}</div>,
+                width: 200,
+                dataIndex: e,
+                key: e,
+              })
+            );
+          this.setState({
+            previewDs: preview,
+            previewCols: previewCols,
+            visible: true,
+            loading: false
+          });
+        })
+    }else{
+      message.error('please select staging datadet to preview');
+    }
   }
 
   onSelectDataSet(value){
@@ -209,15 +212,16 @@ class Preprocess extends React.Component{
         <div style={{marginLeft: 20, marginTop: 20, display: 'flex', flexDirection: 'row'}}>
           <Button onClick={() => this.openPreview()}>PREVIEW</Button>
           <Modal title="Staged Data Preview"
-                  width="1000"
-                  visible={this.state.visible}
-                  onOk={() => this.setState({visible: false})}
-                  onCancel={() => this.setState({visible: false})}
-                  >
-                  <Table style={{marginTop: -20, width: '100%'}}
-                         dataSource={this.state.previewDs}
-                         columns={this.state.previewCols}
-                         scroll={{x: '200%', y: '100%'}}/>
+                 width={1000}
+                 visible={this.state.visible}
+                 onOk={() => this.setState({visible: false})}
+                 onCancel={() => this.setState({visible: false})}
+          >
+            <Table style={{marginTop: -20}}
+                   rowKey={record => record._id}
+                   dataSource={this.state.previewDs}
+                   columns={this.state.previewCols}
+                   scroll={{x: 100 * this.state.previewCols.length}}/>
           </Modal>
         </div>
       </div>

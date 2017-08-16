@@ -8,7 +8,10 @@ import style from './table.css';
 
 const getColumns = (props) => {
   let line = props.data.table[0];
-  let Columns = Object.keys(line).map((e) => {
+  let cols = Object.keys(line)
+  cols = cols.filter((el) => el !== '_id')
+  cols = cols.filter((el) => el !== 'staging_data_set')
+  let Columns = cols.map((e) => {
         if (props.data.X_fields.indexOf(e) !== -1) {
           if (props.data.labels[props.data.X_fields.indexOf(e)]) {
             return ({
