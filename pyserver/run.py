@@ -25,8 +25,8 @@ from server3.route import model_route
 from server3.route import visualization_route
 from server3.repository import config
 from server3.utility import json_utility
+from server3.constants import PORT
 
-# from server3.sio import socketio
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
@@ -38,6 +38,7 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
 
 socketio = SocketIO(app,
                     logger=True,
+                    ping_timeout=600,
                     engineio_logger=True,
                     async_mode='eventlet',
                     message_queue='redis://')
@@ -90,4 +91,4 @@ app.register_blueprint(monitor_route.monitor_app)
 app.register_blueprint(visualization_route.visualization_app)
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    socketio.run(app, host='0.0.0.0', port=PORT, debug=True)

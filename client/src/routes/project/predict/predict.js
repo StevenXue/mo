@@ -5,7 +5,7 @@ import { Button, message, Table, Radio, Input, Collapse, Select, Tabs, Spin, Mod
 import debounce from 'lodash/debounce'
 
 import { flaskServer } from '../../../constants'
-import * as utils from '../../upload/components/utils'
+import * as utils from '../../../utils/utils_keras'
 import './predict.less'
 
 class Predict extends React.Component {
@@ -23,10 +23,6 @@ class Predict extends React.Component {
       this.getIntermediateResults()
     })
   }
-
-  // componentDidUpdate (prevProps, prevState) {
-  //   if()
-  // }
 
   clear = () => {
     this.clearIntermediateResults()
@@ -196,10 +192,10 @@ class Predict extends React.Component {
 
   render () {
     let predict = this.props.predict
-    let loadingProgress = () => {
+    const loadingProgress = () => {
       return predict.model.getLoadingProgress()
     }
-    let predictedClass = () => {
+    const predictedClass = () => {
       if (predict.output.reduce((a, b) => a + b, 0) === 0) {
         return -1
       }

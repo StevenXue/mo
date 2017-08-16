@@ -54,7 +54,7 @@ class AutomatedModel extends React.Component {
   }
 
   componentDidMount () {
-    this.props.dispatch({ type: 'project/listFiles' })
+    this.props.dispatch({ type: 'project/listFiles', payload: {extension: 'zip'} })
 
     fetch(flaskServer + '/project/jobs/' + this.props.project_id + '?categories=model', {
       method: 'get',

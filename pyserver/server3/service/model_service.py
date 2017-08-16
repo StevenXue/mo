@@ -10,6 +10,7 @@
 """
 import inspect
 import os
+import sys
 
 import numpy as np
 import pandas as pd
@@ -24,6 +25,7 @@ from server3.business import staging_data_business
 from server3.business import project_business
 from server3.business import job_business
 from server3.repository import config
+from server3 import encoder as keras_encoder
 
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 # user_directory = 'user_directory/'
@@ -430,7 +432,7 @@ def manage_folder_input_to_str(conf, file_id, **kwargs):
     return code_str
 
 
-def get_results_by_job_id_and_user_ID(job_id, checkpoint='final'):
+def get_results_dir_by_job_id(job_id, checkpoint='final'):
     """
 
     :param job_id:
@@ -442,9 +444,16 @@ def get_results_by_job_id_and_user_ID(job_id, checkpoint='final'):
     ownership = ownership_business.get_ownership_by_owned_item(project,
                                                                'project')
     user_ID = ownership.user.user_ID
-    result_dir = '{}{}/{}/{}/{}.hdf5'.format(user_directory, user_ID,
-                                             project_name, job_id, checkpoint)
-    return result_dir
+    result_dir = '{}{}/{}/{}/'.format(user_directory, user_ID,
+                                             project_name, job_id)
+    filename = '{}.hdf5'.format(checkpoint)
+    return result_dir, filename
+
+
+def encode_h5_for_keras_js(weights_hdf5_filepath):
+    encoder = keras_encoder.Encoder(weights_hdf5_filepath)
+    encoder.serialize()
+    encoder.save()
 
 
 # ------------------------------ temp function ------------------------------e

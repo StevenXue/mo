@@ -1,4 +1,5 @@
 @import '../../../variables.css';
+
 :global {
   .demo.mnist-cnn {
     & .column {
@@ -150,6 +151,298 @@
           }
         }
       }
+    }
+  }
+
+  .demo.inception-v3 {
+    & .top-container {
+      margin: 10px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      & .input-container {
+        & .input-label {
+          font-family: var(--font-cursive);
+          font-size: 16px;
+          color: var(--color-lightgray);
+          text-align: left;
+          user-select: none;
+          cursor: default;
+        }
+
+        & .image-url {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: flex-start;
+          position: relative;
+
+          & span {
+            margin: 0 10px;
+            font-family: var(--font-cursive);
+            font-size: 16px;
+            color: var(--color-lightgray);
+          }
+        }
+      }
+
+      & .controls {
+        width: 250px;
+        margin-left: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        & .mdl-switch {
+          margin-bottom: 5px;
+        }
+      }
+    }
+
+    & .columns.input-output {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+
+      & .column {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      & .column.input-column {
+        position: relative;
+
+        & .loading-indicator {
+          position: absolute;
+          top: 0;
+          left: -10px;
+          display: flex;
+          flex-direction: column;
+          align-self: flex-start;
+
+          & .mdl-spinner {
+            margin: 20px;
+            align-self: center;
+          }
+
+          & .error {
+            color: var(--color-error);
+            font-size: 14px;
+            font-family: var(--font-sans-serif);
+            margin: 20px;
+          }
+        }
+
+        & .canvas-container {
+          display: inline-flex;
+          justify-content: flex-end;
+
+          & canvas {
+            background: whitesmoke;
+          }
+        }
+      }
+
+      & .column.output-column {
+        & .output {
+          width: 370px;
+          height: 160px;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          justify-content: center;
+
+          & .output-class {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 0;
+
+            & .output-label {
+              text-align: right;
+              width: 200px;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              font-family: var(--font-monospace);
+              font-size: 18px;
+              color: var(--color-lightgray);
+              padding: 0 6px;
+              border-right: 2px solid var(--color-green-lighter);
+            }
+
+            & .output-bar {
+              height: 8px;
+              transition: width 0.2s ease-out;
+            }
+
+            & .output-value {
+              text-align: left;
+              margin-left: 5px;
+              font-family: var(--font-monospace);
+              font-size: 14px;
+              color: var(--color-lightgray);
+            }
+          }
+
+          & .output-class.predicted {
+            & .output-label {
+              color: var(--color-green);
+              border-left-color: var(--color-green);
+            }
+
+            & .output-value {
+              color: var(--color-green);
+            }
+          }
+        }
+      }
+    }
+
+    & .architecture-container {
+      min-width: 800px;
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+
+      & .layers-row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 5px;
+        position: relative;
+        z-index: 1;
+
+        & .layer-column {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 5px;
+
+          & .layer {
+            display: inline-block;
+            background: whitesmoke;
+            border: 2px solid whitesmoke;
+            border-radius: 5px;
+            padding: 2px 10px 0px;
+            margin: 3px;
+
+            & .layer-class-name {
+              color: var(--color-green);
+              font-size: 14px;
+              font-weight: bold;
+            }
+
+            & .layer-details {
+              color: #999999;
+              font-size: 12px;
+              font-weight: bold;
+            }
+          }
+
+          & .layer.has-result {
+            border-color: var(--color-green);
+          }
+        }
+      }
+
+      & .architecture-connections {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 0;
+
+        & path {
+          stroke-width: 4px;
+          stroke: #AAAAAA;
+          fill: none;
+        }
+      }
+    }
+  }
+
+  .demo.neural-style {
+    & .title {
+      text-align: center;
+    }
+    & .top-container {
+      margin: 10px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      & .input-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+      /* tile uploaded pictures */
+      & .upload-list-inline .ant-upload-list-item {
+        float: left;
+        width: 200px;
+        margin-right: 8px;
+      }
+      & .upload-list-inline .ant-upload-animate-enter {
+        animation-name: uploadAnimateInlineIn;
+      }
+      & .upload-list-inline .ant-upload-animate-leave {
+        animation-name: uploadAnimateInlineOut;
+      }
+    }
+    & .predict-container {
+      max-width: 800px;
+      margin: 20px auto;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      & .plus-icon {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding-top: 28px;
+        font-size: 40px;
+        margin: 0 40px;
+      }
+      & .predict-half-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 50%;
+      }
+      & .predict-image {
+        width: 100%;
+        max-height: 100%;
+      }
+    }
+    & .image-container {
+      margin: 20px 0;
+      width: 400px;
+      height: 400px;
+      border: dashed 2px lightgrey;
+      border-radius: 5px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 5px;
+    }
+    & .output-image-container {
+      width: 600px;
+      height: 600px;
+    }
+    & .output-image {
+      width: 100%;
+      max-height: 100%;
     }
   }
 }

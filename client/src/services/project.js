@@ -1,7 +1,8 @@
-import { request, config } from '../utils';
-import { jupyterServer } from '../constants';
-const { api, CORS } = config;
-const { dataSets, projects, getDataFields, publish, fork, files, getStagingData, toolkits} = api;
+import { request, config } from '../utils'
+import { jupyterServer } from '../constants'
+
+const { api, CORS } = config
+const { dataSets, projects, getDataFields, publish, fork, files, getStagingData, neuralStyle, toolkits } = api
 
 export async function query (user_ID) {
   let query = `?user_ID=${user_ID}`
@@ -13,7 +14,7 @@ export async function query (user_ID) {
 
 export async function publishProject (project_id) {
   return request({
-    url: CORS + publish +"/" +project_id,
+    url: CORS + publish + '/' + project_id,
     method: 'put',
   })
 }
@@ -26,7 +27,7 @@ export async function listToolkits () {
 }
 
 export async function getStagedData (project_id) {
-  let query = `?project_id=${project_id}`;
+  let query = `?project_id=${project_id}`
   return request({
     url: CORS + getStagingData + query,
     method: 'get',
@@ -37,16 +38,15 @@ export async function convertToStaging (data) {
   return request({
     url: CORS + getStagingData,
     method: 'post',
-    data
+    data,
   })
 }
 
-
 export async function forkProject (project_id, user_Id) {
-  let query = `?user_ID=${user_Id}`;
-  console.log(query);
+  let query = `?user_ID=${user_Id}`
+  console.log(query)
   return request({
-    url: CORS + fork +"/" +project_id + query,
+    url: CORS + fork + '/' + project_id + query,
     method: 'post',
   })
 }
@@ -74,9 +74,11 @@ export async function listDataSets (user_ID) {
   })
 }
 
-export async function listFiles (user_ID) {
-  let query = `?user_ID=${user_ID}&extension=zip`
-  console.log("files", query);
+export async function listFiles (user_ID, extension, predict) {
+  let query = `?user_ID=${user_ID}&predict=${predict}`
+  if (extension) {
+    query += `&extension=${extension}`
+  }
   return request({
     url: CORS + files + query,
     method: 'get',
@@ -87,5 +89,13 @@ export async function listDataFields (data_set_id) {
   return request({
     url: CORS + getDataFields + '/' + data_set_id,
     method: 'get',
+  })
+}
+
+export async function predictNeuralStyle (data) {
+  return request({
+    url: CORS + neuralStyle,
+    method: 'post',
+    data,
   })
 }
