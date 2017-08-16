@@ -85,8 +85,8 @@ def polynomial_features(arr0, index):
 
 # 返回get dummy的值
 def get_dummy(arr0, index):
-    series = pd.DataFrame(arr0)
-    value = pd.get_dummies(series).values
+    # series = pd.DataFrame(arr0)
+    value = pd.get_dummies(arr0).values
     result = data_utility.retrieve_nan_index(value.tolist(), index)
     return result
 
