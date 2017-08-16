@@ -44,7 +44,6 @@ class Preprocess extends React.Component{
     let original = data;
     console.log(fields);
     if(original) {
-      message.loading('Please wait while we find out the missing values for you. \n This may take more than 1 minute, please DO NOT refresh page', 3);
       let columns = Object.keys(fields);
       let missing_id = Object.keys(original.missing);
       let missing_dict = {};
@@ -98,11 +97,9 @@ class Preprocess extends React.Component{
       }).then((response) => response.json())
         .then((res) => {
           let preview = res.response.data;
-          //console.log(filterId(preview))
           let cols = Object.keys(preview[0])
             .filter((el) => el !== '_id')
           cols = cols.filter((el) =>  el !== 'staging_data_set')
-          //console.log(cols)
           let previewCols = cols.map((e) => ({
                 title: <div>{e}</div>,
                 width: 200,
@@ -124,6 +121,7 @@ class Preprocess extends React.Component{
 
   onSelectDataSet(value){
     this.setState({dataSet: value, loading: true});
+    message.loading('Please wait while we find out the missing values for you. \n This may take more than 1 minute, please DO NOT refresh page', 3);
     fetch(flaskServer + '/staging_data/staging_data_sets/fields?staging_data_set_id=' + value, {
       method: 'get',
       headers: {
