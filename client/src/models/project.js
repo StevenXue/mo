@@ -13,6 +13,7 @@ import {
   getStagedData,
   convertToStaging,
   predictNeuralStyle,
+  listToolkits
 } from '../services/project'
 
 export default {
