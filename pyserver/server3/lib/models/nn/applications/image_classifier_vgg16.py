@@ -4,6 +4,7 @@ import os
 from keras import applications
 from keras import backend as K
 from keras.callbacks import LambdaCallback
+from keras.callbacks import ModelCheckpoint
 from keras.layers import Dropout, Flatten, Dense
 from keras.models import Model
 from keras.preprocessing.image import ImageDataGenerator
@@ -27,6 +28,7 @@ def image_classifier_vgg16(conf, input, **kw):
     # extract kw
     result_sds = kw.pop('result_sds', None)
     project_id = kw.pop('project_id', None)
+    result_dir = kw.pop('result_dir', None)
     # extract input
     train_data_dir = input['train_data_dir']
     validation_data_dir = input['validation_data_dir']
@@ -120,21 +122,38 @@ def image_classifier_vgg16(conf, input, **kw):
                                               logger_service.log_epoch_end(
                                                   epoch, logs,
                                                   result_sds,
-                                                  project_id))
+                                                  project_id),
+                                              # on_batch_end=
+                                              # lambda batch, logs:
+                                              # logger_service.log_batch_end(
+                                              #     batch, logs,
+                                              #     result_sds,
+                                              #     project_id)
+                                              )
+
         # checkpoint to save best weight
-        best_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
-                                               verbose=0,
-                                               save_best_only=True)
+        # best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,
+        #                                        save_best_only=True)
+        best_checkpoint = ModelCheckpoint(
+            result_dir + 'best.hdf5',
+            save_weights_only=True,
+            verbose=1, save_best_only=True)
         # checkpoint to save latest weight
-        general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
-                                                  verbose=0)
+        # general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
+        #                                           verbose=0)
+        general_checkpoint = ModelCheckpoint(
+            result_dir + 'latest.hdf5',
+            save_weights_only=True,
+            verbose=1)
+
         history = model.fit_generator(
             train_generator,
             steps_per_epoch=nb_train_samples // batch_size,
             epochs=epochs,
             validation_data=validation_generator,
             validation_steps=nb_validation_samples // batch_size,
-            callbacks=[batch_print_callback],
+            callbacks=[batch_print_callback, best_checkpoint,
+                       general_checkpoint],
         )
         # model.save_weights('first_try.h5')
         config = model.get_config()
@@ -142,6 +161,11 @@ def image_classifier_vgg16(conf, input, **kw):
                                      model_config=config,
                                      # score=score,
                                      history=history.history)
+
+        model.save_weights(result_dir + 'final.hdf5')
+        with open(result_dir + 'model.json', 'w') as f:
+            f.write(model.to_json())
+
         return {'history': history.history}
 
 

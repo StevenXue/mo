@@ -5,12 +5,29 @@ from flask_socketio import SocketIO
 # from sio import socketio
 from server3.business import staging_data_business
 from server3.business import staging_data_set_business
+from server3.utility import json_utility
+
+socketio = SocketIO(message_queue='redis://')
+
+# epoch = 0
 
 
 def log_epoch_end(*args):
+    # global epoch
+    # epoch = epoch + 1
     print(args)
     save_log('epoch', *args)
     emit_log('epoch', *args)
+
+
+def log_batch_end(*args):
+    pass
+    # global epoch
+    # args = list(args)
+    # args = json_utility.convert_to_json(args)
+    # args[0] = '{}/{}'.format(epoch, args[0])
+    # print(*args)
+    # emit_log('batch', *args)
 
 
 def log_train_end(*args, **kw):
@@ -30,10 +47,19 @@ def save_log_fn(event, n, logs, result_sds, project_id):
 def emit_log(event, n, logs, result_sds, project_id):
     kw = {'n': n, 'event': event}
     kw.update(logs)
-    # add sds id to namespace
-    socketio = SocketIO(message_queue='redis://')
     socketio.emit('log_epoch_end', kw, namespace='/log/%s' % project_id)
-    # print('send by socket', n, logs)
+
+
+# def emit_log(event, n, logs, result_sds, project_id):
+#     eventlet.spawn_n(emit_log_fn, event, n, logs, result_sds, project_id)
+
+
+def emit_message(message, project_id):
+    socketio.emit('send_message', message, namespace='/log/%s' % project_id)
+
+
+# def emit_message(message, project_id):
+#     eventlet.spawn_n(emit_message_fn, message, project_id)
 
 
 def save_result_fn(result_sds, **result):

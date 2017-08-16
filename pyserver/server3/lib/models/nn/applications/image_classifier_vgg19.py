@@ -4,6 +4,7 @@ import os
 from keras import applications
 from keras import backend as K
 from keras.callbacks import LambdaCallback
+from keras.callbacks import ModelCheckpoint
 from keras.layers import Dropout, Flatten, Dense
 from keras.models import Model
 from keras.preprocessing.image import ImageDataGenerator
@@ -27,6 +28,7 @@ def image_classifier_vgg19(conf, input, **kw):
     # extract kw
     result_sds = kw.pop('result_sds', None)
     project_id = kw.pop('project_id', None)
+    result_dir = kw.pop('result_dir', None)
     # extract input
     train_data_dir = input['train_data_dir']
     validation_data_dir = input['validation_data_dir']
@@ -34,7 +36,9 @@ def image_classifier_vgg19(conf, input, **kw):
     nb_validation_samples = input['nb_validation_samples']
 
     # 通过train_data_dir下的文件夹数目得到分类数量
-    num_classes = len(os.listdir(train_data_dir))
+    l = os.listdir(train_data_dir)
+    l.remove('.DS_Store')
+    num_classes = len(l)
     if num_classes < 2:
         raise Exception('classes should be more than 1, put your '
                         'different classes images file into '
@@ -117,13 +121,22 @@ def image_classifier_vgg19(conf, input, **kw):
                                                   epoch, logs,
                                                   result_sds,
                                                   project_id))
+
         # checkpoint to save best weight
-        best_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
-                                               verbose=0,
-                                               save_best_only=True)
+        # best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,
+        #                                        save_best_only=True)
+        best_checkpoint = ModelCheckpoint(
+            result_dir + 'best.hdf5',
+            save_weights_only=True,
+            verbose=1, save_best_only=True)
         # checkpoint to save latest weight
-        general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
-                                                  verbose=0)
+        # general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
+        #                                           verbose=0)
+        general_checkpoint = ModelCheckpoint(
+            result_dir + 'latest.hdf5',
+            save_weights_only=True,
+            verbose=1)
+
         history = model.fit_generator(
             train_generator,
             steps_per_epoch=nb_train_samples // batch_size,
@@ -139,8 +152,11 @@ def image_classifier_vgg19(conf, input, **kw):
                                      model_config=config,
                                      # score=score,
                                      history=history.history)
-        return {
-            'history': history.history}
+        model.save_weights(result_dir + 'final.hdf5')
+        with open(result_dir + 'model.json', 'w') as f:
+            f.write(model.to_json())
+
+        return {'history': history.history}
 
 
 def image_classifier_vgg19_to_str():

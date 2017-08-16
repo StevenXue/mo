@@ -80,8 +80,8 @@ class PreviewCard extends React.Component {
           ],
           yAxis : [
             {
+              name: '次数',
               type : 'value',
-              min: 'dataMin',
               max: 'dataMax',
             }
           ],
@@ -213,6 +213,7 @@ class PreviewCard extends React.Component {
               this.state.barType === 1 &&
               <span style={{color: '#00AAAA'}}>{this.state.isGuassian}</span>
             }
+            <br/>
             <span>{"P value: "}</span>
             <span style={{color: '#00AAAA'}}>{this.state.pValue}</span>
             <ReactEcharts

@@ -29,6 +29,7 @@ const getOption = (props) => {
     ],
     yAxis : [
       {
+        name: '次数',
         type : 'value'
       }
     ],

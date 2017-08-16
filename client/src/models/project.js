@@ -2,7 +2,19 @@ import lodash from 'lodash'
 import { parse } from 'qs'
 import { message } from 'antd'
 import { Router, routerRedux } from 'dva/router'
-import { query, create, edit, listDataSets, publishProject, forkProject , listFiles, getStagedData, convertToStaging, listToolkits } from '../services/project'
+import {
+  query,
+  create,
+  edit,
+  listDataSets,
+  publishProject,
+  forkProject,
+  listFiles,
+  getStagedData,
+  convertToStaging,
+  predictNeuralStyle,
+  listToolkits
+} from '../services/project'
 
 export default {
 
@@ -18,24 +30,33 @@ export default {
       owned_files: [],
     },
     loading: false,
-    files:[],
+    files: [],
+    predictFileList: {
+      public_files: [],
+      owned_files: [],
+    },
+    predictFiles: [],
+    predictImages: [],
     projects: {
       public_projects: [],
       owned_projects: [],
     },
     toolkits:{},
     selectedDSIds: [],
-    stagingData: []
+    stagingData: [],
+    predictLoading: false,
+    predictEnd: false,
+    predictModelType: 6,
   },
 
   effects: {
-    *query ({ payload }, { call, put, select }) {
+    * query ({ payload }, { call, put, select }) {
       const user = yield select(state => state['app'].user)
       yield put({
         type: 'querySuccess',
         payload: {
           user: user,
-        }
+        },
       })
       const data = yield call(query, user.user_ID)
       if (data) {
@@ -51,23 +72,23 @@ export default {
       }
     },
 
-    *toDetail ({ payload }, { call, put, select }) {
-      console.log("to detail", payload);
+    * toDetail ({ payload }, { call, put, select }) {
+      console.log('to detail', payload)
       const user = yield select(state => state['app'].user)
       yield put(
         routerRedux.push({
-        pathname: `project/${payload.name}`,
-        query: {
-          _id: payload._id,
-          user: user
-        },
-      })
+          pathname: `project/${payload.name}`,
+          query: {
+            _id: payload._id,
+            user: user,
+          },
+        }),
       )
     },
 
-    *fork ({ payload }, { call, put, select }) {
+    * fork ({ payload }, { call, put, select }) {
       const user = yield select(state => state['app'].user)
-      console.log("fork", payload, user.user_ID);
+      console.log('fork', payload, user.user_ID)
       const data = yield call(forkProject, payload, user.user_ID)
       if (data.success) {
         const res = yield call(query, user.user_ID)
@@ -88,8 +109,8 @@ export default {
       }
     },
 
-    *publish ({ payload }, { call, put, select }) {
-      console.log("to detail", payload);
+    * publish ({ payload }, { call, put, select }) {
+      console.log('to detail', payload)
       const data = yield call(publishProject, payload)
       const user = yield select(state => state['app'].user)
       if (data.success) {
@@ -111,7 +132,7 @@ export default {
       }
     },
 
-    *listDataSets ({ payload }, { call, put, select }) {
+    * listDataSets ({ payload }, { call, put, select }) {
       const user = yield select(state => state['app'].user)
       const data = yield call(listDataSets, user.user_ID)
       if (data.success) {
@@ -127,9 +148,9 @@ export default {
       }
     },
 
-    *getStagingDatasets ({ payload }, { call, put, select }) {
+    * getStagingDatasets ({ payload }, { call, put, select }) {
       let body = lodash.cloneDeep(payload)
-      console.log("fetch staging data");
+      console.log('fetch staging data')
       const data = yield call(getStagedData, body)
       if (data.success) {
         yield put({
@@ -144,7 +165,7 @@ export default {
       }
     },
 
-    *toStagingData ({ payload }, { call, put, select }) {
+    * toStagingData ({ payload }, { call, put, select }) {
       yield put({ type: 'loadingStart' })
       const data = yield call(convertToStaging, payload)
       if (data.success) {
@@ -178,16 +199,28 @@ export default {
 
     *listFiles ({ payload }, { call, put, select }) {
       const user = yield select(state => state['app'].user)
-      const data = yield call(listFiles, user.user_ID)
+      const predict = payload['predict']
+      const extension = payload['extension']
+      const data = yield call(listFiles, user.user_ID, extension, predict)
 
       if (data.success) {
-        console.log(data.response);
+        console.log(data.response)
+        let payload
+        if (predict === true) {
+          let allFiles = data.response['owned_files'].concat(data.response['public_files'])
+          payload = {
+            predictFileList: data.response,
+            predictFiles: allFiles,
+          }
+        } else {
+          payload = {
+            fileList: data.response,
+            files: data.response['owned_files'].concat(data.response['public_files']),
+          }
+        }
         yield put({
           type: 'querySuccess',
-          payload: {
-            FileList: data.response,
-            files: data.response['owned_files'].concat(data.response['public_files'])
-          },
+          payload,
         })
       } else {
         console.log('error', data)
@@ -195,7 +228,7 @@ export default {
       }
     },
 
-    *edit ({ payload }, { call, put }) {
+    * edit ({ payload }, { call, put }) {
       const data = yield call(edit, payload)
       if (data.success) {
         yield put({ type: 'query' })
@@ -204,7 +237,7 @@ export default {
       }
     },
 
-    *create ({ payload }, { call, put, select }) {
+    * create ({ payload }, { call, put, select }) {
       const user = yield select(state => state['app'].user)
       let body = lodash.cloneDeep(payload)
       body['user_ID'] = user.user_ID
@@ -218,11 +251,32 @@ export default {
         throw data
       }
     },
+
+    * doPredict ({ payload }, { call, put, select }) {
+      const user_ID = yield select(state => state['app'].user.user_ID)
+      let body = {
+        user_ID,
+        ...payload
+      }
+      yield put({ type: 'predictStart' })
+      const data = yield call(predictNeuralStyle, body)
+      yield put({ type: 'predictEnd' })
+      if (data.success) {
+        console.log('success', data.response)
+      } else {
+        console.log('error', data)
+        throw data
+      }
+    },
   },
 
   reducers: {
 
     querySuccess (state, action) {
+      return { ...state, ...action.payload }
+    },
+
+    predictQuerySuccess (state, action) {
       return { ...state, ...action.payload }
     },
 
@@ -247,6 +301,39 @@ export default {
       return { ...state, ...action.payload }
     },
 
+    setActiveKey (state, { payload: activeKey }) {
+      return {
+        ...state,
+        activeKey,
+      }
+    },
+
+    selectPredictImage (state, { payload: predictImages }) {
+      return { ...state, predictImages }
+    },
+
+    predictStart (state) {
+      return {
+        ...state,
+        predictLoading: true,
+        predictEnd: false,
+      }
+    },
+
+    predictEnd (state) {
+      return {
+        ...state,
+        predictLoading: false,
+        predictEnd: true,
+      }
+    },
+
+    setPredictInfo (state, action) {
+      return {
+        ...state,
+        ...action.payload,
+      }
+    },
   },
 
 }
