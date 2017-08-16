@@ -101,14 +101,16 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
             index_nan.append(index)
 
     # 正式的文字转数字
-    argv_before = list(zip(*arg_filter))
-    argv_after = []
-    for arr in argv_before:
-        try:
-            float(arr[0])
-            argv_after.append(arr)
-        except ValueError:
-            argv_after.append(pd.Series(arr).astype('category').cat.codes)
+    # 正式的也被弃用了
+    # argv_before = list(zip(*arg_filter))
+    # argv_after = []
+    # for arr in argv_before:
+    #     try:
+    #         float(arr[0])
+    #         argv_after.append(arr)
+    #     except ValueError:
+    #         argv_after.append(pd.Series(arr).astype('category').cat.codes)
+    argv_after = list(zip(*arg_filter))
 
     # 准备input
     argv = [list(zip(*argv_after[:len(col1)]))]
