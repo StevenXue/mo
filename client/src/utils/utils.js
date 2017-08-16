@@ -20,4 +20,9 @@ let toolkit_info =  {
   "数值转换": "数值转换是将数据从一种表示形式变为另一种表现形式的过程。数据在应用过程中相对比较繁杂，为了能够更好的应用数据，需要对其进行某种特定格式化的排列，数值转换通常包含对数字去量纲化、二值化、标准化等操作。"
 }
 
-export { isEmpty, toolkit_info}
+// function filterId(dataset) {
+//   let data = dataset.map((el) => delete el["_id"])
+//   console.log(data)
+// }
+
+export { isEmpty, toolkit_info }

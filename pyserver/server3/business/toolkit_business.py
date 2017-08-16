@@ -204,7 +204,7 @@ def create_public_toolkit():
                       "if_reserved": False,
                       "args": [
                           {
-                              "name": "simple moving average",
+                              "name": "simple_moving_average",
                               "des": "所选范围的样本的移动平均值",
                               "if_add_column": False,
                               "attribute": "value"
@@ -462,7 +462,7 @@ def create_public_toolkit():
                       "if_reserved": True,
                       "args": [
                           {
-                              "name": "降维结果",
+                              "name": "dimension_reduction_result",
                               "des": "所选范围的样本的降维后的结果",
                               "if_add_column": True,
                               "attribute": "label"
@@ -539,7 +539,7 @@ def create_public_toolkit():
                        "if_reserved": True,
                        "args": [
                            {
-                               "name": "降维结果",
+                               "name": "dimension_reduction_result",
                                "des": "所选范围的样本的降维后的结果",
                                "if_add_column": True,
                                "attribute": "label"
@@ -615,7 +615,7 @@ def create_public_toolkit():
                       "if_reserved": False,
                       "args": [
                           {
-                              "name": "四分位距",
+                              "name": "IQR_range",
                               "des": "所选范围的样本死分数",
                               "if_add_column": False,
                               "attribute": "value"
@@ -906,7 +906,7 @@ def create_public_data_process():
                                  },
                                  'default': None,
                                  'required': True,
-                                 'len_range': [1, None],
+                                 'len_range': [2, None],
                                  'data_type': ['int', 'float']
                              }
                          },
@@ -1612,13 +1612,6 @@ def create_public_data_process():
     MIC = toolkit_repo.create(MIC)
     ownership_business.add(user, False, toolkit=MIC)
 
-
-def update_one_public_toolkit():
-    """
-        数据库建一个toolkit的collection, 记载public的数据分析工具包简介
-    """
-    user = user_business.get_by_user_ID('system')
-
     DUM = Toolkit(name='类别转数字',
                   description='将一组类别属性的数据，转化成几列数字组成的矩阵',
                   category=2,
@@ -1710,6 +1703,48 @@ def update_one_public_toolkit():
                   })
     CUT = toolkit_repo.create(CUT)
     ownership_business.add(user, False, toolkit=CUT)
+
+
+def update_one_public_toolkit():
+    """
+        数据库建一个toolkit的collection, 记载public的数据分析工具包简介
+    """
+    user = user_business.get_by_user_ID('system')
+
+    TMP = Toolkit(name='字符串转数字类别',
+                  description='将一组类别属性的数据，转化为数字的类别',
+                  category=2,
+                  entry_function='str_to_categories',
+                  target_py_code=inspect.getsource(preprocess_orig.str_to_categories),
+                  parameter_spec={
+                      "data": {
+                          'name': 'input',
+                          'type': {
+                              'key': 'select_box',
+                              'des': 'nD tensor with shape: (batch_size, ..., '
+                                     'input_dim). The most common situation would be a '
+                                     '2D input with shape (batch_size, input_dim).',
+                              'range': None
+                          },
+                          'default': None,
+                          'required': True,
+                          'len_range': [1, 1],
+                          'data_type': ['str']
+                      }
+                  },
+                  result_spec={
+                      "if_reserved": True,
+                      "args": [
+                          {
+                              "name": "result",
+                              "des": "所选范围的样本的数字分类结果",
+                              "if_add_column": True,
+                              "attribute": "label"
+                          }
+                      ]
+                  })
+    TMP = toolkit_repo.create(TMP)
+    ownership_business.add(user, False, toolkit=TMP)
 
 
 def remove_one_public_toolkit():
