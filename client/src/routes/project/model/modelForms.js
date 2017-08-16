@@ -59,6 +59,7 @@ class ModelForms extends React.Component {
     console.log(this.props.selectedFile)
     let socket = io.connect(flaskServer + '/log/' + this.props.project_id)
     socket.on('log_epoch_end', (msg) => {
+      console.log('receive msg', msg)
       this.setState({ ioData: msg })
     })
 

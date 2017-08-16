@@ -35,8 +35,16 @@ def emit_log(event, n, logs, result_sds, project_id):
     socketio.emit('log_epoch_end', kw, namespace='/log/%s' % project_id)
 
 
+# def emit_log(event, n, logs, result_sds, project_id):
+#     eventlet.spawn_n(emit_log_fn, event, n, logs, result_sds, project_id)
+
+
 def emit_message(message, project_id):
     socketio.emit('send_message', message, namespace='/log/%s' % project_id)
+
+
+# def emit_message(message, project_id):
+#     eventlet.spawn_n(emit_message_fn, message, project_id)
 
 
 def save_result_fn(result_sds, **result):
