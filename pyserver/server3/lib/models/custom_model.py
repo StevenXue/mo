@@ -132,7 +132,7 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
         metrics=validation_metrics,
         name='val')
 
-    tra__monitor = ValidationMonitor(
+    tra_monitor = ValidationMonitor(
         input_fn=train_input_fn,
         eval_steps=1,
         every_n_steps=100,
@@ -140,15 +140,11 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
         name='tra')
 
     # init model
-    estimator = \
-        tf.contrib.learn.Estimator(model_fn=model_fn,
-                                   model_dir=None,
-                                   config=
-                                   tf.contrib.learn.RunConfig(
-                                       save_checkpoints_steps=
-                                       100),
-                                   params=est_params[
-                                       'args'])
+    estimator = tf.contrib.learn.Estimator(model_fn=model_fn,
+                                           model_dir=None,
+                                           config=tf.contrib.learn.RunConfig(
+                                               save_checkpoints_steps=100),
+                                           params=est_params['args'])
 
     # fit
     # result = {}
@@ -167,7 +163,7 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
 
     # fit
     estimator.fit(input_fn=train_input_fn,
-                  monitors=[val_monitor, tra__monitor],
+                  monitors=[val_monitor, tra_monitor],
                   **fit_params['args'])
     # evaluate
     metrics = estimator.evaluate(input_fn=eval_input_fn,

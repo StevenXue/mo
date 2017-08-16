@@ -230,7 +230,9 @@ def model_to_code(conf, project_id, data_source_id, model_id, **kwargs):
         head_str += 'import tensorflow as tf\n'
         head_str += 'from tensorflow.python.framework import constant_op\n'
         head_str += 'from tensorflow.python.framework import dtypes\n'
+        head_str += 'from tensorflow.contrib.learn.python.learn import metric_spec\n'
         head_str += 'from server3.lib import models\n'
+        head_str += 'from server3.lib.models.modified_tf_file.monitors import ValidationMonitor\n'
         head_str += 'from server3.business import staging_data_set_business\n'
         head_str += 'from server3.business import staging_data_business\n'
         head_str += 'from server3.service import staging_data_service\n'
@@ -242,13 +244,14 @@ def model_to_code(conf, project_id, data_source_id, model_id, **kwargs):
         head_str += 'model_fn = models.%s\n' % model.entry_function
         head_str += "data_source_id = '%s'\n" % data_source_id
         head_str += "model_name = '%s'\n" % model.name
+        head_str += "kwargs = %s\n" % kwargs
         fit = conf.get('fit', None)
         if model['category'] == 1:
             data_fields = fit.get('data_fields', [[], []])
             head_str += 'data_fields = %s\n' % data_fields
             head_str += inspect.getsource(model_input_manager_custom_supervised)
             head_str += "input_dict = model_input_manager_custom_supervised(" \
-                        "data_fields, data_source_id, model_name)\n"
+                        "data_fields, data_source_id, model_name, **kwargs)\n"
         elif model['category'] == 2:
             x_cols = fit.get('data_fields', [])
             head_str += "x_cols = %s\n" % x_cols
@@ -450,7 +453,7 @@ def get_results_dir_by_job_id(job_id, checkpoint='final'):
                                                                'project')
     user_ID = ownership.user.user_ID
     result_dir = '{}{}/{}/{}/'.format(user_directory, user_ID,
-                                             project_name, job_id)
+                                      project_name, job_id)
     filename = '{}.hdf5'.format(checkpoint)
     return result_dir, filename
 
