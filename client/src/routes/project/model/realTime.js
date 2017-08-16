@@ -101,7 +101,7 @@ export default class Curve extends React.Component {
         top: 70,
         bottom: 50,
       },
-      xAxis: [
+      xAxis:
         {
           type: 'category',
           axisTick: {
@@ -124,29 +124,6 @@ export default class Curve extends React.Component {
           boundaryGap: 0,
           data: this.state.trainStep,
         },
-        // {
-        //   type: 'category',
-        //   axisTick: {
-        //     alignWithLabel: true,
-        //   },
-        //   axisLine: {
-        //     onZero: false,
-        //     lineStyle: {
-        //       color: colors[1],
-        //     },
-        //   },
-        //   axisPointer: {
-        //     label: {
-        //       formatter: function (params) {
-        //         return 'val_' + metric + params.value
-        //           + (params.seriesData.length ? '：' + params.seriesData[0].data : '')
-        //       },
-        //     },
-        //   },
-        //   boundaryGap: 0,
-        //   data: this.state.testStep,
-        // },
-      ],
       yAxis:
         {
           type: 'value',
