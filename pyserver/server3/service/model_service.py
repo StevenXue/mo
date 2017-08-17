@@ -258,7 +258,7 @@ def model_to_code(conf, project_id, data_source_id, model_id, **kwargs):
             head_str += inspect.getsource(model_input_manager_unsupervised)
             head_str += "input_dict = model_input_manager_unsupervised(x_cols, " \
                         "data_source_id, model_name)\n"
-        return job_service.run_code(conf, project_id, data_source_id,
+        return job_service.run_codei(conf, project_id, data_source_id,
                                     model, f, head_str)
 
 
