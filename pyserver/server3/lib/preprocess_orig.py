@@ -138,7 +138,7 @@ def select_k_best_pearson(arr0, target, index, k):
     from scipy.stats import pearsonr
     matrix = np.array(arr0)
     target = np.array(target)
-    temp = feature_selection.SelectKBest(lambda X, Y: np.array(list(map(lambda x: pearsonr(x, Y), X.T))).T[0], k=k).fit(matrix, target)
+    temp = feature_selection.SelectKBest(lambda X, Y: np.array(list(map(lambda x: abs(pearsonr(x, Y)[0]), X.T))), k=k).fit(matrix, target)
     scores = temp.scores_.tolist()
     indx = temp.get_support().tolist()
     result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)

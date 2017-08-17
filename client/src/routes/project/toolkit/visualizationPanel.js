@@ -3,7 +3,9 @@ import { BarChart, Histogram, PieChart, Scatter, SimpleScatter, SimpleTable, Tab
 import { flaskServer } from '../../../constants'
 import { Card, Select, Spin, Popover, Icon} from 'antd'
 import { isEmpty } from '../../../utils/utils'
-import './toolkit.css'
+import classnames from 'classnames';
+import style from './toolkit.css';
+
 
 export default class VisualizationPanel extends React.Component {
   constructor (props) {
@@ -356,7 +358,7 @@ export default class VisualizationPanel extends React.Component {
                     target: this.state.responseBody['table1']['Y_fields']
                   }}/>
                 </div>
-                <div className="description" style={{width: '30%', marginLeft: 70, textAlign: 'left'}}>
+                <div className={classnames(style.description)}>
                   <div>
                       <div style={{ marginBottom: 10}}>
                         <div style={{height: 20, width: 100, backgroundColor: '#C6DFB5'}}/>
