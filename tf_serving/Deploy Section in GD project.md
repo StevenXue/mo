@@ -1,10 +1,10 @@
 # Deploy Section in GD project
 
 ### gRPC Connection Info:
-Deployed: tensorflow_model_server --port:9000 --model_name=inception --model_base_path=/tmp/inception_output/
+Deployed: 
+    $> tensorflow_model_server --port:9000 --model_name=inception --model_base_path=/tmp/inception_output/
 
 IP: X.X.X.X
-
 Port: 9000
 
 ```
