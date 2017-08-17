@@ -18,6 +18,9 @@ class Serving extends React.Component {
   render () {
     return (
       <div className="serving-container">
+        <h2>gRPC Connection Info</h2>
+        <p>IP: X.X.X.X</p>
+        <p>Port: 9000</p>
         <Tabs defaultActiveKey="1" size="small" className='code-tabs'>
           <TabPane tab="Python" key="1">
             <Highlight className='python hljs code-container'>
