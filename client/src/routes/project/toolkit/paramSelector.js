@@ -191,28 +191,6 @@ class ParamsSeletcor extends React.Component {
               }
             }
           }
-          // if (this.props.selectable[0][1] !== null){
-          //   if (this.state.checkedCols.length <= this.props.selectable[0][1]
-          //     && this.state.checkedCols.length >= this.props.selectable[0][0]) {
-          //     this.props.setData({
-          //       checkedCols: this.state.checkedCols,
-          //       runnable: true
-          //     });
-          //   } else {
-          //     console.log(this.props.selectable[0], "hi");
-          //     message.error('please select correct amount of target fields');
-          //   }
-          // }else{
-          //   if (this.state.checkedCols.length >= this.props.selectable[0][0]) {
-          //     this.props.setData({
-          //       checkedCols: this.state.checkedCols,
-          //       runnable: true
-          //     });
-          //   } else {
-          //     message.error('please select correct amount of target fields');
-          //   }
-          // }
-
         }
         return
       case 'Select Source Fields':
@@ -272,7 +250,6 @@ class ParamsSeletcor extends React.Component {
 
   renderCheckBoxTable() {
     let col = this.state.dataColumns;
-    //console.log(col);
     if (col.length !== 0) {
       if(this.state.type === 'select_box') {
         let type = this.props.selectableType[0];
@@ -283,7 +260,7 @@ class ParamsSeletcor extends React.Component {
             return e
           }
         })
-        col = col.filter((el) => types.indexOf(el[1][1]) !== -1)
+        col = col.filter((el) => types.indexOf(el[1][0]) !== -1 || types.indexOf(el[1][1]) !== -1)
         return col.map((el) =>
           <div style={{marginTop: 10}} key={el}>
             <Checkbox onChange={(e) => this.onCheckCol(e)}
@@ -292,7 +269,6 @@ class ParamsSeletcor extends React.Component {
           </div>,
         )
       }else if(this.state.type === 'transfer_box'){
-        //console.log(this.props.selectableType);
         let type = this.props.selectableType[0];
         let types = type.map((e) => {
           if (e === 'int') {
@@ -302,7 +278,7 @@ class ParamsSeletcor extends React.Component {
           }
         });
 
-        col = col.filter((el) => types.indexOf(el[1][1]) !== -1)
+        col = col.filter((el) => types.indexOf(el[1][0]) !== -1 || types.indexOf(el[1][1]) !== -1)
 
         let source = [];
         col.map((e) =>
@@ -323,7 +299,7 @@ class ParamsSeletcor extends React.Component {
               return e
             }
           });
-          col = col.filter((el) => types.indexOf(el[1][1]) !== -1)
+          col = col.filter((el) => types.indexOf(el[1][0]) !== -1 || types.indexOf(el[1][1]) !== -1)
           let temp = col.map((e) => e[0]);
           temp = temp.filter((el) => selected.indexOf(el) === -1 || selected.indexOf(el) === -1);
           source = temp.map((el) => (

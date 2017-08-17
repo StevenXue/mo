@@ -10,8 +10,11 @@
 # from .toolkit_backup import VARIENCE
 # from lib import toolkit_code
 
+from keras.applications import vgg19
+from keras import backend as K
 from keras.models import Sequential
 import tensorflow as tf
+
 
 # global graph
 graph = tf.get_default_graph()

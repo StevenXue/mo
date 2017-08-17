@@ -117,12 +117,25 @@ def image_classifier_resnet50(conf, input, **kw):
             class_mode=class_mode)
 
         # callback to save metrics
-        batch_print_callback = LambdaCallback(on_epoch_end=
+        batch_print_callback = LambdaCallback(on_epoch_begin=
+                                              lambda epoch, logs:
+                                              logger_service.log_epoch_begin(
+                                                  epoch, logs,
+                                                  result_sds,
+                                                  project_id),
+                                              on_epoch_end=
                                               lambda epoch, logs:
                                               logger_service.log_epoch_end(
                                                   epoch, logs,
                                                   result_sds,
-                                                  project_id))
+                                                  project_id),
+                                              on_batch_end=
+                                              lambda batch, logs:
+                                              logger_service.log_batch_end(
+                                                  batch, logs,
+                                                  result_sds,
+                                                  project_id)
+                                              )
         # checkpoint to save best weight
         best_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
                                                verbose=0,
