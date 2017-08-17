@@ -124,11 +124,7 @@ def get_fields_with_types(staging_data_set_id):
     mapper, reducer = data_service.field_mapper_reducer()
     result = staging_data_business. \
         get_fields_by_map_reduce(staging_data_set_id, mapper, reducer)
-    # result = StagingData.objects(ListingId='126541').map_reduce(mapper, reducer, 'inline')
-    # print isinstance(result, MapReduceDocument)
     return [[mr_doc.key, list(mr_doc.value.keys())] for mr_doc in result]
-    # for mr_doc in result:
-    #     print mr_doc.key, mr_doc.value
 
 
 def _get_fields_with_types(staging_data_set_id):
@@ -310,7 +306,6 @@ def split_test_train(x_y_obj, schema='cv', **kwargs):
         return {'x_tr': x[:divide_row, :], 'y_tr': y[:divide_row, :],
                 'x_te': x[divide_row:, :], 'y_te': y[divide_row:, :]}
     if schema == 'rand':
-        print('rand')
         ratio = ratio or DEFAULT_RATIO
         X_train, X_test, y_train, y_test = train_test_split(
             x, y,
