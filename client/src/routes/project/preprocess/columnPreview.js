@@ -234,7 +234,8 @@ export default class ColumnPreview extends React.Component {
     super(props)
     this.state = {
       loading: false,
-      info: {}
+      info: {},
+      type: ''
     }
   }
 
@@ -248,6 +249,7 @@ export default class ColumnPreview extends React.Component {
     }else{
       type = this.props.type[1];
     }
+    this.setState({type});
     fetch(flaskServer + '/visualization/visualization/usr1', {
       method: 'post',
       headers: {
@@ -270,6 +272,43 @@ export default class ColumnPreview extends React.Component {
             data: res.response
           });
       })
+  }
+
+  componentWillReceiveProps(nextProps){
+    if(this.state.type !== nextProps.newType){
+      this.setState({loading: true});
+      let type = '';
+      if(nextProps.newType === 'integer') {
+        type = 'int';
+      }else if(nextProps.newType=== 'string'){
+        type = 'str';
+      }else{
+        type = nextProps.newType;
+      }
+      this.setState({type});
+      fetch(flaskServer + '/visualization/visualization/usr1', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          'staging_data_set_id': this.props.stagedDs,
+          'field': [this.props.name],
+          'type': type
+        })
+      }).then((response) => response.json())
+        .then((res) => {
+          let pv = res.response.gen_info;
+          delete pv["25%"]
+          delete pv["50%"]
+          delete pv["75%"]
+          this.setState({
+            info: res.response.gen_info,
+            loading: false,
+            data: res.response
+          });
+        })
+    }
   }
 
   renderInfo(){
