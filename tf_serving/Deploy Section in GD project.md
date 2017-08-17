@@ -1,9 +1,10 @@
 # Deploy Section in GD project
 
 ### gRPC Connection Info:
+Deployed: 
+    $> tensorflow_model_server --port:9000 --model_name=inception --model_base_path=/tmp/inception_output/
 
 IP: X.X.X.X
-
 Port: 9000
 
 ```
@@ -52,6 +53,26 @@ if __name__ == '__main__':
 
 
 #### Model Signature
-
-
+...
+predict_inputs_tensor_info = tf.saved_model.utils.build_tensor_info(jpegs)
+prediction_signature = (
+    tf.saved_model.signature_def_utils.build_signature_def(
+        inputs={'images': predict_inputs_tensor_info},
+        outputs={
+            'classes': classes_output_tensor_info,
+            'scores': scores_output_tensor_info
+        },
+        method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME
+  ))
+...
+builder.add_meta_graph_and_variables(
+    sess, [tf.saved_model.tag_constants.SERVING],
+    signature_def_map={
+        'predict_images':
+          prediction_signature,
+        tf.saved_model.signature_constants.
+        DEFAULT_SERVING_SIGNATURE_DEF_KEY:
+          classification_signature,
+    },
+    legacy_init_op=legacy_init_op)
 
