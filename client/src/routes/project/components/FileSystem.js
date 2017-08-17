@@ -32,12 +32,19 @@ class FileSystem extends React.Component {
   onClickDelete (event, _id, user_ID) {
     event.stopPropagation()
     event.preventDefault()
+    // this.setState({
+    //   deletingProject: _id
+    // })
+    this.props.dispatch({ type: 'project/setDeletingProject', payload: _id })
     fetch(flaskServer + '/project/projects/' + _id + '?user_ID=' + user_ID, {
       method: 'delete',
     }).then((response) => {
       console.log(response.status)
       if (response.status === 200) {
         this.props.dispatch({ type: 'project/query' })
+        // this.setState({
+        //   deletingProject: undefined
+        // })
       }
     })
   }
@@ -53,6 +60,18 @@ class FileSystem extends React.Component {
     }
   }
 
+  checkLoading(id) {
+    return id === this.props.project.deletingProject
+  }
+
+  checkForkingPublishing(id) {
+    return id === this.props.project.forkingProject || id === this.props.project.publishingProject
+  }
+
+  // checkPublishing(id) {
+  //   return id === this.props.project.publishingProject
+  // }
+
   renderTabContent (key) {
     return(
     <div className='full-width' style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', width: '100%' }}>
@@ -67,15 +86,20 @@ class FileSystem extends React.Component {
       <Card key={e._id} title={e.name} extra={
         <a>
           <Button type="primary" style={{ marginTop: -5 }}
+                  loading={this.checkForkingPublishing(e._id)}
                   onClick={(event) => this.onClickProjectOp(event, key, e._id)}>
             {
               key === 'owned_projects' ? 'Publish' : 'Fork'
             }
           </Button>
-          <Button type="danger" style={{ marginTop: -5, marginLeft: 5 }}
-                  onClick={(event) => this.onClickDelete(event, e._id, this.props.project.user.user_ID)}>
-            DELETE
-          </Button>
+          {
+            key === 'owned_projects' &&
+            <Button type="danger" style={{marginTop: -5, marginLeft: 5}}
+                    loading={this.checkLoading(e._id)}
+                    onClick={(event) => this.onClickDelete(event, e._id, this.props.project.user.user_ID)}>
+              DELETE
+            </Button>
+          }
         </a>
       } style={{ width: 400 , marginLeft: 5}}>
         <div onClick={() => this.toProjectDetail(e.name, e._id, false)} style={{ cursor: 'pointer' }}>

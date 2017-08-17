@@ -47,6 +47,7 @@ export default {
     predictLoading: false,
     predictEnd: false,
     predictModelType: 6,
+    activeKeys: []
   },
 
   effects: {
@@ -59,6 +60,7 @@ export default {
         },
       })
       const data = yield call(query, user.user_ID)
+      yield put({type: 'setDeletingProject', payload: undefined})
       if (data) {
         yield put({
           type: 'querySuccess',
@@ -89,9 +91,12 @@ export default {
     * fork ({ payload }, { call, put, select }) {
       const user = yield select(state => state['app'].user)
       console.log('fork', payload, user.user_ID)
+      yield put({ type: 'setForkingProject', payload: payload})
       const data = yield call(forkProject, payload, user.user_ID)
       if (data.success) {
+        message.success('fork success!')
         const res = yield call(query, user.user_ID)
+        yield put({ type: 'setForkingProject', payload: undefined})
         if (res) {
           yield put({
             type: 'querySuccess',
@@ -104,6 +109,7 @@ export default {
           throw res
         }
       } else {
+        yield put({ type: 'setForkingProject', payload: undefined})
         console.log('error', data)
         throw data
       }
@@ -111,10 +117,13 @@ export default {
 
     * publish ({ payload }, { call, put, select }) {
       console.log('to detail', payload)
+      yield put({ type: 'setPublishingProject', payload: payload})
       const data = yield call(publishProject, payload)
       const user = yield select(state => state['app'].user)
       if (data.success) {
+        message.success('publish success!')
         const res = yield call(query, user.user_ID)
+        yield put({ type: 'setPublishingProject', payload: undefined})
         if (res) {
           yield put({
             type: 'querySuccess',
@@ -127,6 +136,7 @@ export default {
           throw res
         }
       } else {
+        yield put({ type: 'setPublishingProject', payload: undefined})
         console.log('error', data)
         throw data
       }
@@ -301,10 +311,10 @@ export default {
       return { ...state, ...action.payload }
     },
 
-    setActiveKey (state, { payload: activeKey }) {
+    setActiveKey (state, { payload: activeKeys }) {
       return {
         ...state,
-        activeKey,
+        activeKeys,
       }
     },
 
@@ -334,6 +344,28 @@ export default {
         ...action.payload,
       }
     },
+
+    setDeletingProject (state, {payload: deletingProject}) {
+      return {
+        ...state,
+        deletingProject,
+      }
+    },
+
+    setForkingProject (state, {payload: forkingProject}) {
+      return {
+        ...state,
+        forkingProject,
+      }
+    },
+
+    setPublishingProject (state, {payload: publishingProject}) {
+      return {
+        ...state,
+        publishingProject,
+      }
+    },
+
   },
 
 }

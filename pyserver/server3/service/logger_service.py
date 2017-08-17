@@ -9,25 +9,25 @@ from server3.utility import json_utility
 
 socketio = SocketIO(message_queue='redis://')
 
-# epoch = 0
+epoch = 0
 
 
 def log_epoch_end(*args):
-    # global epoch
-    # epoch = epoch + 1
+    global epoch
+    epoch = args[0] + 1
     print(args)
     save_log('epoch', *args)
     emit_log('epoch', *args)
 
 
 def log_batch_end(*args):
-    pass
-    # global epoch
-    # args = list(args)
-    # args = json_utility.convert_to_json(args)
-    # args[0] = '{}/{}'.format(epoch, args[0])
-    # print(*args)
-    # emit_log('batch', *args)
+    global epoch
+    args = list(args)
+    args = json_utility.convert_to_json(args)
+    batch = 'Epoch: {}, Batch: {}'.format(epoch, args[0])
+    project_id = args[-1]
+    print(*args)
+    emit_message({"batch": batch}, project_id)
 
 
 def log_train_end(*args, **kw):
@@ -55,7 +55,7 @@ def emit_log(event, n, logs, result_sds, project_id):
 
 
 def emit_message(message, project_id):
-    socketio.emit('send_message', message, namespace='/log/%s' % project_id)
+    socketio.emit('log_epoch_end', message, namespace='/log/%s' % project_id)
 
 
 # def emit_message(message, project_id):
