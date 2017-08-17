@@ -2,20 +2,18 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import classnames from 'classnames'
-import lodash from 'lodash';
-import { Button, Select, Icon, message, Modal, Table, Collapse, Spin, Popover } from 'antd'
+import lodash from 'lodash'
+import { Button, Collapse, Icon, message, Modal, Popover, Select, Spin, Table } from 'antd'
 
-import { jupyterServer, flaskServer } from '../../../constants'
+import { assetsUrl, flaskServer, jupyterServer, stepStyle } from '../../../constants'
 import Toolkits from '../toolkit/toolSteps'
 import JupyterNotebook from './jupyterNotebook'
 import Preprocess from '../preprocess/preprocess'
 import AutomatedModel from '../model/autoModal'
-import Predict from '../predict/predict'
 import ImagePredict from '../predict/imagePredict'
 import NeuralStyle from '../predict/neuralStyle'
 import Serving from '../serving/serving'
 import DataPreview from './dataPreview'
-import { stepStyle, assetsUrl } from '../../../constants'
 import { TourArea } from '../../../components'
 import { isEmpty, toolkit_info } from '../../../utils/utils'
 import empty from './empty.ipynb'
@@ -311,8 +309,12 @@ class ProjectDetail extends React.Component {
           </div>
           <div className='operation-area'>
             <div>
-              <Collapse className='data-preview-collapse' bordered={true} style={{ marginTop: 10, width: '100%' }}>
-                <Panel className='data-preview-collapse' header={'Stage Data'} key="1">
+              <Collapse className='data-preview-collapse' bordered={true} style={{marginTop: 10, width: '100%'}}>
+                <Panel className='data-preview-collapse'
+                       header={'Stage Data'}
+                       key="1"
+                       activeKey={this.props.project.activeKeys}
+                       onChange={(e) => this.onCollapseChange(e)}>
                   <Spin spinning={this.state.loading}>
                     {this.state.dataSet.length > 0 &&
                     <DataPreview dataSet={this.state.dataSet}
@@ -324,7 +326,7 @@ class ProjectDetail extends React.Component {
             </div>
             <div>
               <Collapse className='preprocess-collapse' bordered={true} style={{ marginTop: 10, width: '100%' }}>
-                <Panel header={'Preprocess'} key="1">
+                <Panel header={'Preprocess'} key="2">
                   <Spin spinning={this.state.loading}>
                     <Preprocess dataSet={this.state.dataSet}
                                 fields={this.state.fields}
@@ -336,7 +338,7 @@ class ProjectDetail extends React.Component {
             </div>
             <div>
               <Collapse className='exploration-collapse' bordered={true} style={{ marginTop: 10, width: '100%' }}>
-                <Panel header={'Data Exploration & Analysis'} key="1">
+                <Panel header={'Data Exploration & Analysis'} key="3">
                   <div className={classnames(style.descriptions)}>
                     <span style={{ fontSize: 14 }}>{'There are currently 5 types of toolkits available: '}</span>
                     {
@@ -360,16 +362,12 @@ class ProjectDetail extends React.Component {
             </div>
             <div>
               <Collapse className='model-collapse' bordered={true} style={{ marginTop: 10, width: '100%' }}>
-                <Panel header={'Automated Modelling'} key="1" style={{ width: '100%' }}>
+                <Panel header={'Automated Modelling'} key="4" style={{ width: '100%' }}>
                   <AutomatedModel project_id={this.props.location.query._id} runTour={(steps) => this.runTour(steps)}/>
                 </Panel>
               </Collapse>
             </div>
-            <Collapse className='model-predict' id="model-predict" bordered={false}
-                      style={{ marginTop: 10, width: '100%' }}
-                      activeKey={this.props.project.activeKeys}
-                      onChange={(e) => this.onCollapseChange(e)}
-            >
+            <Collapse className='model-predict' id="model-predict" bordered={false} style={{ marginTop: 10, width: '100%' }}>
               <Panel header='Predict' key="5" style={customPanelStyle}>
                 {this.props.project.predictModelType === 4 ? <ImagePredict/>
                   : <NeuralStyle project_id={this.state.project_id}/>
