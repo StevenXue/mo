@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import classnames from 'classnames'
+import lodash from 'lodash';
 import { Button, Select, Icon, message, Modal, Table, Collapse, Spin, Popover } from 'antd'
 
 import { jupyterServer, flaskServer } from '../../../constants'
@@ -192,13 +193,9 @@ class ProjectDetail extends React.Component {
   }
 
   getNotebook (content) {
-    console.log(content)
-    for (let i = 0; 0 < content.length; i++) {
-      if (content[i] && content[i]['type'] === 'notebook') {
-        // console.log(content[i]);
-        return content[i]
-      }
-    }
+    let target;
+    target = content.find((el) => el.type === 'notebook')
+    return target
   }
 
   startNotebook () {
@@ -206,10 +203,15 @@ class ProjectDetail extends React.Component {
       method: 'get',
     }).then((response) => response.json())
       .then((res) => {
-        console.log(res)
+        console.log(res);
         let notebook_content = {}
-        if (res.content && res.content.length !== 0) {
-          notebook_content = this.getNotebook(res.content)
+        let response = lodash.cloneDeep(res)
+        if (response.content instanceof Array && response.content[0]) {
+          setTimeout(() => {
+            let content = response.content;
+            console.log(response);
+            notebook_content = this.getNotebook(content)
+          }, 1000)
         }
 
         if (isEmpty(notebook_content)) {

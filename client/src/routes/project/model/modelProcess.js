@@ -1,13 +1,13 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
-import { connect } from 'dva'
-import { Button, message, Transfer, Input, Spin, Select, Card, Tag} from 'antd';
-
+import { message, Select, Tag } from 'antd'
+import classnames from 'classnames'
 import { flaskServer } from '../../../constants'
 import { isEmpty } from '../../../utils/utils'
-import ModelForms from './modelForms';
-import Spliter from './spliter';
+import ModelForms from './modelForms'
+import Spliter from './spliter'
+
+import style from './model.css';
 
 export default class ModelProcess extends React.Component {
   constructor (props) {
@@ -108,7 +108,6 @@ export default class ModelProcess extends React.Component {
   }
 
   checkIfFile(props){
-    console.log(props.selectedFile, props.dataset_id);
     if(props.selectedFile && props.selectedFile !== ''){
       let models = this.state.allModels;
       models = models.filter((e) => e.category === 4);
@@ -330,13 +329,15 @@ export default class ModelProcess extends React.Component {
                : (
                 <div>
                   <p>Input: </p>
-                  {
-                    this.state.selectedKeys && this.state.selectedKeys.map((e) =>
-                      <Tag style={{margin: 5}} key={e}>
-                        {e}
-                      </Tag>
-                    )
-                  }
+                  <div className={classnames(style.inputSelections)}>
+                    {
+                      this.state.selectedKeys && this.state.selectedKeys.map((e) =>
+                        <Tag style={{margin: 5}} key={e}>
+                          {e}
+                        </Tag>
+                      )
+                    }
+                  </div>
                   <p>Output: </p>
                   {
                     this.state.targetKeys && this.state.targetKeys.map((e) =>
