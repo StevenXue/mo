@@ -60,6 +60,7 @@ export default {
         },
       })
       const data = yield call(query, user.user_ID)
+      yield put({type: 'setDeletingProject', payload: undefined})
       if (data) {
         yield put({
           type: 'querySuccess',
@@ -335,6 +336,14 @@ export default {
         ...action.payload,
       }
     },
+
+    setDeletingProject (state, {payload: deletingProject}) {
+      return {
+        ...state,
+        deletingProject,
+      }
+    },
+
   },
 
 }
