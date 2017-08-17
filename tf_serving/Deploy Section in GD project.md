@@ -52,6 +52,7 @@ if __name__ == '__main__':
 
 
 #### Model Signature
+...
 predict_inputs_tensor_info = tf.saved_model.utils.build_tensor_info(jpegs)
 prediction_signature = (
     tf.saved_model.signature_def_utils.build_signature_def(
@@ -62,5 +63,15 @@ prediction_signature = (
         },
         method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME
   ))
-
+...
+builder.add_meta_graph_and_variables(
+    sess, [tf.saved_model.tag_constants.SERVING],
+    signature_def_map={
+        'predict_images':
+          prediction_signature,
+        tf.saved_model.signature_constants.
+        DEFAULT_SERVING_SIGNATURE_DEF_KEY:
+          classification_signature,
+    },
+    legacy_init_op=legacy_init_op)
 
