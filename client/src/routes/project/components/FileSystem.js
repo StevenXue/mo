@@ -64,6 +64,14 @@ class FileSystem extends React.Component {
     return id === this.props.project.deletingProject
   }
 
+  checkForking(id) {
+    return id === this.props.project.forkingProject
+  }
+
+  // checkPublishing(id) {
+  //   return id === this.props.project.publishingProject
+  // }
+
   renderTabContent (key) {
     return(
     <div className='full-width' style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', width: '100%' }}>
@@ -78,6 +86,7 @@ class FileSystem extends React.Component {
       <Card key={e._id} title={e.name} extra={
         <a>
           <Button type="primary" style={{ marginTop: -5 }}
+                  loading={this.checkForking(e._id)}
                   onClick={(event) => this.onClickProjectOp(event, key, e._id)}>
             {
               key === 'owned_projects' ? 'Publish' : 'Fork'

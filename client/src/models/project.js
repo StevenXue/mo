@@ -91,7 +91,9 @@ export default {
     * fork ({ payload }, { call, put, select }) {
       const user = yield select(state => state['app'].user)
       console.log('fork', payload, user.user_ID)
+      yield put({ type: 'setForkingProject', payload: payload})
       const data = yield call(forkProject, payload, user.user_ID)
+      yield put({ type: 'setForkingProject', payload: undefined})
       if (data.success) {
         const res = yield call(query, user.user_ID)
         if (res) {
@@ -341,6 +343,13 @@ export default {
       return {
         ...state,
         deletingProject,
+      }
+    },
+
+    setForkingProject (state, {payload: forkingProject}) {
+      return {
+        ...state,
+        forkingProject,
       }
     },
 
