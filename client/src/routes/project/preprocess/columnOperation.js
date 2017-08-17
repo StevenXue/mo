@@ -70,6 +70,7 @@ export default class ColumnOperations extends React.Component {
       }).then((response) => {
         if (response.status === 200) {
           message.success('Successfully Deleted columns');
+          this.setState({deleted: {}});
           fetch(flaskServer + '/staging_data/staging_data_sets/types', {
             method: 'put',
             headers: {
@@ -82,6 +83,7 @@ export default class ColumnOperations extends React.Component {
           }).then((response) => {
             if (response.status === 200) {
               message.success('Successfully transferred field types');
+              //this.setState({deleted: {}});
             } else {
               message.error('Error transferring field types');
             }
@@ -91,6 +93,7 @@ export default class ColumnOperations extends React.Component {
         } else {
           message.error('Error deleting fields');
           this.setState({loading: false});
+
         }
       }).catch((err) => message.error('Error', err))
     }
@@ -146,7 +149,7 @@ export default class ColumnOperations extends React.Component {
                 <Card style={{ margin: 5, display:'flex', flexDirection: 'column'}} key={e} >
                   <div style={{float: 'right', marginTop: -20, marginRight: -20}}>
                     <Popover content={
-                      <ColumnPreview stagedDs={this.state.dataSet} name={e} type={dataSet[e]}/>
+                      <ColumnPreview stagedDs={this.state.dataSet} name={e} type={dataSet[e]} newType={this.state.values[e]}/>
                     } title={e} trigger="click" >
                       <Button size="small" >
                         <span style={{fontSize: '12px'}}>VIEW</span>

@@ -162,7 +162,7 @@ class FileSystem extends React.Component {
             onMouseLeave={() => this.toggleButton(-1)}>
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <div style={{width: 400}}>
-            <p>Path: {e.uri.replace(/..\/user_directory\//, '')}</p>
+            <p>Description: {e.description}</p>
             <p>Upload Time: {showTime(e.upload_time)}</p>
           </div>
           <Button type="primary" style={{ display: button === i ? 'inline':'none' }}
