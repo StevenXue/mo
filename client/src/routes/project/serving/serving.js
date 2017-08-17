@@ -51,22 +51,22 @@ class Serving extends React.Component {
               'FLAGS = tf.app.flags.FLAGS\n\n' +
 
               'def main(_):\n' +
-              'host, port = FLAGS.server.split(\':\')\n' +
-              'channel = implementations.insecure_channel(host, int(port))\n' +
-              'stub = prediction_service_pb2.beta_create_PredictionService_stub(channel)\n\n' +
+              '\thost, port = FLAGS.server.split(\':\')\n' +
+              '\tchannel = implementations.insecure_channel(host, int(port))\n' +
+              '\tstub = prediction_service_pb2.beta_create_PredictionService_stub(channel)\n\n' +
 
-              '# Send request\n' +
-              'with open(FLAGS.image, \'rb\') as f:\n\n' +
+              '\t# Send request\n' +
+              '\twith open(FLAGS.image, \'rb\') as f:\n\n' +
 
-              '# See prediction_service.proto for gRPC request/response details.\n' +
-              'data = f.read()\n' +
-              'request = predict_pb2.PredictRequest()\n' +
-              'request.model_spec.name = \'inception\'\n' +
-              'request.model_spec.signature_name = \'predict_images\'\n' +
-              'request.inputs[\'images\'].CopyFrom(\n' +
-              'tf.contrib.util.make_tensor_proto(data, shape=[1]))\n' +
-              'result = stub.Predict(request, 10.0)  # 10 secs timeout\n' +
-              'print(result)\n\n' +
+              '\t\t# See prediction_service.proto for gRPC request/response details.\n' +
+              '\t\tdata = f.read()\n' +
+              '\t\trequest = predict_pb2.PredictRequest()\n' +
+              '\t\trequest.model_spec.name = \'inception\'\n' +
+              '\t\trequest.model_spec.signature_name = \'predict_images\'\n' +
+              '\t\trequest.inputs[\'images\'].CopyFrom(\n' +
+              '\t\ttf.contrib.util.make_tensor_proto(data, shape=[1]))\n' +
+              '\t\tresult = stub.Predict(request, 10.0)  # 10 secs timeout\n' +
+              '\t\tprint(result)\n\n' +
 
               'if __name__ == \'__main__\':\n' +
               'tf.app.run()'}
