@@ -72,10 +72,13 @@ class FileSystem extends React.Component {
               key === 'owned_projects' ? 'Publish' : 'Fork'
             }
           </Button>
-          <Button type="danger" style={{ marginTop: -5, marginLeft: 5 }}
-                  onClick={(event) => this.onClickDelete(event, e._id, this.props.project.user.user_ID)}>
-            DELETE
-          </Button>
+          {
+            key === 'owned_projects' &&
+            <Button type="danger" style={{marginTop: -5, marginLeft: 5}}
+                    onClick={(event) => this.onClickDelete(event, e._id, this.props.project.user.user_ID)}>
+              DELETE
+            </Button>
+          }
         </a>
       } style={{ width: 400 , marginLeft: 5}}>
         <div onClick={() => this.toProjectDetail(e.name, e._id, false)} style={{ cursor: 'pointer' }}>
