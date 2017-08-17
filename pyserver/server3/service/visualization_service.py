@@ -145,21 +145,28 @@ def t_sne(arr):
     return result
 
 
-def freq_hist(arr, group_num=10, multip=1):
+def freq_hist(arr, group_num=10, mul=1):
     arr_array = np.array(arr)
     _min = arr_array.min()
     _max = arr_array.max()
     step = find_step(_min, _max, group_num)
+
+    __min = math.floor(_min/step)*step
+    __max = math.ceil(_max/step)*step
     # 给出x轴
-    # x_domain = np.arange(_min, _max + interval, interval).round(1)
-    x_domain = np.arange(math.floor(_min/step)*step, math.ceil(_max/step)*step+step, step)
+    x_domain = np.arange(__min, __max+step/2, step)
 
     freq_hist = {"freq_hist": arr_array}
     df = pd.DataFrame(freq_hist)
     # 给出y轴
     y_domain = df.groupby(pd.cut(df.freq_hist, x_domain, right=False)).count().freq_hist.values
+    if __max == x_domain[-1]:
+        y_domain[-1] += list(arr_array).count(x_domain[-1])
     # 注意x会比y多一个
-    return {'x_domain': x_domain.tolist(), 'y_domain': (y_domain * multip).round(3).tolist()}
+    print("test", len(arr))
+    print("test", x_domain)
+    print("test", sum(y_domain))
+    return {'x_domain': x_domain.tolist(), 'y_domain': (y_domain * mul).tolist()}
 
 
 def find_step(start, stop, count):
