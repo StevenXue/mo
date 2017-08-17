@@ -56,7 +56,13 @@ def mlp_main(result_sds, project_id, result_dir, x_train, y_train, x_val, y_val,
                   metrics=['accuracy'])
 
     # callback to save metrics
-    batch_print_callback = LambdaCallback(on_epoch_end=
+    batch_print_callback = LambdaCallback(on_epoch_begin=
+                                          lambda epoch, logs:
+                                          logger_service.log_epoch_begin(
+                                              epoch, logs,
+                                              result_sds,
+                                              project_id),
+                                          on_epoch_end=
                                           lambda epoch, logs:
                                           logger_service.log_epoch_end(
                                               epoch, logs,
@@ -67,7 +73,8 @@ def mlp_main(result_sds, project_id, result_dir, x_train, y_train, x_val, y_val,
                                           logger_service.log_batch_end(
                                               batch, logs,
                                               result_sds,
-                                              project_id))
+                                              project_id)
+                                          )
 
     # checkpoint to save best weight
     # best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,

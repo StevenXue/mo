@@ -19,7 +19,7 @@ def neural_style_transfer(args, project_id, file_url):
     # Prefix for the saved results.
     result_prefix = args.get('result_prefix')
     # Number of iterations to run.
-    iterations = args.get('iter', 10)
+    iterations = args.get('iter', 3)
     # these are the weights of the different loss components
     # content_weight
     content_weight = args.get('content_weight', 0.025)
@@ -230,7 +230,7 @@ def neural_style_transfer(args, project_id, file_url):
         imsave(fname, img)
         end_time = time.time()
         url = file_url + 'result_at_iteration_{}.png?predict=true'.format(i)
-        logger_service.emit_message({
+        logger_service.emit_message_url({
             'url': url,
             'n': i
         }, project_id)

@@ -32,6 +32,17 @@ let spliter = [
         type: 'int'
       }
     ]
+  },
+  {
+    name: 'Random',
+    value: 'rand',
+    options:[
+      {
+        name: 'ratio',
+        type: 'float',
+        range: [0, 1]
+      }
+    ]
   }
 ];
 
@@ -96,8 +107,14 @@ export default class Spliter extends React.Component {
           'schema': name,
           [this.state.selectedSeq]: value
         }
-
         break;
+      case 'rand':
+        params = {
+          'schema': name,
+          'ratio': parseFloat(value)
+        }
+
+        break
     }
     this.props.getParams(params);
   }
@@ -132,6 +149,17 @@ export default class Spliter extends React.Component {
               }
             </Select>
             <Input ref={selected + '-' + this.state.selectedSeq}
+                   style={{width: 80, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}} />
+            <Button size="small" onClick={() => this.setParams()}>
+              set
+            </Button>
+          </div>
+        );
+      case 'rand':
+        return (
+          <div style={{marginLeft: 80}}>
+            <span>{"ratio" + ""}</span>
+            <Input ref={selected + '-ratio'}
                    style={{width: 80, border: 'none', borderRadius: 0, borderBottom: '1px solid #108ee9'}} />
             <Button size="small" onClick={() => this.setParams()}>
               set
