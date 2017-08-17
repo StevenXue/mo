@@ -19,20 +19,57 @@ class Serving extends React.Component {
     return (
       <div className="serving-container">
         <h2>gRPC Connection Info</h2>
-        <p>IP: X.X.X.X</p>
-        <p>Port: 9000</p>
+        <br/>
+        <div className='flex-row'>
+          <h3 style={{width: 35}}>IP:</h3>
+          <Highlight className='python hljs code-container inline-code-container'>
+            122.224.116.44
+          </Highlight>
+        </div>
+        <br/>
+        <div className='flex-row'>
+          <h3 style={{width: 35}}>Port: </h3>
+          <Highlight className='python hljs code-container inline-code-container'>
+            9000
+          </Highlight>
+        </div>
+        <br/>
+        <h3>Example:</h3>
         <Tabs defaultActiveKey="1" size="small" className='code-tabs'>
           <TabPane tab="Python" key="1">
             <Highlight className='python hljs code-container'>
-              {'def do_inference(hostport, work_dir, concurrency, num_tests):\n' +
-              '  test_data_set = mnist_input_data.read_data_sets(work_dir).test\n' +
-              '  host, port = hostport.split(\':\')\n' +
-              '  for _ in range(num_tests):\n' +
-              '    request = predict_pb2.PredictRequest()\n' +
-              '    request.model_spec.name = \'mnist\'\n' +
-              '    request.model_spec.signature_name = \'predict_images\'\n' +
-              '    image, label = test_data_set.next_batch(1)\n' +
-              '  return result_counter.get_error_rate()'}
+              {'from grpc.beta import implementations\n' +
+              'import tensorflow as tf\n\n' +
+
+              'from tensorflow_serving.apis import predict_pb2\n' +
+              'from tensorflow_serving.apis import prediction_service_pb2\n\n' +
+
+              'tf.app.flags.DEFINE_string(\'server\', \'localhost:9000\',\n' +
+              '\'PredictionService host:port\')\n' +
+              'tf.app.flags.DEFINE_string(\'image\', \'\', \'path to image in JPEG format\')\n\n' +
+
+              'FLAGS = tf.app.flags.FLAGS\n\n' +
+
+              'def main(_):\n' +
+              'host, port = FLAGS.server.split(\':\')\n' +
+              'channel = implementations.insecure_channel(host, int(port))\n' +
+              'stub = prediction_service_pb2.beta_create_PredictionService_stub(channel)\n\n' +
+
+              '# Send request\n' +
+              'with open(FLAGS.image, \'rb\') as f:\n\n' +
+
+              '# See prediction_service.proto for gRPC request/response details.\n' +
+              'data = f.read()\n' +
+              'request = predict_pb2.PredictRequest()\n' +
+              'request.model_spec.name = \'inception\'\n' +
+              'request.model_spec.signature_name = \'predict_images\'\n' +
+              'request.inputs[\'images\'].CopyFrom(\n' +
+              'tf.contrib.util.make_tensor_proto(data, shape=[1]))\n' +
+              'result = stub.Predict(request, 10.0)  # 10 secs timeout\n' +
+              'print(result)\n\n' +
+
+              'if __name__ == \'__main__\':\n' +
+              'tf.app.run()'}
             </Highlight>
           </TabPane>
           <TabPane tab="JavaScript" disabled key="2">Content of tab 2</TabPane>
