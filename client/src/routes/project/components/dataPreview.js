@@ -68,6 +68,7 @@ class DataPreview extends React.Component {
           <Table style={{marginTop: 5, width: '100%'}}
                  dataSource={this.props.dataSet}
                  columns={dsColumns}
+                 pagination={false}
                  scroll={{x: this.getWidth(dsColumns), y: '100%'}}/>
           <div style={{marginBottom: 10, width: 200, marginLeft: 20}}>
             <Input placeholder="enter statge data name"
