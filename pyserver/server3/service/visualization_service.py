@@ -30,6 +30,8 @@ def usr_story1_exploration(data, d_type, group_num=10):
         arr_temp = [float(list(arr.values())[0]) for arr in data if isNaN(list(arr.values())[0]) == False and list(arr.values())[0] != '']
     elif d_type == 'string' or d_type == 'str':
         arr_temp = [list(arr.values())[0] for arr in data if isNaN(list(arr.values())[0]) == False and list(arr.values())[0] != '']
+    else:
+        arr_temp = []
 
     # 生成的dict有4栏:
     # 数值类型 'type',
