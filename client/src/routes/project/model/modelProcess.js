@@ -182,14 +182,16 @@ export default class ModelProcess extends React.Component {
 
   renderSelections(){
     let source = []
+    console.log(this.state.source);
     if(!this.state.isImage) {
       if (this.state.selectedModel && !isEmpty(this.state.modelData)) {
         if (this.state.supervised) {
-          console.log("supervised");
+          //console.log("supervised");
           let type = this.state.modelData.fit.data_fields.data_type;
           let temp = []
           if (type !== null) {
-            temp = this.state.source.filter((e) => type.indexOf(e[1][1]) !== -1);
+            console.log("type", type);
+            temp = this.state.source.filter((e) => type.indexOf(e[1][0]) !== -1 || type.indexOf(e[1][1]) !== -1);
             source = temp.map((e) => e[0]);
           } else {
             source = this.state.source.map((e) => e[0]);
@@ -221,15 +223,16 @@ export default class ModelProcess extends React.Component {
         } else {
           let x_type = this.state.modelData.fit.data_fields.x_data_type;
           let y_type = this.state.modelData.fit.data_fields.y_data_type;
+          console.log("x_type", x_type, "y_type", y_type);
           if (x_type !== null) {
-            let temp = this.state.source.filter((e) => x_type.indexOf(e[1][1]) !== -1);
+            let temp = this.state.source.filter((e) => x_type.indexOf(e[1][0]) !== -1 || x_type.indexOf(e[1][1]) !== -1);
             source = temp.map((e) => e[0]);
           } else {
             source = this.state.source.map((e) => e[0]);
           }
           let target = []
           if (y_type !== null) {
-            let temp_out = this.state.source.filter((e) => y_type.indexOf(e[1][1]) !== -1);
+            let temp_out = this.state.source.filter((e) => y_type.indexOf(e[1][0]) !== -1 || y_type.indexOf(e[1][1]) !== -1);
             target = temp_out.map((e) => e[0]);
             target = target.filter((e) => this.state.selectedKeys.indexOf(e) === -1);
           } else {

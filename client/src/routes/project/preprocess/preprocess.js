@@ -133,11 +133,11 @@ class Preprocess extends React.Component{
           let fields = {};
           res.response.forEach((e) => {
               fields[e[0]] = e[1];
-              if(e[1][1] === 'string') {
+              if(e[1][0] === 'string') {
                 values[e[0]] = 'str';
-              }else if(e[1][1] === 'float'){
+              }else if(e[1][0] === 'float'){
                 values[e[0]] = 'float';
-              }else if(e[1][1] === 'integer'){
+              }else if(e[1][0] === 'integer'){
                 values[e[0]] = 'int';
               }else{
                 values[e[0]] = e[1][1];
