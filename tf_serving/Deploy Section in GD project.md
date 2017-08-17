@@ -52,6 +52,15 @@ if __name__ == '__main__':
 
 
 #### Model Signature
-
+predict_inputs_tensor_info = tf.saved_model.utils.build_tensor_info(jpegs)
+prediction_signature = (
+    tf.saved_model.signature_def_utils.build_signature_def(
+        inputs={'images': predict_inputs_tensor_info},
+        outputs={
+            'classes': classes_output_tensor_info,
+            'scores': scores_output_tensor_info
+        },
+        method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME
+  ))
 
 
