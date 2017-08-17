@@ -178,7 +178,7 @@ class ModelForms extends React.Component {
   }
 
   onClickRun () {
-    console.log(this.props.params['results'])
+    //console.log(this.props.params['results'])
     if (this.props.jupyter) {
       console.log(this.state.dataset_id);
       let run_params = this.constructParams()
