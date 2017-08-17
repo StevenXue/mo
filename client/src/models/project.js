@@ -93,9 +93,10 @@ export default {
       console.log('fork', payload, user.user_ID)
       yield put({ type: 'setForkingProject', payload: payload})
       const data = yield call(forkProject, payload, user.user_ID)
-      yield put({ type: 'setForkingProject', payload: undefined})
       if (data.success) {
+        message.success('fork success!')
         const res = yield call(query, user.user_ID)
+        yield put({ type: 'setForkingProject', payload: undefined})
         if (res) {
           yield put({
             type: 'querySuccess',
@@ -115,10 +116,13 @@ export default {
 
     * publish ({ payload }, { call, put, select }) {
       console.log('to detail', payload)
+      yield put({ type: 'setPublishingProject', payload: payload})
       const data = yield call(publishProject, payload)
       const user = yield select(state => state['app'].user)
       if (data.success) {
+        message.success('publish success!')
         const res = yield call(query, user.user_ID)
+        yield put({ type: 'setPublishingProject', payload: undefined})
         if (res) {
           yield put({
             type: 'querySuccess',
@@ -350,6 +354,13 @@ export default {
       return {
         ...state,
         forkingProject,
+      }
+    },
+
+    setPublishingProject (state, {payload: publishingProject}) {
+      return {
+        ...state,
+        publishingProject,
       }
     },
 

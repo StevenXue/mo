@@ -64,8 +64,8 @@ class FileSystem extends React.Component {
     return id === this.props.project.deletingProject
   }
 
-  checkForking(id) {
-    return id === this.props.project.forkingProject
+  checkForkingPublishing(id) {
+    return id === this.props.project.forkingProject || id === this.props.project.publishingProject
   }
 
   // checkPublishing(id) {
@@ -86,7 +86,7 @@ class FileSystem extends React.Component {
       <Card key={e._id} title={e.name} extra={
         <a>
           <Button type="primary" style={{ marginTop: -5 }}
-                  loading={this.checkForking(e._id)}
+                  loading={this.checkForkingPublishing(e._id)}
                   onClick={(event) => this.onClickProjectOp(event, key, e._id)}>
             {
               key === 'owned_projects' ? 'Publish' : 'Fork'
