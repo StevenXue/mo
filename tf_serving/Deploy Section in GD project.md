@@ -26,14 +26,14 @@ def main(_):
 	# Send request
 	with open(FLAGS.image, 'rb') as f:
 	
-	# See prediction_service.proto for gRPC request/response details.
-	data = f.read()
-	request = predict_pb2.PredictRequest()
-	request.model_spec.name = 'inception'
-	request.model_spec.signature_name = 'predict_images'
-	request.inputs['images'].CopyFrom(tf.contrib.util.make_tensor_proto(data, shape=[1]))
-	result = stub.Predict(request, 10.0)  # 10 secs timeout
-	print(result)
+        # See prediction_service.proto for gRPC request/response details.
+        data = f.read()
+        request = predict_pb2.PredictRequest()
+        request.model_spec.name = 'inception'
+        request.model_spec.signature_name = 'predict_images'
+        request.inputs['images'].CopyFrom(tf.contrib.util.make_tensor_proto(data, shape=[1]))
+        result = stub.Predict(request, 10.0)  # 10 secs timeout
+        print(result)
 
 if __name__ == '__main__':
   tf.app.run()
