@@ -163,9 +163,6 @@ def freq_hist(arr, group_num=10, mul=1):
     if __max == x_domain[-1]:
         y_domain[-1] += list(arr_array).count(x_domain[-1])
     # 注意x会比y多一个
-    print("test", len(arr))
-    print("test", x_domain)
-    print("test", sum(y_domain))
     return {'x_domain': x_domain.tolist(), 'y_domain': (y_domain * mul).tolist()}
 
 
