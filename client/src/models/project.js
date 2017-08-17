@@ -109,6 +109,7 @@ export default {
           throw res
         }
       } else {
+        yield put({ type: 'setForkingProject', payload: undefined})
         console.log('error', data)
         throw data
       }
@@ -135,6 +136,7 @@ export default {
           throw res
         }
       } else {
+        yield put({ type: 'setPublishingProject', payload: undefined})
         console.log('error', data)
         throw data
       }
