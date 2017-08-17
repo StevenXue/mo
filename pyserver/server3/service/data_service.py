@@ -28,7 +28,7 @@ def field_mapper_reducer():
                             type = 'float'
                         }
                     }
-                    emit(key, type); 
+                    emit(key, [type, this[key]]); 
                 }
                 //for (var key in this) { emit(key, null); }
             }
@@ -37,7 +37,8 @@ def field_mapper_reducer():
     reducer = Code("""
             function(key, stuff) { 
                 let obj = {}
-                stuff.forEach(e => obj[e] = null)
+                stuff.filter(e => e[0] !== undefined).forEach(e => 
+                obj[e[0]] = e[1])
                 return obj; 
             }
         """)
