@@ -2,6 +2,7 @@
 from datetime import datetime
 from copy import deepcopy
 import shutil
+import os
 
 from mongoengine import DoesNotExist
 
@@ -69,17 +70,24 @@ def remove_project_by_id(project_id, user_ID):
     :return:
     """
     project = project_business.get_by_id(project_id)
-    for job in project['jobs']:
-        job_business.remove_by_id(job['id'])
-    for result in project['results']:
-        result_business.remove_by_id(result['id'])
+    # check ownership
     ownership = ownership_business.get_ownership_by_owned_item(project,
                                                                'project')
     if user_ID != ownership.user.user_ID:
         print(user_ID, ownership.user.user_ID)
         raise ValueError('project not belong to this user, cannot delete')
+    try:
+        for job in project['jobs']:
+            job_business.remove_by_id(job['id'])
+        for result in project['results']:
+            result_business.remove_by_id(result['id'])
+    except TypeError:
+        pass
+    # delete project directory
     project_directory = UPLOAD_FOLDER + user_ID + '/' + project.name
-    shutil.rmtree(project_directory)
+    if os.path.isdir(project_directory):
+        shutil.rmtree(project_directory)
+    # delete project object
     return project_business.remove_by_id(project_id)
 
 

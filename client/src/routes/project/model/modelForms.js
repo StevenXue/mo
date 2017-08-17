@@ -58,7 +58,7 @@ class ModelForms extends React.Component {
       selectedFile: this.props.selectedFile,
       dataset_id: this.props.dataset_id
     })
-    console.log(this.props.selectedFile)
+    //console.log(this.props.selectedFile)
     let socket = io.connect(flaskServer + '/log/' + this.props.project_id)
     socket.on('log_epoch_end', (msg) => {
       console.log('receive msg', msg)
@@ -66,6 +66,7 @@ class ModelForms extends React.Component {
     })
 
     if (this.props.params) {
+      console.log(this.props.params);
       this.setState({ end: true })
     }
 
@@ -177,6 +178,7 @@ class ModelForms extends React.Component {
   }
 
   onClickRun () {
+    //console.log(this.props.params['results'])
     if (this.props.jupyter) {
       console.log(this.state.dataset_id);
       let run_params = this.constructParams()
@@ -252,7 +254,8 @@ class ModelForms extends React.Component {
           .then((res) => {
             if (res.response === 'success') {
               message.success(res.response)
-              this.setState({ score: res.response.score })
+              this.setState({ score: res.response.score,
+              jobId: res.response.job_id})
             }
             this.props.modalSuccess()
             this.setState({ end: true })
@@ -461,12 +464,22 @@ class ModelForms extends React.Component {
   }
 
   onClickPredict () {
-    let run_params = this.props.params || this.constructParams()
-    this.props.dispatch({ type: 'project/setActiveKey', payload: '5' })
+    let run_params = this.props.params
+    this.props.dispatch({ type: 'project/setActiveKey', payload: [...this.props.project.activeKeys, '5'] })
+    let predictModelType
+    let predictJobId
+    if (run_params) {
+      predictModelType = run_params.model.category
+      predictJobId = run_params._id
+    } else {
+      // run_params =  this.constructParams()
+      predictModelType = this.props.model_type
+      predictJobId = this.state.jobId
+    }
     this.props.dispatch({
       type: 'project/setPredictInfo', payload: {
-        predictModelType: run_params.model.category,
-        predictJobId: run_params._id,
+        predictModelType,
+        predictJobId,
       },
     })
   }
@@ -509,7 +522,7 @@ class ModelForms extends React.Component {
                    </Button>
                  ]}>
             {this.props.params?
-              (this.state.params['results'] && <Curve data={this.state.params['results']['history']}/>):
+              (this.state.params['results']['history'] && <Curve data={this.state.params['results']['history']}/>):
               <Visual data={this.state.ioData} end={this.state.end}/>
             }
           </Modal>

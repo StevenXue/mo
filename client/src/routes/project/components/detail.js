@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import classnames from 'classnames'
+import lodash from 'lodash';
 import { Button, Select, Icon, message, Modal, Table, Collapse, Spin, Popover } from 'antd'
 
 import { jupyterServer, flaskServer } from '../../../constants'
@@ -12,10 +13,11 @@ import AutomatedModel from '../model/autoModal'
 import Predict from '../predict/predict'
 import ImagePredict from '../predict/imagePredict'
 import NeuralStyle from '../predict/neuralStyle'
+import Serving from '../serving/serving'
 import DataPreview from './dataPreview'
 import { stepStyle, assetsUrl } from '../../../constants'
 import { TourArea } from '../../../components'
-import { isEmpty, toolkit_info} from '../../../utils/utils'
+import { isEmpty, toolkit_info } from '../../../utils/utils'
 import empty from './empty.ipynb'
 import style from './detail.css'
 // 全局css，在index里去import
@@ -24,6 +26,13 @@ import 'codemirror/theme/monokai.css'
 
 const { Panel } = Collapse
 const { Option } = Select
+
+const customPanelStyle = {
+  background: '#f7f7f7',
+  borderRadius: 4,
+  marginBottom: 10,
+  border: '1px solid #e5e5e5',
+};
 
 const defaultSteps = [
   {
@@ -112,7 +121,7 @@ class ProjectDetail extends React.Component {
   componentDidMount () {
     this.props.dispatch({ type: 'project/query' })
     this.props.dispatch({ type: 'project/listDataSets' })
-    this.props.dispatch({ type: 'project/listToolkit'})
+    this.props.dispatch({ type: 'project/listToolkit' })
     this.props.dispatch({ type: 'project/getStagingDatasets', payload: this.props.location.query._id })
   }
 
@@ -184,13 +193,9 @@ class ProjectDetail extends React.Component {
   }
 
   getNotebook (content) {
-    console.log(content);
-    for (let i = 0; 0 < content.length; i++) {
-      if (content[i] && content[i]['type'] === 'notebook') {
-        // console.log(content[i]);
-        return content[i]
-      }
-    }
+    let target;
+    target = content.find((el) => el.type === 'notebook')
+    return target
   }
 
   startNotebook () {
@@ -200,8 +205,13 @@ class ProjectDetail extends React.Component {
       .then((res) => {
         console.log(res);
         let notebook_content = {}
-        if (res.content && res.content.length !== 0) {
-          notebook_content = this.getNotebook(res.content)
+        let response = lodash.cloneDeep(res)
+        if (response.content instanceof Array && response.content[0]) {
+          setTimeout(() => {
+            let content = response.content;
+            console.log(response);
+            notebook_content = this.getNotebook(content)
+          }, 1000)
         }
 
         if (isEmpty(notebook_content)) {
@@ -243,15 +253,20 @@ class ProjectDetail extends React.Component {
       )
   }
 
-  onClickCollapse () {
-    console.log('onClickCollapse')
-    let key = this.props.project.activeKey
-    if (!key) {
-      key = '5'
-    } else {
-      key = undefined
-    }
-    this.props.dispatch({ type: 'project/setActiveKey', payload: key })
+  onCollapseChange (e) {
+    // console.log('click', e)
+    // let keys = this.props.project.activeKeys
+    // // if (!keys) {
+    // //   keys = e[0]
+    // // } else {
+    // //   keys = undefined
+    // // }
+    // if(e[0] in keys) {
+    //   keys = keys.filter(k => k !== e[0])
+    // } else {
+    //   e[0] && keys.push(e[0])
+    // }
+    this.props.dispatch({ type: 'project/setActiveKey', payload: e })
   }
 
   renderOptions (key) {
@@ -269,7 +284,6 @@ class ProjectDetail extends React.Component {
                       shape="circle" icon="question" onClick={() => this.runTour(defaultSteps)}
               />
             </h2>
-            <h4 style={{ marginTop: 10 }}>{'project id: ' + this.props.location.query._id}</h4>
             <div style={{ display: 'flex', flexDirection: 'column', marginTop: 20 }}>
               <div>
                 <Modal title="Choose DataSet"
@@ -315,7 +329,7 @@ class ProjectDetail extends React.Component {
                     <Preprocess dataSet={this.state.dataSet}
                                 fields={this.state.fields}
                                 project_id={this.props.location.query._id}
-                                passStaging={(value) => this.getStagingId(value)} />
+                                passStaging={(value) => this.getStagingId(value)}/>
                   </Spin>
                 </Panel>
               </Collapse>
@@ -324,23 +338,23 @@ class ProjectDetail extends React.Component {
               <Collapse className='exploration-collapse' bordered={true} style={{ marginTop: 10, width: '100%' }}>
                 <Panel header={'Data Exploration & Analysis'} key="1">
                   <div className={classnames(style.descriptions)}>
-                    <span style={{fontSize:14}}>{"There are currently 5 types of toolkits available: "}</span>
+                    <span style={{ fontSize: 14 }}>{'There are currently 5 types of toolkits available: '}</span>
                     {
                       Object.keys(toolkit_info).map((el) =>
-                        <div key={el} style={{marginLeft: 10}}>
-                          <span style={{fontSize:14}}>{el}</span>
+                        <div key={el} style={{ marginLeft: 10 }}>
+                          <span style={{ fontSize: 14 }}>{el}</span>
                           <Popover content={
                             <div>
-                              <p style={{width: 150}}>{toolkit_info[el]}</p>
+                              <p style={{ width: 150 }}>{toolkit_info[el]}</p>
                             </div>
                           } title="Description">
-                            <Icon type="question-circle-o" style={{fontSize: 10, marginLeft:3, color: '#767676'}}/>
+                            <Icon type="question-circle-o" style={{ fontSize: 10, marginLeft: 3, color: '#767676' }}/>
                           </Popover>
-                          <span>{", "}</span>
-                      </div>)
+                          <span>{', '}</span>
+                        </div>)
                     }
                   </div>
-                  <Toolkits project_id={this.props.location.query._id} />
+                  <Toolkits project_id={this.props.location.query._id}/>
                 </Panel>
               </Collapse>
             </div>
@@ -351,14 +365,18 @@ class ProjectDetail extends React.Component {
                 </Panel>
               </Collapse>
             </div>
-            <Collapse className='model-predict' id="model-predict" bordered={true} style={{ marginTop: 10, width: '100%' }}
-                      activeKey={this.props.project.activeKey}
-                      onChange={() => this.onClickCollapse()}
+            <Collapse className='model-predict' id="model-predict" bordered={false}
+                      style={{ marginTop: 10, width: '100%' }}
+                      activeKey={this.props.project.activeKeys}
+                      onChange={(e) => this.onCollapseChange(e)}
             >
-              <Panel header={'Predict'} key="5">
+              <Panel header='Predict' key="5" style={customPanelStyle}>
                 {this.props.project.predictModelType === 4 ? <ImagePredict/>
                   : <NeuralStyle project_id={this.state.project_id}/>
                 }
+              </Panel>
+              <Panel header='Serving' key="6" style={customPanelStyle}>
+                <Serving/>
               </Panel>
             </Collapse>
           </div>

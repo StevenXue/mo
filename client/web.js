@@ -11,4 +11,4 @@ app.get('/*', function (req, res) {
     res.sendFile(path.join(__dirname, './dist', 'index.html'));
 });
 
-app.listen(3090, "0.0.0.0");
+app.listen(8008, "0.0.0.0");
