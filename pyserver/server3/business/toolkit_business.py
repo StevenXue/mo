@@ -844,7 +844,7 @@ def create_public_data_process():
                                   "if_reserved": True,
                                   "args": [
                                       {
-                                          "name": "standerd_scalar",
+                                          "name": "result",
                                           "des": "数值转换，对所选数据做标准化处理",
                                           "if_add_column": True,
                                           "attribute": "label"
@@ -879,7 +879,7 @@ def create_public_data_process():
                                  "if_reserved": True,
                                  "args": [
                                      {
-                                         "name": "min_max_scaler",
+                                         "name": "result",
                                          "des": "数值转换，对所选数据做标准化处理",
                                          "if_add_column": True,
                                          "attribute": "label"
@@ -914,7 +914,7 @@ def create_public_data_process():
                              "if_reserved": True,
                              "args": [
                                  {
-                                     "name": "normalizer",
+                                     "name": "result",
                                      "des": "数值转换，对所选数据做标准化处理",
                                      "if_add_column": True,
                                      "attribute": "label"
@@ -961,7 +961,7 @@ def create_public_data_process():
                             "if_reserved": True,
                             "args": [
                                 {
-                                    "name": "binarizer",
+                                    "name": "result",
                                     "des": "数值转换，对所选数据做标准化处理",
                                     "if_add_column": True,
                                     "attribute": "label"
@@ -996,7 +996,7 @@ def create_public_data_process():
                                   "if_reserved": True,
                                   "args": [
                                       {
-                                          "name": "one_hot_encoder",
+                                          "name": "result",
                                           "des": "数值转换，对所选数据做标准化处理",
                                           "if_add_column": True,
                                           "attribute": "label"
@@ -1031,7 +1031,7 @@ def create_public_data_process():
                           "if_reserved": True,
                           "args": [
                               {
-                                  "name": "imputer",
+                                  "name": "result",
                                   "des": "数值转换，对所选数据做标准化处理",
                                   "if_add_column": True,
                                   "attribute": "label"
@@ -1066,7 +1066,7 @@ def create_public_data_process():
                                       "if_reserved": True,
                                       "args": [
                                           {
-                                              "name": "polynomial_features",
+                                              "name": "result",
                                               "des": "数值转换，对所选数据做标准化处理",
                                               "if_add_column": True,
                                               "attribute": "label"
@@ -1602,7 +1602,7 @@ def create_public_data_process():
                       "if_reserved": False,
                       "args": [
                           {
-                              "name": "mic_result",
+                              "name": "result",
                               "des": "所选范围的样本的MIC的结果",
                               "if_add_column": False,
                               "attribute": "label"
