@@ -44,7 +44,7 @@ export default class Playground extends React.Component {
       .then((res) => {
 		    console.log(res);
 		    //const URL = `http://10.52.14.182:8888/notebooks/${res.path}`;
-        const URL = jupyterBase + 'notebooks/' + res.path;
+        const URL = baseUrl + 'notebooks/' + res.path;
         console.log('constructed', URL);
         this.setState({ notebookURL: URL });
       });
