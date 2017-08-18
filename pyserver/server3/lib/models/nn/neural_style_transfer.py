@@ -33,130 +33,130 @@ def neural_style_transfer(args, project_id, file_url):
     img_nrows = 400
     img_ncols = int(width * img_nrows / height)
 
-    # this Evaluator class makes it possible
-    # to compute loss and gradients in one pass
-    # while retrieving them via two separate functions,
-    # "loss" and "grads". This is done because scipy.optimize
-    # requires separate functions for loss and gradients,
-    # but computing them separately would be inefficient.
-    class Evaluator(object):
-        def __init__(self):
-            self.loss_value = None
-            self.grads_values = None
-
-        def loss(self, x):
-            assert self.loss_value is None
-            loss_value, grad_values = eval_loss_and_grads(x)
-            self.loss_value = loss_value
-            self.grad_values = grad_values
-            return self.loss_value
-
-        def grads(self, x):
-            assert self.loss_value is not None
-            grad_values = np.copy(self.grad_values)
-            self.loss_value = None
-            self.grad_values = None
-            return grad_values
-
-    # util function to open, resize and format pictures into appropriate
-    # tensors
-    # 此步骤将img的channel顺序由RGB转到了BGR
-    # 主要是因为 vgg模型当时是用caffe训练的，使用了opencv来加载图像，
-    # 而opencv的加载顺序是 BGR
-    # 结果是 VGG 的输入图像需要转换到 BGR模式
-    def preprocess_image(image_path):
-        img = load_img(image_path, target_size=(img_nrows, img_ncols))
-        img = img_to_array(img)
-        img = np.expand_dims(img, axis=0)
-        img = vgg19.preprocess_input(img)
-        return img
-
-    # util function to convert a tensor into a valid image
-    # 此步骤又从BGR转换回 RGB
-    def deprocess_image(x):
-        if K.image_data_format() == 'channels_first':
-            x = x.reshape((3, img_nrows, img_ncols))
-            x = x.transpose((1, 2, 0))
-        else:
-            x = x.reshape((img_nrows, img_ncols, 3))
-        # Remove zero-center by mean pixel
-        x[:, :, 0] += 103.939
-        x[:, :, 1] += 116.779
-        x[:, :, 2] += 123.68
-        # 'BGR'->'RGB'
-        x = x[:, :, ::-1]
-        x = np.clip(x, 0, 255).astype('uint8')
-        return x
-
-    # compute the neural style loss
-    # first we need to define 4 util functions
-
-    # the gram matrix of an image tensor (feature-wise outer product)
-    def gram_matrix(x):
-        assert K.ndim(x) == 3
-        if K.image_data_format() == 'channels_first':
-            features = K.batch_flatten(x)
-        else:
-            features = K.batch_flatten(K.permute_dimensions(x, (2, 0, 1)))
-        gram = K.dot(features, K.transpose(features))
-        return gram
-
-    # the "style loss" is designed to maintain
-    # the style of the reference image in the generated image.
-    # It is based on the gram matrices (which capture style) of
-    # feature maps from the style reference image
-    # and from the generated image
-    def style_loss(style, combination):
-        assert K.ndim(style) == 3
-        assert K.ndim(combination) == 3
-        S = gram_matrix(style)
-        C = gram_matrix(combination)
-        channels = 3
-        size = img_nrows * img_ncols
-        return K.sum(K.square(S - C)) / (4. * (channels ** 2) * (size ** 2))
-
-    # an auxiliary loss function
-    # designed to maintain the "content" of the
-    # base image in the generated image
-    def content_loss(base, combination):
-        return K.sum(K.square(combination - base))
-
-    # the 3rd loss function, total variation loss,
-    # designed to keep the generated image locally coherent
-    def total_variation_loss(x):
-        assert K.ndim(x) == 4
-        if K.image_data_format() == 'channels_first':
-            a = K.square(x[:, :, :img_nrows - 1, :img_ncols - 1] - x[:, :, 1:,
-                                                                   :img_ncols - 1])
-            b = K.square(
-                x[:, :, :img_nrows - 1, :img_ncols - 1] - x[:, :,
-                                                          :img_nrows - 1,
-                                                          1:])
-        else:
-            a = K.square(
-                x[:, :img_nrows - 1, :img_ncols - 1, :] - x[:, 1:,
-                                                          :img_ncols - 1,
-                                                          :])
-            b = K.square(
-                x[:, :img_nrows - 1, :img_ncols - 1, :] - x[:, :img_nrows - 1,
-                                                          1:,
-                                                          :])
-        return K.sum(K.pow(a + b, 1.25))
-
-    def eval_loss_and_grads(x):
-        if K.image_data_format() == 'channels_first':
-            x = x.reshape((1, 3, img_nrows, img_ncols))
-        else:
-            x = x.reshape((1, img_nrows, img_ncols, 3))
-        outs = f_outputs([x])
-        loss_value = outs[0]
-        if len(outs[1:]) == 1:
-            grad_values = outs[1].flatten().astype('float64')
-        else:
-            grad_values = np.array(outs[1:]).flatten().astype('float64')
-        return loss_value, grad_values
-
     with graph.as_default():
+        # this Evaluator class makes it possible
+        # to compute loss and gradients in one pass
+        # while retrieving them via two separate functions,
+        # "loss" and "grads". This is done because scipy.optimize
+        # requires separate functions for loss and gradients,
+        # but computing them separately would be inefficient.
+        class Evaluator(object):
+            def __init__(self):
+                self.loss_value = None
+                self.grads_values = None
+
+            def loss(self, x):
+                assert self.loss_value is None
+                loss_value, grad_values = eval_loss_and_grads(x)
+                self.loss_value = loss_value
+                self.grad_values = grad_values
+                return self.loss_value
+
+            def grads(self, x):
+                assert self.loss_value is not None
+                grad_values = np.copy(self.grad_values)
+                self.loss_value = None
+                self.grad_values = None
+                return grad_values
+
+        # util function to open, resize and format pictures into appropriate
+        # tensors
+        # 此步骤将img的channel顺序由RGB转到了BGR
+        # 主要是因为 vgg模型当时是用caffe训练的，使用了opencv来加载图像，
+        # 而opencv的加载顺序是 BGR
+        # 结果是 VGG 的输入图像需要转换到 BGR模式
+        def preprocess_image(image_path):
+            img = load_img(image_path, target_size=(img_nrows, img_ncols))
+            img = img_to_array(img)
+            img = np.expand_dims(img, axis=0)
+            img = vgg19.preprocess_input(img)
+            return img
+
+        # util function to convert a tensor into a valid image
+        # 此步骤又从BGR转换回 RGB
+        def deprocess_image(x):
+            if K.image_data_format() == 'channels_first':
+                x = x.reshape((3, img_nrows, img_ncols))
+                x = x.transpose((1, 2, 0))
+            else:
+                x = x.reshape((img_nrows, img_ncols, 3))
+            # Remove zero-center by mean pixel
+            x[:, :, 0] += 103.939
+            x[:, :, 1] += 116.779
+            x[:, :, 2] += 123.68
+            # 'BGR'->'RGB'
+            x = x[:, :, ::-1]
+            x = np.clip(x, 0, 255).astype('uint8')
+            return x
+
+        # compute the neural style loss
+        # first we need to define 4 util functions
+
+        # the gram matrix of an image tensor (feature-wise outer product)
+        def gram_matrix(x):
+            assert K.ndim(x) == 3
+            if K.image_data_format() == 'channels_first':
+                features = K.batch_flatten(x)
+            else:
+                features = K.batch_flatten(K.permute_dimensions(x, (2, 0, 1)))
+            gram = K.dot(features, K.transpose(features))
+            return gram
+
+        # the "style loss" is designed to maintain
+        # the style of the reference image in the generated image.
+        # It is based on the gram matrices (which capture style) of
+        # feature maps from the style reference image
+        # and from the generated image
+        def style_loss(style, combination):
+            assert K.ndim(style) == 3
+            assert K.ndim(combination) == 3
+            S = gram_matrix(style)
+            C = gram_matrix(combination)
+            channels = 3
+            size = img_nrows * img_ncols
+            return K.sum(K.square(S - C)) / (4. * (channels ** 2) * (size ** 2))
+
+        # an auxiliary loss function
+        # designed to maintain the "content" of the
+        # base image in the generated image
+        def content_loss(base, combination):
+            return K.sum(K.square(combination - base))
+
+        # the 3rd loss function, total variation loss,
+        # designed to keep the generated image locally coherent
+        def total_variation_loss(x):
+            assert K.ndim(x) == 4
+            if K.image_data_format() == 'channels_first':
+                a = K.square(x[:, :, :img_nrows - 1, :img_ncols - 1] - x[:, :, 1:,
+                                                                       :img_ncols - 1])
+                b = K.square(
+                    x[:, :, :img_nrows - 1, :img_ncols - 1] - x[:, :,
+                                                              :img_nrows - 1,
+                                                              1:])
+            else:
+                a = K.square(
+                    x[:, :img_nrows - 1, :img_ncols - 1, :] - x[:, 1:,
+                                                              :img_ncols - 1,
+                                                              :])
+                b = K.square(
+                    x[:, :img_nrows - 1, :img_ncols - 1, :] - x[:, :img_nrows - 1,
+                                                              1:,
+                                                              :])
+            return K.sum(K.pow(a + b, 1.25))
+
+        def eval_loss_and_grads(x):
+            if K.image_data_format() == 'channels_first':
+                x = x.reshape((1, 3, img_nrows, img_ncols))
+            else:
+                x = x.reshape((1, img_nrows, img_ncols, 3))
+            outs = f_outputs([x])
+            loss_value = outs[0]
+            if len(outs[1:]) == 1:
+                grad_values = outs[1].flatten().astype('float64')
+            else:
+                grad_values = np.array(outs[1:]).flatten().astype('float64')
+            return loss_value, grad_values
+
         # get tensor representations of our images
         base_image = K.variable(preprocess_image(base_image_path))
         style_reference_image = K.variable(
@@ -180,7 +180,8 @@ def neural_style_transfer(args, project_id, file_url):
         print('Model loaded.')
 
         # get the symbolic outputs of each "key" layer (we gave them unique names).
-        outputs_dict = dict([(layer.name, layer.output) for layer in model.layers])
+        outputs_dict = dict(
+            [(layer.name, layer.output) for layer in model.layers])
 
         # combine these loss functions into a single scalar
         loss = K.variable(0.)
@@ -258,4 +259,3 @@ def neural_style_transfer(args, project_id, file_url):
 #     'result_prefix': './neural_style_transfer/result/result',
 # }
 # neural_style_transfer(args, '', '')
-
