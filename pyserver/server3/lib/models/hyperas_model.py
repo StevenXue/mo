@@ -40,25 +40,22 @@ from keras.optimizers import RMSprop
 def train_hyperas_model(conf, data_source_id, **kwargs):
     # generate my_temp_model python file
     conf_to_python_file(conf, data_source_id, **kwargs)
-
     import my_temp_model
     model = my_temp_model.model_function
     data = my_temp_model.my_data_function_template
     X_train, Y_train, X_test, Y_test = data()
-
     best_run, best_model = optim.minimize(model=model,
                                           data=data,
                                           algo=tpe.suggest,
                                           max_evals=5,
                                           trials=Trials())
-
-    temp_file = "./my_temp_model.py"
-    try:
-        pass
-        os.remove(temp_file)
-        os.remove(temp_file + 'c')
-    except OSError:
-        pass
+    # temp_file = "./my_temp_model.py"
+    # try:
+    #     pass
+    #     os.remove(temp_file)
+    #     os.remove(temp_file + 'c')
+    # except OSError:
+    #     pass
 
     print("Evalutation of best performing model:")
     score, acc = best_model.evaluate(X_test, Y_test)
