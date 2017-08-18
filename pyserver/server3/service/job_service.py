@@ -146,7 +146,6 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                     inn = inn + 1
                 # 由于出来的数据格式不一致，判断是否为二维数据(是=>1, 不是=>0)
                 flag_shape = 1 if isinstance(labels[inn], list) else 0
-                # print("flag_shape", arg[0][inn], isinstance(args[0][inn], list))
 
                 result_be = labels if flag_shape else np.array(labels).reshape([-1, 1]).tolist()
 
