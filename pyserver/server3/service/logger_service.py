@@ -12,10 +12,18 @@ socketio = SocketIO(message_queue='redis://')
 epoch = 0
 
 
-def log_epoch_end(*args):
+def log_epoch_begin(*args):
     global epoch
-    epoch = args[0] + 1
-    print(args)
+    epoch = args[0]
+    print(args[0], epoch)
+    # save_log('epoch', *args)
+    # emit_log('epoch', *args)
+
+
+def log_epoch_end(*args):
+    # global epoch
+    # epoch = args[0] + 1
+    # print(args)
     save_log('epoch', *args)
     emit_log('epoch', *args)
 
@@ -26,7 +34,7 @@ def log_batch_end(*args):
     args = json_utility.convert_to_json(args)
     batch = 'Epoch: {}, Batch: {}'.format(epoch, args[0])
     project_id = args[-1]
-    print(*args)
+    print(batch)
     emit_message({"batch": batch}, project_id)
 
 
@@ -57,6 +65,9 @@ def emit_log(event, n, logs, result_sds, project_id):
 def emit_message(message, project_id):
     socketio.emit('log_epoch_end', message, namespace='/log/%s' % project_id)
 
+
+def emit_message_url(message, project_id):
+    socketio.emit('send_message', message, namespace='/log/%s' % project_id)
 
 # def emit_message(message, project_id):
 #     eventlet.spawn_n(emit_message_fn, message, project_id)

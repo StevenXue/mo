@@ -133,15 +133,23 @@ class Preprocess extends React.Component{
           let fields = {};
           res.response.forEach((e) => {
               fields[e[0]] = e[1];
-              if(e[1][1] === 'string') {
-                values[e[0]] = 'str';
-              }else if(e[1][1] === 'float'){
-                values[e[0]] = 'float';
-              }else if(e[1][1] === 'integer'){
-                values[e[0]] = 'int';
+
+              if(e[1].length === 1){
+                if(e[1][0] === 'string') {
+                  values[e[0]] = 'str';
+                }else if(e[1][0] === 'float'){
+                  values[e[0]] = 'float';
+                }else if(e[1][0] === 'integer'){
+                  values[e[0]] = 'int';
+                }else{
+                  values[e[0]] = e[1][1];
+                }
               }else{
-                values[e[0]] = e[1][1];
+                if(e[1].indexOf('float') !== -1){
+                  values[e[0]] = 'float';
+                }
               }
+
             }
           );
           console.log(values, fields);
@@ -216,6 +224,7 @@ class Preprocess extends React.Component{
                  onCancel={() => this.setState({visible: false})}
           >
             <Table style={{marginTop: -20}}
+                   size="small"
                    rowKey={record => record._id}
                    dataSource={this.state.previewDs}
                    columns={this.state.previewCols}

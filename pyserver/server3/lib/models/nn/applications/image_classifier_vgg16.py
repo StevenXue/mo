@@ -57,7 +57,7 @@ def image_classifier_vgg16(conf, input, **kw):
 
         # load the VGG16 network
         base_model = applications.VGG16(weights='imagenet', include_top=False,
-                                   input_shape=input_shape)
+                                        input_shape=input_shape)
 
         # build the top of cnn network
         top_model = Sequential()
@@ -90,8 +90,6 @@ def image_classifier_vgg16(conf, input, **kw):
                           optimizer='rmsprop',
                           metrics=['accuracy'])
 
-
-
         # this is the augmentation configuration we will use for training
         train_datagen = ImageDataGenerator(
             rescale=1. / 255,
@@ -117,7 +115,13 @@ def image_classifier_vgg16(conf, input, **kw):
             batch_size=batch_size,
             class_mode=class_mode)
         # callback to save metrics
-        batch_print_callback = LambdaCallback(on_epoch_end=
+        batch_print_callback = LambdaCallback(on_epoch_begin=
+                                              lambda epoch, logs:
+                                              logger_service.log_epoch_begin(
+                                                  epoch, logs,
+                                                  result_sds,
+                                                  project_id),
+                                              on_epoch_end=
                                               lambda epoch, logs:
                                               logger_service.log_epoch_end(
                                                   epoch, logs,
