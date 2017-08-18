@@ -171,7 +171,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                     raw_d = data[indx]
 
                     if not flag_str1 and len(set(raw_d)) > 5:
-                        bar1_tmp = visualization_service.freq_hist(raw_d, multip=1)
+                        bar1_tmp = visualization_service.freq_hist(raw_d)
                     else:
                         seta = set(raw_d)
                         x_domain = [el for el in seta]
@@ -185,7 +185,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                     raw_re = result[indx]
 
                     if not flag_str2 and len(set(raw_re)) > 5:
-                        bar2_tmp = visualization_service.freq_hist(raw_re, multip=1)
+                        bar2_tmp = visualization_service.freq_hist(raw_re)
                     else:
                         seta = set(raw_re)
                         x_domain = [el for el in seta]
