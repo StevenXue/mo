@@ -5,6 +5,8 @@ import lodash from 'lodash'
 import { connect } from 'dva'
 import { Button, Input, Spin, Select, Icon, message, Modal, Popover } from 'antd'
 
+import { default_hyper_parameter } from '../../../utils/utils'
+
 const Option = Select.Option
 import io from 'socket.io-client'
 
@@ -258,39 +260,53 @@ class ModelForms extends React.Component {
           }
         }
         let url = ''
-        if (this.state.hyped) {
+        if (this.props.model_id === '598bb663d845c0625b249be2') {
           this.setState({hypeLoading: true});
           url = flaskServer + '/model/models/run_hyperas_model/' + this.props.model_id
-        } else {
-          url = flaskServer + '/model/models/run/' + this.props.model_id
-        }
-        let param = this.cleanParamsTemp(params);
-        fetch(url, {
-          method: 'post',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(param),
-        }).then((response) => response.json())
-          .then((res) => {
-            if(this.state.hyped){
+          fetch(url, {
+            method: 'post',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(default_hyper_parameter),
+          }).then((response) => response.json())
+            .then((res) => {
               this.setState({
                 hypeParams: res.response,
                 hypeLoading: false,
                 end: true
               });
-            }else {
-              if (res.response === 'success') {
-                message.success(res.response)
+            });
+        } else {
+          //let param = this.cleanParamsTemp(params);
+          url = flaskServer + '/model/models/run/' + this.props.model_id
+          fetch(url, {
+            method: 'post',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(params),
+          }).then((response) => response.json())
+            .then((res) => {
+              if(this.props.model_id === '598bb663d845c0625b249be2'){
                 this.setState({
-                  score: res.response.score,
-                  jobId: res.response.job_id
-                })
+                  hypeParams: res.response,
+                  hypeLoading: false,
+                  end: true
+                });
+              }else {
+                if (res.response === 'success') {
+                  message.success(res.response)
+                  this.setState({
+                    score: res.response.score,
+                    jobId: res.response.job_id
+                  })
+                }
+                this.props.modalSuccess()
+                this.setState({end: true})
               }
-              this.props.modalSuccess()
-              this.setState({end: true})
-            }
-          })
+            });
+        }
       }else{
         this.setState({ visible: true })
       }
@@ -572,7 +588,7 @@ class ModelForms extends React.Component {
               this.props.params?
               (this.state.params['results']['history'] && <Curve data={this.state.params['results']['history']}/>):
 
-                  this.state.hyped?
+                this.props.model_id === '598bb663d845c0625b249be2'?
                     this.renderHypeResults():
                   <Visual data={this.state.ioData} end={this.state.end} />
             }
