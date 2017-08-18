@@ -15,7 +15,6 @@ const bodyStyle = {
 	},
 };
 
-//let selectable = 0;
 
 export default class Playground extends React.Component {
 	constructor(props) {
