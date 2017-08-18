@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
+import lodash from 'lodash'
 import { connect } from 'dva'
 import { Button, Input, Spin, Select, Icon, message, Modal, Popover } from 'antd'
 
@@ -41,7 +42,9 @@ class ModelForms extends React.Component {
       selectedFile: '',
       spliter: {},
       hyped: false,
-      dataset_id: ''
+      dataset_id: '',
+      hypeLoading: false,
+      hypeParams: {}
     }
   }
 
@@ -177,6 +180,22 @@ class ModelForms extends React.Component {
     return run_params
   }
 
+
+  //TODO
+  cleanParamsTemp(params){
+    console.log(params);
+    let param = lodash.cloneDeep(params);
+    let keys = Object.keys(param['conf']['compile']['args']['optimizer']['args']);
+    keys.forEach((e) => {
+        console.log(e);
+        delete param['conf']['compile']['args']['optimizer']['args'][e]['range']
+        delete param['conf']['compile']['args']['optimizer']['args'][e]['hyped']
+        param['conf']['compile']['args']['optimizer']['args'][e] = param['conf']['compile']['args']['optimizer']['args'][e]['args']
+    })
+    console.log(param);
+    return param
+  }
+
   onClickRun () {
     //console.log(this.props.params['results'])
     if (this.props.jupyter) {
@@ -240,25 +259,37 @@ class ModelForms extends React.Component {
         }
         let url = ''
         if (this.state.hyped) {
+          this.setState({hypeLoading: true});
           url = flaskServer + '/model/models/run_hyperas_model/' + this.props.model_id
         } else {
           url = flaskServer + '/model/models/run/' + this.props.model_id
         }
+        let param = this.cleanParamsTemp(params);
         fetch(url, {
           method: 'post',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(params),
+          body: JSON.stringify(param),
         }).then((response) => response.json())
           .then((res) => {
-            if (res.response === 'success') {
-              message.success(res.response)
-              this.setState({ score: res.response.score,
-              jobId: res.response.job_id})
+            if(this.state.hyped){
+              this.setState({
+                hypeParams: res.response,
+                hypeLoading: false,
+                end: true
+              });
+            }else {
+              if (res.response === 'success') {
+                message.success(res.response)
+                this.setState({
+                  score: res.response.score,
+                  jobId: res.response.job_id
+                })
+              }
+              this.props.modalSuccess()
+              this.setState({end: true})
             }
-            this.props.modalSuccess()
-            this.setState({ end: true })
           })
       }else{
         this.setState({ visible: true })
@@ -484,6 +515,22 @@ class ModelForms extends React.Component {
     })
   }
 
+  renderHypeResults(){
+    return(
+      <Spin size='default' spinning={this.state.hypeLoading} tip='Train session in progress, please wait for reault....'>
+        {
+          !isEmpty(this.state.hypeParams) &&
+            Object.keys(this.state.hypeParams).map((e) =>
+              <div key={e}>
+                <span>{"best" + " " + e + ": "}</span>
+                <span style={{ color: '#00AAAA' }}>{this.state.hypeParams[e]}</span>
+              </div>
+            )
+        }
+      </Spin>
+    )
+  }
+
   render () {
     return (
       <div style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
@@ -521,9 +568,13 @@ class ModelForms extends React.Component {
                      OK
                    </Button>
                  ]}>
-            {this.props.params?
+            {
+              this.props.params?
               (this.state.params['results']['history'] && <Curve data={this.state.params['results']['history']}/>):
-              <Visual data={this.state.ioData} end={this.state.end}/>
+
+                  this.state.hyped?
+                    this.renderHypeResults():
+                  <Visual data={this.state.ioData} end={this.state.end} />
             }
           </Modal>
         </div>
