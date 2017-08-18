@@ -126,14 +126,14 @@ class PreviewCard extends React.Component {
           },
           yAxis: [{
             type: 'value',
-            min: 'dataMin',
-            max: 'dataMax',
+            // min: 'dataMin',
+            // max: 'dataMax',
             position: 'left',
           }, {
             type: 'value',
             name: '次',
-            min: 'dataMin',
-            max: 'dataMax',
+            // min: 'dataMin',
+            // max: 'dataMax',
             position: 'right'
           }
           ],
@@ -242,13 +242,15 @@ export default class ColumnPreview extends React.Component {
   componentDidMount(){
     this.setState({loading: true});
     let type = '';
-    if(this.props.type[1] === 'integer') {
+    console.log(this.props.type);
+    if(this.props.type[0] === 'integer') {
       type = 'int';
-    }else if(this.props.type[1] === 'string'){
+    }else if(this.props.type[0] === 'string'){
       type = 'str';
     }else{
-      type = this.props.type[1];
+      type = this.props.type[0];
     }
+    console.log(type);
     this.setState({type});
     fetch(flaskServer + '/visualization/visualization/usr1', {
       method: 'post',
@@ -285,6 +287,7 @@ export default class ColumnPreview extends React.Component {
       }else{
         type = nextProps.newType;
       }
+      console.log(type);
       this.setState({type});
       fetch(flaskServer + '/visualization/visualization/usr1', {
         method: 'post',

@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
+import lodash from 'lodash'
 import { connect } from 'dva'
 import { Button, Input, Spin, Select, Icon, message, Modal, Popover } from 'antd'
 
@@ -177,6 +178,22 @@ class ModelForms extends React.Component {
     return run_params
   }
 
+
+  //TODO
+  cleanParamsTemp(params){
+    console.log(params);
+    let param = lodash.cloneDeep(params);
+    let keys = Object.keys(param['conf']['compile']['args']['optimizer']['args']);
+    keys.forEach((e) => {
+        console.log(e);
+        delete param['conf']['compile']['args']['optimizer']['args'][e]['range']
+        delete param['conf']['compile']['args']['optimizer']['args'][e]['hyped']
+        param['conf']['compile']['args']['optimizer']['args'][e] = param['conf']['compile']['args']['optimizer']['args'][e]['args']
+    })
+    console.log(param);
+    return param
+  }
+
   onClickRun () {
     //console.log(this.props.params['results'])
     if (this.props.jupyter) {
@@ -244,12 +261,13 @@ class ModelForms extends React.Component {
         } else {
           url = flaskServer + '/model/models/run/' + this.props.model_id
         }
+        let param = this.cleanParamsTemp(params);
         fetch(url, {
           method: 'post',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(params),
+          body: JSON.stringify(param),
         }).then((response) => response.json())
           .then((res) => {
             if (res.response === 'success') {

@@ -68,6 +68,7 @@ export default class Layer extends React.Component {
           if(e.hype_paramter === 'choice'){
             v = v.replace(/\s+/g, "");
             v = v.split(",")
+            v = v.map((e) => parseInt(e));
           }
           layer['args'][e.name]['value'] = v;
         }
