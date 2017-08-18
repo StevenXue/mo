@@ -256,6 +256,8 @@ class ParamsSeletcor extends React.Component {
         let types = type.map((e) => {
           if (e === 'int') {
             return 'integer'
+          }else if(e === 'str') {
+            return 'string'
           }else{
             return e
           }
@@ -273,6 +275,8 @@ class ParamsSeletcor extends React.Component {
         let types = type.map((e) => {
           if (e === 'int') {
             return 'integer'
+          }else if(e === 'str') {
+            return 'string'
           }else{
             return e
           }
@@ -295,6 +299,8 @@ class ParamsSeletcor extends React.Component {
           types = type.map((e) => {
             if (e === 'int') {
               return 'integer'
+            }else if(e === 'str') {
+              return 'string'
             }else{
               return e
             }
