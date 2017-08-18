@@ -89,8 +89,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                     # strr = "%s_%s_col" % (arg["name"], toolkit_obj.name)
                     strr = "%s_%s_col" % (arg["name"], toolkit_obj.entry_function)
                     try:
-                        add_new_column(value, args[-1], strr,
-                                       staging_data_set_id)
+                        add_new_column(value, args[-1], strr, staging_data_set_id)
                     except:
                         error_flag = 1
 
