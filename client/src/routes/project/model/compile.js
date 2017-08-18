@@ -141,7 +141,14 @@ export default class Compile extends React.Component {
     this.setState({values});
     let values_correct = lodash.cloneDeep(values);
     values_correct[parent]['args'][child] = values[parent]['args'][child]['args'];
-    console.log(values_correct);
+    let keys = Object.keys(values_correct[parent]['args'][child]);
+    keys.forEach((e) => {
+      if(e !== 'distribute' && e !== 'value'){
+        console.log(e);
+        delete values_correct[parent]['args'][child][e]
+      }
+    })
+    console.log("setValue", values_correct);
     delete values_correct['hype_loss']
     this.props.getParams(values_correct);
   }
@@ -159,6 +166,7 @@ export default class Compile extends React.Component {
       v = parseFloat(v);
     }
     values[parent]['args'][child] = v;
+    console.log("setInputValue", values);
     this.setState({values});
     this.props.getParams(values);
   }
