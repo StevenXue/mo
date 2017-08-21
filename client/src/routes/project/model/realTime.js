@@ -37,7 +37,6 @@ export default class Curve extends React.Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    console.log("nextProps", nextProps.data);
     if (!nextProps.end) {
       this.updateChart(nextProps.data)
     }

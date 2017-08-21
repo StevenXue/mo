@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styles from './index.less';
 import { Button, Select, Checkbox, Input} from 'antd';
-import {jupyterServer, flaskServer,jupyterBase } from '../../constants';
+import {jupyterServer, flaskServer, baseUrl } from '../../constants';
 
 const mockResult = [['device_node_id', 'unicode'], ['productor', 'unicode'], ['name', 'unicode'], ['f1', 'unicode'], ['device_model', 'unicode'], ['data_set', 'ObjectId'], ['local_device_id', 'unicode'], ['asset_code', 'unicode'], ['staging_data_set', 'ObjectId'], ['version', 'unicode'], ['station_id', 'unicode'], ['device_type', 'unicode'], ['_id', 'ObjectId']];
 
@@ -15,7 +15,6 @@ const bodyStyle = {
 	},
 };
 
-//let selectable = 0;
 
 export default class Playground extends React.Component {
 	constructor(props) {
@@ -44,7 +43,7 @@ export default class Playground extends React.Component {
       .then((res) => {
 		    console.log(res);
 		    //const URL = `http://10.52.14.182:8888/notebooks/${res.path}`;
-        const URL = jupyterBase + 'notebooks/' + res.path;
+        const URL = baseUrl + 'notebooks/' + res.path;
         console.log('constructed', URL);
         this.setState({ notebookURL: URL });
       });

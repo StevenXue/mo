@@ -38,7 +38,6 @@ ModelType = {
     'unsupervised': 2,
     'half_supervised': 3,
     'folder_input': 4,
-
     'hyperas': 5
 
 }

@@ -19,6 +19,7 @@ simplejson
 hyperas
 hyperopt
 pillow
+h5py
 
 
 
