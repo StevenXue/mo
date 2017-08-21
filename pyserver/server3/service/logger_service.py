@@ -15,15 +15,9 @@ epoch = 0
 def log_epoch_begin(*args):
     global epoch
     epoch = args[0]
-    print(args[0], epoch)
-    # save_log('epoch', *args)
-    # emit_log('epoch', *args)
 
 
 def log_epoch_end(*args):
-    # global epoch
-    # epoch = args[0] + 1
-    # print(args)
     save_log('epoch', *args)
     emit_log('epoch', *args)
 
