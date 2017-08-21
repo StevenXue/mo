@@ -25,7 +25,6 @@ export default class Layer extends React.Component {
   }
 
   componentWillMount(){
-    console.log("layer index", this.props.index);
   }
 
   componentDidMount(){

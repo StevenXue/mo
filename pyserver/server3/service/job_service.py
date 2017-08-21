@@ -357,6 +357,10 @@ def run_code(conf, project_id, staging_data_set_id, model, f, *args, **kwargs):
     # add decorator
     func = create_model_job(project_id, staging_data_set_id, model, **kwargs)(f)
     # run model with decorator
+    # from run import socketio
+    # thread = socketio.start_background_task(func, conf, *args)
+    # print(thread)
+    # return 1
     return func(conf, *args)
 
 

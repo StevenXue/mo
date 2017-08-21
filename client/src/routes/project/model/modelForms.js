@@ -5,6 +5,8 @@ import lodash from 'lodash'
 import { connect } from 'dva'
 import { Button, Input, Spin, Select, Icon, message, Modal, Popover } from 'antd'
 
+import { default_hyper_parameter } from '../../../utils/utils'
+
 const Option = Select.Option
 import io from 'socket.io-client'
 
@@ -42,7 +44,9 @@ class ModelForms extends React.Component {
       selectedFile: '',
       spliter: {},
       hyped: false,
-      dataset_id: ''
+      dataset_id: '',
+      hypeLoading: false,
+      hypeParams: {}
     }
   }
 
@@ -59,18 +63,14 @@ class ModelForms extends React.Component {
       selectedFile: this.props.selectedFile,
       dataset_id: this.props.dataset_id
     })
-    //console.log(this.props.selectedFile)
-    let socket = io.connect(flaskServer + '/log/' + this.props.project_id)
-    socket.on('log_epoch_end', (msg) => {
-      console.log('receive msg', msg)
-      this.setState({ ioData: msg })
-    })
-
     if (this.props.params) {
-      console.log(this.props.params);
       this.setState({ end: true })
+    } else {
+      let socket = io.connect(flaskServer + '/log/' + this.props.project_id)
+      socket.on('log_epoch_end', (msg) => {
+        this.setState({ ioData: msg })
+      })
     }
-
   }
 
   componentWillReceiveProps (nextProps) {
@@ -256,28 +256,53 @@ class ModelForms extends React.Component {
           }
         }
         let url = ''
-        if (this.state.hyped) {
+        if (this.props.model_id === '598bb663d845c0625b249be2') {
+          this.setState({hypeLoading: true});
           url = flaskServer + '/model/models/run_hyperas_model/' + this.props.model_id
+          fetch(url, {
+            method: 'post',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(default_hyper_parameter),
+          }).then((response) => response.json())
+            .then((res) => {
+              this.setState({
+                hypeParams: res.response,
+                hypeLoading: false,
+                end: true
+              });
+            });
         } else {
+          //let param = this.cleanParamsTemp(params);
           url = flaskServer + '/model/models/run/' + this.props.model_id
+          fetch(url, {
+            method: 'post',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(params),
+          }).then((response) => response.json())
+            .then((res) => {
+              if(this.props.model_id === '598bb663d845c0625b249be2'){
+                this.setState({
+                  hypeParams: res.response,
+                  hypeLoading: false,
+                  end: true
+                });
+              }else {
+                if (res.response === 'success') {
+                  message.success(res.response)
+                  this.setState({
+                    score: res.response.score,
+                    jobId: res.response.job_id
+                  })
+                }
+                this.props.modalSuccess()
+                this.setState({end: true})
+              }
+            });
         }
-        let param = this.cleanParamsTemp(params);
-        fetch(url, {
-          method: 'post',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(param),
-        }).then((response) => response.json())
-          .then((res) => {
-            if (res.response === 'success') {
-              message.success(res.response)
-              this.setState({ score: res.response.score,
-              jobId: res.response.job_id})
-            }
-            this.props.modalSuccess()
-            this.setState({ end: true })
-          })
       }else{
         this.setState({ visible: true })
       }
@@ -502,6 +527,22 @@ class ModelForms extends React.Component {
     })
   }
 
+  renderHypeResults(){
+    return(
+      <Spin size='default' spinning={this.state.hypeLoading} tip='Train session in progress, please wait for reault....'>
+        {
+          !isEmpty(this.state.hypeParams) &&
+            Object.keys(this.state.hypeParams).map((e) =>
+              <div key={e}>
+                <span>{"best" + " " + e + ": "}</span>
+                <span style={{ color: '#00AAAA' }}>{this.state.hypeParams[e]}</span>
+              </div>
+            )
+        }
+      </Spin>
+    )
+  }
+
   render () {
     return (
       <div style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
@@ -539,9 +580,13 @@ class ModelForms extends React.Component {
                      OK
                    </Button>
                  ]}>
-            {this.props.params?
+            {
+              this.props.params?
               (this.state.params['results']['history'] && <Curve data={this.state.params['results']['history']}/>):
-              <Visual data={this.state.ioData} end={this.state.end}/>
+
+                this.props.model_id === '598bb663d845c0625b249be2'?
+                    this.renderHypeResults():
+                  <Visual data={this.state.ioData} end={this.state.end} />
             }
           </Modal>
         </div>

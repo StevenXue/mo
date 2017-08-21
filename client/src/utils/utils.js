@@ -20,9 +20,177 @@ let toolkit_info =  {
   "数值转换": "数值转换是将数据从一种表示形式变为另一种表现形式的过程。数据在应用过程中相对比较繁杂，为了能够更好的应用数据，需要对其进行某种特定格式化的排列，数值转换通常包含对数字去量纲化、二值化、标准化等操作。"
 }
 
-// function filterId(dataset) {
-//   let data = dataset.map((el) => delete el["_id"])
-//   console.log(data)
-// }
+let default_hyper_parameter = {
+  "conf":{
+    "layers":[
+      {
+        "name":"Dense",
+        "args":{
+          "units":{
+            "distribute":"choice",
+            "value":[
+              32,
+              64
+            ]
+          },
+          "activation":{
+            "distribute":"choice",
+            "value":[
+              "linear",
+              "relu"
+            ]
+          },
+          "input_shape":[
+            4
+          ]
+        },
+        "index":0
+      },
+      {
+        "name":"Dropout",
+        "args":{
+          "rate":{
+            "distribute":"uniform",
+            "value":"0, 0.5"
+          }
+        },
+        "index":1
+      },
+      {
+        "name":"Dense",
+        "args":{
+          "units":2,
+          "activation":"softmax"
+        },
+        "index":2
+      }
+    ],
+    "compile":{
+      "args":{
+        "loss":{
+          "distribute":"choice",
+          "value":[
+            "categorical_crossentropy",
+            "squared_hinge"
+          ]
+        },
+        "optimizer":{
+          "name":"SGD",
+          "range":[
+            {
+              "distribute":{
+                "name":"distribute_choice",
+                "type":{
+                  "des":"distribute choice for hyperparameters tuning",
+                  "key":"choice",
+                  "range":[
+                    {
+                      "default":"0, 1",
+                      "eg":"0, 1",
+                      "name":"uniform",
+                      "type":{
+                        "des":"Uniform distribution, Returns a value uniformly between low and high.",
+                        "key":"join_low_high"
+                      }
+                    },
+                    {
+                      "default":null,
+                      "eg":[
+                        256,
+                        512,
+                        1024
+                      ],
+                      "name":"choice",
+                      "type":{
+                        "des":"Choice distribution, Returns one of the options, which should be a list or tuple.",
+                        "key":"multiple"
+                      }
+                    }
+                  ]
+                }
+              },
+              "name":"lr",
+              "type":{
+                "des":"the learning rate of NN optimizers",
+                "key":"float"
+              }
+            },
+            {
+              "distribute":{
+                "name":"distribute_choice",
+                "type":{
+                  "des":"distribute choice for hyperparameters tuning",
+                  "key":"choice",
+                  "range":[
+                    {
+                      "default":"0, 1",
+                      "eg":"0, 1",
+                      "name":"uniform",
+                      "type":{
+                        "des":"Uniform distribution, Returns a value uniformly between low and high.",
+                        "key":"join_low_high"
+                      }
+                    },
+                    {
+                      "default":null,
+                      "eg":[
+                        256,
+                        512,
+                        1024
+                      ],
+                      "name":"choice",
+                      "type":{
+                        "des":"Choice distribution, Returns one of the options, which should be a list or tuple.",
+                        "key":"multiple"
+                      }
+                    }
+                  ]
+                }
+              },
+              "name":"momentum",
+              "type":{
+                "des":"the learning rate of NN optimizers",
+                "key":"float"
+              }
+            }
+          ],
+          "args":{
+            "lr":0.01
+          }
+        },
+        "metrics":[
+          "acc"
+        ]
+      }
+    },
+    "fit":{
+      "data_fields":[
+        [
+          "alm",
+          "erl",
+          "gvh",
+          "mcg"
+        ],
+        [
+          "mit",
+          "nuc"
+        ]
+      ],
+      "args":{
+        "batch_size":128,
+        "epochs":10
+      }
+    },
+    "evaluate":{
+      "args":{
+        "batch_size":128
+      }
+    }
+  },
+  "project_id":"59959ea9429782d5377ac133",
+  "staging_data_set_id":"5995a0bc429782d65508f3ea",
+  "schema":"seq",
+  "divide_row":1000
+}
 
-export { isEmpty, toolkit_info }
+export { isEmpty, toolkit_info, default_hyper_parameter }

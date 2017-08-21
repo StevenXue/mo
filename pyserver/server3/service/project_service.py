@@ -74,7 +74,6 @@ def remove_project_by_id(project_id, user_ID):
     ownership = ownership_business.get_ownership_by_owned_item(project,
                                                                'project')
     if user_ID != ownership.user.user_ID:
-        print(user_ID, ownership.user.user_ID)
         raise ValueError('project not belong to this user, cannot delete')
     try:
         for job in project['jobs']:

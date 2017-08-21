@@ -30,35 +30,34 @@ from hyperopt import Trials, tpe
 
 # distribution
 from hyperas.distributions import choice, uniform
-from keras.models import Sequential
 from hyperopt import STATUS_OK
 from keras.layers import Dense, Dropout
 from keras.optimizers import SGD
 from keras.optimizers import RMSprop
 
+from server3.lib import Sequential
+from server3.lib import graph
+
 
 def train_hyperas_model(conf, data_source_id, **kwargs):
     # generate my_temp_model python file
     conf_to_python_file(conf, data_source_id, **kwargs)
-
     import my_temp_model
     model = my_temp_model.model_function
     data = my_temp_model.my_data_function_template
     X_train, Y_train, X_test, Y_test = data()
-
     best_run, best_model = optim.minimize(model=model,
                                           data=data,
                                           algo=tpe.suggest,
                                           max_evals=5,
                                           trials=Trials())
-
-    temp_file = "./my_temp_model.py"
-    try:
-        pass
-        os.remove(temp_file)
-        os.remove(temp_file + 'c')
-    except OSError:
-        pass
+    # temp_file = "./my_temp_model.py"
+    # try:
+    #     pass
+    #     os.remove(temp_file)
+    #     os.remove(temp_file + 'c')
+    # except OSError:
+    #     pass
 
     print("Evalutation of best performing model:")
     score, acc = best_model.evaluate(X_test, Y_test)
@@ -79,8 +78,10 @@ def conf_to_python_file(conf, data_source_id, **kwargs):
     # model function: function name
     function_name = 'def model_function(x_train, y_train, x_test, y_test):\n'
     model_str = conf_to_model_str(conf)
+
+    graph_str = "    with graph.as_default():\n"
     model_str = get_indent(model_str)
-    model_function_str = function_name + model_str
+    model_function_str = function_name + graph_str + model_str
     # data function
     data_function_str = conf_to_data_function_str(conf, data_source_id,
                                                   **kwargs)
@@ -122,7 +123,7 @@ def get_indent(string):
     """
     lines = string.split('\n')
     for i in range(len(lines)):
-        lines[i] = '    ' + lines[i]
+        lines[i] = '        ' + lines[i]
     lines = '\n'.join(lines)
     return lines
 
@@ -965,17 +966,23 @@ if __name__ == "__main__":
                     "name": "Dense",
                     "args": {
                         "units": {
-                            "distribute": "uniform",
-                            "value": "0, 1"
+                            "distribute": "choice",
+                            "value": [
+                                16,
+                                32,
+                                64
+                            ]
                         },
                         "activation": {
                             "distribute": "choice",
-                            "value": ["relu"]
+                            "value": [
+                                "linear",
+                                "relu"
+                            ]
                         },
                         "input_shape": [
-                            3
+                            4
                         ]
-
                     },
                     "index": 0
                 },
@@ -983,8 +990,8 @@ if __name__ == "__main__":
                     "name": "Dropout",
                     "args": {
                         "rate": {
-                            "distribute": "choice",
-                            "value": [0.1, 0.2, 0.4]
+                            "distribute": "uniform",
+                            "value": "0, 0.5"
                         }
                     },
                     "index": 1
@@ -992,7 +999,7 @@ if __name__ == "__main__":
                 {
                     "name": "Dense",
                     "args": {
-                        "units": 64,
+                        "units": 2,
                         "activation": "softmax"
                     },
                     "index": 2
@@ -1000,10 +1007,13 @@ if __name__ == "__main__":
             ],
             "compile": {
                 "args": {
-                    "loss": [
-                        "categorical_crossentropy",
-                        "hinge"
-                    ],
+                    "loss": {
+                        "distribute": "choice",
+                        "value": [
+                            "categorical_crossentropy",
+                            "hinge"
+                        ]
+                    },
                     "optimizer": {
                         "hyped": True,
                         "name": "SGD",
@@ -1088,18 +1098,16 @@ if __name__ == "__main__":
                         "args": {
                             "lr": {
 
-                                "value": "0, 1",
                                 "distribute": "uniform",
-                                "uniform": 0
+                                "value": "0, 0.05"
 
-                            },
-                            "momentum": 10
+                            }
+
                         }
                     },
                     "metrics": [
                         "acc"
-                    ],
-                    "hype_loss": True
+                    ]
                 }
             },
             "fit": {
@@ -1107,7 +1115,8 @@ if __name__ == "__main__":
                     [
                         "alm",
                         "erl",
-                        "gvh"
+                        "gvh",
+                        "mcg"
                     ],
                     [
                         "mit",
@@ -1115,19 +1124,20 @@ if __name__ == "__main__":
                     ]
                 ],
                 "args": {
-                    "batch_size": 100,
+                    "batch_size": 128,
                     "epochs": 10
                 }
             },
             "evaluate": {
                 "args": {
-                    "batch_size": 100
+                    "batch_size": 128
                 }
             }
         },
-        "project_id": "598accd4e89bdeaf80e7206f",
-        "staging_data_set_id": "598af547e89bdec0f544b427",
-        "schema": "seq"
+        "project_id": "598bd8f10c11f33b69e5f6c2",
+        "staging_data_set_id": "598bd9010c11f33b69e5f6c4",
+        "schema": "cv",
+        "ratio": 0.7
     }
     MODEL_TEMPLATE = {
         "conf": {
