@@ -202,6 +202,10 @@ def add_new_keys_value(sds_id, lst_dicts):
         staging_data_business.update_by_id(oid.id, lst_dicts.pop(0))
 
 
+def update_many_with_new_fields():
+    
+
+
 def get_row_col_info(sds_id):
     """
     get_row_col_info
