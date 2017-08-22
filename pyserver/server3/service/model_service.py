@@ -488,18 +488,21 @@ def deploy(user_ID, job_id, name, description, server, signatures,
     :return:
     """
     export_path = export(name, job_id, user_ID)
-    tf_model_server = '/Users/zhaofengli/Documents/goldersgreen/serving/bazel-bin/tensorflow_serving/model_servers/tensorflow_model_server'
-    cmd = '{tf_model_server} --enable_batching --port=9000 ' \
-          '--model_name={name} ' \
-          '--model_base_path={export_path}'.format(
-          tf_model_server=tf_model_server, name=name,
-        export_path=export_path)
-    cmd = shlex.split(cmd)
-    call(cmd)
     # add a served model entity
-    return served_model_service.add(user_ID, name, description, server,
-                                    signatures, input_type, export_path,
-                                    is_private)
+    served_model = served_model_service.add(user_ID, name, description, server,
+                                            signatures, input_type, export_path,
+                                            is_private)
+    tf_model_server = '/Users/zhaofengli/Documents/goldersgreen/serving/' \
+                      'bazel-bin/tensorflow_serving/model_servers/' \
+                      'tensorflow_model_server'
+    call([
+        tf_model_server,
+        '--enable_batching',
+        '--port=9000',
+        '--model_name={name}'.format(name=name),
+        '--model_base_path={export_path}'.format(export_path=export_path)
+    ])
+    return served_model
 
 
 def export(name, job_id, user_ID):
