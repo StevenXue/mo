@@ -19,6 +19,7 @@ INPUT_TYPES = ('image', '1darray', '2darray', 'ndarray')
 class ServedModel(Document):
     name = StringField(max_length=50, required=True)
     description = StringField(max_length=140, required=True)
+    version = IntField(required=True)
     server = StringField(required=True)
     signatures = DictField(required=True)
     input_type = StringField(required=True, choices=INPUT_TYPES)

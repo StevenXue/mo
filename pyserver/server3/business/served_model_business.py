@@ -21,8 +21,10 @@ def get_by_id(model_obj):
     return served_model_repo.read_by_id(model_obj)
 
 
-def add(name, description, server, signatures, input_type, model_base_path):
-    model = ServedModel(name=name, description=description, server=server,
+def add(name, description, version, server, signatures, input_type,
+        model_base_path):
+    model = ServedModel(name=name, description=description,
+                        version=version, server=server,
                         signatures=signatures, input_type=input_type,
                         model_base_path=model_base_path)
     return served_model_repo.create(model)

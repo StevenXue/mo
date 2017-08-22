@@ -44,10 +44,11 @@ def export(new_model, working_dir, export_path_base):
         tf.compat.as_bytes(str(FLAGS.model_version)))
 
     # if version path exists, create a new version
-    if file_io.file_exists(export_path):
+    while file_io.file_exists(export_path):
+        FLAGS.model_version += 1
         export_path = os.path.join(
             tf.compat.as_bytes(export_path_base),
-            tf.compat.as_bytes(str(FLAGS.model_version + 1)))
+            tf.compat.as_bytes(str(FLAGS.model_version)))
 
     builder = saved_model_builder.SavedModelBuilder(export_path)
 
@@ -60,3 +61,4 @@ def export(new_model, working_dir, export_path_base):
                                              signature_def_map={
                                                  'predict': signature})
         builder.save()
+        return FLAGS.model_version
