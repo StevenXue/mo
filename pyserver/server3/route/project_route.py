@@ -91,6 +91,13 @@ def project_publish(project_id):
     return jsonify({'response': update_num}), 200
 
 
+@project_app.route('/unpublish/<string:project_id>', methods=['PUT'])
+def project_unpublish(project_id):
+    update_num = project_service.unpublish_project(project_id)
+    update_num = json_utility.convert_to_json(update_num)
+    return jsonify({'response': update_num}), 200
+
+
 @project_app.route('/projects', methods=['POST'])
 def create_project():
     if not request.json \
