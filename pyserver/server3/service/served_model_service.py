@@ -4,7 +4,7 @@ from server3.business import ownership_business
 from server3.business import served_model_business
 
 
-def add(user_ID, name, description, server, signatures, input_type,
+def add(user_ID, name, description, version, server, signatures, input_type,
         model_base_path, is_private=False):
     """
     add a served model
@@ -18,7 +18,7 @@ def add(user_ID, name, description, server, signatures, input_type,
     :param model_base_path:
     :return:
     """
-    served_model = served_model_business.add(name, description, server,
+    served_model = served_model_business.add(name, description, version, server,
                                              signatures, input_type,
                                              model_base_path)
     user = user_business.get_by_user_ID(user_ID)

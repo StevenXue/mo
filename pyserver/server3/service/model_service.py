@@ -487,9 +487,10 @@ def deploy(user_ID, job_id, name, description, server, signatures,
     :param is_private: bool
     :return:
     """
-    export_path = export(name, job_id, user_ID)
+    export_path, version = export(name, job_id, user_ID)
     # add a served model entity
-    served_model = served_model_service.add(user_ID, name, description, server,
+    served_model = served_model_service.add(user_ID, name, description,
+                                            version, server,
                                             signatures, input_type, export_path,
                                             is_private)
     tf_model_server = '/Users/zhaofengli/Documents/goldersgreen/serving/' \
@@ -522,9 +523,9 @@ def export(name, job_id, user_ID):
         model.load_weights(weights_dir)
         working_dir = '/tmp'
         export_base_path = os.path.join(working_dir, name)
-        keras_saved_model.export(model, working_dir,
-                                 export_base_path)
-        return export_base_path
+        version = keras_saved_model.export(model, working_dir,
+                                           export_base_path)
+        return export_base_path, version
 
 
 # ------------------------------ temp function ------------------------------e
