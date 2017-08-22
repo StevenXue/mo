@@ -134,7 +134,9 @@ def encode_model_result(job_id):
     :param job_id:
     :return:
     """
-    result_dir, h5_filename = model_service.get_results_dir_by_job_id(job_id)
+    user_ID = request.args.get('user_ID')
+    result_dir, h5_filename = model_service.get_results_dir_by_job_id(job_id,
+                                                                      user_ID)
     model_service.encode_h5_for_keras_js(result_dir + h5_filename)
     prefix = re.sub('\.hdf5$', '', h5_filename)
     origin = request.remote_addr
@@ -157,7 +159,9 @@ def model_result(job_id, filename):
     :param filename:
     :return:
     """
-    result_dir, h5_filename = model_service.get_results_dir_by_job_id(job_id)
+    user_ID = request.args.get('user_ID')
+    result_dir, h5_filename = model_service.get_results_dir_by_job_id(job_id,
+                                                                      user_ID)
     return send_from_directory(result_dir, filename)
 
 
@@ -185,6 +189,26 @@ def neural_style():
     url = neural_style_transfer.neural_style_transfer(args, project_id,
                                                       file_url)
     return jsonify({'response': url})
+
+
+@model_app.route('/deploy/<string:job_id>', methods=['POST'])
+def deploy_trained_model(job_id):
+    """
+    deploy trained model
+    :param job_id:
+    :return:
+    """
+    data = request.get_json()
+    user_ID = data.get('user_ID')
+    description = data.get('description')
+    name = data.get('name')
+    server = 'localhost:9000'
+    signatures = data.get('signatures')
+    input_type = data.get('input_type')
+    served_model = model_service.deploy(user_ID, job_id, name, description,
+                                        server, signatures, input_type)
+    served_model = json_utility.convert_to_json(served_model)
+    return jsonify({'response': served_model})
 
 
 # keras model

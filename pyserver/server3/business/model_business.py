@@ -24,12 +24,6 @@ from server3.business import user_business, ownership_business
 model_repo = ModelRepo(Model)
 
 
-def get_by_model_name(model_name):
-    # model_obj = Model(name=model_name)
-    # return model_repo.read_by_model_name(model_obj)
-    return model_repo.read_by_unique_field('name', model_name)
-
-
 def get_by_model_id(model_obj):
     return model_repo.read_by_id(model_obj)
 

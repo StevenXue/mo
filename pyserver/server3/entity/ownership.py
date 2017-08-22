@@ -23,4 +23,5 @@ class Ownership(Document):
     model = ReferenceField('Model', reverse_delete_rule=CASCADE)
     toolkit = ReferenceField('Toolkit', reverse_delete_rule=CASCADE)
     file = ReferenceField('File', reverse_delete_rule=CASCADE)
+    served_model = ReferenceField('ServedModel', reverse_delete_rule=CASCADE)
 
