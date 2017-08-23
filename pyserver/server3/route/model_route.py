@@ -14,6 +14,7 @@ from flask import make_response
 from flask import request
 from flask import send_from_directory
 
+import server3.service.served_model_service
 from server3.service import model_service
 from server3.service import staging_data_service
 from server3.business import model_business
@@ -189,26 +190,6 @@ def neural_style():
     url = neural_style_transfer.neural_style_transfer(args, project_id,
                                                       file_url)
     return jsonify({'response': url})
-
-
-@model_app.route('/deploy/<string:job_id>', methods=['POST'])
-def deploy_trained_model(job_id):
-    """
-    deploy trained model
-    :param job_id:
-    :return:
-    """
-    data = request.get_json()
-    user_ID = data.get('user_ID')
-    description = data.get('description')
-    name = data.get('name')
-    server = 'localhost:9000'
-    signatures = data.get('signatures')
-    input_type = data.get('input_type')
-    served_model = model_service.deploy(user_ID, job_id, name, description,
-                                        server, signatures, input_type)
-    served_model = json_utility.convert_to_json(served_model)
-    return jsonify({'response': served_model})
 
 
 # keras model

@@ -13,16 +13,6 @@ from flask_jwt_extended import jwt_required
 from flask_jwt_extended import get_jwt_claims
 from flask_socketio import SocketIO
 
-from server3.route import file_route
-from server3.route import ownership_route
-from server3.route import project_route
-from server3.route import data_route
-from server3.route import staging_data_route
-from server3.route import toolkit_route
-from server3.route import user_route
-from server3.route import monitor_route
-from server3.route import model_route
-from server3.route import visualization_route
 from server3.repository import config
 from server3.utility import json_utility
 from server3.constants import PORT
@@ -36,17 +26,37 @@ app.secret_key = 'super-super-secret'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
 
-socketio = SocketIO(app,
-                    logger=True,
-                    ping_timeout=600,
-                    engineio_logger=True,
-                    async_mode='eventlet',
-                    message_queue='redis://')
+socketio = SocketIO(app, logger=True, engineio_logger=True, ping_timeout=600,
+                    async_mode='eventlet', message_queue='redis://')
 
 CORS(app, supports_credentials=True)
 
 # Setup the Flask-JWT-Extended extension
 jwt = JWTManager(app)
+
+from server3.route import file_route
+from server3.route import ownership_route
+from server3.route import project_route
+from server3.route import data_route
+from server3.route import staging_data_route
+from server3.route import toolkit_route
+from server3.route import user_route
+from server3.route import monitor_route
+from server3.route import model_route
+from server3.route import visualization_route
+from server3.route import served_model_route
+
+app.register_blueprint(file_route.file_app)
+app.register_blueprint(ownership_route.ownership_app)
+app.register_blueprint(project_route.project_app)
+app.register_blueprint(data_route.data_app)
+app.register_blueprint(staging_data_route.staging_data_app)
+app.register_blueprint(toolkit_route.toolkit_app)
+app.register_blueprint(model_route.model_app)
+app.register_blueprint(user_route.user_app)
+app.register_blueprint(monitor_route.monitor_app)
+app.register_blueprint(visualization_route.visualization_app)
+app.register_blueprint(served_model_route.served_model_app)
 
 
 # This method will get whatever object is passed into the
@@ -78,17 +88,6 @@ def refresh_token():
     claims = get_jwt_claims()
     return jsonify({'user': claims['user']}), 200
 
-
-app.register_blueprint(file_route.file_app)
-app.register_blueprint(ownership_route.ownership_app)
-app.register_blueprint(project_route.project_app)
-app.register_blueprint(data_route.data_app)
-app.register_blueprint(staging_data_route.staging_data_app)
-app.register_blueprint(toolkit_route.toolkit_app)
-app.register_blueprint(model_route.model_app)
-app.register_blueprint(user_route.user_app)
-app.register_blueprint(monitor_route.monitor_app)
-app.register_blueprint(visualization_route.visualization_app)
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=PORT, debug=True)
