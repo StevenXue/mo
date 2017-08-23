@@ -27,20 +27,13 @@ from server3.service import staging_data_service
 from server3.service.job_service import split_supervised_input
 from server3.service.saved_model_services import encoder as keras_encoder
 from server3.service.saved_model_services import keras_saved_model
+from server3.entity.model import MODEL_TYPE
+from server3.constants import MODEL_EXPORT_BASE
 
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 # user_directory = 'user_directory/'
 
-# TODO 根据entity生成
-ModelType = {
-    'neural_network': 0,
-    'custom_supervised': 1,
-    'unsupervised': 2,
-    'half_supervised': 3,
-    'folder_input': 4,
-    'hyperas': 5
-
-}
+ModelType = {list(v)[1]: list(v)[0] for v in list(MODEL_TYPE)}
 
 
 def get_all_public_model():
@@ -485,7 +478,7 @@ def export(name, job_id, user_ID):
         json_string = json.dumps(data)
         model = keras_saved_model.model_from_json(json_string)
         model.load_weights(weights_dir)
-        working_dir = '/tmp'
+        working_dir = MODEL_EXPORT_BASE
         export_base_path = os.path.join(working_dir, name)
         version = keras_saved_model.export(model, working_dir,
                                            export_base_path)

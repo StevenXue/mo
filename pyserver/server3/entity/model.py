@@ -16,8 +16,8 @@ from mongoengine import DictField
 from mongoengine import ListField
 
 MODEL_TYPE = (
-    (0, 'nn'),
-    (1, 'supervised'),
+    (0, 'neural_network'),
+    (1, 'custom_supervised'),
     (2, 'unsupervised'),
     (3, 'half_supervised'),
     (4, 'folder_input'),

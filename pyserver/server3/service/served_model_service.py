@@ -4,8 +4,13 @@ import subprocess
 from server3.business import user_business
 from server3.business import ownership_business
 from server3.business import served_model_business
+from server3.business import staging_data_set_business
+from server3.business import job_business
 from server3.service import ownership_service
 from server3.service import model_service
+from server3.entity.model import MODEL_TYPE
+
+ModelType = {list(v)[1]: list(v)[0] for v in list(MODEL_TYPE)}
 
 
 def add(user_ID, name, description, version, pid, server, signatures,
@@ -67,7 +72,15 @@ def deploy(user_ID, job_id, name, description, server, signatures,
     :param is_private: bool
     :return:
     """
-    export_path, version = model_service.export(name, job_id, user_ID)
+    job = job_business.get_by_job_id(job_id)
+    model_type = job.model.category
+    if model_type == ModelType['neural_network'] or model_type == ModelType['folder_input']:
+        export_path, version = model_service.export(name, job_id, user_ID)
+    else:
+        result_sds = staging_data_set_business.get_by_job_id(job_id)
+        saved_model_path_array = result_sds.saved_model_path.split('/')
+        version = saved_model_path_array.pop()
+        export_path = '/'.join(saved_model_path_array)
     tf_model_server = './tensorflow_serving/model_servers/tensorflow_model_server'
     p = subprocess.Popen([
         tf_model_server,
