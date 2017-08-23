@@ -1,5 +1,6 @@
 import logging
 import inspect
+import os
 
 import tensorflow as tf
 import pandas as pd
@@ -12,6 +13,7 @@ from server3.service.custom_log_handler import MetricsHandler
 from tensorflow.contrib.learn.python.learn.estimators import estimator
 
 from server3.lib.models.modified_tf_file.monitors import ValidationMonitor
+from server3.utility import input_fn_utils
 
 # 修改了 metric_spec 的部分内容，
 # 源代码为
@@ -180,6 +182,14 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
     if predict_feature:
         predictions = estimator.predict(predict_feature, as_iterable=True)
         result['predictions'] = predictions
+
+    features = {k: constant_op.constant(X_train[k].values,
+                                        shape=[X_train.shape[0], 1],
+                                        dtype=dtypes.float32)
+                for k in X_train.columns}
+    serving_input_fn = input_fn_utils.build_default_serving_input_fn(features)
+    estimator.export_savedmodel(os.path.join('/tmp', input_data['model_name']),
+                                serving_input_fn)
 
     return result
 
