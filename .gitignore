@@ -9,4 +9,3 @@ gen
 
 # ignore all .pyc files
 *.pyc
-/pyserver/tensorflow_serving/model_servers/
