@@ -91,10 +91,8 @@ def deploy(user_ID, job_id, name, description, server, signatures,
         '--model_base_path={export_path}'.format(export_path=export_path)
     ])
     # add a served model entity
-    return add(user_ID, name, description,
-               version, p.pid, server,
-               signatures, input_type, export_path,
-               is_private)
+    return add(user_ID, name, description, version, p.pid, server,
+               signatures, input_type, export_path, is_private)
 
 
 def remove_by_id(model_id):
