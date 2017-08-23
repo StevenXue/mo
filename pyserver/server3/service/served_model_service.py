@@ -74,7 +74,8 @@ def deploy(user_ID, job_id, name, description, server, signatures,
     """
     job = job_business.get_by_job_id(job_id)
     model_type = job.model.category
-    if model_type == ModelType['neural_network'] or model_type == ModelType['folder_input']:
+    if model_type == ModelType['neural_network'] \
+            or model_type == ModelType['folder_input']:
         export_path, version = model_service.export(name, job_id, user_ID)
     else:
         result_sds = staging_data_set_business.get_by_job_id(job_id)
@@ -99,6 +100,3 @@ def deploy(user_ID, job_id, name, description, server, signatures,
 def remove_by_id(model_id):
     served_model_business.terminate_by_id(model_id)
     served_model_business.remove_by_id(model_id)
-
-
-
