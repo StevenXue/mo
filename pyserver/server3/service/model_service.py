@@ -8,10 +8,8 @@
 # @running  : python
 # Further to FIXME of None
 """
-import os
-import shlex
 import inspect
-from subprocess import call
+import os
 
 import numpy as np
 import pandas as pd
@@ -29,7 +27,6 @@ from server3.service import staging_data_service
 from server3.service.job_service import split_supervised_input
 from server3.service.saved_model_services import encoder as keras_encoder
 from server3.service.saved_model_services import keras_saved_model
-from server3.service import served_model_service
 
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 # user_directory = 'user_directory/'
@@ -471,39 +468,6 @@ def encode_h5_for_keras_js(weights_hdf5_filepath):
     encoder = keras_encoder.Encoder(weights_hdf5_filepath)
     encoder.serialize()
     encoder.save()
-
-
-def deploy(user_ID, job_id, name, description, server, signatures,
-           input_type, is_private=False):
-    """
-    deploy model
-    :param user_ID: str
-    :param job_id: str/ObjectId
-    :param name: str
-    :param description: str
-    :param server: str
-    :param signatures: dict
-    :param input_type: str
-    :param is_private: bool
-    :return:
-    """
-    export_path, version = export(name, job_id, user_ID)
-    # add a served model entity
-    served_model = served_model_service.add(user_ID, name, description,
-                                            version, server,
-                                            signatures, input_type, export_path,
-                                            is_private)
-    tf_model_server = '/Users/zhaofengli/Documents/goldersgreen/serving/' \
-                      'bazel-bin/tensorflow_serving/model_servers/' \
-                      'tensorflow_model_server'
-    call([
-        tf_model_server,
-        '--enable_batching',
-        '--port=9000',
-        '--model_name={name}'.format(name=name),
-        '--model_base_path={export_path}'.format(export_path=export_path)
-    ])
-    return served_model
 
 
 def export(name, job_id, user_ID):
