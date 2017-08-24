@@ -46,8 +46,8 @@ def get_process(pid):
 
 def terminate_by_id(oid):
     p = get_process_by_id(oid)
-    p.terminate()
     try:
+        p.terminate()
         p.status()
     except psutil.NoSuchProcess:
         return True
