@@ -12,6 +12,7 @@ module.exports = {
   CORS: [CONSTANT.flaskServer],
   openPages: ['/login'],
   apiPrefix: '/api/v1',
+  //jupyterUrl: CONSTANT.,
   jupyterServer: CONSTANT.jupyterServer,
   api: {
     userLogin: '/user/login',
@@ -28,10 +29,13 @@ module.exports = {
     dataSets: '/data/data_sets',
     projects: '/project/projects',
     publish: '/project/publish',
+    unpublish: '/project/unpublish',
     fork : '/project/fork',
     toolkits: '/toolkit/toolkits/public',
     // projectCreate: '/project/create_project',
     getDataFields: '/data/data_sets/fields',
-    neuralStyle: '/model/neural_style'
+    neuralStyle: '/model/neural_style',
+    servedModel: '/served_model',
+    allModels: '/served_models'
   },
 }

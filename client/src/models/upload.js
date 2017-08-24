@@ -4,7 +4,6 @@ import lodash from 'lodash'
 import { message } from 'antd'
 
 export default {
-
   namespace: 'upload',
 
   state: {
@@ -16,6 +15,11 @@ export default {
       owned_files: []
     },
     button: -1,
+    field: '',
+    tags: [],
+    relatedTasks: '',
+    inputVisible: false,
+    inputValue: ''
   },
 
   effects: {
@@ -65,6 +69,7 @@ export default {
         throw data
       }
     },
+
     *importData(
       {
         payload,
@@ -83,6 +88,7 @@ export default {
       }
       const data = yield call(importData, body)
       if (data.success) {
+        yield put({type: 'resetStates'})
         message.success('Import Success!')
       } else {
         console.log('error', data);
@@ -90,6 +96,8 @@ export default {
       }
     },
   },
+
+
   reducers: {
 
     querySuccess (state, { payload: files }) {
@@ -105,6 +113,10 @@ export default {
       }
     },
 
+    resetStates(state) {
+      return { ...state, inputValue: '', tags:[], inputVisible: false }
+    },
+
     setUploading (state, {payload: uploading}) {
       return { ...state, uploading }
     },
@@ -115,6 +127,25 @@ export default {
 
     hideModal (state) {
       return { ...state, visible: false }
+    },
+
+    showInput(state) {
+      console.log("inputVisible");
+      return { ...state, inputVisible: true }
+    },
+
+    hideInput(state) {
+      return { ...state, inputVisible: false }
+    },
+
+    setInputValue(state, {payload: value}){
+      return {...state, inputValue: value }
+    },
+
+    confirmInput(state){
+      //let tags = state.tags;
+      let value = state.inputValue;
+      return {...state, inputValue: '',  inputVisible: false, tags: [...state.tags, value]}
     },
 
     toggleButton (state, {payload: button}) {

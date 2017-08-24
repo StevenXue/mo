@@ -472,7 +472,7 @@ class ParamsSeletcor extends React.Component {
             this.state.steps.map((el, index) =>
               <div key={el}>
                 <div style={{display: 'flex', flexDirection: 'row'}}>
-                  <span style={{width:200, display:'block'}}>{el}</span>
+                  <span style={{width:200, display:'block', color: this.state.editing === el && '#0AA'}}>{el}</span>
                   <Button disabled={this.checkEnable(index)}
                           onClick={() => this.openModal(el)}
                           key={el}

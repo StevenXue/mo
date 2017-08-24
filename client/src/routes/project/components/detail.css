@@ -15,3 +15,10 @@
 .descriptions_section {
   width: 20% ;
 }
+
+.nameInput {
+  width: 150px;
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid #108ee9;
+}

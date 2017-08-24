@@ -121,7 +121,6 @@ class Preprocess extends React.Component{
 
   onSelectDataSet(value){
     this.setState({dataSet: value, loading: true});
-    message.loading('Please wait while we find out the missing values for you. \n This may take more than 1 minute, please DO NOT refresh page', 3);
     fetch(flaskServer + '/staging_data/staging_data_sets/fields?staging_data_set_id=' + value, {
       method: 'get',
       headers: {
@@ -187,7 +186,7 @@ class Preprocess extends React.Component{
               )
             }
           </Select>
-          <Spin spinning={this.state.loading}>
+          <Spin spinning={this.state.loading} tip="Please wait while we find out the missing values for you. This may take more than 1 minute, please DO NOT refresh page">
           <Collapse bordered={false} style={{marginTop: 10, width: '98%', marginLeft: '1%'}} >
             {
               this.state.missing_dict !== {} &&
