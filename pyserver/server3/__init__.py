@@ -10,6 +10,7 @@ from server3.entity.project import Project
 from server3.entity.file import File
 from server3.entity.user import User
 from server3.entity.data import Data
+from server3.entity.served_model import ServedModel
 from server3.entity.ownership import Ownership
 
 # ——————————————————————————————————————————————————————— external delete rules

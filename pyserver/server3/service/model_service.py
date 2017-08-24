@@ -10,37 +10,30 @@
 """
 import inspect
 import os
-import sys
 
 import numpy as np
 import pandas as pd
-import eventlet
+import simplejson as json
 
-from server3.business import model_business, ownership_business, user_business
-from server3.service import job_service
-from server3.service.job_service import split_supervised_input
-from server3.lib import models
-from server3.service import staging_data_service
 from server3.business import file_business
-from server3.business import staging_data_business
-from server3.business import project_business
 from server3.business import job_business
+from server3.business import model_business, ownership_business, user_business
+from server3.business import project_business
+from server3.business import staging_data_business
+from server3.lib import models
 from server3.repository import config
-from server3 import encoder as keras_encoder
+from server3.service import job_service
+from server3.service import staging_data_service
+from server3.service.job_service import split_supervised_input
+from server3.service.saved_model_services import encoder as keras_encoder
+from server3.service.saved_model_services import keras_saved_model
+from server3.entity.model import MODEL_TYPE
+from server3.constants import MODEL_EXPORT_BASE
 
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 # user_directory = 'user_directory/'
 
-# TODO 根据entity生成
-ModelType = {
-    'neural_network': 0,
-    'custom_supervised': 1,
-    'unsupervised': 2,
-    'half_supervised': 3,
-    'folder_input': 4,
-    'hyperas': 5
-
-}
+ModelType = {list(v)[1]: list(v)[0] for v in list(MODEL_TYPE)}
 
 
 def get_all_public_model():
@@ -439,10 +432,11 @@ def manage_folder_input_to_str(conf, file_id, **kwargs):
     return code_str
 
 
-def get_results_dir_by_job_id(job_id, checkpoint='final'):
+def get_results_dir_by_job_id(job_id, user_ID, checkpoint='final'):
     """
-
+    get training result by job id
     :param job_id:
+    :param user_ID:
     :param checkpoint:
     :return:
     """
@@ -450,17 +444,45 @@ def get_results_dir_by_job_id(job_id, checkpoint='final'):
     project_name = project.name
     ownership = ownership_business.get_ownership_by_owned_item(project,
                                                                'project')
+    if ownership.private and ownership.user.user_ID != user_ID:
+        raise ValueError('Authentication failed')
     user_ID = ownership.user.user_ID
-    result_dir = '{}{}/{}/{}/'.format(user_directory, user_ID,
-                                      project_name, job_id)
+    result_dir = os.path.join(user_directory + user_ID, project_name, job_id)
     filename = '{}.hdf5'.format(checkpoint)
     return result_dir, filename
 
 
 def encode_h5_for_keras_js(weights_hdf5_filepath):
+    """
+    encode_h5_for_keras_js
+    :param weights_hdf5_filepath:
+    :return:
+    """
     encoder = keras_encoder.Encoder(weights_hdf5_filepath)
     encoder.serialize()
     encoder.save()
+
+
+def export(name, job_id, user_ID):
+    """
+    export model for tf serving
+    :param name: str
+    :param job_id: str/ObjectId
+    :return:
+    """
+    result_dir, h5_filename = get_results_dir_by_job_id(job_id, user_ID)
+    model_dir = os.path.join(result_dir, 'model.json')
+    weights_dir = os.path.join(result_dir, h5_filename)
+    with open(model_dir, 'r') as f:
+        data = json.load(f)
+        json_string = json.dumps(data)
+        model = keras_saved_model.model_from_json(json_string)
+        model.load_weights(weights_dir)
+        working_dir = MODEL_EXPORT_BASE
+        export_base_path = os.path.join(working_dir, name)
+        version = keras_saved_model.export(model, working_dir,
+                                           export_base_path)
+        return export_base_path, version
 
 
 # ------------------------------ temp function ------------------------------e
@@ -677,18 +699,18 @@ def temp():
     #     {'type': 'DataFrame'}
     # ))
 
-    print(add_model_with_ownership(
-        'system',
-        False,
-        'Hyperas Model',
-        'Hyperas Model for hyperparameters tuning',
-        ModelType['hyperas'],
-        'server3/lib/models/linear_regressor.py',
-        'linear_regressor_model_fn',
-        'linear_regressor_to_str',
-        models.HYPERAS_SPEC,
-        {'type': 'ndarray', 'n': None}
-    ))
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'Hyperas Model',
+    #     'Hyperas Model for hyperparameters tuning',
+    #     ModelType['hyperas'],
+    #     'server3/lib/models/linear_regressor.py',
+    #     'linear_regressor_model_fn',
+    #     'linear_regressor_to_str',
+    #     models.HYPERAS_SPEC,
+    #     {'type': 'ndarray', 'n': None}
+    # ))
 
 
 if __name__ == '__main__':

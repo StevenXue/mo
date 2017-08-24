@@ -14,6 +14,7 @@ from flask import make_response
 from flask import request
 from flask import send_from_directory
 
+import server3.service.served_model_service
 from server3.service import model_service
 from server3.service import staging_data_service
 from server3.business import model_business
@@ -134,7 +135,9 @@ def encode_model_result(job_id):
     :param job_id:
     :return:
     """
-    result_dir, h5_filename = model_service.get_results_dir_by_job_id(job_id)
+    user_ID = request.args.get('user_ID')
+    result_dir, h5_filename = model_service.get_results_dir_by_job_id(job_id,
+                                                                      user_ID)
     model_service.encode_h5_for_keras_js(result_dir + h5_filename)
     prefix = re.sub('\.hdf5$', '', h5_filename)
     origin = request.remote_addr
@@ -157,7 +160,9 @@ def model_result(job_id, filename):
     :param filename:
     :return:
     """
-    result_dir, h5_filename = model_service.get_results_dir_by_job_id(job_id)
+    user_ID = request.args.get('user_ID')
+    result_dir, h5_filename = model_service.get_results_dir_by_job_id(job_id,
+                                                                      user_ID)
     return send_from_directory(result_dir, filename)
 
 
