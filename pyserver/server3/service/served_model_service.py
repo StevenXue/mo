@@ -101,7 +101,7 @@ def deploy(user_ID, job_id, name, description, server, signatures,
             '--port=9000',
             '--model_name={name}'.format(name=name),
             '--model_base_path={export_path}'.format(export_path=export_path)
-        ], preexec_fn=os.setpgrp)
+        ], start_new_session=True)
         # add a served model entity
         return add(user_ID, name, description, version, p.pid, server,
                    signatures, input_type, export_path, job, is_private)
