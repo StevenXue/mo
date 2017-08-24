@@ -140,7 +140,9 @@ class AutomatedModel extends React.Component {
     if(this.state.selectedData !== '' || this.state.selectedFile !== '') {
       return (
         <Button type='normal' size='small'
-                style={{marginLeft: 10}} onClick={() => this.addNewModel()}>
+                disabled={this.props.project.isPublic}
+                style={{marginLeft: 10}}
+                onClick={() => this.addNewModel()}>
           Add New Section
         </Button>
       )
@@ -250,7 +252,8 @@ class AutomatedModel extends React.Component {
                         shape="circle" icon="question" onClick={() => this.props.runTour(steps)}
                 />
               </div>
-              <div style={{ height: 480, overflowY: 'auto', marginTop: 5, backgroundColor: '#fafafa' }}>
+              <div style={{width: '100%', height: 1, backgroundColor: '#108ee9', margin: 5}} />
+              <div style={{ height: 480, overflowY: 'auto', backgroundColor: '#fafafa' }}>
                 {
                   this.state.statusStack.map((el, i) =>
                     <Model style={{ width: 1200, height: 450 }}

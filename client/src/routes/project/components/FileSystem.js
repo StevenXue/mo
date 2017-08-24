@@ -19,22 +19,30 @@ class FileSystem extends React.Component {
 
   componentDidMount () {
     this.props.dispatch({ type: 'project/query' })
+    //console.log(this.props.project.user)
   }
 
-  toProjectDetail (name, _id, isDeleting) {
-    console.log('isDeleting', isDeleting)
-    if (!isDeleting) {
-      this.props.toDetail(name, _id)
-      // this.props.dispatch({ type: 'project/toDetail'});
+  toProjectDetail (e, key) {
+    console.log("to project detail");
+    let _id = e._id;
+    let name = e.name;
+    let isPublic;
+    console.log(e, key);
+    if(key === 'owned_projects') {
+      isPublic = false;
+    }else{
+      if(e.user_name === this.props.project.user.user_ID) {
+        isPublic = false
+      }else{
+        isPublic = true
+      }
     }
+    this.props.dispatch({type:'project/toDetail', payload: {name: name, _id: _id, isPublic: isPublic}})
   }
 
   onClickDelete (event, _id, user_ID) {
     event.stopPropagation()
     event.preventDefault()
-    // this.setState({
-    //   deletingProject: _id
-    // })
     this.props.dispatch({ type: 'project/setDeletingProject', payload: _id })
     fetch(flaskServer + '/project/projects/' + _id + '?user_ID=' + user_ID, {
       method: 'delete',
@@ -42,9 +50,6 @@ class FileSystem extends React.Component {
       console.log(response.status)
       if (response.status === 200) {
         this.props.dispatch({ type: 'project/query' })
-        // this.setState({
-        //   deletingProject: undefined
-        // })
       }
     })
   }
@@ -60,6 +65,12 @@ class FileSystem extends React.Component {
     }
   }
 
+  onClickUnpublish(event, _id, username){
+    event.stopPropagation()
+    event.preventDefault()
+    this.props.dispatch({ type: 'project/unpublish', payload: _id })
+  }
+
   checkLoading(id) {
     return id === this.props.project.deletingProject
   }
@@ -67,10 +78,6 @@ class FileSystem extends React.Component {
   checkForkingPublishing(id) {
     return id === this.props.project.forkingProject || id === this.props.project.publishingProject
   }
-
-  // checkPublishing(id) {
-  //   return id === this.props.project.publishingProject
-  // }
 
   renderTabContent (key) {
     return(
@@ -82,6 +89,7 @@ class FileSystem extends React.Component {
 
   renderCards (key) {
     let cards = this.props.project.projects[key]
+    //console.log("projects", this.props.project.projects);
     return cards.map((e) =>
       <Card key={e._id} title={e.name} extra={
         <a>
@@ -100,9 +108,17 @@ class FileSystem extends React.Component {
               DELETE
             </Button>
           }
+          {
+            e.user_name ===  this.props.project.user.name &&
+            <Button type="danger" style={{marginTop: -5, marginLeft: 5}}
+                    loading={this.checkLoading(e._id)}
+                    onClick={(event) => this.onClickUnpublish(event, e._id, this.props.project.user.user_ID)}>
+              Unpublish
+            </Button>
+          }
         </a>
       } style={{ width: 400 , marginLeft: 5}}>
-        <div onClick={() => this.toProjectDetail(e.name, e._id, false)} style={{ cursor: 'pointer' }}>
+        <div onClick={() => this.toProjectDetail(e, key)} style={{ cursor: 'pointer' }}>
           <p>Description: {e.description}</p>
           <p>Create Time: {showTime(e.create_time)}</p>
           {e['user_name'] && <p>Owner: {e.user_name}</p>}
@@ -130,7 +146,6 @@ class FileSystem extends React.Component {
 }
 
 FileSystem.propTypes = {
-  toDetail: PropTypes.func,
   dispatch: PropTypes.func,
 }
 

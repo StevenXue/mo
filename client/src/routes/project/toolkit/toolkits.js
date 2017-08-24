@@ -1,13 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
+import JSONTree from 'react-json-tree'
+import { connect } from 'dva'
 import { Button, Select, message, Spin, Steps, Modal, Cascader} from 'antd'
 const { Option, OptGroup } = Select;
 const Step = Steps.Step;
-import { Router, routerRedux } from 'dva/router';
 //import ReactJson from 'react-json-view';
-import JSONTree from 'react-json-tree'
-import { connect } from 'dva'
 import { jupyterServer, flaskServer } from '../../../constants';
 import { isEmpty } from '../../../utils/utils'
 import VisualizationPanel from './visualizationPanel';
@@ -355,7 +354,7 @@ class Toolkit extends React.Component {
               {this.renderSelections()}
             </div>
             <div style={{marginTop: 10, height: 250}}>
-              <Spin spinning={this.state.loading}>
+              <Spin spinning={this.state.loading} tip="running">
                 {
                   !isEmpty(this.state.resultJson) &&
                     <div style={{height: 200, overflowY: 'auto'}}>
@@ -431,7 +430,7 @@ class Toolkit extends React.Component {
             this.state.current === 0
             &&
             <div>
-              <Button style={{ marginTop: 10, marginLeft: '40%' }} type="primary" onClick={() => this.next()}>Next</Button>
+              <Button disabled={this.props.project.isPublic} style={{ marginTop: 10, marginLeft: '40%' }} type="primary" onClick={() => this.next()}>Next</Button>
             </div>
           }
           {

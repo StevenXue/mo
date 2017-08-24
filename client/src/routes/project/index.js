@@ -14,18 +14,10 @@ const bodyStyle = {
 }
 
 function Dashboard ({ dispatch }) {
-  function handleToDetail (name, id) {
-    dispatch(routerRedux.push({
-      pathname: `project/${name}`,
-      query: {
-        _id: id,
-      },
-    }))
-  }
 
   return (
     <div style={bodyStyle}>
-      <FileSystem toDetail={handleToDetail} dispatch={dispatch} />
+      <FileSystem dispatch={dispatch} />
     </div>
   )
 }

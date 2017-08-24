@@ -2,10 +2,12 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
-import { flaskServer } from '../../../constants'
-
+import classnames from 'classnames'
 import { Button, message, Table, Radio, Input, Collapse, Card, Tag, Tabs, Spin, Modal, Popover} from 'antd';
 const RadioGroup = Radio.Group;
+
+import { flaskServer } from '../../../constants'
+import styles from './detail.css'
 
 class DataPreview extends React.Component {
   constructor (props) {
@@ -62,7 +64,7 @@ class DataPreview extends React.Component {
     }
     return(
       <div>
-        <p style={{marginLeft: 20}}>Preview your chosen dataset here, remember to rename your chosen dataset and we will make a copy for you for further operations.</p>
+        <p style={{marginLeft: 20, fontSize: 14, color: '#108ee9'}}>Preview your chosen dataset here, remember to rename your chosen dataset and we will make a copy for you for further operations.</p>
         <Spin spinning={this.props.project.loading}>
         <div>
           <Table style={{marginTop: 5, width: '100%'}}
@@ -70,23 +72,28 @@ class DataPreview extends React.Component {
                  columns={dsColumns}
                  pagination={false}
                  scroll={{x: this.getWidth(dsColumns), y: '100%'}}/>
-          <div style={{marginBottom: 10, width: 200, marginLeft: 20}}>
-            <Input placeholder="enter statge data name"
-                   id="stage_data_name"
-                   style={{width: 150}}
-            />
-            <Input style={{marginTop: 10, marginBottom: 5, width: 200}}
+          <div style={{marginBottom: 10, marginTop: 20, marginLeft: 20}}>
+            <div style={{marginBottom: 10}}>
+              <span>{"Staging Dataset Name: "}</span>
+              <Input className={classnames(styles.nameInput)}
+                     placeholder="enter statge data name"
+                     id="stage_data_name"
+              />
+            </div>
+            <span>{"Staging Dataset Description: "}</span>
+            <br/>
+            <Input style={{marginBottom: 5, width: 200}}
                    type="textarea"
                    placeholder="enter statge data description"
                    id='stage_description'
                    rows={2} />
-            <Button type='primary'
-                    style={{marginLeft: 20}}
-                    onClick={() => this.convertToStaging()}
-            >
-              Confirm and Stage
-            </Button>
           </div>
+          <Button type='primary'
+                  style={{marginLeft: 20}}
+                  onClick={() => this.convertToStaging()}
+          >
+            Confirm and Stage
+          </Button>
         </div>
         </Spin>
       </div>
