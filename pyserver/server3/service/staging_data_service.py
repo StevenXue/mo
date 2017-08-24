@@ -30,8 +30,8 @@ def get_by_query_str(staging_data_set_id, **kwargs):
 def list_staging_data_sets_by_project_id(project_id, without_result=False):
     """
     Get the list of staging_data_set by project id
-    
-    :param project_id: 
+
+    :param project_id:
     :param without_result:
     :return: list of staging_data_set objects
     """
@@ -44,9 +44,9 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
                                         data_set_id):
     """
     Create staging_data_set and copy to staging_data by original data_set id
-        
+
     :param sds_name: str
-    :param sds_description: str 
+    :param sds_description: str
     :param project_id: ObjectId
     :param data_set_id: ObjectId
     :return: new staging_data_set object
@@ -130,9 +130,9 @@ def get_fields_with_types(staging_data_set_id):
 def _get_fields_with_types(staging_data_set_id):
     """
     Get the fields and its types of one staging_data_set
-        
-    :param staging_data_set_id: 
-    :return: the list of field name and value type 
+
+    :param staging_data_set_id:
+    :return: the list of field name and value type
     """
     # sds_object = staging_data_set_business.get_by_id(staging_data_set_id)
     # sd_object = staging_data_business.get_first_one_by_staging_data_set(
