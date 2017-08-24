@@ -153,6 +153,12 @@ def publish_project(project_id):
     return ownership_business.update_by_id(ow['id'], private=False)
 
 
+def unpublish_project(project_id):
+    project = project_business.get_by_id(project_id)
+    ow = ownership_business.get_ownership_by_owned_item(project, 'project')
+    return ownership_business.update_by_id(ow['id'], private=True)
+
+
 def fork(project_id, new_user_ID):
     """
     fork project
