@@ -20,6 +20,7 @@ from server3.business import job_business
 from server3.business import model_business, ownership_business, user_business
 from server3.business import project_business
 from server3.business import staging_data_business
+from server3.business import staging_data_set_business
 from server3.lib import models
 from server3.repository import config
 from server3.service import job_service
@@ -473,6 +474,7 @@ def export(name, job_id, user_ID):
     :return:
     """
     result_dir, h5_filename = get_results_dir_by_job_id(job_id, user_ID)
+    result_sds = staging_data_set_business.get_by_job_id(job_id)
     model_dir = os.path.join(result_dir, 'model.json')
     weights_dir = os.path.join(result_dir, h5_filename)
     with open(model_dir, 'r') as f:
@@ -482,7 +484,7 @@ def export(name, job_id, user_ID):
             model = model_from_json(json_string)
             model.load_weights(weights_dir)
             working_dir = MODEL_EXPORT_BASE
-            export_base_path = os.path.join(working_dir, user_ID, name)
+            export_base_path = os.path.join(working_dir, str(result_sds.id))
             version = keras_saved_model.export(model, working_dir,
                                                export_base_path)
             return export_base_path, version
