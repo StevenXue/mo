@@ -45,7 +45,9 @@ class ModelForms extends React.Component {
       hyped: false,
       dataset_id: '',
       hypeLoading: false,
-      hypeParams: {}
+      hypeParams: {},
+      deployVisible: false,
+      jobId: ''
     }
   }
 
@@ -285,12 +287,13 @@ class ModelForms extends React.Component {
                 end: true
               });
             }else {
-              if (res.response === 'success') {
-                message.success(res.response)
+              if (res.response) {
+                //message.success(res.response)
                 this.setState({
                   score: res.response.score,
                   jobId: res.response.job_id
-                })
+                });
+                console.log("job id set", res.response.job_id, this.state.jobId)
               }
               this.props.modalSuccess()
               this.setState({end: true})
@@ -523,7 +526,23 @@ class ModelForms extends React.Component {
 
   onClickDeploy(){
     let params = this.state.params;
-    this.props.dispatch({type: 'project/deployModel', payload: {'_id': params._id, 'name': params.model.name}})
+    let name, des;
+    if(ReactDOM.findDOMNode(this.refs['model_name']).value && ReactDOM.findDOMNode(this.refs['model_des']).value){
+      name = ReactDOM.findDOMNode(this.refs['model_name']).value;
+      des = ReactDOM.findDOMNode(this.refs['model_des']).value
+      let jobId;
+      console.log(this.state.jobId)
+      if(this.state.params){
+        jobId = params._id
+      }else{
+        jobId = this.state.jobId
+      }
+      console.log(jobId);
+      this.props.dispatch({type: 'project/deployModel', payload: {'_id': jobId, 'name': name, 'des': des}})
+      this.setState({deployVisible: false, jobId: ''});
+    }else{
+      message.error('please complete fields to deploy model');
+    }
   }
 
   renderHypeResults(){
@@ -571,10 +590,24 @@ class ModelForms extends React.Component {
           </Button>}
           <br/>
           {this.state.end &&
-          <Button type='primary' style={{ marginTop: 10, width: 100 }} onClick={() => this.onClickDeploy()}>
+          <Button type='primary' style={{ marginTop: 10, width: 100 }} onClick={() => this.setState({deployVisible: true})}>
             <Icon type="export" />
             Deploy
           </Button>}
+          <Modal title="Confirm Deploy"
+                 width={500}
+                 visible={this.state.deployVisible}
+                 onOk={() => this.onClickDeploy()}
+                 onCancel={() => this.setState({deployVisible: false})}>
+            <div>
+              <span>{'Name: '}</span>
+              <Input ref='model_name' placeholder="Deployed Model Name" />
+            </div>
+            <div style={{marginTop: 10}}>
+              <span>{'Description: '}</span>
+              <Input ref='model_des' placeholder="Model Description" />
+            </div>
+          </Modal>
           <Modal title="Result"
                  width={700}
                  visible={this.state.visible}
