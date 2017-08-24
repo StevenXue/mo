@@ -20,19 +20,9 @@ class FileSystem extends React.Component {
   renderOperations(e){
     return(
       <div className={classnames(styles.flexRow)} style={{justifyContent: 'flex-end'}}>
-        <Popconfirm placement="top"
-                    title={'Conform Delete'}
-                    onConfirm={() => this.props.dispatch({type: 'serving/deleteModel', payload: e._id})}
-                    okText="Yes"
-                    cancelText="No">
-          <a style={{color: '#df060b'}}>
-            <Icon type="close-circle" style={{fontSize: 20, color: '#df060b'}}/>
-          </a>
-        </Popconfirm>
         {
           e.status === 'running' &&
-          <a style={{marginLeft: 10}}
-             onClick={() => this.props.dispatch({type: 'serving/suspendModel', payload: e._id})}>
+          <a onClick={() => this.props.dispatch({type: 'serving/suspendModel', payload: e._id})}>
             <Icon type="pause-circle-o" style={{fontSize: 20}}/>
           </a>
         }
@@ -44,12 +34,21 @@ class FileSystem extends React.Component {
           </a>
         }
         {
-          e.status !== 'terminated' &&
+          e.status !== 'terminated' && e.status !== 'zombie' &&
           <a style={{marginLeft: 10}}
              onClick={() => this.props.dispatch({type: 'serving/terminateModel', payload: e._id})}>
             <Icon type="minus-square-o" style={{fontSize: 20}}/>
           </a>
         }
+        <Popconfirm placement="top"
+                    title={'Conform Delete'}
+                    onConfirm={() => this.props.dispatch({type: 'serving/deleteModel', payload: e._id})}
+                    okText="Yes"
+                    cancelText="No">
+          <a style={{marginLeft: 10, color: '#df060b'}}>
+            <Icon type="close-circle" style={{fontSize: 20, color: '#df060b'}}/>
+          </a>
+        </Popconfirm>
       </div>
     )
   }

@@ -92,7 +92,7 @@ export default {
       let args = {
         "user_ID": user.user_ID,
         "name": payload.name,
-        "description": payload.name + " some des",
+        "description": payload.des,
         "signatures": {"inputs": "inputs", "outputs": "scores",
           "def": "predict"},
         "input_type": "1darray"
