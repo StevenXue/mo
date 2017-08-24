@@ -8,8 +8,6 @@ from tensorflow.python.saved_model.signature_def_utils_impl import \
 from tensorflow.python.lib.io import file_io
 
 from server3.lib import K
-# from server3.lib import load_model
-# from server3.lib import model_from_json
 from server3.lib import tf
 
 
