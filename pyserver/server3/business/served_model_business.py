@@ -52,9 +52,7 @@ def terminate_by_id(oid):
     try:
         p = get_process_by_id(oid)
         p.terminate()
-        if p.status() == 'zombie':
-            print(p.status())
-            return True
+        return True
     except psutil.NoSuchProcess:
         return True
 
