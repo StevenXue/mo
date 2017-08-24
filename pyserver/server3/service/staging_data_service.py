@@ -193,7 +193,7 @@ def add_new_key_value(sds_id, key, array):
 def add_new_keys_value(sds_id, lst_dicts):
     """
         update data row by row
-        :param update:
+        :param update
         :return:
     """
     # get staging data的所有id
@@ -203,7 +203,7 @@ def add_new_keys_value(sds_id, lst_dicts):
 
 
 def update_many_with_new_fields():
-    
+    pass
 
 
 def get_row_col_info(sds_id):
