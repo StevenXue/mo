@@ -45,7 +45,7 @@ def main(_):
                                                                          1.8]]))
 
     result = stub.Predict(request, 10.0)  # 10 secs timeout
-    print(result)
+    print(result.outputs['scores'])
 
 
 if __name__ == '__main__':

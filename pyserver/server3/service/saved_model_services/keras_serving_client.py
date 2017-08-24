@@ -36,10 +36,10 @@ def main(_):
 
     result = stub.Predict(request, 10.0)  # 10 secs timeout
     print(result)
-    to_decode = np.expand_dims(result.outputs['outputs'].float_val, axis=0)
+    to_decode = np.expand_dims(result.outputs['scores'].float_val, axis=0)
     from tensorflow.contrib.keras.python.keras.applications.vgg19 import \
         decode_predictions
-    decoded = decode_predictions(to_decode, 5)
+    decoded = decode_predictions(to_decode)
     print(decoded)
 
 if __name__ == '__main__':

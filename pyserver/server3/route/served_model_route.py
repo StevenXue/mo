@@ -37,6 +37,8 @@ def deploy_trained_model(job_id):
     served_model = served_model_service.deploy(user_ID, job_id, name,
                                                description, server,
                                                signatures, input_type)
+    if not served_model:
+        return jsonify({'response': 'already deployed'}), 400
     served_model = json_utility.convert_to_json(served_model.to_mongo())
     return jsonify({'response': served_model})
 

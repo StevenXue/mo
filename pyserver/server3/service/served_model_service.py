@@ -1,6 +1,9 @@
 # -*- coding: UTF-8 -*-
-import subprocess
+import os
 import psutil
+import subprocess
+
+from mongoengine import DoesNotExist
 
 from server3.business import user_business
 from server3.business import ownership_business
@@ -16,7 +19,7 @@ ModelType = {list(v)[1]: list(v)[0] for v in list(MODEL_TYPE)}
 
 def add(user_ID, name, description, version, pid, server, signatures,
         input_type,
-        model_base_path, is_private=False):
+        model_base_path, job, is_private=False):
     """
     add a served model
     :param user_ID:
@@ -32,7 +35,7 @@ def add(user_ID, name, description, version, pid, server, signatures,
     served_model = served_model_business.add(name, description, version, pid,
                                              server,
                                              signatures, input_type,
-                                             model_base_path)
+                                             model_base_path, job)
     user = user_business.get_by_user_ID(user_ID)
     ownership_business.add(user, is_private, served_model=served_model)
     return served_model
@@ -77,26 +80,31 @@ def deploy(user_ID, job_id, name, description, server, signatures,
     :return:
     """
     job = job_business.get_by_job_id(job_id)
-    model_type = job.model.category
-    if model_type == ModelType['neural_network'] \
-            or model_type == ModelType['folder_input']:
-        export_path, version = model_service.export(name, job_id, user_ID)
-    else:
-        result_sds = staging_data_set_business.get_by_job_id(job_id)
-        saved_model_path_array = result_sds.saved_model_path.split('/')
-        version = saved_model_path_array.pop()
-        export_path = '/'.join(saved_model_path_array)
-    tf_model_server = './tensorflow_serving/model_servers/tensorflow_model_server'
-    p = subprocess.Popen([
-        tf_model_server,
-        '--enable_batching',
-        '--port=9000',
-        '--model_name={name}'.format(name=name),
-        '--model_base_path={export_path}'.format(export_path=export_path)
-    ])
-    # add a served model entity
-    return add(user_ID, name, description, version, p.pid, server,
-               signatures, input_type, export_path, is_private)
+
+    # if not deployed do the deployment
+    try:
+        served_model_business.get_by_job(job)
+    except DoesNotExist:
+        model_type = job.model.category
+        if model_type == ModelType['neural_network'] \
+                or model_type == ModelType['folder_input']:
+            export_path, version = model_service.export(name, job_id, user_ID)
+        else:
+            result_sds = staging_data_set_business.get_by_job_id(job_id)
+            saved_model_path_array = result_sds.saved_model_path.split('/')
+            version = saved_model_path_array.pop()
+            export_path = '/'.join(saved_model_path_array)
+        tf_model_server = './tensorflow_serving/model_servers/tensorflow_model_server'
+        p = subprocess.Popen([
+            tf_model_server,
+            '--enable_batching',
+            '--port=9000',
+            '--model_name={name}'.format(name=name),
+            '--model_base_path={export_path}'.format(export_path=export_path)
+        ], preexec_fn=os.setpgrp)
+        # add a served model entity
+        return add(user_ID, name, description, version, p.pid, server,
+                   signatures, input_type, export_path, job, is_private)
 
 
 def remove_by_id(model_id):
