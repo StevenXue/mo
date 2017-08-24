@@ -13,7 +13,7 @@ from mongoengine import DictField
 from mongoengine import ListField
 
 INPUT_TYPES = ('image', '1darray', '2darray', 'ndarray')
-STATUS = ('running', 'stopped')
+STATUS = ('running', 'stopped', 'terminated')
 
 
 class ServedModel(Document):
