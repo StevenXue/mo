@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 import subprocess
+import psutil
 
 from server3.business import user_business
 from server3.business import ownership_business
@@ -53,8 +54,11 @@ def list_served_models_by_user_ID(user_ID, order=-1):
 
 
 def set_status(served_model):
-    served_model.status = served_model_business.get_process(
-        served_model.pid).status()
+    try:
+        served_model.status = served_model_business.get_process(
+            served_model.pid).status()
+    except psutil.NoSuchProcess:
+        served_model.status = 'terminated'
     return served_model
 
 
