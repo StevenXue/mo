@@ -56,6 +56,7 @@ def mlp_main(result_sds, project_id, result_dir, x_train, y_train, x_val, y_val,
                   metrics=['accuracy'])
 
     # callback to save metrics
+    # TODO custom to make database writing async
     batch_print_callback = LambdaCallback(on_epoch_begin=
                                           lambda epoch, logs:
                                           logger_service.log_epoch_begin(
