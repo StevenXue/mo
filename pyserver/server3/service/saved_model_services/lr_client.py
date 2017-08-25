@@ -37,8 +37,10 @@ def main(_):
     host, port = FLAGS.server.split(':')
     channel = implementations.insecure_channel(host, int(port))
     stub = prediction_service_pb2.beta_create_PredictionService_stub(channel)
+
     request = predict_pb2.PredictRequest()
     request.model_spec.name = 'lr_1'
+
     request.inputs['AGE'].CopyFrom(tf.contrib.util.make_tensor_proto([[1.0]]))
     request.inputs['B'].CopyFrom(tf.contrib.util.make_tensor_proto([[1.0]]))
     request.inputs['CHAS'].CopyFrom(tf.contrib.util.make_tensor_proto([[1.0]]))

@@ -13,6 +13,7 @@ from server3.business import job_business
 from server3.service import ownership_service
 from server3.service import model_service
 from server3.entity.model import MODEL_TYPE
+from server3.constants import SERVING_PORT
 
 ModelType = {list(v)[1]: list(v)[0] for v in list(MODEL_TYPE)}
 
@@ -98,7 +99,7 @@ def deploy(user_ID, job_id, name, description, server, signatures,
         p = subprocess.Popen([
             tf_model_server,
             '--enable_batching',
-            '--port=9000',
+            '--port={port}'.format(port=SERVING_PORT),
             '--model_name={name}'.format(name=name),
             '--model_base_path={export_path}'.format(export_path=export_path)
         ], start_new_session=True)
