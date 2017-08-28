@@ -11,6 +11,7 @@ from mongoengine import StringField
 from mongoengine import IntField
 from mongoengine import DictField
 from mongoengine import ReferenceField
+from mongoengine import ListField
 
 INPUT_TYPES = ('image', '1darray', '2darray', 'ndarray')
 STATUS = ('running', 'stopped', 'terminated')
@@ -28,6 +29,9 @@ class ServedModel(Document):
     job = ReferenceField('Job', required=True)
     status = StringField(choices=STATUS)
     user_name = StringField()
+    related_field = StringField(max_length=100)
+    tags = ListField(StringField(max_length=50))
+    related_tasks = StringField(max_length=50)
 
 
 

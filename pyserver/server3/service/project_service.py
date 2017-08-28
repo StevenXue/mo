@@ -90,16 +90,6 @@ def remove_project_by_id(project_id, user_ID):
     return project_business.remove_by_id(project_id)
 
 
-def add_job_to_project(job_obj, project_id):
-    """
-    add job to project
-    :param job_obj:
-    :param project_id:
-    :return:
-    """
-    return project_business.insert_job_by_id(project_id, job_obj)
-
-
 # 增加result_obj和job_obj到project
 def add_job_and_result_to_project(result_obj, project_id):
     """

@@ -20,7 +20,7 @@ ModelType = {list(v)[1]: list(v)[0] for v in list(MODEL_TYPE)}
 
 def add(user_ID, name, description, version, pid, server, signatures,
         input_type,
-        model_base_path, job, is_private=False):
+        model_base_path, job, is_private=False, **optional):
     """
     add a served model
     :param user_ID:
@@ -36,7 +36,7 @@ def add(user_ID, name, description, version, pid, server, signatures,
     served_model = served_model_business.add(name, description, version, pid,
                                              server,
                                              signatures, input_type,
-                                             model_base_path, job)
+                                             model_base_path, job, **optional)
     user = user_business.get_by_user_ID(user_ID)
     ownership_business.add(user, is_private, served_model=served_model)
     return served_model
@@ -67,7 +67,7 @@ def set_status(served_model):
 
 
 def deploy(user_ID, job_id, name, description, server, signatures,
-           input_type, is_private=False):
+           input_type, is_private=False, **optional):
     """
     deploy model by create a tensorflow servable subprocess
     :param user_ID: str
@@ -105,7 +105,7 @@ def deploy(user_ID, job_id, name, description, server, signatures,
         ], start_new_session=True)
         # add a served model entity
         return add(user_ID, name, description, version, p.pid, server,
-                   signatures, input_type, export_path, job, is_private)
+                   signatures, input_type, export_path, job, is_private, **optional)
 
 
 def remove_by_id(model_id):

@@ -64,7 +64,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                                                    project_obj,
                                                    **job_spec)
             # update a project
-            project_service.add_job_to_project(job_obj, ObjectId(project_id))
+            project_business.insert_job_by_id(project_id, job_obj.id)
 
             # calculate
             func_rst = func(*args, **kw)
@@ -306,8 +306,9 @@ def create_model_job(project_id, staging_data_set_id, model_obj, **kwargs):
                                                  params=params,
                                                  **file_dict)
             # update a project
-            from server3.service import project_service
-            project_service.add_job_to_project(job_obj, ObjectId(project_id))
+            project_business.insert_job_by_id(project_id, job_obj.id)
+            project_business.update_items_to_list_field(
+                project_id, related_tasks=model_obj.category)
             # create result sds for model
             sds_name = '%s_%s_result' % (model_obj['name'], job_obj['id'])
             result_sds_obj = staging_data_set_business.add(sds_name, 'des',

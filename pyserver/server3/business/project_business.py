@@ -36,6 +36,10 @@ def add_by_obj(obj):
     return project_repo.create(obj)
 
 
+def update_items_to_list_field(project_id, **update):
+    project_repo.add_to_set(project_id, **update)
+
+
 def get_by_id(object_id):
     """
     Get a project object by its ObjectId

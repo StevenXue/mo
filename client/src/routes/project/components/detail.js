@@ -11,8 +11,8 @@ import Toolkits from '../toolkit/toolSteps'
 import JupyterNotebook from './jupyterNotebook'
 import Preprocess from '../preprocess/preprocess'
 import AutomatedModel from '../model/autoModal'
-import ImagePredict from '../predict/imagePredict'
-import NeuralStyle from '../predict/neuralStyle'
+// import ImagePredict from '../predict/imagePredict'
+// import NeuralStyle from '../predict/neuralStyle'
 import Serving from '../serving/serving'
 import DataPreview from './dataPreview'
 import { TourArea } from '../../../components'
@@ -380,11 +380,11 @@ class ProjectDetail extends React.Component {
                 <Panel  className='model-collapse' header={'Automated Modelling'} key="4" style={customPanelStyle}>
                   <AutomatedModel project_id={this.props.location.query._id} runTour={(steps) => this.runTour(steps)}/>
                 </Panel>
-                <Panel header='Predict' key="5" style={customPanelStyle}>
-                  {this.props.project.predictModelType === 4 ? <ImagePredict/>
-                    : <NeuralStyle project_id={this.state.project_id}/>
-                  }
-                </Panel>
+                {/*<Panel header='Predict' key="5" style={customPanelStyle}>*/}
+                  {/*{this.props.project.predictModelType === 4 ? <ImagePredict/>*/}
+                    {/*: <NeuralStyle project_id={this.state.project_id}/>*/}
+                  {/*}*/}
+                {/*</Panel>*/}
                 <Panel header='Serving' key="6" style={customPanelStyle}>
                   <Serving/>
                 </Panel>

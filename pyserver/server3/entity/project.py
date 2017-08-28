@@ -7,10 +7,6 @@ from mongoengine import ReferenceField
 from mongoengine import ListField
 from mongoengine import PULL
 
-# from server3.entity import DataSet
-# from server3.entity import Job
-# from server3.entity import Result
-
 
 class Project(Document):
     name = StringField(max_length=50, required=True)
@@ -22,3 +18,6 @@ class Project(Document):
     # if forked project, which project fork from
     source_project = ReferenceField('Project')
     user_name = StringField(max_length=50)
+    related_fields = ListField(StringField(max_length=100))
+    tags = ListField(StringField(max_length=50))
+    related_tasks = ListField(StringField(max_length=50))

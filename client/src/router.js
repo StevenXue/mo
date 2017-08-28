@@ -44,8 +44,8 @@ const Routers = function ({ history, app }) {
           getComponent (nextState, cb) {
             require.ensure([], require => {
               registerModel(app, require('./models/project'))
-              registerModel(app, require('./models/predict'))
-              registerModel(app, require('./models/predictImage'))
+              // registerModel(app, require('./models/predict'))
+              // registerModel(app, require('./models/predictImage'))
               cb(null, require('./routes/project/components/detail'))
             }, 'project')
           },
