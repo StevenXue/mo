@@ -4,6 +4,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
+import lodash from 'lodash'
 import { Form, Input, Button, Upload, Icon, Select, Tag, Tooltip } from 'antd'
 import Output from '../../../display-area/src/output'
 
@@ -31,8 +32,11 @@ const ImportPanel =
       e.preventDefault();
       validateFields((err, values) => {
         if (!err) {
-          console.log(values);
-          //dispatch({ type: 'upload/importData', payload: values })
+          //console.log(values);
+          let value = lodash.cloneDeep(values);
+          value.tags = upload.tags;
+          console.log(value);
+          dispatch({ type: 'upload/importData', payload: value })
         } else {
           console.log('error', err);
         }
@@ -40,9 +44,9 @@ const ImportPanel =
     }
 
     function handleClose(removedTag){
-      const tags = this.state.tags.filter(tag => tag !== removedTag);
+      const tags = upload.tags.filter(tag => tag !== removedTag);
       console.log(tags);
-      this.setState({ tags });
+      dispatch({type: 'upload/removeTag', payload: tags});
     }
 
     function showInput() {
@@ -144,9 +148,10 @@ const ImportPanel =
         <FormItem
           label="Tags"
         >
-          {getFieldDecorator('tags', {
+          {
+            getFieldDecorator('tags', {
             rules: [
-              { required: false},
+              { required: false },
             ],
           })(
             <div>

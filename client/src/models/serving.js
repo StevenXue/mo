@@ -3,7 +3,7 @@ import { uploadFile, fetchFileList, importData } from '../services/upload'
 import { parse } from 'qs'
 import lodash from 'lodash'
 import { message } from 'antd'
-
+import { Router, routerRedux } from 'dva/router'
 import {
   query,
   deleteModel,
@@ -39,6 +39,18 @@ export default {
         console.log('error', data)
         throw data
       }
+    },
+
+    * toDetail ({ payload }, { call, put, select }) {
+      console.log("to detail", payload)
+      yield put(
+        routerRedux.push({
+          pathname: `serving/${payload._id}`,
+          query: {
+            content: JSON.stringify(payload)
+          },
+        }),
+      )
     },
 
     *resumeModel ({ payload }, { call, put, select }) {

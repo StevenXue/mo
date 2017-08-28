@@ -17,6 +17,10 @@ class FileSystem extends React.Component {
     this.props.dispatch({ type: 'serving/query' });
   }
 
+  onClickToDetail(e){
+    this.props.dispatch({type:'serving/toDetail', payload: e})
+  }
+
   renderOperations(e){
     return(
       <div className={classnames(styles.flexRow)} style={{justifyContent: 'flex-end'}}>
@@ -63,7 +67,7 @@ class FileSystem extends React.Component {
           {' version: '}
         </span>
         <span className={classnames(styles.subTitle)}>{e.version}</span>
-      </div>} style={{width: 500}}>
+      </div>} extra={<a onClick={() => this.onClickToDetail(e)}>{"EDIT"}</a>} style={{width: 500}}>
         <div style={{width: 400}}>
           <span style={{fontSize: 14}}>STATUS: </span>
           <span style={{fontSize: 14}}>{e.status}</span>

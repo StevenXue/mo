@@ -59,6 +59,15 @@ const Routers = function ({ history, app }) {
             }, 'serving')
           },
         },
+        {
+          path: 'serving/:id',
+          getComponent (nextState, cb) {
+            require.ensure([], require => {
+              registerModel(app, require('./models/serving'))
+              cb(null, require('./routes/serving/components/modelDetail'))
+            }, 'serving')
+          },
+        },
         // {
         //   path: 'user',
         //   getComponent (nextState, cb) {

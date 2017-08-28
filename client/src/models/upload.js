@@ -138,6 +138,10 @@ export default {
       return { ...state, inputVisible: false }
     },
 
+    removeTag(state, {payload: value}){
+      return {...state, tags: value}
+    },
+
     setInputValue(state, {payload: value}){
       return {...state, inputValue: value }
     },
