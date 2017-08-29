@@ -222,9 +222,7 @@ def update_many_with_new_fields(raw_data, index, fields, name, sds_id):
     # 判断是否为一维数组
     if not isinstance(raw_data[inn], list):
         for i in range(len(ids)):
-            list_dicts.append(
-                UpdateOne({'_id': ids[i]}, {'$set': {fields[0]: raw_data[i]}})
-            )
+            list_dicts.append({'_id': ids[i].id, fields[0]: raw_data[i]})
     else:
         length1 = len(raw_data[inn])
         length2 = len(fields)
@@ -243,7 +241,7 @@ def update_many_with_new_fields(raw_data, index, fields, name, sds_id):
                 obj = dict(zip(name_list, rows))
             else:
                 obj = dict(zip(name_list, arr))
-            obj.update({'_id': ids[i]})
+            obj.update({'_id': ids[i].id})
             list_dicts.append(obj)
 
     # 把list_dicts存到数据库
