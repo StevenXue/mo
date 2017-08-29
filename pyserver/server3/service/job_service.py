@@ -47,7 +47,6 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
-            from server3.service import project_service
 
             # create a job
             staging_data_set_obj = staging_data_set_business.get_by_id(

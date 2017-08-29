@@ -21,6 +21,10 @@ def get_by_id(file_id):
     return file_repo.read_by_id(file_id)
 
 
+def update_one_by_id(file_id, **update):
+    return file_repo.update_one_by_id(file_id, update)
+
+
 def remove_by_id(file_id):
     return file_repo.delete_by_id(file_id)
 

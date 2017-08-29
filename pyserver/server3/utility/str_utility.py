@@ -1,5 +1,7 @@
 import re
 import unicodedata
+import random
+import string
 
 
 def generate_args_str(args):
@@ -19,12 +21,19 @@ def slugify(value, allow_unicode=False):
     Remove characters that aren't alphanumerics, underscores, or hyphens.
     Convert to lowercase. Also strip leading and trailing whitespace.
     """
+    if value == '':
+        value = 'field' + rand_str(3)
+
     value = str(value)
     if allow_unicode:
         value = unicodedata.normalize('NFKC', value)
     else:
-        value = unicodedata.normalize('NFKD', value).encode('ascii',
-                                                            'ignore').decode(
-            'ascii')
+        value = unicodedata.normalize('NFKD', value).encode(
+            'ascii', 'ignore').decode('ascii')
     value = re.sub(r'[^\w\s-]', '', value).strip()
     return re.sub(r'[-\s]+', '-', value)
+
+
+def rand_str(length):
+    return ''.join(
+        random.choices(string.ascii_uppercase + string.digits, k=length))

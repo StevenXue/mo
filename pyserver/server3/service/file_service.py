@@ -9,6 +9,7 @@ from server3.business import file_business
 from server3.business import user_business
 from server3.business import ownership_business
 from server3.service import ownership_service
+from server3.service import data_service
 from server3.repository import config
 from server3.constants import ALLOWED_EXTENSIONS
 from server3.constants import PREDICT_FOLDER
@@ -20,18 +21,23 @@ IGNORED_FILES = ['__MACOSX/']
 PASSED_FILES = ['__MACOSX', '.DS_Store']
 
 
-def add_file(file, url_base, user_ID, is_private=False, description='',
-             type='table', predict=False):
+def add_file(data_set_name, file, url_base, user_ID, is_private=False,
+             description='', ds_type='table', predict=False, names=None,
+             **optional):
     """
     add file by all file attributes
-    :param file: file instance
-    :param url_base: url can use to fetch the file
-    :param user_ID: user_ID
-    :param is_private: true or false
-    :param description: description of file
-    :param type:
-    :param predict:
-    :return:
+
+    :param data_set_name: 
+    :param file: 
+    :param url_base: 
+    :param user_ID: 
+    :param is_private: 
+    :param description: 
+    :param ds_type: 
+    :param predict: 
+    :param names: 
+    :param optional: 
+    :return: 
     """
     if not user_ID:
         raise ValueError('no user id or private input')
@@ -49,29 +55,43 @@ def add_file(file, url_base, user_ID, is_private=False, description='',
     filename_array = file.filename.rsplit('.', 1)
     extension = filename_array[1].lower()
     if extension == 'zip':
+        # extract zip files
         file_size, file_uri, folder_name = \
             extract_files_and_get_size(file, save_directory)
         file_url += folder_name
     else:
+        # save not zip files
         file_size, file_uri = save_file_and_get_size(file, save_directory)
         file_url += file.filename
 
     if predict:
         file_url += '?predict=true'
 
+    # deal with tags, tasks etc.
+    if 'tags' in optional:
+        optional['tags'] = [x.strip() for x in optional['tags'].split(',')]
+    if 'related_tasks' in optional:
+        optional['related_tasks'] = [x.strip() for x in
+                                     optional['related_tasks'].split(',')]
+
     # create file entity in database
     saved_file = file_business.add(file.filename, file_size, file_url,
-                                   file_uri, description, extension, type,
+                                   file_uri, description, extension, ds_type,
                                    predict=predict)
-    if saved_file:
-        if not ownership_business.add(user, is_private, file=saved_file):
-            # revert file saving
-            file_business.remove_by_id(saved_file['_id'])
-            raise RuntimeError('ownership create failed')
-        else:
-            return saved_file
-    else:
-        raise RuntimeError('file create failed')
+
+    ds = data_service.add_data_set(user_ID, is_private, data_set_name,
+                                   description, saved_file, **optional)
+
+    file_business.update_one_by_id(saved_file.id, data_set=ds)
+
+    if names:
+        names = [x.strip() for x in names.split(',')]
+
+    if extension == 'csv':
+        table = get_file_content(file_uri, names)
+        data_service.import_data(table, ds)
+
+    return saved_file.reload()
 
 
 def remove_file_by_id(file_id):
@@ -188,18 +208,23 @@ def file_loader(file_id, user_ID, names):
     if is_private and not is_owned:
         raise Exception('file permission denied, private: %s, owned: %s' % (
             is_private, is_owned))
+
+    return get_file_content(file.uri, names)
+
+
+def get_file_content(file_uri, names):
     if not names:
         # if no names get the first line of csv as names
-        with open(file.uri, encoding="utf-8") as f:
+        with open(file_uri, encoding="utf-8") as f:
             reader = csv.reader(f)
             names = next(reader)  # gets the first line
     # convert invalid characters in names
     names = [str_utility.slugify(n, allow_unicode=True) for n in names]
-    table = pd.read_csv(file.uri, skipinitialspace=True, names=names,
+
+    table = pd.read_csv(file_uri, skipinitialspace=True, names=names,
                         skiprows=[0])
     table = table.to_dict('records')
-    table = json_utility.convert_to_json(table)
-    return table
+    return json_utility.convert_to_json(table)
 
 
 def allowed_file(filename):

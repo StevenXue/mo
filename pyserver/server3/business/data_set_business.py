@@ -1,15 +1,16 @@
 # -*- coding: UTF-8 -*-
-
+from datetime import datetime
 from server3.entity.data_set import DataSet
 from server3.repository.data_set_repo import DataSetRepo
 
 data_set_repo = DataSetRepo(DataSet)
 
 
-def add(name, description, **kwargs):
+def add(name, description, file, **kwargs):
     if not name or not description:
         raise ValueError('no name or no description')
-    data_set = DataSet(name=name, description=description, **kwargs)
+
+    data_set = DataSet(name=name, description=description, file=file, **kwargs)
     return data_set_repo.create(data_set)
 
 

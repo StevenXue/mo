@@ -6,6 +6,7 @@ from mongoengine import ListField
 from mongoengine import DateTimeField
 from mongoengine import IntField
 from mongoengine import BooleanField
+from mongoengine import ReferenceField
 
 from server3.constants import ALLOWED_EXTENSIONS
 
@@ -25,14 +26,15 @@ class DataSet(Document):
     tags = ListField(StringField(max_length=50))
     related_tasks = ListField(StringField(max_length=50))
     user_name = StringField(max_length=50)
+    file = ReferenceField('File')
     # meta = {'allow_inheritance': True}
-    # upload_time = DateTimeField(required=True)
     # url = StringField(unique=True, required=True)
-    # uri = StringField(required=True)
+    # uri = StringField(unique=True, required=True)
+    # extension = StringField(choices=EXTENSION, required=True)
+    # type = StringField(choices=FILE_TYPE, required=True)
+    # predict = BooleanField(required=True)
+    # upload_time = DateTimeField()
     # size = IntField()
-    # extension = StringField(choices=EXTENSION)
-    # type = StringField(choices=FILE_TYPE)
-    # predict = BooleanField()
 
 # class FileDataSet(DataSet):
 #     upload_time = DateTimeField(required=True)

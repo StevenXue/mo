@@ -7,7 +7,7 @@ from server3.business import data_business
 from server3.business import data_set_business
 from server3.business import ownership_business
 from server3.business import user_business
-from server3.service import file_service
+# from server3.service import file_service
 from server3.service import ownership_service
 from server3.utility import json_utility
 from server3 import constants
@@ -45,22 +45,14 @@ def field_mapper_reducer():
     return mapper, reducer
 
 
-def add_data_set(data_set_name, ds_description, user_ID, is_private,
-                 **kwargs):
-    ds = data_set_business.add(data_set_name, ds_description, **kwargs)
+def add_data_set(user_ID, is_private, *args, **kwargs):
+    ds = data_set_business.add(*args, **kwargs)
     user = user_business.get_by_user_ID(user_ID)
-    os = ownership_business.add(user, is_private, data_set=ds)
+    ownership_business.add(user, is_private, data_set=ds)
     return ds
 
 
-def import_data(data_array, data_set_name, ds_description, user_ID,
-                is_private, **kwargs):
-    # find data set, if not exists add new one
-    # try:
-    #     ds = data_set_business.get_by_name(data_set_name)
-    # except DoesNotExist:
-    ds = add_data_set(data_set_name, ds_description, user_ID, is_private,
-                      **kwargs)
+def import_data(data_array, data_set):
     new_data_array = []
     for data in data_array:
         # id field will conflict with object_id
@@ -75,22 +67,22 @@ def import_data(data_array, data_set_name, ds_description, user_ID,
     # print(new_data_array)
     # import json
     # print(json.dumps(new_data_array))
-    data_business.add_many(ds, new_data_array)
-    return ds
+    data_business.add_many(data_set, new_data_array)
+    return data_set
 
 
-def import_data_from_file_id(file_id, data_set_name, ds_description, user_ID,
-                             is_private, names, **kwargs):
-    table = file_service.file_loader(file_id, user_ID, names)
-    return import_data(table, data_set_name, ds_description, user_ID,
-                       is_private, **kwargs)
+# def import_data_from_file_id(file_id, data_set_name, ds_description, user_ID,
+#                              is_private, names, **kwargs):
+#     table = file_service.file_loader(file_id, user_ID, names)
+#     return import_data(table, data_set_name, ds_description, user_ID,
+#                        is_private, **kwargs)
 
 
 def list_data_sets_by_user_ID(user_ID, order=-1):
     if not user_ID:
         raise ValueError('no user id')
     public_ds = ownership_service.get_all_public_objects('data_set')
-    owned_ds = ownership_service.\
+    owned_ds = ownership_service. \
         get_private_ownership_objects_by_user_ID(user_ID, 'data_set')
 
     if order == -1:

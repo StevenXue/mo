@@ -1,4 +1,5 @@
 from mongoengine import CASCADE
+from mongoengine import NULLIFY
 
 from server3.entity.staging_data_set import StagingDataSet
 from server3.entity.toolkit import Toolkit
@@ -16,3 +17,5 @@ from server3.entity.ownership import Ownership
 # ——————————————————————————————————————————————————————— external delete rules
 #                                            Defined here to avoid import loops
 Project.register_delete_rule(Job, 'project', CASCADE)
+# DataSet.register_delete_rule(File, 'data_set', CASCADE)
+File.register_delete_rule(DataSet, 'file', NULLIFY)

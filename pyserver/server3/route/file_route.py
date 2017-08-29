@@ -5,6 +5,8 @@ Blueprint for file
 Author: Zhaofeng Li
 Date: 2017.05.22
 """
+from copy import deepcopy
+
 from bson import ObjectId
 from flask import Blueprint
 from flask import jsonify
@@ -29,10 +31,13 @@ file_app = Blueprint("file_app", __name__, url_prefix=PREFIX)
 
 @file_app.route('/files', methods=['POST'])
 def upload_file():
-    user_ID = request.form['user_ID']
-    is_private = request.form['if_private']
-    description = request.form['description']
-    type = request.form['type']
+    data = dict(request.form.items())
+    user_ID = data.pop('user_ID')
+    data_set_name = data.pop('data_set_name')
+    is_private = data.pop('if_private')
+    description = data.pop('description')
+    ds_type = data.pop('type')
+    names = data.pop('names', None)
     # convert string to bool
     is_private = str(is_private).lower() == 'true'
 
@@ -45,9 +50,10 @@ def upload_file():
             return jsonify({'response': 'no selected file'}), 400
         if file and file_service.allowed_file(file.filename):
             url_base = PREFIX + UPLOAD_URL
-            saved_file = file_service.add_file(file, url_base,
+            saved_file = file_service.add_file(data_set_name, file, url_base,
                                                user_ID, is_private,
-                                               description, type)
+                                               description, ds_type,
+                                               names=names, **data)
             file_json = json_utility.convert_to_json(saved_file.to_mongo())
             return jsonify({'response': file_json})
         else:
@@ -101,8 +107,7 @@ def remove_file_by_id(file_id):
     try:
         result = file_service.remove_file_by_id(ObjectId(file_id))
     except Exception as e:
-        return jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)})
+        return jsonify({'response': '%s: %s' % (str(Exception), e.args)})
     return jsonify({'response': result})
 
 
@@ -132,9 +137,10 @@ def upload_predict_image():
             return jsonify({'response': 'no selected file'}), 400
         if file and file_service.allowed_file(file.filename):
             url_base = PREFIX + UPLOAD_URL
-            saved_file = file_service.add_file(file, url_base,
+            saved_file = file_service.add_file(file.filename, file, url_base,
                                                user_ID, is_private=True,
-                                               type='image', predict=True)
+                                               ds_type='image', predict=True,
+                                               **request.form)
             file_json = json_utility.convert_to_json(saved_file.to_mongo())
             return jsonify({'response': file_json})
         else:
