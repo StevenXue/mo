@@ -393,7 +393,7 @@ def create_public_toolkit():
                         "if_reserved": True,
                         "args": [
                             {
-                                "name": "Clustering Label",
+                                "name": "Clustering_Label",
                                 "des": "原始数据的每一行元素，对应分类的分类标签",
                                 # "type": "list",
                                 # 在存列的时候，要记得传进来的时候验证是不是list
