@@ -31,8 +31,8 @@ def get_by_query_str(staging_data_set_id, **kwargs):
 def list_staging_data_sets_by_project_id(project_id, without_result=False):
     """
     Get the list of staging_data_set by project id
-    
-    :param project_id: 
+
+    :param project_id:
     :param without_result:
     :return: list of staging_data_set objects
     """
@@ -45,9 +45,9 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
                                         data_set_id):
     """
     Create staging_data_set and copy to staging_data by original data_set id
-        
+
     :param sds_name: str
-    :param sds_description: str 
+    :param sds_description: str
     :param project_id: ObjectId
     :param data_set_id: ObjectId
     :return: new staging_data_set object
@@ -139,9 +139,9 @@ def get_fields_with_types(staging_data_set_id):
 def _get_fields_with_types(staging_data_set_id):
     """
     Get the fields and its types of one staging_data_set
-        
-    :param staging_data_set_id: 
-    :return: the list of field name and value type 
+
+    :param staging_data_set_id:
+    :return: the list of field name and value type
     """
     # sds_object = staging_data_set_business.get_by_id(staging_data_set_id)
     # sd_object = staging_data_business.get_first_one_by_staging_data_set(
@@ -211,8 +211,41 @@ def add_new_keys_value(sds_id, lst_dicts):
         staging_data_business.update_by_id(oid.id, lst_dicts.pop(0))
 
 
-def update_many_with_new_fields():
-    pass
+def update_many_with_new_fields(raw_data, index, fields, name, sds_id):
+    ids = staging_data_business.get_by_staging_data_set_id(sds_id)
+    ids = list(ids)
+    inn = 0
+    while inn in index:
+        inn += 1
+
+    list_dicts = []
+    # 判断是否为一维数组
+    if not isinstance(raw_data[inn], list):
+        for i in range(len(ids)):
+            list_dicts.append({'_id': ids[i].id, fields[0]: raw_data[i]})
+    else:
+        length1 = len(raw_data[inn])
+        length2 = len(fields)
+
+        # 判断是不是一对多还是多对多
+        if length1 == length2:
+            name_list = [item + '_' + name for item in fields]
+        else:
+            name_list = [fields[0] + '_' + name + str(i) for i in range(length1)]
+
+        # for i in range(len(raw_data)):
+        for i in range(len(raw_data)):
+            arr = raw_data[i]
+            if arr != arr:
+                rows = [arr] * length1
+                obj = dict(zip(name_list, rows))
+            else:
+                obj = dict(zip(name_list, arr))
+            obj.update({'_id': ids[i].id})
+            list_dicts.append(obj)
+
+    # 把list_dicts存到数据库
+    staging_data_business.update_many_with_new_fields(list_dicts)
 
 
 def get_row_col_info(sds_id):

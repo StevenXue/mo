@@ -14,37 +14,20 @@ from server3.business import toolkit_business
 # from bson import ObjectId
 # from server3.lib.data_manager import get_staging_data_pandas
 
+from server3.entity import toolkit
+
 connect(
     db=config.get_mongo_db(),
     username=config.get_mongo_user(),
     password=config.get_mongo_pass(),
     host=config.get_mongo_host(),)
 
-def log(func):
-    def wrapper(*args, **kw):
-        print('call %s()' % func.__name__)
-        func(*args, **kw)
-        print('call %s() after' % func.__name__)
-        return
-    return wrapper
-
-@log
-def now(arr0, arr1, k):
-    print('love wyt')
-
-def a(*args):
-    print(args[0], args[1], args[2])
-
-def test(a,b,c=3):
-    print('a', a)
-    print('b', b)
-    print('c', c)
 
 if __name__ == '__main__':
     '# 创建所有的public toolkit'
     # toolkit_business.create_public_toolkit()
     # toolkit_business.create_public_data_process()
-    toolkit_business.update_one_public_toolkit()
+    # toolkit_business.update_one_public_toolkit()
 
     # 删除一个public toolkit和它的ownership
     # 593a27a88be34db7c6e24349
@@ -86,11 +69,10 @@ if __name__ == '__main__':
     # for i in array:
     #     arr.append({'a': str(i)})
     # result = visualization_service.usr_story1_exploration(arr, 'str', group_num=10)
-    # print (result)
 
     # 测getattr
-    # print (hasattr(toolkit_orig, "toolkit_average"))
     # f = getattr(toolkit_orig, "toolkit_average")
-    # print ('f', f)
     # result = f([1,2,3,4])
-    # print (result)
+
+    # 测试get collection
+    test = toolkit.Toolkit._get_collection()

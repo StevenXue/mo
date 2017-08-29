@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
 from copy import deepcopy
-
 from bson import ObjectId
 
 from server3.entity.staging_data import StagingData
@@ -166,3 +165,8 @@ def copy_staging_data_by_staging_data_set_id(sds):
     sd_array = get_by_staging_data_set_id(sds['id'])
     sd_array_cp = [copy_staging_data(sd, sds) for sd in sd_array]
     return add_many_obj(sd_array_cp)
+
+
+def update_many_with_new_fields(list_dicts):
+    staging_data_repo.update_many(list_dicts)
+

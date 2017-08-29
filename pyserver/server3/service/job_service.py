@@ -23,7 +23,7 @@ from server3.business import project_business
 from server3.business import staging_data_business
 from server3.business import staging_data_set_business
 from server3.service import staging_data_service, logger_service, \
-    visualization_service
+     visualization_service
 from server3.business import ownership_business
 from server3.utility import data_utility
 from server3.lib import models
@@ -86,9 +86,12 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 if arg["if_add_column"]:
                     # 不能使用中文名
                     # strr = "%s_%s_col" % (arg["name"], toolkit_obj.name)
-                    strr = "%s_%s_col" % (arg["name"], toolkit_obj.entry_function)
+                    # strr = "%s_%s_col" % (arg["name"], toolkit_obj.entry_function)
+                    strr = "%s_col" % toolkit_obj.entry_function
+
                     try:
-                        add_new_column(value, args[-1], strr, staging_data_set_id)
+                        # add_new_column(value, args[-1], fileds[0], strr, staging_data_set_id)
+                        staging_data_service.update_many_with_new_fields(value, args[-1], fields[0], strr, staging_data_set_id)
                     except:
                         error_flag = 1
 
@@ -369,7 +372,7 @@ def list_by_project_id(project_id):
     return job_business.get_by_project(project)
 
 
-def add_new_column(value, index, name, staging_data_set_id):
+def add_new_column(value, index, fields, name, staging_data_set_id):
     inn = 0
     while inn in index:
         inn = inn + 1
@@ -393,43 +396,3 @@ def add_new_column(value, index, name, staging_data_set_id):
 
 if __name__ == '__main__':
     pass
-    # to_code({'layers': [{'name': 'Dense',
-    #                       'args': {'units': 64, 'activation': 'relu', 'input_shape': [
-    #                           20, ]}},
-    #                      {'name': 'Dropout',
-    #                       'args': {'rate': 0.5}},
-    #                      {'name': 'Dense',
-    #                       'args': {'units': 64, 'activation': 'relu'}},
-    #                      {'name': 'Dropout',
-    #                       'args': {'rate': 0.5}},
-    #                      {'name': 'Dense',
-    #                       'args': {'units': 10, 'activation': 'softmax'}}
-    #                      ],
-    #           'compile': {'loss': 'categorical_crossentropy',
-    #                       'optimizer': 'SGD',
-    #                       'metrics': ['accuracy']
-    #                       },
-    #           'fit': {'x_train': ['11', '11', '11', '11', '11', '11',
-    #                               '11', '11', '11', '11', '11', '11',
-    #                               '11', '11', '11', '11', '11', '11',
-    #                               '11', '11', '11', '11', '11', '11',
-    #                               '11', '11', '11', '11', '11', '11',
-    #                               '11', '11', '11', '11', '11', '11',
-    #                               '11', '11', '11', '11', '11', '11',
-    #                               '11', '11', '11', '11', '11', '11'],
-    #                   'y_train': '11',
-    #                   'x_val': '11',
-    #                   'y_val': '11',
-    #                   'args': {
-    #                       'epochs': 20,
-    #                       'batch_size': 128
-    #                   }
-    #                   },
-    #           'evaluate': {'x_test': '11',
-    #                        'y_test': '11',
-    #                        'args': {
-    #                            'batch_size': 128
-    #                        }
-    #                        }
-    #           }, "595f32e4e89bde8ba70738a3", "5934d1e5df86b2c9ccc7145a",
-    #          "59562a76d123ab6f72bcac23", schema='seq')

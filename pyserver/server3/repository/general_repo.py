@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 from mongoengine import connect
+from pymongo import UpdateOne
 
 from server3.repository import config
 
@@ -150,3 +151,13 @@ class Repo:
         :return: a list of objects corresponding to the query
         """
         return Repo.delete_many(self, {field_name: field_value})
+
+    def update_many(self, list_dicts):
+        """
+        update many columns into database
+        :param list_dicts: update values
+        :return: None
+        """
+        # 组合时候添加一笔资料
+        update_list_dicts = [UpdateOne({'_id': item.pop('_id')}, {'$set': item}) for item in list_dicts]
+        self.__instance._get_collection().bulk_write(update_list_dicts, ordered=False)
