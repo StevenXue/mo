@@ -91,7 +91,7 @@ def hypo_test(arr, mean, std, x_range, type='norm'):
 
 
 def usr_story2_exploration(data, d_type, sds_id):
-    print("sds-id", sds_id, str(sds_id))
+    # print("sds-id", sds_id, str(sds_id))
     if d_type == 0:
         cols = data["fields"]
         # TODO 暂时只支持3个栏位以上的
