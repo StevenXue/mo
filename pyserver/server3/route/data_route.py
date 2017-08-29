@@ -38,25 +38,25 @@ def list_data_sets_by_user_ID():
     return jsonify({'response': 'insufficient arguments'}), 400
 
 
-@data_app.route('/data_sets', methods=['POST'])
-def import_data_from_file_id():
-    data = request.get_json()
-    user_ID = data.pop('user_ID')
-    file_id = data.pop('file_id')
-    data_set_name = data.pop('data_set_name')
-    ds_description = data.pop('ds_description')
-    is_private = data.pop('is_private')
-    is_private = str(is_private).lower() == 'true'
-    names = data.pop('names', None)
-    saved_ds = data_service.import_data_from_file_id(ObjectId(file_id),
-                                                     data_set_name,
-                                                     ds_description,
-                                                     user_ID,
-                                                     is_private,
-                                                     names,
-                                                     **data)
-    ds_json = json_utility.convert_to_json(saved_ds.to_mongo())
-    return jsonify({'response': ds_json}), 200
+# @data_app.route('/data_sets', methods=['POST'])
+# def import_data_from_file_id():
+#     data = request.get_json()
+#     user_ID = data.pop('user_ID')
+#     file_id = data.pop('file_id')
+#     data_set_name = data.pop('data_set_name')
+#     ds_description = data.pop('ds_description')
+#     is_private = data.pop('is_private')
+#     is_private = str(is_private).lower() == 'true'
+#     names = data.pop('names', None)
+#     saved_ds = data_service.import_data_from_file_id(ObjectId(file_id),
+#                                                      data_set_name,
+#                                                      ds_description,
+#                                                      user_ID,
+#                                                      is_private,
+#                                                      names,
+#                                                      **data)
+#     ds_json = json_utility.convert_to_json(saved_ds.to_mongo())
+#     return jsonify({'response': ds_json}), 200
 
 
 @data_app.route('/data_sets/<string:data_set_id>', methods=['GET'])

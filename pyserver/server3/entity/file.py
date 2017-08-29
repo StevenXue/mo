@@ -26,6 +26,6 @@ class File(Document):
     type = StringField(choices=FILE_TYPE)
     user_name = StringField(max_length=50)
     predict = BooleanField()
-    data_set = ReferenceField('DataSet', reverse_delete_rule=CASCADE)
+    data_set = ReferenceField('DataSet')
 
 

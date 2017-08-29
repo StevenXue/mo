@@ -84,11 +84,18 @@ def list_data_sets_by_user_ID(user_ID, order=-1):
     public_ds = ownership_service.get_all_public_objects('data_set')
     owned_ds = ownership_service. \
         get_private_ownership_objects_by_user_ID(user_ID, 'data_set')
-
+    public_ds = [deref_file(ds) for ds in public_ds]
+    owned_ds = [deref_file(ds) for ds in owned_ds]
     if order == -1:
         public_ds.reverse()
         owned_ds.reverse()
     return public_ds, owned_ds
+
+
+def deref_file(data_set):
+    if hasattr(data_set, 'file') and data_set.file:
+        data_set.file_obj = data_set.file.to_mongo()
+    return data_set
 
 
 def get_fields_with_types(data_set_id):

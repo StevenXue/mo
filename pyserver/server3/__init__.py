@@ -17,5 +17,5 @@ from server3.entity.ownership import Ownership
 # ——————————————————————————————————————————————————————— external delete rules
 #                                            Defined here to avoid import loops
 Project.register_delete_rule(Job, 'project', CASCADE)
-# DataSet.register_delete_rule(File, 'data_set', CASCADE)
+DataSet.register_delete_rule(File, 'data_set', CASCADE)
 File.register_delete_rule(DataSet, 'file', NULLIFY)

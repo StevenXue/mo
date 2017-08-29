@@ -95,6 +95,8 @@ def me_obj_list_to_json_list(me_obj_list):
     :param me_obj_list: list
     :return:
     """
+    # print(me_obj_list[0].file_obj)
+    # print(me_obj_list[0].to_mongo())
     return [convert_to_json(me_obj.to_mongo()) for me_obj in
             me_obj_list]
 

@@ -1,4 +1,4 @@
-import { uploadFile, fetchFileList, importData } from '../services/upload'
+import { uploadFile, fetchFileList, fetchDataSets, importData } from '../services/upload'
 import { parse } from 'qs'
 import lodash from 'lodash'
 import { message } from 'antd'
@@ -14,6 +14,10 @@ export default {
       public_files: [],
       owned_files: []
     },
+    dataSets: {
+      public_ds: [],
+      owned_ds: []
+    },
     button: -1,
     field: '',
     tags: [],
@@ -22,13 +26,25 @@ export default {
     inputValue: ''
   },
 
+  subscriptions: {
+    setup({ dispatch, history }) {
+      history.listen(({ pathname }) => {
+        if (pathname === '/upload') {
+          dispatch({
+            type: 'fetch',
+          });
+        }
+      });
+    },
+  },
+
   effects: {
     *fetch(
       {
         payload,
       }, { put, call, select }) {
       const user = yield select(state => state['app'].user);
-      const data = yield call(fetchFileList, user.user_ID)
+      const data = yield call(fetchDataSets, user.user_ID)
       if (data.success) {
         yield put({ type: 'querySuccess', payload: data.response })
       } else {
@@ -48,6 +64,10 @@ export default {
       formData.append('description', payload.description);
       formData.append('if_private', payload.isPrivate);
       formData.append('type', payload.type);
+      formData.append('data_set_name', payload.data_set_name);
+      formData.append('tags', payload.tags);
+      formData.append('related_tasks', payload.related_tasks);
+      formData.append('related_field', payload.related_field);
       formData.append('user_ID', user.user_ID);
       yield put({ type: 'setUploading', payload: true })
       const data = yield call(uploadFile, formData)
@@ -100,11 +120,11 @@ export default {
 
   reducers: {
 
-    querySuccess (state, { payload: files }) {
+    querySuccess (state, { payload: dataSets }) {
       // const {} = action.payload
       return {
         ...state,
-        files,
+        dataSets,
         // list,
         // pagination: {
         //   ...state.pagination,
