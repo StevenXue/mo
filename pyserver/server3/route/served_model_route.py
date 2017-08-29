@@ -28,15 +28,17 @@ def deploy_trained_model(job_id):
     :return:
     """
     data = request.get_json()
-    user_ID = data.get('user_ID')
-    description = data.get('description')
-    name = data.get('name')
+    user_ID = data.pop('user_ID')
+    description = data.pop('description')
+    name = data.pop('name')
     server = 'localhost:9000'
-    signatures = data.get('signatures')
-    input_type = data.get('input_type')
+    signatures = data.pop('signatures')
+    input_type = data.pop('input_type')
     served_model = served_model_service.deploy(user_ID, job_id, name,
                                                description, server,
-                                               signatures, input_type)
+                                               signatures, input_type, **data)
+    if not served_model:
+        return jsonify({'response': 'already deployed'}), 400
     served_model = json_utility.convert_to_json(served_model.to_mongo())
     return jsonify({'response': served_model})
 

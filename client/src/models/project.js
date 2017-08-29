@@ -13,8 +13,13 @@ import {
   getStagedData,
   convertToStaging,
   predictNeuralStyle,
-  listToolkits
+  listToolkits,
+  getNotebookFile,
+  getNotebookContent,
+  unpublishProject,
+  deploy
 } from '../services/project'
+import { isEmpty } from '../utils/utils'
 
 export default {
 
@@ -47,7 +52,9 @@ export default {
     predictLoading: false,
     predictEnd: false,
     predictModelType: 6,
-    activeKeys: []
+    activeKeys: [],
+    isPublic: false,
+    notebookContent: {}
   },
 
   effects: {
@@ -74,15 +81,89 @@ export default {
       }
     },
 
-    * toDetail ({ payload }, { call, put, select }) {
-      console.log('to detail', payload)
+    * deployModel ({ payload }, { call, put, select }) {
       const user = yield select(state => state['app'].user)
+      yield put({
+        type: 'querySuccess',
+        payload: {
+          user: user,
+        },
+      })
+      let args = {
+        "user_ID": user.user_ID,
+        "name": payload.name,
+        "description": payload.des,
+        "signatures": {"inputs": "inputs", "outputs": "scores",
+          "def": "predict"},
+        "input_type": "1darray"
+      }
+      const data = yield call(deploy, payload._id, args)
+      if (data.success) {
+        message.success("Model deployed, please check it at the Deployed Model Section")
+      } else {
+        console.log('error', data)
+        throw data
+      }
+    },
+
+    *getNotebook ({ payload }, { call, put, select }) {
+      const user = yield select(state => state['app'].user)
+      const data = yield call(getNotebookFile, user.user_ID, payload)
+      if(data.success){
+        console.log("notebook success", data);
+        let notebook_content = {}
+        if(data.content instanceof Array && data.content[0]) {
+          let content = data.content;
+          notebook_content = content.find((el) => el.type === 'notebook')
+        }
+
+        if (isEmpty(notebook_content)){
+          yield put({
+            type: 'querySuccess',
+            payload: {
+              notebookContent: {},
+            },
+          })
+        }else{
+          yield put({
+            type: 'getNotebookContent',
+            payload: {
+              path: notebook_content.path
+            }
+          })
+        }
+      }else{
+        console.log('error', data)
+        throw data
+      }
+    },
+
+    *getNotebookContent({ payload }, { call, put, select }) {
+      const data = yield call(getNotebookContent, payload.path)
+      if(data.success){
+        console.log("content success", data)
+        yield put({
+          type: 'querySuccess',
+          payload: {
+            notebookContent: data.content,
+          },
+        })
+      }else{
+        console.log('error', res)
+        throw res
+      }
+    },
+
+    * toDetail ({ payload }, { call, put, select }) {
+      const user = yield select(state => state['app'].user)
+      yield put({type: 'setProjectPrivacy', payload: payload.isPublic})
       yield put(
         routerRedux.push({
           pathname: `project/${payload.name}`,
           query: {
             _id: payload._id,
             user: user,
+            isPublic: payload.isPublic
           },
         }),
       )
@@ -122,6 +203,33 @@ export default {
       const user = yield select(state => state['app'].user)
       if (data.success) {
         message.success('publish success!')
+        const res = yield call(query, user.user_ID)
+        yield put({ type: 'setPublishingProject', payload: undefined})
+        if (res) {
+          yield put({
+            type: 'querySuccess',
+            payload: {
+              projects: res.response,
+            },
+          })
+        } else {
+          console.log('error', res)
+          throw res
+        }
+      } else {
+        yield put({ type: 'setPublishingProject', payload: undefined})
+        console.log('error', data)
+        throw data
+      }
+    },
+
+    * unpublish ({ payload }, { call, put, select }) {
+      console.log('to detail', payload)
+      yield put({ type: 'setPublishingProject', payload: payload})
+      const data = yield call(unpublishProject, payload)
+      const user = yield select(state => state['app'].user)
+      if (data.success) {
+        message.success('unpublish success!')
         const res = yield call(query, user.user_ID)
         yield put({ type: 'setPublishingProject', payload: undefined})
         if (res) {
@@ -306,12 +414,17 @@ export default {
       return { ...state, modalVisible: false }
     },
 
+    setProjectPrivacy (state, action) {
+      return { ...state, isPublic: action.payload }
+    },
+
     selectDataSets (state, action) {
-      console.log('action', action)
       return { ...state, ...action.payload }
     },
 
-    setActiveKey (state, { payload: activeKeys }) {
+    setActiveKey (state, { payload: activeKey }) {
+      // console.log("in model", activeKeys);
+      let activeKeys = activeKey.filter((elem, index, self) => index === self.indexOf(elem))
       return {
         ...state,
         activeKeys,

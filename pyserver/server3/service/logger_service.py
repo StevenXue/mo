@@ -1,6 +1,4 @@
 # -*- coding: UTF-8 -*-
-import eventlet
-
 from flask_socketio import SocketIO
 # from sio import socketio
 from server3.business import staging_data_business
@@ -63,6 +61,7 @@ def emit_message(message, project_id):
 def emit_message_url(message, project_id):
     socketio.emit('send_message', message, namespace='/log/%s' % project_id)
 
+
 # def emit_message(message, project_id):
 #     eventlet.spawn_n(emit_message_fn, message, project_id)
 
@@ -90,17 +89,18 @@ def save_weights_result_fn(result_sds, max_to_keep, key, new_weight):
 
 
 def save_log(event, n, logs, result_sds, project_id):
-    eventlet.spawn_n(save_log_fn, event, n, logs, result_sds, project_id)
+    socketio.start_background_task(save_log_fn, event, n, logs, result_sds, project_id)
 
 
 def save_result(result_sds, **result):
-    eventlet.spawn_n(save_result_fn, result_sds, **result)
+    socketio.start_background_task(save_result_fn, result_sds, **result)
 
 
 def save_weights_result(result_sds, max_to_keep, key, new_weight):
-    eventlet.spawn_n(save_weights_result_fn, result_sds, max_to_keep,
-                     key,
-                     new_weight)
+    socketio.start_background_task(save_weights_result_fn, result_sds,
+                                   max_to_keep,
+                                   key,
+                                   new_weight)
 
 
 def emit_result():

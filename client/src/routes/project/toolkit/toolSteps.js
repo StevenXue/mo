@@ -1,10 +1,11 @@
 import React from 'react';
+import { connect } from 'dva'
 import PropTypes from 'prop-types';
 import { flaskServer } from '../../../constants';
 import { Button, Spin} from 'antd'
 import Toolkit from './toolkits';
 
-export default class ToolkitContainer extends React.Component {
+class ToolkitContainer extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -93,11 +94,11 @@ export default class ToolkitContainer extends React.Component {
     let index = this.state.statusStack.length - 1;
     return (
       <div style={{width: '100%'}}>
-        <Spin spinning={this.state.loading}>
+        <Spin spinning={this.state.loading} tip="loading history">
         {this.renderSections()}
         <div style={{width: '100%', display: 'flex', flexDirection:'row', justifyContent: 'center'}}>
           { !this.state.statusStack[index] &&
-          <Button style={{}} onClick={() => this.onAddNewSection()}>
+          <Button disabled={this.props.project.isPublic} onClick={() => this.onAddNewSection()}>
             Add New Section
           </Button>
           }
@@ -111,3 +112,5 @@ export default class ToolkitContainer extends React.Component {
 ToolkitContainer.PropTypes = {
   project_id: PropTypes.string
 }
+
+export default connect(({ project }) => ({ project }))(ToolkitContainer)

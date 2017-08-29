@@ -2,13 +2,15 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
-import ColumnPreview from './columnPreview';
-import { flaskServer } from '../../../constants'
-
+import classnames from 'classnames'
 import { Button, message, Table, Radio, Input, Collapse, Card, Tag, Tabs, Spin, Modal, Popover} from 'antd';
 const RadioGroup = Radio.Group;
 
-export default class ColumnOperations extends React.Component {
+import ColumnPreview from './columnPreview';
+import { flaskServer } from '../../../constants'
+import styles from './preprocess.css';
+
+class ColumnOperations extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -17,7 +19,8 @@ export default class ColumnOperations extends React.Component {
       values: this.props.values,
       deleted: {},
       stagedId: this.props.stagedId,
-      dataSet: this.props.dataSet
+      dataSet: this.props.dataSet,
+      changedFields: []
     }
   }
 
@@ -34,7 +37,6 @@ export default class ColumnOperations extends React.Component {
 
   onClickEditCols(){
     let values = this.state.values
-    //console.log(values);
     let deleted = Object.keys(this.state.deleted);
     deleted.forEach((e) => {
       delete values[e];
@@ -82,8 +84,8 @@ export default class ColumnOperations extends React.Component {
             })
           }).then((response) => {
             if (response.status === 200) {
+              this.setState({changedFields: []})
               message.success('Successfully transferred field types');
-              //this.setState({deleted: {}});
             } else {
               message.error('Error transferring field types');
             }
@@ -129,10 +131,23 @@ export default class ColumnOperations extends React.Component {
     ev.preventDefault();
     ev.stopPropagation();
     let values = this.state.values
+    let changedFields = this.state.changedFields
+    if(!changedFields.includes(field)){
+      changedFields.push(field)
+    }
     values[field] = ev.target.value
     this.setState({
-      values
+      values,
+      changedFields
     });
+  }
+
+  checkBgcolor(e){
+    if(this.state.changedFields.includes(e)){
+      return '#e9e0bb'
+    }else{
+      return '#ffffff'
+    }
   }
 
   renderColumnCards(){
@@ -143,10 +158,10 @@ export default class ColumnOperations extends React.Component {
       columns = columns.filter((el) => el !== '_id');
       columns = columns.filter((el) => el !== 'staging_data_set');
       return(
-        <div style={{display: 'flex', height: 400, width: '100%', overflowX: 'auto', overflowY: 'auto', flexDirection: 'row', flexWrap: 'wrap', margin: 10}}>
+        <div className={classnames(styles.columnsPreview)}>
           {
             columns.map((e) =>
-                <Card style={{ margin: 5, display:'flex', flexDirection: 'column'}} key={e} >
+                <Card style={{ margin: 5, display:'flex', flexDirection: 'column', height: 150, backgroundColor: this.checkBgcolor(e)}} key={e} >
                   <div style={{float: 'right', marginTop: -20, marginRight: -20}}>
                     <Popover content={
                       <ColumnPreview stagedDs={this.state.dataSet} name={e} type={dataSet[e]} newType={this.state.values[e]}/>
@@ -155,16 +170,19 @@ export default class ColumnOperations extends React.Component {
                         <span style={{fontSize: '12px'}}>VIEW</span>
                       </Button>
                     </Popover>
-                    <Button size="small" style={{marginLeft: 5}} onClick={(ev) => this.onDeleteCol(e, ev)}>
+                    <Button size="small"
+                            style={{marginLeft: 5}}
+                            disabled={this.props.project.isPublic}
+                            onClick={(ev) => this.onDeleteCol(e, ev)}>
                       <span style={{fontSize: '12px'}}>DELETE</span>
                     </Button>
                   </div>
                   <p>{e}</p>
                   <div className="custom-filter-dropdown">
                     <RadioGroup onChange={(ev) => this.onRadioChange(ev, e)} value={this.state.values[e]}>
-                      <Radio value={'str'}>String</Radio>
-                      <Radio value={'int'}>Integer</Radio>
-                      <Radio value={'float'}>Float</Radio>
+                      <Radio disabled={this.props.project.isPublic} value={'str'}>String</Radio>
+                      <Radio disabled={this.props.project.isPublic} value={'int'}>Integer</Radio>
+                      <Radio disabled={this.props.project.isPublic} value={'float'}>Float</Radio>
                     </RadioGroup>
                   </div>
                 </Card>
@@ -194,7 +212,7 @@ export default class ColumnOperations extends React.Component {
             <div style={{marginLeft: 20, marginTop: 20}}>
               {this.renderDeletedCols()}
             </div>
-            <Button style={{marginLeft: 20}} onClick={() => this.onClickEditCols()}>Confirm</Button>
+            <Button disabled={this.props.project.isPublic} type='primary' style={{marginLeft: 20}} onClick={() => this.onClickEditCols()}>Confirm</Button>
           </div>
         </Spin>
       </div>
@@ -208,5 +226,6 @@ ColumnOperations.PropTypes = {
   fields: PropTypes.any,
   values: PropTypes.any,
   stagedId: PropTypes.any,
-  //dataSet: PropTypes.any
 }
+
+export default connect(({ project }) => ({ project }))(ColumnOperations)

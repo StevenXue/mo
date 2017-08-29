@@ -117,6 +117,17 @@ class Repo:
         modified_obj = self.__instance.objects(id=obj_id).modify(**update)
         return modified_obj.reload()
 
+    def add_to_set(self, obj_id, **update):
+        """
+        insert items to list fields of document with given object id
+        :param obj_id:
+        :param update:
+        :return:
+        """
+        update = {'add_to_set__' + k: v for k, v in list(update.items())}
+        modified_obj = self.__instance.objects(id=obj_id).modify(**update)
+        return modified_obj.reload()
+
     def delete(self, obj):
         return obj.delete()
 

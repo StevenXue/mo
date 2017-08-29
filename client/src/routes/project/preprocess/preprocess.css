@@ -1,0 +1,14 @@
+.columnsPreview {
+  display: flex;
+  max-height: 400px;
+  width: 100%;
+  overflow-x: auto;
+  overflowY: auto;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 10px;
+}
+
+.ant-radio-inner:after {
+  background-color: #e9b419;
+}

@@ -22,12 +22,16 @@ def get_by_id(model_obj):
     return served_model_repo.read_by_id(model_obj)
 
 
+def get_by_job(job):
+    return served_model_repo.read_by_unique_field('job', job)
+
+
 def add(name, description, version, pid, server, signatures, input_type,
-        model_base_path):
+        model_base_path, job, **optional):
     model = ServedModel(name=name, description=description,
                         version=version, pid=pid, server=server,
                         signatures=signatures, input_type=input_type,
-                        model_base_path=model_base_path)
+                        model_base_path=model_base_path, job=job, **optional)
     return served_model_repo.create(model)
 
 
@@ -45,10 +49,10 @@ def get_process(pid):
 
 
 def terminate_by_id(oid):
-    p = get_process_by_id(oid)
-    p.terminate()
     try:
-        p.status()
+        p = get_process_by_id(oid)
+        p.terminate()
+        return True
     except psutil.NoSuchProcess:
         return True
 

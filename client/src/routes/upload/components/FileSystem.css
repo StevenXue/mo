@@ -3,16 +3,23 @@
   flex-direction: row;
 }
 
-.full-width {
+.fullWidth {
   width: 100%;
 }
 
-.flex-row {
+.flexRow {
   display: flex;
   flex-direction: row;
 }
 
-.flex-col {
+.flexCol {
   display: flex;
   flex-direction: column;
+}
+
+.importPanel {
+  width: 40%;
+  margin-left: 10%;
+  min-width: 200px;
+  max-width: 400px;
 }

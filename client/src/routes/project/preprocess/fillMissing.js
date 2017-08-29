@@ -6,7 +6,7 @@ import { flaskServer } from '../../../constants'
 import { Button, message, Table, Radio, Input, Collapse, Card, Tag, Tabs, Spin, Modal, Popover} from 'antd';
 const TabPane = Tabs.TabPane;
 
-export default class FillMissing extends React.Component {
+class FillMissing extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -188,7 +188,9 @@ export default class FillMissing extends React.Component {
       return (
         <div className="editable-row-operations">
           <Input id={index["_id"]} key={index["_id"]} className={index["_id"]} style={{width: 80, border: 'none', borderBottom: '1px solid #49a9ee'}}/>
-          <Button size='small' onClick={() => this.fillOne(index["_id"], name)}>OK</Button>
+          <Button size='small'
+                  disabled={this.props.project.isPublic}
+                  onClick={() => this.fillOne(index["_id"], name)}>OK</Button>
         </div>)
     }else{
       return(
@@ -260,13 +262,14 @@ export default class FillMissing extends React.Component {
             <span style={{color: '#108ee9'}}>{"Batch Edit "}</span>
             <span >{name + ": "}</span>
             <Input ref="batch_fill"
+                   disabled={this.props.project.isPublic}
                    style={{width: 200, marginLeft: 10, border: 'none', borderBottom: '1px solid #49a9ee'}}
             />
-            <Button size='small' style={{marginLeft: 10}} onClick={() => this.fillBatch(name)}>Confirm</Button>
+            <Button size='small' disabled={this.props.project.isPublic} style={{marginLeft: 10}} onClick={() => this.fillBatch(name)}>Confirm</Button>
             <br/>
             <Button size='small'
                     type={this.state.selectedRow.length === 0? "normal": "primary"}
-                    disabled={this.state.selectedRow.length === 0}
+                    disabled={this.state.selectedRow.length === 0 || this.props.project.isPublic}
                     onClick={() => this.onClickDeleteRow()}>Delete Rows</Button>
             <div style={{backgroundColor: '#49a9ee', height: 1, marginTop: 5, width: '80%'}} />
             <div style={{height: 500, overflowY: 'auto'}}>
@@ -318,3 +321,5 @@ export default class FillMissing extends React.Component {
 FillMissing.PropTypes = {
 
 }
+
+export default connect(({ project }) => ({ project }))(FillMissing)

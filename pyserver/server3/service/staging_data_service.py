@@ -12,6 +12,7 @@ from server3.business import staging_data_set_business
 from server3.business import staging_data_business
 from server3.business import data_business
 from server3.business import data_set_business
+from server3.business import project_business
 from server3.service import data_service
 from server3.utility import data_utility
 from server3.utility import json_utility
@@ -60,6 +61,14 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
     ds.pop('description')
     sds = staging_data_set_business.add(sds_name, sds_description, project_id,
                                         **ds)
+
+    # update project info
+    # note: related_field in data set become related_fields here
+    project_business.update_items_to_list_field(
+        project_id, tags=ds.get('tags'),
+        related_tasks=ds.get('related_tasks'),
+        related_fields=ds.get('related_field'))
+
     # copy data from data(raw) to staging data
     # get all data objects by data_set id
     try:

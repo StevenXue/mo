@@ -5,6 +5,7 @@ FILL_BLANK = 'BLANK_GRID'
 ALLOWED_EXTENSIONS = {'zip', 'csv', 'png', 'jpg', 'jpeg', 'txt'}
 PREDICT_FOLDER = 'predict_data/'
 MODEL_EXPORT_BASE = '/tmp'
+SERVING_PORT = 9000
 PARAMETER_SPEC = [
     {
         "name": "validation",

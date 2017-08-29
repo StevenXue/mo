@@ -10,6 +10,7 @@ from mongoengine import Document
 from mongoengine import StringField
 from mongoengine import IntField
 from mongoengine import DictField
+from mongoengine import ReferenceField
 from mongoengine import ListField
 
 INPUT_TYPES = ('image', '1darray', '2darray', 'ndarray')
@@ -25,7 +26,12 @@ class ServedModel(Document):
     input_type = StringField(required=True, choices=INPUT_TYPES)
     model_base_path = StringField(required=True)
     pid = IntField(required=True)
+    job = ReferenceField('Job', required=True)
     status = StringField(choices=STATUS)
     user_name = StringField()
+    related_field = StringField(max_length=100)
+    tags = ListField(StringField(max_length=50))
+    related_tasks = StringField(max_length=50)
+
 
 

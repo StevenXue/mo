@@ -191,7 +191,7 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
                 X_train.columns}
     serving_input_fn = input_fn_utils.build_default_serving_input_fn(features)
     saved_model_path = estimator.export_savedmodel(
-        os.path.join(MODEL_EXPORT_BASE, input_data['model_name']),
+        os.path.join(MODEL_EXPORT_BASE, str(result_sds.id)),
         serving_input_fn)
     # add saved_model_path to result staging data set
     staging_data_set_business.update(result_sds.id,

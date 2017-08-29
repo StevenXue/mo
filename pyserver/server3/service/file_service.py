@@ -64,8 +64,7 @@ def add_file(file, url_base, user_ID, is_private=False, description='',
                                    file_uri, description, extension, type,
                                    predict=predict)
     if saved_file:
-        if not ownership_business.add(user, is_private,
-                                      file=saved_file):
+        if not ownership_business.add(user, is_private, file=saved_file):
             # revert file saving
             file_business.remove_by_id(saved_file['_id'])
             raise RuntimeError('ownership create failed')

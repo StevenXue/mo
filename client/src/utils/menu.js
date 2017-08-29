@@ -15,8 +15,8 @@ module.exports = [
   },
   {
     id: 2,
-    icon: 'file',
-    name: 'Upload',
+    icon: 'database',
+    name: 'Dataset & File',
     router: '/upload',
   },
   // {
@@ -35,17 +35,23 @@ module.exports = [
   // },
   {
     id: 3,
-    bpid: 1,
     name: 'Playgound',
-    icon: 'database',
+    icon: 'code-o',
     router: '/playground',
   },
-  // {
-  //   id: 4,
-  //   bpid: 1,
-  //   name: 'UI Element',
-  //   icon: 'camera-o',
-  // },
+  {
+    id: 4,
+    name: 'Deployed Models',
+    icon: 'api',
+    router: '/serving'
+  },
+  {
+    id: 41,
+    mpid: -1,
+    bpid: 1,
+    name: 'Model Detail',
+    router: '/serving/:_id',
+  }
   // {
   //   id: 41,
   //   bpid: 4,

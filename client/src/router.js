@@ -44,19 +44,28 @@ const Routers = function ({ history, app }) {
           getComponent (nextState, cb) {
             require.ensure([], require => {
               registerModel(app, require('./models/project'))
-              registerModel(app, require('./models/predict'))
-              registerModel(app, require('./models/predictImage'))
+              // registerModel(app, require('./models/predict'))
+              // registerModel(app, require('./models/predictImage'))
               cb(null, require('./routes/project/components/detail'))
             }, 'project')
           },
         },
         {
-          path: 'project/:name/playground',
+          path: 'serving',
           getComponent (nextState, cb) {
             require.ensure([], require => {
-              registerModel(app, require('./models/project'))
-              cb(null, require('./routes/playground/'))
-            }, 'project')
+              registerModel(app, require('./models/serving'))
+              cb(null, require('./routes/serving/'))
+            }, 'serving')
+          },
+        },
+        {
+          path: 'serving/:id',
+          getComponent (nextState, cb) {
+            require.ensure([], require => {
+              registerModel(app, require('./models/serving'))
+              cb(null, require('./routes/serving/components/modelDetail'))
+            }, 'serving')
           },
         },
         // {
@@ -92,14 +101,16 @@ const Routers = function ({ history, app }) {
               cb(null, require('./routes/playground/'))
             }, 'playground')
           },
-        },{
-          path: 'request',
-          getComponent (nextState, cb) {
-            require.ensure([], require => {
-              cb(null, require('./routes/request/'))
-            }, 'request')
-          },
-        },{
+        },
+        // {
+        //   path: 'request',
+        //   getComponent (nextState, cb) {
+        //     require.ensure([], require => {
+        //       cb(null, require('./routes/request/'))
+        //     }, 'request')
+        //   },
+        // },
+        {
           path: '*',
           getComponent (nextState, cb) {
             require.ensure([], require => {
