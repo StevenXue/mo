@@ -23,7 +23,7 @@ from server3.business import project_business
 from server3.business import staging_data_business
 from server3.business import staging_data_set_business
 from server3.service import staging_data_service, logger_service, \
-    visualization_service
+     visualization_service
 from server3.business import ownership_business
 from server3.utility import data_utility
 from server3.lib import models
@@ -87,9 +87,12 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 if arg["if_add_column"]:
                     # 不能使用中文名
                     # strr = "%s_%s_col" % (arg["name"], toolkit_obj.name)
-                    strr = "%s_%s_col" % (arg["name"], toolkit_obj.entry_function)
+                    # strr = "%s_%s_col" % (arg["name"], toolkit_obj.entry_function)
+                    strr = "%s_col" % toolkit_obj.entry_function
+
                     try:
-                        add_new_column(value, args[-1], strr, staging_data_set_id)
+                        # add_new_column(value, args[-1], fileds[0], strr, staging_data_set_id)
+                        staging_data_service.update_many_with_new_fields(value, args[-1], fields[0], strr, staging_data_set_id)
                     except:
                         error_flag = 1
 
@@ -369,7 +372,7 @@ def list_by_project_id(project_id):
     return job_business.get_by_project(project)
 
 
-def add_new_column(value, index, name, staging_data_set_id):
+def add_new_column(value, index, fields, name, staging_data_set_id):
     inn = 0
     while inn in index:
         inn = inn + 1
