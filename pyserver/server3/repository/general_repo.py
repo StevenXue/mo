@@ -160,4 +160,5 @@ class Repo:
         """
         # 组合时候添加一笔资料
         update_list_dicts = [UpdateOne({'_id': item.pop('_id')}, {'$set': item}) for item in list_dicts]
+        print(update_list_dicts[:10])
         self.__instance._get_collection().bulk_write(update_list_dicts, ordered=False)
