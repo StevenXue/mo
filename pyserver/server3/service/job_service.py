@@ -67,8 +67,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
 
             # calculate
             func_rst = func(*args, **kw)
-            result = list(func_rst) if isinstance(func_rst, tuple) else [
-                func_rst]
+            result = list(func_rst) if isinstance(func_rst, tuple) else [func_rst]
 
             # 新设计的存取方式
             results = {
