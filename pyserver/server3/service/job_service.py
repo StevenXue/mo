@@ -85,7 +85,6 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 if arg["if_add_column"]:
                     # 不能使用中文名
                     strr = "%s_col" % toolkit_obj.entry_function
-                    staging_data_service.update_many_with_new_fields(value, args[-1], fields[0], strr, staging_data_set_id)
                     try:
                         staging_data_service.update_many_with_new_fields(value, args[-1], fields[0], strr, staging_data_set_id)
                     except:
