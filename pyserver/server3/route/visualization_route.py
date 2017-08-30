@@ -44,7 +44,7 @@ def usr1_visualization():
 def usr2_visualization():
     data = request.get_json()
     staging_data_set_id = data.get('staging_data_set_id')
-    
+
     sds_data = staging_data_set_business.get_by_id(ObjectId(staging_data_set_id))
 
     data = sds_data.visualization
