@@ -44,16 +44,11 @@ def usr1_visualization():
 def usr2_visualization():
     data = request.get_json()
     staging_data_set_id = data.get('staging_data_set_id')
-    # try:
-    #
-    #     data = staging_data_set_business.get_by_id(ObjectId(staging_data_set_id))["visualization"]
-    # except Exception as e:
-    #     return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
-    # return jsonify({'response': json_utility.convert_to_json(data)}), 200
+    
+    sds_data = staging_data_set_business.get_by_id(ObjectId(staging_data_set_id))
 
-    sds_data = staging_data_set_business.get_by_id(ObjectId(staging_data_set_id)).to_mongo().to_dict()
-    data = sds_data["visualization"]
-    job_obj = job_business.get_by_job_id(sds_data["job"])
-    visul_type = toolkit_business.get_by_toolkit_id(ObjectId(job_obj["toolkit"].id)).category
-    result = visualization_service.usr_story2_exploration(data, visul_type, job_obj.staging_data_set.id)
+    data = sds_data.visualization
+    job_obj = sds_data.job
+    visual_type = job_obj.toolkit.category
+    result = visualization_service.usr_story2_exploration(data, visual_type, job_obj.staging_data_set.id)
     return jsonify({'response': json_utility.convert_to_json(result)}), 200
