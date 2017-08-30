@@ -78,18 +78,49 @@ def import_data(data_array, data_set):
 #                        is_private, **kwargs)
 
 
-def list_data_sets_by_user_ID(user_ID, order=-1):
+def list_data_sets_by_user_ID(user_ID, order=-1, related_field=None, tag=None,
+                              related_task=None, extension=None, type=None):
     if not user_ID:
         raise ValueError('no user id')
     public_ds = ownership_service.get_all_public_objects('data_set')
     owned_ds = ownership_service. \
         get_private_ownership_objects_by_user_ID(user_ID, 'data_set')
-    public_ds = [deref_file(ds) for ds in public_ds]
-    owned_ds = [deref_file(ds) for ds in owned_ds]
+
+    public_ds = [deref_file(ds) for ds in public_ds
+                 if combine_conditions(ds,
+                                       [['related_field', related_field],
+                                        ['file.extension', extension],
+                                        ['file.type', type]],
+                                       [['tags', tag],
+                                        ['related_tasks', related_task]])]
+    owned_ds = [deref_file(ds) for ds in owned_ds
+                if combine_conditions(ds,
+                                      [['related_field', related_field],
+                                       ['file.extension', extension],
+                                       ['file.type', type]],
+                                      [['tags', tag],
+                                       ['related_tasks', related_task]])]
     if order == -1:
         public_ds.reverse()
         owned_ds.reverse()
     return public_ds, owned_ds
+
+
+def combine_conditions(obj, equal_array, in_array):
+    return all(tuple(get_attr(obj, e[0]) == e[1] for e in equal_array
+                     if e[1] is not None and get_attr(obj, e[0]) is not None) +
+               tuple(e[1] in get_attr(obj, e[0]) for e in in_array
+                     if e[1] is not None and get_attr(obj, e[0]) is not None))
+
+
+def get_attr(obj, key_str):
+    keys = key_str.split('.')
+    for k in keys:
+        if hasattr(obj, k):
+            obj = obj[k]
+        else:
+            return 'NO_KEY'
+    return obj
 
 
 def deref_file(data_set):
