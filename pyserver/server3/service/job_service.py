@@ -29,11 +29,12 @@ from server3.utility import data_utility
 from server3.lib import models
 from server3.repository import config
 from server3.utility import json_utility
+from server3.utility import data_utility
 
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 
 
-def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
+def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields, nan_index):
     """
     help toolkit to create a job before toolkit runs,
     as well as save the job & create a result after toolkit runs
@@ -84,6 +85,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 if arg["if_add_column"]:
                     # 不能使用中文名
                     str_name = "%s_col" % toolkit_obj.entry_function
+                    value = data_utility.retrieve_nan_index(value, nan_index)
                     try:
                         staging_data_service.update_many_with_new_fields(value, args[-1], fields[0],
                                                                          str_name, staging_data_set_id)
