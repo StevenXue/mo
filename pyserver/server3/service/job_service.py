@@ -77,18 +77,18 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
             }
             gen_info = []
             result_spec = toolkit_obj.result_spec
-            error_flag = 0
 
             for arg in result_spec["args"]:
                 value = result.pop(0)
                 results.update({arg["name"]: value})
                 if arg["if_add_column"]:
                     # 不能使用中文名
-                    strr = "%s_col" % toolkit_obj.entry_function
+                    str_name = "%s_col" % toolkit_obj.entry_function
                     try:
-                        staging_data_service.update_many_with_new_fields(value, args[-1], fields[0], strr, staging_data_set_id)
-                    except:
-                        error_flag = 1
+                        staging_data_service.update_many_with_new_fields(value, args[-1], fields[0],
+                                                                         str_name, staging_data_set_id)
+                    except (TypeError, ValueError) as e:
+                        print("ERRORS in data saved to database")
 
                 if arg.get("attribute", False) and arg["attribute"] == "label":
                     labels = value
