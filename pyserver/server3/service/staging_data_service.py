@@ -230,8 +230,10 @@ def update_many_with_new_fields(raw_data, index, fields, name, sds_id):
         # 判断是不是一对多还是多对多
         if length1 == length2:
             name_list = [item + '_' + name for item in fields]
-        else:
+        elif length2 == 1:
             name_list = [fields[0] + '_' + name + str(i) for i in range(length1)]
+        else:
+            name_list = [name + str(i) for i in range(length1)]
 
         # for i in range(len(raw_data)):
         for i in range(len(raw_data)):
