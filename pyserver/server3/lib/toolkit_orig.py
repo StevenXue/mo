@@ -16,8 +16,6 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 import scipy.stats as stats
 
-from server3.utility import data_utility
-
 
 ######################################################################
 # 探索数据 Exploring Data
