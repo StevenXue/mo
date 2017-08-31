@@ -154,32 +154,35 @@ def toolkit_mic(arr0):
 ###################################
 # 降维
 # 降维PCA-主成分分析算法
-def dimension_reduction_PCA(arr0, index, n_components='mle'):
+def dimension_reduction_PCA(arr0, n_components='mle'):
     matrix = np.array(arr0)
     svd_solver = 'auto'
     pca = PCA(n_components=n_components, svd_solver=svd_solver).fit(matrix)
     result = pca.transform(matrix)
-    label = data_utility.retrieve_nan_index(result.tolist(), index)
+    # label = data_utility.retrieve_nan_index(result.tolist(), index)
+    label = result.tolist()
     return label, pca.components_.tolist(), pca.explained_variance_.tolist(), pca.explained_variance_ratio_.tolist(), pca.mean_.tolist(), pca.noise_variance_
 
 
 # 降维TSNE-t_分布邻域嵌入算法
-def dimension_reduction_TSNE(arr0, index, n_components=2):
+def dimension_reduction_TSNE(arr0, n_components=2):
     matrix = np.array(arr0)
     t_sne = TSNE(n_components=n_components, random_state=0)
     np.set_printoptions(suppress=True)
     result = t_sne.fit(matrix)
     kl_divergence = result.kl_divergence_
-    label = data_utility.retrieve_nan_index(t_sne.fit_transform(matrix).tolist(), index)
+    # label = data_utility.retrieve_nan_index(t_sne.fit_transform(matrix).tolist(), index)
+    label = t_sne.fit_transform(matrix).tolist()
     return label, kl_divergence
 
 
 # K平均数算法
-def k_mean(arr0, index, k=2):
+def k_mean(arr0, k=2):
     matrix = np.array(arr0)
     k_means = KMeans(k).fit(matrix)
     result = k_means.labels_
-    label = data_utility.retrieve_nan_index(result.tolist(), index)
+    # label = data_utility.retrieve_nan_index(result.tolist(), index)
+    label = result.tolist()
     return label, k, k_means.cluster_centers_.tolist(), k_means.inertia_
 
 
