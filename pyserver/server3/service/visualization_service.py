@@ -19,6 +19,7 @@ from bson import ObjectId
 
 from server3.utility import data_utility, json_utility
 from server3.business import staging_data_business
+from server3.lib import toolkit_orig
 
 
 def usr_story1_exploration(data, d_type, group_num=10):
@@ -39,10 +40,16 @@ def usr_story1_exploration(data, d_type, group_num=10):
     # 频率直方图/词云图 'freq_hist'
     # 假设检验的信息 'hypo_info'
     gen_info = generate_stats_info(arr_temp, d_type)
+
     info_dict = {'type': d_type, 'gen_info': gen_info}
     if d_type == 'integer' or d_type == "int" or d_type == 'float':
-        mean, std, min, max = (gen_info['mean'], gen_info['std'], int(gen_info['min']), int(gen_info['max']))
         arr_array = np.array(arr_temp)
+
+        # 增加更多信息
+        more_info = add_more_info(arr_array, d_type)
+        info_dict["gen_info"].update(more_info)
+
+        mean, std, min, max = (gen_info['mean'], gen_info['std'], int(gen_info['min']), int(gen_info['max']))
         if len(set(arr_temp)) > 5:
             info_dict['freq_hist'] = freq_hist(arr_array, group_num)
             flag, p_value, standard_norm_value = hypo_test(arr_array, mean, std, info_dict['freq_hist']['x_domain'], 'norm')
