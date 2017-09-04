@@ -42,13 +42,14 @@ def get_all_public_toolkit():
 def get_all_public_toolkit_by_category():
     toolkit_category_dict = {}
     for obj in ownership_business.list_ownership_by_type_and_private('toolkit', False):
-        string = TOOLKIT_CATEGORY_DICT[obj.toolkit.category]
-        toolkit_obj = obj.toolkit.to_mongo()
-        toolkit_obj.pop("target_py_code")
-        if string in toolkit_category_dict:
-            toolkit_category_dict[string].append(toolkit_obj)
-        else:
-            toolkit_category_dict[string] = [toolkit_obj]
+        if obj.toolkit.category in TOOLKIT_CATEGORY_DICT:
+            string = TOOLKIT_CATEGORY_DICT[obj.toolkit.category]
+            toolkit_obj = obj.toolkit.to_mongo()
+            toolkit_obj.pop("target_py_code")
+            if string in toolkit_category_dict:
+                toolkit_category_dict[string].append(toolkit_obj)
+            else:
+                toolkit_category_dict[string] = [toolkit_obj]
     return toolkit_category_dict
 
 
