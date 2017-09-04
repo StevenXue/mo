@@ -181,3 +181,13 @@ def find_step(start, stop, count):
 
 def list_to_interval():
     pass
+
+
+def add_more_info(array, d_type):
+    info_dict = {'average': toolkit_orig.toolkit_average(array),
+                 'median': toolkit_orig.toolkit_median(array),
+                 'range': toolkit_orig.toolkit_range(array),
+                 'var': toolkit_orig.toolkit_variance(array)}
+    if str(d_type) != 'float':
+        info_dict.update({'mode': str(toolkit_orig.toolkit_mode(array)[0]) + ", " + str(toolkit_orig.toolkit_mode(array)[1]) + " in total"})
+    return info_dict
