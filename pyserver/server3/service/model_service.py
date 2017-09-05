@@ -120,48 +120,23 @@ def generate_model_py(conf, project_id, data_source_id, model_id, **kwargs):
     }
 
     # create model job
-    job_obj = job_business.add_model_job(model_obj,
-                                         staging_data_set_obj,
-                                         project_obj,
-                                         params=conf,
+    job_obj = job_business.add_model_job(model_obj, staging_data_set_obj,
+                                         project_obj, params=conf,
                                          run_args=run_args,
                                          **file_dict)
     job_id = str(job_obj.id)
-    # code_str = "from server3.service.model_service import run_model\n"
-    # code_str += "\n"
-    # code_str += "conf = {}\n".format(conf)
-    # code_str += "project_id = '{}'\n".format(project_id)
-    # code_str += "data_source_id = '{}'\n".format(data_source_id)
-    # code_str += "model_id = '{}'\n".format(model_id)
-    # code_str += "job_id = '{}'\n".format(job_id)
-    # code_str += "kwargs = {}\n".format(kwargs)
-    # code_str += "\n"
-    # code_str += "run_model(conf, project_id, data_source_id, model_id, " \
-    #             "job_id, **kwargs)\n"
-    # model_script_path = os.path.join(user_directory, user_ID, project_name,
-    #                                  job_id, 'run_model.py')
-    # file_utils.write_to_filepath(code_str, model_script_path)
     cwd = os.getcwd()
-    p = subprocess.Popen([
-        "docker",
-        'run',
-        '--rm',
-        '-i',
-        '-p',
-        '2222:22',
-        '--name',
-        'model_app_test',
-        '--mount',
-        'type=bind,source={}/user_directory,target=/pyserver/user_directory'.format(cwd),
-        '--entrypoint',
-        '/usr/local/bin/python',
+    subprocess.Popen([
+        "docker", 'run', '--rm', '-i', '-p', '2222:22',
+        '--name', job_id,
+        '--mount', 'type=bind,source={}/user_directory,'
+        'target=/pyserver/user_directory'.format(cwd),
+        '--entrypoint', '/usr/local/bin/python',
         'model_app:v1',
         'run_model.py',
-        '--job_id',
-        job_id,
+        '--job_id', job_id,
     ], start_new_session=True)
-    print(p.pid)
-    # TODO spawn and run script
+    print(job_id)
     # TODO add more status logging in model logger
 
 
