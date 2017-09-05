@@ -10,7 +10,7 @@ RUN apt-get install openssh-server -y
 RUN mkdir /var/run/sshd
 RUN chmod 0755 /var/run/sshd
 
-COPY id_rsa.pub /root/.ssh/authorized_keys
+COPY *.pub /root/.ssh/authorized_keys
 
 ADD pyserver /pyserver
 
