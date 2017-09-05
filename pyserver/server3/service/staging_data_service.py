@@ -221,17 +221,19 @@ def update_many_with_new_fields(raw_data, index, fields, name, sds_id):
     list_dicts = []
     # 判断是否为一维数组
     if not isinstance(raw_data[inn], list):
+        str_name = fields[0] + name if len(fields) == 1 else name
         for i in range(len(ids)):
-            list_dicts.append({'_id': ids[i].id, fields[0]: raw_data[i]})
+            list_dicts.append({'_id': ids[i].id, str_name: raw_data[i]})
     else:
         length1 = len(raw_data[inn])
         length2 = len(fields)
-
         # 判断是不是一对多还是多对多
         if length1 == length2:
             name_list = [item + '_' + name for item in fields]
-        else:
+        elif length2 == 1:
             name_list = [fields[0] + '_' + name + str(i) for i in range(length1)]
+        else:
+            name_list = [name + str(i) for i in range(length1)]
 
         # for i in range(len(raw_data)):
         for i in range(len(raw_data)):

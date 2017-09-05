@@ -24,18 +24,19 @@ from server3.business import project_business
 from server3.business import staging_data_business
 from server3.business import staging_data_set_business
 from server3.service import staging_data_service, logger_service, \
-    visualization_service
+     visualization_service
 from server3.business import ownership_business
 from server3.utility import data_utility
 from server3.lib import models
 from server3.repository import config
 from server3.utility import json_utility
 from server3.utility import file_utils
+from server3.utility import data_utility
 
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 
 
-def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
+def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields, nan_index):
     """
     help toolkit to create a job before toolkit runs,
     as well as save the job & create a result after toolkit runs
@@ -69,8 +70,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
 
             # calculate
             func_rst = func(*args, **kw)
-            result = list(func_rst) if isinstance(func_rst, tuple) else [
-                func_rst]
+            result = list(func_rst) if isinstance(func_rst, tuple) else [func_rst]
 
             # 新设计的存取方式
             results = {
@@ -80,35 +80,24 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
             }
             gen_info = []
             result_spec = toolkit_obj.result_spec
-            error_flag = 0
 
             for arg in result_spec["args"]:
                 value = result.pop(0)
                 results.update({arg["name"]: value})
                 if arg["if_add_column"]:
                     # 不能使用中文名
-                    # strr = "%s_%s_col" % (arg["name"], toolkit_obj.name)
-                    # strr = "%s_%s_col" % (arg["name"], toolkit_obj.entry_function)
-                    strr = "%s_col" % toolkit_obj.entry_function
-
+                    str_name = "%s_col" % toolkit_obj.entry_function
+                    value = data_utility.retrieve_nan_index(value, nan_index)
                     try:
-                        # add_new_column(value, args[-1], fileds[0], strr, staging_data_set_id)
-                        staging_data_service.update_many_with_new_fields(value,
-                                                                         args[
-                                                                             -1],
-                                                                         fields[
-                                                                             0],
-                                                                         strr,
-                                                                         staging_data_set_id)
-                    except:
-                        error_flag = 1
+                        staging_data_service.update_many_with_new_fields(value, args[-1], fields[0],
+                                                                         str_name, staging_data_set_id)
+                    except (TypeError, ValueError) as e:
+                        print("ERRORS in data saved to database")
 
                 if arg.get("attribute", False) and arg["attribute"] == "label":
                     labels = value
-                elif arg.get("attribute", False) and arg[
-                    "attribute"] == "general_info":
-                    gen_info.append({arg["name"]: {"value": value,
-                                                   "description": arg["des"]}})
+                elif arg.get("attribute", False) and arg["attribute"] == "general_info":
+                    gen_info.append({arg["name"]: {"value": value, "description": arg["des"]}})
 
             # 可视化计算
             # 聚类分析
@@ -158,8 +147,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 # 由于出来的数据格式不一致，判断是否为二维数据(是=>1, 不是=>0)
                 flag_shape = 1 if isinstance(labels[inn], list) else 0
 
-                result_be = labels if flag_shape else np.array(labels).reshape(
-                    [-1, 1]).tolist()
+                result_be = labels if flag_shape else np.array(labels).reshape([-1, 1]).tolist()
 
                 data = list(zip(*args[0]))
                 result = list(zip(*result_be))
@@ -167,11 +155,9 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 # 曾经两表合并，现在不需要了
                 # merge_data = list(zip(*(data + result)))
                 if len(result) == len(fields[0]):
-                    lab_fields = [str(fields[0][i]) + "_New_Col" for i in
-                                  range(len(result))]
+                    lab_fields = [str(fields[0][i]) + "_New_Col" for i in range(len(result))]
                 else:
-                    lab_fields = [str(fields[0][0]) + "_New_Col_" + str(i) for i
-                                  in range(len(result))]
+                    lab_fields = [str(fields[0][0]) + "_New_Col_" + str(i) for i in range(len(result))]
 
                 # merge_fields = fields[0] + lab_fields
 
@@ -211,57 +197,52 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                         "table1": {
                             "title": "原始数据",
                             "field": fields[0],
-                            "data": [dict(zip(fields[0], arr)) for arr in
-                                     args[0]]
+                            "data": [dict(zip(fields[0], arr)) for arr in args[0]]
                         },
                         "table2": {
                             "title": "转换后数据",
                             "field": lab_fields,
-                            "data": [dict(zip(lab_fields, arr)) for arr in
-                                     result_be]
+                            "data": [dict(zip(lab_fields, arr)) for arr in result_be]
                         },
                         "bar1": bar1,
                         "bar2": bar2}
 
             # 降维
             elif toolkit_obj.category == 3:
-                if error_flag:
-                    json = {}
-                else:
-                    flag = toolkit_obj.parameter_spec["data"]["type"][
-                               "key"] == "transfer_box"
-                    data = list(zip(*args[0]))
+                flag = toolkit_obj.parameter_spec["data"]["type"][
+                           "key"] == "transfer_box"
+                data = list(zip(*args[0]))
 
-                    if flag:
-                        data.append(args[1])
-                    lab = list(zip(*labels))
-                    lab_fields = ["New Col" + str(i) for i in range(len(lab))]
-                    var1 = [np.var(da) for da in data]
-                    var2 = [np.var(da) for da in lab]
-                    merge_fields = fields[0] + fields[1] if fields[1] else \
-                        fields[0]
-                    x_domain = merge_fields + ["_empty"] + lab_fields
-                    y_domain = var1 + [0] + var2
+                if flag:
+                    data.append(args[1])
+                lab = list(zip(*labels))
+                lab_fields = ["New Col" + str(i) for i in range(len(lab))]
+                var1 = [np.var(da) for da in data]
+                var2 = [np.var(da) for da in lab]
+                merge_fields = fields[0] + fields[1] if fields[1] else \
+                    fields[0]
+                x_domain = merge_fields + ["_empty"] + lab_fields
+                y_domain = var1 + [0] + var2
 
-                    temp = var1[:-1] if flag else var1
-                    json = {
-                        "table1": {"X_fields": fields[0],
-                                   "Y_fields": fields[1],
-                                   "data": [dict(zip(merge_fields, arr)) for arr
-                                            in list(zip(*data))]
-                                   },
-                        "table2": {
-                            "data": [dict(zip(lab_fields, arr)) for arr in
-                                     labels],
-                            "fields": lab_fields},
-                        "bar": {"x_domain": x_domain,
-                                "y_domain": y_domain},
-                        "pie1": [{"name": fields[0][i], "value": temp[i]} for i
-                                 in range(len(temp))],
-                        "pie2": [{"name": lab_fields[i], "value": var2[i]} for i
-                                 in range(len(var2))],
-                        "general_info": gen_info,
-                        "category": toolkit_obj.category}
+                temp = var1[:-1] if flag else var1
+                json = {
+                    "table1": {"X_fields": fields[0],
+                               "Y_fields": fields[1],
+                               "data": [dict(zip(merge_fields, arr)) for arr
+                                        in list(zip(*data))]
+                               },
+                    "table2": {
+                        "data": [dict(zip(lab_fields, arr)) for arr in
+                                 labels],
+                        "fields": lab_fields},
+                    "bar": {"x_domain": x_domain,
+                            "y_domain": y_domain},
+                    "pie1": [{"name": fields[0][i], "value": temp[i]} for i
+                             in range(len(temp))],
+                    "pie2": [{"name": lab_fields[i], "value": var2[i]} for i
+                             in range(len(var2))],
+                    "general_info": gen_info,
+                    "category": toolkit_obj.category}
 
             else:
                 json = {}
@@ -276,10 +257,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                                                                project_obj,
                                                                job=job_obj,
                                                                type='result')
-                logger_service.save_result(result_sds_obj, **{
-                    "result": json_utility.convert_to_json(results)})
-                logger_service.save_result(result_sds_obj,
-                                           **{"visualization": json})
+                logger_service.save_result(result_sds_obj, **{"result": json_utility.convert_to_json(results)})
+                logger_service.save_result(result_sds_obj, **{"visualization": json})
                 return {
                     "visual_sds_id": str(result_sds_obj.id) if json else None,
                     "result": results}

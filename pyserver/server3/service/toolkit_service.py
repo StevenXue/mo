@@ -28,7 +28,7 @@ TOOLKIT_CATEGORY_DICT = {
     1: '特征选取',
     2: '数值转换',
     3: '降维',
-    4: '描述性统计'
+    4: '概率统计推断'
 }
 
 
@@ -42,13 +42,14 @@ def get_all_public_toolkit():
 def get_all_public_toolkit_by_category():
     toolkit_category_dict = {}
     for obj in ownership_business.list_ownership_by_type_and_private('toolkit', False):
-        string = TOOLKIT_CATEGORY_DICT[obj.toolkit.category]
-        toolkit_obj = obj.toolkit.to_mongo()
-        toolkit_obj.pop("target_py_code")
-        if string in toolkit_category_dict:
-            toolkit_category_dict[string].append(toolkit_obj)
-        else:
-            toolkit_category_dict[string] = [toolkit_obj]
+        if obj.toolkit.category in TOOLKIT_CATEGORY_DICT:
+            string = TOOLKIT_CATEGORY_DICT[obj.toolkit.category]
+            toolkit_obj = obj.toolkit.to_mongo()
+            toolkit_obj.pop("target_py_code")
+            if string in toolkit_category_dict:
+                toolkit_category_dict[string].append(toolkit_obj)
+            else:
+                toolkit_category_dict[string] = [toolkit_obj]
     return toolkit_category_dict
 
 
@@ -72,21 +73,21 @@ def toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, fields, 
 
 # for database 调用toolkit code tag for zhaofeng
 def toolkit_calculate(project_id, staging_data_set_id, toolkit_obj,
-                      fields, *argv, **kwargs):
+                      fields, nan_index, *argv, **kwargs):
     if hasattr(toolkit_orig, toolkit_obj.entry_function):
         func = getattr(toolkit_orig, toolkit_obj.entry_function)
     else:
         func = getattr(preprocess_orig, toolkit_obj.entry_function)
 
     func = job_service.create_toolkit_job(project_id, staging_data_set_id,
-                                          toolkit_obj, fields)(func)
+                                          toolkit_obj, fields, nan_index)(func)
     result = func(*argv, **kwargs)
 
     return result
 
 
 def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
-                               fields, data, args):
+                               fields, data, kwargs):
     """convert json list"""
     col1, col2 = fields
     columns = col1 + col2 if col2 is not None else col1
@@ -100,16 +101,6 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
         else:
             index_nan.append(index)
 
-    # 正式的文字转数字
-    # 正式的也被弃用了
-    # argv_before = list(zip(*arg_filter))
-    # argv_after = []
-    # for arr in argv_before:
-    #     try:
-    #         float(arr[0])
-    #         argv_after.append(arr)
-    #     except ValueError:
-    #         argv_after.append(pd.Series(arr).astype('category').cat.codes)
     argv_after = list(zip(*arg_filter))
 
     # 准备input
@@ -118,14 +109,12 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
         argv.append(argv_after[len(col1):][0])
 
     toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
-    if toolkit_obj.category != 4:
-        argv.append(index_nan)
 
     # toolkit_temp应该支持数据库接入
-    if args:
-        result = toolkit_calculate(project_id, staging_data_set_id, toolkit_obj, fields, *argv, **args)
+    if kwargs:
+        result = toolkit_calculate(project_id, staging_data_set_id, toolkit_obj, fields, index_nan, *argv, **kwargs)
     else:
-        result = toolkit_calculate(project_id, staging_data_set_id, toolkit_obj, fields, *argv)
+        result = toolkit_calculate(project_id, staging_data_set_id, toolkit_obj, fields, index_nan, *argv)
     return result
 
 

@@ -107,5 +107,4 @@ def me_obj_list_to_dict_list(me_obj_list):
     :param me_obj_list: list
     :return:
     """
-    return [me_obj.to_mongo().to_dict() for me_obj in
-            me_obj_list]
+    return [me_obj.to_mongo().to_dict() for me_obj in me_obj_list]

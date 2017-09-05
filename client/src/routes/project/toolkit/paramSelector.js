@@ -222,6 +222,7 @@ class ParamsSeletcor extends React.Component {
               case 'int':
                 constant[el] = parseInt(ReactDOM.findDOMNode(this.refs[el]).value);
                 break;
+
               case 'string_m':
                 value = ReactDOM.findDOMNode(this.refs[el]).value;
                 value = value.replace(/\s+/g, "");
@@ -233,7 +234,12 @@ class ParamsSeletcor extends React.Component {
                     message.error('numbers of lables must be the same as bins');
                   }
                 }
-                break
+                break;
+
+              case 'float':
+                constant[el] = parseFloat(ReactDOM.findDOMNode(this.refs[el]).value);
+                break;
+
               default:
                 value = ReactDOM.findDOMNode(this.refs[el]).value;
                 constant[el] = value
