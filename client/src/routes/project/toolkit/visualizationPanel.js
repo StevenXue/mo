@@ -214,41 +214,46 @@ export default class VisualizationPanel extends React.Component {
                     <BarChart data={{x_domain: this.state.responseBody.X_fields, y_domain: this.state.responseBody.bar}}/>
                   </div>
                 </Card>
-                <Card title="各栏位与目标项相关系数分析图" style={{width: '40%' , margin: 5}}>
-                  <span style={{ marginLeft: 20 }}>Choose Field</span>
-                  <Select style={{width: 100, marginTop: 5, marginLeft: 20, zIndex: 100}}
-                          onChange={(values) => this.onSelectDataScatter(values)}
-                          allowClear={false}
-                          value={this.state.selected}
-                          placeholder="Choose Field">
+                {this.state.responseBody.scatter.y_domain &&
+                  <Card title="各栏位与目标项相关系数分析图" style={{ width: '40%', margin: 5 }}>
+                    <span style={{ marginLeft: 20 }}>Choose Field</span>
+                    <Select style={{ width: 100, marginTop: 5, marginLeft: 20, zIndex: 100 }}
+                            onChange={(values) => this.onSelectDataScatter(values)}
+                            allowClear={false}
+                            value={this.state.selected}
+                            placeholder="Choose Field">
 
+                      {
+                        this.state.responseBody.X_fields.map((e) =>
+                          <Select.Option value={e} key={e}>
+                            {e}
+                          </Select.Option>)
+                      }
+                    </Select>
                     {
-                      this.state.responseBody.X_fields.map((e) =>
-                        <Select.Option value={e} key={e}>
-                          {e}
-                        </Select.Option>)
+                      !isEmpty(this.state.scatterData) &&
+                      <div style={{ height: 270, marginTop: -20 }}>
+                        <SimpleScatter data={this.state.scatterData} yName={this.state.responseBody.Y_target[0]}
+                                       xName={this.state.selected}/>
+                      </div>
                     }
-                  </Select>
-                  {
-                    !isEmpty(this.state.scatterData) &&
-                      <div style={{height: 270, marginTop: -20}}>
-                        <SimpleScatter data={this.state.scatterData} yName={this.state.responseBody.Y_target[0]} xName={this.state.selected}/>
-                      </div>
-                  }
-                  {
-                    !isEmpty(this.state.scatterData) &&
-                      <div style={{marginTop: -20}}>
-                        <div >
+                    {
+                      !isEmpty(this.state.scatterData) &&
+                      <div style={{ marginTop: -20 }}>
+                        <div>
                           <span style={{ marginLeft: 20 }}>Pearsonr: </span>
-                          <span style={{color: "#00AAAA"}}>{this.state.responseBody['scatter']['pearsonr'][this.state.responseBody['X_fields'].indexOf(this.state.selected)]}</span>
+                          <span
+                            style={{ color: "#00AAAA" }}>{this.state.responseBody['scatter']['pearsonr'][this.state.responseBody['X_fields'].indexOf(this.state.selected)]}</span>
                         </div>
-                        <div >
+                        <div>
                           <span style={{ marginLeft: 20 }}>MIC: </span>
-                          <span style={{color: "#00AAAA"}}>{this.state.responseBody['scatter']['mic'][this.state.responseBody['X_fields'].indexOf(this.state.selected)]}</span>
+                          <span
+                            style={{ color: "#00AAAA" }}>{this.state.responseBody['scatter']['mic'][this.state.responseBody['X_fields'].indexOf(this.state.selected)]}</span>
                         </div>
                       </div>
-                  }
-                </Card>
+                    }
+                  </Card>
+                }
                 <Card title="图例和其它参数" style={{width: '30%', display: 'flex', flexDirection: 'column', margin: 5}}>
                   <div style={{marginLeft: 20, marginBottom: 10}}>
                     <div style={{height: 20, width: 100, backgroundColor: '#C6DFB5'}}/>

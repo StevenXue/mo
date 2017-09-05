@@ -57,7 +57,7 @@ const getColumns = (props) => {
           })
         }
 
-      } else if (props.data.Y_target.indexOf(e) !== -1) {
+      } else if (props.data.Y_target && props.data.Y_target.indexOf(e) !== -1) {
         return ({
           title: e,
           dataIndex: e,
