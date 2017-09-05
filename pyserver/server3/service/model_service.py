@@ -125,16 +125,57 @@ def generate_model_py(conf, project_id, data_source_id, model_id, **kwargs):
                                          run_args=run_args,
                                          **file_dict)
     job_id = str(job_obj.id)
+
+    return run_model(conf, project_id, data_source_id, model_id, job_id,
+                     **kwargs)
+
     cwd = os.getcwd()
+    # # docker command
+    # subprocess.Popen([
+    #     "docker", 'run', '--rm', '-i', '-p', '2222:22',
+    #     '--name', job_id,
+    #     '--mount', 'type=bind,source={}/user_directory,'
+    #     'target=/pyserver/user_directory'.format(cwd),
+    #     '--entrypoint', '/usr/local/bin/python',
+    #     'model_app:v1',
+    #     'run_model.py',
+    #     '--job_id', job_id,
+    # ], start_new_session=True)
+
+    kube_json = {
+        "apiVersion": "v1",
+        "kind": "Deployment",
+        "spec": {
+            "template": {
+                "spec": {
+                    "containers": [
+                        {
+                            "name": job_id,
+                            "image": "model_app:v1",
+                            "command": ["/usr/local/bin/python"],
+                            "args": [
+                                "run_model.py",
+                                "--job_id", job_id
+                            ],
+                            "volumeMounts": [{
+                                "mountPath": "/pyserver/user_directory",
+                                "name": "store"
+                            }]
+                        }
+                    ],
+                    "volumes": [{
+                        "name": "store",
+                        "hostPath": {"path": "{}/user_directory".format(cwd)}
+                    }]
+                }
+            }
+        }
+    }
+    # kubectl command
     subprocess.Popen([
-        "docker", 'run', '--rm', '-i', '-p', '2222:22',
-        '--name', job_id,
-        '--mount', 'type=bind,source={}/user_directory,'
-        'target=/pyserver/user_directory'.format(cwd),
-        '--entrypoint', '/usr/local/bin/python',
-        'model_app:v1',
-        'run_model.py',
-        '--job_id', job_id,
+        "kubectl", 'run', job_id, '--image=model_app:v1',
+        '-i', '--rm', '--port=22',
+        '--overrides={}'.format(json.dumps(kube_json)),
     ], start_new_session=True)
     print(job_id)
     # TODO add more status logging in model logger
@@ -291,7 +332,8 @@ def model_to_code(conf, project_id, data_source_id, model_id, **kwargs):
         if model['category'] == 1:
             data_fields = fit.get('data_fields', [[], []])
             head_str += 'data_fields = %s\n' % data_fields
-            head_str += inspect.getsource(model_input_manager_custom_supervised)
+            head_str += inspect.getsource(
+                model_input_manager_custom_supervised)
             head_str += "input_dict = model_input_manager_custom_supervised(" \
                         "data_fields, data_source_id, model_name, **kwargs)\n"
         elif model['category'] == 2:
@@ -367,8 +409,8 @@ def model_input_manager_unsupervised(x_cols, data_source_id, model_name,
                                                  'y': pd.DataFrame([[]])},
                                                 schema,
                                                 **kwargs)
-    obj.pop('y_tr')
-    obj.pop('y_te')
+    obj['y_tr'] = None
+    obj['y_te'] = None
     return {
         'model_name': model_name,
         **obj

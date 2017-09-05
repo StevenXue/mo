@@ -318,7 +318,7 @@ def create_model_job(project_id, staging_data_set_id, model_obj,
             if isinstance(func_result, dict):
                 func_result['job_id'] = str(job_obj['id'])
 
-            # return func_result
+            return func_result
 
         return wrapper
 
