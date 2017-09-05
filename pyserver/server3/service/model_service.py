@@ -10,10 +10,12 @@
 """
 import inspect
 import os
+import subprocess
 
 import numpy as np
 import pandas as pd
 import simplejson as json
+from bson import ObjectId
 
 from server3.business import file_business
 from server3.business import job_business
@@ -30,8 +32,10 @@ from server3.service.saved_model_services import encoder as keras_encoder
 from server3.service.saved_model_services import keras_saved_model
 from server3.entity.model import MODEL_TYPE
 from server3.constants import MODEL_EXPORT_BASE
+from server3.constants import MODEL_SCRIPT_PATH
 from server3.lib import graph
 from server3.lib import model_from_json
+from server3.utility import file_utils
 
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 # user_directory = 'user_directory/'
@@ -93,7 +97,75 @@ def split_categorical_and_continuous(df, exclude_cols):
     return continuous_cols, categorical_cols
 
 
-def run_model(conf, project_id, data_source_id, model_id, **kwargs):
+def generate_model_py(conf, project_id, data_source_id, model_id, **kwargs):
+    file_id = kwargs.get('file_id')
+    staging_data_set_obj = None
+    if data_source_id:
+        staging_data_set_obj = \
+            staging_data_set_business.get_by_id(data_source_id)
+    project_obj = project_business.get_by_id(project_id)
+    project_name = project_obj.name
+    project_os = ownership_business.get_ownership_by_owned_item(project_obj,
+                                                                'project')
+    user_ID = project_os.user.user_ID
+    file_dict = {'file': ObjectId(file_id)} if file_id else {}
+    model_obj = model_business.get_by_model_id(model_id)
+
+    run_args = {
+        "conf": conf,
+        "project_id": project_id,
+        "data_source_id": data_source_id,
+        "model_id": model_id,
+        "kwargs": kwargs
+    }
+
+    # create model job
+    job_obj = job_business.add_model_job(model_obj,
+                                         staging_data_set_obj,
+                                         project_obj,
+                                         params=conf,
+                                         run_args=run_args,
+                                         **file_dict)
+    job_id = str(job_obj.id)
+    # code_str = "from server3.service.model_service import run_model\n"
+    # code_str += "\n"
+    # code_str += "conf = {}\n".format(conf)
+    # code_str += "project_id = '{}'\n".format(project_id)
+    # code_str += "data_source_id = '{}'\n".format(data_source_id)
+    # code_str += "model_id = '{}'\n".format(model_id)
+    # code_str += "job_id = '{}'\n".format(job_id)
+    # code_str += "kwargs = {}\n".format(kwargs)
+    # code_str += "\n"
+    # code_str += "run_model(conf, project_id, data_source_id, model_id, " \
+    #             "job_id, **kwargs)\n"
+    # model_script_path = os.path.join(user_directory, user_ID, project_name,
+    #                                  job_id, 'run_model.py')
+    # file_utils.write_to_filepath(code_str, model_script_path)
+    cwd = os.getcwd()
+    p = subprocess.Popen([
+        "docker",
+        'run',
+        '--rm',
+        '-i',
+        '-p',
+        '2222:22',
+        '--name',
+        'model_app_test',
+        '--mount',
+        'type=bind,source={}/user_directory,target=/pyserver/user_directory'.format(cwd),
+        '--entrypoint',
+        '/usr/local/bin/python',
+        'model_app:v1',
+        'run_model.py',
+        '--job_id',
+        job_id,
+    ], start_new_session=True)
+    print(p.pid)
+    # TODO spawn and run script
+    # TODO add more status logging in model logger
+
+
+def run_model(conf, project_id, data_source_id, model_id, job_id, **kwargs):
     """
     run model by model_id and the parameter config
 
@@ -101,6 +173,7 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
     :param project_id:
     :param data_source_id:
     :param model_id:
+    :param job_id:
     :param kwargs:
     :return:
     """
@@ -118,16 +191,15 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
 
         input_dict = manage_nn_input(conf, data_source_id, **kwargs)
         return job_service.run_code(conf, project_id, data_source_id,
-                                    model, f, input_dict,
+                                    model, f, job_id, input_dict,
                                     result_dir=result_dir)
     elif model['category'] == ModelType['folder_input']:
         # input from folder
         f = getattr(models, model.entry_function)
         input_dict = model_input_manager_folder_input(conf, data_source_id,
                                                       **kwargs)
-        print(input_dict)
         return job_service.run_code(conf, project_id, None,
-                                    model, f, input_dict,
+                                    model, f, job_id, input_dict,
                                     file_id=data_source_id,
                                     result_dir=result_dir)
     else:
@@ -142,7 +214,7 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
                                                                model.name,
                                                                **kwargs)
             return job_service.run_code(conf, project_id, data_source_id,
-                                        model, f, model_fn, input_dict,
+                                        model, f, job_id, model_fn, input_dict,
                                         result_dir=result_dir)
         if model['category'] == ModelType['unsupervised']:
             x_cols = fit.get('data_fields', [])
@@ -151,7 +223,7 @@ def run_model(conf, project_id, data_source_id, model_id, **kwargs):
                                                           model.name,
                                                           **kwargs)
             return job_service.run_code(conf, project_id, data_source_id,
-                                        model, f, model_fn, input_dict,
+                                        model, f, job_id, model_fn, input_dict,
                                         result_dir=result_dir)
 
 

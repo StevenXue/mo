@@ -106,6 +106,12 @@ def list_data_sets_by_user_ID(user_ID, order=-1, related_field=None, tag=None,
     return public_ds, owned_ds
 
 
+def deref_file(data_set):
+    if hasattr(data_set, 'file') and data_set.file:
+        data_set.file_obj = data_set.file.to_mongo()
+    return data_set
+
+
 def combine_conditions(obj, equal_array, in_array):
     return all(tuple(get_attr(obj, e[0]) == e[1] for e in equal_array
                      if e[1] is not None and get_attr(obj, e[0]) is not None) +
@@ -121,12 +127,6 @@ def get_attr(obj, key_str):
         else:
             return 'NO_KEY'
     return obj
-
-
-def deref_file(data_set):
-    if hasattr(data_set, 'file') and data_set.file:
-        data_set.file_obj = data_set.file.to_mongo()
-    return data_set
 
 
 def get_fields_with_types(data_set_id):

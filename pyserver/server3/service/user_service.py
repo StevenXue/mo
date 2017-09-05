@@ -2,7 +2,6 @@
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 
-
 from server3.business import user_business
 
 

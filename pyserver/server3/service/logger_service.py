@@ -4,8 +4,9 @@ from flask_socketio import SocketIO
 from server3.business import staging_data_business
 from server3.business import staging_data_set_business
 from server3.utility import json_utility
+from server3.constants import REDIS_SERVER
 
-socketio = SocketIO(message_queue='redis://')
+socketio = SocketIO(message_queue=REDIS_SERVER)
 
 epoch = 0
 
@@ -26,7 +27,6 @@ def log_batch_end(*args):
     args = json_utility.convert_to_json(args)
     batch = 'Epoch: {}, Batch: {}'.format(epoch, args[0])
     project_id = args[-1]
-    print(batch)
     emit_message({"batch": batch}, project_id)
 
 
@@ -55,6 +55,7 @@ def emit_log(event, n, logs, result_sds, project_id):
 
 
 def emit_message(message, project_id):
+    print(message, project_id)
     socketio.emit('log_epoch_end', message, namespace='/log/%s' % project_id)
 
 

@@ -41,3 +41,4 @@ class Job(Document):
     project = ReferenceField('Project')
     params = DictField()
     file = ReferenceField('File')
+    run_args = DictField()

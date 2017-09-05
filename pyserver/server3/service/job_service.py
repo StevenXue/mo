@@ -11,6 +11,7 @@
 import os
 
 import functools
+import inspect
 import numpy as np
 
 from bson import ObjectId
@@ -23,12 +24,13 @@ from server3.business import project_business
 from server3.business import staging_data_business
 from server3.business import staging_data_set_business
 from server3.service import staging_data_service, logger_service, \
-     visualization_service
+    visualization_service
 from server3.business import ownership_business
 from server3.utility import data_utility
 from server3.lib import models
 from server3.repository import config
 from server3.utility import json_utility
+from server3.utility import file_utils
 
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 
@@ -91,14 +93,22 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
 
                     try:
                         # add_new_column(value, args[-1], fileds[0], strr, staging_data_set_id)
-                        staging_data_service.update_many_with_new_fields(value, args[-1], fields[0], strr, staging_data_set_id)
+                        staging_data_service.update_many_with_new_fields(value,
+                                                                         args[
+                                                                             -1],
+                                                                         fields[
+                                                                             0],
+                                                                         strr,
+                                                                         staging_data_set_id)
                     except:
                         error_flag = 1
 
                 if arg.get("attribute", False) and arg["attribute"] == "label":
                     labels = value
-                elif arg.get("attribute", False) and arg["attribute"] == "general_info":
-                    gen_info.append({arg["name"]: {"value": value, "description": arg["des"]}})
+                elif arg.get("attribute", False) and arg[
+                    "attribute"] == "general_info":
+                    gen_info.append({arg["name"]: {"value": value,
+                                                   "description": arg["des"]}})
 
             # 可视化计算
             # 聚类分析
@@ -148,7 +158,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 # 由于出来的数据格式不一致，判断是否为二维数据(是=>1, 不是=>0)
                 flag_shape = 1 if isinstance(labels[inn], list) else 0
 
-                result_be = labels if flag_shape else np.array(labels).reshape([-1, 1]).tolist()
+                result_be = labels if flag_shape else np.array(labels).reshape(
+                    [-1, 1]).tolist()
 
                 data = list(zip(*args[0]))
                 result = list(zip(*result_be))
@@ -156,9 +167,11 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                 # 曾经两表合并，现在不需要了
                 # merge_data = list(zip(*(data + result)))
                 if len(result) == len(fields[0]):
-                    lab_fields = [str(fields[0][i]) + "_New_Col" for i in range(len(result))]
+                    lab_fields = [str(fields[0][i]) + "_New_Col" for i in
+                                  range(len(result))]
                 else:
-                    lab_fields = [str(fields[0][0]) + "_New_Col_" + str(i) for i in range(len(result))]
+                    lab_fields = [str(fields[0][0]) + "_New_Col_" + str(i) for i
+                                  in range(len(result))]
 
                 # merge_fields = fields[0] + lab_fields
 
@@ -198,12 +211,14 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                         "table1": {
                             "title": "原始数据",
                             "field": fields[0],
-                            "data": [dict(zip(fields[0], arr)) for arr in args[0]]
+                            "data": [dict(zip(fields[0], arr)) for arr in
+                                     args[0]]
                         },
                         "table2": {
                             "title": "转换后数据",
                             "field": lab_fields,
-                            "data": [dict(zip(lab_fields, arr)) for arr in result_be]
+                            "data": [dict(zip(lab_fields, arr)) for arr in
+                                     result_be]
                         },
                         "bar1": bar1,
                         "bar2": bar2}
@@ -261,8 +276,10 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
                                                                project_obj,
                                                                job=job_obj,
                                                                type='result')
-                logger_service.save_result(result_sds_obj, **{"result": json_utility.convert_to_json(results)})
-                logger_service.save_result(result_sds_obj, **{"visualization": json})
+                logger_service.save_result(result_sds_obj, **{
+                    "result": json_utility.convert_to_json(results)})
+                logger_service.save_result(result_sds_obj,
+                                           **{"visualization": json})
                 return {
                     "visual_sds_id": str(result_sds_obj.id) if json else None,
                     "result": results}
@@ -274,7 +291,8 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields):
     return decorator
 
 
-def create_model_job(project_id, staging_data_set_id, model_obj, **kwargs):
+def create_model_job(project_id, staging_data_set_id, model_obj,
+                     job_id, **kwargs):
     """
     help model to create a job before model runs,
     as well as save the job & create a result after model runs
@@ -289,24 +307,12 @@ def create_model_job(project_id, staging_data_set_id, model_obj, **kwargs):
         def wrapper(*args, **kw):
             # create a job
             # model_obj = model_business.get_by_model_id(model_id)
-            params = args[0]
-            file_id = kwargs.get('file_id')
             result_dir = kwargs.get('result_dir')
-            staging_data_set_obj = None
-            if staging_data_set_id:
-                staging_data_set_obj = \
-                    staging_data_set_business.get_by_id(staging_data_set_id)
 
             project_obj = project_business.get_by_id(project_id)
 
-            file_dict = {'file': ObjectId(file_id)} if file_id else {}
+            job_obj = job_business.get_by_job_id(job_id)
 
-            # create model job
-            job_obj = job_business.add_model_job(model_obj,
-                                                 staging_data_set_obj,
-                                                 project_obj,
-                                                 params=params,
-                                                 **file_dict)
             # update a project
             project_business.insert_job_by_id(project_id, job_obj.id)
             project_business.update_items_to_list_field(
@@ -322,6 +328,10 @@ def create_model_job(project_id, staging_data_set_id, model_obj, **kwargs):
                 result_dir += str(job_obj['id']) + '/'
                 os.makedirs(result_dir)
                 kw['result_dir'] = result_dir
+
+            # generate_job_py(func, *args, **kw, result_sds=result_sds_obj,
+            #                 project_id=project_id)
+
             func_result = func(*args, **kw, result_sds=result_sds_obj,
                                project_id=project_id)
             # update a job
@@ -329,7 +339,7 @@ def create_model_job(project_id, staging_data_set_id, model_obj, **kwargs):
             if isinstance(func_result, dict):
                 func_result['job_id'] = str(job_obj['id'])
 
-            return func_result
+            # return func_result
 
         return wrapper
 
@@ -347,7 +357,8 @@ def split_supervised_input(staging_data_set_id, x_fields, y_fields, schema,
     return staging_data_service.split_test_train(obj, schema=schema, **kwargs)
 
 
-def run_code(conf, project_id, staging_data_set_id, model, f, *args, **kwargs):
+def run_code(conf, project_id, staging_data_set_id, model, f, job_id, *args,
+             **kwargs):
     """
     run supervised learning code
     :param conf:
@@ -355,10 +366,12 @@ def run_code(conf, project_id, staging_data_set_id, model, f, *args, **kwargs):
     :param staging_data_set_id:
     :param model:
     :param f:
+    :param job_id:
     :return:
     """
     # add decorator
-    func = create_model_job(project_id, staging_data_set_id, model, **kwargs)(f)
+    func = create_model_job(project_id, staging_data_set_id, model, job_id,
+                            **kwargs)(f)
     # run model with decorator
     # from run import socketio
     # thread = socketio.start_background_task(func, conf, *args)

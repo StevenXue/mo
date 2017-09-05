@@ -20,6 +20,7 @@ hyperas
 hyperopt
 pillow
 h5py
+tensorflow
 
 
 
