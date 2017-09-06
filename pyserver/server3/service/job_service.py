@@ -87,7 +87,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields, nan
                     str_name = "%s_col" % toolkit_obj.entry_function
                     value = data_utility.retrieve_nan_index(value, nan_index)
                     try:
-                        staging_data_service.update_many_with_new_fields(value, args[-1], fields[0],
+                        staging_data_service.update_many_with_new_fields(value, nan_index, fields[0],
                                                                          str_name, staging_data_set_id)
                     except (TypeError, ValueError) as e:
                         print("ERRORS in data saved to database")
@@ -100,8 +100,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields, nan
             # 可视化计算
             # 聚类分析
             if toolkit_obj.category == 0:
-                json = {"scatter": data_utility.retrieve_nan_index(args[0],
-                                                                   args[-1]),
+                json = {"scatter": data_utility.retrieve_nan_index(args[0], nan_index),
                         "labels": labels,
                         "pie": [{'name': el, 'value': labels.count(el)} for el
                                 in set(labels)],
@@ -140,7 +139,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields, nan
             # 数值转换
             elif toolkit_obj.category == 2:
                 inn = 0
-                while inn in args[-1]:
+                while inn in nan_index:
                     inn = inn + 1
                 # 由于出来的数据格式不一致，判断是否为二维数据(是=>1, 不是=>0)
                 flag_shape = 1 if isinstance(labels[inn], list) else 0
