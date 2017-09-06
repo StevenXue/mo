@@ -208,6 +208,7 @@ class PreviewCard extends React.Component {
       <div>
         {!isEmpty(this.state.options)&&
           <div>
+            <br/>
             {
               this.state.barType === 1 &&
               <span style={{color: '#00AAAA'}}>{this.state.isGuassian}</span>
@@ -316,7 +317,7 @@ export default class ColumnPreview extends React.Component {
 
   renderInfo(){
     return Object.keys(this.state.info).map((el) =>
-    <div>
+    <div style={{width: 200}}>
       <span>{el + " : "}</span>
       <span style={{color: '#00AAAA'}}>{this.state.info[el]}</span>
     </div>
@@ -328,7 +329,7 @@ export default class ColumnPreview extends React.Component {
       <div style={{width:400}}>
         <Spin spinning={this.state.loading}>
         { !isEmpty(this.state.info) &&
-          <div>
+          <div style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap'}}>
             {this.renderInfo()}
           </div>
         }
