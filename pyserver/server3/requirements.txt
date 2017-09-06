@@ -21,6 +21,7 @@ hyperopt
 pillow
 h5py
 tensorflow
+kubernetes
 
 
 

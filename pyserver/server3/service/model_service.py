@@ -16,6 +16,8 @@ import numpy as np
 import pandas as pd
 import simplejson as json
 from bson import ObjectId
+from kubernetes import client, config
+from kubernetes import config as kube_config
 
 from server3.business import file_business
 from server3.business import job_business
@@ -104,10 +106,6 @@ def generate_model_py(conf, project_id, data_source_id, model_id, **kwargs):
         staging_data_set_obj = \
             staging_data_set_business.get_by_id(data_source_id)
     project_obj = project_business.get_by_id(project_id)
-    project_name = project_obj.name
-    project_os = ownership_business.get_ownership_by_owned_item(project_obj,
-                                                                'project')
-    user_ID = project_os.user.user_ID
     file_dict = {'file': ObjectId(file_id)} if file_id else {}
     model_obj = model_business.get_by_model_id(model_id)
 
@@ -125,10 +123,8 @@ def generate_model_py(conf, project_id, data_source_id, model_id, **kwargs):
                                          run_args=run_args,
                                          **file_dict)
     job_id = str(job_obj.id)
-
-    return run_model(conf, project_id, data_source_id, model_id, job_id,
-                     **kwargs)
-
+    print(job_id)
+    # return
     cwd = os.getcwd()
     # # docker command
     # subprocess.Popen([
@@ -141,17 +137,32 @@ def generate_model_py(conf, project_id, data_source_id, model_id, **kwargs):
     #     'run_model.py',
     #     '--job_id', job_id,
     # ], start_new_session=True)
-
+    job_name = job_id + '-training-job'
+    namespace = 'default'
     kube_json = {
-        "apiVersion": "v1",
-        "kind": "Deployment",
+        "apiVersion": "batch/v1",
+        "kind": "Job",
+        "metadata": {
+            "name": job_name
+        },
         "spec": {
             "template": {
+                "metadata": {
+                    "labels": {
+                        "app": job_id
+                    }
+                },
                 "spec": {
+                    "restartPolicy": "Never",
                     "containers": [
                         {
                             "name": job_id,
                             "image": "model_app:v1",
+                            "ports": [{
+                                "hostPort": 2222,
+                                "containerPort": 22
+                            }],
+                            "stdin": True,
                             "command": ["/usr/local/bin/python"],
                             "args": [
                                 "run_model.py",
@@ -167,17 +178,17 @@ def generate_model_py(conf, project_id, data_source_id, model_id, **kwargs):
                         "name": "store",
                         "hostPath": {"path": "{}/user_directory".format(cwd)}
                     }]
-                }
-            }
+                },
+                "restartPolicy": "Never",
+            },
         }
     }
-    # kubectl command
-    subprocess.Popen([
-        "kubectl", 'run', job_id, '--image=model_app:v1',
-        '-i', '--rm', '--port=22',
-        '--overrides={}'.format(json.dumps(kube_json)),
-    ], start_new_session=True)
-    print(job_id)
+    kube_config.load_kube_config()
+    api = client.BatchV1Api()
+    resp = api.create_namespaced_job(body=kube_json, namespace=namespace)
+    print("Job created. status='%s'" % str(resp.status))
+    print(job_name)
+    print(api.read_namespaced_job(job_name, namespace))
     # TODO add more status logging in model logger
 
 

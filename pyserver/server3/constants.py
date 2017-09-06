@@ -10,8 +10,8 @@ PREDICT_FOLDER = 'predict_data/'
 MODEL_EXPORT_BASE = '/tmp'
 MODEL_SCRIPT_PATH = './run_model.py'
 SERVING_PORT = 9000
-# REDIS_SERVER = 'redis://192.168.31.26:6379'
-REDIS_SERVER = 'redis://localhost:6379'
+REDIS_SERVER = 'redis://192.168.31.26:6379'
+# REDIS_SERVER = 'redis://localhost:6379'
 PARAMETER_SPEC = [
     {
         "name": "validation",
