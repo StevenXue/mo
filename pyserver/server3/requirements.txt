@@ -12,7 +12,7 @@ pandas>=0.20.1
 scipy>=0.19.0
 flask_socketio>=2.9.0
 eventlet
-keras
+keras==2.0.6
 sklearn
 redis
 simplejson
