@@ -166,11 +166,11 @@ def generate_model_py(conf, project_id, data_source_id, model_id, **kwargs):
                             "name": job_id,
                             "image": "model_app:v1",
                             "stdin": True,
-                            # "command": ["/usr/local/bin/python"],
-                            # "args": [
-                            #     "run_model.py",
-                            #     "--job_id", job_id
-                            # ],
+                            "command": ["/usr/local/bin/python"],
+                            "args": [
+                                "run_model.py",
+                                "--job_id", job_id
+                            ],
                             "securityContext": {
                                 "privileged": True,
                                 "seLinuxOptions": {
@@ -193,8 +193,8 @@ def generate_model_py(conf, project_id, data_source_id, model_id, **kwargs):
             },
         }
     }
-    file_utils.write_to_filepath(json.dumps(kube_json), './model_app.json')
-    return
+    # file_utils.write_to_filepath(json.dumps(kube_json), './model_app.json')
+    # return
     kube_config.load_kube_config()
     api = client.BatchV1Api()
     resp = api.create_namespaced_job(body=kube_json, namespace=namespace)

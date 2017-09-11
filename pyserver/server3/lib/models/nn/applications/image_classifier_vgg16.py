@@ -13,7 +13,7 @@ from server3.lib import Sequential
 from server3.lib import graph
 from server3.lib.models.metrics import custom_metrcis
 from server3.service import logger_service
-from server3.service.keras_callbacks import MongoModelCheckpoint
+from server3.service.keras_callbacks import MyModelCheckpoint
 
 # Todo: change this path in the  vgg model file
 WEIGHTS_PATH_NO_TOP = ''
@@ -136,17 +136,15 @@ def image_classifier_vgg16(conf, input, **kw):
                                               )
 
         # checkpoint to save best weight
-        # best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,
-        #                                        save_best_only=True)
-        best_checkpoint = ModelCheckpoint(
-            result_dir + 'best.hdf5',
+        best_checkpoint = MyModelCheckpoint(
+            ['/pyserver/best.hdf5',
+             os.path.abspath(os.path.join(result_dir, 'best.hdf5'))],
             save_weights_only=True,
             verbose=1, save_best_only=True)
         # checkpoint to save latest weight
-        # general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
-        #                                           verbose=0)
-        general_checkpoint = ModelCheckpoint(
-            result_dir + 'latest.hdf5',
+        general_checkpoint = MyModelCheckpoint(
+            ['/pyserver/latest.hdf5', os.path.abspath(os.path.join(result_dir,
+                                                                   'latest.hdf5'))],
             save_weights_only=True,
             verbose=1)
 

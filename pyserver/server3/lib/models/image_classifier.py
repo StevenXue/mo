@@ -36,6 +36,7 @@ data/
 ```
 '''
 import inspect
+import os
 
 from keras import backend as K
 from keras.callbacks import LambdaCallback
@@ -46,7 +47,7 @@ from keras.preprocessing.image import ImageDataGenerator
 from server3.lib import Sequential
 from server3.lib import graph
 from server3.service import logger_service
-from server3.service.keras_callbacks import MongoModelCheckpoint
+from server3.service.keras_callbacks import MyModelCheckpoint
 
 
 def image_classifier(conf, input, **kw):
@@ -58,6 +59,8 @@ def image_classifier(conf, input, **kw):
     # extract kw
     result_sds = kw.pop('result_sds', None)
     project_id = kw.pop('project_id', None)
+    result_dir = kw.pop('result_dir', None)
+
     # extract input
     train_data_dir = input['train_data_dir']
     validation_data_dir = input['validation_data_dir']
@@ -74,14 +77,14 @@ def image_classifier(conf, input, **kw):
         input_shape = (img_width, img_height, 3)
 
     with graph.as_default():
-        model_main(result_sds, project_id, train_data_dir,
+        model_main(result_sds, project_id, result_dir, train_data_dir,
                    validation_data_dir, nb_train_samples,
                    nb_validation_samples, input_shape,
                    img_width, img_height,
                    epochs, batch_size)
 
 
-def model_main(result_sds, project_id, train_data_dir,
+def model_main(result_sds, project_id, result_dir, train_data_dir,
                validation_data_dir, nb_train_samples,
                nb_validation_samples, input_shape,
                img_width, img_height,
@@ -156,11 +159,17 @@ def model_main(result_sds, project_id, train_data_dir,
                                           )
 
     # checkpoint to save best weight
-    best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,
-                                           save_best_only=True)
+    best_checkpoint = MyModelCheckpoint(
+        ['/pyserver/best.hdf5',
+         os.path.abspath(os.path.join(result_dir, 'best.hdf5'))],
+        save_weights_only=True,
+        verbose=1, save_best_only=True)
     # checkpoint to save latest weight
-    general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
-                                              verbose=0)
+    general_checkpoint = MyModelCheckpoint(
+        ['/pyserver/latest.hdf5', os.path.abspath(os.path.join(result_dir,
+                                                               'latest.hdf5'))],
+        save_weights_only=True,
+        verbose=1)
 
     history = model.fit_generator(
         train_generator,
