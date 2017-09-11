@@ -1,3 +1,7 @@
+import eventlet
+eventlet.monkey_patch(thread=False)
+eventlet.import_patched('mongoengine')
+
 import tensorflow as tf
 from server3.service.model_service import run_model
 from server3.business.job_business import get_by_job_id

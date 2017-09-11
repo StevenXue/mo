@@ -279,6 +279,7 @@ def create_model_job(project_id, staging_data_set_id, model_obj,
     :param project_id:
     :param staging_data_set_id:
     :param model_obj:
+    :param job_id:
     :return:
     """
 

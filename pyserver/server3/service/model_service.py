@@ -124,6 +124,8 @@ def generate_model_py(conf, project_id, data_source_id, model_id, **kwargs):
                                          **file_dict)
     job_id = str(job_obj.id)
     print(job_id)
+    # return run_model(conf, project_id, data_source_id, model_id, job_id,
+    #                  **kwargs)
     # return
     cwd = os.getcwd()
     # # docker command
@@ -137,12 +139,9 @@ def generate_model_py(conf, project_id, data_source_id, model_id, **kwargs):
     #     'run_model.py',
     #     '--job_id', job_id,
     # ], start_new_session=True)
-    job_name = 'training-job-' + job_id
+    job_name = job_id + '-training-job'
     namespace = 'default'
     kube_json = {
-        # "apiVersion": "apps/v1beta1",
-        # "kind": "Deployment",
-
         "apiVersion": "batch/v1",
         "kind": "Job",
         "metadata": {
@@ -156,29 +155,28 @@ def generate_model_py(conf, project_id, data_source_id, model_id, **kwargs):
                     }
                 },
                 "spec": {
+                    "securityContext": {
+                        # "runAsUser": 1001,
+                        # "fsGroup": 1000
+                        "seLinuxOptions":
+                            {"level": "s0:c123,c456"}
+                    },
                     "containers": [
                         {
-                            "name": 'container-' + job_id,
+                            "name": job_id,
                             "image": "model_app:v1",
-                            "ports": [
-                                {
-                                    "hostPort": 2222,
-                                    "containerPort": 22
-                                },
-                                {
-                                    "hostPort": 8080,
-                                    "containerPort": 8080
-                                }
-                            ],
                             "stdin": True,
-                            "command": ["/usr/local/bin/python"],
-                            "args": [
-                                "run_model.py",
-                                "--job_id", job_id
-                            ],
+                            # "command": ["/usr/local/bin/python"],
                             # "args": [
-                            #     "-m", "http.server", "8080"
+                            #     "run_model.py",
+                            #     "--job_id", job_id
                             # ],
+                            "securityContext": {
+                                "privileged": True,
+                                "seLinuxOptions": {
+                                    "level": "s0:c123,c456"
+                                }
+                            },
                             "volumeMounts": [{
                                 "mountPath": "/pyserver/user_directory",
                                 "name": "store"
@@ -188,21 +186,21 @@ def generate_model_py(conf, project_id, data_source_id, model_id, **kwargs):
                     "restartPolicy": "Never",
                     "volumes": [{
                         "name": "store",
-                        "hostPath": {"path": "{}/user_directory".format(cwd)}
+                        "hostPath": {"path": "{}/user_directory".format(cwd)},
+                        # "SELinuxRelabel": True
                     }]
                 },
             },
         }
     }
+    file_utils.write_to_filepath(json.dumps(kube_json), './model_app.json')
+    return
     kube_config.load_kube_config()
     api = client.BatchV1Api()
-    # api = client.AppsV1beta1Api()
     resp = api.create_namespaced_job(body=kube_json, namespace=namespace)
-    # resp = api.create_namespaced_deployment(body=kube_json, namespace=namespace)
     print("Job created. status='%s'" % str(resp.status))
     print(job_name)
     print(api.read_namespaced_job(job_name, namespace))
-    # print(api.read_namespaced_deployment(job_name, namespace))
     # TODO add more status logging in model logger
 
 

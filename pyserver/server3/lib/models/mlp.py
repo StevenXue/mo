@@ -2,6 +2,7 @@
 # https://keras.io/getting-started/sequential-model-guide/#examples
 # Multilayer Perceptron (MLP) for multi-class softmax classification
 import inspect
+import os
 
 from keras.callbacks import LambdaCallback
 from keras.callbacks import ModelCheckpoint
@@ -81,14 +82,14 @@ def mlp_main(result_sds, project_id, result_dir, x_train, y_train, x_val, y_val,
     # best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,
     #                                        save_best_only=True)
     best_checkpoint = ModelCheckpoint(
-        result_dir + 'best.hdf5',
+        os.path.abspath(os.path.join(result_dir, 'best.hdf5')),
         save_weights_only=True,
         verbose=1, save_best_only=True)
     # checkpoint to save latest weight
     # general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
     #                                           verbose=0)
     general_checkpoint = ModelCheckpoint(
-        result_dir + 'latest.hdf5',
+        os.path.abspath(os.path.join(result_dir, 'latest.hdf5')),
         save_weights_only=True,
         verbose=1)
 
