@@ -75,13 +75,13 @@ def remove_project_by_id(project_id, user_ID):
                                                                'project')
     if user_ID != ownership.user.user_ID:
         raise ValueError('project not belong to this user, cannot delete')
-    try:
-        for job in project['jobs']:
-            job_business.remove_by_id(job['id'])
-        for result in project['results']:
-            result_business.remove_by_id(result['id'])
-    except TypeError:
-        pass
+    # try:
+    #     for job in project['jobs']:
+    #         job_business.remove_by_id(job['id'])
+    #     for result in project['results']:
+    #         result_business.remove_by_id(result['id'])
+    # except TypeError:
+    #     pass
     # delete project directory
     project_directory = UPLOAD_FOLDER + user_ID + '/' + project.name
     if os.path.isdir(project_directory):

@@ -55,7 +55,6 @@ def emit_log(event, n, logs, result_sds, project_id):
 
 
 def emit_message(message, project_id):
-    print(message, project_id)
     socketio.emit('log_epoch_end', message, namespace='/log/%s' % project_id)
 
 
