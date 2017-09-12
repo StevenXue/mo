@@ -1,5 +1,7 @@
 # -*- coding: UTF-8 -*-
+import os
 import sys
+import subprocess
 from copy import deepcopy
 
 from bson import Code
@@ -13,13 +15,14 @@ from server3.business import staging_data_business
 from server3.business import data_business
 from server3.business import data_set_business
 from server3.business import project_business
+from server3.business import ownership_business
 from server3.service import data_service
 from server3.utility import data_utility
 from server3.utility import json_utility
 from server3 import constants
 
 DEFAULT_RATIO = 0.5
-
+USER_DIR = './user_directory'
 
 def get_by_query_str(staging_data_set_id, **kwargs):
     # query_str = dict(query_str_in_mongodb_form)
@@ -56,7 +59,8 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
     # project = project_business.get_by_id(project_id)
 
     # create new staging data set
-    ds = data_set_business.get_by_id(data_set_id).to_mongo()
+    ds_obj = data_set_business.get_by_id(data_set_id)
+    ds = ds_obj.to_mongo()
     ds.pop('name')
     ds.pop('description')
     sds = staging_data_set_business.add(sds_name, sds_description, project_id,
@@ -69,9 +73,21 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
         related_tasks=ds.get('related_tasks'),
         related_fields=ds.get('related_field'))
 
+    # generate the project volume path
+    project = project_business.get_by_id(project_id)
+    user_ID = ownership_business.get_owner(project, 'project').user_ID
+    volume_dir = os.path.join(USER_DIR, user_ID, project.name, 'volume/')
+    if not os.path.exists(volume_dir):
+        os.makedirs(volume_dir)
+
     # copy data from data(raw) to staging data
     # get all data objects by data_set id
     try:
+        # copy the file instance to project volume
+        if hasattr(ds_obj, 'file'):
+            file = ds_obj.file
+            subprocess.run(['cp', '-r', file.uri, volume_dir])
+
         data_objects = data_business.get_by_data_set(data_set_id)
         # convert mongoengine objects to dicts
         data_objects = json_utility.me_obj_list_to_dict_list(data_objects)

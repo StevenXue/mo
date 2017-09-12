@@ -44,3 +44,7 @@ def list_ownership_by_user(user):
 
 def list_ownership_by_type_and_private(owned_type, is_private):
     return ownership_repo.read_by_type_and_private(owned_type, is_private)
+
+
+def get_owner(owned, owned_type):
+    return get_ownership_by_owned_item(owned, owned_type).user

@@ -85,13 +85,10 @@ def add_staging_data_set_by_data_set_id():
     staging_data_set_name = data['staging_data_set_name']
     staging_data_set_description = data['staging_data_set_description']
     data_set_id = data['data_set_id']
-    try:
-        saved_sds = staging_data_service.add_staging_data_set_by_data_set_id(
-            staging_data_set_name, staging_data_set_description,
-            ObjectId(project_id), ObjectId(data_set_id))
-        sds_json = json_utility.convert_to_json(saved_sds.to_mongo())
-    except Exception as e:
-        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    saved_sds = staging_data_service.add_staging_data_set_by_data_set_id(
+        staging_data_set_name, staging_data_set_description,
+        ObjectId(project_id), ObjectId(data_set_id))
+    sds_json = json_utility.convert_to_json(saved_sds.to_mongo())
     return jsonify({'response': sds_json}), 200
 
 
