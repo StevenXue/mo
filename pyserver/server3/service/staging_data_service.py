@@ -19,10 +19,10 @@ from server3.business import ownership_business
 from server3.service import data_service
 from server3.utility import data_utility
 from server3.utility import json_utility
-from server3 import constants
+from server3.constants import USER_DIR
 
 DEFAULT_RATIO = 0.5
-USER_DIR = './user_directory'
+
 
 def get_by_query_str(staging_data_set_id, **kwargs):
     # query_str = dict(query_str_in_mongodb_form)

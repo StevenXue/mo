@@ -36,8 +36,7 @@ def mlp(conf, input, **kw):
 
 
 def mlp_main(result_sds, project_id, result_dir, x_train, y_train, x_val,
-             y_val,
-             x_test, y_test, f=None, e=None):
+             y_val, x_test, y_test, f=None, e=None):
     input_len = x_train.shape[1]
     output_len = y_train.shape[1]
 

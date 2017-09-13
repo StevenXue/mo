@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 import simplejson as json
 from bson import ObjectId
-from kubernetes import client, config
+from kubernetes import client
 from kubernetes import config as kube_config
 
 from server3.business import file_business

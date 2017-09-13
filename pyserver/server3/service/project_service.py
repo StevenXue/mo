@@ -5,6 +5,8 @@ import shutil
 import os
 
 from mongoengine import DoesNotExist
+from kubernetes import client
+from kubernetes import config as kube_config
 
 from server3.service import job_service
 from server3.business import project_business
@@ -18,6 +20,7 @@ from server3.service import staging_data_service
 from server3.business import staging_data_set_business
 from server3.utility import json_utility
 from server3.repository import config
+from server3.constants import USER_DIR
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
@@ -34,7 +37,8 @@ def create_project(name, description, user_ID, is_private=True):
     """
 
     # create a new project object
-    created_project = project_business.add(name, description, datetime.utcnow())
+    created_project = project_business.add(name, description,
+                                           datetime.utcnow())
     if created_project:
         # create project successfully
 
@@ -118,20 +122,25 @@ def get_all_jobs_of_project(project_id, categories):
             if job[key]:
                 job_info = job.to_mongo()
                 try:
-                    result_sds = staging_data_set_business.get_by_job_id(job['id']).to_mongo()
+                    result_sds = staging_data_set_business.get_by_job_id(
+                        job['id']).to_mongo()
                 except DoesNotExist:
                     result_sds = None
                 job_info[key] = {
                     'name': job[key]['name'],
                     'category': job[key]['category'],
                 }
-                job_info['staging_data_set'] = job['staging_data_set']['name'] if job['staging_data_set'] else None
-                job_info['staging_data_set_id'] = job['staging_data_set']['id'] if job['staging_data_set'] else None
+                job_info['staging_data_set'] = job['staging_data_set'][
+                    'name'] if job['staging_data_set'] else None
+                job_info['staging_data_set_id'] = job['staging_data_set'][
+                    'id'] if job['staging_data_set'] else None
                 if key == 'model':
                     job_info['results'] = result_sds
                 else:
-                    job_info['results'] = result_sds['result'] if result_sds and "result" in result_sds else None
-                job_info['results_staging_data_set_id'] = result_sds['_id'] if result_sds else None
+                    job_info['results'] = result_sds[
+                        'result'] if result_sds and "result" in result_sds else None
+                job_info['results_staging_data_set_id'] = result_sds[
+                    '_id'] if result_sds else None
                 history_jobs[key].append(job_info)
                 break
     return history_jobs
@@ -213,3 +222,72 @@ def fork(project_id, new_user_ID):
         jobs=jobs_cp)
     project_cp.reload()
     return project_cp
+
+
+def open_project_playground(project_id):
+    # generate the project volume path
+    project = project_business.get_by_id(project_id)
+    user_ID = ownership_business.get_owner(project, 'project').user_ID
+    volume_dir = os.path.join(USER_DIR, user_ID, project.name, 'volume/')
+    if not os.path.exists(volume_dir):
+        os.makedirs(volume_dir)
+    abs_volume_dir = os.path.abspath(volume_dir)
+
+    deploy_name = project_id + '-jupyter'
+    namespace = 'default'
+    kube_json = {
+        "apiVersion": "apps/v1beta1",
+        "kind": "Deployment",
+        "metadata": {
+            "name": deploy_name
+        },
+        "spec": {
+            "template": {
+                "metadata": {
+                    "labels": {
+                        "app": project_id
+                    }
+                },
+                "spec": {
+                    # "securityContext": {
+                    #     # "runAsUser": 1000,
+                    #     "fsGroup": 100
+                    # },
+                    "containers": [
+                        {
+                            "name": project_id,
+                            "image": "jupyter_app:v1",
+                            "ports": [{
+                                "containerPort": 8888,
+                                "hostPort": 8899
+                            }],
+                            "stdin": True,
+                            "command": ['python'],
+                            "args": ["-m", "notebook", "--no-browser",
+                                     "--allow-root",
+                                     "--NotebookApp.allow_origin=*",
+                                     "--NotebookApp.disable_check_xsrf=True",
+                                     "--NotebookApp.token=''",
+                                     "--NotebookApp.iopub_data_rate_limit=10000000000"],
+                            "volumeMounts": [{
+                                "mountPath": "/home/jovyan/work/volume",
+                                "name": project_id + "-volume"
+                            }]
+                        }
+                    ],
+                    "volumes": [{
+                        "name": project_id + "-volume",
+                        "hostPath": {"path": abs_volume_dir},
+                    }]
+                },
+            },
+        }
+    }
+    # import json
+    # from server3.utility import file_utils
+    # file_utils.write_to_filepath(json.dumps(kube_json), './jupyter_app.json')
+    # return
+    kube_config.load_kube_config()
+    api = client.AppsV1beta1Api()
+    resp = api.create_namespaced_deployment(body=kube_json,
+                                            namespace=namespace)
