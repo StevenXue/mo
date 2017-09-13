@@ -1,7 +1,5 @@
 FROM jupyter/tensorflow-notebook
 
-USER root:root
-
 WORKDIR /home/jovyan/work/volume
 
 ADD pyserver/server3/requirements.txt .

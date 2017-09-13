@@ -156,7 +156,7 @@ def generate_model_py(conf, project_id, data_source_id, model_id, **kwargs):
                 },
                 "spec": {
                     "securityContext": {
-                        # "runAsUser": 1001,
+                        "runAsUser": 1001,
                         # "fsGroup": 1000
                         "seLinuxOptions":
                             {"level": "s0:c123,c456"}

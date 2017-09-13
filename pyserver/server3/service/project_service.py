@@ -249,10 +249,9 @@ def open_project_playground(project_id):
                     }
                 },
                 "spec": {
-                    # "securityContext": {
-                    #     # "runAsUser": 1000,
-                    #     "fsGroup": 100
-                    # },
+                    "securityContext": {
+                        "runAsUser": 1001,
+                    },
                     "containers": [
                         {
                             "name": project_id,
