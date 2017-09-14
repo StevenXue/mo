@@ -128,7 +128,7 @@ class ModelForms extends React.Component {
 
     run_params['compile']['args'] = this.state.compileParams
 
-    if (this.state.fit.data_fields) {
+    if (this.state.fit && this.state.fit.data_fields) {
       if (this.state.fit.data_fields.type.key === 'transfer_box') {
         run_params['fit'] = {
           'data_fields': [
@@ -153,12 +153,12 @@ class ModelForms extends React.Component {
       'args': {},
     }
 
-    this.state.fit['args'].map((e) => {
+    this.state.fit && this.state.fit['args'].map((e) => {
         run_params['fit']['args'][e.name] = parseInt(ReactDOM.findDOMNode(this.refs['fit_' + e.name]).value)
       },
     )
 
-    this.state.evaluate['args'].map((e) =>
+    this.state.evaluate && this.state.evaluate['args'].map((e) =>
       run_params['evaluate']['args'][e.name] = parseInt(ReactDOM.findDOMNode(this.refs['evaluate_' + e.name]).value),
     )
 

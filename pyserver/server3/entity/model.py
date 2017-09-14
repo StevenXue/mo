@@ -21,7 +21,8 @@ MODEL_TYPE = (
     (2, 'unsupervised'),
     (3, 'half_supervised'),
     (4, 'folder_input'),
-    (5, 'hyperas')
+    (5, 'hyperas'),
+    (6, 'advanced')
 )
 
 
