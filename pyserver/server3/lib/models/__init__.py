@@ -74,3 +74,5 @@ from server3.lib.models.svm import svm_model_fn
 
 # hyperas
 from server3.lib.models.hyperas_model import HYPERAS_SPEC
+
+from server3.lib.models.naturalDQN_to_str import naturalDQN_to_str

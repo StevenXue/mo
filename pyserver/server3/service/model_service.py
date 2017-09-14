@@ -327,6 +327,12 @@ def model_to_code(conf, project_id, data_source_id, model_id, **kwargs):
         return job_service.run_code(conf, project_id, None,
                                     model, f, head_str,
                                     file_id=data_source_id)
+
+    elif model['category'] == ModelType['advanced']:
+        # no input
+        return job_service.run_code(conf, project_id, None,
+                                    model, f, '',
+                                    file_id=None)
     else:
         # custom models
         head_str = ''
@@ -829,6 +835,32 @@ def temp():
     #     {'type': 'ndarray', 'n': None}
     # ))
 
+    print(add_model_with_ownership(
+        'system',
+        False,
+        'naturalDQN',
+        'A Natural DQN Model',
+        ModelType['advanced'],
+        'server3/lib/models/naturalDQN_to_str.py',
+        'naturalDQN',
+        'naturalDQN_to_str',
+        {'fit': {
+        "data_fields": {
+            "name": "x_y_fields",
+            "type": {
+                "key": "transfer_box",
+                "des": "data fields for x and y",
+            },
+            "default": None,
+            "required": True,
+            "x_data_type": None,
+            "y_data_type": None,
+            "x_len_range": None,
+            "y_len_range": None,
+        }}},
+        {'type': 'DataFrame'}
+    ))
+
 
 if __name__ == '__main__':
     pass
@@ -862,4 +894,4 @@ if __name__ == '__main__':
     # run_model(conf, "595f32e4e89bde8ba70738a3", "5979da380c11f32674eb2788",
     #           "59687821d123abcfbfe8cab9")
 
-    # temp()
+    temp()
