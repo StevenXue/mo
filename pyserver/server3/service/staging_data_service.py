@@ -84,7 +84,7 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
     # get all data objects by data_set id
     try:
         # copy the file instance to project volume
-        if hasattr(ds_obj, 'file'):
+        if hasattr(ds_obj, 'file') and ds_obj.file:
             file = ds_obj.file
             subprocess.run(['cp', '-r', file.uri, volume_dir])
 
@@ -98,11 +98,11 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
 
         staging_data_business.add_many(sds, data_objects)
         return sds
-    except Exception:
+    except Exception as e:
         # remove staging_data_set and staging_data
         staging_data_business.remove_by_staging_data_set_id(sds.id)
         staging_data_set_business.remove_by_id(sds.id)
-        raise RuntimeError("Create staging data set failed")
+        raise e
 
 
 def convert_fields_type(sds_id, f_t_arrays):

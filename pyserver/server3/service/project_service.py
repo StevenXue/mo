@@ -21,8 +21,13 @@ from server3.business import staging_data_set_business
 from server3.utility import json_utility
 from server3.repository import config
 from server3.constants import USER_DIR
+from server3.utility import network_utility
+from server3.constants import NAMESPACE
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
+
+
+# NAMESPACE = 'default'
 
 
 def create_project(name, description, user_ID, is_private=True):
@@ -40,8 +45,9 @@ def create_project(name, description, user_ID, is_private=True):
     created_project = project_business.add(name, description,
                                            datetime.utcnow())
     if created_project:
-        # create project successfully
-
+        project_path = os.path.join(USER_DIR, user_ID, name)
+        if not os.path.exists(project_path):
+            os.makedirs(project_path)
         # get user object
         user = user_business.get_by_user_ID(user_ID)
 
@@ -224,7 +230,7 @@ def fork(project_id, new_user_ID):
     return project_cp
 
 
-def open_project_playground(project_id):
+def start_project_playground(project_id):
     # generate the project volume path
     project = project_business.get_by_id(project_id)
     user_ID = ownership_business.get_owner(project, 'project').user_ID
@@ -234,7 +240,7 @@ def open_project_playground(project_id):
     abs_volume_dir = os.path.abspath(volume_dir)
 
     deploy_name = project_id + '-jupyter'
-    namespace = 'default'
+    port = network_utility.get_open_port()
     kube_json = {
         "apiVersion": "apps/v1beta1",
         "kind": "Deployment",
@@ -249,16 +255,17 @@ def open_project_playground(project_id):
                     }
                 },
                 "spec": {
-                    "securityContext": {
-                        "runAsUser": 1001,
-                    },
+                    # "securityContext": {
+                    #     "runAsUser": 1001,
+                    # },
                     "containers": [
                         {
                             "name": project_id,
-                            "image": "jupyter_app:v1",
+                            "image": "jupyter_app",
+                            "imagePullPolicy": "IfNotPresent",
                             "ports": [{
                                 "containerPort": 8888,
-                                "hostPort": 8899
+                                "hostPort": port
                             }],
                             "stdin": True,
                             "command": ['python'],
@@ -269,7 +276,7 @@ def open_project_playground(project_id):
                                      "--NotebookApp.token=''",
                                      "--NotebookApp.iopub_data_rate_limit=10000000000"],
                             "volumeMounts": [{
-                                "mountPath": "/home/jovyan/work/volume",
+                                "mountPath": "/home/root/work/volume",
                                 "name": project_id + "-volume"
                             }]
                         }
@@ -289,4 +296,21 @@ def open_project_playground(project_id):
     kube_config.load_kube_config()
     api = client.AppsV1beta1Api()
     resp = api.create_namespaced_deployment(body=kube_json,
-                                            namespace=namespace)
+                                            namespace=NAMESPACE)
+    replicas = api.read_namespaced_deployment_status(
+        deploy_name, NAMESPACE).status.available_replicas
+    while replicas is None or replicas < 1:
+        replicas = api.read_namespaced_deployment_status(
+            deploy_name, NAMESPACE).status.available_replicas
+    # FIXME one second sleep to wait for container ready
+    import time
+    time.sleep(1)
+    return port
+
+
+def get_playground(project_id):
+    deploy_name = project_id + '-jupyter'
+    kube_config.load_kube_config()
+    api = client.AppsV1beta1Api()
+    dep = api.read_namespaced_deployment(deploy_name, NAMESPACE)
+    return dep.spec.template.spec.containers[0].ports[0].host_port

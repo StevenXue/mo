@@ -1,29 +1,29 @@
-import React, { Component } from 'react';
-import { Modal, Form, Input, Radio } from 'antd';
-import PropTypes from 'prop-types';
-import { connect } from 'dva';
-import {jupyterServer, flaskServer } from '../../../constants';
+import React, { Component } from 'react'
+import { Modal, Form, Input, Radio } from 'antd'
+import PropTypes from 'prop-types'
+import { connect } from 'dva'
+import { jupyterServer, flaskServer } from '../../../constants'
 
-const FormItem = Form.Item;
-const RadioButton = Radio.Button;
-const RadioGroup = Radio.Group;
+const FormItem = Form.Item
+const RadioButton = Radio.Button
+const RadioGroup = Radio.Group
 
 class ProjectModal extends Component {
-  constructor(props) {
-    super(props);
+  constructor (props) {
+    super(props)
     this.state = {
       visible: false,
       is_private: 'true',
-    };
+    }
   }
 
   showModelHandler = (e) => {
-    if (e) e.stopPropagation();
+    if (e) e.stopPropagation()
     // this.setState({
     //   visible: true,
     // });
     this.props.dispatch({ type: 'project/showModal' })
-  };
+  }
 
   hideModelHandler = () => {
     // this.setState({
@@ -31,71 +31,43 @@ class ProjectModal extends Component {
     // });
     this.props.dispatch({ type: 'project/hideModal' })
 
-  };
-
-  okHandler = (values) => {
-    console.log(values);
-    const user_ID = this.props.project.user.user_ID
-    this.props.form.validateFields((err, values) => {
-      console.log(values);
-      if (!err) {
-        fetch(jupyterServer+user_ID, {
-          method: 'post',
-          crossDomain: true,
-          headers:{
-            "content-type": "application/json",
-            //"cache-control": "no-cache",
-          },
-          body: JSON.stringify({"type": "directory"})
-        }).then((response) => response.json())
-          .then((res) => {
-            fetch(jupyterServer+res.path, {
-              method: 'PATCH',
-              crossDomain: true,
-              headers:{
-                "content-type": "application/json;charset=utf-8",
-                //"cache-control": "no-cache",
-                //'Access-Control-Allow-Method': 'PATCH'
-              },
-              body: JSON.stringify({
-                "path": user_ID +'/' + values.name
-              })
-            }).then((response) => {
-              console.log(response.status);
-              if(response.status === 200){
-                let body = {
-                  name: values.name,
-                  description: values.description,
-                  is_private: this.state.is_private
-                }
-                this.props.dispatch({ type: 'project/create', payload: body })
-              }
-            });
-          })
-          .catch((err) => console.log('error', err));
-      }
-    });
-  };
-
-  onChangePrivacy(e){
-    this.setState({
-      is_private: e.target.value
-    });
   }
 
-  render() {
-    const { children } = this.props;
-    const { getFieldDecorator } = this.props.form;
-    const { name, description, privacy } = this.props.record;
+  okHandler = (values) => {
+    console.log(values)
+    // const user_ID = this.props.project.user.user_ID
+    this.props.form.validateFields((err, values) => {
+      console.log(values)
+      if (!err) {
+        let body = {
+          name: values.name,
+          description: values.description,
+          is_private: this.state.is_private,
+        }
+        this.props.dispatch({ type: 'project/create', payload: body })
+      }
+    })
+  }
+
+  onChangePrivacy (e) {
+    this.setState({
+      is_private: e.target.value,
+    })
+  }
+
+  render () {
+    const { children } = this.props
+    const { getFieldDecorator } = this.props.form
+    const { name, description, privacy } = this.props.record
     const formItemLayout = {
       labelCol: { span: 6 },
       wrapperCol: { span: 14 },
-    };
+    }
 
     return (
       <span>
         <span onClick={this.showModelHandler}>
-          { children }
+          {children}
         </span>
         <Modal
           title="Project Configuration"
@@ -103,7 +75,7 @@ class ProjectModal extends Component {
           onOk={this.okHandler}
           onCancel={this.hideModelHandler}
         >
-          <Form layout='horizontal' onSubmit={() => this.okHandler(values)} >
+          <Form layout='horizontal' onSubmit={() => this.okHandler(values)}>
             <FormItem
               {...formItemLayout}
               label="Project Name"
@@ -115,8 +87,8 @@ class ProjectModal extends Component {
                     {
                       required: true,
                     },
-                  ]
-                })(<Input />)
+                  ],
+                })(<Input/>)
               }
             </FormItem>
             <FormItem
@@ -130,8 +102,8 @@ class ProjectModal extends Component {
                     {
                       required: true,
                     },
-                  ]
-                })(<Input />)
+                  ],
+                })(<Input/>)
               }
             </FormItem>
             <FormItem
@@ -146,7 +118,7 @@ class ProjectModal extends Component {
           </Form>
         </Modal>
       </span>
-    );
+    )
   }
 }
 
@@ -155,6 +127,6 @@ ProjectModal.propTypes = {
   type: PropTypes.string,
   item: PropTypes.object,
   onOk: PropTypes.func,
-};
+}
 
-export default connect(({ project }) => ({ project }))(Form.create()(ProjectModal));
+export default connect(({ project }) => ({ project }))(Form.create()(ProjectModal))

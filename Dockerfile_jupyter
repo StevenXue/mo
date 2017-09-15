@@ -1,10 +1,25 @@
 FROM jupyter/tensorflow-notebook
 
-WORKDIR /home/jovyan/work/volume
+USER root:root
+
+WORKDIR /home/root/work/volume
+
+# replace apt-get source with USTC mirror
+RUN sudo sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
+# update apt-get
+RUN sudo apt-get update -y
+RUN sudo apt-get update
+# install requirements for gym
+RUN apt-get install -y python-numpy python-dev cmake zlib1g-dev libjpeg-dev xvfb libav-tools xorg-dev python-opengl libboost-all-dev libsdl2-dev swig
+
+# replace pipy source with USTC mirror
+RUN mkdir /home/root/.pip
+ADD pip.conf /home/root/.pip
 
 ADD pyserver/server3/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir 'gym[all]'
 
 COPY metric_spec.py /usr/local/lib/python3.6/site-packages/tensorflow/contrib/learn/python/learn/metric_spec.py
 
-ADD pyserver /home/jovyan/work
+ADD pyserver /home/root/work

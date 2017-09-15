@@ -13,6 +13,7 @@ SERVING_PORT = 9000
 REDIS_SERVER = 'redis://192.168.31.26:6379'
 # REDIS_SERVER = 'redis://localhost:6379'
 USER_DIR = './user_directory'
+NAMESPACE = 'default'
 PARAMETER_SPEC = [
     {
         "name": "validation",

@@ -14,6 +14,8 @@ from server3.lib import graph
 from server3.lib.models.metrics import custom_metrcis
 from server3.service import logger_service
 from server3.service.keras_callbacks import MyModelCheckpoint
+from server3.service.saved_model_services import keras_saved_model
+
 
 # Todo: change this path in the  inception_v3 model file
 WEIGHTS_PATH_NO_TOP = ''
@@ -180,9 +182,7 @@ def model_main(result_sds, project_id, result_dir, train_data_dir,
                                  # score=score,
                                  history=history.history)
 
-    model.save_weights(result_dir + 'final.hdf5')
-    with open(result_dir + 'model.json', 'w') as f:
-        f.write(model.to_json())
+    keras_saved_model.save_model(result_dir, model)
 
     return {'history': history.history}
 

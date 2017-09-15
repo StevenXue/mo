@@ -9,5 +9,4 @@ COPY metric_spec.py /usr/local/lib/python3.6/site-packages/tensorflow/contrib/le
 
 ADD pyserver /pyserver
 
-
 CMD [ "python", "-m", "http.server", "8080" ]

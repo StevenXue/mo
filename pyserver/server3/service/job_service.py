@@ -306,7 +306,7 @@ def create_model_job(project_id, staging_data_set_id, model_obj,
                                                            type='result')
             # run
             if result_dir:
-                result_dir += str(job_obj['id']) + '/'
+                # result_dir += str(job_obj['id']) + '/'
                 os.makedirs(result_dir)
                 kw['result_dir'] = result_dir
 

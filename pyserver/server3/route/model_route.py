@@ -71,12 +71,12 @@ def run_model(model_id):
     #                                  schema=schema,
     #                                  divide_row=divide_row,
     #                                  ratio=ratio)
-    result = model_service.generate_model_py(conf, project_id,
-                                             staging_data_set_id or file_id,
-                                             model_id,
-                                             schema=schema,
-                                             divide_row=divide_row,
-                                             ratio=ratio)
+    result = model_service.kube_run_model(conf, project_id,
+                                          staging_data_set_id or file_id,
+                                          model_id,
+                                          schema=schema,
+                                          divide_row=divide_row,
+                                          ratio=ratio)
     result = json_utility.convert_to_json(result)
     return jsonify({'response': result})
 

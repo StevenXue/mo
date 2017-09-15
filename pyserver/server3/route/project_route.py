@@ -10,6 +10,7 @@ from flask import Blueprint
 from flask import jsonify
 from flask import make_response
 from flask import request
+from kubernetes import client
 
 from server3.service import project_service
 from server3.business import project_business
@@ -131,3 +132,25 @@ def remove_project(project_id):
     result = project_service.remove_project_by_id(ObjectId(project_id),
                                                   user_ID)
     return jsonify({'response': result}), 200
+
+
+@project_app.route('/playground/<string:project_id>', methods=['POST'])
+def start_project_playground(project_id):
+    if not project_id:
+        return jsonify({'response': 'no project_id arg'}), 400
+    try:
+        port = project_service.start_project_playground(project_id)
+    except client.rest.ApiException as e:
+        return jsonify({'response': e.reason}), 400
+    return jsonify({'response': port})
+
+
+@project_app.route('/playground/<string:project_id>', methods=['GET'])
+def get_project_playground(project_id):
+    if not project_id:
+        return jsonify({'response': 'no project_id arg'}), 400
+    try:
+        port = project_service.get_playground(project_id)
+    except client.rest.ApiException as e:
+        return jsonify({'response': e.reason}), 400
+    return jsonify({'response': port})

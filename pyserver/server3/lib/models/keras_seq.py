@@ -11,6 +11,7 @@ from server3.service import logger_service
 from server3.service.keras_callbacks import MongoModelCheckpoint
 from server3.service.keras_callbacks import MyModelCheckpoint
 from server3.utility.str_utility import generate_args_str
+from server3.service.saved_model_services import keras_saved_model
 
 
 def keras_seq(conf, input, **kw):
@@ -108,7 +109,7 @@ def keras_seq(conf, input, **kw):
                                      model_config=config,
                                      score=score,
                                      history=history.history)
-        model.save(result_dir + 'final.{epoch:02d}-{val_loss:.2f}.hdf5')
+        keras_saved_model.save_model(result_dir, model)
         return {'score': score, 'history': history.history}
 
 

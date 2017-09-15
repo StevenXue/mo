@@ -35,6 +35,7 @@ from server3.service.saved_model_services import keras_saved_model
 from server3.entity.model import MODEL_TYPE
 from server3.constants import MODEL_EXPORT_BASE
 from server3.constants import MODEL_SCRIPT_PATH
+from server3.constants import NAMESPACE
 from server3.lib import graph
 from server3.lib import model_from_json
 from server3.utility import file_utils
@@ -99,7 +100,7 @@ def split_categorical_and_continuous(df, exclude_cols):
     return continuous_cols, categorical_cols
 
 
-def generate_model_py(conf, project_id, data_source_id, model_id, **kwargs):
+def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
     file_id = kwargs.get('file_id')
     staging_data_set_obj = None
     if data_source_id:
@@ -135,12 +136,11 @@ def generate_model_py(conf, project_id, data_source_id, model_id, **kwargs):
     #     '--mount', 'type=bind,source={}/user_directory,'
     #     'target=/pyserver/user_directory'.format(cwd),
     #     '--entrypoint', '/usr/local/bin/python',
-    #     'model_app:v1',
+    #     'model_app',
     #     'run_model.py',
     #     '--job_id', job_id,
     # ], start_new_session=True)
     job_name = job_id + '-training-job'
-    namespace = 'default'
     kube_json = {
         "apiVersion": "batch/v1",
         "kind": "Job",
@@ -155,28 +155,20 @@ def generate_model_py(conf, project_id, data_source_id, model_id, **kwargs):
                     }
                 },
                 "spec": {
-                    "securityContext": {
-                        "runAsUser": 1001,
-                        # "fsGroup": 1000
-                        "seLinuxOptions":
-                            {"level": "s0:c123,c456"}
-                    },
                     "containers": [
                         {
                             "name": job_id,
-                            "image": "model_app:v1",
+                            "image": "model_app",
+                            "imagePullPolicy": "IfNotPresent",
+                            "securityContext": {
+                                "privileged": True,
+                            },
                             "stdin": True,
                             "command": ["/usr/local/bin/python"],
                             "args": [
                                 "run_model.py",
                                 "--job_id", job_id
                             ],
-                            "securityContext": {
-                                "privileged": True,
-                                "seLinuxOptions": {
-                                    "level": "s0:c123,c456"
-                                }
-                            },
                             "volumeMounts": [{
                                 "mountPath": "/pyserver/user_directory",
                                 "name": "store"
@@ -187,7 +179,6 @@ def generate_model_py(conf, project_id, data_source_id, model_id, **kwargs):
                     "volumes": [{
                         "name": "store",
                         "hostPath": {"path": "{}/user_directory".format(cwd)},
-                        # "SELinuxRelabel": True
                     }]
                 },
             },
@@ -197,10 +188,11 @@ def generate_model_py(conf, project_id, data_source_id, model_id, **kwargs):
     # return
     kube_config.load_kube_config()
     api = client.BatchV1Api()
-    resp = api.create_namespaced_job(body=kube_json, namespace=namespace)
+    resp = api.create_namespaced_job(body=kube_json, namespace=NAMESPACE)
     print("Job created. status='%s'" % str(resp.status))
-    print(job_name)
-    print(api.read_namespaced_job(job_name, namespace))
+    return {
+        'job_id': job_id
+    }
     # TODO add more status logging in model logger
 
 
@@ -220,9 +212,9 @@ def run_model(conf, project_id, data_source_id, model_id, job_id, **kwargs):
     project = project_business.get_by_id(project_id)
     ownership = ownership_business.get_ownership_by_owned_item(project,
                                                                'project')
-    result_dir = '{0}{1}/{2}/'.format(user_directory,
-                                      ownership.user.user_ID,
-                                      project.name)
+    result_dir = os.path.join(user_directory, ownership.user.user_ID,
+                              project.name, job_id)
+
     # import model function
     if model['category'] == ModelType['neural_network']:
         # keras nn
@@ -311,27 +303,51 @@ def model_to_code(conf, project_id, data_source_id, model_id, **kwargs):
     :param kwargs:
     :return:
     """
-    model = model_business.get_by_model_id(model_id)
-    f = getattr(models, model.to_code_function)
+    file_id = kwargs.get('file_id')
+    staging_data_set_obj = None
+    if data_source_id:
+        staging_data_set_obj = \
+            staging_data_set_business.get_by_id(data_source_id)
+    project_obj = project_business.get_by_id(project_id)
+    file_dict = {'file': ObjectId(file_id)} if file_id else {}
+    model_obj = model_business.get_by_model_id(model_id)
 
-    if model['category'] == 0:
+    run_args = {
+        "conf": conf,
+        "project_id": project_id,
+        "data_source_id": data_source_id,
+        "model_id": model_id,
+        "kwargs": kwargs
+    }
+
+    # create model job
+    job_obj = job_business.add_model_job(model_obj, staging_data_set_obj,
+                                         project_obj, params=conf,
+                                         run_args=run_args,
+                                         **file_dict)
+    job_id = str(job_obj.id)
+
+    # model_obj = model_business.get_by_model_id(model_id)
+    f = getattr(models, model_obj.to_code_function)
+
+    if model_obj['category'] == 0:
         # keras nn
         head_str = manage_supervised_input_to_str(conf, data_source_id,
                                                   **kwargs)
         return job_service.run_code(conf, project_id, data_source_id,
-                                    model, f, head_str)
-    elif model['category'] == ModelType['folder_input']:
+                                    model_obj, f, job_id, head_str)
+    elif model_obj['category'] == ModelType['folder_input']:
         # input from folder
         head_str = manage_folder_input_to_str(conf, data_source_id,
                                               **kwargs)
         return job_service.run_code(conf, project_id, None,
-                                    model, f, head_str,
+                                    model_obj, f, job_id, head_str,
                                     file_id=data_source_id)
 
-    elif model['category'] == ModelType['advanced']:
+    elif model_obj['category'] == ModelType['advanced']:
         # no input
         return job_service.run_code(conf, project_id, None,
-                                    model, f, '',
+                                    model_obj, f, job_id, '',
                                     file_id=None)
     else:
         # custom models
@@ -353,26 +369,26 @@ def model_to_code(conf, project_id, data_source_id, model_id, **kwargs):
                     'split_categorical_and_continuous\n'
         head_str += 'from server3.service.custom_log_handler ' \
                     'import MetricsHandler\n'
-        head_str += 'model_fn = models.%s\n' % model.entry_function
+        head_str += 'model_fn = models.%s\n' % model_obj.entry_function
         head_str += "data_source_id = '%s'\n" % data_source_id
-        head_str += "model_name = '%s'\n" % model.name
+        head_str += "model_name = '%s'\n" % model_obj.name
         head_str += "kwargs = %s\n" % kwargs
         fit = conf.get('fit', None)
-        if model['category'] == 1:
+        if model_obj['category'] == 1:
             data_fields = fit.get('data_fields', [[], []])
             head_str += 'data_fields = %s\n' % data_fields
             head_str += inspect.getsource(
                 model_input_manager_custom_supervised)
             head_str += "input_dict = model_input_manager_custom_supervised(" \
                         "data_fields, data_source_id, model_name, **kwargs)\n"
-        elif model['category'] == 2:
+        elif model_obj['category'] == 2:
             x_cols = fit.get('data_fields', [])
             head_str += "x_cols = %s\n" % x_cols
             head_str += inspect.getsource(model_input_manager_unsupervised)
             head_str += "input_dict = model_input_manager_unsupervised(x_cols, " \
                         "data_source_id, model_name)\n"
         return job_service.run_code(conf, project_id, data_source_id,
-                                    model, f, head_str)
+                                    model_obj, f, job_id, head_str)
 
 
 def manage_nn_input(conf, staging_data_set_id, **kwargs):
@@ -592,7 +608,7 @@ def export(name, job_id, user_ID):
     :return:
     """
     result_dir, h5_filename = get_results_dir_by_job_id(job_id, user_ID)
-    result_sds = staging_data_set_business.get_by_job_id(job_id)
+    # result_sds = staging_data_set_business.get_by_job_id(job_id)
     model_dir = os.path.join(result_dir, 'model.json')
     weights_dir = os.path.join(result_dir, h5_filename)
     with open(model_dir, 'r') as f:
@@ -601,11 +617,10 @@ def export(name, job_id, user_ID):
         with graph.as_default():
             model = model_from_json(json_string)
             model.load_weights(weights_dir)
-            working_dir = MODEL_EXPORT_BASE
-            export_base_path = os.path.join(working_dir, str(result_sds.id))
-            version = keras_saved_model.export(model, working_dir,
-                                               export_base_path)
-            return export_base_path, version
+            # working_dir = MODEL_EXPORT_BASE
+            # export_base_path = os.path.join(working_dir, str(result_sds.id))
+            version = keras_saved_model.export(model, result_dir)
+            return result_dir, version
 
 
 # ------------------------------ temp function ------------------------------e

@@ -4,15 +4,15 @@
 cluster_ip=$2
 case "$1" in
 "model")
-    image=model_app:v1
+    image=model_app
     dockerfile=Dockerfile_model
     ;;
 "jupyter")
-    image=jupyter_app:v1
+    image=jupyter_app
     dockerfile=Dockerfile_jupyter
     ;;
 "serving")
-    image=serving_app:v1
+    image=serving_app
     dockerfile=Dockerfile_serving
     ;;
 *)

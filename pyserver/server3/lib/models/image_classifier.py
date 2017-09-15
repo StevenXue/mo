@@ -11,6 +11,7 @@ from server3.lib import Sequential
 from server3.lib import graph
 from server3.service import logger_service
 from server3.service.keras_callbacks import MyModelCheckpoint
+from server3.service.saved_model_services import keras_saved_model
 
 
 def image_classifier(conf, input, **kw):
@@ -151,7 +152,7 @@ def model_main(result_sds, project_id, result_dir, train_data_dir,
                                  model_config=config,
                                  # score=score,
                                  history=history.history)
-
+    keras_saved_model.save_model(result_dir, model)
     return {'history': history.history}
 
 

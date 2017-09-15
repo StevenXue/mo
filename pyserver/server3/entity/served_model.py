@@ -25,7 +25,7 @@ class ServedModel(Document):
     signatures = DictField(required=True)
     input_type = StringField(required=True, choices=INPUT_TYPES)
     model_base_path = StringField(required=True)
-    pid = IntField(required=True)
+    deploy_name = StringField(required=True)
     job = ReferenceField('Job', required=True)
     status = StringField(choices=STATUS)
     user_name = StringField()

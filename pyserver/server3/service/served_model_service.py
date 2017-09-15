@@ -4,6 +4,8 @@ import psutil
 import subprocess
 
 from mongoengine import DoesNotExist
+from kubernetes import client
+from kubernetes import config as kube_config
 
 from server3.business import user_business
 from server3.business import ownership_business
@@ -12,13 +14,15 @@ from server3.business import staging_data_set_business
 from server3.business import job_business
 from server3.service import ownership_service
 from server3.service import model_service
+from server3.utility import network_utility
 from server3.entity.model import MODEL_TYPE
 from server3.constants import SERVING_PORT
+from server3.constants import NAMESPACE
 
 ModelType = {list(v)[1]: list(v)[0] for v in list(MODEL_TYPE)}
 
 
-def add(user_ID, name, description, version, pid, server, signatures,
+def add(user_ID, name, description, version, deploy_name, server, signatures,
         input_type,
         model_base_path, job, is_private=False, **optional):
     """
@@ -33,7 +37,8 @@ def add(user_ID, name, description, version, pid, server, signatures,
     :param model_base_path:
     :return:
     """
-    served_model = served_model_business.add(name, description, version, pid,
+    served_model = served_model_business.add(name, description, version,
+                                             deploy_name,
                                              server,
                                              signatures, input_type,
                                              model_base_path, job, **optional)
@@ -95,17 +100,83 @@ def deploy(user_ID, job_id, name, description, server, signatures,
             saved_model_path_array = result_sds.saved_model_path.split('/')
             version = saved_model_path_array.pop()
             export_path = '/'.join(saved_model_path_array)
-        tf_model_server = './tensorflow_serving/model_servers/tensorflow_model_server'
-        p = subprocess.Popen([
-            tf_model_server,
-            '--enable_batching',
-            '--port={port}'.format(port=SERVING_PORT),
-            '--model_name={name}'.format(name=name),
-            '--model_base_path={export_path}'.format(export_path=export_path)
-        ], start_new_session=True)
+
+        cwd = os.getcwd()
+        deploy_name = job_id + '-serving'
+        port = network_utility.get_open_port()
+        export_path = export_path.replace('./user_directory',
+                                          '/home/root/work/user_directory')
+        kube_json = {
+            "apiVersion": "apps/v1beta1",
+            "kind": "Deployment",
+            "metadata": {
+                "name": deploy_name
+            },
+            "spec": {
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "app": job_id
+                        }
+                    },
+                    "spec": {
+                        # "securityContext": {
+                        #     "runAsUser": 1001,
+                        # },
+                        "containers": [
+                            {
+                                "name": job_id,
+                                "image": "serving_app",
+                                "imagePullPolicy": "IfNotPresent",
+                                "ports": [{
+                                    "containerPort": 9000,
+                                    "hostPort": port
+                                }],
+                                "stdin": True,
+                                "command": ['tensorflow_model_server'],
+                                "args": ['--enable_batching',
+                                         '--port={port}'.format(
+                                             port=SERVING_PORT),
+                                         '--model_name={name}'.format(
+                                             name=name),
+                                         '--model_base_path={export_path}'.format(
+                                             export_path=export_path)],
+                                "volumeMounts": [{
+                                    "mountPath": "/home/root/work/user_directory",
+                                    "name": job_id + "-volume"
+                                }]
+                            }
+                        ],
+                        "volumes": [{
+                            "name": job_id + "-volume",
+                            "hostPath": {
+                                "path": "{}/user_directory".format(cwd)},
+                        }]
+                    },
+                },
+            }
+        }
+        # import json
+        # from server3.utility import file_utils
+        # file_utils.write_to_filepath(json.dumps(kube_json), './jupyter_app.json')
+        # return
+        kube_config.load_kube_config()
+        api = client.AppsV1beta1Api()
+        resp = api.create_namespaced_deployment(body=kube_json,
+                                                namespace=NAMESPACE)
+        # tf_model_server = './tensorflow_serving/model_servers/tensorflow_model_server'
+        # p = subprocess.Popen([
+        #     tf_model_server,
+        #     '--enable_batching',
+        #     '--port={port}'.format(port=SERVING_PORT),
+        #     '--model_name={name}'.format(name=name),
+        #     '--model_base_path={export_path}'.format(export_path=export_path)
+        # ], start_new_session=True)
         # add a served model entity
-        return add(user_ID, name, description, version, p.pid, server,
-                   signatures, input_type, export_path, job, is_private, **optional)
+        server = server.replace('9000', str(port))
+        return add(user_ID, name, description, version, deploy_name, server,
+                   signatures, input_type, export_path, job, is_private,
+                   **optional)
 
 
 def remove_by_id(model_id):

@@ -22,7 +22,7 @@ pillow
 h5py>=2.7.0
 tensorflow
 kubernetes
-
+scikit-image
 
 
 

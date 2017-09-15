@@ -15,11 +15,11 @@ from server3.lib import tf
 K.set_learning_phase(0)
 
 
-def export(new_model, working_dir, export_path_base):
+def export(new_model, export_path_base):
     # Exporting the model
     tf.app.flags.DEFINE_integer('model_version', 1,
                                 'version number of the model.')
-    tf.app.flags.DEFINE_string('work_dir', working_dir, 'Working directory.')
+    # tf.app.flags.DEFINE_string('work_dir', working_dir, 'Working directory.')
     FLAGS = tf.app.flags.FLAGS
 
     export_path = os.path.join(
@@ -45,3 +45,9 @@ def export(new_model, working_dir, export_path_base):
                                                  'predict': signature})
         builder.save()
         return FLAGS.model_version
+
+
+def save_model(result_dir, model):
+    model.save_weights(os.path.join(result_dir, 'final.hdf5'))
+    with open(os.path.join(result_dir, 'model.json'), 'w') as f:
+        f.write(model.to_json())

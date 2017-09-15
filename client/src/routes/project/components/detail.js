@@ -194,7 +194,35 @@ class ProjectDetail extends React.Component {
   }
 
   startNotebook () {
-    fetch(jupyterServer + this.props.project.user.user_ID + '/' + this.state.projectName, {
+    let playground = '/project/playground/'
+    fetch(flaskServer + playground + this.state.project_id, {method: 'get'})
+      .then((response) => {
+      if(response.status === 200) {
+        return response.json()
+      } else {
+        fetch(flaskServer + playground + this.state.project_id, {method: 'post'})
+          .then((response) => response.json())
+          .then(res => {
+            let port = res.response
+            this.setState({
+              port
+            })
+            this.enterNotebook(port)
+          })
+      }
+    })
+      .then(res => {
+        let port = res.response
+        this.setState({
+          port
+        })
+        this.enterNotebook(port)
+      })
+      .catch(err =>  console.log('error', err))
+  }
+
+  enterNotebook(port) {
+    fetch(jupyterServer.replace('8888', port), {
       method: 'get',
     }).then((response) => response.json())
       .then((res) => {
@@ -205,7 +233,7 @@ class ProjectDetail extends React.Component {
           let content = response.content;
           notebook_content = content.find((el) => el.type === 'notebook')
         }
-
+        // 如果没有ipynb文件，新建一个
         if (isEmpty(notebook_content)) {
           this.setState({
             start_notebook: true,
@@ -213,7 +241,8 @@ class ProjectDetail extends React.Component {
             spawn_new: true,
           })
         } else {
-          fetch(jupyterServer + notebook_content.path, {
+          // 如果有，打开它
+          fetch(server + notebook_content.path, {
             method: 'get',
           }).then((response) => response.json())
             .then((res) => {
@@ -278,6 +307,7 @@ class ProjectDetail extends React.Component {
                              dataset_id={this.state.stagingDataID}
                              spawn_new={this.state.spawn_new}
                              columns={this.state.columns}
+                             port={this.state.port}
             />
             }
           </div>

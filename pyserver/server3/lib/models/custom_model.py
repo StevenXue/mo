@@ -56,6 +56,7 @@ def custom_model(conf, model_fn, input_data, **kw):
     # project_id = kw.pop('project_id', None)
     project_id = kw.pop('project_id', None)
     result_sds = kw.pop('result_sds', None)
+    result_dir = kw.pop('result_dir', None)
 
     est_params = conf.get('estimator', None)
     fit_params = conf.get('fit', {})
@@ -68,12 +69,13 @@ def custom_model(conf, model_fn, input_data, **kw):
 
     # def eval_input_fn():
     #     return input_fn(test, continuous_cols, categorical_cols, label_col)
-    return custom_model_help(model_fn, input_data, project_id, result_sds,
+    return custom_model_help(model_fn, input_data, project_id, result_dir,
+                             result_sds,
                              est_params, fit_params,
                              eval_params)
 
 
-def custom_model_help(model_fn, input_data, project_id, result_sds,
+def custom_model_help(model_fn, input_data, project_id, result_dir, result_sds,
                       est_params=None, fit_params=None,
                       eval_params=None):
     tf.logging.set_verbosity(tf.logging.INFO)
@@ -191,7 +193,7 @@ def custom_model_help(model_fn, input_data, project_id, result_sds,
                 X_train.columns}
     serving_input_fn = input_fn_utils.build_default_serving_input_fn(features)
     saved_model_path = estimator.export_savedmodel(
-        os.path.join(MODEL_EXPORT_BASE, str(result_sds.id)),
+        os.path.abspath(result_dir),
         serving_input_fn)
     # add saved_model_path to result staging data set
     staging_data_set_business.update(result_sds.id,

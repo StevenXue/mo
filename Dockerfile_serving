@@ -1,0 +1,19 @@
+FROM python:2
+
+USER root:root
+
+WORKDIR /home/root/work
+
+#ADD pyserver/server3/requirements.txt .
+#RUN pip install --no-cache-dir -r requirements.txt
+
+#COPY metric_spec.py /usr/local/lib/python3.6/site-packages/tensorflow/contrib/learn/python/learn/metric_spec.py
+
+#ADD pyserver/tensorflow_serving /home/root/work/tensorflow_serving
+
+RUN echo "deb [arch=amd64] http://storage.googleapis.com/tensorflow-serving-apt stable tensorflow-model-server tensorflow-model-server-universal" | tee /etc/apt/sources.list.d/tensorflow-serving.list
+RUN curl https://storage.googleapis.com/tensorflow-serving-apt/tensorflow-serving.release.pub.gpg | apt-key add -
+RUN apt-get update && apt-get install tensorflow-model-server
+
+
+#CMD [ "", "-m", "http.server", "8080" ]

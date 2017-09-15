@@ -26,10 +26,10 @@ def get_by_job(job):
     return served_model_repo.read_by_unique_field('job', job)
 
 
-def add(name, description, version, pid, server, signatures, input_type,
+def add(name, description, version, deploy_name, server, signatures, input_type,
         model_base_path, job, **optional):
     model = ServedModel(name=name, description=description,
-                        version=version, pid=pid, server=server,
+                        version=version, deploy_name=deploy_name, server=server,
                         signatures=signatures, input_type=input_type,
                         model_base_path=model_base_path, job=job, **optional)
     return served_model_repo.create(model)
