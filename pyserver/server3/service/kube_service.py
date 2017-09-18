@@ -21,11 +21,11 @@ def get_deployment_status(served_model):
 
 def get_job_status(job_info, job_name):
     if check_job_condition(job_name, 'Complete'):
-        job_info['status'] = 'complete'
+        job_info['kube_status'] = 'Completed'
     elif check_job_condition(job_name, 'Progressing'):
-        job_info['status'] = 'running'
+        job_info['kube_status'] = 'Running'
     else:
-        job_info['status'] = 'terminated'
+        job_info['kube_status'] = 'Terminated'
     return job_info
 
 

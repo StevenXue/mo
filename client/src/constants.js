@@ -26,5 +26,12 @@ module.exports = {
       inner: mainColor,
       outer: mainColor,
     },
+  },
+
+  statusColor: {
+    running: '#108ee9',
+    completed: '#00a854',
+    terminated: '#f04134',
   }
+
 }

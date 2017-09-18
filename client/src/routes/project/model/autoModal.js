@@ -265,7 +265,8 @@ class AutomatedModel extends React.Component {
                            dataset_id={this.state.selectedData}
                            key={i}
                            cols={this.state.columns}
-                           jupyter={false} params={this.state.params[i]}
+                           jupyter={false}
+                           params={this.state.params[i]}
                            modalSuccess={() => this.deactivate(i)}
                            isActive={el}/>)
                 }
