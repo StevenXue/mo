@@ -14,6 +14,7 @@ from server3.business import staging_data_set_business
 from server3.business import job_business
 from server3.service import ownership_service
 from server3.service import model_service
+from server3.service import kube_service
 from server3.utility import network_utility
 from server3.entity.model import MODEL_TYPE
 from server3.constants import SERVING_PORT
@@ -23,8 +24,7 @@ ModelType = {list(v)[1]: list(v)[0] for v in list(MODEL_TYPE)}
 
 
 def add(user_ID, name, description, version, deploy_name, server, signatures,
-        input_type,
-        model_base_path, job, is_private=False, **optional):
+        input_type, model_base_path, job, is_private=False, **optional):
     """
     add a served model
     :param user_ID:
@@ -54,21 +54,12 @@ def list_served_models_by_user_ID(user_ID, order=-1):
     owned_sm = ownership_service. \
         get_private_ownership_objects_by_user_ID(user_ID, 'served_model')
     # set status
-    public_sm = [set_status(sm) for sm in public_sm]
-    owned_sm = [set_status(sm) for sm in owned_sm]
+    public_sm = [kube_service.get_deployment_status(sm) for sm in public_sm]
+    owned_sm = [kube_service.get_deployment_status(sm) for sm in owned_sm]
     if order == -1:
         public_sm.reverse()
         owned_sm.reverse()
     return public_sm, owned_sm
-
-
-def set_status(served_model):
-    if served_model_business.check_condition(served_model.deploy_name,
-                                             'Progressing'):
-        served_model.status = 'running'
-    else:
-        served_model.status = 'terminated'
-    return served_model
 
 
 def deploy(user_ID, job_id, name, description, server, signatures,
@@ -180,5 +171,7 @@ def deploy(user_ID, job_id, name, description, server, signatures,
 
 
 def remove_by_id(served_model_id):
-    served_model_business.terminate_by_id(served_model_id)
+    served_model = served_model_business.get_by_id(served_model_id)
+    kube_service.delete_deployment(served_model.name)
+    # served_model_business.terminate_by_id(served_model_id)
     served_model_business.remove_by_id(served_model_id)

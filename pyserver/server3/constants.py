@@ -14,6 +14,11 @@ REDIS_SERVER = 'redis://192.168.31.156:6379'
 # REDIS_SERVER = 'redis://localhost:6379'
 USER_DIR = './user_directory'
 NAMESPACE = 'default'
+KUBE_NAME = {
+    'model': '{job_id}-training-job',
+    'jupyter': '{project_id}-jupyter',
+    'serving': '{job_id}-serving'
+}
 PARAMETER_SPEC = [
     {
         "name": "validation",

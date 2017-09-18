@@ -17,12 +17,14 @@ from server3.business import result_business
 from server3.business import data_set_business
 from server3.service import ownership_service
 from server3.service import staging_data_service
+from server3.service import kube_service
 from server3.business import staging_data_set_business
 from server3.utility import json_utility
 from server3.repository import config
 from server3.constants import USER_DIR
 from server3.utility import network_utility
 from server3.constants import NAMESPACE
+from server3.constants import KUBE_NAME
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
@@ -127,19 +129,24 @@ def get_all_jobs_of_project(project_id, categories):
         for key in categories:
             if job[key]:
                 job_info = job.to_mongo()
+                # model/toolkit info
+                job_info[key] = {
+                    'name': job[key]['name'],
+                    'category': job[key]['category'],
+                }
+
+                # source staging data set info
+                job_info['staging_data_set'] = job['staging_data_set'][
+                    'name'] if job['staging_data_set'] else None
+                job_info['staging_data_set_id'] = job['staging_data_set'][
+                    'id'] if job['staging_data_set'] else None
+
+                # result sds info
                 try:
                     result_sds = staging_data_set_business.get_by_job_id(
                         job['id']).to_mongo()
                 except DoesNotExist:
                     result_sds = None
-                job_info[key] = {
-                    'name': job[key]['name'],
-                    'category': job[key]['category'],
-                }
-                job_info['staging_data_set'] = job['staging_data_set'][
-                    'name'] if job['staging_data_set'] else None
-                job_info['staging_data_set_id'] = job['staging_data_set'][
-                    'id'] if job['staging_data_set'] else None
                 if key == 'model':
                     job_info['results'] = result_sds
                 else:
@@ -147,6 +154,12 @@ def get_all_jobs_of_project(project_id, categories):
                         'result'] if result_sds and "result" in result_sds else None
                 job_info['results_staging_data_set_id'] = result_sds[
                     '_id'] if result_sds else None
+
+                # model running status info
+                if key == 'model':
+                    job_name = KUBE_NAME['model'].format(job_id=job['id'])
+                    job_info = kube_service.get_job_status(job_info, job_name)
+
                 history_jobs[key].append(job_info)
                 break
     return history_jobs
@@ -168,6 +181,7 @@ def fork(project_id, new_user_ID):
     """
     fork project
     :param project_id:
+    :param new_user_ID:
     :return:
     """
     # get project
@@ -299,6 +313,7 @@ def start_project_playground(project_id):
                                             namespace=NAMESPACE)
     replicas = api.read_namespaced_deployment_status(
         deploy_name, NAMESPACE).status.available_replicas
+    # wait until deployment is available
     while replicas is None or replicas < 1:
         replicas = api.read_namespaced_deployment_status(
             deploy_name, NAMESPACE).status.available_replicas
