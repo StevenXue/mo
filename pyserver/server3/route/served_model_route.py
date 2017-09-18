@@ -68,12 +68,12 @@ def list_served_models_by_user_ID():
     return jsonify({'response': result})
 
 
-@served_model_app.route('/suspend/<string:oid>', methods=['PUT'])
-def suspend_served_model(oid):
-    if served_model_business.suspend_by_id(oid):
-        return jsonify({'response': 'suspended'})
-    else:
-        return jsonify({'response': 'suspend failed'}), 400
+# @served_model_app.route('/suspend/<string:oid>', methods=['PUT'])
+# def suspend_served_model(oid):
+#     if served_model_business.suspend_by_id(oid):
+#         return jsonify({'response': 'suspended'})
+#     else:
+#         return jsonify({'response': 'suspend failed'}), 400
 
 
 @served_model_app.route('/terminate/<string:oid>', methods=['PUT'])
@@ -84,9 +84,9 @@ def terminate_served_model(oid):
         return jsonify({'response': 'terminate failed'}), 400
 
 
-@served_model_app.route('/resume/<string:oid>', methods=['PUT'])
-def resume_served_model(oid):
-    if served_model_business.resume_by_id(oid):
-        return jsonify({'response': 'resumed'})
-    else:
-        return jsonify({'response': 'resume failed'}), 400
+# @served_model_app.route('/resume/<string:oid>', methods=['PUT'])
+# def resume_served_model(oid):
+#     if served_model_business.resume_by_id(oid):
+#         return jsonify({'response': 'resumed'})
+#     else:
+#         return jsonify({'response': 'resume failed'}), 400

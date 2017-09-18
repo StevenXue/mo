@@ -24,19 +24,19 @@ class FileSystem extends React.Component {
   renderOperations(e){
     return(
       <div className={classnames(styles.flexRow)} style={{justifyContent: 'flex-end'}}>
-        {
-          e.status === 'running' &&
-          <a onClick={() => this.props.dispatch({type: 'serving/suspendModel', payload: e._id})}>
-            <Icon type="pause-circle-o" style={{fontSize: 20}}/>
-          </a>
-        }
-        {
-          e.status === 'stopped' &&
-          <a style={{marginLeft: 10}}
-             onClick={() => this.props.dispatch({type: 'serving/resumeModel', payload: e._id})}>
-            <Icon type="play-circle-o" style={{fontSize: 20}}/>
-          </a>
-        }
+        {/*{*/}
+          {/*e.status === 'running' &&*/}
+          {/*<a onClick={() => this.props.dispatch({type: 'serving/suspendModel', payload: e._id})}>*/}
+            {/*<Icon type="pause-circle-o" style={{fontSize: 20}}/>*/}
+          {/*</a>*/}
+        {/*}*/}
+        {/*{*/}
+          {/*e.status === 'stopped' &&*/}
+          {/*<a style={{marginLeft: 10}}*/}
+             {/*onClick={() => this.props.dispatch({type: 'serving/resumeModel', payload: e._id})}>*/}
+            {/*<Icon type="play-circle-o" style={{fontSize: 20}}/>*/}
+          {/*</a>*/}
+        {/*}*/}
         {
           e.status !== 'terminated' && e.status !== 'zombie' &&
           <a style={{marginLeft: 10}}

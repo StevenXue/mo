@@ -63,10 +63,10 @@ def list_served_models_by_user_ID(user_ID, order=-1):
 
 
 def set_status(served_model):
-    try:
-        served_model.status = served_model_business.get_process(
-            served_model.pid).status()
-    except psutil.NoSuchProcess:
+    if served_model_business.check_condition(served_model.deploy_name,
+                                             'Progressing'):
+        served_model.status = 'running'
+    else:
         served_model.status = 'terminated'
     return served_model
 
@@ -179,6 +179,6 @@ def deploy(user_ID, job_id, name, description, server, signatures,
                    **optional)
 
 
-def remove_by_id(model_id):
-    served_model_business.terminate_by_id(model_id)
-    served_model_business.remove_by_id(model_id)
+def remove_by_id(served_model_id):
+    served_model_business.terminate_by_id(served_model_id)
+    served_model_business.remove_by_id(served_model_id)
