@@ -43,6 +43,7 @@ const defaultSteps = [
                     src={assetsUrl + '/videos/choose_data.mp4'}/>,
     selector: '[class*="dataChooseButton"]',
     position: 'bottom',
+    isFixed: true,
     style: stepStyle,
   },
   {
@@ -50,6 +51,7 @@ const defaultSteps = [
     text: 'After choose your data set, you can have a preview in this area',
     selector: '.data-preview-collapse',
     position: 'bottom',
+    isFixed: true,
     style: stepStyle,
   },
   {
@@ -57,6 +59,7 @@ const defaultSteps = [
     text: 'You can do some preprocess for your data set here, such as missing value completion and column filtering',
     selector: '.preprocess-collapse',
     position: 'bottom',
+    isFixed: true,
     style: stepStyle,
   },
   {

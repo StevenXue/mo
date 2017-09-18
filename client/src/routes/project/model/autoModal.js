@@ -12,6 +12,7 @@ const steps = [
     text: 'Click to choose your data set to use as input of model',
     selector: '.modelling_dataset',
     position: 'top',
+    isFixed: true,
     style: stepStyle,
   },
   {
@@ -19,6 +20,7 @@ const steps = [
     text: 'Choose the model you want to training, and choose the input columns',
     selector: '.choose_model_and_input',
     position: 'top',
+    isFixed: true,
     style: stepStyle,
   },
   {
@@ -28,6 +30,7 @@ const steps = [
       src={assetsUrl + '/videos/modelling.mp4'}/>,
     selector: '.choose_params',
     position: 'top',
+    isFixed: true,
     style: stepStyle,
   },
 ]
