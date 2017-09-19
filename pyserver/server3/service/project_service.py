@@ -19,6 +19,7 @@ from server3.service import ownership_service
 from server3.service import staging_data_service
 from server3.service import kube_service
 from server3.business import staging_data_set_business
+from server3.business import staging_data_business
 from server3.utility import json_utility
 from server3.repository import config
 from server3.constants import USER_DIR
@@ -149,6 +150,10 @@ def get_all_jobs_of_project(project_id, categories):
                     result_sds = None
                 if key == 'model':
                     job_info['results'] = result_sds
+                    job_info['metrics_status'] = \
+                        [sd.to_mongo() for sd in
+                         staging_data_business.get_by_staging_data_set_id(
+                             result_sds['_id'])]
                 else:
                     job_info['results'] = result_sds[
                         'result'] if result_sds and "result" in result_sds else None
