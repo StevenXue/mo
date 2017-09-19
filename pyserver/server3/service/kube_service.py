@@ -1,13 +1,16 @@
-from kubernetes import client
-from kubernetes import config as kube_config
-from kubernetes.client.models import v1_delete_options
+try:
+    from kubernetes import client
+    from kubernetes import config as kube_config
+    from kubernetes.client.models import v1_delete_options
+
+    kube_config.load_kube_config()
+    deployment_api = client.AppsV1beta1Api()
+    job_api = client.BatchV1Api()
+    options = v1_delete_options.V1DeleteOptions()
+except:
+    pass
 
 from server3.constants import NAMESPACE
-
-kube_config.load_kube_config()
-deployment_api = client.AppsV1beta1Api()
-job_api = client.BatchV1Api()
-options = v1_delete_options.V1DeleteOptions()
 
 
 def get_deployment_status(served_model):
@@ -39,9 +42,8 @@ def check_deployment_condition(deploy_name, status):
     try:
         deploy = deployment_api.read_namespaced_deployment(deploy_name,
                                                            NAMESPACE)
-    except client.rest.ApiException as e:
-        if e.reason == 'Not Found':
-            return False
+    except client.rest.ApiException:
+        return False
     else:
         return check_condition(deploy, status)
 
@@ -62,8 +64,9 @@ def check_job_condition(job_name, status):
 
 
 def check_condition(kube, status):
-    if kube and kube.status.conditions[0].type == status and \
-            kube.status.conditions[0].status:
+    if kube and kube.status.conditions and \
+       kube.status.conditions[0].type == status and \
+       kube.status.conditions[0].status:
         return True
     else:
         return False

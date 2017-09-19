@@ -1,6 +1,7 @@
 import logging
 import inspect
 import os
+import shutil
 
 import tensorflow as tf
 import pandas as pd
@@ -43,6 +44,8 @@ from server3.lib.models.modified_tf_file.monitors import ValidationMonitor
 
 from tensorflow.contrib.learn.python.learn import metric_spec
 
+temp_dir = '/tmp/model_results'
+
 
 def custom_model(conf, model_fn, input_data, **kw):
     """
@@ -52,9 +55,7 @@ def custom_model(conf, model_fn, input_data, **kw):
     :param kw:
     :return:
     """
-    # predict_x = kw.pop('predict_x', None)
-    # project_id = kw.pop('project_id', None)
-    project_id = kw.pop('project_id', None)
+    job_id = kw.pop('job_id', None)
     result_sds = kw.pop('result_sds', None)
     result_dir = kw.pop('result_dir', None)
 
@@ -69,13 +70,13 @@ def custom_model(conf, model_fn, input_data, **kw):
 
     # def eval_input_fn():
     #     return input_fn(test, continuous_cols, categorical_cols, label_col)
-    return custom_model_help(model_fn, input_data, project_id, result_dir,
+    return custom_model_help(model_fn, input_data, job_id, result_dir,
                              result_sds,
                              est_params, fit_params,
                              eval_params)
 
 
-def custom_model_help(model_fn, input_data, project_id, result_dir, result_sds,
+def custom_model_help(model_fn, input_data, job_id, result_dir, result_sds,
                       est_params=None, fit_params=None,
                       eval_params=None):
     tf.logging.set_verbosity(tf.logging.INFO)
@@ -84,7 +85,7 @@ def custom_model_help(model_fn, input_data, project_id, result_dir, result_sds,
     mh = MetricsHandler()
     # pass result staging data set for logger to save results
     mh.result_sds = result_sds
-    mh.project_id = project_id
+    mh.job_id = job_id
     logger = logging.getLogger('tensorflow')
     logger.setLevel(logging.DEBUG)
     logger.addHandler(mh)
@@ -193,8 +194,12 @@ def custom_model_help(model_fn, input_data, project_id, result_dir, result_sds,
                 X_train.columns}
     serving_input_fn = input_fn_utils.build_default_serving_input_fn(features)
     saved_model_path = estimator.export_savedmodel(
-        os.path.abspath(result_dir),
+        # os.path.abspath(result_dir),
+        temp_dir,
         serving_input_fn)
+    files = os.listdir(temp_dir)
+    for f in files:
+        shutil.move(os.path.join(temp_dir, f), os.path.abspath(result_dir))
     # add saved_model_path to result staging data set
     staging_data_set_business.update(result_sds.id,
                                      saved_model_path=saved_model_path.decode(
@@ -203,7 +208,7 @@ def custom_model_help(model_fn, input_data, project_id, result_dir, result_sds,
 
 
 def custom_model_to_str(conf, head_str, **kw):
-    project_id = kw.get('project_id', None)
+    job_id = kw.get('job_id', None)
     result_sds = kw.get('result_sds', None)
     est_params = conf.get('estimator', None)['args']
     fit_params = conf.get('fit', {})
@@ -211,7 +216,7 @@ def custom_model_to_str(conf, head_str, **kw):
     result_sds_id = result_sds['id']
     str_model = ''
     str_model += head_str
-    str_model += "project_id = '%s'\n" % project_id
+    str_model += "job_id = '%s'\n" % job_id
     str_model += "result_sds = staging_data_set_business.get_by_id('%s')\n" % \
                  result_sds_id
     str_model += inspect.getsource(get_input_fn)
@@ -227,7 +232,7 @@ def custom_model_to_str(conf, head_str, **kw):
         custom_model_help_str.replace("**eval_params['args']",
                                       generate_args_str(eval_params['args']))
     str_model += custom_model_help_str
-    str_model += 'print(custom_model_help(model_fn, input_dict, project_id, ' \
+    str_model += 'print(custom_model_help(model_fn, input_dict, job_id, ' \
                  'result_sds))'
     return str_model
 

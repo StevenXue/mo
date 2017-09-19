@@ -4,8 +4,8 @@ import psutil
 import subprocess
 
 from mongoengine import DoesNotExist
-from kubernetes import client
-from kubernetes import config as kube_config
+# from kubernetes import client
+# from kubernetes import config as kube_config
 
 from server3.business import user_business
 from server3.business import ownership_business
@@ -151,8 +151,7 @@ def deploy(user_ID, job_id, name, description, server, signatures,
         # from server3.utility import file_utils
         # file_utils.write_to_filepath(json.dumps(kube_json), './jupyter_app.json')
         # return
-        kube_config.load_kube_config()
-        api = client.AppsV1beta1Api()
+        api = kube_service.deployment_api
         resp = api.create_namespaced_deployment(body=kube_json,
                                                 namespace=NAMESPACE)
         # tf_model_server = './tensorflow_serving/model_servers/tensorflow_model_server'

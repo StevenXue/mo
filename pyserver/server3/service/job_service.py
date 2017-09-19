@@ -332,7 +332,7 @@ def create_model_job(project_id, staging_data_set_id, model_obj,
             #                 project_id=project_id)
 
             func_result = func(*args, **kw, result_sds=result_sds_obj,
-                               project_id=project_id)
+                               project_id=project_id, job_id=job_id)
             # update a job
             job_business.end_job(job_obj)
             if isinstance(func_result, dict):

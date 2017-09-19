@@ -67,7 +67,7 @@ class AutomatedModel extends React.Component {
     }).then((response) => response.json())
       .then((res) => {
           let params = res.response.model
-          params = params.filter((e) => e.status === 200)
+          // params = params.filter((e) => e.status === 200)
           // console.log(params);
           this.setState({ params })
           if (res.response.model.length === 0) {

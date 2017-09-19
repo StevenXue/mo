@@ -20,7 +20,7 @@ from server3.service.saved_model_services import keras_saved_model
 
 def mlp(conf, input, **kw):
     result_sds = kw.pop('result_sds', None)
-    project_id = kw.pop('project_id', None)
+    job_id = kw.pop('job_id', None)
     result_dir = kw.pop('result_dir', None)
     f = conf['fit']
     e = conf['evaluate']
@@ -32,11 +32,11 @@ def mlp(conf, input, **kw):
     y_test = input['y_te']
 
     with graph.as_default():
-        return mlp_main(result_sds, project_id, result_dir, x_train, y_train,
+        return mlp_main(result_sds, job_id, result_dir, x_train, y_train,
                         x_val, y_val, x_test, y_test, f, e)
 
 
-def mlp_main(result_sds, project_id, result_dir, x_train, y_train, x_val,
+def mlp_main(result_sds, job_id, result_dir, x_train, y_train, x_val,
              y_val, x_test, y_test, f=None, e=None):
     input_len = x_train.shape[1]
     output_len = y_train.shape[1]
@@ -65,19 +65,19 @@ def mlp_main(result_sds, project_id, result_dir, x_train, y_train, x_val,
                                           logger_service.log_epoch_begin(
                                               epoch, logs,
                                               result_sds,
-                                              project_id),
+                                              job_id),
                                           on_epoch_end=
                                           lambda epoch, logs:
                                           logger_service.log_epoch_end(
                                               epoch, logs,
                                               result_sds,
-                                              project_id),
+                                              job_id),
                                           on_batch_end=
                                           lambda batch, logs:
                                           logger_service.log_batch_end(
                                               batch, logs,
                                               result_sds,
-                                              project_id)
+                                              job_id)
                                           )
 
     # checkpoint to save best weight
@@ -125,7 +125,7 @@ def mlp_to_str(conf, head_str, **kw):
     # in the first layer, you must specify the expected input data shape:
     # here, 20-dimensional vectors.
     result_sds = kw.pop('result_sds', None)
-    project_id = kw.pop('project_id', None)
+    job_id = kw.pop('job_id', None)
     f = conf['fit']
     e = conf['evaluate']
     if result_sds is None:
@@ -143,14 +143,14 @@ def mlp_to_str(conf, head_str, **kw):
     str_model += head_str
     str_model += "result_sds = staging_data_set_business.get_by_id('%s')\n" % \
                  result_sds['id']
-    str_model += "project_id = '%s'\n" % project_id
+    str_model += "job_id = '%s'\n" % job_id
     mlp_main_str = inspect.getsource(mlp_main)
     mlp_main_str = mlp_main_str.replace("**f['args']",
                                         generate_args_str(f['args']))
     mlp_main_str = mlp_main_str.replace("**e['args']",
                                         generate_args_str(e['args']))
     str_model += mlp_main_str
-    str_model += 'print(mlp_main(result_sds, project_id, x_train, y_train, ' \
+    str_model += 'print(mlp_main(result_sds, job_id, x_train, y_train, ' \
                  'x_val, y_val, x_test, y_test))\n'
     print(str_model)
     return str_model

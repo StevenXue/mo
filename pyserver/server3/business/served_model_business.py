@@ -12,18 +12,14 @@
 # from minepy import MINE
 import psutil
 
-from kubernetes import client
-from kubernetes import config as kube_config
-from kubernetes.client.models import v1_delete_options
-
 from server3.entity.served_model import ServedModel
 from server3.repository.served_model_repo import ServedModelRepo
 from server3.constants import NAMESPACE
+from server3.service import kube_service
 
 served_model_repo = ServedModelRepo(ServedModel)
-kube_config.load_kube_config()
-api = client.AppsV1beta1Api()
-options = v1_delete_options.V1DeleteOptions()
+api = kube_service.deployment_api
+options = kube_service.options
 
 
 def get_by_id(model_obj):

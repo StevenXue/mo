@@ -22,7 +22,7 @@ clip_norm = 1.0
 
 def convnet(conf, input, **kw):
     result_sds = kw.pop('result_sds', None)
-    project_id = kw.pop('project_id', None)
+    job_id = kw.pop('job_id', None)
     f = conf['fit']
     e = conf['evaluate']
     x_train = input['x_tr']
@@ -54,7 +54,7 @@ def convnet(conf, input, **kw):
                                               logger_service.log_epoch_end(epoch,
                                                                            logs,
                                                                            result_sds,
-                                                                           project_id))
+                                                                           job_id))
 
         # checkpoint to save best weight
         best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,

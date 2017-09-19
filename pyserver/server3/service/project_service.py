@@ -312,8 +312,7 @@ def start_project_playground(project_id):
     # from server3.utility import file_utils
     # file_utils.write_to_filepath(json.dumps(kube_json), './jupyter_app.json')
     # return
-    kube_config.load_kube_config()
-    api = client.AppsV1beta1Api()
+    api = kube_service.deployment_api
     resp = api.create_namespaced_deployment(body=kube_json,
                                             namespace=NAMESPACE)
     replicas = api.read_namespaced_deployment_status(
@@ -330,7 +329,6 @@ def start_project_playground(project_id):
 
 def get_playground(project_id):
     deploy_name = project_id + '-jupyter'
-    kube_config.load_kube_config()
-    api = client.AppsV1beta1Api()
+    api = kube_service.deployment_api
     dep = api.read_namespaced_deployment(deploy_name, NAMESPACE)
     return dep.spec.template.spec.containers[0].ports[0].host_port

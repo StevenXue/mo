@@ -29,7 +29,7 @@ def image_classifier_vgg19(conf, input, **kw):
     batch_size = f['batch_size']
     # extract kw
     result_sds = kw.pop('result_sds', None)
-    project_id = kw.pop('project_id', None)
+    job_id = kw.pop('job_id', None)
     result_dir = kw.pop('result_dir', None)
     # extract input
     train_data_dir = input['train_data_dir']
@@ -47,14 +47,14 @@ def image_classifier_vgg19(conf, input, **kw):
         input_shape = (img_width, img_height, 3)
 
     with graph.as_default():
-        return model_main(result_sds, project_id, result_dir, train_data_dir,
+        return model_main(result_sds, job_id, result_dir, train_data_dir,
                           validation_data_dir, nb_train_samples,
                           nb_validation_samples, input_shape,
                           img_width, img_height,
                           epochs, batch_size)
 
 
-def model_main(result_sds, project_id, result_dir, train_data_dir,
+def model_main(result_sds, job_id, result_dir, train_data_dir,
                validation_data_dir, nb_train_samples,
                nb_validation_samples, input_shape,
                img_width, img_height,
@@ -133,19 +133,19 @@ def model_main(result_sds, project_id, result_dir, train_data_dir,
                                           logger_service.log_epoch_begin(
                                               epoch, logs,
                                               result_sds,
-                                              project_id),
+                                              job_id),
                                           on_epoch_end=
                                           lambda epoch, logs:
                                           logger_service.log_epoch_end(
                                               epoch, logs,
                                               result_sds,
-                                              project_id),
+                                              job_id),
                                           on_batch_end=
                                           lambda batch, logs:
                                           logger_service.log_batch_end(
                                               batch, logs,
                                               result_sds,
-                                              project_id)
+                                              job_id)
                                           )
 
     # checkpoint to save best weight
@@ -189,7 +189,7 @@ def image_classifier_vgg19_to_str(conf, head_str, **kw):
     batch_size = f['batch_size']
     # extract kw
     result_sds = kw.pop('result_sds', None)
-    project_id = kw.pop('project_id', None)
+    job_id = kw.pop('job_id', None)
 
     # dimensions of our images.
     # use 150, 150 as default
@@ -218,7 +218,7 @@ def image_classifier_vgg19_to_str(conf, head_str, **kw):
     str_model += head_str
     str_model += "result_sds = staging_data_set_business.get_by_id('%s')\n" % \
                  result_sds['id']
-    str_model += "project_id = '%s'\n" % project_id
+    str_model += "job_id = '%s'\n" % job_id
     str_model += "epochs = %s\n" % epochs
     str_model += "batch_size = %s\n" % batch_size
     str_model += "img_width = %s\n" % img_width
@@ -226,7 +226,7 @@ def image_classifier_vgg19_to_str(conf, head_str, **kw):
     str_model += "input_shape = (%s, %s, %s)\n" % input_shape
     model_main_str = inspect.getsource(model_main)
     str_model += model_main_str
-    str_model += 'print(model_main(result_sds, project_id, train_data_dir, ' \
+    str_model += 'print(model_main(result_sds, job_id, train_data_dir, ' \
                  'validation_data_dir, nb_train_samples, ' \
                  'nb_validation_samples, input_shape, ' \
                  'img_width, img_height, ' \

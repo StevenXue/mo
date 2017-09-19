@@ -293,11 +293,18 @@ class ModelForms extends React.Component {
                   score: res.response.score,
                   jobId: res.response.job_id
                 });
+
+                socket = io.connect(flaskServer + '/log/' + res.response.job_id)
+                socket.on('log_epoch_end', (msg) => {
+                  console.log('receive msg', msg)
+                  this.setState({ ioData: msg })
+                });
+
                 console.log("job id set", res.response.job_id, this.state.jobId)
               }
               this.props.modalSuccess()
-              this.setState({end: true})
-              socket.disconnect()
+              // this.setState({end: true})
+              // socket.disconnect()
             }
           })
       }else{

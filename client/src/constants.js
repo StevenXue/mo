@@ -29,9 +29,9 @@ module.exports = {
   },
 
   statusColor: {
-    running: '#108ee9',
-    completed: '#00a854',
-    terminated: '#f04134',
+    Running: '#108ee9',
+    Completed: '#00a854',
+    Terminated: '#f04134',
   }
 
 }

@@ -16,8 +16,6 @@ import numpy as np
 import pandas as pd
 import simplejson as json
 from bson import ObjectId
-from kubernetes import client
-from kubernetes import config as kube_config
 
 from server3.business import file_business
 from server3.business import job_business
@@ -32,6 +30,7 @@ from server3.service import staging_data_service
 from server3.service.job_service import split_supervised_input
 from server3.service.saved_model_services import encoder as keras_encoder
 from server3.service.saved_model_services import keras_saved_model
+from server3.service import kube_service
 from server3.entity.model import MODEL_TYPE
 from server3.constants import MODEL_EXPORT_BASE
 from server3.constants import MODEL_SCRIPT_PATH
@@ -129,17 +128,6 @@ def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
     #                  **kwargs)
     # return
     cwd = os.getcwd()
-    # # docker command
-    # subprocess.Popen([
-    #     "docker", 'run', '--rm', '-i', '-p', '2222:22',
-    #     '--name', job_id,
-    #     '--mount', 'type=bind,source={}/user_directory,'
-    #     'target=/pyserver/user_directory'.format(cwd),
-    #     '--entrypoint', '/usr/local/bin/python',
-    #     'model_app',
-    #     'run_model.py',
-    #     '--job_id', job_id,
-    # ], start_new_session=True)
     job_name = job_id + '-training-job'
     kube_json = {
         "apiVersion": "batch/v1",
@@ -176,6 +164,7 @@ def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
                         }
                     ],
                     "restartPolicy": "Never",
+                    # "activeDeadlineSeconds": 1,
                     "volumes": [{
                         "name": "store",
                         "hostPath": {"path": "{}/user_directory".format(cwd)},
@@ -186,8 +175,7 @@ def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
     }
     # file_utils.write_to_filepath(json.dumps(kube_json), './model_app.json')
     # return
-    kube_config.load_kube_config()
-    api = client.BatchV1Api()
+    api = kube_service.job_api
     resp = api.create_namespaced_job(body=kube_json, namespace=NAMESPACE)
     print("Job created. status='%s'" % str(resp.status))
     return {

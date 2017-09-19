@@ -73,10 +73,10 @@ class JupyterNotebook extends React.Component {
   componentDidMount () {
 
     //console.log("in jupyter"this.props.project.stagingData);
-
+    // jupyter channel
     this.attachChannels()
-    let socket = io.connect(flaskServer + '/log/' + this.props.project_id)
 
+    let socket = io.connect(flaskServer + '/log/' + this.props.project_id)
     socket.on('log_epoch_end', (msg) => {
       this.setState({ ioData: msg })
     })

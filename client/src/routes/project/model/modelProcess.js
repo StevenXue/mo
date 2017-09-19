@@ -333,11 +333,18 @@ export default class ModelProcess extends React.Component {
             {this.state.isActive ? this.renderSelections()
               : (
                 <div>
-                  {this.props.params &&
-                  <p>Status:&nbsp;&nbsp;
-                    <span
-                      style={{ color: statusColor[this.props.params.kube_status] }}>{this.props.params.kube_status}</span>
-                  </p>
+                  {this.props.params && [
+                    <p>Status:&nbsp;&nbsp;
+                      <span
+                        style={{ color: statusColor[this.props.params.kube_status] }}>{this.props.params.kube_status}</span>
+                    </p>,
+                    this.props.params.metrics_status && <p>Epoch:&nbsp;&nbsp;
+                      <span>{this.props.params.metrics_status[this.props.params.metrics_status.length - 1].n}/
+                        {this.props.params.run_args.conf.fit.args.epochs-1 ||
+                        this.props.params.run_args.conf.fit.args.steps}
+                        </span>
+                    </p>,
+                  ]
                   }
                   <p>Input: </p>
                   <div className={classnames(style.inputSelections)}>
