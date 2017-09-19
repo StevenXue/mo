@@ -12,67 +12,72 @@ export default {
     panelVisible: false,
     files: {
       public_files: [],
-      owned_files: []
+      owned_files: [],
     },
     dataSets: {
       public_ds: [],
-      owned_ds: []
+      owned_ds: [],
     },
     button: -1,
     field: '',
     tags: [],
     relatedTasks: '',
     inputVisible: false,
-    inputValue: ''
+    inputValue: '',
   },
 
   subscriptions: {
-    setup({ dispatch, history }) {
+    setup ({ dispatch, history }) {
       history.listen(({ pathname }) => {
         if (pathname === '/upload') {
           dispatch({
             type: 'fetch',
-          });
+          })
         }
-      });
+      })
     },
   },
 
   effects: {
-    *fetch(
-      {
-        payload,
-      }, { put, call, select }) {
-      const user = yield select(state => state['app'].user);
+    * fetch ({
+               payload,
+             }, { put, call, select }) {
+      const user = yield select(state => state['app'].user)
       const data = yield call(fetchDataSets, user.user_ID)
       if (data.success) {
         yield put({ type: 'querySuccess', payload: data.response })
       } else {
-        console.log('error', data);
+        console.log('error', data)
         throw data
       }
     },
-    *upload(
-      {
-        payload,
-      }, { put, call, select }) {
+    * upload ({
+                payload,
+              }, { put, call, select }) {
 
-      const user = yield select(state => state['app'].user);
+      const user = yield select(state => state['app'].user)
 
-      let formData = new FormData();
-      formData.append('uploaded_file', payload.upload[0]);
-      formData.append('description', payload.description);
-      formData.append('if_private', payload.isPrivate);
-      formData.append('type', payload.type);
-      formData.append('data_set_name', payload.data_set_name);
-      payload.tags && formData.append('tags', payload.tags);
-      payload.related_tasks && formData.append('related_tasks', payload.related_tasks);
-      payload.related_field && formData.append('related_field', payload.related_field);
-      formData.append('user_ID', user.user_ID);
+      let formData = new FormData()
+      formData.append('uploaded_file', payload.upload[0])
+      formData.append('description', payload.description)
+      formData.append('if_private', payload.isPrivate)
+      formData.append('type', payload.type)
+      formData.append('data_set_name', payload.data_set_name)
+      formData.append('user_ID', user.user_ID)
+      payload.tags && formData.append('tags', payload.tags)
+      payload.related_tasks && formData.append('related_tasks', payload.related_tasks)
+      payload.related_field && formData.append('related_field', payload.related_field)
+      if (payload['names']) {
+        formData.append('names', payload.names
+          .replace(/ /g, '')
+          .replace(/"/g, '')
+          .replace(/'/g, '')
+          .split(','))
+      }
       yield put({ type: 'setUploading', payload: true })
       const data = yield call(uploadFile, formData)
       if (data.success) {
-        console.log('upload success');
+        console.log('upload success')
         message.success('upload success')
         yield put({ type: 'setUploading', payload: false })
         yield put({ type: 'hideModal' })
@@ -85,17 +90,16 @@ export default {
         //   yield put(routerRedux.push('/project'))
         // }
       } else {
-        console.log('error', data, formData);
+        console.log('error', data, formData)
         throw data
       }
     },
 
-    *importData(
-      {
-        payload,
-      }, { put, call, select }) {
-      const user = yield select(state => state['app'].user);
-      const file = yield select(state => state['upload'].file);
+    * importData ({
+                    payload,
+                  }, { put, call, select }) {
+      const user = yield select(state => state['app'].user)
+      const file = yield select(state => state['upload'].file)
       let body = lodash.cloneDeep(payload)
       body['user_ID'] = user.user_ID
       body['file_id'] = file._id
@@ -108,15 +112,14 @@ export default {
       }
       const data = yield call(importData, body)
       if (data.success) {
-        yield put({type: 'resetStates'})
+        yield put({ type: 'resetStates' })
         message.success('Import Success!')
       } else {
-        console.log('error', data);
+        console.log('error', data)
         throw data
       }
     },
   },
-
 
   reducers: {
 
@@ -133,11 +136,11 @@ export default {
       }
     },
 
-    resetStates(state) {
-      return { ...state, inputValue: '', tags:[], inputVisible: false }
+    resetStates (state) {
+      return { ...state, inputValue: '', tags: [], inputVisible: false }
     },
 
-    setUploading (state, {payload: uploading}) {
+    setUploading (state, { payload: uploading }) {
       return { ...state, uploading }
     },
 
@@ -149,30 +152,30 @@ export default {
       return { ...state, visible: false }
     },
 
-    showInput(state) {
-      console.log("inputVisible");
+    showInput (state) {
+      console.log('inputVisible')
       return { ...state, inputVisible: true }
     },
 
-    hideInput(state) {
+    hideInput (state) {
       return { ...state, inputVisible: false }
     },
 
-    removeTag(state, {payload: value}){
-      return {...state, tags: value}
+    removeTag (state, { payload: value }) {
+      return { ...state, tags: value }
     },
 
-    setInputValue(state, {payload: value}){
-      return {...state, inputValue: value }
+    setInputValue (state, { payload: value }) {
+      return { ...state, inputValue: value }
     },
 
-    confirmInput(state){
+    confirmInput (state) {
       //let tags = state.tags;
-      let value = state.inputValue;
-      return {...state, inputValue: '',  inputVisible: false, tags: [...state.tags, value]}
+      let value = state.inputValue
+      return { ...state, inputValue: '', inputVisible: false, tags: [...state.tags, value] }
     },
 
-    toggleButton (state, {payload: button}) {
+    toggleButton (state, { payload: button }) {
       return {
         ...state,
         button,
