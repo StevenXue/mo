@@ -65,9 +65,9 @@ export default {
       formData.append('if_private', payload.isPrivate);
       formData.append('type', payload.type);
       formData.append('data_set_name', payload.data_set_name);
-      formData.append('tags', payload.tags);
-      formData.append('related_tasks', payload.related_tasks);
-      formData.append('related_field', payload.related_field);
+      payload.tags && formData.append('tags', payload.tags);
+      payload.related_tasks && formData.append('related_tasks', payload.related_tasks);
+      payload.related_field && formData.append('related_field', payload.related_field);
       formData.append('user_ID', user.user_ID);
       yield put({ type: 'setUploading', payload: true })
       const data = yield call(uploadFile, formData)
