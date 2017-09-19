@@ -67,13 +67,12 @@ export default {
       payload.tags && formData.append('tags', payload.tags)
       payload.related_tasks && formData.append('related_tasks', payload.related_tasks)
       payload.related_field && formData.append('related_field', payload.related_field)
-      if (payload['names']) {
-        formData.append('names', payload.names
-          .replace(/ /g, '')
-          .replace(/"/g, '')
-          .replace(/'/g, '')
-          .split(','))
-      }
+      payload.names &&
+      formData.append('names', payload.names
+        .replace(/ /g, '')
+        .replace(/"/g, '')
+        .replace(/'/g, '')
+        .split(','))
       yield put({ type: 'setUploading', payload: true })
       const data = yield call(uploadFile, formData)
       if (data.success) {
