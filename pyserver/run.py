@@ -16,6 +16,7 @@ from flask_socketio import SocketIO
 from server3.repository import config
 from server3.utility import json_utility
 from server3.constants import PORT
+from server3.constants import REDIS_SERVER
 
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
@@ -27,7 +28,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
 
 socketio = SocketIO(app, logger=True, engineio_logger=True, ping_timeout=600,
-                    async_mode='eventlet', message_queue='redis://')
+                    async_mode='eventlet', message_queue=REDIS_SERVER)
 
 CORS(app, supports_credentials=True)
 
