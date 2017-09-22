@@ -2,6 +2,7 @@
 import os
 import sys
 import subprocess
+import shutil
 from copy import deepcopy
 
 from bson import Code
@@ -86,7 +87,10 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
         # copy the file instance to project volume
         if hasattr(ds_obj, 'file') and ds_obj.file:
             file = ds_obj.file
-            subprocess.run(['cp', '-r', file.uri, volume_dir])
+            if os.path.isdir(file.uri):
+                shutil.copytree(file.uri, volume_dir)
+            else:
+                shutil.copy(file.uri, volume_dir)
 
         data_objects = data_business.get_by_data_set(data_set_id)
         # convert mongoengine objects to dicts

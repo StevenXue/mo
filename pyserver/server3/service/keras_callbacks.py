@@ -3,6 +3,7 @@
 import warnings
 import subprocess
 import os
+import shutil
 
 import numpy as np
 from keras.callbacks import ModelCheckpoint
@@ -179,10 +180,10 @@ class MyModelCheckpoint(Callback):
                         if self.save_weights_only:
                             self.model.save_weights(filepath[0],
                                                     overwrite=True)
-                            subprocess.run(['mv', filepath[0], filepath[1]])
+                            shutil.move(filepath[0], filepath[1])
                         else:
                             self.model.save(filepath[0], overwrite=True)
-                            subprocess.run(['mv', filepath[0], filepath[1]])
+                            shutil.move(filepath[0], filepath[1])
                     else:
                         if self.verbose > 0:
                             print('Epoch %05d: %s did not improve' %
@@ -192,8 +193,8 @@ class MyModelCheckpoint(Callback):
                     print('Epoch %05d: saving model to %s' % (epoch, filepath))
                 if self.save_weights_only:
                     self.model.save_weights(filepath[0], overwrite=True)
-                    subprocess.run(['mv', filepath[0], filepath[1]])
+                    shutil.move(filepath[0], filepath[1])
                 else:
                     self.model.save(filepath[0], overwrite=True)
-                    subprocess.run(['mv', filepath[0], filepath[1]])
+                    shutil.move(filepath[0], filepath[1])
 
