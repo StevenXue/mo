@@ -34,7 +34,7 @@ const customPanelStyle = {
   flexDirection: 'column',
   justifyContent: 'center',
   //alignItems: 'center'
-};
+}
 
 const defaultSteps = [
   {
@@ -116,14 +116,15 @@ class ProjectDetail extends React.Component {
   rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
       console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
-      let keys = this.props.project.activeKeys;
-      keys.push("1");
+      let keys = this.props.project.activeKeys
+      keys.push('1')
       keys = keys.filter((elem, index, self) => index === self.indexOf(elem))
-      this.props.dispatch({ type: 'project/setActiveKey', payload: keys });
+      this.props.dispatch({ type: 'project/setActiveKey', payload: keys })
       this.props.dispatch({ type: 'project/selectDataSets', payload: { selectedDSIds: selectedRows[0]._id } })
       this.setState({
         selectedData: selectedRows[0]._id,
         dataset_name: selectedRows[0].name,
+        selectedFile: selectedRows[0].file_obj,
         visible: false,
       })
       this.dataOp(selectedRows[0]._id)
@@ -137,7 +138,7 @@ class ProjectDetail extends React.Component {
     this.props.dispatch({ type: 'project/getStagingDatasets', payload: this.props.location.query._id })
 
     //this.props.dispatch({ type: 'project/getNotebook', payload: this.state.projectName })
-    if(this.props.project.isPublic){
+    if (this.props.project.isPublic) {
       this.props.dispatch({ type: 'project/getNotebook', payload: this.state.projectName })
     }
   }
@@ -147,7 +148,7 @@ class ProjectDetail extends React.Component {
   }
 
   componentWillUnmount () {
-    this.props.dispatch({ type: 'project/setActiveKey', payload: [] });
+    this.props.dispatch({ type: 'project/setActiveKey', payload: [] })
     this.setState({ to_disconnect: true })
   }
 
@@ -198,42 +199,42 @@ class ProjectDetail extends React.Component {
 
   startNotebook () {
     let playground = '/project/playground/'
-    fetch(flaskServer + playground + this.state.project_id, {method: 'get'})
+    fetch(flaskServer + playground + this.state.project_id, { method: 'get' })
       .then((response) => {
-      if(response.status === 200) {
-        return response.json()
-      } else {
-        fetch(flaskServer + playground + this.state.project_id, {method: 'post'})
-          .then((response) => response.json())
-          .then(res => {
-            let port = res.response
-            this.setState({
-              port
+        if (response.status === 200) {
+          return response.json()
+        } else {
+          fetch(flaskServer + playground + this.state.project_id, { method: 'post' })
+            .then((response) => response.json())
+            .then(res => {
+              let port = res.response
+              this.setState({
+                port,
+              })
+              this.enterNotebook(port)
             })
-            this.enterNotebook(port)
-          })
-      }
-    })
+        }
+      })
       .then(res => {
         let port = res.response
         this.setState({
-          port
+          port,
         })
         this.enterNotebook(port)
       })
-      .catch(err =>  console.log('error', err))
+      .catch(err => console.log('error', err))
   }
 
-  enterNotebook(port) {
+  enterNotebook (port) {
     fetch(jupyterServer.replace('8888', port), {
       method: 'get',
     }).then((response) => response.json())
       .then((res) => {
-        console.log(res);
+        console.log(res)
         let notebook_content = {}
         let response = lodash.cloneDeep(res)
         if (response.content instanceof Array && response.content[0]) {
-          let content = response.content;
+          let content = response.content
           notebook_content = content.find((el) => el.type === 'notebook')
         }
         // 如果没有ipynb文件，新建一个
@@ -276,24 +277,24 @@ class ProjectDetail extends React.Component {
       )
   }
 
-  renderNotebookSection(){
-    if(this.props.project.isPublic){
+  renderNotebookSection () {
+    if (this.props.project.isPublic) {
       return (
         !isEmpty(this.props.project.notebookContent) &&
-          <div style={{width: '80%', marginLeft: 80, marginTop: 50}}>
-            <Jupyter
-              notebook={this.props.project.notebookContent}
-              showCode={true}
-              defaultStyle={true}
-              loadMathjax={true}
-            />
-          </div>
+        <div style={{ width: '80%', marginLeft: 80, marginTop: 50 }}>
+          <Jupyter
+            notebook={this.props.project.notebookContent}
+            showCode={true}
+            defaultStyle={true}
+            loadMathjax={true}
+          />
+        </div>
 
       )
-    }else {
+    } else {
       return (
         <div>
-          <Button className='notebook-start-button' type='primary' style={{marginTop: 20, width: 120}}
+          <Button className='notebook-start-button' type='primary' style={{ marginTop: 20, width: 120 }}
                   onClick={() => this.startNotebook()}>
             <a href="#notebookSection">
               Start Notebook
@@ -368,18 +369,20 @@ class ProjectDetail extends React.Component {
           </div>
           <div className='operation-area'>
             <div>
-              <Collapse bordered={false} style={{marginTop: 10, width: '100%'}}
+              <Collapse bordered={false} style={{ marginTop: 10, width: '100%' }}
                         activeKey={this.props.project.activeKeys}
                         onChange={(e) => this.props.dispatch({ type: 'project/setActiveKey', payload: e })}>
                 <Panel className='data-preview-collapse'
                        header={'Stage Data'}
                        key="1"
                        style={customPanelStyle}>
-                  <Spin style={{marginLeft: 30}} spinning={this.state.loading} tip="loading dataset">
-                    {this.state.dataSet.length > 0 &&
-                    <DataPreview dataSet={this.state.dataSet}
+                  <Spin style={{ marginLeft: 30 }} spinning={this.state.loading} tip="loading dataset">
+
+                    <DataPreview dataSetName={this.state.dataset_name}
+                                 dataSet={this.state.dataSet}
+                                 file={this.state.selectedData}
                                  project_id={this.props.location.query._id}/>
-                    }
+
                   </Spin>
                 </Panel>
                 <Panel header={'Preprocess'} className='preprocess-collapse' key="2" style={customPanelStyle}>
@@ -390,7 +393,8 @@ class ProjectDetail extends React.Component {
                                 passStaging={(value) => this.getStagingId(value)}/>
                   </Spin>
                 </Panel>
-                <Panel className='exploration-collapse' header={'Data Exploration & Analysis'} key="3" style={customPanelStyle}>
+                <Panel className='exploration-collapse' header={'Data Exploration & Analysis'} key="3"
+                       style={customPanelStyle}>
                   <div className={classnames(style.descriptions)}>
                     <span style={{ fontSize: 14 }}>{'There are currently 5 types of toolkits available: '}</span>
                     {
@@ -410,13 +414,13 @@ class ProjectDetail extends React.Component {
                   </div>
                   <Toolkits project_id={this.props.location.query._id}/>
                 </Panel>
-                <Panel  className='model-collapse' header={'Automated Modelling'} key="4" style={customPanelStyle}>
+                <Panel className='model-collapse' header={'Automated Modelling'} key="4" style={customPanelStyle}>
                   <AutomatedModel project_id={this.props.location.query._id} runTour={(steps) => this.runTour(steps)}/>
                 </Panel>
                 {/*<Panel header='Predict' key="5" style={customPanelStyle}>*/}
-                  {/*{this.props.project.predictModelType === 4 ? <ImagePredict/>*/}
-                    {/*: <NeuralStyle project_id={this.state.project_id}/>*/}
-                  {/*}*/}
+                {/*{this.props.project.predictModelType === 4 ? <ImagePredict/>*/}
+                {/*: <NeuralStyle project_id={this.state.project_id}/>*/}
+                {/*}*/}
                 {/*</Panel>*/}
                 <Panel header='Serving' key="6" style={customPanelStyle}>
                   <Serving/>
@@ -426,10 +430,10 @@ class ProjectDetail extends React.Component {
             {/*<Collapse className='model-predict' id="model-predict" bordered={false} style={{ marginTop: 10, width: '100%' }}>*/}
             {/*</Collapse>*/}
           </div>
-          <div style={{width: '100%'}}>
-          {
-            this.renderNotebookSection()
-          }
+          <div style={{ width: '100%' }}>
+            {
+              this.renderNotebookSection()
+            }
           </div>
         </div>
       </div>

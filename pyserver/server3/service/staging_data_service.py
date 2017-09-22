@@ -88,7 +88,12 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
         if hasattr(ds_obj, 'file') and ds_obj.file:
             file = ds_obj.file
             if os.path.isdir(file.uri):
-                shutil.copytree(file.uri, volume_dir)
+                dst = os.path.join(volume_dir, os.path.dirname(file.uri))
+                # if dir exists, remove it and copytree, cause copytree will
+                #  create the dir
+                if os.path.exists(dst):
+                    shutil.rmtree(dst)
+                shutil.copytree(file.uri, dst)
             else:
                 shutil.copy(file.uri, volume_dir)
 
@@ -100,7 +105,8 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
         for d in data_objects:
             d.pop('data_set')
 
-        staging_data_business.add_many(sds, data_objects)
+        if data_objects:
+            staging_data_business.add_many(sds, data_objects)
         return sds
     except Exception as e:
         # remove staging_data_set and staging_data
@@ -251,7 +257,8 @@ def update_many_with_new_fields(raw_data, index, fields, name, sds_id):
         if length1 == length2:
             name_list = [item + '_' + name for item in fields]
         elif length2 == 1:
-            name_list = [fields[0] + '_' + name + str(i) for i in range(length1)]
+            name_list = [fields[0] + '_' + name + str(i) for i in
+                         range(length1)]
         else:
             name_list = [name + str(i) for i in range(length1)]
 

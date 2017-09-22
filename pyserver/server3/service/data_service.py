@@ -79,7 +79,7 @@ def import_data(data_array, data_set):
 
 
 def list_data_sets_by_user_ID(user_ID, order=-1, related_field=None, tag=None,
-                              related_task=None, extension=None, type=None):
+                              related_task=None, extension=None, file_type=None):
     if not user_ID:
         raise ValueError('no user id')
     public_ds = ownership_service.get_all_public_objects('data_set')
@@ -90,14 +90,14 @@ def list_data_sets_by_user_ID(user_ID, order=-1, related_field=None, tag=None,
                  if combine_conditions(ds,
                                        [['related_field', related_field],
                                         ['file.extension', extension],
-                                        ['file.type', type]],
+                                        ['file.type', file_type]],
                                        [['tags', tag],
                                         ['related_tasks', related_task]])]
     owned_ds = [deref_file(ds) for ds in owned_ds
                 if combine_conditions(ds,
                                       [['related_field', related_field],
                                        ['file.extension', extension],
-                                       ['file.type', type]],
+                                       ['file.type', file_type]],
                                       [['tags', tag],
                                        ['related_tasks', related_task]])]
     if order == -1:

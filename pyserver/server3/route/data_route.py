@@ -36,7 +36,7 @@ def list_data_sets_by_user_ID():
                                       related_field=related_field, tag=tag,
                                       related_task=related_task,
                                       extension=extension,
-                                      type=type)
+                                      file_type=type)
         public_ds = json_utility.me_obj_list_to_json_list(public_ds)
         owned_ds = json_utility.me_obj_list_to_json_list(owned_ds)
         result = {
