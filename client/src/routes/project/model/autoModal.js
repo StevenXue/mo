@@ -43,10 +43,10 @@ class AutomatedModel extends React.Component {
       selectedData: '',
       selectedDataName: '',
       tags: [],
-      cols: 0,
+      // cols: 0,
+      // row: 0,
       field: '',
       tasks: [],
-      row: 0,
       loading: true,
       statusStack: [],
       columns: [],
@@ -57,7 +57,7 @@ class AutomatedModel extends React.Component {
   }
 
   componentDidMount () {
-    this.props.dispatch({ type: 'project/listFiles', payload: {extension: 'zip'} })
+    this.props.dispatch({ type: 'project/listFiles', payload: { extension: 'zip' } })
 
     fetch(flaskServer + '/project/jobs/' + this.props.project_id + '?categories=model', {
       method: 'get',
@@ -96,20 +96,20 @@ class AutomatedModel extends React.Component {
       )
   }
 
-  addNewModel() {
+  addNewModel () {
     let array = this.state.statusStack
     array.push(true)
     this.setState({ statusStack: array })
   }
 
-  onSelectFile(values){
-    this.setState({selectedFile: values, selectedData: '', selectedDataName: ''});
+  onSelectFile (values) {
+    this.setState({ selectedFile: values, selectedData: '', selectedDataName: '' })
   }
 
   onSelectDataSet (values) {
     let selected = this.state.data_set.filter((el) => el._id === values)
     let selectedName = selected[0].name
-    this.setState({ selectedData: values, selectedDataName: selectedName, loading: true , selectedFile: ''})
+    this.setState({ selectedData: values, selectedDataName: selectedName, loading: true, selectedFile: '' })
     fetch(flaskServer + '/staging_data/staging_data_sets/' + values, {
       method: 'get',
       headers: {
@@ -123,6 +123,7 @@ class AutomatedModel extends React.Component {
             tasks: res.response['related tasks'],
             field: res.response.field,
             tags: res.response.tags,
+            dataSetType: res.response.data_set_type,
             loading: false,
           })
           console.log(res.response)
@@ -139,12 +140,12 @@ class AutomatedModel extends React.Component {
     this.setState({ statusStack: array })
   }
 
-  renderAddButton(){
-    if(this.state.selectedData !== '' || this.state.selectedFile !== '') {
+  renderAddButton () {
+    if (this.state.selectedData !== '' || this.state.selectedFile !== '') {
       return (
         <Button type='normal' size='small'
                 disabled={this.props.project.isPublic}
-                style={{marginLeft: 10}}
+                style={{ marginLeft: 10 }}
                 onClick={() => this.addNewModel()}>
           Add New Section
         </Button>
@@ -161,9 +162,9 @@ class AutomatedModel extends React.Component {
             alignItems: 'center',
           }}>
             <span style={{ color: '#108ee9' }}>Choose Source for modelling</span>
-            <span style={{float: 'left'}}>{"Choose Dataset:"}</span>
+            <span style={{ float: 'left' }}>{'Choose Dataset:'}</span>
             <Select className="dataset-select"
-                    style={{width: '90%'}}
+                    style={{ width: '90%' }}
                     onChange={(values) => this.onSelectDataSet(values)}
                     value={this.state.selectedData}
                     placeholder="Choose DataSet"
@@ -176,41 +177,47 @@ class AutomatedModel extends React.Component {
                 )
               }
             </Select>
-            <span style={{float: 'left', marginTop: 10}}>{"Or Choose File:"}</span>
-            <Select className="dataset-select"
-                    style={{width: '90%'}}
-                    onChange={(values) => this.onSelectFile(values)}
-                    value={this.state.selectedFile}
-                    placeholder="Choose DataSet"
-                    allowClear>
-              {
-                this.props.project.files &&
-                this.props.project.files.map((e) =>
-                  <Select.Option value={e._id} key={e._id}>
-                    {e.name}
-                  </Select.Option>,
-                )
-              }
-            </Select>
+            {/*<span style={{float: 'left', marginTop: 10}}>{"Or Choose File:"}</span>*/}
+            {/*<Select className="dataset-select"*/}
+            {/*style={{width: '90%'}}*/}
+            {/*onChange={(values) => this.onSelectFile(values)}*/}
+            {/*value={this.state.selectedFile}*/}
+            {/*placeholder="Choose DataSet"*/}
+            {/*allowClear>*/}
+            {/*{*/}
+            {/*this.props.project.files &&*/}
+            {/*this.props.project.files.map((e) =>*/}
+            {/*<Select.Option value={e._id} key={e._id}>*/}
+            {/*{e.name}*/}
+            {/*</Select.Option>,*/}
+            {/*)*/}
+            {/*}*/}
+            {/*</Select>*/}
 
-            {this.state.cols !== 0 &&
-            <div style={{ marginTop: 15, marginLeft: 10 }}>
+            {this.state.selectedData &&
+            <div style={{ marginTop: 15, marginLeft: 10, width: '90%' }}>
               <Spin spinning={this.state.loading}>
                 <span style={{ color: '#108ee9' }}>Dataset Info</span>
+                {this.state.cols !== undefined && this.state.cols > 0 &&
                 <div>
-                  <span>{'Number of Fields: '}</span>
-                  <span style={{ color: '#00AAAA' }}>{this.state.cols}</span>
+                  <div>
+                    <span>{'Number of Fields: '}</span>
+                    <span style={{ color: '#00AAAA' }}>{this.state.cols}</span>
+                  </div>
+                  <div>
+                    <span>{'Number of Records: '}</span>
+                    <span style={{ color: '#00AAAA' }}>{this.state.row}</span>
+                  </div>
                 </div>
-                <div>
-                  <span>{'Number of Records: '}</span>
-                  <span style={{ color: '#00AAAA' }}>{this.state.row}</span>
-                </div>
+                }
                 <div style={{ backgroundColor: '#49a9ee', height: 1, marginTop: 5, width: '80%' }}/>
                 <div style={{ marginTop: 10 }}>
                   <span>{'Category: '}</span>
+                  {this.state.field &&
                   <Tag style={{ margin: 5 }}>
                     {this.state.field}
                   </Tag>
+                  }
                 </div>
                 <div style={{ marginTop: 10 }}>
                   <span>{'Tags: '}</span>
@@ -255,7 +262,7 @@ class AutomatedModel extends React.Component {
                         shape="circle" icon="question" onClick={() => this.props.runTour(steps)}
                 />
               </div>
-              <div style={{width: '100%', height: 1, backgroundColor: '#108ee9', margin: 5}} />
+              <div style={{ width: '100%', height: 1, backgroundColor: '#108ee9', margin: 5 }}/>
               <div style={{ height: 480, overflowY: 'auto', backgroundColor: '#fafafa' }}>
                 {
                   this.state.statusStack.map((el, i) =>
@@ -263,6 +270,7 @@ class AutomatedModel extends React.Component {
                            selectedFile={this.state.selectedFile}
                            project_id={this.props.project_id}
                            dataset_id={this.state.selectedData}
+                           dataSetType={this.state.dataSetType}
                            key={i}
                            cols={this.state.columns}
                            jupyter={false}

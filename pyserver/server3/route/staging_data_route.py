@@ -11,6 +11,7 @@ from flask import jsonify
 from flask import request
 
 from server3.business import staging_data_business
+from server3.business import staging_data_set_business
 from server3.service import staging_data_service
 from server3.service import toolkit_service
 from server3.utility import json_utility
@@ -48,33 +49,27 @@ def list_staging_data_sets_by_project_id():
 
 
 @staging_data_app.route('/staging_data_sets/<string:sds_id>', methods=['GET'])
-def get_data_set(sds_id):
+def get_staging_data_set(sds_id):
     limit = request.args.get('limit')
     if limit is None:
         limit = 10
-    try:
-        data = staging_data_business.\
-            get_by_staging_data_set_id_limit(ObjectId(sds_id), int(limit))
-        data = json_utility.me_obj_list_to_json_list(data)
-        data = {'data': data}
-        columns = staging_data_service.get_fields_with_types(
-            ObjectId(sds_id))
+    data_set = staging_data_set_business.get_by_id(sds_id)
+    response = staging_data_business. \
+        get_by_staging_data_set_id_limit(ObjectId(sds_id), int(limit))
+    response = json_utility.me_obj_list_to_json_list(response)
+    response = {'data': response}
+    columns = staging_data_service.get_fields_with_types(
+        ObjectId(sds_id))
 
-        # FIXME
-        info = {
-            'field': 'Government',
-            'tags': ['scheduled releases', 'open data datasets', 'city',
-                     'canada', 'public service'],
-            'related tasks': ['classification'],
-            'columns': columns
-        }
-        data.update(info)
+    response['field'] = getattr(data_set, 'related_field', None)
+    response['tags'] = getattr(data_set, 'tags', None)
+    response['related tasks'] = getattr(data_set, 'related_tasks', None)
+    response['data_set_type'] = data_set.file.type
+    response['columns'] = columns
 
-        # update row col info
-        data.update(staging_data_service.get_row_col_info(ObjectId(sds_id)))
-    except Exception as e:
-        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
-    return jsonify({'response': data}), 200
+    # update row col info
+    response.update(staging_data_service.get_row_col_info(ObjectId(sds_id)))
+    return jsonify({'response': response}), 200
 
 
 @staging_data_app.route('/staging_data_sets', methods=['POST'])

@@ -11,6 +11,7 @@
 import inspect
 import os
 import subprocess
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -100,13 +101,13 @@ def split_categorical_and_continuous(df, exclude_cols):
 
 
 def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
-    file_id = kwargs.get('file_id')
+    # file_id = kwargs.get('file_id')
     staging_data_set_obj = None
     if data_source_id:
         staging_data_set_obj = \
             staging_data_set_business.get_by_id(data_source_id)
     project_obj = project_business.get_by_id(project_id)
-    file_dict = {'file': ObjectId(file_id)} if file_id else {}
+    # file_dict = {'file': ObjectId(file_id)} if file_id else {}
     model_obj = model_business.get_by_model_id(model_id)
 
     run_args = {
@@ -120,8 +121,7 @@ def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
     # create model job
     job_obj = job_business.add_model_job(model_obj, staging_data_set_obj,
                                          project_obj, params=conf,
-                                         run_args=run_args,
-                                         **file_dict)
+                                         run_args=run_args)
     job_id = str(job_obj.id)
     print(job_id)
     # return run_model(conf, project_id, data_source_id, model_id, job_id,
@@ -160,7 +160,12 @@ def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
                             "volumeMounts": [{
                                 "mountPath": "/pyserver/user_directory",
                                 "name": "store"
-                            }]
+                            },
+                                {
+                                    "mountPath": "/root/.keras",
+                                    "name": "keras"
+                                },
+                            ]
                         }
                     ],
                     "restartPolicy": "Never",
@@ -168,7 +173,14 @@ def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
                     "volumes": [{
                         "name": "store",
                         "hostPath": {"path": "{}/user_directory".format(cwd)},
-                    }]
+                    },
+                        {
+                            "name": "keras",
+                            "hostPath": {
+                                "path": "{home_dir}/.keras".format(
+                                    home_dir=str(Path.home())
+                                    )},
+                        }]
                 },
             },
         }
@@ -178,10 +190,7 @@ def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
     api = kube_service.job_api
     resp = api.create_namespaced_job(body=kube_json, namespace=NAMESPACE)
     print("Job created. status='%s'" % str(resp.status))
-    return {
-        'job_id': job_id
-    }
-    # TODO add more status logging in model logger
+    return {'job_id': job_id}
 
 
 def run_model(conf, project_id, data_source_id, model_id, job_id, **kwargs):
@@ -450,8 +459,8 @@ def model_input_manager_unsupervised(x_cols, data_source_id, model_name,
     }
 
 
-def model_input_manager_folder_input(conf, file_id, **kwargs):
-    file = file_business.get_by_id(file_id)
+def model_input_manager_folder_input(conf, data_set_id, **kwargs):
+    file = staging_data_set_business.get_by_id(data_set_id).file
     print(file['uri'])
     input = {
         'train_data_dir': file['uri'] + 'train/',
@@ -848,19 +857,19 @@ def temp():
         'naturalDQN',
         'naturalDQN_to_str',
         {'fit': {
-        "data_fields": {
-            "name": "x_y_fields",
-            "type": {
-                "key": "transfer_box",
-                "des": "data fields for x and y",
-            },
-            "default": None,
-            "required": True,
-            "x_data_type": None,
-            "y_data_type": None,
-            "x_len_range": None,
-            "y_len_range": None,
-        }}},
+            "data_fields": {
+                "name": "x_y_fields",
+                "type": {
+                    "key": "transfer_box",
+                    "des": "data fields for x and y",
+                },
+                "default": None,
+                "required": True,
+                "x_data_type": None,
+                "y_data_type": None,
+                "x_len_range": None,
+                "y_len_range": None,
+            }}},
         {'type': 'DataFrame'}
     ))
 

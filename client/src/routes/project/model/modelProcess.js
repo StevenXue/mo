@@ -108,16 +108,16 @@ export default class ModelProcess extends React.Component {
   }
 
   checkIfFile (props) {
-    if (props.selectedFile && props.selectedFile !== '') {
-      let models = this.state.allModels
-      models = models.filter((e) => e.category === 4)
-      models = models.map((e) => ({ 'name': e.name, '_id': e._id }))
-      this.setState({ models, isImage: true, selectedFile: props.selectedFile })
-    } else if (props.dataset_id && props.dataset_id !== '') {
+    if (props.dataSetType === 'table') {
       let models = this.state.allModels
       models = models.filter((e) => e.category !== 4)
       models = models.map((e) => ({ 'name': e.name, '_id': e._id }))
       this.setState({ models, isImage: false, selectedFile: props.selectedFile })
+    } else {
+      let models = this.state.allModels
+      models = models.filter((e) => e.category === 4)
+      models = models.map((e) => ({ 'name': e.name, '_id': e._id }))
+      this.setState({ models, isImage: true, selectedFile: props.selectedFile })
     }
   }
 
@@ -338,9 +338,10 @@ export default class ModelProcess extends React.Component {
                       <span
                         style={{ color: statusColor[this.props.params.kube_status] }}>{this.props.params.kube_status}</span>
                     </p>,
-                    this.props.params.metrics_status && <p>Epoch:&nbsp;&nbsp;
+                    this.props.params.metrics_status && this.props.params.metrics_status.length > 0 &&
+                    <p>Epoch:&nbsp;&nbsp;
                       <span>{this.props.params.metrics_status[this.props.params.metrics_status.length - 1].n}/
-                        {this.props.params.run_args.conf.fit.args.epochs-1 ||
+                        {this.props.params.run_args.conf.fit.args.epochs - 1 ||
                         this.props.params.run_args.conf.fit.args.steps}
                         </span>
                     </p>,

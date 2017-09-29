@@ -422,9 +422,9 @@ class ProjectDetail extends React.Component {
                 {/*: <NeuralStyle project_id={this.state.project_id}/>*/}
                 {/*}*/}
                 {/*</Panel>*/}
-                <Panel header='Serving' key="6" style={customPanelStyle}>
-                  <Serving/>
-                </Panel>
+                {/*<Panel header='Serving' key="6" style={customPanelStyle}>*/}
+                  {/*<Serving/>*/}
+                {/*</Panel>*/}
               </Collapse>
             </div>
             {/*<Collapse className='model-predict' id="model-predict" bordered={false} style={{ marginTop: 10, width: '100%' }}>*/}
