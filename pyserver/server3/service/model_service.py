@@ -126,7 +126,7 @@ def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
     print(job_id)
     # return run_model(conf, project_id, data_source_id, model_id, job_id,
     #                  **kwargs)
-    # return
+    # return #
     cwd = os.getcwd()
     job_name = job_id + '-training-job'
     kube_json = {
