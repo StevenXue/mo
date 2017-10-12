@@ -122,7 +122,7 @@ def deploy(user_ID, job_id, name, description, server, signatures,
                                 "imagePullPolicy": "IfNotPresent",
                                 "ports": [{
                                     "containerPort": 9000,
-                                    "hostPort": port
+                                    # "hostPort": port
                                 }],
                                 "stdin": True,
                                 "command": ['tensorflow_model_server'],
@@ -148,13 +148,34 @@ def deploy(user_ID, job_id, name, description, server, signatures,
                 },
             }
         }
+        service_json = {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "my-" + job_id + "-service"
+            },
+            "spec": {
+                "type": "NodePort",
+                "ports": [
+                    {
+                        "port": 8888,
+                        "nodePort": port
+                    }
+                ],
+                "selector": {
+                    "app": job_id
+                }
+            }
+        }
         # import json
         # from server3.utility import file_utils
         # file_utils.write_to_filepath(json.dumps(kube_json), './jupyter_app.json')
         # return
         api = kube_service.deployment_api
+        s_api = kube_service.service_api
         resp = api.create_namespaced_deployment(body=kube_json,
                                                 namespace=NAMESPACE)
+        s_api.create_namespaced_service(body=service_json, namespace=NAMESPACE)
         # tf_model_server = './tensorflow_serving/model_servers/tensorflow_model_server'
         # p = subprocess.Popen([
         #     tf_model_server,
