@@ -222,7 +222,9 @@ class ProjectDetail extends React.Component {
         })
         this.enterNotebook(port)
       })
-      .catch(err => console.log('error', err))
+      .catch(err => {
+        console.log('error', err)
+      })
   }
 
   enterNotebook (port) {
