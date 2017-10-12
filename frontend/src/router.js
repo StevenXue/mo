@@ -6,7 +6,6 @@ import Users from "./routes/Users.js";
 
 import DataAnalysis from "./routes/DataAnalysis/DataAnalysis";
 
-import App from "./routes/App.js";
 import MainLayout from './components/MainLayout/MainLayout'
 
 function RouterConfig({ history, location }) {
