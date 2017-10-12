@@ -6,7 +6,11 @@
 out
 gen
 /.idea/
+goldersgreen.iml
 
 # ignore all .pyc files
 *.pyc
 /pyserver/tensorflow_serving/model_servers/
+
+# ignore virtual env files
+/venv/
