@@ -5,7 +5,6 @@ import MainLayout from '../../components/MainLayout/MainLayout'
 
 function DataAnalysis({location}) {
   return (
-    <MainLayout location={location}>
 
       <div className={styles.normal}>
 
@@ -22,7 +21,6 @@ function DataAnalysis({location}) {
       </div>
 
 
-    </MainLayout>
   );
 }
 

@@ -1,19 +1,23 @@
 import React from 'react';
-import { Router, Route } from 'dva/router';
+import { BrowserRouter, Route } from 'dva/router';
 import IndexPage from './routes/IndexPage';
 
 import Users from "./routes/Users.js";
 
 import DataAnalysis from "./routes/DataAnalysis/DataAnalysis";
 
-function RouterConfig({ history }) {
-  return (
+import App from "./routes/App.js";
+import MainLayout from './components/MainLayout/MainLayout'
 
-    <Router history={history}>
-      <Route path="/" component={IndexPage} />
-      <Route path="/users" component={Users} />
-      <Route path="/DataAnalysis" component={DataAnalysis} />
-    </Router>
+function RouterConfig({ history, location }) {
+  return (
+    <BrowserRouter>
+      <MainLayout location={location} >
+        <Route path="/" exact component={Users} />
+        <Route path="/DataAnalysis" component={DataAnalysis} />
+        {/*<Route path="/app" component={App} />*/}
+      </MainLayout>
+    </BrowserRouter>
   );
 }
 
