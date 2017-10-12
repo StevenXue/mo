@@ -6,6 +6,7 @@ import subprocess
 from mongoengine import DoesNotExist
 # from kubernetes import client
 # from kubernetes import config as kube_config
+import port_for
 
 from server3.business import user_business
 from server3.business import ownership_business
@@ -94,7 +95,7 @@ def deploy(user_ID, job_id, name, description, server, signatures,
 
         cwd = os.getcwd()
         deploy_name = job_id + '-serving'
-        port = network_utility.get_open_port()
+        port = port_for.select_random()
         export_path = export_path.replace('./user_directory',
                                           '/home/root/work/user_directory')
         kube_json = {
