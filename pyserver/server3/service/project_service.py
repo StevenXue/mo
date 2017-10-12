@@ -7,6 +7,7 @@ import os
 from mongoengine import DoesNotExist
 from kubernetes import client
 from kubernetes import config as kube_config
+import port_for
 
 from server3.service import job_service
 from server3.business import project_business
@@ -259,7 +260,8 @@ def start_project_playground(project_id):
     abs_volume_dir = os.path.abspath(volume_dir)
 
     deploy_name = project_id + '-jupyter'
-    port = network_utility.get_open_port()
+    port = port_for.select_random(ports=set(range(30000, 32767)))
+    # port = network_utility.get_free_port_with_range(30000, 32767)
     kube_json = {
         "apiVersion": "apps/v1beta1",
         "kind": "Deployment",
@@ -280,16 +282,17 @@ def start_project_playground(project_id):
                     "containers": [
                         {
                             "name": project_id,
-                            "image": "jupyter_app",
+                            "image": "10.52.14.192/gzyw/jupyter_app",
                             "imagePullPolicy": "IfNotPresent",
                             "ports": [{
                                 "containerPort": 8888,
-                                "hostPort": port
+                                # "hostPort": port
                             }],
                             "stdin": True,
                             "command": ['python'],
                             "args": ["-m", "notebook", "--no-browser",
                                      "--allow-root",
+                                     "--ip=0.0.0.0",
                                      "--NotebookApp.allow_origin=*",
                                      "--NotebookApp.disable_check_xsrf=True",
                                      "--NotebookApp.token=''",
@@ -308,13 +311,33 @@ def start_project_playground(project_id):
             },
         }
     }
+    service_json = {
+        "kind": "Service",
+        "apiVersion": "v1",
+        "metadata": {
+            "name": "my-" + project_id + "-service"
+        },
+        "spec": {
+            "type": "NodePort",
+            "ports": [
+                {
+                    "port": 8888,
+                    "nodePort": port
+                }
+            ],
+            "selector": {
+                "app": project_id
+            }
+        }
+    }
     # import json
     # from server3.utility import file_utils
     # file_utils.write_to_filepath(json.dumps(kube_json), './jupyter_app.json')
     # return
     api = kube_service.deployment_api
-    resp = api.create_namespaced_deployment(body=kube_json,
-                                            namespace=NAMESPACE)
+    s_api = kube_service.service_api
+    api.create_namespaced_deployment(body=kube_json,
+                                     namespace=NAMESPACE)
     replicas = api.read_namespaced_deployment_status(
         deploy_name, NAMESPACE).status.available_replicas
     # wait until deployment is available
@@ -324,11 +347,13 @@ def start_project_playground(project_id):
     # FIXME one second sleep to wait for container ready
     import time
     time.sleep(1)
+    s_api.create_namespaced_service(body=service_json, namespace=NAMESPACE)
+    time.sleep(1)
     return port
 
 
 def get_playground(project_id):
-    deploy_name = project_id + '-jupyter'
-    api = kube_service.deployment_api
-    dep = api.read_namespaced_deployment(deploy_name, NAMESPACE)
-    return dep.spec.template.spec.containers[0].ports[0].host_port
+    service_name = "my-" + project_id + "-service"
+    api = kube_service.service_api
+    dep = api.read_namespaced_service(service_name, NAMESPACE)
+    return dep.spec.ports[0].node_port

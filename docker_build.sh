@@ -22,4 +22,4 @@ esac
 
 cd /Users/zhaofengli/Documents/goldersgreen/goldersgreen
 docker build -f ${dockerfile} -t ${image} .
-docker save ${image} | bzip2 | pv | ssh docker@${cluster_ip} 'cat | docker load'
+docker save ${image} | bzip2 | pv | ssh root@${cluster_ip} 'cat | docker load'

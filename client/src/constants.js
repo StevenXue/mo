@@ -1,7 +1,8 @@
 const mainColor = '#108ee9'
 
 module.exports = {
-  jupyterServer: 'http://192.168.65.2:8888/api/contents/',  // kube master node ip
+  // jupyterServer: 'http://192.168.65.2:8888/api/contents/',  // kube master node ip
+  jupyterServer: 'http://10.52.14.182:8888/api/contents/',  // kube master node ip
   // jupyterServer: 'http://10.52.14.182:8888/api/contents/',
   // jupyterServer: 'http://122.224.116.44:9001/api/contents/',
 

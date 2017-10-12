@@ -42,5 +42,6 @@ def main(_):
     decoded = decode_predictions(to_decode)
     print(decoded)
 
+
 if __name__ == '__main__':
     tf.app.run()
