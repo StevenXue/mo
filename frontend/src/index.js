@@ -4,7 +4,7 @@ import './index.css';
 // 1. Initialize
 const app = dva();
 
-app.model(require("./models/data_analysis"));
+app.model(require("./models/dataAnalysis"));
 
 // 2. Plugins
 // app.use({});

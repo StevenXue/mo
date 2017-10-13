@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Route } from 'dva/router';
+import { HashRouter, Route } from 'dva/router';
 import IndexPage from './routes/IndexPage';
 
 import Users from "./routes/Users.js";
@@ -10,13 +10,14 @@ import MainLayout from './components/MainLayout/MainLayout'
 
 function RouterConfig({ history, location }) {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <MainLayout location={location} >
         <Route path="/" exact component={Users} />
-        <Route path="/DataAnalysis" component={DataAnalysis} />
+
+        <Route path="/dataAnalysis" component={DataAnalysis} />
         {/*<Route path="/app" component={App} />*/}
       </MainLayout>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

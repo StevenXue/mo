@@ -1,17 +1,17 @@
 import * as dataAnalysisService from '../services/dataAnalysis';
-
+// import pathToRegexp from 'path-to-regexp';
 
 export default {
-  namespace: 'data_analysis',
+  namespace: 'dataAnalysis',
   state: {
     //左侧
-    showLeftSideBar: true,
+    isLeftSideBar: true,
     //用户拥有的 section
     sections: [],
     //现在开启的 section
-    active_sections_name: [],
+    active_sections_id: [],
     //焦点位置section名称
-    focus_section_name: "",
+    focus_section_id: "",
     //加载状态
     loading: false,
 
@@ -23,10 +23,10 @@ export default {
   },
   reducers: {
     // 改变 left_side_bar
-    toggleLeftSiderBar(state, action) {
+    toggleLeftSideBar(state, action) {
       return {
         ...state,
-        showLeftSideBar: !state.showLeftSideBar
+        isLeftSideBar: !state.isLeftSideBar
       }
     },
 
@@ -40,9 +40,10 @@ export default {
 
     // 添加 active section
     addActiveSection(state, action) {
+
       return {
         ...state,
-        active_sections_name: state.active_sections_name.concat(action.section_name)
+        active_sections_id: state.active_sections_id.concat(action.section_id)
       }
     },
 
@@ -60,7 +61,7 @@ export default {
     set_focus_section(state, action) {
       return {
         ...state,
-        focus_section_name: action.section_name
+        focus_section_id: action.focus_section_id
       }
     },
 
@@ -80,7 +81,7 @@ export default {
   effects: {
     // 获取用户所有sections
     *fetchSections(action, {call, put}) {
-      const sections = yield call(dataAnalysisService.fetchSections);
+      const {data: sections} = yield call(dataAnalysisService.fetchSections);
       yield put({type: 'setSections', sections})
 
     },
@@ -103,7 +104,8 @@ export default {
     // 当进入该页面是 获取用户所有 section
     setup({dispatch, history}) {
       return history.listen(({pathname}) => {
-        if (pathname === '/project/dataAnalysis') {
+        // const match = pathToRegexp('/users/:userId/search').exec(pathname);
+        if (pathname === '/dataAnalysis') {
           dispatch({type: 'fetchSections'});
         }
       });
