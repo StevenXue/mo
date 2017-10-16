@@ -7,15 +7,15 @@ import styles from './index.less'
 
 const Option = Select.Option
 
-function handleChange (value) {
+function handleChange(value) {
   console.log(`selected ${value}`)
 }
 
-function toProjectDetail( ) {
-
+function toProjectDetail(id, history) {
+  history.push(`/projects/${id}/import`)
 }
 
-function Projects ({ project }) {
+function Projects({ history, project }) {
   console.log(project)
   return (
     <div className={styles.normal}>
@@ -34,7 +34,7 @@ function Projects ({ project }) {
       <div>
         {project.projects.owned_projects.map(e =>
           <Card key={e._id} title={e.name} style={{ width: '90%', marginLeft: 5 }}>
-            <div onClick={() => toProjectDetail(e, key)} style={{ cursor: 'pointer' }}>
+            <div onClick={() => toProjectDetail(e._id, history)} style={{ cursor: 'pointer' }}>
               <p>Description: {e.description}</p>
               <p>Create Time: {showTime(e.create_time)}</p>
               {e['user_name'] && <p>Owner: {e.user_name}</p>}

@@ -7,7 +7,27 @@ import { Select, Button } from 'antd'
 import Dots from './Dots'
 import styles from './index.less'
 
-const pages = ['import', 'analysis', 'modelling', 'deploy']
+const pageConfig =[
+  {
+    path: 'import',
+    text: 'Import Data',
+  },
+  {
+    path: 'analysis',
+    text: 'Data Analysis',
+  },
+  {
+    path: 'modelling',
+    text: 'Modelling',
+  },
+  {
+    path: 'deploy',
+    text: 'Deployment',
+  },
+
+];
+const paths = pageConfig.map(e => e.path)
+const titles = pageConfig.map(e => e.text)
 const num = 5
 const radius = 5
 const buttonSize = 30
@@ -20,25 +40,25 @@ function Steps({ match, history, location }) {
   return (
     <div>
       <div className={styles.steps} style={{margin: `10px ${dis}px`}}>
-        {pages.map((p, i) =>
-          <div className={styles.step} key={pages[i]}>
+        {paths.map((p, i) =>
+          <div className={styles.step} key={paths[i]}>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <Button
                 shape="circle"
-                type={pages[i] === activePage ? 'primary' : 'default'}
+                type={paths[i] === activePage ? 'primary' : 'default'}
                 style={{ width: buttonSize, height: buttonSize }}
-                onClick={() => history.push(`/projects/${match.params.projectID}/${pages[i]}`)}>
+                onClick={() => history.push(`/projects/${match.params.projectID}/${paths[i]}`)}>
                 {i + 1}
               </Button>
             </div>
-            {i < pages.length - 1 && <Dots num={num} radius={radius}/>}
+            {i < paths.length - 1 && <Dots num={num} radius={radius}/>}
           </div>,
         )}
       </div>
-      <div className='flex-row-center' style={{width: buttonSize*pages.length+dis*(pages.length*2)}} >
-        {pages.map((p, i) =>
-          <div key={pages[i]} className='capitalize-first' style={{width: `${100/pages.length}%`, textAlign: 'center'}} >
-            <p> {pages[i]}</p>
+      <div className='flex-row-center' style={{width: buttonSize*paths.length+dis*(paths.length*2)}} >
+        {titles.map((p, i) =>
+          <div key={titles[i]} style={{width: `${100/paths.length}%`, textAlign: 'center'}} >
+            <p> {titles[i]}</p>
           </div>,
         )}
       </div>

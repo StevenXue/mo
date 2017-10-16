@@ -20,8 +20,7 @@ const pages = ['import', 'analysis', 'modelling', 'deploy']
 
 function ProjectDetail({ match, history, location, project }) {
   console.log(match, project, location)
-  // get active page name from url
-  const [activePage] = location.pathname.split('/').slice(-1)
+
   return (
     <div className={styles.normal}>
       <h2>Steps</h2>
