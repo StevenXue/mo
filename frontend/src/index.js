@@ -8,6 +8,10 @@ app.model(require("./models/dataAnalysis"));
 
 app.model(require("./models/stagingData"));
 
+app.model(require("./models/project"));
+
+app.model(require("./models/login"));
+
 // 2. Plugins
 // app.use({});
 
