@@ -37,7 +37,7 @@ export default async function request(url, options) {
   const data = await response.json();
 
   const ret = {
-    data,
+    data: data.response,
     headers: {},
   };
 

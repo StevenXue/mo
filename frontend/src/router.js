@@ -14,7 +14,7 @@ function RouterConfig({ history, location }) {
       <MainLayout location={location} >
         <Route path="/" exact component={Users} />
 
-        <Route path="/dataAnalysis" component={DataAnalysis} />
+        <Route path="/project/dataAnalysis" component={DataAnalysis} />
         {/*<Route path="/app" component={App} />*/}
       </MainLayout>
     </HashRouter>

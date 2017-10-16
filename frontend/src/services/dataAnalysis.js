@@ -46,7 +46,7 @@ export function fetchSections() {
       steps: [
         {
           title: '选择目标数据表',
-          content: 'A'
+          content: null
         },
 
         {
@@ -63,9 +63,14 @@ export function fetchSections() {
     },
     {
       ...test_section,
-      section_id: '0002'
+      section_id: '0002',
+      section_name: 'new_section_2',
     },
-
+    {
+      ...test_section,
+      section_id: '0003',
+      section_name: 'new_section_3',
+    },
 
   ];
   return {

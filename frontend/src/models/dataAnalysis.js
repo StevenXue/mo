@@ -1,4 +1,6 @@
 import * as dataAnalysisService from '../services/dataAnalysis';
+import * as stagingDataService from '../services/stagingData';
+
 // import pathToRegexp from 'path-to-regexp';
 
 export default {
@@ -15,6 +17,7 @@ export default {
     //加载状态
     loading: false,
 
+    stagingDataList: []
 
     // //开启的section的内容json
     // active_sections_content: {},
@@ -38,12 +41,12 @@ export default {
       }
     },
 
-    // 添加 active section
+    // 添加 active section, 将 focus 移到
     addActiveSection(state, action) {
-
       return {
         ...state,
-        active_sections_id: state.active_sections_id.concat(action.section_id)
+        active_sections_id: state.active_sections_id.concat(action.section_id),
+        focus_section_id: action.section_id
       }
     },
 
@@ -53,12 +56,20 @@ export default {
       const active_sections_name = [];
       return {
         ...state,
-        active_sections_name
+        active_sections_id
+      }
+    },
+
+    // 更新 active sections (看是否需要）
+    setActiveSections(state, action) {
+      return {
+        ...state,
+        active_sections_id: action.active_sections_id
       }
     },
 
     // 切换 focus section
-    set_focus_section(state, action) {
+    setFocusSection(state, action) {
       return {
         ...state,
         focus_section_id: action.focus_section_id
@@ -99,14 +110,24 @@ export default {
     // 添加 section
 
     // 删除 section
+
+    // 获取stage data set list
+    *fetchStagingDatasetList(action, {call, put}) {
+      const {data: stagingDataList} = yield call(stagingDataService.fetchStagingDatas, action.project_id);
+      yield put({type: 'stagingDataList', stagingDataList})
+
+    },
+
+
   },
   subscriptions: {
     // 当进入该页面是 获取用户所有 section
     setup({dispatch, history}) {
       return history.listen(({pathname}) => {
         // const match = pathToRegexp('/users/:userId/search').exec(pathname);
-        if (pathname === '/dataAnalysis') {
+        if (pathname === '/project/dataAnalysis') {
           dispatch({type: 'fetchSections'});
+          dispatch({type: 'fetchStagingDatasetList'});
         }
       });
     },

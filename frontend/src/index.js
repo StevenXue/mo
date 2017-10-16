@@ -6,6 +6,8 @@ const app = dva();
 
 app.model(require("./models/dataAnalysis"));
 
+app.model(require("./models/stagingData"));
+
 // 2. Plugins
 // app.use({});
 
