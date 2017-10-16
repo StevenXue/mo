@@ -111,7 +111,6 @@ export default {
     *updateSection(action, {call, put, select}) {
       // 开始加载
       const section_id = action.section_id;
-      console.log("section_id", section_id);
       const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson);
       const section = sectionsJson[section_id];
       const sections = yield call(dataAnalysisService.updateSection,section_id, section);

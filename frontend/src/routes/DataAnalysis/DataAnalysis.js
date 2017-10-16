@@ -3,7 +3,7 @@ import {connect} from 'dva';
 import styles from './DataAnalysis.css';
 import {Button, Tabs} from 'antd';
 
-import TabArea from '../../components/TabArea';
+// import TabArea from '../../components/useless/TabArea';
 import WorkBench from '../../components/WorkBench';
 
 const TabPane = Tabs.TabPane;
@@ -117,16 +117,15 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
         lastIndex = i - 1;
       }
     });
-    console.log("lastIndex", lastIndex);
 
     const new_active_sections_id = active_sections_id.filter(active_section_id => active_section_id !== targetKey);
 
     if (lastIndex >= 0 && activeKey === targetKey) {
       activeKey = new_active_sections_id[lastIndex];
     }
-    else{
+    else {
       // 如果之前没有tab
-      activeKey = new_active_sections_id[lastIndex+1];
+      activeKey = new_active_sections_id[lastIndex + 1];
     }
     setFocusSection(activeKey);
     setActiveSections(new_active_sections_id);
@@ -175,9 +174,9 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
                   tab={sectionsJson[active_section_id].section_name} key={active_section_id}
                   closabel={true}>
 
-                  <WorkBench section={sectionsJson[active_section_id]} />
+                  <WorkBench section={sectionsJson[active_section_id]}/>
                   {/*{*/}
-                    {/*mainArea(sectionsJson[active_section_id])*/}
+                  {/*mainArea(sectionsJson[active_section_id])*/}
                   {/*}*/}
                 </TabPane>
               )
