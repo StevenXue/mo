@@ -21,7 +21,6 @@ export default {
     * fetch (action, { call, put }) {
       let user_ID = 'dev_1'
       const { data: projects } = yield call(fetchProjects, user_ID)
-      console.log(projects)
       // const projects = res.response
       yield put({ type: 'setProjects', payload: projects })
 
