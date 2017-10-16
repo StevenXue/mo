@@ -11,7 +11,7 @@ import DataAnalysis from '../DataAnalysis/DataAnalysis'
 import Modelling from '../Modelling'
 
 import styles from './index.less'
-
+//
 function ProjectDetail({ match, history, project }) {
   console.log(match, project)
   return (
