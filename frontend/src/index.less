@@ -1,0 +1,19 @@
+
+html, body, :global(#root) {
+  height: 100%;
+}
+
+:global {
+  .flex-row-center {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .capitalize-first {
+    p::first-letter {
+      text-transform: uppercase;
+    }
+  }
+}
