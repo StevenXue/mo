@@ -6,6 +6,10 @@ const app = dva();
 
 app.model(require("./models/data_analysis"));
 
+app.model(require("./models/project"));
+
+app.model(require("./models/login"));
+
 // 2. Plugins
 // app.use({});
 
