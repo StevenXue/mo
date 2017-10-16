@@ -8,24 +8,26 @@ import WorkBench from '../../components/WorkBench';
 
 const TabPane = Tabs.TabPane;
 
-const arrayToJson = (array) => {
-  let finalJson = {};
-  for (let i of array) {
-    finalJson[i.section_id] = i;
-  }
-  return finalJson
+import {arrayToJson, JsonToArray} from '../../utils/JsonUtils';
 
-};
+// const arrayToJson = (array) => {
+//   let finalJson = {};
+//   for (let i of array) {
+//     finalJson[i.section_id] = i;
+//   }
+//   return finalJson
+// };
 
 
 function DataAnalysis({location, dispatch, dataAnalysis}) {
   // state
   const {
     isLeftSideBar,
-    sections,
+    sectionsJson,
     active_sections_id,
     focus_section_id
   } = dataAnalysis;
+  const sections = JsonToArray(sectionsJson);
 
   // change state
   const toggleLeftSideBar = () => {
@@ -152,7 +154,7 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
   }
 
   const box2 = () => {
-    const sectionsJson = arrayToJson(sections);
+    // const sectionsJson = arrayToJson(sections);
     // return <TabArea/>
     return (
       <div>

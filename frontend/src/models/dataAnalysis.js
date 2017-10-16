@@ -1,6 +1,6 @@
 import * as dataAnalysisService from '../services/dataAnalysis';
 import * as stagingDataService from '../services/stagingData';
-
+import {arrayToJson} from '../utils/JsonUtils';
 // import pathToRegexp from 'path-to-regexp';
 
 export default {
@@ -9,7 +9,7 @@ export default {
     //左侧
     isLeftSideBar: true,
     //用户拥有的 section
-    sections: [],
+    sectionsJson: [],
     //现在开启的 section
     active_sections_id: [],
     //焦点位置section名称
@@ -17,7 +17,9 @@ export default {
     //加载状态
     loading: false,
 
-    stagingDataList: []
+    stagingDataList: [],
+
+    project_id: '59c21ca6d845c0538f0fadd5'
 
     // //开启的section的内容json
     // active_sections_content: {},
@@ -37,7 +39,7 @@ export default {
     setSections(state, action) {
       return {
         ...state,
-        sections: action.sections
+        sectionsJson: action.sectionsJson
       }
     },
 
@@ -84,23 +86,36 @@ export default {
         ...state,
         loading: action.loading
       }
-    }
+    },
 
-    //
+    // 更改 stagingDataList
+    setStagingDataList(state, action) {
+      return {
+        ...state,
+        stagingDataList: action.stagingDataList
+      }
+    }
 
   },
   effects: {
     // 获取用户所有sections
     *fetchSections(action, {call, put}) {
       const {data: sections} = yield call(dataAnalysisService.fetchSections);
-      yield put({type: 'setSections', sections})
+
+      // array to json
+      const sectionsJson = arrayToJson(sections, 'section_id');
+      yield put({type: 'setSections', sectionsJson})
 
     },
     // 更新用户 section
-    *updateSection(action, {call, put}) {
+    *updateSection(action, {call, put, select}) {
       // 开始加载
+      const section_id = action.section_id;
+      console.log("section_id", section_id);
+      const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson);
+      const section = sectionsJson[section_id];
+      const sections = yield call(dataAnalysisService.updateSection,section_id, section);
 
-      const sections = yield call(dataAnalysisService.updateSection());
       // 停止加载
       // 显示保存成功
       // yield put({type: 'setSections', sections})
@@ -112,9 +127,11 @@ export default {
     // 删除 section
 
     // 获取stage data set list
-    *fetchStagingDatasetList(action, {call, put}) {
-      const {data: stagingDataList} = yield call(stagingDataService.fetchStagingDatas, action.project_id);
-      yield put({type: 'stagingDataList', stagingDataList})
+    *fetchStagingDatasetList(action, {call, put, select}) {
+      const project_id = yield select(state => state.dataAnalysis.project_id);
+      console.log("project_id", project_id);
+      const {data: stagingDataList} = yield call(stagingDataService.fetchStagingDatas, project_id);
+      yield put({type: 'setStagingDataList', stagingDataList})
 
     },
 

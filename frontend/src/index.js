@@ -6,7 +6,7 @@ const app = dva();
 
 app.model(require("./models/dataAnalysis"));
 
-app.model(require("./models/stagingData"));
+// app.model(require("./models/stagingData"));
 
 app.model(require("./models/project"));
 

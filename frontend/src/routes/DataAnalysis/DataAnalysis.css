@@ -28,7 +28,7 @@
 .box1 {
   /*flex: 1;*/
   display: flex;
-  width: 20%;
+  width: 200px;
   border-style: double;
   flex-direction: column;
 }
@@ -49,6 +49,6 @@
 .box3 {
   /*flex: 1;*/
   display: flex;
-  width: 35%;
+  width: 400px;
   border-style: double;
 }
