@@ -136,7 +136,7 @@ def list_files_by_user_ID(user_ID, order=-1):
         raise ValueError('no user id')
     public_files = ownership_service.get_all_public_objects('file')
     owned_files = ownership_service. \
-        get_private_ownership_objects_by_user_ID(user_ID, 'file')
+        get_privacy_ownership_objects_by_user_ID(user_ID, 'file')
 
     if order == -1:
         public_files.reverse()

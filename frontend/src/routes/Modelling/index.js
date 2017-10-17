@@ -3,6 +3,7 @@ import {connect} from 'dva';
 import styles from './index.css';
 import MainLayout from '../../components/MainLayout/MainLayout'
 
+
 function Modelling({location}) {
   return (
 
@@ -11,7 +12,7 @@ function Modelling({location}) {
         <div className={styles.content}>
 
           <div className={styles.box1}>
-            mmm
+
           </div>
           <div className={styles.box2}>
           </div>
