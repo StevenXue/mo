@@ -7,7 +7,7 @@ import { connect } from 'dva'
 import { Select, Button } from 'antd'
 import { withRouter} from "react-router-dom";
 
-import DataAnalysis from '../DataAnalysis/DataAnalysis'
+import DataAnalysis from '../DataAnalysis/index'
 import Modelling from '../Modelling'
 
 import styles from './index.less'
