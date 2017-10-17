@@ -2,10 +2,10 @@ import React from 'react'
 import { Icon } from 'antd'
 import styles from './index.less'
 
-function MyCard({ icon, text }) {
+function MyCard({ icon, text, style, onClick }) {
 
   return (
-    <div className={styles.box}>
+    <div className={styles.box} style={style} onClick={onClick} >
       <Icon
         type={icon}
         className={styles.anticon}
