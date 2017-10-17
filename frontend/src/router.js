@@ -20,7 +20,7 @@ function RouterConfig({ history, location }) {
           <Route path="/login" component={Login}/>
           <Route path="/projects/:projectID" component={ProjectDetail}/>
           <Route path="/projects" component={Projects}/>
-          <Route path="/DataAnalysis" component={DataAnalysis}/>
+          <Route path="/project/dataAnalysis" component={DataAnalysis} />
         </Switch>
       </MainLayout>
     </HashRouter>
