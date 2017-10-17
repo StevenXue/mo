@@ -15,7 +15,8 @@ def get_ownership_objects_by_user_ID(user_ID, owned_type):
     return [os[owned_type] for os in ownerships if owned_type in os]
 
 
-def get_private_ownership_objects_by_user_ID(user_ID, owned_type):
+def get_privacy_ownership_objects_by_user_ID(user_ID, owned_type,
+                                             private=True):
     """
     get different type of objects belong to a user, by user_Id
     :param user_ID:
@@ -24,7 +25,7 @@ def get_private_ownership_objects_by_user_ID(user_ID, owned_type):
     """
     ownerships = list_by_user_ID(user_ID)
     return [os[owned_type] for os in ownerships if owned_type in os and os[
-        'private'] is True]
+        'private'] is private]
 
 
 def get_all_public_objects(owned_type):

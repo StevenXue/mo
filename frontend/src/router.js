@@ -7,7 +7,7 @@ import Login from './routes/Login'
 import Projects from './routes/Projects'
 import ProjectDetail from './routes/ProjectDetail'
 
-import DataAnalysis from './routes/DataAnalysis/index'
+import DataAnalysis from './routes/DataAnalysis'
 
 import MainLayout from './components/MainLayout/MainLayout'
 

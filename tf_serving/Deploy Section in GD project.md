@@ -1,4 +1,4 @@
-# Deploy Section in GD project
+# Deploy Section in GD projectDetail
 
 ### gRPC Connection Info:
 Deployed: 

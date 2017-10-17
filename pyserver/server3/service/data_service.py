@@ -84,7 +84,7 @@ def list_data_sets_by_user_ID(user_ID, order=-1, related_field=None, tag=None,
         raise ValueError('no user id')
     public_ds = ownership_service.get_all_public_objects('data_set')
     owned_ds = ownership_service. \
-        get_private_ownership_objects_by_user_ID(user_ID, 'data_set')
+        get_privacy_ownership_objects_by_user_ID(user_ID, 'data_set')
 
     public_ds = [deref_file(ds) for ds in public_ds
                  if combine_conditions(ds,

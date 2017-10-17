@@ -5,30 +5,47 @@ import {
 } from 'react-router-dom'
 import { connect } from 'dva'
 import { Select, Button } from 'antd'
-import { withRouter } from 'react-router-dom'
 
 // pages
 import DataImport from '../DataImport'
 import DataAnalysis from '../DataAnalysis'
 import Modelling from '../Modelling'
 import Deployment from '../Deployment'
-
 // components
 import Steps from '../../components/Steps'
-
 import styles from './index.less'
 
 const pages = ['import', 'analysis', 'modelling', 'deploy']
 
+function ProjectInfo({ match, history, location, projectDetail }) {
+  if (location.pathname.split('/').length > 3) {
+    return (
+      <ProjectDetail match={match} history={history} location={location} project={projectDetail}/>
+    )
+  } else {
+    if (projectDetail.project) {
+      return (
+        <div className={`main-container ${styles.normal}`}>
+          <div className={styles.info}>
+            <p>Name: {projectDetail.project.name}</p>
+            <p>Description: {projectDetail.project.description}</p>
+          </div>
+          <div className={styles.navCards}>
+
+          </div>
+        </div>
+      )
+    }
+    return <div/>
+  }
+
+}
+
 function ProjectDetail({ match, history, location, project }) {
-  console.log(match, project, location)
 
   return (
-    <div className={styles.normal}>
-      <h2>Steps</h2>
-      <div className={styles.steps}>
-       <Steps match={match} history={history} location={location} />
-      </div>
+    <div className={`main-container ${styles.normal}`}>
+      <Steps match={match} history={history} location={location}/>
       <Route path="/projects/:projectID/import" component={DataImport}/>
       <Route path="/projects/:projectID/analysis" component={DataAnalysis}/>
       <Route path="/projects/:projectID/modelling" component={Modelling}/>
@@ -37,4 +54,4 @@ function ProjectDetail({ match, history, location, project }) {
   )
 }
 
-export default connect(({ project }) => ({ project }))(ProjectDetail)
+export default connect(({ projectDetail }) => ({ projectDetail }))(ProjectInfo)
