@@ -1,37 +1,27 @@
 import React from 'react';
 import {connect} from 'dva';
-import { Button, Icon } from 'antd';
 import styles from './index.css';
 import MainLayout from '../../components/MainLayout/MainLayout'
 
-function DataImport({location}) {
+function Modelling({location}) {
   return (
-    <div>
-      <div className={styles.head}>
-        Start your trip!
-      </div>
-      <div className={styles.container}>
-        <div className={styles.box}>
-          <Icon
-            type="cloud-upload"
-            className={styles.anticon}
-          />
-          <div className={styles.description}>
-               Upload new files
+
+      <div className={styles.normal}>
+
+        <div className={styles.content}>
+
+          <div className={styles.box1}>
+            III
           </div>
-        </div>
-        <div className={styles.box}>
-          <Icon
-            type="switcher"
-            className={styles.anticon}
-          />
-          <div className={styles.description}>
-            Choose from existing
+          <div className={styles.box2}>
           </div>
+          <div className={styles.box3}>
+          </div>
+
         </div>
       </div>
 
-    </div>
+
   );
 }
 
@@ -39,4 +29,4 @@ function mapStateToProps() {
   return {};
 }
 
-export default connect(mapStateToProps)(DataImport);
+export default connect(mapStateToProps)(Modelling);

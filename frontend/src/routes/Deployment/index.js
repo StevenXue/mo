@@ -1,9 +1,9 @@
 import React from 'react';
 import {connect} from 'dva';
-import styles from './DataAnalysis.css';
+import styles from './index.css';
 import MainLayout from '../../components/MainLayout/MainLayout'
 
-function DataAnalysis({location}) {
+function Modelling({location}) {
   return (
 
       <div className={styles.normal}>
@@ -11,6 +11,7 @@ function DataAnalysis({location}) {
         <div className={styles.content}>
 
           <div className={styles.box1}>
+            DDD
           </div>
           <div className={styles.box2}>
           </div>
@@ -28,4 +29,4 @@ function mapStateToProps() {
   return {};
 }
 
-export default connect(mapStateToProps)(DataAnalysis);
+export default connect(mapStateToProps)(Modelling);

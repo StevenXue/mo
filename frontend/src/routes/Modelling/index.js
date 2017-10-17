@@ -3,7 +3,7 @@ import {connect} from 'dva';
 import styles from './index.css';
 import MainLayout from '../../components/MainLayout/MainLayout'
 
-function DataAnalysis({location}) {
+function Modelling({location}) {
   return (
 
       <div className={styles.normal}>
@@ -29,4 +29,4 @@ function mapStateToProps() {
   return {};
 }
 
-export default connect(mapStateToProps)(DataAnalysis);
+export default connect(mapStateToProps)(Modelling);

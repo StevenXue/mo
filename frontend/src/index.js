@@ -1,10 +1,12 @@
 import dva from 'dva';
-import './index.css';
+import './index.less';
 
 // 1. Initialize
 const app = dva();
 
-app.model(require("./models/data_analysis"));
+app.model(require("./models/dataAnalysis"));
+
+// app.model(require("./models/stagingData"));
 
 app.model(require("./models/project"));
 

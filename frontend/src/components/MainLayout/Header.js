@@ -14,10 +14,10 @@ const config = [
     text: 'Home',
   },
   {
-    key: '/project',
-    Link: '/project',
+    key: '/projects',
+    Link: '/projects',
     Icon: null,
-    text: 'Project',
+    text: 'Projects',
   },
   {
     key: '/deployed_models',
