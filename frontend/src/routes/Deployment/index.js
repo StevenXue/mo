@@ -11,7 +11,7 @@ function Modelling({location}) {
         <div className={styles.content}>
 
           <div className={styles.box1}>
-            mmm
+            DDD
           </div>
           <div className={styles.box2}>
           </div>
