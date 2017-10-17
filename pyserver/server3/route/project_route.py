@@ -28,6 +28,7 @@ def get_project(project_id):
         return jsonify({'response': 'no project_id arg'}), 400
     try:
         project = project_business.get_by_id(project_id)
+        project = json_utility.convert_to_json(project.to_mongo())
     except Exception as e:
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}), 400)

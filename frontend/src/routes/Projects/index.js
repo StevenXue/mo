@@ -15,7 +15,7 @@ function Projects({ history, project, dispatch }) {
   }
 
   function toProjectDetail(id, history) {
-    history.push(`/projects/${id}/import`)
+    history.push(`/projects/${id}`)
   }
 
   return (

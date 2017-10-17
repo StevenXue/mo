@@ -5,7 +5,6 @@ export default {
   namespace: 'project',
   state: {
     projects: [],
-    privacy: 'all',
   },
   reducers: {
     setProjects(state, { payload: projects }) {
