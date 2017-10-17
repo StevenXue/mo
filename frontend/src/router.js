@@ -7,7 +7,7 @@ import Login from './routes/Login'
 import Projects from './routes/Projects'
 import ProjectDetail from './routes/ProjectDetail'
 
-// import DataAnalysis from './routes/DataAnalysis/DataAnalysis'
+import DataAnalysis from './routes/DataAnalysis/index'
 
 import MainLayout from './components/MainLayout/MainLayout'
 
@@ -20,7 +20,7 @@ function RouterConfig({ history, location }) {
           <Route path="/login" component={Login}/>
           <Route path="/projects/:projectID" component={ProjectDetail}/>
           <Route path="/projects" component={Projects}/>
-          {/*<Route path="/project/dataAnalysis" component={DataAnalysis} />*/}
+          <Route path="/project/dataAnalysis" component={DataAnalysis} />
         </Switch>
       </MainLayout>
     </HashRouter>

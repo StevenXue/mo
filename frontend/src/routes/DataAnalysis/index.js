@@ -1,11 +1,12 @@
 import React from 'react';
 import {connect} from 'dva';
-import styles from './DataAnalysis.css';
-import {Button, Tabs} from 'antd';
+import styles from './index.less';
+import {Tabs} from 'antd';
 
-import TabArea from '../../components/TabArea';
+// import TabArea from '../../components/useless/TabArea';
 import WorkBench from '../../components/WorkBench';
-
+import SideBar from '../../components/SideBar';
+import Launcher from './Launcher'
 const TabPane = Tabs.TabPane;
 
 import {arrayToJson, JsonToArray} from '../../utils/JsonUtils';
@@ -22,19 +23,11 @@ import {arrayToJson, JsonToArray} from '../../utils/JsonUtils';
 function DataAnalysis({location, dispatch, dataAnalysis}) {
   // state
   const {
-    isLeftSideBar,
     sectionsJson,
     active_sections_id,
     focus_section_id
   } = dataAnalysis;
-  const sections = JsonToArray(sectionsJson);
 
-  // change state
-  const toggleLeftSideBar = () => {
-    dispatch({
-      type: 'dataAnalysis/toggleLeftSideBar'
-    });
-  };
   const addActiveSection = (section_id) => {
     dispatch({
       type: 'dataAnalysis/addActiveSection',
@@ -57,36 +50,6 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
   };
 
 
-  // 当section 被点击
-  const onClickSection = (section_id) => {
-    //1 active sections not include this section
-    if (!active_sections_id.includes(section_id)) {
-      addActiveSection(section_id)
-    }
-    //2 include
-    else {
-      setFocusSection(section_id)
-    }
-  };
-
-
-  const sectionList = () => {
-    return (
-      sections.map(
-        (section) => {
-          return (
-            <div key={section.section_id + section.section_name} onClick={() => onClickSection(section.section_id)}>
-              {section.section_name}
-            </div>
-          )
-        }
-      )
-    )
-  };
-
-  // const callback = (key) => {
-  //   console.log(key);
-  // };
   /**** tab ****/
   const onChange = (activeKey) => {
     // 更改 active key
@@ -117,122 +80,74 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
         lastIndex = i - 1;
       }
     });
-    console.log("lastIndex", lastIndex);
 
     const new_active_sections_id = active_sections_id.filter(active_section_id => active_section_id !== targetKey);
 
     if (lastIndex >= 0 && activeKey === targetKey) {
       activeKey = new_active_sections_id[lastIndex];
     }
-    else{
+    else {
       // 如果之前没有tab
-      activeKey = new_active_sections_id[lastIndex+1];
+      activeKey = new_active_sections_id[lastIndex + 1];
     }
     setFocusSection(activeKey);
     setActiveSections(new_active_sections_id);
     // this.setState({ panes, activeKey });
   };
 
-
-  function box1() {
-    if (isLeftSideBar) {
-      return (
-        <div className={styles.box1}>
-          <Button type="primary" onClick={toggleLeftSideBar}>Primary</Button>
-          {sectionList()}
-        </div>
-      )
-    } else {
-
-      return (
-        <div className={styles.left_column}>
-          <Button type="primary" onClick={toggleLeftSideBar}>Primary</Button>
-        </div>
-      )
-    }
-
-  }
-
-  const box2 = () => {
-    // const sectionsJson = arrayToJson(sections);
-    // return <TabArea/>
-    return (
-      <div>
-        {/*<div style={{ marginBottom: 16 }}>*/}
-        {/*<Button onClick={add}>ADD</Button>*/}
-        {/*</div>*/}
-        <Tabs
-          hideAdd
-          onChange={onChange}
-          activeKey={focus_section_id}
-          type="editable-card"
-          onEdit={onEdit}
-        >
-          {
-            active_sections_id.map((active_section_id) => {
-              return (
-                <TabPane
-                  tab={sectionsJson[active_section_id].section_name} key={active_section_id}
-                  closabel={true}>
-
-                  <WorkBench section={sectionsJson[active_section_id]} />
-                  {/*{*/}
-                    {/*mainArea(sectionsJson[active_section_id])*/}
-                  {/*}*/}
-                </TabPane>
-              )
-            })
-          }
-        </Tabs>
-      </div>
-    );
-  };
-
-  // 主要操作区域
-  const mainArea = (section) => {
-
-    return (
-      section.steps.map((step) => {
-        return (
-          <div key={step.title}>
-            <div>
-              {step.title}
-            </div>
-
-            {step.content ?
-              <div>
-                {step.content}
-              </div> :
-              <div>
-                选择框
-              </div>
-            }
-
-          </div>
-        )
-      })
-    )
-  };
+  // todo
+  // 如果不存在section 显示Launcher
+  // 新增按钮生成 Launcher
 
   // 主函数
   return (
-    <div className={styles.normal}>
+    <div className={styles.container}>
 
       <div className={styles.content}>
-
-        {box1()}
-
-        <div className={styles.box2}>
-          {box2()}
+        <div className={styles.sidebar}>
+          <SideBar/>
         </div>
 
-        <div className={styles.box3}>
+        <div className={styles.middle_area}>
+          <Tabs
+            hideAdd
+            onChange={onChange}
+            activeKey={focus_section_id}
+            type="editable-card"
+            onEdit={onEdit}
+            tabBarStyle={{
+              // flex: 1, display: 'flex', flexDirection: 'row',
+              // backgroundColor:"#C7C7C7"
+            }}
+            className={styles.tab_area}
+            animated={true}
+          >
+            {
+              active_sections_id.map((active_section_id) => {
+                return (
+                  active_section_id.includes('new_launcher') ?
+                    <TabPane
+                      tab={'Launcher'} key={active_section_id}
+                    >
+                      <Launcher/>
+
+                    </TabPane> :
+                    <TabPane
+                      tab={sectionsJson[active_section_id].section_name} key={active_section_id}
+                      closabel={true}>
+                      <WorkBench section={sectionsJson[active_section_id]}/>
+                    </TabPane>
+                )
+              })
+            }
+          </Tabs>
+        </div>
+
+        <div className={styles.right_area}>
         </div>
 
       </div>
     </div>
-
-
   );
 }
 
