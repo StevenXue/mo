@@ -1,7 +1,7 @@
 /**
  * choose toolkit
  */
-import React from 'react';
+import React, { Component } from 'react';
 import styles from './index.less';
 import {connect} from 'dva';
 
@@ -24,33 +24,50 @@ const config = [
   }
 ];
 
-function Launcher() {
-  return (
-    <div className={styles.launcher}>
-      <h1>
-        Choose a toolkit to start
-      </h1>
+class Launcher extends Component {
 
-      <Tabs defaultActiveKey="1" onChange={callback}>
-        <TabPane tab="Data Explore" key="1">
-          <Card style={{width: '100%', backgroundColor: '#F8F8F8'}}>
+  onClick = () => {
+    // 更改选中状态
 
-            <div className={styles.card_area}>
-              <div>
-                <p className='custom-title-font'>K-mean</p>
-                <p className='custom-text-font'>xxx</p>
-              </div>
-              <Icon type="check-circle"/>
-            </div>
-          </Card>
+  };
+  render() {
+    return (
+      <div className={styles.launcher}>
+        <h1>
+          Choose a toolkit to start
+        </h1>
 
-        </TabPane>
-        <TabPane tab="Data Quality Improve" key="2">Content of Tab Pane 2</TabPane>
-        <TabPane tab="Feature Selection" key="3">Content of Tab Pane 3</TabPane>
-      </Tabs>
+        <Tabs defaultActiveKey="1" onChange={callback}>
+          <TabPane tab="Data Explore" key="1">
+            {config.map((e, i)=>
+              <Card key={e.name+i} style={{width: '100%', backgroundColor: '#F8F8F8'}}>
+                <div className={styles.card_area}>
+                  <div>
+                    <p className='custom-title-font'>{e.name}</p>
+                    <p className='custom-text-font'>{e.description}</p>
+                  </div>
+                  <Icon type="check-circle"
+                        onClick={this.onClick}
+                        style={{fontSize:20}}/>
+                </div>
+              </Card>
+            )}
 
-    </div>
-  );
+
+          </TabPane>
+          <TabPane tab="Data Quality Improve" key="2">Content of Tab Pane 2</TabPane>
+          <TabPane tab="Feature Selection" key="3">Content of Tab Pane 3</TabPane>
+        </Tabs>
+
+      </div>
+    );
+  }
 }
 
-export default connect(({}) => ({}))(Launcher);
+// function Launcher() {
+//
+//
+//
+// }
+
+export default connect(({dataAnalysis}) => ({dataAnalysis}))(Launcher);
