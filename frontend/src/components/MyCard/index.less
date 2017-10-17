@@ -1,0 +1,36 @@
+.box {
+  display: flex;
+  box-shadow:0 2px 15px 1px rgba(142, 142, 142, 0.6);
+  width: 244px;
+  height: 206px;
+  flex-direction: column;
+  margin-right: 58px;
+  border-radius: 3px;
+  cursor: pointer;
+
+  .anticon {
+    color: rgba(50,183,216,1);
+    font-size: 80px;
+    margin: 10% 82px 40px;
+  }
+
+  .description {
+
+    font-size: 16px;
+    text-align: center;
+    color: #999999;
+  }
+}
+
+.box:hover {
+  box-shadow: none;
+  background-color: rgba(50,183,216,1);
+
+  .description {
+    color: #fff;
+  }
+
+  .anticon {
+    color: #fff;
+  }
+}

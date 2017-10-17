@@ -1,5 +1,6 @@
 import { fetchProject } from '../services/project'
 import { privacyChoices } from '../constants'
+import pathToRegexp from 'path-to-regexp';
 
 export default {
   namespace: 'projectDetail',
@@ -23,10 +24,9 @@ export default {
     // 当进入该页面获取project
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
-        const pathnames = pathname.split('/')
-        if (pathnames[1] === 'projects' && pathnames.length >= 3) {
-          console.log(pathnames)
-          const [projectID] = pathnames.slice(-1)
+        const match = pathToRegexp('/projects/:projectID').exec(pathname);
+        if (match) {
+          const projectID = match[1]
           dispatch({ type: 'fetch', projectID: projectID })
         }
       })
