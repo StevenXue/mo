@@ -48,6 +48,12 @@ function Sidebar({dataAnalysis, dispatch}) {
     }
   };
 
+  // 新增 section
+  const onClickAdd = () => {
+    //temp section id
+    addActiveSection('new_launcher ' + Math.random());
+  };
+
 
   return (
     isLeftSideBar ?
@@ -57,11 +63,11 @@ function Sidebar({dataAnalysis, dispatch}) {
         </div>
 
         <div className={styles.add_row}>
-          <Icon type="plus" onClick={toggleLeftSideBar} style={{fontSize: 20}}/>
+          <Icon type="plus" onClick={onClickAdd} style={{fontSize: 20}}/>
         </div>
         {
           sections.map((section, i) => {
-            const opacity = i%2?0.7:1;
+              const opacity = i % 2 ? 0.7 : 1;
               return (
                 <div key={section.section_id + section.section_name}
                      onClick={() => onClickSection(section.section_id)}

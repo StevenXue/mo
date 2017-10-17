@@ -43,6 +43,22 @@ export default {
       }
     },
 
+
+    // addNewSection(state, action) {
+    //   return {
+    //     ...state,
+    //
+    //   }
+    // },
+
+    // // add new tab to add new section
+    // addLauncher() {
+    //   return {
+    //     ...state,
+    //     active_sections_id:
+    //   }
+    // },
+
     // 添加 active section, 将 focus 移到
     addActiveSection(state, action) {
       return {

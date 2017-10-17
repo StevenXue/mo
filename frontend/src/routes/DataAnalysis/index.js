@@ -6,7 +6,7 @@ import {Tabs} from 'antd';
 // import TabArea from '../../components/useless/TabArea';
 import WorkBench from '../../components/WorkBench';
 import SideBar from '../../components/SideBar';
-
+import Launcher from './Launcher'
 const TabPane = Tabs.TabPane;
 
 import {arrayToJson, JsonToArray} from '../../utils/JsonUtils';
@@ -95,6 +95,9 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
     // this.setState({ panes, activeKey });
   };
 
+  // todo
+  // 如果不存在section 显示Launcher
+  // 新增按钮生成 Launcher
 
   // 主函数
   return (
@@ -106,14 +109,14 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
         </div>
 
         <div className={styles.middle_area}>
-          {/*<div >*/}
           <Tabs
             hideAdd
             onChange={onChange}
             activeKey={focus_section_id}
             type="editable-card"
             onEdit={onEdit}
-            tabBarStyle={{flex:1, display:'flex', flexDirection:'row',
+            tabBarStyle={{
+              // flex: 1, display: 'flex', flexDirection: 'row',
               // backgroundColor:"#C7C7C7"
             }}
             className={styles.tab_area}
@@ -122,16 +125,22 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
             {
               active_sections_id.map((active_section_id) => {
                 return (
-                  <TabPane
-                    tab={sectionsJson[active_section_id].section_name} key={active_section_id}
-                    closabel={true}>
-                    <WorkBench section={sectionsJson[active_section_id]}/>
-                  </TabPane>
+                  active_section_id.includes('new_launcher') ?
+                    <TabPane
+                      tab={'Launcher'} key={active_section_id}
+                    >
+                      <Launcher/>
+
+                    </TabPane> :
+                    <TabPane
+                      tab={sectionsJson[active_section_id].section_name} key={active_section_id}
+                      closabel={true}>
+                      <WorkBench section={sectionsJson[active_section_id]}/>
+                    </TabPane>
                 )
               })
             }
           </Tabs>
-          {/*</div>*/}
         </div>
 
         <div className={styles.right_area}>
@@ -139,8 +148,6 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
 
       </div>
     </div>
-
-
   );
 }
 
