@@ -27,7 +27,7 @@ function ProjectDetail({ match, history, location, project }) {
     <div className={styles.normal}>
       <h2>Steps</h2>
       <div className={styles.steps}>
-       <Steps match={match} history={history} location={location} />
+        <Steps match={match} history={history} location={location}/>
       </div>
       <Route path="/projects/:projectID/import" component={DataImport}/>
       {/*<Route path="/projects/:projectID/analysis" component={DataAnalysis}/>*/}

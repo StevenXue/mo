@@ -17,5 +17,10 @@
   /*min-width: 1200px;*/
   /*padding: 0 8px;*/
   /*margin: 10px 0;*/
-  flex: 1 0 auto;
+  display: flex;
+  justify-content: center;
+  padding: 24px 15px;
+  width: 100%;
+  /*background: #EBEBEB;*/
+  /*flex: 1 0 auto;*/
 }

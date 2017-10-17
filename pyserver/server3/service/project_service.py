@@ -63,17 +63,33 @@ def create_project(name, description, user_ID, is_private=True):
         raise RuntimeError('Cannot create the new project')
 
 
-def list_projects_by_user_ID(user_ID, order=-1):
+def list_projects_by_user_ID(user_ID, order=-1, privacy='all'):
+    """
+    list all projects
+    :param user_ID:
+    :param order:
+    :param privacy:
+    :return:
+    """
     if not user_ID:
-        raise ValueError('no user id')
-    public_projects = ownership_service.get_all_public_objects('project')
-    owned_projects = ownership_service. \
-        get_private_ownership_objects_by_user_ID(user_ID, 'project')
+        projects = ownership_service.get_all_public_objects('project')
+    else:
+        if privacy == 'all':
+            projects = ownership_service. \
+                get_ownership_objects_by_user_ID(user_ID, 'project')
+        elif privacy == 'private':
+            projects = ownership_service. \
+                get_privacy_ownership_objects_by_user_ID(user_ID, 'project')
+        elif privacy == 'public':
+            projects = ownership_service. \
+                get_privacy_ownership_objects_by_user_ID(user_ID, 'project',
+                                                         private=False)
+        else:
+            projects = []
 
     if order == -1:
-        public_projects.reverse()
-        owned_projects.reverse()
-    return public_projects, owned_projects
+        projects.reverse()
+    return projects
 
 
 def remove_project_by_id(project_id, user_ID):

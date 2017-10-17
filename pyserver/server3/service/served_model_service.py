@@ -52,7 +52,7 @@ def list_served_models_by_user_ID(user_ID, order=-1):
         raise ValueError('no user id')
     public_sm = ownership_service.get_all_public_objects('served_model')
     owned_sm = ownership_service. \
-        get_private_ownership_objects_by_user_ID(user_ID, 'served_model')
+        get_privacy_ownership_objects_by_user_ID(user_ID, 'served_model')
     # set status
     public_sm = [kube_service.get_deployment_status(sm) for sm in public_sm]
     owned_sm = [kube_service.get_deployment_status(sm) for sm in owned_sm]

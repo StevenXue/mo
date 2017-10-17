@@ -32,6 +32,12 @@ module.exports = {
     Running: '#108ee9',
     Completed: '#00a854',
     Terminated: '#f04134',
-  }
+  },
+
+  privacyChoices: [
+    {value: 'all', text: 'All'},
+    {value: 'private', text: 'Private'},
+    {value: 'public', text: 'Public'}
+  ]
 
 }
