@@ -8,8 +8,10 @@ import { Select, Button } from 'antd'
 import { withRouter } from 'react-router-dom'
 
 // pages
-import DataAnalysis from '../DataAnalysis/DataAnalysis'
+import DataImport from '../DataImport'
+// import DataAnalysis from '../DataAnalysis/DataAnalysis'
 import Modelling from '../Modelling'
+import Deployment from '../Deployment'
 
 // components
 import Steps from '../../components/Steps'
@@ -27,10 +29,10 @@ function ProjectDetail({ match, history, location, project }) {
       <div className={styles.steps}>
        <Steps match={match} history={history} location={location} />
       </div>
-      <Route path="/projects/:projectID/import" component={DataAnalysis}/>
-      <Route path="/projects/:projectID/analysis" component={DataAnalysis}/>
+      <Route path="/projects/:projectID/import" component={DataImport}/>
+      {/*<Route path="/projects/:projectID/analysis" component={DataAnalysis}/>*/}
       <Route path="/projects/:projectID/modelling" component={Modelling}/>
-      <Route path="/projects/:projectID/deploy" component={DataAnalysis}/>
+      <Route path="/projects/:projectID/deploy" component={Deployment}/>
     </div>
   )
 }
