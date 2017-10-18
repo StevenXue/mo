@@ -26,8 +26,7 @@ export default {
       return history.listen(({ pathname }) => {
         const match = pathToRegexp('/projects/:projectID').exec(pathname);
         if (match) {
-          console.log(match);
-          const projectID = match[1];
+          const projectID = match[1]
           dispatch({ type: 'fetch', projectID: projectID })
         }
       })

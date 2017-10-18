@@ -7,11 +7,28 @@ export default {
     projects: [],
   },
   reducers: {
+    *create({ payload }, { call, put, select }) {
+      const user = 'dev_1'
+      let body = payload
+      body['user_ID'] = user.user_ID
+      const data = yield call(create, body)
+      yield put({ type: 'query' })
+      yield put({ type: 'hideModal' })
+    },
+
     setProjects(state, { payload: projects }) {
       return {
         ...state,
         projects,
       }
+    },
+
+    showModal(state) {
+      return { ...state, modalVisible: true }
+    },
+
+    hideModal(state) {
+      return { ...state, modalVisible: false }
     },
   },
   effects: {
