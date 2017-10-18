@@ -11,6 +11,7 @@ function Sidebar({dataAnalysis, dispatch}) {
     isLeftSideBar,
     sectionsJson,
     active_sections_id,
+    focus_section_id
   } = dataAnalysis;
   const sections = JsonToArray(sectionsJson);
 
@@ -67,12 +68,27 @@ function Sidebar({dataAnalysis, dispatch}) {
         </div>
         {
           sections.map((section, i) => {
-              const opacity = i % 2 ? 0.7 : 1;
+              // const opacity = i % 2 ? 0.7 : 1;
+              let backgroundColor = null;
+              let opacity = null;
+              let color = 'black';
+              if (focus_section_id && (section.section_id === focus_section_id)) {
+                backgroundColor = "#34C0E2";
+                color = 'white';
+              } else {
+                opacity = i % 2 ? 0.7 : 1;
+                color = 'black';
+              }
+
               return (
                 <div key={section.section_id + section.section_name}
                      onClick={() => onClickSection(section.section_id)}
                      className={styles.row}
-                     style={{opacity: opacity}}
+                     style={{
+                       opacity: opacity,
+                       backgroundColor: backgroundColor,
+                       fontColor: color
+                     }}
                 >
                   {section.section_name}
                 </div>
@@ -81,7 +97,10 @@ function Sidebar({dataAnalysis, dispatch}) {
           )}
       </div> :
       <div className={styles.left_column}>
-        <Icon type="menu-unfold" onClick={toggleLeftSideBar} style={{fontSize: 20}}/>
+        <div>
+          Task List
+        </div>
+        <Icon type="menu-unfold" onClick={toggleLeftSideBar} style={{height: 77, fontSize: 20}}/>
       </div>
   );
 }

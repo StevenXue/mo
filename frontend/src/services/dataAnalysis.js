@@ -31,10 +31,10 @@ const test_section = {
   ]
 };
 
-const empty_section = {
-  section_name: null,
-
-};
+// const empty_section = {
+//   section_name: null,
+//
+// };
 
 // 获取用户所有sections
 export function fetchSections() {
@@ -84,8 +84,21 @@ export function fetchSections() {
 }
 
 // 添加section
-export function addSection(sectionName) {
-  return request('/api/users');
+export function addSection(section) {
+  return {
+    data: {
+      section_id: "000001",
+      section_name: "new_section____xddd",
+      section_type: "K-mean"
+    },
+    header: {
+
+    }
+  };
+
+  // return request('/api/section', {
+  //   method: 'ADD',
+  // });
 }
 
 // 删除section

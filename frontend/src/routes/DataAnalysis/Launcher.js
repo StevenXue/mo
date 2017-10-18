@@ -21,14 +21,48 @@ const config = [
   {
     name: 'StandardScaler',
     description: "xxxx"
-  }
+  },
+  {
+    name: 'MinMaxScaler',
+    description: "xxxx"
+  },
+  {
+    name: 'OneHotEncoder',
+    description: "xxxx"
+  },
+  {
+    name: 'FunctionTransformer',
+    description: "xxxx"
+  },
+
 ];
 
 class Launcher extends Component {
+  state={
+    choice: null
+  };
+  addSection = (section) => {
+    this.props.dispatch({
+      type: 'dataAnalysis/addSection',
+      section: section
+    });
+  };
 
-  onClick = () => {
+
+  onClickIcon = () => {
     // 更改选中状态
 
+  };
+
+  onClick = (e) => {
+    // 更改选中状态
+    console.log(this.state);
+    console.log(e.name);
+
+    this.addSection({
+      section_id: this.props.section_id,
+      section_type: e.name
+    })
   };
   render() {
     return (
@@ -40,14 +74,15 @@ class Launcher extends Component {
         <Tabs defaultActiveKey="1" onChange={callback}>
           <TabPane tab="Data Explore" key="1">
             {config.map((e, i)=>
-              <Card key={e.name+i} style={{width: '100%', backgroundColor: '#F8F8F8'}}>
+              <Card key={e.name+i} onClick={()=>this.onClick(e, )}
+                    style={{margin: 10, width: '100%', backgroundColor: '#F8F8F8'}}>
                 <div className={styles.card_area}>
                   <div>
                     <p className='custom-title-font'>{e.name}</p>
                     <p className='custom-text-font'>{e.description}</p>
                   </div>
                   <Icon type="check-circle"
-                        onClick={this.onClick}
+                        onClick={this.onClickIcon}
                         style={{fontSize:20}}/>
                 </div>
               </Card>
