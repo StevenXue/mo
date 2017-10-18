@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'dva'
 import { Select, Button, Card } from 'antd'
+import ProjectModel from '../../components/ProjectModel'
 import { showTime } from '../../utils'
 import { privacyChoices } from '../../constants'
 
@@ -23,15 +24,17 @@ function Projects({ history, project, dispatch }) {
       <div className={styles.header}>
         <Select defaultValue="all" className={styles.select} onChange={handleChange}>
           {privacyChoices.map(e =>
-            <Option key={e.value} value={e.value}>{e.text}</Option>
+            <Option key={e.value} value={e.value}>{e.text}</Option>,
           )}
         </Select>
         {/*<Select defaultValue="lucy" className={styles.select}  allowClear>*/}
-          {/*<Option value="lucy">Lucy</Option>*/}
+        {/*<Option value="lucy">Lucy</Option>*/}
         {/*</Select>*/}
-        <Button icon='plus-circle-o' className={styles.rightButton}>New Project</Button>
+        <ProjectModel new={true} >
+          <Button icon='plus-circle-o' className={styles.rightButton}>New Project</Button>
+        </ProjectModel>
       </div>
-      <div className={styles.projectList} >
+      <div className={styles.projectList}>
         {project.projects.map(e =>
           <Card key={e._id} title={e.name} className={styles.card}>
             <div onClick={() => toProjectDetail(e._id, history)} style={{ cursor: 'pointer' }}>
