@@ -8,7 +8,7 @@ import { Select, Button } from 'antd'
 
 // pages
 import DataImport from '../DataImport'
-// import DataAnalysis from '../DataAnalysis/DataAnalysis'
+import DataAnalysis from '../DataAnalysis'
 import Modelling from '../Modelling'
 import Deployment from '../Deployment'
 // components
@@ -45,9 +45,12 @@ function ProjectDetail({ match, history, location, project }) {
 
   return (
     <div className={`main-container ${styles.normal}`}>
-      <Steps match={match} history={history} location={location}/>
+      <div className={styles.step}>
+        <Steps match={match} history={history} location={location}/>
+      </div>
+
       <Route path="/projects/:projectID/import" component={DataImport}/>
-      {/*<Route path="/projects/:projectID/analysis" component={DataAnalysis}/>*/}
+      <Route path="/projects/:projectID/analysis" component={DataAnalysis}/>
       <Route path="/projects/:projectID/modelling" component={Modelling}/>
       <Route path="/projects/:projectID/deploy" component={Deployment}/>
     </div>

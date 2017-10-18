@@ -1,7 +1,7 @@
 /**
  * choose toolkit
  */
-import React from 'react';
+import React, { Component } from 'react';
 import styles from './index.less';
 import {connect} from 'dva';
 
@@ -21,36 +21,88 @@ const config = [
   {
     name: 'StandardScaler',
     description: "xxxx"
-  }
+  },
+  {
+    name: 'MinMaxScaler',
+    description: "xxxx"
+  },
+  {
+    name: 'OneHotEncoder',
+    description: "xxxx"
+  },
+  {
+    name: 'FunctionTransformer',
+    description: "xxxx"
+  },
+
 ];
 
-function Launcher() {
-  return (
-    <div className={styles.launcher}>
-      <h1>
-        Choose a toolkit to start
-      </h1>
+class Launcher extends Component {
+  state={
+    choice: null
+  };
+  addSection = (section) => {
+    this.props.dispatch({
+      type: 'dataAnalysis/addSection',
+      section: section
+    });
+  };
 
-      <Tabs defaultActiveKey="1" onChange={callback}>
-        <TabPane tab="Data Explore" key="1">
-          <Card style={{width: '100%', backgroundColor: '#F8F8F8'}}>
 
-            <div className={styles.card_area}>
-              <div>
-                <p className='custom-title-font'>K-mean</p>
-                <p className='custom-text-font'>xxx</p>
-              </div>
-              <Icon type="check-circle"/>
-            </div>
-          </Card>
+  onClickIcon = () => {
+    // 更改选中状态
 
-        </TabPane>
-        <TabPane tab="Data Quality Improve" key="2">Content of Tab Pane 2</TabPane>
-        <TabPane tab="Feature Selection" key="3">Content of Tab Pane 3</TabPane>
-      </Tabs>
+  };
 
-    </div>
-  );
+  onClick = (e) => {
+    // 更改选中状态
+    console.log(this.state);
+    console.log(e.name);
+
+    this.addSection({
+      section_id: this.props.section_id,
+      section_type: e.name
+    })
+  };
+  render() {
+    return (
+      <div className={styles.launcher}>
+        <h1>
+          Choose a toolkit to start
+        </h1>
+
+        <Tabs defaultActiveKey="1" onChange={callback}>
+          <TabPane tab="Data Explore" key="1">
+            {config.map((e, i)=>
+              <Card key={e.name+i} onClick={()=>this.onClick(e, )}
+                    style={{margin: 10, width: '100%', backgroundColor: '#F8F8F8'}}>
+                <div className={styles.card_area}>
+                  <div>
+                    <p className='custom-title-font'>{e.name}</p>
+                    <p className='custom-text-font'>{e.description}</p>
+                  </div>
+                  <Icon type="check-circle"
+                        onClick={this.onClickIcon}
+                        style={{fontSize:20}}/>
+                </div>
+              </Card>
+            )}
+
+
+          </TabPane>
+          <TabPane tab="Data Quality Improve" key="2">Content of Tab Pane 2</TabPane>
+          <TabPane tab="Feature Selection" key="3">Content of Tab Pane 3</TabPane>
+        </Tabs>
+
+      </div>
+    );
+  }
 }
 
-export default connect(({}) => ({}))(Launcher);
+// function Launcher() {
+//
+//
+//
+// }
+
+export default connect(({dataAnalysis}) => ({dataAnalysis}))(Launcher);

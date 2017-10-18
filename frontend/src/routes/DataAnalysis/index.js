@@ -19,7 +19,6 @@ import {arrayToJson, JsonToArray} from '../../utils/JsonUtils';
 //   return finalJson
 // };
 
-
 function DataAnalysis({location, dispatch, dataAnalysis}) {
   // state
   const {
@@ -27,6 +26,7 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
     active_sections_id,
     focus_section_id
   } = dataAnalysis;
+
 
   const addActiveSection = (section_id) => {
     dispatch({
@@ -96,8 +96,10 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
   };
 
   // todo
-  // 如果不存在section 显示Launcher
-  // 新增按钮生成 Launcher
+  // 如果不存在tabs 显示Launcher
+  // if(active_sections_id){
+  //
+  // }
 
   // 主函数
   return (
@@ -129,7 +131,7 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
                     <TabPane
                       tab={'Launcher'} key={active_section_id}
                     >
-                      <Launcher/>
+                      <Launcher section_id={active_section_id}/>
 
                     </TabPane> :
                     <TabPane
