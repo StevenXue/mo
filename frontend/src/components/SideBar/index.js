@@ -5,32 +5,33 @@ import {Icon} from 'antd';
 
 import {arrayToJson, JsonToArray} from '../../utils/JsonUtils';
 
-function Sidebar({dataAnalysis, dispatch}) {
+function Sidebar({model, dispatch, namespace}) {
   //state
   const {
     isLeftSideBar,
     sectionsJson,
     active_sections_id,
     focus_section_id
-  } = dataAnalysis;
+  } = model;
+
   const sections = JsonToArray(sectionsJson);
 
   // change state
   const toggleLeftSideBar = () => {
     dispatch({
-      type: 'dataAnalysis/toggleLeftSideBar'
+      type: namespace + '/toggleLeftSideBar'
     });
   };
   const addActiveSection = (section_id) => {
     dispatch({
-      type: 'dataAnalysis/addActiveSection',
+      type: namespace + '/addActiveSection',
       section_id: section_id
     });
   };
 
   const setFocusSection = (section_id) => {
     dispatch({
-      type: 'dataAnalysis/setFocusSection',
+      type: namespace + '/setFocusSection',
       focus_section_id: section_id
     });
   };
@@ -97,7 +98,7 @@ function Sidebar({dataAnalysis, dispatch}) {
           )}
       </div> :
       <div className={styles.left_column}>
-        <div>
+        <div className={styles.text_reverse}>
           Task List
         </div>
         <Icon type="menu-unfold" onClick={toggleLeftSideBar} style={{height: 77, fontSize: 20}}/>
@@ -105,5 +106,5 @@ function Sidebar({dataAnalysis, dispatch}) {
   );
 }
 
-
-export default connect(({dataAnalysis}) => ({dataAnalysis}))(Sidebar);
+export default Sidebar;
+// export default connect(({dataAnalysis}) => ({dataAnalysis}))(Sidebar);

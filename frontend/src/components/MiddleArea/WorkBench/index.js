@@ -3,7 +3,8 @@ import styles from './WorkBench.css';
 import {connect} from 'dva';
 
 import {Select, Collapse} from 'antd';
-import ToolBar from '../../components/ToolBar';
+import ToolBar from '../ToolBar/index';
+
 const Option = Select.Option;
 const Panel = Collapse.Panel;
 
@@ -17,17 +18,16 @@ const text = `
   it can be found as a welcome guest in many households across the world.
 `;
 
-function WorkBench({section, dataAnalysis, dispatch}) {
+function WorkBench({section, model, dispatch, namespace}) {
   //state
   const {
     stagingDataList,
     sectionsJson
-  } = dataAnalysis;
+  } = model;
   //change state
-
   const setSections = (sectionsJson) => {
     dispatch({
-      type: 'dataAnalysis/setSections',
+      type: namespace + 'dataAnalysis/setSections',
       sectionsJson: sectionsJson
     })
   };
