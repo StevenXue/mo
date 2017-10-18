@@ -6,7 +6,7 @@ import MainLayout from '../../components/MainLayout/MainLayout'
 
 function DataImport({location}) {
   return (
-    <div className="main-container">
+    <div>
       <div className={styles.head}>
         Start your trip!
       </div>
