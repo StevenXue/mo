@@ -1,0 +1,4 @@
+REVIEWBOARD_URL = "192.168.31.14"
+REPOSITORY = "goldersgreen"
+BRANCH = "UI_version_1"
+LAND_DEST_BRANCH = "UI_version_1"
