@@ -93,7 +93,7 @@ class Launcher extends Component {
     console.log(e.name);
 
     this.addSection({
-      section_id: this.props.section_id,
+      sectionId: this.props.sectionId,
       section_type: e.name
     })
   };
@@ -151,10 +151,5 @@ class Launcher extends Component {
   }
 }
 
-// function Launcher() {
-//
-//
-//
-// }
 
 export default connect(({dataAnalysis}) => ({dataAnalysis}))(Launcher);

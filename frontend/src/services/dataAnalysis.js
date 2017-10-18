@@ -4,7 +4,7 @@ const PREFIX = '/sections';
 
 const test_section = {
   section_name: 'new_section_1',
-  section_id: '0001',
+  sectionId: '0001',
   method: {
     // 方法大类 数据处理，建模
     first: 'data_analysis',
@@ -43,7 +43,7 @@ export function fetchSections() {
     {
       ...test_section,
       section_name: 'new_section_1',
-      section_id: '0001',
+      sectionId: '0001',
       steps: [
         {
           title: '选择目标数据表',
@@ -65,12 +65,12 @@ export function fetchSections() {
     },
     {
       ...test_section,
-      section_id: '0002',
+      sectionId: '0002',
       section_name: 'new_section_2',
     },
     {
       ...test_section,
-      section_id: '0003',
+      sectionId: '0003',
       section_name: 'new_section_3',
     },
 
@@ -87,9 +87,26 @@ export function fetchSections() {
 export function addSection(section) {
   return {
     data: {
-      section_id: "000001",
+      sectionId: "000001",
       section_name: "new_section____xddd",
-      section_type: "K-mean"
+      section_type: "K-mean",
+      steps: [
+        {
+          title: '选择目标数据表',
+          content: null
+        },
+
+        {
+          title: '选择来源数据表',
+          content: '59c21d71d845c0538f0faeb2'
+        },
+
+        {
+          title: '编辑对应列名称',
+          content: 'A'
+        }
+
+      ]
     },
     header: {
 
@@ -104,8 +121,8 @@ export function addSection(section) {
 // 删除section
 
 // 更改section
-export function updateSection(section_id, section) {
-  console.log("section_id",section_id);
+export function updateSection(sectionId, section) {
+  console.log("sectionId",sectionId);
   console.log("upload_section",section);
   // return request(`/api${PREFIX}/section`, {
   //   method: 'ADD',

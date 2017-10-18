@@ -10,8 +10,8 @@ function Sidebar({model, dispatch, namespace}) {
   const {
     isLeftSideBar,
     sectionsJson,
-    active_sections_id,
-    focus_section_id
+    activeSectionsId,
+    focusSectionsId
   } = model;
 
   const sections = JsonToArray(sectionsJson);
@@ -22,31 +22,31 @@ function Sidebar({model, dispatch, namespace}) {
       type: namespace + '/toggleLeftSideBar'
     });
   };
-  const addActiveSection = (section_id) => {
+  const addActiveSection = (sectionId) => {
     dispatch({
       type: namespace + '/addActiveSection',
-      section_id: section_id
+      sectionId: sectionId
     });
   };
 
-  const setFocusSection = (section_id) => {
+  const setFocusSection = (sectionId) => {
     dispatch({
       type: namespace + '/setFocusSection',
-      focus_section_id: section_id
+      focusSectionsId: sectionId
     });
   };
 
 
   // functions
   // 当section 被点击
-  const onClickSection = (section_id) => {
+  const onClickSection = (sectionId) => {
     //1 active sections not include this section
-    if (!active_sections_id.includes(section_id)) {
-      addActiveSection(section_id)
+    if (!activeSectionsId.includes(sectionId)) {
+      addActiveSection(sectionId)
     }
     //2 include
     else {
-      setFocusSection(section_id)
+      setFocusSection(sectionId)
     }
   };
 
@@ -73,7 +73,7 @@ function Sidebar({model, dispatch, namespace}) {
               let backgroundColor = null;
               let opacity = null;
               let color = 'black';
-              if (focus_section_id && (section.section_id === focus_section_id)) {
+              if (focusSectionsId && (section.sectionId === focusSectionsId)) {
                 backgroundColor = "#34C0E2";
                 color = 'white';
               } else {
@@ -82,8 +82,8 @@ function Sidebar({model, dispatch, namespace}) {
               }
 
               return (
-                <div key={section.section_id + section.section_name}
-                     onClick={() => onClickSection(section.section_id)}
+                <div key={section.sectionId + section.section_name}
+                     onClick={() => onClickSection(section.sectionId)}
                      className={styles.row}
                      style={{
                        opacity: opacity,

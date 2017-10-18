@@ -34,7 +34,7 @@ function WorkBench({section, model, dispatch, namespace}) {
 
   //functions
   function handleChange(value, step) {
-    sectionsJson[section.section_id].steps[step].content = value;
+    sectionsJson[section.sectionId].steps[step].content = value;
     setSections(sectionsJson);
     console.log(`selected ${value}`);
   }
@@ -50,7 +50,7 @@ function WorkBench({section, model, dispatch, namespace}) {
 
   return (
     <div className={styles.normal}>
-      <ToolBar section_id={section.section_id}/>
+      <ToolBar sectionId={section.sectionId}/>
 
       <Collapse defaultActiveKey={['1']} onChange={callback}>
         <Panel header="This is panel header 1" key="1">

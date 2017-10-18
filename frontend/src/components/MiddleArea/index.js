@@ -11,8 +11,8 @@ const TabPane = Tabs.TabPane;
 function MiddleArea({model, dispatch, namespace}) {
   const {
     sectionsJson,
-    active_sections_id,
-    focus_section_id
+    activeSectionsId,
+    focusSectionsId
   } = model;
 
   // change state
@@ -21,24 +21,24 @@ function MiddleArea({model, dispatch, namespace}) {
   //     type: namespace + '/toggleLeftSideBar'
   //   });
   // };
-  // const addActiveSection = (section_id) => {
+  // const addActiveSection = (sectionId) => {
   //   dispatch({
   //     type: namespace + '/addActiveSection',
-  //     section_id: section_id
+  //     sectionId: sectionId
   //   });
   // };
 
-  const setFocusSection = (section_id) => {
+  const setFocusSection = (sectionId) => {
     dispatch({
       type: namespace + '/setFocusSection',
-      focus_section_id: section_id
+      focusSectionsId: sectionId
     });
   };
 
-  const setActiveSections = (active_sections_id) => {
+  const setActiveSections = (activeSectionsId) => {
     dispatch({
       type: namespace + '/setActiveSections',
-      active_sections_id: active_sections_id
+      activeSectionsId: activeSectionsId
     });
   };
 
@@ -62,33 +62,34 @@ function MiddleArea({model, dispatch, namespace}) {
 
   // 被 onEdit 调用
   const remove = (targetKey) => {
-    let activeKey = focus_section_id;
+    let activeKey = focusSectionsId;
     let lastIndex;
-    active_sections_id.forEach((active_section_id, i) => {
-      if (active_section_id === targetKey) {
+    activeSectionsId.forEach((active_sectionId, i) => {
+      if (active_sectionId === targetKey) {
         lastIndex = i - 1;
+        if (lastIndex < 0) {
+          lastIndex = 0
+        }
       }
     });
+    const new_activeSectionsId = activeSectionsId.filter(active_sectionId => active_sectionId !== targetKey);
+    console.log("lastIndex", lastIndex);
+    console.log("new_activeSectionsId", new_activeSectionsId);
 
-    const new_active_sections_id = active_sections_id.filter(active_section_id => active_section_id !== targetKey);
+    if (lastIndex >=0 && activeKey === targetKey) {
 
-    if (lastIndex >= 0 && activeKey === targetKey) {
-      activeKey = new_active_sections_id[lastIndex];
-    }
-    else {
-      // 如果之前没有tab
-      activeKey = new_active_sections_id[lastIndex + 1];
+      activeKey = new_activeSectionsId[lastIndex];
+      console.log("activeKey", activeKey);
     }
     setFocusSection(activeKey);
-    setActiveSections(new_active_sections_id);
-    // this.setState({ panes, activeKey });
+    setActiveSections(new_activeSectionsId);
   };
 
   return (
     <Tabs
       hideAdd
       onChange={onChange}
-      activeKey={focus_section_id}
+      activeKey={focusSectionsId}
       type="editable-card"
       onEdit={onEdit}
       tabBarStyle={{
@@ -99,19 +100,19 @@ function MiddleArea({model, dispatch, namespace}) {
       animated={true}
     >
       {
-        active_sections_id.map((active_section_id) => {
+        activeSectionsId.map((active_sectionId) => {
           return (
-            active_section_id.includes('new_launcher') ?
+            active_sectionId.includes('new_launcher') ?
               <TabPane
-                tab={'Launcher'} key={active_section_id}
+                tab={'Launcher'} key={active_sectionId}
               >
-                <Launcher section_id={active_section_id}/>
+                <Launcher sectionId={active_sectionId}/>
 
               </TabPane> :
               <TabPane
-                tab={sectionsJson[active_section_id].section_name} key={active_section_id}
+                tab={sectionsJson[active_sectionId].section_name} key={active_sectionId}
                 closabel={true}>
-                <WorkBench section={sectionsJson[active_section_id]}
+                <WorkBench section={sectionsJson[active_sectionId]}
                            {...{model, dispatch, namespace}}
                 />
               </TabPane>

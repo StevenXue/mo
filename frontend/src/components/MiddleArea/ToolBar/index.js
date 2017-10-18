@@ -3,18 +3,18 @@ import {connect} from 'dva';
 import {Icon} from 'antd';
 import styles from './ToolBar.css';
 
-function ToolBar({dispatch, dataAnalysis, section_id}) {
+function ToolBar({dispatch, dataAnalysis, sectionId}) {
 
   // change state
-  const updateSection = (section_id) => {
+  const updateSection = (sectionId) => {
     dispatch({
       type: 'dataAnalysis/setSections',
-      section_id: section_id
+      sectionId: sectionId
     })
   };
 
   function onClickSave() {
-    updateSection(section_id);
+    updateSection(sectionId);
   }
 
   return (
