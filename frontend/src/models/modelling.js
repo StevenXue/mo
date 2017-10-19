@@ -2,7 +2,7 @@ import modelExtend from 'dva-model-extend'
 import pathToRegexp from 'path-to-regexp'
 
 import workBench from './workBench'
-const categories = 'model'
+const categories = 'model';
 
 const modelling = modelExtend(workBench, {
   namespace: 'modelling',
