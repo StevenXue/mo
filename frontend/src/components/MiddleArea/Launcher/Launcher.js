@@ -71,12 +71,10 @@ const toolkit = [
 
 
 class Launcher extends Component {
-  state={
-    choice: null
-  };
+
   addSection = (section) => {
     this.props.dispatch({
-      type: 'dataAnalysis/addSection',
+      type: this.props.namespace + '/addSection',
       section: section
     });
   };
@@ -98,6 +96,8 @@ class Launcher extends Component {
     })
   };
   render() {
+    const { namespace } = this.props;
+
     return (
       <div className={styles.launcher}>
         <h1>

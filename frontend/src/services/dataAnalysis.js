@@ -31,11 +31,6 @@ const test_section = {
   ]
 };
 
-// const empty_section = {
-//   section_name: null,
-//
-// };
-
 // 获取用户所有sections
 export function fetchSections() {
   const data = [
@@ -129,3 +124,15 @@ export function updateSection(sectionId, section) {
   //   body: section
   // });
 }
+
+// //获取toolkits api
+// export function getToolkits() {
+//   return request()
+//   return request({
+//     url: CORS + '/toolkit/toolkits/public',
+//     method: 'get',
+//     headers: {
+//       'Content-Type': 'application/json',
+//     },
+//   })
+// }

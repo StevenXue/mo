@@ -102,11 +102,12 @@ function MiddleArea({model, dispatch, namespace}) {
       {
         activeSectionsId.map((active_sectionId) => {
           return (
+            // 当激活的section_id 包含 new_launcher,显示launcher
             active_sectionId.includes('new_launcher') ?
               <TabPane
                 tab={'Launcher'} key={active_sectionId}
               >
-                <Launcher sectionId={active_sectionId}/>
+                <Launcher sectionId={active_sectionId} {...{model, dispatch, namespace}}/>
 
               </TabPane> :
               <TabPane

@@ -117,6 +117,7 @@ export default {
   effects: {
     // 获取用户所有sections
     * fetchSections(action, {call, put}) {
+      console.log("fetch");
       const {data: sections} = yield call(dataAnalysisService.fetchSections);
       // array to json
       const sectionsJson = arrayToJson(sections, 'sectionId');
@@ -166,18 +167,20 @@ export default {
   },
   subscriptions: {
     // 当进入该页面是 获取用户所有 section
-    setup({dispatch, history}) {
-      return history.listen(({pathname}) => {
-        const match = pathToRegexp('/projects/:projectId/analysis').exec(pathname);
-        if (match) {
-          let projectId = match[1];
-          projectId = '59c21ca6d845c0538f0fadd5';
-
-          dispatch({type: 'fetchSections'});
-          dispatch({type: 'fetchStagingDatasetList'});
-        }
-      });
-    },
+    // setup({dispatch, history}) {
+    //   return history.listen(({pathname}) => {
+    //     const match = pathToRegexp('/projects/:projectId/analysis').exec(pathname);
+    //     if (match) {
+    //       let projectId = match[1];
+    //       projectId = '59c21ca6d845c0538f0fadd5';
+    //
+    //       dispatch({type: 'fetchSections'});
+    //
+    //
+    //       dispatch({type: 'fetchStagingDatasetList'});
+    //     }
+    //   });
+    // },
 
   },
 };
