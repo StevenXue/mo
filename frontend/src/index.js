@@ -1,4 +1,5 @@
 import dva from 'dva';
+import './global.less';
 import './index.less';
 
 // 1. Initialize
