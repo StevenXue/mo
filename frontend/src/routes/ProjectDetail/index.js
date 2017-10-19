@@ -33,9 +33,8 @@ function ProjectInfo({ match, history, location, projectDetail }) {
               <h1>
                 {projectDetail.project.name}
                 <span className={styles.rightButton}>
-                  <Icon type="edit" style={{ marginRight: 15 }} className={styles.anticon}/>
-                  <Icon type="delete" style={{ marginRight: 15 }} className={styles.anticon}/>
-                  <Icon type="fork" className={styles.anticon} />
+                  <Button icon='edit' style={{ marginRight: 15 }} />
+                  <Button icon='delete'/>
                 </span>
               </h1>
               <p className={styles.text} style={{ fontSize: 14, marginTop: 6 }}>

@@ -33,7 +33,6 @@ const radius = 5
 const buttonSize = 30
 
 function Steps({ match, history, location }) {
-  console.log(match, location)
   // get active page name from url
   const [activePage] = location.pathname.split('/').slice(-1)
   const dis = radius*(num*2+1)

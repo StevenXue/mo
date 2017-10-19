@@ -7,6 +7,21 @@ import modelExtend from 'dva-model-extend';
 import workBench from './workBench';
 const dataAnalysis = modelExtend(workBench, {
   namespace: 'dataAnalysis',
+  subscriptions: {
+  //   // 当进入该页面是 获取用户所有 section
+  //   setup({dispatch, history}) {
+  //     console.log("xxx");
+  //     return history.listen(({pathname}) => {
+  //       const match = pathToRegexp('/projects/:projectId/analysis').exec(pathname);
+  //       if (match) {
+  //         let projectId = match[1];
+  //         dispatch({type: 'fetchSections', projectId: projectId, categories});
+  //         dispatch({type: 'fetchStagingDatasetList'});
+  //       }
+  //     });
+  //   },
+  //
+  },
 });
 export default dataAnalysis;
 //

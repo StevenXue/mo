@@ -27,7 +27,7 @@ function WorkBench({section, model, dispatch, namespace}) {
   //change state
   const setSections = (sectionsJson) => {
     dispatch({
-      type: namespace + 'dataAnalysis/setSections',
+      type: namespace + '/setSections',
       sectionsJson: sectionsJson
     })
   };
@@ -52,7 +52,7 @@ function WorkBench({section, model, dispatch, namespace}) {
     <div className={styles.normal}>
       <ToolBar sectionId={section.sectionId}/>
 
-      <Collapse defaultActiveKey={['1']} onChange={callback}>
+      <Collapse defaultActiveKey={['1']} onChange={callback} >
         <Panel header="This is panel header 1" key="1">
           <p>{text}</p>
         </Panel>

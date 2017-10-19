@@ -1,6 +1,8 @@
-import request from '../utils/request';
-const PREFIX = '/sections';
+import { request, config } from '../utils'
 
+const { CORS, api } = config
+const { projectJobs, toolkits } = api
+const PREFIX = '/sections'
 
 const test_section = {
   section_name: 'new_section_1',
@@ -9,27 +11,27 @@ const test_section = {
     // 方法大类 数据处理，建模
     first: 'data_analysis',
     second: '提升数据质量',
-    third: '合并添加行'
+    third: '合并添加行',
   },
 
   steps: [
     {
       title: '选择目标数据表',
-      content: '59c21d71d845c0538f0faeb2'
+      content: '59c21d71d845c0538f0faeb2',
     },
 
     {
       title: '选择来源数据表',
-      content: '59c21d71d845c0538f0faeb2'
+      content: '59c21d71d845c0538f0faeb2',
     },
 
     {
       title: '编辑对应列名称',
-      content: 'A'
-    }
+      content: 'A',
+    },
 
-  ]
-};
+  ],
+}
 
 // const empty_section = {
 //   section_name: null,
@@ -37,7 +39,7 @@ const test_section = {
 // };
 
 // 获取用户所有sections
-export function fetchSections() {
+export async function fetchSections(payload) {
   const data = [
     // one section
     {
@@ -47,20 +49,20 @@ export function fetchSections() {
       steps: [
         {
           title: '选择目标数据表',
-          content: null
+          content: null,
         },
 
         {
           title: '选择来源数据表',
-          content: '59c21d71d845c0538f0faeb2'
+          content: '59c21d71d845c0538f0faeb2',
         },
 
         {
           title: '编辑对应列名称',
-          content: 'A'
-        }
+          content: 'A',
+        },
 
-      ]
+      ],
 
     },
     {
@@ -74,44 +76,40 @@ export function fetchSections() {
       section_name: 'new_section_3',
     },
 
-  ];
-  return {
-    data,
-    headers: {},
-  }
+  ]
 
-  // return request('/api/users');
+  let res = await request(`${CORS}${projectJobs}/${payload.projectId}?categories=${payload.categories}`)
+  // res.data.toolkit.map(e => e)
+  return res
 }
 
 // 添加section
 export function addSection(section) {
   return {
     data: {
-      sectionId: "000001",
-      section_name: "new_section____xddd",
-      section_type: "K-mean",
+      sectionId: '000001',
+      section_name: 'new_section____xddd',
+      section_type: 'K-mean',
       steps: [
         {
           title: '选择目标数据表',
-          content: null
+          content: null,
         },
 
         {
           title: '选择来源数据表',
-          content: '59c21d71d845c0538f0faeb2'
+          content: '59c21d71d845c0538f0faeb2',
         },
 
         {
           title: '编辑对应列名称',
-          content: 'A'
-        }
+          content: 'A',
+        },
 
-      ]
+      ],
     },
-    header: {
-
-    }
-  };
+    header: {},
+  }
 
   // return request('/api/section', {
   //   method: 'ADD',
@@ -122,10 +120,16 @@ export function addSection(section) {
 
 // 更改section
 export function updateSection(sectionId, section) {
-  console.log("sectionId",sectionId);
-  console.log("upload_section",section);
+  console.log('sectionId', sectionId)
+  console.log('upload_section', section)
   // return request(`/api${PREFIX}/section`, {
   //   method: 'ADD',
   //   body: section
   // });
 }
+
+export async function fetchToolkits(payload) {
+  return await request(`${CORS}${toolkits}`)
+}
+
+
