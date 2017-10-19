@@ -1,33 +1,38 @@
 import React from 'react';
 import {connect} from 'dva';
-import styles from './index.css';
-import MainLayout from '../../components/MainLayout/MainLayout'
+import styles from './index.less';
+
+import SideBar from '../../components/SideBar';
+import MiddleArea from '../../components/MiddleArea';
+import RightArea from '../../components/RightArea';
 
 
-function Modelling({location}) {
+function Modelling({location, dispatch, modelling}) {
   return (
+    <div className={styles.container}>
 
-      <div className={styles.normal}>
-
-        <div className={styles.content}>
-
-          <div className={styles.box1}>
-
-          </div>
-          <div className={styles.box2}>
-          </div>
-          <div className={styles.box3}>
-          </div>
-
+      <div className={styles.content}>
+        <div className={styles.sidebar}>
+          <SideBar
+            model={modelling}
+            namespace='modelling'
+            dispatch={dispatch}
+          />
+        </div>
+        <div className={styles.middle_area}>
+          <MiddleArea
+            model={modelling}
+            namespace='modelling'
+            dispatch={dispatch}
+          />
+        </div>
+        <div className={styles.right_area}>
+          <RightArea/>
         </div>
       </div>
-
-
+    </div>
   );
 }
 
-function mapStateToProps() {
-  return {};
-}
 
-export default connect(mapStateToProps)(Modelling);
+export default connect(({modelling}) => ({modelling}))(Modelling);

@@ -57,7 +57,7 @@ function Sidebar({model, dispatch, namespace}) {
     addActiveSection('new_launcher ' + Math.random());
   };
 
-
+  console.log(sections)
   return (
     isLeftSideBar ?
       <div className={styles.container}>
@@ -75,7 +75,7 @@ function Sidebar({model, dispatch, namespace}) {
           sections.map((section, i) => {
               let backgroundColor;
               let color;
-              if (focusSectionsId && (section.sectionId === focusSectionsId)) {
+              if (focusSectionsId && (section._id === focusSectionsId)) {
                 backgroundColor = "#34C0E2";
                 color = 'white';
               } else {
@@ -84,15 +84,15 @@ function Sidebar({model, dispatch, namespace}) {
                 color = null;
               }
               return (
-                <div key={section.sectionId + section.section_name}
-                     onClick={() => onClickSection(section.sectionId)}
+                <div key={section._id + section.section_name}
+                     onClick={() => onClickSection(section._id)}
                      className={`${styles.row} custom-little-title-font`}
                      style={{
                        backgroundColor: backgroundColor,
                        color: color
                      }}
                 >
-                  {section.section_name}
+                  {section.section_name || section._id}
                 </div>
               )
             }

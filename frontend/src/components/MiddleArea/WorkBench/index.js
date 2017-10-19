@@ -52,7 +52,7 @@ function WorkBench({section, model, dispatch, namespace}) {
       <ToolBar sectionId={section.sectionId}/>
 
       <div className={styles.container}>
-        <Collapse className={styles.collapse} defaultActiveKey={['2']} onChange={callback}>
+        <Collapse className={styles.collapse} defaultActiveKey={['2']} onChange={callback} >
 
           <Panel
             // style={{borderWidth: 1}}

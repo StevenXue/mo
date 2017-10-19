@@ -1,7 +1,8 @@
-import * as dataAnalysisService from '../services/dataAnalysis';
-import * as stagingDataService from '../services/stagingData';
-import {arrayToJson} from '../utils/JsonUtils';
-import pathToRegexp from 'path-to-regexp';
+import * as dataAnalysisService from '../services/dataAnalysis'
+import * as stagingDataService from '../services/stagingData'
+import * as modelService from '../services/model'
+import { arrayToJson } from '../utils/JsonUtils'
+import pathToRegexp from 'path-to-regexp'
 
 export default {
   namespace: 'workBench',
@@ -19,7 +20,9 @@ export default {
 
     stagingDataList: [],
 
-    project_id: '59c21ca6d845c0538f0fadd5'
+    project_id: '59c21ca6d845c0538f0fadd5',
+
+    launchItems: [],
 
   },
   reducers: {
@@ -27,7 +30,7 @@ export default {
     toggleLeftSideBar(state, action) {
       return {
         ...state,
-        isLeftSideBar: !state.isLeftSideBar
+        isLeftSideBar: !state.isLeftSideBar,
       }
     },
 
@@ -35,7 +38,7 @@ export default {
     setSections(state, action) {
       return {
         ...state,
-        sectionsJson: action.sectionsJson
+        sectionsJson: action.sectionsJson,
       }
     },
 
@@ -45,8 +48,8 @@ export default {
         ...state,
         sectionsJson: {
           ...state.sectionsJson,
-          [action.section["sectionId"]]: action.section
-        }
+          [action.section['sectionId']]: action.section,
+        },
 
       }
     },
@@ -56,7 +59,7 @@ export default {
       return {
         ...state,
         activeSectionsId: state.activeSectionsId.concat(action.sectionId),
-        focusSectionsId: action.sectionId
+        focusSectionsId: action.sectionId,
       }
     },
 
@@ -65,7 +68,7 @@ export default {
       // 将 action.section_name 删掉
       return {
         ...state,
-        activeSectionsId: state.activeSectionsId.filter(sectionId => sectionId !== action.sectionId)
+        activeSectionsId: state.activeSectionsId.filter(sectionId => sectionId !== action.sectionId),
       }
     },
 
@@ -75,7 +78,7 @@ export default {
         ...state,
         activeSectionsId: state.activeSectionsId
           .filter(sectionId => sectionId !== action.sectionId).concat(action.new_sectionId),
-        focusSectionsId: action.sectionId
+        focusSectionsId: action.sectionId,
       }
     },
 
@@ -83,7 +86,7 @@ export default {
     setActiveSections(state, action) {
       return {
         ...state,
-        activeSectionsId: action.activeSectionsId
+        activeSectionsId: action.activeSectionsId,
       }
     },
 
@@ -91,7 +94,7 @@ export default {
     setFocusSection(state, action) {
       return {
         ...state,
-        focusSectionsId: action.focusSectionsId
+        focusSectionsId: action.focusSectionsId,
       }
     },
 
@@ -101,7 +104,7 @@ export default {
     set_loading(state, action) {
       return {
         ...state,
-        loading: action.loading
+        loading: action.loading,
       }
     },
 
@@ -109,28 +112,40 @@ export default {
     setStagingDataList(state, action) {
       return {
         ...state,
-        stagingDataList: action.stagingDataList
+        stagingDataList: action.stagingDataList,
       }
-    }
+    },
 
   },
   effects: {
     // 获取用户所有sections
-    * fetchSections(action, {call, put}) {
+    *fetchSections(action, { call, put }) {
       console.log("fetch");
-      const {data: sections} = yield call(dataAnalysisService.fetchSections);
+      const { data: { [action.categories]: sections } } = yield call(dataAnalysisService.fetchSections, {
+        projectId: action.projectId,
+        categories: action.categories,
+      })
+      console.log(sections)
+      // sections.map(e => e._id)
       // array to json
-      const sectionsJson = arrayToJson(sections, 'sectionId');
-      yield put({type: 'setSections', sectionsJson})
-
+      const sectionsJson = arrayToJson(sections, '_id')
+      yield put({ type: 'setSections', sectionsJson })
+    },
+    *fetchAlgorithms(action, { call, put }) {
+      const requestFunc = {
+        toolkit: dataAnalysisService.fetchToolkits,
+        model: modelService.fetchModels,
+      }
+      const { data: algorithms } = yield call(requestFunc[action.categories])
+      console.log('algos', algorithms)
     },
     // 更新用户 section
-    * updateSection(action, {call, put, select}) {
+    *updateSection(action, { call, put, select }) {
       // 开始加载
-      const sectionId = action.sectionId;
-      const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson);
-      const section = sectionsJson[sectionId];
-      const sections = yield call(dataAnalysisService.updateSection, sectionId, section);
+      const sectionId = action.sectionId
+      const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson)
+      const section = sectionsJson[sectionId]
+      const sections = yield call(dataAnalysisService.updateSection, sectionId, section)
 
       // 停止加载
       // 显示保存成功
@@ -139,48 +154,52 @@ export default {
     },
 
     // 添加 section
-    * addSection(action, {call, put, select}) {
+    *addSection(action, { call, put, select }) {
       //todo 1. 向后台发起请求 获得section 的json 内容
-      const {data: section} = yield call(dataAnalysisService.addSection, action.section);
+      const { data: section } = yield call(dataAnalysisService.addSection, action.section)
       // 2. 添加section
-      yield put({type: 'addNewSection', section: section});
+      yield put({ type: 'addNewSection', section: section })
       // 3. 替换原有active section
       yield put({
         type: 'replaceActiveSection',
         sectionId: action.section.sectionId,
-        new_sectionId: section.sectionId
-      });
+        new_sectionId: section.sectionId,
+      })
     },
 
     // 删除 section
 
     // 获取stage data set list
-    * fetchStagingDatasetList(action, {call, put, select}) {
-      const project_id = yield select(state => state.dataAnalysis.project_id);
-      console.log("project_id", project_id);
-      const {data: stagingDataList} = yield call(stagingDataService.fetchStagingDatas, project_id);
-      yield put({type: 'setStagingDataList', stagingDataList})
+    *fetchStagingDatasetList(action, { call, put, select }) {
+      console.log('fetchStagingDatasetList')
+      const project_id = yield select(state => state.dataAnalysis.project_id)
+      console.log('project_id', project_id)
+      const { data: stagingDataList } = yield call(stagingDataService.fetchStagingDatas, project_id)
+      yield put({ type: 'setStagingDataList', stagingDataList })
 
     },
-
 
   },
   subscriptions: {
     // 当进入该页面是 获取用户所有 section
-    // setup({dispatch, history}) {
-    //   return history.listen(({pathname}) => {
-    //     const match = pathToRegexp('/projects/:projectId/analysis').exec(pathname);
-    //     if (match) {
-    //       let projectId = match[1];
-    //       projectId = '59c21ca6d845c0538f0fadd5';
-    //
-    //       dispatch({type: 'fetchSections'});
-    //
-    //
-    //       dispatch({type: 'fetchStagingDatasetList'});
-    //     }
-    //   });
-    // },
-
+    setup({ dispatch, history }) {
+      const pathJson = {
+        analysis: 'toolkit',
+        modelling: 'model',
+      }
+      return history.listen(({ pathname }) => {
+        const match = pathToRegexp('/projects/:projectId/:categories').exec(pathname)
+        if (match) {
+          let projectId = match[1]
+          let path = match[2]
+          if (path in pathJson) {
+            const categories = pathJson[path]
+            dispatch({ type: 'fetchSections', projectId: projectId, categories })
+            dispatch({ type: 'fetchAlgorithms', categories })
+            dispatch({ type: 'fetchStagingDatasetList' })
+          }
+        }
+      })
+    },
   },
-};
+}

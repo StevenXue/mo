@@ -100,7 +100,7 @@ function MiddleArea({model, dispatch, namespace}) {
       animated={true}
     >
       {
-        activeSectionsId.map((active_sectionId) => {
+        activeSectionsId.map((active_sectionId, i) => {
           return (
             // 当激活的section_id 包含 new_launcher,显示launcher
             active_sectionId.includes('new_launcher') ?
@@ -111,7 +111,7 @@ function MiddleArea({model, dispatch, namespace}) {
 
               </TabPane> :
               <TabPane
-                tab={sectionsJson[active_sectionId].section_name} key={active_sectionId}
+                tab={sectionsJson[active_sectionId].section_name || sectionsJson[active_sectionId]._id} key={active_sectionId}
                 closabel={true}>
                 <WorkBench section={sectionsJson[active_sectionId]}
                            {...{model, dispatch, namespace}}
