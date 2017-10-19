@@ -39,7 +39,7 @@ function Header() {
     <Menu
       mode='horizontal'
       theme='dark'
-      style={{backgroundColor:'#464E78', paddingLeft:100}}
+      style={{backgroundColor:'#464E78', paddingLeft:100, minWidth: 1200}}
     >
       {config.map(
         (i)=>
