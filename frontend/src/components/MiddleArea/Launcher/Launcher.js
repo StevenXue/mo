@@ -72,9 +72,7 @@ const toolkit = [
 ]
 
 class Launcher extends Component {
-  state = {
-    choice: null,
-  }
+
   addSection = (section) => {
     this.props.dispatch({
       type: this.props.namespace + '/addSection',
@@ -99,6 +97,8 @@ class Launcher extends Component {
   }
 
   render() {
+    const { namespace } = this.props;
+
     return (
       <div className={styles.launcher}>
         <h1>

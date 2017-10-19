@@ -120,6 +120,7 @@ export default {
   effects: {
     // 获取用户所有sections
     *fetchSections(action, { call, put }) {
+      console.log("fetch");
       const { data: { [action.categories]: sections } } = yield call(dataAnalysisService.fetchSections, {
         projectId: action.projectId,
         categories: action.categories,

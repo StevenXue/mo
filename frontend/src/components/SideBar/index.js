@@ -3,6 +3,7 @@ import styles from './index.less';
 import {connect} from 'dva';
 import {Icon} from 'antd';
 
+
 import {arrayToJson, JsonToArray} from '../../utils/JsonUtils';
 
 function Sidebar({model, dispatch, namespace}) {
@@ -65,30 +66,30 @@ function Sidebar({model, dispatch, namespace}) {
         </div>
 
         <div className={styles.add_row}>
+          <div className='custom-title-font'>
+            task list
+          </div>
           <Icon type="plus" onClick={onClickAdd} style={{fontSize: 20}}/>
         </div>
         {
           sections.map((section, i) => {
-              // const opacity = i % 2 ? 0.7 : 1;
-              let backgroundColor = null;
-              let opacity = null;
-              let color = 'black';
+              let backgroundColor;
+              let color;
               if (focusSectionsId && (section._id === focusSectionsId)) {
                 backgroundColor = "#34C0E2";
                 color = 'white';
               } else {
-                opacity = i % 2 ? 0.7 : 1;
-                color = 'black';
+                backgroundColor = i % 2? "#F5F5F5"
+                  : "#FBFBFB";
+                color = null;
               }
-
               return (
                 <div key={section._id + section.section_name}
                      onClick={() => onClickSection(section._id)}
-                     className={styles.row}
+                     className={`${styles.row} custom-little-title-font`}
                      style={{
-                       opacity: opacity,
                        backgroundColor: backgroundColor,
-                       fontColor: color
+                       color: color
                      }}
                 >
                   {section.section_name || section._id}

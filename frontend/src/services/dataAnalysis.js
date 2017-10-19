@@ -33,11 +33,6 @@ const test_section = {
   ],
 }
 
-// const empty_section = {
-//   section_name: null,
-//
-// };
-
 // 获取用户所有sections
 export async function fetchSections(payload) {
   const data = [

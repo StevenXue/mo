@@ -1,8 +1,8 @@
 import React from 'react';
-import styles from './WorkBench.css';
+import styles from './index.less';
 import {connect} from 'dva';
 
-import {Select, Collapse} from 'antd';
+import {Select, Collapse, Button, Input} from 'antd';
 import ToolBar from '../ToolBar/index';
 
 const Option = Select.Option;
@@ -12,11 +12,10 @@ function callback(key) {
   console.log(key);
 }
 
-const text = `
-  A dog is a type of domesticated animal.
-  Known for its loyalty and faithfulness,
-  it can be found as a welcome guest in many households across the world.
-`;
+
+const fields = ['aaa', 'aaa', 'aaa', 'aaa', 'aaa', 'aaa', 'aaa', 'aaa', 'aaa', 'aaa'];
+
+
 
 function WorkBench({section, model, dispatch, namespace}) {
   //state
@@ -52,40 +51,65 @@ function WorkBench({section, model, dispatch, namespace}) {
     <div className={styles.normal}>
       <ToolBar sectionId={section.sectionId}/>
 
-      <Collapse defaultActiveKey={['1']} onChange={callback} >
-        <Panel header="This is panel header 1" key="1">
-          <p>{text}</p>
-        </Panel>
-        <Panel header="This is panel header 2" key="2">
-          <p>{text}</p>
-        </Panel>
-        <Panel header="This is panel header 3" key="3" disabled>
-          <p>{text}</p>
-        </Panel>
-      </Collapse>
+      <div className={styles.container}>
+        <Collapse className={styles.collapse} defaultActiveKey={['2']} onChange={callback} >
+
+          <Panel
+            // style={{borderWidth: 1}}
+            className={styles.panel}
+            header="Select Data" key="1">
+
+            <Select
+              className={styles.select}
+              showSearch
+              style={{width: 200}}
+              placeholder="Select a stagingData"
+              optionFilterProp="children"
+              onChange={(value) => handleChange(value, 0)}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              defaultValue={section.steps[0].content}
+              filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+            >
+              {stagingDataList.map((stagingData) =>
+                <Option key={stagingData._id} value={stagingData._id}>{stagingData.name}</Option>
+              )}
+            </Select>
+
+            <Button type="primary" className={styles.button}>save</Button>
+          </Panel>
 
 
-      <div>
-        1. 选择目标数据表
+          <Panel header="Select Fields" key="2"
+                 className={styles.panel}
+          >
+            <div className={styles.fields}>
+              {fields.map(field =>
+                <div key={Math.random()} className={styles.field}>field</div>
+              )}
+            </div>
+
+            <div className={styles.end_button}>
+              <Button type="primary" className={styles.button}>save</Button>
+            </div>
+          </Panel>
+
+          <Panel header="Parameter" key="3"
+                 className={styles.panel}>
+
+            <span>
+              Number of cluster
+            </span>
+
+            <div className={styles.row}>
+              <Input placeholder=""/>
+              <Button type="primary" className={styles.button}>save</Button>
+
+            </div>
+
+          </Panel>
+        </Collapse>
       </div>
-
-      <Select
-        showSearch
-        style={{width: 200}}
-        placeholder="Select a stagingData"
-        optionFilterProp="children"
-        onChange={(value) => handleChange(value, 0)}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        defaultValue={section.steps[0].content}
-        filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-      >
-        {stagingDataList.map((stagingData) =>
-          <Option key={stagingData._id} value={stagingData._id}>{stagingData.name}</Option>
-        )}
-      </Select>
-
-
     </div>
   );
 }
