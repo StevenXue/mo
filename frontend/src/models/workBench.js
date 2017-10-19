@@ -182,24 +182,24 @@ export default {
   },
   subscriptions: {
     // 当进入该页面是 获取用户所有 section
-    setup({ dispatch, history }) {
-      const pathJson = {
-        analysis: 'toolkit',
-        modelling: 'model',
-      }
-      return history.listen(({ pathname }) => {
-        const match = pathToRegexp('/projects/:projectId/:categories').exec(pathname)
-        if (match) {
-          let projectId = match[1]
-          let path = match[2]
-          if (path in pathJson) {
-            const categories = pathJson[path]
-            dispatch({ type: 'fetchSections', projectId: projectId, categories })
-            dispatch({ type: 'fetchAlgorithms', categories })
-            dispatch({ type: 'fetchStagingDatasetList' })
-          }
-        }
-      })
-    },
+    // setup({ dispatch, history }) {
+    //   const pathJson = {
+    //     analysis: 'toolkit',
+    //     modelling: 'model',
+    //   }
+    //   return history.listen(({ pathname }) => {
+    //     const match = pathToRegexp('/projects/:projectId/:categories').exec(pathname)
+    //     if (match) {
+    //       let projectId = match[1]
+    //       let path = match[2]
+    //       if (path in pathJson) {
+    //         const categories = pathJson[path]
+    //         dispatch({ type: 'fetchSections', projectId: projectId, categories })
+    //         dispatch({ type: 'fetchAlgorithms', categories })
+    //         dispatch({ type: 'fetchStagingDatasetList' })
+    //       }
+    //     }
+    //   })
+    // },
   },
 }
