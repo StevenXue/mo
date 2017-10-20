@@ -20,9 +20,9 @@ const RouterConfig = withRouter(({history, location}) => {
     const url = `/${pathSnippets.slice(0, index + 1).join('/')}`;
     let breadcrumbName;
     const matchDetail = pathToRegexp('/projects/:projectId').exec(url);
-    const matchPro = pathToRegexp('/projects/:projectId/:page').exec(url);
+    const matchPro = pathToRegexp('/projects/:projectId/:step').exec(url);
     if (matchDetail) {
-      breadcrumbName = `Project Detail`
+      breadcrumbName = `Project Info`
     } else if (matchPro) {
       breadcrumbName = matchPro[2]
     }
