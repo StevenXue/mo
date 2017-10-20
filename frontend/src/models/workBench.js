@@ -24,6 +24,9 @@ export default {
 
     launchItems: [],
 
+    algorithms: [],
+
+
   },
   reducers: {
     // 改变 left_side_bar
@@ -116,35 +119,44 @@ export default {
       }
     },
 
+    // 储存 algorithms
+    setAlgorithms(state, action) {
+      return {
+        ...state,
+        algorithms: action.payload.algorithms,
+      }
+    }
+
   },
   effects: {
     // 获取用户所有sections
     *fetchSections(action, { call, put }) {
-      console.log("fetch");
       const { data: { [action.categories]: sections } } = yield call(dataAnalysisService.fetchSections, {
         projectId: action.projectId,
         categories: action.categories,
-      })
-      console.log(sections)
-      // sections.map(e => e._id)
+      });
       // array to json
-      const sectionsJson = arrayToJson(sections, '_id')
+      const sectionsJson = arrayToJson(sections, '_id');
       yield put({ type: 'setSections', sectionsJson })
     },
     *fetchAlgorithms(action, { call, put }) {
       const requestFunc = {
         toolkit: dataAnalysisService.fetchToolkits,
         model: modelService.fetchModels,
+      };
+      const { data: algorithms } = yield call(requestFunc[action.categories]);
+
+      if(action.categories==='toolkit'){
+        yield put({ type: 'setAlgorithms', payload: {algorithms: algorithms}})
       }
-      const { data: algorithms } = yield call(requestFunc[action.categories])
-      console.log('algos', algorithms)
+
     },
     // 更新用户 section
     *updateSection(action, { call, put, select }) {
       // 开始加载
-      const sectionId = action.sectionId
+      const sectionId = action.sectionId;
       const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson)
-      const section = sectionsJson[sectionId]
+      const section = sectionsJson[sectionId];
       const sections = yield call(dataAnalysisService.updateSection, sectionId, section)
 
       // 停止加载
@@ -171,9 +183,7 @@ export default {
 
     // 获取stage data set list
     *fetchStagingDatasetList(action, { call, put, select }) {
-      console.log('fetchStagingDatasetList')
       const project_id = yield select(state => state.dataAnalysis.project_id)
-      console.log('project_id', project_id)
       const { data: stagingDataList } = yield call(stagingDataService.fetchStagingDatas, project_id)
       yield put({ type: 'setStagingDataList', stagingDataList })
 
@@ -186,17 +196,17 @@ export default {
     //   const pathJson = {
     //     analysis: 'toolkit',
     //     modelling: 'model',
-    //   }
+    //   };
     //   return history.listen(({ pathname }) => {
     //     const match = pathToRegexp('/projects/:projectId/:categories').exec(pathname)
     //     if (match) {
-    //       let projectId = match[1]
-    //       let path = match[2]
+    //       let projectId = match[1];
+    //       let path = match[2];
     //       if (path in pathJson) {
-    //         const categories = pathJson[path]
+    //         const categories = pathJson[path];
     //         dispatch({ type: 'fetchSections', projectId: projectId, categories })
-    //         dispatch({ type: 'fetchAlgorithms', categories })
-    //         dispatch({ type: 'fetchStagingDatasetList' })
+    //         dispatch({ type: 'fetchAlgorithms', categories });
+    //         dispatch({ type: 'fetchStagingDatasetList' });
     //       }
     //     }
     //   })
