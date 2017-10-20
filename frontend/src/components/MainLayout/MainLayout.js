@@ -21,7 +21,6 @@ import en_US from '../../intl/en_US';
 function MainLayout({children, location}) {
   return (
     <div className={styles.normal}>
-
       <Header location={location}/>
       <div className={styles.content}>
         <div className={styles.main}>
