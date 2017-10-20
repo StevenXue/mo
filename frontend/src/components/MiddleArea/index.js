@@ -110,6 +110,7 @@ function MiddleArea({model, dispatch, namespace}) {
                 <Launcher sectionId={active_sectionId} {...{model, dispatch, namespace}}/>
 
               </TabPane> :
+
               <TabPane
                 tab={sectionsJson[active_sectionId].section_name || sectionsJson[active_sectionId]._id} key={active_sectionId}
                 closabel={true}>

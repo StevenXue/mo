@@ -102,7 +102,7 @@ class Launcher extends Component {
               tabBarStyle={{display: "flex", justifyContent: "center", alignItems: 'center'}}
         >
 
-          {this.props.dataAnalysis.algorithms.map((category, index) =>
+          {this.props.model.algorithms.map((category, index) =>
 
             <TabPane tab={category.name} key={index}>
               {category.children.map((e, i) =>
@@ -130,4 +130,4 @@ class Launcher extends Component {
   }
 }
 
-export default connect(({dataAnalysis}) => ({dataAnalysis}))(Launcher)
+export default Launcher;
