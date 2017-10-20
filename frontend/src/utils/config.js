@@ -9,9 +9,9 @@ module.exports = {
   iconFontJS: '/iconfont.js',
   baseURL: 'http://localhost:8000/api/v1',
   YQL: ['http://www.zuimeitianqi.com'],
-  CORS: [CONSTANT.flaskServer],
+  CORS: CONSTANT.apiPrefix,
   openPages: ['/login'],
-  apiPrefix: '/api/v1',
+  // apiPrefix: '/api/v1',
   //jupyterUrl: CONSTANT.,
   jupyterServer: CONSTANT.jupyterServer,
   api: {
