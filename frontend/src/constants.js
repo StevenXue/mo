@@ -1,4 +1,4 @@
-const mainColor = '#108ee9'
+const mainColor = '#108ee9';
 
 module.exports = {
   jupyterServer: 'http://192.168.65.2:8888/api/contents/',  // kube master node ip
@@ -38,6 +38,12 @@ module.exports = {
     {value: 'all', text: 'All'},
     {value: 'private', text: 'Private'},
     {value: 'public', text: 'Public'}
+  ],
+
+  dataCategory: [
+    'Business', 'Government', 'Education', 'Environment',
+    'Health', 'Housing & Development', 'Public', 'Services',
+    'Social', 'Transportation', 'Science', 'Technology'
   ]
 
-}
+};

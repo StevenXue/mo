@@ -2,6 +2,7 @@ import React from 'react'
 import {
   Route,
   Link,
+  Switch
 } from 'react-router-dom'
 import { connect } from 'dva'
 import { Icon, Button, Tag } from 'antd'
@@ -11,6 +12,9 @@ import DataImport from '../DataImport'
 import DataAnalysis from '../DataAnalysis'
 import Modelling from '../Modelling'
 import Deployment from '../Deployment'
+import UploadData from '../Upload'
+import DataSelection from '../DataSelection'
+import DataPreview from '../DataPreview'
 // components
 import Steps from '../../components/Steps'
 import MyCard from '../../components/MyCard'
@@ -75,11 +79,15 @@ function ProjectDetail({ match, history, location, project }) {
       <div className={styles.step}>
         <Steps match={match} history={history} location={location}/>
       </div>
-
-      <Route path="/projects/:projectID/import" component={DataImport}/>
-      <Route path="/projects/:projectID/analysis" component={DataAnalysis}/>
-      <Route path="/projects/:projectID/modelling" component={Modelling}/>
-      <Route path="/projects/:projectID/deploy" component={Deployment}/>
+      <Switch>
+        <Route path="/projects/:projectID/import/preview" component={DataPreview}/>
+        <Route path="/projects/:projectID/import/select" component={DataSelection}/>
+        <Route path="/projects/:projectID/import/upload" component={UploadData}/>
+        <Route path="/projects/:projectID/import" component={DataImport}/>
+        <Route path="/projects/:projectID/analysis" component={DataAnalysis}/>
+        <Route path="/projects/:projectID/modelling" component={Modelling}/>
+        <Route path="/projects/:projectID/deploy" component={Deployment}/>
+      </Switch>
     </div>
   )
 }
