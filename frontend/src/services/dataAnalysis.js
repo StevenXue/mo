@@ -71,10 +71,11 @@ export async function fetchSections(payload) {
       section_name: 'new_section_3',
     },
 
-  ]
+  ];
+  let res = await request(`${CORS}/project/jobs/${payload.projectId}?categories=${payload.categories}`);
 
-  let res = await request(`${CORS}${projectJobs}/${payload.projectId}?categories=${payload.categories}`)
-  // res.data.toolkit.map(e => e)
+  console.log("res", res);
+  // let res = await request(`${CORS}${projectJobs}/${payload.projectId}?categories=${payload.categories}`);
   return res
 }
 

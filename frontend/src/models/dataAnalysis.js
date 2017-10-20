@@ -7,6 +7,20 @@ import modelExtend from 'dva-model-extend';
 import workBench from './workBench';
 const dataAnalysis = modelExtend(workBench, {
   namespace: 'dataAnalysis',
+
+  // effects: {
+  //   *fetchAlgorithms(action, { call, put }) {
+  //     const requestFunc = {
+  //       toolkit: dataAnalysisService.fetchToolkits,
+  //       model: modelService.fetchModels,
+  //     };
+  //     const { data: algorithms } = yield call(requestFunc[action.categories]);
+  //     //
+  //
+  //     console.log('algos1', algorithms)
+  //   },
+  // }
+
   // subscriptions: {
   //   // 当进入该页面是 获取用户所有 section
   //   setup({dispatch, history}) {

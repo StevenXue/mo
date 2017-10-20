@@ -1,13 +1,13 @@
 /**
  * choose toolkit
  */
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import styles from './index.less'
-import { connect } from 'dva'
+import {connect} from 'dva'
 
-import { Tabs, Card, Icon } from 'antd'
+import {Tabs, Card, Icon} from 'antd'
 
-const TabPane = Tabs.TabPane
+const TabPane = Tabs.TabPane;
 
 function callback(key) {
   console.log(key)
@@ -69,82 +69,60 @@ const toolkit = [
     ],
   },
 
-]
+];
 
 class Launcher extends Component {
 
+  // change state
   addSection = (section) => {
     this.props.dispatch({
       type: this.props.namespace + '/addSection',
       section: section,
     })
-  }
-
-  onClickIcon = () => {
-    // 更改选中状态
-
-  }
+  };
 
   onClick = (e) => {
     // 更改选中状态
-    console.log(this.state)
-    console.log(e.name)
 
     this.addSection({
       sectionId: this.props.sectionId,
       section_type: e.name,
     })
-  }
+  };
 
   render() {
-    const { namespace } = this.props;
+    const {namespace} = this.props;
 
     return (
       <div className={styles.launcher}>
-        <h1>
+        <h1 className={styles.title}>
           Choose a toolkit to start
         </h1>
+        <Tabs defaultActiveKey="1" onChange={callback}
+              tabBarStyle={{display: "flex", justifyContent: "center", alignItems: 'center'}}
+        >
 
-        <Tabs defaultActiveKey="1" onChange={callback}>
+          {this.props.dataAnalysis.algorithms.map((category, index) =>
 
-          {toolkit.map(category =>
-
-            <TabPane tab={category.name} key={category.key}>
+            <TabPane tab={category.name} key={index}>
               {category.children.map((e, i) =>
                 <Card key={e.name + i} onClick={() => this.onClick(e,)}
-                      style={{ margin: 10, width: '100%', backgroundColor: '#F8F8F8' }}>
+                      style={{
+                        margin: 10,
+                        backgroundColor: '#F8F8F8'
+                      }}
+                >
                   <div className={styles.card_area}>
                     <div>
-                      <p className='custom-title-font'>{e.name}</p>
-                      <p className='custom-text-font'>{e.description}</p>
+                      <div className='custom-title-font'>{e.name}</div>
+                      <div className='custom-text-font'>{e.description}</div>
                     </div>
-                    <Icon type="check-circle"
-                          onClick={this.onClickIcon}
-                          style={{ fontSize: 20 }}/>
                   </div>
-                </Card>,
+                </Card>
               )}
-            </TabPane>,
+            </TabPane>
           )}
 
-          {/*<TabPane tab="Data Explore" key="1">*/}
-          {/*{config.map((e, i)=>*/}
-          {/*<Card key={e.name+i} onClick={()=>this.onClick(e, )}*/}
-          {/*style={{margin: 10, width: '100%', backgroundColor: '#F8F8F8'}}>*/}
-          {/*<div className={styles.card_area}>*/}
-          {/*<div>*/}
-          {/*<p className='custom-title-font'>{e.name}</p>*/}
-          {/*<p className='custom-text-font'>{e.description}</p>*/}
-          {/*</div>*/}
-          {/*<Icon type="check-circle"*/}
-          {/*onClick={this.onClickIcon}*/}
-          {/*style={{fontSize:20}}/>*/}
-          {/*</div>*/}
-          {/*</Card>*/}
-          {/*)}*/}
-          {/*</TabPane>*/}
-          {/*<TabPane tab="Data Quality Improve" key="2">Content of Tab Pane 2</TabPane>*/}
-          {/*<TabPane tab="Feature Selection" key="3">Content of Tab Pane 3</TabPane>*/}
         </Tabs>
 
       </div>
@@ -152,4 +130,4 @@ class Launcher extends Component {
   }
 }
 
-export default connect(({ dataAnalysis }) => ({ dataAnalysis }))(Launcher)
+export default connect(({dataAnalysis}) => ({dataAnalysis}))(Launcher)

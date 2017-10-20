@@ -17,6 +17,23 @@ const tabs = [
   }
 ];
 
+function View () {
+  return <div>
+    view
+  </div>
+}
+
+function Result () {
+  return <div>
+    Result
+  </div>
+}
+
+const children = [
+  <View />, <Result/>
+];
+
+
 class RightArea extends Component {
   state = {
     status: 0
@@ -25,53 +42,29 @@ class RightArea extends Component {
   render() {
     return (
       <div className="card-container">
-
         <div className={styles.row}>
-
           {
             tabs.map(tab=>
+
               <div className={styles.button}
                    key={tab.key}
                    style={{
-                     backgroundColor: this.state.status==='view'?'#34C0E2':'white'
+                     backgroundColor: this.state.status===tab.key?'#34C0E2':'white'
+                   }}
+                   onClick={()=>{
+                     this.setState({
+                       status: tab.key
+                     })
                    }}
               >
                 {tab.text}
               </div>
             )
           }
-
-          {/*<div className={styles.button}*/}
-               {/*style={{*/}
-                 {/*backgroundColor: this.state.status==='view'?'#34C0E2':'white'*/}
-               {/*}}*/}
-          {/*>*/}
-            {/*View*/}
-          {/*</div>*/}
-
-          {/*<div className={styles.button}*/}
-               {/*style={{*/}
-                 {/*backgroundColor: this.state.status==='history'?'#34C0E2':'white'*/}
-               {/*}}*/}
-          {/*>*/}
-            {/*History*/}
-          {/*</div>*/}
         </div>
-
-        {/*<Tabs*/}
-          {/*type="card"*/}
-          {/*tabBarStyle={{flex: 1, display: 'flex'}}*/}
-        {/*>*/}
-          {/*<TabPane tab="View" key="view">*/}
-            {/*<p>Content of Tab Pane 1</p>*/}
-
-          {/*</TabPane>*/}
-
-          {/*<TabPane tab="History" key="history">*/}
-            {/*<p>Content of Tab Pane 2</p>*/}
-
-          {/*</TabPane>*/}
-        {/*</Tabs>*/}
+        {
+          children[this.state.status]
+        }
       </div>
     )
   }
