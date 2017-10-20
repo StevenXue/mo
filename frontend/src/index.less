@@ -4,38 +4,17 @@ html, body, :global(#root) {
   //width: 100%;
 }
 
-:global {
-  .flex-row-center {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .capitalize-first {
-    p::first-letter {
-      text-transform: uppercase;
-    }
-  }
-
-  .main-container {
-    min-height: 85vh;
-    width: 1170px;
-    max-width: 100%;
-    padding: 24px;
-    //background: #fff;
-  }
-
-
-  .custom-title-font {
-    font-size: large;
-  }
-
-  .custom-text-font {
-    font-size: small;
-  }
-}
-
 // color
 @custom-grey: #F5F5F5;
+@custom-light-grey: #FBFBFB;
+@custom-blue: #464E78;
+@custom-light-blue: #34C0E2;
+
+//
+#center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
 

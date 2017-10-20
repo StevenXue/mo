@@ -20,8 +20,11 @@ from sklearn.manifold import TSNE
 from server3.lib import toolkit_orig
 from server3.lib import preprocess_orig
 from server3.service import job_service
-from server3.business import toolkit_business, ownership_business, user_business, job_business, result_business, project_business
+from server3.business import toolkit_business, ownership_business, user_business, job_business, \
+    result_business, project_business
 from server3.utility import data_utility
+# from server3.business import ownership_business
+import copy
 
 TOOLKIT_CATEGORY_DICT = {
     0: '聚类',
@@ -30,6 +33,58 @@ TOOLKIT_CATEGORY_DICT = {
     3: '降维',
     4: '概率统计推断'
 }
+
+NEW_TOOLKIT_CATEGORY = [
+    {
+        'name': 'data_explore',
+        'zh_name': '初探数据集',
+        'us_name': 'Data Explore',
+        'child': [
+            'K平均数算法',
+            '移动平均值',
+            '皮尔森相关系数',
+            '变异系数',
+            '数据互相关'
+        ],
+        'children': []
+    },
+    {
+        'name': 'data_quality_improve',
+        'zh_name': '提升数据质量',
+        'us_name': 'Data Quality Improve',
+        'child': [
+            '归一化',
+        ],
+        'children': []
+    },
+    {
+        'name': 'feature_selection',
+        'zh_name': '特征提取',
+        'us_name': 'Feature Selection',
+        'child': [
+            '方差选择法',
+            '卡方选择法',
+            '相关系数选择法',
+            '互信息选择法',
+            '递归特征消除法'
+        ],
+        'children': []
+    }
+]
+
+
+def get_all_public_toolkit_by_new_category():
+    toolkit_category = copy.deepcopy(NEW_TOOLKIT_CATEGORY)
+    for obj in ownership_business.list_ownership_by_type_and_private('toolkit', False):
+        toolkit_obj = obj.toolkit.to_mongo()
+        toolkit_obj.pop("target_py_code")
+        for idx, category in enumerate(NEW_TOOLKIT_CATEGORY):
+            for name in category['child']:
+                if toolkit_obj['name'] == name:
+                    toolkit_category[idx]['children'].append(toolkit_obj)
+                    break
+
+    return toolkit_category
 
 
 def get_all_public_toolkit():
@@ -112,9 +167,11 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
 
     # toolkit_temp应该支持数据库接入
     if kwargs:
-        result = toolkit_calculate(project_id, staging_data_set_id, toolkit_obj, fields, index_nan, *argv, **kwargs)
+        result = toolkit_calculate(project_id, staging_data_set_id, toolkit_obj, fields, index_nan,
+                                   *argv, **kwargs)
     else:
-        result = toolkit_calculate(project_id, staging_data_set_id, toolkit_obj, fields, index_nan, *argv)
+        result = toolkit_calculate(project_id, staging_data_set_id, toolkit_obj, fields, index_nan,
+                                   *argv)
     return result
 
 
@@ -125,3 +182,7 @@ def add_toolkit_with_ownership(name, description, target_py_code,
                                    entry_function, parameter_spec)
     user = user_business.get_by_user_ID(user_ID)
     ownership_business.add(user, is_private, toolkit=toolkit)
+
+
+if __name__ == '__main__':
+    print(get_all_public_toolkit_by_new_category())

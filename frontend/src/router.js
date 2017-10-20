@@ -1,30 +1,66 @@
 import React from 'react'
-import { HashRouter, Route, Switch } from 'dva/router'
-import IndexPage from './routes/IndexPage'
+import {HashRouter, Route, Switch, Link, withRouter} from 'dva/router'
+import {Breadcrumb} from 'antd'
+import pathToRegexp from 'path-to-regexp';
 
 import Users from './routes/Users.js'
 import Login from './routes/Login'
 import Projects from './routes/Projects'
 import ProjectDetail from './routes/ProjectDetail'
-
-import DataAnalysis from './routes/DataAnalysis'
-
 import MainLayout from './components/MainLayout/MainLayout'
 
-function RouterConfig({ history, location }) {
+const breadcrumbNameMap = {
+  '/login': 'Login',
+  '/projects': 'Project List',
+};
+
+const RouterConfig = withRouter(({history, location}) => {
+  const pathSnippets = location.pathname.split('/').filter(i => i);
+  const extraBreadcrumbItems = pathSnippets.map((_, index) => {
+    const url = `/${pathSnippets.slice(0, index + 1).join('/')}`;
+    let breadcrumbName;
+    const matchDetail = pathToRegexp('/projects/:projectId').exec(url);
+    const matchPro = pathToRegexp('/projects/:projectId/:page').exec(url);
+    if (matchDetail) {
+      breadcrumbName = `Project Detail`
+    } else if (matchPro) {
+      breadcrumbName = matchPro[2]
+    }
+    return (
+      <Breadcrumb.Item key={url}>
+        <Link to={url} style={{textTransform: 'capitalize'}}>
+          {breadcrumbName || breadcrumbNameMap[url]}
+        </Link>
+      </Breadcrumb.Item>
+    );
+  });
+  const breadcrumbItems = [(
+    <Breadcrumb.Item key="home">
+      <Link to="/">Home</Link>
+    </Breadcrumb.Item>
+  )].concat(extraBreadcrumbItems);
+
   return (
-    <HashRouter>
-      <MainLayout location={location}>
+    <MainLayout location={location}>
+      <div style={{display: 'flex', flexDirection: 'column'}}>
+        <Breadcrumb>
+          {breadcrumbItems}
+        </Breadcrumb>
         <Switch>
           <Route path="/" exact component={Users}/>
           <Route path="/login" component={Login}/>
           <Route path="/projects/:projectID" component={ProjectDetail}/>
           <Route path="/projects" component={Projects}/>
-          {/*<Route path="/project/dataAnalysis" component={DataAnalysis} />*/}
         </Switch>
-      </MainLayout>
-    </HashRouter>
+      </div>
+    </MainLayout>
   )
-}
+});
 
-export default RouterConfig
+const App = ((props) =>
+  <HashRouter>
+    <RouterConfig/>
+  </HashRouter>
+)
+
+export default App

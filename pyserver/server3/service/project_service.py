@@ -148,8 +148,10 @@ def get_all_jobs_of_project(project_id, categories):
                 job_info = job.to_mongo()
                 # model/toolkit info
                 job_info[key] = {
+                    'item_id': job[key]['id'],
                     'name': job[key]['name'],
                     'category': job[key]['category'],
+                    'parameter_spec': job[key]['parameter_spec'],
                 }
 
                 # source staging data set info
@@ -164,13 +166,16 @@ def get_all_jobs_of_project(project_id, categories):
                         job['id']).to_mongo()
                 except DoesNotExist:
                     result_sds = None
+
                 if key == 'model':
+                    # model results
                     job_info['results'] = result_sds
                     job_info['metrics_status'] = \
                         [sd.to_mongo() for sd in
                          staging_data_business.get_by_staging_data_set_id(
                              result_sds['_id'])]
                 else:
+                    # toolkit results
                     job_info['results'] = result_sds[
                         'result'] if result_sds and "result" in result_sds else None
                 job_info['results_staging_data_set_id'] = result_sds[

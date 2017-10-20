@@ -74,6 +74,9 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields,
             result = list(func_rst) if isinstance(func_rst, tuple) else [
                 func_rst]
 
+
+
+
             # 新设计的存取方式
             results = {
                 "fields": {
@@ -405,6 +408,8 @@ def add_new_column(value, index, fields, name, staging_data_set_id):
                 obj = dict(zip(name_list, arr))
             col_value.append(obj)
         staging_data_service.add_new_keys_value(staging_data_set_id, col_value)
+
+
 
 
 if __name__ == '__main__':

@@ -13,7 +13,6 @@
 }
 
 .main {
-  max-width: 1500px;
   min-width: 1200px;
   /*padding: 0 8px;*/
   /*margin: 10px 0;*/
@@ -22,5 +21,9 @@
   padding: 24px 15px;
   width: 100%;
   background: #F9FAFA;
-  /*flex: 1 0 auto;*/
+  overflow: auto;
+  margin: auto;
+  position: absolute;
+  left: 0;
+  right: 0;
 }

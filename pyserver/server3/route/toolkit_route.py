@@ -51,12 +51,25 @@ def get_all_toolkit_info():
     try:
         # 新增方法按照category分类
         # result = toolkit_service.get_all_public_toolkit()
-        result = toolkit_service.get_all_public_toolkit_by_category()
+        result = toolkit_service.get_all_public_toolkit_by_new_category()
     except Exception as e:
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}), 400)
     return jsonify({'message': 'get info success', 'response':
         json_utility.convert_to_json(result)}), 200
+
+
+# @toolkit_app.route('/toolkits/public_test', methods=['GET'])
+# def get_all_toolkit_info_test():
+#     try:
+#         # 新增方法按照category分类
+#         # result = toolkit_service.get_all_public_toolkit()
+#         result = toolkit_service.get_all_public_toolkit_by_new_category()
+#     except Exception as e:
+#         return make_response(jsonify({'response': '%s: %s' % (str(
+#             Exception), e.args)}), 400)
+#     return jsonify({'message': 'get info success', 'response':
+#         json_utility.convert_to_json(result)}), 200
 
 
 @toolkit_app.route('/toolkits', methods=['POST'])
