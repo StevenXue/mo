@@ -12,7 +12,7 @@ function Modelling({location, dispatch, modelling}) {
     model: modelling,
     namespace: 'modelling',
     dispatch:  dispatch,
-    title: 'Model'
+    step: 'model'
   };
   return (
     <div className={styles.container}>

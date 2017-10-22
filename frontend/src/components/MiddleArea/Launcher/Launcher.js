@@ -1,13 +1,13 @@
 /**
  * choose toolkit
  */
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import styles from './index.less'
-import {connect} from 'dva'
+import { connect } from 'dva'
 
-import {Tabs, Card, Icon} from 'antd'
+import { Tabs, Card, Icon } from 'antd'
 
-const TabPane = Tabs.TabPane;
+const TabPane = Tabs.TabPane
 
 function callback(key) {
   console.log(key)
@@ -69,7 +69,7 @@ const toolkit = [
     ],
   },
 
-];
+]
 
 class Launcher extends Component {
 
@@ -79,7 +79,7 @@ class Launcher extends Component {
       type: this.props.namespace + '/addSection',
       section: section,
     })
-  };
+  }
 
   onClick = (e) => {
     // 更改选中状态
@@ -88,18 +88,18 @@ class Launcher extends Component {
       sectionId: this.props.sectionId,
       section_type: e.name,
     })
-  };
+  }
 
   render() {
-    const {namespace} = this.props;
+    const { namespace } = this.props
 
     return (
       <div className={styles.launcher}>
         <h1 className={styles.title}>
-          Choose a toolkit to start
+          Choose a {this.props.step} to start
         </h1>
         <Tabs defaultActiveKey="1" onChange={callback}
-              tabBarStyle={{display: "flex", justifyContent: "center", alignItems: 'center'}}
+              tabBarStyle={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
         >
 
           {this.props.model.algorithms.map((category, index) =>
@@ -109,7 +109,7 @@ class Launcher extends Component {
                 <Card key={e.name + i} onClick={() => this.onClick(e,)}
                       style={{
                         margin: 10,
-                        backgroundColor: '#F8F8F8'
+                        backgroundColor: '#F8F8F8',
                       }}
                 >
                   <div className={styles.card_area}>
@@ -118,9 +118,9 @@ class Launcher extends Component {
                       <div className='custom-text-font'>{e.description}</div>
                     </div>
                   </div>
-                </Card>
+                </Card>,
               )}
-            </TabPane>
+            </TabPane>,
           )}
 
         </Tabs>
@@ -130,4 +130,4 @@ class Launcher extends Component {
   }
 }
 
-export default Launcher;
+export default Launcher

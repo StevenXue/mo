@@ -40,7 +40,11 @@ def allowed_file(filename):
 
 @model_app.route('/models/public', methods=['GET'])
 def get_all_model_info():
-    result = model_service.get_all_public_model()
+    type = request.args.get('type').lower()
+    if type == 'true':
+        result = model_service.get_all_public_model_by_type()
+    else:
+        result = model_service.get_all_public_model()
     return jsonify({'message': 'get info success', 'response':
         json_utility.convert_to_json(result)})
 

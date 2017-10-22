@@ -12,7 +12,7 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
     model: dataAnalysis,
     namespace: 'dataAnalysis',
     dispatch:  dispatch,
-    title: 'Toolkit'
+    step: 'toolkit'
   };
   return (
     <div className={styles.container}>

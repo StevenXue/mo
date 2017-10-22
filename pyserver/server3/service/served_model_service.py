@@ -84,7 +84,7 @@ def deploy(user_ID, job_id, name, description, server, signatures,
     except DoesNotExist:
         model_type = job.model.category
         if model_type == ModelType['neural_network'] \
-                or model_type == ModelType['folder_input']:
+                or model_type == ModelType['unstructured']:
             export_path, version = model_service.export(name, job_id, user_ID)
         else:
             result_sds = staging_data_set_business.get_by_job_id(job_id)
