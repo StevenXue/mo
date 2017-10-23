@@ -9,7 +9,6 @@
 # Further to FIXME of None
 """
 
-
 # import numpy as np
 import pandas as pd
 import numpy as np
@@ -1045,7 +1044,8 @@ def create_public_data_process():
                                   description='多项式数据转换, 默认为两次',
                                   category=2,
                                   entry_function='polynomial_features',
-                                  target_py_code=inspect.getsource(preprocess_orig.polynomial_features),
+                                  target_py_code=inspect.getsource(
+                                      preprocess_orig.polynomial_features),
                                   parameter_spec={
                                       "data": {
                                           'name': 'input',
@@ -1080,7 +1080,8 @@ def create_public_data_process():
                                  description='选取合适的特征，方差选择法',
                                  category=1,
                                  entry_function='variance_threshold',
-                                 target_py_code=inspect.getsource(preprocess_orig.variance_threshold),
+                                 target_py_code=inspect.getsource(
+                                     preprocess_orig.variance_threshold),
                                  parameter_spec={
                                      "data": {
                                          'name': 'input',
@@ -1141,7 +1142,8 @@ def create_public_data_process():
                                  description='选择K个最好的特征，返回选择特征后的数据',
                                  category=1,
                                  entry_function='select_k_best_chi2',
-                                 target_py_code=inspect.getsource(preprocess_orig.select_k_best_chi2),
+                                 target_py_code=inspect.getsource(
+                                     preprocess_orig.select_k_best_chi2),
                                  parameter_spec={
                                      "data": {
                                          'name': 'input',
@@ -1205,7 +1207,8 @@ def create_public_data_process():
                                     description='选择K个最好的特征，返回选择特征后的数据',
                                     category=1,
                                     entry_function='select_k_best_pearson',
-                                    target_py_code=inspect.getsource(preprocess_orig.select_k_best_pearson),
+                                    target_py_code=inspect.getsource(
+                                        preprocess_orig.select_k_best_pearson),
                                     parameter_spec={
                                         "data": {
                                             'name': 'input',
@@ -1397,7 +1400,8 @@ def create_public_data_process():
                                    description='带L1惩罚项的逻辑回归作为基模型的特征选择, 属于带惩罚的基模型，除了筛选出特征，同时也降维',
                                    category=1,
                                    entry_function='select_from_model_lr',
-                                   target_py_code=inspect.getsource(preprocess_orig.select_from_model_lr),
+                                   target_py_code=inspect.getsource(
+                                       preprocess_orig.select_from_model_lr),
                                    parameter_spec={
                                        "data": {
                                            'name': 'input',
@@ -1449,7 +1453,8 @@ def create_public_data_process():
                                      description='基树模型中GBDT可用来作为基模型进行特征选择',
                                      category=1,
                                      entry_function='select_from_model_gbdt',
-                                     target_py_code=inspect.getsource(preprocess_orig.select_from_model_gbdt),
+                                     target_py_code=inspect.getsource(
+                                         preprocess_orig.select_from_model_gbdt),
                                      parameter_spec={
                                          "data": {
                                              'name': 'input',
@@ -1754,5 +1759,106 @@ def remove_one_public_toolkit():
     # 已舍去
     # ownership_business.remove_ownership_by_user_and_owned_item(user, toolkit, 'toolkit')
 
-if __name__ == '__main__':
+
+# k-means
+k_means = {
+    'parameter_spec': {
+        "data": {
+            'name': 'input',
+            'type': {
+                'key': 'select_box',
+                'des': 'nD tensor with shape: (batch_size, ..., '
+                       'input_dim). The most common situation would be a '
+                       '2D input with shape (batch_size, input_dim).',
+                'range': None
+            },
+            'default': None,
+            'required': True,
+            'len_range': [1, None],
+            'data_type': ['int', 'float']
+        },
+        "args": [
+            {
+                'name': 'n_clusters',
+                'type': {
+                    'key': 'int',
+                    'des': 'the number of clustering numbers',
+                    'range': [2, None]
+                },
+                'default': 2,
+                'required': True
+            }
+        ]
+    },
+}
+steps = [
+    {
+        'name': 'data_source',
+        'display_name': 'select parameters',
+        'args': [
+            {
+                "name": "input",
+                "des": "",
+
+                "type": "select_box",
+                "default": None,
+                "required": True,
+
+                # length of values
+                "len_range": [
+                    1,
+                    1
+                ],
+                # range of one value
+                'value_range': None,
+                'value_type': [
+                    "int",
+                    "float"
+                ],
+                'values': []
+            }
+        ],
+    },
+    {
+        'name': 'fields',
+        'display_name': 'select fields',
+        'args': [
+            {
+                'name': 'fields',
+                'des': '',
+
+                'type': 'multiple_choice',
+                'values': []
+            }
+        ],
+    },
+    {
+        'name': 'parameters',
+        'display_name': 'input parameters',
+        'args': [
+            {
+                'name': 'k',
+                'display_name': 'k',
+                'type': 'input',
+                'value': None,
+            }
+        ]
+    }
+]
+
+
+def update_toolkit_with_new_steps():
+    toolkit_id = '5980149d8be34d34da32c170'
+    toolkit_id = ObjectId(toolkit_id)
+    # toolkit_obj = Toolkit.objects.get(id=toolkit_id)
+    toolkit_obj = get_by_toolkit_id(toolkit_id)
+    # toolkit obj to conf (need be move to?)
+    toolkit_obj.steps = steps
+    toolkit_obj.save()
     pass
+
+
+if __name__ == '__main__':
+    update_toolkit_with_new_steps()
+    pass
+
