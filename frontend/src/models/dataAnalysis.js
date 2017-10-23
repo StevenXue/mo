@@ -20,9 +20,9 @@ const dataAnalysis = modelExtend(workBench, {
         if (match) {
           let projectId = match[1];
 
-          dispatch({ type: 'fetchSections', projectId: projectId, categories })
-          dispatch({ type: 'fetchAlgorithms', categories })
-          dispatch({ type: 'fetchStagingDatasetList' })
+          dispatch({ type: 'fetchSections', projectId: projectId, categories });
+          dispatch({ type: 'fetchAlgorithms', categories });
+          dispatch({ type: 'fetchStagingDatasetList', projectId: projectId })
         }
       });
     },

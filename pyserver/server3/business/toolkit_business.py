@@ -1846,6 +1846,62 @@ steps = [
     }
 ]
 
+version_1_steps = [
+    {
+        'name': 'data_source',
+        'display_name': 'select parameters',
+
+        'args': [
+            {
+                "name": "input",
+                "des": "",
+
+                "type": "select_box",
+                "default": None,
+                "required": True,
+
+                # length of values
+                "len_range": [
+                    1,
+                    1
+                ],
+                # range of one value
+                'value_range': None,
+                'value_type': [
+                    "int",
+                    "float"
+                ],
+                'values': []
+            }
+        ],
+    },
+    {
+        'name': 'fields',
+        'display_name': 'select fields',
+        'args': [
+            {
+                'name': 'fields',
+                'des': '',
+
+                'type': 'multiple_choice',
+                'values': []
+            }
+        ],
+    },
+    {
+        'name': 'parameters',
+        'display_name': 'input parameters',
+        'args': [
+            {
+                'name': 'k',
+                'display_name': 'k',
+                'type': 'input',
+                'value': None,
+            }
+        ]
+    }
+]
+
 
 def update_toolkit_with_new_steps():
     toolkit_id = '5980149d8be34d34da32c170'

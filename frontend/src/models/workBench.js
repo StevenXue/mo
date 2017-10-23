@@ -20,11 +20,14 @@ export default {
 
     stagingDataList: [],
 
-    project_id: '59c21ca6d845c0538f0fadd5',
-
     launchItems: [],
 
+    // 渲染launcher页面，能提供toolkit
     algorithms: [],
+
+    // 右侧激活的preview表格
+
+
 
 
   },
@@ -183,8 +186,9 @@ export default {
 
     // 获取stage data set list
     *fetchStagingDatasetList(action, { call, put, select }) {
-      const project_id = yield select(state => state.dataAnalysis.project_id)
-      const { data: stagingDataList } = yield call(stagingDataService.fetchStagingDatas, project_id)
+
+      const projectId = action.projectId;
+      const { data: stagingDataList } = yield call(stagingDataService.fetchStagingDatas, projectId);
       yield put({ type: 'setStagingDataList', stagingDataList })
 
     },

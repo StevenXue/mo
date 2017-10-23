@@ -52,6 +52,6 @@ class Toolkit(DynamicDocument):
     user_name = StringField(max_length=50)
 
     # steps
-    # steps = DictField()
+    steps = ListField(DictField())
 
 

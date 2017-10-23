@@ -59,10 +59,14 @@ def add_toolkit_job(toolkit_obj, staging_data_set_obj, project_obj, **kwargs):
     #     raise ValueError('invalid toolkit_obj')
     time = datetime.utcnow()
 
+    print("toolkit_obj['steps']11", toolkit_obj.to_mongo()['steps'])
+
     job_obj = Job(status=0, toolkit=toolkit_obj,
                   staging_data_set=staging_data_set_obj,
                   project=project_obj,
-                  create_time=time, **kwargs)
+                  create_time=time, **kwargs,
+                  steps=toolkit_obj.steps
+                  )
     return job_repo.create(job_obj)
 
 
@@ -119,3 +123,6 @@ def copy_job(job, belonged_project, staging_data_set):
         j.staging_data_set = staging_data_set
     job_repo.create(j)
     return j
+
+
+# def update_whole_job()
