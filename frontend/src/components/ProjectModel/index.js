@@ -39,8 +39,6 @@ class ProjectModal extends Component {
   }
 
   okHandler = (values) => {
-    console.log(this.state.tags, this.state.inputValue)
-
     this.props.form.validateFields((err, values) => {
       if (!err) {
         if (values.related_fields) {
@@ -210,6 +208,7 @@ class ProjectModal extends Component {
             >
           {
             getFieldDecorator('tags', {
+              initialValue: tags,
               getValueFromEvent: (e) => {
                 return [...this.state.tags, e.target.value].join(',')
               },

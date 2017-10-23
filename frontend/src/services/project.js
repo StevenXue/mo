@@ -27,7 +27,6 @@ export function createProject(payload) {
 
 // 更新 project
 export function updateProject(payload) {
-  console.log(payload)
   return request(`${CORS}${projects}/${payload.projectId}`, {
     method: 'put',
     headers: {
