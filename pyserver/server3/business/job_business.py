@@ -104,8 +104,8 @@ def update_job(job_obj):
     return job_repo.update_one_by_id_status_and_time(job_obj.id, 200, time)
 
 
-def remove_by_id(file_id):
-    return job_repo.delete_by_id(file_id)
+def remove_by_id(job_id):
+    return job_repo.delete_by_id(job_id)
 
 
 def copy_job(job, belonged_project, staging_data_set):

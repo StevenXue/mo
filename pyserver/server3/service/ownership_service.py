@@ -12,7 +12,13 @@ def get_ownership_objects_by_user_ID(user_ID, owned_type):
     :return: list of objects
     """
     ownerships = list_by_user_ID(user_ID)
-    return [os[owned_type] for os in ownerships if owned_type in os]
+    ow_list = []
+    for os in ownerships:
+        if owned_type in os:
+            item = os[owned_type]
+            item.is_private = os.private
+            ow_list.append(item)
+    return ow_list
 
 
 def get_privacy_ownership_objects_by_user_ID(user_ID, owned_type,
@@ -24,8 +30,13 @@ def get_privacy_ownership_objects_by_user_ID(user_ID, owned_type,
     :return: list of objects
     """
     ownerships = list_by_user_ID(user_ID)
-    return [os[owned_type] for os in ownerships if owned_type in os and os[
-        'private'] is private]
+    ow_list = []
+    for os in ownerships:
+        if owned_type in os and os['private'] is private:
+            item = os[owned_type]
+            item.is_private = os.private
+            ow_list.append(item)
+    return ow_list
 
 
 def get_all_public_objects(owned_type):

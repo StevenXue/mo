@@ -49,7 +49,7 @@ const RouterConfig = withRouter(({history, location}) => {
         <Switch>
           <Route path="/" exact component={Users}/>
           <Route path="/login" component={Login}/>
-          <Route path="/projects/:projectID" component={ProjectDetail}/>
+          <Route path="/projects/:projectId" component={ProjectDetail}/>
           <Route path="/projects" component={Projects}/>
         </Switch>
       </div>

@@ -10,6 +10,7 @@
 """
 # -*- coding: UTF-8 -*-
 from copy import deepcopy
+from datetime import datetime
 
 from server3.entity.project import Project
 # from server3.repository import job_repo
@@ -18,7 +19,8 @@ from server3.repository.project_repo import ProjectRepo
 project_repo = ProjectRepo(Project)
 
 
-def add(name, description, create_time):
+def add(name, description, related_fields,
+        tags, related_tasks):
     """
     Add a new Project.
 
@@ -28,7 +30,9 @@ def add(name, description, create_time):
     :return: added Project object
     """
     project_obj = Project(name=name, description=description,
-                          create_time=create_time)
+                          create_time=datetime.utcnow(),
+                          related_fields=related_fields,
+                          tags=tags, related_tasks=related_tasks)
     return project_repo.create(project_obj)
 
 

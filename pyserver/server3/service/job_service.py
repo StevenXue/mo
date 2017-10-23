@@ -411,6 +411,5 @@ def add_new_column(value, index, fields, name, staging_data_set_id):
 
 
 
-
 if __name__ == '__main__':
     pass

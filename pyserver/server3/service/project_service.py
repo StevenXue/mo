@@ -33,7 +33,15 @@ UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 # NAMESPACE = 'default'
 
 
-def create_project(name, description, user_ID, is_private=True):
+def get_by_id(project_id):
+    project = project_business.get_by_id(project_id)
+    ow = ownership_business.get_ownership_by_owned_item(project, 'project')
+    project.is_private = ow.private
+    return project
+
+
+def create_project(name, description, user_ID, is_private=True,
+                   related_fields=[], tags=[], related_tasks=[]):
     """
     Create a new project
 
@@ -45,8 +53,8 @@ def create_project(name, description, user_ID, is_private=True):
     """
 
     # create a new project object
-    created_project = project_business.add(name, description,
-                                           datetime.utcnow())
+    created_project = project_business.add(name, description, related_fields,
+                                           tags, related_tasks)
     if created_project:
         project_path = os.path.join(USER_DIR, user_ID, name)
         if not os.path.exists(project_path):
@@ -61,6 +69,28 @@ def create_project(name, description, user_ID, is_private=True):
             raise RuntimeError('Cannot create ownership of the new project')
     else:
         raise RuntimeError('Cannot create the new project')
+
+
+def update_project(project_id, name, description, is_private=True,
+                   related_fields=[], tags=[], related_tasks=[]):
+    """
+    Create a new project
+
+    :param name: str
+    :param description: str
+    :param user_ID: ObjectId
+    :param is_private: boolean
+    :return: a new created project object
+    """
+    project = project_business.get_by_id(project_id)
+    ow = ownership_business.get_ownership_by_owned_item(project, 'project')
+    ownership_business.update_by_id(ow['id'], private=is_private)
+    project_business.update_by_id(project_id, name=name,
+                                  description=description,
+                                  update_time=datetime.utcnow(),
+                                  related_fields=related_fields,
+                                  tags=tags, related_tasks=related_tasks)
+
 
 
 def list_projects_by_user_ID(user_ID, order=-1, privacy='all'):
@@ -170,10 +200,11 @@ def get_all_jobs_of_project(project_id, categories):
                 if key == 'model':
                     # model results
                     job_info['results'] = result_sds
-                    job_info['metrics_status'] = \
-                        [sd.to_mongo() for sd in
-                         staging_data_business.get_by_staging_data_set_id(
-                             result_sds['_id'])]
+                    # FIXME too slow to get metrics status
+                    # job_info['metrics_status'] = \
+                    #     [sd.to_mongo() for sd in
+                    #      staging_data_business.get_by_staging_data_set_id(
+                    #          result_sds['_id'])]
                 else:
                     # toolkit results
                     job_info['results'] = result_sds[
