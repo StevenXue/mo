@@ -8,7 +8,7 @@ import Launcher from './Launcher/Launcher'
 const TabPane = Tabs.TabPane;
 
 
-function MiddleArea({model, dispatch, namespace}) {
+function MiddleArea({model, dispatch, namespace, step}) {
   const {
     sectionsJson,
     activeSectionsId,
@@ -107,7 +107,7 @@ function MiddleArea({model, dispatch, namespace}) {
               <TabPane
                 tab={'Launcher'} key={active_sectionId}
               >
-                <Launcher sectionId={active_sectionId} {...{model, dispatch, namespace}}/>
+                <Launcher sectionId={active_sectionId} {...{model, dispatch, namespace, step}}/>
 
               </TabPane> :
 
@@ -115,7 +115,7 @@ function MiddleArea({model, dispatch, namespace}) {
                 tab={sectionsJson[active_sectionId].section_name || sectionsJson[active_sectionId]._id} key={active_sectionId}
                 closabel={true}>
                 <WorkBench section={sectionsJson[active_sectionId]}
-                           {...{model, dispatch, namespace}}
+                           {...{model, dispatch, namespace, step}}
                 />
               </TabPane>
           )

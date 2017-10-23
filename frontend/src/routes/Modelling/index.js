@@ -8,22 +8,24 @@ import RightArea from '../../components/RightArea';
 
 
 function Modelling({location, dispatch, modelling}) {
+  const props = {
+    model: modelling,
+    namespace: 'modelling',
+    dispatch:  dispatch,
+    step: 'model'
+  };
   return (
     <div className={styles.container}>
 
       <div className={styles.content}>
         <div className={styles.sidebar}>
           <SideBar
-            model={modelling}
-            namespace='modelling'
-            dispatch={dispatch}
+            {...props}
           />
         </div>
         <div className={styles.middle_area}>
           <MiddleArea
-            model={modelling}
-            namespace='modelling'
-            dispatch={dispatch}
+            {...props}
           />
         </div>
         <div className={styles.right_area}>

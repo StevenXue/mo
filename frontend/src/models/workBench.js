@@ -149,9 +149,8 @@ export default {
       };
       const { data: algorithms } = yield call(requestFunc[action.categories]);
 
-      if(action.categories==='toolkit'){
-        yield put({ type: 'setAlgorithms', payload: {algorithms: algorithms}})
-      }
+      yield put({ type: 'setAlgorithms', payload: {algorithms: algorithms}})
+
 
     },
     // 更新用户 section

@@ -33,6 +33,7 @@ from server3.service.saved_model_services import encoder as keras_encoder
 from server3.service.saved_model_services import keras_saved_model
 from server3.service import kube_service
 from server3.entity.model import MODEL_TYPE
+from server3.entity.model import TYPE
 from server3.constants import MODEL_EXPORT_BASE
 from server3.constants import MODEL_SCRIPT_PATH
 from server3.constants import NAMESPACE
@@ -44,13 +45,34 @@ user_directory = config.get_file_prop('UPLOAD_FOLDER')
 # user_directory = 'user_directory/'
 
 ModelType = {list(v)[1]: list(v)[0] for v in list(MODEL_TYPE)}
+TYPE = {list(v)[0]: list(v)[1] for v in list(TYPE)}
+
+ZH_MAP = {
+    'regression': '回归分析',
+    'classification': '统计分类',
+    'clustering': '聚类分析',
+    'reinforcement_learning': '强化学习'
+}
 
 
 def get_all_public_model():
-    models = [obj.model.to_mongo().to_dict() for obj in
-              ownership_business.list_ownership_by_type_and_private('model',
-                                                                    False)]
-    return models
+    models_list = [obj.model.to_mongo().to_dict() for obj in
+                   ownership_business.list_ownership_by_type_and_private(
+                       'model',
+                       False)]
+    return models_list
+
+
+def get_all_public_model_by_type():
+    models_list = [obj.model.to_mongo().to_dict() for obj in
+                   ownership_business.list_ownership_by_type_and_private(
+                       'model',
+                       False)]
+    return [{'name': TYPE[key],
+             'zh_name': ZH_MAP[TYPE[key]],
+             'children': [model_obj for model_obj in models_list
+                          if model_obj['type'] == key]
+             } for key in TYPE.keys()]
 
 
 def list_public_model_name():
@@ -179,7 +201,7 @@ def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
                             "hostPath": {
                                 "path": "{home_dir}/.keras".format(
                                     home_dir=str(Path.home())
-                                    )},
+                                )},
                         }]
                 },
             },
@@ -221,10 +243,10 @@ def run_model(conf, project_id, data_source_id, model_id, job_id, **kwargs):
         return job_service.run_code(conf, project_id, data_source_id,
                                     model, f, job_id, input_dict,
                                     result_dir=result_dir)
-    elif model['category'] == ModelType['folder_input']:
+    elif model['category'] == ModelType['unstructured']:
         # input from folder
         f = getattr(models, model.entry_function)
-        input_dict = model_input_manager_folder_input(conf, data_source_id,
+        input_dict = model_input_manager_unstructured(conf, data_source_id,
                                                       **kwargs)
         return job_service.run_code(conf, project_id, None,
                                     model, f, job_id, input_dict,
@@ -333,9 +355,9 @@ def model_to_code(conf, project_id, data_source_id, model_id, **kwargs):
                                                   **kwargs)
         return job_service.run_code(conf, project_id, data_source_id,
                                     model_obj, f, job_id, head_str)
-    elif model_obj['category'] == ModelType['folder_input']:
+    elif model_obj['category'] == ModelType['unstructured']:
         # input from folder
-        head_str = manage_folder_input_to_str(conf, data_source_id,
+        head_str = manage_unstructured_to_str(conf, data_source_id,
                                               **kwargs)
         return job_service.run_code(conf, project_id, None,
                                     model_obj, f, job_id, head_str,
@@ -459,7 +481,7 @@ def model_input_manager_unsupervised(x_cols, data_source_id, model_name,
     }
 
 
-def model_input_manager_folder_input(conf, data_set_id, **kwargs):
+def model_input_manager_unstructured(conf, data_set_id, **kwargs):
     file = staging_data_set_business.get_by_id(data_set_id).file
     print(file['uri'])
     input = {
@@ -537,7 +559,7 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
     return code_str
 
 
-def manage_folder_input_to_str(conf, file_id, **kwargs):
+def manage_unstructured_to_str(conf, file_id, **kwargs):
     """
     deal with input when supervised learning
     :param conf:
@@ -670,7 +692,7 @@ def temp():
     #     'Image Classifier',
     #     'Training a small convnet from scratch: 80% accuracy in 40 lines '
     #     'of code',
-    #     ModelType['folder_input'],
+    #     ModelType['unstructured'],
     #     '/lib/models/image_classifier',
     #     'image_classifier',
     #     'image_classifier_to_str',
@@ -720,7 +742,7 @@ def temp():
     #     False,
     #     'Image Classifier VGG16',
     #     'Image Classifier VGG16',
-    #     ModelType['folder_input'],
+    #     ModelType['unstructured'],
     #     'server3/lib/models/nn/image_classifier_vgg16.py',
     #     'image_classifier_vgg16',
     #     'image_classifier_vgg16_to_str',
@@ -733,7 +755,7 @@ def temp():
     #     False,
     #     'Image Classifier VGG19',
     #     'Image Classifier VGG19',
-    #     ModelType['folder_input'],
+    #     ModelType['unstructured'],
     #     'server3/lib/models/nn/image_classifier_vgg19.py',
     #     'image_classifier_vgg19',
     #     'image_classifier_vgg19_to_str',
@@ -747,7 +769,7 @@ def temp():
     #     False,
     #     'Image Classifier ResNet50',
     #     'Image Classifier ResNet50',
-    #     ModelType['folder_input'],
+    #     ModelType['unstructured'],
     #     'server3/lib/models/nn/image_classifier_resnet50.py',
     #     'image_classifier_resnet50',
     #     'image_classifier_resnet50_to_str',
@@ -761,7 +783,7 @@ def temp():
     #     False,
     #     'Image Classifier Inception V3',
     #     'Image Classifier Inception V3',
-    #     ModelType['folder_input'],
+    #     ModelType['unstructured'],
     #     'server3/lib/models/nn/image_classifier_inception_v3.py',
     #     'image_classifier_inception_v3',
     #     'image_classifier_inception_v3_to_str',
@@ -775,7 +797,7 @@ def temp():
     #     False,
     #     'Image Classifier Xception',
     #     'Image Classifier Xception',
-    #     ModelType['folder_input'],
+    #     ModelType['unstructured'],
     #     'server3/lib/models/nn/image_classifier_xception.py',
     #     'image_classifier_xception',
     #     'image_classifier_xception_to_str',

@@ -20,7 +20,8 @@ from sklearn.manifold import TSNE
 from server3.lib import toolkit_orig
 from server3.lib import preprocess_orig
 from server3.service import job_service
-from server3.business import toolkit_business, ownership_business, user_business, job_business, \
+from server3.business import toolkit_business, ownership_business, \
+    user_business, job_business, \
     result_business, project_business
 from server3.utility import data_utility
 # from server3.business import ownership_business
@@ -75,7 +76,8 @@ NEW_TOOLKIT_CATEGORY = [
 
 def get_all_public_toolkit_by_new_category():
     toolkit_category = copy.deepcopy(NEW_TOOLKIT_CATEGORY)
-    for obj in ownership_business.list_ownership_by_type_and_private('toolkit', False):
+    for obj in ownership_business.list_ownership_by_type_and_private('toolkit',
+                                                                     False):
         toolkit_obj = obj.toolkit.to_mongo()
         toolkit_obj.pop("target_py_code")
         for idx, category in enumerate(NEW_TOOLKIT_CATEGORY):
@@ -89,14 +91,16 @@ def get_all_public_toolkit_by_new_category():
 
 def get_all_public_toolkit():
     list_toolkit = []
-    for obj in ownership_business.list_ownership_by_type_and_private('toolkit', False):
+    for obj in ownership_business.list_ownership_by_type_and_private('toolkit',
+                                                                     False):
         list_toolkit.append(obj.toolkit.to_mongo().to_dict())
     return list_toolkit
 
 
 def get_all_public_toolkit_by_category():
     toolkit_category_dict = {}
-    for obj in ownership_business.list_ownership_by_type_and_private('toolkit', False):
+    for obj in ownership_business.list_ownership_by_type_and_private('toolkit',
+                                                                     False):
         if obj.toolkit.category in TOOLKIT_CATEGORY_DICT:
             string = TOOLKIT_CATEGORY_DICT[obj.toolkit.category]
             toolkit_obj = obj.toolkit.to_mongo()
@@ -115,13 +119,15 @@ def list_public_toolkit_name():
     return all_names
 
 
-def toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, fields, *argv):
+def toolkit_calculate_temp(project_id, staging_data_set_id, toolkit_id, fields,
+                           *argv):
     toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
     entry_function = toolkit_obj.entry_function
     code = "from lib.toolkit_orig import " + entry_function
     exec(code)
     func = locals()[toolkit_obj.entry_function]
-    func = job_service.create_toolkit_job(project_id, staging_data_set_id, toolkit_id, fields)(func)
+    func = job_service.create_toolkit_job(project_id, staging_data_set_id,
+                                          toolkit_id, fields)(func)
     result = func(*argv)
     return result
 
@@ -150,7 +156,8 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
     index_nan = []
     arg_filter = []
     for index, item in enumerate(data):
-        temp = [data_utility.convert_string_to_number_with_poss(item[i]) for i in columns]
+        temp = [data_utility.convert_string_to_number_with_poss(item[i]) for i
+                in columns]
         if np.nan not in temp:
             arg_filter.append(temp)
         else:
@@ -167,10 +174,12 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
 
     # toolkit_temp应该支持数据库接入
     if kwargs:
-        result = toolkit_calculate(project_id, staging_data_set_id, toolkit_obj, fields, index_nan,
+        result = toolkit_calculate(project_id, staging_data_set_id,
+                                   toolkit_obj, fields, index_nan,
                                    *argv, **kwargs)
     else:
-        result = toolkit_calculate(project_id, staging_data_set_id, toolkit_obj, fields, index_nan,
+        result = toolkit_calculate(project_id, staging_data_set_id,
+                                   toolkit_obj, fields, index_nan,
                                    *argv)
     return result
 
