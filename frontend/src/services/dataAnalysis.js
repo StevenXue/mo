@@ -51,12 +51,13 @@ export function addSection(section) {
 
 // 更改section
 export function updateSection(sectionId, section) {
-  console.log('sectionId', sectionId)
-  console.log('upload_section', section)
-  // return request(`/api${PREFIX}/section`, {
-  //   method: 'ADD',
-  //   body: section
-  // });
+
+  console.log('sectionId', sectionId);
+  console.log('upload_section', section);
+  return request(`/api/job/job_steps`, {
+    method: 'PUT',
+    body: section
+  });
 }
 
 //

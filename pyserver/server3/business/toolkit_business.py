@@ -1793,7 +1793,7 @@ k_means = {
 }
 steps = [
     {
-        'name': 'data_source',
+        'name': 'custom',
         'display_name': 'select parameters',
         'args': [
             {

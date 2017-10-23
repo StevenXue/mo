@@ -63,13 +63,16 @@ def create_job():
         pass
 
 
-@job_app.route("/job", methods=["PUT"])
-def update_job():
+@job_app.route("/job_steps", methods=["PUT"])
+def update_job_steps():
     data = request.get_json()
-
-
-
-
+    job_id, steps = ObjectId(data["_id"]), data['steps']
+    result = job_business.update_job_steps(job_id, steps)
+    result = json_utility.convert_to_json(result.to_mongo())
+    return jsonify({
+        "response": {
+            "result": result
+        }}), 200
 
 
 @job_app.route("/job", methods=["DELETE"])
