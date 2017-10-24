@@ -27,6 +27,7 @@ export default {
 
     // 右侧激活的preview表格
 
+    projectId: null,
 
 
 
@@ -54,7 +55,7 @@ export default {
         ...state,
         sectionsJson: {
           ...state.sectionsJson,
-          [action.section['sectionId']]: action.section,
+          [action.payload.section['_id']]: action.payload.section,
         },
 
       }
@@ -83,8 +84,8 @@ export default {
       return {
         ...state,
         activeSectionsId: state.activeSectionsId
-          .filter(sectionId => sectionId !== action.sectionId).concat(action.new_sectionId),
-        focusSectionsId: action.sectionId,
+          .filter(sectionId => sectionId !== action.payload.oldSectionId).concat(action.payload.newSectionId),
+        focusSectionsId: action.payload.newSectionId,
       }
     },
 
@@ -128,6 +129,13 @@ export default {
         ...state,
         algorithms: action.payload.algorithms,
       }
+    },
+
+    setProjectId(state, action){
+      return {
+        ...state,
+        projectId: action.payload.projectId,
+      }
     }
 
   },
@@ -153,39 +161,13 @@ export default {
 
 
     },
-    // 更新用户 section
-    *updateSection(action, { call, put, select }) {
-      // 开始加载
-      const sectionId = action.sectionId;
-      const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson)
-      const section = sectionsJson[sectionId];
-      const sections = yield call(dataAnalysisService.updateSection, sectionId, section)
 
-      // 停止加载
-      // 显示保存成功
-      // yield put({type: 'setSections', sections})
 
-    },
-
-    // 添加 section
-    *addSection(action, { call, put, select }) {
-      //todo 1. 向后台发起请求 获得section 的json 内容
-      const { data: section } = yield call(dataAnalysisService.addSection, action.section)
-      // 2. 添加section
-      yield put({ type: 'addNewSection', section: section })
-      // 3. 替换原有active section
-      yield put({
-        type: 'replaceActiveSection',
-        sectionId: action.section.sectionId,
-        new_sectionId: section.sectionId,
-      })
-    },
 
     // 删除 section
 
     // 获取stage data set list
     *fetchStagingDatasetList(action, { call, put, select }) {
-
       const projectId = action.projectId;
       const { data: stagingDataList } = yield call(stagingDataService.fetchStagingDatas, projectId);
       yield put({ type: 'setStagingDataList', stagingDataList })

@@ -45,8 +45,11 @@ def create_job(project_id, toolkit_id):
         staging_data_set_obj=None,
         project_obj=project_obj,
     )
+
     # update a project
     project_business.insert_job_by_id(project_id, job_obj.id)
+    # 将job的toolkit转换成object
+    # job_obj.toolkit = job_obj.toolkit.to_mongo()
     return job_obj
 
 

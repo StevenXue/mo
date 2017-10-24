@@ -29,10 +29,8 @@ job_app = Blueprint("job_app", __name__, url_prefix=PREFIX)
 eg = {
     "project_id": "59c21ca6d845c0538f0fadd5",
     "job_type": "toolkit",
-    "algorithm": {
-        "name": "k-mean",
-        "_id": "5980149d8be34d34da32c170",
-    }
+    "algorithm_id": "5980149d8be34d34da32c170",
+
 }
 
 
@@ -46,15 +44,19 @@ def create_job():
     """
     data = request.get_json()
     # todo 使用try except 捕捉错误
+    print("data", data)
     if data["job_type"] == "toolkit":
-        toolkit_id = ObjectId(data["algorithm"]["_id"])
+        toolkit_id = ObjectId(data["algorithm_id"])
         project_id = ObjectId(data["project_id"])
 
         job_obj = job_service.create_job(
             project_id=project_id,
             toolkit_id=toolkit_id
         )
-        job_obj = json_utility.convert_to_json(job_obj.to_mongo())
+        toolkit = job_obj.toolkit.to_mongo()
+        job_obj = job_obj.to_mongo()
+        job_obj['toolkit'] = toolkit
+        job_obj = json_utility.convert_to_json(job_obj)
         return jsonify({
             "response": {
                 "job": job_obj

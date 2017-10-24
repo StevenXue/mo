@@ -11,7 +11,49 @@ const categories = 'toolkit'
 
 const dataAnalysis = modelExtend(workBench, {
   namespace: 'dataAnalysis',
+  reducers: {
 
+  },
+  effects: {
+    // 更新用户 section
+    *updateSection(action, { call, put, select }) {
+      // 开始加载
+      const sectionId = action.sectionId;
+      const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson)
+      const section = sectionsJson[sectionId];
+      const sections = yield call(dataAnalysisService.updateSection, sectionId, section)
+
+      // 停止加载
+      // 显示保存成功
+      // yield put({type: 'setSections', sections})
+
+    },
+
+    // 添加 section
+    *addSection(action, { call, put, select }) {
+
+      const projectId = yield select(state => state.dataAnalysis.projectId);
+
+      //todo 1. 向后台发起请求 获得section 的json 内容
+      const { data: {job: newSection} } = yield call(dataAnalysisService.addSection, {
+        ...action.payload,
+        project_id: projectId,
+      });
+
+      // 2. 添加section
+      yield put({ type: 'addNewSection', payload: {section: newSection}});
+
+      // 3. 替换原有active section
+      yield put({
+        type: 'replaceActiveSection',
+        payload: {
+          // 原先的launcher id
+          oldSectionId: action.payload.sectionId,
+          newSectionId: newSection._id,
+        }
+      })
+    },
+  },
 
 
   subscriptions: {
@@ -24,7 +66,12 @@ const dataAnalysis = modelExtend(workBench, {
 
           dispatch({ type: 'fetchSections', projectId: projectId, categories });
           dispatch({ type: 'fetchAlgorithms', categories });
-          dispatch({ type: 'fetchStagingDatasetList', projectId: projectId })
+          dispatch({ type: 'fetchStagingDatasetList', projectId: projectId });
+
+          //将project id存起来
+          dispatch({ type: 'setProjectId', payload: {projectId: projectId}});
+
+
         }
       });
     },

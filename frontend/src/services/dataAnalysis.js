@@ -14,37 +14,23 @@ export async function fetchSections(payload) {
   return res
 }
 
+const myDict = {
+  'dataAnalysis': 'toolkit'
+};
+
 // 添加section
-export function addSection(section) {
-  return {
-    data: {
-      sectionId: '000001',
-      section_name: 'new_section____xddd',
-      section_type: 'K-mean',
-      steps: [
-        {
-          title: '选择目标数据表',
-          content: null,
-        },
-
-        {
-          title: '选择来源数据表',
-          content: '59c21d71d845c0538f0faeb2',
-        },
-
-        {
-          title: '编辑对应列名称',
-          content: 'A',
-        },
-
-      ],
+export function addSection(payload) {
+  return request('/api/job/job', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
     },
-    header: {},
-  }
-
-  // return request('/api/section', {
-  //   method: 'ADD',
-  // });
+    body: JSON.stringify({
+      "project_id": payload.project_id,
+      "job_type": myDict[payload.namespace],
+      "algorithm_id": payload.algorithm_id,
+    })
+  });
 }
 
 // 删除section
