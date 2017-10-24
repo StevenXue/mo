@@ -34,6 +34,17 @@ export function addSection(payload) {
 }
 
 // 删除section
+export function deleteSection(payload) {
+  return request(`/api/job/job`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      "job_id": payload.sectionId
+    })
+  });
+}
 
 // 更改section
 export function saveSection(payload) {

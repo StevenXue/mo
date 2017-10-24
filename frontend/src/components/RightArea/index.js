@@ -1,9 +1,11 @@
 import React, {Component} from 'react';
 import styles from './index.less';
 
-import {Tabs} from 'antd';
+import {Tabs, Select} from 'antd';
+// import {, Collapse, Button, Input} from 'antd';
 
 const TabPane = Tabs.TabPane;
+const Option = Select.Option;
 
 // todo 自己写tab 以实现样式自定义
 const tabs = [
@@ -18,10 +20,37 @@ const tabs = [
 ];
 
 function View () {
+
+  function handleChange() {
+
+  }
   return <div>
     view
+    <div>
+
+      <Select
+        // key={arg.name + argIndex}
+        // className={styles.select}
+        showSearch
+        style={{width: 200}}
+        placeholder="Select a stagingData"
+        optionFilterProp="children"
+        onChange={(value) => handleChange(value)}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        defaultValue={arg.values[0]}
+        filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+      >
+        {stagingDataList.map((stagingData) =>
+          <Option key={stagingData._id} value={stagingData._id}>{stagingData.name}</Option>
+        )}
+      </Select>
+
+    </div>
+
   </div>
 }
+
 
 function Result () {
   return <div>

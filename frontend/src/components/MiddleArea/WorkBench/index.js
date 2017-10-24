@@ -22,8 +22,6 @@ const JsonToArray = (json, key) => {
   return arr
 };
 
-const fields = ['aaa', 'aaa', 'aaa', 'aaa', 'aaa', 'aaa', 'aaa', 'aaa', 'aaa', 'aaa'];
-
 
 function WorkBench({section, model, dispatch, namespace}) {
   //state
@@ -32,13 +30,12 @@ function WorkBench({section, model, dispatch, namespace}) {
     sectionsJson
   } = model;
   //change state
-  const setSections = (sectionsJson) => {
-    dispatch({
-      type: namespace + '/setSections',
-      sectionsJson: sectionsJson
-    })
-  };
-
+  // const setSections = (sectionsJson) => {
+  //   dispatch({
+  //     type: namespace + '/setSections',
+  //     sectionsJson: sectionsJson
+  //   })
+  // };
 
 
   function handleBlur() {
@@ -63,9 +60,33 @@ function WorkBench({section, model, dispatch, namespace}) {
     // section.steps[index].args[argIndex].values = [value]; 备选方案以后再加相应的reducer
 
     sectionsJson[section._id].steps[index].args[argIndex].values = [value];
-    setSections(sectionsJson);
-    console.log(`selected ${value}`);
+
+    dispatch({
+      type: namespace + '/setSections',
+      payload: {sectionsJson: sectionsJson}
+    });
     // 将预览设置
+  }
+
+  function handleSave(stagingDatasetId) {
+
+    dispatch({
+      type: namespace + '/getFields',
+      payload: {
+        stagingDatasetId,
+        sectionId: section._id
+      }
+    })
+  }
+
+  function handleClickField(fieldName) {
+    dispatch({
+      type: namespace + '/addRemoveField',
+      payload: {
+        fieldName,
+        sectionId: section._id
+      }
+    })
   }
 
 
@@ -83,9 +104,9 @@ function WorkBench({section, model, dispatch, namespace}) {
                       className={styles.panel}
                       header={step.display_name} key="1">
                       {
-                        step.args.map((arg, argIndex)=>
+                        step.args.map((arg, argIndex) =>
                           <Select
-                            key={arg.name+argIndex}
+                            key={arg.name + argIndex}
                             className={styles.select}
                             showSearch
                             style={{width: 200}}
@@ -103,15 +124,23 @@ function WorkBench({section, model, dispatch, namespace}) {
                           </Select>
                         )
                       }
-                      <Button type="primary" className={styles.button}>save</Button>
+                      <Button type="primary" onClick={() => handleSave(step.args[0].values[0])} className={styles.button}>save</Button>
                     </Panel>;
                   case 'fields':
                     return <Panel header="Select Fields" key="2"
                                   className={styles.panel}
                     >
                       <div className={styles.fields}>
-                        {fields.map(field =>
-                          <div key={Math.random()} className={styles.field}>field</div>
+
+                        {step.args[0]["fields"] && step.args[0].fields.map(field =>
+                          <div
+                            key={field[0]}
+                            className={styles.field}
+                            onClick={() => handleClickField(field[0])}
+                            style={{backgroundColor: (step.args[0].values).includes(field[0]) ? 'yellow' : '#F3F3F3'}}
+                          >
+                            <p className={styles.text}>{field[0]}</p>
+                          </div>
                         )}
                       </div>
 
