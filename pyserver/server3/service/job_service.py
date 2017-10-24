@@ -36,6 +36,24 @@ from server3.utility import data_utility
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 
 
+def create_job(project_id, toolkit_id):
+    # create a job
+    toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
+    project_obj = project_business.get_by_id(project_id)
+    job_obj = job_business.add_toolkit_job(
+        toolkit_obj=toolkit_obj,
+        staging_data_set_obj=None,
+        project_obj=project_obj,
+    )
+
+    # update a project
+    project_business.insert_job_by_id(project_id, job_obj.id)
+    # 将job的toolkit转换成object
+    # job_obj.toolkit = job_obj.toolkit.to_mongo()
+    return job_obj
+
+
+
 def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields,
                        nan_index):
     """
@@ -73,9 +91,6 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields,
             func_rst = func(*args, **kw)
             result = list(func_rst) if isinstance(func_rst, tuple) else [
                 func_rst]
-
-
-
 
             # 新设计的存取方式
             results = {
@@ -272,7 +287,7 @@ def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields,
             if result_spec["if_reserved"]:
                 # create result sds for toolkit
                 sds_name = '%s_%s_result' % (
-                toolkit_obj['name'], job_obj['id'])
+                    toolkit_obj['name'], job_obj['id'])
                 result_sds_obj = staging_data_set_business.add(sds_name, 'des',
                                                                project_obj,
                                                                job=job_obj,
@@ -408,8 +423,6 @@ def add_new_column(value, index, fields, name, staging_data_set_id):
                 obj = dict(zip(name_list, arr))
             col_value.append(obj)
         staging_data_service.add_new_keys_value(staging_data_set_id, col_value)
-
-
 
 
 if __name__ == '__main__':

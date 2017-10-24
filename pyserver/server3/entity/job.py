@@ -42,3 +42,5 @@ class Job(Document):
     params = DictField()
     file = ReferenceField('File')
     run_args = DictField()
+
+    steps = ListField(DictField())

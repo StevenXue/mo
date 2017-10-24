@@ -57,7 +57,6 @@ function Sidebar({model, dispatch, namespace}) {
     addActiveSection('new_launcher ' + Math.random());
   };
 
-  console.log(sections)
   return (
     isLeftSideBar ?
       <div className={styles.container}>
