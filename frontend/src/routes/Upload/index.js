@@ -136,7 +136,7 @@ class UploadData extends Component {
           <FormItem
             wrapperCol={{ span: 12, offset: 2 }}
           >
-            <Button type="primary" htmlType="submit">Submit</Button>
+            <Button type="primary" htmlType="submit" loading={this.props.upload.uploading}>Submit</Button>
           </FormItem>
         </Form>
       </div>
