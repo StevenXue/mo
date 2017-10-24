@@ -6,7 +6,7 @@
 # @date     : 2017-08-22
 # @running  : python
 """
-from mongoengine import Document
+from mongoengine import DynamicDocument
 from mongoengine import StringField
 from mongoengine import IntField
 from mongoengine import DictField
@@ -17,7 +17,7 @@ INPUT_TYPES = ('image', '1darray', '2darray', 'ndarray')
 STATUS = ('running', 'stopped', 'terminated')
 
 
-class ServedModel(Document):
+class ServedModel(DynamicDocument):
     name = StringField(max_length=50, required=True)
     description = StringField(max_length=140, required=True)
     version = IntField(required=True)

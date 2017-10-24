@@ -1,17 +1,24 @@
 import React, { Component } from 'react'
-import { Modal, Form, Input, Radio } from 'antd'
+import { Modal, Form, Input, Radio, Select, Tag, Tooltip, Button } from 'antd'
 import { connect } from 'dva'
 
 const FormItem = Form.Item
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
+const Option = Select.Option
+
+const fields = ['Business', 'Government', 'Education', 'Environment', 'Health', 'Housing & Development',
+  'Public Services', 'Social', 'Transportation', 'Science', 'Technology']
+const tasks = ['Classification', 'Regression', 'Clustering', 'Reinforcement Learning']
 
 class ProjectModal extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       visible: false,
       is_private: 'true',
+      tags: [],
+      inputVisible: false,
     }
   }
 
@@ -32,34 +39,74 @@ class ProjectModal extends Component {
   }
 
   okHandler = (values) => {
-    console.log(values)
-    // const user_ID = this.props.project.user.user_ID
     this.props.form.validateFields((err, values) => {
-      console.log(values)
       if (!err) {
-        let body = {
-          name: values.name,
-          description: values.description,
-          is_private: this.state.is_private,
+        if (values.related_fields) {
+          values.related_fields = values.related_fields.join(',')
         }
-        this.props.dispatch({ type: 'project/create', payload: body })
+        if (values.related_tasks) {
+          values.related_tasks = values.related_tasks.join(',')
+        }
+        // let body = {
+        //   ...values,
+        //   is_private: this.state.is_private,
+        // }
+        if (this.props.new) {
+          this.props.dispatch({ type: 'project/create', body: values })
+        } else {
+          this.props.dispatch({ type: 'projectDetail/update', body: values })
+        }
       }
     })
   }
 
-  onChangePrivacy (e) {
+  onChangePrivacy(e) {
     this.setState({
       is_private: e.target.value,
     })
   }
 
-  render () {
-    const { children } = this.props
+  handleClose(removedTag) {
+    const tags = this.state.tags.filter(tag => tag !== removedTag).filter(e => e)
+    this.setState({ tags })
+    // dispatch({ type: 'upload/removeTag', payload: tags })
+  }
+
+  showInput() {
+    this.setState({ inputVisible: true })
+    // dispatch({ type: 'upload/showInput' })
+  }
+
+  handleInputChange(e) {
+    this.setState({ inputValue: e.target.value })
+    // dispatch({ type: 'upload/setInputValue', payload: e.target.value })
+  }
+
+  handleInputConfirm() {
+    if (this.state.inputValue && this.state.tags.indexOf(this.state.inputValue) === -1) {
+      const tags = [...this.state.tags, this.state.inputValue]
+      this.setState({ tags, inputValue: undefined, inputVisible: false })
+    }
+
+    // if (upload.inputValue && upload.tags.indexOf(upload.inputValue) === -1) {
+    //   dispatch({ type: 'upload/confirmInput' })
+    // }
+  }
+
+  render() {
+    const { children, projectDetail } = this.props
     const { getFieldDecorator } = this.props.form
     // const { name, description, privacy } = this.props.record
     const formItemLayout = {
       labelCol: { span: 6 },
       wrapperCol: { span: 14 },
+    }
+    let name, description, related_fields, related_tasks, is_private
+    let tags = this.state.tags
+    if (projectDetail) {
+      ({ name, description, related_fields, related_tasks, is_private } = projectDetail.project)
+      is_private = String(is_private)
+      tags = tags.length > 0 ? tags : projectDetail.project.tags
     }
 
     return (
@@ -80,7 +127,7 @@ class ProjectModal extends Component {
             >
               {
                 getFieldDecorator('name', {
-                  // initialValue: name,
+                  initialValue: name,
                   rules: [
                     {
                       required: true,
@@ -95,7 +142,7 @@ class ProjectModal extends Component {
             >
               {
                 getFieldDecorator('description', {
-                  // initialValue: description,
+                  initialValue: description,
                   rules: [
                     {
                       required: true,
@@ -108,50 +155,97 @@ class ProjectModal extends Component {
               {...formItemLayout}
               label="Privacy"
             >
-              <RadioGroup defaultValue="true" onChange={(e) => this.onChangePrivacy(e)}>
-                <RadioButton value="true">Private</RadioButton>
-                <RadioButton value="false">Public</RadioButton>
-              </RadioGroup>
+              {getFieldDecorator('is_private', {
+                initialValue: is_private,
+                rules: [
+                  { required: false },
+                ],
+              })(
+                <RadioGroup onChange={(e) => this.onChangePrivacy(e)}>
+                  <RadioButton value="true">Private</RadioButton>
+                  <RadioButton value="false">Public</RadioButton>
+                </RadioGroup>,
+              )}
+
             </FormItem>}
-            {/*<FormItem*/}
-              {/*{...formItemLayout}*/}
-              {/*label="Fields"*/}
-            {/*>*/}
-          {/*{getFieldDecorator('related_field', {*/}
-            {/*rules: [*/}
-              {/*{ required: false },*/}
-            {/*],*/}
-          {/*})(*/}
-            {/*<Select>*/}
-              {/*{*/}
-                {/*fields.map((e) => <Option value={e} key={e}>{e}</Option>)*/}
-              {/*}*/}
-            {/*</Select>,*/}
-          {/*)}*/}
-            {/*</FormItem>*/}
-            {/*<FormItem*/}
-              {/*{...formItemLayout}*/}
-              {/*label="Related Tasks"*/}
-            {/*>*/}
-          {/*{getFieldDecorator('related_tasks', {*/}
-            {/*rules: [*/}
-              {/*{ required: false },*/}
-            {/*],*/}
-          {/*})(*/}
-            {/*<Select mode="multiple">*/}
-              {/*{*/}
-                {/*tasks.map((e) => <Option value={e} key={e}>{e}</Option>)*/}
-              {/*}*/}
-            {/*</Select>,*/}
-          {/*)}*/}
-        {/*</FormItem>*/}
+            <FormItem
+              {...formItemLayout}
+              label="Fields"
+            >
+          {getFieldDecorator('related_fields', {
+            initialValue: related_fields,
+            rules: [
+              { required: false },
+            ],
+          })(
+            <Select mode="multiple">
+              {
+                fields.map((e) => <Option value={e} key={e}>{e}</Option>)
+              }
+            </Select>,
+          )}
+            </FormItem>
+            <FormItem
+              {...formItemLayout}
+              label="Related Tasks"
+            >
+          {getFieldDecorator('related_tasks', {
+            initialValue: related_tasks,
+            rules: [
+              { required: false },
+            ],
+          })(
+            <Select mode="multiple">
+              {
+                tasks.map((e) => <Option value={e} key={e}>{e}</Option>)
+              }
+            </Select>,
+          )}
+        </FormItem>
+            <FormItem
+              {...formItemLayout}
+              label="Tags"
+            >
+          {
+            getFieldDecorator('tags', {
+              initialValue: tags,
+              getValueFromEvent: (e) => {
+                return [...this.state.tags, e.target.value].join(',')
+              },
+              rules: [
+                { required: false },
+              ],
+            })(
+              <div>
+                {tags.length !== 0 && tags.map((tag, index) => {
+                  const isLongTag = tag.length > 15
+                  const tagElem = (
+                    <Tag key={tag} closable={true} afterClose={() => this.handleClose(tag)}>
+                      {isLongTag ? `${tag.slice(0, 15)}...` : tag}
+                    </Tag>
+                  )
+                  return isLongTag ? <Tooltip key={tag} title={tag}>{tagElem}</Tooltip> : tagElem
+                })}
+                {this.state.inputVisible ? (
+                  <Input
+                    //ref={input => this.input = input}
+                    type="text"
+                    size="small"
+                    style={{ width: 78 }}
+                    value={this.state.inputValue}
+                    onChange={(e) => this.handleInputChange(e)}
+                    onBlur={() => this.handleInputConfirm()}
+                    onPressEnter={() => this.handleInputConfirm()}
+                  />
+                ) : <Button size="small" type="dashed" onClick={() => this.showInput()}>+ New Tag</Button>}
+              </div>,
+            )}
+            </FormItem>
           </Form>
         </Modal>
       </span>
     )
   }
 }
-
-
 
 export default connect(({ project }) => ({ project }))(Form.create()(ProjectModal))

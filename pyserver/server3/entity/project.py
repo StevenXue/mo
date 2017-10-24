@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from mongoengine import Document
+from mongoengine import DynamicDocument
 from mongoengine import StringField
 from mongoengine import DateTimeField
 from mongoengine import ReferenceField
@@ -8,7 +8,7 @@ from mongoengine import ListField
 from mongoengine import PULL
 
 
-class Project(Document):
+class Project(DynamicDocument):
     name = StringField(max_length=50, required=True)
     description = StringField(max_length=140)
     create_time = DateTimeField(required=True)

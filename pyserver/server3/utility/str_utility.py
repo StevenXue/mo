@@ -37,3 +37,7 @@ def slugify(value, allow_unicode=False):
 def rand_str(length):
     return ''.join(
         random.choices(string.ascii_uppercase + string.digits, k=length))
+
+
+def split_without_empty(string):
+    return [x.strip() for x in string.split(',') if x]
