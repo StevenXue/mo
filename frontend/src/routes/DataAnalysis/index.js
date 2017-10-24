@@ -12,6 +12,7 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
     model: dataAnalysis,
     namespace: 'dataAnalysis',
     dispatch:  dispatch,
+    // step 用来干嘛了？
     step: 'toolkit'
   };
   return (
