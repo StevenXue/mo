@@ -15,6 +15,7 @@ export default {
 
   },
 
+
   effects: {
 
     * upload ({
@@ -38,20 +39,16 @@ export default {
       payload.related_field && formData.append('related_field', payload.related_field)
       console.log('22')
       yield put({ type: 'setUploading', payload: true })
-      console.log('225')
+
       const data = yield call(uploadFile, formData)
-      console.log('33')
-      if (data.success) {
-        console.log('upload success')
-        message.success('upload success')
-        yield put({ type: 'setUploading', payload: false })
+      console.log(data)
+      message.success('upload success')
+      yield put({ type: 'setUploading', payload: false })
 
-        // yield put({ type: 'fetch' })
+      console.log('44')
 
-      } else {
-        console.log('error', data, formData)
-        throw data
-      }
+      // yield put({ type: 'fetch' })
+
     },
 
   },

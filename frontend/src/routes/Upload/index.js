@@ -15,7 +15,7 @@ class UploadData extends Component {
   constructor (props) {
     super(props);
     this.state = {
-      ...props.upload
+      ...props
 
     }
   }
@@ -94,13 +94,14 @@ class UploadData extends Component {
               })(
                 <Select>
                   {
-                    dataCategory.map(e => <Option key={e} value={e.toLowerCase()}>{e}</Option>)
+                    dataCategory.map(e => <Option key={e} value={e}>{e}</Option>)
                   }
                 </Select>
               )
             }
 
           </FormItem>
+
 
           <FormItem
             { ...formItemLayout }
