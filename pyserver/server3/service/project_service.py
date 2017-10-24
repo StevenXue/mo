@@ -182,6 +182,7 @@ def get_all_jobs_of_project(project_id, categories):
                     'name': job[key]['name'],
                     'category': job[key]['category'],
                     'parameter_spec': job[key]['parameter_spec'],
+                    'steps': job[key]['steps']
                 }
 
                 # source staging data set info

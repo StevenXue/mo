@@ -42,3 +42,5 @@ class Job(DynamicDocument):
     params = DictField()
     file = ReferenceField('File')
     run_args = DictField()
+
+    steps = ListField(DictField())
