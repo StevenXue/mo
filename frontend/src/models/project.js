@@ -1,4 +1,5 @@
-import { fetchProjects } from '../services/project'
+import { routerRedux } from 'dva/router'
+import { fetchProjects, createProject, deleteProject, updateProject } from '../services/project'
 import { privacyChoices } from '../constants'
 
 export default {
@@ -7,15 +8,6 @@ export default {
     projects: [],
   },
   reducers: {
-    *create({ payload }, { call, put, select }) {
-      const user = 'dev_1'
-      let body = payload
-      body['user_ID'] = user.user_ID
-      const data = yield call(create, body)
-      yield put({ type: 'query' })
-      yield put({ type: 'hideModal' })
-    },
-
     setProjects(state, { payload: projects }) {
       return {
         ...state,
@@ -34,10 +26,18 @@ export default {
   effects: {
     // 获取用户所有 project
     *fetch(action, { call, put, select }) {
-      // select login info
+      // TODO select login info
       let user_ID = 'dev_1'
       const { data: projects } = yield call(fetchProjects, { user_ID, privacy: action.privacy })
       yield put({ type: 'setProjects', payload: projects })
+    },
+
+    *create({ body }, { call, put, select }) {
+      const user_ID = 'dev_1'
+      body['user_ID'] = user_ID
+      yield call(createProject, { body })
+      yield put({ type: 'hideModal' })
+      yield put({ type: 'fetch', privacy: 'all' })
     },
   },
   subscriptions: {

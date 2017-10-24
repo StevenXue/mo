@@ -1,4 +1,4 @@
-{
+export default {
   "entry": "src/index.js",
   "env": {
     "development": {
@@ -27,6 +27,8 @@
           "changeOrigin": true,
           "pathRewrite": { "^/api" : "" }
         }
-  }
-
+  },
+  "theme": {
+    "primary-color": "#34C0E2",
+  },
 }

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from mongoengine import Document
+from mongoengine import DynamicDocument
 from mongoengine import StringField
 from mongoengine import DateTimeField
 from mongoengine import IntField
@@ -15,7 +15,7 @@ EXTENSION = tuple(ALLOWED_EXTENSIONS)
 FILE_TYPE = ('table', 'image', 'text', 'audio', 'video')
 
 
-class File(Document):
+class File(DynamicDocument):
     name = StringField(max_length=50, required=True)
     description = StringField(max_length=140)
     upload_time = DateTimeField(required=True)
