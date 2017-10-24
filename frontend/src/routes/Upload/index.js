@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { Form, Input, Select, Upload, Button, Icon } from 'antd'
 import { connect } from 'dva'
 import styles from './index.css'
@@ -11,64 +11,138 @@ const formItemLayout = {
   labelCol: { span: 2 },
   wrapperCol: { span: 7 },
 };
-function UploadData({ location }) {
-  return (
-    <div>
-      <div className={styles.head}>
-        Upload your file
-      </div>
+class UploadData extends Component {
+  constructor (props) {
+    super(props);
+    this.state = {
+      ...props.upload
 
-      <Form>
-        <FormItem
-          { ...formItemLayout }
-          label='File name'
-        >
-          <Input />
-        </FormItem>
-        <FormItem
-          { ...formItemLayout }
-          label='Description'
-        >
-          <Input.TextArea />
-        </FormItem>
-        <FormItem
-          { ...formItemLayout }
-          label='Category'
-        >
-          <Select>
+    }
+  }
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+
+      if (!err) {
+        // console.log(values);
+        // let value = lodash.cloneDeep(values);
+        // value.tags = this.props.upload.tags.join(',');
+        this.props.dispatch({ type: 'upload/upload', payload: values })
+      } else {
+
+        console.log('error', err)
+      }
+    })
+  };
+
+  beforeUpload = (file) => {
+    // console.log(file);
+    // this.props.form.setFieldsValue({
+    //   'upload': [file],
+    // });
+    return false
+
+  };
+
+  render() {
+    const { getFieldDecorator } = this.props.form
+    return (
+      <div>
+        <div className={styles.head}>
+          Upload your file
+        </div>
+
+        <Form onSubmit={this.handleSubmit}>
+          <FormItem
+            { ...formItemLayout }
+            label='File name'
+
+          >
             {
-              dataCategory.map(e => <Option key={e} value={e.toLowerCase()}>{e}</Option>)
+              getFieldDecorator('data_set_name', {
+                rules: [
+                  { required: true, message: 'please enter name' },
+                ],
+              })(<Input />)
             }
-          </Select>
-        </FormItem>
-        <FormItem
-          { ...formItemLayout }
-          label='Tags'
-        >
-        </FormItem>
-        <FormItem
-          {...formItemLayout }
-          label='Upload'
-        >
-          <Upload>
-            <Button>
-              <Icon type="upload"/> choose file
-            </Button>
-          </Upload>
-        </FormItem>
+          </FormItem>
 
-        <FormItem
-          wrapperCol={{ span: 12, offset: 2 }}
-        >
-          <Button type="primary" htmlType="submit">Submit</Button>
-        </FormItem>
-      </Form>
-    </div>
-  )
+          <FormItem
+            { ...formItemLayout }
+            label='Description'
+          >
+            {
+              getFieldDecorator('description', {
+                initialValue: name,
+                rules: [
+                  { required: true, message: 'Please enter description' },
+                ],
+              })(<Input.TextArea/>)
+            }
+          </FormItem>
+
+          <FormItem
+            { ...formItemLayout }
+            label='Category'
+          >
+            {
+              getFieldDecorator('related_field', {
+                rules: [
+                  { required: false },
+                ],
+              })(
+                <Select>
+                  {
+                    dataCategory.map(e => <Option key={e} value={e.toLowerCase()}>{e}</Option>)
+                  }
+                </Select>
+              )
+            }
+
+          </FormItem>
+
+          <FormItem
+            { ...formItemLayout }
+            label='Tags'
+          >
+          </FormItem>
+
+          <FormItem
+            {...formItemLayout }
+            label='Upload'
+            extra="Please choose file"
+            // fileList={this.state.fileList}
+          >
+
+            {getFieldDecorator('upload', {
+              // valuePropName: 'fileList',
+              rules: [
+                { required: true, message: 'please choose file' },
+              ],
+            })(
+              <Upload
+                name="uploaded_file"
+                action="/upload.do"
+                beforeUpload={this.beforeUpload}
+              >
+                <Button>
+                  <Icon type="upload"/> choose file
+                </Button>
+              </Upload>
+            )}
+          </FormItem>
+
+          <FormItem
+            wrapperCol={{ span: 12, offset: 2 }}
+          >
+            <Button type="primary" htmlType="submit">Submit</Button>
+          </FormItem>
+        </Form>
+      </div>
+    )
+  }
 }
 
-function mapStateToProps() {
-  return {}
-}
 
-export default connect(mapStateToProps)(Form.create()(UploadData))
+export default connect(({ upload }) => ({ upload }))(Form.create()(UploadData))
