@@ -39,14 +39,7 @@ function WorkBench({section, model, dispatch, namespace}) {
     })
   };
 
-  //functions
-  function handleChange(value, index, argIndex) {
 
-    sectionsJson[section._id].toolkit.steps[index].args[argIndex].values = [value];
-    setSections(sectionsJson);
-    console.log(`selected ${value}`);
-    // 将预览设置
-  }
 
   function handleBlur() {
     console.log('blur');
@@ -58,19 +51,27 @@ function WorkBench({section, model, dispatch, namespace}) {
 
   const {
     _id: sectionId,
-    toolkit: {
-      steps
-    }
+    // toolkit: {
+    //   steps
+    // }
+    steps
 
   } = section;
 
+  //functions 下拉框选择
+  function handleChange(value, index, argIndex) {
+    // section.steps[index].args[argIndex].values = [value]; 备选方案以后再加相应的reducer
 
-  // const steps = JsonToArray(stepsJson, 'key');
+    sectionsJson[section._id].steps[index].args[argIndex].values = [value];
+    setSections(sectionsJson);
+    console.log(`selected ${value}`);
+    // 将预览设置
+  }
 
 
   return (
     <div className={styles.normal}>
-      <ToolBar sectionId={sectionId}/>
+      <ToolBar sectionId={sectionId} {...{model, dispatch, namespace}}/>
       <div className={styles.container}>
         <Collapse className={styles.collapse} defaultActiveKey={['1']} onChange={callback}>
 
