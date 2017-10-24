@@ -54,6 +54,7 @@ def create_job():
             toolkit_id=toolkit_id
         )
         toolkit = job_obj.toolkit.to_mongo()
+        # 将job的toolkit转换成object
         job_obj = job_obj.to_mongo()
         job_obj['toolkit'] = toolkit
         job_obj = json_utility.convert_to_json(job_obj)

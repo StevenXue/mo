@@ -3,18 +3,22 @@ import {connect} from 'dva';
 import {Icon} from 'antd';
 import styles from './ToolBar.css';
 
-function ToolBar({dispatch, dataAnalysis, sectionId}) {
+function ToolBar({model, dispatch, namespace, sectionId}) {
 
-  // change state
-  const updateSection = (sectionId) => {
-    dispatch({
-      type: 'dataAnalysis/setSections',
-      sectionId: sectionId
-    })
-  };
+  // // change state
+  // const updateSection = (sectionId) => {
+  //   dispatch({
+  //     type: namespace + '/setSections',
+  //     sectionId: sectionId
+  //   })
+  // };
 
   function onClickSave() {
-    updateSection(sectionId);
+    dispatch({
+      type: namespace + '/saveSection',
+      payload: {sectionId: sectionId}
+    })
+
   }
 
   return (
@@ -29,10 +33,10 @@ function ToolBar({dispatch, dataAnalysis, sectionId}) {
       <Icon type="retweet" style={{fontSize:20, margin:10}}/>
       <Icon type="pause-circle" style={{fontSize:20, margin:10}}/>
       <Icon type="play-circle" style={{fontSize:20, margin:10}}/>
-      <Icon type="save" onClick={onClickSave} style={{fontSize:20, margin:10}}/>
+      <Icon type="save" onClick={()=>onClickSave()} style={{fontSize:20, margin:10}}/>
 
     </div>
   );
 }
 
-export default connect(({dataAnalysis}) => ({dataAnalysis}))(ToolBar);
+export default ToolBar;

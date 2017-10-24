@@ -36,13 +36,16 @@ export function addSection(payload) {
 // 删除section
 
 // 更改section
-export function updateSection(sectionId, section) {
+export function saveSection(payload) {
 
-  console.log('sectionId', sectionId);
-  console.log('upload_section', section);
+  // console.log('sectionId', sectionId);
+  console.log('upload_section', payload.section);
   return request(`/api/job/job_steps`, {
     method: 'PUT',
-    body: section
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload.section)
   });
 }
 

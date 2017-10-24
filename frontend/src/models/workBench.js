@@ -1,7 +1,7 @@
 import * as dataAnalysisService from '../services/dataAnalysis'
 import * as stagingDataService from '../services/stagingData'
 import * as modelService from '../services/model'
-import { arrayToJson } from '../utils/JsonUtils'
+import {arrayToJson} from '../utils/JsonUtils'
 import pathToRegexp from 'path-to-regexp'
 
 export default {
@@ -28,7 +28,6 @@ export default {
     // 右侧激活的preview表格
 
     projectId: null,
-
 
 
   },
@@ -131,48 +130,72 @@ export default {
       }
     },
 
-    setProjectId(state, action){
+    setProjectId(state, action) {
       return {
         ...state,
         projectId: action.payload.projectId,
+      }
+    },
+
+    deleteSectionR(state, action) {
+      return {
+        ...state,
+        sectionsJson: state.sectionsJson
       }
     }
 
   },
   effects: {
     // 获取用户所有sections
-    *fetchSections(action, { call, put }) {
-      const { data: { [action.categories]: sections } } = yield call(dataAnalysisService.fetchSections, {
+    * fetchSections(action, {call, put}) {
+      const {data: {[action.categories]: sections}} = yield call(dataAnalysisService.fetchSections, {
         projectId: action.projectId,
         categories: action.categories,
       });
       // array to json
       const sectionsJson = arrayToJson(sections, '_id');
-      yield put({ type: 'setSections', sectionsJson })
+      yield put({type: 'setSections', sectionsJson})
     },
-    *fetchAlgorithms(action, { call, put }) {
+
+    * fetchAlgorithms(action, {call, put}) {
       const requestFunc = {
         toolkit: dataAnalysisService.fetchToolkits,
         model: modelService.fetchModels,
       };
-      const { data: algorithms } = yield call(requestFunc[action.categories]);
-
-      yield put({ type: 'setAlgorithms', payload: {algorithms: algorithms}})
-
-
+      const {data: algorithms} = yield call(requestFunc[action.categories]);
+      yield put({type: 'setAlgorithms', payload: {algorithms: algorithms}})
     },
-
-
-
     // 删除 section
 
     // 获取stage data set list
-    *fetchStagingDatasetList(action, { call, put, select }) {
+    * fetchStagingDatasetList(action, {call, put, select}) {
       const projectId = action.projectId;
-      const { data: stagingDataList } = yield call(stagingDataService.fetchStagingDatas, projectId);
-      yield put({ type: 'setStagingDataList', stagingDataList })
+      const {data: stagingDataList} = yield call(stagingDataService.fetchStagingDatas, projectId);
+      yield put({type: 'setStagingDataList', stagingDataList})
 
     },
+
+    // 保存section
+    * saveSection(action, {call, put, select}) {
+      const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson);
+      const section = sectionsJson[action.payload.sectionId];
+
+      const {data: result} = yield call(dataAnalysisService.saveSection, {section: section})
+      // 没有后续操作了？
+    },
+
+    //删除section
+    * deleteSection(action, {call, put, select}) {
+      //1. 后端删除
+      const {data} = yield call(dataAnalysisService.saveSection, {sectionId: action.payload.sectionId});
+
+      //2. 前端删除
+      if (data) {
+        console.log("delete " + action.payload.sectionId)
+
+      }
+
+    }
 
   },
   subscriptions: {

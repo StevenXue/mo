@@ -147,13 +147,14 @@ def get_all_jobs_of_project(project_id, categories):
             if job[key]:
                 job_info = job.to_mongo()
                 # model/toolkit info
-                job_info[key] = {
-                    'item_id': job[key]['id'],
-                    'name': job[key]['name'],
-                    'category': job[key]['category'],
-                    'parameter_spec': job[key]['parameter_spec'],
-                    'steps': job[key]['steps']
-                }
+                # job_info[key] = {
+                #     'item_id': job[key]['id'],
+                #     'name': job[key]['name'],
+                #     'category': job[key]['category'],
+                #     'parameter_spec': job[key]['parameter_spec'],
+                #     'steps': job[key]['steps']
+                # }
+                job_info[key] = job[key].to_mongo()
 
                 # source staging data set info
                 job_info['staging_data_set'] = job['staging_data_set'][
