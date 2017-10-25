@@ -12,6 +12,7 @@ app.model(require("./models/projectDetail"));
 app.model(require("./models/project"));
 app.model(require("./models/login"));
 app.model(require("./models/preview"));
+app.model(require("./models/deployment"));
 
 // 2. Plugins
 // app.use({});
