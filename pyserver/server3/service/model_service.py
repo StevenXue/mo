@@ -174,11 +174,11 @@ def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
                                 "privileged": True,
                             },
                             "stdin": True,
-                            # "command": ["/usr/local/bin/python"],
-                            # "args": [
-                            #     "run_model.py",
-                            #     "--job_id", job_id
-                            # ],
+                            "command": ["/usr/local/bin/python"],
+                            "args": [
+                                "run_model.py",
+                                "--job_id", job_id
+                            ],
                             "volumeMounts": [
                                 {
                                     "mountPath": "/pyserver/user_directory",
