@@ -89,5 +89,22 @@ def delete_job():
         }}), 200
 
 
+@job_app.route("/run_job", methods=["POST"])
+def run_job():
+    data = request.get_json()
+    job_id = data['section_id']
+    job_obj = job_business.get_by_job_id(job_id)
+    job_obj = json_utility.convert_to_json(job_obj.to_mongo())
+    # print("job_obj", job_obj)
+
+    # staging_data_set_id = job_obj.
+
+
+    return jsonify({
+        "response": {
+            "job_obj": job_obj
+        }}), 200
+
+
 if __name__ == "__main__":
     create_job()
