@@ -1,10 +1,13 @@
 import React, {Component} from 'react';
 import styles from './index.less';
+import {connect} from 'dva';
 
 import {Tabs} from 'antd';
+// import {, Collapse, Button, Input} from 'antd';
 
 const TabPane = Tabs.TabPane;
 
+import Preview from './Preview';
 // todo 自己写tab 以实现样式自定义
 const tabs = [
   {
@@ -17,27 +20,23 @@ const tabs = [
   }
 ];
 
-function View () {
-  return <div>
-    view
-  </div>
-}
-
-function Result () {
-  return <div>
-    Result
-  </div>
-}
-
-const children = [
-  <View />, <Result/>
-];
-
 
 class RightArea extends Component {
   state = {
     status: 0
   };
+
+  renderChildren(){
+    switch (this.state.status) {
+      case 0:
+        return <Preview/>;
+      case 1:
+        return <div>
+          Result
+        </div>
+    }
+
+  }
 
   render() {
     return (
@@ -63,7 +62,7 @@ class RightArea extends Component {
           }
         </div>
         {
-          children[this.state.status]
+          this.renderChildren()
         }
       </div>
     )

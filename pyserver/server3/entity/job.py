@@ -44,3 +44,4 @@ class Job(DynamicDocument):
     run_args = DictField()
 
     steps = ListField(DictField())
+    active_steps = ListField(default=[])

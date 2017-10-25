@@ -21,7 +21,6 @@ from server3.business import project_business
 from server3.business import toolkit_business
 from server3.utility import json_utility
 
-
 PREFIX = "/job"
 
 job_app = Blueprint("job_app", __name__, url_prefix=PREFIX)
@@ -44,7 +43,6 @@ def create_job():
     """
     data = request.get_json()
     # todo 使用try except 捕捉错误
-    print("data", data)
     if data["job_type"] == "toolkit":
         toolkit_id = ObjectId(data["algorithm_id"])
         project_id = ObjectId(data["project_id"])
@@ -54,6 +52,7 @@ def create_job():
             toolkit_id=toolkit_id
         )
         toolkit = job_obj.toolkit.to_mongo()
+        # 将job的toolkit转换成object
         job_obj = job_obj.to_mongo()
         job_obj['toolkit'] = toolkit
         job_obj = json_utility.convert_to_json(job_obj)
@@ -68,8 +67,9 @@ def create_job():
 @job_app.route("/job_steps", methods=["PUT"])
 def update_job_steps():
     data = request.get_json()
-    job_id, steps = ObjectId(data["_id"]), data['steps']
-    result = job_business.update_job_steps(job_id, steps)
+    print("data", data)
+    job_id, steps, active_steps = ObjectId(data["_id"]), data['steps'], data['active_steps']
+    result = job_business.update_job_steps(job_id, steps, active_steps)
     result = json_utility.convert_to_json(result.to_mongo())
     return jsonify({
         "response": {
@@ -86,6 +86,23 @@ def delete_job():
     return jsonify({
         "response": {
             "result": result
+        }}), 200
+
+
+@job_app.route("/run_job", methods=["POST"])
+def run_job():
+    data = request.get_json()
+    job_id = data['section_id']
+    job_obj = job_business.get_by_job_id(job_id)
+    job_obj = json_utility.convert_to_json(job_obj.to_mongo())
+    # print("job_obj", job_obj)
+
+    # staging_data_set_id = job_obj.
+
+
+    return jsonify({
+        "response": {
+            "job_obj": job_obj
         }}), 200
 
 
