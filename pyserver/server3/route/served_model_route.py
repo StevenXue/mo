@@ -31,7 +31,7 @@ def deploy_trained_model(job_id):
     user_ID = data.pop('user_ID')
     description = data.pop('description')
     name = data.pop('name')
-    server = '192.168.65.2:9000'
+    server = '10.52.14.182:9000'
     signatures = data.pop('signatures')
     input_type = data.pop('input_type')
     served_model = served_model_service.deploy(user_ID, job_id, name,

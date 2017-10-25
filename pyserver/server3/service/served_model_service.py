@@ -95,7 +95,7 @@ def deploy(user_ID, job_id, name, description, server, signatures,
 
         cwd = os.getcwd()
         deploy_name = job_id + '-serving'
-        port = port_for.select_random()
+        port = port_for.select_random(ports=set(range(30000, 32767)))
         export_path = export_path.replace('./user_directory',
                                           '/home/root/work/user_directory')
         kube_json = {
@@ -118,7 +118,7 @@ def deploy(user_ID, job_id, name, description, server, signatures,
                         "containers": [
                             {
                                 "name": job_id,
-                                "image": "serving_app",
+                                "image": "10.52.14.192/gzyw/serving_app",
                                 "imagePullPolicy": "IfNotPresent",
                                 "ports": [{
                                     "containerPort": 9000,
@@ -172,7 +172,7 @@ def deploy(user_ID, job_id, name, description, server, signatures,
                 "type": "NodePort",
                 "ports": [
                     {
-                        "port": 8888,
+                        "port": 9000,
                         "nodePort": port
                     }
                 ],

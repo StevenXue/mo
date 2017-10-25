@@ -58,7 +58,6 @@ def custom_model(conf, model_fn, input_data, **kw):
     job_id = kw.pop('job_id', None)
     result_sds = kw.pop('result_sds', None)
     result_dir = kw.pop('result_dir', None)
-
     est_params = conf.get('estimator', None)
     fit_params = conf.get('fit', {})
     eval_params = conf.get('evaluate', {})
@@ -194,12 +193,13 @@ def custom_model_help(model_fn, input_data, job_id, result_dir, result_sds,
                 X_train.columns}
     serving_input_fn = input_fn_utils.build_default_serving_input_fn(features)
     saved_model_path = estimator.export_savedmodel(
-        # os.path.abspath(result_dir),
-        temp_dir,
+        os.path.abspath(result_dir),
+        # temp_dir,
         serving_input_fn)
-    files = os.listdir(temp_dir)
-    for f in files:
-        shutil.move(os.path.join(temp_dir, f), os.path.abspath(result_dir))
+    # files = os.listdir(temp_dir)
+    # for f in files:
+    #     shutil.move(os.path.join(temp_dir, f), os.path.abspath(result_dir))
+
     # add saved_model_path to result staging data set
     staging_data_set_business.update(result_sds.id,
                                      saved_model_path=saved_model_path.decode(

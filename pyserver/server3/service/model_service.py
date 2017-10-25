@@ -168,30 +168,22 @@ def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
                     "containers": [
                         {
                             "name": job_id,
-                            "image": "model_app",
+                            "image": "10.52.14.192/gzyw/model_app",
                             "imagePullPolicy": "IfNotPresent",
                             "securityContext": {
                                 "privileged": True,
                             },
                             "stdin": True,
-                            "command": ["/usr/local/bin/python"],
-                            "args": [
-                                "run_model.py",
-                                "--job_id", job_id
-                            ],
+                            # "command": ["/usr/local/bin/python"],
+                            # "args": [
+                            #     "run_model.py",
+                            #     "--job_id", job_id
+                            # ],
                             "volumeMounts": [
                                 {
                                     "mountPath": "/pyserver/user_directory",
                                     "name": "nfsvol"
                                 },
-                                # {
-                                #     "mountPath": "/pyserver/user_directory",
-                                #     "name": "user_directory"
-                                # },
-                                # {
-                                #     "mountPath": "/root/.keras",
-                                #     "name": "keras"
-                                # },
                             ]
                         }
                     ],
@@ -204,18 +196,6 @@ def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
                                 "claimName": "nfs-pvc"
                             }
                         },
-                        # {
-                        #     "name": "user_directory",
-                        #     "hostPath": {
-                        #         "path": "{}/user_directory".format(cwd)},
-                        # },
-                        # {
-                        #     "name": "keras",
-                        #     "hostPath": {
-                        #         "path": "{home_dir}/.keras".format(
-                        #             home_dir=str(Path.home())
-                        #         )},
-                        # }
                     ]
                 },
             },
