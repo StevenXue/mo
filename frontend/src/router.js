@@ -15,7 +15,7 @@ const breadcrumbNameMap = {
   '/projects': 'Project List',
 }
 
-const RouterConfig = withRouter(({ history, location, login }) => {
+const RouterConfig = ({ history, location, login }) => {
   const pathSnippets = location.pathname.split('/').filter(i => i)
 
   const extraBreadcrumbItems = pathSnippets.map((_, index) => {
@@ -43,7 +43,7 @@ const RouterConfig = withRouter(({ history, location, login }) => {
   )].concat(extraBreadcrumbItems)
 
   return (
-    <MainLayout location={location}>
+    <MainLayout location={location} history={history}>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <Breadcrumb>
           {breadcrumbItems}
@@ -57,13 +57,13 @@ const RouterConfig = withRouter(({ history, location, login }) => {
       </div>
     </MainLayout>
   )
-})
+}
 
-// const Main = connect(({ login }) => ({ login }))(RouterConfig)
+const Main = withRouter(connect(({ login }) => ({ login }))(RouterConfig))
 
 const App = ((props) =>
     <HashRouter>
-      <RouterConfig/>
+      <Main/>
     </HashRouter>
 )
 

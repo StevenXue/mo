@@ -26,6 +26,7 @@ export default {
   effects: {
     // 获取用户所有 project
     *fetch(action, { call, put, select, take }) {
+      console.log('project list')
       const { payload } = yield take('login/setUser')
       const user_ID = payload.user_ID
       // const user_ID = yield select(state => state.login.user.user_ID)

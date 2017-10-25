@@ -25,17 +25,23 @@ class MetricsHandler(logging.StreamHandler):
         # compile regex
         # \S maybe match to many cases, alternative \w+/?\w
         re_metrics = re.compile(r'(\S+) = (%s)' % sci_re)
+        # FIXME fix hard code for confusion_matrix
+        # confusion_matrix = [[0 29]
+        #                     [0 50]]
+        # re_confusion_matrix = re.compile(r'confusion_matrix = (\s*),')
         re_sec = re.compile(r'(%s) sec' % float_re)
         re_step = re.compile(r'\(step (%s)\)' % sci_re)
 
         # catch metrics and seconds from message
         metrics = re_metrics.findall(msg)
+        # confusion_matrix = re_confusion_matrix.findall(msg)
         sec = re_sec.findall(msg)
         step = re_step.findall(msg)
 
         # construct log object
         log_obj = {metric[0].replace('.', '').split('/')[0]: float(metric[1])
                    for metric in metrics}
+        # log_obj.update({'confusion_matrix': confusion_matrix[0]})
         if len(sec) > 0:
             return
         for s in sec:
@@ -55,5 +61,3 @@ class MetricsHandler(logging.StreamHandler):
                     return
                 logger_service.log_epoch_end(n, log_obj, self.result_sds,
                                              self.job_id)
-
-

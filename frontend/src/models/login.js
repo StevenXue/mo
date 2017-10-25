@@ -26,6 +26,12 @@ export default {
         user,
       }
     },
+    resetUser(state, { payload: user }) {
+      return {
+        ...state,
+        user: undefined,
+      }
+    },
   },
   effects: {
     *login({
@@ -55,13 +61,14 @@ export default {
           payload: data.user,
         })
         // FIXME regex can't catch whole url
-        const from = queryURL('from')
-        if (from) {
-          yield put(routerRedux.push(from))
-        }
-        if (location.pathname === '/login') {
+        // const from = queryURL('from')
+        // if (from) {
+        //   yield put(routerRedux.push(from))
+        // }
+        console.log(location.hash.substr(1))
+        if (location.hash.substr(1) === '/login') {
           // user dashboard not build yet, push to project by default
-          yield put(routerRedux.push('/project'))
+          yield put(routerRedux.push('/projects'))
         }
       } catch(err) {
         console.log(err)
@@ -70,7 +77,6 @@ export default {
           // window.location = `${location.origin}/login?from=${from}`
           // window.location = `${location.origin}/#/login`
           yield put(routerRedux.push('/login'))
-
         }
       }
     },

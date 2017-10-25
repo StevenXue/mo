@@ -18,10 +18,10 @@ import Header from './Header'
 import zh_CN from '../../intl/zh_CN';
 import en_US from '../../intl/en_US';
 
-function MainLayout({children, location}) {
+function MainLayout({children, location, history}) {
   return (
     <div className={styles.normal}>
-      <Header location={location}/>
+      <Header location={location} history={history}/>
       <div className={styles.content}>
         <div className={styles.main}>
           {children}
@@ -74,7 +74,7 @@ class OutMainLayout extends React.Component {
             locale={'en'}
             messages={this.state.language}
           >
-            <MainLayout location={this.props.location} children={this.props.children}/>
+            <MainLayout location={this.props.location} history={this.props.history} children={this.props.children}/>
           </IntlProvider>
 
         </LocaleProvider>

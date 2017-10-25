@@ -1,12 +1,16 @@
 import React from 'react'
+import { connect } from 'dva'
+
 import styles from './Header.less'
 import { Menu, Icon } from 'antd'
-import { Link } from 'dva/router'
+import { Link, routerRedux } from 'dva/router'
 import { FormattedMessage } from 'react-intl'
 import { config } from '../../utils'
+
 const logo = config.logo
 
 const SubMenu = Menu.SubMenu
+
 const menuConfig = [
   {
     key: '/',
@@ -35,8 +39,18 @@ const menuConfig = [
 
 ]
 
-function Header({ location }) {
+function Header({ location, login, history, dispatch }) {
   const key = '/' + location.pathname.split('/')[1]
+  const toLoginPage = () => {
+    if (!login.user) {
+      history.push('/login')
+    }
+  }
+  const logout = () => {
+    localStorage.removeItem('token')
+    dispatch({type: 'resetUser'})
+    history.push('/login')
+  }
   return (
     <div className={styles.container}>
       <div className={styles.box}>
@@ -46,7 +60,7 @@ function Header({ location }) {
           theme='dark'
           selectedKeys={[key]}
         >
-          <Menu.Item className={styles.logoItem} >
+          <Menu.Item className={styles.logoItem}>
             <Link to={'/'} className={styles.logo}>
               <img src={logo} className={styles.logo}/>
             </Link>
@@ -69,17 +83,23 @@ function Header({ location }) {
           theme='dark'
           selectedKeys={[key]}
         >
-          <Menu.Item key={'/login'}>
-            <Link to={'/login'}>
-              <Icon type="user"/>
-              username
-            </Link>
-          </Menu.Item>
+          <SubMenu
+            title={
+              <span onClick={toLoginPage}>
+                <Icon type="user"/>{login.user ? login.user.name : 'Login'}
+              </span>
+            }
+          >
+            <Menu.Item key={'/logout'}>
+              <div onClick={logout}>
+                Logout
+              </div>
+            </Menu.Item>
+          </SubMenu>
         </Menu>
       </div>
     </div>
-
   )
 }
 
-export default Header
+export default connect(({ login }) => ({ login }))(Header)
