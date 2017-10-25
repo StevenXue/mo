@@ -25,17 +25,18 @@ export default {
   },
   effects: {
     // 获取用户所有 project
-    *fetch(action, { call, put, select }) {
+    *fetch(action, { call, put, select, take }) {
+      const { payload } = yield take('login/setUser')
+      const user_ID = payload.user_ID
       // const user_ID = yield select(state => state.login.user.user_ID)
-      const user_ID = 'dev_1'
+      // const user_ID = 'dev_1'
       const { data: projects } = yield call(fetchProjects, { user_ID, privacy: action.privacy })
       yield put({ type: 'setProjects', payload: projects })
     },
 
     *create({ body }, { call, put, select }) {
-      const user_ID = yield select(state => state.login.user.user_ID)
       // const user_ID = 'dev_1'
-      body['user_ID'] = user_ID
+      body['user_ID'] = yield select(state => state.login.user.user_ID)
       yield call(createProject, { body })
       yield put({ type: 'hideModal' })
       yield put({ type: 'fetch', privacy: 'all' })

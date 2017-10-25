@@ -23,9 +23,8 @@ export default {
     },
 
     *delete({ payload }, { call, put, select }) {
-      const user_ID = yield select(state => state.login.user.user_ID)
       // const user_ID = 'dev_1'
-      payload['user_ID'] = user_ID
+      payload['user_ID'] = yield select(state => state.login.user.user_ID)
       yield call(deleteProject, payload)
       yield put(routerRedux.push('/projects'))
     },

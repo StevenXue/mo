@@ -48,11 +48,8 @@ export default {
       }
     },
     *query({ payload }, { call, put }) {
-      const { data: data } = yield call(tokenLogin)
-      console.log(data)
-      console.log('location', location)
-
-      if (data) {
+      try {
+        const { data: data } = yield call(tokenLogin)
         yield put({
           type: 'setUser',
           payload: data.user,
@@ -66,7 +63,8 @@ export default {
           // user dashboard not build yet, push to project by default
           yield put(routerRedux.push('/project'))
         }
-      } else {
+      } catch(err) {
+        console.log(err)
         if (location.pathname !== '/login') {
           let from = location.pathname
           // window.location = `${location.origin}/login?from=${from}`
@@ -79,6 +77,7 @@ export default {
   },
   subscriptions: {
     setup({ dispatch }) {
+      console.log('query')
       dispatch({ type: 'query' })
     },
   },
