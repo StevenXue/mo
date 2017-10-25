@@ -29,6 +29,8 @@ export default {
 
     projectId: null,
 
+    // activeKey: ['1']
+
 
   },
   reducers: {
@@ -206,7 +208,31 @@ export default {
 
         }
       }
+    },
+
+    setParameter(state, action){
+      const {sectionId, stepIndex, argIndex, value} = action.payload;
+      let sectionsJson = state.sectionsJson;
+      sectionsJson[sectionId].steps[stepIndex].args[argIndex].value = value;
+      return {
+        ...state,
+        sectionsJson
+      }
+    },
+
+    setActiveKey(state, action){
+
+      const {sectionId, activeKey} = action.payload;
+
+      let sectionsJson = state.sectionsJson;
+      sectionsJson[sectionId].active_steps = activeKey;
+      return {
+        ...state,
+        sectionsJson
+      }
     }
+
+
 
   },
   effects: {
@@ -266,10 +292,12 @@ export default {
 
     // 获取fields
     * getFields(action, {call, put, select}) {
+      const {stepIndex, argIndex} = action.payload;
+
       const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson);
       // const section = sectionsJson[action.payload.sectionId];
       const {data} = yield call(stagingDataService.fetchFields, action.payload.stagingDatasetId);
-      sectionsJson[action.payload.sectionId].steps[1].args[0].fields = data;
+      sectionsJson[action.payload.sectionId].steps[stepIndex+1].args[argIndex].fields = data;
       yield put({type: 'setSections', payload: {sectionsJson: sectionsJson}});
 
     }

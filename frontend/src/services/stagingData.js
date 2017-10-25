@@ -21,9 +21,9 @@ export function fetchFields(id) {
   })
 }
 
-// fetch stage data field
+// fetch stage data
 export function fetchStagingDataset(id) {
-  return request(`/api${PREFIX}/staging_data_sets/${id}`, {
+  return request(`/api${PREFIX}/staging_data_sets/${id}?limit=30`, {
     method: 'GET'
   })
 }

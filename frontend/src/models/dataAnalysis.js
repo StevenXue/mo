@@ -6,7 +6,7 @@ import pathToRegexp from 'path-to-regexp';
 import modelExtend from 'dva-model-extend';
 import workBench from './workBench';
 
-const categories = 'toolkit'
+const categories = 'toolkit';
 
 
 const dataAnalysis = modelExtend(workBench, {
@@ -19,7 +19,7 @@ const dataAnalysis = modelExtend(workBench, {
     *updateSection(action, { call, put, select }) {
       // 开始加载
       const sectionId = action.sectionId;
-      const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson)
+      const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson);
       const section = sectionsJson[sectionId];
       const sections = yield call(dataAnalysisService.updateSection, sectionId, section)
 

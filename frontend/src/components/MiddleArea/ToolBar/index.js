@@ -1,8 +1,9 @@
 import React from 'react';
 import {connect} from 'dva';
-import {Icon} from 'antd';
+import {Icon, Button} from 'antd';
 import styles from './ToolBar.css';
-
+const ButtonGroup = Button.Group;
+import ResultButton from './ResultButton';
 function ToolBar({model, dispatch, namespace, sectionId}) {
 
   // // change state
@@ -21,22 +22,55 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
 
   }
 
+  function handleClickRun() {
+    dispatch({
+      type: namespace + '/runSection',
+      payload: {
+        sectionId
+      }
+    })
+  }
+
   return (
     <div className={styles.container} >
-      <div className={styles.result}>
-        <Icon type="bar-chart" style={{fontSize:20, margin:10, color:'white'}}/>
-        <span className={styles.text}>
-          Result
-        </span>
+      <div className={styles.result} >
+       <ResultButton/>
       </div>
 
-      <Icon type="retweet" style={{fontSize:20, margin:10}}/>
-      <Icon type="pause-circle" style={{fontSize:20, margin:10}}/>
-      <Icon type="play-circle" style={{fontSize:20, margin:10}}/>
-      <Icon type="save" onClick={()=>onClickSave()} style={{fontSize:20, margin:10}}/>
+      {/*<Icon type="retweet" style={{fontSize:20, margin:10}}/>*/}
+      {/*<Icon type="pause-circle" style={{fontSize:20, margin:10}}/>*/}
+      {/*<Icon type="play-circle" style={{fontSize:20, margin:10}}/>*/}
 
+      {/*<Icon type="save" onClick={()=>onClickSave()} style={{fontSize:20, margin:10}}/>*/}
+
+      <ButtonGroup>
+        <Button type="primary" className={styles.button}
+                onClick={()=>onClickSave()}>
+          <Icon type="save" className={styles.icon}/>
+        </Button>
+
+        <Button type="primary" className={styles.button}
+                onClick={()=>handleClickRun()}
+        >
+          <Icon type="play-circle" className={styles.icon}/>
+        </Button>
+
+        <Button type="primary" className={styles.button}>
+          <Icon type="pause-circle" className={styles.icon}/>
+        </Button>
+
+        <Button type="primary" className={styles.button}>
+          <Icon type="retweet" className={styles.icon}/>
+        </Button>
+
+
+      </ButtonGroup>
     </div>
   );
 }
 
 export default ToolBar;
+/*
+<Button type="primary"   icon="save" />
+        <Button type="primary"  icon="play-circle" />
+ */
