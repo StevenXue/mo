@@ -162,11 +162,12 @@ def add_job_and_result_to_project(result_obj, project_id):
                                                      job_obj)
 
 
-def get_all_jobs_of_project(project_id, categories):
+def get_all_jobs_of_project(project_id, categories, status=None):
     """
     get all jobs and job info of a project
     :param project_id:
     :param categories:
+    :param status:
     :return:
     """
     jobs = project_business.get_by_id(project_id)['jobs']
@@ -174,7 +175,11 @@ def get_all_jobs_of_project(project_id, categories):
     for job in jobs:
         # keys = history_jobs.keys()
         for key in categories:
-            if job[key]:
+            if status is None:
+                check = job[key]
+            else:
+                check = job[key] and (job['status'] == status)
+            if check:
                 job_info = job.to_mongo()
                 # model/toolkit info
                 # job_info[key] = {
@@ -203,10 +208,11 @@ def get_all_jobs_of_project(project_id, categories):
                     # model results
                     job_info['results'] = result_sds
                     # FIXME too slow to get metrics status
-                    # job_info['metrics_status'] = \
-                    #     [sd.to_mongo() for sd in
-                    #      staging_data_business.get_by_staging_data_set_id(
-                    #          result_sds['_id'])]
+                    # 已添加索引
+                    job_info['metrics_status'] = \
+                        [sd.to_mongo() for sd in
+                         staging_data_business.get_by_staging_data_set_id(
+                             result_sds['_id'])]
                 else:
                     # toolkit results
                     job_info['results'] = result_sds[
@@ -215,9 +221,9 @@ def get_all_jobs_of_project(project_id, categories):
                     '_id'] if result_sds else None
 
                 # model running status info
-                if key == 'model':
-                    job_name = KUBE_NAME['model'].format(job_id=job['id'])
-                    job_info = kube_service.get_job_status(job_info, job_name)
+                # if key == 'model':
+                #     job_name = KUBE_NAME['model'].format(job_id=job['id'])
+                #     job_info = kube_service.get_job_status(job_info, job_name)
 
                 history_jobs[key].append(job_info)
                 break

@@ -50,15 +50,20 @@ def list_projects():
 @project_app.route('/jobs/<string:project_id>', methods=['GET'])
 def get_jobs_of_project(project_id):
     categories = request.args.get('categories')
+    status = request.args.get('status')
     if categories is None:
         categories = DEFAULT_CAT
     else:
         categories = categories.split(',')
+    if status is not None:
+        status = int(status)
+
     for c in categories:
         if c not in DEFAULT_CAT:
             raise ValueError('categories arg error')
     history_jobs = project_service.get_all_jobs_of_project(project_id,
-                                                           categories)
+                                                           categories,
+                                                           status)
     history_jobs = json_utility.convert_to_json(history_jobs)
     # try:
     #     history_jobs = project_service.get_all_jobs_of_project(project_id,
