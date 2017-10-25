@@ -10,7 +10,6 @@ app.model(require("./models/dataAnalysis"));
 app.model(require("./models/modelling"));
 app.model(require("./models/projectDetail"));
 app.model(require("./models/project"));
-app.model(require("./models/login"));
 app.model(require("./models/preview"));
 app.model(require("./models/deployment"));
 
