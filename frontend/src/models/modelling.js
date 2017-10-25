@@ -16,7 +16,7 @@ const modelling = modelExtend(workBench, {
 
           dispatch({ type: 'fetchSections', projectId: projectId, categories })
           dispatch({ type: 'fetchAlgorithms', categories })
-          dispatch({ type: 'fetchStagingDatasetList' })
+          dispatch({ type: 'fetchStagingDatasetList', projectId: projectId })
         }
       });
     },

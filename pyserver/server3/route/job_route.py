@@ -21,7 +21,6 @@ from server3.business import project_business
 from server3.business import toolkit_business
 from server3.utility import json_utility
 
-
 PREFIX = "/job"
 
 job_app = Blueprint("job_app", __name__, url_prefix=PREFIX)
@@ -44,7 +43,6 @@ def create_job():
     """
     data = request.get_json()
     # todo 使用try except 捕捉错误
-    print("data", data)
     if data["job_type"] == "toolkit":
         toolkit_id = ObjectId(data["algorithm_id"])
         project_id = ObjectId(data["project_id"])
@@ -69,8 +67,9 @@ def create_job():
 @job_app.route("/job_steps", methods=["PUT"])
 def update_job_steps():
     data = request.get_json()
-    job_id, steps = ObjectId(data["_id"]), data['steps']
-    result = job_business.update_job_steps(job_id, steps)
+    print("data", data)
+    job_id, steps, active_steps = ObjectId(data["_id"]), data['steps'], data['active_steps']
+    result = job_business.update_job_steps(job_id, steps, active_steps)
     result = json_utility.convert_to_json(result.to_mongo())
     return jsonify({
         "response": {
