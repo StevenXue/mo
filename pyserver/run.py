@@ -46,6 +46,8 @@ from server3.route import monitor_route
 from server3.route import model_route
 from server3.route import visualization_route
 from server3.route import served_model_route
+from server3.route import job_route
+
 
 app.register_blueprint(file_route.file_app)
 app.register_blueprint(ownership_route.ownership_app)
@@ -58,6 +60,7 @@ app.register_blueprint(user_route.user_app)
 app.register_blueprint(monitor_route.monitor_app)
 app.register_blueprint(visualization_route.visualization_app)
 app.register_blueprint(served_model_route.served_model_app)
+app.register_blueprint(job_route.job_app)
 
 
 # This method will get whatever object is passed into the
@@ -87,7 +90,7 @@ def refresh_token():
     # Access the identity of the current user with get_jwt_identity
     # current_user = get_jwt_identity()
     claims = get_jwt_claims()
-    return jsonify({'user': claims['user']}), 200
+    return jsonify({'response': {'user': claims['user']}}), 200
 
 
 if __name__ == '__main__':

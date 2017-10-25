@@ -1,0 +1,30 @@
+
+.normal {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  /*align-items: center;*/
+  justify-content: center;
+}
+
+.main {
+  min-width: 1200px;
+  /*padding: 0 8px;*/
+  /*margin: 10px 0;*/
+  display: flex;
+  justify-content: center;
+  padding: 24px 15px;
+  width: 100%;
+  min-height: 100%;
+  background: #F9FAFA;
+  overflow: auto;
+  margin: auto;
+  position: absolute;
+  left: 0;
+  right: 0;
+}

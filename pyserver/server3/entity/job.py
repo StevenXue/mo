@@ -9,7 +9,7 @@
 # Further to FIXME of None
 """
 
-from mongoengine import Document
+from mongoengine import DynamicDocument
 from mongoengine import ReferenceField
 from mongoengine import ListField
 from mongoengine import IntField
@@ -30,7 +30,7 @@ STATUS = (
 )
 
 
-class Job(Document):
+class Job(DynamicDocument):
     model = ReferenceField('Model', reverse_delete_rule=CASCADE)
     toolkit = ReferenceField('Toolkit', reverse_delete_rule=CASCADE)
     staging_data_set = ReferenceField('StagingDataSet')
@@ -42,3 +42,5 @@ class Job(Document):
     params = DictField()
     file = ReferenceField('File')
     run_args = DictField()
+
+    steps = ListField(DictField())

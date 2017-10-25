@@ -15,6 +15,7 @@ from kubernetes import client
 from server3.service import project_service
 from server3.business import project_business
 from server3.utility import json_utility
+from server3.utility import str_utility
 
 PREFIX = '/project'
 DEFAULT_CAT = ['model', 'toolkit']
@@ -27,7 +28,8 @@ def get_project(project_id):
     if not project_id:
         return jsonify({'response': 'no project_id arg'}), 400
     try:
-        project = project_business.get_by_id(project_id)
+        project = project_service.get_by_id(project_id)
+        project = json_utility.convert_to_json(project.to_mongo())
     except Exception as e:
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}), 400)
@@ -37,19 +39,12 @@ def get_project(project_id):
 @project_app.route('/projects', methods=['GET'])
 def list_projects():
     user_ID = request.args.get('user_ID')
-    if user_ID:
-        public_projects, owned_projects = project_service. \
-            list_projects_by_user_ID(user_ID, -1)
-        public_projects = json_utility. \
-            me_obj_list_to_json_list(public_projects)
-        owned_projects = json_utility. \
-            me_obj_list_to_json_list(owned_projects)
-        result = {
-            'public_projects': public_projects,
-            'owned_projects': owned_projects
-        }
-        return jsonify({'response': result}), 200
-    return jsonify({'response': 'no user_ID arg'}), 400
+    privacy = request.args.get('privacy')
+    projects = project_service. \
+        list_projects_by_user_ID(user_ID, -1, privacy=privacy)
+    projects = json_utility. \
+        me_obj_list_to_json_list(projects)
+    return jsonify({'response': projects}), 200
 
 
 @project_app.route('/jobs/<string:project_id>', methods=['GET'])
@@ -113,12 +108,38 @@ def create_project():
     user_ID = data['user_ID']
     is_private = data['is_private']
     is_private = str(is_private).lower() == 'true'
+    related_fields = data.get('related_fields', []).split(',')
+    tags = data.get('tags', []).split(',')
+    related_tasks = data.get('related_tasks', []).split(',')
+    project_service.create_project(name, description, user_ID,
+                                   is_private, related_fields=related_fields,
+                                   tags=tags, related_tasks=related_tasks)
+    return jsonify({'response': 'create project success'}), 200
 
-    try:
-        project_service.create_project(name, description, user_ID,
-                                       is_private)
-    except Exception as e:
-        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+
+@project_app.route('/projects/<string:project_id>', methods=['PUT'])
+def update_project(project_id):
+    if not request.json \
+            or 'name' not in request.json \
+            or 'is_private' not in request.json:
+        return jsonify({'response': 'insufficient arguments'}), 400
+
+    data = request.get_json()
+    name = data.get('name')
+    description = data.get('description')
+    is_private = data.get('is_private')
+    is_private = str(is_private).lower() == 'true'
+    related_fields = data.get('related_fields', '')
+    tags = data.get('tags', '')
+    related_tasks = data.get('related_tasks', '')
+
+    related_fields = str_utility.split_without_empty(related_fields)
+    tags = str_utility.split_without_empty(tags)
+    related_tasks = str_utility.split_without_empty(related_tasks)
+
+    project_service.update_project(project_id, name, description, is_private,
+                                   related_fields=related_fields,
+                                   tags=tags, related_tasks=related_tasks)
     return jsonify({'response': 'create project success'}), 200
 
 

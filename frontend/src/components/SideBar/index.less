@@ -1,0 +1,64 @@
+@paddingLR: 21px;
+
+.normal {
+}
+
+.container {
+  /*flex: 1;*/
+  //background-color: white;
+  display: flex;
+  width: 220px;
+  flex-direction: column;
+  background-color: white;
+}
+
+
+.first_row {
+  height:77px;
+  flex-direction: row-reverse;
+  display: flex;
+  align-items: center;
+  padding: 2px @paddingLR 2px @paddingLR;
+
+}
+
+.add_row {
+  height:71px;
+  flex-direction: row;
+  justify-content: space-between;
+  display: flex;
+  align-items: center;
+  padding: 2px @paddingLR 2px @paddingLR;
+  background-color: #F1F8FF;
+}
+
+.row {
+  display: flex;
+  height:50px;
+  justify-content: center;
+  align-items: center;
+  background-color: lightgrey;
+}
+
+
+.left_column {
+  display: flex;
+  width: 40px;
+  height:180px;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column-reverse;
+
+  background-color: white;
+  //border-style: double;
+}
+
+.text_reverse {
+  //align-self: stretch;
+  //direction: rtl;
+  //unicode-bidi: bidi-override;
+  //display: flex;
+  //flex-direction: column;
+  width: 60px;
+  transform:rotate(270deg)
+}

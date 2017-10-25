@@ -15,14 +15,22 @@ from mongoengine import IntField
 from mongoengine import DictField
 from mongoengine import ListField
 
+# type for
 MODEL_TYPE = (
     (0, 'neural_network'),
-    (1, 'custom_supervised'),
+    (1, 'custom_supervised'),  # model write with tf custom estimator
     (2, 'unsupervised'),
-    (3, 'half_supervised'),
-    (4, 'folder_input'),
+    (3, 'semi_supervised'),  # none
+    (4, 'unstructured'),  # input with directory path
     (5, 'hyperas'),
-    (6, 'advanced')
+    (6, 'advanced')  # eg, style transfer
+)
+
+TYPE = (
+    (0, 'regression'),
+    (1, 'classification'),
+    (2, 'clustering'),
+    (3, 'reinforcement_learning')
 )
 
 
@@ -33,6 +41,7 @@ class Model(DynamicDocument):
     entry_function = StringField(required=True)
     to_code_function = StringField(required=True)
     category = IntField(required=True, choices=MODEL_TYPE)
+    type = IntField(required=True, choices=TYPE)
     parameter_spec = DictField(required=True)
     input = DictField(required=True)
     user_name = StringField(max_length=50)

@@ -53,7 +53,7 @@ def list_served_models_by_user_ID(user_ID, order=-1):
         raise ValueError('no user id')
     public_sm = ownership_service.get_all_public_objects('served_model')
     owned_sm = ownership_service. \
-        get_private_ownership_objects_by_user_ID(user_ID, 'served_model')
+        get_privacy_ownership_objects_by_user_ID(user_ID, 'served_model')
     # set status
     public_sm = [kube_service.get_deployment_status(sm) for sm in public_sm]
     owned_sm = [kube_service.get_deployment_status(sm) for sm in owned_sm]
@@ -85,7 +85,7 @@ def deploy(user_ID, job_id, name, description, server, signatures,
     except DoesNotExist:
         model_type = job.model.category
         if model_type == ModelType['neural_network'] \
-                or model_type == ModelType['folder_input']:
+                or model_type == ModelType['unstructured']:
             export_path, version = model_service.export(name, job_id, user_ID)
         else:
             result_sds = staging_data_set_business.get_by_job_id(job_id)
@@ -133,17 +133,31 @@ def deploy(user_ID, job_id, name, description, server, signatures,
                                              name=name),
                                          '--model_base_path={export_path}'.format(
                                              export_path=export_path)],
-                                "volumeMounts": [{
-                                    "mountPath": "/home/root/work/user_directory",
-                                    "name": job_id + "-volume"
-                                }]
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/home/root/work/user_directory",
+                                        "name": "nfsvol"
+                                    },
+                                    # {
+                                    #     "mountPath": "/home/root/work/user_directory",
+                                    #     "name": job_id + "-volume"
+                                    # }
+                                ]
                             }
                         ],
-                        "volumes": [{
-                            "name": job_id + "-volume",
-                            "hostPath": {
-                                "path": "{}/user_directory".format(cwd)},
-                        }]
+                        "volumes": [
+                            {
+                                "name": "nfsvol",
+                                "persistentVolumeClaim": {
+                                    "claimName": "nfs-pvc"
+                                }
+                            },
+                            # {
+                            #     "name": job_id + "-volume",
+                            #     "hostPath": {
+                            #         "path": "{}/user_directory".format(cwd)},
+                            # }
+                        ]
                     },
                 },
             }
