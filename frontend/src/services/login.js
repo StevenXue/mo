@@ -1,14 +1,23 @@
 import { request, config } from '../utils'
 
 const { CORS, api } = config
-const { userLogin } = api
+const { userLogin, refreshToken } = api
 
-export async function login (body) {
-  return request(CORS[0] + userLogin, {
+export async function login(body) {
+  return request(CORS + userLogin, {
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
     },
-    body,
+    body: JSON.stringify(body),
+  })
+}
+
+export async function tokenLogin(params) {
+  return request(CORS + refreshToken, {
+    method: 'get',
+    headers: {
+      'Authorization': 'Bearer ' + localStorage.getItem('token'),
+    },
   })
 }

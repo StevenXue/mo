@@ -1,4 +1,4 @@
-import { login } from '../services/login'
+import { login, tokenLogin } from '../services/login'
 import { routerRedux } from 'dva/router'
 import { queryURL } from '../utils'
 
@@ -8,40 +8,79 @@ export default {
     loginLoading: false,
   },
   reducers: {
-    showLoginLoading (state) {
+    showLoginLoading(state) {
       return {
         ...state,
         loginLoading: true,
       }
     },
-    hideLoginLoading (state) {
+    hideLoginLoading(state) {
       return {
         ...state,
         loginLoading: false,
       }
     },
+    setUser(state, { payload: user }) {
+      return {
+        ...state,
+        user,
+      }
+    },
   },
   effects: {
-    *login ({
-              payload,
-            }, { put, call }) {
+    *login({
+             payload,
+           }, { put, call }) {
       yield put({ type: 'showLoginLoading' })
-      const data = yield call(login, payload)
+      const { data: data } = yield call(login, payload)
       yield put({ type: 'hideLoginLoading' })
-      if (data.success) {
-        localStorage.setItem('token', data.response.token)
+      if (data) {
+        localStorage.setItem('token', data.token)
         const from = queryURL('from')
-        yield put({ type: 'app/querySuccess', payload: data.response.user })
+        yield put({ type: 'setUser', payload: data.user })
         if (from) {
           yield put(routerRedux.push(from))
         } else {
-          yield put(routerRedux.push('/project'))
+          yield put(routerRedux.push('/projects'))
         }
       } else {
         throw data
       }
     },
+    *query({ payload }, { call, put }) {
+      const { data: data } = yield call(tokenLogin)
+      console.log(data)
+      console.log('location', location)
+
+      if (data) {
+        yield put({
+          type: 'setUser',
+          payload: data.user,
+        })
+        // FIXME regex can't catch whole url
+        const from = queryURL('from')
+        if (from) {
+          yield put(routerRedux.push(from))
+        }
+        if (location.pathname === '/login') {
+          // user dashboard not build yet, push to project by default
+          yield put(routerRedux.push('/project'))
+        }
+      } else {
+        if (location.pathname !== '/login') {
+          let from = location.pathname
+          // window.location = `${location.origin}/login?from=${from}`
+          // window.location = `${location.origin}/#/login`
+          yield put(routerRedux.push('/login'))
+
+        }
+      }
+    },
   },
-  subscriptions: {},
-};
+  subscriptions: {
+    setup({ dispatch }) {
+      dispatch({ type: 'query' })
+    },
+  },
+}
 

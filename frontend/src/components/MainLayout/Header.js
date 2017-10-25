@@ -3,10 +3,11 @@ import styles from './Header.less'
 import { Menu, Icon } from 'antd'
 import { Link } from 'dva/router'
 import { FormattedMessage } from 'react-intl'
-import logo from '../../logo.png'
+import { config } from '../../utils'
+const logo = config.logo
 
 const SubMenu = Menu.SubMenu
-const config = [
+const menuConfig = [
   {
     key: '/',
     Link: '/',
@@ -51,7 +52,7 @@ function Header({ location }) {
             </Link>
           </Menu.Item>
 
-          {config.map(
+          {menuConfig.map(
             (i) =>
               <Menu.Item key={i.key}>
                 <Link to={i.Link}>

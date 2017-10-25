@@ -179,30 +179,44 @@ def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
                                 "run_model.py",
                                 "--job_id", job_id
                             ],
-                            "volumeMounts": [{
-                                "mountPath": "/pyserver/user_directory",
-                                "name": "store"
-                            },
+                            "volumeMounts": [
                                 {
-                                    "mountPath": "/root/.keras",
-                                    "name": "keras"
+                                    "mountPath": "/pyserver/user_directory",
+                                    "name": "nfsvol"
                                 },
+                                # {
+                                #     "mountPath": "/pyserver/user_directory",
+                                #     "name": "user_directory"
+                                # },
+                                # {
+                                #     "mountPath": "/root/.keras",
+                                #     "name": "keras"
+                                # },
                             ]
                         }
                     ],
                     "restartPolicy": "Never",
                     # "activeDeadlineSeconds": 1,
-                    "volumes": [{
-                        "name": "store",
-                        "hostPath": {"path": "{}/user_directory".format(cwd)},
-                    },
+                    "volumes": [
                         {
-                            "name": "keras",
-                            "hostPath": {
-                                "path": "{home_dir}/.keras".format(
-                                    home_dir=str(Path.home())
-                                )},
-                        }]
+                            "name": "nfsvol",
+                            "persistentVolumeClaim": {
+                                "claimName": "nfs-pvc"
+                            }
+                        },
+                        # {
+                        #     "name": "user_directory",
+                        #     "hostPath": {
+                        #         "path": "{}/user_directory".format(cwd)},
+                        # },
+                        # {
+                        #     "name": "keras",
+                        #     "hostPath": {
+                        #         "path": "{home_dir}/.keras".format(
+                        #             home_dir=str(Path.home())
+                        #         )},
+                        # }
+                    ]
                 },
             },
         }

@@ -132,17 +132,31 @@ def deploy(user_ID, job_id, name, description, server, signatures,
                                              name=name),
                                          '--model_base_path={export_path}'.format(
                                              export_path=export_path)],
-                                "volumeMounts": [{
-                                    "mountPath": "/home/root/work/user_directory",
-                                    "name": job_id + "-volume"
-                                }]
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/home/root/work/user_directory",
+                                        "name": "nfsvol"
+                                    },
+                                    # {
+                                    #     "mountPath": "/home/root/work/user_directory",
+                                    #     "name": job_id + "-volume"
+                                    # }
+                                ]
                             }
                         ],
-                        "volumes": [{
-                            "name": job_id + "-volume",
-                            "hostPath": {
-                                "path": "{}/user_directory".format(cwd)},
-                        }]
+                        "volumes": [
+                            {
+                                "name": "nfsvol",
+                                "persistentVolumeClaim": {
+                                    "claimName": "nfs-pvc"
+                                }
+                            },
+                            # {
+                            #     "name": job_id + "-volume",
+                            #     "hostPath": {
+                            #         "path": "{}/user_directory".format(cwd)},
+                            # }
+                        ]
                     },
                 },
             }

@@ -90,7 +90,7 @@ def refresh_token():
     # Access the identity of the current user with get_jwt_identity
     # current_user = get_jwt_identity()
     claims = get_jwt_claims()
-    return jsonify({'user': claims['user']}), 200
+    return jsonify({'response': {'user': claims['user']}}), 200
 
 
 if __name__ == '__main__':
