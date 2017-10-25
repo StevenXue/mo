@@ -14,6 +14,19 @@ export function fetchStagingDatas(project_id) {
   );
 }
 
+// fetch stage data field
+export function fetchFields(id) {
+  return request(`/api${PREFIX}/staging_data_sets/fields?staging_data_set_id=${id}`, {
+    method: 'GET'
+  })
+}
+
+// fetch stage data
+export function fetchStagingDataset(id) {
+  return request(`/api${PREFIX}/staging_data_sets/${id}?limit=30`, {
+    method: 'GET'
+  })
+}
 
 
 

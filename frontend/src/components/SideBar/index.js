@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './index.less';
 import {connect} from 'dva';
-import {Icon} from 'antd';
+import {Menu, Dropdown, Icon} from 'antd';
 
 
 import {arrayToJson, JsonToArray} from '../../utils/JsonUtils';
@@ -51,10 +51,28 @@ function Sidebar({model, dispatch, namespace}) {
     }
   };
 
-  // 新增 section
+  // 新增 section launcher
   const onClickAdd = () => {
     //temp section id
     addActiveSection('new_launcher ' + Math.random());
+  };
+
+  const onClickDelete = (sectionId) => {
+    console.log("sectionId", sectionId);
+    dispatch({
+      type: namespace + '/deleteSection',
+      payload: {sectionId: sectionId}
+    });
+  };
+
+  const menu = (sectionId)=>{
+    return (
+    <Menu>
+      <Menu.Item key="0">
+        <a onClick={()=>onClickDelete(sectionId)}>DELETE</a>
+      </Menu.Item>
+    </Menu>
+  )
   };
 
   return (
@@ -78,21 +96,32 @@ function Sidebar({model, dispatch, namespace}) {
                 backgroundColor = "#34C0E2";
                 color = 'white';
               } else {
-                backgroundColor = i % 2? "#F5F5F5"
+                backgroundColor = i % 2 ? "#F5F5F5"
                   : "#FBFBFB";
                 color = null;
               }
               return (
-                <div key={section._id + section.section_name}
-                     onClick={() => onClickSection(section._id)}
-                     className={`${styles.row} custom-little-title-font`}
-                     style={{
-                       backgroundColor: backgroundColor,
-                       color: color
-                     }}
+
+                <div
+                  key={section._id + section.section_name}
+                  onClick={() => onClickSection(section._id)}
+                  className={`${styles.row} custom-little-title-font`}
+                  style={{
+                    backgroundColor: backgroundColor,
+                    color: color
+                  }}
                 >
+
                   {section.section_name || section._id}
+
+                  <Dropdown overlay={menu(section._id)} trigger={['click']}>
+                    <a className="ant-dropdown-link" href="#">
+                      <Icon type="down"/>
+                    </a>
+                  </Dropdown>
                 </div>
+
+
               )
             }
           )}
@@ -107,4 +136,3 @@ function Sidebar({model, dispatch, namespace}) {
 }
 
 export default Sidebar;
-// export default connect(({dataAnalysis}) => ({dataAnalysis}))(Sidebar);
