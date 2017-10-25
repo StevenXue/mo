@@ -6,24 +6,27 @@
 
   .box {
     background-color: #464E78;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     min-width: 1170px;
 
     .normal {
+      display: inline;
       background-color: #464E78;
-      display: flex;
-      align-items: center;
-      .logoItem {
-        width: 2.5em;
-        #center;
+      .logoBox {
+        padding: 0;
+
+        .logo {
+          display: inline;
+          width: 2.5em;
+          vertical-align: middle;
+        }
       }
-      .logo {
-        width: 2.5em;
-        height: 2.5em;
+
+      .rightButton {
+        float: right;
       }
+
     }
+
   }
 
 }

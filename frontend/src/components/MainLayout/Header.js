@@ -48,24 +48,24 @@ function Header({ location, login, history, dispatch }) {
   }
   const logout = () => {
     localStorage.removeItem('token')
-    dispatch({type: 'resetUser'})
+    dispatch({ type: 'resetUser' })
     history.push('/login')
   }
   return (
     <div className={styles.container}>
       <div className={styles.box}>
+
         <Menu
           className={styles.normal}
           mode='horizontal'
           theme='dark'
           selectedKeys={[key]}
         >
-          <Menu.Item className={styles.logoItem}>
-            <Link to={'/'} className={styles.logo}>
+          <Menu.Item key='logo' className={styles.logoBox}>
+            <Link to={'/'}>
               <img src={logo} className={styles.logo}/>
             </Link>
           </Menu.Item>
-
           {menuConfig.map(
             (i) =>
               <Menu.Item key={i.key}>
@@ -75,26 +75,21 @@ function Header({ location, login, history, dispatch }) {
                 </Link>
               </Menu.Item>,
           )}
-
-        </Menu>
-        <Menu
-          className={styles.normal}
-          mode='horizontal'
-          theme='dark'
-          selectedKeys={[key]}
-        >
           <SubMenu
+            className={styles.rightButton}
             title={
               <span onClick={toLoginPage}>
                 <Icon type="user"/>{login.user ? login.user.name : 'Login'}
               </span>
             }
           >
+            {login.user &&
             <Menu.Item key={'/logout'}>
               <div onClick={logout}>
                 Logout
               </div>
             </Menu.Item>
+            }
           </SubMenu>
         </Menu>
       </div>
