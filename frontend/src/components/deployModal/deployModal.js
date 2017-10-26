@@ -5,6 +5,7 @@ import {connect} from 'dva';
 const {TextArea} = Input;
 const FormItem = Form.Item;
 import { get } from 'lodash';
+import EditableTagGroup from '../../components/Tag/tag';
 
 
 function hasErrors(fieldsError) {
@@ -24,6 +25,7 @@ class DeployModal extends React.Component {
     this.props.dispatch({
       type: 'deployment/setModelHowToUse',
       payload: {
+        deployName: values['deployName'],
         deployDescription: values['deployDescription'],
         deployInput: values['deployInput'],
         deployOutput: values['deployOutput'],
@@ -33,9 +35,16 @@ class DeployModal extends React.Component {
     this.openNotificationWithIcon();
   };
 
-  deployModel = () => {
+  firstDeployModel = (values) => {
     this.props.dispatch({
-      type: 'deployment/deployModel',
+      type: 'deployment/firstDeployModel',
+      payload: {
+        deployName: values['deployName'],
+        deployDescription: values['deployDescription'],
+        deployInput: values['deployInput'],
+        deployOutput: values['deployOutput'],
+        deployExamples: values['deployExamples'],
+      }
     });
     this.openNotificationWithIcon();
   };
@@ -75,7 +84,7 @@ class DeployModal extends React.Component {
         this.setModelHowToUse(values);
         this.showModal(false);
         if (this.props.firstDeploy) {
-          this.deployModel();
+          this.firstDeployModel(values);
         }
       }
     });
@@ -110,6 +119,24 @@ class DeployModal extends React.Component {
 
           <Form onSubmit={this.handleSubmit}>
             <h1>Overview</h1>
+            <h2>Name</h2>
+            <FormItem
+              validateStatus={inputFieldError ? 'error' : ''}
+              help={inputFieldError || ''}
+            >
+              {getFieldDecorator('deployName', {
+                initialValue: this.initialValue('deployName'),
+                rules: [{
+                  required: true,
+                  message: 'hello'
+                }],
+              })(
+                <Input className={styles.inputtext}
+                          placeholder="Provide a good name"
+                />
+              )}
+            </FormItem>
+            <h2>Description</h2>
             <FormItem
               validateStatus={inputFieldError ? 'error' : ''}
               help={inputFieldError || ''}
@@ -184,6 +211,7 @@ class DeployModal extends React.Component {
                           placeholder="Provide and explain examples of input and output for your algorithm."/>
               )}
             </FormItem>
+              {/*<EditableTagGroup />*/}
             <FormItem>
               <Button
                 type="primary"

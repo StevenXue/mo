@@ -80,6 +80,7 @@ export default {
     setModelHowToUse(state, action) {
       let newInfo = {
         ...state.modelsJson[state.focusModelId],
+        deployName: action.payload.deployName,
         deployDescription: action.payload.deployDescription,
         deployInput: action.payload.deployInput,
         deployOutput: action.payload.deployOutput,
@@ -145,16 +146,39 @@ export default {
       yield put({type: 'setModels', payload: {modelsJson: modelsJson}})
     },
 
-
-    // 部署Model
-    * deployModels(action, {call, put, select}) {
-      const modelId = action.modelId;
-      const modelsJson = yield select(state => state.deployment.modelsJson);
-      const model = modelsJson[modelId];
-      const models = yield call(deploymentService.deployModel, modelId, model);
+    // 首次部署模型
+    * firstDeployModel(action, {call, put,select}) {
+      const focusModelId = yield select(state => state.deployment.focusModelId);
+      const user_ID = yield select(state => state.login.user.user_ID);
+      let payload = action.payload;
+      payload.jobID = focusModelId;
+      payload.user_ID = user_ID;
+      const {data: result} = yield call(deploymentService.firstDeployModel, payload)
     },
 
+    // 更改部署模型信息
+    * updateDeployInfo(action, {call, put, select}) {
+      const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson);
+      const section = sectionsJson[action.payload.sectionId];
 
+      const {data: result} = yield call(deploymentService.updateDeployInfo, {section: section})
+    },
+
+    // 部署Model
+    * deployModel(action, {call, put, select}) {
+      const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson);
+      const section = sectionsJson[action.payload.sectionId];
+
+      const {data: result} = yield call(deploymentService.deployModel, {section: section})
+    },
+
+    // 取消部署Model
+    * undeployModel(action, {call, put, select}) {
+      const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson);
+      const section = sectionsJson[action.payload.sectionId];
+
+      const {data: result} = yield call(deploymentService.undeployModel, {section: section})
+    },
   },
   subscriptions: {
     // 当进入该页面是 获取用户所有 Models
