@@ -10,7 +10,7 @@ export default {
     //左侧
     isLeftSideBar: true,
     //用户拥有的 section
-    sectionsJson: [],
+    sectionsJson: {},
     //现在开启的 section
     activeSectionsId: ['new_launcher ' + 'init'],
     //焦点位置section名称
@@ -29,6 +29,8 @@ export default {
 
     projectId: null,
 
+    // activeKey: ['1']
+
 
   },
   reducers: {
@@ -44,7 +46,7 @@ export default {
     setSections(state, action) {
       return {
         ...state,
-        sectionsJson: action.sectionsJson,
+        sectionsJson: action.payload.sectionsJson,
       }
     },
 
@@ -138,11 +140,98 @@ export default {
     },
 
     deleteSectionR(state, action) {
+      let newsectionsJson = state.sectionsJson;
+      delete newsectionsJson[action.payload.sectionId];
       return {
         ...state,
-        sectionsJson: state.sectionsJson
+        sectionsJson: newsectionsJson
+      }
+    },
+
+    // 去除active section
+    removeActiveSection(state, action) {
+      let targetKey = action.payload.targetKey;
+      let activeKey = state.focusSectionsId;
+      let lastIndex;
+      state.activeSectionsId.forEach((active_sectionId, i) => {
+        if (active_sectionId === targetKey) {
+          lastIndex = i - 1;
+          if (lastIndex < 0) {
+            lastIndex = 0
+          }
+        }
+      });
+
+      const new_activeSectionsId = state.activeSectionsId.filter(active_sectionId => active_sectionId !== targetKey);
+      console.log("lastIndex", lastIndex);
+      console.log("new_activeSectionsId", new_activeSectionsId);
+
+      if (lastIndex >= 0 && activeKey === targetKey) {
+        activeKey = new_activeSectionsId[lastIndex];
+        console.log("activeKey", activeKey);
+      }
+
+      return {
+        ...state,
+        focusSectionsId: activeKey,
+        activeSectionsId: new_activeSectionsId
+      }
+    },
+
+    //
+    updateSteps(state, action) {
+
+    },
+
+    addRemoveField(state, action) {
+      const fieldName = action.payload.fieldName;
+      const section = state.sectionsJson[action.payload.sectionId];
+      const values = section.steps[1].args[0].values;
+      if (!values.includes(fieldName)) {
+        values.push(fieldName);
+        console.log("push", values);
+
+      } else {
+        values.splice(values.indexOf(fieldName), 1);
+        console.log("pop", values);
+
+      }
+      section.steps[1].args[0].values = values;
+
+      console.log("section", section);
+
+      return {
+        ...state,
+        sectionsJson: {
+          ...state.sectionsJson,
+          [action.payload.sectionId]: section
+
+        }
+      }
+    },
+
+    setParameter(state, action) {
+      const {sectionId, stepIndex, argIndex, value} = action.payload;
+      let sectionsJson = state.sectionsJson;
+      sectionsJson[sectionId].steps[stepIndex].args[argIndex].value = value;
+      return {
+        ...state,
+        sectionsJson
+      }
+    },
+
+    setActiveKey(state, action) {
+
+      const {sectionId, activeKey} = action.payload;
+
+      let sectionsJson = state.sectionsJson;
+      sectionsJson[sectionId].active_steps = activeKey;
+      return {
+        ...state,
+        sectionsJson
       }
     }
+
 
   },
   effects: {
@@ -154,7 +243,7 @@ export default {
       });
       // array to json
       const sectionsJson = arrayToJson(sections, '_id');
-      yield put({type: 'setSections', sectionsJson})
+      yield put({type: 'setSections', payload: {sectionsJson: sectionsJson}})
     },
 
     * fetchAlgorithms(action, {call, put}) {
@@ -177,8 +266,10 @@ export default {
 
     // 保存section
     * saveSection(action, {call, put, select}) {
-      const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson);
-      const section = sectionsJson[action.payload.sectionId];
+      const {namespace, sectionId} = action.payload;
+
+      const sectionsJson = yield select(state => state[namespace].sectionsJson);
+      const section = sectionsJson[sectionId];
 
       const {data: result} = yield call(dataAnalysisService.saveSection, {section: section})
       // 没有后续操作了？
@@ -187,15 +278,70 @@ export default {
     //删除section
     * deleteSection(action, {call, put, select}) {
       //1. 后端删除
-      const {data} = yield call(dataAnalysisService.saveSection, {sectionId: action.payload.sectionId});
+      const {data} = yield call(dataAnalysisService.deleteSection, {sectionId: action.payload.sectionId});
 
       //2. 前端删除
       if (data) {
-        console.log("delete " + action.payload.sectionId)
+        console.log("delete " + action.payload.sectionId);
+        yield put({type: 'removeActiveSection', payload: {targetKey: action.payload.sectionId}});
+
+        yield put({type: 'deleteSectionR', payload: {sectionId: action.payload.sectionId}});
 
       }
 
-    }
+    },
+
+    // 获取fields
+    * getFields(action, {call, put, select}) {
+      const {stepIndex, argIndex, namespace} = action.payload;
+
+      const sectionsJson = yield select(state => state[namespace].sectionsJson);
+      // const section = sectionsJson[action.payload.sectionId];
+      const {data} = yield call(stagingDataService.fetchFields, action.payload.stagingDatasetId);
+      sectionsJson[action.payload.sectionId].steps[stepIndex + 1].args[argIndex].fields = data;
+      yield put({type: 'setSections', payload: {sectionsJson: sectionsJson}});
+
+    },
+
+    // 更新用户 section 为什么没用到
+    * updateSection(action, {call, put, select}) {
+      // 开始加载
+      const sectionId = action.sectionId;
+      const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson);
+      const section = sectionsJson[sectionId];
+      const sections = yield call(dataAnalysisService.updateSection, sectionId, section)
+
+      // 停止加载
+      // 显示保存成功
+      // yield put({type: 'setSections', sections})
+
+    },
+
+    // 添加 section
+    * addSection(action, {call, put, select}) {
+      const {namespace} = action.payload;
+
+      const projectId = yield select(state => state[namespace].projectId);
+
+      //todo 1. 向后台发起请求 获得section 的json 内容
+      const {data: {job: newSection}} = yield call(dataAnalysisService.addSection, {
+        ...action.payload,
+        project_id: projectId,
+      });
+
+      // 2. 添加section
+      yield put({type: 'addNewSection', payload: {section: newSection}});
+
+      // 3. 替换原有active section
+      yield put({
+        type: 'replaceActiveSection',
+        payload: {
+          // 原先的launcher id
+          oldSectionId: action.payload.sectionId,
+          newSectionId: newSection._id,
+        }
+      })
+    },
 
   },
   subscriptions: {

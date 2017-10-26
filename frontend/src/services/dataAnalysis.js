@@ -1,14 +1,14 @@
-import { request, config } from '../utils'
+import {request, config} from '../utils'
 
-const { CORS, api } = config;
-const { projectJobs, toolkits } = api;
+const {CORS, api} = config;
+const {projectJobs, toolkits} = api;
 const PREFIX = '/sections';
 
 // 获取用户所有sections
 export async function fetchSections(payload) {
 
   let res = await request(`${CORS}/project/jobs/${payload.projectId}?categories=${payload.categories}`);
-  if(payload.categories==='toolkit') {
+  if (payload.categories === 'toolkit') {
   }
   // let res = await request(`${CORS}${projectJobs}/${payload.projectId}?categories=${payload.categories}`);
   return res
@@ -34,6 +34,17 @@ export function addSection(payload) {
 }
 
 // 删除section
+export function deleteSection(payload) {
+  return request(`/api/job/job`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      "job_id": payload.sectionId
+    })
+  });
+}
 
 // 更改section
 export function saveSection(payload) {
@@ -54,4 +65,42 @@ export async function fetchToolkits(payload) {
   return await request(`${CORS}${toolkits}`)
 }
 
+export function runToolkits(payload) {
+  return request(`/api/toolkit/toolkits/staging_data_set`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload.section)
+  });
+}
 
+export function runJob(payload) {
+  return request(`/api/job/run_job`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      "section_id": payload.sectionId,
+      "project_id": payload.projectId
+    })
+  });
+}
+/*
+http://122.224.116.44:5005/toolkit/toolkits/staging_data_set
+
+{staging_data_set_id: "59c21d71d845c0538f0faeb2",…}
+conf
+:
+{args: {k: "3"}, data_fields: ["Attention", "Attention_dimension_reduction_PCA_col"]}
+project_id
+:
+"59c21ca6d845c0538f0fadd5"
+staging_data_set_id
+:
+"59c21d71d845c0538f0faeb2"
+toolkit_id
+:
+"5980149d8be34d34da32c170"
+ */
