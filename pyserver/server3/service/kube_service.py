@@ -1,15 +1,16 @@
-try:
-    from kubernetes import client
-    from kubernetes import config as kube_config
-    from kubernetes.client.models import v1_delete_options
+from kubernetes import client
+from kubernetes import config as kube_config
+from kubernetes.client.models import v1_delete_options
 
+try:
     kube_config.load_kube_config()
-    deployment_api = client.AppsV1beta1Api()
-    job_api = client.BatchV1Api()
-    service_api = client.CoreV1Api()
-    options = v1_delete_options.V1DeleteOptions()
 except:
     pass
+
+deployment_api = client.AppsV1beta1Api()
+job_api = client.BatchV1Api()
+service_api = client.CoreV1Api()
+options = v1_delete_options.V1DeleteOptions()
 
 from server3.constants import NAMESPACE
 
@@ -66,8 +67,8 @@ def check_job_condition(job_name, status):
 
 def check_condition(kube, status):
     if kube and kube.status.conditions and \
-       kube.status.conditions[0].type == status and \
-       kube.status.conditions[0].status:
+                    kube.status.conditions[0].type == status and \
+            kube.status.conditions[0].status:
         return True
     else:
         return False
