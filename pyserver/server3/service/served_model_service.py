@@ -136,9 +136,6 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
                         }
                     },
                     "spec": {
-                        # "securityContext": {
-                        #     "runAsUser": 1001,
-                        # },
                         "containers": [
                             {
                                 "name": job_id,
@@ -146,7 +143,6 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
                                 "imagePullPolicy": "IfNotPresent",
                                 "ports": [{
                                     "containerPort": 9000,
-                                    # "hostPort": port
                                 }],
                                 "stdin": True,
                                 "command": ['tensorflow_model_server'],
@@ -162,10 +158,6 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
                                         "mountPath": "/home/root/work/user_directory",
                                         "name": "nfsvol"
                                     },
-                                    # {
-                                    #     "mountPath": "/home/root/work/user_directory",
-                                    #     "name": job_id + "-volume"
-                                    # }
                                 ]
                             }
                         ],
@@ -176,11 +168,6 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
                                     "claimName": "nfs-pvc"
                                 }
                             },
-                            # {
-                            #     "name": job_id + "-volume",
-                            #     "hostPath": {
-                            #         "path": "{}/user_directory".format(cwd)},
-                            # }
                         ]
                     },
                 },

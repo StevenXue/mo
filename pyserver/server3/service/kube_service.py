@@ -12,6 +12,7 @@ job_api = client.BatchV1Api()
 service_api = client.CoreV1Api()
 options = v1_delete_options.V1DeleteOptions()
 
+
 from server3.constants import NAMESPACE
 
 
@@ -67,8 +68,8 @@ def check_job_condition(job_name, status):
 
 def check_condition(kube, status):
     if kube and kube.status.conditions and \
-       kube.status.conditions[0].type == status and \
-       kube.status.conditions[0].status:
+                    kube.status.conditions[0].type == status and \
+            kube.status.conditions[0].status:
         return True
     else:
         return False

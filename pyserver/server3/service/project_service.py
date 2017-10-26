@@ -204,22 +204,23 @@ def get_all_jobs_of_project(project_id, categories, status=None):
                         job['id']).to_mongo()
                 except DoesNotExist:
                     result_sds = None
-
-                if key == 'model':
-                    # model results
-                    job_info['results'] = result_sds
-                    # FIXME too slow to get metrics status
-                    # 已添加索引
-                    job_info['metrics_status'] = \
-                        [sd.to_mongo() for sd in
-                         staging_data_business.get_by_staging_data_set_id(
-                             result_sds['_id'])]
-                else:
-                    # toolkit results
-                    job_info['results'] = result_sds[
-                        'result'] if result_sds and "result" in result_sds else None
-                job_info['results_staging_data_set_id'] = result_sds[
-                    '_id'] if result_sds else None
+                finally:
+                    if result_sds:
+                        if key == 'model':
+                            # model results
+                            job_info['results'] = result_sds
+                            # FIXME too slow to get metrics status
+                            # 已添加索引
+                            job_info['metrics_status'] = \
+                                [sd.to_mongo() for sd in
+                                 staging_data_business.get_by_staging_data_set_id(
+                                     result_sds['_id'])]
+                        else:
+                            # toolkit results
+                            job_info['results'] = result_sds[
+                                'result'] if result_sds and "result" in result_sds else None
+                        job_info['results_staging_data_set_id'] = result_sds[
+                            '_id'] if result_sds else None
 
                 # model running status info
                 # if key == 'model':

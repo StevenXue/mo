@@ -15,7 +15,8 @@ export async function fetchSections(payload) {
 }
 
 const myDict = {
-  'dataAnalysis': 'toolkit'
+  'dataAnalysis': 'toolkit',
+  'modelling': 'model'
 };
 
 // 添加section
@@ -28,7 +29,7 @@ export function addSection(payload) {
     body: JSON.stringify({
       "project_id": payload.project_id,
       "job_type": myDict[payload.namespace],
-      "algorithm_id": payload.algorithm_id,
+      [`${myDict[payload.namespace]}_id`]: payload.algorithm_id
     })
   });
 }
@@ -72,6 +73,19 @@ export function runToolkits(payload) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(payload.section)
+  });
+}
+
+export function runJob(payload) {
+  return request(`/api/job/run_job`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      "section_id": payload.sectionId,
+      "project_id": payload.projectId
+    })
   });
 }
 /*

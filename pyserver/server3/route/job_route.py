@@ -44,13 +44,13 @@ def create_job():
     data = request.get_json()
     # todo 使用try except 捕捉错误
     job_type = data["job_type"]
-    algorithm_id = ObjectId(data["algorithm_id"])
-    project_id = ObjectId(data["project_id"])
-    job_dict = {
-        "project_id": project_id,
-        "{}_id".format(job_type): algorithm_id
-    }
-    job_obj = job_service.create_job(**job_dict)
+    # algorithm_id = data.get("algorithm_id")
+    model_id = data.get("model_id")
+    toolkit_id = data.get("toolkit_id")
+    project_id = data["project_id"]
+    job_obj = job_service.create_job(project_id=project_id,
+                                     toolkit_id=toolkit_id,
+                                     model_id=model_id)
     algorithm = job_obj[job_type].to_mongo()
     # 将job的toolkit转换成object
     job_obj = job_obj.to_mongo()
@@ -70,7 +70,8 @@ def create_job():
 def update_job_steps():
     data = request.get_json()
     print("data", data)
-    job_id, steps, active_steps = ObjectId(data["_id"]), data['steps'], data['active_steps']
+    job_id, steps, active_steps = ObjectId(data["_id"]), data['steps'], data[
+        'active_steps']
     result = job_business.update_job_steps(job_id, steps, active_steps)
     result = json_utility.convert_to_json(result.to_mongo())
     return jsonify({
@@ -95,16 +96,42 @@ def delete_job():
 def run_job():
     data = request.get_json()
     job_id = data['section_id']
+    project_id = data["project_id"]
+
     job_obj = job_business.get_by_job_id(job_id)
-    job_obj = json_utility.convert_to_json(job_obj.to_mongo())
-    # print("job_obj", job_obj)
+    # job_obj = json_utility.convert_to_json(job_obj.to_mongo())
+    # print("job_obj.steps[2]", job_obj.steps[2])
 
-    # staging_data_set_id = job_obj.
+    args = job_obj.steps[2]["args"]
+    new_args = {}
+    for arg in args:
+        new_args[arg['name']] = int(arg['value'])
 
+    obj = {
+        "staging_data_set_id": job_obj.steps[0]["args"][0]["values"][0],
+        "conf": {
+            "args": new_args,
+            "data_fields":
+            # ["HighAlpha", "Attention_dimension_reduction_PCA_col"]
+                job_obj.steps[1]["args"][0]["values"]
+        },
+        "project_id": project_id,
+        "toolkit_id": job_obj.toolkit.id,
+    }
+    result = job_service.run_job(obj=obj)
+
+    # obj = {
+    #     "staging_data_set_id": "59c21d71d845c0538f0faeb2",
+    #     "conf": {
+    #         "args": {"k": "3"},
+    #         "data_fields": ["Attention", "Attention_dimension_reduction_PCA_col"]},
+    #     "project_id": "59c21ca6d845c0538f0fadd5",
+    #     "toolkit_id": "5980149d8be34d34da32c170",
+    # }
 
     return jsonify({
         "response": {
-            "job_obj": job_obj
+            "result": result
         }}), 200
 
 

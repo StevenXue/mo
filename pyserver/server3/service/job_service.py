@@ -18,6 +18,7 @@ from bson import ObjectId
 from itertools import compress
 
 from server3.business import toolkit_business
+from server3.business import model_business
 from server3.business import job_business
 from server3.business import result_business
 from server3.business import project_business
@@ -36,15 +37,27 @@ from server3.utility import data_utility
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 
 
-def create_job(project_id, toolkit_id):
-    # create a job
-    toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
-    project_obj = project_business.get_by_id(project_id)
-    job_obj = job_business.add_toolkit_job(
-        toolkit_obj=toolkit_obj,
-        staging_data_set_obj=None,
-        project_obj=project_obj,
-    )
+def create_job(project_id, toolkit_id, model_id):
+    if toolkit_id:
+        # create a job
+        toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
+        project_obj = project_business.get_by_id(project_id)
+        job_obj = job_business.add_toolkit_job(
+            toolkit_obj=toolkit_obj,
+            model_obj=None,
+            staging_data_set_obj=None,
+            project_obj=project_obj,
+        )
+    else:
+        # create a job
+        model_obj = model_business.get_by_model_id(model_id)
+        project_obj = project_business.get_by_id(project_id)
+        job_obj = job_business.add_toolkit_job(
+            model_obj=model_obj,
+            toolkit_obj=None,
+            staging_data_set_obj=None,
+            project_obj=project_obj,
+        )
     # update a project
     project_business.insert_job_by_id(project_id, job_obj.id)
     return job_obj
@@ -419,6 +432,39 @@ def add_new_column(value, index, fields, name, staging_data_set_id):
                 obj = dict(zip(name_list, arr))
             col_value.append(obj)
         staging_data_service.add_new_keys_value(staging_data_set_id, col_value)
+
+
+from server3.service import toolkit_service
+
+
+def run_job(obj):
+    data = obj
+    staging_data_set_id = data.get('staging_data_set_id')
+    toolkit_id = data.get('toolkit_id')
+    project_id = data.get('project_id')
+    conf = data.get('conf')
+
+    # conf初步操作
+    flag = isinstance(conf["data_fields"][0], (list, tuple))
+    x_fields = conf["data_fields"][0] if flag else conf["data_fields"]
+    y_fields = conf["data_fields"][1] if flag else None
+    fields = x_fields + y_fields if flag else x_fields
+    data = staging_data_business.get_by_staging_data_set_and_fields(
+        ObjectId(staging_data_set_id), fields)
+
+    # 数据库转to_mongo和to_dict
+    data = [d.to_mongo().to_dict() for d in data]
+
+    # 拿到conf
+    fields = [x_fields, y_fields]
+    conf = conf.get('args')
+
+    result = toolkit_service.convert_json_and_calculate(project_id,
+                                                        staging_data_set_id,
+                                                        toolkit_id,
+                                                        fields, data, conf)
+    result.update({"fields": [x_fields, y_fields]})
+    return result
 
 
 if __name__ == '__main__':
