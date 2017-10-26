@@ -34,7 +34,6 @@ class DataPreview extends React.Component {
       )
       new_col = dsColumns.map((e) => (<span>{e}</span>),
       )
-
     }
 
     return (
