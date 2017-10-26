@@ -421,5 +421,38 @@ def add_new_column(value, index, fields, name, staging_data_set_id):
         staging_data_service.add_new_keys_value(staging_data_set_id, col_value)
 
 
+from server3.service import toolkit_service
+def run_job(obj):
+
+    data = obj
+    staging_data_set_id = data.get('staging_data_set_id')
+    toolkit_id = data.get('toolkit_id')
+    project_id = data.get('project_id')
+    conf = data.get('conf')
+
+    # conf初步操作
+    flag = isinstance(conf["data_fields"][0], (list, tuple))
+    x_fields = conf["data_fields"][0] if flag else conf["data_fields"]
+    y_fields = conf["data_fields"][1] if flag else None
+    fields = x_fields + y_fields if flag else x_fields
+    data = staging_data_business.get_by_staging_data_set_and_fields(
+        ObjectId(staging_data_set_id), fields)
+
+    # 数据库转to_mongo和to_dict
+    data = [d.to_mongo().to_dict() for d in data]
+
+    # 拿到conf
+    fields = [x_fields, y_fields]
+    conf = conf.get('args')
+
+    result = toolkit_service.convert_json_and_calculate(project_id,
+                                                        staging_data_set_id,
+                                                        toolkit_id,
+                                                        fields, data, conf)
+    result.update({"fields": [x_fields, y_fields]})
+    return result
+
+
+
 if __name__ == '__main__':
     pass

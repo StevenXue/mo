@@ -1896,6 +1896,7 @@ version_1_steps = [
                 'name': 'k',
                 'display_name': 'k',
                 'type': 'input',
+                'value_type': 'int',
                 'value': None,
             }
         ]

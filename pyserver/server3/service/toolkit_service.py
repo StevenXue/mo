@@ -155,6 +155,8 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
     # 去除NaN
     index_nan = []
     arg_filter = []
+    print("data", data)
+    print("fields", fields)
     for index, item in enumerate(data):
         temp = [data_utility.convert_string_to_number_with_poss(item[i]) for i
                 in columns]

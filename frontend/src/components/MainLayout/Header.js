@@ -32,11 +32,10 @@ const menuConfig = [
     Icon: null,
     text: 'Playground',
   },
-
-]
+];
 
 function Header({ location }) {
-  const key = '/' + location.pathname.split('/')[1]
+  const key = '/' + location.pathname.split('/')[1];
   return (
     <div className={styles.container}>
       <div className={styles.box}>

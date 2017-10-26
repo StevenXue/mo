@@ -53,7 +53,7 @@ export default {
   subscriptions: {
     setup({dispatch, history}) {
       return history.listen(({pathname}) => {
-        const match = pathToRegexp('/projects/:projectId/analysis').exec(pathname);
+        const match = pathToRegexp('/projects/:projectId/:category').exec(pathname);
         if (match) {
           let projectId = match[1];
 

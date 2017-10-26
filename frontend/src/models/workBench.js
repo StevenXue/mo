@@ -192,7 +192,7 @@ export default {
         console.log("push", values);
 
       } else {
-        values.splice(values.indexOf(fieldName),1);
+        values.splice(values.indexOf(fieldName), 1);
         console.log("pop", values);
 
       }
@@ -210,7 +210,7 @@ export default {
       }
     },
 
-    setParameter(state, action){
+    setParameter(state, action) {
       const {sectionId, stepIndex, argIndex, value} = action.payload;
       let sectionsJson = state.sectionsJson;
       sectionsJson[sectionId].steps[stepIndex].args[argIndex].value = value;
@@ -220,7 +220,7 @@ export default {
       }
     },
 
-    setActiveKey(state, action){
+    setActiveKey(state, action) {
 
       const {sectionId, activeKey} = action.payload;
 
@@ -231,7 +231,6 @@ export default {
         sectionsJson
       }
     }
-
 
 
   },
@@ -267,8 +266,10 @@ export default {
 
     // 保存section
     * saveSection(action, {call, put, select}) {
-      const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson);
-      const section = sectionsJson[action.payload.sectionId];
+      const {namespace, sectionId} = action.payload;
+
+      const sectionsJson = yield select(state => state[namespace].sectionsJson);
+      const section = sectionsJson[sectionId];
 
       const {data: result} = yield call(dataAnalysisService.saveSection, {section: section})
       // 没有后续操作了？
@@ -292,15 +293,55 @@ export default {
 
     // 获取fields
     * getFields(action, {call, put, select}) {
-      const {stepIndex, argIndex} = action.payload;
+      const {stepIndex, argIndex, namespace} = action.payload;
 
-      const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson);
+      const sectionsJson = yield select(state => state[namespace].sectionsJson);
       // const section = sectionsJson[action.payload.sectionId];
       const {data} = yield call(stagingDataService.fetchFields, action.payload.stagingDatasetId);
-      sectionsJson[action.payload.sectionId].steps[stepIndex+1].args[argIndex].fields = data;
+      sectionsJson[action.payload.sectionId].steps[stepIndex + 1].args[argIndex].fields = data;
       yield put({type: 'setSections', payload: {sectionsJson: sectionsJson}});
 
-    }
+    },
+
+    // 更新用户 section 为什么没用到
+    * updateSection(action, {call, put, select}) {
+      // 开始加载
+      const sectionId = action.sectionId;
+      const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson);
+      const section = sectionsJson[sectionId];
+      const sections = yield call(dataAnalysisService.updateSection, sectionId, section)
+
+      // 停止加载
+      // 显示保存成功
+      // yield put({type: 'setSections', sections})
+
+    },
+
+    // 添加 section
+    * addSection(action, {call, put, select}) {
+      const {namespace} = action.payload;
+
+      const projectId = yield select(state => state[namespace].projectId);
+
+      //todo 1. 向后台发起请求 获得section 的json 内容
+      const {data: {job: newSection}} = yield call(dataAnalysisService.addSection, {
+        ...action.payload,
+        project_id: projectId,
+      });
+
+      // 2. 添加section
+      yield put({type: 'addNewSection', payload: {section: newSection}});
+
+      // 3. 替换原有active section
+      yield put({
+        type: 'replaceActiveSection',
+        payload: {
+          // 原先的launcher id
+          oldSectionId: action.payload.sectionId,
+          newSectionId: newSection._id,
+        }
+      })
+    },
 
   },
   subscriptions: {
