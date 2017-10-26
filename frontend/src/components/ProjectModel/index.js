@@ -51,6 +51,9 @@ class ProjectModal extends Component {
         //   ...values,
         //   is_private: this.state.is_private,
         // }
+        if(!values.is_private) {
+          values.is_private = 'true'
+        }
         if (this.props.new) {
           this.props.dispatch({ type: 'project/create', body: values })
         } else {
@@ -208,7 +211,7 @@ class ProjectModal extends Component {
             >
           {
             getFieldDecorator('tags', {
-              initialValue: tags,
+              initialValue: tags.join(','),
               getValueFromEvent: (e) => {
                 return [...this.state.tags, e.target.value].join(',')
               },

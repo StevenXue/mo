@@ -42,6 +42,7 @@ export default {
       yield put({ type: 'hideLoginLoading' })
       if (data) {
         localStorage.setItem('token', data.token)
+        localStorage.setItem('user_ID', data.user.user_ID)
         const from = queryURL('from')
         yield put({ type: 'setUser', payload: data.user })
         if (from) {

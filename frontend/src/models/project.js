@@ -1,4 +1,5 @@
 import { routerRedux } from 'dva/router'
+import { tokenLogin } from '../services/login'
 import { fetchProjects, createProject, deleteProject, updateProject } from '../services/project'
 import { privacyChoices } from '../constants'
 
@@ -26,18 +27,23 @@ export default {
   effects: {
     // 获取用户所有 project
     *fetch(action, { call, put, select, take }) {
-      console.log('project list')
-      const { payload } = yield take('login/setUser')
-      const user_ID = payload.user_ID
+      // yield put({type: 'login/query'})
+      // const { data: data } = yield call(tokenLogin)
+      // console.log(data)
+      // yield put({
+      //   type: 'login/setUser',
+      //   payload: data.user,
+      // })
+      // yield put({ type: 'setProjects', payload: [] })
+
       // const user_ID = yield select(state => state.login.user.user_ID)
-      // const user_ID = 'dev_1'
-      const { data: projects } = yield call(fetchProjects, { user_ID, privacy: action.privacy })
+      const { data: projects } = yield call(fetchProjects, { privacy: action.privacy })
       yield put({ type: 'setProjects', payload: projects })
     },
 
     *create({ body }, { call, put, select }) {
       // const user_ID = 'dev_1'
-      body['user_ID'] = yield select(state => state.login.user.user_ID)
+      // body['user_ID'] = yield select(state => state.login.user.user_ID)
       yield call(createProject, { body })
       yield put({ type: 'hideModal' })
       yield put({ type: 'fetch', privacy: 'all' })
