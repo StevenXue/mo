@@ -43,25 +43,27 @@ def create_job():
     """
     data = request.get_json()
     # todo 使用try except 捕捉错误
-    if data["job_type"] == "toolkit":
-        toolkit_id = ObjectId(data["algorithm_id"])
-        project_id = ObjectId(data["project_id"])
-
-        job_obj = job_service.create_job(
-            project_id=project_id,
-            toolkit_id=toolkit_id
-        )
-        toolkit = job_obj.toolkit.to_mongo()
-        # 将job的toolkit转换成object
-        job_obj = job_obj.to_mongo()
-        job_obj['toolkit'] = toolkit
-        job_obj = json_utility.convert_to_json(job_obj)
-        return jsonify({
-            "response": {
-                "job": job_obj
-            }}), 200
-    else:
-        pass
+    job_type = data["job_type"]
+    algorithm_id = ObjectId(data["algorithm_id"])
+    project_id = ObjectId(data["project_id"])
+    job_dict = {
+        "project_id": project_id,
+        "{}_id".format(job_type): algorithm_id
+    }
+    job_obj = job_service.create_job(**job_dict)
+    algorithm = job_obj[job_type].to_mongo()
+    # 将job的toolkit转换成object
+    job_obj = job_obj.to_mongo()
+    job_obj[job_type] = algorithm
+    job_obj = json_utility.convert_to_json(job_obj)
+    return jsonify({
+        "response": {
+            "job": job_obj
+        }}), 200
+    # if data["job_type"] == "toolkit":
+    #
+    # else:
+    #     pass
 
 
 @job_app.route("/job_steps", methods=["PUT"])
