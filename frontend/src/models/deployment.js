@@ -122,7 +122,7 @@ export default {
     undeployModel(state, action) {
       let newInfo = {
         ...state.modelsJson[state.focusModelId],
-        deployState: 1,
+        deployState: 0,
       };
       return {
         ...state,

@@ -3,16 +3,15 @@ import {connect} from 'dva';
 import styles from './index.less';
 import {Tabs, Switch, Button, Input, Icon,notification,Modal} from 'antd';
 import {arrayToJson, JsonToArray} from '../../utils/JsonUtils';
-import LineChart from '../../components/Charts/lineChart';
 import LearningCurve from '../../components/Charts/curve';
 import HeatmapOnCartesianChart from '../../components/Charts/heatmapOnCartesianChart';
 import DeployModal from '../../components/deployModal/deployModal';
-import { get } from 'lodash'
+import { get } from 'lodash';
 
 const {TextArea} = Input;
 const TabPane = Tabs.TabPane;
 const confirm = Modal.confirm;
-
+const fakeField = ['A','B','AC','A','A']
 
 const openNotificationWithIcon = (type) => {
   if (type ==='edit'){
@@ -57,10 +56,10 @@ function UseThisAPIPage({deployment, dispatch}){
     //  跳转到该model详细页面
     if (modelsJson[focusModelId]['deployState']===0){
       deployModel();
-      openNotificationWithIcon('deploy')
+      openNotificationWithIcon('deploy');
       }
     else{
-      showUndeployConfirm()
+      showUndeployConfirm();
       }
   };
 
@@ -119,6 +118,9 @@ function UseThisAPIPage({deployment, dispatch}){
     return (<div>
       <DeployModal dispatch={dispatch} deployment={deployment} visible={deployment.modalState} firstDeploy={false}/>
       <h1>Overview</h1><Icon type="edit" onClick={()=>onClickModifyModal(true)}/>
+      <h2>Name</h2>
+      {/*<pre>{modelsJson[focusModelId]['deployName']}</pre>*/}
+      <h2>Description</h2>
       <pre>{modelsJson[focusModelId]['deployDescription']}</pre>
       <h1>Usage</h1>
       <h2>Input</h2>
@@ -160,7 +162,6 @@ function Deployment({deployment, dispatch}) {
     //  跳转到该model详细页面
     setFocusModel(modelId)
   };
-  console.log(get(modelsJson,`[${focusModelId}].metrics_status`))
 
   return (
     <div className={styles.container}>
@@ -207,6 +208,18 @@ function Deployment({deployment, dispatch}) {
           >
             <TabPane tab="Information" key="1">
               <h1>Dataset</h1>
+              <div className={styles.fields}>
+                {fakeField.map(field =>
+                  <div
+                    key={field}
+                    className={styles.field}
+                    style={{backgroundColor: '#F3F3F3'}}
+                  >
+                    <p className={styles.text}>{field}</p>
+                  </div>
+                )}
+              </div>
+
               <h1>Performance</h1>
               <div>
                 {get(modelsJson,`[${focusModelId}].metrics_status`)?
