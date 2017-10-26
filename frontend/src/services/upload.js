@@ -17,13 +17,12 @@ export async function uploadFile (body) {
 //   })
 // }
 //
-// export async function fetchDataSets (user_ID) {
-//   let query = `?user_ID=${user_ID}`
-//   return request({
-//     url: CORS + dataSets + query,
-//     method: 'get',
-//   })
-// }
+export async function fetchDataSets (user_ID) {
+  let query = `?user_ID=${user_ID}`;
+  return request(CORS + dataSets + query, {
+    method: 'get',
+  })
+}
 //
 // export async function importData (data) {
 //   return request({
@@ -32,3 +31,9 @@ export async function uploadFile (body) {
 //     data,
 //   })
 // }
+export async function fetchDataSet(dataSet_ID) {
+  let query = `/${dataSet_ID}?limit=5`;
+  return request(CORS + dataSets +query, {
+    method: 'get',
+  })
+}

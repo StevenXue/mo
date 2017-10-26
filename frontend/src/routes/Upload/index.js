@@ -21,6 +21,8 @@ class UploadData extends Component {
   }
 
   handleSubmit = (e) => {
+    const {history, match, dispatch} = this.props
+
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
 
@@ -28,7 +30,8 @@ class UploadData extends Component {
         // console.log(values);
         // let value = lodash.cloneDeep(values);
         // value.tags = this.props.upload.tags.join(',');
-        this.props.dispatch({ type: 'upload/upload', payload: values })
+        dispatch({ type: 'upload/upload', payload: values })
+        // history.push('preview')
       } else {
 
         console.log('error', err)
