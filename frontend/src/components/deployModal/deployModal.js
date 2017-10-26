@@ -2,16 +2,16 @@ import {Modal, Button, Input, Form, notification} from 'antd';
 import styles from './deployModal.less';
 import React from 'react';
 import {connect} from 'dva';
-
 const {TextArea} = Input;
 const FormItem = Form.Item;
+import { get } from 'lodash';
+
 
 function hasErrors(fieldsError) {
   return Object.keys(fieldsError).some(field => fieldsError[field]);
 }
 
 class DeployModal extends React.Component {
-
 
   openNotificationWithIcon = () => {
     notification['success']({
@@ -50,9 +50,6 @@ class DeployModal extends React.Component {
       type: 'deployment/showModal',
       payload:{modalState: modalState},
     });
-    // this.setState({
-    //   visible: true,
-    // });
   };
 
   handleOk = (e) => {
@@ -60,7 +57,7 @@ class DeployModal extends React.Component {
     this.setState({
       visible: false,
     });
-  }
+  };
 
   handleCancel = (e) => {
     console.log(e);
@@ -68,11 +65,7 @@ class DeployModal extends React.Component {
       type: 'deployment/showModal',
       payload:{modalState: false},
     });
-    // this.setState({
-    //   visible: false,
-    // });
-  }
-
+  };
 
   handleSubmit = (e) => {
     e.preventDefault();
@@ -82,14 +75,25 @@ class DeployModal extends React.Component {
         this.setModelHowToUse(values);
         this.showModal(false);
         if (this.props.firstDeploy) {
-          this.deployModel()
+          this.deployModel();
         }
       }
     });
-  }
+  };
+
+  initialValue = (deployInfo) =>{
+
+    let output = get(this.props.deployment.modelsJson,`[${this.props.deployment.focusModelId}][${deployInfo}]`);
+    if (output){
+      return [output]
+    }
+    else{
+      return []
+    }
+};
+
 
   render() {
-
     const {getFieldDecorator, getFieldsError, getFieldError, isFieldTouched} = this.props.form;
     const inputFieldError = isFieldTouched('inputField') && getFieldError('inputField');
 
@@ -111,12 +115,10 @@ class DeployModal extends React.Component {
               help={inputFieldError || ''}
             >
               {getFieldDecorator('deployDescription', {
-                initialValue:[
-                  this.props.deployment.modelsJson[this.props.deployment.focusModelId]['deployDescription'],
-                ],
+                initialValue: this.initialValue('deployDescription'),
                 rules: [{
                   required: true,
-                  message: '让他人更好的理解你的模型'
+                  message: 'hello'
                 }],
               })(
                 <TextArea className={styles.inputtext}
@@ -133,12 +135,10 @@ class DeployModal extends React.Component {
             >
 
               {getFieldDecorator('deployInput', {
-                initialValue:[
-                  this.props.deployment.modelsJson[this.props.deployment.focusModelId]['deployInput'],
-                ],
+                initialValue: this.initialValue('deployInput'),
                 rules: [{
                   required: true,
-                  message: '让他人更好的理解你的模型'
+                  message: 'hello'
                 }],
               })(
                 <TextArea className={styles.inputtext}
@@ -153,12 +153,12 @@ class DeployModal extends React.Component {
             >
 
               {getFieldDecorator('deployOutput', {
-                initialValue:[
-                  this.props.deployment.modelsJson[this.props.deployment.focusModelId]['deployOutput'],
-                ],
+
+                initialValue:this.initialValue('deployOutput'),
+
                 rules: [{
                   required: true,
-                  message: '让他人更好的理解你的模型'
+                  message: 'hello'
                 }],
               })(
                 <TextArea className={styles.inputtext}
@@ -172,12 +172,11 @@ class DeployModal extends React.Component {
               help={inputFieldError || ''}
             >
               {getFieldDecorator('deployExamples', {
-                initialValue:[
-                  this.props.deployment.modelsJson[this.props.deployment.focusModelId]['deployExamples'],
-                ],
+                initialValue:this.initialValue('deployExamples'),
+
                 rules: [{
                   required: true,
-                  message: '让他人更好的理解你的模型'
+                  message: 'hello'
                 }],
               })(
                 <TextArea className={styles.inputtext}
@@ -195,12 +194,11 @@ class DeployModal extends React.Component {
               </Button>
             </FormItem>
           </Form>
-
         </Modal>
       </div>
     );
   }
 }
-
-connect(({deployment}) => ({deployment}))(Form.create()(DeployModal));
-export default Form.create()(DeployModal);
+const WrappedDeployModal = Form.create()(DeployModal);
+connect(({deployment}) => ({deployment}))(WrappedDeployModal);
+export default WrappedDeployModal;
