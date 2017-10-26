@@ -112,9 +112,6 @@ def deploy(user_ID, job_id, name, description, server, signatures,
                         }
                     },
                     "spec": {
-                        # "securityContext": {
-                        #     "runAsUser": 1001,
-                        # },
                         "containers": [
                             {
                                 "name": job_id,
@@ -122,7 +119,6 @@ def deploy(user_ID, job_id, name, description, server, signatures,
                                 "imagePullPolicy": "IfNotPresent",
                                 "ports": [{
                                     "containerPort": 9000,
-                                    # "hostPort": port
                                 }],
                                 "stdin": True,
                                 "command": ['tensorflow_model_server'],
@@ -138,10 +134,6 @@ def deploy(user_ID, job_id, name, description, server, signatures,
                                         "mountPath": "/home/root/work/user_directory",
                                         "name": "nfsvol"
                                     },
-                                    # {
-                                    #     "mountPath": "/home/root/work/user_directory",
-                                    #     "name": job_id + "-volume"
-                                    # }
                                 ]
                             }
                         ],
@@ -152,11 +144,6 @@ def deploy(user_ID, job_id, name, description, server, signatures,
                                     "claimName": "nfs-pvc"
                                 }
                             },
-                            # {
-                            #     "name": job_id + "-volume",
-                            #     "hostPath": {
-                            #         "path": "{}/user_directory".format(cwd)},
-                            # }
                         ]
                     },
                 },
