@@ -95,16 +95,42 @@ def delete_job():
 def run_job():
     data = request.get_json()
     job_id = data['section_id']
+    project_id = data["project_id"]
+
     job_obj = job_business.get_by_job_id(job_id)
-    job_obj = json_utility.convert_to_json(job_obj.to_mongo())
-    # print("job_obj", job_obj)
+    # job_obj = json_utility.convert_to_json(job_obj.to_mongo())
+    # print("job_obj.steps[2]", job_obj.steps[2])
 
-    # staging_data_set_id = job_obj.
+    args = job_obj.steps[2]["args"]
+    new_args = {}
+    for arg in args:
+        new_args[arg['name']] = int(arg['value'])
 
+    obj = {
+        "staging_data_set_id": job_obj.steps[0]["args"][0]["values"][0],
+        "conf": {
+            "args": new_args,
+            "data_fields":
+                # ["HighAlpha", "Attention_dimension_reduction_PCA_col"]
+                job_obj.steps[1]["args"][0]["values"]
+        },
+        "project_id": project_id,
+        "toolkit_id": job_obj.toolkit.id,
+    }
+    result = job_service.run_job(obj=obj)
+
+    # obj = {
+    #     "staging_data_set_id": "59c21d71d845c0538f0faeb2",
+    #     "conf": {
+    #         "args": {"k": "3"},
+    #         "data_fields": ["Attention", "Attention_dimension_reduction_PCA_col"]},
+    #     "project_id": "59c21ca6d845c0538f0fadd5",
+    #     "toolkit_id": "5980149d8be34d34da32c170",
+    # }
 
     return jsonify({
         "response": {
-            "job_obj": job_obj
+            "result": result
         }}), 200
 
 

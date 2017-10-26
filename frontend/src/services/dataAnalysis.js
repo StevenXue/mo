@@ -74,6 +74,19 @@ export function runToolkits(payload) {
     body: JSON.stringify(payload.section)
   });
 }
+
+export function runJob(payload) {
+  return request(`/api/job/run_job`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      "section_id": payload.sectionId,
+      "project_id": payload.projectId
+    })
+  });
+}
 /*
 http://122.224.116.44:5005/toolkit/toolkits/staging_data_set
 
