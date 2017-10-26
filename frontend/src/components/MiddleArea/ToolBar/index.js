@@ -17,7 +17,10 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
   function onClickSave() {
     dispatch({
       type: namespace + '/saveSection',
-      payload: {sectionId: sectionId}
+      payload: {
+        sectionId: sectionId,
+        namespace
+      }
     })
 
   }

@@ -52,7 +52,6 @@ function Preview({preview, dataAnalysis, dispatch}) {
   let columns = null;
   if (table.length !== 0) {
     columns = table.columns.map((e, index) => {
-
       const ret = {
         title: e[0],
         dataIndex: e[0],
@@ -63,7 +62,6 @@ function Preview({preview, dataAnalysis, dispatch}) {
         ret['className'] = 'active-table-column';
         ret['fixed'] = true;
       }
-
       return ret
     })
   }
@@ -73,7 +71,6 @@ function Preview({preview, dataAnalysis, dispatch}) {
     <div >
       view
       <div>
-
         <Select
           // key={arg.name + argIndex}
           className='column'

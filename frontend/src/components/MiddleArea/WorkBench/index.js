@@ -72,7 +72,8 @@ function WorkBench({section, model, dispatch, namespace}) {
         stagingDatasetId,
         sectionId: section._id,
         stepIndex,
-        argIndex
+        argIndex,
+        namespace
       }
     });
 
