@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'dva';
 import {Icon, Button} from 'antd';
-import styles from './ToolBar.css';
+import styles from './ToolBar.less';
 const ButtonGroup = Button.Group;
 import ResultButton from './ResultButton';
 function ToolBar({model, dispatch, namespace, sectionId}) {
@@ -49,9 +49,12 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
 
   return (
     <div className={styles.container} >
-      <div className={styles.title}>{name}</div>
+      <div className={styles.title}>
+        {name}
+      </div>
 
       <ButtonGroup className={styles.button_group}>
+
         <Button type="primary" className={styles.button}
                 onClick={()=>onClickSave()}>
           <Icon type="save" className={styles.icon}/>
@@ -71,9 +74,10 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
           <Icon type="retweet" className={styles.icon}/>
         </Button>
 
-        <div className={styles.result} >
+        <div  >
           <ResultButton visual_sds_id={visual_sds_id}/>
         </div>
+
       </ButtonGroup>
 
     </div>
