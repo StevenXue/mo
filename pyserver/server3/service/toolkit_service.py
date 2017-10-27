@@ -40,6 +40,16 @@ TOOLKIT_CATEGORY_DICT = {
 
 NEW_TOOLKIT_CATEGORY = [
     {
+        'name': 'finished_toolkit',
+        'zh_name': '完成的toolkit',
+        'us_name': 'Finished Toolkit',
+        'child': [
+            'K平均数算法',
+            '移动平均值',
+        ],
+        'children': []
+    },
+    {
         'name': 'simple_toolkit',
         'zh_name': '简单的toolkit',
         'us_name': 'Simple Toolkit',
@@ -53,8 +63,8 @@ NEW_TOOLKIT_CATEGORY = [
         'zh_name': '初探数据集',
         'us_name': 'Data Explore',
         'child': [
-            'K平均数算法',
-            '移动平均值',
+            # 'K平均数算法',
+            # '移动平均值',
             '皮尔森相关系数',
             '变异系数',
             '数据互相关'

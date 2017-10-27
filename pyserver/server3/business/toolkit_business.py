@@ -23,6 +23,7 @@ from server3.entity.toolkit import Toolkit
 from server3.repository.toolkit_repo import ToolkitRepo
 from server3.business import user_business, ownership_business
 
+from server3.constants import SPEC
 toolkit_repo = ToolkitRepo(Toolkit)
 
 
@@ -1759,6 +1760,7 @@ def remove_one_public_toolkit():
     # 已舍去
     # ownership_business.remove_ownership_by_user_and_owned_item(user, toolkit, 'toolkit')
 
+# input = SPEC.ui_spec['input']
 
 def update_toolkit():
     KMEAN = Toolkit(name='K平均数算法',
@@ -1833,22 +1835,23 @@ def update_toolkit():
                             'display_name': 'select parameters',
                             'args': [
                                 {
+                                    **SPEC.ui_spec['choice'],
                                     "name": "input",
                                     "des": "",
 
-                                    "type": "select_box",
-                                    "default": None,
-                                    "required": True,
+                                    # "type": "select_box",
+                                    # "default": None,
+                                    # "required": True,
 
                                     # length of values
-                                    "len_range": [
-                                        1,
-                                        1
-                                    ],
+                                    # "len_range": [
+                                    #     1,
+                                    #     1
+                                    # ],
                                     # range of one value
-                                    'value_range': None,
-                                    'value_type': None,
-                                    'values': []
+                                    # 'value_range': None,
+                                    # 'value_type': None,
+                                    # 'values': []
                                 }
                             ],
                         },
@@ -1857,11 +1860,12 @@ def update_toolkit():
                             'display_name': 'select fields',
                             'args': [
                                 {
+                                    **SPEC.ui_spec['multiple_choice'],
                                     'name': 'fields',
                                     'des': '',
-                                    'type': 'multiple_choice',
-                                    'value_type': None,
-                                    'values': []
+                                    # 'type': 'multiple_choice',
+                                    # 'value_type': None,
+                                    # 'values': []
                                 }
                             ],
                         },
@@ -1870,21 +1874,29 @@ def update_toolkit():
                             'display_name': 'input parameters',
                             'args': [
                                 {
+                                    **SPEC.ui_spec['input'],
                                     'name': 'k',
                                     'display_name': 'k',
-                                    'type': 'input',
-                                    'value': None,
                                     'value_type': 'int',
-                                    'default': 2,
-                                    'required': True,
+                                    'range': [2, None],
                                     'des': 'the number of clustering numbers',
-                                    # length of values
-                                    "len_range": [
-                                        1,
-                                        1
-                                    ],
-                                    # range of one value
-                                    'value_range': [2, None],
+
+
+                                    # 'name': 'k',
+                                    # 'display_name': 'k',
+                                    # 'type': 'input',
+                                    # 'value': None,
+                                    # 'value_type': 'int',
+                                    # 'default': 2,
+                                    # 'required': True,
+                                    # 'des': 'the number of clustering numbers',
+                                    # # length of values
+                                    # "len_range": [
+                                    #     1,
+                                    #     1
+                                    # ],
+                                    # # range of one value
+                                    # 'value_range': [2, None],
 
                                 }
                             ]
@@ -1943,22 +1955,9 @@ def update_toolkit():
                           'display_name': 'select parameters',
                           'args': [
                               {
+                                  **SPEC.ui_spec['choice'],
                                   "name": "input",
                                   "des": "",
-
-                                  "type": "select_box",
-                                  "default": None,
-                                  "required": True,
-
-                                  # length of values
-                                  "len_range": [
-                                      1,
-                                      1
-                                  ],
-                                  # range of one value
-                                  'value_range': None,
-                                  'value_type': None,
-                                  'values': []
                               }
                           ],
                       },
@@ -1967,11 +1966,9 @@ def update_toolkit():
                           'display_name': 'select fields',
                           'args': [
                               {
+                                  **SPEC.ui_spec['multiple_choice'],
                                   'name': 'fields',
                                   'des': '',
-                                  'type': 'multiple_choice',
-                                  'value_type': None,
-                                  'values': []
                               }
                           ],
                       },
@@ -1980,14 +1977,16 @@ def update_toolkit():
                           'display_name': 'input parameters',
                           'args': [
                               {
+                                  **SPEC.ui_spec['input'],
+                                  'range': [2, None],
                                   'name': 'window',
-                                  'display_name': 'k',
+                                  'display_name': 'window',
                                   'type': 'input',
-                                  'value': None,
                                   'value_type': 'int',
                                   'default': 3,
-                                  'required': True,
                                   'des': 'the window of moving average',
+                                  'required': True,
+
                               }
                           ]
                       }
