@@ -5,7 +5,16 @@ import styles from './ToolBar.css';
 const ButtonGroup = Button.Group;
 import ResultButton from './ResultButton';
 function ToolBar({model, dispatch, namespace, sectionId}) {
+  const {
+    sectionsJson
+  } = model;
 
+  const {
+    visual_sds_id,
+    toolkit: {
+      name
+    }
+  } = sectionsJson[sectionId];
   // // change state
   // const updateSection = (sectionId) => {
   //   dispatch({
@@ -29,24 +38,20 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
     dispatch({
       type: namespace + '/runSection',
       payload: {
-        sectionId
+        sectionId,
+        namespace
       }
     })
   }
 
+
+
+
   return (
     <div className={styles.container} >
-      <div className={styles.result} >
-       <ResultButton/>
-      </div>
+      <div className={styles.title}>{name}</div>
 
-      {/*<Icon type="retweet" style={{fontSize:20, margin:10}}/>*/}
-      {/*<Icon type="pause-circle" style={{fontSize:20, margin:10}}/>*/}
-      {/*<Icon type="play-circle" style={{fontSize:20, margin:10}}/>*/}
-
-      {/*<Icon type="save" onClick={()=>onClickSave()} style={{fontSize:20, margin:10}}/>*/}
-
-      <ButtonGroup>
+      <ButtonGroup className={styles.button_group}>
         <Button type="primary" className={styles.button}
                 onClick={()=>onClickSave()}>
           <Icon type="save" className={styles.icon}/>
@@ -66,8 +71,11 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
           <Icon type="retweet" className={styles.icon}/>
         </Button>
 
-
+        <div className={styles.result} >
+          <ResultButton visual_sds_id={visual_sds_id}/>
+        </div>
       </ButtonGroup>
+
     </div>
   );
 }

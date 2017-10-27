@@ -81,5 +81,9 @@ def delete_deployment(deploy_name):
                                                        options)
 
 
+def delete_service(service_name):
+    return service_api.delete_namespaced_service(service_name, NAMESPACE)
+
+
 def delete_job(job_name):
     return job_api.delete_namespaced_job(job_name, NAMESPACE, options)

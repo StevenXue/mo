@@ -53,5 +53,7 @@ class Toolkit(DynamicDocument):
 
     # steps
     steps = ListField(DictField())
+    # frontend display category
+    front_end_category = StringField(max_length=50)
 
 

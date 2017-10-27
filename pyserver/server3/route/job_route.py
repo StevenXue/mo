@@ -118,7 +118,7 @@ def run_job():
         "project_id": project_id,
         "toolkit_id": job_obj.toolkit.id,
     }
-    result = job_service.run_job(obj=obj)
+    result = job_service.run_job(obj=obj, job_obj=job_obj)
 
     # obj = {
     #     "staging_data_set_id": "59c21d71d845c0538f0faeb2",

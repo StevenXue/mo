@@ -43,7 +43,8 @@ def update_db(user_ID, name, description, input_info, output_info,
 def first_save_to_db(user_ID, name, description, input_info, output_info,
                      examples, version,
                      deploy_name, server,
-                     input_type, model_base_path, job, job_id,is_private=False,
+                     input_type, model_base_path, job, is_private=False,
+                     service_name=None,
                      **optional):
     """
     add a served model
@@ -63,10 +64,10 @@ def first_save_to_db(user_ID, name, description, input_info, output_info,
                                              output_info,
                                              examples, version, deploy_name,
                                              server,  input_type,
-                                             model_base_path, job, **optional)
+                                             model_base_path, job,
+                                             service_name, **optional)
     user = user_business.get_by_user_ID(user_ID)
     ownership_business.add(user, is_private, served_model=served_model)
-    job_business.update_job_by_id(job_id, served_model=served_model)
     return served_model
 
 
@@ -120,6 +121,7 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
 
         cwd = os.getcwd()
         deploy_name = job_id + '-serving'
+        service_name = "my-" + job_id + "-service"
         port = port_for.select_random(ports=set(range(30000, 32767)))
         export_path = export_path.replace('./user_directory',
                                           '/home/root/work/user_directory')
@@ -178,7 +180,7 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
             "kind": "Service",
             "apiVersion": "v1",
             "metadata": {
-                "name": "my-" + job_id + "-service"
+                "name": service_name
             },
             "spec": {
                 "type": "NodePort",
@@ -216,13 +218,15 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
                                 output_info,
                                 examples, version,
                                 deploy_name, server,
-                                input_type, export_path, job,job_id,
+                                input_type, export_path, job,
                                 is_private,
+                                service_name=service_name,
                                 **optional)
 
 
 def remove_by_id(served_model_id):
     served_model = served_model_business.get_by_id(served_model_id)
     kube_service.delete_deployment(served_model.name)
+    kube_service.delete_deployment(served_model.service_name)
     # served_model_business.terminate_by_id(served_model_id)
     served_model_business.remove_by_id(served_model_id)

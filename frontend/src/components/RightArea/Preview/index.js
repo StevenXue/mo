@@ -69,7 +69,7 @@ function Preview({preview, dataAnalysis, dispatch}) {
 
   return (
     <div >
-      view
+
       <div>
         <Select
           // key={arg.name + argIndex}
@@ -88,7 +88,6 @@ function Preview({preview, dataAnalysis, dispatch}) {
             <Option key={stagingData._id} value={stagingData._id}>{stagingData.name}</Option>
           )}
         </Select>
-
       </div>
 
       <Table dataSource={dataSource} columns={columns} scroll={{ x: 6000 , y: '100%'}}/>

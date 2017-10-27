@@ -343,6 +343,22 @@ export default {
       })
     },
 
+    * runSection(action, {call, put, select}) {
+      const {namespace, sectionId} = action.payload;
+      // 先把 save section 复制过来
+      const projectId = yield select(state => state[namespace].projectId);
+
+      const {data: {result}} = yield call(dataAnalysisService.runJob, {
+        ...action.payload,
+        projectId: projectId,
+      });
+
+      console.log("result", result)
+
+
+    }
+
+
   },
   subscriptions: {
     // 当进入该页面是 获取用户所有 section
