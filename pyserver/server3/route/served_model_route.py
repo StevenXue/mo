@@ -21,7 +21,7 @@ served_model_app = Blueprint("served_model_app", __name__, url_prefix=PREFIX)
 
 
 @served_model_app.route('/deploy/<string:job_id>', methods=['POST'])
-def deploy_trained_model(job_id):
+def first_deploy(job_id):
     """
     deploy trained model
     :param job_id:
@@ -29,14 +29,21 @@ def deploy_trained_model(job_id):
     """
     data = request.get_json()
     user_ID = data.pop('user_ID')
-    description = data.pop('description')
-    name = data.pop('name')
+    name = data.pop('deployName')
+    description = data.pop('deployDescription')
+    input_info = data.pop('deployInput')
+    output_info = data.pop('deployOutput')
+    examples = data.pop('deployExamples')
     server = '10.52.14.182:9000'
-    signatures = data.pop('signatures')
-    input_type = data.pop('input_type')
-    served_model = served_model_service.deploy(user_ID, job_id, name,
-                                               description, server,
-                                               signatures, input_type, **data)
+    # 用户提供 or 从数据库 训练的dataset中 获取
+    #
+    input_type = '1darray'
+    served_model = served_model_service.first_deploy(user_ID, job_id, name,
+                                                     description, input_info,
+                                                     output_info,
+                                                     examples, server,
+                                                     input_type,
+                                                     **data)
     if not served_model:
         return jsonify({'response': 'already deployed'}), 400
     served_model = json_utility.convert_to_json(served_model.to_mongo())
@@ -82,7 +89,6 @@ def terminate_served_model(oid):
         return jsonify({'response': 'terminated'})
     else:
         return jsonify({'response': 'terminate failed'}), 400
-
 
 # @served_model_app.route('/resume/<string:oid>', methods=['PUT'])
 # def resume_served_model(oid):

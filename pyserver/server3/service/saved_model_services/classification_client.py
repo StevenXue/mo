@@ -28,7 +28,7 @@ import tensorflow as tf
 from tensorflow_serving.apis import classification_pb2
 from tensorflow_serving.apis import prediction_service_pb2
 
-tf.app.flags.DEFINE_string('server', 'localhost:9000',
+tf.app.flags.DEFINE_string('server', '10.52.14.182:30361',
                            'PredictionService host:port')
 FLAGS = tf.app.flags.FLAGS
 
@@ -41,7 +41,8 @@ def main(_):
     request = classification_pb2.ClassificationRequest()
 
     example = request.input.example_list.examples.add()
-    example.features.feature['x'].float_list.value.extend([0.8])
+    example.features.feature['petal_length'].float_list.value.extend([0.8])
+    example.features.feature['petal_width'].float_list.value.extend([0.8])
 
     result = stub.Classify(request, 10.0)  # 10 secs timeout
     print(result)

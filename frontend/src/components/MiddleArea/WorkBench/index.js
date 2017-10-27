@@ -1,39 +1,39 @@
-import React from 'react';
-import styles from './index.less';
-import {connect} from 'dva';
+import React from 'react'
+import styles from './index.less'
+import { connect } from 'dva'
 
 import {Select, Collapse, Button, Input} from 'antd';
 import ToolBar from '../ToolBar/index';
 import {format} from '../../../utils/base';
 
-const Option = Select.Option;
-const Panel = Collapse.Panel;
-
+const Option = Select.Option
+const Panel = Collapse.Panel
 
 const JsonToArray = (json, key) => {
-  let arr = [];
+  let arr = []
   for (let prop in json) {
-    let newObject = json[prop];
-    newObject[[key]] = prop;
-    arr.push(newObject);
+    let newObject = json[prop]
+    newObject[[key]] = prop
+    arr.push(newObject)
   }
   return arr
-};
+}
 
-
-function WorkBench({section, model, dispatch, namespace}) {
+function WorkBench({ section, model, dispatch, namespace }) {
   //state
   const {
     stagingDataList,
     sectionsJson,
-  } = model;
+
+  } = model
+
 
   function handleBlur() {
-    console.log('blur');
+    console.log('blur')
   }
 
   function handleFocus() {
-    console.log('focus');
+    console.log('focus')
   }
 
   const {
@@ -43,18 +43,18 @@ function WorkBench({section, model, dispatch, namespace}) {
     toolkit: {
       steps: baseSteps
     }
-  } = section;
+  } = section
 
   //functions 下拉框选择
   function handleChange(value, index, argIndex) {
     // section.steps[index].args[argIndex].values = [value]; 备选方案以后再加相应的reducer
 
-    sectionsJson[section._id].steps[index].args[argIndex].values = [value];
+    sectionsJson[section._id].steps[index].args[argIndex].values = [value]
 
     dispatch({
       type: namespace + '/setSections',
-      payload: {sectionsJson: sectionsJson}
-    });
+      payload: { sectionsJson: sectionsJson },
+    })
     // 将预览设置
   }
 
@@ -67,19 +67,18 @@ function WorkBench({section, model, dispatch, namespace}) {
         sectionId: section._id,
         stepIndex,
         argIndex,
-        namespace
-      }
-    });
+        namespace,
+      },
+    })
 
     // let activeKey=active_steps;
-
 
     dispatch({
       type: namespace + '/setActiveKey',
       payload: {
-        activeKey: ["1", "2"],
-        sectionId: section._id
-      }
+        activeKey: [String(stepIndex), String(stepIndex + 1)],
+        sectionId: section._id,
+      },
     })
   }
 
@@ -88,19 +87,18 @@ function WorkBench({section, model, dispatch, namespace}) {
       type: namespace + '/setActiveKey',
       payload: {
         activeKey: key,
-        sectionId: section._id
-      }
-    });
+        sectionId: section._id,
+      },
+    })
   }
-
 
   function handleClickField(fieldName) {
     dispatch({
       type: namespace + '/addRemoveField',
       payload: {
         fieldName,
-        sectionId: section._id
-      }
+        sectionId: section._id,
+      },
     })
   }
 
@@ -115,15 +113,14 @@ function WorkBench({section, model, dispatch, namespace}) {
         sectionId: section._id,
         stepIndex,
         argIndex,
-        value: e
-      }
-    });
+        value: e,
+      },
+    })
   }
-
 
   return (
     <div className={styles.normal}>
-      <ToolBar sectionId={sectionId} {...{model, dispatch, namespace}}/>
+      <ToolBar sectionId={sectionId} {...{ model, dispatch, namespace }}/>
       <div className={styles.container}>
         <Collapse className={styles.collapse}
                   defaultActiveKey={['data_source']} onChange={callback}
@@ -135,7 +132,7 @@ function WorkBench({section, model, dispatch, namespace}) {
                   case 'data_source':
                     return <Panel
                       className={styles.panel}
-                      header={step.display_name} key={"1"}>
+                      header={step.display_name} key={stepIndex}>
                       {
                         step.args.map((arg, argIndex) =>
                           <div key={arg.name + argIndex}>
@@ -143,7 +140,7 @@ function WorkBench({section, model, dispatch, namespace}) {
                               key={arg.name + argIndex}
                               className={styles.select}
                               showSearch
-                              style={{width: 200}}
+                              style={{ width: 200 }}
                               placeholder="Select a stagingData"
                               optionFilterProp="children"
                               onChange={(value) => handleChange(value, stepIndex, argIndex)}
@@ -153,7 +150,7 @@ function WorkBench({section, model, dispatch, namespace}) {
                               filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
                             >
                               {stagingDataList.map((stagingData) =>
-                                <Option key={stagingData._id} value={stagingData._id}>{stagingData.name}</Option>
+                                <Option key={stagingData._id} value={stagingData._id}>{stagingData.name}</Option>,
                               )}
                             </Select>
 
@@ -163,36 +160,80 @@ function WorkBench({section, model, dispatch, namespace}) {
                               next
                             </Button>
 
-                          </div>
+                          </div>,
                         )
                       }
 
-                    </Panel>;
+                    </Panel>
                   case 'fields':
-                    return <Panel header="Select Fields" key={"2"}
+                    return <Panel header="Select Fields" key={stepIndex}
                                   className={styles.panel}
                     >
                       <div className={styles.fields}>
 
-                        {step.args[0]["fields"] && step.args[0].fields.map(field =>
+                        {step.args[0]['fields'] && step.args[0].fields.map(field =>
                           <div
                             key={field[0]}
                             className={styles.field}
                             onClick={() => handleClickField(field[0])}
-                            style={{backgroundColor: (step.args[0].values).includes(field[0]) ? 'yellow' : '#F3F3F3'}}
+                            style={{ backgroundColor: (step.args[0].values).includes(field[0]) ? 'yellow' : '#F3F3F3' }}
                           >
                             <p className={styles.text}>{field[0]}</p>
-                          </div>
+                          </div>,
                         )}
                       </div>
 
                       <div className={styles.end_button}>
                         <Button type="primary" className={styles.button}>next</Button>
                       </div>
-                    </Panel>;
+                    </Panel>
+                  case 'feature_fields':
+                    return <Panel header="Select Feature Fields" key={stepIndex}
+                                  className={styles.panel}
+                    >
+                      <div className={styles.fields}>
+
+                        {step.args[0]['feature_fields'] && step.args[0].fields.map(field =>
+                          <div
+                            key={field[0]}
+                            className={styles.field}
+                            onClick={() => handleClickField(field[0])}
+                            style={{ backgroundColor: (step.args[0].values).includes(field[0]) ? 'yellow' : '#F3F3F3' }}
+                          >
+                            <p className={styles.text}>{field[0]}</p>
+                          </div>,
+                        )}
+                      </div>
+
+                      <div className={styles.end_button}>
+                        <Button type="primary" className={styles.button}>next</Button>
+                      </div>
+                    </Panel>
+                  case 'label_fields':
+                    return <Panel header="Select Label Fields" key={stepIndex}
+                                  className={styles.panel}
+                    >
+                      <div className={styles.fields}>
+
+                        {step.args[0]['label_fields'] && step.args[0].fields.map(field =>
+                          <div
+                            key={field[0]}
+                            className={styles.field}
+                            onClick={() => handleClickField(field[0])}
+                            style={{ backgroundColor: (step.args[0].values).includes(field[0]) ? 'yellow' : '#F3F3F3' }}
+                          >
+                            <p className={styles.text}>{field[0]}</p>
+                          </div>,
+                        )}
+                      </div>
+
+                      <div className={styles.end_button}>
+                        <Button type="primary" className={styles.button}>next</Button>
+                      </div>
+                    </Panel>
                   case 'parameters':
                     return (
-                      <Panel header="Parameter" key={"3"}
+                      <Panel header="Parameter" key={stepIndex}
                              className={styles.panel}>
                         {
                           step.args.map((arg, argIndex) =>
@@ -204,24 +245,23 @@ function WorkBench({section, model, dispatch, namespace}) {
                                 <Input placeholder="" defaultValue={arg.value}
                                        onChange={(e) => handleOnChangeArgs(e.target.value, stepIndex, argIndex)}/>
                               </div>
-                            </div>
+                            </div>,
                           )
                         }
                         <div className={styles.end_button}>
                           <Button type="primary" className={styles.button}>run</Button>
                         </div>
                       </Panel>
-                    );
+                    )
                 }
-              }
+              },
             )
           }
         </Collapse>
       </div>
     </div>
-  );
+  )
 }
-
 
 // function DataSource({step, model, dispatch, namespace}) {
 //
@@ -264,4 +304,4 @@ function WorkBench({section, model, dispatch, namespace}) {
 //     <Button type="primary" className={styles.button}>save</Button>
 //   </div>
 // }
-export default WorkBench;
+export default WorkBench

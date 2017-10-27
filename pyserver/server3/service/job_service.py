@@ -18,6 +18,7 @@ from bson import ObjectId
 from itertools import compress
 
 from server3.business import toolkit_business
+from server3.business import model_business
 from server3.business import job_business
 from server3.business import result_business
 from server3.business import project_business
@@ -36,15 +37,27 @@ from server3.utility import data_utility
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 
 
-def create_job(project_id, toolkit_id):
-    # create a job
-    toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
-    project_obj = project_business.get_by_id(project_id)
-    job_obj = job_business.add_toolkit_job(
-        toolkit_obj=toolkit_obj,
-        staging_data_set_obj=None,
-        project_obj=project_obj,
-    )
+def create_job(project_id, toolkit_id, model_id):
+    if toolkit_id:
+        # create a job
+        toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
+        project_obj = project_business.get_by_id(project_id)
+        job_obj = job_business.add_toolkit_job(
+            toolkit_obj=toolkit_obj,
+            model_obj=None,
+            staging_data_set_obj=None,
+            project_obj=project_obj,
+        )
+    else:
+        # create a job
+        model_obj = model_business.get_by_model_id(model_id)
+        project_obj = project_business.get_by_id(project_id)
+        job_obj = job_business.add_toolkit_job(
+            model_obj=model_obj,
+            toolkit_obj=None,
+            staging_data_set_obj=None,
+            project_obj=project_obj,
+        )
     # update a project
     project_business.insert_job_by_id(project_id, job_obj.id)
     return job_obj
@@ -422,8 +435,6 @@ def add_new_column(value, index, fields, name, staging_data_set_id):
 
 
 from server3.service import toolkit_service
-
-
 def run_job(obj, job_obj):
     data = obj
     staging_data_set_id = data.get('staging_data_set_id')

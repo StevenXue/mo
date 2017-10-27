@@ -24,24 +24,45 @@ from server3.constants import NAMESPACE
 ModelType = {list(v)[1]: list(v)[0] for v in list(MODEL_TYPE)}
 
 
-def add(user_ID, name, description, version, deploy_name, server, signatures,
-        input_type, model_base_path, job, is_private=False, **optional):
+def update_db(user_ID, name, description, input_info, output_info,
+              examples):
+    """
+
+    :param user_ID:
+    :param name:
+    :param description:
+    :param input_info:
+    :param output_info:
+    :param examples:
+    :return:
+    """
+    served_model_business.update_info(name, description, input_info,
+                                      output_info, examples)
+
+
+def first_save_to_db(user_ID, name, description, input_info, output_info,
+                     examples, version,
+                     deploy_name, server,
+                     input_type, model_base_path, job, is_private=False,
+                     **optional):
     """
     add a served model
     :param user_ID:
     :param is_private:
     :param name:
     :param description:
+    :param input_info: str
+    :param output_info: str
+    :param examples: str
     :param server:
-    :param signatures:
     :param input_type:
     :param model_base_path:
     :return:
     """
-    served_model = served_model_business.add(name, description, version,
-                                             deploy_name,
-                                             server,
-                                             signatures, input_type,
+    served_model = served_model_business.add(name, description, input_info,
+                                             output_info,
+                                             examples, version, deploy_name,
+                                             server,  input_type,
                                              model_base_path, job, **optional)
     user = user_business.get_by_user_ID(user_ID)
     ownership_business.add(user, is_private, served_model=served_model)
@@ -63,16 +84,19 @@ def list_served_models_by_user_ID(user_ID, order=-1):
     return public_sm, owned_sm
 
 
-def deploy(user_ID, job_id, name, description, server, signatures,
-           input_type, is_private=False, **optional):
+def first_deploy(user_ID, job_id, name, description, input_info, output_info,
+                 examples, server, input_type, is_private=False,
+                 **optional):
     """
     deploy model by create a tensorflow servable subprocess
     :param user_ID: str
     :param job_id: str/ObjectId
     :param name: str
     :param description: str
+    :param input_info: str
+    :param output_info: str
+    :param examples: str
     :param server: str
-    :param signatures: dict
     :param input_type: str
     :param is_private: bool
     :return:
@@ -112,9 +136,6 @@ def deploy(user_ID, job_id, name, description, server, signatures,
                         }
                     },
                     "spec": {
-                        # "securityContext": {
-                        #     "runAsUser": 1001,
-                        # },
                         "containers": [
                             {
                                 "name": job_id,
@@ -122,7 +143,6 @@ def deploy(user_ID, job_id, name, description, server, signatures,
                                 "imagePullPolicy": "IfNotPresent",
                                 "ports": [{
                                     "containerPort": 9000,
-                                    # "hostPort": port
                                 }],
                                 "stdin": True,
                                 "command": ['tensorflow_model_server'],
@@ -138,10 +158,6 @@ def deploy(user_ID, job_id, name, description, server, signatures,
                                         "mountPath": "/home/root/work/user_directory",
                                         "name": "nfsvol"
                                     },
-                                    # {
-                                    #     "mountPath": "/home/root/work/user_directory",
-                                    #     "name": job_id + "-volume"
-                                    # }
                                 ]
                             }
                         ],
@@ -152,11 +168,6 @@ def deploy(user_ID, job_id, name, description, server, signatures,
                                     "claimName": "nfs-pvc"
                                 }
                             },
-                            # {
-                            #     "name": job_id + "-volume",
-                            #     "hostPath": {
-                            #         "path": "{}/user_directory".format(cwd)},
-                            # }
                         ]
                     },
                 },
@@ -200,9 +211,13 @@ def deploy(user_ID, job_id, name, description, server, signatures,
         # ], start_new_session=True)
         # add a served model entity
         server = server.replace('9000', str(port))
-        return add(user_ID, name, description, version, deploy_name, server,
-                   signatures, input_type, export_path, job, is_private,
-                   **optional)
+        return first_save_to_db(user_ID, name, description, input_info,
+                                output_info,
+                                examples, version,
+                                deploy_name, server,
+                                input_type, export_path, job,
+                                is_private,
+                                **optional)
 
 
 def remove_by_id(served_model_id):

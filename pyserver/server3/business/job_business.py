@@ -52,7 +52,9 @@ def get_by_job_status(job_status):
     return job_repo.read_by_unique_field('job_status', job_status)
 
 
-def add_toolkit_job(toolkit_obj, staging_data_set_obj, project_obj, **kwargs):
+def add_toolkit_job(toolkit_obj, model_obj, staging_data_set_obj,
+                    project_obj,
+                    **kwargs):
     """toolkit is a obj"""
     # job = job_obj['staging_data_set'] or job_obj['model'] or job_obj['toolkit']
     # if not 0 < len(toolkit_obj.items()) <= 1:
@@ -60,13 +62,20 @@ def add_toolkit_job(toolkit_obj, staging_data_set_obj, project_obj, **kwargs):
     time = datetime.utcnow()
 
     # print("toolkit_obj['steps']11", toolkit_obj.to_mongo()['steps'])
-
-    job_obj = Job(status=0, toolkit=toolkit_obj,
-                  staging_data_set=staging_data_set_obj,
-                  project=project_obj,
-                  create_time=time, **kwargs,
-                  steps=toolkit_obj.steps
-                  )
+    if toolkit_obj:
+        job_obj = Job(status=0, toolkit=toolkit_obj,
+                      staging_data_set=staging_data_set_obj,
+                      project=project_obj,
+                      create_time=time, **kwargs,
+                      steps=toolkit_obj.steps
+                      )
+    if model_obj:
+        job_obj = Job(status=0, model=model_obj,
+                      staging_data_set=staging_data_set_obj,
+                      project=project_obj,
+                      create_time=time, **kwargs,
+                      steps=model_obj.steps
+                      )
     return job_repo.create(job_obj)
 
 

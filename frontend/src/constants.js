@@ -1,4 +1,4 @@
-const mainColor = '#108ee9'
+const mainColor = '#108ee9';
 
 module.exports = {
   apiPrefix: '/api',
@@ -43,10 +43,10 @@ module.exports = {
     {value: 'public', text: 'Public'}
   ],
 
+  dataCategory: [
+    'Business', 'Government', 'Education', 'Environment',
+    'Health', 'Housing & Development', 'Public', 'Services',
+    'Social', 'Transportation', 'Science', 'Technology'
+  ]
 
-  // valueTypeDict: {
-  //   'int':
-  // }
-
-
-}
+};
