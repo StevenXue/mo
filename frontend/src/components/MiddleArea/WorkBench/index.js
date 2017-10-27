@@ -4,6 +4,7 @@ import {connect} from 'dva';
 
 import {Select, Collapse, Button, Input} from 'antd';
 import ToolBar from '../ToolBar/index';
+import {format} from '../../../utils/base';
 
 const Option = Select.Option;
 const Panel = Collapse.Panel;
@@ -25,16 +26,7 @@ function WorkBench({section, model, dispatch, namespace}) {
   const {
     stagingDataList,
     sectionsJson,
-
   } = model;
-  //change state
-  // const setSections = (sectionsJson) => {
-  //   dispatch({
-  //     type: namespace + '/setSections',
-  //     sectionsJson: sectionsJson
-  //   })
-  // };
-
 
   function handleBlur() {
     console.log('blur');
@@ -47,8 +39,10 @@ function WorkBench({section, model, dispatch, namespace}) {
   const {
     _id: sectionId,
     steps,
-    active_steps
-
+    active_steps,
+    toolkit: {
+      steps: baseSteps
+    }
   } = section;
 
   //functions 下拉框选择
@@ -111,6 +105,10 @@ function WorkBench({section, model, dispatch, namespace}) {
   }
 
   function handleOnChangeArgs(e, stepIndex, argIndex) {
+    console.log("e", e);
+    console.log("baseSteps", baseSteps[stepIndex].args[argIndex]["value_type"]);
+
+    e = format(e, baseSteps[stepIndex].args[argIndex]["value_type"]);
     dispatch({
       type: namespace + '/setParameter',
       payload: {

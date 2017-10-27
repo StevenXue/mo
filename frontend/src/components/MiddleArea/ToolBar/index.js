@@ -5,7 +5,13 @@ import styles from './ToolBar.css';
 const ButtonGroup = Button.Group;
 import ResultButton from './ResultButton';
 function ToolBar({model, dispatch, namespace, sectionId}) {
+  const {
+    sectionsJson
+  } = model;
 
+  const {
+    visual_sds_id
+  } = sectionsJson[sectionId];
   // // change state
   // const updateSection = (sectionId) => {
   //   dispatch({
@@ -29,15 +35,19 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
     dispatch({
       type: namespace + '/runSection',
       payload: {
-        sectionId
+        sectionId,
+        namespace
       }
     })
   }
 
+
+
+
   return (
     <div className={styles.container} >
       <div className={styles.result} >
-       <ResultButton/>
+       <ResultButton visual_sds_id={visual_sds_id}/>
       </div>
 
       {/*<Icon type="retweet" style={{fontSize:20, margin:10}}/>*/}

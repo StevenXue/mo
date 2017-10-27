@@ -45,3 +45,4 @@ class Job(DynamicDocument):
 
     steps = ListField(DictField())
     active_steps = ListField(default=[])
+    visual_sds_id = ReferenceField('StagingDataSet')

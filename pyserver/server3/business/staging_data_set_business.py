@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 from copy import deepcopy
 
+from mongoengine import DoesNotExist
 from server3.entity.staging_data_set import StagingDataSet
 from server3.entity.project import Project
 from server3.repository.staging_data_set_repo import StagingDataSetRepo
@@ -62,6 +63,19 @@ def add(name, description, project, **kwargs):
     staging_data_set = StagingDataSet(name=name, description=description,
                                       project=project, **kwargs)
     return staging_data_set_repo.create(staging_data_set)
+
+
+def get_or_create(job_obj, name, description, project, **kwargs):
+    try:
+        staging_data_set = get_by_job_id(job_obj)
+        return staging_data_set
+
+    except DoesNotExist as e:
+        if not name or not description or not project:
+            raise ValueError('no name or no description or no project')
+        staging_data_set = StagingDataSet(name=name, description=description,
+                                          project=project, **kwargs)
+        return staging_data_set_repo.create(staging_data_set)
 
 
 def update(sds_id, **update):

@@ -1,0 +1,17 @@
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.description {
+  width: 30%;
+  margin: 50px;
+  text-align: left;
+  max-height: 300px;
+  overflow-y: auto;
+}

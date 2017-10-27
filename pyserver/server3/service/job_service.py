@@ -422,8 +422,9 @@ def add_new_column(value, index, fields, name, staging_data_set_id):
 
 
 from server3.service import toolkit_service
-def run_job(obj):
 
+
+def run_job(obj, job_obj):
     data = obj
     staging_data_set_id = data.get('staging_data_set_id')
     toolkit_id = data.get('toolkit_id')
@@ -445,13 +446,10 @@ def run_job(obj):
     fields = [x_fields, y_fields]
     conf = conf.get('args')
 
-    result = toolkit_service.convert_json_and_calculate(project_id,
-                                                        staging_data_set_id,
-                                                        toolkit_id,
-                                                        fields, data, conf)
+    result = toolkit_service.run_toolkit(project_id, staging_data_set_id, toolkit_id,
+                                         fields, data, conf, job_obj)
     result.update({"fields": [x_fields, y_fields]})
     return result
-
 
 
 if __name__ == '__main__':

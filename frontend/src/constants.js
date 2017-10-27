@@ -41,6 +41,12 @@ module.exports = {
     {value: 'all', text: 'All'},
     {value: 'private', text: 'Private'},
     {value: 'public', text: 'Public'}
-  ]
+  ],
+
+
+  // valueTypeDict: {
+  //   'int':
+  // }
+
 
 }
