@@ -33,7 +33,7 @@ def get_by_job(job):
 def add(name, description, input_info, output_info, examples, version,
         deploy_name, server,
         input_type,
-        model_base_path, job, **optional):
+        model_base_path, job, service_name, **optional):
     model = ServedModel(name=name, description=description,
                         input_info=input_info,
                         output_info=output_info,
@@ -41,7 +41,8 @@ def add(name, description, input_info, output_info, examples, version,
                         version=version, deploy_name=deploy_name,
                         server=server,
                         input_type=input_type,
-                        model_base_path=model_base_path, job=job, **optional)
+                        model_base_path=model_base_path, job=job,
+                        service_name=service_name, **optional)
     return served_model_repo.create(model)
 
 

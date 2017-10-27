@@ -41,8 +41,9 @@ class Model(DynamicDocument):
     entry_function = StringField(required=True)
     to_code_function = StringField(required=True)
     category = IntField(required=True, choices=MODEL_TYPE)
-    type = IntField(required=True, choices=TYPE)
+    model_type = IntField(required=True, choices=TYPE)
     parameter_spec = DictField(required=True)
+    steps = DictField()
     input = DictField(required=True)
     user_name = StringField(max_length=50)
     # usage = IntField(choices=RESUlt_TYPE, required=True)    # 类型，用作何用途
