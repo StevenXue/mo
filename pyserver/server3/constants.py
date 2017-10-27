@@ -143,3 +143,56 @@ PARAMETER_SPEC = [
     }
 ]
 
+value_type = ['int', 'float', 'str']
+
+ui_spec = {
+    'input': {
+        'name': None,
+        'type': 'input',
+        'value_type': 'int',
+        'range': [2, None],
+
+        "default": None,
+        "required": None,
+    },
+
+    "multiple_input": {
+        'name': None,
+        "type": "multiple_input",
+        'value_type': 'int',
+        'range': [2, None],
+        "len_range": None,
+
+        "default": None,
+        "required": None,
+    },
+
+    "choice": {
+        'name': None,
+        "type": "choice",
+        "range": [
+            "aa",
+            "bb",
+            "cc",
+        ],
+
+        "default": None,
+        "required": None,
+    },
+
+    "multiple_choice": {
+        'name': None,
+        "type": "multiple_choice",
+        "range": [
+            "aa",
+            "bb",
+            "cc",
+        ],
+        "len_range": None,
+
+        "default": None,
+        "required": None,
+    },
+
+
+}
