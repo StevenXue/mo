@@ -43,7 +43,7 @@ def update_db(user_ID, name, description, input_info, output_info,
 def first_save_to_db(user_ID, name, description, input_info, output_info,
                      examples, version,
                      deploy_name, server,
-                     input_type, model_base_path, job, is_private=False,
+                     input_type, model_base_path, job, job_id,is_private=False,
                      **optional):
     """
     add a served model
@@ -66,6 +66,7 @@ def first_save_to_db(user_ID, name, description, input_info, output_info,
                                              model_base_path, job, **optional)
     user = user_business.get_by_user_ID(user_ID)
     ownership_business.add(user, is_private, served_model=served_model)
+    job_business.update_job_by_id(job_id, served_model=served_model)
     return served_model
 
 
@@ -215,7 +216,7 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
                                 output_info,
                                 examples, version,
                                 deploy_name, server,
-                                input_type, export_path, job,
+                                input_type, export_path, job,job_id,
                                 is_private,
                                 **optional)
 

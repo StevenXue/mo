@@ -76,6 +76,7 @@ def check_condition(kube, status):
 
 
 def delete_deployment(deploy_name):
+
     return deployment_api.delete_namespaced_deployment(deploy_name, NAMESPACE,
                                                        options)
 
