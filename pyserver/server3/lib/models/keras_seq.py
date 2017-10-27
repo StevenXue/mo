@@ -12,6 +12,7 @@ from server3.service.keras_callbacks import MongoModelCheckpoint
 from server3.service.keras_callbacks import MyModelCheckpoint
 from server3.utility.str_utility import generate_args_str
 from server3.service.saved_model_services import keras_saved_model
+from server3.constants import SPEC
 
 
 def keras_seq(conf, input, **kw):
@@ -215,7 +216,7 @@ def get_value(obj, key, default):
         raise ValueError
 
 
-ACTIVATION = {
+_ACTIVATION = {
     'name': 'activation',
     'type': {
         'key': 'choice',
@@ -237,7 +238,28 @@ ACTIVATION = {
     'required': True
 }
 
-INPUT_SHAPE = {
+ACTIVATION = {
+    **SPEC.ui_spec['choice'],
+    'name': 'activation',
+    'display_name': 'Activation',
+    'des': 'Activation function to use (see activations). If you don\'t '
+           'specify anything, no activation is applied (ie. linear '
+           'activation: a(x) = x).',
+    'range': ['softmax',
+              'elu',
+              'selu',
+              'softplus',
+              'softsign',
+              'relu',
+              'tanh',
+              'sigmoid',
+              'hard_sigmoid',
+              'linear'],
+    'default': 'relu',
+    'required': True
+}
+
+_INPUT_SHAPE = {
     'name': 'input_shape',
     'type': {
         'key': 'int_m',
@@ -247,14 +269,339 @@ INPUT_SHAPE = {
         'range': None
     },
     'default': None,
-    'required': False,
+    'required': True,
     'len_range': None
+}
+
+INPUT_SHAPE = {
+    **SPEC.ui_spec['multiple_input'],
+    'name': 'input_shape',
+    'display_name': 'Input Shape',
+    'des': 'nD tensor with shape: (batch_size, ..., '
+           'input_dim). The most common situation would be a '
+           '2D input with shape (batch_size, input_dim).',
+    'required': True,
+    'len_range': [1, None]
 }
 
 # supported layers:
 # Dense, Dropout, Flatten, Reshape, Conv1D, Conv2D, MaxPooling2D
 # wait for support:
 # Embedding, LSTM, GlobalAveragePooling1D
+KERAS_SEQ_STEPS = [
+    {
+        "name": "data_source",
+        "display_name": "Select parameters",
+        "args": [
+            {
+                "name": "input",
+                "des": "Please select input data source",
+                "type": "select_box",
+                "default": None,
+                "required": True,
+                "len_range": [
+                    1,
+                    1
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "feature_fields",
+        "display_name": "Select feature fields",
+        "args": [
+            {
+                "name": "fields",
+                "des": "",
+                "required": True,
+                "type": "multiple_choice",
+                "len_range": [
+                    1,
+                    None
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "label_fields",
+        "display_name": "Select label fields",
+        "args": [
+            {
+                "name": "fields",
+                "des": "",
+                "type": "multiple_choice",
+                "required": True,
+                "len_range": [
+                    1,
+                    None
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "network",
+        "display_name": "Build your network",
+        "layers": [
+            {
+                "name": "Dense",
+                "args": [
+                    {
+                        **SPEC.ui_spec['input'],
+                        "name": "units",
+                        "display_name": "Units",
+                        "des": "Just your regular densely-connected NN layer",
+                        "default": 32,
+                        "required": True
+                    },
+                    ACTIVATION,
+                    INPUT_SHAPE
+                ],
+            },
+            {
+                "name": "Dropout",
+                "args": [
+                    {
+                        **SPEC.ui_spec['input'],
+                        "name": "rate",
+                        "display_name": "Rate",
+                        "des": "Fraction of the input units to drop",
+                        "type": "float",
+                        "range": [0, 1],
+                        "required": True
+                    },
+                    {
+                        **SPEC.ui_spec['multiple_input'],
+                        "name": "noise_shape",
+                        "display_name": "Noise Shape",
+                        "des": "1D integer tensor representing the shape of "
+                               "the binary dropout mask that will be "
+                               "multiplied with the input.",
+                        "len_range": [3, 3]
+                    },
+                    {
+                        **SPEC.ui_spec['input'],
+                        "name": "seed",
+                        "display_name": "Seed",
+                        "des": "A Python integer to use as random seed",
+                    },
+                ],
+            },
+            {
+                "name": "Flatten",
+                "args": [],
+            },
+            {
+                "name": "Reshape",
+                "args": [
+                    {
+                        **SPEC.ui_spec['multiple_input'],
+                        "name": "target_shape",
+                        "display_name": "Target Shape",
+                        "des": "nD tensor with shape: (batch_size, ..., "
+                               "input_dim). The most common situation would be "
+                               "a 2D input with shape (batch_size, input_dim).",
+                        "required": True,
+                    },
+                    INPUT_SHAPE
+                ],
+            },
+            {
+                "name": "Conv1D",
+                "args": [
+                    {
+                        **SPEC.ui_spec['input'],
+                        "name": "filters",
+                        "display_name": "Filters",
+                        "des": "the dimensionality of the output space (i.e. "
+                               "the number output of filters in the "
+                               "convolution)",
+                        "required": True,
+                    },
+                    {
+                        **SPEC.ui_spec['input'],
+                        "name": "kernel_size",
+                        "display_name": "Kernel Size",
+                        "des": "An integer specifying the length of the 1D "
+                               "convolution window.",
+                        "required": True,
+                    },
+                    ACTIVATION,
+                    INPUT_SHAPE
+                ],
+            },
+            {
+                "name": "Conv2D",
+                "args": [
+                    {
+                        **SPEC.ui_spec['input'],
+                        "name": "filters",
+                        "display_name": "Filters",
+                        "des": "the dimensionality of the output space (i.e. "
+                               "the number output of filters in the "
+                               "convolution)",
+                        "required": True,
+                    },
+                    {
+                        **SPEC.ui_spec['input'],
+                        "name": "kernel_size",
+                        "display_name": "Kernel Size",
+                        "des": "An integer specifying the length of the 1D "
+                               "convolution window.",
+                        "required": True,
+                        "len_range": [2, 2]
+                    },
+                    ACTIVATION,
+                    INPUT_SHAPE
+                ],
+            },
+            {
+                "name": "MaxPooling2D",
+                "args": [
+                    {
+                        **SPEC.ui_spec['multiple_input'],
+                        "name": "pool_size",
+                        "display_name": "Pool Size",
+                        "des": "tuple of 2 integers, factors by which to "
+                               "downscale (vertical, horizontal). (2, 2) will "
+                               "halve the input in both spatial dimension. ",
+                        "len_range": [2, 2]
+                    },
+                    {
+                        **SPEC.ui_spec['multiple_input'],
+                        "name": "strides",
+                        "display_name": "Strides",
+                        "des": "tuple of 2 integers, or None. Strides values."
+                               " If None, it will default to pool_size",
+                        "len_range": [2, 2]
+                    },
+                    {
+                        **SPEC.ui_spec['choice'],
+                        "name": "padding",
+                        "display_name": "Padding",
+                        "des": "",
+                        "range": ["valid", "same"],
+                        "default": "valid",
+                    },
+                    {
+                        **SPEC.ui_spec['choice'],
+                        "name": "data_format",
+                        "display_name": "Data Format",
+                        "des": "The ordering of the dimensions in the inputs",
+                        "range": ["channels_last", "channels_first"],
+                        "default": "channels_last"
+                    },
+                    {
+                        **INPUT_SHAPE,
+                        "des": "4D tensor",
+                        "len_range": [4, 4],
+                        "required": False,
+                    }
+                ],
+            },
+        ],
+    },
+    {
+        "name": "compile",
+        "display_name": "Compile Parameters",
+        'args': [
+            {
+                **SPEC.ui_spec['choice'],
+                "name": "loss",
+                "display_name": "Loss",
+                "des": "A loss function (or objective function, or "
+                       "optimization score function) is one of the two "
+                       "parameters required to compile a model",
+                "range": ["mean_squared_error",
+                          "mean_absolute_error",
+                          "mean_absolute_percentage_error",
+                          "mean_squared_logarithmic_error",
+                          "squared_hinge",
+                          "hinge",
+                          "categorical_hinge",
+                          "logcosh",
+                          "categorical_crossentropy",
+                          "sparse_categorical_crossentropy",
+                          "binary_crossentropy",
+                          "kullback_leibler_divergence",
+                          "poisson",
+                          "cosine_proximity"],
+                "default": "categorical_crossentropy",
+                "required": True
+            },
+            {
+                **SPEC.ui_spec['choice'],
+                "name": "optimizer",
+                "display_name": "Optimizer",
+                "des": "An optimizer is one of the two arguments required for "
+                       "compiling a Keras model",
+                "range": ["sgd",
+                          "rmsprop",
+                          "adagrad",
+                          "adadelta",
+                          "adam",
+                          "adamax",
+                          "nadam"],
+                "default": "sgd",
+                "required": True
+            },
+            {
+                **SPEC.ui_spec['choice'],
+                "name": "metrics",
+                "Name": "Metrics",
+                "des": "A metric is a function that is used to judge the "
+                       "performance of your model",
+                "range": ["acc",
+                          "mse",
+                          "mae",
+                          "mape",
+                          "msle",
+                          "cosine"],
+                "default": "acc",
+            },
+        ],
+    },
+    {
+        "name": "fit",
+        "display_name": "Fit Parameters",
+        "args": [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "batch_size",
+                "display_name": "Batch Size",
+                "des": "Number of samples per gradient update for model "
+                       "training",
+                "default": 32,
+                "required": True
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name": "epochs",
+                "display_name": "Epochs",
+                "des": "Number of epochs of model training",
+                "default": 10,
+                "required": True
+            },
+        ],
+    },
+    {
+        "name": "evaluate",
+        "display_name": "Evaluate Parameters",
+        "args": [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "batch_size",
+                "display_name": "Batch Size",
+                "des": "Number of samples per gradient update for evaluate",
+                "default": 32,
+                "required": True
+            },
+        ]
+    }
+]
+
 KERAS_SEQ_SPEC = {
     "layers": [
         {

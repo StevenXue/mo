@@ -149,29 +149,32 @@ class SPEC(object):
     ui_spec = {
         'input': {
             'name': None,
+            'display_name': None,
             'type': 'input',
             'value_type': 'int',
             'range': None,  #[2, None],
 
             "default": None,
-            "required": None,
+            "required": False,
             'values': [],
         },
 
         "multiple_input": {
             'name': None,
+            'display_name': None,
             "type": "multiple_input",
             'value_type': 'int',
             'range': [2, None],
             "len_range": None,
 
             "default": None,
-            "required": None,
+            "required": False,
             'values': [],
         },
 
         "choice": {
             'name': None,
+            'display_name': None,
             "type": "choice",
             "range": [
                 "aa",
@@ -180,12 +183,13 @@ class SPEC(object):
             ],
 
             "default": None,
-            "required": None,
+            "required": False,
             'values': [],
         },
 
         "multiple_choice": {
             'name': None,
+            'display_name': None,
             "type": "multiple_choice",
             "range": [
                 "aa",
@@ -195,7 +199,7 @@ class SPEC(object):
             "len_range": None,
 
             "default": None,
-            "required": None,
+            "required": False,
             'values': [],
         },
 
