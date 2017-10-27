@@ -40,6 +40,15 @@ TOOLKIT_CATEGORY_DICT = {
 
 NEW_TOOLKIT_CATEGORY = [
     {
+        'name': 'simple_toolkit',
+        'zh_name': '简单的toolkit',
+        'us_name': 'Simple Toolkit',
+        'child': [
+            '简单的K平均数算法',
+        ],
+        'children': []
+    },
+    {
         'name': 'data_explore',
         'zh_name': '初探数据集',
         'us_name': 'Data Explore',

@@ -252,6 +252,15 @@ function WorkBench({ section, model, dispatch, namespace }) {
                           <Button type="primary" className={styles.button}>run</Button>
                         </div>
                       </Panel>
+                    );
+                  case 'custom':
+                    return (
+                      <Panel header="Parameter" key={stepIndex}
+                             className={styles.panel}>
+                        <div>
+                          custom Panel
+                        </div>
+                      </Panel>
                     )
                 }
               },

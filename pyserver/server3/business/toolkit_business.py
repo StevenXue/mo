@@ -1994,7 +1994,7 @@ def update_toolkit():
                   ]
                   )
 
-    SIMPLE_KMEAN = Toolkit(name='K平均数算法',
+    SIMPLE_KMEAN = Toolkit(name='简单的K平均数算法',
                     description='计算所选数据集合的k-mean, 把一个把数据空间划分为k个子集',
                     category=0,
                     entry_function='k_mean',
@@ -2135,7 +2135,7 @@ def update_toolkit():
             "object": SMA
         },
         {
-            '_id': None,
+            '_id': ObjectId("59f297cad845c05376f599c6"),
             "object": SIMPLE_KMEAN
         }
     ]
@@ -2146,16 +2146,104 @@ def update_toolkit():
             # create toolkit, then add _id to TOOLKIT_DICT
             new_toolkit_obj = toolkit_repo.create(toolkit['object'])
             ownership_business.add(user, False, toolkit=new_toolkit_obj)
-            pass
+        else:
 
-        toolkit_obj = get_by_toolkit_id(toolkit["_id"])
-        attributes = ['name', 'description', 'category', 'result_form', 'entry_function',
-                      'target_py_code', 'parameter_spec', 'result_spec', 'steps']
-        for attribute in attributes:
-            if hasattr(toolkit['object'], attribute):
-                toolkit_obj[attribute] = toolkit['object'][attribute]
-        toolkit_obj.save()
+            toolkit_obj = get_by_toolkit_id(toolkit["_id"])
+            attributes = ['name', 'description', 'category', 'result_form', 'entry_function',
+                          'target_py_code', 'parameter_spec', 'result_spec', 'steps']
+            for attribute in attributes:
+                if hasattr(toolkit['object'], attribute):
+                    toolkit_obj[attribute] = toolkit['object'][attribute]
+            toolkit_obj.save()
 
+
+steps_config = [
+    {
+        'name': 'data_source',
+        'display_name': 'select parameters',
+        'args': [
+            {
+                "name": "input",
+                "des": "",
+
+                "type": "select_box",
+                "default": None,
+                "required": True,
+
+                # length of values
+                "len_range": [
+                    1,
+                    1
+                ],
+                # range of one value
+                'value_range': None,
+                'value_type': None,
+                'values': []
+            }
+        ],
+    },
+    {
+        'name': 'fields',
+        'display_name': 'select fields',
+        'args': [
+            {
+                'name': 'fields',
+                'des': '',
+                'type': 'multiple_choice',
+                'value_type': None,
+                'values': []
+            }
+        ],
+    },
+    {
+        'name': 'parameters',
+        'display_name': 'input parameters',
+        'args': [
+            {
+                'name': 'k',
+                'display_name': 'k',
+                'type': 'input',
+                'value': 2,
+                'value_type': 'int',
+                'default': 2,
+                'required': True,
+                'des': 'the number of clustering numbers',
+                # length of values
+                "len_range": [
+                    1,
+                    1
+                ],
+                # range of one value
+                'value_range': [2, None],
+
+            }
+        ]
+    },
+    {
+        'name': 'custom',
+        'display_name': 'input parameters',
+        'args': [
+            {
+                'name': 'k',
+                'display_name': 'k',
+                'type': 'input',
+                'value': 2,
+                'value_type': 'int',
+                'default': 2,
+                'required': True,
+                'des': 'the number of clustering numbers',
+                # length of values
+                "len_range": [
+                    1,
+                    1
+                ],
+                # range of one value
+                'value_range': [2, None],
+
+            }
+        ]
+    }
+]
 
 # def create_one_public_toolkit:
 #     pass
