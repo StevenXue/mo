@@ -12,7 +12,7 @@ import 'moment/locale/zh-cn';
 
 moment.locale('en');
 
-import styles from './MainLayout.css';
+import styles from './MainLayout.less';
 import Header from './Header'
 
 import zh_CN from '../../intl/zh_CN';

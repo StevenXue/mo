@@ -52,7 +52,9 @@ def get_by_job_status(job_status):
     return job_repo.read_by_unique_field('job_status', job_status)
 
 
-def add_toolkit_job(toolkit_obj, staging_data_set_obj, project_obj, **kwargs):
+def add_toolkit_job(toolkit_obj, model_obj, staging_data_set_obj,
+                    project_obj,
+                    **kwargs):
     """toolkit is a obj"""
     # job = job_obj['staging_data_set'] or job_obj['model'] or job_obj['toolkit']
     # if not 0 < len(toolkit_obj.items()) <= 1:
@@ -60,13 +62,20 @@ def add_toolkit_job(toolkit_obj, staging_data_set_obj, project_obj, **kwargs):
     time = datetime.utcnow()
 
     # print("toolkit_obj['steps']11", toolkit_obj.to_mongo()['steps'])
-
-    job_obj = Job(status=0, toolkit=toolkit_obj,
-                  staging_data_set=staging_data_set_obj,
-                  project=project_obj,
-                  create_time=time, **kwargs,
-                  steps=toolkit_obj.steps
-                  )
+    if toolkit_obj:
+        job_obj = Job(status=0, toolkit=toolkit_obj,
+                      staging_data_set=staging_data_set_obj,
+                      project=project_obj,
+                      create_time=time, **kwargs,
+                      steps=toolkit_obj.steps
+                      )
+    if model_obj:
+        job_obj = Job(status=0, model=model_obj,
+                      staging_data_set=staging_data_set_obj,
+                      project=project_obj,
+                      create_time=time, **kwargs,
+                      steps=model_obj.steps
+                      )
     return job_repo.create(job_obj)
 
 
@@ -103,11 +112,6 @@ def end_job(job_obj):
     return job_repo.update_one_by_id_status_and_time(job_obj.id, 200, time)
 
 
-def update_job(job_obj):
-    time = datetime.utcnow()
-    return job_repo.update_one_by_id_status_and_time(job_obj.id, 200, time)
-
-
 def remove_by_id(job_id):
     return job_repo.delete_by_id(job_id)
 
@@ -132,3 +136,5 @@ def update_job_steps(job_id, steps, active_steps):
     return job_obj.save()
 
 
+def update_job_by_id(job_id, **kwargs):
+    return job_repo.update_one_by_id(job_id, kwargs)

@@ -29,7 +29,9 @@ function Modelling({location, dispatch, modelling}) {
           />
         </div>
         <div className={styles.right_area}>
-          <RightArea/>
+          <RightArea
+            {...props}
+          />
         </div>
       </div>
     </div>

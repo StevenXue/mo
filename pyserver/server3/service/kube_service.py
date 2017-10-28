@@ -76,8 +76,13 @@ def check_condition(kube, status):
 
 
 def delete_deployment(deploy_name):
+
     return deployment_api.delete_namespaced_deployment(deploy_name, NAMESPACE,
                                                        options)
+
+
+def delete_service(service_name):
+    return service_api.delete_namespaced_service(service_name, NAMESPACE)
 
 
 def delete_job(job_name):

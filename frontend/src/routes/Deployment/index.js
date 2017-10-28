@@ -1,26 +1,26 @@
 import React from 'react';
 import {connect} from 'dva';
 import styles from './index.less';
-import {Tabs, Switch, Button, Input, Icon,notification,Modal} from 'antd';
+import {Tabs, Switch, Button, Input, Icon, notification, Modal} from 'antd';
 import {arrayToJson, JsonToArray} from '../../utils/JsonUtils';
 import LearningCurve from '../../components/Charts/curve';
 import HeatmapOnCartesianChart from '../../components/Charts/heatmapOnCartesianChart';
 import DeployModal from '../../components/deployModal/deployModal';
-import { get } from 'lodash';
+import {get} from 'lodash';
 
 const {TextArea} = Input;
 const TabPane = Tabs.TabPane;
 const confirm = Modal.confirm;
-const fakeField = ['A','B','AC','A','A']
+const fakeField = ['A', 'B', 'AC', 'ABBB', 'ACCCCC']
 
 const openNotificationWithIcon = (type) => {
-  if (type ==='edit'){
+  if (type === 'edit') {
     notification['success']({
       message: 'Model Info successfully edited',
       // description: 'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
     });
   }
-  else if (type ==='deploy'){
+  else if (type === 'deploy') {
     notification['success']({
       message: 'Model successfully deployed',
       // description: 'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
@@ -35,8 +35,7 @@ const openNotificationWithIcon = (type) => {
 };
 
 
-
-function UseThisAPIPage({deployment, dispatch}){
+function UseThisAPIPage({deployment, dispatch}) {
   const {
     modelsJson,
     focusModelId,
@@ -54,19 +53,19 @@ function UseThisAPIPage({deployment, dispatch}){
   };
   const onClickModel = () => {
     //  跳转到该model详细页面
-    if (modelsJson[focusModelId]['deployState']===0){
+    if (modelsJson[focusModelId]['deployState'] === 0) {
       deployModel();
       openNotificationWithIcon('deploy');
-      }
-    else{
+    }
+    else {
       showUndeployConfirm();
-      }
+    }
   };
 
   const onClickModifyModal = (modalState) => {
     dispatch({
       type: 'deployment/showModal',
-      payload:{modalState:modalState},
+      payload: {modalState: modalState},
     });
   };
 
@@ -87,23 +86,28 @@ function UseThisAPIPage({deployment, dispatch}){
     });
   };
 
-  if (focusModelId === null){
-    return (<div />)
+  if (focusModelId === null) {
+    return (<div/>)
   }
-  else if(modelsJson[focusModelId]['deployState'] === 1){
+  else if (modelsJson[focusModelId]['served_model'] !== null) {
     return (<div>
-      <DeployModal dispatch={dispatch} deployment={deployment} visible={deployment.modalState} firstDeploy={false}/>
-      <h1>Overview</h1><Icon type="edit" onClick={()=>onClickModifyModal(true)}/>
-      <pre>{modelsJson[focusModelId]['deployDescription']}</pre>
+      <DeployModal dispatch={dispatch} deployment={deployment}
+                   visible={deployment.modalState} firstDeploy={false}/>
+      <h1>Overview</h1><Icon type="edit"
+                             onClick={() => onClickModifyModal(true)}/>
+      <h2>Name</h2>
+      <pre>{modelsJson[focusModelId]['served_model']['name']}</pre>
+      <h2>Description</h2>
+      <pre>{modelsJson[focusModelId]['served_model']['description']}</pre>
       <h1>Usage</h1>
       <h2>Input</h2>
-      <pre>{modelsJson[focusModelId]['deployInput']}</pre>
+      <pre>{modelsJson[focusModelId]['served_model']['input_info']}</pre>
       <h2>Output</h2>
-      <pre>{modelsJson[focusModelId]['deployOutput']}</pre>
+      <pre>{modelsJson[focusModelId]['served_model']['output_info']}</pre>
       <h2>Examples</h2>
-      <pre>{modelsJson[focusModelId]['deployExamples']}</pre>
-      <Button type="primary" onClick={()=>onClickModel()}>
-        Stop Service</Button>      {/*<LineChart/>*/}
+      <pre>{modelsJson[focusModelId]['served_model']['examples']}</pre>
+      <Button type="primary" onClick={() => onClickModel()}>
+        Stop Service</Button> {/*<LineChart/>*/}
       <h1>1.TYPE YOUR INPUT</h1>
       <TextArea className={styles.inputtext} rows={4}
                 placeholder="TYPE YOUR INPUT"/>
@@ -114,32 +118,36 @@ function UseThisAPIPage({deployment, dispatch}){
       <TextArea rows={4} placeholder="USE THIS ALGORITHM"/>
     </div> )
   }
-  else if(modelsJson[focusModelId]['deployState'] === 0 && modelsJson[focusModelId]['deployDescription']){
+  else if (modelsJson[focusModelId]['deployState'] === 0 && modelsJson[focusModelId]['deployDescription']) {
     return (<div>
-      <DeployModal dispatch={dispatch} deployment={deployment} visible={deployment.modalState} firstDeploy={false}/>
-      <h1>Overview</h1><Icon type="edit" onClick={()=>onClickModifyModal(true)}/>
+      <DeployModal dispatch={dispatch} deployment={deployment}
+                   visible={deployment.modalState} firstDeploy={false}/>
+      <h1>Overview</h1><Icon type="edit"
+                             onClick={() => onClickModifyModal(true)}/>
       <h2>Name</h2>
-      {/*<pre>{modelsJson[focusModelId]['deployName']}</pre>*/}
+      <pre>{modelsJson[focusModelId]['served_model']['name']}</pre>
       <h2>Description</h2>
-      <pre>{modelsJson[focusModelId]['deployDescription']}</pre>
+      <pre>{modelsJson[focusModelId]['served_model']['description']}</pre>
       <h1>Usage</h1>
       <h2>Input</h2>
-      <pre>{modelsJson[focusModelId]['deployInput']}</pre>
+      <pre>{modelsJson[focusModelId]['served_model']['input_info']}</pre>
       <h2>Output</h2>
-      <pre>{modelsJson[focusModelId]['deployOutput']}</pre>
+      <pre>{modelsJson[focusModelId]['served_model']['output_info']}</pre>
       <h2>Examples</h2>
-      <pre>{modelsJson[focusModelId]['deployExamples']}</pre>
-      <Button type="primary" onClick={()=>onClickModel()}>
+      <pre>{modelsJson[focusModelId]['served_model']['examples']}</pre>
+      <Button type="primary" onClick={() => onClickModel()}>
         Start Service</Button>
     </div> )
   }
-  else{
-    return(<div><h1>What is Deployment</h1>
+  else {
+    return (<div><h1>What is Deployment</h1>
       <p>Deployment module will host the model you trained and provide
         remote access to it. After deployment, you can make predictions
         for new data samples through provided gRPC/HTTP service.</p>
-      <Button type="primary" onClick={()=>onClickModifyModal(true)}>Deploy</Button>
-      <DeployModal dispatch={dispatch} deployment={deployment} visible={deployment.modalState} firstDeploy={true}/></div>)
+      <Button type="primary"
+              onClick={() => onClickModifyModal(true)}>Deploy</Button>
+      <DeployModal dispatch={dispatch} deployment={deployment}
+                   visible={deployment.modalState} firstDeploy={true}/></div>)
   }
 }
 
@@ -155,7 +163,7 @@ function Deployment({deployment, dispatch}) {
   const setFocusModel = (modelId) => {
     dispatch({
       type: 'deployment/setFocusModel',
-      payload:{focusModelId: modelId},
+      payload: {focusModelId: modelId},
     });
   };
   const onClickModel = (modelId) => {
@@ -222,13 +230,14 @@ function Deployment({deployment, dispatch}) {
 
               <h1>Performance</h1>
               <div>
-                {get(modelsJson,`[${focusModelId}].metrics_status`)?
-                  <LearningCurve data={get(modelsJson,`[${focusModelId}].metrics_status`)}/>:null}
+                {get(modelsJson, `[${focusModelId}].metrics_status`) ?
+                  <LearningCurve
+                    data={get(modelsJson, `[${focusModelId}].metrics_status`)}/> : null}
               </div>
               <HeatmapOnCartesianChart/>
             </TabPane>
             <TabPane tab="Use This API" key="2">
-              <UseThisAPIPage deployment={deployment} dispatch={dispatch} />
+              <UseThisAPIPage deployment={deployment} dispatch={dispatch}/>
             </TabPane>
           </Tabs>
         </div>
@@ -236,4 +245,5 @@ function Deployment({deployment, dispatch}) {
     </div>
   );
 }
+
 export default connect(({deployment}) => ({deployment}))(Deployment);

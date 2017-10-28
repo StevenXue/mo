@@ -20,6 +20,7 @@ from bson import ObjectId
 from server3.entity.model import Model
 from server3.repository.model_repo import ModelRepo
 from server3.business import user_business, ownership_business
+from server3.lib import models
 
 model_repo = ModelRepo(Model)
 
@@ -30,12 +31,12 @@ def get_by_model_id(model_obj):
 
 def add(name, description, category,
         target_py_code, entry_function,
-        to_code_function, parameter_spec, input):
+        to_code_function, parameter_spec, input, steps):
     model = Model(name=name, description=description, category=category,
                   entry_function=entry_function, target_py_code=target_py_code,
                   to_code_function=to_code_function,
                   parameter_spec=parameter_spec,
-                  input=input)
+                  input=input, steps=steps)
     # user = user_business.get_by_user_ID('system')
     # ownership_business.add(user, False, model=model)
     return model_repo.create(model)
@@ -71,6 +72,10 @@ def update_one_public_model():
                   optimization_algorithm=[0])
     MNIST = model_repo.create(MNIST)
     ownership_business.add(user, False, model=MNIST)
+
+
+def update_by_id(model_id, **update):
+    return model_repo.update_one_by_id(model_id, update)
 
 
 if __name__ == '__main__':

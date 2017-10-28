@@ -23,6 +23,7 @@ from server3.entity.toolkit import Toolkit
 from server3.repository.toolkit_repo import ToolkitRepo
 from server3.business import user_business, ownership_business
 
+from server3.constants import SPEC
 toolkit_repo = ToolkitRepo(Toolkit)
 
 
@@ -1759,98 +1760,408 @@ def remove_one_public_toolkit():
     # 已舍去
     # ownership_business.remove_ownership_by_user_and_owned_item(user, toolkit, 'toolkit')
 
+# input = SPEC.ui_spec['input']
 
-# k-means
-k_means = {
-    'parameter_spec': {
-        "data": {
-            'name': 'input',
-            'type': {
-                'key': 'select_box',
-                'des': 'nD tensor with shape: (batch_size, ..., '
-                       'input_dim). The most common situation would be a '
-                       '2D input with shape (batch_size, input_dim).',
-                'range': None
-            },
-            'default': None,
-            'required': True,
-            'len_range': [1, None],
-            'data_type': ['int', 'float']
+
+def update_toolkit():
+    KMEAN = Toolkit(name='K平均数算法',
+                    description='计算所选数据集合的k-mean, 把一个把数据空间划分为k个子集',
+                    category=0,
+                    entry_function='k_mean',
+                    target_py_code=inspect.getsource(toolkit_orig.k_mean),
+                    parameter_spec={
+                        "data": {
+                            'name': 'input',
+                            'type': {
+                                'key': 'select_box',
+                                'des': 'nD tensor with shape: (batch_size, ..., '
+                                       'input_dim). The most common situation would be a '
+                                       '2D input with shape (batch_size, input_dim).',
+                                'range': None
+                            },
+                            'default': None,
+                            'required': True,
+                            'len_range': [1, None],
+                            'data_type': ['int', 'float']
+                        },
+                        "args": [
+                            {
+                                'name': 'n_clusters',
+                                'type': {
+                                    'key': 'int',
+                                    'des': 'the number of clustering numbers',
+                                    'range': [2, None]
+                                },
+                                'default': 2,
+                                'required': True
+                            }
+                        ]
+                    },
+                    result_spec={
+                        "if_reserved": True,
+                        "args": [
+                            {
+                                "name": "Clustering_Label",
+                                "des": "原始数据的每一行元素，对应分类的分类标签",
+                                # "type": "list",
+                                # 在存列的时候，要记得传进来的时候验证是不是list
+                                "if_add_column": True,
+                                "attribute": "label",
+                                "usage": ["pie", "scatter"]
+                            },
+                            {
+                                "name": "Number of Clusters",
+                                "des": "聚类的数量",
+                                "if_add_column": False,
+                                "attribute": "general_info"
+                            },
+                            {
+                                "name": "Centroids of Clusters",
+                                "des": "每个类的中心点",
+                                "if_add_column": False,
+                                "attribute": "position",
+                                "usage": ["scatter"]
+                            },
+                            {
+                                "name": "SSE",
+                                "des": "每个到其中心点的距离之和",
+                                "if_add_column": False,
+                                "attribute": "general_info"
+                            }
+                        ]
+                    },
+                    steps=[
+                        {
+                            'name': 'data_source',
+                            'display_name': 'select parameters',
+                            'args': [
+                                {
+                                    **SPEC.ui_spec['choice'],
+                                    "name": "input",
+                                    "des": "",
+
+                                    # "type": "select_box",
+                                    # "default": None,
+                                    # "required": True,
+
+                                    # length of values
+                                    # "len_range": [
+                                    #     1,
+                                    #     1
+                                    # ],
+                                    # range of one value
+                                    # 'value_range': None,
+                                    # 'value_type': None,
+                                    # 'values': []
+                                }
+                            ],
+                        },
+                        {
+                            'name': 'fields',
+                            'display_name': 'select fields',
+                            'args': [
+                                {
+                                    **SPEC.ui_spec['multiple_choice'],
+                                    'name': 'fields',
+                                    'des': '',
+                                    # 'type': 'multiple_choice',
+                                    # 'value_type': None,
+                                    # 'values': []
+                                }
+                            ],
+                        },
+                        {
+                            'name': 'parameters',
+                            'display_name': 'input parameters',
+                            'args': [
+                                {
+                                    **SPEC.ui_spec['input'],
+                                    'name': 'k',
+                                    'display_name': 'k',
+                                    'value_type': 'int',
+                                    'range': [2, None],
+                                    'des': 'the number of clustering numbers',
+
+
+                                    # 'name': 'k',
+                                    # 'display_name': 'k',
+                                    # 'type': 'input',
+                                    # 'value': None,
+                                    # 'value_type': 'int',
+                                    # 'default': 2,
+                                    # 'required': True,
+                                    # 'des': 'the number of clustering numbers',
+                                    # # length of values
+                                    # "len_range": [
+                                    #     1,
+                                    #     1
+                                    # ],
+                                    # # range of one value
+                                    # 'value_range': [2, None],
+
+                                }
+                            ]
+                        }
+                    ]
+                    )
+
+    SMA = Toolkit(name='移动平均值',
+                  description='计算所选数据集合的移动平均值',
+                  category=4,
+                  result_form=3,
+                  entry_function='toolkit_moving_average',
+                  target_py_code=inspect.getsource(toolkit_orig.toolkit_moving_average),
+                  parameter_spec={
+                      "data": {
+                          'name': 'input',
+                          'type': {
+                              'key': 'select_box',
+                              'des': 'nD tensor with shape: (batch_size, ..., '
+                                     'input_dim). The most common situation would be a '
+                                     '2D input with shape (batch_size, input_dim).',
+                              'range': None
+                          },
+                          'default': None,
+                          'required': True,
+                          'len_range': [1, 1],
+                          'data_type': ['int', 'float']
+                      },
+                      "args": [
+                          {
+                              'name': 'window',
+                              'type': {
+                                  'key': 'int',
+                                  'des': 'the window of moving average',
+                                  'range': [2, None]
+                              },
+                              'default': 3,
+                              'required': True
+                          }
+                      ]
+                  },
+                  result_spec={
+                      "if_reserved": False,
+                      "args": [
+                          {
+                              "name": "simple_moving_average",
+                              "des": "所选范围的样本的移动平均值",
+                              "if_add_column": False,
+                              "attribute": "value"
+                          }
+                      ]
+                  },
+                  steps=[
+                      {
+                          'name': 'data_source',
+                          'display_name': 'select parameters',
+                          'args': [
+                              {
+                                  **SPEC.ui_spec['choice'],
+                                  "name": "input",
+                                  "des": "",
+                              }
+                          ],
+                      },
+                      {
+                          'name': 'fields',
+                          'display_name': 'select fields',
+                          'args': [
+                              {
+                                  **SPEC.ui_spec['multiple_choice'],
+                                  'name': 'fields',
+                                  'des': '',
+                              }
+                          ],
+                      },
+                      {
+                          'name': 'parameters',
+                          'display_name': 'input parameters',
+                          'args': [
+                              {
+                                  **SPEC.ui_spec['input'],
+                                  'range': [2, None],
+                                  'name': 'window',
+                                  'display_name': 'window',
+                                  'type': 'input',
+                                  'value_type': 'int',
+                                  'default': 3,
+                                  'des': 'the window of moving average',
+                                  'required': True,
+
+                              }
+                          ]
+                      }
+                  ]
+                  )
+
+    SIMPLE_KMEAN = Toolkit(name='简单的K平均数算法',
+                           description='计算所选数据集合的k-mean, 把一个把数据空间划分为k个子集',
+                           category=0,
+                           entry_function='k_mean',
+                           target_py_code=inspect.getsource(toolkit_orig.k_mean),
+                           parameter_spec={
+                               "data": {
+                                   'name': 'input',
+                                   'type': {
+                                       'key': 'select_box',
+                                       'des': 'nD tensor with shape: (batch_size, ..., '
+                                              'input_dim). The most common situation would be a '
+                                              '2D input with shape (batch_size, input_dim).',
+                                       'range': None
+                                   },
+                                   'default': None,
+                                   'required': True,
+                                   'len_range': [1, None],
+                                   'data_type': ['int', 'float']
+                               },
+                               "args": [
+                                   {
+                                       'name': 'n_clusters',
+                                       'type': {
+                                           'key': 'int',
+                                           'des': 'the number of clustering numbers',
+                                           'range': [2, None]
+                                       },
+                                       'default': 2,
+                                       'required': True
+                                   }
+                               ]
+                           },
+                           result_spec={
+                               "if_reserved": True,
+                               "args": [
+                                   {
+                                       "name": "Clustering_Label",
+                                       "des": "原始数据的每一行元素，对应分类的分类标签",
+                                       # "type": "list",
+                                       # 在存列的时候，要记得传进来的时候验证是不是list
+                                       "if_add_column": True,
+                                       "attribute": "label",
+                                       "usage": ["pie", "scatter"]
+                                   },
+                                   {
+                                       "name": "Number of Clusters",
+                                       "des": "聚类的数量",
+                                       "if_add_column": False,
+                                       "attribute": "general_info"
+                                   },
+                                   {
+                                       "name": "Centroids of Clusters",
+                                       "des": "每个类的中心点",
+                                       "if_add_column": False,
+                                       "attribute": "position",
+                                       "usage": ["scatter"]
+                                   },
+                                   {
+                                       "name": "SSE",
+                                       "des": "每个到其中心点的距离之和",
+                                       "if_add_column": False,
+                                       "attribute": "general_info"
+                                   }
+                               ]
+                           },
+                           steps=[
+                               {
+                                   'name': 'data_source',
+                                   'display_name': 'select parameters',
+                                   'args': [
+                                       {
+
+                                           "name": "input",
+                                           "des": "",
+
+                                           "type": "select_box",
+                                           "default": None,
+                                           "required": True,
+
+                                           # length of values
+                                           "len_range": [
+                                               1,
+                                               1
+                                           ],
+                                           # range of one value
+                                           'value_range': None,
+                                           'value_type': None,
+                                           'values': []
+                                       }
+                                   ],
+                               },
+                               {
+                                   'name': 'fields',
+                                   'display_name': 'select fields',
+                                   'args': [
+                                       {
+                                           'name': 'fields',
+                                           'des': '',
+                                           'type': 'multiple_choice',
+                                           'value_type': None,
+                                           'values': []
+                                       }
+                                   ],
+                               },
+                               {
+                                   'name': 'parameters',
+                                   'display_name': 'input parameters',
+                                   'args': [
+                                       {
+                                           'name': 'k',
+                                           'display_name': 'k',
+                                           'type': 'input',
+                                           'value': 2,
+                                           'value_type': 'int',
+                                           'default': 2,
+                                           'required': True,
+                                           'des': 'the number of clustering numbers',
+                                           # length of values
+                                           "len_range": [
+                                               1,
+                                               1
+                                           ],
+                                           # range of one value
+                                           'value_range': [2, None],
+
+                                       }
+                                   ]
+                               }
+                           ]
+                           )
+
+    TOOLKIT_DICT = [
+        {
+            "_id": ObjectId("5980149d8be34d34da32c170"),
+            "object": KMEAN
         },
-        "args": [
-            {
-                'name': 'n_clusters',
-                'type': {
-                    'key': 'int',
-                    'des': 'the number of clustering numbers',
-                    'range': [2, None]
-                },
-                'default': 2,
-                'required': True
-            }
-        ]
-    },
-}
-steps = [
-    {
-        'name': 'custom',
-        'display_name': 'select parameters',
-        'args': [
-            {
-                "name": "input",
-                "des": "",
+        {
+            "_id": ObjectId("5980149d8be34d34da32c166"),
+            "object": SMA
+        },
+        {
+            '_id': ObjectId("59f297cad845c05376f599c6"),
+            "object": SIMPLE_KMEAN
+        }
+    ]
+    user = user_business.get_by_user_ID('system')
 
-                "type": "select_box",
-                "default": None,
-                "required": True,
+    for toolkit in TOOLKIT_DICT:
+        if not toolkit["_id"]:
+            # create toolkit, then add _id to TOOLKIT_DICT
+            new_toolkit_obj = toolkit_repo.create(toolkit['object'])
+            ownership_business.add(user, False, toolkit=new_toolkit_obj)
+        else:
 
-                # length of values
-                "len_range": [
-                    1,
-                    1
-                ],
-                # range of one value
-                'value_range': None,
-                'value_type': [
-                    "int",
-                    "float"
-                ],
-                'values': []
-            }
-        ],
-    },
-    {
-        'name': 'fields',
-        'display_name': 'select fields',
-        'args': [
-            {
-                'name': 'fields',
-                'des': '',
+            toolkit_obj = get_by_toolkit_id(toolkit["_id"])
+            attributes = ['name', 'description', 'category', 'result_form', 'entry_function',
+                          'target_py_code', 'parameter_spec', 'result_spec', 'steps']
+            for attribute in attributes:
+                if hasattr(toolkit['object'], attribute):
+                    toolkit_obj[attribute] = toolkit['object'][attribute]
+            toolkit_obj.save()
 
-                'type': 'multiple_choice',
-                'values': []
-            }
-        ],
-    },
-    {
-        'name': 'parameters',
-        'display_name': 'input parameters',
-        'args': [
-            {
-                'name': 'k',
-                'display_name': 'k',
-                'type': 'input',
-                'value': None,
-            }
-        ]
-    }
-]
 
-version_1_steps = [
+steps_config = [
     {
         'name': 'data_source',
         'display_name': 'select parameters',
-
         'args': [
             {
                 "name": "input",
@@ -1867,10 +2178,7 @@ version_1_steps = [
                 ],
                 # range of one value
                 'value_range': None,
-                'value_type': [
-                    "int",
-                    "float"
-                ],
+                'value_type': None,
                 'values': []
             }
         ],
@@ -1882,8 +2190,8 @@ version_1_steps = [
             {
                 'name': 'fields',
                 'des': '',
-
                 'type': 'multiple_choice',
+                'value_type': None,
                 'values': []
             }
         ],
@@ -1896,26 +2204,52 @@ version_1_steps = [
                 'name': 'k',
                 'display_name': 'k',
                 'type': 'input',
+                'value': 2,
                 'value_type': 'int',
-                'value': None,
+                'default': 2,
+                'required': True,
+                'des': 'the number of clustering numbers',
+                # length of values
+                "len_range": [
+                    1,
+                    1
+                ],
+                # range of one value
+                'value_range': [2, None],
+
+            }
+        ]
+    },
+    {
+        'name': 'custom',
+        'display_name': 'input parameters',
+        'args': [
+            {
+                'name': 'k',
+                'display_name': 'k',
+                'type': 'input',
+                'value': 2,
+                'value_type': 'int',
+                'default': 2,
+                'required': True,
+                'des': 'the number of clustering numbers',
+                # length of values
+                "len_range": [
+                    1,
+                    1
+                ],
+                # range of one value
+                'value_range': [2, None],
+
             }
         ]
     }
 ]
 
 
-def update_toolkit_with_new_steps():
-    toolkit_id = '5980149d8be34d34da32c170'
-    toolkit_id = ObjectId(toolkit_id)
-    # toolkit_obj = Toolkit.objects.get(id=toolkit_id)
-    toolkit_obj = get_by_toolkit_id(toolkit_id)
-    # toolkit obj to conf (need be move to?)
-    toolkit_obj.steps = steps
-    toolkit_obj.save()
-    pass
-
+# def create_one_public_toolkit:
+#     pass
 
 if __name__ == '__main__':
-    update_toolkit_with_new_steps()
+    update_toolkit()
     pass
-

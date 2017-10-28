@@ -30,15 +30,27 @@ def get_by_job(job):
     return served_model_repo.read_by_unique_field('job', job)
 
 
-def add(name, description, version, deploy_name, server, signatures,
+def add(name, description, input_info, output_info, examples, version,
+        deploy_name, server,
         input_type,
-        model_base_path, job, **optional):
+        model_base_path, job, service_name, **optional):
     model = ServedModel(name=name, description=description,
+                        input_info=input_info,
+                        output_info=output_info,
+                        examples=examples,
                         version=version, deploy_name=deploy_name,
                         server=server,
-                        signatures=signatures, input_type=input_type,
-                        model_base_path=model_base_path, job=job, **optional)
+                        input_type=input_type,
+                        model_base_path=model_base_path, job=job,
+                        service_name=service_name, **optional)
     return served_model_repo.create(model)
+
+
+def update_info(served_model_id, name, description, input_info, output_info, examples):
+    update = {'name': name, 'description': description,
+              'input_info': input_info, 'output_info': output_info,
+              'examples': examples, }
+    served_model_repo.update_one_by_id(served_model_id, update)
 
 
 def remove_by_id(model_id):

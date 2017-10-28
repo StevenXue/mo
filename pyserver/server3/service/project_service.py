@@ -21,6 +21,7 @@ from server3.service import staging_data_service
 from server3.service import kube_service
 from server3.business import staging_data_set_business
 from server3.business import staging_data_business
+from server3.business import served_model_business
 from server3.utility import json_utility
 from server3.repository import config
 from server3.constants import USER_DIR
@@ -199,33 +200,41 @@ def get_all_jobs_of_project(project_id, categories, status=None):
                     'id'] if job['staging_data_set'] else None
 
                 # result sds info
+                # object 用的是 .id  json用 _id
                 try:
                     result_sds = staging_data_set_business.get_by_job_id(
                         job['id']).to_mongo()
                 except DoesNotExist:
                     result_sds = None
-
-                if key == 'model':
-                    # model results
-                    job_info['results'] = result_sds
-                    # FIXME too slow to get metrics status
-                    # 已添加索引
-                    job_info['metrics_status'] = \
-                        [sd.to_mongo() for sd in
-                         staging_data_business.get_by_staging_data_set_id(
-                             result_sds['_id'])]
-                else:
-                    # toolkit results
-                    job_info['results'] = result_sds[
-                        'result'] if result_sds and "result" in result_sds else None
-                job_info['results_staging_data_set_id'] = result_sds[
-                    '_id'] if result_sds else None
+                finally:
+                    if result_sds:
+                        if key == 'model':
+                            # model results
+                            job_info['results'] = result_sds
+                            # FIXME too slow to get metrics status
+                            # 已添加索引
+                            job_info['metrics_status'] = \
+                                [sd.to_mongo() for sd in
+                                 staging_data_business.get_by_staging_data_set_id(
+                                     result_sds['_id'])]
+                        else:
+                            # toolkit results
+                            job_info['results'] = result_sds[
+                                'result'] if result_sds and "result" in result_sds else None
+                        job_info['results_staging_data_set_id'] = result_sds[
+                            '_id'] if result_sds else None
 
                 # model running status info
                 # if key == 'model':
                 #     job_name = KUBE_NAME['model'].format(job_id=job['id'])
                 #     job_info = kube_service.get_job_status(job_info, job_name)
-
+                served_model_id = job_info.get('served_model')
+                if served_model_id:
+                    served_model = served_model_business.get_by_id(
+                        served_model_id).to_mongo()
+                else:
+                    served_model = None
+                job_info["served_model"] = served_model
                 history_jobs[key].append(job_info)
                 break
     return history_jobs

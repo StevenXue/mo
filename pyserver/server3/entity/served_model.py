@@ -20,9 +20,11 @@ STATUS = ('running', 'stopped', 'terminated')
 class ServedModel(DynamicDocument):
     name = StringField(max_length=50, required=True)
     description = StringField(max_length=140, required=True)
+    input_info = StringField(required=True)
+    output_info = StringField(required=True)
+    examples = StringField(required=True)
     version = IntField(required=True)
     server = StringField(required=True)
-    signatures = DictField(required=True)
     input_type = StringField(required=True, choices=INPUT_TYPES)
     model_base_path = StringField(required=True)
     deploy_name = StringField(required=True)
@@ -32,6 +34,3 @@ class ServedModel(DynamicDocument):
     related_field = StringField(max_length=100)
     tags = ListField(StringField(max_length=50))
     related_tasks = StringField(max_length=50)
-
-
-

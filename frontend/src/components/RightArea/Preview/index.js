@@ -5,7 +5,7 @@ import {Select, Table} from 'antd';
 
 const Option = Select.Option;
 
-function Preview({preview, dataAnalysis, dispatch}) {
+function Preview({preview, model, dispatch, namespace}) {
 
   const {
     stagingDataList,
@@ -14,8 +14,9 @@ function Preview({preview, dataAnalysis, dispatch}) {
 
   const {
     focusSectionsId,
-    sectionsJson
-  } = dataAnalysis;
+    sectionsJson,
+    mouseOverField,
+  } = model;
 
   let fields;
   if(focusSectionsId!=='new_launcher ' + 'init'){
@@ -53,15 +54,28 @@ function Preview({preview, dataAnalysis, dispatch}) {
   if (table.length !== 0) {
     columns = table.columns.map((e, index) => {
       const ret = {
-        title: e[0],
+        title: <div className={styles.table_title}>
+          <div>
+            {e[0]}
+          </div>
+          <div className={styles.table_title_type}>
+            {e[1][0]}
+          </div>
+        </div>,
         dataIndex: e[0],
         key: e[0],
         width: 120,
       };
-      if(fields.includes(e[0])){
-        ret['className'] = 'active-table-column';
+      let className = '';
+
+      if(fields&&fields.includes(e[0])){
+        className += 'active-table-column';
+      }
+      if(mouseOverField===e[0]){
+        className += ' mouse-over-table-column';
         ret['fixed'] = true;
       }
+      ret['className'] = className;
       return ret
     })
   }
@@ -69,8 +83,8 @@ function Preview({preview, dataAnalysis, dispatch}) {
 
   return (
     <div >
-      view
-      <div>
+
+      <div className={styles.first_line}>
         <Select
           // key={arg.name + argIndex}
           className='column'
@@ -88,8 +102,12 @@ function Preview({preview, dataAnalysis, dispatch}) {
             <Option key={stagingData._id} value={stagingData._id}>{stagingData.name}</Option>
           )}
         </Select>
-
       </div>
+      {
+        dataSource?<div className={styles.info_box}>
+          {`${table.row} rows, ${table.col} columns`}
+        </div>:null
+      }
 
       <Table dataSource={dataSource} columns={columns} scroll={{ x: 6000 , y: '100%'}}/>
 
@@ -97,4 +115,4 @@ function Preview({preview, dataAnalysis, dispatch}) {
   );
 }
 
-export default connect(({preview, dataAnalysis}) => ({preview, dataAnalysis}))(Preview);
+export default connect(({preview}) => ({preview}))(Preview);

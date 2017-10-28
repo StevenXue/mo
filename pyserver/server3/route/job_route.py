@@ -44,13 +44,13 @@ def create_job():
     data = request.get_json()
     # todo 使用try except 捕捉错误
     job_type = data["job_type"]
-    algorithm_id = ObjectId(data["algorithm_id"])
-    project_id = ObjectId(data["project_id"])
-    job_dict = {
-        "project_id": project_id,
-        "{}_id".format(job_type): algorithm_id
-    }
-    job_obj = job_service.create_job(**job_dict)
+    # algorithm_id = data.get("algorithm_id")
+    model_id = data.get("model_id")
+    toolkit_id = data.get("toolkit_id")
+    project_id = data["project_id"]
+    job_obj = job_service.create_job(project_id=project_id,
+                                     toolkit_id=toolkit_id,
+                                     model_id=model_id)
     algorithm = job_obj[job_type].to_mongo()
     # 将job的toolkit转换成object
     job_obj = job_obj.to_mongo()
@@ -70,7 +70,8 @@ def create_job():
 def update_job_steps():
     data = request.get_json()
     print("data", data)
-    job_id, steps, active_steps = ObjectId(data["_id"]), data['steps'], data['active_steps']
+    job_id, steps, active_steps = ObjectId(data["_id"]), data['steps'], data[
+        'active_steps']
     result = job_business.update_job_steps(job_id, steps, active_steps)
     result = json_utility.convert_to_json(result.to_mongo())
     return jsonify({
@@ -111,13 +112,13 @@ def run_job():
         "conf": {
             "args": new_args,
             "data_fields":
-                # ["HighAlpha", "Attention_dimension_reduction_PCA_col"]
+            # ["HighAlpha", "Attention_dimension_reduction_PCA_col"]
                 job_obj.steps[1]["args"][0]["values"]
         },
         "project_id": project_id,
         "toolkit_id": job_obj.toolkit.id,
     }
-    result = job_service.run_job(obj=obj)
+    result = job_service.run_job(obj=obj, job_obj=job_obj)
 
     # obj = {
     #     "staging_data_set_id": "59c21d71d845c0538f0faeb2",

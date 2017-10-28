@@ -17,6 +17,10 @@ const modelling = modelExtend(workBench, {
           dispatch({ type: 'fetchSections', projectId: projectId, categories })
           dispatch({ type: 'fetchAlgorithms', categories })
           dispatch({ type: 'fetchStagingDatasetList', projectId: projectId })
+
+          //将project id存起来
+          dispatch({ type: 'setProjectId', payload: {projectId: projectId}});
+
         }
       });
     },

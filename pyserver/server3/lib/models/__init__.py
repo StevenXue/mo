@@ -14,6 +14,7 @@ from server3.lib.models.image_classifier import IMAGE_CLASSIFIER
 from server3.lib.models.image_classifier import image_classifier
 from server3.lib.models.image_classifier import image_classifier_to_str
 from server3.lib.models.keras_seq import KERAS_SEQ_SPEC
+from server3.lib.models.keras_seq import KERAS_SEQ_STEPS
 from server3.lib.models.keras_seq import keras_seq
 from server3.lib.models.keras_seq import keras_seq_to_str
 from server3.lib.models.kmeans_cluster import KmeansCluster

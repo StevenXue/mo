@@ -28,6 +28,7 @@ export default {
     // 右侧激活的preview表格
 
     projectId: null,
+    mouseOverField: null,
 
     // activeKey: ['1']
 
@@ -210,6 +211,22 @@ export default {
       }
     },
 
+    addMouseOverField(state, action) {
+      const {fieldName, sectionId} = action.payload;
+      return {
+        ...state,
+        mouseOverField: fieldName
+      }
+    },
+
+    removeMouseOverField(state, action) {
+      return {
+        ...state,
+        mouseOverField: null
+      }
+    },
+
+
     setParameter(state, action) {
       const {sectionId, stepIndex, argIndex, value} = action.payload;
       let sectionsJson = state.sectionsJson;
@@ -342,6 +359,22 @@ export default {
         }
       })
     },
+
+    * runSection(action, {call, put, select}) {
+      const {namespace, sectionId} = action.payload;
+      // 先把 save section 复制过来
+      const projectId = yield select(state => state[namespace].projectId);
+
+      const {data: {result}} = yield call(dataAnalysisService.runJob, {
+        ...action.payload,
+        projectId: projectId,
+      });
+
+      console.log("result", result)
+
+
+    }
+
 
   },
   subscriptions: {

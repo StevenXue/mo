@@ -57,7 +57,8 @@ function Sidebar({model, dispatch, namespace}) {
     addActiveSection('new_launcher ' + Math.random());
   };
 
-  const onClickDelete = (sectionId) => {
+  const onClickDelete = (e, sectionId) => {
+    e.stopPropagation();
     console.log("sectionId", sectionId);
     dispatch({
       type: namespace + '/deleteSection',
@@ -69,7 +70,7 @@ function Sidebar({model, dispatch, namespace}) {
     return (
     <Menu>
       <Menu.Item key="0">
-        <a onClick={()=>onClickDelete(sectionId)}>DELETE</a>
+        <a onClick={(e)=>onClickDelete(e, sectionId)}>DELETE</a>
       </Menu.Item>
     </Menu>
   )
