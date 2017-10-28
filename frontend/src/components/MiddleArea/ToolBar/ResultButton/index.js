@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import styles from '../ToolBar.css';
+import styles from '../ToolBar.less';
 import {connect} from 'dva';
 import {Icon, Button, Modal} from 'antd';
 import VisualizationPanel from './visualizationPanel.js';
@@ -25,7 +25,8 @@ class ResultButton extends Component {
         }, console.log("this.state.onFocus", this.state.onFocus));
       }}
            onClick={() => this.setState({visible: true})}
-           // onClick={()=>this.handleClickResult()}
+
+           className={styles.result}
       >
         <Icon type="bar-chart" style={{fontSize: 20, margin: 10, color: 'white'}}/>
         <span className={styles.text}>

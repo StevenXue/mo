@@ -6,8 +6,10 @@ import {Select, Collapse, Button, Input} from 'antd';
 import ToolBar from '../ToolBar/index';
 import {format} from '../../../utils/base';
 
-const Option = Select.Option
-const Panel = Collapse.Panel
+// import  from '../../../index.less'
+
+const Option = Select.Option;
+const Panel = Collapse.Panel;
 
 // const JsonToArray = (json, key) => {
 //   let arr = []
@@ -20,7 +22,13 @@ const Panel = Collapse.Panel
 // }
 
 function getArgs(baseSteps, stepIndex, argIndex) {
-  return baseSteps[stepIndex].args[argIndex]
+
+  if (argIndex !== undefined) {
+    return baseSteps[stepIndex].args[argIndex]
+  } else {
+    return baseSteps[stepIndex]
+  }
+
 }
 
 
@@ -29,8 +37,8 @@ function WorkBench({section, model, dispatch, namespace}) {
   const {
     stagingDataList,
     sectionsJson,
-
-  } = model
+    mouseOverField,
+  } = model;
 
   function handleBlur() {
     console.log('blur')
@@ -62,8 +70,7 @@ function WorkBench({section, model, dispatch, namespace}) {
     // 将预览设置
   }
 
-  function handleSave(stagingDatasetId, stepIndex, argIndex) {
-
+  function handleNext(stagingDatasetId, stepIndex, argIndex) {
     dispatch({
       type: namespace + '/getFields',
       payload: {
@@ -73,10 +80,8 @@ function WorkBench({section, model, dispatch, namespace}) {
         argIndex,
         namespace,
       },
-    })
-
+    });
     // let activeKey=active_steps;
-
     dispatch({
       type: namespace + '/setActiveKey',
       payload: {
@@ -106,6 +111,22 @@ function WorkBench({section, model, dispatch, namespace}) {
     })
   }
 
+  function handleMouseOverField(fieldName) {
+    dispatch({
+      type: namespace + '/addMouseOverField',
+      payload: {
+        fieldName,
+        sectionId: section._id,
+      },
+    })
+  }
+
+  function handleMouseLeaveField() {
+    dispatch({
+      type: namespace + '/removeMouseOverField',
+    })
+  }
+
   function handleOnChangeArgs(e, stepIndex, argIndex) {
     // console.log("e", e);
     console.log("baseSteps", baseSteps[stepIndex].args[argIndex]["value_type"]);
@@ -123,7 +144,7 @@ function WorkBench({section, model, dispatch, namespace}) {
   }
 
   return (
-    <div className={styles.normal}>
+    <div>
       <ToolBar sectionId={sectionId} {...{model, dispatch, namespace}}/>
       <div className={styles.container}>
         <Collapse className={styles.collapse}
@@ -136,7 +157,7 @@ function WorkBench({section, model, dispatch, namespace}) {
                   case 'data_source':
                     return <Panel
                       className={styles.panel}
-                      header={step.display_name} key={stepIndex}>
+                      header={getArgs(baseSteps, stepIndex).display_name} key={stepIndex}>
                       {
                         step.args.map((arg, argIndex) =>
                           <div key={arg.name + argIndex}>
@@ -159,7 +180,7 @@ function WorkBench({section, model, dispatch, namespace}) {
                             </Select>
 
                             <Button type="primary"
-                                    onClick={() => handleSave(arg.values[0], stepIndex, argIndex)}
+                                    onClick={() => handleNext(arg.values[0], stepIndex, argIndex)}
                                     className={styles.button}>
                               next
                             </Button>
@@ -168,7 +189,7 @@ function WorkBench({section, model, dispatch, namespace}) {
                         )
                       }
 
-                    </Panel>
+                    </Panel>;
                   case 'fields':
                     return <Panel header="Select Fields" key={stepIndex}
                                   className={styles.panel}
@@ -180,7 +201,12 @@ function WorkBench({section, model, dispatch, namespace}) {
                             key={field[0]}
                             className={styles.field}
                             onClick={() => handleClickField(field[0])}
-                            style={{backgroundColor: (step.args[0].values).includes(field[0]) ? 'yellow' : '#F3F3F3'}}
+                            style={{
+                              backgroundColor: (step.args[0].values).includes(field[0]) ? '#34C0E2' : '#F3F3F3',
+                              color: mouseOverField === field[0] ? 'green' : 'grey'
+                            }}
+                            onMouseOver={() => handleMouseOverField(field[0])}
+                            onMouseLeave={() => handleMouseLeaveField()}
                           >
                             <p className={styles.text}>{field[0]}</p>
                           </div>,
@@ -188,9 +214,16 @@ function WorkBench({section, model, dispatch, namespace}) {
                       </div>
 
                       <div className={styles.end_button}>
-                        <Button type="primary" className={styles.button}>next</Button>
+                        <Button type="primary" className={styles.button} onClick={() =>
+                          dispatch({
+                            type: namespace + '/setActiveKey',
+                            payload: {
+                              activeKey: [String(stepIndex), String(stepIndex + 1)],
+                              sectionId: section._id,
+                            },
+                          })}>next</Button>
                       </div>
-                    </Panel>
+                    </Panel>;
                   case 'feature_fields':
                     return (
                       <Panel header="Select Feature Fields" key={stepIndex}
@@ -202,7 +235,7 @@ function WorkBench({section, model, dispatch, namespace}) {
                               key={field[0]}
                               className={styles.field}
                               onClick={() => handleClickField(field[0])}
-                              style={{backgroundColor: (step.args[0].values).includes(field[0]) ? 'yellow' : '#F3F3F3'}}
+                              style={{backgroundColor: (step.args[0].values).includes(field[0]) ? '#34C0E2' : '#F3F3F3'}}
                             >
                               <p className={styles.text}>{field[0]}</p>
                             </div>,
@@ -224,7 +257,7 @@ function WorkBench({section, model, dispatch, namespace}) {
                             key={field[0]}
                             className={styles.field}
                             onClick={() => handleClickField(field[0])}
-                            style={{backgroundColor: (step.args[0].values).includes(field[0]) ? 'yellow' : '#F3F3F3'}}
+                            style={{backgroundColor: (step.args[0].values).includes(field[0]) ? '#34C0E2' : '#F3F3F3'}}
                           >
                             <p className={styles.text}>{field[0]}</p>
                           </div>,
@@ -253,7 +286,17 @@ function WorkBench({section, model, dispatch, namespace}) {
                           )
                         }
                         <div className={styles.end_button}>
-                          <Button type="primary" className={styles.button}>run</Button>
+                          <Button type="primary" className={styles.button} onClick={() =>
+                            dispatch({
+                              type: namespace + '/runSection',
+                              payload: {
+                                sectionId,
+                                namespace
+                              }
+                            })
+                          }>
+                            run
+                          </Button>
                         </div>
                       </Panel>
                     );
@@ -317,4 +360,6 @@ function WorkBench({section, model, dispatch, namespace}) {
 //     <Button type="primary" className={styles.button}>save</Button>
 //   </div>
 // }
+// export default connect(({ preview }) => ({ upload }))(WorkBench)
+
 export default WorkBench

@@ -15,7 +15,7 @@ const tabs = [
     key: 0
   },
   {
-    text: 'Result',
+    text: 'History',
     key: 1
   }
 ];
@@ -29,10 +29,10 @@ class RightArea extends Component {
   renderChildren(){
     switch (this.state.status) {
       case 0:
-        return <Preview/>;
+        return <Preview {...this.props}/>;
       case 1:
         return <div>
-          Result
+          History
         </div>
     }
 

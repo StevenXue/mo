@@ -28,6 +28,7 @@ export default {
     // 右侧激活的preview表格
 
     projectId: null,
+    mouseOverField: null,
 
     // activeKey: ['1']
 
@@ -209,6 +210,22 @@ export default {
         }
       }
     },
+
+    addMouseOverField(state, action) {
+      const {fieldName, sectionId} = action.payload;
+      return {
+        ...state,
+        mouseOverField: fieldName
+      }
+    },
+
+    removeMouseOverField(state, action) {
+      return {
+        ...state,
+        mouseOverField: null
+      }
+    },
+
 
     setParameter(state, action) {
       const {sectionId, stepIndex, argIndex, value} = action.payload;

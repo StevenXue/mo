@@ -30,7 +30,9 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
           />
         </div>
         <div className={styles.right_area}>
-          <RightArea/>
+          <RightArea
+            {...props}
+          />
         </div>
       </div>
     </div>

@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 import simplejson as json
 from bson import ObjectId
+from mongoengine import DoesNotExist
 
 from server3.business import file_business
 from server3.business import job_business
@@ -84,7 +85,7 @@ def list_public_model_name():
 
 def add_model_with_ownership(user_ID, is_private, name, description, category,
                              target_py_code, entry_function,
-                             to_code_function, parameter_spec, input):
+                             to_code_function, parameter_spec, input, steps):
     """
     add_model_with_ownership
     :param user_ID:
@@ -101,7 +102,7 @@ def add_model_with_ownership(user_ID, is_private, name, description, category,
     """
     model = model_business.add(name, description, category,
                                target_py_code, entry_function,
-                               to_code_function, parameter_spec, input)
+                               to_code_function, parameter_spec, input, steps)
     user = user_business.get_by_user_ID(user_ID)
     ownership_business.add(user, is_private, model=model)
     return model
@@ -864,31 +865,81 @@ def temp():
     #     {'type': 'ndarray', 'n': None}
     # ))
 
-    print(add_model_with_ownership(
-        'system',
-        False,
-        'naturalDQN',
-        'A Natural DQN Model',
-        ModelType['advanced'],
-        'server3/lib/models/naturalDQN_to_str.py',
-        'naturalDQN',
-        'naturalDQN_to_str',
-        {'fit': {
-            "data_fields": {
-                "name": "x_y_fields",
-                "type": {
-                    "key": "transfer_box",
-                    "des": "data fields for x and y",
-                },
-                "default": None,
-                "required": True,
-                "x_data_type": None,
-                "y_data_type": None,
-                "x_len_range": None,
-                "y_len_range": None,
-            }}},
-        {'type': 'DataFrame'}
-    ))
+    # print(add_model_with_ownership(
+    #     'system',
+    #     False,
+    #     'naturalDQN',
+    #     'A Natural DQN Model',
+    #     ModelType['advanced'],
+    #     'server3/lib/models/naturalDQN_to_str.py',
+    #     'naturalDQN',
+    #     'naturalDQN_to_str',
+    #     {'fit': {
+    #         "data_fields": {
+    #             "name": "x_y_fields",
+    #             "type": {
+    #                 "key": "transfer_box",
+    #                 "des": "data fields for x and y",
+    #             },
+    #             "default": None,
+    #             "required": True,
+    #             "x_data_type": None,
+    #             "y_data_type": None,
+    #             "x_len_range": None,
+    #             "y_len_range": None,
+    #         }}},
+    #     {'type': 'DataFrame'}
+    # ))
+
+
+def _update_model():
+    GNN = {
+        "name": "General Neural Network",
+        "description": "keras_seq from keras",
+        "target_py_code": "server3/lib/models/keras_seq",
+        "entry_function": "keras_seq",
+        "to_code_function": "keras_seq_to_str",
+        "category": 0,
+        "model_type": 1,
+        "steps": models.KERAS_SEQ_STEPS,
+        "parameter_spec": models.KERAS_SEQ_SPEC,
+        "input": {
+            "type": "ndarray",
+            "n": None
+        }
+    }
+
+    user = user_business.get_by_user_ID('system')
+
+    MODEL_DICT = [
+        {
+            "_id": ObjectId("598293510c11f34ca9a2b486"),
+            "is_private": False,
+            "user_ID": user.user_ID,
+            "obj": GNN
+        }
+    ]
+
+    for model in MODEL_DICT:
+        try:
+            model_obj = model_business.get_by_model_id(model['_id'])
+        except DoesNotExist:
+            # create model
+            model.pop('_id')
+            obj = {
+                **model.pop('obj'),
+                **model
+            }
+            print('Added:', add_model_with_ownership(**obj))
+        else:
+            if model_obj:
+                print(model_obj)
+                # update model
+                model_id = model.get('_id')
+                # print(model.get('obj').keys())
+                print('Updated:', model_business.update_by_id(model_id,
+                                                              **model.get(
+                                                                  'obj')))
 
 
 if __name__ == '__main__':

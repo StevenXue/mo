@@ -4,6 +4,7 @@ from mongoengine import connect
 from pymongo import UpdateOne
 
 from server3.repository import config
+import json
 
 connect(
     db=config.get_mongo_db(),
@@ -34,7 +35,7 @@ class Repo:
         return self.__instance.objects(**query).first()
 
     def read_unique_one(self, query):
-            return self.__instance.objects.get(**query)
+        return self.__instance.objects.get(**query)
 
     def read_by_unique_field(self, field_name, field_value):
         """
@@ -55,7 +56,7 @@ class Repo:
         return Repo.read(self, {field_name: field_value})
 
     def read_by_non_unique_field_subset(self, field_name,
-                                                  field_value, subset):
+                                        field_value, subset):
         """
         general function to query the db by non unique field, thus return a list
         :param field_name:str
@@ -85,11 +86,7 @@ class Repo:
         return modified_obj.reload()
 
     def update_one_by_id(self, obj_id, update):
-        # print '2', type(obj_id), obj_id
         modified_obj = self.__instance.objects(id=obj_id).modify(**update)
-        # print '3', type(modified_obj)
-        print('SJSJSJ')
-        print(modified_obj.reload())
         return modified_obj.reload()
 
     def update_unique_one(self, query, update):
@@ -98,7 +95,7 @@ class Repo:
     def update_unset_fields_by_non_unique_field(self, field_name, field_value,
                                                 fields):
         update = {'unset__' + k: '' for k in fields}
-        return self.__instance.objects(**{field_name: field_value})\
+        return self.__instance.objects(**{field_name: field_value}) \
             .update(**update)
 
     # for List field add only one new element- update={'job': new_job_obj,
@@ -161,5 +158,8 @@ class Repo:
         :return: None
         """
         # 组合时候添加一笔资料
-        update_list_dicts = [UpdateOne({'_id': item.pop('_id')}, {'$set': item}) for item in list_dicts]
-        self.__instance._get_collection().bulk_write(update_list_dicts, ordered=False)
+        update_list_dicts = [
+            UpdateOne({'_id': item.pop('_id')}, {'$set': item}) for item in
+            list_dicts]
+        self.__instance._get_collection().bulk_write(update_list_dicts,
+                                                     ordered=False)
