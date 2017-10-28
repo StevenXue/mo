@@ -28,7 +28,7 @@ import tensorflow as tf
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2
 
-tf.app.flags.DEFINE_string('server', '10.52.14.182:31186',
+tf.app.flags.DEFINE_string('server', '10.52.14.182:32126',
                            'PredictionService host:port')
 FLAGS = tf.app.flags.FLAGS
 
@@ -38,7 +38,7 @@ def main(_):
     channel = implementations.insecure_channel(host, int(port))
     stub = prediction_service_pb2.beta_create_PredictionService_stub(channel)
     request = predict_pb2.PredictRequest()
-    request.model_spec.name = '1'
+    request.model_spec.name = '1234'
     request.model_spec.signature_name = 'predict'
     request.inputs['inputs'].CopyFrom(tf.contrib.util.make_tensor_proto([[1,
                                                                           0.3,

@@ -24,8 +24,29 @@ from server3.constants import NAMESPACE
 ModelType = {list(v)[1]: list(v)[0] for v in list(MODEL_TYPE)}
 
 
-def update_db(user_ID, name, description, input_info, output_info,
+def update_db(served_model_id, name, description, input_info, output_info,
               examples):
+    """
+
+    :param served_model_id:
+    :param name:
+    :param description:
+    :param input_info:
+    :param output_info:
+    :param examples:
+    :return:
+    """
+    served_model_business.update_info(served_model_id, name, description, input_info,
+                                      output_info, examples)
+
+
+def first_save_to_db(user_ID, name, description, input_info, output_info,
+                     examples, version,
+                     deploy_name, server,
+                     input_type, model_base_path, job,
+                     job_id, is_private=False,
+                     service_name=None,
+                     **optional):
     """
 
     :param user_ID:
@@ -34,30 +55,16 @@ def update_db(user_ID, name, description, input_info, output_info,
     :param input_info:
     :param output_info:
     :param examples:
-    :return:
-    """
-    served_model_business.update_info(name, description, input_info,
-                                      output_info, examples)
-
-
-def first_save_to_db(user_ID, name, description, input_info, output_info,
-                     examples, version,
-                     deploy_name, server,
-                     input_type, model_base_path, job, is_private=False,
-                     service_name=None,
-                     **optional):
-    """
-    add a served model
-    :param user_ID:
-    :param is_private:
-    :param name:
-    :param description:
-    :param input_info: str
-    :param output_info: str
-    :param examples: str
+    :param version:
+    :param deploy_name:
     :param server:
     :param input_type:
     :param model_base_path:
+    :param job:
+    :param job_id:
+    :param is_private:
+    :param service_name:
+    :param optional:
     :return:
     """
     served_model = served_model_business.add(name, description, input_info,
@@ -68,6 +75,7 @@ def first_save_to_db(user_ID, name, description, input_info, output_info,
                                              service_name, **optional)
     user = user_business.get_by_user_ID(user_ID)
     ownership_business.add(user, is_private, served_model=served_model)
+    job_business.update_job_by_id(job_id, served_model=served_model)
     return served_model
 
 
@@ -219,14 +227,26 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
                                 examples, version,
                                 deploy_name, server,
                                 input_type, export_path, job,
+                                job_id,
                                 is_private,
                                 service_name=service_name,
                                 **optional)
 
 
 def remove_by_id(served_model_id):
+    # delete
     served_model = served_model_business.get_by_id(served_model_id)
     kube_service.delete_deployment(served_model.name)
-    kube_service.delete_deployment(served_model.service_name)
+    kube_service.delete_service(served_model.service_name)
     # served_model_business.terminate_by_id(served_model_id)
     served_model_business.remove_by_id(served_model_id)
+
+
+def undeploy_by_id(served_model_id):
+    """
+    :param served_model_id:
+    :return:
+    """
+    served_model = served_model_business.get_by_id(served_model_id)
+    kube_service.delete_deployment(served_model.name)
+    kube_service.delete_service(served_model.service_name)

@@ -623,8 +623,8 @@ def export(name, job_id, user_ID):
     """
     result_dir, h5_filename = get_results_dir_by_job_id(job_id, user_ID)
     # result_sds = staging_data_set_business.get_by_job_id(job_id)
-    model_dir = os.path.join(result_dir, 'model.json')
-    weights_dir = os.path.join(result_dir, h5_filename)
+    model_dir = os.path.join(result_dir+'/', 'model.json')
+    weights_dir = os.path.join(result_dir+'/', h5_filename)
     with open(model_dir, 'r') as f:
         data = json.load(f)
         json_string = json.dumps(data)

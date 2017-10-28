@@ -42,7 +42,7 @@ class Job(DynamicDocument):
     params = DictField()
     file = ReferenceField('File')
     run_args = DictField()
-
     steps = ListField(DictField())
     active_steps = ListField(default=[])
     visual_sds_id = ReferenceField('StagingDataSet')
+    served_model = ReferenceField('ServedModel')

@@ -5,7 +5,6 @@ import {getRound} from '../utils/number';
 import pathToRegexp from 'path-to-regexp';
 
 
-
 export default {
   namespace: 'deployment',
   state: {
@@ -39,7 +38,7 @@ export default {
           for (let eachMetricHis of action.payload.modelsJson[eachModel].metrics_status) {
             for (let metric of Object.keys(metrics)) {
               if (eachMetricHis[metric]) {
-                metrics[metric].push(getRound(eachMetricHis[metric],2))
+                metrics[metric].push(getRound(eachMetricHis[metric], 2))
               }
             }
           }
@@ -79,19 +78,22 @@ export default {
     // 存储 deploy 时 model的 信息
     setModelHowToUse(state, action) {
       let newInfo = {
-        ...state.modelsJson[state.focusModelId],
-        deployName: action.payload.deployName,
-        deployDescription: action.payload.deployDescription,
-        deployInput: action.payload.deployInput,
-        deployOutput: action.payload.deployOutput,
-        deployExamples: action.payload.deployExamples,
+        ...state.modelsJson[state.focusModelId]['served_model'],
+        name: action.payload.deployName,
+        description: action.payload.deployDescription,
+        input_info: action.payload.deployInput,
+        output_info: action.payload.deployOutput,
+        examples: action.payload.deployExamples,
       };
 
       return {
         ...state,
         modelsJson: {
           ...state.modelsJson,
-          [state.focusModelId]: newInfo
+          [state.focusModelId]: {
+            ...state.modelsJson[state.focusModelId],
+            ['served_model']: newInfo
+          }
         }
       }
     },
@@ -143,25 +145,29 @@ export default {
       });
       // array to json
       const modelsJson = arrayToJson(models, '_id');
+      // 查询 部署的状态
+
       yield put({type: 'setModels', payload: {modelsJson: modelsJson}})
     },
 
     // 首次部署模型
-    * firstDeployModel(action, {call, put,select}) {
+    * firstDeployModel(action, {call, put, select}) {
       const focusModelId = yield select(state => state.deployment.focusModelId);
       const user_ID = yield select(state => state.login.user.user_ID);
       let payload = action.payload;
       payload.jobID = focusModelId;
       payload.user_ID = user_ID;
-      const {data: result} = yield call(deploymentService.firstDeployModel, payload)
+      yield call(deploymentService.firstDeployModel, payload)
     },
 
-    // 更改部署模型信息
-    * updateDeployInfo(action, {call, put, select}) {
-      const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson);
-      const section = sectionsJson[action.payload.sectionId];
-
-      const {data: result} = yield call(deploymentService.updateDeployInfo, {section: section})
+    // 更新部署模型的信息
+    * undateDeployModelInfo(action, {call, put, select}) {
+      let payload = action.payload;
+      console.log(payload);
+      const {data: result} = yield call(deploymentService.updateDeployModelInfo, payload);
+      if (result === 'updated') {
+        yield put({type: 'setModelHowToUse', payload: payload});
+      }
     },
 
     // 部署Model

@@ -22,3 +22,14 @@ export async function firstDeployModel(payload) {
       body: JSON.stringify(payload),
     })
 }
+// 更新 deploy model 的信息
+export async function updateDeployModelInfo(payload) {
+  return await request(`${CORS}/served_model/update/${payload.served_model_id}`,
+    {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+}

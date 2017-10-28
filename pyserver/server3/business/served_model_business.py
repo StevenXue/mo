@@ -46,9 +46,11 @@ def add(name, description, input_info, output_info, examples, version,
     return served_model_repo.create(model)
 
 
-def update_info(name, description, input_info, output_info, examples):
-    pass
-
+def update_info(served_model_id, name, description, input_info, output_info, examples):
+    update = {'name': name, 'description': description,
+              'input_info': input_info, 'output_info': output_info,
+              'examples': examples, }
+    served_model_repo.update_one_by_id(served_model_id, update)
 
 
 def remove_by_id(model_id):

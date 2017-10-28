@@ -88,6 +88,8 @@ class Repo:
         # print '2', type(obj_id), obj_id
         modified_obj = self.__instance.objects(id=obj_id).modify(**update)
         # print '3', type(modified_obj)
+        print('SJSJSJ')
+        print(modified_obj.reload())
         return modified_obj.reload()
 
     def update_unique_one(self, query, update):

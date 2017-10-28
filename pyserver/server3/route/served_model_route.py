@@ -20,6 +20,29 @@ PREFIX = '/served_model'
 served_model_app = Blueprint("served_model_app", __name__, url_prefix=PREFIX)
 
 
+@served_model_app.route('/update/<string:served_model_id>', methods=['POST'])
+def update_deploy_info(served_model_id):
+    """
+    deploy trained model
+    :param served_model_id:
+    :return:
+    """
+    data = request.get_json()
+    name = data.pop('deployName')
+    description = data.pop('deployDescription')
+    input_info = data.pop('deployInput')
+    output_info = data.pop('deployOutput')
+    examples = data.pop('deployExamples')
+
+    served_model = served_model_service.update_db(served_model_id, name,
+                                                  description, input_info,
+                                                  output_info,  examples)
+    if not served_model:
+        return jsonify({'response': 'updated'}), 200
+    served_model = json_utility.convert_to_json(served_model.to_mongo())
+    return jsonify({'response': served_model})
+
+
 @served_model_app.route('/deploy/<string:job_id>', methods=['POST'])
 def first_deploy(job_id):
     """
@@ -48,6 +71,7 @@ def first_deploy(job_id):
         return jsonify({'response': 'already deployed'}), 400
     served_model = json_utility.convert_to_json(served_model.to_mongo())
     return jsonify({'response': served_model})
+
 
 
 @served_model_app.route('/<string:oid>', methods=['DELETE'])
@@ -85,7 +109,7 @@ def list_served_models_by_user_ID():
 
 @served_model_app.route('/terminate/<string:oid>', methods=['PUT'])
 def terminate_served_model(oid):
-    if served_model_business.terminate_by_id(oid):
+    if served_model_service.undeploy_by_id(oid):
         return jsonify({'response': 'terminated'})
     else:
         return jsonify({'response': 'terminate failed'}), 400
