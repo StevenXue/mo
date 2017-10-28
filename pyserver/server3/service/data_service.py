@@ -10,6 +10,7 @@ from server3.business import user_business
 # from server3.service import file_service
 from server3.service import ownership_service
 from server3.utility import json_utility
+from server3.utility import data_utility
 from server3 import constants
 
 
@@ -181,3 +182,33 @@ def update_data(update):
 def remove_data_set_by_id(data_set_id):
     data_business.remove_data_by_data_set_id(data_set_id)
     return data_set_business.remove_by_id(data_set_id)
+
+
+def convert_fields_type(ds_id, f_t_arrays):
+    """
+    convert field types of data set
+    :param ds_id: ObjectId
+    :param f_t_arrays: array: [['name', 'str'],['age', 'int'], ['salary',
+    'float']]
+    :return: new staging_data_set object
+    """
+
+    ds = data_set_business.get_by_id(ds_id)
+
+    data_objects = data_business.get_by_data_set(ds['id'])
+    # convert mongoengine objects to dicts
+    data_objects = json_utility.me_obj_list_to_dict_list(data_objects)
+    # convert types of values in dicts
+    result = data_utility.convert_data_array_by_fields(data_objects,
+                                                       f_t_arrays)
+    data_objects = result['result']
+
+    # update all rows
+    for data_obj in data_objects:
+        data_business.update_by_id(data_obj['_id'], data_obj)
+
+    if 'failure_count' in result:
+        failure_count = result['failure_count']
+        return {'result': ds, 'failure_count': failure_count}
+    return {'result': ds}
+

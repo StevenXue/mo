@@ -1,6 +1,5 @@
-import { uploadFile, fetchDataSets, fetchDataSet } from '../services/upload'
-import { parse } from 'qs'
-import lodash from 'lodash'
+import { uploadFile, fetchDataSets, fetchDataSet, deleteDataColumns, changeTypes, stateData } from '../services/upload'
+
 import { message } from 'antd'
 import pathToRegexp from 'path-to-regexp';
 import {routerRedux} from 'dva/router';
@@ -15,7 +14,10 @@ export default {
       owned_ds: [],
     },
     dataSet: [],
+    fields: {},
     dataSetID: '',
+    selected: [],
+    deleted: [],
 
   },
 
@@ -23,13 +25,9 @@ export default {
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
         const match = pathToRegexp('/projects/:projectId/import/select').exec(pathname);
-
-
         if (match) {
           dispatch({ type: 'fetch' })
         }
-
-
       })
     },
 
@@ -42,7 +40,7 @@ export default {
 
       let user_ID = 'dev_1'
       const data = yield call(fetchDataSets, user_ID)
-      console.log(data)
+      // console.log(data)
       yield put({ type: 'setDataSets', payload: data.data })
 
     },
@@ -51,8 +49,9 @@ export default {
       const dataSetID = yield select(state => state.upload.dataSetID)
 
       const data = yield call(fetchDataSet, dataSetID)
-      console.log(data)
-      yield put({ type: 'setDataSet', payload: data.data})
+      // console.log(data)
+      yield put({ type: 'setDataSet', payload: data.response})
+      yield put({ type: 'setFields', payload: data.fields})
       yield put(routerRedux.push('preview'))
     },
 
@@ -90,9 +89,62 @@ export default {
       yield put({ type: 'setDataSetID', payload: data.data.data_set })
       console.log(data.data.data_set)
       yield put( {type: 'show'})
+    },
+
+    * delCol ({ payload }, { put, call, select }) {
+      console.log('del', payload)
+      // console.log(payload)
+      const dataSetID = yield select(state => state.upload.dataSetID)
+      const res = yield call(deleteDataColumns, dataSetID, payload)
+      console.log(res)
+
+      // const dels = dels.concat(payload)
+
+      yield put({type: 'addDeleted', payload: payload})
+      // console.log(dels)
+
+      yield put({type: 'setSelected', payload: []})
 
 
     },
+
+    * submit (action, { put, call, select }) {
+      const flds = yield select(state => state.upload.fields)
+      const dels = yield select(state => state.upload.deleted)
+      const dataSetID = yield select(state => state.upload.dataSetID)
+      const fld_lst = []
+      const ignored = ['data_set', '_id', 'staging_dataset_id'].concat(dels)
+      for (let key of Object.keys(flds)) {
+        if (!ignored.includes(key)) {
+
+          if (flds[key] === 'string') {
+            fld_lst.push([key, 'str'])
+          }
+          else if (flds[key] === 'integer') {
+            fld_lst.push([key, 'int'])
+          }
+          else {
+            fld_lst.push([key, 'float'])
+          }
+
+        }
+      }
+      // const res = yield call(changeTypes, dataSetID, fld_lst)
+
+      yield put({type: 'stage'})
+    },
+
+    * stage (action, { put, call, select }) {
+      // const test = yield select(state => state)
+      // console.log(test)
+      const prjID = yield select(state => state.projectDetail.project._id)
+      const prjname = yield select(state => state.projectDetail.project.name)
+      const prjdes = yield select(state => state.projectDetail.project.description)
+      const dataSetID = yield select(state => state.upload.dataSetID)
+      const res = yield call(stateData, dataSetID, prjID, prjname, prjdes)
+      console.log(res)
+    }
+
 
   },
 
@@ -115,10 +167,43 @@ export default {
       }
     },
 
+    setFields(state, { payload: flds }) {
+      for (let key of Object.keys(flds)) {
+        flds[key] = flds[key][0]
+      }
+      return {
+        ...state,
+        fields: flds
+      }
+    },
+
+    setField(state, { payload: value }) {
+      const fields = {...state.fields, ...value}
+      return {
+        ...state,
+        fields,
+      }
+    },
+
     setDataSetID(state, { payload: dataSetID }) {
       return {
         ...state,
         dataSetID,
+      }
+    },
+
+
+    setSelected(state, { payload: selected }) {
+      return {
+        ...state,
+        selected,
+      }
+    },
+
+    addDeleted(state, { payload: dels }) {
+      return {
+        ...state,
+        deleted: state.deleted.concat(dels),
       }
     }
 

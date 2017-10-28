@@ -1,6 +1,6 @@
-import { request, config } from '../utils';
+import { request, config, org_request } from '../utils';
 const { api, CORS } = config;
-const { files, dataSets } = api;
+const { files, dataSets, getStagingData } = api;
 
 export async function uploadFile (body) {
   return request(CORS + files, {
@@ -23,17 +23,53 @@ export async function fetchDataSets (user_ID) {
     method: 'get',
   })
 }
-//
-// export async function importData (data) {
-//   return request({
-//     url: CORS + dataSets,
-//     method: 'post',
-//     data,
-//   })
-// }
+
 export async function fetchDataSet(dataSet_ID) {
   let query = `/${dataSet_ID}?limit=5`;
-  return request(CORS + dataSets +query, {
+  return org_request(CORS + dataSets +query, {
     method: 'get',
+  })
+}
+
+// delete data columns
+export function deleteDataColumns(id, cols) {
+  let query = `/fields/${id}`;
+  return request(CORS + dataSets + query, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({'fields': cols})
+  })
+}
+
+// change field types
+export function changeTypes(id, arrays) {
+  let query = '/types'
+  return request(CORS + dataSets + query, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      'data_set_id': id,
+      'f_t_arrays': arrays,
+    })
+  })
+}
+
+// state data
+export function stateData(dsid, prjid, name, desc) {
+  return request(CORS + getStagingData, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      'data_set_id': dsid,
+      'project_id': prjid,
+      'staging_data_set_name': name,
+      'staging_data_set_description': desc
+    })
   })
 }
