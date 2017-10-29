@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'dva';
 import styles from './index.less';
-import {Tabs, Switch, Button, Input, Icon, notification, Modal} from 'antd';
+import {Tabs, Switch, Button, Input, Icon, Spin, Modal} from 'antd';
 import {arrayToJson, JsonToArray} from '../../utils/JsonUtils';
 import LearningCurve from '../../components/Charts/curve';
 import HeatmapOnCartesianChart from '../../components/Charts/heatmapOnCartesianChart';
@@ -13,52 +13,32 @@ const TabPane = Tabs.TabPane;
 const confirm = Modal.confirm;
 const fakeField = ['A', 'B', 'AC', 'ABBB', 'ACCCCC']
 
-const openNotificationWithIcon = (type) => {
-  if (type === 'edit') {
-    notification['success']({
-      message: 'Model Info successfully edited',
-      // description: 'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
-    });
-  }
-  else if (type === 'deploy') {
-    notification['success']({
-      message: 'Model successfully deployed',
-      // description: 'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
-    });
-  }
-  else {
-    notification['success']({
-      message: 'Model successfully undeployed',
-      // description: 'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
-    });
-  }
-};
-
-
 function UseThisAPIPage({deployment, dispatch}) {
   const {
     modelsJson,
     focusModelId,
+    loadingState,
   } = deployment;
 
   const deployModel = () => {
     dispatch({
-      type: 'deployment/deployModel',
+      type: 'deployment/resumeModel',
+      payload: {served_model_id: get(modelsJson, `[${focusModelId}].served_model._id`)},
     });
   };
   const undeployModel = () => {
     dispatch({
       type: 'deployment/undeployModel',
+      payload: {served_model_id: get(modelsJson, `[${focusModelId}].served_model._id`)},
     });
   };
-  const onClickModel = () => {
+  const onClickModel = (mode) => {
     //  跳转到该model详细页面
-    if (modelsJson[focusModelId]['deployState'] === 0) {
-      deployModel();
-      openNotificationWithIcon('deploy');
+    if (mode === 'undeploy') {
+      showUndeployConfirm();
     }
     else {
-      showUndeployConfirm();
+      deployModel();
     }
   };
 
@@ -78,7 +58,6 @@ function UseThisAPIPage({deployment, dispatch}) {
       cancelText: 'No',
       onOk() {
         undeployModel();
-        openNotificationWithIcon('undeploy')
       },
       onCancel() {
         console.log('Cancel');
@@ -89,8 +68,18 @@ function UseThisAPIPage({deployment, dispatch}) {
   if (focusModelId === null) {
     return (<div/>)
   }
-  else if (modelsJson[focusModelId]['served_model'] !== null) {
-    return (<div>
+  else if (modelsJson[focusModelId]['served_model'] === null) {
+    return (<div><h1>What is Deployment</h1>
+      <p>Deployment module will host the model you trained and provide
+        remote access to it. After deployment, you can make predictions
+        for new data samples through provided gRPC/HTTP service.</p>
+      <Button type="primary"
+              onClick={() => onClickModifyModal(true)}>Deploy</Button>
+      <DeployModal dispatch={dispatch} deployment={deployment}
+                   visible={deployment.modalState} firstDeploy={true}/></div>)
+  }
+  else if (modelsJson[focusModelId]['served_model']['status'] === 'serving') {
+    return (<div><Spin spinning={loadingState}>
       <DeployModal dispatch={dispatch} deployment={deployment}
                    visible={deployment.modalState} firstDeploy={false}/>
       <h1>Overview</h1><Icon type="edit"
@@ -106,7 +95,7 @@ function UseThisAPIPage({deployment, dispatch}) {
       <pre>{modelsJson[focusModelId]['served_model']['output_info']}</pre>
       <h2>Examples</h2>
       <pre>{modelsJson[focusModelId]['served_model']['examples']}</pre>
-      <Button type="primary" onClick={() => onClickModel()}>
+      <Button type="primary" onClick={() => onClickModel('undeploy')}>
         Stop Service</Button> {/*<LineChart/>*/}
       <h1>1.TYPE YOUR INPUT</h1>
       <TextArea className={styles.inputtext} rows={4}
@@ -116,10 +105,12 @@ function UseThisAPIPage({deployment, dispatch}) {
       <TextArea rows={4} placeholder="SEE THE RESULT"/>
       <h1>3.USE THIS ALGORITHM</h1>
       <TextArea rows={4} placeholder="USE THIS ALGORITHM"/>
+    </Spin>
     </div> )
   }
-  else if (modelsJson[focusModelId]['deployState'] === 0 && modelsJson[focusModelId]['deployDescription']) {
+  else {
     return (<div>
+      <Spin spinning={loadingState}>
       <DeployModal dispatch={dispatch} deployment={deployment}
                    visible={deployment.modalState} firstDeploy={false}/>
       <h1>Overview</h1><Icon type="edit"
@@ -135,19 +126,10 @@ function UseThisAPIPage({deployment, dispatch}) {
       <pre>{modelsJson[focusModelId]['served_model']['output_info']}</pre>
       <h2>Examples</h2>
       <pre>{modelsJson[focusModelId]['served_model']['examples']}</pre>
-      <Button type="primary" onClick={() => onClickModel()}>
+      <Button type="primary" onClick={() => onClickModel('resume')}>
         Start Service</Button>
+    </Spin>
     </div> )
-  }
-  else {
-    return (<div><h1>What is Deployment</h1>
-      <p>Deployment module will host the model you trained and provide
-        remote access to it. After deployment, you can make predictions
-        for new data samples through provided gRPC/HTTP service.</p>
-      <Button type="primary"
-              onClick={() => onClickModifyModal(true)}>Deploy</Button>
-      <DeployModal dispatch={dispatch} deployment={deployment}
-                   visible={deployment.modalState} firstDeploy={true}/></div>)
   }
 }
 
@@ -158,7 +140,6 @@ function Deployment({deployment, dispatch}) {
     focusModelId,
   } = deployment;
   const models = JsonToArray(modelsJson);
-  const stateList = ['', 'serving'];
 
   const setFocusModel = (modelId) => {
     dispatch({
@@ -179,6 +160,8 @@ function Deployment({deployment, dispatch}) {
             <div>Models</div>
             <div>State</div>
           </div>
+          <div>
+          </div>
           {
             models.map((model, i) => {
               let backgroundColor;
@@ -191,7 +174,7 @@ function Deployment({deployment, dispatch}) {
                 opacity = i % 2 ? 0.7 : 1;
                 color = 'black';
               }
-              let state = stateList[model.deployState];
+              let state = get(model, 'served_model.status');
               return (
                 <div key={model._id + model.model.name}
                      onClick={() => onClickModel(model._id)}

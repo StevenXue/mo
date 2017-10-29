@@ -2,7 +2,7 @@ import React from 'react'
 import styles from './index.less'
 import {connect} from 'dva'
 
-import {Select, Collapse, Button, Input} from 'antd';
+import {Select, Collapse, Button, Input, Popover, Icon, Tooltip} from 'antd';
 import ToolBar from '../ToolBar/index';
 import {format} from '../../../utils/base';
 
@@ -11,6 +11,7 @@ import {format} from '../../../utils/base';
 const Option = Select.Option;
 const Panel = Collapse.Panel;
 
+import {translateDict} from '../../../constants'
 // const JsonToArray = (json, key) => {
 //   let arr = []
 //   for (let prop in json) {
@@ -31,6 +32,12 @@ function getArgs(baseSteps, stepIndex, argIndex) {
 
 }
 
+const content = (content) => (
+  <div>
+    <p>{content}</p>
+  </div>
+);
+
 
 function WorkBench({section, model, dispatch, namespace}) {
   //state
@@ -48,20 +55,25 @@ function WorkBench({section, model, dispatch, namespace}) {
     console.log('focus')
   }
 
+  // const translateDict = {
+  //   'dataAnalysis': 'toolkit',
+  //   'modelling': 'model',
+  // };
+
   const {
     _id: sectionId,
     steps,
     active_steps,
-    toolkit: {
+    [translateDict[namespace]]: {
       steps: baseSteps
     }
-  } = section
+  } = section;
 
   //functions 下拉框选择
   function handleChange(value, index, argIndex) {
     // section.steps[index].args[argIndex].values = [value]; 备选方案以后再加相应的reducer
 
-    sectionsJson[section._id].steps[index].args[argIndex].values = [value]
+    sectionsJson[section._id].steps[index].args[argIndex].value = value;
 
     dispatch({
       type: namespace + '/setSections',
@@ -85,7 +97,7 @@ function WorkBench({section, model, dispatch, namespace}) {
     dispatch({
       type: namespace + '/setActiveKey',
       payload: {
-        activeKey: [String(stepIndex), String(stepIndex + 1)],
+        activeKey: [String(stepIndex + 1)],
         sectionId: section._id,
       },
     })
@@ -171,7 +183,7 @@ function WorkBench({section, model, dispatch, namespace}) {
                               onChange={(value) => handleChange(value, stepIndex, argIndex)}
                               onFocus={handleFocus}
                               onBlur={handleBlur}
-                              defaultValue={arg.values[0]}
+                              defaultValue={arg.value}
                               filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
                             >
                               {stagingDataList.map((stagingData) =>
@@ -180,7 +192,7 @@ function WorkBench({section, model, dispatch, namespace}) {
                             </Select>
 
                             <Button type="primary"
-                                    onClick={() => handleNext(arg.values[0], stepIndex, argIndex)}
+                                    onClick={() => handleNext(arg.value, stepIndex, argIndex)}
                                     className={styles.button}>
                               next
                             </Button>
@@ -218,7 +230,7 @@ function WorkBench({section, model, dispatch, namespace}) {
                           dispatch({
                             type: namespace + '/setActiveKey',
                             payload: {
-                              activeKey: [String(stepIndex), String(stepIndex + 1)],
+                              activeKey: [String(stepIndex + 1)],
                               sectionId: section._id,
                             },
                           })}>next</Button>
@@ -275,12 +287,25 @@ function WorkBench({section, model, dispatch, namespace}) {
                         {
                           step.args.map((arg, argIndex) =>
                             <div className={styles.pair} key={arg.name + argIndex}>
-                            <span>
-                              {getArgs(baseSteps, stepIndex, argIndex).display_name}
-                            </span>
+                              <span>
+                                {getArgs(baseSteps, stepIndex, argIndex).display_name}
+                              </span>
                               <div className={styles.row}>
                                 <Input placeholder="" defaultValue={arg.value}
                                        onChange={(e) => handleOnChangeArgs(e.target.value, stepIndex, argIndex)}/>
+
+
+                                <div className={styles.help}>
+                                  <Tooltip title={getArgs(baseSteps, stepIndex, argIndex).des}>
+                                    <Icon type="question-circle-o"/>
+                                  </Tooltip>
+
+                                  {/*<Popover content={content(getArgs(baseSteps, stepIndex, argIndex).des)}*/}
+                                           {/*title="Help info">*/}
+                                    {/*<Icon type="question-circle-o"/>*/}
+                                  {/*</Popover>*/}
+                                </div>
+
                               </div>
                             </div>,
                           )

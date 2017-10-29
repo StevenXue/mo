@@ -120,7 +120,7 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
         model_type = job.model.category
         if model_type == ModelType['neural_network'] \
                 or model_type == ModelType['unstructured']:
-            export_path, version = model_service.export(name, job_id, user_ID)
+            export_path, version = model_service.export(job_id, user_ID)
         else:
             result_sds = staging_data_set_business.get_by_job_id(job_id)
             saved_model_path_array = result_sds.saved_model_path.split('/')
@@ -248,5 +248,119 @@ def undeploy_by_id(served_model_id):
     :return:
     """
     served_model = served_model_business.get_by_id(served_model_id)
-    kube_service.delete_deployment(served_model.name)
+    kube_service.delete_deployment(served_model.deploy_name)
     kube_service.delete_service(served_model.service_name)
+    return True
+
+
+def resume_by_id(served_model_id, user_ID):
+
+    """
+
+    :param served_model_id:
+    :param user_ID:
+    :return:
+    """
+    served_model = served_model_business.get_by_id(served_model_id)
+    job_id = served_model.jobID
+    name = served_model.name
+    job = job_business.get_by_job_id(job_id)
+
+    # if not deployed do the deployment
+    try:
+        served_model_business.get_by_job(job)
+
+        model_type = job.model.category
+        if model_type == ModelType['neural_network'] \
+                or model_type == ModelType['unstructured']:
+            export_path, version = model_service.export(job_id, user_ID)
+        else:
+            result_sds = staging_data_set_business.get_by_job_id(job_id)
+            saved_model_path_array = result_sds.saved_model_path.split('/')
+            version = saved_model_path_array.pop()
+            export_path = '/'.join(saved_model_path_array)
+
+        cwd = os.getcwd()
+        deploy_name = job_id + '-serving'
+        service_name = "my-" + job_id + "-service"
+        port = port_for.select_random(ports=set(range(30000, 32767)))
+        export_path = export_path.replace('./user_directory',
+                                          '/home/root/work/user_directory')
+        kube_json = {
+            "apiVersion": "apps/v1beta1",
+            "kind": "Deployment",
+            "metadata": {
+                "name": deploy_name
+            },
+            "spec": {
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "app": job_id
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": job_id,
+                                "image": "10.52.14.192/gzyw/serving_app",
+                                "imagePullPolicy": "IfNotPresent",
+                                "ports": [{
+                                    "containerPort": 9000,
+                                }],
+                                "stdin": True,
+                                "command": ['tensorflow_model_server'],
+                                "args": ['--enable_batching',
+                                         '--port={port}'.format(
+                                             port=SERVING_PORT),
+                                         '--model_name={name}'.format(
+                                             name=name),
+                                         '--model_base_path={export_path}'.format(
+                                             export_path=export_path)],
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/home/root/work/user_directory",
+                                        "name": "nfsvol"
+                                    },
+                                ]
+                            }
+                        ],
+                        "volumes": [
+                            {
+                                "name": "nfsvol",
+                                "persistentVolumeClaim": {
+                                    "claimName": "nfs-pvc"
+                                }
+                            },
+                        ]
+                    },
+                },
+            }
+        }
+        service_json = {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": service_name
+            },
+            "spec": {
+                "type": "NodePort",
+                "ports": [
+                    {
+                        "port": 9000,
+                        "nodePort": port
+                    }
+                ],
+                "selector": {
+                    "app": job_id
+                }
+            }
+        }
+        api = kube_service.deployment_api
+        s_api = kube_service.service_api
+        resp = api.create_namespaced_deployment(body=kube_json,
+                                                namespace=NAMESPACE)
+        s_api.create_namespaced_service(body=service_json, namespace=NAMESPACE)
+        return True
+    except DoesNotExist:
+        return False

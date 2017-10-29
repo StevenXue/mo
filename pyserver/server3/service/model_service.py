@@ -72,7 +72,7 @@ def get_all_public_model_by_type():
     return [{'name': TYPE[key],
              'zh_name': ZH_MAP[TYPE[key]],
              'children': [model_obj for model_obj in models_list
-                          if model_obj['type'] == key]
+                          if model_obj['model_type'] == key]
              } for key in TYPE.keys()]
 
 
@@ -615,10 +615,9 @@ def encode_h5_for_keras_js(weights_hdf5_filepath):
     encoder.save()
 
 
-def export(name, job_id, user_ID):
+def export(job_id, user_ID):
     """
     export model for tf serving
-    :param name: str
     :param job_id: str/ObjectId
     :return:
     """

@@ -47,7 +47,13 @@ module.exports = {
     'Business', 'Government', 'Education', 'Environment',
     'Health', 'Housing & Development', 'Public', 'Services',
     'Social', 'Transportation', 'Science', 'Technology'
-  ]
+  ],
+
+
+  translateDict: {
+    'dataAnalysis': 'toolkit',
+    'modelling': 'model',
+  }
 
 };
 

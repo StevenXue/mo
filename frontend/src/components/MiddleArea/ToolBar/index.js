@@ -4,6 +4,8 @@ import {Icon, Button} from 'antd';
 import styles from './ToolBar.less';
 const ButtonGroup = Button.Group;
 import ResultButton from './ResultButton';
+import {translateDict} from '../../../constants'
+
 function ToolBar({model, dispatch, namespace, sectionId}) {
   const {
     sectionsJson
@@ -11,7 +13,7 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
 
   const {
     visual_sds_id,
-    toolkit: {
+    [translateDict[namespace]]: {
       name
     }
   } = sectionsJson[sectionId];

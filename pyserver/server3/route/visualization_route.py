@@ -51,7 +51,7 @@ def usr2_visualization():
     job_obj = sds_data.job
     visual_type = job_obj.toolkit.category
 
-    staging_data_set_id = job_obj.steps[0]["args"][0]["values"][0]
+    staging_data_set_id = job_obj.steps[0]["args"][0]["value"]
 
     result = visualization_service.usr_story2_exploration(data, visual_type, staging_data_set_id)
     return jsonify({'response': json_utility.convert_to_json(result)}), 200
