@@ -102,13 +102,13 @@ def run_job():
     # job_obj = json_utility.convert_to_json(job_obj.to_mongo())
     # print("job_obj.steps[2]", job_obj.steps[2])
 
-    args = job_obj.steps[2]["args"]
+    args = job_obj.steps[2].get("args")
     new_args = {}
     for arg in args:
         new_args[arg['name']] = int(arg['value'])
 
     obj = {
-        "staging_data_set_id": job_obj.steps[0]["args"][0]["values"][0],
+        "staging_data_set_id": job_obj.steps[0]["args"][0]["value"],
         "conf": {
             "args": new_args,
             "data_fields":

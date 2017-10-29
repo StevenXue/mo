@@ -156,7 +156,7 @@ class SPEC(object):
 
             "default": None,
             "required": False,
-            'values': [],
+            'value': None,
         },
 
         "multiple_input": {
@@ -184,7 +184,7 @@ class SPEC(object):
 
             "default": None,
             "required": False,
-            'values': [],
+            'value': None,
         },
 
         "multiple_choice": {

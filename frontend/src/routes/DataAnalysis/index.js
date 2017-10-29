@@ -2,6 +2,7 @@ import React from 'react';
 import {connect} from 'dva';
 import styles from './index.less';
 
+
 import SideBar from '../../components/SideBar';
 import MiddleArea from '../../components/MiddleArea';
 import RightArea from '../../components/RightArea';

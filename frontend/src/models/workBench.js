@@ -363,6 +363,11 @@ export default {
     * runSection(action, {call, put, select}) {
       const {namespace, sectionId} = action.payload;
       // 先把 save section 复制过来
+      const sectionsJson = yield select(state => state[namespace].sectionsJson);
+      const section = sectionsJson[sectionId];
+      yield call(dataAnalysisService.saveSection, {section: section});
+
+
       const projectId = yield select(state => state[namespace].projectId);
 
       const {data: {result}} = yield call(dataAnalysisService.runJob, {

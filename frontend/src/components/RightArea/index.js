@@ -8,6 +8,8 @@ import {Tabs} from 'antd';
 const TabPane = Tabs.TabPane;
 
 import Preview from './Preview';
+import History from './History';
+
 // todo 自己写tab 以实现样式自定义
 const tabs = [
   {
@@ -31,9 +33,7 @@ class RightArea extends Component {
       case 0:
         return <Preview {...this.props}/>;
       case 1:
-        return <div>
-          History
-        </div>
+        return <History {...this.props}/>;
     }
 
   }

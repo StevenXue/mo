@@ -24,6 +24,7 @@ from server3.repository.toolkit_repo import ToolkitRepo
 from server3.business import user_business, ownership_business
 
 from server3.constants import SPEC
+
 toolkit_repo = ToolkitRepo(Toolkit)
 
 
@@ -1760,7 +1761,64 @@ def remove_one_public_toolkit():
     # 已舍去
     # ownership_business.remove_ownership_by_user_and_owned_item(user, toolkit, 'toolkit')
 
+
 # input = SPEC.ui_spec['input']
+
+
+class StepTemplate(object):
+    data_source = {
+        'name': 'data_source',
+        'display_name': 'select data source',
+        'args': [
+            {
+                **SPEC.ui_spec['choice'],
+                "name": "input",
+                "des": "",
+            }
+        ],
+    }
+
+    fields = {
+        'name': 'fields',
+        'display_name': 'select fields',
+        'args': [
+            {
+                **SPEC.ui_spec['multiple_choice'],
+                'name': 'fields',
+                'des': '',
+            }
+        ],
+    }
+
+    parameters = {
+        'name': 'parameters',
+        'display_name': 'input parameters',
+        'args': [
+            {
+                **SPEC.ui_spec['input'],
+                'name': 'k',
+                'display_name': 'k',
+                'value_type': 'int',
+                'range': [2, None],
+                'des': 'the number of clustering numbers',
+            }
+        ]
+    }
+
+    custom = {
+        'name': 'custom',
+        'display_name': 'custom step',
+        'args': [
+            {
+                **SPEC.ui_spec['input'],
+                'name': 'k',
+                'display_name': 'k',
+                'value_type': 'int',
+                'range': [2, None],
+                'des': 'the number of clustering numbers',
+            }
+        ]
+    }
 
 
 def update_toolkit():
@@ -1833,7 +1891,7 @@ def update_toolkit():
                     steps=[
                         {
                             'name': 'data_source',
-                            'display_name': 'select parameters',
+                            'display_name': 'select data source',
                             'args': [
                                 {
                                     **SPEC.ui_spec['choice'],
@@ -1881,7 +1939,6 @@ def update_toolkit():
                                     'value_type': 'int',
                                     'range': [2, None],
                                     'des': 'the number of clustering numbers',
-
 
                                     # 'name': 'k',
                                     # 'display_name': 'k',
@@ -1953,7 +2010,7 @@ def update_toolkit():
                   steps=[
                       {
                           'name': 'data_source',
-                          'display_name': 'select parameters',
+                          'display_name': 'select data source',
                           'args': [
                               {
                                   **SPEC.ui_spec['choice'],
@@ -2063,26 +2120,12 @@ def update_toolkit():
                            steps=[
                                {
                                    'name': 'data_source',
-                                   'display_name': 'select parameters',
+                                   'display_name': 'select data source',
                                    'args': [
                                        {
-
+                                           **SPEC.ui_spec['choice'],
                                            "name": "input",
                                            "des": "",
-
-                                           "type": "select_box",
-                                           "default": None,
-                                           "required": True,
-
-                                           # length of values
-                                           "len_range": [
-                                               1,
-                                               1
-                                           ],
-                                           # range of one value
-                                           'value_range': None,
-                                           'value_type': None,
-                                           'values': []
                                        }
                                    ],
                                },
@@ -2091,11 +2134,9 @@ def update_toolkit():
                                    'display_name': 'select fields',
                                    'args': [
                                        {
+                                           **SPEC.ui_spec['multiple_choice'],
                                            'name': 'fields',
                                            'des': '',
-                                           'type': 'multiple_choice',
-                                           'value_type': None,
-                                           'values': []
                                        }
                                    ],
                                },
@@ -2104,27 +2145,146 @@ def update_toolkit():
                                    'display_name': 'input parameters',
                                    'args': [
                                        {
+                                           **SPEC.ui_spec['input'],
                                            'name': 'k',
                                            'display_name': 'k',
-                                           'type': 'input',
-                                           'value': 2,
                                            'value_type': 'int',
+                                           'range': [2, None],
+                                           'des': 'the number of clustering numbers',
+                                           'value': 2,
                                            'default': 2,
                                            'required': True,
-                                           'des': 'the number of clustering numbers',
-                                           # length of values
-                                           "len_range": [
-                                               1,
-                                               1
-                                           ],
-                                           # range of one value
-                                           'value_range': [2, None],
-
                                        }
                                    ]
                                }
                            ]
                            )
+
+    # Result_orm 重新设计
+    PEARSON = Toolkit(name='皮尔森相关系数',
+                      description='计算所选数据集合的皮尔森相关系数, 表达两变量之间(线性)相关系数',
+                      category=4,
+                      entry_function='toolkit_pearson',
+                      target_py_code=inspect.getsource(toolkit_orig.toolkit_pearson),
+                      parameter_spec={
+                          "data": {
+                              'name': 'input',
+                              'type': {
+                                  'key': 'select_box',
+                                  'des': 'nD tensor with shape: (batch_size, ..., '
+                                         'input_dim). The most common situation would be a '
+                                         '2D input with shape (batch_size, input_dim).',
+                                  'range': None
+                              },
+                              'default': None,
+                              'required': True,
+                              'len_range': [2, 2],
+                              'data_type': ['int', 'float']
+                          }
+                      },
+                      result_spec={
+                          "if_reserved": False,
+                          "args": [
+                              {
+                                  "name": "pearson",
+                                  "des": "所选范围的样本的皮尔森相关系数",
+                                  "if_add_column": False,
+                                  "attribute": "value"
+                              }
+                          ]
+                      },
+                      steps=[
+                          {
+                              **StepTemplate.data_source
+                          },
+                          {
+                              **StepTemplate.fields
+                          }
+                      ]
+                      )
+
+    variance_threshold = Toolkit(name='方差选择法',
+                                 description='选取合适的特征，方差选择法',
+                                 category=1,
+                                 entry_function='variance_threshold',
+                                 target_py_code=inspect.getsource(
+                                     preprocess_orig.variance_threshold),
+                                 parameter_spec={
+                                     "data": {
+                                         'name': 'input',
+                                         'type': {
+                                             'key': 'select_box',
+                                             'des': 'nD tensor with shape: (batch_size, ..., '
+                                                    'input_dim). The most common situation would be a '
+                                                    '2D input with shape (batch_size, input_dim).',
+                                             'range': None
+                                         },
+                                         'default': None,
+                                         'required': True,
+                                         'len_range': [1, None],
+                                         'data_type': ['int', 'float']
+                                     },
+                                     "args": [
+                                         {
+                                             'name': 'threshold',
+                                             'type': {
+                                                 'key': 'float',
+                                                 'des': 'the threshold to judge if positive of negative',
+                                                 'range': [0, None]
+                                             },
+                                             'default': 1,
+                                             'required': True
+                                         }
+                                     ]
+                                 },
+                                 result_spec={
+                                     "if_reserved": True,
+                                     "args": [
+                                         {
+                                             "name": "scores",
+                                             "des": "每类特征得到的评分估算",
+                                             "if_add_column": False,
+                                             "attribute": "value",
+                                             "usage": ["bar"]
+                                         },
+                                         {
+                                             "name": "index",
+                                             "des": "每类特征是否取用的标签",
+                                             "if_add_column": False,
+                                             "attribute": "label",
+                                             "usage": ["bar", "table"]
+                                         },
+                                         {
+                                             "name": "result",
+                                             "des": "筛选出的所有特征值",
+                                             "if_add_column": False,
+                                             "attribute": "",
+                                         }
+                                     ]
+                                 },
+                                 steps=[
+                                     {
+                                         **StepTemplate.data_source
+                                     },
+                                     {
+                                         **StepTemplate.fields
+                                     },
+                                     {
+                                         **StepTemplate.parameters,
+                                         'args': [
+                                             {
+                                                 **SPEC.ui_spec['input'],
+                                                 'name': 'threshold',
+                                                 'display_name': 'threshold',
+                                                 'value_type': 'float',
+                                                 'des': 'Tian yi is coming, the threshold to judge if positive of negative',
+                                                 'default': 1,
+                                                 'required': True,
+                                             }
+                                         ]
+                                     }
+                                 ]
+                                 )
 
     TOOLKIT_DICT = [
         {
@@ -2138,6 +2298,14 @@ def update_toolkit():
         {
             '_id': ObjectId("59f297cad845c05376f599c6"),
             "object": SIMPLE_KMEAN
+        },
+        {
+            '_id': ObjectId("5980149d8be34d34da32c16e"),
+            "object": PEARSON
+        },
+        {
+            '_id': ObjectId("5980149d8be34d34da32c192"),
+            "object": variance_threshold
         }
     ]
     user = user_business.get_by_user_ID('system')
@@ -2157,94 +2325,6 @@ def update_toolkit():
                     toolkit_obj[attribute] = toolkit['object'][attribute]
             toolkit_obj.save()
 
-
-steps_config = [
-    {
-        'name': 'data_source',
-        'display_name': 'select parameters',
-        'args': [
-            {
-                "name": "input",
-                "des": "",
-
-                "type": "select_box",
-                "default": None,
-                "required": True,
-
-                # length of values
-                "len_range": [
-                    1,
-                    1
-                ],
-                # range of one value
-                'value_range': None,
-                'value_type': None,
-                'values': []
-            }
-        ],
-    },
-    {
-        'name': 'fields',
-        'display_name': 'select fields',
-        'args': [
-            {
-                'name': 'fields',
-                'des': '',
-                'type': 'multiple_choice',
-                'value_type': None,
-                'values': []
-            }
-        ],
-    },
-    {
-        'name': 'parameters',
-        'display_name': 'input parameters',
-        'args': [
-            {
-                'name': 'k',
-                'display_name': 'k',
-                'type': 'input',
-                'value': 2,
-                'value_type': 'int',
-                'default': 2,
-                'required': True,
-                'des': 'the number of clustering numbers',
-                # length of values
-                "len_range": [
-                    1,
-                    1
-                ],
-                # range of one value
-                'value_range': [2, None],
-
-            }
-        ]
-    },
-    {
-        'name': 'custom',
-        'display_name': 'input parameters',
-        'args': [
-            {
-                'name': 'k',
-                'display_name': 'k',
-                'type': 'input',
-                'value': 2,
-                'value_type': 'int',
-                'default': 2,
-                'required': True,
-                'des': 'the number of clustering numbers',
-                # length of values
-                "len_range": [
-                    1,
-                    1
-                ],
-                # range of one value
-                'value_range': [2, None],
-
-            }
-        ]
-    }
-]
 
 
 # def create_one_public_toolkit:
