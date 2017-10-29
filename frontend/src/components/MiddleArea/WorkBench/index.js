@@ -11,6 +11,7 @@ import {format} from '../../../utils/base';
 const Option = Select.Option;
 const Panel = Collapse.Panel;
 
+import {translateDict} from '../../../constants'
 // const JsonToArray = (json, key) => {
 //   let arr = []
 //   for (let prop in json) {
@@ -54,14 +55,19 @@ function WorkBench({section, model, dispatch, namespace}) {
     console.log('focus')
   }
 
+  // const translateDict = {
+  //   'dataAnalysis': 'toolkit',
+  //   'modelling': 'model',
+  // };
+
   const {
     _id: sectionId,
     steps,
     active_steps,
-    toolkit: {
+    [translateDict[namespace]]: {
       steps: baseSteps
     }
-  } = section
+  } = section;
 
   //functions 下拉框选择
   function handleChange(value, index, argIndex) {
