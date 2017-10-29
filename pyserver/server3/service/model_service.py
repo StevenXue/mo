@@ -615,10 +615,9 @@ def encode_h5_for_keras_js(weights_hdf5_filepath):
     encoder.save()
 
 
-def export(name, job_id, user_ID):
+def export(job_id, user_ID):
     """
     export model for tf serving
-    :param name: str
     :param job_id: str/ObjectId
     :return:
     """

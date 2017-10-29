@@ -15,12 +15,6 @@ function hasErrors(fieldsError) {
 
 class DeployModal extends React.Component {
 
-  openNotificationWithIcon = () => {
-    notification['success']({
-      message: 'Model successfully deployed',
-      // description: 'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
-    });
-  };
 
   setModelHowToUse = (values) => {
     this.props.dispatch({
@@ -34,7 +28,6 @@ class DeployModal extends React.Component {
         deployExamples: values['deployExamples'],
       }
     });
-    this.openNotificationWithIcon();
   };
 
   firstDeployModel = (values) => {

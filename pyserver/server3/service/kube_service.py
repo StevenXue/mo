@@ -18,8 +18,8 @@ from server3.constants import NAMESPACE
 
 def get_deployment_status(served_model):
     if check_deployment_condition(served_model.deploy_name,
-                                  'Progressing'):
-        served_model.status = 'running'
+                                  'Available'):
+        served_model.status = 'serving'
     else:
         served_model.status = 'terminated'
     return served_model
@@ -45,9 +45,12 @@ def check_deployment_condition(deploy_name, status):
     try:
         deploy = deployment_api.read_namespaced_deployment(deploy_name,
                                                            NAMESPACE)
+        print('deploy_name')
+        print(deploy_name)
     except client.rest.ApiException:
         return False
     else:
+        print(check_condition(deploy, status))
         return check_condition(deploy, status)
 
 
@@ -67,6 +70,8 @@ def check_job_condition(job_name, status):
 
 
 def check_condition(kube, status):
+    print('kube')
+    print(kube.status.conditions[0].type)
     if kube and kube.status.conditions and \
                     kube.status.conditions[0].type == status and \
             kube.status.conditions[0].status:

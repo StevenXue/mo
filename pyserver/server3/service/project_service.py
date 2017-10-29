@@ -228,13 +228,19 @@ def get_all_jobs_of_project(project_id, categories, status=None):
                 # if key == 'model':
                 #     job_name = KUBE_NAME['model'].format(job_id=job['id'])
                 #     job_info = kube_service.get_job_status(job_info, job_name)
+
+                # 获取 served_model 数据库中的信息
                 served_model_id = job_info.get('served_model')
                 if served_model_id:
                     served_model = served_model_business.get_by_id(
-                        served_model_id).to_mongo()
+                        served_model_id)
+                    # 获取 kube 中部署模型的状态
+                    served_model = kube_service.get_deployment_status(served_model)
+                    served_model = served_model.to_mongo()
                 else:
                     served_model = None
                 job_info["served_model"] = served_model
+                # 获取 kube 中部署模型的状态
                 history_jobs[key].append(job_info)
                 break
     return history_jobs
