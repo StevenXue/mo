@@ -14,3 +14,6 @@ goldersgreen.iml
 
 # ignore virtual env files
 /venv/
+
+# ignore user directory
+pyserver/user_directory/
