@@ -1,10 +1,13 @@
 import fetch from 'dva/fetch';
+import { message } from 'antd';
+
 
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
+    message.success('This is a message of success');
     return response;
   }
-
+  message.error('This is a message of error');
   const error = new Error(response.statusText);
   error.response = response;
   throw error;

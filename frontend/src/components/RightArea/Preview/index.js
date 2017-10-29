@@ -55,7 +55,7 @@ function Preview({preview, model, dispatch, namespace}) {
     columns = table.columns.map((e, index) => {
       const ret = {
         title: <div className={styles.table_title}>
-          <div>
+          <div className={styles.table_title_name}>
             {e[0]}
           </div>
           <div className={styles.table_title_type}>
