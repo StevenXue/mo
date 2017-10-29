@@ -9,15 +9,8 @@ export async function uploadFile (body) {
   })
 }
 
-// export async function fetchFileList (user_ID) {
-//   let query = `?user_ID=${user_ID}`
-//   return request({
-//     url: CORS + files + query,
-//     method: 'get',
-//   })
-// }
-//
-export async function fetchDataSets (user_ID) {
+export async function fetchDataSets () {
+  const user_ID = localStorage.getItem('user_ID')
   let query = `?user_ID=${user_ID}`;
   return request(CORS + dataSets + query, {
     method: 'get',
@@ -71,5 +64,15 @@ export function stateData(dsid, prjid, name, desc) {
       'staging_data_set_name': name,
       'staging_data_set_description': desc
     })
+  })
+}
+
+// get staging dataset
+export async function fetchStagingDataSet(prjid) {
+  // let query = `?project_id=59eff5d7ab111732796cef13&without_result=true`;
+
+  let query = `?project_id=${prjid}&without_result=true`;
+  return request(CORS + getStagingData + query, {
+    method: 'get',
   })
 }
