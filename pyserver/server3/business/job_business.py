@@ -112,11 +112,6 @@ def end_job(job_obj):
     return job_repo.update_one_by_id_status_and_time(job_obj.id, 200, time)
 
 
-def update_job(job_obj):
-    time = datetime.utcnow()
-    return job_repo.update_one_by_id_status_and_time(job_obj.id, 200, time)
-
-
 def remove_by_id(job_id):
     return job_repo.delete_by_id(job_id)
 
@@ -141,3 +136,5 @@ def update_job_steps(job_id, steps, active_steps):
     return job_obj.save()
 
 
+def update_job_by_id(job_id, **kwargs):
+    return job_repo.update_one_by_id(job_id, kwargs)

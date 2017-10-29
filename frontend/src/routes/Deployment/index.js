@@ -89,23 +89,23 @@ function UseThisAPIPage({deployment, dispatch}) {
   if (focusModelId === null) {
     return (<div/>)
   }
-  else if (modelsJson[focusModelId]['deployState'] === 1) {
+  else if (modelsJson[focusModelId]['served_model'] !== null) {
     return (<div>
       <DeployModal dispatch={dispatch} deployment={deployment}
                    visible={deployment.modalState} firstDeploy={false}/>
       <h1>Overview</h1><Icon type="edit"
                              onClick={() => onClickModifyModal(true)}/>
       <h2>Name</h2>
-      <pre>{modelsJson[focusModelId]['deployName']}</pre>
+      <pre>{modelsJson[focusModelId]['served_model']['name']}</pre>
       <h2>Description</h2>
-      <pre>{modelsJson[focusModelId]['deployDescription']}</pre>
+      <pre>{modelsJson[focusModelId]['served_model']['description']}</pre>
       <h1>Usage</h1>
       <h2>Input</h2>
-      <pre>{modelsJson[focusModelId]['deployInput']}</pre>
+      <pre>{modelsJson[focusModelId]['served_model']['input_info']}</pre>
       <h2>Output</h2>
-      <pre>{modelsJson[focusModelId]['deployOutput']}</pre>
+      <pre>{modelsJson[focusModelId]['served_model']['output_info']}</pre>
       <h2>Examples</h2>
-      <pre>{modelsJson[focusModelId]['deployExamples']}</pre>
+      <pre>{modelsJson[focusModelId]['served_model']['examples']}</pre>
       <Button type="primary" onClick={() => onClickModel()}>
         Stop Service</Button> {/*<LineChart/>*/}
       <h1>1.TYPE YOUR INPUT</h1>
@@ -125,16 +125,16 @@ function UseThisAPIPage({deployment, dispatch}) {
       <h1>Overview</h1><Icon type="edit"
                              onClick={() => onClickModifyModal(true)}/>
       <h2>Name</h2>
-      <pre>{modelsJson[focusModelId]['deployName']}</pre>
+      <pre>{modelsJson[focusModelId]['served_model']['name']}</pre>
       <h2>Description</h2>
-      <pre>{modelsJson[focusModelId]['deployDescription']}</pre>
+      <pre>{modelsJson[focusModelId]['served_model']['description']}</pre>
       <h1>Usage</h1>
       <h2>Input</h2>
-      <pre>{modelsJson[focusModelId]['deployInput']}</pre>
+      <pre>{modelsJson[focusModelId]['served_model']['input_info']}</pre>
       <h2>Output</h2>
-      <pre>{modelsJson[focusModelId]['deployOutput']}</pre>
+      <pre>{modelsJson[focusModelId]['served_model']['output_info']}</pre>
       <h2>Examples</h2>
-      <pre>{modelsJson[focusModelId]['deployExamples']}</pre>
+      <pre>{modelsJson[focusModelId]['served_model']['examples']}</pre>
       <Button type="primary" onClick={() => onClickModel()}>
         Start Service</Button>
     </div> )

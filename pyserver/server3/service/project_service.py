@@ -21,6 +21,7 @@ from server3.service import staging_data_service
 from server3.service import kube_service
 from server3.business import staging_data_set_business
 from server3.business import staging_data_business
+from server3.business import served_model_business
 from server3.utility import json_utility
 from server3.repository import config
 from server3.constants import USER_DIR
@@ -199,6 +200,7 @@ def get_all_jobs_of_project(project_id, categories, status=None):
                     'id'] if job['staging_data_set'] else None
 
                 # result sds info
+                # object 用的是 .id  json用 _id
                 try:
                     result_sds = staging_data_set_business.get_by_job_id(
                         job['id']).to_mongo()
@@ -226,7 +228,13 @@ def get_all_jobs_of_project(project_id, categories, status=None):
                 # if key == 'model':
                 #     job_name = KUBE_NAME['model'].format(job_id=job['id'])
                 #     job_info = kube_service.get_job_status(job_info, job_name)
-
+                served_model_id = job_info.get('served_model')
+                if served_model_id:
+                    served_model = served_model_business.get_by_id(
+                        served_model_id).to_mongo()
+                else:
+                    served_model = None
+                job_info["served_model"] = served_model
                 history_jobs[key].append(job_info)
                 break
     return history_jobs

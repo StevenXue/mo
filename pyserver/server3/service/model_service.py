@@ -598,7 +598,8 @@ def get_results_dir_by_job_id(job_id, user_ID, checkpoint='final'):
     if ownership.private and ownership.user.user_ID != user_ID:
         raise ValueError('Authentication failed')
     user_ID = ownership.user.user_ID
-    result_dir = os.path.join(user_directory + user_ID, project_name, job_id)
+    result_dir = os.path.join(user_directory + user_ID+'/',
+                              project_name+'/', job_id)
     filename = '{}.hdf5'.format(checkpoint)
     return result_dir, filename
 
@@ -623,8 +624,8 @@ def export(name, job_id, user_ID):
     """
     result_dir, h5_filename = get_results_dir_by_job_id(job_id, user_ID)
     # result_sds = staging_data_set_business.get_by_job_id(job_id)
-    model_dir = os.path.join(result_dir, 'model.json')
-    weights_dir = os.path.join(result_dir, h5_filename)
+    model_dir = os.path.join(result_dir+'/', 'model.json')
+    weights_dir = os.path.join(result_dir+'/', h5_filename)
     with open(model_dir, 'r') as f:
         data = json.load(f)
         json_string = json.dumps(data)
