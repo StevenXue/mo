@@ -104,10 +104,11 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
     })
   }
 
-  function handleClickField(fieldName) {
+  function handleClickField(fieldName, stepIndex) {
     dispatch({
       type: namespace + '/addRemoveField',
       payload: {
+        stepIndex,
         fieldName,
         sectionId: section._id,
       },
@@ -142,6 +143,21 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
         stepIndex,
         argIndex,
         value: e,
+      },
+    })
+  }
+
+  function setValue(value, stepIndex, argIndex) {
+    // console.log("e", e);
+    // console.log('baseSteps', baseSteps[stepIndex].args[argIndex]['value_type'])
+
+    dispatch({
+      type: namespace + '/setValue',
+      payload: {
+        sectionId: section._id,
+        stepIndex,
+        argIndex,
+        value,
       },
     })
   }
@@ -205,7 +221,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
     })
   }
 
-  function FieldSelector({ step, stepIndex }) {
+  function fieldSelector(step, stepIndex) {
     return (
       <div>
         <div className={styles.fields}>
@@ -214,7 +230,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
             <div
               key={field[0]}
               className={styles.field}
-              onClick={() => handleClickField(field[0])}
+              onClick={() => handleClickField(field[0], stepIndex)}
               style={{
                 backgroundColor: (step.args[0].values).includes(field[0]) ? '#34C0E2' : '#F3F3F3',
                 color: mouseOverField === field[0] ? 'green' : 'grey',
@@ -294,7 +310,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
   function renderParameters(step, stepIndex) {
     return (
       <div>
-        <ParamsMapper args={step.args}/>
+        <ParamsMapper args={step.args} setValue={(value, argIndex) => setValue(value, stepIndex, argIndex)} />
         <div className={styles.end_button}>
           <Button type="primary" className={styles.button} onClick={() =>
             dispatch({
@@ -440,83 +456,20 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                     return <Panel header="Select Fields" key={stepIndex}
                                   className={styles.panel}
                     >
-                      <div className={styles.fields}>
-
-                        {step.args[0]['fields'] && step.args[0].fields.map(field =>
-                          <div
-                            key={field[0]}
-                            className={styles.field}
-                            onClick={() => handleClickField(field[0])}
-                            style={{
-                              backgroundColor: (step.args[0].values).includes(field[0]) ? '#34C0E2' : '#F3F3F3',
-                              color: mouseOverField === field[0] ? 'green' : 'grey'
-                            }}
-                            onMouseOver={() => handleMouseOverField(field[0])}
-                            onMouseLeave={() => handleMouseLeaveField()}
-                          >
-                            <p className={styles.text}>{field[0]}</p>
-                          </div>,
-                        )}
-                      </div>
-
-                      <div className={styles.end_button}>
-                        {
-                          LastOrLastButton(stepIndex, stepLength)
-                        }
-                        {/*<Button type="primary" className={styles.button} onClick={() =>*/}
-                        {/*dispatch({*/}
-                        {/*type: namespace + '/setActiveKey',*/}
-                        {/*payload: {*/}
-                        {/*activeKey: [String(stepIndex + 1)],*/}
-                        {/*sectionId: section._id,*/}
-                        {/*},*/}
-                        {/*})}>next</Button>*/}
-                      </div>
-                    </Panel>;
+                        {fieldSelector(step, stepIndex)}
+                    </Panel>
                   case 'feature_fields':
                     return (
                       <Panel header="Select Feature Fields" key={stepIndex}
                              className={styles.panel}>
-                        <div className={styles.fields}>
-
-                          {step.args[0]['feature_fields'] && step.args[0].fields.map(field =>
-                            <div
-                              key={field[0]}
-                              className={styles.field}
-                              onClick={() => handleClickField(field[0])}
-                              style={{backgroundColor: (step.args[0].values).includes(field[0]) ? '#34C0E2' : '#F3F3F3'}}
-                            >
-                              <p className={styles.text}>{field[0]}</p>
-                            </div>,
-                          )}
-                        </div>
-
-                        <div className={styles.end_button}>
-                          <Button type="primary" className={styles.button}>next</Button>
-                        </div>
+                        {fieldSelector(step, stepIndex)}
                       </Panel>
                     );
                   case 'label_fields':
                     return <Panel header="Select Label Fields" key={stepIndex}
                                   className={styles.panel}>
-                      <div className={styles.fields}>
-
-                        {step.args[0]['label_fields'] && step.args[0].fields.map(field =>
-                          <div
-                            key={field[0]}
-                            className={styles.field}
-                            onClick={() => handleClickField(field[0])}
-                            style={{backgroundColor: (step.args[0].values).includes(field[0]) ? '#34C0E2' : '#F3F3F3'}}
-                          >
-                            <p className={styles.text}>{field[0]}</p>
-                          </div>,
-                        )}
-                      </div>
-
-                      <div className={styles.end_button}>
-                        <Button type="primary" className={styles.button}>next</Button>
-                      </div>
-                    </Panel>;
+                      {fieldSelector(step, stepIndex)}
+                    </Panel>
                   case 'parameters':
                     return (
                       <Panel header="Parameter" key={stepIndex}

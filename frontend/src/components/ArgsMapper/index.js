@@ -22,11 +22,6 @@ function ArgsMapper({
                       },
                     }) {
 
-  const formItemLayout = {
-    labelCol: { span: 4 },
-    wrapperCol: { span: 14 },
-  }
-
   let args = []
   if (value.args) {
     args = value.args
@@ -40,9 +35,26 @@ function ArgsMapper({
   // updateValueOfValues({units: 32, activation: 'relu', input_shape: [1,1]})
 
   const valueParser = {
-    int: (e) => parseInt(e),
-    float: (e) => parseFloat(e),
+    int: (e) => JSON.parse(e),
+    float: (e) => JSON.parse(e),
     str: (e) => (e),
+  }
+
+  const typeParser = (type, valueType) => {
+    const typeDict = {
+      int: 'integer',
+      float: 'float',
+      str: 'string',
+    }
+
+    switch (type) {
+      case 'multiple_input':
+        return 'array'
+      case 'input':
+        return typeDict[valueType]
+      default:
+        return 'string'
+    }
   }
 
   const splitHandler = (e, type, valueType) => {
@@ -53,12 +65,20 @@ function ArgsMapper({
         if (splitValue.includes('')) {
           return e.target.value
         } else {
-          return e.target.value.split(',').map(e => {
-            return valueParser[valueType](e)
-          })
+          try {
+            return e.target.value.split(',').map(e => {
+              return valueParser[valueType](e)
+            })
+          } catch (err) {
+            return e.target.value
+          }
         }
       case 'input':
-        return valueParser[valueType](e.target.value)
+        try {
+          return valueParser[valueType](e.target.value)
+        } catch (err) {
+          return e.target.value
+        }
       default:
         return e
     }
@@ -137,7 +157,9 @@ function ArgsMapper({
               initialValue: arg.default,
               getValueFromEvent: (value) => splitHandler(value, arg.type, arg.value_type),
               rules: [
-                { required: arg.required, message: arg.des },
+                { required: arg.required, message: `need ${arg.value_type} ${arg.type}`,
+                  type: typeParser(arg.type, arg.value_type)
+                },
               ],
             })(switchComponent(arg))
           }

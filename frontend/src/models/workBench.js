@@ -194,7 +194,7 @@ export default {
     addRemoveField(state, action) {
       const fieldName = action.payload.fieldName
       const section = state.sectionsJson[action.payload.sectionId]
-      const values = section.steps[1].args[0].values
+      const values = section.steps[action.payload.stepIndex].args[0].values
       if (!values.includes(fieldName)) {
         values.push(fieldName)
         console.log('push', values)
@@ -237,16 +237,33 @@ export default {
     setParameter(state, action) {
       const { sectionId, stepIndex, argIndex, value } = action.payload
       let sectionsJson = state.sectionsJson
-      sectionsJson[sectionId].steps[stepIndex].args[argIndex].value = value
+      if(Array.isArray(value)) {
+        sectionsJson[sectionId].steps[stepIndex].args[argIndex].value = value
+      } else {
+        sectionsJson[sectionId].steps[stepIndex].args[argIndex].values = value
+      }
       return {
         ...state,
         sectionsJson,
       }
     },
 
-    // setValues(){
-    //
-    // },
+    setValue(state, action){
+      const { sectionId, stepIndex, value } = action.payload
+      let sectionsJson = state.sectionsJson
+      for (let key in value) {
+        let idx = sectionsJson[sectionId].steps[stepIndex].args.findIndex(e => e.name === key)
+        if(Array.isArray(value)) {
+          sectionsJson[sectionId].steps[stepIndex].args[idx].value = value[key]
+        } else {
+          sectionsJson[sectionId].steps[stepIndex].args[idx].values = value[key]
+        }
+      }
+      return {
+        ...state,
+        sectionsJson,
+      }
+    },
 
     addValue(state, action) {
       const { sectionId, stepIndex, argIndex, value, valueIndex } = action.payload
