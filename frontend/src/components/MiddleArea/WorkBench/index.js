@@ -155,6 +155,21 @@ function WorkBench({ section, model, dispatch, namespace }) {
     })
   }
 
+  function setValue(value, stepIndex, argIndex) {
+    // console.log("e", e);
+    // console.log('baseSteps', baseSteps[stepIndex].args[argIndex]['value_type'])
+
+    dispatch({
+      type: namespace + '/setValue',
+      payload: {
+        sectionId: section._id,
+        stepIndex,
+        argIndex,
+        value,
+      },
+    })
+  }
+
   function addValue(value, stepIndex, argIndex, valueIndex) {
     console.log('value', value)
     console.log('index', stepIndex, argIndex, valueIndex)
@@ -303,7 +318,7 @@ function WorkBench({ section, model, dispatch, namespace }) {
   function renderParameters(step, stepIndex) {
     return (
       <div>
-        <ParamsMapper args={step.args}/>
+        <ParamsMapper args={step.args} setValue={(value, argIndex) => setValue(value, stepIndex, argIndex)} />
         <div className={styles.end_button}>
           <Button type="primary" className={styles.button} onClick={() =>
             dispatch({

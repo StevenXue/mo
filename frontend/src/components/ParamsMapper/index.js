@@ -19,9 +19,26 @@ function ParamsMapper({
                       }) {
 
   const valueParser = {
-    int: (e) => parseInt(e),
-    float: (e) => parseFloat(e),
+    int: (e) => JSON.parse(e),
+    float: (e) => JSON.parse(e),
     str: (e) => (e),
+  }
+
+  const typeParser = (type, valueType) => {
+    const typeDict = {
+      int: 'integer',
+      float: 'float',
+      str: 'string',
+    }
+
+    switch (type) {
+      case 'multiple_input':
+        return 'array'
+      case 'input':
+        return typeDict[valueType]
+      default:
+        return 'string'
+    }
   }
 
   const splitHandler = (e, type, valueType) => {
@@ -32,12 +49,20 @@ function ParamsMapper({
         if (splitValue.includes('')) {
           return e.target.value
         } else {
-          return e.target.value.split(',').map(e => {
-            return valueParser[valueType](e)
-          })
+          try {
+            return e.target.value.split(',').map(e => {
+              return valueParser[valueType](e)
+            })
+          } catch (err) {
+            return e.target.value
+          }
         }
       case 'input':
-        return valueParser[valueType](e.target.value)
+        try {
+          return valueParser[valueType](e.target.value)
+        } catch (err) {
+          return e.target.value
+        }
       default:
         return e
     }
@@ -89,7 +114,10 @@ function ParamsMapper({
               initialValue: arg.default,
               getValueFromEvent: (value) => splitHandler(value, arg.type, arg.value_type),
               rules: [
-                { required: arg.required, message: arg.des },
+                {
+                  required: arg.required, message: `need ${arg.value_type}` ,
+                  type: typeParser(arg.type, arg.value_type)
+                },
               ],
             })(switchComponent(arg))
           }
@@ -99,9 +127,8 @@ function ParamsMapper({
   )
 }
 
-const handleValuesChange = (props, values) => {
-
-  // updateLayerArgs(values)
+const handleValuesChange = ({ setValue }, values) => {
+  setValue(values)
 }
 
 export default Form.create({ onValuesChange: (props, values) => handleValuesChange(props, values) })(ParamsMapper)
