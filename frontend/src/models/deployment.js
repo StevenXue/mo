@@ -186,7 +186,7 @@ export default {
     // 当进入该页面是 获取用户所有 Models
     setup({dispatch, history}) {
       return history.listen(({pathname}) => {
-        const match = pathToRegexp('/projects/:projectId/deploy').exec(pathname);
+        const match = pathToRegexp('/workspace/:projectId/deploy').exec(pathname);
         if (match) {
           const projectId = match[1];
           dispatch({

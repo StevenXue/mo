@@ -32,7 +32,7 @@ export default {
   subscriptions: {
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
-        const match = pathToRegexp('/projects/:projectId/import/select').exec(pathname);
+        const match = pathToRegexp('/workspace/:projectId/import/select').exec(pathname);
         if (match) {
           dispatch({ type: 'fetch' })
         }

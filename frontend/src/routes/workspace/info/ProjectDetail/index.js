@@ -8,19 +8,19 @@ import { connect } from 'dva'
 import { Icon, Button, Tag } from 'antd'
 
 // pages
-import DataImport from '../DataImport'
-import DataAnalysis from '../DataAnalysis'
-import Modelling from '../Modelling'
-import Deployment from '../Deployment'
-import UploadData from '../Upload'
-import DataSelection from '../DataSelection'
-import StagedList from '../DataSelection/Staged'
-import DataPreview from '../DataPreview'
+import DataImport from '../../../DataImport/index'
+import DataAnalysis from '../../../DataAnalysis/index'
+import Modelling from '../../modelling/Modelling/index'
+import Deployment from '../../../Deployment/index'
+import UploadData from '../../../Upload/index'
+import DataSelection from '../../../DataSelection/index'
+import StagedList from '../../../DataSelection/Staged'
+import DataPreview from '../../../DataPreview/index'
 // components
-import Steps from '../../components/Steps'
-import MyCard from '../../components/MyCard'
-import ProjectModel from '../../components/ProjectModel'
-import { showTime } from '../../utils'
+import Steps from '../../../../components/Steps/index'
+import MyCard from '../../../../components/MyCard/index'
+import ProjectModel from '../../../../components/ProjectModel/index'
+import { showTime } from '../../../../utils/index'
 import styles from './index.less'
 
 const pages = ['import', 'analysis', 'modelling', 'deploy']
@@ -66,13 +66,13 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
           </div>
           <div className={styles.navCards}>
             <MyCard icon='file-add' text='Data Import' style={{ marginRight: 50 }}
-                    onClick={() => history.push(`/projects/${match.params.projectId}/import`)}/>
+                    onClick={() => history.push(`/workspace/${match.params.projectId}/import`)}/>
             <MyCard icon='line-chart' text='Data Analysis' style={{ marginRight: 50 }}
-                    onClick={() => history.push(`/projects/${match.params.projectId}/analysis`)}/>
+                    onClick={() => history.push(`/workspace/${match.params.projectId}/analysis`)}/>
             <MyCard icon='edit' text='Model Design' style={{ marginRight: 50 }}
-                    onClick={() => history.push(`/projects/${match.params.projectId}/modelling`)}/>
+                    onClick={() => history.push(`/workspace/${match.params.projectId}/modelling`)}/>
             <MyCard icon='api' text='Model Deployment'
-                    onClick={() => history.push(`/projects/${match.params.projectId}/deploy`)}/>
+                    onClick={() => history.push(`/workspace/${match.params.projectId}/deploy`)}/>
           </div>
         </div>
       )
@@ -91,13 +91,13 @@ function ProjectDetail({ match, history, location, project }) {
       </div>
       <Switch>
         <Route path="/projects/:projectID/import/list" component={StagedList}/>
-        <Route path="/projects/:projectID/import/preview" component={DataPreview}/>
-        <Route path="/projects/:projectID/import/select" component={DataSelection}/>
-        <Route path="/projects/:projectID/import/upload" component={UploadData}/>
-        <Route path="/projects/:projectID/import" component={DataImport}/>
-        <Route path="/projects/:projectID/analysis" component={DataAnalysis}/>
-        <Route path="/projects/:projectID/modelling" component={Modelling}/>
-        <Route path="/projects/:projectID/deploy" component={Deployment}/>
+        <Route path="/workspace/:projectID/import/preview" component={DataPreview}/>
+        <Route path="/workspace/:projectID/import/select" component={DataSelection}/>
+        <Route path="/workspace/:projectID/import/upload" component={UploadData}/>
+        <Route path="/workspace/:projectID/import" component={DataImport}/>
+        <Route path="/workspace/:projectID/analysis" component={DataAnalysis}/>
+        <Route path="/workspace/:projectID/modelling" component={Modelling}/>
+        <Route path="/workspace/:projectID/deploy" component={Deployment}/>
       </Switch>
     </div>
   )

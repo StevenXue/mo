@@ -342,166 +342,173 @@ KERAS_SEQ_STEPS = [
         ]
     },
     {
-        "name": "network",
+        "name": "layers",
         "display_name": "Build your network",
-        "layers": [
+        "args": [
             {
-                "name": "Dense",
-                "args": [
+                "name": "layers",
+                "des": "",
+                "range": [
                     {
-                        **SPEC.ui_spec['input'],
-                        "name": "units",
-                        "display_name": "Units",
-                        "des": "Just your regular densely-connected NN layer",
-                        "default": 32,
-                        "required": True
+                        "name": "Dense",
+                        "args": [
+                            {
+                                **SPEC.ui_spec['input'],
+                                "name": "units",
+                                "display_name": "Units",
+                                "des": "Just your regular densely-connected NN layer",
+                                "default": 32,
+                                "required": True
+                            },
+                            ACTIVATION,
+                            INPUT_SHAPE
+                        ],
                     },
-                    ACTIVATION,
-                    INPUT_SHAPE
+                    {
+                        "name": "Dropout",
+                        "args": [
+                            {
+                                **SPEC.ui_spec['input'],
+                                "name": "rate",
+                                "display_name": "Rate",
+                                "des": "Fraction of the input units to drop",
+                                "type": "float",
+                                "range": [0, 1],
+                                "required": True
+                            },
+                            {
+                                **SPEC.ui_spec['multiple_input'],
+                                "name": "noise_shape",
+                                "display_name": "Noise Shape",
+                                "des": "1D integer tensor representing the shape of "
+                                       "the binary dropout mask that will be "
+                                       "multiplied with the input.",
+                                "len_range": [3, 3]
+                            },
+                            {
+                                **SPEC.ui_spec['input'],
+                                "name": "seed",
+                                "display_name": "Seed",
+                                "des": "A Python integer to use as random seed",
+                            },
+                        ],
+                    },
+                    {
+                        "name": "Flatten",
+                        "args": [],
+                    },
+                    {
+                        "name": "Reshape",
+                        "args": [
+                            {
+                                **SPEC.ui_spec['multiple_input'],
+                                "name": "target_shape",
+                                "display_name": "Target Shape",
+                                "des": "nD tensor with shape: (batch_size, ..., "
+                                       "input_dim). The most common situation would be "
+                                       "a 2D input with shape (batch_size, input_dim).",
+                                "required": True,
+                            },
+                            INPUT_SHAPE
+                        ],
+                    },
+                    {
+                        "name": "Conv1D",
+                        "args": [
+                            {
+                                **SPEC.ui_spec['input'],
+                                "name": "filters",
+                                "display_name": "Filters",
+                                "des": "the dimensionality of the output space (i.e. "
+                                       "the number output of filters in the "
+                                       "convolution)",
+                                "required": True,
+                            },
+                            {
+                                **SPEC.ui_spec['input'],
+                                "name": "kernel_size",
+                                "display_name": "Kernel Size",
+                                "des": "An integer specifying the length of the 1D "
+                                       "convolution window.",
+                                "required": True,
+                            },
+                            ACTIVATION,
+                            INPUT_SHAPE
+                        ],
+                    },
+                    {
+                        "name": "Conv2D",
+                        "args": [
+                            {
+                                **SPEC.ui_spec['input'],
+                                "name": "filters",
+                                "display_name": "Filters",
+                                "des": "the dimensionality of the output space (i.e. "
+                                       "the number output of filters in the "
+                                       "convolution)",
+                                "required": True,
+                            },
+                            {
+                                **SPEC.ui_spec['input'],
+                                "name": "kernel_size",
+                                "display_name": "Kernel Size",
+                                "des": "An integer specifying the length of the 1D "
+                                       "convolution window.",
+                                "required": True,
+                                "len_range": [2, 2]
+                            },
+                            ACTIVATION,
+                            INPUT_SHAPE
+                        ],
+                    },
+                    {
+                        "name": "MaxPooling2D",
+                        "args": [
+                            {
+                                **SPEC.ui_spec['multiple_input'],
+                                "name": "pool_size",
+                                "display_name": "Pool Size",
+                                "des": "tuple of 2 integers, factors by which to "
+                                       "downscale (vertical, horizontal). (2, 2) will "
+                                       "halve the input in both spatial dimension. ",
+                                "len_range": [2, 2]
+                            },
+                            {
+                                **SPEC.ui_spec['multiple_input'],
+                                "name": "strides",
+                                "display_name": "Strides",
+                                "des": "tuple of 2 integers, or None. Strides values."
+                                       " If None, it will default to pool_size",
+                                "len_range": [2, 2]
+                            },
+                            {
+                                **SPEC.ui_spec['choice'],
+                                "name": "padding",
+                                "display_name": "Padding",
+                                "des": "",
+                                "range": ["valid", "same"],
+                                "default": "valid",
+                            },
+                            {
+                                **SPEC.ui_spec['choice'],
+                                "name": "data_format",
+                                "display_name": "Data Format",
+                                "des": "The ordering of the dimensions in the inputs",
+                                "range": ["channels_last", "channels_first"],
+                                "default": "channels_last"
+                            },
+                            {
+                                **INPUT_SHAPE,
+                                "des": "4D tensor",
+                                "len_range": [4, 4],
+                                "required": False,
+                            }
+                        ],
+                    },
                 ],
+                "values": [{}, {}],
             },
-            {
-                "name": "Dropout",
-                "args": [
-                    {
-                        **SPEC.ui_spec['input'],
-                        "name": "rate",
-                        "display_name": "Rate",
-                        "des": "Fraction of the input units to drop",
-                        "type": "float",
-                        "range": [0, 1],
-                        "required": True
-                    },
-                    {
-                        **SPEC.ui_spec['multiple_input'],
-                        "name": "noise_shape",
-                        "display_name": "Noise Shape",
-                        "des": "1D integer tensor representing the shape of "
-                               "the binary dropout mask that will be "
-                               "multiplied with the input.",
-                        "len_range": [3, 3]
-                    },
-                    {
-                        **SPEC.ui_spec['input'],
-                        "name": "seed",
-                        "display_name": "Seed",
-                        "des": "A Python integer to use as random seed",
-                    },
-                ],
-            },
-            {
-                "name": "Flatten",
-                "args": [],
-            },
-            {
-                "name": "Reshape",
-                "args": [
-                    {
-                        **SPEC.ui_spec['multiple_input'],
-                        "name": "target_shape",
-                        "display_name": "Target Shape",
-                        "des": "nD tensor with shape: (batch_size, ..., "
-                               "input_dim). The most common situation would be "
-                               "a 2D input with shape (batch_size, input_dim).",
-                        "required": True,
-                    },
-                    INPUT_SHAPE
-                ],
-            },
-            {
-                "name": "Conv1D",
-                "args": [
-                    {
-                        **SPEC.ui_spec['input'],
-                        "name": "filters",
-                        "display_name": "Filters",
-                        "des": "the dimensionality of the output space (i.e. "
-                               "the number output of filters in the "
-                               "convolution)",
-                        "required": True,
-                    },
-                    {
-                        **SPEC.ui_spec['input'],
-                        "name": "kernel_size",
-                        "display_name": "Kernel Size",
-                        "des": "An integer specifying the length of the 1D "
-                               "convolution window.",
-                        "required": True,
-                    },
-                    ACTIVATION,
-                    INPUT_SHAPE
-                ],
-            },
-            {
-                "name": "Conv2D",
-                "args": [
-                    {
-                        **SPEC.ui_spec['input'],
-                        "name": "filters",
-                        "display_name": "Filters",
-                        "des": "the dimensionality of the output space (i.e. "
-                               "the number output of filters in the "
-                               "convolution)",
-                        "required": True,
-                    },
-                    {
-                        **SPEC.ui_spec['input'],
-                        "name": "kernel_size",
-                        "display_name": "Kernel Size",
-                        "des": "An integer specifying the length of the 1D "
-                               "convolution window.",
-                        "required": True,
-                        "len_range": [2, 2]
-                    },
-                    ACTIVATION,
-                    INPUT_SHAPE
-                ],
-            },
-            {
-                "name": "MaxPooling2D",
-                "args": [
-                    {
-                        **SPEC.ui_spec['multiple_input'],
-                        "name": "pool_size",
-                        "display_name": "Pool Size",
-                        "des": "tuple of 2 integers, factors by which to "
-                               "downscale (vertical, horizontal). (2, 2) will "
-                               "halve the input in both spatial dimension. ",
-                        "len_range": [2, 2]
-                    },
-                    {
-                        **SPEC.ui_spec['multiple_input'],
-                        "name": "strides",
-                        "display_name": "Strides",
-                        "des": "tuple of 2 integers, or None. Strides values."
-                               " If None, it will default to pool_size",
-                        "len_range": [2, 2]
-                    },
-                    {
-                        **SPEC.ui_spec['choice'],
-                        "name": "padding",
-                        "display_name": "Padding",
-                        "des": "",
-                        "range": ["valid", "same"],
-                        "default": "valid",
-                    },
-                    {
-                        **SPEC.ui_spec['choice'],
-                        "name": "data_format",
-                        "display_name": "Data Format",
-                        "des": "The ordering of the dimensions in the inputs",
-                        "range": ["channels_last", "channels_first"],
-                        "default": "channels_last"
-                    },
-                    {
-                        **INPUT_SHAPE,
-                        "des": "4D tensor",
-                        "len_range": [4, 4],
-                        "required": False,
-                    }
-                ],
-            },
-        ],
+        ]
     },
     {
         "name": "compile",

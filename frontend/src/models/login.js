@@ -48,7 +48,7 @@ export default {
         if (from) {
           yield put(routerRedux.push(from))
         } else {
-          yield put(routerRedux.push('/projects'))
+          yield put(routerRedux.push('/workspace'))
         }
       } else {
         throw data
@@ -69,7 +69,7 @@ export default {
         console.log(location.hash.substr(1))
         if (location.hash.substr(1) === '/login') {
           // user dashboard not build yet, push to project by default
-          yield put(routerRedux.push('/projects'))
+          yield put(routerRedux.push('/workspace'))
         }
       } catch(err) {
         console.log(err)
