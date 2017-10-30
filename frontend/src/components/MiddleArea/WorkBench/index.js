@@ -4,6 +4,7 @@ import {connect} from 'dva'
 
 import {Select, Collapse, Button, Input, Popover, Icon, Tooltip} from 'antd';
 import ToolBar from '../ToolBar/index';
+import ParamsMapper from '../../ParamsMapper'
 import {format} from '../../../utils/base';
 
 // import  from '../../../index.less'
@@ -153,6 +154,169 @@ function WorkBench({section, model, dispatch, namespace}) {
         value: e,
       },
     })
+  }
+
+  function addValue(value, stepIndex, argIndex, valueIndex) {
+    console.log('value', value)
+    console.log('index', stepIndex, argIndex, valueIndex)
+
+    // e = format(e, baseSteps[stepIndex].args[argIndex]['value_type'])
+    dispatch({
+      type: namespace + '/addValue',
+      payload: {
+        sectionId: section._id,
+        stepIndex,
+        argIndex,
+        value,
+        valueIndex,
+      },
+    })
+  }
+
+  function updateLayerArgs(value, stepIndex, argIndex, valueIndex) {
+    // e = format(e, baseSteps[stepIndex].args[argIndex]['value_type'])
+    dispatch({
+      type: namespace + '/updateLayerArgs',
+      payload: {
+        sectionId: section._id,
+        stepIndex,
+        argIndex,
+        value,
+        valueIndex,
+      },
+    })
+  }
+
+  function setValueOfValues(e, stepIndex, argIndex, valueIndex) {
+    // e = format(e, baseSteps[stepIndex].args[argIndex]['value_type'])
+    dispatch({
+      type: namespace + '/setValueOfValues',
+      payload: {
+        sectionId: section._id,
+        stepIndex,
+        argIndex,
+        value: e,
+        valueIndex,
+      },
+    })
+  }
+
+  function updateValueOfValues(e, stepIndex, argIndex, valueIndex) {
+    // e = format(e, baseSteps[stepIndex].args[argIndex]['value_type'])
+    dispatch({
+      type: namespace + '/updateValueOfValues',
+      payload: {
+        sectionId: section._id,
+        stepIndex,
+        argIndex,
+        value: e,
+        valueIndex,
+      },
+    })
+  }
+
+  function FieldSelector({ step, stepIndex }) {
+    return (
+      <div>
+        <div className={styles.fields}>
+
+          {step.args[0]['fields'] && step.args[0].fields.map(field =>
+            <div
+              key={field[0]}
+              className={styles.field}
+              onClick={() => handleClickField(field[0])}
+              style={{
+                backgroundColor: (step.args[0].values).includes(field[0]) ? '#34C0E2' : '#F3F3F3',
+                color: mouseOverField === field[0] ? 'green' : 'grey',
+              }}
+              onMouseOver={() => handleMouseOverField(field[0])}
+              onMouseLeave={() => handleMouseLeaveField()}
+            >
+              <p className={styles.text}>{field[0]}</p>
+            </div>,
+          )}
+        </div>
+        <div className={styles.end_button}>
+          <Button type="primary" className={styles.button} onClick={() =>
+            dispatch({
+              type: namespace + '/setActiveKey',
+              payload: {
+                activeKey: [String(stepIndex), String(stepIndex + 1)],
+                sectionId: section._id,
+              },
+            })}>next</Button>
+        </div>
+      </div>)
+  }
+
+  function getTitle(valueIndex, length) {
+    if (valueIndex === 0) {
+      return 'Input Layer'
+    } else if (valueIndex === length - 1) {
+      return 'Output Layer'
+    } else {
+      return `Hidden Layer ${valueIndex}`
+    }
+  }
+
+  function networkBuilder(step, stepIndex) {
+    return (
+      <div>
+        {step.args.map((arg, argIndex) => {
+          const values = step.args[argIndex].values
+          return (
+            <div key={argIndex}>
+              {
+                values.map((value, valueIdx) =>
+                  <LayerCard
+                    title={getTitle(valueIdx, values.length)}
+                    key={'layercard' + valueIdx}
+                    layerIndex={valueIdx}
+                    argIndex={argIndex}
+                    arg={arg}
+                    baseSteps={baseSteps}
+                    {...{ model, dispatch, namespace }}
+                    funcs={{
+                      addValue: (e) => addValue(e, stepIndex, argIndex, valueIdx + 1),
+                      setValueOfValues: (e) => setValueOfValues(e, stepIndex, argIndex, valueIdx),
+                      updateValueOfValues: (e) => updateValueOfValues(e, stepIndex, argIndex, valueIdx),
+                      updateLayerArgs: (e) => updateLayerArgs(e, stepIndex, argIndex, valueIdx),
+                    }}
+                  />,
+                )
+              }
+              <div className={styles.end_button}>
+                <Button type="primary" className={styles.button} onClick={() =>
+                  dispatch({
+                    type: namespace + '/setActiveKey',
+                    payload: {
+                      activeKey: [String(stepIndex), String(stepIndex + 1)],
+                      sectionId: section._id,
+                    },
+                  })}>next</Button>
+              </div>
+            </div>)
+        })}
+      </div>
+    )
+  }
+
+  function renderParameters(step, stepIndex) {
+    return (
+      <div>
+        <ParamsMapper args={step.args}/>
+        <div className={styles.end_button}>
+          <Button type="primary" className={styles.button} onClick={() =>
+            dispatch({
+              type: namespace + '/setActiveKey',
+              payload: {
+                activeKey: [String(stepIndex), String(stepIndex + 1)],
+                sectionId: section._id,
+              },
+            })}>next</Button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -325,14 +489,19 @@ function WorkBench({section, model, dispatch, namespace}) {
                           </Button>
                         </div>
                       </Panel>
-                    );
+                    )
+                  case 'layers':
+                    return (
+                      <Panel header="Build Network" key={stepIndex}
+                             className={styles.panel}>
+                        {networkBuilder(step, stepIndex)}
+                      </Panel>
+                    )
                   case 'custom':
                     return (
-                      <Panel header="Parameter" key={stepIndex}
+                      <Panel header={step.display_name} key={stepIndex}
                              className={styles.panel}>
-                        <div>
-                          custom Panel
-                        </div>
+                        {renderParameters(step, stepIndex)}
                       </Panel>
                     )
                 }
