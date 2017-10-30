@@ -511,7 +511,7 @@ KERAS_SEQ_STEPS = [
         ]
     },
     {
-        "name": "custom",
+        "name": "compile",
         "display_name": "Compile Parameters",
         'args': [
             {
@@ -571,7 +571,7 @@ KERAS_SEQ_STEPS = [
         ],
     },
     {
-        "name": "custom",
+        "name": "fit",
         "display_name": "Fit Parameters",
         "args": [
             {
@@ -594,7 +594,7 @@ KERAS_SEQ_STEPS = [
         ],
     },
     {
-        "name": "custom",
+        "name": "evaluate",
         "display_name": "Evaluate Parameters",
         "args": [
             {

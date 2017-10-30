@@ -237,9 +237,9 @@ export default {
       const { sectionId, stepIndex, argIndex, value } = action.payload
       let sectionsJson = state.sectionsJson
       if(Array.isArray(value)) {
-        sectionsJson[sectionId].steps[stepIndex].args[argIndex].value = value
-      } else {
         sectionsJson[sectionId].steps[stepIndex].args[argIndex].values = value
+      } else {
+        sectionsJson[sectionId].steps[stepIndex].args[argIndex].value = value
       }
       return {
         ...state,
@@ -253,10 +253,24 @@ export default {
       for (let key in value) {
         let idx = sectionsJson[sectionId].steps[stepIndex].args.findIndex(e => e.name === key)
         if(Array.isArray(value)) {
-          sectionsJson[sectionId].steps[stepIndex].args[idx].value = value[key]
-        } else {
           sectionsJson[sectionId].steps[stepIndex].args[idx].values = value[key]
+        } else {
+          sectionsJson[sectionId].steps[stepIndex].args[idx].value = value[key]
         }
+      }
+      return {
+        ...state,
+        sectionsJson,
+      }
+    },
+
+    setDefault(state, action){
+      const { sectionId, stepIndex, value } = action.payload
+      let sectionsJson = state.sectionsJson
+      for (let key in value) {
+        let idx = sectionsJson[sectionId].steps[stepIndex].args.findIndex(e => e.name === key)
+        sectionsJson[sectionId].steps[stepIndex].args[idx].default = value[key]
+
       }
       return {
         ...state,
@@ -291,6 +305,20 @@ export default {
       // sectionsJson[sectionId].steps[stepIndex].args[argIndex].values[valueIndex] = value;
       for (let key in value) {
         sectionsJson[sectionId].steps[stepIndex].args[argIndex].values[valueIndex][key] = value[key]
+      }
+      return {
+        ...state,
+        sectionsJson,
+      }
+    },
+
+    setLayerDefault(state, action) {
+      const { sectionId, stepIndex, argIndex, value, valueIndex } = action.payload
+      let sectionsJson = state.sectionsJson
+      // sectionsJson[sectionId].steps[stepIndex].args[argIndex].values[valueIndex] = value;
+      for (let key in value) {
+        let idx = sectionsJson[sectionId].steps[stepIndex].args[argIndex].values[valueIndex].args.findIndex(e => e.name === key)
+        sectionsJson[sectionId].steps[stepIndex].args[argIndex].values[valueIndex].args[idx].default = value[key]
       }
       return {
         ...state,

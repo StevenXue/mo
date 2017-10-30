@@ -8,6 +8,9 @@ function ArgsMapper({
                       layerIndex,
                       layers,
                       value,
+                      last,
+                      featureFields,
+                      labelFields,
                       form: {
                         getFieldValue,
                         getFieldsValue,
@@ -15,18 +18,16 @@ function ArgsMapper({
                         validateFields,
                       },
                       funcs: {
-                        addValue,
-                        setValueOfValues,
-                        updateLayerArgs,
                         updateValueOfValues,
+                        setLayerDefault,
                       },
                     }) {
 
   let args = []
+  let layerName = getFieldValue('name') || value.name
   if (value.args) {
     args = value.args
   } else {
-    let layerName = getFieldValue('name')
     if (layerName) {
       args = layers.find(e => e.name === layerName).args
     }
@@ -88,10 +89,10 @@ function ArgsMapper({
     switch (arg.type) {
       case 'multiple_input':
       case 'input':
-        return <Input />
+        return <Input/>
       case 'choice':
         return (
-          <Select style={{ width: 142 }} >
+          <Select style={{ width: 142 }}>
             {
               arg.range.map((option) =>
                 <Select.Option value={option} key={option}>{option}</Select.Option>,
@@ -101,7 +102,7 @@ function ArgsMapper({
         )
       case 'multiple_choice':
         return (
-          <Select style={{ width: 142 }} mode='multiple' >
+          <Select style={{ width: 142 }} mode='multiple'>
             {
               arg.range.map((option) =>
                 <Select.Option value={option} key={option}>{option}</Select.Option>,
@@ -110,7 +111,7 @@ function ArgsMapper({
           </Select>
         )
       default:
-        return <Input />
+        return <Input/>
     }
   }
 
@@ -126,7 +127,7 @@ function ArgsMapper({
       >
         {
           getFieldDecorator('name', {
-            // initialValue: 'Dense',
+            initialValue: layerName,
             // getValueFromEvent: value => value,
             rules: [
               { required: true },
@@ -135,7 +136,7 @@ function ArgsMapper({
             <Select placeholder="Choose Layer" style={{ width: 142 }}
                     onChange={(value) => {
                       args = layers.find(e => e.name === value).args
-                      updateValueOfValues({name: value, args})
+                      updateValueOfValues({ name: value, args })
                     }}>
               {
                 layers.map((e) =>
@@ -147,23 +148,39 @@ function ArgsMapper({
         }
       </FormItem>
       {
-        args.map((arg, i) => <FormItem
-          key={i}
-          label={arg.display_name}
-          // className={styles.item}
-        >
-          {
-            getFieldDecorator(arg.name, {
-              initialValue: arg.default,
-              getValueFromEvent: (value) => splitHandler(value, arg.type, arg.value_type),
-              rules: [
-                { required: arg.required, message: `need ${arg.value_type} ${arg.type}`,
-                  type: typeParser(arg.type, arg.value_type)
-                },
-              ],
-            })(switchComponent(arg))
+        args.map((arg, i) => {
+          if (last && arg.name === 'input_shape') {
+            return
           }
-        </FormItem>)
+          if (layerIndex === 0 && arg.name === 'input_shape' && featureFields.length > 0) {
+            setLayerDefault({ [arg.name]: [featureFields.length] })
+          }
+          if (last && arg.name === 'units' && labelFields.length > 0) {
+            setLayerDefault({ [arg.name]: labelFields.length })
+          }
+          let v = arg.value || arg.values
+          if (v && (arg.value || arg.values.length > 0)) {
+            setLayerDefault({ [arg.name]: v })
+          }
+          return <FormItem
+            key={i}
+            label={arg.display_name}
+            // className={styles.item}
+          >
+            {
+              getFieldDecorator(arg.name, {
+                initialValue: arg.default,
+                getValueFromEvent: (value) => splitHandler(value, arg.type, arg.value_type),
+                rules: [
+                  {
+                    required: arg.required, message: `need ${arg.value_type} ${arg.type}`,
+                    type: typeParser(arg.type, arg.value_type),
+                  },
+                ],
+              })(switchComponent(arg))
+            }
+          </FormItem>
+        })
       }
       {/*{args.length > 0 &&*/}
       {/*<FormItem*/}
@@ -177,11 +194,7 @@ function ArgsMapper({
 }
 
 const handleValuesChange = ({
-                              layerName,
                               funcs: {
-                                addValue,
-                                setValueOfValues,
-                                updateValueOfValues,
                                 updateLayerArgs,
                               },
                             }, layer) => {
