@@ -4,16 +4,12 @@ import {arrayToJson} from '../utils/JsonUtils';
 import {getRound} from '../utils/number';
 import pathToRegexp from 'path-to-regexp';
 
-
 export default {
   namespace: 'deployment',
   state: {
     //用户拥有的 models
     modelsJson: [],
-    //deploying中的 model
-    deployingModelsId: [],
-    //加载状态
-    loading: false,
+    loadingState:false,
   },
   reducers: {
     // 获取所有的models
@@ -21,9 +17,7 @@ export default {
     setModels(state, action) {
       let lengthModelsJson = Object.keys(action.payload.modelsJson).length;
 
-
       if (lengthModelsJson !== 0) {
-
         for (let eachModel in action.payload.modelsJson) {
           let metrics = {
             'acc': [],
@@ -105,33 +99,26 @@ export default {
       }
     },
 
-
-    // deploy  model
-    deployModel(state, action) {
-      let newInfo = {
-        ...state.modelsJson[state.focusModelId],
-        deployState: 1,
-      };
+    showLoading(state, action) {
       return {
         ...state,
-        modelsJson: {
-          ...state.modelsJson,
-          [state.focusModelId]: newInfo
-        }
+        loadingState: action.payload.loadingState,
       }
     },
-    // undeploy  model
-
-    undeployModel(state, action) {
+    // changeModelStatus
+    changeModelStatus(state, action) {
       let newInfo = {
-        ...state.modelsJson[state.focusModelId],
-        deployState: 0,
+        ...state.modelsJson[state.focusModelId]['served_model'],
+        status: action.payload.status,
       };
       return {
         ...state,
         modelsJson: {
           ...state.modelsJson,
-          [state.focusModelId]: newInfo
+          [state.focusModelId]: {
+            ...state.modelsJson[state.focusModelId],
+            ['served_model']: newInfo
+          }
         }
       }
     },
@@ -146,44 +133,53 @@ export default {
       // array to json
       const modelsJson = arrayToJson(models, '_id');
       // 查询 部署的状态
-
       yield put({type: 'setModels', payload: {modelsJson: modelsJson}})
     },
 
     // 首次部署模型
     * firstDeployModel(action, {call, put, select}) {
+      yield put({type: 'showLoading', payload: {loadingState:true}});
       const focusModelId = yield select(state => state.deployment.focusModelId);
       const user_ID = yield select(state => state.login.user.user_ID);
       let payload = action.payload;
       payload.jobID = focusModelId;
       payload.user_ID = user_ID;
-      yield call(deploymentService.firstDeployModel, payload)
+      yield call(deploymentService.firstDeployModel, payload);
+      yield put({type: 'showLoading', payload: {loadingState:false}});
     },
 
     // 更新部署模型的信息
     * undateDeployModelInfo(action, {call, put, select}) {
+      yield put({type: 'showLoading', payload: {loadingState:true}});
       let payload = action.payload;
-      console.log(payload);
       const {data: result} = yield call(deploymentService.updateDeployModelInfo, payload);
       if (result === 'updated') {
         yield put({type: 'setModelHowToUse', payload: payload});
       }
+      yield put({type: 'showLoading', payload: {loadingState:false}});
     },
 
     // 部署Model
-    * deployModel(action, {call, put, select}) {
-      const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson);
-      const section = sectionsJson[action.payload.sectionId];
-
-      const {data: result} = yield call(deploymentService.deployModel, {section: section})
+    * resumeModel(action, {call, put, select}) {
+      yield put({type: 'showLoading', payload: {loadingState:true}});
+      const user_ID = yield select(state => state.login.user.user_ID);
+      let payload = action.payload;
+      payload.user_ID = user_ID;
+      const {data: result} = yield call(deploymentService.resumeModel, payload)
+      if (result === 'resumed') {
+        yield put({type: 'changeModelStatus', payload: {status:'serving'}});
+      }
+      yield put({type: 'showLoading', payload: {loadingState:false}});
     },
 
     // 取消部署Model
     * undeployModel(action, {call, put, select}) {
-      const sectionsJson = yield select(state => state.dataAnalysis.sectionsJson);
-      const section = sectionsJson[action.payload.sectionId];
-
-      const {data: result} = yield call(deploymentService.undeployModel, {section: section})
+      yield put({type: 'showLoading', payload: {loadingState:true}});
+      const {data: result} = yield call(deploymentService.undeployModel, action.payload);
+      if (result === 'terminated') {
+        yield put({type: 'changeModelStatus', payload: {status:'terminated'}});
+      }
+      yield put({type: 'showLoading', payload: {loadingState:false}});
     },
   },
   subscriptions: {

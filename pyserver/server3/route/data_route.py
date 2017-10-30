@@ -124,5 +124,23 @@ def update_data_set_integrity():
     return jsonify({'response': result}), 200
 
 
+@data_app.route('/data_sets/types', methods=['PUT'])
+def convert_fields_type():
+    data = request.get_json()
 
+    ds_id = data['data_set_id']
+    f_t_arrays = data['f_t_arrays']
+
+    try:
+        result = data_service.convert_fields_type(ObjectId(ds_id),
+                                                          f_t_arrays)
+        saved_ds = result['result']
+        ds_json = json_utility.convert_to_json(saved_ds.to_mongo())
+    except Exception as e:
+        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    if 'failure_count' in result:
+        failure_count = result['failure_count']
+        return jsonify({'response': ds_json, 'failure_count':
+            failure_count}), 200
+    return jsonify({'response': ds_json}), 200
 

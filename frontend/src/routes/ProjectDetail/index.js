@@ -14,6 +14,7 @@ import Modelling from '../Modelling'
 import Deployment from '../Deployment'
 import UploadData from '../Upload'
 import DataSelection from '../DataSelection'
+import StagedList from '../DataSelection/Staged'
 import DataPreview from '../DataPreview'
 // components
 import Steps from '../../components/Steps'
@@ -89,6 +90,7 @@ function ProjectDetail({ match, history, location, project }) {
         <Steps match={match} history={history} location={location}/>
       </div>
       <Switch>
+        <Route path="/projects/:projectID/import/list" component={StagedList}/>
         <Route path="/projects/:projectID/import/preview" component={DataPreview}/>
         <Route path="/projects/:projectID/import/select" component={DataSelection}/>
         <Route path="/projects/:projectID/import/upload" component={UploadData}/>

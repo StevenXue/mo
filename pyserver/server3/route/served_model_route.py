@@ -43,7 +43,7 @@ def update_deploy_info(served_model_id):
     return jsonify({'response': served_model})
 
 
-@served_model_app.route('/deploy/<string:job_id>', methods=['POST'])
+@served_model_app.route('/first_deploy/<string:job_id>', methods=['POST'])
 def first_deploy(job_id):
     """
     deploy trained model
@@ -114,9 +114,11 @@ def terminate_served_model(oid):
     else:
         return jsonify({'response': 'terminate failed'}), 400
 
-# @served_model_app.route('/resume/<string:oid>', methods=['PUT'])
-# def resume_served_model(oid):
-#     if served_model_business.resume_by_id(oid):
-#         return jsonify({'response': 'resumed'})
-#     else:
-#         return jsonify({'response': 'resume failed'}), 400
+@served_model_app.route('/resume/<string:oid>', methods=['PUT'])
+def resume_served_model(oid):
+    data = request.get_json()
+    user_ID = data.pop('user_ID')
+    if served_model_service.resume_by_id(oid, user_ID):
+        return jsonify({'response': 'resumed'})
+    else:
+        return jsonify({'response': 'resume failed'}), 400
