@@ -38,3 +38,12 @@ export default async function request(url, options) {
 
   return ret;
 }
+
+export async function org_request(url, options) {
+  const response = await fetch(url, options);
+
+  checkStatus(response);
+
+  return await response.json();
+
+}

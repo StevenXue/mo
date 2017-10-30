@@ -1,6 +1,7 @@
-import { uploadFile, fetchDataSets, fetchDataSet } from '../services/upload'
-import { parse } from 'qs'
-import lodash from 'lodash'
+import { uploadFile, fetchDataSets, fetchDataSet,
+  deleteDataColumns, changeTypes, stateData,
+  fetchStagingDataSet } from '../services/upload'
+
 import { message } from 'antd'
 import pathToRegexp from 'path-to-regexp';
 import {routerRedux} from 'dva/router';
@@ -15,7 +16,13 @@ export default {
       owned_ds: [],
     },
     dataSet: [],
+    fields: {},
     dataSetID: '',
+    selected: [],
+    deleted: [],
+    stagingDataSet: [],
+    dataSetName: '',
+    dataSetDesc: '',
 
   },
 
@@ -23,13 +30,9 @@ export default {
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
         const match = pathToRegexp('/workspace/:projectId/import/select').exec(pathname);
-
-
         if (match) {
           dispatch({ type: 'fetch' })
         }
-
-
       })
     },
 
@@ -40,8 +43,8 @@ export default {
 
     * fetch(action, { call, put, select }) {
 
-      let user_ID = 'dev_1'
-      const data = yield call(fetchDataSets, user_ID)
+      // let user_ID = 'dev_1'
+      const data = yield call(fetchDataSets)
       console.log(data)
       yield put({ type: 'setDataSets', payload: data.data })
 
@@ -51,8 +54,9 @@ export default {
       const dataSetID = yield select(state => state.upload.dataSetID)
 
       const data = yield call(fetchDataSet, dataSetID)
-      console.log(data)
-      yield put({ type: 'setDataSet', payload: data.data})
+      // console.log(data)
+      yield put({ type: 'setDataSet', payload: data.response})
+      yield put({ type: 'setFields', payload: data.fields})
       yield put(routerRedux.push('preview'))
     },
 
@@ -66,7 +70,7 @@ export default {
       console.log('enter upload model')
       console.log(payload)
       let formData = new FormData()
-      let user_ID = 'dev_1'
+      const user_ID = localStorage.getItem('user_ID')
       formData.append('uploaded_file', payload.upload.file)
 
       formData.append('description', payload.description)
@@ -90,9 +94,73 @@ export default {
       yield put({ type: 'setDataSetID', payload: data.data.data_set })
       console.log(data.data.data_set)
       yield put( {type: 'show'})
+    },
+
+    * delCol ({ payload }, { put, call, select }) {
+      console.log('del', payload)
+      // console.log(payload)
+      const dataSetID = yield select(state => state.upload.dataSetID)
+      const res = yield call(deleteDataColumns, dataSetID, payload)
+      console.log(res)
+
+      // const dels = dels.concat(payload)
+
+      yield put({type: 'addDeleted', payload: payload})
+      // console.log(dels)
+
+      yield put({type: 'setSelected', payload: []})
 
 
     },
+
+    * submit (action, { put, call, select }) {
+      const flds = yield select(state => state.upload.fields)
+      const dels = yield select(state => state.upload.deleted)
+      const dataSetID = yield select(state => state.upload.dataSetID)
+      const fld_lst = []
+      const ignored = ['data_set', '_id', 'staging_dataset_id'].concat(dels)
+      for (let key of Object.keys(flds)) {
+        if (!ignored.includes(key)) {
+
+          if (flds[key] === 'string') {
+            fld_lst.push([key, 'str'])
+          }
+          else if (flds[key] === 'integer') {
+            fld_lst.push([key, 'int'])
+          }
+          else {
+            fld_lst.push([key, 'float'])
+          }
+
+        }
+      }
+      const res = yield call(changeTypes, dataSetID, fld_lst)
+
+      yield put({type: 'stage'})
+    },
+
+    * stage (action, { put, call, select }) {
+      // const test = yield select(state => state)
+      // console.log(test)
+      const prjID = yield select(state => state.projectDetail.project._id)
+      const dsname = yield select(state => state.upload.dataSetName)
+      const dsdes = yield select(state => state.upload.dataSetDesc)
+      const dataSetID = yield select(state => state.upload.dataSetID)
+      const res = yield call(stateData, dataSetID, prjID, dsname, dsdes)
+      console.log(res)
+      yield put({type: 'staged'})
+    },
+
+    * staged (action, { put, call, select }) {
+      const prjID = yield select(state => state.projectDetail.project._id)
+      const res = yield call(fetchStagingDataSet, prjID)
+      // console.log(res.data)
+      yield put({type: 'setStagingDataSet', payload: res.data})
+      const sds = yield select(state => state.upload.stagingDataSet)
+      console.log(sds)
+      yield put(routerRedux.push('list'))
+    }
+
 
   },
 
@@ -115,12 +183,66 @@ export default {
       }
     },
 
+    setFields(state, { payload: flds }) {
+      for (let key of Object.keys(flds)) {
+        flds[key] = flds[key][0]
+      }
+      return {
+        ...state,
+        fields: flds
+      }
+    },
+
+    setField(state, { payload: value }) {
+      const fields = {...state.fields, ...value}
+      return {
+        ...state,
+        fields,
+      }
+    },
+
     setDataSetID(state, { payload: dataSetID }) {
       return {
         ...state,
         dataSetID,
       }
-    }
+    },
+
+    setDataSetName(state, { payload: dataSetName }) {
+      return {
+        ...state,
+        dataSetName,
+      }
+    },
+
+    setDataSetDesc(state, { payload: dataSetDesc }) {
+      return {
+        ...state,
+        dataSetDesc,
+      }
+    },
+
+
+    setSelected(state, { payload: selected }) {
+      return {
+        ...state,
+        selected,
+      }
+    },
+
+    addDeleted(state, { payload: dels }) {
+      return {
+        ...state,
+        deleted: state.deleted.concat(dels),
+      }
+    },
+
+    setStagingDataSet(state, { payload: stagingDataSet }) {
+      return {
+        ...state,
+        stagingDataSet
+      }
+    },
 
   },
 

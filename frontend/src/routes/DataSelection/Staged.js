@@ -1,8 +1,7 @@
 import React from 'react'
 import MySelection from './MySelection'
 
-
-class DataSelection extends React.Component {
+class StagedList extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -12,10 +11,10 @@ class DataSelection extends React.Component {
   render() {
     return (
       <div>
-      <MySelection {...this.props} isStaged={false}/>
+      <MySelection {...this.props} isStaged={true}/>
       </div>
     )
   }
 }
 
-export default DataSelection;
+export default StagedList;

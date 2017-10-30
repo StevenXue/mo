@@ -1,5 +1,6 @@
 import config from './config'
 import request from './request'
+import {org_request} from './request'
 import { showTime } from './time'
 import classnames from 'classnames'
 import lodash from 'lodash'
@@ -105,5 +106,6 @@ module.exports = {
   queryURL,
   queryArray,
   arrayToTree,
-  showTime
+  showTime,
+  org_request
 }
