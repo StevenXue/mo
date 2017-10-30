@@ -2,9 +2,9 @@ import React from 'react';
 import {connect} from 'dva';
 import styles from './index.less';
 
-import SideBar from '../../components/SideBar';
-import MiddleArea from '../../components/MiddleArea';
-import RightArea from '../../components/RightArea';
+import SideBar from '../../../../components/SideBar/index';
+import MiddleArea from '../../../../components/MiddleArea/index';
+import RightArea from '../../../../components/RightArea/index';
 
 
 function Modelling({location, dispatch, modelling}) {

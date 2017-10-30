@@ -204,9 +204,7 @@ def get_all_jobs_of_project(project_id, categories, status=None):
                 try:
                     result_sds = staging_data_set_business.get_by_job_id(
                         job['id']).to_mongo()
-                except DoesNotExist:
-                    result_sds = None
-                finally:
+
                     if result_sds:
                         if key == 'model':
                             # model results
@@ -223,6 +221,9 @@ def get_all_jobs_of_project(project_id, categories, status=None):
                                 'result'] if result_sds and "result" in result_sds else None
                         job_info['results_staging_data_set_id'] = result_sds[
                             '_id'] if result_sds else None
+                except DoesNotExist:
+                    result_sds = None
+
 
                 # model running status info
                 # if key == 'model':

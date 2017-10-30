@@ -102,7 +102,6 @@ function Sidebar({model, dispatch, namespace}) {
                 color = null;
               }
               return (
-
                 <div
                   key={section._id + section.section_name}
                   onClick={() => onClickSection(section._id)}

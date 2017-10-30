@@ -1,8 +1,8 @@
 from uuid import getnode as get_mac
 
-MONGO = 'DEFAULT'
-# if get_mac() == 274973436731254:
-#     MONGO = 'DEFAULT'
+MONGO = 'EXTERNAL'
+if get_mac() == 274973436731254:
+    MONGO = 'DEFAULT'
 PORT = 5000
 FILL_BLANK = 'BLANK_GRID'
 ALLOWED_EXTENSIONS = {'zip', 'csv', 'png', 'jpg', 'jpeg', 'txt'}

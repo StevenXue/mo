@@ -11,9 +11,9 @@ function DataImport({ match, history }) {
       </div>
       <div className={styles.container}>
         <MyCard icon='cloud-upload' text='Upload new files' style={{ marginRight: 58 }}
-                onClick={() => history.push(`/projects/${match.params.projectID}/import/upload`)}/>
+                onClick={() => history.push(`/workspace/${match.params.projectID}/import/upload`)}/>
         <MyCard icon='switcher' text='Choose from existing' style={{ marginRight: 58 }}
-                onClick={() => history.push(`/projects/${match.params.projectID}/import/select`)}/>
+                onClick={() => history.push(`/workspace/${match.params.projectID}/import/select`)}/>
       </div>
     </div>
   )
