@@ -192,29 +192,28 @@ export default {
     },
 
     addRemoveField(state, action) {
-      const fieldName = action.payload.fieldName
-      const section = state.sectionsJson[action.payload.sectionId]
-      const values = section.steps[action.payload.stepIndex].args[0].values
+      const {stepIndex, argIndex, fieldName, sectionId} = action.payload;
+
+      // const fieldName = action.payload.fieldName
+      // const section = state.sectionsJson[action.payload.sectionId]
+      // const values = section.steps[action.payload.stepIndex].args[0].values
+
+      const values = state.sectionsJson[sectionId].steps[stepIndex].args[argIndex].values;
+
       if (!values.includes(fieldName)) {
-        values.push(fieldName)
+        values.push(fieldName);
         console.log('push', values)
 
       } else {
-        values.splice(values.indexOf(fieldName), 1)
+        values.splice(values.indexOf(fieldName), 1);
         console.log('pop', values)
-
       }
-      section.steps[1].args[0].values = values
-
-      console.log('section', section)
+      let sectionsJson = state.sectionsJson;
+      sectionsJson[sectionId].steps[stepIndex].args[argIndex].values = values
 
       return {
         ...state,
-        sectionsJson: {
-          ...state.sectionsJson,
-          [action.payload.sectionId]: section,
-
-        },
+        sectionsJson
       }
     },
 
@@ -450,7 +449,9 @@ export default {
       const sectionsJson = yield select(state => state[namespace].sectionsJson)
       // const section = sectionsJson[action.payload.sectionId];
       const { data } = yield call(stagingDataService.fetchFields, action.payload.stagingDatasetId)
-      sectionsJson[action.payload.sectionId].steps[stepIndex + 1].args[argIndex].fields = data
+
+      sectionsJson[action.payload.sectionId].steps[stepIndex].args[argIndex].fields = data
+
       yield put({ type: 'setSections', payload: { sectionsJson: sectionsJson } })
 
     },
