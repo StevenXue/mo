@@ -5,6 +5,7 @@ import { connect } from 'dva'
 import { Select, Collapse, Button, Input, Popover, Icon, Tooltip, Card } from 'antd'
 import ToolBar from '../ToolBar/index'
 import LayerCard from '../../../routes/workspace/modelling/LayerCard'
+import ParamsMapper from '../../ParamsMapper'
 import { format } from '../../../utils/base'
 
 // import  from '../../../index.less'
@@ -171,10 +172,38 @@ function WorkBench({ section, model, dispatch, namespace }) {
     })
   }
 
+  function updateLayerArgs(value, stepIndex, argIndex, valueIndex) {
+    // e = format(e, baseSteps[stepIndex].args[argIndex]['value_type'])
+    dispatch({
+      type: namespace + '/updateLayerArgs',
+      payload: {
+        sectionId: section._id,
+        stepIndex,
+        argIndex,
+        value,
+        valueIndex,
+      },
+    })
+  }
+
   function setValueOfValues(e, stepIndex, argIndex, valueIndex) {
     // e = format(e, baseSteps[stepIndex].args[argIndex]['value_type'])
     dispatch({
       type: namespace + '/setValueOfValues',
+      payload: {
+        sectionId: section._id,
+        stepIndex,
+        argIndex,
+        value: e,
+        valueIndex,
+      },
+    })
+  }
+
+  function updateValueOfValues(e, stepIndex, argIndex, valueIndex) {
+    // e = format(e, baseSteps[stepIndex].args[argIndex]['value_type'])
+    dispatch({
+      type: namespace + '/updateValueOfValues',
       payload: {
         sectionId: section._id,
         stepIndex,
@@ -225,27 +254,32 @@ function WorkBench({ section, model, dispatch, namespace }) {
     } else if (valueIndex === length - 1) {
       return 'Output Layer'
     } else {
-      return 'Hidden Layer'
+      return `Hidden Layer ${valueIndex}`
     }
   }
 
-  function NetworkBuilder({ step, stepIndex }) {
+  function networkBuilder(step, stepIndex) {
     return (
       <div>
         {step.args.map((arg, argIndex) => {
           const values = step.args[argIndex].values
           return (
-            <div key={arg.name}>
+            <div key={argIndex}>
               {
                 values.map((value, valueIdx) =>
                   <LayerCard
                     title={getTitle(valueIdx, values.length)}
-                    key={valueIdx}
+                    key={'layercard' + valueIdx}
                     layerIndex={valueIdx}
-                    step={step} {...{ model, dispatch, namespace }}
+                    argIndex={argIndex}
+                    arg={arg}
+                    baseSteps={baseSteps}
+                    {...{ model, dispatch, namespace }}
                     funcs={{
                       addValue: (e) => addValue(e, stepIndex, argIndex, valueIdx + 1),
                       setValueOfValues: (e) => setValueOfValues(e, stepIndex, argIndex, valueIdx),
+                      updateValueOfValues: (e) => updateValueOfValues(e, stepIndex, argIndex, valueIdx),
+                      updateLayerArgs: (e) => updateLayerArgs(e, stepIndex, argIndex, valueIdx),
                     }}
                   />,
                 )
@@ -262,6 +296,24 @@ function WorkBench({ section, model, dispatch, namespace }) {
               </div>
             </div>)
         })}
+      </div>
+    )
+  }
+
+  function renderParameters(step, stepIndex) {
+    return (
+      <div>
+        <ParamsMapper args={step.args}/>
+        <div className={styles.end_button}>
+          <Button type="primary" className={styles.button} onClick={() =>
+            dispatch({
+              type: namespace + '/setActiveKey',
+              payload: {
+                activeKey: [String(stepIndex), String(stepIndex + 1)],
+                sectionId: section._id,
+              },
+            })}>next</Button>
+        </div>
       </div>
     )
   }
@@ -380,16 +432,14 @@ function WorkBench({ section, model, dispatch, namespace }) {
                     return (
                       <Panel header="Build Network" key={stepIndex}
                              className={styles.panel}>
-                        <NetworkBuilder step={step} stepIndex={stepIndex}/>
+                        {networkBuilder(step, stepIndex)}
                       </Panel>
                     )
                   case 'custom':
                     return (
-                      <Panel header="Parameter" key={stepIndex}
+                      <Panel header={step.display_name} key={stepIndex}
                              className={styles.panel}>
-                        <div>
-                          custom Panel
-                        </div>
+                        {renderParameters(step, stepIndex)}
                       </Panel>
                     )
                 }

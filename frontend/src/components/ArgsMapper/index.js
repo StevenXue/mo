@@ -5,9 +5,11 @@ import styles from './index.less'
 const FormItem = Form.Item
 
 function ArgsMapper({
-                      args,
-                      layerName,
+                      layerIndex,
+                      layers,
+                      value,
                       form: {
+                        getFieldValue,
                         getFieldsValue,
                         getFieldDecorator,
                         validateFields,
@@ -15,6 +17,8 @@ function ArgsMapper({
                       funcs: {
                         addValue,
                         setValueOfValues,
+                        updateLayerArgs,
+                        updateValueOfValues,
                       },
                     }) {
 
@@ -22,6 +26,18 @@ function ArgsMapper({
     labelCol: { span: 4 },
     wrapperCol: { span: 14 },
   }
+
+  let args = []
+  if (value.args) {
+    args = value.args
+  } else {
+    let layerName = getFieldValue('name')
+    if (layerName) {
+      args = layers.find(e => e.name === layerName).args
+    }
+  }
+
+  // updateValueOfValues({units: 32, activation: 'relu', input_shape: [1,1]})
 
   const valueParser = {
     int: (e) => parseInt(e),
@@ -32,12 +48,15 @@ function ArgsMapper({
   const splitHandler = (e, type, valueType) => {
     switch (type) {
       case 'multiple_input':
-        return e.target.value.split(',').map(e => {
-          if (e === '') {
-            return ''
-          }
-          return valueParser[valueType](e)
-        })
+        const splitValue = e.target.value.split(',')
+        // FIXME
+        if (splitValue.includes('')) {
+          return e.target.value
+        } else {
+          return e.target.value.split(',').map(e => {
+            return valueParser[valueType](e)
+          })
+        }
       case 'input':
         return valueParser[valueType](e.target.value)
       default:
@@ -49,10 +68,20 @@ function ArgsMapper({
     switch (arg.type) {
       case 'multiple_input':
       case 'input':
-        return <Input/>
+        return <Input />
       case 'choice':
         return (
-          <Select style={{ width: 142 }}>
+          <Select style={{ width: 142 }} >
+            {
+              arg.range.map((option) =>
+                <Select.Option value={option} key={option}>{option}</Select.Option>,
+              )
+            }
+          </Select>
+        )
+      case 'multiple_choice':
+        return (
+          <Select style={{ width: 142 }} mode='multiple' >
             {
               arg.range.map((option) =>
                 <Select.Option value={option} key={option}>{option}</Select.Option>,
@@ -61,16 +90,45 @@ function ArgsMapper({
           </Select>
         )
       default:
-        return <Input/>
+        return <Input />
     }
   }
+
   return (
     <Form layout='inline' className={styles.form}
+          key={`layer-form-${layerIndex}`}
       // onSubmit={handleSubmit}
-          >
+    >
+      <FormItem
+        label={'Select Layer'}
+        key='layer-select'
+        // className={styles.item}
+      >
+        {
+          getFieldDecorator('name', {
+            // initialValue: 'Dense',
+            // getValueFromEvent: value => value,
+            rules: [
+              { required: true },
+            ],
+          })(
+            <Select placeholder="Choose Layer" style={{ width: 142 }}
+                    onChange={(value) => {
+                      args = layers.find(e => e.name === value).args
+                      updateValueOfValues({name: value, args})
+                    }}>
+              {
+                layers.map((e) =>
+                  <Select.Option value={e.name} key={e.name}>{e.name}</Select.Option>,
+                )
+              }
+            </Select>,
+          )
+        }
+      </FormItem>
       {
         args.map((arg, i) => <FormItem
-          key={arg.name}
+          key={i}
           label={arg.display_name}
           // className={styles.item}
         >
@@ -87,24 +145,26 @@ function ArgsMapper({
       }
       {/*{args.length > 0 &&*/}
       {/*<FormItem*/}
-        {/*wrapperCol={{ span: 12, offset: 2 }}*/}
+      {/*wrapperCol={{ span: 12, offset: 2 }}*/}
       {/*>*/}
-        {/*<Button type="primary" size='small' htmlType="submit">Generate Layer</Button>*/}
+      {/*<Button type="primary" size='small' htmlType="submit">Generate Layer</Button>*/}
       {/*</FormItem>*/}
       {/*}*/}
     </Form>
   )
 }
 
-const handleSubmit = ({
-                        layerName,
-                        funcs: {
-                          addValue,
-                          setValueOfValues,
-                        },
-                      }, layer) => {
-  layer.name = layerName
-  setValueOfValues(layer)
+const handleValuesChange = ({
+                              layerName,
+                              funcs: {
+                                addValue,
+                                setValueOfValues,
+                                updateValueOfValues,
+                                updateLayerArgs,
+                              },
+                            }, layer) => {
+
+  updateLayerArgs(layer)
 }
 
-export default Form.create({ onValuesChange: (props, layer) => handleSubmit(props, layer) })(ArgsMapper)
+export default Form.create({ onValuesChange: (props, layer) => handleValuesChange(props, layer) })(ArgsMapper)
