@@ -5,14 +5,17 @@ import { connect } from 'dva'
 import pathToRegexp from 'path-to-regexp'
 
 import Users from './routes/Users.js'
-import Login from './routes/Login'
-import Projects from './routes/Projects'
-import ProjectDetail from './routes/ProjectDetail'
+import Login from './routes/login/Login'
+import MyProjects from './routes/workspace/info/Projects'
+import Projects from './routes/projects/Projects'
+import ProjectDetail from './routes/workspace/info/ProjectDetail'
 import MainLayout from './components/MainLayout/MainLayout'
 
 const breadcrumbNameMap = {
   '/login': 'Login',
-  '/projects': 'Project List',
+  '/workspace': 'My Projects',
+  '/projects': 'Projects',
+  '/deployed_models': 'Deployed Models',
 }
 
 const RouterConfig = ({ history, location, login }) => {
@@ -21,8 +24,8 @@ const RouterConfig = ({ history, location, login }) => {
   const extraBreadcrumbItems = pathSnippets.map((_, index) => {
     const url = `/${pathSnippets.slice(0, index + 1).join('/')}`
     let breadcrumbName
-    const matchDetail = pathToRegexp('/projects/:projectId').exec(url)
-    const matchPro = pathToRegexp('/projects/:projectId/:step').exec(url)
+    const matchDetail = pathToRegexp('/workspace/:projectId').exec(url)
+    const matchPro = pathToRegexp('/workspace/:projectId/:step').exec(url)
     if (matchDetail) {
       breadcrumbName = `Project Info`
     } else if (matchPro) {
@@ -51,7 +54,8 @@ const RouterConfig = ({ history, location, login }) => {
         <Switch>
           <Route path="/" exact component={Users}/>
           <Route path="/login" component={Login}/>
-          <Route path="/projects/:projectId" component={ProjectDetail}/>
+          <Route path="/workspace/:projectId" component={ProjectDetail}/>
+          <Route path="/workspace" component={MyProjects}/>
           <Route path="/projects" component={Projects}/>
         </Switch>
       </div>

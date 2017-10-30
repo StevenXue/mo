@@ -19,6 +19,12 @@ const menuConfig = [
     text: 'Home',
   },
   {
+    key: '/workspace',
+    Link: '/workspace',
+    Icon: null,
+    text: 'Workspace',
+  },
+  {
     key: '/projects',
     Link: '/projects',
     Icon: null,
@@ -29,12 +35,6 @@ const menuConfig = [
     Link: '/deployed_models',
     Icon: null,
     text: 'Deployed Models',
-  },
-  {
-    key: '/playground',
-    Link: '/playground',
-    Icon: null,
-    text: 'Playground',
   },
 
 ]

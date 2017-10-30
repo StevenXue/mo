@@ -42,7 +42,7 @@ function Steps({match, history, location}) {
         {paths.map((p, i) =>
           <div className={styles.step} key={paths[i]}>
             <div style={{display: 'flex', flexDirection: 'column'}}>
-              <Link to={`/projects/${match.params.projectId}/${paths[i]}`}>
+              <Link to={`/workspace/${match.params.projectId}/${paths[i]}`}>
                 <Button
                   shape="circle"
                   type={paths[i] === activePage ? 'primary' : 'default'}

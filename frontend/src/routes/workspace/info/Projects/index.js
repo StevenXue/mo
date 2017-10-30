@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'dva'
 import { Select, Button, Card } from 'antd'
-import ProjectModel from '../../components/ProjectModel'
-import { showTime } from '../../utils'
-import { privacyChoices } from '../../constants'
+import ProjectModel from '../../../../components/ProjectModel/index'
+import { showTime } from '../../../../utils/index'
+import { privacyChoices } from '../../../../constants'
 
 import styles from './index.less'
 
@@ -16,7 +16,7 @@ function Projects({ history, project, dispatch }) {
   }
 
   function toProjectDetail(id, history) {
-    history.push(`/projects/${id}`)
+    history.push(`/workspace/${id}`)
   }
 
   return (

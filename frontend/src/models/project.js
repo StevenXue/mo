@@ -53,7 +53,9 @@ export default {
     // 当进入该页面是 获取用户所有 project
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
-        if (pathname === '/projects') {
+        if (pathname === '/workspace') {
+          dispatch({ type: 'fetch', privacy: 'all' })
+        } else if (pathname === '/projects') {
           dispatch({ type: 'fetch', privacy: 'all' })
         }
       })

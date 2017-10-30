@@ -116,7 +116,8 @@ function MiddleArea({model, dispatch, namespace, step}) {
               </TabPane> :
 
               <TabPane
-                tab={sectionsJson[active_sectionId].section_name || sectionsJson[active_sectionId]._id} key={active_sectionId}
+                tab={sectionsJson[active_sectionId].section_name || sectionsJson[active_sectionId]._id}
+                key={active_sectionId}
                 closabel={true}>
                 <WorkBench section={sectionsJson[active_sectionId]}
                            {...{model, dispatch, namespace, step}}

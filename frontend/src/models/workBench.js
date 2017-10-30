@@ -243,6 +243,41 @@ export default {
       }
     },
 
+    // setValues(){
+    //
+    // },
+
+    addValue(state, action) {
+      const {sectionId, stepIndex, argIndex, value, valueIndex} = action.payload;
+
+      let sectionsJson = state.sectionsJson;
+      sectionsJson[sectionId].steps[stepIndex].args[argIndex].values.splice(valueIndex, 0, value)
+      return {
+        ...state,
+        sectionsJson
+      }
+    },
+
+    setValueOfValues(state, action){
+      const {sectionId, stepIndex, argIndex, value, valueIndex} = action.payload;
+      let sectionsJson = state.sectionsJson;
+      sectionsJson[sectionId].steps[stepIndex].args[argIndex].values[valueIndex] = value;
+      return {
+        ...state,
+        sectionsJson
+      }
+    },
+
+    setLayerParameter(state, action) {
+      const {sectionId, stepIndex, argIndex, value} = action.payload;
+      let sectionsJson = state.sectionsJson;
+      sectionsJson[sectionId].steps[stepIndex].args[argIndex].value = value;
+      return {
+        ...state,
+        sectionsJson
+      }
+    },
+
     setActiveKey(state, action) {
 
       const {sectionId, activeKey} = action.payload;
@@ -435,7 +470,7 @@ export default {
     //     modelling: 'model',
     //   };
     //   return history.listen(({ pathname }) => {
-    //     const match = pathToRegexp('/projects/:projectId/:categories').exec(pathname)
+    //     const match = pathToRegexp('/workspace/:projectId/:categories').exec(pathname)
     //     if (match) {
     //       let projectId = match[1];
     //       let path = match[2];

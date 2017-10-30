@@ -19,7 +19,7 @@ const dataAnalysis = modelExtend(workBench, {
     // 当进入该页面是 获取用户所有 section
     setup({dispatch, history}) {
       return history.listen(({pathname}) => {
-        const match = pathToRegexp('/projects/:projectId/analysis').exec(pathname);
+        const match = pathToRegexp('/workspace/:projectId/analysis').exec(pathname);
         if (match) {
           let projectId = match[1];
 

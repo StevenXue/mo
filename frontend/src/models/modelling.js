@@ -6,11 +6,13 @@ const categories = 'model';
 
 const modelling = modelExtend(workBench, {
   namespace: 'modelling',
+  state: {
+  },
   subscriptions: {
     // 当进入该页面是 获取用户所有 section
     setup({dispatch, history}) {
       return history.listen(({pathname}) => {
-        const match = pathToRegexp('/projects/:projectId/modelling').exec(pathname);
+        const match = pathToRegexp('/workspace/:projectId/modelling').exec(pathname);
         if (match) {
           let projectId = match[1];
 

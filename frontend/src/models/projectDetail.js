@@ -26,7 +26,7 @@ export default {
       // const user_ID = 'dev_1'
       // payload['user_ID'] = yield select(state => state.login.user.user_ID)
       yield call(deleteProject, payload)
-      yield put(routerRedux.push('/projects'))
+      yield put(routerRedux.push('/workspace'))
     },
 
     *update({ body }, { call, put, select }) {
@@ -42,7 +42,7 @@ export default {
     // 当进入该页面获取project
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
-        const match = pathToRegexp('/projects/:projectId').exec(pathname)
+        const match = pathToRegexp('/workspace/:projectId').exec(pathname)
         if (match) {
           const projectId = match[1]
           dispatch({ type: 'fetch', projectId: projectId })
