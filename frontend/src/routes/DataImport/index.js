@@ -5,10 +5,7 @@ import MyCard from '../../components/MyCard'
 
 function DataImport({ match, history }) {
   return (
-    <div>
-      <div className={styles.head}>
-        Start your trip!
-      </div>
+    <div className={styles.whole}>
       <div className={styles.container}>
         <MyCard icon='cloud-upload' text='Upload new files' style={{ marginRight: 58 }}
                 onClick={() => history.push(`/workspace/${match.params.projectID}/import/upload`)}/>

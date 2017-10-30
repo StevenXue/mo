@@ -23,6 +23,9 @@ export default {
     stagingDataSet: [],
     dataSetName: '',
     dataSetDesc: '',
+    currentPage: 1,
+    totalPages: 10,
+    pageSize: 4,
 
   },
 
@@ -47,7 +50,6 @@ export default {
       const data = yield call(fetchDataSets)
       console.log(data)
       yield put({ type: 'setDataSets', payload: data.data })
-
     },
 
     * show(action, { call, put, select }) {
@@ -243,6 +245,27 @@ export default {
         stagingDataSet
       }
     },
+
+    setCurrentPage(state, {payload: currentPage }) {
+      return {
+        ...state,
+        currentPage
+      }
+    },
+
+    setTotalPages(state, {payload: totalPages }) {
+      return {
+        ...state,
+        totalPages
+      }
+    },
+
+    setPageSize(state, {payload: pageSize}) {
+      return {
+        ...state,
+        pageSize
+      }
+    }
 
   },
 

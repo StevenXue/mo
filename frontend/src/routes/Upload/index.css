@@ -1,11 +1,20 @@
+.whole {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 42px 49px;
+  height: 783px;
+}
 
 .head {
 
   font-size: 20px;
   font-weight: 500;
-  margin-top: 68px;
   margin-bottom: 53px;
-  color: #666666;
+
   display: flex;
 }
 
+.formItem {
+  font-size: 14px;
+}

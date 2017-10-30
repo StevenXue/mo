@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Form, Input, Select, Upload, Button, Icon } from 'antd'
+import { Form, Input, Select, Upload, Button, Icon, Tag, Tooltip } from 'antd'
 import { connect } from 'dva'
 import styles from './index.css'
 
@@ -15,8 +15,32 @@ class UploadData extends Component {
   constructor (props) {
     super(props);
     this.state = {
-      ...props
+      ...props,
+      tags: [],
+      inputVisible: false,
+    }
+  }
 
+  handleClose(removedTag) {
+    const tags = this.state.tags.filter(tag => tag !== removedTag).filter(e => e)
+    this.setState({ tags })
+    // dispatch({ type: 'upload/removeTag', payload: tags })
+  }
+
+  showInput() {
+    this.setState({ inputVisible: true })
+    // dispatch({ type: 'upload/showInput' })
+  }
+
+  handleInputChange(e) {
+    this.setState({ inputValue: e.target.value })
+    // dispatch({ type: 'upload/setInputValue', payload: e.target.value })
+  }
+
+  handleInputConfirm() {
+    if (this.state.inputValue && this.state.tags.indexOf(this.state.inputValue) === -1) {
+      const tags = [...this.state.tags, this.state.inputValue]
+      this.setState({tags, inputValue: undefined, inputVisible: false})
     }
   }
 
@@ -27,11 +51,10 @@ class UploadData extends Component {
     this.props.form.validateFields((err, values) => {
 
       if (!err) {
-        // console.log(values);
-        // let value = lodash.cloneDeep(values);
-        // value.tags = this.props.upload.tags.join(',');
+        console.log(values);
+
         dispatch({ type: 'upload/upload', payload: values })
-        // history.push('preview')
+
       } else {
 
         console.log('error', err)
@@ -50,16 +73,18 @@ class UploadData extends Component {
 
   render() {
     const { getFieldDecorator } = this.props.form
+    let tags = this.state.tags
     return (
-      <div>
+      <div className={styles.whole}>
+
         <div className={styles.head}>
-          Upload your file
+          Upload new file
         </div>
 
         <Form onSubmit={this.handleSubmit}>
           <FormItem
             { ...formItemLayout }
-            label='File name'
+            label={<span className={styles.formItem}>File Name</span>}
 
           >
             {
@@ -73,7 +98,7 @@ class UploadData extends Component {
 
           <FormItem
             { ...formItemLayout }
-            label='Description'
+            label={<span className={styles.formItem}>Description</span>}
           >
             {
               getFieldDecorator('description', {
@@ -87,7 +112,7 @@ class UploadData extends Component {
 
           <FormItem
             { ...formItemLayout }
-            label='Category'
+            label={<span className={styles.formItem}>Category</span>}
           >
             {
               getFieldDecorator('related_field', {
@@ -108,17 +133,52 @@ class UploadData extends Component {
 
           <FormItem
             { ...formItemLayout }
-            label='Tags'
+            label={<span className={styles.formItem}>Tag</span>}
           >
+            {
+              getFieldDecorator('tags', {
+                initialValue: tags.join(','),
+                getValueFromEvent: (e) => {
+                  return [...this.state.tags, e.target.value].join(',')
+                },
+                rules: [
+                  { required: false },
+                ],
+              })(
+                <div>
+                  {tags.length !== 0 && tags.map((tag, index) => {
+                    const isLongTag = tag.length > 15
+                    const tagElem = (
+                      <Tag key={tag} closable={true} afterClose={() => this.handleClose(tag)}>
+                        {isLongTag ? `${tag.slice(0, 15)}...` : tag}
+                      </Tag>
+                    )
+                    return isLongTag ? <Tooltip key={tag} title={tag}>{tagElem}</Tooltip> : tagElem
+                  })}
+                  {this.state.inputVisible ? (
+                    <Input
+                      //ref={input => this.input = input}
+                      type="text"
+                      size="small"
+                      style={{ width: 78 }}
+                      value={this.state.inputValue}
+                      onChange={(e) => this.handleInputChange(e)}
+                      onBlur={() => this.handleInputConfirm()}
+                      onPressEnter={() => this.handleInputConfirm()}
+                    />
+                  ) : <Button size="small" type="dashed" onClick={() => this.showInput()}>+ New Tag</Button>}
+
+                </div>
+              )
+            }
           </FormItem>
 
           <FormItem
             {...formItemLayout }
-            label='Upload'
+            label={<span className={styles.formItem}>Upload</span>}
             extra="Please choose file"
             // fileList={this.state.fileList}
           >
-
             {getFieldDecorator('upload', {
               // valuePropName: 'fileList',
               rules: [
@@ -136,7 +196,6 @@ class UploadData extends Component {
               </Upload>
             )}
           </FormItem>
-
           <FormItem
             wrapperCol={{ span: 12, offset: 2 }}
           >
