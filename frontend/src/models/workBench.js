@@ -31,7 +31,13 @@ export default {
     mouseOverField: null,
 
     // activeKey: ['1']
+    getSectionLoading: false,
 
+    spinLoading: {
+      getSections: false,
+      getAlgorithms: false,
+      wholePage: false,
+    }
 
   },
   reducers: {
@@ -226,7 +232,7 @@ export default {
       }
     },
 
-
+    // 设置value
     setParameter(state, action) {
       const {sectionId, stepIndex, argIndex, value} = action.payload;
       let sectionsJson = state.sectionsJson;
@@ -247,28 +253,62 @@ export default {
         ...state,
         sectionsJson
       }
-    }
+    },
+
+    setGetSectionLoading(state, action) {
+      return {
+        ...state,
+        getSectionLoading: action.payload.loading
+      }
+    },
+
+    setLoading(state, action) {
+      return {
+        ...state,
+        spinLoading: {
+          ...state.spinLoading,
+          [action.payload.key]: action.payload.loading
+        }
+      }
+    },
+
+
 
 
   },
   effects: {
     // 获取用户所有sections
     * fetchSections(action, {call, put}) {
+      yield put({type: 'setGetSectionLoading', payload:{loading: true}});
+
       const {data: {[action.categories]: sections}} = yield call(dataAnalysisService.fetchSections, {
         projectId: action.projectId,
         categories: action.categories,
       });
+      yield put({type: 'setGetSectionLoading', payload:{loading: false}});
+
       // array to json
       const sectionsJson = arrayToJson(sections, '_id');
       yield put({type: 'setSections', payload: {sectionsJson: sectionsJson}})
     },
 
     * fetchAlgorithms(action, {call, put}) {
+      yield put({type: 'setLoading', payload:{
+        key: 'getAlgorithms',
+        loading: true
+      }});
+
       const requestFunc = {
         toolkit: dataAnalysisService.fetchToolkits,
         model: modelService.fetchModels,
       };
       const {data: algorithms} = yield call(requestFunc[action.categories]);
+
+      yield put({type: 'setLoading', payload:{
+        key: 'getAlgorithms',
+        loading: false
+      }});
+
       yield put({type: 'setAlgorithms', payload: {algorithms: algorithms}})
     },
     // 删除 section
@@ -361,12 +401,21 @@ export default {
     },
 
     * runSection(action, {call, put, select}) {
+      yield put({type: 'setLoading', payload:{
+        key: 'wholePage',
+        loading: true
+      }});
+
       const {namespace, sectionId} = action.payload;
       // 先把 save section 复制过来
       const sectionsJson = yield select(state => state[namespace].sectionsJson);
       const section = sectionsJson[sectionId];
       yield call(dataAnalysisService.saveSection, {section: section});
 
+      yield put({type: 'setLoading', payload:{
+        key: 'wholePage',
+        loading: false
+      }});
 
       const projectId = yield select(state => state[namespace].projectId);
 
@@ -375,11 +424,7 @@ export default {
         projectId: projectId,
       });
 
-      console.log("result", result)
-
-
     }
-
 
   },
   subscriptions: {

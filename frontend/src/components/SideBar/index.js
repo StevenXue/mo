@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './index.less';
 import {connect} from 'dva';
-import {Menu, Dropdown, Icon} from 'antd';
+import {Menu, Dropdown, Icon, Spin} from 'antd';
 
 
 import {arrayToJson, JsonToArray} from '../../utils/JsonUtils';
@@ -12,7 +12,9 @@ function Sidebar({model, dispatch, namespace}) {
     isLeftSideBar,
     sectionsJson,
     activeSectionsId,
-    focusSectionsId
+    focusSectionsId,
+
+    getSectionLoading
   } = model;
 
   const sections = JsonToArray(sectionsJson);
@@ -89,6 +91,8 @@ function Sidebar({model, dispatch, namespace}) {
           </div>
           <Icon type="plus" onClick={onClickAdd} style={{fontSize: 20}}/>
         </div>
+        <Spin spinning={getSectionLoading}>
+
         {
           sections.map((section, i) => {
               let backgroundColor;
@@ -126,6 +130,7 @@ function Sidebar({model, dispatch, namespace}) {
               )
             }
           )}
+        </Spin>
       </div> :
       <div className={styles.left_column}>
         <div className={styles.text_reverse}>

@@ -291,7 +291,10 @@ function WorkBench({section, model, dispatch, namespace}) {
                                 {getArgs(baseSteps, stepIndex, argIndex).display_name}
                               </span>
                               <div className={styles.row}>
-                                <Input placeholder="" defaultValue={arg.value}
+                                {console.log('arg.value', arg.value) }
+                                <Input placeholder=""
+                                       defaultValue={arg.value}
+                                       // value={arg.value}
                                        onChange={(e) => handleOnChangeArgs(e.target.value, stepIndex, argIndex)}/>
 
 
