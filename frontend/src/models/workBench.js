@@ -187,7 +187,7 @@ export default {
     addRemoveField(state, action) {
       const fieldName = action.payload.fieldName
       const section = state.sectionsJson[action.payload.sectionId]
-      const values = section.steps[1].args[0].values
+      const values = section.steps[action.payload.stepIndex].args[0].values
       if (!values.includes(fieldName)) {
         values.push(fieldName)
         console.log('push', values)

@@ -113,10 +113,11 @@ function WorkBench({ section, model, dispatch, namespace }) {
     })
   }
 
-  function handleClickField(fieldName) {
+  function handleClickField(fieldName, stepIndex) {
     dispatch({
       type: namespace + '/addRemoveField',
       payload: {
+        stepIndex,
         fieldName,
         sectionId: section._id,
       },
@@ -229,7 +230,7 @@ function WorkBench({ section, model, dispatch, namespace }) {
     })
   }
 
-  function FieldSelector({ step, stepIndex }) {
+  function fieldSelector(step, stepIndex) {
     return (
       <div>
         <div className={styles.fields}>
@@ -238,7 +239,7 @@ function WorkBench({ section, model, dispatch, namespace }) {
             <div
               key={field[0]}
               className={styles.field}
-              onClick={() => handleClickField(field[0])}
+              onClick={() => handleClickField(field[0], stepIndex)}
               style={{
                 backgroundColor: (step.args[0].values).includes(field[0]) ? '#34C0E2' : '#F3F3F3',
                 color: mouseOverField === field[0] ? 'green' : 'grey',
@@ -384,19 +385,19 @@ function WorkBench({ section, model, dispatch, namespace }) {
                     return <Panel header="Select Fields" key={stepIndex}
                                   className={styles.panel}
                     >
-                      <FieldSelector step={step} stepIndex={stepIndex} key={step.name}/>
+                        {fieldSelector(step, stepIndex)}
                     </Panel>
                   case 'feature_fields':
                     return (
                       <Panel header="Select Feature Fields" key={stepIndex}
                              className={styles.panel}>
-                        <FieldSelector step={step} stepIndex={stepIndex} key={step.name}/>
+                        {fieldSelector(step, stepIndex)}
                       </Panel>
                     )
                   case 'label_fields':
                     return <Panel header="Select Label Fields" key={stepIndex}
                                   className={styles.panel}>
-                      <FieldSelector step={step} stepIndex={stepIndex} key={step.name}/>
+                      {fieldSelector(step, stepIndex)}
                     </Panel>
                   case 'parameters':
                     return (
