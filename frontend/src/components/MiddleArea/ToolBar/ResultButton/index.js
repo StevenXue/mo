@@ -10,7 +10,6 @@ class ResultButton extends Component {
     onFocus: false,
 
     visible: false,
-
   };
 
   // handleClickResult() {
@@ -44,7 +43,7 @@ class ResultButton extends Component {
                  </Button>
                ]}
         >
-          <VisualizationPanel visual_sds_id={this.props.visual_sds_id} />
+          <VisualizationPanel {...this.props}/>
         </Modal>
 
       </div>

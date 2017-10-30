@@ -342,9 +342,18 @@ export default {
       }
     },
 
-
-
-
+    setSectionResult(state, action){
+      const {sectionId, result} = action.payload;
+      let section = state.sectionsJson[sectionId];
+      section['result'] = result;
+      return {
+        ...state,
+        sectionsJson: {
+          ...state.sectionsJson,
+          [sectionId]:section
+        }
+      }
+    }
   },
   effects: {
     // 获取用户所有sections
@@ -482,39 +491,26 @@ export default {
       yield call(dataAnalysisService.saveSection, { section: section })
 
 
-yield put({type: 'setLoading', payload:{
-        key: 'wholePage',
-        loading: false
-      }});      const projectId = yield select(state => state[namespace].projectId)
+      const projectId = yield select(state => state[namespace].projectId);
 
-      const { data: { result } } = yield call(dataAnalysisService.runJob, {
+      const {data: {result: {result}}} = yield call(dataAnalysisService.runJob, {
         ...action.payload,
         projectId: projectId,
-      })
+      });
 
+      // 更新result
+      yield put({type: 'setSectionResult', payload:{
+        sectionId,
+        result
+      }});
+      yield put({type: 'setLoading', payload:{
+        key: 'wholePage',
+        loading: false
+      }});
     }
 
   },
   subscriptions: {
-    // 当进入该页面是 获取用户所有 section
-    // setup({ dispatch, history }) {
-    //   const pathJson = {
-    //     analysis: 'toolkit',
-    //     modelling: 'model',
-    //   };
-    //   return history.listen(({ pathname }) => {
-    //     const match = pathToRegexp('/workspace/:projectId/:categories').exec(pathname)
-    //     if (match) {
-    //       let projectId = match[1];
-    //       let path = match[2];
-    //       if (path in pathJson) {
-    //         const categories = pathJson[path];
-    //         dispatch({ type: 'fetchSections', projectId: projectId, categories })
-    //         dispatch({ type: 'fetchAlgorithms', categories });
-    //         dispatch({ type: 'fetchStagingDatasetList' });
-    //       }
-    //     }
-    //   })
-    // },
+
   },
 }

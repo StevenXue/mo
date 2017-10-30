@@ -6,6 +6,7 @@ import { isEmpty } from '../../../../utils/utils'
 import classnames from 'classnames';
 import style from './toolkit.css';
 
+import JSONTree from 'react-json-tree'
 
 export default class VisualizationPanel extends React.Component {
   constructor (props) {
@@ -23,40 +24,49 @@ export default class VisualizationPanel extends React.Component {
   }
 
   componentDidMount(){
-    this.setState({loading: true});
-    fetch(flaskServer + '/visualization/visualization/usr2', {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        "staging_data_set_id": this.props.visual_sds_id
-      })
-    }).then((response) => response.json())
-      .then((res) => {
-        this.setState({
-          loading: false,
-          responseBody: res.response,
-        });
 
-        console.log(res.response);
+    if(this.props.visual_sds_id){
+      this.setState({loading: true});
 
-        if(res.response.category && res.response.category === 2){
-          this.setState({selectedColOne: 0, selectedColTwo: 0})
-        }else if(res.response.category && res.response.category === 1){
-          this.setState({selected: res.response.X_fields[0]});
-          let data = {'x_domain': this.state.responseBody['scatter']['x_domain'][0],
-            'y_domain': this.state.responseBody['scatter']['y_domain']}
-          this.setState({scatterData: data});
-        }
+      fetch(flaskServer + '/visualization/visualization/usr2', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          "staging_data_set_id": this.props.visual_sds_id
+        })
+      }).then((response) => response.json())
+        .then((res) => {
+          this.setState({
+            loading: false,
+            responseBody: res.response,
+          });
 
-        if(res.response.hist_freq){
-          let label = Object.keys(res.response.hist_freq);
-          this.setState({dataSelected: res.response.hist_freq[label[0]]})
-          console.log(res.response, label);
-          this.setState({selected: Object.keys(res.response.hist_freq)[0]})
-        }
-      });
+          console.log(res.response);
+
+          if(res.response.category && res.response.category === 2){
+            this.setState({selectedColOne: 0, selectedColTwo: 0})
+          }else if(res.response.category && res.response.category === 1){
+            this.setState({selected: res.response.X_fields[0]});
+            let data = {'x_domain': this.state.responseBody['scatter']['x_domain'][0],
+              'y_domain': this.state.responseBody['scatter']['y_domain']}
+            this.setState({scatterData: data});
+          }
+
+          if(res.response.hist_freq){
+            let label = Object.keys(res.response.hist_freq);
+            this.setState({dataSelected: res.response.hist_freq[label[0]]})
+            console.log(res.response, label);
+            this.setState({selected: Object.keys(res.response.hist_freq)[0]})
+          }
+        })
+        .catch((err)=>{
+          this.setState({loading: false});
+        })
+      ;
+    }
+
   }
 
   onSelectData(values) {
@@ -418,6 +428,34 @@ export default class VisualizationPanel extends React.Component {
   render(){
     return(
     <div style={{width: '100%'}}>
+
+      <div style={{height: 200, overflowY: 'auto'}}>
+        <JSONTree data={ this.props.result }
+                  style={{width: '100%', height: 400}}
+                  theme={{
+                    scheme: 'google',
+                    author: 'seth wright (http://sethawright.com)',
+                    base00: '#1d1f21',
+                    base01: '#282a2e',
+                    base02: '#373b41',
+                    base03: '#969896',
+                    base04: '#b4b7b4',
+                    base05: '#c5c8c6',
+                    base06: '#e0e0e0',
+                    base07: '#ffffff',
+                    base08: '#CC342B',
+                    base09: '#F96A38',
+                    base0A: '#FBA922',
+                    base0B: '#198844',
+                    base0C: '#3971ED',
+                    base0D: '#3971ED',
+                    base0E: '#A36AC7',
+                    base0F: '#3971ED'
+                  }}
+                  invertTheme={true} />
+      </div>
+
+
       <Spin spinning={this.state.loading}>
         {this.renderPanel()}
       </Spin>

@@ -13,15 +13,7 @@ const Option = Select.Option;
 const Panel = Collapse.Panel;
 
 import {translateDict} from '../../../constants'
-// const JsonToArray = (json, key) => {
-//   let arr = []
-//   for (let prop in json) {
-//     let newObject = json[prop]
-//     newObject[[key]] = prop
-//     arr.push(newObject)
-//   }
-//   return arr
-// }
+
 
 function getArgs(baseSteps, stepIndex, argIndex) {
 
@@ -40,13 +32,16 @@ const content = (content) => (
 );
 
 
-function WorkBench({section, model, dispatch, namespace}) {
+function WorkBench({section, model, dispatch, namespace, preview}) {
   //state
   const {
-    stagingDataList,
     sectionsJson,
     mouseOverField,
   } = model;
+
+  const {
+    stagingDataList
+  } = preview;
 
   function handleBlur() {
     console.log('blur')
@@ -55,11 +50,6 @@ function WorkBench({section, model, dispatch, namespace}) {
   function handleFocus() {
     console.log('focus')
   }
-
-  // const translateDict = {
-  //   'dataAnalysis': 'toolkit',
-  //   'modelling': 'model',
-  // };
 
   const {
     _id: sectionId,
@@ -319,6 +309,83 @@ function WorkBench({section, model, dispatch, namespace}) {
     )
   }
 
+  function LastOrLastButton(stepIndex, stepLength) {
+    if (stepIndex !== stepLength - 1) {
+      return (
+        <Button type="primary" className={styles.button}
+                onClick={() => {
+                  dispatch({
+                    type: namespace + '/setActiveKey',
+                    payload: {
+                      activeKey: [String(stepIndex + 1)],
+                      sectionId: section._id,
+                    },
+                  })
+                }}>
+          next
+        </Button>
+      )
+    } else {
+      return (
+        <Button type="primary" className={styles.button}
+                onClick={() => {
+                  dispatch({
+                    type: namespace + '/runSection',
+                    payload: {
+                      sectionId,
+                      namespace
+                    }
+                  });
+                  dispatch({
+                    type: namespace + '/setActiveKey',
+                    payload: {
+                      activeKey: [],
+                      sectionId: section._id,
+                    },
+                  })
+                }}>
+          run
+        </Button>
+      )
+    }
+  }
+
+  const stepLength = steps.length;
+
+  function dataSource(args, stepIndex){
+    return (
+      args.map((arg, argIndex) =>
+        <div key={arg.name + argIndex}>
+          <Select
+            key={arg.name + argIndex}
+            className={styles.select}
+            showSearch
+            style={{width: 200}}
+            placeholder="Select a stagingData"
+            optionFilterProp="children"
+            onChange={(value) => handleChange(value, stepIndex, argIndex)}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            defaultValue={arg.value}
+            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+          >
+            {stagingDataList.map((stagingData) =>
+              <Option key={stagingData._id} value={stagingData._id}>{stagingData.name}</Option>,
+            )}
+          </Select>
+
+          {
+            <Button type="primary"
+                    onClick={() => handleNext(value, stepIndex, argIndex)}
+                    className={styles.button}>
+              next
+            </Button>
+          }
+        </div>,
+      )
+    )
+  }
+
   return (
     <div>
       <ToolBar sectionId={sectionId} {...{model, dispatch, namespace}}/>
@@ -334,35 +401,38 @@ function WorkBench({section, model, dispatch, namespace}) {
                     return <Panel
                       className={styles.panel}
                       header={getArgs(baseSteps, stepIndex).display_name} key={stepIndex}>
+
+                      {dataSource(step.args, stepIndex)}
                       {
-                        step.args.map((arg, argIndex) =>
-                          <div key={arg.name + argIndex}>
-                            <Select
-                              key={arg.name + argIndex}
-                              className={styles.select}
-                              showSearch
-                              style={{width: 200}}
-                              placeholder="Select a stagingData"
-                              optionFilterProp="children"
-                              onChange={(value) => handleChange(value, stepIndex, argIndex)}
-                              onFocus={handleFocus}
-                              onBlur={handleBlur}
-                              defaultValue={arg.value}
-                              filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-                            >
-                              {stagingDataList.map((stagingData) =>
-                                <Option key={stagingData._id} value={stagingData._id}>{stagingData.name}</Option>,
-                              )}
-                            </Select>
-
-                            <Button type="primary"
-                                    onClick={() => handleNext(arg.value, stepIndex, argIndex)}
-                                    className={styles.button}>
-                              next
-                            </Button>
-
-                          </div>,
-                        )
+                        // step.args.map((arg, argIndex) =>
+                        //   <div key={arg.name + argIndex}>
+                        //     <Select
+                        //       key={arg.name + argIndex}
+                        //       className={styles.select}
+                        //       showSearch
+                        //       style={{width: 200}}
+                        //       placeholder="Select a stagingData"
+                        //       optionFilterProp="children"
+                        //       onChange={(value) => handleChange(value, stepIndex, argIndex)}
+                        //       onFocus={handleFocus}
+                        //       onBlur={handleBlur}
+                        //       defaultValue={arg.value}
+                        //       filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                        //     >
+                        //       {stagingDataList.map((stagingData) =>
+                        //         <Option key={stagingData._id} value={stagingData._id}>{stagingData.name}</Option>,
+                        //       )}
+                        //     </Select>
+                        //
+                        //     {
+                        //       <Button type="primary"
+                        //               onClick={() => handleNext(value, stepIndex, argIndex)}
+                        //               className={styles.button}>
+                        //         next
+                        //       </Button>
+                        //     }
+                        //   </div>,
+                        // )
                       }
 
                     </Panel>;
@@ -390,14 +460,17 @@ function WorkBench({section, model, dispatch, namespace}) {
                       </div>
 
                       <div className={styles.end_button}>
-                        <Button type="primary" className={styles.button} onClick={() =>
-                          dispatch({
-                            type: namespace + '/setActiveKey',
-                            payload: {
-                              activeKey: [String(stepIndex + 1)],
-                              sectionId: section._id,
-                            },
-                          })}>next</Button>
+                        {
+                          LastOrLastButton(stepIndex, stepLength)
+                        }
+                        {/*<Button type="primary" className={styles.button} onClick={() =>*/}
+                        {/*dispatch({*/}
+                        {/*type: namespace + '/setActiveKey',*/}
+                        {/*payload: {*/}
+                        {/*activeKey: [String(stepIndex + 1)],*/}
+                        {/*sectionId: section._id,*/}
+                        {/*},*/}
+                        {/*})}>next</Button>*/}
                       </div>
                     </Panel>;
                   case 'feature_fields':
@@ -455,7 +528,7 @@ function WorkBench({section, model, dispatch, namespace}) {
                                 {getArgs(baseSteps, stepIndex, argIndex).display_name}
                               </span>
                               <div className={styles.row}>
-                                {console.log('arg.value', arg.value) }
+                                {console.log('arg.value', arg.value)}
                                 <Input placeholder="" defaultValue={arg.value}
                                        onChange={(e) => handleOnChangeArgs(e.target.value, stepIndex, argIndex)}/>
 
@@ -466,8 +539,8 @@ function WorkBench({section, model, dispatch, namespace}) {
                                   </Tooltip>
 
                                   {/*<Popover content={content(getArgs(baseSteps, stepIndex, argIndex).des)}*/}
-                                           {/*title="Help info">*/}
-                                    {/*<Icon type="question-circle-o"/>*/}
+                                  {/*title="Help info">*/}
+                                  {/*<Icon type="question-circle-o"/>*/}
                                   {/*</Popover>*/}
                                 </div>
 
@@ -476,17 +549,9 @@ function WorkBench({section, model, dispatch, namespace}) {
                           )
                         }
                         <div className={styles.end_button}>
-                          <Button type="primary" className={styles.button} onClick={() =>
-                            dispatch({
-                              type: namespace + '/runSection',
-                              payload: {
-                                sectionId,
-                                namespace
-                              }
-                            })
-                          }>
-                            run
-                          </Button>
+                          {
+                            LastOrLastButton(stepIndex, stepLength)
+                          }
                         </div>
                       </Panel>
                     )
@@ -556,5 +621,6 @@ function WorkBench({section, model, dispatch, namespace}) {
 //   </div>
 // }
 // export default connect(({ preview }) => ({ upload }))(WorkBench)
+export default connect(({preview}) => ({preview}))(WorkBench)
 
-export default WorkBench
+// export default WorkBench

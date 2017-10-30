@@ -101,11 +101,11 @@ def run_job():
     job_obj = job_business.get_by_job_id(job_id)
     # job_obj = json_utility.convert_to_json(job_obj.to_mongo())
     # print("job_obj.steps[2]", job_obj.steps[2])
-
-    args = job_obj.steps[2].get("args")
     new_args = {}
-    for arg in args:
-        new_args[arg['name']] = int(arg['value'])
+    if len(job_obj.steps) > 2:
+        args = job_obj.steps[2].get("args")
+        for arg in args:
+            new_args[arg['name']] = int(arg['value'])
 
     obj = {
         "staging_data_set_id": job_obj.steps[0]["args"][0]["value"],
