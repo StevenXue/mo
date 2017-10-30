@@ -26,6 +26,8 @@ from server3.business import staging_data_business
 from server3.business import staging_data_set_business
 from server3.service import staging_data_service, logger_service, \
     visualization_service
+from server3.service import toolkit_service
+
 from server3.business import ownership_business
 from server3.utility import data_utility
 from server3.lib import models
@@ -434,9 +436,30 @@ def add_new_column(value, index, fields, name, staging_data_set_id):
         staging_data_service.add_new_keys_value(staging_data_set_id, col_value)
 
 
-from server3.service import toolkit_service
-def run_job(obj, job_obj):
-    data = obj
+def steps_to_data(job_obj, project_id):
+    new_args = {}
+    if len(job_obj.steps) > 2:
+        args = job_obj.steps[2].get("args")
+        for arg in args:
+            new_args[arg['name']] = int(arg['value'])
+
+    obj = {
+        "staging_data_set_id": job_obj.steps[0]["args"][0]["value"],
+        "conf": {
+            "args": new_args,
+            "data_fields":
+            # ["HighAlpha", "Attention_dimension_reduction_PCA_col"]
+                job_obj.steps[1]["args"][0]["values"]
+        },
+        "project_id": project_id,
+        "toolkit_id": job_obj.toolkit.id,
+    }
+    return obj
+
+
+def run_toolkit_job(job_obj, project_id):
+    data = steps_to_data(job_obj, project_id)
+
     staging_data_set_id = data.get('staging_data_set_id')
     toolkit_id = data.get('toolkit_id')
     project_id = data.get('project_id')
