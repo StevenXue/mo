@@ -1,4 +1,12 @@
 
+.whole {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 80px 45px;
+  height: 799px;
+}
+
 .head {
 
   font-size: 20px;
