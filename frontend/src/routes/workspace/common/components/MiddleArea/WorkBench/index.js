@@ -3,11 +3,11 @@ import styles from './index.less'
 import { connect } from 'dva'
 
 import { Select, Collapse, Button, Input, Popover, Icon, Tooltip } from 'antd'
-import ToolBar from '../ToolBar/index'
-import ParamsMapper from '../../ParamsMapper'
-import { format } from '../../../utils/base'
+import ToolBar from './ToolBar/index'
+import ParamsMapper from '../../../../../../components/ParamsMapper/index'
+import { format } from '../../../../../../utils/base'
 
-import LayerCard from '../../../routes/workspace/modelling/LayerCard'
+import LayerCard from '../../../../modelling/LayerCard/index'
 import { get, isEqual } from 'lodash'
 
 // import  from '../../../index.less'
@@ -15,7 +15,7 @@ import { get, isEqual } from 'lodash'
 const Option = Select.Option
 const Panel = Collapse.Panel
 
-import { translateDict } from '../../../constants'
+import { translateDict } from '../../../../../../constants'
 
 function getArgs(baseSteps, stepIndex, argIndex) {
 

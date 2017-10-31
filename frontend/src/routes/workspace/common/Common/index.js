@@ -1,25 +1,16 @@
 import React from 'react';
-import {connect} from 'dva';
 import styles from './index.less';
 import {Spin} from 'antd';
 
-import SideBar from '../../components/SideBar';
-import MiddleArea from '../../components/MiddleArea';
-import RightArea from '../../components/RightArea';
+import SideBar from '../components/SideBar/index';
+import MiddleArea from '../components/MiddleArea/index';
+import RightArea from '../components/RightArea/index';
 
 
-function DataAnalysis({location, dispatch, dataAnalysis}) {
-  const props = {
-    model: dataAnalysis,
-    namespace: 'dataAnalysis',
-    dispatch: dispatch,
-    // step 用来干嘛了？
-    step: 'toolkit'
-  };
+function Common(props) {
   return (
-
     <div className={styles.container}>
-      <Spin  spinning={dataAnalysis.spinLoading.wholePage}>
+      <Spin  spinning={props.model.spinLoading.wholePage}>
 
         <div className={styles.content}>
           <div className={styles.sidebar}>
@@ -43,6 +34,4 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
     </div>
   );
 }
-
-
-export default connect(({dataAnalysis}) => ({dataAnalysis}))(DataAnalysis);
+export default Common;

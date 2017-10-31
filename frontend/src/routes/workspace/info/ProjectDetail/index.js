@@ -9,7 +9,7 @@ import { Icon, Button, Tag } from 'antd'
 
 // pages
 import DataImport from '../../../DataImport/index'
-import DataAnalysis from '../../../DataAnalysis/index'
+import DataAnalysis from '../../dataAnalysis/DataAnalysis/index'
 import Modelling from '../../modelling/Modelling/index'
 import Deployment from '../../../Deployment/index'
 import UploadData from '../../../Upload/index'

@@ -144,6 +144,7 @@ def keras_seq_to_str(obj, head_str, **kw):
                  'MongoModelCheckpoint\n'
     str_model += 'from server3.service import logger_service\n'
     str_model += 'from server3.service import job_service\n'
+    str_model += 'from server3.service import model_service\n'
     str_model += 'from server3.business import staging_data_set_business\n'
     str_model += layer_import
     str_model += head_str

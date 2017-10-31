@@ -3,8 +3,8 @@ import {connect} from 'dva';
 import {Icon, Button, Tooltip} from 'antd';
 import styles from './ToolBar.less';
 const ButtonGroup = Button.Group;
-import ResultButton from './ResultButton';
-import {translateDict} from '../../../constants'
+import ResultButton from './ResultButton/index';
+import {translateDict} from '../../../../../../../constants'
 
 function ToolBar({model, dispatch, namespace, sectionId}) {
   const {

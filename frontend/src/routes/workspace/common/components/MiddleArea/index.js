@@ -2,10 +2,10 @@ import React from 'react';
 import styles from './index.less';
 import {connect} from 'dva';
 import {Tabs} from 'antd';
-import WorkBench from './WorkBench';
+import WorkBench from './WorkBench/index';
 import Launcher from './Launcher/Launcher'
 
-import {translateDict} from '../../constants';
+import {translateDict} from '../../../../../constants';
 
 const TabPane = Tabs.TabPane;
 

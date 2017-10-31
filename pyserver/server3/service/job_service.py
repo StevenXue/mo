@@ -8,33 +8,27 @@
 # @running  : python
 # Further to FIXME of None
 """
-import os
-
 import functools
-import inspect
-import numpy as np
-
-from bson import ObjectId
+import os
 from itertools import compress
 
-from server3.business import toolkit_business
-from server3.business import model_business
+import numpy as np
+from bson import ObjectId
+
 from server3.business import job_business
-from server3.business import result_business
+from server3.business import model_business
 from server3.business import project_business
+from server3.business import result_business
 from server3.business import staging_data_business
 from server3.business import staging_data_set_business
+from server3.business import toolkit_business
+from server3.repository import config
+from server3.service import model_service
 from server3.service import staging_data_service, logger_service, \
     visualization_service
 from server3.service import toolkit_service
-
-from server3.business import ownership_business
 from server3.utility import data_utility
-from server3.lib import models
-from server3.repository import config
 from server3.utility import json_utility
-from server3.utility import file_utils
-from server3.utility import data_utility
 
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 
@@ -386,13 +380,6 @@ def get_job_from_result(result_obj):
     return result_business.get_result_by_id(result_obj['id']).job
 
 
-def split_supervised_input(staging_data_set_id, x_fields, y_fields, schema,
-                           **kwargs):
-    obj = staging_data_service.split_x_y(staging_data_set_id, x_fields,
-                                         y_fields)
-    return staging_data_service.split_test_train(obj, schema=schema, **kwargs)
-
-
 def run_code(conf, project_id, staging_data_set_id, model, f, job_id, *args,
              **kwargs):
     """
@@ -444,7 +431,7 @@ def add_new_column(value, index, fields, name, staging_data_set_id):
         staging_data_service.add_new_keys_value(staging_data_set_id, col_value)
 
 
-def steps_to_data(job_obj, project_id):
+def toolkit_steps_to_obj(job_obj, project_id):
     new_args = {}
     if len(job_obj.steps) > 2:
         args = job_obj.steps[2].get("args")
@@ -465,15 +452,80 @@ def steps_to_data(job_obj, project_id):
     return obj
 
 
+def model_steps_to_obj(job_obj, project_id):
+    model_obj = job_obj.model
+    steps = job_obj.steps
+    conf = {}
+    if model_obj.category == 0:
+        for step in steps[4:]:
+            conf.update({step.get('name'):
+                             {'args':
+                                  {arg.get('name'): arg.get('value')
+                                                    or arg.get('values')
+                                                    or arg.get('default')
+                                   for arg in step['args']}}
+                         })
+        conf['fit'].update({
+            "data_fields":
+                [steps[1]["args"][0]["values"],
+                 steps[2]["args"][0]["values"]]
+        })
+        conf['layers'] = [{
+            'name': layer.get('name'),
+            'args': {arg.get('name'): arg.get('value')
+                                      or arg.get('values')
+                                      or arg.get('default')
+                     for arg in layer.get('args')}
+        }
+            for layer in steps[3]['args'][0]['values']]
+    elif model_obj.category == 1:
+        pass
+    elif model_obj.category == 2:
+        pass
+
+    obj = {
+        "data_source_id": job_obj.steps[0]["args"][0]["value"],
+        "conf": conf,
+        "project_id": project_id,
+        "model_id": model_obj.id,
+        "schema": "rand",
+        "ratio": 0.7
+    }
+    print(obj)
+    return obj
+
+
 def run_toolkit_job(job_obj, project_id):
-    data = steps_to_data(job_obj, project_id)
+    data = toolkit_steps_to_obj(job_obj, project_id)
 
     staging_data_set_id = data.get('staging_data_set_id')
     toolkit_id = data.get('toolkit_id')
     project_id = data.get('project_id')
     conf = data.get('conf')
-from server3.service import toolkit_service
-from server3.service import model_service
+    # conf初步操作
+    flag = isinstance(conf["data_fields"][0], (list, tuple))
+    x_fields = conf["data_fields"][0] if flag else conf["data_fields"]
+    y_fields = conf["data_fields"][1] if flag else None
+    fields = x_fields + y_fields if flag else x_fields
+    data = staging_data_business.get_by_staging_data_set_and_fields(
+        ObjectId(staging_data_set_id), fields)
+
+    # 数据库转to_mongo和to_dict
+    data = [d.to_mongo().to_dict() for d in data]
+
+    # 拿到conf
+    fields = [x_fields, y_fields]
+    conf = conf.get('args')
+
+    result = toolkit_service.run_toolkit(project_id, staging_data_set_id, toolkit_id,
+                                         fields, data, conf, job_obj)
+    result.update({"fields": [x_fields, y_fields]})
+    return result
+
+
+def run_model_job(job_obj, project_id):
+    obj = run_toolkit_job(job_obj, project_id)
+    return model_service.kube_run_model(job_obj=job_obj, **obj)
 
 
 def run_job(obj, job_obj):

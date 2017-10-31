@@ -3,8 +3,8 @@ import styles from './index.less';
 import {connect} from 'dva';
 import {Menu, Dropdown, Icon, Spin} from 'antd';
 
-import {translateDict} from '../../constants';
-import {arrayToJson, JsonToArray} from '../../utils/JsonUtils';
+import {translateDict} from '../../../../../constants';
+import {arrayToJson, JsonToArray} from '../../../../../utils/JsonUtils';
 
 function Sidebar({model, dispatch, namespace}) {
   //state
