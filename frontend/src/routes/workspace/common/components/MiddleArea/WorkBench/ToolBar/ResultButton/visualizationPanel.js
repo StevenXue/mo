@@ -1,8 +1,8 @@
 import React from 'react'
-import { BarChart, Histogram, PieChart, Scatter, SimpleScatter, SimpleTable, Table } from '../../../../components/visualization'
-import { flaskServer } from '../../../../constants'
+import { BarChart, Histogram, PieChart, Scatter, SimpleScatter, SimpleTable, Table } from '../../../../../../../../components/visualization/index'
+import { flaskServer } from '../../../../../../../../constants'
 import { Card, Select, Spin, Popover, Icon} from 'antd'
-import { isEmpty } from '../../../../utils/utils'
+import { isEmpty } from '../../../../../../../../utils/utils'
 import classnames from 'classnames';
 import style from './toolkit.css';
 

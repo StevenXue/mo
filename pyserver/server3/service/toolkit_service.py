@@ -19,10 +19,10 @@ from minepy import MINE
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
-
 from server3.lib import toolkit_orig
 from server3.lib import preprocess_orig
-from server3.service import job_service, staging_data_service, visualization_service, logger_service
+from server3.service import job_service, staging_data_service, \
+    visualization_service, logger_service
 from server3.business import toolkit_business, ownership_business, \
     user_business, job_business, \
     result_business, project_business, staging_data_set_business
@@ -40,19 +40,6 @@ TOOLKIT_CATEGORY_DICT = {
 
 NEW_TOOLKIT_CATEGORY = [
     {
-        'name': 'finished_toolkit',
-        'zh_name': '完成的toolkit',
-        'us_name': 'Finished Toolkit',
-        'child': [
-            'K平均数算法',
-            '移动平均值',
-            '皮尔森相关系数',
-            '方差选择法',
-
-        ],
-        'children': []
-    },
-    {
         'name': 'simple_toolkit',
         'zh_name': '简单的toolkit',
         'us_name': 'Simple Toolkit',
@@ -66,9 +53,9 @@ NEW_TOOLKIT_CATEGORY = [
         'zh_name': '初探数据集',
         'us_name': 'Data Explore',
         'child': [
-            # 'K平均数算法',
-            # '移动平均值',
-            # '皮尔森相关系数',
+            'K平均数算法',
+            '移动平均值',
+            '皮尔森相关系数',
             '变异系数',
             '数据互相关'
         ],
@@ -95,7 +82,45 @@ NEW_TOOLKIT_CATEGORY = [
             '递归特征消除法'
         ],
         'children': []
-    }
+    },
+    {
+        'name': 'finished_toolkit',
+        'zh_name': '完成的toolkit',
+        'us_name': 'Finished Toolkit',
+        'child': [
+            # 'K平均数算法',
+            # '移动平均值',
+            # '皮尔森相关系数',
+            # '变异系数',
+            # '数据互相关',
+            # '归一化',
+            # '方差选择法',
+            # '卡方选择法',
+            # '相关系数选择法',
+            # '互信息选择法',
+            # '递归特征消除法'
+
+        ],
+        'children': []
+    },
+    {
+        'name': 'others',
+        'zh_name': '其他',
+        'us_name': 'Others',
+        'child': [
+        ],
+        'children': []
+    },
+    {
+        'name': 'custom_toolkit',
+        'zh_name': '自定义toolkit',
+        'us_name': 'Custom Toolkit',
+        'child': [
+        ],
+        'children': []
+    },
+
+
 ]
 
 
@@ -193,7 +218,8 @@ def run_toolkit_sub(project_id, staging_data_set_id, toolkit_obj,
 
 
 def after_run_toolkit(project_id, staging_data_set_id,
-                      toolkit_obj, fields, nan_index, func_rst, job_obj, *args, **kwargs):
+                      toolkit_obj, fields, nan_index, func_rst, job_obj, *args,
+                      **kwargs):
     project_obj = project_business.get_by_id(project_id)
     result = list(func_rst) if isinstance(func_rst, tuple) else [func_rst]
     # 新设计的存取方式
@@ -229,13 +255,13 @@ def after_run_toolkit(project_id, staging_data_set_id,
             "attribute"] == "general_info":
             gen_info.append({arg["name"]: {"value": value,
                                            "description": arg["des"]}})
-    # print("results", results)
-    # job_obj.result = results
-    # job_obj.save()
-    # # save to job
+            # print("results", results)
+            # job_obj.result = results
+            # job_obj.save()
+            # # save to job
 
-        # 可视化计算
-        # 聚类分析
+            # 可视化计算
+            # 聚类分析
     if toolkit_obj.category == 0:
         json = {"scatter": data_utility.retrieve_nan_index(args[0],
                                                            nan_index),
@@ -397,9 +423,10 @@ def after_run_toolkit(project_id, staging_data_set_id,
         # create result sds for toolkit
         sds_name = '%s_%s_result' % (
             toolkit_obj['name'], job_obj['id'])
-        result_sds_obj = staging_data_set_business.get_or_create(job_obj, sds_name, 'des',
+        result_sds_obj = staging_data_set_business.get_or_create(job_obj,
+                                                                 sds_name,
+                                                                 'des',
                                                                  project_obj,
-                                                                 job=job_obj,
                                                                  type='result')
 
         # result_sds_obj = staging_data_set_business.add(sds_name, 'des',
@@ -417,7 +444,6 @@ def after_run_toolkit(project_id, staging_data_set_id,
         }
 
     return {"result": results}
-
 
 
 def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,

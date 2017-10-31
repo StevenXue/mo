@@ -26,6 +26,7 @@ from server3.lib.models.linear_classifier import linear_classifier_model_fn
 ## linear regressor
 from server3.lib.models.linear_regressor import linear_regressor_model_fn
 from server3.lib.models.linear_regressor import LinearRegressor
+from server3.lib.models.linear_regressor import LinearRegressorSteps
 ## logistic regressor
 from server3.lib.models.logistic_regressor import LogisticRegressor
 from server3.lib.models.logistic_regressor import logistic_regressor_model_fn

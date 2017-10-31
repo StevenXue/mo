@@ -9,30 +9,29 @@
 # Further to FIXME of None
 """
 import os
+import random
 
 import functools
-import inspect
-import numpy as np
-
-from bson import ObjectId
+import os
 from itertools import compress
 
-from server3.business import toolkit_business
-from server3.business import model_business
+import numpy as np
+from bson import ObjectId
+
 from server3.business import job_business
-from server3.business import result_business
+from server3.business import model_business
 from server3.business import project_business
+from server3.business import result_business
 from server3.business import staging_data_business
 from server3.business import staging_data_set_business
+from server3.business import toolkit_business
+from server3.repository import config
+from server3.service import model_service
 from server3.service import staging_data_service, logger_service, \
     visualization_service
-from server3.business import ownership_business
+from server3.service import toolkit_service
 from server3.utility import data_utility
-from server3.lib import models
-from server3.repository import config
 from server3.utility import json_utility
-from server3.utility import file_utils
-from server3.utility import data_utility
 
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 
@@ -344,15 +343,24 @@ def create_model_job(project_id, staging_data_set_id, model_obj,
             project_business.update_items_to_list_field(
                 project_id, related_tasks=model_obj.category)
             # create result sds for model
-            sds_name = '%s_%s_result' % (model_obj['name'], job_obj['id'])
+            sds_name = '%s_%s_result_%s' % (model_obj['name'], job_obj[
+                'id'], str(random.randint(0, 99999)))
             result_sds_obj = staging_data_set_business.add(sds_name, 'des',
                                                            project_obj,
                                                            job=job_obj,
                                                            type='result')
+            # result_sds_obj = staging_data_set_business.get_or_create(job_obj,
+            #                                                          sds_name,
+            #                                                          'des',
+            #                                                          project_obj,
+            #                                                          type='result')
             # run
             if result_dir:
                 # result_dir += str(job_obj['id']) + '/'
-                os.makedirs(result_dir)
+                try:
+                    os.makedirs(result_dir)
+                except FileExistsError:
+                    print('dir exists, no need to create')
                 kw['result_dir'] = result_dir
 
             # generate_job_py(func, *args, **kw, result_sds=result_sds_obj,
@@ -374,13 +382,6 @@ def create_model_job(project_id, staging_data_set_id, model_obj,
 
 def get_job_from_result(result_obj):
     return result_business.get_result_by_id(result_obj['id']).job
-
-
-def split_supervised_input(staging_data_set_id, x_fields, y_fields, schema,
-                           **kwargs):
-    obj = staging_data_service.split_x_y(staging_data_set_id, x_fields,
-                                         y_fields)
-    return staging_data_service.split_test_train(obj, schema=schema, **kwargs)
 
 
 def run_code(conf, project_id, staging_data_set_id, model, f, job_id, *args,
@@ -434,14 +435,88 @@ def add_new_column(value, index, fields, name, staging_data_set_id):
         staging_data_service.add_new_keys_value(staging_data_set_id, col_value)
 
 
-from server3.service import toolkit_service
-def run_job(obj, job_obj):
-    data = obj
+def toolkit_steps_to_obj(job_obj, project_id):
+    new_args = {}
+    if len(job_obj.steps) > 2:
+        args = job_obj.steps[2].get("args")
+        for arg in args:
+            new_args[arg['name']] = int(arg['value'])
+
+    obj = {
+        "staging_data_set_id": job_obj.steps[0]["args"][0]["value"],
+        "conf": {
+            "args": new_args,
+            "data_fields":
+            # ["HighAlpha", "Attention_dimension_reduction_PCA_col"]
+                job_obj.steps[1]["args"][0]["values"]
+        },
+        "project_id": project_id,
+        "toolkit_id": job_obj.toolkit.id,
+    }
+    return obj
+
+
+def model_steps_to_obj(job_obj, project_id):
+    model_obj = job_obj.model
+    steps = job_obj.steps
+    conf = {}
+    if model_obj.category == 0:
+        for step in steps[4:]:
+            conf.update({step.get('name'):
+                             {'args':
+                                  {arg.get('name'): arg.get('value')
+                                                    or arg.get('values')
+                                                    or arg.get('default')
+                                   for arg in step['args']}}
+                         })
+        conf['fit'].update({
+            "data_fields":
+                [steps[1]["args"][0]["values"],
+                 steps[2]["args"][0]["values"]]
+        })
+        conf['layers'] = [{
+            'name': layer.get('name'),
+            'args': {arg.get('name'): arg.get('value')
+                                      or arg.get('values')
+                                      or arg.get('default')
+                     for arg in layer.get('args')}
+        }
+            for layer in steps[3]['args'][0]['values']]
+    elif model_obj.category == 1:
+        for step in steps[3:]:
+            conf.update({step.get('name'):
+                             {'args':
+                                  {arg.get('name'): arg.get('value')
+                                                    or arg.get('values')
+                                                    or arg.get('default')
+                                   for arg in step['args']}}
+                         })
+        conf['fit'].update({
+            "data_fields":
+                [steps[1]["args"][0]["values"],
+                 steps[2]["args"][0]["values"]]
+        })
+    elif model_obj.category == 2:
+        pass
+
+    obj = {
+        "data_source_id": job_obj.steps[0]["args"][0]["value"],
+        "conf": conf,
+        "project_id": project_id,
+        "model_id": model_obj.id,
+        "schema": "rand",
+        "ratio": 0.7
+    }
+    return obj
+
+
+def run_toolkit_job(job_obj, project_id):
+    data = toolkit_steps_to_obj(job_obj, project_id)
+
     staging_data_set_id = data.get('staging_data_set_id')
     toolkit_id = data.get('toolkit_id')
     project_id = data.get('project_id')
     conf = data.get('conf')
-
     # conf初步操作
     flag = isinstance(conf["data_fields"][0], (list, tuple))
     x_fields = conf["data_fields"][0] if flag else conf["data_fields"]
@@ -461,6 +536,42 @@ def run_job(obj, job_obj):
                                          fields, data, conf, job_obj)
     result.update({"fields": [x_fields, y_fields]})
     return result
+
+
+def run_model_job(job_obj, project_id):
+    obj = model_steps_to_obj(job_obj, project_id)
+    return model_service.kube_run_model(job_obj=job_obj, **obj)
+
+
+def run_job(obj, job_obj):
+    if obj.get('model_id'):
+        return model_service.kube_run_model(job_obj=job_obj, **obj)
+    else:
+        data = obj
+        staging_data_set_id = data.get('staging_data_set_id')
+        toolkit_id = data.get('toolkit_id')
+        project_id = data.get('project_id')
+        conf = data.get('conf')
+
+        # conf初步操作
+        flag = isinstance(conf["data_fields"][0], (list, tuple))
+        x_fields = conf["data_fields"][0] if flag else conf["data_fields"]
+        y_fields = conf["data_fields"][1] if flag else None
+        fields = x_fields + y_fields if flag else x_fields
+        data = staging_data_business.get_by_staging_data_set_and_fields(
+            ObjectId(staging_data_set_id), fields)
+
+        # 数据库转to_mongo和to_dict
+        data = [d.to_mongo().to_dict() for d in data]
+
+        # 拿到conf
+        fields = [x_fields, y_fields]
+        conf = conf.get('args')
+
+        result = toolkit_service.run_toolkit(project_id, staging_data_set_id, toolkit_id,
+                                             fields, data, conf, job_obj)
+        result.update({"fields": [x_fields, y_fields]})
+        return result
 
 
 if __name__ == '__main__':

@@ -9,6 +9,7 @@ function ParamsMapper({
                         layerIndex,
                         layers,
                         value,
+                        setValueDefault,
                         form: {
                           getFieldValue,
                           getFieldsValue,
@@ -21,6 +22,7 @@ function ParamsMapper({
   const valueParser = {
     int: (e) => JSON.parse(e),
     float: (e) => JSON.parse(e),
+    bool: (e) => JSON.parse(e.toLowerCase()),
     str: (e) => (e),
   }
 
@@ -29,6 +31,7 @@ function ParamsMapper({
       int: 'integer',
       float: 'float',
       str: 'string',
+      bool: 'boolean',
     }
 
     switch (type) {
@@ -104,24 +107,32 @@ function ParamsMapper({
       // onSubmit={handleSubmit}
     >
       {
-        args.map((arg, i) => <FormItem
-          key={i}
-          label={arg.display_name}
-          // className={styles.item}
-        >
-          {
-            getFieldDecorator(arg.name, {
-              initialValue: arg.default,
-              getValueFromEvent: (value) => splitHandler(value, arg.type, arg.value_type),
-              rules: [
-                {
-                  required: arg.required, message: `need ${arg.value_type}` ,
-                  type: typeParser(arg.type, arg.value_type)
-                },
-              ],
-            })(switchComponent(arg))
+        args.map((arg, i) => {
+
+          let v = arg.value || arg.values
+          // console.log({ [arg.name]: arg.values }, arg.value || (arg.values && arg.values.length > 0))
+          if (arg.value || (arg.values && arg.values.length > 0)) {
+            setValueDefault({ [arg.name]: v })
           }
-        </FormItem>)
+          return <FormItem
+            key={i}
+            label={arg.display_name}
+            // className={styles.item}
+          >
+            {
+              getFieldDecorator(arg.name, {
+                initialValue: arg.default,
+                getValueFromEvent: (value) => splitHandler(value, arg.type, arg.value_type),
+                rules: [
+                  {
+                    required: arg.required, message: `need ${arg.value_type}`,
+                    type: typeParser(arg.type, arg.value_type),
+                  },
+                ],
+              })(switchComponent(arg))
+            }
+          </FormItem>
+        })
       }
     </Form>
   )

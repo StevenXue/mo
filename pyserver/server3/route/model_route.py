@@ -24,6 +24,7 @@ from server3.utility import json_utility
 from server3.constants import PORT
 from server3.lib.models.nn import neural_style_transfer
 
+
 PREFIX = '/model'
 
 model_app = Blueprint("model_app", __name__, url_prefix=PREFIX)

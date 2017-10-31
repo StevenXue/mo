@@ -1,4 +1,4 @@
-@import "../../../index";
+@import "../../../../../../index";
 
 
 .container {
@@ -46,10 +46,21 @@
 .field {
   width: 120px;
   height: 50px;
-  background-color: #F3F3F3;
+  background-color: @custom-grey-background;
   margin: 5px;
   border-radius: 5px;
+  cursor: pointer;
   #center
+}
+
+.active_field {
+  background-color: @custom-blue-active
+
+}
+
+.disable_field {
+  background-color: white;
+  cursor: not-allowed;
 }
 
 .text {

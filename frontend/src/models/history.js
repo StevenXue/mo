@@ -51,9 +51,11 @@ export default {
           let projectId = match[1];
           let category = match[2];
 
-          //将project id存起来
-          dispatch({type: 'setProjectId', payload: {projectId: projectId}});
-          dispatch({type: 'fetchHistory', payload: {projectId: projectId, category: category}});
+          if(['dataAnalysis','modelling'].includes(category)){
+            //将project id存起来
+            dispatch({type: 'setProjectId', payload: {projectId: projectId}});
+            dispatch({type: 'fetchHistory', payload: {projectId: projectId, category: category}});
+          }
 
         }
       });

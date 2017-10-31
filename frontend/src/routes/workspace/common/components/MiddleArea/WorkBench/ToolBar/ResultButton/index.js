@@ -3,6 +3,7 @@ import styles from '../ToolBar.less';
 import {connect} from 'dva';
 import {Icon, Button, Modal} from 'antd';
 import VisualizationPanel from './visualizationPanel.js';
+import LearningCurve from '../../../../../../../../components/Charts/curve';
 
 
 class ResultButton extends Component {
@@ -12,9 +13,6 @@ class ResultButton extends Component {
     visible: false,
   };
 
-  // handleClickResult() {
-  //
-  // }
 
   render() {
     return (
@@ -42,8 +40,11 @@ class ResultButton extends Component {
                    OK
                  </Button>
                ]}
-        >
-          <VisualizationPanel {...this.props}/>
+        >{this.props.namespace === 'dataAnalysis'?
+          <VisualizationPanel {...this.props}/>:
+          <LearningCurve {...this.props} />
+        }
+
         </Modal>
 
       </div>

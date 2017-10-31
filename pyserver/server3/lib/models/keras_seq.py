@@ -144,6 +144,7 @@ def keras_seq_to_str(obj, head_str, **kw):
                  'MongoModelCheckpoint\n'
     str_model += 'from server3.service import logger_service\n'
     str_model += 'from server3.service import job_service\n'
+    str_model += 'from server3.service import model_service\n'
     str_model += 'from server3.business import staging_data_set_business\n'
     str_model += layer_import
     str_model += head_str
@@ -281,6 +282,7 @@ INPUT_SHAPE = {
            'input_dim). The most common situation would be a '
            '2D input with shape (batch_size, input_dim).',
     'required': True,
+    'default': [],
     'len_range': [1, None]
 }
 
@@ -372,7 +374,7 @@ KERAS_SEQ_STEPS = [
                                 "name": "rate",
                                 "display_name": "Rate",
                                 "des": "Fraction of the input units to drop",
-                                "type": "float",
+                                "value_type": "float",
                                 "range": [0, 1],
                                 "required": True
                             },
@@ -511,7 +513,7 @@ KERAS_SEQ_STEPS = [
         ]
     },
     {
-        "name": "custom",
+        "name": "compile",
         "display_name": "Compile Parameters",
         'args': [
             {
@@ -566,12 +568,12 @@ KERAS_SEQ_STEPS = [
                           "mape",
                           "msle",
                           "cosine"],
-                "default": "acc",
+                "default": ["acc"],
             },
         ],
     },
     {
-        "name": "custom",
+        "name": "fit",
         "display_name": "Fit Parameters",
         "args": [
             {
@@ -594,7 +596,7 @@ KERAS_SEQ_STEPS = [
         ],
     },
     {
-        "name": "custom",
+        "name": "evaluate",
         "display_name": "Evaluate Parameters",
         "args": [
             {

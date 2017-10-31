@@ -74,7 +74,8 @@ def get_or_create(job_obj, name, description, project, **kwargs):
         if not name or not description or not project:
             raise ValueError('no name or no description or no project')
         staging_data_set = StagingDataSet(name=name, description=description,
-                                          project=project, **kwargs)
+                                          project=project, job=job_obj,
+                                          **kwargs)
         return staging_data_set_repo.create(staging_data_set)
 
 
