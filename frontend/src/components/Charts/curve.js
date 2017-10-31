@@ -48,7 +48,6 @@ export default class LearningCurve extends React.Component {
 
 
   update = () => {
-    console.log(this.props.data);
     let steps = [];
     let len = this.props.data[Object.keys(this.props.data)[0]].length;
     for (let i = 0; i < len; i++) {
