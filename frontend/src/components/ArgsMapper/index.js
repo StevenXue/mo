@@ -1,6 +1,7 @@
 import React from 'react'
 import { Form, Button, Select, Input } from 'antd'
 import styles from './index.less'
+import { cloneDeep } from 'lodash'
 
 const FormItem = Form.Item
 
@@ -26,10 +27,10 @@ function ArgsMapper({
   let args = []
   let layerName = getFieldValue('name') || value.name
   if (value.args) {
-    args = value.args
+     args = value.args
   } else {
     if (layerName) {
-      args = layers.find(e => e.name === layerName).args
+       args = layers.find(e => e.name === layerName).args
     }
   }
 
@@ -135,7 +136,7 @@ function ArgsMapper({
           })(
             <Select placeholder="Choose Layer" style={{ width: 142 }}
                     onChange={(value) => {
-                      args = layers.find(e => e.name === value).args
+                      const args = cloneDeep(layers.find(e => e.name === value).args)
                       updateValueOfValues({ name: value, args })
                     }}>
               {
@@ -152,24 +153,26 @@ function ArgsMapper({
           if (last && arg.name === 'input_shape') {
             return
           }
+
           if (layerIndex === 0 && arg.name === 'input_shape' && featureFields.length > 0) {
             setLayerDefault({ [arg.name]: [featureFields.length] })
-          }
-          if (last && arg.name === 'units' && labelFields.length > 0) {
+          } else if (last && arg.name === 'units' && labelFields.length > 0) {
             setLayerDefault({ [arg.name]: labelFields.length })
           }
-          let v = arg.value || arg.values
-          if (v && (arg.value || arg.values.length > 0)) {
-            setLayerDefault({ [arg.name]: v })
+          // else
+          let v
+          if (arg.value || (arg.values && arg.values.length > 0)) {
+            v = arg.value || arg.values
           }
+
           return <FormItem
-            key={i}
+            key={`${layerIndex}${i}`}
             label={arg.display_name}
             // className={styles.item}
           >
             {
               getFieldDecorator(arg.name, {
-                initialValue: arg.default,
+                initialValue: v || arg.default,
                 getValueFromEvent: (value) => splitHandler(value, arg.type, arg.value_type),
                 rules: [
                   {
@@ -182,13 +185,6 @@ function ArgsMapper({
           </FormItem>
         })
       }
-      {/*{args.length > 0 &&*/}
-      {/*<FormItem*/}
-      {/*wrapperCol={{ span: 12, offset: 2 }}*/}
-      {/*>*/}
-      {/*<Button type="primary" size='small' htmlType="submit">Generate Layer</Button>*/}
-      {/*</FormItem>*/}
-      {/*}*/}
     </Form>
   )
 }
@@ -198,7 +194,7 @@ const handleValuesChange = ({
                                 updateLayerArgs,
                               },
                             }, layer) => {
-
+  console.log('111', layer)
   updateLayerArgs(layer)
 }
 

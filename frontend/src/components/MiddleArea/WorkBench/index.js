@@ -342,11 +342,13 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                     layerIndex={valueIdx}
                     argIndex={argIndex}
                     arg={arg}
-                    baseSteps={baseSteps}
+                    baseStep={baseSteps[stepIndex]}
                     featureFields={featureFields}
                     labelFields={labelFields}
                     {...{ model, dispatch, namespace }}
                     funcs={{
+                      addValue: (e) => addValue(e, stepIndex, argIndex, valueIdx + 1),
+                      updateValueOfValues: (e) => updateValueOfValues(e, stepIndex, argIndex, valueIdx),
                       updateLayerArgs: (e) => updateLayerArgs(e, stepIndex, argIndex, valueIdx),
                       setLayerDefault: (e) => setLayerDefault(e, stepIndex, argIndex, valueIdx),
                     }}

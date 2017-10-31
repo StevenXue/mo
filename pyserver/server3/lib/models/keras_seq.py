@@ -281,6 +281,7 @@ INPUT_SHAPE = {
            'input_dim). The most common situation would be a '
            '2D input with shape (batch_size, input_dim).',
     'required': True,
+    'default': [],
     'len_range': [1, None]
 }
 
@@ -566,7 +567,7 @@ KERAS_SEQ_STEPS = [
                           "mape",
                           "msle",
                           "cosine"],
-                "default": "acc",
+                "default": ["acc"],
             },
         ],
     },

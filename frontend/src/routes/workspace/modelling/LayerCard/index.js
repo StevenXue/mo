@@ -10,11 +10,11 @@ class LayerCard extends React.Component {
 
   render() {
     const {
-      title, layerIndex, argIndex, arg, baseSteps, style, onClick, model, dispatch, namespace, funcs,
+      title, layerIndex, argIndex, arg, baseStep, style, onClick, model, dispatch, namespace, funcs,
       featureFields, labelFields
     } = this.props
 
-    // const baseArg = baseSteps[3].args[0]
+    const baseArg = baseStep.args[0]
     // const arg = step.args[0]
 
     // console.log('ln', layerName)

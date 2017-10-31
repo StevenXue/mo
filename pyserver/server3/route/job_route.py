@@ -129,15 +129,14 @@ def run_job():
         steps = job_obj.steps
         conf = {}
         if model_obj.category == 0:
-            for step in steps[4: -1]:
+            for step in steps[4:]:
                 conf.update({step.get('name'):
-                                 {arg.get('name'): arg.get('value')
-                                                   or arg.get('values')
-                                                   or arg.get('default')
-                                  for arg in step['args']}
+                                 {'args':
+                                      {arg.get('name'): arg.get('value')
+                                                        or arg.get('values')
+                                                        or arg.get('default')
+                                       for arg in step['args']}}
                              })
-
-            print(conf)
             conf['fit'].update({
                 "data_fields":
                     [steps[1]["args"][0]["values"],
@@ -151,22 +150,21 @@ def run_job():
                          for arg in layer.get('args')}
             }
                 for layer in steps[3]['args'][0]['values']]
-            print(conf)
         elif model_obj.category == 1:
             pass
         elif model_obj.category == 2:
             pass
 
         obj = {
-            "staging_data_set_id": job_obj.steps[0]["args"][0]["value"],
+            "data_source_id": job_obj.steps[0]["args"][0]["value"],
             "conf": conf,
             "project_id": project_id,
             "model_id": model_obj.id,
             "schema": "rand",
-            "ratio": "0.7"
+            "ratio": 0.7
         }
         print(obj)
-    # result = job_service.run_job(obj=obj, job_obj=job_obj)
+    result = job_service.run_job(obj=obj, job_obj=job_obj)
 
     # obj = {
     #     "staging_data_set_id": "59c21d71d845c0538f0faeb2",
@@ -179,7 +177,7 @@ def run_job():
 
     return jsonify({
         "response": {
-            "result": 1
+            "result": result
         }}), 200
 
 

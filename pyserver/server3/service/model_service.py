@@ -123,7 +123,8 @@ def split_categorical_and_continuous(df, exclude_cols):
     return continuous_cols, categorical_cols
 
 
-def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
+def kube_run_model(conf, project_id, data_source_id, model_id, job_obj,
+                   **kwargs):
     # file_id = kwargs.get('file_id')
     staging_data_set_obj = None
     if data_source_id:
@@ -142,9 +143,15 @@ def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
     }
 
     # create model job
-    job_obj = job_business.add_model_job(model_obj, staging_data_set_obj,
-                                         project_obj, params=conf,
-                                         run_args=run_args)
+    # job_obj = job_business.add_model_job(model_obj, staging_data_set_obj,
+    #                                      project_obj, params=conf,
+    #                                      run_args=run_args)
+
+    job_obj = job_business.update_job_by_id(job_obj.id, model=model_obj,
+                                            staging_data_set=staging_data_set_obj,
+                                            project=project_obj, params=conf,
+                                            run_args=run_args)
+
     job_id = str(job_obj.id)
     print(job_id)
     # return run_model(conf, project_id, data_source_id, model_id, job_id,
@@ -598,8 +605,8 @@ def get_results_dir_by_job_id(job_id, user_ID, checkpoint='final'):
     if ownership.private and ownership.user.user_ID != user_ID:
         raise ValueError('Authentication failed')
     user_ID = ownership.user.user_ID
-    result_dir = os.path.join(user_directory + user_ID+'/',
-                              project_name+'/', job_id)
+    result_dir = os.path.join(user_directory + user_ID + '/',
+                              project_name + '/', job_id)
     filename = '{}.hdf5'.format(checkpoint)
     return result_dir, filename
 
@@ -623,8 +630,8 @@ def export(job_id, user_ID):
     """
     result_dir, h5_filename = get_results_dir_by_job_id(job_id, user_ID)
     # result_sds = staging_data_set_business.get_by_job_id(job_id)
-    model_dir = os.path.join(result_dir+'/', 'model.json')
-    weights_dir = os.path.join(result_dir+'/', h5_filename)
+    model_dir = os.path.join(result_dir + '/', 'model.json')
+    weights_dir = os.path.join(result_dir + '/', h5_filename)
     with open(model_dir, 'r') as f:
         data = json.load(f)
         json_string = json.dumps(data)
