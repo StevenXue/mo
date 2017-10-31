@@ -553,6 +553,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                       </Panel>
                     )
                   case 'parameters':
+                  case 'estimator':
                   case 'compile':
                   case 'fit':
                   case 'evaluate':

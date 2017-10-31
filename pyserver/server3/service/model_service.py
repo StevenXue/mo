@@ -933,7 +933,7 @@ def _update_model():
         "entry_function": "linear_regressor_model_fn",
         "to_code_function": "custom_model_to_str",
         "category": 1,
-        "model_type": 1,
+        "model_type": 0,
         "steps": models.LinearRegressorSteps,
         "parameter_spec": models.LinearRegressor,
         "input": {

@@ -151,7 +151,19 @@ def run_job():
             }
                 for layer in steps[3]['args'][0]['values']]
         elif model_obj.category == 1:
-            pass
+            for step in steps[3:]:
+                conf.update({step.get('name'):
+                                 {'args':
+                                      {arg.get('name'): arg.get('value')
+                                                        or arg.get('values')
+                                                        or arg.get('default')
+                                       for arg in step['args']}}
+                             })
+            conf['fit'].update({
+                "data_fields":
+                    [steps[1]["args"][0]["values"],
+                     steps[2]["args"][0]["values"]]
+            })
         elif model_obj.category == 2:
             pass
 

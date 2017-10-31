@@ -193,7 +193,7 @@ LinearRegressorSteps = [
         ]
     },
     {
-        "name": "parameters",
+        "name": "estimator",
         "display_name": "Estimator Parameters",
         'args': [
             {
@@ -216,7 +216,6 @@ LinearRegressorSteps = [
                 "des": "A float > 0. If provided, gradients are clipped "
                        "to their global norm with this clipping ratio.",
                 "range": [0.0, 100],
-                "required": True
             },
             {
                 **SPEC.ui_spec['input'],
@@ -229,7 +228,6 @@ LinearRegressorSteps = [
                        "incompatible with SDCAOptimizer, and requires "
                        "all feature columns are sparse and use"
                        " the 'sum' combiner.",
-                "required": True
             },
             {
                 **SPEC.ui_spec['input'],
@@ -240,7 +238,6 @@ LinearRegressorSteps = [
                        "centered bias variable for each class. "
                        "Rest of the model structure learns the residual "
                        "after centered bias.",
-                "required": True
             },
             {
                 **SPEC.ui_spec['input'],
