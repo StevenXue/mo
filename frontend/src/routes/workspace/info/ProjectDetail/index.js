@@ -90,7 +90,7 @@ function ProjectDetail({ match, history, location, project }) {
         <Steps match={match} history={history} location={location}/>
       </div>
       <Switch>
-        <Route path="/projects/:projectID/import/list" component={StagedList}/>
+        <Route path="/workspace/:projectID/import/list" component={StagedList}/>
         <Route path="/workspace/:projectID/import/preview" component={DataPreview}/>
         <Route path="/workspace/:projectID/import/select" component={DataSelection}/>
         <Route path="/workspace/:projectID/import/upload" component={UploadData}/>
