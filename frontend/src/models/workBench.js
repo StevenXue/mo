@@ -401,11 +401,12 @@ export default {
     },
 
     setLoading(state, action) {
+      const {key, loading} = action.payload
       return {
         ...state,
         spinLoading: {
           ...state.spinLoading,
-          [action.payload.key]: action.payload.loading,
+          [key]: loading,
         },
       }
     },

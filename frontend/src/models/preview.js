@@ -6,7 +6,10 @@ export default {
   state: {
     stagingDataList: [],
     table: [],
-    projectId: ''
+    projectId: '',
+    spinLoading: {
+      fetchTable: false,
+    },
 
   },
   reducers: {
@@ -30,8 +33,18 @@ export default {
         ...state,
         table: action.payload.table
       }
-    }
+    },
 
+    setLoading(state, action) {
+      const {key, loading} = action.payload
+      return {
+        ...state,
+        spinLoading: {
+          ...state.spinLoading,
+          [key]: loading,
+        },
+      }
+    },
 
   },
   effects: {
@@ -44,8 +57,22 @@ export default {
     },
 
     * fetchTable(action, {call, put, select}) {
+      yield put({
+        type: 'setLoading', payload: {
+          key: 'fetchTable',
+          loading: true,
+        },
+      })
+
       const {data: table} = yield call(stagingDataService.fetchStagingDataset, action.payload._id);
       yield put({type: 'setTable', payload: {table}})
+
+      yield put({
+        type: 'setLoading', payload: {
+          key: 'fetchTable',
+          loading: false,
+        },
+      })
 
     }
   },

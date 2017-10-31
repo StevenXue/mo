@@ -240,3 +240,8 @@ def lda(arr0, target, n_components):
     # label = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
     label = temp.transform(matrix).tolist()
     return label, coef.tolist(), mean.tolist(), priors.tolist(), scalings.tolist(), xbar.tolist()
+
+
+#
+def add_columns_append():
+    pass

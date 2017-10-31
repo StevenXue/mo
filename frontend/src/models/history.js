@@ -1,5 +1,9 @@
 import pathToRegexp from 'path-to-regexp';
 import * as dataAnalysisService from '../services/dataAnalysis'
+const dict = {
+  'analysis': 'toolkit',
+  'modelling': 'model'
+};
 
 export default {
   namespace: 'history',
@@ -15,27 +19,34 @@ export default {
       }
     },
 
+    setCategory(state, action) {
+      return {
+        ...state,
+        category: action.payload.category,
+      }
+    },
+
     setHistory(state, action) {
       return {
         ...state,
         historyList: action.payload.historyList,
       }
     },
-
-
-
   },
   effects: {
     // 获取stage data set list
     * fetchHistory(action, {call, put, select}) {
-      const projectId = action.payload.projectId;
-      const dict = {
-        'analysis': 'toolkit',
-        'modelling': 'model'
-      };
-      const {data: {toolkit: historyList}} = yield call(dataAnalysisService.fetchSections, {
+      const {projectId, category} = action.payload;
+
+
+      let {data: {[category]: historyList}} = yield call(dataAnalysisService.fetchSections, {
         projectId: projectId,
-        categories: dict[action.payload.category]
+        categories: category
+      });
+
+      // temp sort history
+      historyList = historyList.sort(function (a, b) {
+        return new Date(b.create_time) - new Date(a.create_time);
       });
 
       yield put({type: 'setHistory', payload: {historyList}})
@@ -51,10 +62,12 @@ export default {
           let projectId = match[1];
           let category = match[2];
 
-          if(['dataAnalysis','modelling'].includes(category)){
+          if (['analysis', 'modelling'].includes(category)) {
             //将project id存起来
             dispatch({type: 'setProjectId', payload: {projectId: projectId}});
-            dispatch({type: 'fetchHistory', payload: {projectId: projectId, category: category}});
+            dispatch({type: 'setCategory', payload: {category: dict[category]}});
+
+            dispatch({type: 'fetchHistory', payload: {projectId: projectId, category: dict[category]}});
           }
 
         }

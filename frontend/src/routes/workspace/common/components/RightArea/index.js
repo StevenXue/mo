@@ -48,7 +48,8 @@ class RightArea extends Component {
               <div className={styles.button}
                    key={tab.key}
                    style={{
-                     backgroundColor: this.state.status===tab.key?'#34C0E2':'white'
+                     backgroundColor: this.state.status===tab.key?'#34C0E2':'white',
+                     color: this.state.status===tab.key?'white': 'grey',
                    }}
                    onClick={()=>{
                      this.setState({
