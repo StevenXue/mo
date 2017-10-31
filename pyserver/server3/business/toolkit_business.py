@@ -2286,6 +2286,469 @@ def update_toolkit():
                                  ]
                                  )
 
+    CV = Toolkit(name='变异系数',
+                 description='返回数据变异系数',
+                 category=4,
+                 entry_function='toolkit_cv',
+                 target_py_code=inspect.getsource(toolkit_orig.toolkit_cv),
+                 parameter_spec={
+                     "data": {
+                         'name': 'input',
+                         'type': {
+                             'key': 'select_box',
+                             'des': 'nD tensor with shape: (batch_size, ..., '
+                                    'input_dim). The most common situation would be a '
+                                    '2D input with shape (batch_size, input_dim).',
+                             'range': None
+                         },
+                         'default': None,
+                         'required': True,
+                         'len_range': [1, 1],
+                         'data_type': ['int', 'float']
+                     }
+                 },
+                 result_spec={
+                     "if_reserved": False,
+                     "args": [
+                         {
+                             "name": "cv",
+                             "des": "所选范围的样本的变异系数",
+                             "if_add_column": False,
+                             "attribute": "value"
+                         }
+                     ]
+                 },
+                 steps=[
+                     {
+                         **StepTemplate.data_source
+                     },
+                     {
+                         **StepTemplate.fields
+                     }
+                 ]
+                 )
+
+    CORRELATION = Toolkit(name='数据互相关',
+                          description='返回数据correlation',
+                          category=4,
+                          entry_function='toolkit_correlation',
+                          target_py_code=inspect.getsource(toolkit_orig.toolkit_correlation),
+                          parameter_spec={
+                              "data": {
+                                  'name': 'input',
+                                  'type': {
+                                      'key': 'select_box',
+                                      'des': 'nD tensor with shape: (batch_size, ..., '
+                                             'input_dim). The most common situation would be a '
+                                             '2D input with shape (batch_size, input_dim).',
+                                      'range': None
+                                  },
+                                  'default': None,
+                                  'required': True,
+                                  'len_range': [2, 2],
+                                  'data_type': ['int', 'float']
+                              }
+                          },
+                          result_spec={
+                              "if_reserved": False,
+                              "args": [
+                                  {
+                                      "name": "correlation",
+                                      "des": "所选范围的样本的互相关系数",
+                                      "if_add_column": False,
+                                      "attribute": "value"
+                                  }
+                              ]
+                          },
+                          steps=[
+                              {
+                                  **StepTemplate.data_source
+                              },
+                              {
+                                  **StepTemplate.fields
+                              }
+                          ])
+
+    normalizer = Toolkit(name='归一化',
+                         description='基于特征矩阵的行，将样本向量转换为"单位向量"',
+                         category=2,
+                         entry_function='normalizer',
+                         target_py_code=inspect.getsource(preprocess_orig.normalizer),
+                         parameter_spec={
+                             "data": {
+                                 'name': 'input',
+                                 'type': {
+                                     'key': 'select_box',
+                                     'des': 'nD tensor with shape: (batch_size, ..., '
+                                            'input_dim). The most common situation would be a '
+                                            '2D input with shape (batch_size, input_dim).',
+                                     'range': None
+                                 },
+                                 'default': None,
+                                 'required': True,
+                                 'len_range': [2, None],
+                                 'data_type': ['int', 'float']
+                             }
+                         },
+                         result_spec={
+                             "if_reserved": True,
+                             "args": [
+                                 {
+                                     "name": "result",
+                                     "des": "数值转换，对所选数据做标准化处理",
+                                     "if_add_column": True,
+                                     "attribute": "label"
+                                 }
+                             ]
+                         },
+                         steps=[
+                             {
+                                 **StepTemplate.data_source
+                             },
+                             {
+                                 **StepTemplate.fields
+                             }
+                         ])
+
+    select_k_best_chi2 = Toolkit(name='卡方选择法',
+                                 description='选择K个最好的特征，返回选择特征后的数据',
+                                 category=1,
+                                 entry_function='select_k_best_chi2',
+                                 target_py_code=inspect.getsource(
+                                     preprocess_orig.select_k_best_chi2),
+                                 parameter_spec={
+                                     "data": {
+                                         'name': 'input',
+                                         'type': {
+                                             'key': 'transfer_box',
+                                             'des': 'nD tensor with shape: (batch_size, ..., '
+                                                    'input_dim). The most common situation would be a '
+                                                    '2D input with shape (batch_size, input_dim).',
+                                             'range': None
+                                         },
+                                         'default': None,
+                                         'required': True,
+                                         'x_len_range': [2, None],
+                                         'y_len_range': [1, 1],
+
+                                         'x_data_type': ['int', 'float'],
+                                         'y_data_type': ['int', 'float']
+                                     },
+                                     "args": [
+                                         {
+                                             'name': 'k',
+                                             'type': {
+                                                 'key': 'int',
+                                                 'des': 'select k best, k is number of features selected',
+                                                 'range': [1, None]
+                                             },
+                                             'default': 2,
+                                             'required': True
+                                         }
+                                     ]
+                                 },
+                                 result_spec={
+                                     "if_reserved": True,
+                                     "args": [
+                                         {
+                                             "name": "scores",
+                                             "des": "每类特征得到的评分估算",
+                                             "if_add_column": False,
+                                             "attribute": "value",
+                                             "usage": ["bar"]
+                                         },
+                                         {
+                                             "name": "index",
+                                             "des": "每类特征是否取用的标签",
+                                             "if_add_column": False,
+                                             "attribute": "label",
+                                             "usage": ["bar", "table"]
+                                         },
+                                         {
+                                             "name": "result",
+                                             "des": "筛选出的所有特征值",
+                                             "if_add_column": False,
+                                             "attribute": "value",
+                                         }
+                                     ]
+                                 },
+                                 steps=[
+                                     {
+                                         **StepTemplate.data_source
+                                     },
+                                     {
+                                         **StepTemplate.fields
+                                     },
+                                     {
+                                         **StepTemplate.parameters,
+                                         'args': [
+                                             {
+                                                 **SPEC.ui_spec['input'],
+                                                 'name': 'k',
+                                                 'display_name': 'k',
+                                                 'value_type': 'int',
+                                                 'des': 'select k best, k is number of features selected',
+                                                 'default': 2,
+                                                 'required': True,
+                                             }
+                                         ]
+                                     }
+                                 ])
+
+    select_k_best_pearson = Toolkit(name='相关系数选择法',
+                                    description='选择K个最好的特征，返回选择特征后的数据',
+                                    category=1,
+                                    entry_function='select_k_best_pearson',
+                                    target_py_code=inspect.getsource(
+                                        preprocess_orig.select_k_best_pearson),
+                                    parameter_spec={
+                                        "data": {
+                                            'name': 'input',
+                                            'type': {
+                                                'key': 'transfer_box',
+                                                'des': 'nD tensor with shape: (batch_size, ..., '
+                                                       'input_dim). The most common situation would be a '
+                                                       '2D input with shape (batch_size, input_dim).',
+                                                'range': None
+                                            },
+                                            'default': None,
+                                            'required': True,
+                                            'x_len_range': [2, None],
+                                            'y_len_range': [1, 1],
+
+                                            'x_data_type': ['int', 'float'],
+                                            'y_data_type': ['int', 'float']
+                                        },
+                                        "args": [
+                                            {
+                                                'name': 'k',
+                                                'type': {
+                                                    'key': 'int',
+                                                    'des': 'select k best, k is number of features selected',
+                                                    'range': [1, None]
+                                                },
+                                                'default': 2,
+                                                'required': True
+                                            }
+                                        ]
+                                    },
+                                    result_spec={
+                                        "if_reserved": True,
+                                        "args": [
+                                            {
+                                                "name": "scores",
+                                                "des": "每类特征得到的评分估算",
+                                                "if_add_column": False,
+                                                "attribute": "value",
+                                                "usage": ["bar"]
+                                            },
+                                            {
+                                                "name": "index",
+                                                "des": "每类特征是否取用的标签",
+                                                "if_add_column": False,
+                                                "attribute": "label",
+                                                "usage": ["bar", "table"]
+                                            },
+                                            {
+                                                "name": "result",
+                                                "des": "筛选出的所有特征值",
+                                                "if_add_column": False,
+                                                "attribute": "value",
+                                            }
+                                        ]
+                                    },
+                                    steps=[
+                                        {
+                                            **StepTemplate.data_source
+                                        },
+                                        {
+                                            **StepTemplate.fields
+                                        },
+                                        {
+                                            **StepTemplate.parameters,
+                                            'args': [
+                                                {
+                                                    **SPEC.ui_spec['input'],
+                                                    'name': 'k',
+                                                    'display_name': 'k',
+                                                    'value_type': 'int',
+                                                    'des': 'select k best, k is number of features selected',
+                                                    'default': 2,
+                                                    'required': True,
+                                                }
+                                            ]
+                                        }
+                                    ])
+
+    select_k_best_mic = Toolkit(name='互信息选择法',
+                                description='选择K个最好的特征，返回选择特征后的数据',
+                                category=1,
+                                entry_function='select_k_best_mic',
+                                target_py_code=inspect.getsource(preprocess_orig.select_k_best_mic),
+                                parameter_spec={
+                                    "data": {
+                                        'name': 'input',
+                                        'type': {
+                                            'key': 'transfer_box',
+                                            'des': 'nD tensor with shape: (batch_size, ..., '
+                                                   'input_dim). The most common situation would be a '
+                                                   '2D input with shape (batch_size, input_dim).',
+                                            'range': None
+                                        },
+                                        'default': None,
+                                        'required': True,
+                                        'x_len_range': [2, None],
+                                        'y_len_range': [1, 1],
+
+                                        'x_data_type': ['int', 'float'],
+                                        'y_data_type': ['int', 'float']
+                                    },
+                                    "args": [
+                                        {
+                                            'name': 'k',
+                                            'type': {
+                                                'key': 'int',
+                                                'des': 'select k best, k is number of features selected',
+                                                'range': [1, None]
+                                            },
+                                            'default': 2,
+                                            'required': True
+                                        }
+                                    ]
+                                },
+                                result_spec={
+                                    "if_reserved": True,
+                                    "args": [
+                                        {
+                                            "name": "scores",
+                                            "des": "每类特征得到的评分估算",
+                                            "if_add_column": False,
+                                            "attribute": "value",
+                                            "usage": ["bar"]
+                                        },
+                                        {
+                                            "name": "index",
+                                            "des": "每类特征是否取用的标签",
+                                            "if_add_column": False,
+                                            "attribute": "label",
+                                            "usage": ["bar", "table"]
+                                        },
+                                        {
+                                            "name": "result",
+                                            "des": "筛选出的所有特征值",
+                                            "if_add_column": False,
+                                            "attribute": "value",
+                                        }
+                                    ]
+                                },
+                                steps=[
+                                    {
+                                        **StepTemplate.data_source
+                                    },
+                                    {
+                                        **StepTemplate.fields
+                                    },
+                                    {
+                                        **StepTemplate.parameters,
+                                        'args': [
+                                            {
+                                                **SPEC.ui_spec['input'],
+                                                'name': 'k',
+                                                'display_name': 'k',
+                                                'value_type': 'int',
+                                                'des': 'select k best, k is number of features selected',
+                                                'default': 2,
+                                                'required': True,
+                                            }
+                                        ]
+                                    }
+                                ])
+
+    REF = Toolkit(name='递归特征消除法',
+                  description='递归特征消除法, 返回特征选择后的数据, 参数estimator为基模型',
+                  category=1,
+                  entry_function='ref',
+                  target_py_code=inspect.getsource(preprocess_orig.ref),
+                  parameter_spec={
+                      "data": {
+                          'name': 'input',
+                          'type': {
+                              'key': 'transfer_box',
+                              'des': 'nD tensor with shape: (batch_size, ..., '
+                                     'input_dim). The most common situation would be a '
+                                     '2D input with shape (batch_size, input_dim).',
+                              'range': None
+                          },
+                          'default': None,
+                          'required': True,
+                          'x_len_range': [2, None],
+                          'y_len_range': [1, 1],
+
+                          'x_data_type': ['int', 'float'],
+                          'y_data_type': ['int', 'float']
+                      },
+                      "args": [
+                          {
+                              'name': 'n_features',
+                              'type': {
+                                  'key': 'int',
+                                  'des': 'select k best, k is number of features selected',
+                                  'range': [1, None]
+                              },
+                              'default': 2,
+                              'required': True
+                          }
+                      ]
+                  },
+                  result_spec={
+                      "if_reserved": True,
+                      "args": [
+                          {
+                              "name": "scores",
+                              "des": "每类特征得到的评分估算",
+                              "if_add_column": False,
+                              "attribute": "value",
+                              "usage": ["bar"]
+                          },
+                          {
+                              "name": "index",
+                              "des": "每类特征是否取用的标签",
+                              "if_add_column": False,
+                              "attribute": "label",
+                              "usage": ["bar", "table"]
+                          },
+                          {
+                              "name": "result",
+                              "des": "筛选出的所有特征值",
+                              "if_add_column": False,
+                              "attribute": "value",
+                          }
+                      ]
+                  },
+                  steps=[
+                      {
+                          **StepTemplate.data_source
+                      },
+                      {
+                          **StepTemplate.fields
+                      },
+                      {
+                          **StepTemplate.parameters,
+                          'args': [
+                              {
+                                  **SPEC.ui_spec['input'],
+                                  'name': 'n_features',
+                                  'display_name': 'n_features',
+                                  'value_type': 'int',
+                                  'des': 'select k best, k is number of features selected',
+                                  'default': 2,
+                                  'required': True,
+                              }
+                          ]
+                      }
+                  ])
+
+
     TOOLKIT_DICT = [
         {
             "_id": ObjectId("5980149d8be34d34da32c170"),
@@ -2306,6 +2769,40 @@ def update_toolkit():
         {
             '_id': ObjectId("5980149d8be34d34da32c192"),
             "object": variance_threshold
+        }
+
+
+
+        ,
+        {
+            '_id': ObjectId("5980149d8be34d34da32c17a"),
+            "object": CV
+        },
+        {
+            '_id': ObjectId("5980149d8be34d34da32c180"),
+            "object": CORRELATION
+        },
+        {
+            '_id': ObjectId("5980149d8be34d34da32c188"),
+            "object": normalizer
+        },
+        {
+            '_id': ObjectId("5980149d8be34d34da32c194"),
+            "object": select_k_best_chi2
+        },
+
+
+        {
+            '_id': ObjectId("5980149d8be34d34da32c196"),
+            "object": select_k_best_pearson
+        },
+        {
+            '_id': ObjectId("5980149d8be34d34da32c198"),
+            "object": select_k_best_mic
+        },
+        {
+            '_id': ObjectId("5980149d8be34d34da32c19a"),
+            "object": REF
         }
     ]
     user = user_business.get_by_user_ID('system')

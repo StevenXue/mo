@@ -1,10 +1,10 @@
 import React from 'react';
 import {connect} from 'dva';
-import {Icon, Button} from 'antd';
+import {Icon, Button, Tooltip} from 'antd';
 import styles from './ToolBar.less';
 const ButtonGroup = Button.Group;
-import ResultButton from './ResultButton';
-import {translateDict} from '../../../constants'
+import ResultButton from './ResultButton/index';
+import {translateDict} from '../../../../../../../constants'
 
 function ToolBar({model, dispatch, namespace, sectionId}) {
   const {
@@ -15,7 +15,8 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
     metrics_status,
     visual_sds_id,
     [translateDict[namespace]]: {
-      name
+      name,
+      description
     },
     result
   } = sectionsJson[sectionId];
@@ -55,6 +56,11 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
     <div className={styles.container} >
       <div className={styles.title}>
         {name}
+        <div className={styles.help}>
+          <Tooltip title={description}>
+            <Icon type="question-circle-o"/>
+          </Tooltip>
+        </div>
       </div>
 
       <ButtonGroup className={styles.button_group}>

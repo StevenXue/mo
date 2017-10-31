@@ -28,9 +28,8 @@ from server3.business import staging_data_business
 from server3.business import staging_data_set_business
 from server3.lib import models
 from server3.repository import config
-from server3.service import job_service
+from server3.service import job_service, staging_data_service
 from server3.service import staging_data_service
-from server3.service.job_service import split_supervised_input
 from server3.service.saved_model_services import encoder as keras_encoder
 from server3.service.saved_model_services import keras_saved_model
 from server3.service import kube_service
@@ -560,7 +559,7 @@ def manage_supervised_input_to_str(conf, staging_data_set_id, **kwargs):
     code_str += x_str
     code_str += y_str
     code_str += "kwargs = %s\n" % str(kwargs)
-    code_str += "obj = job_service.split_supervised_input(" \
+    code_str += "obj = model_service.split_supervised_input(" \
                 "staging_data_set_id, x_fields, y_fields, schema, **kwargs)\n"
     code_str += "x_train = obj['x_tr']\n"
     code_str += "y_train = obj['y_tr']\n"
@@ -1013,3 +1012,10 @@ if __name__ == '__main__':
     #           "59687821d123abcfbfe8cab9")
 
     temp()
+
+
+def split_supervised_input(staging_data_set_id, x_fields, y_fields, schema,
+                           **kwargs):
+    obj = staging_data_service.split_x_y(staging_data_set_id, x_fields,
+                                         y_fields)
+    return staging_data_service.split_test_train(obj, schema=schema, **kwargs)

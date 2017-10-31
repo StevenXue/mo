@@ -2,8 +2,10 @@ import React from 'react';
 import styles from './index.less';
 import {connect} from 'dva';
 import {Tabs} from 'antd';
-import WorkBench from './WorkBench';
+import WorkBench from './WorkBench/index';
 import Launcher from './Launcher/Launcher'
+
+import {translateDict} from '../../../../../constants';
 
 const TabPane = Tabs.TabPane;
 
@@ -73,13 +75,9 @@ function MiddleArea({model, dispatch, namespace, step}) {
       }
     });
     const new_activeSectionsId = activeSectionsId.filter(active_sectionId => active_sectionId !== targetKey);
-    console.log("lastIndex", lastIndex);
-    console.log("new_activeSectionsId", new_activeSectionsId);
 
     if (lastIndex >=0 && activeKey === targetKey) {
-
       activeKey = new_activeSectionsId[lastIndex];
-      console.log("activeKey", activeKey);
     }
     setFocusSection(activeKey);
     setActiveSections(new_activeSectionsId);
@@ -112,11 +110,10 @@ function MiddleArea({model, dispatch, namespace, step}) {
                 tab={'Launcher'} key={active_sectionId}
               >
                 <Launcher sectionId={active_sectionId} {...{model, dispatch, namespace, step}}/>
-
               </TabPane> :
 
               <TabPane
-                tab={sectionsJson[active_sectionId].section_name || sectionsJson[active_sectionId]._id}
+                tab={sectionsJson[active_sectionId].section_name || sectionsJson[active_sectionId][translateDict[namespace]].name}
                 key={active_sectionId}
                 closabel={true}>
                 <WorkBench section={sectionsJson[active_sectionId]}

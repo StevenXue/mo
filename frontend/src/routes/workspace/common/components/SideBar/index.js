@@ -3,8 +3,8 @@ import styles from './index.less';
 import {connect} from 'dva';
 import {Menu, Dropdown, Icon, Spin} from 'antd';
 
-
-import {arrayToJson, JsonToArray} from '../../utils/JsonUtils';
+import {translateDict} from '../../../../../constants';
+import {arrayToJson, JsonToArray} from '../../../../../utils/JsonUtils';
 
 function Sidebar({model, dispatch, namespace}) {
   //state
@@ -92,7 +92,6 @@ function Sidebar({model, dispatch, namespace}) {
           <Icon type="plus" onClick={onClickAdd} style={{fontSize: 20}}/>
         </div>
         <Spin spinning={getSectionLoading}>
-
         {
           sections.map((section, i) => {
               let backgroundColor;
@@ -115,9 +114,7 @@ function Sidebar({model, dispatch, namespace}) {
                     color: color
                   }}
                 >
-
-                  {section.section_name || section._id}
-
+                  {section.section_name || section[translateDict[namespace]].name}
                   <Dropdown overlay={menu(section._id)} trigger={['click']}>
                     <a className="ant-dropdown-link" href="#">
                       <Icon type="down"/>

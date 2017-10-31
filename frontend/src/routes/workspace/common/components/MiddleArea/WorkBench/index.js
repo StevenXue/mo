@@ -1,21 +1,21 @@
 import React from 'react'
 import styles from './index.less'
-import { connect } from 'dva'
+import {connect} from 'dva'
 
-import { Select, Collapse, Button, Input, Popover, Icon, Tooltip } from 'antd'
-import ToolBar from '../ToolBar/index'
-import ParamsMapper from '../../ParamsMapper'
-import { format } from '../../../utils/base'
+import {Select, Collapse, Button, Input, Popover, Icon, Tooltip} from 'antd'
+import ToolBar from './ToolBar/index'
+import ParamsMapper from '../../../../../../components/ParamsMapper/index'
+import {format} from '../../../../../../utils/base'
 
-import LayerCard from '../../../routes/workspace/modelling/LayerCard'
-import { get, isEqual } from 'lodash'
+import LayerCard from '../../../../modelling/LayerCard/index'
+import {get, isEqual} from 'lodash'
 
 // import  from '../../../index.less'
 
 const Option = Select.Option
 const Panel = Collapse.Panel
 
-import { translateDict } from '../../../constants'
+import {translateDict} from '../../../../../../constants'
 
 function getArgs(baseSteps, stepIndex, argIndex) {
 
@@ -33,7 +33,7 @@ const content = (content) => (
   </div>
 )
 
-function WorkBench({ section, model, dispatch, namespace, preview }) {
+function WorkBench({section, model, dispatch, namespace, preview}) {
   //state
   const {
     sectionsJson,
@@ -69,7 +69,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
 
     dispatch({
       type: namespace + '/setSections',
-      payload: { sectionsJson: sectionsJson },
+      payload: {sectionsJson: sectionsJson},
     })
     // 将预览设置
   }
@@ -105,7 +105,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
     })
   }
 
-  function handleClickField(fieldName, stepIndex, argIndex) {
+  function handleClickField(fieldName, stepIndex, argIndex, datasourceStepIndex) {
     dispatch({
       type: namespace + '/addRemoveField',
       payload: {
@@ -113,6 +113,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
         argIndex,
         fieldName,
         sectionId: section._id,
+        datasourceStepIndex
       },
     })
   }
@@ -134,8 +135,6 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
   }
 
   function handleOnChangeArgs(e, stepIndex, argIndex) {
-    // console.log("e", e);
-    console.log('baseSteps', baseSteps[stepIndex].args[argIndex]['value_type'])
 
     e = format(e, baseSteps[stepIndex].args[argIndex]['value_type'])
     dispatch({
@@ -150,8 +149,6 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
   }
 
   function setValue(value, stepIndex, argIndex) {
-    // console.log("e", e);
-    // console.log('baseSteps', baseSteps[stepIndex].args[argIndex]['value_type'])
 
     dispatch({
       type: namespace + '/setValue',
@@ -165,8 +162,6 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
   }
 
   function addValue(value, stepIndex, argIndex, valueIndex) {
-    console.log('value', value)
-    console.log('index', stepIndex, argIndex, valueIndex)
 
     // e = format(e, baseSteps[stepIndex].args[argIndex]['value_type'])
     dispatch({
@@ -200,7 +195,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
     // e = format(e, baseSteps[stepIndex].args[argIndex]['value_type'])
     for (let key in value) {
       let idx = sectionsJson[sectionId].steps[stepIndex].args[argIndex].values[valueIndex].args.findIndex(e => e.name === key)
-      if(!isEqual(sectionsJson[sectionId].steps[stepIndex].args[argIndex].values[valueIndex].args[idx].default, value[key])) {
+      if (!isEqual(sectionsJson[sectionId].steps[stepIndex].args[argIndex].values[valueIndex].args[idx].default, value[key])) {
         dispatch({
           type: namespace + '/setLayerDefault',
           payload: {
@@ -220,7 +215,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
     console.log(value)
     for (let key in value) {
       let idx = sectionsJson[sectionId].steps[stepIndex].args.findIndex(e => e.name === key)
-      if(!isEqual(sectionsJson[sectionId].steps[stepIndex].args[idx].default, value[key])) {
+      if (!isEqual(sectionsJson[sectionId].steps[stepIndex].args[idx].default, value[key])) {
         dispatch({
           type: namespace + '/setDefault',
           payload: {
@@ -264,58 +259,153 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
     })
   }
 
-  function fieldSelector(datasourceStep, step, stepIndex) {
-
+  function fieldSelector(datasourceStep, datasourceStepIndex, step, stepIndex) {
     return (
       <div>
         <div className={styles.fields}>
           {
             step.args.map((arg, argIndex) => {
-              let fields = get(datasourceStep, `args[${argIndex}].fields`, [])
-              console.log('datasourceStep', datasourceStep)
-              console.log('fields', fields)
+              const values = arg.values;
 
-              return fields.map((field) => <div
-                key={field[0]}
-                className={styles.field}
-                onClick={() => handleClickField(field[0], stepIndex, argIndex)}
-                style={{
-                  backgroundColor: (step.args[argIndex].values).includes(field[0]) ? '#34C0E2' : '#F3F3F3',
-                  color: mouseOverField === field[0] ? 'green' : 'grey',
-                }}
-                onMouseOver={() => handleMouseOverField(field[0])}
-                onMouseLeave={() => handleMouseLeaveField()}
-              >
-                <p className={styles.text}>{field[0]}</p>
-              </div>,)
+              let fields = get(datasourceStep, `args[${argIndex}].fields`, []);
+              let fieldsJson = get(datasourceStep, `args[${argIndex}].fieldsJson`, {});
+              return fields.map((field) => {
+                const fieldName = field[0];
 
+                let backgroundColor;
+                let onClick;
+                let className;
+
+                if (fieldsJson[fieldName]) {
+                  if (values.includes(fieldName)) {
+                    // blue onclick
+                    backgroundColor = '#34C0E2';
+                    onClick = true;
+                    className = styles.active_field
+                  }
+                  else {
+                    //black
+                    backgroundColor = 'black';
+                    onClick = false;
+                    className = styles.disable_field
+                  }
+                } else {
+                  if (values.includes(fieldName)) {
+                    // blue onclick
+                    backgroundColor = '#34C0E2';
+                    onClick = true;
+                    className = styles.active_field
+
+                  }
+                  else {
+                    //grey onclick
+                    backgroundColor = '#F3F3F3';
+                    onClick = true;
+                    className = styles.field
+
+                  }
+
+                }
+
+                return (
+                  <div key={fieldName}
+                       className={`${styles.field} ${className}`}
+                       onClick={onClick ? () => handleClickField(fieldName, stepIndex, argIndex, datasourceStepIndex) : null}
+                       style={{
+                         // backgroundColor: backgroundColor,
+                         color: mouseOverField === fieldName ? 'green' : 'grey',
+                       }}
+                       onMouseOver={() => handleMouseOverField(fieldName)}
+                       onMouseLeave={() => handleMouseLeaveField()}>
+                    <p className={styles.text}>{fieldName}</p>
+                  </div>
+                )
+
+
+              })
             })
           }
-
-          {/*{step.args[0]['fields'] && step.args[0].fields.map(field =>*/}
-          {/*<div*/}
-          {/*key={field[0]}*/}
-          {/*className={styles.field}*/}
-          {/*onClick={() => handleClickField(field[0], stepIndex)}*/}
-          {/*style={{*/}
-          {/*backgroundColor: (step.args[0].values).includes(field[0]) ? '#34C0E2' : '#F3F3F3',*/}
-          {/*color: mouseOverField === field[0] ? 'green' : 'grey',*/}
-          {/*}}*/}
-          {/*onMouseOver={() => handleMouseOverField(field[0])}*/}
-          {/*onMouseLeave={() => handleMouseLeaveField()}*/}
-          {/*>*/}
-          {/*<p className={styles.text}>{field[0]}</p>*/}
-          {/*</div>,*/}
-          {/*)}*/}
         </div>
         <div className={styles.end_button}>
           {
             LastOrRunButton(stepIndex, stepLength)
           }
         </div>
+      </div>
+    )
+  }
 
+  function secondFieldSelector(datasourceStep, step, stepIndex, LastStep) {
+    return (
+      <div>
+        <div className={styles.fields}>
+          {
+            step.args.map((arg, argIndex) => {
+              const values = arg.values;
+              const lastValues = LastStep.args[argIndex].values;
+
+              let fields = get(datasourceStep, `args[${argIndex}].fields`, []);
+              return fields.map((field) => {
+                const fieldName = field[0];
+
+                if (lastValues.includes(fieldName)) {
+                  return (
+                    <div key={fieldName}
+                         className={styles.field}
+                         style={{
+                           backgroundColor: 'grey',
+                           color: mouseOverField === fieldName ? 'green' : 'grey',
+                         }}
+                         onMouseOver={() => handleMouseOverField(fieldName)}
+                         onMouseLeave={() => handleMouseLeaveField()}>
+                      <p className={styles.text}>{fieldName}</p>
+                    </div>
+                  )
+                }
+
+                return (
+                  <div key={fieldName}
+                       className={styles.field}
+                       onClick={() => handleClickField(fieldName, stepIndex, argIndex)}
+                       style={{
+                         backgroundColor: values.includes(fieldName) ? '#34C0E2' : '#F3F3F3',
+                         color: mouseOverField === fieldName ? 'green' : 'grey',
+                       }}
+                       onMouseOver={() => handleMouseOverField(fieldName)}
+                       onMouseLeave={() => handleMouseLeaveField()}>
+                    <p className={styles.text}>{fieldName}</p>
+                  </div>
+                )
+
+                // if(values.includes(fieldName)){
+                //   return (
+                //     <div key={fieldName}
+                //          className={styles.field}
+                //          onClick={() => handleClickField(fieldName, stepIndex, argIndex)}
+                //          style={{
+                //            backgroundColor: (arg.values).includes(fieldName) ? '#34C0E2' : '#F3F3F3',
+                //            color: mouseOverField === fieldName ? 'green' : 'grey',
+                //          }}
+                //          onMouseOver={() => handleMouseOverField(fieldName)}
+                //          onMouseLeave={() => handleMouseLeaveField()}>
+                //       <p className={styles.text}>{fieldName}</p>
+                //     </div>
+                //   )
+                // }
+
+
+              })
+            })
+          }
+        </div>
+        <div className={styles.end_button}>
+          {
+            LastOrRunButton(stepIndex, stepLength)
+          }
+        </div>
       </div>)
   }
+
 
   function getTitle(valueIndex, length) {
     if (valueIndex === 0) {
@@ -345,7 +435,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                     baseStep={baseSteps[stepIndex]}
                     featureFields={featureFields}
                     labelFields={labelFields}
-                    {...{ model, dispatch, namespace }}
+                    {...{model, dispatch, namespace}}
                     funcs={{
                       addValue: (e) => addValue(e, stepIndex, argIndex, valueIdx + 1),
                       updateValueOfValues: (e) => updateValueOfValues(e, stepIndex, argIndex, valueIdx),
@@ -379,14 +469,9 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                       setValueDefault={(value) => setValueDefault(value, stepIndex)}
         />
         <div className={styles.end_button}>
-          <Button type="primary" className={styles.button} onClick={() =>
-            dispatch({
-              type: namespace + '/setActiveKey',
-              payload: {
-                activeKey: [String(stepIndex), String(stepIndex + 1)],
-                sectionId: section._id,
-              },
-            })}>next</Button>
+          {
+            LastOrRunButton(stepIndex, stepLength)
+          }
         </div>
       </div>
     )
@@ -443,7 +528,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
             key={arg.name + argIndex}
             className={styles.select}
             showSearch
-            style={{ width: 200 }}
+            style={{width: 200}}
             placeholder="Select a stagingData"
             optionFilterProp="children"
             onChange={(value) => handleChange(value, stepIndex, argIndex)}
@@ -469,9 +554,57 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
     )
   }
 
+  // function parameters(step, stepIndex) {
+  //   return (
+  //     <div>
+  //       <ParamsMapper args={step.args} setValue={(value, argIndex) => setValue(value, stepIndex, argIndex)}/>
+  //       <div className={styles.end_button}>
+  //         {
+  //           LastOrRunButton(stepIndex, stepLength)
+  //         }
+  //       </div>
+  //     </div>
+  //   );
+  //   // return (
+  //   //   <div>
+  //   //     {
+  //   //       step.args.map((arg, argIndex) =>
+  //   //         <div className={styles.pair} key={arg.name + argIndex}>
+  //   //                           <span>
+  //   //                             {getArgs(baseSteps, stepIndex, argIndex).display_name}
+  //   //                           </span>
+  //   //           <div className={styles.row}>
+  //   //             <Input placeholder="" defaultValue={arg.value}
+  //   //                    onChange={(e) => handleOnChangeArgs(e.target.value, stepIndex, argIndex)}/>
+  //   //
+  //   //
+  //   //             <div className={styles.help}>
+  //   //               <Tooltip title={getArgs(baseSteps, stepIndex, argIndex).des}>
+  //   //                 <Icon type="question-circle-o"/>
+  //   //               </Tooltip>
+  //   //
+  //   //               {/*<Popover content={content(getArgs(baseSteps, stepIndex, argIndex).des)}*/}
+  //   //               {/*title="Help info">*/}
+  //   //               {/*<Icon type="question-circle-o"/>*/}
+  //   //               {/*</Popover>*/}
+  //   //             </div>
+  //   //
+  //   //           </div>
+  //   //         </div>,
+  //   //       )
+  //   //     }
+  //   //     <div className={styles.end_button}>
+  //   //       {
+  //   //         LastOrRunButton(stepIndex, stepLength)
+  //   //       }
+  //   //     </div>
+  //   //   </div>
+  //   // )
+  // }
+
   return (
     <div>
-      <ToolBar sectionId={sectionId} {...{ model, dispatch, namespace }}/>
+      <ToolBar sectionId={sectionId} {...{model, dispatch, namespace}}/>
       <div className={styles.container}>
         <Collapse className={styles.collapse}
                   defaultActiveKey={['data_source']} onChange={callback}
@@ -492,59 +625,30 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                     return <Panel header="Select Fields" key={stepIndex}
                                   className={styles.panel}
                     >
-                      {fieldSelector(steps[0], step, stepIndex)}
+                      {fieldSelector(steps[0], 0, step, stepIndex)}
                     </Panel>
                   case 'feature_fields':
                     return (
                       <Panel header="Select Feature Fields" key={stepIndex}
                              className={styles.panel}>
-                        {fieldSelector(steps[0], step, stepIndex)}
+                        {fieldSelector(steps[0], 0, step, stepIndex)}
 
                       </Panel>
                     )
                   case 'label_fields':
                     return <Panel header="Select Label Fields" key={stepIndex}
                                   className={styles.panel}>
-                      {fieldSelector(steps[0], step, stepIndex)}
+                      {fieldSelector(steps[0], 0, step, stepIndex)}
+
+                      {/*{secondFieldSelector(steps[0], step, stepIndex, steps[stepIndex-1])}*/}
                     </Panel>
-                  // case 'parameters':
-                  //   return (
-                  //     <Panel header="Parameter" key={stepIndex}
-                  //            className={styles.panel}>
-                  //       {
-                  //         step.args.map((arg, argIndex) =>
-                  //           <div className={styles.pair} key={arg.name + argIndex}>
-                  //             <span>
-                  //               {getArgs(baseSteps, stepIndex, argIndex).display_name}
-                  //             </span>
-                  //             <div className={styles.row}>
-                                {/*{console.log('arg.value', arg.value)}*/}
-                  //               <Input placeholder="" defaultValue={arg.value}
-                  //                      onChange={(e) => handleOnChangeArgs(e.target.value, stepIndex, argIndex)}/>
-                  //
-
-                                {/*<div className={styles.help}>*/}
-                                  {/*<Tooltip title={getArgs(baseSteps, stepIndex, argIndex).des}>*/}
-                                    {/*<Icon type="question-circle-o"/>*/}
-                                  {/*</Tooltip>*/}
-
-                  //                 {/*<Popover content={content(getArgs(baseSteps, stepIndex, argIndex).des)}*/}
-                  //                 {/*title="Help info">*/}
-                  //                 {/*<Icon type="question-circle-o"/>*/}
-                  //                 {/*</Popover>*/}
-                  //               </div>
-                  //
-                  //             </div>
-                  //           </div>,
-                  //         )
-                  //       }
-                  //       <div className={styles.end_button}>
-                  //         {
-                  //           LastOrRunButton(stepIndex, stepLength)
-                  //         }
-                  //       </div>
-                  //     </Panel>
-                  //   )
+                  case 'parameters':
+                    return (
+                      <Panel header="Parameter" key={stepIndex}
+                             className={styles.panel}>
+                        {renderParameters(step, stepIndex)}
+                      </Panel>
+                    )
                   case 'layers':
                     return (
                       <Panel header="Build Network" key={stepIndex}
@@ -573,48 +677,4 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
   )
 }
 
-// function DataSource({step, model, dispatch, namespace}) {
-//
-//   const {
-//     stagingDataList,
-//   } = model;
-//
-//   //functions
-//   function handleChange(value, step) {
-//     sectionsJson[section.sectionId].toolkit.parameter_spec.data_source.value = value;
-//     setSections(sectionsJson);
-//     console.log(`selected ${value}`);
-//   }
-//
-//   function handleBlur() {
-//     console.log('blur');
-//   }
-//
-//   function handleFocus() {
-//     console.log('focus');
-//   }
-//
-//   return <div>
-//     <Select
-//       className={styles.select}
-//       showSearch
-//       style={{width: 200}}
-//       placeholder="Select a stagingData"
-//       optionFilterProp="children"
-//       onChange={(value) => handleChange(value, 0)}
-//       onFocus={handleFocus}
-//       onBlur={handleBlur}
-//       defaultValue={step.value}
-//       filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-//     >
-//       {stagingDataList.map((stagingData) =>
-//         <Option key={stagingData._id} value={stagingData._id}>{stagingData.name}</Option>
-//       )}
-//     </Select>
-//     <Button type="primary" className={styles.button}>save</Button>
-//   </div>
-// }
-// export default connect(({ preview }) => ({ upload }))(WorkBench)
-export default connect(({ preview }) => ({ preview }))(WorkBench)
-
-// export default WorkBench
+export default connect(({preview}) => ({preview}))(WorkBench)

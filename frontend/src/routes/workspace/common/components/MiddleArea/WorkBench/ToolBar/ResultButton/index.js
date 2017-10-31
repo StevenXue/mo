@@ -3,7 +3,7 @@ import styles from '../ToolBar.less';
 import {connect} from 'dva';
 import {Icon, Button, Modal} from 'antd';
 import VisualizationPanel from './visualizationPanel.js';
-import LearningCurve from '../../../../components/Charts/curve';
+import LearningCurve from '../../../../../../../../components/Charts/curve';
 
 
 class ResultButton extends Component {

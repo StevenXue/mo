@@ -7,8 +7,8 @@ import {Tabs} from 'antd';
 
 const TabPane = Tabs.TabPane;
 
-import Preview from './Preview';
-import History from './History';
+import Preview from './Preview/index';
+import History from './History/index';
 
 // todo 自己写tab 以实现样式自定义
 const tabs = [

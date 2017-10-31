@@ -21,7 +21,9 @@ import en_US from '../../intl/en_US';
 function MainLayout({children, location, history}) {
   return (
     <div className={styles.normal}>
-      <Header location={location} history={history}/>
+      <div>
+        <Header location={location} history={history}/>
+      </div>
       <div className={styles.content}>
         <div className={styles.main}>
           {children}
@@ -61,13 +63,13 @@ class OutMainLayout extends React.Component {
   render() {
     return (
       <div>
-        <div className="change-locale">
-          <span style={{marginRight: 16}}>Change locale of components: </span>
-          <Radio.Group defaultValue={enUS} onChange={this.changeLocale}>
-            <Radio.Button key="en" value={enUS}>English</Radio.Button>
-            <Radio.Button key="cn">中文</Radio.Button>
-          </Radio.Group>
-        </div>
+        {/*<div className="change-locale">*/}
+          {/*<span style={{marginRight: 16}}>Change locale of components: </span>*/}
+          {/*<Radio.Group defaultValue={enUS} onChange={this.changeLocale}>*/}
+            {/*<Radio.Button key="en" value={enUS}>English</Radio.Button>*/}
+            {/*<Radio.Button key="cn">中文</Radio.Button>*/}
+          {/*</Radio.Group>*/}
+        {/*</div>*/}
 
         <LocaleProvider locale={this.state.locale}>
           <IntlProvider
