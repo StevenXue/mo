@@ -100,6 +100,7 @@ def run_job():
     job_obj = job_business.get_by_job_id(job_id)
     result = job_service.run_toolkit_job(project_id=project_id, job_obj=job_obj)
 
+    result = json_utility.convert_to_json(result)
     return jsonify({
         "response": {
             "result": result

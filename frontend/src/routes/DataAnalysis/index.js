@@ -17,11 +17,9 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
     step: 'toolkit'
   };
   return (
-    <Spin spinning={dataAnalysis.spinLoading.wholePage}>
-      {
-        console.log('dataAnalysis.spinLoading.wholePage', dataAnalysis.spinLoading.wholePage)
-      }
-      <div className={styles.container}>
+
+    <div className={styles.container}>
+      <Spin  spinning={dataAnalysis.spinLoading.wholePage}>
 
         <div className={styles.content}>
           <div className={styles.sidebar}>
@@ -40,8 +38,9 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
             />
           </div>
         </div>
-      </div>
-    </Spin>
+      </Spin>
+
+    </div>
   );
 }
 

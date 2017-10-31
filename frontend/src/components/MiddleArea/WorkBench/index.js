@@ -137,8 +137,6 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
   }
 
   function handleOnChangeArgs(e, stepIndex, argIndex) {
-    // console.log("e", e);
-    console.log("baseSteps", baseSteps[stepIndex].args[argIndex]["value_type"]);
 
     e = format(e, baseSteps[stepIndex].args[argIndex]["value_type"]);
     dispatch({
@@ -153,8 +151,6 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
   }
 
   function setValue(value, stepIndex, argIndex) {
-    // console.log("e", e);
-    // console.log('baseSteps', baseSteps[stepIndex].args[argIndex]['value_type'])
 
     dispatch({
       type: namespace + '/setValue',
@@ -168,8 +164,6 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
   }
 
   function addValue(value, stepIndex, argIndex, valueIndex) {
-    console.log('value', value)
-    console.log('index', stepIndex, argIndex, valueIndex)
 
     // e = format(e, baseSteps[stepIndex].args[argIndex]['value_type'])
     dispatch({
@@ -234,8 +228,6 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
           {
             step.args.map((arg, argIndex)=>{
               let fields = get(datasourceStep, `args[${argIndex}].fields`, []);
-              console.log("datasourceStep", datasourceStep);
-              console.log("fields", fields);
 
               return fields.map((field)=><div
                 key={field[0]}
@@ -336,14 +328,9 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
       <div>
         <ParamsMapper args={step.args} setValue={(value, argIndex) => setValue(value, stepIndex, argIndex)}/>
         <div className={styles.end_button}>
-          <Button type="primary" className={styles.button} onClick={() =>
-            dispatch({
-              type: namespace + '/setActiveKey',
-              payload: {
-                activeKey: [String(stepIndex), String(stepIndex + 1)],
-                sectionId: section._id,
-              },
-            })}>next</Button>
+          {
+            LastOrRunButton(stepIndex, stepLength)
+          }
         </div>
       </div>
     )
@@ -426,6 +413,54 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
     )
   }
 
+  // function parameters(step, stepIndex) {
+  //   return (
+  //     <div>
+  //       <ParamsMapper args={step.args} setValue={(value, argIndex) => setValue(value, stepIndex, argIndex)}/>
+  //       <div className={styles.end_button}>
+  //         {
+  //           LastOrRunButton(stepIndex, stepLength)
+  //         }
+  //       </div>
+  //     </div>
+  //   );
+  //   // return (
+  //   //   <div>
+  //   //     {
+  //   //       step.args.map((arg, argIndex) =>
+  //   //         <div className={styles.pair} key={arg.name + argIndex}>
+  //   //                           <span>
+  //   //                             {getArgs(baseSteps, stepIndex, argIndex).display_name}
+  //   //                           </span>
+  //   //           <div className={styles.row}>
+  //   //             <Input placeholder="" defaultValue={arg.value}
+  //   //                    onChange={(e) => handleOnChangeArgs(e.target.value, stepIndex, argIndex)}/>
+  //   //
+  //   //
+  //   //             <div className={styles.help}>
+  //   //               <Tooltip title={getArgs(baseSteps, stepIndex, argIndex).des}>
+  //   //                 <Icon type="question-circle-o"/>
+  //   //               </Tooltip>
+  //   //
+  //   //               {/*<Popover content={content(getArgs(baseSteps, stepIndex, argIndex).des)}*/}
+  //   //               {/*title="Help info">*/}
+  //   //               {/*<Icon type="question-circle-o"/>*/}
+  //   //               {/*</Popover>*/}
+  //   //             </div>
+  //   //
+  //   //           </div>
+  //   //         </div>,
+  //   //       )
+  //   //     }
+  //   //     <div className={styles.end_button}>
+  //   //       {
+  //   //         LastOrRunButton(stepIndex, stepLength)
+  //   //       }
+  //   //     </div>
+  //   //   </div>
+  //   // )
+  // }
+
   return (
     <div>
       <ToolBar sectionId={sectionId} {...{model, dispatch, namespace}}/>
@@ -468,38 +503,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                     return (
                       <Panel header="Parameter" key={stepIndex}
                              className={styles.panel}>
-                        {
-                          step.args.map((arg, argIndex) =>
-                            <div className={styles.pair} key={arg.name + argIndex}>
-                              <span>
-                                {getArgs(baseSteps, stepIndex, argIndex).display_name}
-                              </span>
-                              <div className={styles.row}>
-                                {console.log('arg.value', arg.value)}
-                                <Input placeholder="" defaultValue={arg.value}
-                                       onChange={(e) => handleOnChangeArgs(e.target.value, stepIndex, argIndex)}/>
-
-
-                                <div className={styles.help}>
-                                  <Tooltip title={getArgs(baseSteps, stepIndex, argIndex).des}>
-                                    <Icon type="question-circle-o"/>
-                                  </Tooltip>
-
-                                  {/*<Popover content={content(getArgs(baseSteps, stepIndex, argIndex).des)}*/}
-                                  {/*title="Help info">*/}
-                                  {/*<Icon type="question-circle-o"/>*/}
-                                  {/*</Popover>*/}
-                                </div>
-
-                              </div>
-                            </div>,
-                          )
-                        }
-                        <div className={styles.end_button}>
-                          {
-                            LastOrRunButton(stepIndex, stepLength)
-                          }
-                        </div>
+                        {renderParameters(step, stepIndex)}
                       </Panel>
                     )
                   case 'layers':
@@ -525,49 +529,4 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
     </div>
   )
 }
-
-// function DataSource({step, model, dispatch, namespace}) {
-//
-//   const {
-//     stagingDataList,
-//   } = model;
-//
-//   //functions
-//   function handleChange(value, step) {
-//     sectionsJson[section.sectionId].toolkit.parameter_spec.data_source.value = value;
-//     setSections(sectionsJson);
-//     console.log(`selected ${value}`);
-//   }
-//
-//   function handleBlur() {
-//     console.log('blur');
-//   }
-//
-//   function handleFocus() {
-//     console.log('focus');
-//   }
-//
-//   return <div>
-//     <Select
-//       className={styles.select}
-//       showSearch
-//       style={{width: 200}}
-//       placeholder="Select a stagingData"
-//       optionFilterProp="children"
-//       onChange={(value) => handleChange(value, 0)}
-//       onFocus={handleFocus}
-//       onBlur={handleBlur}
-//       defaultValue={step.value}
-//       filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-//     >
-//       {stagingDataList.map((stagingData) =>
-//         <Option key={stagingData._id} value={stagingData._id}>{stagingData.name}</Option>
-//       )}
-//     </Select>
-//     <Button type="primary" className={styles.button}>save</Button>
-//   </div>
-// }
-// export default connect(({ preview }) => ({ upload }))(WorkBench)
 export default connect(({preview}) => ({preview}))(WorkBench)
-
-// export default WorkBench

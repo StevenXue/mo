@@ -40,26 +40,6 @@ TOOLKIT_CATEGORY_DICT = {
 
 NEW_TOOLKIT_CATEGORY = [
     {
-        'name': 'finished_toolkit',
-        'zh_name': '完成的toolkit',
-        'us_name': 'Finished Toolkit',
-        'child': [
-            'K平均数算法',
-            '移动平均值',
-            '皮尔森相关系数',
-            '变异系数',
-            '数据互相关',
-            '归一化',
-            '方差选择法',
-            '卡方选择法',
-            '相关系数选择法',
-            '互信息选择法',
-            '递归特征消除法'
-
-        ],
-        'children': []
-    },
-    {
         'name': 'simple_toolkit',
         'zh_name': '简单的toolkit',
         'us_name': 'Simple Toolkit',
@@ -73,11 +53,11 @@ NEW_TOOLKIT_CATEGORY = [
         'zh_name': '初探数据集',
         'us_name': 'Data Explore',
         'child': [
-            # 'K平均数算法',
-            # '移动平均值',
-            # '皮尔森相关系数',
-            # '变异系数',
-            # '数据互相关'
+            'K平均数算法',
+            '移动平均值',
+            '皮尔森相关系数',
+            '变异系数',
+            '数据互相关'
         ],
         'children': []
     },
@@ -86,7 +66,7 @@ NEW_TOOLKIT_CATEGORY = [
         'zh_name': '提升数据质量',
         'us_name': 'Data Quality Improve',
         'child': [
-            # '归一化',
+            '归一化',
         ],
         'children': []
     },
@@ -95,14 +75,52 @@ NEW_TOOLKIT_CATEGORY = [
         'zh_name': '特征提取',
         'us_name': 'Feature Selection',
         'child': [
+            '方差选择法',
+            '卡方选择法',
+            '相关系数选择法',
+            '互信息选择法',
+            '递归特征消除法'
+        ],
+        'children': []
+    },
+    {
+        'name': 'finished_toolkit',
+        'zh_name': '完成的toolkit',
+        'us_name': 'Finished Toolkit',
+        'child': [
+            # 'K平均数算法',
+            # '移动平均值',
+            # '皮尔森相关系数',
+            # '变异系数',
+            # '数据互相关',
+            # '归一化',
             # '方差选择法',
             # '卡方选择法',
             # '相关系数选择法',
             # '互信息选择法',
             # '递归特征消除法'
+
         ],
         'children': []
-    }
+    },
+    {
+        'name': 'others',
+        'zh_name': '其他',
+        'us_name': 'Others',
+        'child': [
+        ],
+        'children': []
+    },
+    {
+        'name': 'custom_toolkit',
+        'zh_name': '自定义toolkit',
+        'us_name': 'Custom Toolkit',
+        'child': [
+        ],
+        'children': []
+    },
+
+
 ]
 
 
