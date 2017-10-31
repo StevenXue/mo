@@ -8,50 +8,32 @@ import styles from './index.less'
 class LayerCard extends React.Component {
   state = {}
 
-  handleSelect = (value) => {
-    this.props.setValueOfValues()
-  }
-
   render() {
     const {
-      title, layerIndex, step, style, onClick, model, dispatch, namespace, funcs
+      title, layerIndex, argIndex, arg, baseSteps, style, onClick, model, dispatch, namespace, funcs,
     } = this.props
-    const arg = step.args[0]
 
-    let layerName
-    if(arg.values[layerIndex]) {
-      layerName = arg.values[layerIndex].name
-    }
-      console.log('ln', layerName)
+    // const baseArg = baseSteps[3].args[0]
+    // const arg = step.args[0]
+
+    // console.log('ln', layerName)
 
     const layers = arg.range
-
-    let args = []
-    if (layerName) {
-      args = layers.find(e => e.name === layerName).args
-    }
+    const value = arg.values[layerIndex]
+    // console.log('values', arg.values)
 
     return (
-      <Card className={`${styles.box} layer-card`} style={style} onClick={onClick}>
+      <Card className={`${styles.box} layer-card`} style={style} onClick={onClick} key={`${argIndex}${layerIndex}`}>
         <div className={styles.header}>
           {title}
         </div>
         <div className={styles.body}>
-          <Select placeholder="Choose Layer" style={{ width: '60%', marginBottom: 10 }} onChange={(name)=> {
-            funcs.setValueOfValues({name})
-          }}
-          value={layerName}>
-            {
-              layers.map((e) =>
-                <Select.Option value={e.name} key={e.name}>{e.name}</Select.Option>,
-              )
-            }
-          </Select>
-          <ArgsMapper args={args} layerName={layerName} funcs={funcs} />
+          <ArgsMapper layerIndex={layerIndex} funcs={funcs} value={value}
+                      layers={layers}/>
         </div>
         <div className={styles.add}>
           {
-            layerIndex > -1 &&
+            layerIndex < arg.values.length - 1 &&
             <Button shape="circle" icon="plus" size='small' style={{ zIndex: 9 }} onClick={() => funcs.addValue({})}/>
           }
         </div>

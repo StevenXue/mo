@@ -26,40 +26,54 @@ function History({history}) {
 
       {historyList.map((e) => {
 
-        if(e.create_time.substring(0,10)!==dateString){
-          dateString = e.create_time.substring(0,10);
-          return <div key={e._id}>
-            <div className={styles.date}>
-              {e.create_time.substring(0,10)}
+          if (e.create_time.substring(0, 10) !== dateString) {
+            dateString = e.create_time.substring(0, 10);
+            let displayDate = dateString;
+
+            let now = new Date();
+            let year = now.getFullYear();
+
+            let date = now.getDate();
+            let month = now.getMonth();
+            if (`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}` === dateString) {
+              displayDate = 'Today';
+            }
+            if (`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate() - 1}` === dateString) {
+              displayDate = 'Yesterday';
+            }
+
+            return <div key={e._id}>
+              <div className={styles.date}>
+                {displayDate}
+              </div>
+              <Card className={styles.card_container}>
+                <div className={styles.card}>
+                  <div className={styles.content}>
+                    {e._id}
+                  </div>
+
+                  <div>
+                    {e.create_time.substring(11, 16)}
+                  </div>
+                </div>
+              </Card>
             </div>
-            <Card  className={styles.card_container}>
-              <div className={styles.card}>
-                <div className={styles.content}>
-                  {e._id}
-                </div>
+          }
+          else {
+            return (
+              <Card key={e._id} className={styles.card_container}>
+                <div className={styles.card}>
+                  <div className={styles.content}>
+                    {e._id}
+                  </div>
 
-                <div>
-                  {e.create_time.substring(11,16)}
+                  <div>
+                    {e.create_time.substring(11, 16)}
+                  </div>
                 </div>
-              </div>
-            </Card>
-          </div>
-        }
-        else{
-          return (
-            <Card key={e._id} className={styles.card_container}>
-              <div className={styles.card}>
-                <div className={styles.content}>
-                  {e._id}
-                </div>
-
-                <div>
-                  {e.create_time.substring(11,16)}
-                </div>
-              </div>
-            </Card>
-          )
-        }
+              </Card>
+            )
+          }
 
         }
       )}

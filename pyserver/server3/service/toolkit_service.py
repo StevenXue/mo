@@ -186,7 +186,8 @@ def run_toolkit_sub(project_id, staging_data_set_id, toolkit_obj,
                                func_rst, job_obj,
                                *argv, **kwargs)
     # save visual_sds_id to job
-    job_obj.visual_sds_id = result.pop("result_sds_obj")
+    job_obj.visual_sds_id = result.pop("result_sds_obj", None)
+    job_obj.result = result["result"]
     job_obj.save()
     return result
 
@@ -204,6 +205,7 @@ def after_run_toolkit(project_id, staging_data_set_id,
     gen_info = []
     result_spec = toolkit_obj.result_spec
 
+    # result format
     for arg in result_spec["args"]:
         value = result.pop(0)
         results.update({arg["name"]: value})
@@ -227,6 +229,10 @@ def after_run_toolkit(project_id, staging_data_set_id,
             "attribute"] == "general_info":
             gen_info.append({arg["name"]: {"value": value,
                                            "description": arg["des"]}})
+    # print("results", results)
+    # job_obj.result = results
+    # job_obj.save()
+    # # save to job
 
         # 可视化计算
         # 聚类分析

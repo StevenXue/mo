@@ -15,7 +15,8 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
     visual_sds_id,
     [translateDict[namespace]]: {
       name
-    }
+    },
+    result
   } = sectionsJson[sectionId];
   // // change state
   // const updateSection = (sectionId) => {
@@ -77,7 +78,7 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
         </Button>
 
         <div  >
-          <ResultButton visual_sds_id={visual_sds_id}/>
+          <ResultButton visual_sds_id={visual_sds_id} result={result}/>
         </div>
 
       </ButtonGroup>

@@ -291,7 +291,7 @@ INPUT_SHAPE = {
 KERAS_SEQ_STEPS = [
     {
         "name": "data_source",
-        "display_name": "Select parameters",
+        "display_name": "Select Data Source",
         "args": [
             {
                 "name": "input",
@@ -309,7 +309,7 @@ KERAS_SEQ_STEPS = [
     },
     {
         "name": "feature_fields",
-        "display_name": "Select feature fields",
+        "display_name": "Select Feature Fields",
         "args": [
             {
                 "name": "fields",
@@ -326,7 +326,7 @@ KERAS_SEQ_STEPS = [
     },
     {
         "name": "label_fields",
-        "display_name": "Select label fields",
+        "display_name": "Select Label Fields",
         "args": [
             {
                 "name": "fields",
@@ -511,7 +511,7 @@ KERAS_SEQ_STEPS = [
         ]
     },
     {
-        "name": "compile",
+        "name": "custom",
         "display_name": "Compile Parameters",
         'args': [
             {
@@ -571,7 +571,7 @@ KERAS_SEQ_STEPS = [
         ],
     },
     {
-        "name": "fit",
+        "name": "custom",
         "display_name": "Fit Parameters",
         "args": [
             {
@@ -594,7 +594,7 @@ KERAS_SEQ_STEPS = [
         ],
     },
     {
-        "name": "evaluate",
+        "name": "custom",
         "display_name": "Evaluate Parameters",
         "args": [
             {
