@@ -40,12 +40,11 @@ class MySelection extends React.Component {
     // console.log(value)
   }
 
-  handleAdd = (oid, name, desc, tags) => {
+  handleAdd = (oid, name, desc) => {
     this.props.dispatch({ type: 'upload/setDataSetID', payload: oid})
     this.props.dispatch({ type: 'upload/setDataSetName', payload: name})
     this.props.dispatch({ type: 'upload/setDataSetDesc', payload: desc})
-    this.props.dispatch({ type: 'upload/setDataSetTags', payload: tags})
-    this.props.dispatch({ type: 'upload/stage' })
+    this.props.dispatch({ type: 'upload/stage'})
   }
 
   handleNew = () => {
@@ -88,7 +87,7 @@ class MySelection extends React.Component {
                   onClick={() => {this.handleView(e._id, e.name, e.description, e.tags)}} >
             <Icon type="eye"/>View</Button>
           <Button size="large" className={styles.bottom} loading={this.props.upload.addLoading}
-                  onClick={() => {this.handleAdd(e._id, e.name, e.description, e.tags)}} >
+                  onClick={() => {this.handleAdd(e._id, e.name, e.description)}} >
             Add to project</Button>
         </div>:null}
       </div>
