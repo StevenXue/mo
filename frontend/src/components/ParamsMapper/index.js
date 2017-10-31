@@ -22,6 +22,7 @@ function ParamsMapper({
   const valueParser = {
     int: (e) => JSON.parse(e),
     float: (e) => JSON.parse(e),
+    bool: (e) => JSON.parse(e.toLowerCase()),
     str: (e) => (e),
   }
 
@@ -30,6 +31,7 @@ function ParamsMapper({
       int: 'integer',
       float: 'float',
       str: 'string',
+      bool: 'boolean',
     }
 
     switch (type) {

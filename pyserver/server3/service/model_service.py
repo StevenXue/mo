@@ -42,7 +42,6 @@ from server3.lib import graph
 from server3.lib import model_from_json
 from server3.utility import file_utils
 
-
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 # user_directory = 'user_directory/'
 
@@ -913,7 +912,7 @@ def _update_model():
     GNN = {
         "name": "General Neural Network",
         "description": "keras_seq from keras",
-        "target_py_code": "server3/lib/models/keras_seq",
+        "target_py_code": "server3/lib/models/keras_seq.py",
         "entry_function": "keras_seq",
         "to_code_function": "keras_seq_to_str",
         "category": 0,
@@ -926,6 +925,21 @@ def _update_model():
         }
     }
 
+    LinearRegressor = {
+        "name": "Linear Regressor",
+        "description": "Custom linear regression model",
+        "target_py_code": "server3/lib/models/linear_regressor.py",
+        "entry_function": "linear_regressor_model_fn",
+        "to_code_function": "custom_model_to_str",
+        "category": 1,
+        "model_type": 0,
+        "steps": models.LinearRegressorSteps,
+        "parameter_spec": models.LinearRegressor,
+        "input": {
+            "type": "DataFrame"
+        }
+    }
+
     user = user_business.get_by_user_ID('system')
 
     MODEL_DICT = [
@@ -934,7 +948,13 @@ def _update_model():
             "is_private": False,
             "user_ID": user.user_ID,
             "obj": GNN
-        }
+        },
+        {
+            "_id": ObjectId("597ae03e0c11f32f859a0f8c"),
+            "is_private": False,
+            "user_ID": user.user_ID,
+            "obj": LinearRegressor
+        },
     ]
 
     for model in MODEL_DICT:

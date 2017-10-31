@@ -374,7 +374,7 @@ KERAS_SEQ_STEPS = [
                                 "name": "rate",
                                 "display_name": "Rate",
                                 "des": "Fraction of the input units to drop",
-                                "type": "float",
+                                "value_type": "float",
                                 "range": [0, 1],
                                 "required": True
                             },

@@ -657,7 +657,8 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                         {networkBuilder(step, stepIndex, steps[1].args[0].values, steps[2].args[0].values)}
                       </Panel>
                     )
-                  case 'custom':
+                  case 'parameters':
+                  case 'estimator':
                   case 'compile':
                   case 'fit':
                   case 'evaluate':

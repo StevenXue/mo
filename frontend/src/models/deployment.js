@@ -31,7 +31,7 @@ export default {
           };
           for (let eachMetricHis of action.payload.modelsJson[eachModel].metrics_status) {
             for (let metric of Object.keys(metrics)) {
-              if (eachMetricHis[metric]) {
+              if (eachMetricHis[metric] !== undefined) {
                 metrics[metric].push(getRound(eachMetricHis[metric], 2))
               }
             }

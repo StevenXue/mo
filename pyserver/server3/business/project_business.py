@@ -72,8 +72,7 @@ def remove_by_id(project_id):
 
 
 def insert_job_by_id(project_id, job_obj):
-    return project_repo.insert_to_list_fields_by_id(project_id,
-                                                    {'jobs': job_obj})
+    return project_repo.add_to_set(project_id, jobs=job_obj)
 
 
 def update_by_id(project_id, **update):
