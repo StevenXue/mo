@@ -38,7 +38,7 @@ export default {
       getSections: false,
       getAlgorithms: false,
       wholePage: false,
-    }
+    },
 
   },
   reducers: {
@@ -192,28 +192,28 @@ export default {
     },
 
     addRemoveField(state, action) {
-      const {stepIndex, argIndex, fieldName, sectionId} = action.payload;
+      const { stepIndex, argIndex, fieldName, sectionId } = action.payload
 
       // const fieldName = action.payload.fieldName
       // const section = state.sectionsJson[action.payload.sectionId]
       // const values = section.steps[action.payload.stepIndex].args[0].values
 
-      const values = state.sectionsJson[sectionId].steps[stepIndex].args[argIndex].values;
+      const values = state.sectionsJson[sectionId].steps[stepIndex].args[argIndex].values
 
       if (!values.includes(fieldName)) {
-        values.push(fieldName);
+        values.push(fieldName)
         console.log('push', values)
 
       } else {
-        values.splice(values.indexOf(fieldName), 1);
+        values.splice(values.indexOf(fieldName), 1)
         console.log('pop', values)
       }
-      let sectionsJson = state.sectionsJson;
+      let sectionsJson = state.sectionsJson
       sectionsJson[sectionId].steps[stepIndex].args[argIndex].values = values
 
       return {
         ...state,
-        sectionsJson
+        sectionsJson,
       }
     },
 
@@ -236,7 +236,7 @@ export default {
     setParameter(state, action) {
       const { sectionId, stepIndex, argIndex, value } = action.payload
       let sectionsJson = state.sectionsJson
-      if(Array.isArray(value)) {
+      if (Array.isArray(value)) {
         sectionsJson[sectionId].steps[stepIndex].args[argIndex].values = value
       } else {
         sectionsJson[sectionId].steps[stepIndex].args[argIndex].value = value
@@ -247,12 +247,12 @@ export default {
       }
     },
 
-    setValue(state, action){
+    setValue(state, action) {
       const { sectionId, stepIndex, value } = action.payload
       let sectionsJson = state.sectionsJson
       for (let key in value) {
         let idx = sectionsJson[sectionId].steps[stepIndex].args.findIndex(e => e.name === key)
-        if(Array.isArray(value)) {
+        if (Array.isArray(value)) {
           sectionsJson[sectionId].steps[stepIndex].args[idx].values = value[key]
         } else {
           sectionsJson[sectionId].steps[stepIndex].args[idx].value = value[key]
@@ -264,7 +264,7 @@ export default {
       }
     },
 
-    setDefault(state, action){
+    setDefault(state, action) {
       const { sectionId, stepIndex, value } = action.payload
       let sectionsJson = state.sectionsJson
       for (let key in value) {
@@ -332,10 +332,10 @@ export default {
       // sectionsJson[sectionId].steps[stepIndex].args[argIndex].values[valueIndex] = value;
       for (let key in value) {
         let idx = sectionsJson[sectionId].steps[stepIndex].args[argIndex].values[valueIndex].args.findIndex(e => e.name === key)
-        let  v = value[key]
-        if(key === 'name') {
+        let v = value[key]
+        if (key === 'name') {
           sectionsJson[sectionId].steps[stepIndex].args[argIndex].values[valueIndex].name = v
-        } else if(Array.isArray(v)) {
+        } else if (Array.isArray(v)) {
           sectionsJson[sectionId].steps[stepIndex].args[argIndex].values[valueIndex].args[idx].values = v
         } else {
           sectionsJson[sectionId].steps[stepIndex].args[argIndex].values[valueIndex].args[idx].value = v
@@ -372,7 +372,7 @@ export default {
     setGetSectionLoading(state, action) {
       return {
         ...state,
-        getSectionLoading: action.payload.loading
+        getSectionLoading: action.payload.loading,
       }
     },
 
@@ -381,55 +381,65 @@ export default {
         ...state,
         spinLoading: {
           ...state.spinLoading,
-          [action.payload.key]: action.payload.loading
-        }
+          [action.payload.key]: action.payload.loading,
+        },
       }
     },
 
-    setSectionResult(state, action){
-      const {sectionId, result} = action.payload;
-      let section = state.sectionsJson[sectionId];
-      section['result'] = result;
+    setSectionResult(state, action) {
+      const { sectionId, result } = action.payload
+      let section = state.sectionsJson[sectionId]
+      section['result'] = result
       return {
         ...state,
         sectionsJson: {
           ...state.sectionsJson,
-          [sectionId]:section
-        }
+          [sectionId]: section,
+        },
       }
-    }
+    },
   },
   effects: {
     // 获取用户所有sections
     *fetchSections(action, { call, put }) {
-      yield put({type: 'setGetSectionLoading', payload:{loading: true}});
+      const { categories } = action
+      yield put({ type: 'setGetSectionLoading', payload: { loading: true } })
 
       const { data: { [action.categories]: sections } } = yield call(dataAnalysisService.fetchSections, {
         projectId: action.projectId,
         categories: action.categories,
-      });
-      yield put({type: 'setGetSectionLoading', payload:{loading: false}});
+      })
+      yield put({ type: 'setGetSectionLoading', payload: { loading: false } })
 
       // array to json
       const sectionsJson = arrayToJson(sections, '_id')
-      yield put({ type: 'setSections', payload: { sectionsJson: sectionsJson } })
+      if (categories === 'model') {
+        yield put({ type: 'setModels', payload: { sectionsJson: sectionsJson } })
+
+      } else {
+        yield put({ type: 'setSections', payload: { sectionsJson: sectionsJson } })
+      }
     },
 
     *fetchAlgorithms(action, { call, put }) {
-      yield put({type: 'setLoading', payload:{
-        key: 'getAlgorithms',
-        loading: true
-      }});
+      yield put({
+        type: 'setLoading', payload: {
+          key: 'getAlgorithms',
+          loading: true,
+        },
+      })
       const requestFunc = {
         toolkit: dataAnalysisService.fetchToolkits,
         model: modelService.fetchModels,
       }
       const { data: algorithms } = yield call(requestFunc[action.categories])
 
-      yield put({type: 'setLoading', payload:{
-        key: 'getAlgorithms',
-        loading: false
-      }});
+      yield put({
+        type: 'setLoading', payload: {
+          key: 'getAlgorithms',
+          loading: false,
+        },
+      })
 
       yield put({ type: 'setAlgorithms', payload: { algorithms: algorithms } })
     },
@@ -525,10 +535,12 @@ export default {
     },
 
     *runSection(action, { call, put, select }) {
-      yield put({type: 'setLoading', payload:{
-        key: 'wholePage',
-        loading: true
-      }});
+      yield put({
+        type: 'setLoading', payload: {
+          key: 'wholePage',
+          loading: true,
+        },
+      })
 
       const { namespace, sectionId } = action.payload
       // 先把 save section 复制过来
@@ -536,27 +548,28 @@ export default {
       const section = sectionsJson[sectionId]
       yield call(dataAnalysisService.saveSection, { section: section })
 
+      const projectId = yield select(state => state[namespace].projectId)
 
-      const projectId = yield select(state => state[namespace].projectId);
-
-      const {data: {result: {result}}} = yield call(dataAnalysisService.runJob, {
+      const { data: { result: { result } } } = yield call(dataAnalysisService.runJob, {
         ...action.payload,
         projectId: projectId,
-      });
+      })
 
       // 更新result
-      yield put({type: 'setSectionResult', payload:{
-        sectionId,
-        result
-      }});
-      yield put({type: 'setLoading', payload:{
-        key: 'wholePage',
-        loading: false
-      }});
-    }
+      yield put({
+        type: 'setSectionResult', payload: {
+          sectionId,
+          result,
+        },
+      })
+      yield put({
+        type: 'setLoading', payload: {
+          key: 'wholePage',
+          loading: false,
+        },
+      })
+    },
 
   },
-  subscriptions: {
-
-  },
+  subscriptions: {},
 }
