@@ -507,44 +507,44 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                                   className={styles.panel}>
                       {fieldSelector(steps[0], step, stepIndex)}
                     </Panel>
-                  case 'parameters':
-                    return (
-                      <Panel header="Parameter" key={stepIndex}
-                             className={styles.panel}>
-                        {
-                          step.args.map((arg, argIndex) =>
-                            <div className={styles.pair} key={arg.name + argIndex}>
-                              <span>
-                                {getArgs(baseSteps, stepIndex, argIndex).display_name}
-                              </span>
-                              <div className={styles.row}>
-                                {console.log('arg.value', arg.value)}
-                                <Input placeholder="" defaultValue={arg.value}
-                                       onChange={(e) => handleOnChangeArgs(e.target.value, stepIndex, argIndex)}/>
+                  // case 'parameters':
+                  //   return (
+                  //     <Panel header="Parameter" key={stepIndex}
+                  //            className={styles.panel}>
+                  //       {
+                  //         step.args.map((arg, argIndex) =>
+                  //           <div className={styles.pair} key={arg.name + argIndex}>
+                  //             <span>
+                  //               {getArgs(baseSteps, stepIndex, argIndex).display_name}
+                  //             </span>
+                  //             <div className={styles.row}>
+                                {/*{console.log('arg.value', arg.value)}*/}
+                  //               <Input placeholder="" defaultValue={arg.value}
+                  //                      onChange={(e) => handleOnChangeArgs(e.target.value, stepIndex, argIndex)}/>
+                  //
 
+                                {/*<div className={styles.help}>*/}
+                                  {/*<Tooltip title={getArgs(baseSteps, stepIndex, argIndex).des}>*/}
+                                    {/*<Icon type="question-circle-o"/>*/}
+                                  {/*</Tooltip>*/}
 
-                                <div className={styles.help}>
-                                  <Tooltip title={getArgs(baseSteps, stepIndex, argIndex).des}>
-                                    <Icon type="question-circle-o"/>
-                                  </Tooltip>
-
-                                  {/*<Popover content={content(getArgs(baseSteps, stepIndex, argIndex).des)}*/}
-                                  {/*title="Help info">*/}
-                                  {/*<Icon type="question-circle-o"/>*/}
-                                  {/*</Popover>*/}
-                                </div>
-
-                              </div>
-                            </div>,
-                          )
-                        }
-                        <div className={styles.end_button}>
-                          {
-                            LastOrRunButton(stepIndex, stepLength)
-                          }
-                        </div>
-                      </Panel>
-                    )
+                  //                 {/*<Popover content={content(getArgs(baseSteps, stepIndex, argIndex).des)}*/}
+                  //                 {/*title="Help info">*/}
+                  //                 {/*<Icon type="question-circle-o"/>*/}
+                  //                 {/*</Popover>*/}
+                  //               </div>
+                  //
+                  //             </div>
+                  //           </div>,
+                  //         )
+                  //       }
+                  //       <div className={styles.end_button}>
+                  //         {
+                  //           LastOrRunButton(stepIndex, stepLength)
+                  //         }
+                  //       </div>
+                  //     </Panel>
+                  //   )
                   case 'layers':
                     return (
                       <Panel header="Build Network" key={stepIndex}
@@ -552,7 +552,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                         {networkBuilder(step, stepIndex, steps[1].args[0].values, steps[2].args[0].values)}
                       </Panel>
                     )
-                  case 'custom':
+                  case 'parameters':
                   case 'compile':
                   case 'fit':
                   case 'evaluate':
