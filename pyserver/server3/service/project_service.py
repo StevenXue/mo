@@ -238,14 +238,61 @@ def get_all_jobs_of_project(project_id, categories, status=None):
                     # 获取 kube 中部署模型的状态
                     served_model = kube_service.get_deployment_status(served_model)
                     served_model = served_model.to_mongo()
+                    # 生成use代码
+                    job_info["served_model"] = served_model
+                    job_info = build_how_to_use_code(job_info)
                 else:
                     served_model = None
-                job_info["served_model"] = served_model
+                    job_info["served_model"] = served_model
                 # 获取 kube 中部署模型的状态
                 history_jobs[key].append(job_info)
                 break
     return history_jobs
 
+def build_how_to_use_code(job_info):
+
+    served_model_id = str(job_info['served_model']['_id'])
+    server = str(job_info['served_model']['server'])
+    served_model_name = job_info['served_model']['model_name']
+
+    str_js = "let url = 'http://localhost:5000/served_model/predict/" + \
+             served_model_id+"';\n"
+    str_js += "let data = {\n"
+    str_js += "  input_value: [[1.1, 2.1, 3.0, 4.0]],\n"
+    str_js += "  served_model_id:\"" + served_model_id+"\",\n"
+    str_js += "  server:\"" + server + "\",\n"
+    str_js += "  model_name: \""+served_model_name+"\",\n"
+    str_js += "};\n"
+    str_js += "fetch(url, {\n"
+    str_js += "  method: \"POST\",\n"
+    str_js += "  body: JSON.stringify(data),\n"
+    str_js += "  headers: {\n"
+    str_js += "     \"Content-Type\": \"application/json\",\n"
+    str_js += "  },\n"
+    str_js += "}).then(function (response) {\n"
+    str_js += "  return response.json();\n"
+    str_js += "}).then(function (responseData) {\n"
+    str_js += "  console.log(responseData);\n"
+    str_js += "}).catch(function () {\n"
+    str_js += "  console.log('error');\n"
+    str_js += "});"
+
+    str_py = "import requests\n"
+    str_py += "import json\n"
+    str_py += "data = { \n"
+    str_py += "  \"server\":\"" + server + "\",\n"
+    str_py += "  \"input_value\": [[1.1, 2.1, 3.0, 4.0]],\n"
+    str_py += "  \"served_model_id\":\"" + served_model_id + "\",\n"
+    str_py += "  \"model_name\":\"" + served_model_name + "\",\n"
+    str_py += " }\n"
+    str_py += "r = requests.post(\"http://localhost:5000/served_model/predict/"+ \
+              served_model_id + "\",json=data) \n"
+    str_py += "result = r.json()['response']['result']\n"
+    str_py += "print(result)\n"
+
+    job_info['how_to_use_code_js'] = str_js
+    job_info['how_to_use_code_py'] = str_py
+    return job_info
 
 def publish_project(project_id):
     project = project_business.get_by_id(project_id)
