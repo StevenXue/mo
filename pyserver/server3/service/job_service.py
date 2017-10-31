@@ -9,6 +9,7 @@
 # Further to FIXME of None
 """
 import os
+import random
 
 import functools
 import inspect
@@ -344,16 +345,17 @@ def create_model_job(project_id, staging_data_set_id, model_obj,
             project_business.update_items_to_list_field(
                 project_id, related_tasks=model_obj.category)
             # create result sds for model
-            sds_name = '%s_%s_result' % (model_obj['name'], job_obj['id'])
-            # result_sds_obj = staging_data_set_business.add(sds_name, 'des',
-            #                                                project_obj,
-            #                                                job=job_obj,
-            #                                                type='result')
-            result_sds_obj = staging_data_set_business.get_or_create(job_obj,
-                                                                     sds_name,
-                                                                     'des',
-                                                                     project_obj,
-                                                                     type='result')
+            sds_name = '%s_%s_result_%s' % (model_obj['name'], job_obj[
+                'id'], str(random.randint(0, 99999)))
+            result_sds_obj = staging_data_set_business.add(sds_name, 'des',
+                                                           project_obj,
+                                                           job=job_obj,
+                                                           type='result')
+            # result_sds_obj = staging_data_set_business.get_or_create(job_obj,
+            #                                                          sds_name,
+            #                                                          'des',
+            #                                                          project_obj,
+            #                                                          type='result')
             # run
             if result_dir:
                 # result_dir += str(job_obj['id']) + '/'
