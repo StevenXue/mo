@@ -105,11 +105,30 @@ export default {
         loadingState: action.payload.loadingState,
       }
     },
+
+    getPredictionR(state, action) {
+      let newInfo = {
+        ...state.modelsJson[state.focusModelId]['served_model'],
+        predict_result: action.payload.result,
+      };
+      return {
+        ...state,
+        modelsJson: {
+          ...state.modelsJson,
+          [state.focusModelId]: {
+            ...state.modelsJson[state.focusModelId],
+            ['served_model']: newInfo
+          }
+        }
+      }
+    },
+
     // changeModelStatus
     changeModelStatus(state, action) {
       let newInfo = {
         ...state.modelsJson[state.focusModelId]['served_model'],
         status: action.payload.status,
+        server:action.payload.server,
       };
       return {
         ...state,
@@ -163,11 +182,15 @@ export default {
     * resumeModel(action, {call, put, select}) {
       yield put({type: 'showLoading', payload: {loadingState:true}});
       const user_ID = yield select(state => state.login.user.user_ID);
+      const focusModelId = yield select(state => state.deployment.focusModelId);
+      const model_name = yield select(state => state.deployment.modelsJson[focusModelId]['model']['name']);
+
       let payload = action.payload;
       payload.user_ID = user_ID;
+      payload.model_name=model_name;
       const {data: result} = yield call(deploymentService.resumeModel, payload)
-      if (result === 'resumed') {
-        yield put({type: 'changeModelStatus', payload: {status:'serving'}});
+      if (result) {
+        yield put({type: 'changeModelStatus', payload: {status:'serving',server:result}});
       }
       yield put({type: 'showLoading', payload: {loadingState:false}});
     },
@@ -181,6 +204,19 @@ export default {
       }
       yield put({type: 'showLoading', payload: {loadingState:false}});
     },
+    // 获得预测值
+    * getPrediction(action, {call, put, select}) {
+      const user_ID = yield select(state => state.login.user.user_ID);
+      let payload = action.payload;
+      const focusModelId = yield select(state => state.deployment.focusModelId);
+      payload.served_model_id= yield select(state => state.deployment.modelsJson[focusModelId]['served_model']['_id']);
+      payload.server=yield select(state => state.deployment.modelsJson[focusModelId]['served_model']['server']);
+      // payload.name=yield select(state => state.deployment.modelsJson[focusModelId]['served_model']['name']);
+      payload.model_name=yield select(state => state.deployment.modelsJson[focusModelId]['model']['name']);
+      const {data: result} = yield call(deploymentService.getPrediction, payload);
+      yield put({type: 'getPredictionR', payload: result});
+    },
+
   },
   subscriptions: {
     // 当进入该页面是 获取用户所有 Models
