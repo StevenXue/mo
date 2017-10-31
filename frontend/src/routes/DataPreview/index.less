@@ -1,26 +1,58 @@
-
-.abs {
+.whole {
+  background-color: white;
   display: flex;
   flex-direction: column;
+  padding: 24px 32px;
+}
+
+.card {
+  display: flex;
   margin-bottom: 20px;
-  .down {
+  justify-content: space-between;
+  .left {
+    .title {
+      font-size: 20px;
+      margin-bottom: 22px;
+    }
+    .desc {
+      height: 34px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      font-size: 12px;
+      background-color: #F9FAFA;
+      border-left: 2px solid #34C0E2;
+      padding-left: 7px;
+
+    }
+  }
+  .center {
+    flex: 1
+  }
+  .right {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column-reverse;
+    .del {
+      width: 142px;
+      height: 40px;
+    }
   }
 
 }
 
-.tableback {
-  background-color: white;
-}
-
 .myheader {
-  display: flex;
-  flex-direction: column;
+  height: 100%;
+  .sel {
+  }
 }
 
 .bottom {
   display: flex;
   flex-direction: row-reverse;
   margin-top: 20px;
+  .btn {
+
+    width: 120px;
+    height: 40px;
+  }
 }

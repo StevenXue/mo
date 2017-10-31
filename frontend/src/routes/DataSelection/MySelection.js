@@ -18,14 +18,14 @@ class MySelection extends React.Component {
   }
 
   handleChangePrv = (value) => {
-    console.log(this.props)
+    // console.log(this.props)
     this.setState({
       privacy: value
     })
   }
 
   handleChangeCat = (value) => {
-    console.log(this.props)
+    // console.log(this.props)
     this.setState({
       category: value
     })
@@ -37,7 +37,6 @@ class MySelection extends React.Component {
     this.props.dispatch({ type: 'upload/setDataSetDesc', payload: desc})
     this.props.dispatch({ type: 'upload/show' })
     // console.log(value)
-
   }
 
   handleAdd = (oid, name, desc) => {
@@ -76,9 +75,10 @@ class MySelection extends React.Component {
           <div className={styles.desc}>{e.description}</div>
           {e.tags.length > 0 ?
             <div className={styles.tagzone}>
-              {e.tags.map((tag) => <Tag color="#C1E4F6"><span className={styles.tag}>{tag}</span></Tag>)}
+              {e.tags.map((tag) => <Tag key={tag} color="#C1E4F6"><span className={styles.tag}>{tag}</span></Tag>)}
             </div>:null }
         </div>
+
         {!this.props.isStaged?<div className={styles.buttons}>
           <Button size="large" onClick={() =>
           {this.handleView(e._id, e.name, e.description)}} className={styles.top}><Icon type="eye"/>View</Button>
