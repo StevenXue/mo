@@ -19,7 +19,7 @@ export default {
       }
     },
 
-    setProjectId(state, action) {
+    setCategory(state, action) {
       return {
         ...state,
         category: action.payload.category,

@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './index.less';
 import {connect} from 'dva';
 import {Card} from 'antd';
-
+import {get} from 'lodash'
 // const data = [
 //   {
 //     content: '111',
@@ -29,8 +29,9 @@ function History({history}) {
 
 
       {historyList.map((e) => {
+        const content = get(e,`${category}.description`, null);
 
-          if (e.create_time.substring(0, 10) !== dateString) {
+        if (e.create_time.substring(0, 10) !== dateString) {
             dateString = e.create_time.substring(0, 10);
             let displayDate = dateString;
 
@@ -53,7 +54,7 @@ function History({history}) {
               <Card className={styles.card_container}>
                 <div className={styles.card}>
                   <div className={styles.content}>
-                    {e._id}
+                    {content}
                   </div>
 
                   <div>
@@ -68,10 +69,11 @@ function History({history}) {
               <Card key={e._id} className={styles.card_container}>
                 <div className={styles.card}>
                   <div className={styles.content}>
-                    {e[category].description}
+                    {content}
                   </div>
 
                   <div>
+
                     {e.create_time.substring(11, 16)}
                   </div>
                 </div>

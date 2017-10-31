@@ -303,9 +303,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                     className = styles.field
 
                   }
-
                 }
-
                 return (
                   <div key={fieldName}
                        className={`${styles.field} ${className}`}
@@ -553,6 +551,14 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
     )
   }
 
+  function setting(args, stepIndex) {
+    return (
+      args.map((arg, argIndex)=>{
+
+      })
+    )
+  }
+
   // function parameters(step, stepIndex) {
   //   return (
   //     <div>
@@ -655,7 +661,6 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                         {networkBuilder(step, stepIndex, steps[1].args[0].values, steps[2].args[0].values)}
                       </Panel>
                     )
-                  case 'parameters':
                   case 'estimator':
                   case 'compile':
                   case 'fit':
@@ -664,6 +669,13 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                       <Panel header={step.display_name} key={stepIndex}
                              className={styles.panel}>
                         {renderParameters(step, stepIndex)}
+                      </Panel>
+                    );
+                  case 'setting':
+                    return (
+                      <Panel header={step.display_name} key={stepIndex}
+                             className={styles.panel}>
+                        {setting(step, stepIndex)}
                       </Panel>
                     )
                 }
