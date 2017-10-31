@@ -5,6 +5,14 @@ import { arrayToJson } from '../utils/JsonUtils'
 import pathToRegexp from 'path-to-regexp'
 import { cloneDeep } from 'lodash'
 
+const arrayToInitJson = (array) => {
+  let finalJson = {};
+  for (let i of array) {
+    finalJson[i] = false;
+  }
+  return finalJson
+};
+
 export default {
   namespace: 'workBench',
   state: {
@@ -192,7 +200,7 @@ export default {
     },
 
     addRemoveField(state, action) {
-      const { stepIndex, argIndex, fieldName, sectionId } = action.payload
+      const { stepIndex, argIndex, fieldName, sectionId, datasourceStepIndex } = action.payload
 
       // const fieldName = action.payload.fieldName
       // const section = state.sectionsJson[action.payload.sectionId]
@@ -201,11 +209,15 @@ export default {
       const values = state.sectionsJson[sectionId].steps[stepIndex].args[argIndex].values
 
       if (!values.includes(fieldName)) {
-        values.push(fieldName)
+        values.push(fieldName);
+        sectionsJson[sectionId].steps[datasourceStepIndex].args[argIndex].fieldsJson[fieldName] = true;
+
         console.log('push', values)
 
       } else {
-        values.splice(values.indexOf(fieldName), 1)
+        values.splice(values.indexOf(fieldName), 1);
+        sectionsJson[sectionId].steps[datasourceStepIndex].args[argIndex].fieldsJson[fieldName] = false;
+
         console.log('pop', values)
       }
       let sectionsJson = state.sectionsJson
@@ -482,13 +494,14 @@ export default {
 
     // 获取fields
     *getFields(action, { call, put, select }) {
-      const { stepIndex, argIndex, namespace } = action.payload
+      const { stepIndex, argIndex, namespace } = action.payload;
 
       const sectionsJson = yield select(state => state[namespace].sectionsJson)
       // const section = sectionsJson[action.payload.sectionId];
       const { data } = yield call(stagingDataService.fetchFields, action.payload.stagingDatasetId)
-
-      sectionsJson[action.payload.sectionId].steps[stepIndex].args[argIndex].fields = data
+      const fieldsJson = arrayToInitJson(data);
+      sectionsJson[action.payload.sectionId].steps[stepIndex].args[argIndex].fields = data;
+      sectionsJson[action.payload.sectionId].steps[stepIndex].args[argIndex].fieldsJson = fieldsJson;
 
       yield put({ type: 'setSections', payload: { sectionsJson: sectionsJson } })
 

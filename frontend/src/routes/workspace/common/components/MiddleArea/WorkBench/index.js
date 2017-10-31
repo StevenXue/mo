@@ -105,7 +105,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
     })
   }
 
-  function handleClickField(fieldName, stepIndex, argIndex) {
+  function handleClickField(fieldName, stepIndex, argIndex, datasourceStepIndex) {
     dispatch({
       type: namespace + '/addRemoveField',
       payload: {
@@ -113,6 +113,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
         argIndex,
         fieldName,
         sectionId: section._id,
+        datasourceStepIndex
       },
     })
   }
@@ -258,29 +259,69 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
     })
   }
 
-  function fieldSelector(datasourceStep, step, stepIndex) {
+  function fieldSelector(datasourceStep, datasourceStepIndex, step, stepIndex) {
     return (
       <div>
         <div className={styles.fields}>
           {
             step.args.map((arg, argIndex) => {
+              const values = arg.values;
               let fields = get(datasourceStep, `args[${argIndex}].fields`, []);
+              let fieldsJson = get(datasourceStep, `args[${argIndex}].fieldsJson`, {});
+
               return fields.map((field) => {
                 const fieldName = field[0];
 
-                return (
-                  <div key={fieldName}
-                       className={styles.field}
-                       onClick={() => handleClickField(fieldName, stepIndex, argIndex)}
-                       style={{
-                         backgroundColor: (arg.values).includes(fieldName) ? '#34C0E2' : '#F3F3F3',
-                         color: mouseOverField === fieldName ? 'green' : 'grey',
-                       }}
-                       onMouseOver={() => handleMouseOverField(fieldName)}
-                       onMouseLeave={() => handleMouseLeaveField()}>
-                    <p className={styles.text}>{fieldName}</p>
-                  </div>
-                )
+
+                if(fieldsJson[field]){
+                  if(values.includes(fieldName)){
+                    return (
+                      <div key={fieldName}
+                           className={styles.field}
+                           onClick={() => handleClickField(fieldName, stepIndex, argIndex, datasourceStepIndex)}
+                           style={{
+                             backgroundColor: (arg.values).includes(fieldName) ? '#34C0E2' : '#F3F3F3',
+                             color: mouseOverField === fieldName ? 'green' : 'grey',
+                           }}
+                           onMouseOver={() => handleMouseOverField(fieldName)}
+                           onMouseLeave={() => handleMouseLeaveField()}>
+                        <p className={styles.text}>{fieldName}</p>
+                      </div>
+                    )
+                  }else{
+                    return (
+                      <div key={fieldName}
+                           className={styles.field}
+                        // onClick={() => handleClickField(fieldName, stepIndex, argIndex)}
+                           style={{
+                             backgroundColor: 'lightgrey',
+                             color: mouseOverField === fieldName ? 'green' : 'grey',
+                           }}
+                           onMouseOver={() => handleMouseOverField(fieldName)}
+                           onMouseLeave={() => handleMouseLeaveField()}>
+                        <p className={styles.text}>{fieldName}</p>
+                      </div>
+                    )
+
+                  }
+
+                }else{
+                  return (
+                    <div key={fieldName}
+                         className={styles.field}
+                         onClick={() => handleClickField(fieldName, stepIndex, argIndex, datasourceStepIndex)}
+                         style={{
+                           backgroundColor: (arg.values).includes(fieldName) ? '#34C0E2' : '#F3F3F3',
+                           color: mouseOverField === fieldName ? 'green' : 'grey',
+                         }}
+                         onMouseOver={() => handleMouseOverField(fieldName)}
+                         onMouseLeave={() => handleMouseLeaveField()}>
+                      <p className={styles.text}>{fieldName}</p>
+                    </div>
+                  )
+
+                }
+
               })
             })
           }
@@ -585,20 +626,22 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                     return <Panel header="Select Fields" key={stepIndex}
                                   className={styles.panel}
                     >
-                      {fieldSelector(steps[0], step, stepIndex)}
+                      {fieldSelector(steps[0], 0, step, stepIndex)}
                     </Panel>
                   case 'feature_fields':
                     return (
                       <Panel header="Select Feature Fields" key={stepIndex}
                              className={styles.panel}>
-                        {fieldSelector(steps[0], step, stepIndex)}
+                        {fieldSelector(steps[0], 0, step, stepIndex)}
 
                       </Panel>
                     )
                   case 'label_fields':
                     return <Panel header="Select Label Fields" key={stepIndex}
                                   className={styles.panel}>
-                      {secondFieldSelector(steps[0], step, stepIndex, steps[stepIndex-1])}
+                      {fieldSelector(steps[0], 0, step, stepIndex)}
+
+                      {/*{secondFieldSelector(steps[0], step, stepIndex, steps[stepIndex-1])}*/}
                     </Panel>
                   case 'parameters':
                     return (
