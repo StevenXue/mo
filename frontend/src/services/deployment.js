@@ -7,7 +7,6 @@ const PREFIX = '/models';
 
 // 获取用户所有models
 export async function fetchModels(payload) {
-
   return await request(`${CORS}/project/jobs/${payload.projectId}?categories=${payload.categories}&status=200`);
 
 }

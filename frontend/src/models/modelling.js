@@ -1,11 +1,12 @@
 import modelExtend from 'dva-model-extend'
 import pathToRegexp from 'path-to-regexp'
+import io from 'socket.io-client'
+import { get } from 'lodash'
 
 import workBench from './workBench'
-import {JsonToArray} from '../utils/JsonUtils';
 
 import { getRound } from '../utils/number'
-import { get } from 'lodash'
+import { flaskServer } from '../constants'
 
 const categories = 'model'
 
@@ -38,11 +39,11 @@ const modelling = modelExtend(workBench, {
           // 剔除空的metrics
           for (let metric of Object.keys(metrics)) {
             if (metrics[metric].length === 0) {
-              delete metrics[metric];
+              delete metrics[metric]
             }
           }
 
-          sectionsJson[modelKey]['metrics_status'] = metrics;
+          sectionsJson[modelKey]['metrics_status'] = metrics
         }
 
         return {
@@ -74,7 +75,6 @@ const modelling = modelExtend(workBench, {
 
           //将project id存起来
           dispatch({ type: 'setProjectId', payload: { projectId: projectId } })
-
         }
       })
     },
