@@ -8,7 +8,6 @@ const PREFIX = '/models';
 // 获取用户所有models
 export async function fetchModels(payload) {
   return await request(`${CORS}/project/jobs/${payload.projectId}?categories=${payload.categories}&status=200`);
-
 }
 
 // 首次 deploy model
@@ -75,5 +74,19 @@ export async function resumeModel(payload) {
   if (response){
     message.info('Model deploy Success');
   }
+  return response
+}
+
+// get prediction
+export async function getPrediction(payload) {
+  let response =  await request(`${CORS}/served_model/predict/${payload.served_model_id}`,
+    {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+  console.log(response);
   return response
 }
