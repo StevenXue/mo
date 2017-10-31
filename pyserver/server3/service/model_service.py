@@ -12,6 +12,7 @@ import inspect
 import os
 import subprocess
 from pathlib import Path
+import time
 
 import numpy as np
 import pandas as pd
@@ -41,6 +42,7 @@ from server3.constants import NAMESPACE
 from server3.lib import graph
 from server3.lib import model_from_json
 from server3.utility import file_utils
+
 
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 # user_directory = 'user_directory/'
@@ -159,6 +161,16 @@ def kube_run_model(conf, project_id, data_source_id, model_id, job_obj,
     # return #
     cwd = os.getcwd()
     job_name = job_id + '-training-job'
+    client = kube_service.client
+    try:
+        # TODO need to terminate running pod
+        kube_service.delete_job(job_name)
+        while True:
+            kube_service.get_job(job_name)
+            time.sleep(1)
+    except client.rest.ApiException:
+        print('job not exists or deleted, ok to create')
+
     kube_json = {
         "apiVersion": "batch/v1",
         "kind": "Job",

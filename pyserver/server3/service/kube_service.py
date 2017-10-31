@@ -54,6 +54,10 @@ def check_deployment_condition(deploy_name, status):
         return check_condition(deploy, status)
 
 
+def get_job(job_name):
+    return job_api.read_namespaced_job(job_name, NAMESPACE)
+
+
 def check_job_condition(job_name, status):
     """
     check running condition of served model

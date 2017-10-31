@@ -357,7 +357,10 @@ def create_model_job(project_id, staging_data_set_id, model_obj,
             # run
             if result_dir:
                 # result_dir += str(job_obj['id']) + '/'
-                os.makedirs(result_dir)
+                try:
+                    os.makedirs(result_dir)
+                except FileExistsError:
+                    print('dir exists, no need to create')
                 kw['result_dir'] = result_dir
 
             # generate_job_py(func, *args, **kw, result_sds=result_sds_obj,
