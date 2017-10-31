@@ -19,7 +19,7 @@ STATUS = ('running', 'stopped', 'terminated')
 
 class ServedModel(DynamicDocument):
     name = StringField(max_length=50, required=True)
-    description = StringField(max_length=140, required=True)
+    description = StringField(required=True)
     input_info = StringField(required=True)
     output_info = StringField(required=True)
     examples = StringField(required=True)

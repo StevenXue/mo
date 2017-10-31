@@ -1,12 +1,11 @@
 import modelExtend from 'dva-model-extend'
 import pathToRegexp from 'path-to-regexp'
-import io from 'socket.io-client'
 import { get } from 'lodash'
+import * as dataAnalysisService from '../services/dataAnalysis'
 
 import workBench from './workBench'
 
 import { getRound } from '../utils/number'
-import { flaskServer } from '../constants'
 
 const categories = 'model'
 
@@ -59,6 +58,102 @@ const modelling = modelExtend(workBench, {
           focusModelId: null,
         }
       }
+    },
+    setMetrics(state, { payload }) {
+      const { message } = payload
+
+      const sectionId = message.job_id
+      let sectionsJson = state.sectionsJson
+      let metrics = {
+        'acc': [],
+        'precision': [],
+        'recall': [],
+        'loss': [],
+        'val_acc': [],
+        'val_precision': [],
+        'val_recall': [],
+        'val_loss': [],
+      }
+
+      if (sectionsJson[sectionId].metrics_status) {
+        for (let metric in metrics) {
+          if (message[metric] !== undefined) {
+            if (!sectionsJson[sectionId].metrics_status[metric]) {
+              sectionsJson[sectionId].metrics_status[metric] = [message[metric]]
+            } else {
+              sectionsJson[sectionId].metrics_status[metric].push(message[metric])
+            }
+          }
+        }
+      } else {
+        for (let metric in metrics) {
+          if (message[metric] !== undefined) {
+            metric[metric].push(message[metric])
+          }
+        }
+
+        for (let metric of Object.keys(metrics)) {
+          if (metrics[metric].length === 0) {
+            delete metrics[metric]
+          }
+        }
+        sectionsJson[sectionId].metrics_status = metrics
+      }
+      if(message.batch) {
+        sectionsJson[sectionId].batch = message.batch
+      }
+
+      return {
+        ...state,
+        sectionsJson,
+      }
+    },
+    clearMetrics(state, { payload }) {
+      let sectionsJson = state.sectionsJson
+      sectionsJson[payload.sectionId].metrics_status = {}
+      return {
+        ...state,
+        sectionsJson,
+      }
+    },
+  },
+  effects: {
+    *runSection(action, { call, put, select }) {
+      const { namespace, sectionId } = action.payload
+      yield put({ type: 'clearMetrics', payload: { sectionId } })
+      yield put({ type: 'showResult' })
+      yield put({
+        type: 'setLoading', payload: {
+          key: 'wholePage',
+          loading: true,
+        },
+      })
+
+      // 先把 save section 复制过来
+      const sectionsJson = yield select(state => state[namespace].sectionsJson)
+      const section = sectionsJson[sectionId]
+      yield call(dataAnalysisService.saveSection, { section: section })
+
+      const projectId = yield select(state => state[namespace].projectId)
+
+      const { data: { result: { result } } } = yield call(dataAnalysisService.runJob, {
+        ...action.payload,
+        projectId: projectId,
+      })
+
+      // 更新result
+      yield put({
+        type: 'setSectionResult', payload: {
+          sectionId,
+          result,
+        },
+      })
+      yield put({
+        type: 'setLoading', payload: {
+          key: 'wholePage',
+          loading: false,
+        },
+      })
     },
   },
   subscriptions: {

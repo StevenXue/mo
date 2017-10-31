@@ -1,6 +1,11 @@
 import { login, tokenLogin } from '../services/login'
 import { routerRedux } from 'dva/router'
+import pathToRegexp from 'path-to-regexp'
+import io from 'socket.io-client'
+
 import { queryURL } from '../utils'
+
+import { flaskServer } from '../constants'
 
 export default {
   namespace: 'login',
@@ -71,7 +76,7 @@ export default {
           // user dashboard not build yet, push to project by default
           yield put(routerRedux.push('/workspace'))
         }
-      } catch(err) {
+      } catch (err) {
         console.log(err)
         if (location.pathname !== '/login') {
           let from = location.pathname
@@ -81,11 +86,36 @@ export default {
         }
       }
     },
+    *handleSocket({ payload }, { call, put }) {
+      const { message, pathname } = payload
+      const projectIdMsg = message.project_id
+      const jobIdMsg = message.job_id
+      const match = pathToRegexp('/workspace/:projectId*').exec(pathname)
+      if(match) {
+        const projectId = match[1]
+        if(projectId === projectIdMsg) {
+          // in project
+          yield put({
+            type: 'modelling/setMetrics',
+            payload: {message}
+          })
+        }
+      }
+    },
   },
   subscriptions: {
-    setup({ dispatch }) {
-      console.log('query')
-      dispatch({ type: 'query' })
+    setup({ dispatch, history }) {
+      return history.listen(({ pathname }) => {
+        dispatch({ type: 'query' })
+        dispatch({ type: 'handleSocket', payload: { message:'', pathname } })
+        const userId = localStorage.getItem('user_ID')
+        if (userId) {
+          const socket = io.connect(flaskServer + '/log/' + userId)
+          socket.on('log_epoch_end', (message) => {
+            dispatch({ type: 'handleSocket', payload: { message, pathname } })
+          })
+        }
+      })
     },
   },
 }

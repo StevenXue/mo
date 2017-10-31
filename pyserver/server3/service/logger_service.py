@@ -93,7 +93,7 @@ def save_weights_result_fn(result_sds, max_to_keep, key, new_weight):
         staging_data_set_business.update(result_sds['id'], **obj)
 
 
-def save_log(event, n, logs, result_sds, project_id):
+def save_log(event, n, logs, result_sds, project_id, **kw):
     socketio.start_background_task(save_log_fn, event, n, logs, result_sds,
                                    project_id)
 

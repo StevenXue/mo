@@ -9,8 +9,8 @@ module.exports = {
   // jupyterServer: 'http://122.224.116.44:9001/api/contents/',
 
   // server api
-  // flaskServer: 'http://localhost:5000',
-  flaskServer: 'http://10.52.14.182:5005',
+  flaskServer: 'http://localhost:5000',
+  // flaskServer: 'http://10.52.14.182:5005',
   // flaskServer: 'http://122.224.116.44:5005',
 
   //jupyter

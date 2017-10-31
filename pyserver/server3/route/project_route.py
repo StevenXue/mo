@@ -113,9 +113,14 @@ def create_project():
     user_ID = data['user_ID']
     is_private = data['is_private']
     is_private = str(is_private).lower() == 'true'
-    related_fields = data.get('related_fields', '').split(',')
-    tags = data.get('tags', '').split(',')
-    related_tasks = data.get('related_tasks', '').split(',')
+    related_fields = data.get('related_fields', '')
+    tags = data.get('tags', '')
+    related_tasks = data.get('related_tasks', '')
+
+    related_fields = str_utility.split_without_empty(related_fields)
+    tags = str_utility.split_without_empty(tags)
+    related_tasks = str_utility.split_without_empty(related_tasks)
+
     project_service.create_project(name, description, user_ID,
                                    is_private, related_fields=related_fields,
                                    tags=tags, related_tasks=related_tasks)
