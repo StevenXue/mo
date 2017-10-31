@@ -11,23 +11,23 @@ socketio = SocketIO(message_queue=REDIS_SERVER)
 epoch = 0
 
 
-def log_epoch_begin(*args):
+def log_epoch_begin(*args, **kw):
     global epoch
     epoch = args[0]
 
 
-def log_epoch_end(*args):
-    save_log('epoch', *args)
-    emit_log('epoch', *args)
+def log_epoch_end(*args, **kw):
+    save_log('epoch', *args, **kw)
+    emit_log('epoch', *args, **kw)
 
 
-def log_batch_end(*args):
+def log_batch_end(*args, **kw):
     global epoch
     args = list(args)
     args = json_utility.convert_to_json(args)
     batch = 'Epoch: {}, Batch: {}'.format(epoch, args[0])
     project_id = args[-1]
-    emit_message({"batch": batch}, project_id)
+    emit_message({"batch": batch}, project_id, **kw)
 
 
 def log_train_end(*args, **kw):
@@ -44,18 +44,23 @@ def save_log_fn(event, n, logs, result_sds, project_id):
     staging_data_business.add(result_sds, kw)
 
 
-def emit_log(event, n, logs, result_sds, project_id):
-    kw = {'n': n, 'event': event}
+def emit_log(event, n, logs, result_sds, project_id, **kwargs):
+    job_id = kwargs.get('job_id')
+    user_ID = kwargs.get('user_ID')
+    kw = {'n': n, 'event': event, 'project_id': project_id, 'job_id': job_id}
     kw.update(logs)
-    socketio.emit('log_epoch_end', kw, namespace='/log/%s' % project_id)
+    socketio.emit('log_epoch_end', kw, namespace='/log/%s' % user_ID)
 
 
 # def emit_log(event, n, logs, result_sds, project_id):
 #     eventlet.spawn_n(emit_log_fn, event, n, logs, result_sds, project_id)
 
 
-def emit_message(message, project_id):
-    socketio.emit('log_epoch_end', message, namespace='/log/%s' % project_id)
+def emit_message(message, project_id, **kw):
+    job_id = kw.get('job_id')
+    user_ID = kw.get('user_ID')
+    message.update({'job_id': job_id, 'project_id': project_id})
+    socketio.emit('log_epoch_end', message, namespace='/log/%s' % user_ID)
 
 
 def emit_message_url(message, project_id):
@@ -89,7 +94,8 @@ def save_weights_result_fn(result_sds, max_to_keep, key, new_weight):
 
 
 def save_log(event, n, logs, result_sds, project_id):
-    socketio.start_background_task(save_log_fn, event, n, logs, result_sds, project_id)
+    socketio.start_background_task(save_log_fn, event, n, logs, result_sds,
+                                   project_id)
 
 
 def save_result(result_sds, **result):
