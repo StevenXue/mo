@@ -150,7 +150,8 @@ function ArgsMapper({
       </FormItem>
       {
         args.map((arg, i) => {
-          if (last && arg.name === 'input_shape') {
+          // no need to fill input shape except first layer
+          if (layerIndex > 0 && arg.name === 'input_shape') {
             return
           }
 
