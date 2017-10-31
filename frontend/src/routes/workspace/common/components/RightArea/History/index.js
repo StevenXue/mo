@@ -3,20 +3,24 @@ import styles from './index.less';
 import {connect} from 'dva';
 import {Card} from 'antd';
 
-const data = [
-  {
-    content: '111',
-    time: new Date(2011)
-  },
-  {
-    content: '1112',
-    time: new Date(2012)
-  }
-];
+// const data = [
+//   {
+//     content: '111',
+//     time: new Date(2011)
+//   },
+//   {
+//     content: '1112',
+//     time: new Date(2012)
+//   }
+// ];
 
 function History({history}) {
 
-  const {historyList} = history;
+  const {
+    historyList,
+    category
+
+  } = history;
 
   let dateString;
 
@@ -64,7 +68,7 @@ function History({history}) {
               <Card key={e._id} className={styles.card_container}>
                 <div className={styles.card}>
                   <div className={styles.content}>
-                    {e._id}
+                    {e[category].description}
                   </div>
 
                   <div>

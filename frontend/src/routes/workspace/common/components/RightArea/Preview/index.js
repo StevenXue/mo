@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './index.less';
 import {connect} from 'dva';
-import {Select, Table} from 'antd';
+import {Select, Table, Spin} from 'antd';
 
 const Option = Select.Option;
 
@@ -9,7 +9,10 @@ function Preview({preview, model, dispatch, namespace}) {
 
   const {
     stagingDataList,
-    table
+    table,
+    spinLoading: {
+      fetchTable
+    }
   } = preview;
 
   const {
@@ -22,8 +25,9 @@ function Preview({preview, model, dispatch, namespace}) {
   let labelFields;
   if(focusSectionsId!=='new_launcher ' + 'init'){
     fields = sectionsJson[focusSectionsId].steps[1].args[0].values;
-    labelFields = sectionsJson[focusSectionsId].steps[2].args[0].values;
-
+    if(namespace === 'modelling'){
+      labelFields = sectionsJson[focusSectionsId].steps[2].args[0].values;
+    }
   }
 
   function handleChange(value) {
@@ -91,7 +95,7 @@ function Preview({preview, model, dispatch, namespace}) {
 
   return (
     <div >
-
+      <Spin spinning={fetchTable}>
       <div className={styles.first_line}>
         <Select
           // key={arg.name + argIndex}
@@ -118,7 +122,7 @@ function Preview({preview, model, dispatch, namespace}) {
       }
 
       <Table dataSource={dataSource} columns={columns} scroll={{ x: 6000 , y: '100%'}}/>
-
+      </Spin>
     </div>
   );
 }
