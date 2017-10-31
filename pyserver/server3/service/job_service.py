@@ -483,7 +483,19 @@ def model_steps_to_obj(job_obj, project_id):
         }
             for layer in steps[3]['args'][0]['values']]
     elif model_obj.category == 1:
-        pass
+        for step in steps[3:]:
+            conf.update({step.get('name'):
+                             {'args':
+                                  {arg.get('name'): arg.get('value')
+                                                    or arg.get('values')
+                                                    or arg.get('default')
+                                   for arg in step['args']}}
+                         })
+        conf['fit'].update({
+            "data_fields":
+                [steps[1]["args"][0]["values"],
+                 steps[2]["args"][0]["values"]]
+        })
     elif model_obj.category == 2:
         pass
 
@@ -495,7 +507,6 @@ def model_steps_to_obj(job_obj, project_id):
         "schema": "rand",
         "ratio": 0.7
     }
-    print(obj)
     return obj
 
 
@@ -528,7 +539,7 @@ def run_toolkit_job(job_obj, project_id):
 
 
 def run_model_job(job_obj, project_id):
-    obj = run_toolkit_job(job_obj, project_id)
+    obj = model_steps_to_obj(job_obj, project_id)
     return model_service.kube_run_model(job_obj=job_obj, **obj)
 
 

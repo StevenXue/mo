@@ -5,10 +5,10 @@ import { arrayToJson } from '../utils/JsonUtils'
 import pathToRegexp from 'path-to-regexp'
 import { cloneDeep } from 'lodash'
 
-const arrayToInitJson = (array) => {
+const arrayToInitJson = (array, key) => {
   let finalJson = {};
   for (let i of array) {
-    finalJson[i] = false;
+    finalJson[i[key]] = false;
   }
   return finalJson
 };
@@ -207,20 +207,17 @@ export default {
       // const values = section.steps[action.payload.stepIndex].args[0].values
 
       const values = state.sectionsJson[sectionId].steps[stepIndex].args[argIndex].values
+      let sectionsJson = state.sectionsJson
 
       if (!values.includes(fieldName)) {
         values.push(fieldName);
         sectionsJson[sectionId].steps[datasourceStepIndex].args[argIndex].fieldsJson[fieldName] = true;
-
         console.log('push', values)
-
       } else {
         values.splice(values.indexOf(fieldName), 1);
         sectionsJson[sectionId].steps[datasourceStepIndex].args[argIndex].fieldsJson[fieldName] = false;
-
         console.log('pop', values)
       }
-      let sectionsJson = state.sectionsJson
       sectionsJson[sectionId].steps[stepIndex].args[argIndex].values = values
 
       return {
@@ -499,7 +496,7 @@ export default {
       const sectionsJson = yield select(state => state[namespace].sectionsJson)
       // const section = sectionsJson[action.payload.sectionId];
       const { data } = yield call(stagingDataService.fetchFields, action.payload.stagingDatasetId)
-      const fieldsJson = arrayToInitJson(data);
+      const fieldsJson = arrayToInitJson(data, 0);
       sectionsJson[action.payload.sectionId].steps[stepIndex].args[argIndex].fields = data;
       sectionsJson[action.payload.sectionId].steps[stepIndex].args[argIndex].fieldsJson = fieldsJson;
 

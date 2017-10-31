@@ -106,46 +106,6 @@ def run_job():
             return jsonify(
                 {"response": 'no model and toolkit in job object'}), 400
         result = job_service.run_model_job(project_id=project_id, job_obj=job_obj)
-        # model_obj = job_obj.model
-        # steps = job_obj.steps
-        # conf = {}
-        # if model_obj.category == 0:
-        #     for step in steps[4:]:
-        #         conf.update({step.get('name'):
-        #                          {'args':
-        #                               {arg.get('name'): arg.get('value')
-        #                                                 or arg.get('values')
-        #                                                 or arg.get('default')
-        #                                for arg in step['args']}}
-        #                      })
-        #     conf['fit'].update({
-        #         "data_fields":
-        #             [steps[1]["args"][0]["values"],
-        #              steps[2]["args"][0]["values"]]
-        #     })
-        #     conf['layers'] = [{
-        #         'name': layer.get('name'),
-        #         'args': {arg.get('name'): arg.get('value')
-        #                                   or arg.get('values')
-        #                                   or arg.get('default')
-        #                  for arg in layer.get('args')}
-        #     }
-        #         for layer in steps[3]['args'][0]['values']]
-        # elif model_obj.category == 1:
-        #     pass
-        # elif model_obj.category == 2:
-        #     pass
-        #
-        # obj = {
-        #     "data_source_id": job_obj.steps[0]["args"][0]["value"],
-        #     "conf": conf,
-        #     "project_id": project_id,
-        #     "model_id": model_obj.id,
-        #     "schema": "rand",
-        #     "ratio": 0.7
-        # }
-        # print(obj)
-    # result = job_service.run_job(obj=obj, job_obj=job_obj)
     result = json_utility.convert_to_json(result)
     return jsonify({
         "response": {
