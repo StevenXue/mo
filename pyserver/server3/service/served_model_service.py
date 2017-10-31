@@ -20,6 +20,8 @@ from server3.utility import network_utility
 from server3.entity.model import MODEL_TYPE
 from server3.constants import SERVING_PORT
 from server3.constants import NAMESPACE
+from server3.service.saved_model_services import general_model_services
+
 
 ModelType = {list(v)[1]: list(v)[0] for v in list(MODEL_TYPE)}
 
@@ -36,15 +38,17 @@ def update_db(served_model_id, name, description, input_info, output_info,
     :param examples:
     :return:
     """
-    served_model_business.update_info(served_model_id, name, description, input_info,
-                                      output_info, examples)
+    update = {'name': name, 'description': description,
+              'input_info': input_info, 'output_info': output_info,
+              'examples': examples, }
+    served_model_business.update_info(served_model_id, update)
 
 
 def first_save_to_db(user_ID, name, description, input_info, output_info,
                      examples, version,
                      deploy_name, server,
                      input_type, model_base_path, job,
-                     job_id, is_private=False,
+                     job_id, model_name, is_private=False,
                      service_name=None,
                      **optional):
     """
@@ -64,6 +68,7 @@ def first_save_to_db(user_ID, name, description, input_info, output_info,
     :param job_id:
     :param is_private:
     :param service_name:
+    :param model_name:
     :param optional:
     :return:
     """
@@ -72,7 +77,8 @@ def first_save_to_db(user_ID, name, description, input_info, output_info,
                                              examples, version, deploy_name,
                                              server,  input_type,
                                              model_base_path, job,
-                                             service_name, **optional)
+                                             service_name, model_name,
+                                             **optional)
     user = user_business.get_by_user_ID(user_ID)
     ownership_business.add(user, is_private, served_model=served_model)
     job_business.update_job_by_id(job_id, served_model=served_model)
@@ -80,6 +86,12 @@ def first_save_to_db(user_ID, name, description, input_info, output_info,
 
 
 def list_served_models_by_user_ID(user_ID, order=-1):
+    """
+
+    :param user_ID:
+    :param order:
+    :return:
+    """
     if not user_ID:
         raise ValueError('no user id')
     public_sm = ownership_service.get_all_public_objects('served_model')
@@ -95,20 +107,22 @@ def list_served_models_by_user_ID(user_ID, order=-1):
 
 
 def first_deploy(user_ID, job_id, name, description, input_info, output_info,
-                 examples, server, input_type, is_private=False,
+                 examples, server, input_type, model_name, is_private=False,
                  **optional):
     """
-    deploy model by create a tensorflow servable subprocess
-    :param user_ID: str
-    :param job_id: str/ObjectId
-    :param name: str
-    :param description: str
-    :param input_info: str
-    :param output_info: str
-    :param examples: str
-    :param server: str
-    :param input_type: str
-    :param is_private: bool
+
+    :param user_ID:
+    :param job_id:
+    :param name:
+    :param description:
+    :param input_info:
+    :param output_info:
+    :param examples:
+    :param server:
+    :param input_type:
+    :param model_name:
+    :param is_private:
+    :param optional:
     :return:
     """
     job = job_business.get_by_job_id(job_id)
@@ -161,7 +175,7 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
                                          '--port={port}'.format(
                                              port=SERVING_PORT),
                                          '--model_name={name}'.format(
-                                             name=name),
+                                             name=model_name),
                                          '--model_base_path={export_path}'.format(
                                              export_path=export_path)],
                                 "volumeMounts": [
@@ -227,7 +241,7 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
                                 examples, version,
                                 deploy_name, server,
                                 input_type, export_path, job,
-                                job_id,
+                                job_id, model_name,
                                 is_private,
                                 service_name=service_name,
                                 **optional)
@@ -253,17 +267,17 @@ def undeploy_by_id(served_model_id):
     return True
 
 
-def resume_by_id(served_model_id, user_ID):
+def resume_by_id(served_model_id, user_ID, model_name):
 
     """
 
     :param served_model_id:
     :param user_ID:
+    :param model_name:
     :return:
     """
     served_model = served_model_business.get_by_id(served_model_id)
     job_id = served_model.jobID
-    name = served_model.name
     job = job_business.get_by_job_id(job_id)
 
     # if not deployed do the deployment
@@ -314,7 +328,7 @@ def resume_by_id(served_model_id, user_ID):
                                          '--port={port}'.format(
                                              port=SERVING_PORT),
                                          '--model_name={name}'.format(
-                                             name=name),
+                                             name=model_name),
                                          '--model_base_path={export_path}'.format(
                                              export_path=export_path)],
                                 "volumeMounts": [
@@ -361,6 +375,14 @@ def resume_by_id(served_model_id, user_ID):
         resp = api.create_namespaced_deployment(body=kube_json,
                                                 namespace=NAMESPACE)
         s_api.create_namespaced_service(body=service_json, namespace=NAMESPACE)
-        return True
+        # 更新数据库中的port
+        new_server = '10.52.14.182:'+str(port)
+        update = {'server': new_server}
+        served_model_business.update_info(served_model_id, update)
+        return new_server
     except DoesNotExist:
         return False
+
+
+def get_prediction_by_id(server, model_name,input_value):
+    return general_model_services.get_prediction_by_id(server, model_name,input_value)

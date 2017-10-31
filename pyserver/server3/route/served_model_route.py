@@ -57,6 +57,7 @@ def first_deploy(job_id):
     input_info = data.pop('deployInput')
     output_info = data.pop('deployOutput')
     examples = data.pop('deployExamples')
+    model_name = data.pop('model_name')
     server = '10.52.14.182:9000'
     # 用户提供 or 从数据库 训练的dataset中 获取
     #
@@ -65,7 +66,7 @@ def first_deploy(job_id):
                                                      description, input_info,
                                                      output_info,
                                                      examples, server,
-                                                     input_type,
+                                                     input_type, model_name,
                                                      **data)
     if not served_model:
         return jsonify({'response': 'already deployed'}), 400
@@ -114,11 +115,27 @@ def terminate_served_model(oid):
     else:
         return jsonify({'response': 'terminate failed'}), 400
 
+
 @served_model_app.route('/resume/<string:oid>', methods=['PUT'])
 def resume_served_model(oid):
     data = request.get_json()
     user_ID = data.pop('user_ID')
-    if served_model_service.resume_by_id(oid, user_ID):
-        return jsonify({'response': 'resumed'})
+    model_name = data.pop('model_name')
+    new_server = served_model_service.resume_by_id(oid, user_ID, model_name)
+    if new_server:
+        return jsonify({'response': new_server})
     else:
         return jsonify({'response': 'resume failed'}), 400
+
+
+@served_model_app.route('/predict/<string:oid>', methods=['POST'])
+def get_prediction(oid):
+    data = request.get_json()
+    server = data.pop('server')
+    model_name = data.pop('model_name')
+    input_value = data.pop('input_value')
+    result = served_model_service.get_prediction_by_id(server, model_name, input_value)
+    if result:
+        return jsonify({'response': {'result': result}})
+    else:
+        return jsonify({'response': 'prediction failed'}), 400

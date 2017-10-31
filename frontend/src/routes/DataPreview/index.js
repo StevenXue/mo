@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Table, Checkbox, Select, Modal } from 'antd'
+import { Button, Table, Checkbox, Select, Modal, Icon, Spin, Tag } from 'antd'
 import { connect } from 'dva'
 import styles from './index.less'
 
@@ -11,6 +11,7 @@ class DataPreview extends React.Component {
     super(props)
     this.state = {
       ...props,
+      chk: false,
     }
 
   }
@@ -30,7 +31,16 @@ class DataPreview extends React.Component {
       sels.splice(index, 1)
     }
     this.props.dispatch({type: 'upload/setSelected', payload: sels})
-    // console.log(sels)
+    console.log(sels)
+    if (sels.length > 0) {
+      this.setState(
+        {chk: true}
+      )
+    } else {
+      this.setState(
+        {chk: false}
+      )
+    }
   }
 
   onSelect (value, e) {
@@ -42,18 +52,21 @@ class DataPreview extends React.Component {
     this.props.dispatch({type: 'upload/submit'})
   }
 
-  showDeleteConfirm() {
+  showDeleteConfirm = () => {
     const { dispatch } = this.props
     let sels = this.props.upload.selected
 
     confirm({
-      title: 'Are you sure delete these columns?',
-      content: 'Some descriptions',
+      title: 'Are you sure to delete these columns?',
+      content: 'The operation will permanently alter your dataset!',
       okText: 'Yes',
       okType: 'danger',
       cancelText: 'No',
-      onOk() {
+      onOk: () => {
         dispatch({ type: 'upload/delCol', payload: sels })
+        this.setState({
+          chk: false
+        })
       },
       onCancel() {
         console.log('Cancel');
@@ -87,7 +100,8 @@ class DataPreview extends React.Component {
           checked={sels.includes(e)}
         >{e}
         </Checkbox>
-        <Select defaultValue={flds[e]} onChange={(value) => {this.onSelect(value, e)}}>
+
+        <Select className={styles.sel} defaultValue={flds[e]} onChange={(value) => {this.onSelect(value, e)}}>
           <Option key="string" value="string">String</Option>
           <Option key="integer" value="integer">Integer</Option>
           <Option key="float" value="float">Float</Option>
@@ -105,28 +119,57 @@ class DataPreview extends React.Component {
 
     return (
       <div>
-        <div className={styles.abs}>
-          <p>File Information</p>
-          <div className={styles.down}>
-            <p>1000 rows, 1000 lines, 298 records, 13 missing</p>
-            <Button type="danger" onClick={() => {this.showDeleteConfirm()}}>
-              Delete
-            </Button>
+        <div className={styles.card}>
+          <div className={styles.cleft}>
+            <p className={styles.ctitle}>{this.props.upload.dataSetName}</p>
+            <p className={styles.cdesc}>{this.props.upload.dataSetDesc}</p>
+            {this.props.upload.dataSetTags.length > 0 ?
+              <div className={styles.tagzone}>
+                {this.props.upload.dataSetTags.map((tag) => <Tag key={tag} color="#C1E4F6">
+                  <span className={styles.tag}>{tag}</span></Tag>)}
+              </div>:null }
+          </div>
+          <div className={styles.cright}>
+            <Button icon="edit"/>
+            <Button icon="delete"/>
           </div>
         </div>
+        <div className={styles.whole}>
+          <div className={styles.info}>
+            <div className={styles.left}>
+            <p className={styles.title}>File Information</p>
+            <div className={styles.desc}>
+              <p>{dsColumns.length} columns, 5 rows for preview</p>
+            </div>
+            </div>
+            <div className={styles.center}>
+            </div>
+            <div className={styles.right}>
+              {this.state.chk? <Button
+                className={styles.del}
+                type="danger" onClick={() => {this.showDeleteConfirm()}}>
+                <Icon type="delete"/>Delete Columns
+              </Button>:null}
+            </div>
+          </div>
 
+          <div>
+            {this.props.upload.delLoading?<Spin/>:
+              <Table style={{ marginTop: 5, width: '100%' }}
+                     dataSource={ds.map((e) => ({...e, key: e._id}))}
+                     columns={old_col}
+                     pagination={false}
+                     bordered={true}
+                     scroll={{ x: this.getWidth(old_col), y: '100%' }}
+              />
+            }
 
-        <div className={styles.tableback}>
-          <Table style={{ marginTop: 5, width: '100%' }}
-                 dataSource={ds.map((e) => ({...e, key: e._id}))}
-                 columns={old_col}
-                 pagination={false}
-                 bordered={true}
-                 scroll={{ x: this.getWidth(old_col), y: '100%' }}
-          />
-        </div>
-        <div className={styles.bottom}>
-          <Button onClick={() => {this.onSave()}}>Save</Button>
+          </div>
+          <div className={styles.bottom}>
+            <Button type="primary" className={styles.btn}
+                    loading={this.props.upload.saveLoading}
+                    onClick={() => {this.onSave()}}>Save</Button>
+          </div>
         </div>
       </div>
     )

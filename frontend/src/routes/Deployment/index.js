@@ -6,12 +6,57 @@ import {arrayToJson, JsonToArray} from '../../utils/JsonUtils';
 import LearningCurve from '../../components/Charts/curve';
 import HeatmapOnCartesianChart from '../../components/Charts/heatmapOnCartesianChart';
 import DeployModal from '../../components/deployModal/deployModal';
+import GetPredictionForm from '../../components/PredictForm/predictForm';
 import {get} from 'lodash';
+import Highlight from 'react-highlight'
 
 const {TextArea} = Input;
 const TabPane = Tabs.TabPane;
 const confirm = Modal.confirm;
-const fakeField = ['A', 'B', 'AC', 'ABBB', 'ACCCCC']
+
+
+function GetPredictionPage({deployment, dispatch}) {
+  const {
+    modelsJson,
+    focusModelId,
+    loadingState,
+  } = deployment;
+  if (modelsJson[focusModelId]['served_model']['status'] === 'serving') {
+    return (
+      <div>
+        <h1>1.TYPE YOUR INPUT</h1>
+        <GetPredictionForm deployment={deployment} dispatch={dispatch}/>
+        <h1>2.SEE THE RESULT</h1>
+        <pre className={styles.outputpre}>
+        {modelsJson[focusModelId]['served_model']['predict_result'] ? modelsJson[focusModelId]['served_model']['predict_result'] : null}
+        </pre>
+        <h1>3.USE THIS ALGORITHM</h1>
+
+        <Tabs defaultActiveKey="1">
+          <TabPane tab={<span>JS</span>} key="1">
+            <pre className={styles.usealgorithm}>
+            <Highlight
+              className='JavaScript hljs code-container inline-code-container'>
+              {modelsJson[focusModelId]['how_to_use_code_js']}
+            </Highlight>
+            </pre>
+          </TabPane>
+          <TabPane tab={<span>Python</span>} key="2">
+            <pre className={styles.usealgorithm} >
+            <Highlight
+              className='python hljs code-container inline-code-container'>
+              {modelsJson[focusModelId]['how_to_use_code_py']}
+            </Highlight>
+            </pre>
+          </TabPane>
+        </Tabs>
+      </div>
+    )
+  }
+  else {
+    return (<div/>)
+  }
+}
 
 function UseThisAPIPage({deployment, dispatch}) {
   const {
@@ -34,7 +79,7 @@ function UseThisAPIPage({deployment, dispatch}) {
   };
   const onClickModel = (mode) => {
     //  跳转到该model详细页面
-    if (mode === 'undeploy') {
+    if (mode === 'serving') {
       showUndeployConfirm();
     }
     else {
@@ -65,71 +110,60 @@ function UseThisAPIPage({deployment, dispatch}) {
     });
   };
 
+
   if (focusModelId === null) {
     return (<div/>)
   }
   else if (modelsJson[focusModelId]['served_model'] === null) {
-    return (<div><h1>What is Deployment</h1>
-      <p>Deployment module will host the model you trained and provide
-        remote access to it. After deployment, you can make predictions
-        for new data samples through provided gRPC/HTTP service.</p>
-      <Button type="primary"
-              onClick={() => onClickModifyModal(true)}>Deploy</Button>
-      <DeployModal dispatch={dispatch} deployment={deployment}
-                   visible={deployment.modalState} firstDeploy={true}/></div>)
-  }
-  else if (modelsJson[focusModelId]['served_model']['status'] === 'serving') {
-    return (<div><Spin spinning={loadingState}>
-      <DeployModal dispatch={dispatch} deployment={deployment}
-                   visible={deployment.modalState} firstDeploy={false}/>
-      <h1>Overview</h1><Icon type="edit"
-                             onClick={() => onClickModifyModal(true)}/>
-      <h2>Name</h2>
-      <pre>{modelsJson[focusModelId]['served_model']['name']}</pre>
-      <h2>Description</h2>
-      <pre>{modelsJson[focusModelId]['served_model']['description']}</pre>
-      <h1>Usage</h1>
-      <h2>Input</h2>
-      <pre>{modelsJson[focusModelId]['served_model']['input_info']}</pre>
-      <h2>Output</h2>
-      <pre>{modelsJson[focusModelId]['served_model']['output_info']}</pre>
-      <h2>Examples</h2>
-      <pre>{modelsJson[focusModelId]['served_model']['examples']}</pre>
-      <Button type="primary" onClick={() => onClickModel('undeploy')}>
-        Stop Service</Button> {/*<LineChart/>*/}
-      <h1>1.TYPE YOUR INPUT</h1>
-      <TextArea className={styles.inputtext} rows={4}
-                placeholder="TYPE YOUR INPUT"/>
-      <Button type="primary">Run</Button>
-      <h1>2.SEE THE RESULT</h1>
-      <TextArea rows={4} placeholder="SEE THE RESULT"/>
-      <h1>3.USE THIS ALGORITHM</h1>
-      <TextArea rows={4} placeholder="USE THIS ALGORITHM"/>
-    </Spin>
-    </div> )
+    return (
+      <div className={styles.whatisdeploydiv}><Spin spinning={loadingState}>
+        <h1 className={styles.whatisdeployh1}>What is Deployment</h1>
+        <p className={styles.whatisdeployp}>Deployment module will host the
+          model you trained and provide
+          remote access to it. After deployment, you can make predictions
+          for new data samples through provided gRPC/HTTP service.</p>
+        <div className={styles.whatisdeploybuttondiv}>
+          <Button type="primary"
+                  onClick={() => onClickModifyModal(true)}>Deploy</Button></div>
+        <DeployModal dispatch={dispatch} deployment={deployment}
+                     visible={deployment.modalState} firstDeploy={true}/>
+      </Spin></div>)
   }
   else {
-    return (<div>
-      <Spin spinning={loadingState}>
-      <DeployModal dispatch={dispatch} deployment={deployment}
-                   visible={deployment.modalState} firstDeploy={false}/>
-      <h1>Overview</h1><Icon type="edit"
-                             onClick={() => onClickModifyModal(true)}/>
-      <h2>Name</h2>
-      <pre>{modelsJson[focusModelId]['served_model']['name']}</pre>
-      <h2>Description</h2>
-      <pre>{modelsJson[focusModelId]['served_model']['description']}</pre>
-      <h1>Usage</h1>
-      <h2>Input</h2>
-      <pre>{modelsJson[focusModelId]['served_model']['input_info']}</pre>
-      <h2>Output</h2>
-      <pre>{modelsJson[focusModelId]['served_model']['output_info']}</pre>
-      <h2>Examples</h2>
-      <pre>{modelsJson[focusModelId]['served_model']['examples']}</pre>
-      <Button type="primary" onClick={() => onClickModel('resume')}>
-        Start Service</Button>
-    </Spin>
-    </div> )
+    return (
+      <div style={{padding: 40}}>
+        <div><Spin spinning={loadingState}>
+          <DeployModal dispatch={dispatch} deployment={deployment}
+                       visible={deployment.modalState} firstDeploy={false}/>
+
+          <h2
+            style={{paddingBottom: 10}}>{modelsJson[focusModelId]['served_model']['name']}
+            <Icon style={{fontSize: 24, paddingLeft: 20}} type="edit"
+                  onClick={() => onClickModifyModal(true)}/>
+          </h2>
+
+          <p>{modelsJson[focusModelId]['served_model']['description']}</p>
+          <h2 style={{padding: '20px 0 0 0'}}>Usage</h2>
+          <h3 style={{padding: '10px 0 10px 0'}}>Input</h3>
+          <pre>{modelsJson[focusModelId]['served_model']['input_info']}</pre>
+          <h3 style={{padding: '10px 0 10px 0'}}>Output</h3>
+          <pre>{modelsJson[focusModelId]['served_model']['output_info']}</pre>
+          <h3 style={{padding: '10px 0 10px 0'}}>Examples</h3>
+          <pre>{modelsJson[focusModelId]['served_model']['examples']}</pre>
+
+          <div style={{textAlign: 'center'}}><Button style={{
+            backgroundColor: modelsJson[focusModelId]['served_model']['status'] === 'serving' ? 'red' : '',
+            borderColor: modelsJson[focusModelId]['served_model']['status'] === 'serving' ? 'red' : '',
+            margin: 10
+          }} type="primary"
+                                                     onClick={() => onClickModel(modelsJson[focusModelId]['served_model']['status'])}>
+            {modelsJson[focusModelId]['served_model']['status'] === 'serving' ? 'Stop Service' : 'Resume Service'}
+          </Button></div>
+        </Spin></div>
+        <div><GetPredictionPage deployment={deployment} dispatch={dispatch}/>
+        </div>
+      </div>
+    )
   }
 }
 
@@ -140,7 +174,7 @@ function Deployment({deployment, dispatch}) {
     focusModelId,
   } = deployment;
   const models = JsonToArray(modelsJson);
-
+  const featuresTargetsCards = get(modelsJson, `[${focusModelId}].params.fit.data_fields`, [[], []]);
   const setFocusModel = (modelId) => {
     dispatch({
       type: 'deployment/setFocusModel',
@@ -151,14 +185,12 @@ function Deployment({deployment, dispatch}) {
     //  跳转到该model详细页面
     setFocusModel(modelId)
   };
-
   return (
     <div className={styles.container}>
       <div className={styles.content}>
         <div className={styles.sidebar}>
           <div className={styles.titleRow}>
-            <div>Models</div>
-            <div>State</div>
+            <div>Model List</div>
           </div>
           <div>
           </div>
@@ -175,6 +207,9 @@ function Deployment({deployment, dispatch}) {
                 color = 'black';
               }
               let state = get(model, 'served_model.status');
+              if (state === 'terminated') {
+                state = ''
+              }
               return (
                 <div key={model._id + model.model.name}
                      onClick={() => onClickModel(model._id)}
@@ -182,7 +217,8 @@ function Deployment({deployment, dispatch}) {
                      style={{
                        opacity: opacity,
                        backgroundColor: backgroundColor,
-                       fontColor: color
+                       fontColor: color,
+                       padding: 20,
                      }}
                 >
                   <div>{model.model.name}</div>
@@ -198,26 +234,48 @@ function Deployment({deployment, dispatch}) {
             tabPosition="top"
           >
             <TabPane tab="Information" key="1">
-              <h1>Dataset</h1>
-              <div className={styles.fields}>
-                {fakeField.map(field =>
-                  <div
-                    key={field}
-                    className={styles.field}
-                    style={{backgroundColor: '#F3F3F3'}}
-                  >
-                    <p className={styles.text}>{field}</p>
+              <div style={{padding: 40}}>
+                <h1>Dataset</h1>
+                <div style={{padding: 20}}>
+                  <h2
+                    style={{padding: '0 0 10px 0'}}>{get(modelsJson, `[${focusModelId}].datasetInfo.name`)}</h2>
+                  <p>{get(modelsJson, `[${focusModelId}].datasetInfo.description`)}</p>
+                  <h2 style={{padding: '20px 0 10px 0'}}>Selected Fields</h2>
+                  <h3>Input</h3>
+                  <div className={styles.fields}>
+                    {featuresTargetsCards[0].map(field =>
+                      <div
+                        key={field}
+                        className={styles.field}
+                        style={{backgroundColor: '#F3F3F3'}}
+                      >
+                        <p className={styles.text}>{field}</p>
+                      </div>
+                    )}
                   </div>
-                )}
+                  <h3>Output</h3>
+                  <div className={styles.fields}>
+                    {featuresTargetsCards[1].map(field =>
+                      <div
+                        key={field}
+                        className={styles.field}
+                        style={{backgroundColor: '#F3F3F3'}}
+                      >
+                        <p className={styles.text}>{field}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <h1>Performance</h1>
+                  <div style={{padding: 20}}>
+                    {get(modelsJson, `[${focusModelId}].metrics_status`) ?
+                      <LearningCurve
+                        data={get(modelsJson, `[${focusModelId}].metrics_status`)}/> : null}
+                  </div>
+                </div>
               </div>
-
-              <h1>Performance</h1>
-              <div>
-                {get(modelsJson, `[${focusModelId}].metrics_status`) ?
-                  <LearningCurve
-                    data={get(modelsJson, `[${focusModelId}].metrics_status`)}/> : null}
-              </div>
-              <HeatmapOnCartesianChart/>
+              {/*<HeatmapOnCartesianChart/>*/}
             </TabPane>
             <TabPane tab="Use This API" key="2">
               <UseThisAPIPage deployment={deployment} dispatch={dispatch}/>
