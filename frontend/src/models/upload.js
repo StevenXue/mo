@@ -43,6 +43,10 @@ export default {
         if (match) {
           dispatch({ type: 'fetch' })
         }
+        const match2 = pathToRegexp('/workspace/:projectId/import/list').exec(pathname);
+        if (match2) {
+          dispatch({ type: 'staged' })
+        }
       })
     },
 
@@ -54,6 +58,7 @@ export default {
     * fetch(action, { call, put, select }) {
       yield put({type:'setDataSetsLoading', payload: true})
       // let user_ID = 'dev_1'
+
       const data = yield call(fetchDataSets)
       console.log(data)
       yield put({ type: 'setDataSets', payload: data.data })
@@ -77,7 +82,6 @@ export default {
     * upload ({
                 payload,
               }, { put, call, select }) {
-
 
       // const user = yield select(state => state['app'].user)
       console.log('enter upload model')
@@ -158,28 +162,28 @@ export default {
       // const test = yield select(state => state)
       // console.log(test)
       yield put({type:'setAddLoading', payload: true})
-      const prjID = yield select(state => state.projectDetail.project._id)
+      const prjID = location.hash.split('/')[2]
       const dsname = yield select(state => state.upload.dataSetName)
       const dsdes = yield select(state => state.upload.dataSetDesc)
       const dataSetID = yield select(state => state.upload.dataSetID)
       const res = yield call(stateData, dataSetID, prjID, dsname, dsdes)
       console.log(res)
       yield put({type: 'staged'})
+      yield put(routerRedux.push('list'))
 
     },
 
     * staged (action, { put, call, select }) {
-      const prjID = yield select(state => state.projectDetail.project._id)
+      const prjID = location.hash.split('/')[2]
       const res = yield call(fetchStagingDataSet, prjID)
       // console.log(res.data)
       yield put({type: 'setStagingDataSet', payload: res.data})
       const sds = yield select(state => state.upload.stagingDataSet)
       console.log(sds)
-      yield put(routerRedux.push('list'))
+      // yield put(routerRedux.push('list'))
       yield put({type:'setAddLoading', payload: false})
       yield put({type:'setSaveLoading', payload: false})
     }
-
 
   },
 
