@@ -19,10 +19,10 @@ from minepy import MINE
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
-
 from server3.lib import toolkit_orig
 from server3.lib import preprocess_orig
-from server3.service import job_service, staging_data_service, visualization_service, logger_service
+from server3.service import job_service, staging_data_service, \
+    visualization_service, logger_service
 from server3.business import toolkit_business, ownership_business, \
     user_business, job_business, \
     result_business, project_business, staging_data_set_business
@@ -218,7 +218,8 @@ def run_toolkit_sub(project_id, staging_data_set_id, toolkit_obj,
 
 
 def after_run_toolkit(project_id, staging_data_set_id,
-                      toolkit_obj, fields, nan_index, func_rst, job_obj, *args, **kwargs):
+                      toolkit_obj, fields, nan_index, func_rst, job_obj, *args,
+                      **kwargs):
     project_obj = project_business.get_by_id(project_id)
     result = list(func_rst) if isinstance(func_rst, tuple) else [func_rst]
     # 新设计的存取方式
@@ -254,13 +255,13 @@ def after_run_toolkit(project_id, staging_data_set_id,
             "attribute"] == "general_info":
             gen_info.append({arg["name"]: {"value": value,
                                            "description": arg["des"]}})
-    # print("results", results)
-    # job_obj.result = results
-    # job_obj.save()
-    # # save to job
+            # print("results", results)
+            # job_obj.result = results
+            # job_obj.save()
+            # # save to job
 
-        # 可视化计算
-        # 聚类分析
+            # 可视化计算
+            # 聚类分析
     if toolkit_obj.category == 0:
         json = {"scatter": data_utility.retrieve_nan_index(args[0],
                                                            nan_index),
@@ -422,9 +423,10 @@ def after_run_toolkit(project_id, staging_data_set_id,
         # create result sds for toolkit
         sds_name = '%s_%s_result' % (
             toolkit_obj['name'], job_obj['id'])
-        result_sds_obj = staging_data_set_business.get_or_create(job_obj, sds_name, 'des',
+        result_sds_obj = staging_data_set_business.get_or_create(job_obj,
+                                                                 sds_name,
+                                                                 'des',
                                                                  project_obj,
-                                                                 job=job_obj,
                                                                  type='result')
 
         # result_sds_obj = staging_data_set_business.add(sds_name, 'des',
@@ -442,7 +444,6 @@ def after_run_toolkit(project_id, staging_data_set_id,
         }
 
     return {"result": results}
-
 
 
 def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,

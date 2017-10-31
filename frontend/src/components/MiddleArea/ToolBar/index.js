@@ -12,6 +12,7 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
   } = model;
 
   const {
+    metrics_status,
     visual_sds_id,
     [translateDict[namespace]]: {
       name,
@@ -83,8 +84,12 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
           <Icon type="retweet" className={styles.icon}/>
         </Button>
 
-        <div  >
-          <ResultButton visual_sds_id={visual_sds_id} result={result}/>
+        <div>
+          <ResultButton visual_sds_id={visual_sds_id}
+                        data={metrics_status}
+                        result={result}
+                        namespace={namespace}
+          />
         </div>
 
       </ButtonGroup>

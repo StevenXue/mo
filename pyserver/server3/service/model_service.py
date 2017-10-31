@@ -12,6 +12,7 @@ import inspect
 import os
 import subprocess
 from pathlib import Path
+import time
 
 import numpy as np
 import pandas as pd
@@ -41,6 +42,7 @@ from server3.constants import NAMESPACE
 from server3.lib import graph
 from server3.lib import model_from_json
 from server3.utility import file_utils
+
 
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 # user_directory = 'user_directory/'
@@ -123,7 +125,8 @@ def split_categorical_and_continuous(df, exclude_cols):
     return continuous_cols, categorical_cols
 
 
-def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
+def kube_run_model(conf, project_id, data_source_id, model_id, job_obj,
+                   **kwargs):
     # file_id = kwargs.get('file_id')
     staging_data_set_obj = None
     if data_source_id:
@@ -142,9 +145,15 @@ def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
     }
 
     # create model job
-    job_obj = job_business.add_model_job(model_obj, staging_data_set_obj,
-                                         project_obj, params=conf,
-                                         run_args=run_args)
+    # job_obj = job_business.add_model_job(model_obj, staging_data_set_obj,
+    #                                      project_obj, params=conf,
+    #                                      run_args=run_args)
+
+    job_obj = job_business.update_job_by_id(job_obj.id, model=model_obj,
+                                            staging_data_set=staging_data_set_obj,
+                                            project=project_obj, params=conf,
+                                            run_args=run_args)
+
     job_id = str(job_obj.id)
     print(job_id)
     # return run_model(conf, project_id, data_source_id, model_id, job_id,
@@ -152,6 +161,16 @@ def kube_run_model(conf, project_id, data_source_id, model_id, **kwargs):
     # return #
     cwd = os.getcwd()
     job_name = job_id + '-training-job'
+    client = kube_service.client
+    try:
+        # TODO need to terminate running pod
+        kube_service.delete_job(job_name)
+        while True:
+            kube_service.get_job(job_name)
+            time.sleep(1)
+    except client.rest.ApiException:
+        print('job not exists or deleted, ok to create')
+
     kube_json = {
         "apiVersion": "batch/v1",
         "kind": "Job",
@@ -598,8 +617,8 @@ def get_results_dir_by_job_id(job_id, user_ID, checkpoint='final'):
     if ownership.private and ownership.user.user_ID != user_ID:
         raise ValueError('Authentication failed')
     user_ID = ownership.user.user_ID
-    result_dir = os.path.join(user_directory + user_ID+'/',
-                              project_name+'/', job_id)
+    result_dir = os.path.join(user_directory + user_ID + '/',
+                              project_name + '/', job_id)
     filename = '{}.hdf5'.format(checkpoint)
     return result_dir, filename
 
@@ -623,8 +642,8 @@ def export(job_id, user_ID):
     """
     result_dir, h5_filename = get_results_dir_by_job_id(job_id, user_ID)
     # result_sds = staging_data_set_business.get_by_job_id(job_id)
-    model_dir = os.path.join(result_dir+'/', 'model.json')
-    weights_dir = os.path.join(result_dir+'/', h5_filename)
+    model_dir = os.path.join(result_dir + '/', 'model.json')
+    weights_dir = os.path.join(result_dir + '/', h5_filename)
     with open(model_dir, 'r') as f:
         data = json.load(f)
         json_string = json.dumps(data)

@@ -347,14 +347,22 @@ def create_model_job(project_id, staging_data_set_id, model_obj,
                 project_id, related_tasks=model_obj.category)
             # create result sds for model
             sds_name = '%s_%s_result' % (model_obj['name'], job_obj['id'])
-            result_sds_obj = staging_data_set_business.add(sds_name, 'des',
-                                                           project_obj,
-                                                           job=job_obj,
-                                                           type='result')
+            # result_sds_obj = staging_data_set_business.add(sds_name, 'des',
+            #                                                project_obj,
+            #                                                job=job_obj,
+            #                                                type='result')
+            result_sds_obj = staging_data_set_business.get_or_create(job_obj,
+                                                                     sds_name,
+                                                                     'des',
+                                                                     project_obj,
+                                                                     type='result')
             # run
             if result_dir:
                 # result_dir += str(job_obj['id']) + '/'
-                os.makedirs(result_dir)
+                try:
+                    os.makedirs(result_dir)
+                except FileExistsError:
+                    print('dir exists, no need to create')
                 kw['result_dir'] = result_dir
 
             # generate_job_py(func, *args, **kw, result_sds=result_sds_obj,
@@ -464,26 +472,39 @@ def run_toolkit_job(job_obj, project_id):
     toolkit_id = data.get('toolkit_id')
     project_id = data.get('project_id')
     conf = data.get('conf')
+from server3.service import toolkit_service
+from server3.service import model_service
 
-    # conf初步操作
-    flag = isinstance(conf["data_fields"][0], (list, tuple))
-    x_fields = conf["data_fields"][0] if flag else conf["data_fields"]
-    y_fields = conf["data_fields"][1] if flag else None
-    fields = x_fields + y_fields if flag else x_fields
-    data = staging_data_business.get_by_staging_data_set_and_fields(
-        ObjectId(staging_data_set_id), fields)
 
-    # 数据库转to_mongo和to_dict
-    data = [d.to_mongo().to_dict() for d in data]
+def run_job(obj, job_obj):
+    if obj.get('model_id'):
+        return model_service.kube_run_model(job_obj=job_obj, **obj)
+    else:
+        data = obj
+        staging_data_set_id = data.get('staging_data_set_id')
+        toolkit_id = data.get('toolkit_id')
+        project_id = data.get('project_id')
+        conf = data.get('conf')
 
-    # 拿到conf
-    fields = [x_fields, y_fields]
-    conf = conf.get('args')
+        # conf初步操作
+        flag = isinstance(conf["data_fields"][0], (list, tuple))
+        x_fields = conf["data_fields"][0] if flag else conf["data_fields"]
+        y_fields = conf["data_fields"][1] if flag else None
+        fields = x_fields + y_fields if flag else x_fields
+        data = staging_data_business.get_by_staging_data_set_and_fields(
+            ObjectId(staging_data_set_id), fields)
 
-    result = toolkit_service.run_toolkit(project_id, staging_data_set_id, toolkit_id,
-                                         fields, data, conf, job_obj)
-    result.update({"fields": [x_fields, y_fields]})
-    return result
+        # 数据库转to_mongo和to_dict
+        data = [d.to_mongo().to_dict() for d in data]
+
+        # 拿到conf
+        fields = [x_fields, y_fields]
+        conf = conf.get('args')
+
+        result = toolkit_service.run_toolkit(project_id, staging_data_set_id, toolkit_id,
+                                             fields, data, conf, job_obj)
+        result.update({"fields": [x_fields, y_fields]})
+        return result
 
 
 if __name__ == '__main__':
