@@ -212,7 +212,6 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
   }
 
   function setValueDefault(value, stepIndex, argIndex, valueIndex) {
-    console.log(value)
     for (let key in value) {
       let idx = sectionsJson[sectionId].steps[stepIndex].args.findIndex(e => e.name === key)
       if (!isEqual(sectionsJson[sectionId].steps[stepIndex].args[idx].default, value[key])) {

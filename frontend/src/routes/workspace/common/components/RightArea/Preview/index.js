@@ -19,8 +19,11 @@ function Preview({preview, model, dispatch, namespace}) {
   } = model;
 
   let fields;
+  let labelFields;
   if(focusSectionsId!=='new_launcher ' + 'init'){
     fields = sectionsJson[focusSectionsId].steps[1].args[0].values;
+    labelFields = sectionsJson[focusSectionsId].steps[2].args[0].values;
+
   }
 
   function handleChange(value) {
@@ -71,6 +74,11 @@ function Preview({preview, model, dispatch, namespace}) {
       if(fields&&fields.includes(e[0])){
         className += 'active-table-column';
       }
+
+      if(labelFields&&labelFields.includes(e[0])){
+        className += 'active-table-column-label';
+      }
+
       if(mouseOverField===e[0]){
         className += ' mouse-over-table-column';
         ret['fixed'] = true;
