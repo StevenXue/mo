@@ -69,6 +69,7 @@ def get_all_public_model_by_type():
                    ownership_business.list_ownership_by_type_and_private(
                        'model',
                        False)]
+    models_list.sort(key=lambda x: x['name'])
     return [{'name': TYPE[key],
              'zh_name': ZH_MAP[TYPE[key]],
              'children': [model_obj for model_obj in models_list

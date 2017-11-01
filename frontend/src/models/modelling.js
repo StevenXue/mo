@@ -61,7 +61,7 @@ const modelling = modelExtend(workBench, {
     },
     setMetrics(state, { payload }) {
       const { message } = payload
-
+      console.log('message', message)
       const sectionId = message.job_id
       let sectionsJson = state.sectionsJson
       let metrics = {
@@ -102,7 +102,7 @@ const modelling = modelExtend(workBench, {
       if(message.batch) {
         sectionsJson[sectionId].batch = message.batch
       }
-
+      console.log('sectionsJson', sectionsJson)
       return {
         ...state,
         sectionsJson,
