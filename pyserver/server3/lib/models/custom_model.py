@@ -16,6 +16,8 @@ from tensorflow.contrib.learn.python.learn.estimators import estimator
 from server3.utility import input_fn_utils
 from server3.constants import MODEL_EXPORT_BASE
 from server3.lib.models.modified_tf_file.monitors import ValidationMonitor
+from server3.business import ownership_business
+from server3.business import project_business
 
 # 修改了 metric_spec 的部分内容，
 # 源代码为
@@ -56,6 +58,10 @@ def custom_model(conf, model_fn, input_data, **kw):
     :return:
     """
     project_id = kw.pop('project_id', None)
+    job_id = kw.pop('job_id', None)
+    project = project_business.get_by_id(project_id)
+    ow = ownership_business.get_ownership_by_owned_item(project, 'project')
+    user_ID = ow.user.user_ID
     result_sds = kw.pop('result_sds', None)
     result_dir = kw.pop('result_dir', None)
     est_params = conf.get('estimator', None)
@@ -69,13 +75,16 @@ def custom_model(conf, model_fn, input_data, **kw):
 
     # def eval_input_fn():
     #     return input_fn(test, continuous_cols, categorical_cols, label_col)
-    return custom_model_help(model_fn, input_data, project_id, result_dir,
+    return custom_model_help(model_fn, input_data, project_id, job_id,
+                             user_ID,
+                             result_dir,
                              result_sds,
                              est_params, fit_params,
                              eval_params)
 
 
-def custom_model_help(model_fn, input_data, project_id, result_dir, result_sds,
+def custom_model_help(model_fn, input_data, project_id, job_id, user_ID,
+                      result_dir, result_sds,
                       est_params=None, fit_params=None,
                       eval_params=None):
     tf.logging.set_verbosity(tf.logging.INFO)
@@ -85,6 +94,8 @@ def custom_model_help(model_fn, input_data, project_id, result_dir, result_sds,
     # pass result staging data set for logger to save results
     mh.result_sds = result_sds
     mh.project_id = project_id
+    mh.job_id = job_id
+    mh.user_ID = user_ID
     logger = logging.getLogger('tensorflow')
     logger.setLevel(logging.DEBUG)
     logger.addHandler(mh)

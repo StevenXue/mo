@@ -31,8 +31,9 @@ from server3.lib.models.linear_regressor import LinearRegressorSteps
 ## logistic regressor
 from server3.lib.models.logistic_regressor import LogisticRegressor
 from server3.lib.models.logistic_regressor import logistic_regressor_model_fn
-from server3.lib.models.mlp import MLP
 # mlp
+from server3.lib.models.mlp import MLP
+from server3.lib.models.mlp import MLP_STEPS
 from server3.lib.models.mlp import mlp
 from server3.lib.models.mlp import mlp_to_str
 # nn application

@@ -465,7 +465,16 @@ def model_steps_to_obj(job_obj, project_id):
     steps = job_obj.steps
     conf = {}
     if model_obj.category == 0:
-        for step in steps[4:]:
+        fit_idx = None
+        layers_idx = None
+        for i, step in enumerate(steps):
+            if step.get('name') == 'fit':
+                fit_idx = i
+            if step.get('name') == 'layers':
+                layers_idx = i
+        if not fit_idx:
+            raise Exception('Error: no fit step')
+        for step in steps[fit_idx:]:
             conf.update({step.get('name'):
                              {'args':
                                   {arg.get('name'): arg.get('value')
@@ -478,14 +487,15 @@ def model_steps_to_obj(job_obj, project_id):
                 [steps[1]["args"][0]["values"],
                  steps[2]["args"][0]["values"]]
         })
-        conf['layers'] = [{
-            'name': layer.get('name'),
-            'args': {arg.get('name'): arg.get('value')
-                                      or arg.get('values')
-                                      or arg.get('default')
-                     for arg in layer.get('args')}
-        }
-            for layer in steps[3]['args'][0]['values']]
+        if layers_idx:
+            conf['layers'] = [{
+                'name': layer.get('name'),
+                'args': {arg.get('name'): arg.get('value')
+                                          or arg.get('values')
+                                          or arg.get('default')
+                         for arg in layer.get('args')}
+            }
+                for layer in steps[layers_idx]['args'][0]['values']]
     elif model_obj.category == 1:
         for step in steps[3:]:
             conf.update({step.get('name'):

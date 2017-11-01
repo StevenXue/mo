@@ -925,6 +925,22 @@ def _update_model():
         }
     }
 
+    MLP = {
+        "name": "Multilayer Perceptron",
+        "description": "Multilayer Perceptron (MLP) for multi-class softmax classification",
+        "target_py_code": "server3/lib/models/mlp.py",
+        "entry_function": "mlp",
+        "to_code_function": "mlp_to_str",
+        "category": 0,
+        "model_type": 1,
+        "steps": models.MLP_STEPS,
+        "parameter_spec": models.MLP,
+        "input": {
+            "type": "ndarray",
+            "n": None
+        }
+    }
+
     LinearRegressor = {
         "name": "Linear Regressor",
         "description": "Custom linear regression model",
@@ -976,6 +992,12 @@ def _update_model():
             "user_ID": user.user_ID,
             "obj": LinearClassifier
         },
+        {
+            "_id": ObjectId("596f5c8bd123ab59405c6e11"),
+            "is_private": False,
+            "user_ID": user.user_ID,
+            "obj": MLP
+        },
     ]
 
     for model in MODEL_DICT:
@@ -991,13 +1013,11 @@ def _update_model():
             print('Added:', add_model_with_ownership(**obj))
         else:
             if model_obj:
-                print(model_obj)
                 # update model
                 model_id = model.get('_id')
-                # print(model.get('obj').keys())
                 print('Updated:', model_business.update_by_id(model_id,
                                                               **model.get(
-                                                                  'obj')))
+                                                                  'obj')).name)
 
 
 if __name__ == '__main__':
