@@ -1,7 +1,9 @@
 import React from 'react'
 import { Form, Button, Select, Input } from 'antd'
-import styles from './index.less'
 import { cloneDeep } from 'lodash'
+
+import { formItems } from '../../components/ParamsMapper'
+import styles from './index.less'
 
 const FormItem = Form.Item
 
@@ -24,97 +26,19 @@ function ArgsMapper({
                       },
                     }) {
 
-  let args = []
-  let layerName = getFieldValue('name') || value.name
-  if (value.args) {
-     args = value.args
-  } else {
-    if (layerName) {
-       args = layers.find(e => e.name === layerName).args
-    }
-  }
-
+  let args = value.args || []
+  let layerName = value.name
+  // if (value.args) {
+  //    args = value.args
+  // }
+  // else {
+  //   if (layerName) {
+  //      args = layers.find(e => e.name === layerName).args
+  //   }
+  // }
+  //
+  // console.log('getFieldValue(\'name\')', getFieldValue('name'))
   // updateValueOfValues({units: 32, activation: 'relu', input_shape: [1,1]})
-
-  const valueParser = {
-    int: (e) => JSON.parse(e),
-    float: (e) => JSON.parse(e),
-    str: (e) => (e),
-  }
-
-  const typeParser = (type, valueType) => {
-    const typeDict = {
-      int: 'integer',
-      float: 'float',
-      str: 'string',
-    }
-
-    switch (type) {
-      case 'multiple_input':
-        return 'array'
-      case 'input':
-        return typeDict[valueType]
-      default:
-        return 'string'
-    }
-  }
-
-  const splitHandler = (e, type, valueType) => {
-    switch (type) {
-      case 'multiple_input':
-        const splitValue = e.target.value.split(',')
-        // FIXME
-        if (splitValue.includes('')) {
-          return e.target.value
-        } else {
-          try {
-            return e.target.value.split(',').map(e => {
-              return valueParser[valueType](e)
-            })
-          } catch (err) {
-            return e.target.value
-          }
-        }
-      case 'input':
-        try {
-          return valueParser[valueType](e.target.value)
-        } catch (err) {
-          return e.target.value
-        }
-      default:
-        return e
-    }
-  }
-
-  const switchComponent = (arg) => {
-    switch (arg.type) {
-      case 'multiple_input':
-      case 'input':
-        return <Input/>
-      case 'choice':
-        return (
-          <Select style={{ width: 142 }}>
-            {
-              arg.range.map((option) =>
-                <Select.Option value={option} key={option}>{option}</Select.Option>,
-              )
-            }
-          </Select>
-        )
-      case 'multiple_choice':
-        return (
-          <Select style={{ width: 142 }} mode='multiple'>
-            {
-              arg.range.map((option) =>
-                <Select.Option value={option} key={option}>{option}</Select.Option>,
-              )
-            }
-          </Select>
-        )
-      default:
-        return <Input/>
-    }
-  }
 
   return (
     <Form layout='inline' className={styles.form}
@@ -160,30 +84,8 @@ function ArgsMapper({
           } else if (last && arg.name === 'units' && labelFields.length > 0) {
             setLayerDefault({ [arg.name]: labelFields.length })
           }
-          // else
-          let v
-          if (arg.value || (arg.values && arg.values.length > 0)) {
-            v = arg.value || arg.values
-          }
 
-          return <FormItem
-            key={`${layerIndex}${i}`}
-            label={arg.display_name}
-            // className={styles.item}
-          >
-            {
-              getFieldDecorator(arg.name, {
-                initialValue: v || arg.default,
-                getValueFromEvent: (value) => splitHandler(value, arg.type, arg.value_type),
-                rules: [
-                  {
-                    required: arg.required, message: `need ${arg.value_type} ${arg.type}`,
-                    type: typeParser(arg.type, arg.value_type),
-                  },
-                ],
-              })(switchComponent(arg))
-            }
-          </FormItem>
+          return formItems(arg, i, getFieldDecorator)
         })
       }
     </Form>

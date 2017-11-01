@@ -569,9 +569,9 @@ KERAS_SEQ_STEPS = [
                 "required": True
             },
             {
-                **SPEC.ui_spec['choice'],
+                **SPEC.ui_spec['multiple_choice'],
                 "name": "metrics",
-                "Name": "Metrics",
+                "display_name": "Metrics",
                 "des": "A metric is a function that is used to judge the "
                        "performance of your model",
                 "range": ["acc",
