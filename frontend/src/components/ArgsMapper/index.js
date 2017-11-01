@@ -37,7 +37,7 @@ function ArgsMapper({
   //   }
   // }
   //
-  // console.log('getFieldValue(\'name\')', getFieldValue('name'))
+  // console.log(layerIndex, value.name)
   // updateValueOfValues({units: 32, activation: 'relu', input_shape: [1,1]})
 
   return (
