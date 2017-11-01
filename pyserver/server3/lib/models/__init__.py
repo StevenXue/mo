@@ -20,9 +20,10 @@ from server3.lib.models.keras_seq import keras_seq_to_str
 from server3.lib.models.kmeans_cluster import KmeansCluster
 ## kmean
 from server3.lib.models.kmeans_cluster import kmeans_cluster_model_fn
-from server3.lib.models.linear_classifier import LinearClassifier
 ## linear classifier
 from server3.lib.models.linear_classifier import linear_classifier_model_fn
+from server3.lib.models.linear_classifier import LinearClassifier
+from server3.lib.models.linear_classifier import LinearClassifierSteps
 ## linear regressor
 from server3.lib.models.linear_regressor import linear_regressor_model_fn
 from server3.lib.models.linear_regressor import LinearRegressor

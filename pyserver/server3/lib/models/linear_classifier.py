@@ -15,6 +15,7 @@ from tensorflow.python.ops import gradients
 from tensorflow.python.ops import partitioned_variables
 from tensorflow.python.ops import variable_scope
 from tensorflow.python.training import training as train
+from server3.constants import SPEC
 
 
 # The default learning rate of 0.2 is a historical artifact of the initial
@@ -137,6 +138,159 @@ def linear_classifier_model_fn(features, labels, mode, params, config=None):
         train_op_fn=_train_op_fn,
         logits=logits)
 
+
+LinearClassifierSteps = [
+    {
+        "name": "data_source",
+        "display_name": "Select Data Source",
+        "args": [
+            {
+                "name": "input",
+                "des": "Please select input data source",
+                "type": "select_box",
+                "default": None,
+                "required": True,
+                "len_range": [
+                    1,
+                    1
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "feature_fields",
+        "display_name": "Select Feature Fields",
+        "args": [
+            {
+                "name": "fields",
+                "des": "",
+                "required": True,
+                "type": "multiple_choice",
+                "len_range": [
+                    1,
+                    None
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "label_fields",
+        "display_name": "Select Label Fields",
+        "args": [
+            {
+                "name": "fields",
+                "des": "",
+                "type": "multiple_choice",
+                "required": True,
+                "len_range": [
+                    1,
+                    None
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "estimator",
+        "display_name": "Estimator Parameters",
+        'args': [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "n_classes",
+                "display_name": "N Classes",
+                "des": "number of label classes. Default is binary classification.\
+            Note that class labels are integers representing the class index "
+                       "(i.e.\
+    values from 0 to n_classes-1). For arbitrary label values (e.g. string\
+    labels), convert to class indices first.",
+                "default": 2,
+                "required": True
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name": "weight_column_name",
+                "display_name": "Weight Column Name",
+                "value_type": "str",
+                "des": "A string defining feature column name "
+                       "representing "
+                       "weights. It is used to down weight or boost "
+                       "examples during training. It will be multiplied "
+                       "by "
+                       "the loss of the example."
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name": "gradient_clip_norm",
+                "display_name": "Gradient Clip Norm",
+                "value_type": "float",
+                "des": "A float > 0. If provided, gradients are clipped "
+                       "to their global norm with this clipping ratio.",
+                "range": [0.0, 100],
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name": "_joint_weights",
+                "display_name": "Joint weights",
+                "value_type": "bool",
+                "des": "If True, the weights for all columns will be "
+                       "stored in a single (possibly partitioned) "
+                       "variable. It's more efficient, but it's "
+                       "incompatible with SDCAOptimizer, and requires "
+                       "all feature columns are sparse and use"
+                       " the 'sum' combiner.",
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name": "enable_centered_bias",
+                "display_name": "Enable Centered Bias",
+                "value_type": "bool",
+                "des": "A bool. If True, estimator will learn a "
+                       "centered bias variable for each class. "
+                       "Rest of the model structure learns the residual "
+                       "after centered bias.",
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name": "label_keys",
+                "display_name": "Label Keys",
+                "value_type": "str",
+                "des" : "Optional list of strings with size `[n_classes]` "
+                        "defining thelabel vocabulary. Only supported for "
+                        "`n_classes` > 2.",
+            }
+        ]
+    },
+    {
+        "name": "fit",
+        "display_name": "Fit Parameters",
+        "args": [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "steps",
+                "display_name": "Steps",
+                "des": "Number of steps of training",
+                "default": 400,
+                "required": True
+            },
+        ],
+    },
+    {
+        "name": "evaluate",
+        "display_name": "Evaluate Parameters",
+        "args": [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "steps",
+                "display_name": "Steps",
+                "des": "Number of steps of evaluate",
+                "default": 1,
+                "required": True
+            },
+        ]
+    }
+]
 
 
 LinearClassifier = {

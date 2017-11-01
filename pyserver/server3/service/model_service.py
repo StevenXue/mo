@@ -940,6 +940,21 @@ def _update_model():
         }
     }
 
+    LinearClassifier = {
+        "name": "Linear Classifier",
+        "description": "Custom linear classifier model",
+        "target_py_code": "server3/lib/models/linear_classifier.py",
+        "entry_function": "linear_classifier_model_fn",
+        "to_code_function": "custom_model_to_str",
+        "category": 1,
+        "model_type": 1,
+        "steps": models.LinearClassifierSteps,
+        "parameter_spec": models.LinearClassifier,
+        "input": {
+            "type": "DataFrame"
+        }
+    }
+
     user = user_business.get_by_user_ID('system')
 
     MODEL_DICT = [
@@ -954,6 +969,12 @@ def _update_model():
             "is_private": False,
             "user_ID": user.user_ID,
             "obj": LinearRegressor
+        },
+        {
+            "_id": ObjectId("5980378d0c11f318f61ce18a"),
+            "is_private": False,
+            "user_ID": user.user_ID,
+            "obj": LinearClassifier
         },
     ]
 
