@@ -3,6 +3,7 @@ import { HashRouter, Route, Switch, Link, withRouter, routerRedux } from 'dva/ro
 import { Breadcrumb } from 'antd'
 import { connect } from 'dva'
 import pathToRegexp from 'path-to-regexp'
+import {get} from 'lodash'
 
 import Users from './routes/Users.js'
 import Login from './routes/login/Login'
@@ -10,7 +11,6 @@ import MyProjects from './routes/workspace/info/Projects'
 import Projects from './routes/projects/Projects'
 import ProjectDetail from './routes/workspace/info/ProjectDetail'
 import MainLayout from './components/MainLayout/MainLayout'
-
 const breadcrumbNameMap = {
   '/login': 'Login',
   '/workspace': 'My Projects',
@@ -18,7 +18,7 @@ const breadcrumbNameMap = {
   '/deployed_models': 'Deployed Models',
 }
 
-const RouterConfig = ({ history, location, login }) => {
+const RouterConfig = ({ history, location, login, projectDetail }) => {
   const pathSnippets = location.pathname.split('/').filter(i => i)
 
   const extraBreadcrumbItems = pathSnippets.map((_, index) => {
@@ -27,7 +27,7 @@ const RouterConfig = ({ history, location, login }) => {
     const matchDetail = pathToRegexp('/workspace/:projectId').exec(url)
     const matchPro = pathToRegexp('/workspace/:projectId/:step').exec(url)
     if (matchDetail) {
-      breadcrumbName = `Project Info`
+      breadcrumbName = get(projectDetail, 'project.name', 'Project Info');
     } else if (matchPro) {
       breadcrumbName = matchPro[2]
     }
@@ -63,7 +63,7 @@ const RouterConfig = ({ history, location, login }) => {
   )
 }
 
-const Main = withRouter(connect(({ login }) => ({ login }))(RouterConfig))
+const Main = withRouter(connect(({ login, projectDetail }) => ({ login, projectDetail }))(RouterConfig))
 
 const App = ((props) =>
     <HashRouter>

@@ -113,5 +113,40 @@ def run_job():
         }}), 200
 
 
+@job_app.route("/save_result", methods=["POST"])
+def save_result():
+    '''
+
+    :return:
+    :rtype:
+    '''
+    data = {
+        "job_id": "59f2ece0d845c066c7aa5000"
+    }
+    data = request.get_json()
+    job_id = data['job_id']
+
+    job_service.save_result(
+        job_id=job_id,
+    )
+
+
+@job_app.route("/save_as_result", methods=["POST"])
+def save_as_result():
+    data = {
+        'job_id': '',
+        'new_sds_name': 'xxx',
+    }
+    data = request.get_json()
+    job_id = data['job_id']
+    new_sds_name = data.get("new_sds_name")
+
+    job_service.save_as_result(
+        job_id=job_id,
+        new_sds_name=new_sds_name
+    )
+
+
+
 if __name__ == "__main__":
     create_job()

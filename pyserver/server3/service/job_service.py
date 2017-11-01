@@ -25,6 +25,8 @@ from server3.business import result_business
 from server3.business import staging_data_business
 from server3.business import staging_data_set_business
 from server3.business import toolkit_business
+from server3.business.step_business import StepBusiness
+
 from server3.repository import config
 from server3.service import model_service
 from server3.service import staging_data_service, logger_service, \
@@ -519,14 +521,23 @@ def run_toolkit_job(job_obj, project_id):
     conf = data.get('conf')
     # conf初步操作
     flag = isinstance(conf["data_fields"][0], (list, tuple))
+
+    # 是否可以替代 0位是什么，什么时候出现
+    if flag:
+        fields = conf["data_fields"][0] + conf["data_fields"][1]
+    else:
+        fields = conf["data_fields"]  # 数组
+
     x_fields = conf["data_fields"][0] if flag else conf["data_fields"]
     y_fields = conf["data_fields"][1] if flag else None
     fields = x_fields + y_fields if flag else x_fields
     data = staging_data_business.get_by_staging_data_set_and_fields(
         ObjectId(staging_data_set_id), fields)
 
+    print("data", data)
     # 数据库转to_mongo和to_dict
     data = [d.to_mongo().to_dict() for d in data]
+    print("data_after", data)
 
     # 拿到conf
     fields = [x_fields, y_fields]
@@ -573,6 +584,52 @@ def run_job(obj, job_obj):
         result.update({"fields": [x_fields, y_fields]})
         return result
 
+
+def save_result(job_id):
+    job_obj = job_business.get_by_job_id(job_id)
+    result = job_obj.result
+    sds_id = StepBusiness.get_datasource(job_obj.steps)
+    print("sds_id", sds_id)
+    save_result_sub(result, sds_id)
+
+
+def save_as_result(job_id, new_sds_name):
+    job_obj = job_business.get_by_job_id(job_id)
+    result = job_obj.result
+    project_obj = job_obj.project
+
+    sds_id = staging_data_set_business.add(
+        name=new_sds_name,
+        description='des',
+        project=project_obj,
+        job=job_obj
+        )
+    save_result_sub(result, sds_id)
+
+
+def save_result_sub(result, sds_id):
+    """
+
+    :param result: job result
+    :type result: json object
+    :param sds_id: staging_data_set id
+    :type sds_id: ObjectId
+    :return: true or false
+    :rtype:
+    """
+    print("result", result)
+    sds_obj = staging_data_business.get_by_staging_data_set_id(staging_data_set_id=sds_id)
+    print('sds_obj', sds_obj)
+
+    # TODO 帮我把result存进sds_obj中 @tianyi
+
+    # staging_data_service.update_many_with_new_fields(value,
+    #                                                  nan_index,
+    #                                                  fields[
+    #                                                      0],
+    #                                                  str_name,
+    #                                                  staging_data_set_id)
+    pass
 
 if __name__ == '__main__':
     pass

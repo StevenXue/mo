@@ -1830,18 +1830,18 @@ class StepTemplate(object):
                 'display_name': 'save type',
                 "range": [
                     "save",
-                    "save as",
+                    {
+                        **SPEC.ui_spec['input'],
+                        'name': 'save_as',
+                        'display_name': 'save as name',
+                        'value_type': 'str',
+                        "default": "new_staging_dataset",
+                    },
                 ],
                 "default": "save",
                 "required": True,
             },
-            {
-                **SPEC.ui_spec['input'],
-                'name': 'save_as_name',
-                'display_name': 'save as name',
-                'value_type': 'str',
-                "default": "new_staging_dataset",
-            }
+
         ]
     }
 
@@ -2725,6 +2725,19 @@ def update_toolkit():
                       }
                   ])
 
+    '''
+    1. 合并添加列
+    2. 自定义添加列
+    3. 合并添加行
+    
+    合并添加列
+    1. 选择目标数据源
+    2. 选择来源数据源
+    3. 选择index
+    4. 选择添加的fields（temp run)
+    5. 有多少index 对应不上，所做的处理，每个column单独选择？
+    6. setting
+    '''
     add_columns_append = Toolkit(
         name='合并添加列',
         description='通过其他数据表数据添加列',
@@ -2919,9 +2932,6 @@ def update_toolkit():
                     toolkit_obj[attribute] = toolkit['object'][attribute]
             toolkit_obj.save()
 
-
-# def create_one_public_toolkit:
-#     pass
 
 if __name__ == '__main__':
     update_toolkit()
