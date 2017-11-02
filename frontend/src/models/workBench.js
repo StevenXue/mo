@@ -302,6 +302,17 @@ export default {
       }
     },
 
+    deleteValue(state, action) {
+      const { sectionId, stepIndex, argIndex, valueIndex } = action.payload
+
+      let sectionsJson = state.sectionsJson
+      sectionsJson[sectionId].steps[stepIndex].args[argIndex].values.splice(valueIndex, 1)
+      return {
+        ...state,
+        sectionsJson,
+      }
+    },
+
     addValue(state, action) {
       const { sectionId, stepIndex, argIndex, value, valueIndex } = action.payload
 

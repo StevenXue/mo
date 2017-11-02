@@ -176,6 +176,20 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
     })
   }
 
+  function deleteValue(value, stepIndex, argIndex, valueIndex) {
+
+    // e = format(e, baseSteps[stepIndex].args[argIndex]['value_type'])
+    dispatch({
+      type: namespace + '/deleteValue',
+      payload: {
+        sectionId: section._id,
+        stepIndex,
+        argIndex,
+        valueIndex,
+      },
+    })
+  }
+
   function updateLayerArgs(value, stepIndex, argIndex, valueIndex) {
     // e = format(e, baseSteps[stepIndex].args[argIndex]['value_type'])
     dispatch({
@@ -435,6 +449,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                     {...{model, dispatch, namespace}}
                     funcs={{
                       addValue: (e) => addValue(e, stepIndex, argIndex, valueIdx + 1),
+                      deleteValue: (e) => deleteValue(e, stepIndex, argIndex, valueIdx),
                       updateValueOfValues: (e) => updateValueOfValues(e, stepIndex, argIndex, valueIdx),
                       updateLayerArgs: (e) => updateLayerArgs(e, stepIndex, argIndex, valueIdx),
                       setLayerDefault: (e) => setLayerDefault(e, stepIndex, argIndex, valueIdx),

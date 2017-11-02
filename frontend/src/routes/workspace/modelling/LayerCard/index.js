@@ -27,6 +27,11 @@ class LayerCard extends React.Component {
       <Card className={`${styles.box} layer-card`} style={style} onClick={onClick} key={`${argIndex}${layerIndex}`}>
         <div className={styles.header}>
           {title}
+          {
+            layerIndex > 0 && layerIndex < arg.values.length - 1 &&
+            <Button shape="circle" icon="close" size='small' style={{ zIndex: 9, float: 'right' }}
+                    onClick={() => funcs.deleteValue()}/>
+          }
         </div>
         <div className={styles.body}>
           <ArgsMapper layerIndex={layerIndex} funcs={funcs} value={value}
