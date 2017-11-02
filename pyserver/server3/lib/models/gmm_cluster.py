@@ -61,6 +61,7 @@ def gmm_cluster_model_fn(features, labels, mode, params, config=None):
                                    eval_metric_ops=eval_metric_ops,
                                    loss=loss, train_op=training_op)
 
+
 GMMSteps = [
     {
         "name": "data_source",
@@ -111,10 +112,10 @@ GMMSteps = [
             },
             {
                 **SPEC.ui_spec['input'],
-                "name" : "random_seed",
+                "name": "random_seed",
                 "display_name": "Random Seed",
-                "des" : "Seed for PRNG used to initialize centers.",
-                "required" : True
+                "des": "Seed for PRNG used to initialize centers.",
+                "required": True
             },
             {
                 **SPEC.ui_spec['choice'],
