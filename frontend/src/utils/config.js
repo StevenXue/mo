@@ -1,11 +1,13 @@
 import CONSTANT from '../constants'
-import logo from '../logo.png'
+import logo from '../blue-logo.png'
+import whiteLogo from '../white-logo.png'
 
 module.exports = {
-  name: "Golder's Green",
+  name: "MO",
   prefix: 'antdAdmin',
-  footerText: "Golder's Green Datalab  © 2017",
+  footerText: "MO Datalab  © 2017",
   logo: logo,
+  whiteLogo: whiteLogo,
   iconFontCSS: '/iconfont.css',
   iconFontJS: '/iconfont.js',
   baseURL: 'http://localhost:8000/api/v1',

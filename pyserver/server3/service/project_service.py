@@ -211,10 +211,11 @@ def get_all_jobs_of_project(project_id, categories, status=None):
                             job_info['results'] = result_sds
                             # FIXME too slow to get metrics status
                             # 已添加索引
-                            job_info['metrics_status'] = \
-                                [sd.to_mongo() for sd in
-                                 staging_data_business.get_by_staging_data_set_id(
-                                     result_sds['_id'])]
+                            metrics_status = [sd.to_mongo() for sd in
+                                              staging_data_business.get_by_staging_data_set_id(
+                                                  result_sds['_id'])]
+                            metrics_status.sort(key=lambda x: x['n'])
+                            job_info['metrics_status'] = metrics_status
                         else:
                             # toolkit results
                             job_info['results'] = result_sds[

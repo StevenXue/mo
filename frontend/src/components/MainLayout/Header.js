@@ -7,7 +7,7 @@ import { Link, routerRedux } from 'dva/router'
 import { FormattedMessage } from 'react-intl'
 import { config } from '../../utils'
 
-const logo = config.logo
+const logo = config.whiteLogo
 
 const SubMenu = Menu.SubMenu
 

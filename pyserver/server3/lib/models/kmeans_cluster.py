@@ -33,6 +33,7 @@ from tensorflow.python.platform import tf_logging as logging
 from tensorflow.python.summary import summary
 from tensorflow.python.training import session_run_hook
 from tensorflow.python.training.session_run_hook import SessionRunArgs
+from server3.constants import SPEC
 
 
 class _LossRelativeChangeHook(session_run_hook.SessionRunHook):
@@ -189,6 +190,124 @@ def kmeans_cluster_model_fn(features, labels, mode, params, config):
         train_op=training_op,
         training_hooks=training_hooks)
 
+
+KmeansSteps = [
+    {
+        "name": "data_source",
+        "display_name": "Select Data Source",
+        "args": [
+            {
+                "name": "input",
+                "des": "Please select input data source",
+                "type": "select_box",
+                "default": None,
+                "required": True,
+                "len_range": [
+                    1,
+                    1
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "feature_fields",
+        "display_name": "Select Feature Fields",
+        "args": [
+            {
+                "name": "fields",
+                "des": "",
+                "required": True,
+                "type": "multiple_choice",
+                "len_range": [
+                    1,
+                    None
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "estimator",
+        "display_name": "Estimator Parameters",
+        'args': [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "num_clusters",
+                "display_name": "Number of Clusters",
+                "des": "number of clusters to train.",
+                "default": 2,
+                "required": True
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name" : "random_seed",
+                "display_name": "Random Seed",
+                "des" : "Seed for PRNG used to initialize centers.",
+                "required" : True
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name": "use_mini_batch",
+                "display_name": "Use Mini Batch",
+                "value_type": "bool",
+                "des": "If true, use the mini-batch k-means algorithm. Else "
+                       "assume full batch."
+            },
+            # {
+            #     "name": "kmeans_plus_plus_num_retries",
+            #     "type": {
+            #         "key": "int",
+            #         "des": "For each point that is sampled during kmeans++ initialization, this parameter specifies the number of additional points to draw from the current distribution before selecting the best. If a negative value is specified, a heuristic is used to sample O(log(num_to_sample)) additional points.",
+            #         "range": null
+            #     },
+            #     "default": 1,
+            #     "required": true
+            # },
+            # {
+            #     "name": "relative_tolerance",
+            #     "type": {
+            #         "key": "float",
+            #         "des": "A relative tolerance of change in the loss between iterations. Stops learning if the loss changes less than this amount. Note that this may not work correctly if use_mini_batch=True.",
+            #         "range": [
+            #             0.0,
+            #             100
+            #         ]
+            #     },
+            #     "default": null,
+            #     "required": false
+            # }
+        ]
+    },
+    {
+        "name": "fit",
+        "display_name": "Fit Parameters",
+        "args": [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "steps",
+                "display_name": "Steps",
+                "des": "Number of steps of training",
+                "default": 400,
+                "required": True
+            },
+        ],
+    },
+    {
+        "name": "evaluate",
+        "display_name": "Evaluate Parameters",
+        "args": [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "steps",
+                "display_name": "Steps",
+                "des": "Number of steps of evaluate",
+                "default": 1,
+                "required": True
+            },
+        ]
+    }
+]
 
 KmeansCluster = {
     'estimator': {

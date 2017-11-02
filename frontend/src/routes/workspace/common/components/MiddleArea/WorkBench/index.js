@@ -8,7 +8,6 @@ const Panel = Collapse.Panel
 import {get, isEqual} from 'lodash'
 import ToolBar from './ToolBar/index'
 import ParamsMapper from '../../../../../../components/ParamsMapper/index'
-import { format } from '../../../../../../utils/base'
 
 import LayerCard from '../../../../modelling/LayerCard/index'
 import {format} from '../../../../../../utils/base'

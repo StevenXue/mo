@@ -67,7 +67,7 @@ def get_all_public_model_by_type():
     models_list = [obj.model.to_mongo().to_dict() for obj in
                    ownership_business.list_ownership_by_type_and_private(
                        'model',
-                       False)]
+                       False) if obj.model.steps]
     models_list.sort(key=lambda x: x['name'])
     return [{'name': TYPE[key],
              'zh_name': ZH_MAP[TYPE[key]],
