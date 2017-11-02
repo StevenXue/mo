@@ -19,6 +19,8 @@ function ArgsMapper({
                         getFieldsValue,
                         getFieldDecorator,
                         validateFields,
+                        setFieldsValue,
+                        resetFields,
                       },
                       funcs: {
                         updateValueOfValues,
@@ -37,7 +39,10 @@ function ArgsMapper({
   //   }
   // }
   //
-  // console.log(layerIndex, value.name)
+  // console.log(layerIndex, value.name, getFieldValue('name'))
+  if(!value.name && getFieldValue('name')) {
+    resetFields()
+  }
   // updateValueOfValues({units: 32, activation: 'relu', input_shape: [1,1]})
 
   return (
@@ -97,8 +102,9 @@ const handleValuesChange = ({
                                 updateLayerArgs,
                               },
                             }, layer) => {
-  console.log('111', layer)
   updateLayerArgs(layer)
 }
+
+
 
 export default Form.create({ onValuesChange: (props, layer) => handleValuesChange(props, layer) })(ArgsMapper)

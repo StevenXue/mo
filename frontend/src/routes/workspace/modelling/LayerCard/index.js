@@ -8,10 +8,19 @@ import styles from './index.less'
 class LayerCard extends React.Component {
   state = {}
 
+  // componentDidUpdate(prevProps) {
+  //   const { layerIndex, arg } = prevProps
+  //   const value = arg.values[layerIndex]
+  //   if (!value.name && this.formRef && this.formRef.getFieldValue('name')) {
+  //     console.log('this.formRef', this.formRef)
+  //     this.formRef.resetFields()
+  //   }
+  // }
+
   render() {
     const {
       title, layerIndex, argIndex, arg, baseStep, style, onClick, model, dispatch, namespace, funcs,
-      featureFields, labelFields
+      featureFields, labelFields,
     } = this.props
 
     const baseArg = baseStep.args[0]
@@ -21,10 +30,15 @@ class LayerCard extends React.Component {
 
     const layers = arg.range
     const value = arg.values[layerIndex]
-    // console.log('values', arg.values)
 
     return (
       <Card className={`${styles.box} layer-card`} style={style} onClick={onClick} key={`${argIndex}${layerIndex}`}>
+        <div className={styles.add}>
+          {
+            layerIndex > 0 &&
+            <Button shape="circle" icon="plus" size='small' style={{ zIndex: 9 }} onClick={() => funcs.addValue({})}/>
+          }
+        </div>
         <div className={styles.header}>
           {title}
           {
@@ -37,13 +51,9 @@ class LayerCard extends React.Component {
           <ArgsMapper layerIndex={layerIndex} funcs={funcs} value={value}
                       featureFields={featureFields}
                       labelFields={labelFields}
+                      // ref={`layer-form-${layerIndex}`}
+                      // wrappedComponentRef={(inst) => this.formRef = inst}
                       layers={layers} last={layerIndex === arg.values.length - 1}/>
-        </div>
-        <div className={styles.add}>
-          {
-            layerIndex < arg.values.length - 1 &&
-            <Button shape="circle" icon="plus" size='small' style={{ zIndex: 9 }} onClick={() => funcs.addValue({})}/>
-          }
         </div>
       </Card>
     )
