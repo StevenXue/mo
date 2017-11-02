@@ -50,7 +50,9 @@ class GetPredictionForm extends React.Component {
           {getFieldDecorator('get_prediction_input', {
             rules: [{required: true, message: 'Please input your data!'}],
           })(
-            <TextArea rows={10} cols={100} placeholder=""/>
+            <TextArea className={styles.inputtext}   style={{  height: '236px',
+              width: '784px'}}
+             placeholder=""/>
           )}
         </FormItem>
         <FormItem>
