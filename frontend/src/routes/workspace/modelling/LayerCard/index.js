@@ -29,7 +29,6 @@ class LayerCard extends React.Component {
           {title}
         </div>
         <div className={styles.body}>
-          {console.log("baseValue1", baseValue)}
           <ArgsMapper layerIndex={layerIndex} funcs={funcs} value={value}
                       featureFields={featureFields}
                       labelFields={labelFields}

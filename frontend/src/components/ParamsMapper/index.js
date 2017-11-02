@@ -118,15 +118,15 @@ const switchComponent = (arg, baseArg) => {
 
 const formItems = (arg, i, getFieldDecorator, baseArg) => {
 
-  let v
+  let v;
   if (arg.value || (arg.values && arg.values.length > 0)) {
     v = arg.value || arg.values
   }
+  console.log("v", v);
 
   return <FormItem
     key={i}
     label={arg.display_name}
-
   >
     {
       getFieldDecorator(arg.name, {
