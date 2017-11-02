@@ -13,7 +13,7 @@ import os
 import subprocess
 from pathlib import Path
 import time
-
+import tensorflow as tf
 import numpy as np
 import pandas as pd
 import simplejson as json
@@ -41,7 +41,6 @@ from server3.constants import NAMESPACE
 from server3.lib import graph
 from server3.lib import model_from_json
 from server3.utility import file_utils
-
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 # user_directory = 'user_directory/'
 
@@ -646,12 +645,13 @@ def export(job_id, user_ID):
     with open(model_dir, 'r') as f:
         data = json.load(f)
         json_string = json.dumps(data)
+        # new_g = tf.Graph()
         with graph.as_default():
             model = model_from_json(json_string)
-            model.load_weights(weights_dir)
+            # model.load_weights(weights_dir)
             # working_dir = MODEL_EXPORT_BASE
             # export_base_path = os.path.join(working_dir, str(result_sds.id))
-            version = keras_saved_model.export(model, result_dir)
+            version = keras_saved_model.export(model, result_dir, weights_dir)
             return result_dir, version
 
 

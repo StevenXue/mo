@@ -3,19 +3,16 @@ import styles from './index.less'
 import {connect} from 'dva'
 
 import {Select, Collapse, Button, Input, Popover, Icon, Tooltip} from 'antd'
-import ToolBar from './ToolBar/index'
-import ParamsMapper from '../../../../../../components/ParamsMapper/index'
-import {format} from '../../../../../../utils/base'
-
-import LayerCard from '../../../../modelling/LayerCard/index'
-import {get, isEqual} from 'lodash'
-
-// import  from '../../../index.less'
-
 const Option = Select.Option
 const Panel = Collapse.Panel
+import {get, isEqual} from 'lodash'
 
+import ToolBar from './ToolBar/index'
+import ParamsMapper from '../../../../../../components/ParamsMapper/index'
+import LayerCard from '../../../../modelling/LayerCard/index'
+import {format} from '../../../../../../utils/base'
 import {translateDict} from '../../../../../../constants'
+
 
 function getArgs(baseSteps, stepIndex, argIndex) {
 
@@ -135,7 +132,6 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
   }
 
   function handleOnChangeArgs(e, stepIndex, argIndex) {
-
     e = format(e, baseSteps[stepIndex].args[argIndex]['value_type'])
     dispatch({
       type: namespace + '/setParameter',
@@ -149,7 +145,6 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
   }
 
   function setValue(value, stepIndex, argIndex) {
-
     dispatch({
       type: namespace + '/setValue',
       payload: {
@@ -162,7 +157,6 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
   }
 
   function addValue(value, stepIndex, argIndex, valueIndex) {
-
     // e = format(e, baseSteps[stepIndex].args[argIndex]['value_type'])
     dispatch({
       type: namespace + '/addValue',
@@ -191,7 +185,6 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
   }
 
   function setLayerDefault(value, stepIndex, argIndex, valueIndex) {
-
     // e = format(e, baseSteps[stepIndex].args[argIndex]['value_type'])
     for (let key in value) {
       let idx = sectionsJson[sectionId].steps[stepIndex].args[argIndex].values[valueIndex].args.findIndex(e => e.name === key)
@@ -317,8 +310,6 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                     <p className={styles.text}>{fieldName}</p>
                   </div>
                 )
-
-
               })
             })
           }
@@ -332,77 +323,76 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
     )
   }
 
-  function secondFieldSelector(datasourceStep, step, stepIndex, LastStep) {
-    return (
-      <div>
-        <div className={styles.fields}>
-          {
-            step.args.map((arg, argIndex) => {
-              const values = arg.values;
-              const lastValues = LastStep.args[argIndex].values;
-
-              let fields = get(datasourceStep, `args[${argIndex}].fields`, []);
-              return fields.map((field) => {
-                const fieldName = field[0];
-
-                if (lastValues.includes(fieldName)) {
-                  return (
-                    <div key={fieldName}
-                         className={styles.field}
-                         style={{
-                           backgroundColor: 'grey',
-                           color: mouseOverField === fieldName ? 'green' : 'grey',
-                         }}
-                         onMouseOver={() => handleMouseOverField(fieldName)}
-                         onMouseLeave={() => handleMouseLeaveField()}>
-                      <p className={styles.text}>{fieldName}</p>
-                    </div>
-                  )
-                }
-
-                return (
-                  <div key={fieldName}
-                       className={styles.field}
-                       onClick={() => handleClickField(fieldName, stepIndex, argIndex)}
-                       style={{
-                         backgroundColor: values.includes(fieldName) ? '#34C0E2' : '#F3F3F3',
-                         color: mouseOverField === fieldName ? 'green' : 'grey',
-                       }}
-                       onMouseOver={() => handleMouseOverField(fieldName)}
-                       onMouseLeave={() => handleMouseLeaveField()}>
-                    <p className={styles.text}>{fieldName}</p>
-                  </div>
-                )
-
-                // if(values.includes(fieldName)){
-                //   return (
-                //     <div key={fieldName}
-                //          className={styles.field}
-                //          onClick={() => handleClickField(fieldName, stepIndex, argIndex)}
-                //          style={{
-                //            backgroundColor: (arg.values).includes(fieldName) ? '#34C0E2' : '#F3F3F3',
-                //            color: mouseOverField === fieldName ? 'green' : 'grey',
-                //          }}
-                //          onMouseOver={() => handleMouseOverField(fieldName)}
-                //          onMouseLeave={() => handleMouseLeaveField()}>
-                //       <p className={styles.text}>{fieldName}</p>
-                //     </div>
-                //   )
-                // }
-
-
-              })
-            })
-          }
-        </div>
-        <div className={styles.end_button}>
-          {
-            LastOrRunButton(stepIndex, stepLength)
-          }
-        </div>
-      </div>)
-  }
-
+  // function secondFieldSelector(datasourceStep, step, stepIndex, LastStep) {
+  //   return (
+  //     <div>
+  //       <div className={styles.fields}>
+  //         {
+  //           step.args.map((arg, argIndex) => {
+  //             const values = arg.values;
+  //             const lastValues = LastStep.args[argIndex].values;
+  //
+  //             let fields = get(datasourceStep, `args[${argIndex}].fields`, []);
+  //             return fields.map((field) => {
+  //               const fieldName = field[0];
+  //
+  //               if (lastValues.includes(fieldName)) {
+  //                 return (
+  //                   <div key={fieldName}
+  //                        className={styles.field}
+  //                        style={{
+  //                          backgroundColor: 'grey',
+  //                          color: mouseOverField === fieldName ? 'green' : 'grey',
+  //                        }}
+  //                        onMouseOver={() => handleMouseOverField(fieldName)}
+  //                        onMouseLeave={() => handleMouseLeaveField()}>
+  //                     <p className={styles.text}>{fieldName}</p>
+  //                   </div>
+  //                 )
+  //               }
+  //
+  //               return (
+  //                 <div key={fieldName}
+  //                      className={styles.field}
+  //                      onClick={() => handleClickField(fieldName, stepIndex, argIndex)}
+  //                      style={{
+  //                        backgroundColor: values.includes(fieldName) ? '#34C0E2' : '#F3F3F3',
+  //                        color: mouseOverField === fieldName ? 'green' : 'grey',
+  //                      }}
+  //                      onMouseOver={() => handleMouseOverField(fieldName)}
+  //                      onMouseLeave={() => handleMouseLeaveField()}>
+  //                   <p className={styles.text}>{fieldName}</p>
+  //                 </div>
+  //               )
+  //
+  //               // if(values.includes(fieldName)){
+  //               //   return (
+  //               //     <div key={fieldName}
+  //               //          className={styles.field}
+  //               //          onClick={() => handleClickField(fieldName, stepIndex, argIndex)}
+  //               //          style={{
+  //               //            backgroundColor: (arg.values).includes(fieldName) ? '#34C0E2' : '#F3F3F3',
+  //               //            color: mouseOverField === fieldName ? 'green' : 'grey',
+  //               //          }}
+  //               //          onMouseOver={() => handleMouseOverField(fieldName)}
+  //               //          onMouseLeave={() => handleMouseLeaveField()}>
+  //               //       <p className={styles.text}>{fieldName}</p>
+  //               //     </div>
+  //               //   )
+  //               // }
+  //
+  //
+  //             })
+  //           })
+  //         }
+  //       </div>
+  //       <div className={styles.end_button}>
+  //         {
+  //           LastOrRunButton(stepIndex, stepLength)
+  //         }
+  //       </div>
+  //     </div>)
+  // }
 
   function getTitle(valueIndex, length) {
     if (valueIndex === 0) {
@@ -429,10 +419,10 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                     layerIndex={valueIdx}
                     argIndex={argIndex}
                     arg={arg}
-                    baseStep={baseSteps[stepIndex]}
+                    baseValue={baseSteps[stepIndex].args[argIndex].range.find(e => e.name === value['name'])}
                     featureFields={featureFields}
                     labelFields={labelFields}
-                    {...{model, dispatch, namespace}}
+                    {...{model, dispatch, namespace, stepIndex, argIndex, valueIdx}}
                     funcs={{
                       addValue: (e) => addValue(e, stepIndex, argIndex, valueIdx + 1),
                       updateValueOfValues: (e) => updateValueOfValues(e, stepIndex, argIndex, valueIdx),
@@ -464,6 +454,8 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
         <ParamsMapper args={step.args}
                       setValue={(value, argIndex) => setValue(value, stepIndex, argIndex)}
                       setValueDefault={(value) => setValueDefault(value, stepIndex)}
+                      baseArgs={baseSteps[stepIndex].args}
+                      {...{stepIndex}}
         />
         <div className={styles.end_button}>
           {
@@ -553,59 +545,54 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
 
   function setting(args, stepIndex) {
     return (
-      args.map((arg, argIndex)=>{
+      args.map((arg, argIndex) => {
 
       })
     )
   }
 
-  // function parameters(step, stepIndex) {
-  //   return (
-  //     <div>
-  //       <ParamsMapper args={step.args} setValue={(value, argIndex) => setValue(value, stepIndex, argIndex)}/>
-  //       <div className={styles.end_button}>
-  //         {
-  //           LastOrRunButton(stepIndex, stepLength)
-  //         }
-  //       </div>
-  //     </div>
-  //   );
-  //   // return (
-  //   //   <div>
-  //   //     {
-  //   //       step.args.map((arg, argIndex) =>
-  //   //         <div className={styles.pair} key={arg.name + argIndex}>
-  //   //                           <span>
-  //   //                             {getArgs(baseSteps, stepIndex, argIndex).display_name}
-  //   //                           </span>
-  //   //           <div className={styles.row}>
-  //   //             <Input placeholder="" defaultValue={arg.value}
-  //   //                    onChange={(e) => handleOnChangeArgs(e.target.value, stepIndex, argIndex)}/>
-  //   //
-  //   //
-  //   //             <div className={styles.help}>
-  //   //               <Tooltip title={getArgs(baseSteps, stepIndex, argIndex).des}>
-  //   //                 <Icon type="question-circle-o"/>
-  //   //               </Tooltip>
-  //   //
-  //   //               {/*<Popover content={content(getArgs(baseSteps, stepIndex, argIndex).des)}*/}
-  //   //               {/*title="Help info">*/}
-  //   //               {/*<Icon type="question-circle-o"/>*/}
-  //   //               {/*</Popover>*/}
-  //   //             </div>
-  //   //
-  //   //           </div>
-  //   //         </div>,
-  //   //       )
-  //   //     }
-  //   //     <div className={styles.end_button}>
-  //   //       {
-  //   //         LastOrRunButton(stepIndex, stepLength)
-  //   //       }
-  //   //     </div>
-  //   //   </div>
-  //   // )
-  // }
+  // todo tooltip 还没加
+
+  function parameters(step, stepIndex) {
+    return (
+      <div>
+        <ParamsMapper args={step.args} setValue={(value, argIndex) => setValue(value, stepIndex, argIndex)}/>
+        <div className={styles.end_button}>
+          {
+            LastOrRunButton(stepIndex, stepLength)
+          }
+        </div>
+      </div>
+    );
+    return (
+      <div>
+        {
+          step.args.map((arg, argIndex) =>
+            <div className={styles.pair} key={arg.name + argIndex}>
+                              <span>
+                                {getArgs(baseSteps, stepIndex, argIndex).display_name}
+                              </span>
+              <div className={styles.row}>
+                <Input placeholder="" defaultValue={arg.value}
+                       onChange={(e) => handleOnChangeArgs(e.target.value, stepIndex, argIndex)}/>
+                <div className={styles.help}>
+                  <Tooltip title={getArgs(baseSteps, stepIndex, argIndex).des}>
+                    <Icon type="question-circle-o"/>
+                  </Tooltip>
+                </div>
+
+              </div>
+            </div>,
+          )
+        }
+        <div className={styles.end_button}>
+          {
+            LastOrRunButton(stepIndex, stepLength)
+          }
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div>

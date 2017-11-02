@@ -518,6 +518,10 @@ def run_toolkit(project_id, staging_data_set_id, toolkit_id,
                              fields, index_nan, job_obj, *argv, **conf)
     return result
 
+# 将toolkit保存的result 存入stagingdata set
+def save_result(job_id):
+    pass
+
 
 def add_toolkit_with_ownership(name, description, target_py_code,
                                entry_function, parameter_spec, user_ID,

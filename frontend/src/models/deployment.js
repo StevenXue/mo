@@ -100,6 +100,7 @@ export default {
     },
 
     showLoading(state, action) {
+
       return {
         ...state,
         loadingState: action.payload.loadingState,
@@ -124,19 +125,25 @@ export default {
     },
 
     // changeModelStatus
-    changeModelStatus(state, action) {
+    changeModelStatus: function (state, action) {
       let newInfo = {
         ...state.modelsJson[state.focusModelId]['served_model'],
         status: action.payload.status,
-        server:action.payload.server,
+        server: action.payload.server,
       };
+      // 使用新的 server 替换旧的，防止 用户undeploy后又resume导致server信息不更新的问题
+      let how_to_use_code = state.modelsJson[state.focusModelId]['how_to_use_code'];
+      for (let each_code of Object.keys(how_to_use_code)) {
+        how_to_use_code[each_code]=how_to_use_code[each_code].replace(/\"[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*\:[0-9]*/,'"'+action.payload.server)
+      }
       return {
         ...state,
         modelsJson: {
           ...state.modelsJson,
           [state.focusModelId]: {
             ...state.modelsJson[state.focusModelId],
-            ['served_model']: newInfo
+            ['how_to_use_code']:how_to_use_code,
+            ['served_model']: newInfo,
           }
         }
       }

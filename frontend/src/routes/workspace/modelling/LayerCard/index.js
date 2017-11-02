@@ -10,11 +10,11 @@ class LayerCard extends React.Component {
 
   render() {
     const {
-      title, layerIndex, argIndex, arg, baseStep, style, onClick, model, dispatch, namespace, funcs,
+      title, layerIndex, argIndex, arg, baseValue, style, onClick, model, dispatch, namespace, funcs,
       featureFields, labelFields
     } = this.props
 
-    const baseArg = baseStep.args[0]
+    // const baseArg = baseStep.args[0]
     // const arg = step.args[0]
 
     // console.log('ln', layerName)
@@ -29,9 +29,11 @@ class LayerCard extends React.Component {
           {title}
         </div>
         <div className={styles.body}>
+          {console.log("baseValue1", baseValue)}
           <ArgsMapper layerIndex={layerIndex} funcs={funcs} value={value}
                       featureFields={featureFields}
                       labelFields={labelFields}
+                      baseValue={baseValue}
                       layers={layers} last={layerIndex === arg.values.length - 1}/>
         </div>
         <div className={styles.add}>

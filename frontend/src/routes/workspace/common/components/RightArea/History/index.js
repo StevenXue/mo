@@ -3,48 +3,33 @@ import styles from './index.less';
 import {connect} from 'dva';
 import {Card} from 'antd';
 import {get} from 'lodash'
-// const data = [
-//   {
-//     content: '111',
-//     time: new Date(2011)
-//   },
-//   {
-//     content: '1112',
-//     time: new Date(2012)
-//   }
-// ];
 
 function History({history}) {
 
   const {
     historyList,
     category
-
   } = history;
 
+  // save temp data string using for decide whether next date has new title
   let dateString;
 
   return (
     <div className={styles.container}>
-
-
       {historyList.map((e) => {
-        const content = get(e,`${category}.description`, null);
+          const content = get(e, `${category}.description`, null);
+          const createTime = e.create_time;
 
-        if (e.create_time.substring(0, 10) !== dateString) {
-            dateString = e.create_time.substring(0, 10);
+          if (createTime.substring(0, 10) !== dateString) {
+            dateString = createTime.substring(0, 10);
             let displayDate = dateString;
-
             let now = new Date();
-            let year = now.getFullYear();
 
-            let date = now.getDate();
-            let month = now.getMonth();
             if (`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}` === dateString) {
-              displayDate = 'Today';
+              displayDate = 'TODAY';
             }
             if (`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate() - 1}` === dateString) {
-              displayDate = 'Yesterday';
+              displayDate = 'YESTERDAY';
             }
 
             return <div key={e._id}>
@@ -56,9 +41,8 @@ function History({history}) {
                   <div className={styles.content}>
                     {content}
                   </div>
-
                   <div>
-                    {e.create_time.substring(11, 16)}
+                    {createTime.substring(11, 16)}
                   </div>
                 </div>
               </Card>
@@ -71,20 +55,15 @@ function History({history}) {
                   <div className={styles.content}>
                     {content}
                   </div>
-
                   <div>
-
-                    {e.create_time.substring(11, 16)}
+                    {createTime.substring(11, 16)}
                   </div>
                 </div>
               </Card>
             )
           }
-
         }
       )}
-
-
     </div>
   );
 }

@@ -2,12 +2,13 @@
  * choose toolkit
  */
 import React, {Component} from 'react'
-import styles from './index.less'
 import {connect} from 'dva'
 
 import {Tabs, Card, Icon, Spin} from 'antd'
 
 const TabPane = Tabs.TabPane;
+
+import styles from './index.less'
 
 function callback(key) {
   console.log(key);
@@ -15,20 +16,7 @@ function callback(key) {
 
 
 class Launcher extends Component {
-
-  // // change state
-  // addSection = (section) => {
-  //   this.props.dispatch({
-  //     type: this.props.namespace + '/addSection',
-  //     payload: {
-  //
-  //     },
-  //   })
-  // };
-
-
   onClick = (e) => {
-
     this.props.dispatch({
       type: this.props.namespace + '/addSection',
       payload: {
@@ -38,11 +26,6 @@ class Launcher extends Component {
       },
     });
 
-
-    // this.addSection({
-    //   sectionId: this.props.sectionId,
-    //   section_type: e.name,
-    // })
   };
 
   render() {
@@ -54,37 +37,28 @@ class Launcher extends Component {
           Choose a {this.props.step} to start
         </h1>
         <Spin spinning={this.props.model.spinLoading.getAlgorithms}>
-
           <Tabs defaultActiveKey="1" onChange={callback}
-                tabBarStyle={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}
-          >
-
-
+                tabBarStyle={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
             {this.props.model.algorithms.map((category, index) =>
-
               <TabPane tab={category.name} key={index}>
                 {category.children.map((e, i) =>
                   <Card key={e.name + i} onClick={() => this.onClick(e,)}
                         style={{
                           margin: 10,
                           backgroundColor: '#F8F8F8',
-                        }}
-                  >
+                        }}>
                     <div className={styles.card_area}>
                       <div>
                         <div className='custom-title-font'>{e.name}</div>
                         <div className='custom-text-font'>{e.description}</div>
                       </div>
                     </div>
-                  </Card>,
+                  </Card>
                 )}
-              </TabPane>,
+              </TabPane>
             )}
-
-
           </Tabs>
         </Spin>
-
       </div>
     )
   }
