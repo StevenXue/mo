@@ -68,6 +68,7 @@ def get_all_public_model_by_type():
                    ownership_business.list_ownership_by_type_and_private(
                        'model',
                        False)]
+    models_list.sort(key=lambda x: x['name'])
     return [{'name': TYPE[key],
              'zh_name': ZH_MAP[TYPE[key]],
              'children': [model_obj for model_obj in models_list
@@ -925,6 +926,22 @@ def _update_model():
         }
     }
 
+    MLP = {
+        "name": "Multilayer Perceptron",
+        "description": "Multilayer Perceptron (MLP) for multi-class softmax classification",
+        "target_py_code": "server3/lib/models/mlp.py",
+        "entry_function": "mlp",
+        "to_code_function": "mlp_to_str",
+        "category": 0,
+        "model_type": 1,
+        "steps": models.MLP_STEPS,
+        "parameter_spec": models.MLP,
+        "input": {
+            "type": "ndarray",
+            "n": None
+        }
+    }
+
     LinearRegressor = {
         "name": "Linear Regressor",
         "description": "Custom linear regression model",
@@ -935,6 +952,21 @@ def _update_model():
         "model_type": 0,
         "steps": models.LinearRegressorSteps,
         "parameter_spec": models.LinearRegressor,
+        "input": {
+            "type": "DataFrame"
+        }
+    }
+
+    LinearClassifier = {
+        "name": "Linear Classifier",
+        "description": "Custom linear classifier model",
+        "target_py_code": "server3/lib/models/linear_classifier.py",
+        "entry_function": "linear_classifier_model_fn",
+        "to_code_function": "custom_model_to_str",
+        "category": 1,
+        "model_type": 1,
+        "steps": models.LinearClassifierSteps,
+        "parameter_spec": models.LinearClassifier,
         "input": {
             "type": "DataFrame"
         }
@@ -955,6 +987,18 @@ def _update_model():
             "user_ID": user.user_ID,
             "obj": LinearRegressor
         },
+        {
+            "_id": ObjectId("5980378d0c11f318f61ce18a"),
+            "is_private": False,
+            "user_ID": user.user_ID,
+            "obj": LinearClassifier
+        },
+        {
+            "_id": ObjectId("596f5c8bd123ab59405c6e11"),
+            "is_private": False,
+            "user_ID": user.user_ID,
+            "obj": MLP
+        },
     ]
 
     for model in MODEL_DICT:
@@ -970,13 +1014,11 @@ def _update_model():
             print('Added:', add_model_with_ownership(**obj))
         else:
             if model_obj:
-                print(model_obj)
                 # update model
                 model_id = model.get('_id')
-                # print(model.get('obj').keys())
                 print('Updated:', model_business.update_by_id(model_id,
                                                               **model.get(
-                                                                  'obj')))
+                                                                  'obj')).name)
 
 
 if __name__ == '__main__':

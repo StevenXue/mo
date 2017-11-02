@@ -19,6 +19,8 @@ class MetricsHandler(logging.StreamHandler):
     """
     result_sds = None
     job_id = None
+    project_id = None
+    user_ID = None
 
     def emit(self, record):
         msg = self.format(record)
@@ -60,4 +62,6 @@ class MetricsHandler(logging.StreamHandler):
                 if is_val == -1 and is_tra == -1:
                     return
                 logger_service.log_epoch_end(n, log_obj, self.result_sds,
-                                             self.job_id)
+                                             self.project_id,
+                                             job_id=self.job_id,
+                                             user_ID=self.user_ID)
