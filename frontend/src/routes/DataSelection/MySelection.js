@@ -51,7 +51,7 @@ class MySelection extends React.Component {
     const { history, match } = this.props
     console.log(history)
     // console.log(match)
-    history.push('import/choice')
+    history.push(`/workspace/${match.params.projectID}/import/choice`)
   }
 
   renderCards (privacy, category) {

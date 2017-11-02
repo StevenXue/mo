@@ -45,10 +45,11 @@ class DataPreview extends React.Component {
 
   onSelect (value, e) {
     this.props.dispatch({type: 'upload/setField', payload: {[e]: value}})
-    console.log(this.props.upload.fields)
+
   }
 
   onSave() {
+    console.log(this.props.upload.fields)
     this.props.dispatch({type: 'upload/submit'})
   }
 
