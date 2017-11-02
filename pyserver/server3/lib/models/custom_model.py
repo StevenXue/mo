@@ -16,6 +16,8 @@ from tensorflow.contrib.learn.python.learn.estimators import estimator
 from server3.utility import input_fn_utils
 from server3.constants import MODEL_EXPORT_BASE
 from server3.lib.models.modified_tf_file.monitors import ValidationMonitor
+from server3.business import ownership_business
+from server3.business import project_business
 
 # 修改了 metric_spec 的部分内容，
 # 源代码为
@@ -55,7 +57,11 @@ def custom_model(conf, model_fn, input_data, **kw):
     :param kw:
     :return:
     """
+    project_id = kw.pop('project_id', None)
     job_id = kw.pop('job_id', None)
+    project = project_business.get_by_id(project_id)
+    ow = ownership_business.get_ownership_by_owned_item(project, 'project')
+    user_ID = ow.user.user_ID
     result_sds = kw.pop('result_sds', None)
     result_dir = kw.pop('result_dir', None)
     est_params = conf.get('estimator', None)
@@ -69,13 +75,16 @@ def custom_model(conf, model_fn, input_data, **kw):
 
     # def eval_input_fn():
     #     return input_fn(test, continuous_cols, categorical_cols, label_col)
-    return custom_model_help(model_fn, input_data, job_id, result_dir,
+    return custom_model_help(model_fn, input_data, project_id, job_id,
+                             user_ID,
+                             result_dir,
                              result_sds,
                              est_params, fit_params,
                              eval_params)
 
 
-def custom_model_help(model_fn, input_data, job_id, result_dir, result_sds,
+def custom_model_help(model_fn, input_data, project_id, job_id, user_ID,
+                      result_dir, result_sds,
                       est_params=None, fit_params=None,
                       eval_params=None):
     tf.logging.set_verbosity(tf.logging.INFO)
@@ -84,7 +93,9 @@ def custom_model_help(model_fn, input_data, job_id, result_dir, result_sds,
     mh = MetricsHandler()
     # pass result staging data set for logger to save results
     mh.result_sds = result_sds
+    mh.project_id = project_id
     mh.job_id = job_id
+    mh.user_ID = user_ID
     logger = logging.getLogger('tensorflow')
     logger.setLevel(logging.DEBUG)
     logger.addHandler(mh)
@@ -208,7 +219,7 @@ def custom_model_help(model_fn, input_data, job_id, result_dir, result_sds,
 
 
 def custom_model_to_str(conf, head_str, **kw):
-    job_id = kw.get('job_id', None)
+    project_id = kw.get('project_id', None)
     result_sds = kw.get('result_sds', None)
     est_params = conf.get('estimator', None)['args']
     fit_params = conf.get('fit', {})
@@ -216,7 +227,7 @@ def custom_model_to_str(conf, head_str, **kw):
     result_sds_id = result_sds['id']
     str_model = ''
     str_model += head_str
-    str_model += "job_id = '%s'\n" % job_id
+    str_model += "project_id = '%s'\n" % project_id
     str_model += "result_sds = staging_data_set_business.get_by_id('%s')\n" % \
                  result_sds_id
     str_model += inspect.getsource(get_input_fn)
@@ -232,7 +243,7 @@ def custom_model_to_str(conf, head_str, **kw):
         custom_model_help_str.replace("**eval_params['args']",
                                       generate_args_str(eval_params['args']))
     str_model += custom_model_help_str
-    str_model += 'print(custom_model_help(model_fn, input_dict, job_id, ' \
+    str_model += 'print(custom_model_help(model_fn, input_dict, project_id, ' \
                  'result_sds))'
     return str_model
 

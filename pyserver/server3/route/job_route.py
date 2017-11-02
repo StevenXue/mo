@@ -69,7 +69,7 @@ def create_job():
 @job_app.route("/job_steps", methods=["PUT"])
 def update_job_steps():
     data = request.get_json()
-    print("data", data)
+    # print("data", data)
     job_id, steps, active_steps = ObjectId(data["_id"]), data['steps'], data[
         'active_steps']
     result = job_business.update_job_steps(job_id, steps, active_steps)

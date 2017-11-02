@@ -17,6 +17,8 @@ from itertools import compress
 
 import numpy as np
 from bson import ObjectId
+from itertools import compress
+from mongoengine import DoesNotExist
 
 from server3.business import job_business
 from server3.business import model_business
@@ -345,17 +347,19 @@ def create_model_job(project_id, staging_data_set_id, model_obj,
             project_business.update_items_to_list_field(
                 project_id, related_tasks=model_obj.category)
             # create result sds for model
-            sds_name = '%s_%s_result_%s' % (model_obj['name'], job_obj[
-                'id'], str(random.randint(0, 99999)))
-            result_sds_obj = staging_data_set_business.add(sds_name, 'des',
-                                                           project_obj,
-                                                           job=job_obj,
-                                                           type='result')
-            # result_sds_obj = staging_data_set_business.get_or_create(job_obj,
-            #                                                          sds_name,
-            #                                                          'des',
-            #                                                          project_obj,
-            #                                                          type='result')
+            sds_name = '%s_%s_result' % (model_obj['name'], job_obj['id'])
+            try:
+                sds = staging_data_set_business.get_by_job_id(job_obj.id)
+            except DoesNotExist:
+                print('free to create sds')
+            else:
+                staging_data_set_business.remove_by_id(sds.id)
+            finally:
+                result_sds_obj = staging_data_set_business.add(sds_name, 'des',
+                                                               project_obj,
+                                                               job=job_obj,
+                                                               type='result')
+
             # run
             if result_dir:
                 # result_dir += str(job_obj['id']) + '/'
@@ -459,47 +463,77 @@ def toolkit_steps_to_obj(job_obj, project_id):
 
 
 def model_steps_to_obj(job_obj, project_id):
+    """
+    convert model steps config to running object
+    :param job_obj:
+    :param project_id:
+    :return:
+    """
     model_obj = job_obj.model
     steps = job_obj.steps
+
     conf = {}
+    fit_idx = None
+    layers_idx = None
+    est_idx = None
+
+    for i, step in enumerate(steps):
+        if step.get('name') == 'fit':
+            fit_idx = i
+        if step.get('name') == 'layers':
+            layers_idx = i
+        if step.get('name') == 'estimator':
+            est_idx = i
+    if not fit_idx:
+        raise Exception('Error: no fit step')
+
+    for step in steps[fit_idx:]:
+        conf.update({step.get('name'):
+                         {'args':
+                              {arg.get('name'): arg.get('value')
+                                                or arg.get('values')
+                                                or arg.get('default')
+                               for arg in step['args']}}
+                     })
     if model_obj.category == 0:
-        for step in steps[4:]:
-            conf.update({step.get('name'):
-                             {'args':
-                                  {arg.get('name'): arg.get('value')
-                                                    or arg.get('values')
-                                                    or arg.get('default')
-                                   for arg in step['args']}}
-                         })
+
         conf['fit'].update({
             "data_fields":
                 [steps[1]["args"][0]["values"],
                  steps[2]["args"][0]["values"]]
         })
-        conf['layers'] = [{
-            'name': layer.get('name'),
-            'args': {arg.get('name'): arg.get('value')
-                                      or arg.get('values')
-                                      or arg.get('default')
-                     for arg in layer.get('args')}
-        }
-            for layer in steps[3]['args'][0]['values']]
+        if layers_idx:
+            conf['layers'] = [{
+                'name': layer.get('name'),
+                'args': {arg.get('name'): arg.get('value')
+                                          or arg.get('values')
+                                          or arg.get('default')
+                         for arg in layer.get('args')}
+            }
+                for layer in steps[layers_idx]['args'][0]['values']]
     elif model_obj.category == 1:
-        for step in steps[3:]:
-            conf.update({step.get('name'):
-                             {'args':
-                                  {arg.get('name'): arg.get('value')
-                                                    or arg.get('values')
-                                                    or arg.get('default')
-                                   for arg in step['args']}}
-                         })
+
         conf['fit'].update({
             "data_fields":
                 [steps[1]["args"][0]["values"],
                  steps[2]["args"][0]["values"]]
         })
+        if est_idx:
+            conf['estimator'] = {'args':
+                                     {arg.get('name'): arg.get('value')
+                                                       or arg.get('values')
+                                                       or arg.get('default')
+                                      for arg in steps[est_idx]['args']}}
     elif model_obj.category == 2:
-        pass
+        conf['fit'].update({
+            "data_fields": steps[1]["args"][0]["values"]
+        })
+        if est_idx:
+            conf['estimator'] = {'args':
+                                     {arg.get('name'): arg.get('value')
+                                                       or arg.get('values')
+                                                       or arg.get('default')
+                                      for arg in step['args']}}
 
     obj = {
         "data_source_id": job_obj.steps[0]["args"][0]["value"],
@@ -509,6 +543,7 @@ def model_steps_to_obj(job_obj, project_id):
         "schema": "rand",
         "ratio": 0.7
     }
+    print('modelling obj', obj)
     return obj
 
 
@@ -543,7 +578,8 @@ def run_toolkit_job(job_obj, project_id):
     fields = [x_fields, y_fields]
     conf = conf.get('args')
 
-    result = toolkit_service.run_toolkit(project_id, staging_data_set_id, toolkit_id,
+    result = toolkit_service.run_toolkit(project_id, staging_data_set_id,
+                                         toolkit_id,
                                          fields, data, conf, job_obj)
     result.update({"fields": [x_fields, y_fields]})
     return result
@@ -579,7 +615,8 @@ def run_job(obj, job_obj):
         fields = [x_fields, y_fields]
         conf = conf.get('args')
 
-        result = toolkit_service.run_toolkit(project_id, staging_data_set_id, toolkit_id,
+        result = toolkit_service.run_toolkit(project_id, staging_data_set_id,
+                                             toolkit_id,
                                              fields, data, conf, job_obj)
         result.update({"fields": [x_fields, y_fields]})
         return result

@@ -13,6 +13,7 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
 
   const {
     metrics_status,
+    batch,
     visual_sds_id,
     [translateDict[namespace]]: {
       name,
@@ -87,8 +88,12 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
         <div>
           <ResultButton visual_sds_id={visual_sds_id}
                         data={metrics_status}
+                        batch={batch}
                         result={result}
                         namespace={namespace}
+                        model={model}
+                        dispatch={dispatch}
+                        sectionId={sectionId}
           />
         </div>
 

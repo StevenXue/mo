@@ -12,6 +12,8 @@ from server3.service.keras_callbacks import MongoModelCheckpoint
 from server3.service.keras_callbacks import MyModelCheckpoint
 from server3.utility.str_utility import generate_args_str
 from server3.service.saved_model_services import keras_saved_model
+from server3.business import ownership_business
+from server3.business import project_business
 from server3.constants import SPEC
 
 
@@ -22,12 +24,16 @@ def keras_seq(conf, input, **kw):
     :return:
     """
     result_sds = kw.pop('result_sds', None)
+    project_id = kw.pop('project_id', None)
     job_id = kw.pop('job_id', None)
+    project = project_business.get_by_id(project_id)
+    ow = ownership_business.get_ownership_by_owned_item(project, 'project')
+    user_ID = ow.user.user_ID
     result_dir = kw.pop('result_dir', None)
     if result_sds is None:
         raise RuntimeError('no result sds id passed to model')
-    if job_id is None:
-        raise RuntimeError('no job id passed to model')
+    if project_id is None:
+        raise RuntimeError('no project id passed to model')
     with graph.as_default():
         model = Sequential()
 
@@ -66,19 +72,25 @@ def keras_seq(conf, input, **kw):
                                               logger_service.log_epoch_begin(
                                                   epoch, logs,
                                                   result_sds,
-                                                  job_id),
+                                                  project_id,
+                                                  job_id=job_id,
+                                                  user_ID=user_ID),
                                               on_epoch_end=
                                               lambda epoch, logs:
                                               logger_service.log_epoch_end(
                                                   epoch, logs,
                                                   result_sds,
-                                                  job_id),
+                                                  project_id,
+                                                  job_id=job_id,
+                                                  user_ID=user_ID),
                                               on_batch_end=
                                               lambda batch, logs:
                                               logger_service.log_batch_end(
                                                   batch, logs,
                                                   result_sds,
-                                                  job_id)
+                                                  project_id,
+                                                  job_id=job_id,
+                                                  user_ID=user_ID)
                                               )
 
         # checkpoint to save best weight
@@ -126,7 +138,7 @@ def keras_seq_to_str(obj, head_str, **kw):
     # in the first layer, you must specify the expected input data shape:
     # here, 20-dimensional vectors.
     result_sds = kw.pop('result_sds', None)
-    job_id = kw.pop('job_id', None)
+    project_id = kw.pop('project_id', None)
     if result_sds is None:
         raise RuntimeError('no result_sds created')
 
@@ -165,11 +177,11 @@ def keras_seq_to_str(obj, head_str, **kw):
 
     str_model += "result_sds = staging_data_set_business.get_by_id('%s')\n" % \
                  result_sds['id']
-    str_model += "job_id = '%s'\n" % job_id
+    str_model += "project_id = '%s'\n" % project_id
     # callback
     str_model += "batch_print_callback = LambdaCallback(on_epoch_end=lambda " \
                  "epoch, \\\nlogs: logger_service.log_epoch_end(epoch, " \
-                 "logs, result_sds, job_id))\n"
+                 "logs, result_sds, project_id))\n"
     str_model += "best_checkpoint = MongoModelCheckpoint(" \
                  "result_sds=result_sds, verbose=0, save_best_only=True)\n"
     str_model += "general_checkpoint = MongoModelCheckpoint(" \
@@ -557,9 +569,9 @@ KERAS_SEQ_STEPS = [
                 "required": True
             },
             {
-                **SPEC.ui_spec['choice'],
+                **SPEC.ui_spec['multiple_choice'],
                 "name": "metrics",
-                "Name": "Metrics",
+                "display_name": "Metrics",
                 "des": "A metric is a function that is used to judge the "
                        "performance of your model",
                 "range": ["acc",

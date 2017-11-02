@@ -22,7 +22,7 @@ clip_norm = 1.0
 
 def convnet(conf, input, **kw):
     result_sds = kw.pop('result_sds', None)
-    job_id = kw.pop('job_id', None)
+    project_id = kw.pop('project_id', None)
     f = conf['fit']
     e = conf['evaluate']
     x_train = input['x_tr']
@@ -39,7 +39,8 @@ def convnet(conf, input, **kw):
         model.add(SimpleRNN(hidden_units,
                             kernel_initializer=initializers.RandomNormal(
                                 stddev=0.001),
-                            recurrent_initializer=initializers.Identity(gain=1.0),
+                            recurrent_initializer=initializers.Identity(
+                                gain=1.0),
                             activation='relu',
                             input_shape=x_train.shape[1:]))
         model.add(Dense(num_classes))
@@ -51,13 +52,15 @@ def convnet(conf, input, **kw):
         # callback to save metrics
         batch_print_callback = LambdaCallback(on_epoch_end=
                                               lambda epoch, logs:
-                                              logger_service.log_epoch_end(epoch,
-                                                                           logs,
-                                                                           result_sds,
-                                                                           job_id))
+                                              logger_service.log_epoch_end(
+                                                  epoch,
+                                                  logs,
+                                                  result_sds,
+                                                  project_id))
 
         # checkpoint to save best weight
-        best_checkpoint = MongoModelCheckpoint(result_sds=result_sds, verbose=0,
+        best_checkpoint = MongoModelCheckpoint(result_sds=result_sds,
+                                               verbose=0,
                                                save_best_only=True)
         # checkpoint to save latest weight
         general_checkpoint = MongoModelCheckpoint(result_sds=result_sds,

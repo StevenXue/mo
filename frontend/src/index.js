@@ -1,4 +1,5 @@
 import dva from 'dva';
+import '../node_modules/highlight.js/styles/mono-blue.css'
 import './global.less';
 import './index.less';
 

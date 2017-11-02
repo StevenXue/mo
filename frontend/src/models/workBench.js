@@ -47,9 +47,24 @@ export default {
       getAlgorithms: false,
       wholePage: false,
     },
+    resultVisible: false
 
   },
   reducers: {
+    hideResult(state, action) {
+      return {
+        ...state,
+        resultVisible: false
+      }
+    },
+
+    showResult(state, action) {
+      return {
+        ...state,
+        resultVisible: true
+      }
+    },
+
     // 改变 left_side_bar
     toggleLeftSideBar(state, action) {
       return {

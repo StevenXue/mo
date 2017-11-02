@@ -16,12 +16,19 @@ from server3.service.keras_callbacks import MongoModelCheckpoint
 from server3.service.keras_callbacks import MyModelCheckpoint
 from server3.utility.str_utility import generate_args_str
 from server3.service.saved_model_services import keras_saved_model
+from server3.business import ownership_business
+from server3.business import project_business
+from server3.constants import SPEC
 
 
 def mlp(conf, input, **kw):
     result_sds = kw.pop('result_sds', None)
-    job_id = kw.pop('job_id', None)
+    project_id = kw.pop('project_id', None)
     result_dir = kw.pop('result_dir', None)
+    job_id = kw.pop('job_id', None)
+    project = project_business.get_by_id(project_id)
+    ow = ownership_business.get_ownership_by_owned_item(project, 'project')
+    user_ID = ow.user.user_ID
     f = conf['fit']
     e = conf['evaluate']
     x_train = input['x_tr']
@@ -32,12 +39,12 @@ def mlp(conf, input, **kw):
     y_test = input['y_te']
 
     with graph.as_default():
-        return mlp_main(result_sds, job_id, result_dir, x_train, y_train,
-                        x_val, y_val, x_test, y_test, f, e)
+        return mlp_main(result_sds, project_id, job_id, user_ID, result_dir,
+                        x_train,  y_train, x_val, y_val, x_test, y_test, f, e)
 
 
-def mlp_main(result_sds, job_id, result_dir, x_train, y_train, x_val,
-             y_val, x_test, y_test, f=None, e=None):
+def mlp_main(result_sds, project_id, job_id, user_ID, result_dir, x_train,
+             y_train, x_val,  y_val, x_test, y_test, f=None, e=None):
     input_len = x_train.shape[1]
     output_len = y_train.shape[1]
 
@@ -65,19 +72,25 @@ def mlp_main(result_sds, job_id, result_dir, x_train, y_train, x_val,
                                           logger_service.log_epoch_begin(
                                               epoch, logs,
                                               result_sds,
-                                              job_id),
+                                              project_id,
+                                              job_id=job_id,
+                                              user_ID=user_ID),
                                           on_epoch_end=
                                           lambda epoch, logs:
                                           logger_service.log_epoch_end(
                                               epoch, logs,
                                               result_sds,
-                                              job_id),
+                                              project_id,
+                                              job_id=job_id,
+                                              user_ID=user_ID),
                                           on_batch_end=
                                           lambda batch, logs:
                                           logger_service.log_batch_end(
                                               batch, logs,
                                               result_sds,
-                                              job_id)
+                                              project_id,
+                                              job_id=job_id,
+                                              user_ID=user_ID)
                                           )
 
     # checkpoint to save best weight
@@ -125,7 +138,7 @@ def mlp_to_str(conf, head_str, **kw):
     # in the first layer, you must specify the expected input data shape:
     # here, 20-dimensional vectors.
     result_sds = kw.pop('result_sds', None)
-    job_id = kw.pop('job_id', None)
+    project_id = kw.pop('project_id', None)
     f = conf['fit']
     e = conf['evaluate']
     if result_sds is None:
@@ -143,18 +156,110 @@ def mlp_to_str(conf, head_str, **kw):
     str_model += head_str
     str_model += "result_sds = staging_data_set_business.get_by_id('%s')\n" % \
                  result_sds['id']
-    str_model += "job_id = '%s'\n" % job_id
+    str_model += "project_id = '%s'\n" % project_id
     mlp_main_str = inspect.getsource(mlp_main)
     mlp_main_str = mlp_main_str.replace("**f['args']",
                                         generate_args_str(f['args']))
     mlp_main_str = mlp_main_str.replace("**e['args']",
                                         generate_args_str(e['args']))
     str_model += mlp_main_str
-    str_model += 'print(mlp_main(result_sds, job_id, x_train, y_train, ' \
+    str_model += 'print(mlp_main(result_sds, project_id, x_train, y_train, ' \
                  'x_val, y_val, x_test, y_test))\n'
     print(str_model)
     return str_model
 
+
+MLP_STEPS = [
+    {
+        "name": "data_source",
+        "display_name": "Select Data Source",
+        "args": [
+            {
+                "name": "input",
+                "des": "Please select input data source",
+                "type": "select_box",
+                "default": None,
+                "required": True,
+                "len_range": [
+                    1,
+                    1
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "feature_fields",
+        "display_name": "Select Feature Fields",
+        "args": [
+            {
+                "name": "fields",
+                "des": "",
+                "required": True,
+                "type": "multiple_choice",
+                "len_range": [
+                    1,
+                    None
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "label_fields",
+        "display_name": "Select Label Fields",
+        "args": [
+            {
+                "name": "fields",
+                "des": "",
+                "type": "multiple_choice",
+                "required": True,
+                "len_range": [
+                    1,
+                    None
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "fit",
+        "display_name": "Fit Parameters",
+        "args": [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "batch_size",
+                "display_name": "Batch Size",
+                "des": "Number of samples per gradient update for model "
+                       "training",
+                "default": 32,
+                "required": True
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name": "epochs",
+                "display_name": "Epochs",
+                "des": "Number of epochs of model training",
+                "default": 10,
+                "required": True
+            },
+        ],
+    },
+    {
+        "name": "evaluate",
+        "display_name": "Evaluate Parameters",
+        "args": [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "batch_size",
+                "display_name": "Batch Size",
+                "des": "Number of samples per gradient update for evaluate",
+                "default": 32,
+                "required": True
+            },
+        ]
+    }
+]
 
 MLP = {
     "fit": {
