@@ -32,6 +32,10 @@ def get_by_query_str(staging_data_set_id, **kwargs):
     return staging_data_business.get_by_query_str(**kwargs)
 
 
+def get_first_one_by_staging_data_set_id(staging_data_set_id):
+    return staging_data_business.get_first_one_by_staging_data_set_id(staging_data_set_id)
+
+
 def list_staging_data_sets_by_project_id(project_id, without_result=False):
     """
     Get the list of staging_data_set by project id

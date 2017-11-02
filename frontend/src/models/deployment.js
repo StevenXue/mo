@@ -9,7 +9,7 @@ export default {
   state: {
     //用户拥有的 models
     modelsJson: [],
-    loadingState:false,
+    loadingState: false,
   },
   reducers: {
     // 获取所有的models
@@ -133,16 +133,20 @@ export default {
       };
       // 使用新的 server 替换旧的，防止 用户undeploy后又resume导致server信息不更新的问题
       let how_to_use_code = state.modelsJson[state.focusModelId]['how_to_use_code'];
-      for (let each_code of Object.keys(how_to_use_code)) {
-        how_to_use_code[each_code]=how_to_use_code[each_code].replace(/\"[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*\:[0-9]*/,'"'+action.payload.server)
+      if (action.payload.status === 'serving') {
+        for (let each_code of Object.keys(how_to_use_code)) {
+          how_to_use_code[each_code] = how_to_use_code[each_code].replace(/\"[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*\:[0-9]*/, '"' + action.payload.server)
+        }
       }
+      console.log('action.payload.server')
+      console.log(action.payload.server)
       return {
         ...state,
         modelsJson: {
           ...state.modelsJson,
           [state.focusModelId]: {
             ...state.modelsJson[state.focusModelId],
-            ['how_to_use_code']:how_to_use_code,
+            ['how_to_use_code']: how_to_use_code,
             ['served_model']: newInfo,
           }
         }
@@ -164,62 +168,69 @@ export default {
 
     // 首次部署模型
     * firstDeployModel(action, {call, put, select}) {
-      yield put({type: 'showLoading', payload: {loadingState:true}});
+      yield put({type: 'showLoading', payload: {loadingState: true}});
       const focusModelId = yield select(state => state.deployment.focusModelId);
       const user_ID = yield select(state => state.login.user.user_ID);
+      const model_name = yield select(state => state.deployment.modelsJson[focusModelId]['model']['name']);
+
       let payload = action.payload;
       payload.jobID = focusModelId;
       payload.user_ID = user_ID;
+      payload.model_name=model_name;
       yield call(deploymentService.firstDeployModel, payload);
-      yield put({type: 'showLoading', payload: {loadingState:false}});
+      yield put({type: 'showLoading', payload: {loadingState: false}});
     },
 
     // 更新部署模型的信息
     * undateDeployModelInfo(action, {call, put, select}) {
-      yield put({type: 'showLoading', payload: {loadingState:true}});
+      yield put({type: 'showLoading', payload: {loadingState: true}});
       let payload = action.payload;
       const {data: result} = yield call(deploymentService.updateDeployModelInfo, payload);
       if (result === 'updated') {
         yield put({type: 'setModelHowToUse', payload: payload});
       }
-      yield put({type: 'showLoading', payload: {loadingState:false}});
+      yield put({type: 'showLoading', payload: {loadingState: false}});
     },
 
     // 部署Model
     * resumeModel(action, {call, put, select}) {
-      yield put({type: 'showLoading', payload: {loadingState:true}});
+      yield put({type: 'showLoading', payload: {loadingState: true}});
       const user_ID = yield select(state => state.login.user.user_ID);
       const focusModelId = yield select(state => state.deployment.focusModelId);
       const model_name = yield select(state => state.deployment.modelsJson[focusModelId]['model']['name']);
 
       let payload = action.payload;
       payload.user_ID = user_ID;
-      payload.model_name=model_name;
+      payload.model_name = model_name;
       const {data: result} = yield call(deploymentService.resumeModel, payload)
       if (result) {
-        yield put({type: 'changeModelStatus', payload: {status:'serving',server:result}});
+        yield put({
+          type: 'changeModelStatus',
+          payload: {status: 'serving', server: result}
+        });
       }
-      yield put({type: 'showLoading', payload: {loadingState:false}});
+      yield put({type: 'showLoading', payload: {loadingState: false}});
     },
 
     // 取消部署Model
     * undeployModel(action, {call, put, select}) {
-      yield put({type: 'showLoading', payload: {loadingState:true}});
+      yield put({type: 'showLoading', payload: {loadingState: true}});
       const {data: result} = yield call(deploymentService.undeployModel, action.payload);
       if (result === 'terminated') {
-        yield put({type: 'changeModelStatus', payload: {status:'terminated'}});
+        yield put({type: 'changeModelStatus', payload: {status: 'terminated'}});
       }
-      yield put({type: 'showLoading', payload: {loadingState:false}});
+      yield put({type: 'showLoading', payload: {loadingState: false}});
     },
     // 获得预测值
     * getPrediction(action, {call, put, select}) {
       const user_ID = yield select(state => state.login.user.user_ID);
       let payload = action.payload;
       const focusModelId = yield select(state => state.deployment.focusModelId);
-      payload.served_model_id= yield select(state => state.deployment.modelsJson[focusModelId]['served_model']['_id']);
-      payload.server=yield select(state => state.deployment.modelsJson[focusModelId]['served_model']['server']);
+      payload.served_model_id = yield select(state => state.deployment.modelsJson[focusModelId]['served_model']['_id']);
+      payload.server = yield select(state => state.deployment.modelsJson[focusModelId]['served_model']['server']);
       // payload.name=yield select(state => state.deployment.modelsJson[focusModelId]['served_model']['name']);
-      payload.model_name=yield select(state => state.deployment.modelsJson[focusModelId]['model']['name']);
+      payload.model_name = yield select(state => state.deployment.modelsJson[focusModelId]['model']['name']);
+      payload.features= yield select(state => state.deployment.modelsJson[focusModelId]['params']['fit']['data_fields'][0]);
       const {data: result} = yield call(deploymentService.getPrediction, payload);
       yield put({type: 'getPredictionR', payload: result});
     },
@@ -232,6 +243,8 @@ export default {
         const match = pathToRegexp('/workspace/:projectId/deploy').exec(pathname);
         if (match) {
           const projectId = match[1];
+          console.log('projectId')
+          console.log(projectId)
           dispatch({
             type: 'fetchModels',
             payload: {projectId: projectId, categories: 'model'},
