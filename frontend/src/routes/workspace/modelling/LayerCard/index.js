@@ -8,22 +8,13 @@ import styles from './index.less'
 class LayerCard extends React.Component {
   state = {}
 
-  // componentDidUpdate(prevProps) {
-  //   const { layerIndex, arg } = prevProps
-  //   const value = arg.values[layerIndex]
-  //   if (!value.name && this.formRef && this.formRef.getFieldValue('name')) {
-  //     console.log('this.formRef', this.formRef)
-  //     this.formRef.resetFields()
-  //   }
-  // }
-
   render() {
     const {
-      title, layerIndex, argIndex, arg, baseStep, style, onClick, model, dispatch, namespace, funcs,
+      title, layerIndex, argIndex, arg, baseValue, style, onClick, model, dispatch, namespace, funcs,
       featureFields, labelFields,
     } = this.props
 
-    const baseArg = baseStep.args[0]
+    // const baseArg = baseStep.args[0]
     // const arg = step.args[0]
 
     // console.log('ln', layerName)
@@ -48,11 +39,11 @@ class LayerCard extends React.Component {
           }
         </div>
         <div className={styles.body}>
+          {console.log("baseValue1", baseValue)}
           <ArgsMapper layerIndex={layerIndex} funcs={funcs} value={value}
                       featureFields={featureFields}
                       labelFields={labelFields}
-                      // ref={`layer-form-${layerIndex}`}
-                      // wrappedComponentRef={(inst) => this.formRef = inst}
+                      baseValue={baseValue}
                       layers={layers} last={layerIndex === arg.values.length - 1}/>
         </div>
       </Card>

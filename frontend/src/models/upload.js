@@ -43,7 +43,7 @@ export default {
         if (match) {
           dispatch({ type: 'fetch' })
         }
-        const match2 = pathToRegexp('/workspace/:projectId/import/list').exec(pathname);
+        const match2 = pathToRegexp('/workspace/:projectId/import').exec(pathname);
         if (match2) {
           dispatch({ type: 'staged' })
         }
@@ -104,12 +104,11 @@ export default {
       const data = yield call(uploadFile, formData)
       console.log(data)
       message.success('upload success')
-
-
       console.log('44')
 
       yield put({ type: 'setDataSetID', payload: data.data.data_set })
-      console.log(data.data.data_set)
+      yield put({type: 'setDataSetName', payload: payload.data_set_name })
+      yield put({type: 'setDataSetDesc', payload: payload.description})
       yield put( {type: 'show'})
     },
 
@@ -169,20 +168,27 @@ export default {
       const res = yield call(stateData, dataSetID, prjID, dsname, dsdes)
       console.log(res)
       yield put({type: 'staged'})
-      yield put(routerRedux.push('list'))
+      const url0 = location.hash.substr(1).replace('list', '')
+      yield put(routerRedux.replace(url0))
 
     },
 
     * staged (action, { put, call, select }) {
       const prjID = location.hash.split('/')[2]
       const res = yield call(fetchStagingDataSet, prjID)
-      // console.log(res.data)
-      yield put({type: 'setStagingDataSet', payload: res.data})
-      const sds = yield select(state => state.upload.stagingDataSet)
-      console.log(sds)
-      // yield put(routerRedux.push('list'))
-      yield put({type:'setAddLoading', payload: false})
-      yield put({type:'setSaveLoading', payload: false})
+      const url0 = location.hash.substr(1).replace('list', '')
+      console.log(location.hash.split('/')[3])
+
+      if (res.data.length === 0) {
+        yield put(routerRedux.push('import/choice'))
+      } else {
+        yield put({type: 'setStagingDataSet', payload: res.data})
+        console.log(res.data)
+        // yield put(routerRedux.push('list'))
+        yield put({type:'setAddLoading', payload: false})
+        yield put({type:'setSaveLoading', payload: false})
+      }
+
     }
 
   },

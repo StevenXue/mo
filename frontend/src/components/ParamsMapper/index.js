@@ -1,8 +1,18 @@
 import React from 'react'
-import { Form, Button, Select, Input } from 'antd'
+import {Form, Button, Select, Input, Tooltip, Icon} from 'antd'
 import styles from './index.less'
 
 const FormItem = Form.Item
+
+function getArgs(baseSteps, stepIndex, argIndex) {
+
+  if (argIndex !== undefined) {
+    return baseSteps[stepIndex].args[argIndex]
+  } else {
+    return baseSteps[stepIndex]
+  }
+
+}
 
 const valueParser = {
   int: (e) => JSON.parse(e),
@@ -57,37 +67,57 @@ const splitHandler = (e, type, valueType) => {
   }
 }
 
-const switchComponent = (arg) => {
+const switchComponent = (arg, baseArg) => {
   switch (arg.type) {
     case 'multiple_input':
     case 'input':
-      return <Input/>
+      return <div className={styles.row}>
+        <Input/>
+        <div className={styles.help}>
+          <Tooltip title={baseArg.des}>
+            <Icon type="question-circle-o"/>
+          </Tooltip>
+        </div>
+      </div>
     case 'choice':
       return (
-        <Select style={{ width: 142 }}>
-          {
-            arg.range.map((option) =>
-              <Select.Option value={option} key={option}>{option}</Select.Option>,
-            )
-          }
-        </Select>
-      )
+        <div className={styles.row}>
+          <Select style={{width: 142}}>
+            {
+              arg.range.map((option) =>
+                <Select.Option value={option} key={option}>{option}</Select.Option>,
+              )
+            }
+          </Select>
+          <div className={styles.help}>
+            <Tooltip title={baseArg.des}>
+              <Icon type="question-circle-o"/>
+            </Tooltip>
+          </div>
+        </div>)
     case 'multiple_choice':
-      return (
-        <Select style={{ width: 142 }} mode='multiple'>
-          {
-            arg.range.map((option) =>
-              <Select.Option value={option} key={option}>{option}</Select.Option>,
-            )
-          }
-        </Select>
+      return (<div className={styles.row}>
+          <Select style={{width: 142}} mode='multiple'>
+            {
+              arg.range.map((option) =>
+                <Select.Option value={option} key={option}>{option}</Select.Option>,
+              )
+            }
+          </Select>
+          <div className={styles.help}>
+            <Tooltip title={baseArg.des}>
+              <Icon type="question-circle-o"/>
+            </Tooltip>
+          </div>
+        </div>
       )
     default:
       return <Input/>
   }
 }
 
-const formItems = (arg, i, getFieldDecorator) => {
+const formItems = (arg, i, getFieldDecorator, baseArg) => {
+
   let v
   if (arg.value || (arg.values && arg.values.length > 0)) {
     v = arg.value || arg.values
@@ -96,6 +126,7 @@ const formItems = (arg, i, getFieldDecorator) => {
   return <FormItem
     key={i}
     label={arg.display_name}
+
   >
     {
       getFieldDecorator(arg.name, {
@@ -103,12 +134,11 @@ const formItems = (arg, i, getFieldDecorator) => {
         getValueFromEvent: (value) => splitHandler(value, arg.type, arg.value_type),
         rules: [
           {
-            required: arg.required,
-            message: `need ${arg.value_type || ''} ${arg.type}`,
+            required: arg.required, message: `need ${arg.value_type || ''} ${arg.type}`,
             type: typeParser(arg.type, arg.value_type),
           },
         ],
-      })(switchComponent(arg))
+      })(switchComponent(arg, baseArg))
     }
   </FormItem>
 }
@@ -116,9 +146,8 @@ const formItems = (arg, i, getFieldDecorator) => {
 function ParamsMapper({
                         args,
                         layerIndex,
-                        layers,
-                        value,
-                        setValueDefault,
+                        baseArgs,
+                        stepIndex,
                         form: {
                           getFieldValue,
                           getFieldsValue,
@@ -140,18 +169,18 @@ function ParamsMapper({
           // if (arg.value || (arg.values && arg.values.length > 0)) {
           //   setValueDefault({ [arg.name]: v })
           // }
-          return formItems(arg, i, getFieldDecorator)
+          return formItems(arg, i, getFieldDecorator, baseArgs[i])
         })
       }
     </Form>
   )
 }
 
-const handleValuesChange = ({ setValue }, values) => {
+const handleValuesChange = ({setValue}, values) => {
   setValue(values)
 }
 
-export default Form.create({ onValuesChange: (props, values) => handleValuesChange(props, values) })(ParamsMapper)
+export default Form.create({onValuesChange: (props, values) => handleValuesChange(props, values)})(ParamsMapper)
 export {
   formItems
 }

@@ -107,10 +107,8 @@ export default {
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
         const match = pathToRegexp('/login').exec(pathname)
-        if (!match) {
-          dispatch({ type: 'query' })
-        }
-        // dispatch({ type: 'handleSocket', payload: { message:'', pathname } })
+        if (!match) {dispatch({ type: 'query' })}
+        //dispatch({ type: 'handleSocket', payload: { message:'', pathname } })
         const userId = localStorage.getItem('user_ID')
         if (userId) {
           const socket = io.connect(flaskServer + '/log/' + userId)

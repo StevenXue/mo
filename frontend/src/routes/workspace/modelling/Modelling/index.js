@@ -4,12 +4,11 @@ import {connect} from 'dva';
 import Common from '../../common/Common/index'
 
 
-
 function Modelling({location, dispatch, modelling}) {
   const props = {
     model: modelling,
     namespace: 'modelling',
-    dispatch:  dispatch,
+    dispatch: dispatch,
     step: 'model'
   };
   return (

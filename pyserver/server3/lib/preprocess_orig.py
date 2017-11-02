@@ -14,6 +14,8 @@ import numpy as np
 import pandas as pd
 from sklearn import preprocessing, feature_selection, decomposition
 from sklearn.feature_selection.from_model import _get_feature_importances as get_importance
+
+
 # -----------------------
 
 
@@ -149,7 +151,9 @@ def select_k_best_pearson(arr0, target, k):
     from scipy.stats import pearsonr
     matrix = np.array(arr0)
     target = np.array(target)
-    temp = feature_selection.SelectKBest(lambda X, Y: np.array(list(map(lambda x: abs(pearsonr(x, Y)[0]), X.T))), k=k).fit(matrix, target)
+    temp = feature_selection.SelectKBest(
+        lambda X, Y: np.array(list(map(lambda x: abs(pearsonr(x, Y)[0]), X.T))), k=k).fit(matrix,
+                                                                                          target)
     scores = temp.scores_.tolist()
     indx = temp.get_support().tolist()
     # result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
@@ -170,7 +174,9 @@ def select_k_best_mic(arr0, target, k):
         m = MINE()
         m.compute_score(x, y)
         return (m.mic(), 0.5)
-    temp = feature_selection.SelectKBest(lambda X, Y: np.array(list(map(lambda x: mic(x, Y), X.T))).T[0], k=k).fit(matrix, target)
+
+    temp = feature_selection.SelectKBest(
+        lambda X, Y: np.array(list(map(lambda x: mic(x, Y), X.T))).T[0], k=k).fit(matrix, target)
     scores = temp.scores_.tolist()
     indx = temp.get_support().tolist()
     # result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
@@ -185,7 +191,8 @@ def ref(arr0, target, n_features):
     from sklearn.linear_model import LogisticRegression
     matrix = np.array(arr0)
     target = np.array(target)
-    temp = feature_selection.RFE(estimator=LogisticRegression(), n_features_to_select=n_features).fit(matrix, target)
+    temp = feature_selection.RFE(estimator=LogisticRegression(),
+                                 n_features_to_select=n_features).fit(matrix, target)
     scores = temp.ranking_.tolist()
     indx = temp.support_.tolist()
     # result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)
@@ -200,7 +207,8 @@ def select_from_model_lr(arr0, target):
     from sklearn.linear_model import LogisticRegression
     matrix = np.array(arr0)
     target = np.array(target)
-    temp = feature_selection.SelectFromModel(LogisticRegression(penalty="l1", C=0.1)).fit(matrix, target)
+    temp = feature_selection.SelectFromModel(LogisticRegression(penalty="l1", C=0.1)).fit(matrix,
+                                                                                          target)
     indx = temp._get_support_mask().tolist()
     scores = get_importance(temp.estimator_).tolist()
     # threthold = temp.threshold_
@@ -242,6 +250,52 @@ def lda(arr0, target, n_components):
     return label, coef.tolist(), mean.tolist(), priors.tolist(), scalings.tolist(), xbar.tolist()
 
 
-#
+# 合并添加列
 def add_columns_append():
     pass
+
+
+# 合并添加行
+def add_rows_append(target_table, source_table, **kwargs):
+    """
+    把两张表纵向拼起来，取target_table的fields
+
+
+    :param target_table:
+    :type target_table:
+    :param source_table:
+    :type source_table:
+    :param kwargs:
+    :type kwargs:
+    :return:
+    :rtype:
+    """
+    # 无数据的单元格填充
+    empty_cell_filling = None
+
+    target = np.array(target_table)
+    source = np.array(source_table)
+    print("target", target)
+
+    pass
+
+
+def test_add_rows_append():
+    from server3.business import staging_data_business
+    def sds_data_to_table(data):
+        return [d.to_mongo().to_dict() for d in data]
+
+    target_sds_id = '59c21d71d845c0538f0faeb2'
+    target_data = staging_data_business.get_by_staging_data_set_id(target_sds_id)
+    source_data = staging_data_business.get_by_staging_data_set_and_fields(
+        staging_data_set_id=target_sds_id,
+        fields=['Attention', 'Attention_dimension_reduction_PCA_col']
+    )
+    add_rows_append(
+        target_table=sds_data_to_table(target_data),
+        source_table=sds_data_to_table(source_data)
+    )
+
+
+if __name__ == '__main__':
+    test_add_rows_append()

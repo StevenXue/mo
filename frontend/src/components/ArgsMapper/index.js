@@ -14,6 +14,7 @@ function ArgsMapper({
                       last,
                       featureFields,
                       labelFields,
+                      baseValue,
                       form: {
                         getFieldValue,
                         getFieldsValue,
@@ -89,8 +90,8 @@ function ArgsMapper({
           } else if (last && arg.name === 'units' && labelFields.length > 0) {
             setLayerDefault({ [arg.name]: labelFields.length })
           }
-
-          return formItems(arg, i, getFieldDecorator)
+          console.log("baseArg.args", baseValue);
+          return formItems(arg, i, getFieldDecorator, baseValue.args[i])
         })
       }
     </Form>
