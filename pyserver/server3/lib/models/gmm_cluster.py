@@ -13,6 +13,8 @@ from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import state_ops
 from tensorflow.python.ops.control_flow_ops import with_dependencies
 from server3.lib.models.modified_tf_file import gmm_ops
+from server3.constants import SPEC
+
 
 def parse_tensor_or_dict(features):
     if isinstance(features, dict):
@@ -59,6 +61,113 @@ def gmm_cluster_model_fn(features, labels, mode, params, config=None):
                                    eval_metric_ops=eval_metric_ops,
                                    loss=loss, train_op=training_op)
 
+GMMSteps = [
+    {
+        "name": "data_source",
+        "display_name": "Select Data Source",
+        "args": [
+            {
+                "name": "input",
+                "des": "Please select input data source",
+                "type": "select_box",
+                "default": None,
+                "required": True,
+                "len_range": [
+                    1,
+                    1
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "feature_fields",
+        "display_name": "Select Feature Fields",
+        "args": [
+            {
+                "name": "fields",
+                "des": "",
+                "required": True,
+                "type": "multiple_choice",
+                "len_range": [
+                    1,
+                    None
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "estimator",
+        "display_name": "Estimator Parameters",
+        'args': [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "num_clusters",
+                "display_name": "Number of Clusters",
+                "des": "number of clusters to train.",
+                "default": 2,
+                "required": True
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name" : "random_seed",
+                "display_name": "Random Seed",
+                "des" : "Seed for PRNG used to initialize centers.",
+                "required" : True
+            },
+            {
+                **SPEC.ui_spec['choice'],
+                "name": "covariance_type",
+                "display_name": "Covariance Type",
+                "des": "one of 'full', 'diag'",
+                "range": ["full", "diag"],
+                "default": "full",
+                "required": True
+            },
+            {
+                **SPEC.ui_spec['multiple_choice'],
+                "name": "update_params",
+                "display_name": "Update Params",
+                "des": "Controls which parameters are "
+                       "updated in the training process.Can "
+                       "contain any combination of 'w' for "
+                       "weights, 'm' for means, and 'c' for covars",
+                "range": ["w", "m", 'c'],
+                "default": ["w", "m", 'c'],
+                "required": True
+            }
+        ]
+    },
+    {
+        "name": "fit",
+        "display_name": "Fit Parameters",
+        "args": [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "steps",
+                "display_name": "Steps",
+                "des": "Number of steps of training",
+                "default": 400,
+                "required": True
+            },
+        ],
+    },
+    {
+        "name": "evaluate",
+        "display_name": "Evaluate Parameters",
+        "args": [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "steps",
+                "display_name": "Steps",
+                "des": "Number of steps of evaluate",
+                "default": 1,
+                "required": True
+            },
+        ]
+    }
+]
 
 GMMCluster = {
     'estimator': {

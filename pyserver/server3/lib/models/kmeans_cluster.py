@@ -254,29 +254,24 @@ KmeansSteps = [
                 "des": "If true, use the mini-batch k-means algorithm. Else "
                        "assume full batch."
             },
-            # {
-            #     "name": "kmeans_plus_plus_num_retries",
-            #     "type": {
-            #         "key": "int",
-            #         "des": "For each point that is sampled during kmeans++ initialization, this parameter specifies the number of additional points to draw from the current distribution before selecting the best. If a negative value is specified, a heuristic is used to sample O(log(num_to_sample)) additional points.",
-            #         "range": null
-            #     },
-            #     "default": 1,
-            #     "required": true
-            # },
-            # {
-            #     "name": "relative_tolerance",
-            #     "type": {
-            #         "key": "float",
-            #         "des": "A relative tolerance of change in the loss between iterations. Stops learning if the loss changes less than this amount. Note that this may not work correctly if use_mini_batch=True.",
-            #         "range": [
-            #             0.0,
-            #             100
-            #         ]
-            #     },
-            #     "default": null,
-            #     "required": false
-            # }
+            {
+                **SPEC.ui_spec['input'],
+                "name": "kmeans_plus_plus_num_retries",
+                "display_name": "Kmeans Plus Plus Num Retries",
+                "des": "For each point that is sampled during kmeans++ initialization, this parameter specifies the number of additional points to draw from the current distribution before selecting the best. If a negative value is specified, a heuristic is used to sample O(log(num_to_sample)) additional points.",
+                "default": 1,
+                "required": True
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name": "relative_tolerance",
+                "display_name": "Relative Tolerance",
+                "value_type": "float",
+                "range": [
+                    0.0,
+                    100
+                ],
+            }
         ]
     },
     {

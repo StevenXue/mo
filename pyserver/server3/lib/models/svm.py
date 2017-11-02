@@ -12,6 +12,7 @@ from tensorflow.contrib.framework.python.ops import \
 from tensorflow.python.ops import array_ops
 from tensorflow.python.framework import constant_op
 from tensorflow.python.framework import sparse_tensor
+from server3.constants import SPEC
 
 
 def _add_bias_column(feature_columns, columns_to_tensors, bias_variable,
@@ -44,11 +45,13 @@ def _add_bias_column(feature_columns, columns_to_tensors, bias_variable,
                                                      dtype=dtypes.float32)
     columns_to_variables[bias_column] = [bias_variable]
 
+
 def parse_tensor_or_dict(features):
     if isinstance(features, dict):
         return array_ops.concat([features[k] for k in sorted(features.keys())],
                                 1)
     return features
+
 
 def example_id_column(features):
     # if feature is a dict
@@ -56,7 +59,8 @@ def example_id_column(features):
         lenth = list(features.values())[0].get_shape().as_list()
         results = list(map(str, list(range(lenth[0]))))
         features['index'] = constant_op.constant(results)
-    # print(features['index'])
+        # print(features['index'])
+
 
 def svm_model_fn(features, labels, mode, params):
     """A model_fn for linear models that use the SDCA optimizer.
@@ -163,6 +167,138 @@ def svm_model_fn(features, labels, mode, params):
                                   [update_weights_hook]))
     return model_fn_ops
 
+
+SVMSteps = [
+    {
+        "name": "data_source",
+        "display_name": "Select Data Source",
+        "args": [
+            {
+                "name": "input",
+                "des": "Please select input data source",
+                "type": "select_box",
+                "default": None,
+                "required": True,
+                "len_range": [
+                    1,
+                    1
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "feature_fields",
+        "display_name": "Select Feature Fields",
+        "args": [
+            {
+                "name": "fields",
+                "des": "",
+                "required": True,
+                "type": "multiple_choice",
+                "len_range": [
+                    1,
+                    None
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "label_fields",
+        "display_name": "Select Label Fields",
+        "args": [
+            {
+                "name": "fields",
+                "des": "",
+                "type": "multiple_choice",
+                "required": True,
+                "len_range": [
+                    1,
+                    None
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "estimator",
+        "display_name": "Estimator Parameters",
+        'args': [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "example_id_column",
+                "display_name": "Example Id Column",
+                "value_type": "str",
+                "des": "A string defining the feature column name "
+                       "representing example ids. Used to initialize the underlying optimizer.",
+                "default": "index",
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name": "weight_column_name",
+                "display_name": "Weight Column Name",
+                "value_type": "str",
+                "des": "A string defining feature column name "
+                       "representing "
+                       "weights. It is used to down weight or boost "
+                       "examples during training. It will be multiplied "
+                       "by "
+                       "the loss of the example."
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name": "l1_regularization",
+                "display_name": "L1 Regularization",
+                "value_type": "float",
+                "des": "L1-regularization parameter. Refers to global L1 regularization (across all examples).",
+                "default": 0.0,
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name": "L2 Regularization",
+                "value_type": "float",
+                "des": "L2-regularization parameter. Refers to global L1 regularization (across all examples).",
+                "default": 0.0,
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name": "num_loss_partitions",
+                "display_name": "Num Loss Partitions",
+                "des": "number of partitions of the (global) loss function optimized by the underlying optimizer (SDCAOptimizer). num_loss_partitions defines the number of partitions of the global loss function",
+                "default": 1,
+            }
+        ]
+    },
+    {
+        "name": "fit",
+        "display_name": "Fit Parameters",
+        "args": [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "steps",
+                "display_name": "Steps",
+                "des": "Number of steps of training",
+                "default": 400,
+                "required": True
+            },
+        ],
+    },
+    {
+        "name": "evaluate",
+        "display_name": "Evaluate Parameters",
+        "args": [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "steps",
+                "display_name": "Steps",
+                "des": "Number of steps of evaluate",
+                "default": 1,
+                "required": True
+            },
+        ]
+    }
+]
 
 SVM = {
     'estimator': {
