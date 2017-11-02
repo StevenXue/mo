@@ -11,7 +11,7 @@ class LayerCard extends React.Component {
   render() {
     const {
       title, layerIndex, argIndex, arg, baseValue, style, onClick, model, dispatch, namespace, funcs,
-      featureFields, labelFields
+      featureFields, labelFields,
     } = this.props
 
     // const baseArg = baseStep.args[0]
@@ -21,12 +21,22 @@ class LayerCard extends React.Component {
 
     const layers = arg.range
     const value = arg.values[layerIndex]
-    // console.log('values', arg.values)
 
     return (
       <Card className={`${styles.box} layer-card`} style={style} onClick={onClick} key={`${argIndex}${layerIndex}`}>
+        <div className={styles.add}>
+          {
+            layerIndex > 0 &&
+            <Button shape="circle" icon="plus" size='small' style={{ zIndex: 9 }} onClick={() => funcs.addValue({})}/>
+          }
+        </div>
         <div className={styles.header}>
           {title}
+          {
+            layerIndex > 0 && layerIndex < arg.values.length - 1 &&
+            <Button shape="circle" icon="close" size='small' style={{ zIndex: 9, float: 'right' }}
+                    onClick={() => funcs.deleteValue()}/>
+          }
         </div>
         <div className={styles.body}>
           <ArgsMapper layerIndex={layerIndex} funcs={funcs} value={value}
@@ -34,12 +44,6 @@ class LayerCard extends React.Component {
                       labelFields={labelFields}
                       baseValue={baseValue}
                       layers={layers} last={layerIndex === arg.values.length - 1}/>
-        </div>
-        <div className={styles.add}>
-          {
-            layerIndex < arg.values.length - 1 &&
-            <Button shape="circle" icon="plus" size='small' style={{ zIndex: 9 }} onClick={() => funcs.addValue({})}/>
-          }
         </div>
       </Card>
     )

@@ -16,6 +16,7 @@ export default {
       owned_ds: [],
     },
     dataSet: [],
+    orgFields: {},
     fields: {},
     dataSetID: '',
     selected: [],
@@ -43,7 +44,7 @@ export default {
         if (match) {
           dispatch({ type: 'fetch' })
         }
-        const match2 = pathToRegexp('/workspace/:projectId/import/list').exec(pathname);
+        const match2 = pathToRegexp('/workspace/:projectId/import').exec(pathname);
         if (match2) {
           dispatch({ type: 'staged' })
         }
@@ -71,8 +72,11 @@ export default {
 
       const data = yield call(fetchDataSet, dataSetID)
       // console.log(data)
+      const orgflds = JSON.parse(JSON.stringify(data.fields))
       yield put({ type: 'setDataSet', payload: data.response})
+      yield put({ type: 'setOrgFields', payload: orgflds})
       yield put({ type: 'setFields', payload: data.fields})
+
       yield put(routerRedux.push('preview'))
       yield put({type:'setViewLoading', payload: false})
       yield put({ type: 'setUploading', payload: false })
@@ -104,12 +108,11 @@ export default {
       const data = yield call(uploadFile, formData)
       console.log(data)
       message.success('upload success')
-
-
       console.log('44')
 
       yield put({ type: 'setDataSetID', payload: data.data.data_set })
-      console.log(data.data.data_set)
+      yield put({type: 'setDataSetName', payload: payload.data_set_name })
+      yield put({type: 'setDataSetDesc', payload: payload.description})
       yield put( {type: 'show'})
     },
 
@@ -134,13 +137,18 @@ export default {
     * submit (action, { put, call, select }) {
       yield put({type:'setSaveLoading', payload: true})
       const flds = yield select(state => state.upload.fields)
+      const org_flds = yield select(state => state.upload.orgFields)
       const dels = yield select(state => state.upload.deleted)
       const dataSetID = yield select(state => state.upload.dataSetID)
       const fld_lst = []
+      let change_flag = false
       const ignored = ['data_set', '_id', 'staging_dataset_id'].concat(dels)
       for (let key of Object.keys(flds)) {
         if (!ignored.includes(key)) {
 
+          if (flds[key] !== org_flds[key]) {
+            change_flag = true
+          }
           if (flds[key] === 'string') {
             fld_lst.push([key, 'str'])
           }
@@ -153,7 +161,12 @@ export default {
 
         }
       }
-      const res = yield call(changeTypes, dataSetID, fld_lst)
+      if (change_flag) {
+        console.log('change')
+        yield call(changeTypes, dataSetID, fld_lst)
+      } else {
+        console.log('not change')
+      }
 
       yield put({type: 'stage'})
     },
@@ -169,20 +182,28 @@ export default {
       const res = yield call(stateData, dataSetID, prjID, dsname, dsdes)
       console.log(res)
       yield put({type: 'staged'})
-      yield put(routerRedux.push('list'))
+      const url0 = location.hash.substr(1).replace('preview', '')
+      // console.log('url0', url0)
+      yield put(routerRedux.replace(url0))
 
     },
 
     * staged (action, { put, call, select }) {
       const prjID = location.hash.split('/')[2]
       const res = yield call(fetchStagingDataSet, prjID)
-      // console.log(res.data)
-      yield put({type: 'setStagingDataSet', payload: res.data})
-      const sds = yield select(state => state.upload.stagingDataSet)
-      console.log(sds)
-      // yield put(routerRedux.push('list'))
-      yield put({type:'setAddLoading', payload: false})
-      yield put({type:'setSaveLoading', payload: false})
+      const url0 = location.hash.substr(1).replace('list', '')
+      console.log(location.hash.split('/')[3])
+
+      if (res.data.length === 0) {
+        yield put(routerRedux.push('import/choice'))
+      } else {
+        yield put({type: 'setStagingDataSet', payload: res.data})
+        console.log(res.data)
+        // yield put(routerRedux.push('list'))
+        yield put({type:'setAddLoading', payload: false})
+        yield put({type:'setSaveLoading', payload: false})
+      }
+
     }
 
   },
@@ -213,6 +234,16 @@ export default {
       return {
         ...state,
         fields: flds
+      }
+    },
+
+    setOrgFields(state, { payload: orgflds }) {
+      for (let okey of Object.keys(orgflds)) {
+        orgflds[okey] = orgflds[okey][0]
+      }
+      return {
+        ...state,
+        orgFields: orgflds
       }
     },
 

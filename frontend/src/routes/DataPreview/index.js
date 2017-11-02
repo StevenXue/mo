@@ -45,11 +45,17 @@ class DataPreview extends React.Component {
 
   onSelect (value, e) {
     this.props.dispatch({type: 'upload/setField', payload: {[e]: value}})
-    console.log(this.props.upload.fields)
+
   }
 
   onSave() {
+    console.log(this.props.upload.fields)
     this.props.dispatch({type: 'upload/submit'})
+  }
+
+  onSaveAdd = () => {
+    const { history, match } = this.props
+    history.push(`/workspace/${match.params.projectID}/import`)
   }
 
   showDeleteConfirm = () => {
@@ -169,6 +175,8 @@ class DataPreview extends React.Component {
             <Button type="primary" className={styles.btn}
                     loading={this.props.upload.saveLoading}
                     onClick={() => {this.onSave()}}>Save</Button>
+            <Button className={styles.btn}
+                    onClick={this.onSaveAdd}>Save & Add New</Button>
           </div>
         </div>
       </div>

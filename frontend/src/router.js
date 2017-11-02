@@ -26,10 +26,13 @@ const RouterConfig = ({ history, location, login, projectDetail }) => {
     let breadcrumbName
     const matchDetail = pathToRegexp('/workspace/:projectId').exec(url)
     const matchPro = pathToRegexp('/workspace/:projectId/:step').exec(url)
+    const matchSubStep = pathToRegexp('/workspace/:projectId/:step/:subs').exec(url)
     if (matchDetail) {
       breadcrumbName = get(projectDetail, 'project.name', 'Project Info');
     } else if (matchPro) {
       breadcrumbName = matchPro[2]
+    } else if (matchSubStep) {
+      breadcrumbName = matchSubStep[3]
     }
     return (
       <Breadcrumb.Item key={url}>
