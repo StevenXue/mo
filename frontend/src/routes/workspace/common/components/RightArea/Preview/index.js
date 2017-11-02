@@ -3,6 +3,7 @@ import styles from './index.less';
 import {connect} from 'dva';
 import {Select, Table, Spin} from 'antd';
 
+import {get} from 'lodash'
 const Option = Select.Option;
 
 function Preview({preview, model, dispatch, namespace}) {
@@ -24,7 +25,8 @@ function Preview({preview, model, dispatch, namespace}) {
   let fields;
   let labelFields;
   if(focusSectionsId!=='new_launcher ' + 'init'){
-    fields = sectionsJson[focusSectionsId].steps[1].args[0].values;
+    // fields = sectionsJson[focusSectionsId].steps[1].args[0].values;
+    fields = get(sectionsJson[focusSectionsId], 'steps[1].args[0].values', []);
     if(namespace === 'modelling'){
       labelFields = sectionsJson[focusSectionsId].steps[2].args[0].values;
     }

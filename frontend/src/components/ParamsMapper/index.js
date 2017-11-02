@@ -71,45 +71,29 @@ const switchComponent = (arg, baseArg) => {
   switch (arg.type) {
     case 'multiple_input':
     case 'input':
-      return <div className={styles.row}>
-        <Input/>
-        <div className={styles.help}>
-          <Tooltip title={baseArg.des}>
-            <Icon type="question-circle-o"/>
-          </Tooltip>
-        </div>
-      </div>
+      // return <Input/>
+      return <Input/>
+
     case 'choice':
       return (
-        <div className={styles.row}>
-          <Select style={{width: 142}}>
-            {
-              arg.range.map((option) =>
-                <Select.Option value={option} key={option}>{option}</Select.Option>,
-              )
-            }
-          </Select>
-          <div className={styles.help}>
-            <Tooltip title={baseArg.des}>
-              <Icon type="question-circle-o"/>
-            </Tooltip>
-          </div>
-        </div>)
+        <Select style={{width: 142}}>
+          {
+            arg.range.map((option) =>
+              <Select.Option value={option} key={option}>{option}</Select.Option>,
+            )
+          }
+        </Select>
+      )
+
     case 'multiple_choice':
-      return (<div className={styles.row}>
-          <Select style={{width: 142}} mode='multiple'>
-            {
-              arg.range.map((option) =>
-                <Select.Option value={option} key={option}>{option}</Select.Option>,
-              )
-            }
-          </Select>
-          <div className={styles.help}>
-            <Tooltip title={baseArg.des}>
-              <Icon type="question-circle-o"/>
-            </Tooltip>
-          </div>
-        </div>
+      return (
+        <Select style={{width: 142}} mode='multiple'>
+          {
+            arg.range.map((option) =>
+              <Select.Option value={option} key={option}>{option}</Select.Option>,
+            )
+          }
+        </Select>
       )
     default:
       return <Input/>
@@ -122,24 +106,30 @@ const formItems = (arg, i, getFieldDecorator, baseArg) => {
   if (arg.value || (arg.values && arg.values.length > 0)) {
     v = arg.value || arg.values
   }
-  console.log("v", v);
 
   return <FormItem
     key={i}
     label={arg.display_name}
   >
-    {
-      getFieldDecorator(arg.name, {
-        initialValue: v || arg.default,
-        getValueFromEvent: (value) => splitHandler(value, arg.type, arg.value_type),
-        rules: [
-          {
-            required: arg.required, message: `need ${arg.value_type || ''} ${arg.type}`,
-            type: typeParser(arg.type, arg.value_type),
-          },
-        ],
-      })(switchComponent(arg, baseArg))
-    }
+    <div className={styles.row}>
+      {
+        getFieldDecorator(arg.name, {
+          initialValue: v || arg.default,
+          getValueFromEvent: (value) => splitHandler(value, arg.type, arg.value_type),
+          rules: [
+            {
+              required: arg.required, message: `need ${arg.value_type || ''} ${arg.type}`,
+              type: typeParser(arg.type, arg.value_type),
+            },
+          ],
+        })(switchComponent(arg, baseArg))
+      }
+      <div className={styles.help}>
+        <Tooltip title={baseArg.des}>
+          <Icon type="question-circle-o"/>
+        </Tooltip>
+      </div>
+    </div>
   </FormItem>
 }
 
