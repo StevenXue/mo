@@ -1,16 +1,17 @@
 import React from 'react'
 import styles from './index.less'
-import {connect} from 'dva'
+import { connect } from 'dva'
 
-import {Select, Collapse, Button, Input, Popover, Icon, Tooltip} from 'antd'
+import { Select, Collapse, Button, Input, Popover, Icon, Tooltip } from 'antd'
 const Option = Select.Option
 const Panel = Collapse.Panel
 import {get, isEqual} from 'lodash'
-
 import ToolBar from './ToolBar/index'
 import ParamsMapper from '../../../../../../components/ParamsMapper/index'
+
 import LayerCard from '../../../../modelling/LayerCard/index'
 import {format} from '../../../../../../utils/base'
+
 import {translateDict} from '../../../../../../constants'
 
 
@@ -30,7 +31,7 @@ const content = (content) => (
   </div>
 )
 
-function WorkBench({section, model, dispatch, namespace, preview}) {
+function WorkBench({ section, model, dispatch, namespace, preview }) {
   //state
   const {
     sectionsJson,
@@ -66,7 +67,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
 
     dispatch({
       type: namespace + '/setSections',
-      payload: {sectionsJson: sectionsJson},
+      payload: { sectionsJson: sectionsJson },
     })
     // 将预览设置
   }
@@ -110,7 +111,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
         argIndex,
         fieldName,
         sectionId: section._id,
-        datasourceStepIndex
+        datasourceStepIndex,
       },
     })
   }
@@ -165,6 +166,20 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
         stepIndex,
         argIndex,
         value,
+        valueIndex,
+      },
+    })
+  }
+
+  function deleteValue(value, stepIndex, argIndex, valueIndex) {
+
+    // e = format(e, baseSteps[stepIndex].args[argIndex]['value_type'])
+    dispatch({
+      type: namespace + '/deleteValue',
+      payload: {
+        sectionId: section._id,
+        stepIndex,
+        argIndex,
         valueIndex,
       },
     })
@@ -257,42 +272,42 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
         <div className={styles.fields}>
           {
             step.args.map((arg, argIndex) => {
-              const values = arg.values;
+              const values = arg.values
 
-              let fields = get(datasourceStep, `args[${argIndex}].fields`, []);
-              let fieldsJson = get(datasourceStep, `args[${argIndex}].fieldsJson`, {});
+              let fields = get(datasourceStep, `args[${argIndex}].fields`, [])
+              let fieldsJson = get(datasourceStep, `args[${argIndex}].fieldsJson`, {})
               return fields.map((field) => {
-                const fieldName = field[0];
+                const fieldName = field[0]
 
-                let backgroundColor;
-                let onClick;
-                let className;
+                let backgroundColor
+                let onClick
+                let className
 
                 if (fieldsJson[fieldName]) {
                   if (values.includes(fieldName)) {
                     // blue onclick
-                    backgroundColor = '#34C0E2';
-                    onClick = true;
+                    backgroundColor = '#34C0E2'
+                    onClick = true
                     className = styles.active_field
                   }
                   else {
                     //black
-                    backgroundColor = 'black';
-                    onClick = false;
+                    backgroundColor = 'black'
+                    onClick = false
                     className = styles.disable_field
                   }
                 } else {
                   if (values.includes(fieldName)) {
                     // blue onclick
-                    backgroundColor = '#34C0E2';
-                    onClick = true;
+                    backgroundColor = '#34C0E2'
+                    onClick = true
                     className = styles.active_field
 
                   }
                   else {
                     //grey onclick
-                    backgroundColor = '#F3F3F3';
-                    onClick = true;
+                    backgroundColor = '#F3F3F3'
+                    onClick = true
                     className = styles.field
 
                   }
@@ -310,6 +325,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                     <p className={styles.text}>{fieldName}</p>
                   </div>
                 )
+
               })
             })
           }
@@ -424,7 +440,8 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                     labelFields={labelFields}
                     {...{model, dispatch, namespace, stepIndex, argIndex, valueIdx}}
                     funcs={{
-                      addValue: (e) => addValue(e, stepIndex, argIndex, valueIdx + 1),
+                      addValue: (e) => addValue(e, stepIndex, argIndex, valueIdx),
+                      deleteValue: (e) => deleteValue(e, stepIndex, argIndex, valueIdx),
                       updateValueOfValues: (e) => updateValueOfValues(e, stepIndex, argIndex, valueIdx),
                       updateLayerArgs: (e) => updateLayerArgs(e, stepIndex, argIndex, valueIdx),
                       setLayerDefault: (e) => setLayerDefault(e, stepIndex, argIndex, valueIdx),
@@ -517,7 +534,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
             key={arg.name + argIndex}
             className={styles.select}
             showSearch
-            style={{width: 200}}
+            style={{ width: 200 }}
             placeholder="Select a stagingData"
             optionFilterProp="children"
             onChange={(value) => handleChange(value, stepIndex, argIndex)}
@@ -596,7 +613,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
 
   return (
     <div>
-      <ToolBar sectionId={sectionId} {...{model, dispatch, namespace}}/>
+      <ToolBar sectionId={sectionId} {...{ model, dispatch, namespace }}/>
       <div className={styles.container}>
         <Collapse className={styles.collapse}
                   defaultActiveKey={['data_source']} onChange={callback}
@@ -657,7 +674,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                              className={styles.panel}>
                         {renderParameters(step, stepIndex)}
                       </Panel>
-                    );
+                    )
                   case 'setting':
                     return (
                       <Panel header={step.display_name} key={stepIndex}
@@ -675,4 +692,4 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
   )
 }
 
-export default connect(({preview}) => ({preview}))(WorkBench)
+export default connect(({ preview }) => ({ preview }))(WorkBench)

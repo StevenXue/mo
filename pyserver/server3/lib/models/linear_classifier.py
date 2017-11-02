@@ -199,7 +199,7 @@ LinearClassifierSteps = [
             {
                 **SPEC.ui_spec['input'],
                 "name": "num_classes",
-                "display_name": "N Classes",
+                "display_name": "Number of Classes",
                 "des": "number of label classes. Default is binary classification.\
             Note that class labels are integers representing the class index "
                        "(i.e.\

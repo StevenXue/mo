@@ -46,6 +46,7 @@ class Launcher extends Component {
                         style={{
                           margin: 10,
                           backgroundColor: '#F8F8F8',
+                          cursor: 'pointer'
                         }}>
                     <div className={styles.card_area}>
                       <div>
