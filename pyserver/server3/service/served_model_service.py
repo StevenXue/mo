@@ -21,7 +21,7 @@ from server3.entity.model import MODEL_TYPE
 from server3.constants import SERVING_PORT
 from server3.constants import NAMESPACE
 from server3.service.saved_model_services import general_model_services
-
+import tensorflow as tf
 
 ModelType = {list(v)[1]: list(v)[0] for v in list(MODEL_TYPE)}
 

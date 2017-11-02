@@ -289,9 +289,9 @@ def build_how_to_use_code(job_info):
               served_model_id + "\",json=data) \n"
     str_py += "result = r.json()['response']['result']\n"
     str_py += "print(result)\n"
-
-    job_info['how_to_use_code_js'] = str_js
-    job_info['how_to_use_code_py'] = str_py
+    job_info['how_to_use_code'] = {}
+    job_info['how_to_use_code']['js'] = str_js
+    job_info['how_to_use_code']['py'] = str_py
     return job_info
 
 def publish_project(project_id):

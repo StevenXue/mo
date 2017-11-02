@@ -15,36 +15,43 @@ from server3.lib import tf
 K.set_learning_phase(0)
 
 
-def export(new_model, export_path_base):
+def export(new_model, export_path_base,weights_dir):
     # Exporting the model
-    tf.app.flags.DEFINE_integer('model_version', 1,
-                                'version number of the model.')
+    # new_model.load_weights(weights_dir)
+    model_version = 1
+    # tf.app.flags.DEFINE_integer('model_version', 1,
+    #                             'version number of the model.')
     # tf.app.flags.DEFINE_string('work_dir', working_dir, 'Working directory.')
     FLAGS = tf.app.flags.FLAGS
-
     export_path = os.path.join(
         tf.compat.as_bytes(export_path_base),
-        tf.compat.as_bytes(str(FLAGS.model_version)))
+        tf.compat.as_bytes(str(model_version)))
 
     # if version path exists, create a new version
     while file_io.file_exists(export_path):
-        FLAGS.model_version += 1
+        model_version += 1
         export_path = os.path.join(
             tf.compat.as_bytes(export_path_base),
-            tf.compat.as_bytes(str(FLAGS.model_version)))
+            tf.compat.as_bytes(str(model_version)))
 
     builder = saved_model_builder.SavedModelBuilder(export_path)
 
-    signature = predict_signature_def(inputs={'inputs': new_model.input},
-                                      outputs={'scores': new_model.output})
+    # with K.get_session() as sess:
 
-    with K.get_session() as sess:
+    sess = tf.InteractiveSession()
+    sess.run(tf.global_variables_initializer())
+    K.set_session(sess)
+    with sess.as_default():
+        new_model.load_weights(weights_dir)
+
+        signature = predict_signature_def(inputs={'inputs': new_model.input},
+                                          outputs={'scores': new_model.output})
         builder.add_meta_graph_and_variables(sess=sess,
                                              tags=[tag_constants.SERVING],
                                              signature_def_map={
                                                  'predict': signature})
         builder.save()
-        return FLAGS.model_version
+        return model_version
 
 
 def save_model(result_dir, model):

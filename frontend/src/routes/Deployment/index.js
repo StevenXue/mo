@@ -37,7 +37,7 @@ function GetPredictionPage({deployment, dispatch}) {
             <pre className={styles.usealgorithm}>
             <Highlight
               className='JavaScript hljs code-container inline-code-container'>
-              {modelsJson[focusModelId]['how_to_use_code_js']}
+              {modelsJson[focusModelId]['how_to_use_code']['js']}
             </Highlight>
             </pre>
           </TabPane>
@@ -45,7 +45,7 @@ function GetPredictionPage({deployment, dispatch}) {
             <pre className={styles.usealgorithm} >
             <Highlight
               className='python hljs code-container inline-code-container'>
-              {modelsJson[focusModelId]['how_to_use_code_py']}
+              {modelsJson[focusModelId]['how_to_use_code']['py']}
             </Highlight>
             </pre>
           </TabPane>
