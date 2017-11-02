@@ -15,6 +15,14 @@ import {format} from '../../../../../../utils/base'
 import {translateDict} from '../../../../../../constants'
 
 
+function FakePanel({children, header, headerClass, isActive, prefixCls, destroyInactivePanel, openAnimation, onItemClick}) {
+  return (
+    <div>
+      {children}
+    </div>
+  )
+}
+
 function getArgs(baseSteps, stepIndex, argIndex) {
 
   if (argIndex !== undefined) {
@@ -568,8 +576,6 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
     )
   }
 
-  // todo tooltip 还没加
-
   function parameters(step, stepIndex) {
     return (
       <div>
@@ -611,77 +617,243 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
     )
   }
 
+  function renderFakePanel(step, stepIndex, text) {
+    return (
+      !active_steps.includes(stepIndex.toString()) ?
+        <FakePanel key={stepIndex + step.name + 'hint'}>
+          <div className={styles.fake_panel_container}>
+            <div className={styles.fake_panel}>
+              {text}
+            </div>
+          </div>
+        </FakePanel> : null
+    )
+  }
+
   return (
     <div>
       <ToolBar sectionId={sectionId} {...{ model, dispatch, namespace }}/>
-      <div className={styles.container}>
+      <div className={`${styles.container} my-collapse-arrow`}>
         <Collapse className={styles.collapse}
                   defaultActiveKey={['data_source']} onChange={callback}
-                  activeKey={active_steps}
-        >
+                  activeKey={active_steps}>
           {
             steps.map((step, stepIndex) => {
                 switch (step.name) {
+
                   case 'data_source':
-                    return (
-                      <Panel
-                        className={styles.panel}
-                        header={getArgs(baseSteps, stepIndex).display_name} key={stepIndex}>
-                        {dataSource(step.args, stepIndex)}
-                      </Panel>
-                    )
-                  case 'fields':
-                    return <Panel header="Select Fields" key={stepIndex}
-                                  className={styles.panel}
+                    let ret = [<Panel
+                      className={styles.panel}
+                      header={
+                        (
+                          <div className={styles.panel_title_row}>
+                            {getArgs(baseSteps, stepIndex).display_name}
+                          </div>)
+                      }
+                      key={stepIndex}
                     >
-                      {fieldSelector(steps[0], 0, step, stepIndex)}
+                      {dataSource(step.args, stepIndex)}
                     </Panel>
-                  case 'feature_fields':
-                    return (
-                      <Panel header="Select Feature Fields" key={stepIndex}
-                             className={styles.panel}>
+                    ];
+                    if (!active_steps.includes(stepIndex.toString())) {
+                      ret.push(
+                        <FakePanel key={stepIndex + step.name + 'hint'}>
+                          <div className={styles.fake_panel_container}>
+                            <div className={styles.fake_panel}>
+                              {step.args[0].value ? 'You have select 1 data' : 'You have not select any data'}
+                            </div>
+                          </div>
+                        </FakePanel>)
+                    }
+                    return ret;
+
+                  case 'fields':
+                    return [
+                      <Panel
+                        header={
+                          (
+                            <div className={styles.panel_title_row}>
+                              {getArgs(baseSteps, stepIndex).display_name}
+                            </div>)
+                        }
+                        key={stepIndex}
+                        className={styles.panel}
+                      >
                         {fieldSelector(steps[0], 0, step, stepIndex)}
+                      </Panel>,
 
-                      </Panel>
-                    )
+                      renderFakePanel(step, stepIndex,
+                        step.args[0].values.length ?
+                          `You have select ${step.args[0].values.length} fields`
+                          : 'You have not select any fields'
+                      )
+                    ];
+
+                  case 'feature_fields':
+                    return [
+                      <Panel
+                        header={
+                          (
+                            <div className={styles.panel_title_row}>
+                              {getArgs(baseSteps, stepIndex).display_name}
+                            </div>)
+                        }
+                        key={stepIndex}
+                        className={styles.panel}>
+                        {fieldSelector(steps[0], 0, step, stepIndex)}
+                      </Panel>,
+
+                      renderFakePanel(step, stepIndex,
+                        step.args[0].values.length ?
+                          `You have select ${step.args[0].values.length} fields`
+                          : 'You have not select any fields'
+                      )
+
+                    ];
+
                   case 'label_fields':
-                    return <Panel header="Select Label Fields" key={stepIndex}
-                                  className={styles.panel}>
-                      {fieldSelector(steps[0], 0, step, stepIndex)}
+                    return [
+                      <Panel
+                        header={
+                          (
+                            <div className={styles.panel_title_row}>
+                              {getArgs(baseSteps, stepIndex).display_name}
+                            </div>)
+                        }
+                        key={stepIndex}
+                        className={styles.panel}>
+                        {fieldSelector(steps[0], 0, step, stepIndex)}
+                      </Panel>,
 
-                      {/*{secondFieldSelector(steps[0], step, stepIndex, steps[stepIndex-1])}*/}
-                    </Panel>
+                      renderFakePanel(step, stepIndex,
+                        step.args[0].values.length ?
+                          `You have select ${step.args[0].values.length} fields`
+                          : 'You have not select any fields'
+                      )
+
+                    ];
+
                   case 'parameters':
-                    return (
-                      <Panel header="Parameter" key={stepIndex}
-                             className={styles.panel}>
+                    // num of args filled
+                    let numArgsFill = 0;
+                    step.args.forEach((arg) => {
+                      if (arg.value) {
+                        numArgsFill += 1
+                      }
+                    });
+                    return [
+                      <Panel
+                        header={
+                          (
+                            <div className={styles.panel_title_row}>
+                              {getArgs(baseSteps, stepIndex).display_name}
+                            </div>)
+                        }
+                        key={stepIndex}
+                        className={styles.panel}>
                         {renderParameters(step, stepIndex)}
-                      </Panel>
-                    )
+                      </Panel>,
+
+                      renderFakePanel(step, stepIndex,
+                        numArgsFill ?
+                          `You have filled ${numArgsFill} args`
+                          : 'You have not fill any args'
+                      )
+
+                    ];
+
                   case 'layers':
-                    return (
-                      <Panel header="Build Network" key={stepIndex}
-                             className={styles.panel}>
+                    let numOfLayer = 2;
+                    return [
+                      <Panel
+                        header={
+                          (
+                            <div className={styles.panel_title_row}>
+                              {getArgs(baseSteps, stepIndex).display_name}
+                            </div>)
+                        }
+                        key={stepIndex}
+                        className={styles.panel}>
                         {networkBuilder(step, stepIndex, steps[1].args[0].values, steps[2].args[0].values)}
-                      </Panel>
-                    )
+                      </Panel>,
+
+                      renderFakePanel(step, stepIndex,
+                        numOfLayer !== 2 ?
+                          `You have add ${numOfLayer} layers`
+                          : 'You have not add any layers'
+                      )
+
+                    ];
+
+                  // return (
+                  //   <Panel header="Build Network" key={stepIndex}
+                  //          className={styles.panel}>
+                  //     {networkBuilder(step, stepIndex, steps[1].args[0].values, steps[2].args[0].values)}
+                  //   </Panel>
+                  // )
                   case 'estimator':
                   case 'compile':
                   case 'fit':
                   case 'evaluate':
-                    return (
-                      <Panel header={step.display_name} key={stepIndex}
-                             className={styles.panel}>
+                    let numArgsFillEvaluate = 0;
+                    step.args.forEach((arg) => {
+                      if (arg.value) {
+                        numArgsFill += 1
+                      }
+                    });
+                    return [
+                      <Panel
+                        header={
+                          (
+                            <div className={styles.panel_title_row}>
+                              {getArgs(baseSteps, stepIndex).display_name}
+                            </div>)
+                        }
+                        key={stepIndex}
+                        className={styles.panel}>
                         {renderParameters(step, stepIndex)}
-                      </Panel>
-                    )
+                      </Panel>,
+
+                      renderFakePanel(step, stepIndex,
+                        numArgsFillEvaluate ?
+                          `You have filled ${numArgsFillEvaluate} args`
+                          : 'You have not fill any args'
+                      )
+
+                    ];
+                  // return (
+                  //   <Panel header={step.display_name} key={stepIndex}
+                  //          className={styles.panel}>
+                  //     {renderParameters(step, stepIndex)}
+                  //   </Panel>
+                  // )
                   case 'setting':
-                    return (
-                      <Panel header={step.display_name} key={stepIndex}
-                             className={styles.panel}>
-                        {setting(step, stepIndex)}
-                      </Panel>
-                    )
+                    let numArgsFillSetting = 0;
+                    step.args.forEach((arg) => {
+                      if (arg.value) {
+                        numArgsFill += 1
+                      }
+                    });
+                    return [
+                      <Panel
+                        header={
+                          (
+                            <div className={styles.panel_title_row}>
+                              {getArgs(baseSteps, stepIndex).display_name}
+                            </div>)
+                        }
+                        key={stepIndex}
+                        className={styles.panel}>
+                        {renderParameters(step, stepIndex)}
+                      </Panel>,
+
+                      renderFakePanel(step, stepIndex,
+                        numArgsFillSetting ?
+                          `You have filled ${numArgsFillSetting} args`
+                          : 'You have not fill any args'
+                      )
+
+                    ];
                 }
               },
             )

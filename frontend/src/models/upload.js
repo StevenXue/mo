@@ -16,6 +16,7 @@ export default {
       owned_ds: [],
     },
     dataSet: [],
+    orgFields: {},
     fields: {},
     dataSetID: '',
     selected: [],
@@ -71,8 +72,11 @@ export default {
 
       const data = yield call(fetchDataSet, dataSetID)
       // console.log(data)
+      const orgflds = JSON.parse(JSON.stringify(data.fields))
       yield put({ type: 'setDataSet', payload: data.response})
+      yield put({ type: 'setOrgFields', payload: orgflds})
       yield put({ type: 'setFields', payload: data.fields})
+
       yield put(routerRedux.push('preview'))
       yield put({type:'setViewLoading', payload: false})
       yield put({ type: 'setUploading', payload: false })
@@ -133,13 +137,18 @@ export default {
     * submit (action, { put, call, select }) {
       yield put({type:'setSaveLoading', payload: true})
       const flds = yield select(state => state.upload.fields)
+      const org_flds = yield select(state => state.upload.orgFields)
       const dels = yield select(state => state.upload.deleted)
       const dataSetID = yield select(state => state.upload.dataSetID)
       const fld_lst = []
+      let change_flag = false
       const ignored = ['data_set', '_id', 'staging_dataset_id'].concat(dels)
       for (let key of Object.keys(flds)) {
         if (!ignored.includes(key)) {
 
+          if (flds[key] !== org_flds[key]) {
+            change_flag = true
+          }
           if (flds[key] === 'string') {
             fld_lst.push([key, 'str'])
           }
@@ -152,7 +161,12 @@ export default {
 
         }
       }
-      const res = yield call(changeTypes, dataSetID, fld_lst)
+      if (change_flag) {
+        console.log('change')
+        yield call(changeTypes, dataSetID, fld_lst)
+      } else {
+        console.log('not change')
+      }
 
       yield put({type: 'stage'})
     },
@@ -168,7 +182,8 @@ export default {
       const res = yield call(stateData, dataSetID, prjID, dsname, dsdes)
       console.log(res)
       yield put({type: 'staged'})
-      const url0 = location.hash.substr(1).replace('list', '')
+      const url0 = location.hash.substr(1).replace('preview', '')
+      // console.log('url0', url0)
       yield put(routerRedux.replace(url0))
 
     },
@@ -219,6 +234,16 @@ export default {
       return {
         ...state,
         fields: flds
+      }
+    },
+
+    setOrgFields(state, { payload: orgflds }) {
+      for (let okey of Object.keys(orgflds)) {
+        orgflds[okey] = orgflds[okey][0]
+      }
+      return {
+        ...state,
+        orgFields: orgflds
       }
     },
 
