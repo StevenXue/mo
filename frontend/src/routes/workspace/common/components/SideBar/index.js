@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'dva';
 import {Menu, Dropdown, Icon, Spin} from 'antd';
 
-import {translateDict} from '../../../../../constants';
+import {translateDict, tempVariable} from '../../../../../constants';
 import {arrayToJson, JsonToArray} from '../../../../../utils/JsonUtils';
 
 import styles from './index.less';
@@ -91,7 +91,8 @@ function Sidebar({model, dispatch, namespace}) {
           </div>
           <Icon type="plus" onClick={onClickAdd} style={{fontSize: 20}}/>
         </div>
-        <Spin spinning={getSectionLoading}>
+        <Spin spinning={getSectionLoading} >
+          <div className={styles.list}>
           {
             sections.map((section, i) => {
                 let backgroundColor;
@@ -114,7 +115,7 @@ function Sidebar({model, dispatch, namespace}) {
                       color: color
                     }}
                   >
-                    {section.section_name || section[translateDict[namespace]].name}
+                    {section[tempVariable.nameOrId] || section[translateDict[namespace]].name}
                     <Dropdown overlay={menu(section._id)} trigger={['click']}>
                       <a className="ant-dropdown-link" href="#">
                         <Icon type="down"/>
@@ -124,6 +125,7 @@ function Sidebar({model, dispatch, namespace}) {
                 )
               }
             )}
+          </div>
         </Spin>
       </div> :
       <div className={styles.left_column}>

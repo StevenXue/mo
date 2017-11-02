@@ -419,10 +419,10 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                     layerIndex={valueIdx}
                     argIndex={argIndex}
                     arg={arg}
-                    baseStep={baseSteps[stepIndex]}
+                    baseValue={baseSteps[stepIndex].args[argIndex].range.find(e => e.name === value['name'])}
                     featureFields={featureFields}
                     labelFields={labelFields}
-                    {...{model, dispatch, namespace}}
+                    {...{model, dispatch, namespace, stepIndex, argIndex, valueIdx}}
                     funcs={{
                       addValue: (e) => addValue(e, stepIndex, argIndex, valueIdx + 1),
                       updateValueOfValues: (e) => updateValueOfValues(e, stepIndex, argIndex, valueIdx),
@@ -454,6 +454,8 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
         <ParamsMapper args={step.args}
                       setValue={(value, argIndex) => setValue(value, stepIndex, argIndex)}
                       setValueDefault={(value) => setValueDefault(value, stepIndex)}
+                      baseArgs={baseSteps[stepIndex].args}
+                      {...{stepIndex}}
         />
         <div className={styles.end_button}>
           {
@@ -577,11 +579,6 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                   <Tooltip title={getArgs(baseSteps, stepIndex, argIndex).des}>
                     <Icon type="question-circle-o"/>
                   </Tooltip>
-
-                  {/*<Popover content={content(getArgs(baseSteps, stepIndex, argIndex).des)}*/}
-                  {/*title="Help info">*/}
-                  {/*<Icon type="question-circle-o"/>*/}
-                  {/*</Popover>*/}
                 </div>
 
               </div>

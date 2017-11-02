@@ -53,6 +53,11 @@ module.exports = {
   translateDict: {
     'dataAnalysis': 'toolkit',
     'modelling': 'model',
+  },
+
+  tempVariable: {
+    nameOrId: '_id',
+    // nameOrId: 'name',
   }
 
 };

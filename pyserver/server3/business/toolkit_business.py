@@ -2737,13 +2737,24 @@ def update_toolkit():
     4. 选择添加的fields（temp run)
     5. 有多少index 对应不上，所做的处理，每个column单独选择？
     6. setting
+    
+    合并添加行
+    1. 选择目标数据源
+    2. 选择来源数据源
+    3. 目标数据源列匹配与设置
+    
+    自定义添加列
+    1. 选择目标数据源
+    2. 新列生成方式
+    
+    
     '''
     add_columns_append = Toolkit(
         name='合并添加列',
         description='通过其他数据表数据添加列',
         # category=1,
         # entry_function='ref',
-        # target_py_code=inspect.getsource(preprocess_orig.ref),
+        target_py_code=inspect.getsource(preprocess_orig.ref),
         parameter_spec={
             "data": {
                 'name': 'input',
