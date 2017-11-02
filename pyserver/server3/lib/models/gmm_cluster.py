@@ -115,7 +115,6 @@ GMMSteps = [
                 "name": "random_seed",
                 "display_name": "Random Seed",
                 "des": "Seed for PRNG used to initialize centers.",
-                "required": True
             },
             {
                 **SPEC.ui_spec['choice'],

@@ -70,6 +70,7 @@ def get_all_public_model_by_type():
                        'model',
                        False) if obj.model.steps]
     models_list.sort(key=lambda x: x['name'])
+    # TYPE.pop(3)
     return [{'name': TYPE[key],
              'zh_name': ZH_MAP[TYPE[key]],
              'children': [model_obj for model_obj in models_list
@@ -155,8 +156,8 @@ def kube_run_model(conf, project_id, data_source_id, model_id, job_obj,
 
     job_id = str(job_obj.id)
     print(job_id)
-    # return run_model(conf, project_id, data_source_id, model_id, job_id,
-    #                  **kwargs)
+    return run_model(conf, project_id, data_source_id, model_id, job_id,
+                     **kwargs)
     # return #
     cwd = os.getcwd()
     job_name = job_id + '-training-job'
@@ -483,7 +484,7 @@ def model_input_manager_unsupervised(x_cols, data_source_id, model_name,
     df_x = staging_data_service.mongo_to_df(train_cursor)
     schema = kwargs.pop('schema')
     obj = staging_data_service.split_test_train({'x': df_x,
-                                                 'y': pd.DataFrame([[]])},
+                                                 'y': df_x},
                                                 schema,
                                                 **kwargs)
     obj['y_tr'] = None
