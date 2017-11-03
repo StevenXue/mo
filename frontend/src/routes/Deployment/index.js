@@ -285,7 +285,7 @@ function Deployment({deployment, dispatch}) {
             defaultActiveKey="1"
             tabPosition="top"
           >
-            <TabPane tab="Information" key="1">
+            <TabPane tab="Information" key="1" style={{minHeight: '85vh'}}>
               <div style={{padding: 40}}>
                 <h1>Dataset</h1>
                 <div style={{padding: 20}}>

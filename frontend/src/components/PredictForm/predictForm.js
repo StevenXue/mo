@@ -60,7 +60,7 @@ class GetPredictionForm extends React.Component {
             <Button
               type="primary"
               htmlType="submit"
-              style={{margin: 10}}
+              style={{margin: 10, fontColor: '#ffffff'}}
               disabled={hasErrors(getFieldsError())}
             >
               Run

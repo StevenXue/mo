@@ -35,8 +35,9 @@ function Projects({ history, project, dispatch }) {
       </div>
       <div className={styles.projectList}>
         {project.projects.map(e =>
-          <Card key={e._id} title={e.name} className={styles.card}>
-            <div onClick={() => toProjectDetail(e._id, history)} style={{ cursor: 'pointer' }}>
+          <Card key={e._id} title={e.name} className={styles.card}
+                onClick={() => toProjectDetail(e._id, history)} style={{ cursor: 'pointer' }}>
+            <div>
               <p>Description: {e.description}</p>
               <p>Create Time: {showTime(e.create_time)}</p>
               {e['user_name'] && <p>Owner: {e.user_name}</p>}

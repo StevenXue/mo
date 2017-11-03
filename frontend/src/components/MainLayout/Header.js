@@ -12,12 +12,12 @@ const logo = config.whiteLogo
 const SubMenu = Menu.SubMenu
 
 const menuConfig = [
-  {
-    key: '/',
-    Link: '/',
-    Icon: 'home',
-    text: 'Home',
-  },
+  // {
+  //   key: '/',
+  //   Link: '/',
+  //   Icon: 'home',
+  //   text: 'Home',
+  // },
   {
     key: '/workspace',
     Link: '/workspace',
