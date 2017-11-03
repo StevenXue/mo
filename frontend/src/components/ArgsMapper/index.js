@@ -90,7 +90,6 @@ function ArgsMapper({
           } else if (last && arg.name === 'units' && labelFields.length > 0) {
             setLayerDefault({ [arg.name]: labelFields.length })
           }
-          console.log("baseArg.args", baseValue);
           return formItems(arg, i, getFieldDecorator, baseValue.args[i])
         })
       }

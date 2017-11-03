@@ -28,6 +28,7 @@ from tensorflow.contrib.learn.python.learn.estimators import metric_key
 from tensorflow.contrib.metrics.python.ops.confusion_matrix_ops import \
     confusion_matrix
 import tensorflow as tf
+from server3.constants import SPEC
 
 
 class TensorForestLossHook(session_run_hook.SessionRunHook):
@@ -43,7 +44,6 @@ class TensorForestLossHook(session_run_hook.SessionRunHook):
 
         # eval
         self._estimator = None
-
 
     def before_run(self, run_context):
         return session_run_hook.SessionRunArgs(
@@ -227,7 +227,7 @@ def random_forest_model_fn(features, labels, mode, params, config):
                                              name='confusion_matrix_print')
 
     regression_ornot = tf.identity(params['regression'],
-                                            name='regression_ornot')
+                                   name='regression_ornot')
     # Put weights back in
     if weights is not None:
         features[weights_name] = weights
@@ -257,6 +257,165 @@ def random_forest_model_fn(features, labels, mode, params, config):
         eval_metric_ops=metrics,
         output_alternatives=output_alternatives)
 
+
+RandomForestSteps = [
+    {
+        "name": "data_source",
+        "display_name": "Select Data Source",
+        "args": [
+            {
+                "name": "input",
+                "des": "Please select input data source",
+                "type": "select_box",
+                "default": None,
+                "required": True,
+                "len_range": [
+                    1,
+                    1
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "feature_fields",
+        "display_name": "Select Feature Fields",
+        "args": [
+            {
+                "name": "fields",
+                "des": "",
+                "required": True,
+                "type": "multiple_choice",
+                "len_range": [
+                    1,
+                    None
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "label_fields",
+        "display_name": "Select Label Fields",
+        "args": [
+            {
+                "name": "fields",
+                "des": "",
+                "type": "multiple_choice",
+                "required": True,
+                "len_range": [
+                    1,
+                    None
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "estimator",
+        "display_name": "Estimator Parameters",
+        'args': [
+            {
+                **SPEC.ui_spec['input'],
+                "des": "A string defining feature column name representing weights.Will be multiplied by the loss of the  example.Used to downweight or boost examples during training.",
+                "name": "weights_name",
+                "display_name": "Weights Name",
+                "value_type": "str"
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "des": "A string naming one of the features to strip out and pass through into the inference/eval results dict.  Useful for associating specific examples with their prediction.",
+                "name": "keys_name",
+                "display_name": "Keys Name",
+                "value_type": "str"
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "des": "number of clusters to train",
+                "default": 1,
+                "required": True,
+                "name": "num_classes",
+                "display_name": "Num Classes",
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "des": "num_features of the data set ",
+                "default": 1,
+                "required": True,
+                "name": "num_features",
+                "display_name": "Num Features",
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "des": "num_trees",
+                "default": 2,
+                "required": True,
+                "name": "num_trees",
+                "display_name": "Num Trees",
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "des": "max_nodes for the tree",
+                "default": 1000,
+                "required": True,
+                "name": "max_nodes",
+                "display_name": "Max Nodes",
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "des": "Allows training to terminate early if the forest is no longer growing. 100 by default.  Set to a Falsy value to disable the default training hook.",
+                "default": 100,
+                "required": True,
+                "name": "early_stopping_rounds",
+                "display_name": "Early Stopping Rounds"
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "des": "True for regression, False for classification.If true, the 'num_classes' should be 1",
+                "value_type": "bool",
+                "required": True,
+                "name": "regression",
+                "display_name": "Regression",
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "des": "The tree will split after some numbers of samples",
+                "default": 100,
+                "required": True,
+                "name": "split_after_samples",
+                "display_name": "Split After Samples",
+            }
+        ]
+    },
+    {
+        "name": "fit",
+        "display_name": "Fit Parameters",
+        "args": [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "steps",
+                "display_name": "Steps",
+                "des": "Number of steps of training",
+                "default": 400,
+                "required": True
+            },
+        ],
+    },
+    {
+        "name": "evaluate",
+        "display_name": "Evaluate Parameters",
+        "args": [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "steps",
+                "display_name": "Steps",
+                "des": "Number of steps of evaluate",
+                "default": 1,
+                "required": True
+            },
+        ]
+    }
+]
 
 RandomForest = {
     'estimator': {

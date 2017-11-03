@@ -145,8 +145,7 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
         deploy_name = job_id + '-serving'
         service_name = "my-" + job_id + "-service"
         port = port_for.select_random(ports=set(range(30000, 32767)))
-        export_path = export_path.replace('./user_directory',
-                                          '/home/root/work/user_directory')
+        export_path = export_path.replace('/pyserver', '/home/root/work')
         kube_json = {
             "apiVersion": "apps/v1beta1",
             "kind": "Deployment",
@@ -267,6 +266,7 @@ def undeploy_by_id(served_model_id):
     return True
 
 
+
 def resume_by_id(served_model_id, user_ID, model_name):
 
     """
@@ -298,8 +298,8 @@ def resume_by_id(served_model_id, user_ID, model_name):
         deploy_name = job_id + '-serving'
         service_name = "my-" + job_id + "-service"
         port = port_for.select_random(ports=set(range(30000, 32767)))
-        export_path = export_path.replace('./user_directory',
-                                          '/home/root/work/user_directory')
+        export_path = export_path.replace('/pyserver', '/home/root/work')
+        print('resume path', export_path)
         kube_json = {
             "apiVersion": "apps/v1beta1",
             "kind": "Deployment",
@@ -384,5 +384,5 @@ def resume_by_id(served_model_id, user_ID, model_name):
         return False
 
 
-def get_prediction_by_id(server, model_name,input_value):
-    return general_model_services.get_prediction_by_id(server, model_name,input_value)
+def get_prediction_by_id(server, model_name,input_value,features):
+    return general_model_services.get_prediction_by_id(server, model_name,input_value,features)

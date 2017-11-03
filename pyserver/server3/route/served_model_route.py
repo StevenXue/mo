@@ -134,7 +134,8 @@ def get_prediction(oid):
     server = data.pop('server')
     model_name = data.pop('model_name')
     input_value = data.pop('input_value')
-    result = served_model_service.get_prediction_by_id(server, model_name, input_value)
+    features = data.pop('features')
+    result = served_model_service.get_prediction_by_id(server, model_name, input_value,features)
     if result:
         return jsonify({'response': {'result': result}})
     else:
