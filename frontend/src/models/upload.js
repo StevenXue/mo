@@ -35,6 +35,7 @@ export default {
     addLoading: false,
     delLoading: false,
     saveLoading: false,
+    saveAddLoading: false,
   },
 
   subscriptions: {
@@ -134,8 +135,13 @@ export default {
 
     },
 
-    * submit (action, { put, call, select }) {
-      yield put({type:'setSaveLoading', payload: true})
+    * submit ({payload}, { put, call, select }) {
+      if (payload === 'new') {
+        yield put({type:'setSaveAddLoading', payload: true})
+      } else {
+        yield put({type:'setSaveLoading', payload: true})
+      }
+
       const flds = yield select(state => state.upload.fields)
       const org_flds = yield select(state => state.upload.orgFields)
       const dels = yield select(state => state.upload.deleted)
@@ -168,10 +174,10 @@ export default {
         console.log('not change')
       }
 
-      yield put({type: 'stage'})
+      yield put({type: 'stage', payload: payload})
     },
 
-    * stage (action, { put, call, select }) {
+    * stage ({payload}, { put, call, select }) {
       // const test = yield select(state => state)
       // console.log(test)
       yield put({type:'setAddLoading', payload: true})
@@ -181,10 +187,19 @@ export default {
       const dataSetID = yield select(state => state.upload.dataSetID)
       const res = yield call(stateData, dataSetID, prjID, dsname, dsdes)
       console.log(res)
-      yield put({type: 'staged'})
-      const url0 = location.hash.substr(1).replace('preview', '')
-      // console.log('url0', url0)
-      yield put(routerRedux.replace(url0))
+      if (payload !== 'new') {
+        yield put({type: 'staged'})
+        const url0 = location.hash.substr(1).replace('preview', '')
+        // console.log('url0', url0)
+        yield put(routerRedux.replace(url0))
+
+      } else {
+        const url1 = location.hash.substr(1).replace('preview', 'choice')
+        yield put(routerRedux.replace(url1))
+        yield put({type:'setSaveAddLoading', payload: false})
+        yield put({type:'setAddLoading', payload: false})
+      }
+
 
     },
 
@@ -360,6 +375,13 @@ export default {
         saveLoading
       }
     },
+
+    setSaveAddLoading(state, {payload: saveAddLoading}) {
+      return {
+        ...state,
+        saveAddLoading
+      }
+    }
   },
 
 }
