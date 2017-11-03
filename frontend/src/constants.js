@@ -45,7 +45,7 @@ module.exports = {
 
   dataCategory: [
     'Business', 'Government', 'Education', 'Environment',
-    'Health', 'Housing & Development', 'Public', 'Services',
+    'Health', 'Housing & Development', 'Public Services',
     'Social', 'Transportation', 'Science', 'Technology'
   ],
 
