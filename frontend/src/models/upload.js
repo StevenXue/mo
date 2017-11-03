@@ -32,6 +32,8 @@ export default {
     totalPages: 10,
     pageSize: 4,
 
+    showStaged: false,
+
     dataSetsLoading: false,
     viewLoading: false,
     addLoading: false,
@@ -227,12 +229,6 @@ export default {
 
     },
 
-    * edit (payload, { put, call, select }) {
-      const res= yield call(
-        updateStagingDataSet, payload.name,
-        payload)
-    },
-
   },
 
   reducers: {
@@ -400,7 +396,14 @@ export default {
         ...state,
         sdsNames
       }
-    }
+    },
+
+    setShowStaged(state, {payload: showStaged}) {
+      return {
+        ...state,
+        showStaged
+      }
+    },
   },
 
 }
