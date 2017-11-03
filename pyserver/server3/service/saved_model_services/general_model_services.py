@@ -39,7 +39,7 @@ def get_prediction_by_id(server, model_name, input_value,features):
     print(port)
     regression_models = ['Linear Regressor']
     classification_models = ['Linear Classifier', 'SVM']
-    cluster_models = ['Kmeans Clustering','Gaussian Mixture Models Cluster']
+    cluster_models = ['Kmeans Clustering', 'Gaussian Mixture Models Cluster']
     keras_models = ['Multilayer Perceptron', 'Image Classifier VGG16',
                     'Image Classifier VGG19', 'General Neural Network',
                     'Image Classifier Inception V3',
@@ -70,11 +70,12 @@ def get_prediction_by_id(server, model_name, input_value,features):
             print(input_value[:, idx, np.newaxis])
             request.inputs[each_feature].CopyFrom(tf.contrib.util.make_tensor_proto(input_value[:, idx, np.newaxis]))
         result = stub.Predict(request, 10.0)  # 10 secs timeout
-        if model_name in cluster_models:
+        print(result)
+        if model_name == 'Kmeans Clustering':
             result = tensor_util.MakeNdarray(result.outputs['cluster_idx'])
+        elif model_name == 'Gaussian Mixture Models Cluster':
+            result = tensor_util.MakeNdarray(result.outputs['assignments'])
         elif model_name in classification_models:
-            print(features)
-            print(result)
             result = tensor_util.MakeNdarray(result.outputs['probabilities'])
             result = np.argmax(result, axis=1)
         else:
