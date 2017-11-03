@@ -400,8 +400,7 @@ def split_x_y(sds_id, x_fields, y_fields):
     :param y_fields:
     :return:
     """
-    data = staging_data_business. \
-        get_by_staging_data_set_and_fields(sds_id,
+    data = staging_data_business.get_by_staging_data_set_and_fields(sds_id,
                                            x_fields + y_fields,
                                            allow_nan=False)
     x = mongo_to_array(data, x_fields)
