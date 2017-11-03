@@ -230,7 +230,7 @@ def get_all_jobs_of_project(project_id, categories, status=None):
                 except DoesNotExist:
                     result_sds = None
 
-                if job['status'] == 200:
+                if job['status'] == 200 and key == 'model':
                     temp_data_fields = job_info['params']['fit']['data_fields']
                     if not isinstance(temp_data_fields[0], list):
                         job_info['params']['fit']['data_fields'] = [temp_data_fields]
