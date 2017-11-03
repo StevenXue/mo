@@ -1845,6 +1845,14 @@ class StepTemplate(object):
         ]
     }
 
+    feature_fields = {
+        **fields,
+        'name': 'feature_fields',
+        'display_name': 'select x fields'
+    }
+
+
+
 
 def update_toolkit():
     KMEAN = Toolkit(name='K平均数算法',
@@ -2387,6 +2395,8 @@ def update_toolkit():
                              }
                          ])
 
+
+    # TODO 增加fields
     select_k_best_chi2 = Toolkit(name='卡方选择法',
                                  description='选择K个最好的特征，返回选择特征后的数据',
                                  category=1,
@@ -2454,7 +2464,14 @@ def update_toolkit():
                                          **StepTemplate.data_source
                                      },
                                      {
-                                         **StepTemplate.fields
+                                         **StepTemplate.fields,
+                                         'name': 'feature_fields',
+                                         'display_name': 'select x fields'
+                                     },
+                                     {
+                                         **StepTemplate.fields,
+                                         'name': 'label_fields',
+                                         'display_name': 'select y fields'
                                      },
                                      {
                                          **StepTemplate.parameters,

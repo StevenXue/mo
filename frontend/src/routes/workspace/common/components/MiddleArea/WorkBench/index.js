@@ -330,7 +330,12 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                        }}
                        onMouseOver={() => handleMouseOverField(fieldName)}
                        onMouseLeave={() => handleMouseLeaveField()}>
-                    <p className={styles.text}>{fieldName}</p>
+                    <p style={{
+                      // backgroundColor: backgroundColor,
+                      color: values.includes(fieldName) ? 'white' : 'grey',
+                    }}
+                      className={styles.text}
+                    >{fieldName}</p>
                   </div>
                 )
 

@@ -121,7 +121,7 @@ def save_result():
     :rtype:
     '''
     data = {
-        "job_id": "59f2ece0d845c066c7aa5000"
+        "job_id": "59fbddb7d845c05927560783"
     }
     data = request.get_json()
     job_id = data['job_id']
@@ -134,7 +134,7 @@ def save_result():
 @job_app.route("/save_as_result", methods=["POST"])
 def save_as_result():
     data = {
-        'job_id': '',
+        'job_id': '59fbddb7d845c05927560783',
         'new_sds_name': 'xxx',
     }
     data = request.get_json()

@@ -31,7 +31,7 @@ def get_by_job_model(model):
 
 
 def get_by_project(project):
-    return job_repo.read_by_unique_field('project', project)
+    return job_repo.read_by_non_unique_field('project', project)
 
 
 def get_by_job_toolkit(toolkit):
@@ -138,3 +138,23 @@ def update_job_steps(job_id, steps, active_steps):
 
 def update_job_by_id(job_id, **kwargs):
     return job_repo.update_one_by_id(job_id, kwargs)
+
+
+def test_get_jobs():
+    from server3.business import project_business
+    # project = project_business.get_by_id('59c21ca6d845c0538f0fadd5')
+    # print("project", project)
+
+
+    # jobs = get_by_project('59c21ca6d845c0538f0fadd5')
+    # jobs = Job.objects(project='59c21ca6d845c0538f0fadd5')
+    jobs = job_repo.read({"project": '59c21ca6d845c0538f0fadd5', })
+    jobs = jobs.order_by('-create_time')
+
+    # jobs = Job.get(project='59c21ca6d845c0538f0fadd5')
+    print("jobs", [job.create_time for job in jobs])
+
+
+
+if __name__ == '__main__':
+    test_get_jobs()
