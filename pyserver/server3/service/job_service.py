@@ -540,7 +540,7 @@ def model_steps_to_obj(job_obj, project_id):
                                      {arg.get('name'): arg.get('value')
                                                        or arg.get('values')
                                                        or arg.get('default')
-                                      for arg in step['args']}}
+                                      for arg in steps[est_idx]['args']}}
 
     obj = {
         "data_source_id": job_obj.steps[0]["args"][0]["value"],

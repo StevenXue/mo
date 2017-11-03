@@ -93,6 +93,23 @@ def add_staging_data_set_by_data_set_id():
     return jsonify({'response': sds_json}), 200
 
 
+@staging_data_app.route('/staging_data_sets', methods=['PUT'])
+def edit_staging_data_set_info():
+    data = request.get_json()
+
+    sds_id = data['staging_data_set_id']
+    sds_name = data['staging_data_set_name']
+    sds_desc = data['staging_data_set_description']
+    sds_tags = data['staging_data_set_tags']
+    sds_field = data['staging_data_set_field']
+
+    result = staging_data_service.update_staging_data_set_by_data_set_id(
+        sds_id, sds_name, sds_desc, sds_tags, sds_field
+    )
+    result = json_utility.convert_to_json(result)
+    return jsonify({'response': result}), 200
+
+
 @staging_data_app.route('/staging_data_sets/types', methods=['PUT'])
 def convert_fields_type():
     data = request.get_json()

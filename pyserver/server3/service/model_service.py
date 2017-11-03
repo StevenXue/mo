@@ -41,11 +41,13 @@ from server3.constants import NAMESPACE
 from server3.lib import graph
 from server3.lib import model_from_json
 from server3.utility import file_utils
+
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 # user_directory = 'user_directory/'
 
 ModelType = {list(v)[1]: list(v)[0] for v in list(MODEL_TYPE)}
-TYPE = {list(v)[0]: list(v)[1] for v in list(TYPE)}
+TYPE = {list(v)[0]: list(v)[1] for v in list(TYPE) if
+        list(v)[1] != 'reinforcement_learning'}
 
 ZH_MAP = {
     'regression': '回归分析',
@@ -69,6 +71,7 @@ def get_all_public_model_by_type():
                        'model',
                        False) if obj.model.steps]
     models_list.sort(key=lambda x: x['name'])
+    # TYPE.pop(3)
     return [{'name': TYPE[key],
              'zh_name': ZH_MAP[TYPE[key]],
              'children': [model_obj for model_obj in models_list
@@ -84,7 +87,7 @@ def list_public_model_name():
 
 
 def add_model_with_ownership(user_ID, is_private, name, description, category,
-                             target_py_code, entry_function,
+                             target_py_code, entry_function, model_type,
                              to_code_function, parameter_spec, input, steps):
     """
     add_model_with_ownership
@@ -101,7 +104,7 @@ def add_model_with_ownership(user_ID, is_private, name, description, category,
     :return:
     """
     model = model_business.add(name, description, category,
-                               target_py_code, entry_function,
+                               target_py_code, entry_function, model_type,
                                to_code_function, parameter_spec, input, steps)
     user = user_business.get_by_user_ID(user_ID)
     ownership_business.add(user, is_private, model=model)
@@ -482,7 +485,7 @@ def model_input_manager_unsupervised(x_cols, data_source_id, model_name,
     df_x = staging_data_service.mongo_to_df(train_cursor)
     schema = kwargs.pop('schema')
     obj = staging_data_service.split_test_train({'x': df_x,
-                                                 'y': pd.DataFrame([[]])},
+                                                 'y': pd.DataFrame([])},
                                                 schema,
                                                 **kwargs)
     obj['y_tr'] = None
@@ -972,6 +975,66 @@ def _update_model():
         }
     }
 
+    SVM = {
+        "name": "Support Vector Machine",
+        "description": "custom sdca model",
+        "target_py_code": "server3/lib/models/svm",
+        "entry_function": "svm_model_fn",
+        "to_code_function": "custom_model_to_str",
+        "category": 1,
+        "model_type": 1,
+        "steps": models.SVMSteps,
+        "parameter_spec": models.SVM,
+        "input": {
+            "type": "DataFrame"
+        }
+    }
+
+    RandomForest = {
+        "name": "Random Forest",
+        "description": "custom Random Forest model",
+        "target_py_code": "server3/lib/models/randomforest.py",
+        "entry_function": "random_forest_model_fn",
+        "to_code_function": "custom_model_to_str",
+        "category": 1,
+        "model_type": 1,
+        "steps": models.RandomForestSteps,
+        "parameter_spec": models.RandomForest,
+        "input": {
+            "type": "DataFrame"
+        }
+    }
+
+    GMM = {
+        "name": "Gaussian Mixture Models Cluster",
+        "description": "custom Gaussian Mixture Models Cluster",
+        "target_py_code": "server3/lib/models/gmm_cluster.py",
+        "entry_function": "gmm_cluster_model_fn",
+        "to_code_function": "custom_model_to_str",
+        "category": 2,
+        "model_type": 2,
+        "steps": models.GMMSteps,
+        "parameter_spec": models.GMMCluster,
+        "input": {
+            "type": "DataFrame"
+        }
+    }
+
+    Kmeans = {
+        "name": "Kmeans Clustering",
+        "description": "custom kmean model",
+        "target_py_code": "server3/lib/models/kmean",
+        "entry_function": "kmeans_cluster_model_fn",
+        "to_code_function": "custom_model_to_str",
+        "category": 2,
+        "model_type": 2,
+        "steps": models.KmeansSteps,
+        "parameter_spec": models.KmeansCluster,
+        "input": {
+            "type": "DataFrame"
+        }
+    }
+
     user = user_business.get_by_user_ID('system')
 
     MODEL_DICT = [
@@ -999,6 +1062,30 @@ def _update_model():
             "user_ID": user.user_ID,
             "obj": MLP
         },
+        {
+            "_id": ObjectId("59687821d123abcfbfe8cab9"),
+            "is_private": False,
+            "user_ID": user.user_ID,
+            "obj": SVM
+        },
+        {
+            "_id": ObjectId("5983e7e339b6bd0c28bdbb29"),
+            "is_private": False,
+            "user_ID": user.user_ID,
+            "obj": RandomForest
+        },
+        {
+            "_id": ObjectId("59faffbb0c11f30876f25f07"),
+            "is_private": False,
+            "user_ID": user.user_ID,
+            "obj": GMM
+        },
+        {
+            "_id": ObjectId("59687821d123abcfbfe8cabb"),
+            "is_private": False,
+            "user_ID": user.user_ID,
+            "obj": Kmeans
+        }
     ]
 
     for model in MODEL_DICT:
@@ -1007,6 +1094,12 @@ def _update_model():
         except DoesNotExist:
             # create model
             model.pop('_id')
+            obj = {
+                **model.pop('obj'),
+                **model
+            }
+            print('Added:', add_model_with_ownership(**obj))
+        except KeyError:
             obj = {
                 **model.pop('obj'),
                 **model

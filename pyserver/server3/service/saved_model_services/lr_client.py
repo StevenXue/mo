@@ -28,7 +28,7 @@ import tensorflow as tf
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2
 
-tf.app.flags.DEFINE_string('server', 'localhost:9000',
+tf.app.flags.DEFINE_string('server', '10.52.14.182',
                            'PredictionService host:port')
 FLAGS = tf.app.flags.FLAGS
 

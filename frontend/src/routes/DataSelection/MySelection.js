@@ -25,7 +25,8 @@ class MySelection extends React.Component {
   }
 
   handleChangeCat = (value) => {
-    // console.log(this.props)
+    console.log(this.props)
+
     this.setState({
       category: value
     })
@@ -44,7 +45,8 @@ class MySelection extends React.Component {
     this.props.dispatch({ type: 'upload/setDataSetID', payload: oid})
     this.props.dispatch({ type: 'upload/setDataSetName', payload: name})
     this.props.dispatch({ type: 'upload/setDataSetDesc', payload: desc})
-    this.props.dispatch({ type: 'upload/stage'})
+    this.props.dispatch({ type: 'upload/stage', payload: 'old'})
+
   }
 
   handleNew = () => {
@@ -56,8 +58,17 @@ class MySelection extends React.Component {
 
   renderCards (privacy, category) {
     let dataSets
+    let sdsnames = this.props.upload.sdsNames
+
     if (!this.props.isStaged) {
       dataSets = this.props.upload.dataSets[privacy]
+      if (sdsnames.length > 0) {
+        // console.log('enter', sdsnames)
+        // console.log(dataSets)
+        dataSets = dataSets.filter(
+          (el) => !sdsnames.includes(el.name)
+        )
+      }
     } else {
       dataSets = this.props.upload.stagingDataSet
     }

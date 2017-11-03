@@ -144,13 +144,14 @@ def kmeans_cluster_model_fn(features, labels, mode, params, config):
     #   https://github.com/tensorflow/tensorflow/blob/master/tensorflow
     # /contrib/factorization/python/ops/clustering_ops.py
     (all_scores, model_predictions, losses,
-     is_initialized, init_op, training_op) = clustering_ops.KMeans(
+     is_initialized, cluster_centers_var, init_op, training_op) = \
+        clustering_ops.KMeans(
         _parse_tensor_or_dict(features),
         params.get('num_clusters'),
         initial_clusters=clustering_ops.RANDOM_INIT,
         distance_metric=clustering_ops.SQUARED_EUCLIDEAN_DISTANCE,
         use_mini_batch=False,
-        mini_batch_steps_per_iteration= 1,
+        mini_batch_steps_per_iteration=1,
         # use_mini_batch = params.get('use_mini_batch'),
         # mini_batch_steps_per_iteration=params.get(
         #     'mini_batch_steps_per_iteration'),
@@ -241,10 +242,9 @@ KmeansSteps = [
             },
             {
                 **SPEC.ui_spec['input'],
-                "name" : "random_seed",
+                "name": "random_seed",
                 "display_name": "Random Seed",
-                "des" : "Seed for PRNG used to initialize centers.",
-                "required" : True
+                "des": "Seed for PRNG used to initialize centers.",
             },
             {
                 **SPEC.ui_spec['input'],
@@ -254,29 +254,24 @@ KmeansSteps = [
                 "des": "If true, use the mini-batch k-means algorithm. Else "
                        "assume full batch."
             },
-            # {
-            #     "name": "kmeans_plus_plus_num_retries",
-            #     "type": {
-            #         "key": "int",
-            #         "des": "For each point that is sampled during kmeans++ initialization, this parameter specifies the number of additional points to draw from the current distribution before selecting the best. If a negative value is specified, a heuristic is used to sample O(log(num_to_sample)) additional points.",
-            #         "range": null
-            #     },
-            #     "default": 1,
-            #     "required": true
-            # },
-            # {
-            #     "name": "relative_tolerance",
-            #     "type": {
-            #         "key": "float",
-            #         "des": "A relative tolerance of change in the loss between iterations. Stops learning if the loss changes less than this amount. Note that this may not work correctly if use_mini_batch=True.",
-            #         "range": [
-            #             0.0,
-            #             100
-            #         ]
-            #     },
-            #     "default": null,
-            #     "required": false
-            # }
+            {
+                **SPEC.ui_spec['input'],
+                "name": "kmeans_plus_plus_num_retries",
+                "display_name": "Kmeans Plus Plus Num Retries",
+                "des": "For each point that is sampled during kmeans++ initialization, this parameter specifies the number of additional points to draw from the current distribution before selecting the best. If a negative value is specified, a heuristic is used to sample O(log(num_to_sample)) additional points.",
+                "default": 1,
+                "required": True
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name": "relative_tolerance",
+                "display_name": "Relative Tolerance",
+                "value_type": "float",
+                "range": [
+                    0.0,
+                    100
+                ],
+            }
         ]
     },
     {

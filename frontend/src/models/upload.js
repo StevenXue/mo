@@ -1,6 +1,6 @@
 import { uploadFile, fetchDataSets, fetchDataSet,
-  deleteDataColumns, changeTypes, stateData,
-  fetchStagingDataSet } from '../services/upload'
+  deleteDataColumns, changeTypes, stageData,
+  fetchStagingDataSet, updateStagingDataSet } from '../services/upload'
 
 import { message } from 'antd'
 import pathToRegexp from 'path-to-regexp';
@@ -26,6 +26,8 @@ export default {
     dataSetDesc: '',
     dataSetTags: [],
 
+    sdsNames: [],
+
     currentPage: 1,
     totalPages: 10,
     pageSize: 4,
@@ -35,6 +37,7 @@ export default {
     addLoading: false,
     delLoading: false,
     saveLoading: false,
+    saveAddLoading: false,
   },
 
   subscriptions: {
@@ -134,8 +137,13 @@ export default {
 
     },
 
-    * submit (action, { put, call, select }) {
-      yield put({type:'setSaveLoading', payload: true})
+    * submit ({payload}, { put, call, select }) {
+      if (payload === 'new') {
+        yield put({type:'setSaveAddLoading', payload: true})
+      } else {
+        yield put({type:'setSaveLoading', payload: true})
+      }
+
       const flds = yield select(state => state.upload.fields)
       const org_flds = yield select(state => state.upload.orgFields)
       const dels = yield select(state => state.upload.deleted)
@@ -168,10 +176,10 @@ export default {
         console.log('not change')
       }
 
-      yield put({type: 'stage'})
+      yield put({type: 'stage', payload: payload})
     },
 
-    * stage (action, { put, call, select }) {
+    * stage ({payload}, { put, call, select }) {
       // const test = yield select(state => state)
       // console.log(test)
       yield put({type:'setAddLoading', payload: true})
@@ -179,12 +187,22 @@ export default {
       const dsname = yield select(state => state.upload.dataSetName)
       const dsdes = yield select(state => state.upload.dataSetDesc)
       const dataSetID = yield select(state => state.upload.dataSetID)
-      const res = yield call(stateData, dataSetID, prjID, dsname, dsdes)
+      const res = yield call(stageData, dataSetID, prjID, dsname, dsdes)
       console.log(res)
-      yield put({type: 'staged'})
-      const url0 = location.hash.substr(1).replace('preview', '')
-      // console.log('url0', url0)
-      yield put(routerRedux.replace(url0))
+      if (payload !== 'new') {
+        yield put({type: 'staged'})
+        const url0 = location.hash.substr(1).replace('preview', '')
+        const url1 = url0.replace('select', '')
+        // console.log('url0', url0)
+        yield put(routerRedux.replace(url1))
+
+      } else {
+        const url1 = location.hash.substr(1).replace('preview', 'choice')
+        yield put(routerRedux.replace(url1))
+        yield put({type:'setSaveAddLoading', payload: false})
+        yield put({type:'setAddLoading', payload: false})
+      }
+
 
     },
 
@@ -199,12 +217,21 @@ export default {
       } else {
         yield put({type: 'setStagingDataSet', payload: res.data})
         console.log(res.data)
+        const sdsnames = res.data.map((e) => (e.name))
+        yield put({type: 'setsdsNames', payload: sdsnames})
+        // console.log(sdsnames)
         // yield put(routerRedux.push('list'))
         yield put({type:'setAddLoading', payload: false})
         yield put({type:'setSaveLoading', payload: false})
       }
 
-    }
+    },
+
+    * edit (payload, { put, call, select }) {
+      const res= yield call(
+        updateStagingDataSet, payload.name,
+        payload)
+    },
 
   },
 
@@ -360,6 +387,20 @@ export default {
         saveLoading
       }
     },
+
+    setSaveAddLoading(state, {payload: saveAddLoading}) {
+      return {
+        ...state,
+        saveAddLoading
+      }
+    },
+
+    setsdsNames(state, {payload: sdsNames}) {
+      return {
+        ...state,
+        sdsNames
+      }
+    }
   },
 
 }

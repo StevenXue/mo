@@ -32,6 +32,11 @@ def get_by_query_str(staging_data_set_id, **kwargs):
     return staging_data_business.get_by_query_str(**kwargs)
 
 
+def get_first_one_by_staging_data_set_id(staging_data_set_id):
+    return staging_data_business.get_first_one_by_staging_data_set_id(
+        staging_data_set_id)
+
+
 def list_staging_data_sets_by_project_id(project_id, without_result=False):
     """
     Get the list of staging_data_set by project id
@@ -113,6 +118,18 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
         staging_data_business.remove_by_staging_data_set_id(sds.id)
         staging_data_set_business.remove_by_id(sds.id)
         raise e
+
+
+def update_staging_data_set_by_data_set_id(sds_id, sds_name, sds_desc, sds_tags,
+                                           sds_field):
+
+    sds_tags = [x.strip() for x in sds_tags.split(',')]
+    result = staging_data_set_business.update(
+        sds_id, name=sds_name, description=sds_desc, tags=sds_tags,
+        related_field=sds_field
+    )
+    return result
+
 
 
 def convert_fields_type(sds_id, f_t_arrays):
@@ -425,14 +442,29 @@ def split_test_train(x_y_obj, schema='cv', **kwargs):
                 'x_te': x[divide_row:, :], 'y_te': y[divide_row:, :]}
     if schema == 'rand':
         ratio = ratio or DEFAULT_RATIO
-        X_train, X_test, y_train, y_test = train_test_split(
-            x, y,
-            test_size=1 - ratio,
-            random_state=42)
-        return {'x_tr': X_train,
-                'y_tr': y_train,
-                'x_te': X_test,
-                'y_te': y_test}
+        if (isinstance(y, pd.DataFrame) and y.empty) or \
+                (isinstance(y, np.ndarray) and np.empty(y)):
+                X_train, X_test = train_test_split(
+                    x,
+                    test_size=1 - ratio,
+                    random_state=42)
+                y_train = []
+                y_test = []
+        else:
+            X_train, X_test, y_train, y_test = train_test_split(
+                x, y,
+                test_size=1 - ratio,
+                random_state=42)
+        if isinstance(x, pd.DataFrame):
+            return {'x_tr': pd.DataFrame(X_train),
+                    'y_tr': pd.DataFrame(y_train),
+                    'x_te': pd.DataFrame(X_test),
+                    'y_te': pd.DataFrame(y_test)}
+        else:
+            return {'x_tr': X_train,
+                    'y_tr': y_train,
+                    'x_te': X_test,
+                    'y_te': y_test}
 
 
 def copy_staging_data_set(sds, belonged_project, **kwargs):

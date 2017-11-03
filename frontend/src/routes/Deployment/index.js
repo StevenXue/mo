@@ -168,6 +168,58 @@ function UseThisAPIPage({deployment, dispatch}) {
 }
 
 
+function input_output_card(featuresTargetsCards){
+  if ((featuresTargetsCards[1])){
+    return(
+      <div>
+        <h3>Input</h3>
+        <div className={styles.fields}>
+          {featuresTargetsCards[0].map(field =>
+            <div
+              key={field}
+              className={styles.field}
+              style={{backgroundColor: '#F3F3F3'}}
+            >
+              <p className={styles.text}>{field}</p>
+            </div>
+          )}
+        </div>
+        <h3>Output</h3>
+        <div className={styles.fields}>
+          {featuresTargetsCards[1].map(field =>
+            <div
+              key={field}
+              className={styles.field}
+              style={{backgroundColor: '#F3F3F3'}}
+            >
+              <p className={styles.text}>{field}</p>
+            </div>
+          )}
+        </div></div>)
+  }
+  else{
+    return(
+      <div>
+        <h3>Input</h3>
+        <div className={styles.fields}>
+          {featuresTargetsCards[0].map(field =>
+            <div
+              key={field}
+              className={styles.field}
+              style={{backgroundColor: '#F3F3F3'}}
+            >
+              <p className={styles.text}>{field}</p>
+            </div>
+          )}
+        </div>
+        </div>)
+  }
+
+
+
+}
+
+
 function Deployment({deployment, dispatch}) {
   const {
     modelsJson,
@@ -241,30 +293,32 @@ function Deployment({deployment, dispatch}) {
                     style={{padding: '0 0 10px 0'}}>{get(modelsJson, `[${focusModelId}].datasetInfo.name`)}</h2>
                   <p>{get(modelsJson, `[${focusModelId}].datasetInfo.description`)}</p>
                   <h2 style={{padding: '20px 0 10px 0'}}>Selected Fields</h2>
-                  <h3>Input</h3>
-                  <div className={styles.fields}>
-                    {featuresTargetsCards[0].map(field =>
-                      <div
-                        key={field}
-                        className={styles.field}
-                        style={{backgroundColor: '#F3F3F3'}}
-                      >
-                        <p className={styles.text}>{field}</p>
-                      </div>
-                    )}
-                  </div>
-                  <h3>Output</h3>
-                  <div className={styles.fields}>
-                    {featuresTargetsCards[1].map(field =>
-                      <div
-                        key={field}
-                        className={styles.field}
-                        style={{backgroundColor: '#F3F3F3'}}
-                      >
-                        <p className={styles.text}>{field}</p>
-                      </div>
-                    )}
-                  </div>
+                  {input_output_card(featuresTargetsCards)}
+                  {/*<h3>Input</h3>*/}
+                  {/*<div className={styles.fields}>*/}
+                    {/*{featuresTargetsCards[0].map(field =>*/}
+                      {/*<div*/}
+                        {/*key={field}*/}
+                        {/*className={styles.field}*/}
+                        {/*style={{backgroundColor: '#F3F3F3'}}*/}
+                      {/*>*/}
+                        {/*<p className={styles.text}>{field}</p>*/}
+                      {/*</div>*/}
+                    {/*)}*/}
+                  {/*</div>*/}
+                  {/*<h3>Output</h3>*/}
+                  {/*<div className={styles.fields}>*/}
+                    {/*{featuresTargetsCards[1].map(field =>*/}
+                      {/*<div*/}
+                        {/*key={field}*/}
+                        {/*className={styles.field}*/}
+                        {/*style={{backgroundColor: '#F3F3F3'}}*/}
+                      {/*>*/}
+                        {/*<p className={styles.text}>{field}</p>*/}
+                      {/*</div>*/}
+                    {/*)}*/}
+                  {/*</div>*/}
+
                 </div>
                 <div>
                   <h1>Performance</h1>
