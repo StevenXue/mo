@@ -144,13 +144,14 @@ def kmeans_cluster_model_fn(features, labels, mode, params, config):
     #   https://github.com/tensorflow/tensorflow/blob/master/tensorflow
     # /contrib/factorization/python/ops/clustering_ops.py
     (all_scores, model_predictions, losses,
-     is_initialized, init_op, training_op) = clustering_ops.KMeans(
+     is_initialized, cluster_centers_var, init_op, training_op) = \
+        clustering_ops.KMeans(
         _parse_tensor_or_dict(features),
         params.get('num_clusters'),
         initial_clusters=clustering_ops.RANDOM_INIT,
         distance_metric=clustering_ops.SQUARED_EUCLIDEAN_DISTANCE,
         use_mini_batch=False,
-        mini_batch_steps_per_iteration= 1,
+        mini_batch_steps_per_iteration=1,
         # use_mini_batch = params.get('use_mini_batch'),
         # mini_batch_steps_per_iteration=params.get(
         #     'mini_batch_steps_per_iteration'),
@@ -241,10 +242,9 @@ KmeansSteps = [
             },
             {
                 **SPEC.ui_spec['input'],
-                "name" : "random_seed",
+                "name": "random_seed",
                 "display_name": "Random Seed",
-                "des" : "Seed for PRNG used to initialize centers.",
-                "required" : True
+                "des": "Seed for PRNG used to initialize centers.",
             },
             {
                 **SPEC.ui_spec['input'],

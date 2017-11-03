@@ -30,11 +30,11 @@ def get_by_model_id(model_obj):
 
 
 def add(name, description, category,
-        target_py_code, entry_function,
+        target_py_code, entry_function, model_type,
         to_code_function, parameter_spec, input, steps):
     model = Model(name=name, description=description, category=category,
                   entry_function=entry_function, target_py_code=target_py_code,
-                  to_code_function=to_code_function,
+                  to_code_function=to_code_function, model_type=model_type,
                   parameter_spec=parameter_spec,
                   input=input, steps=steps)
     # user = user_business.get_by_user_ID('system')

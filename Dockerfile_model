@@ -3,7 +3,7 @@ FROM python:3
 WORKDIR /pyserver
 
 ADD pyserver/server3/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --index https://pypi.mirrors.ustc.edu.cn/simple/ --no-cache-dir -r requirements.txt
 
 COPY metric_spec.py /usr/local/lib/python3.6/site-packages/tensorflow/contrib/learn/python/learn/metric_spec.py
 COPY .keras /root/.keras

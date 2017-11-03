@@ -43,7 +43,7 @@ class Model(DynamicDocument):
     category = IntField(required=True, choices=MODEL_TYPE)
     model_type = IntField(required=True, choices=TYPE)
     parameter_spec = DictField(required=True)
-    steps = DictField()
+    steps = ListField(DictField())
     input = DictField(required=True)
     user_name = StringField(max_length=50)
     # usage = IntField(choices=RESUlt_TYPE, required=True)    # 类型，用作何用途

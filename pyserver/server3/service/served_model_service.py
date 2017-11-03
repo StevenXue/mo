@@ -384,5 +384,5 @@ def resume_by_id(served_model_id, user_ID, model_name):
         return False
 
 
-def get_prediction_by_id(server, model_name,input_value,features):
-    return general_model_services.get_prediction_by_id(server, model_name,input_value,features)
+def get_prediction_by_id(server, model_name, input_value, features):
+    return general_model_services.get_prediction_by_id(server, model_name, input_value,features)
