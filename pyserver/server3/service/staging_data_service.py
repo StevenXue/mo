@@ -120,6 +120,18 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
         raise e
 
 
+def update_staging_data_set_by_data_set_id(sds_id, sds_name, sds_desc, sds_tags,
+                                           sds_field):
+
+    sds_tags = [x.strip() for x in sds_tags.split(',')]
+    result = staging_data_set_business.update(
+        sds_id, name=sds_name, description=sds_desc, tags=sds_tags,
+        related_field=sds_field
+    )
+    return result
+
+
+
 def convert_fields_type(sds_id, f_t_arrays):
     """
     convert field types of staging data set

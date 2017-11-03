@@ -1,6 +1,6 @@
 import { uploadFile, fetchDataSets, fetchDataSet,
-  deleteDataColumns, changeTypes, stateData,
-  fetchStagingDataSet } from '../services/upload'
+  deleteDataColumns, changeTypes, stageData,
+  fetchStagingDataSet, updateStagingDataSet } from '../services/upload'
 
 import { message } from 'antd'
 import pathToRegexp from 'path-to-regexp';
@@ -187,7 +187,7 @@ export default {
       const dsname = yield select(state => state.upload.dataSetName)
       const dsdes = yield select(state => state.upload.dataSetDesc)
       const dataSetID = yield select(state => state.upload.dataSetID)
-      const res = yield call(stateData, dataSetID, prjID, dsname, dsdes)
+      const res = yield call(stageData, dataSetID, prjID, dsname, dsdes)
       console.log(res)
       if (payload !== 'new') {
         yield put({type: 'staged'})
@@ -219,13 +219,19 @@ export default {
         console.log(res.data)
         const sdsnames = res.data.map((e) => (e.name))
         yield put({type: 'setsdsNames', payload: sdsnames})
-        console.log(sdsnames)
+        // console.log(sdsnames)
         // yield put(routerRedux.push('list'))
         yield put({type:'setAddLoading', payload: false})
         yield put({type:'setSaveLoading', payload: false})
       }
 
-    }
+    },
+
+    * edit (payload, { put, call, select }) {
+      const res= yield call(
+        updateStagingDataSet, payload.name,
+        payload)
+    },
 
   },
 

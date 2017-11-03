@@ -63,8 +63,8 @@ class MySelection extends React.Component {
     if (!this.props.isStaged) {
       dataSets = this.props.upload.dataSets[privacy]
       if (sdsnames.length > 0) {
-        console.log('enter', sdsnames)
-        console.log(dataSets)
+        // console.log('enter', sdsnames)
+        // console.log(dataSets)
         dataSets = dataSets.filter(
           (el) => !sdsnames.includes(el.name)
         )
