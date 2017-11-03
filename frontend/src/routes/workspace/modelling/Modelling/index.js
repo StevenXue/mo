@@ -2,6 +2,7 @@ import React from 'react';
 import {connect} from 'dva';
 
 import Common from '../../common/Common/index'
+import Guidance from '../../dataAnalysis/Guidance'
 
 
 function Modelling({location, dispatch, modelling}) {
@@ -11,8 +12,15 @@ function Modelling({location, dispatch, modelling}) {
     dispatch: dispatch,
     step: 'model'
   };
+
+  const {
+    showGuidance
+  } = modelling;
+
   return (
-    <Common {...props}/>
+    showGuidance ?
+      <Guidance {...props}/> :
+      <Common {...props}/>
   );
 }
 

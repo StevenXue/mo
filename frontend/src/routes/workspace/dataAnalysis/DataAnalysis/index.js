@@ -12,6 +12,7 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
     dispatch: dispatch,
     step: 'toolkit'
   };
+
   const {
     showGuidance
   } = dataAnalysis;
