@@ -243,8 +243,8 @@ export default {
         const match = pathToRegexp('/workspace/:projectId/deploy').exec(pathname);
         if (match) {
           const projectId = match[1];
-          console.log('projectId')
-          console.log(projectId)
+          // console.log('projectId')
+          // console.log(projectId)
           dispatch({
             type: 'fetchModels',
             payload: {projectId: projectId, categories: 'model'},

@@ -294,7 +294,7 @@ def build_how_to_use_code(job_info):
     str_py += "import json\n"
     str_py += "data = { \n"
     str_py += "  \"server\":\"" + server + "\",\n"
-    str_py += "  \"input_value\": [[1.1, 2.1, 3.0, 4.0]],\n"
+    str_py += "  \"input_value\": " + job_info["served_model"]["input_data_demo_string"] + ",\n"
     str_py += "  \"served_model_id\":\"" + served_model_id + "\",\n"
     str_py += "  \"model_name\":\"" + served_model_name + "\",\n"
     str_py += " }\n"
