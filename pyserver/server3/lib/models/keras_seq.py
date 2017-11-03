@@ -29,6 +29,8 @@ def keras_seq(conf, input, **kw):
     project = project_business.get_by_id(project_id)
     ow = ownership_business.get_ownership_by_owned_item(project, 'project')
     user_ID = ow.user.user_ID
+    print('conf')
+    print(conf)
     result_dir = kw.pop('result_dir', None)
     if result_sds is None:
         raise RuntimeError('no result sds id passed to model')

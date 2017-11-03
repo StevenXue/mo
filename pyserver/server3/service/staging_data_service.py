@@ -400,8 +400,7 @@ def split_x_y(sds_id, x_fields, y_fields):
     :param y_fields:
     :return:
     """
-    data = staging_data_business. \
-        get_by_staging_data_set_and_fields(sds_id,
+    data = staging_data_business.get_by_staging_data_set_and_fields(sds_id,
                                            x_fields + y_fields,
                                            allow_nan=False)
     x = mongo_to_array(data, x_fields)
@@ -443,7 +442,7 @@ def split_test_train(x_y_obj, schema='cv', **kwargs):
     if schema == 'rand':
         ratio = ratio or DEFAULT_RATIO
         if (isinstance(y, pd.DataFrame) and y.empty) or \
-                (isinstance(y, np.ndarray) and np.empty(y)):
+                (isinstance(y, np.ndarray) and y.size == 0):
                 X_train, X_test = train_test_split(
                     x,
                     test_size=1 - ratio,
