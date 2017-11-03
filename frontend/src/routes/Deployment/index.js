@@ -169,8 +169,7 @@ function UseThisAPIPage({deployment, dispatch}) {
 
 
 function input_output_card(featuresTargetsCards){
-  if (Array.isArray(featuresTargetsCards[0])){
-    console.log(featuresTargetsCards)
+  if ((featuresTargetsCards[1])){
     return(
       <div>
         <h3>Input</h3>
@@ -203,7 +202,7 @@ function input_output_card(featuresTargetsCards){
       <div>
         <h3>Input</h3>
         <div className={styles.fields}>
-          {featuresTargetsCards.map(field =>
+          {featuresTargetsCards[0].map(field =>
             <div
               key={field}
               className={styles.field}

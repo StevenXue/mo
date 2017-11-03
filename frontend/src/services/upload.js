@@ -51,8 +51,8 @@ export function changeTypes(id, arrays) {
   })
 }
 
-// state data
-export function stateData(dsid, prjid, name, desc) {
+// stage data
+export function stageData(dsid, prjid, name, desc) {
   return request(CORS + getStagingData, {
     method: 'POST',
     headers: {
@@ -74,5 +74,22 @@ export async function fetchStagingDataSet(prjid) {
   let query = `?project_id=${prjid}&without_result=true`;
   return request(CORS + getStagingData + query, {
     method: 'get',
+  })
+}
+
+// update staging dataset
+export function updateStagingDataSet(sdsid, name, desc, tags, field) {
+  return request(CORS + getStagingData, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      'staging_data_set_id': sdsid,
+      'staging_data_set_name': name,
+      'staging_data_set_description': desc,
+      'staging_data_set_tags': tags,
+      'staging_data_set_field': field
+    })
   })
 }
