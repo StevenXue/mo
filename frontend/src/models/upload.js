@@ -192,8 +192,9 @@ export default {
       if (payload !== 'new') {
         yield put({type: 'staged'})
         const url0 = location.hash.substr(1).replace('preview', '')
+        const url1 = url0.replace('select', '')
         // console.log('url0', url0)
-        yield put(routerRedux.replace(url0))
+        yield put(routerRedux.replace(url1))
 
       } else {
         const url1 = location.hash.substr(1).replace('preview', 'choice')

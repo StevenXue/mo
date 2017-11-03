@@ -45,7 +45,8 @@ class MySelection extends React.Component {
     this.props.dispatch({ type: 'upload/setDataSetID', payload: oid})
     this.props.dispatch({ type: 'upload/setDataSetName', payload: name})
     this.props.dispatch({ type: 'upload/setDataSetDesc', payload: desc})
-    this.props.dispatch({ type: 'upload/stage'})
+    this.props.dispatch({ type: 'upload/stage', payload: 'old'})
+
   }
 
   handleNew = () => {
