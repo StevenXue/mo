@@ -444,17 +444,24 @@ def add_new_column(value, index, fields, name, staging_data_set_id):
 def toolkit_steps_to_obj(job_obj, project_id):
     new_args = {}
     if len(job_obj.steps) > 2:
-        args = job_obj.steps[2].get("args")
+        args = StepBusiness.get_parameters_step(job_obj.steps).get('args')
+        # args = job_obj.steps[2].get("args")
         for arg in args:
             new_args[arg['name']] = arg['value']
+
+    if StepBusiness.check_fields(job_obj.steps):
+        data_fields = StepBusiness.get_fields(job_obj.steps)
+    else:
+        data_fields = [StepBusiness.get_feature_fields(job_obj.steps),
+                       StepBusiness.get_label_fields(job_obj.steps)]
 
     obj = {
         "staging_data_set_id": job_obj.steps[0]["args"][0]["value"],
         "conf": {
             "args": new_args,
-            "data_fields":
+            "data_fields": data_fields,
             # ["HighAlpha", "Attention_dimension_reduction_PCA_col"]
-                job_obj.steps[1]["args"][0]["values"]
+            #     job_obj.steps[1]["args"][0]["values"],
         },
         "project_id": project_id,
         "toolkit_id": job_obj.toolkit.id,

@@ -1845,6 +1845,14 @@ class StepTemplate(object):
         ]
     }
 
+    feature_fields = {
+        **fields,
+        'name': 'feature_fields',
+        'display_name': 'select x fields'
+    }
+
+
+
 
 def update_toolkit():
     KMEAN = Toolkit(name='K平均数算法',
