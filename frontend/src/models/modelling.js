@@ -61,7 +61,6 @@ const modelling = modelExtend(workBench, {
     },
     setMetrics(state, { payload }) {
       const { message } = payload
-      console.log('message', message)
       const sectionId = message.job_id
       let sectionsJson = state.sectionsJson
       let metrics = {
@@ -73,6 +72,10 @@ const modelling = modelExtend(workBench, {
         'val_precision': [],
         'val_recall': [],
         'val_loss': [],
+      }
+
+      if(sectionsJson[sectionId].messages) {
+        sectionsJson[sectionId].messages.has(message)
       }
 
       if (sectionsJson[sectionId].metrics_status) {
@@ -99,8 +102,19 @@ const modelling = modelExtend(workBench, {
         }
         sectionsJson[sectionId].metrics_status = metrics
       }
+
+      // receive batch
       if(message.batch) {
         sectionsJson[sectionId].batch = message.batch
+      }
+
+      // record messages and prevent duplicate
+      if(message) {
+        if(!sectionsJson[sectionId].messages) {
+          sectionsJson[sectionId].messages= new Set([message])
+        } else {
+          sectionsJson[sectionId].messages.add(message)
+        }
       }
       console.log('sectionsJson', sectionsJson)
       return {
