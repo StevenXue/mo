@@ -230,6 +230,7 @@ export default {
       payload.server = yield select(state => state.deployment.modelsJson[focusModelId]['served_model']['server']);
       // payload.name=yield select(state => state.deployment.modelsJson[focusModelId]['served_model']['name']);
       payload.model_name = yield select(state => state.deployment.modelsJson[focusModelId]['model']['name']);
+
       payload.features= yield select(state => state.deployment.modelsJson[focusModelId]['params']['fit']['data_fields'][0]);
       const {data: result} = yield call(deploymentService.getPrediction, payload);
       yield put({type: 'getPredictionR', payload: result});

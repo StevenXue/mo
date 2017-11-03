@@ -225,7 +225,11 @@ def get_all_jobs_of_project(project_id, categories, status=None):
                 except DoesNotExist:
                     result_sds = None
 
-
+                if job['status'] == 200:
+                    temp_data_fields = job_info['params']['fit']['data_fields']
+                    if not isinstance(temp_data_fields[0], list):
+                        job_info['params']['fit']['data_fields'] = [temp_data_fields]
+                    print(job_info['params']['fit']['data_fields'][0])
                 # model running status info
                 # if key == 'model':
                 #     job_name = KUBE_NAME['model'].format(job_id=job['id'])
@@ -243,13 +247,8 @@ def get_all_jobs_of_project(project_id, categories, status=None):
                     # 获取训练 served_model 时所用的数据的第一条
                     staging_data_demo= staging_data_service.get_first_one_by_staging_data_set_id(job_info['staging_data_set_id'])
                     one_input_data_demo = []
-                    data_fields = job_info['params']['fit']['data_fields']
-                    if isinstance(data_fields[0], list):
-                        for each_feture in data_fields[0]:
-                            one_input_data_demo.append(staging_data_demo[each_feture])
-                    else:
-                        for each_feture in data_fields:
-                            one_input_data_demo.append(staging_data_demo[each_feture])
+                    for each_feture in job_info['params']['fit']['data_fields'][0]:
+                        one_input_data_demo.append(staging_data_demo[each_feture])
                     input_data_demo_string = '['+",".join(str(x) for x in one_input_data_demo)+']'
                     input_data_demo_string = '['+input_data_demo_string+','+input_data_demo_string+']'
                     print(input_data_demo_string)
@@ -271,6 +270,8 @@ def build_how_to_use_code(job_info):
     served_model_id = str(job_info['served_model']['_id'])
     server = str(job_info['served_model']['server'])
     served_model_name = job_info['served_model']['model_name']
+    features = job_info['params']['fit']['data_fields'][0]
+    features_str = '[' + ",".join(('\'' + str(x) + '\'') for x in features) +']'
 
     str_js = "let url = 'http://localhost:5000/served_model/predict/" + \
              served_model_id+"';\n"
@@ -280,6 +281,7 @@ def build_how_to_use_code(job_info):
     str_js += "  served_model_id:\"" + served_model_id+"\",\n"
     str_js += "  server:\"" + server + "\",\n"
     str_js += "  model_name: \""+served_model_name+"\",\n"
+    str_js += "  features: "+features_str+",\n"
     str_js += "};\n"
     str_js += "fetch(url, {\n"
     str_js += "  method: \"POST\",\n"
@@ -302,6 +304,7 @@ def build_how_to_use_code(job_info):
     str_py += "  \"input_value\": " + job_info["served_model"]["input_data_demo_string"] + ",\n"
     str_py += "  \"served_model_id\":\"" + served_model_id + "\",\n"
     str_py += "  \"model_name\":\"" + served_model_name + "\",\n"
+    str_py += "  \"features\":" + features_str + ",\n"
     str_py += " }\n"
     str_py += "r = requests.post(\"http://localhost:5000/served_model/predict/"+ \
               served_model_id + "\",json=data) \n"
