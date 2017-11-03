@@ -256,6 +256,49 @@ def add_new_keys_value(sds_id, lst_dicts):
 
 def update_many_with_new_fields(raw_data, index, fields, name, sds_id):
     ids = staging_data_business.get_by_staging_data_set_id(sds_id)
+
+    ids = list(ids)
+    inn = 0
+    while inn in index:
+        inn += 1
+
+    list_dicts = []
+    # 判断是否为一维数组
+    if not isinstance(raw_data[inn], list):
+        str_name = fields[0] + name if len(fields) == 1 else name
+        for i in range(len(ids)):
+            list_dicts.append({'_id': ids[i].id, str_name: raw_data[i]})
+    else:
+        length1 = len(raw_data[inn])
+        length2 = len(fields)
+        # 判断是不是一对多还是多对多
+        if length1 == length2:
+            name_list = [item + '_' + name for item in fields]
+        elif length2 == 1:
+            name_list = [fields[0] + '_' + name + str(i) for i in
+                         range(length1)]
+        else:
+            name_list = [name + str(i) for i in range(length1)]
+
+        # for i in range(len(raw_data)):
+        for i in range(len(raw_data)):
+            arr = raw_data[i]
+            if arr != arr:
+                rows = [arr] * length1
+                obj = dict(zip(name_list, rows))
+            else:
+                obj = dict(zip(name_list, arr))
+            obj.update({'_id': ids[i].id})
+            list_dicts.append(obj)
+
+    # 把list_dicts存到数据库
+    staging_data_business.update_many_with_new_fields(list_dicts)
+
+
+# 把 raw_data 存进 sds 中
+def new_update_many_with_new_fields(raw_data, fields, name, sds_id):
+    ids = staging_data_business.get_by_staging_data_set_id(sds_id)
+
     ids = list(ids)
     inn = 0
     while inn in index:
@@ -399,13 +442,14 @@ def split_test_train(x_y_obj, schema='cv', **kwargs):
                 'x_te': x[divide_row:, :], 'y_te': y[divide_row:, :]}
     if schema == 'rand':
         ratio = ratio or DEFAULT_RATIO
-        if y.empty:
-            X_train, X_test = train_test_split(
-                x,
-                test_size=1 - ratio,
-                random_state=42)
-            y_train = []
-            y_test = []
+        if (isinstance(y, pd.DataFrame) and y.empty) or \
+                (isinstance(y, np.ndarray) and np.empty(y)):
+                X_train, X_test = train_test_split(
+                    x,
+                    test_size=1 - ratio,
+                    random_state=42)
+                y_train = []
+                y_test = []
         else:
             X_train, X_test, y_train, y_test = train_test_split(
                 x, y,
@@ -416,10 +460,11 @@ def split_test_train(x_y_obj, schema='cv', **kwargs):
                     'y_tr': pd.DataFrame(y_train),
                     'x_te': pd.DataFrame(X_test),
                     'y_te': pd.DataFrame(y_test)}
-        return {'x_tr': X_train,
-                'y_tr': y_train,
-                'x_te': X_test,
-                'y_te': y_test}
+        else:
+            return {'x_tr': X_train,
+                    'y_tr': y_train,
+                    'x_te': X_test,
+                    'y_te': y_test}
 
 
 def copy_staging_data_set(sds, belonged_project, **kwargs):
@@ -442,3 +487,10 @@ def copy_staging_data_set(sds, belonged_project, **kwargs):
             sds, belonged_project, belonged_job)
         staging_data_business.copy_staging_data_by_staging_data_set_id(sds_cp)
         return sds_cp
+
+
+def update_staging_data_set_by_job_id(job_id):
+    sds_obj = staging_data_set_business.get_by_job_id(job_id)
+    sds_obj.type = 'save'
+    return sds_obj.save()
+

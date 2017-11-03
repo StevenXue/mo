@@ -28,3 +28,16 @@ export function fetchStagingDataset(id) {
   })
 }
 
+// save staging data
+export function saveStagingDataset(payload) {
+  return request(`/api${PREFIX}/staging_data_sets/update_type`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body:  JSON.stringify({
+      "job_id": payload.id
+    })
+  })
+}
+

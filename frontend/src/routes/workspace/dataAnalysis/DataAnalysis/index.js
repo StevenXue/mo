@@ -1,6 +1,9 @@
 import React from 'react';
 import {connect} from 'dva';
+import {Button} from 'antd'
+
 import Common from '../../common/Common/index'
+import Guidance from '../Guidance'
 
 function DataAnalysis({location, dispatch, dataAnalysis}) {
   const props = {
@@ -9,8 +12,14 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
     dispatch: dispatch,
     step: 'toolkit'
   };
+  const {
+    showGuidance
+  } = dataAnalysis;
+
   return (
-    <Common {...props}/>
+    showGuidance ?
+      <Guidance {...props}/> :
+      <Common {...props}/>
   );
 }
 

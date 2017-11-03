@@ -1,7 +1,8 @@
 import * as dataAnalysisService from '../services/dataAnalysis'
 import * as stagingDataService from '../services/stagingData'
 import * as modelService from '../services/model'
-import { arrayToJson } from '../utils/JsonUtils'
+import { arrayToJson, JsonToArray} from '../utils/JsonUtils'
+
 import pathToRegexp from 'path-to-regexp'
 import { cloneDeep } from 'lodash'
 
@@ -47,7 +48,9 @@ export default {
       getAlgorithms: false,
       wholePage: false,
     },
-    resultVisible: false
+    resultVisible: false,
+
+    showGuidance: false
 
   },
   reducers: {
@@ -75,9 +78,16 @@ export default {
 
     // 更新sections
     setSections(state, action) {
+      const sections = JsonToArray(action.payload.sectionsJson);
+      let showGuidance = state.showGuidance;
+
+      if (sections.length === 0) {
+        showGuidance= true
+      }
       return {
         ...state,
         sectionsJson: action.payload.sectionsJson,
+        showGuidance
       }
     },
 
@@ -86,8 +96,8 @@ export default {
       return {
         ...state,
         sectionsJson: {
-          ...state.sectionsJson,
           [action.payload.section['_id']]: action.payload.section,
+          ...state.sectionsJson,
         },
 
       }
@@ -423,9 +433,11 @@ export default {
     },
 
     setSectionResult(state, action) {
-      const { sectionId, result } = action.payload
+      const { sectionId, result, visual_sds_id } = action.payload
       let section = state.sectionsJson[sectionId]
       section['result'] = result
+      section['visual_sds_id'] = visual_sds_id
+
       return {
         ...state,
         sectionsJson: {
@@ -434,6 +446,14 @@ export default {
         },
       }
     },
+
+    setShowGuidance(state, action) {
+      const {showGuidance} = action.payload;
+      return {
+        ...state,
+        showGuidance
+      }
+    }
   },
   effects: {
     // 获取用户所有sections
@@ -587,7 +607,7 @@ export default {
 
       const projectId = yield select(state => state[namespace].projectId)
 
-      const { data: { result: { result } } } = yield call(dataAnalysisService.runJob, {
+      const { data: { result: { result, visual_sds_id } } } = yield call(dataAnalysisService.runJob, {
         ...action.payload,
         projectId: projectId,
       })
@@ -597,6 +617,7 @@ export default {
         type: 'setSectionResult', payload: {
           sectionId,
           result,
+          visual_sds_id
         },
       })
       yield put({

@@ -136,7 +136,7 @@ def select_k_best_chi2(arr0, target, k):
     from sklearn.feature_selection import chi2
     matrix = np.array(arr0)
     target = np.array(target)
-    temp = feature_selection.SelectKBest(chi2, k=k).fit(matrix, target)
+    temp = feature_selection.SelectKBest(chi2, k=int(k)).fit(matrix, target)
     scores = temp.scores_.tolist()
     indx = temp.get_support().tolist()
     # result = data_utility.retrieve_nan_index(temp.transform(matrix).tolist(), index)

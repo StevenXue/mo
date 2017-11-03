@@ -1,14 +1,15 @@
 import React from 'react'
 import { BarChart, Histogram, PieChart, Scatter, SimpleScatter, SimpleTable, Table } from '../../../../../../../../components/visualization/index'
 import { flaskServer } from '../../../../../../../../constants'
-import { Card, Select, Spin, Popover, Icon} from 'antd'
+import { Card, Select, Spin, Popover, Icon, Button} from 'antd'
 import { isEmpty } from '../../../../../../../../utils/utils'
 import classnames from 'classnames';
 import style from './toolkit.css';
+import { connect } from 'dva';
 
 import JSONTree from 'react-json-tree'
 
-export default class VisualizationPanel extends React.Component {
+class VisualizationPanel extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
@@ -426,6 +427,12 @@ export default class VisualizationPanel extends React.Component {
   }
 
   render(){
+    const {
+      // sectionsJson,
+      focusSectionId,
+
+    } = this.props.dataAnalysis
+
     return(
     <div style={{width: '100%'}}>
 
@@ -453,6 +460,16 @@ export default class VisualizationPanel extends React.Component {
                     base0F: '#3971ED'
                   }}
                   invertTheme={true} />
+        <Button type="primary"
+                // className={styles.button}
+                onClick={() =>
+          this.props.dispatch({
+            type: namespace + '/saveStagingDataset',
+            payload: {
+              id: focusSectionId,
+            },
+          })}>Save</Button>
+
       </div>
 
 
@@ -463,3 +480,5 @@ export default class VisualizationPanel extends React.Component {
     )
   }
 }
+
+export default connect(({ dataAnalysis }) => ({ dataAnalysis }))(VisualizationPanel)

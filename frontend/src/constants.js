@@ -56,8 +56,8 @@ module.exports = {
   },
 
   tempVariable: {
-    nameOrId: '_id',
-    // nameOrId: 'name',
+    // nameOrId: '_id',
+    nameOrId: 'name',
   }
 
 };

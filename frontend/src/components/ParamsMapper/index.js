@@ -15,15 +15,15 @@ function getArgs(baseSteps, stepIndex, argIndex) {
 }
 
 const valueParser = {
-  int: (e) => JSON.parse(e),
-  float: (e) => JSON.parse(e),
+  int: (e) => parseInt(e),
+  float: (e) => parseFloat(e),
   str: (e) => (e),
 }
 
 const typeParser = (type, valueType) => {
   const typeDict = {
     int: 'integer',
-    float: 'float',
+    float: 'number',
     str: 'string',
     bool: 'boolean',
   }
@@ -49,8 +49,13 @@ const splitHandler = (e, type, valueType) => {
         return e.target.value
       } else {
         try {
-          return e.target.value.split(',').map(e => {
-            return valueParser[valueType](e)
+          return splitValue.map(e => {
+            let parsed = valueParser[valueType](e)
+            if(isNaN(parsed) || String(parsed) !== e) {
+              return e
+            } else {
+              return parsed
+            }
           })
         } catch (err) {
           return e.target.value
@@ -58,7 +63,12 @@ const splitHandler = (e, type, valueType) => {
       }
     case 'input':
       try {
-        return valueParser[valueType](e.target.value)
+        let parsed = valueParser[valueType](e.target.value)
+        if(isNaN(parsed) || String(parsed) !== e.target.value) {
+          return e.target.value
+        } else {
+          return parsed
+        }
       } catch (err) {
         return e.target.value
       }
