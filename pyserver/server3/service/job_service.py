@@ -483,6 +483,7 @@ def model_steps_to_obj(job_obj, project_id):
     fit_idx = None
     layers_idx = None
     est_idx = None
+    comp_idx = None
 
     for i, step in enumerate(steps):
         if step.get('name') == 'fit':
@@ -491,17 +492,15 @@ def model_steps_to_obj(job_obj, project_id):
             layers_idx = i
         if step.get('name') == 'estimator':
             est_idx = i
+        if step.get('name') == 'compile':
+            comp_idx = i
+
     if not fit_idx:
         raise Exception('Error: no fit step')
 
     for step in steps[fit_idx:]:
-        conf.update({step.get('name'):
-                         {'args':
-                              {arg.get('name'): arg.get('value')
-                                                or arg.get('values')
-                                                or arg.get('default')
-                               for arg in step['args']}}
-                     })
+        conf.update({step.get('name'): get_args(step['args'])})
+
     if model_obj.category == 0:
 
         conf['fit'].update({
@@ -509,6 +508,8 @@ def model_steps_to_obj(job_obj, project_id):
                 [steps[1]["args"][0]["values"],
                  steps[2]["args"][0]["values"]]
         })
+        if comp_idx:
+            conf['compile'] = get_args(steps[comp_idx]['args'])
         if layers_idx:
             conf['layers'] = [{
                 'name': layer.get('name'),
@@ -518,6 +519,12 @@ def model_steps_to_obj(job_obj, project_id):
                          for arg in layer.get('args')}
             }
                 for layer in steps[layers_idx]['args'][0]['values']]
+        if layers_idx:
+            conf['layers'] = [{
+                'name': layer.get('name'),
+                **get_args(layer.get('args'))}
+                for layer in steps[layers_idx]['args'][0]['values']]
+
     elif model_obj.category == 1:
 
         conf['fit'].update({
@@ -526,21 +533,14 @@ def model_steps_to_obj(job_obj, project_id):
                  steps[2]["args"][0]["values"]]
         })
         if est_idx:
-            conf['estimator'] = {'args':
-                                     {arg.get('name'): arg.get('value')
-                                                       or arg.get('values')
-                                                       or arg.get('default')
-                                      for arg in steps[est_idx]['args']}}
+            conf['estimator'] = get_args(steps[est_idx]['args'])
+
     elif model_obj.category == 2:
         conf['fit'].update({
             "data_fields": steps[1]["args"][0]["values"]
         })
         if est_idx:
-            conf['estimator'] = {'args':
-                                     {arg.get('name'): arg.get('value')
-                                                       or arg.get('values')
-                                                       or arg.get('default')
-                                      for arg in steps[est_idx]['args']}}
+            conf['estimator'] = {'args': get_args(steps[est_idx]['args'])}
 
     obj = {
         "data_source_id": job_obj.steps[0]["args"][0]["value"],
@@ -552,6 +552,15 @@ def model_steps_to_obj(job_obj, project_id):
     }
     print('modelling obj', obj)
     return obj
+
+
+def get_args(args):
+    return {'args':
+                {arg.get('name'): arg.get('value')
+                                  or arg.get('values')
+                                  or arg.get('default')
+                 for arg in args}
+            }
 
 
 def run_toolkit_job(job_obj, project_id):

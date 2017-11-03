@@ -443,7 +443,7 @@ def split_test_train(x_y_obj, schema='cv', **kwargs):
     if schema == 'rand':
         ratio = ratio or DEFAULT_RATIO
         if (isinstance(y, pd.DataFrame) and y.empty) or \
-                (isinstance(y, np.ndarray) and np.empty(y)):
+                (isinstance(y, np.ndarray) and y.size == 0):
                 X_train, X_test = train_test_split(
                     x,
                     test_size=1 - ratio,
