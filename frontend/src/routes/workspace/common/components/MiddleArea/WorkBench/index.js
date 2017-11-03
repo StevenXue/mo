@@ -660,7 +660,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                         <FakePanel key={stepIndex + step.name + 'hint'}>
                           <div className={styles.fake_panel_container}>
                             <div className={styles.fake_panel}>
-                              {step.args[0].value ? 'You have select 1 data' : 'You have not select any data'}
+                              {step.args[0].value ? 'You have selected 1 data' : 'You have not selected any data'}
                             </div>
                           </div>
                         </FakePanel>)
@@ -684,8 +684,8 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
 
                       renderFakePanel(step, stepIndex,
                         step.args[0].values.length ?
-                          `You have select ${step.args[0].values.length} fields`
-                          : 'You have not select any fields'
+                          `You have selected ${step.args[0].values.length} fields`
+                          : 'You have not selected any fields'
                       )
                     ];
 
@@ -705,8 +705,8 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
 
                       renderFakePanel(step, stepIndex,
                         step.args[0].values.length ?
-                          `You have select ${step.args[0].values.length} fields`
-                          : 'You have not select any fields'
+                          `You have selected ${step.args[0].values.length} fields`
+                          : 'You have not selected any fields'
                       )
 
                     ];
@@ -727,8 +727,8 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
 
                       renderFakePanel(step, stepIndex,
                         step.args[0].values.length ?
-                          `You have select ${step.args[0].values.length} fields`
-                          : 'You have not select any fields'
+                          `You have selected ${step.args[0].values.length} fields`
+                          : 'You have not selected any fields'
                       )
 
                     ];
@@ -757,7 +757,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                       renderFakePanel(step, stepIndex,
                         numArgsFill ?
                           `You have filled ${numArgsFill} args`
-                          : 'You have not fill any args'
+                          : 'You have not filled any args'
                       )
 
                     ];
@@ -779,8 +779,8 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
 
                       renderFakePanel(step, stepIndex,
                         numOfLayer !== 2 ?
-                          `You have add ${numOfLayer} layers`
-                          : 'You have not add any layers'
+                          `You have added ${numOfLayer} layers`
+                          : 'You have not added any layers'
                       )
 
                     ];
@@ -817,7 +817,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                       renderFakePanel(step, stepIndex,
                         numArgsFillEvaluate ?
                           `You have filled ${numArgsFillEvaluate} args`
-                          : 'You have not fill any args'
+                          : 'You have not filled any args'
                       )
 
                     ];
@@ -850,7 +850,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                       renderFakePanel(step, stepIndex,
                         numArgsFillSetting ?
                           `You have filled ${numArgsFillSetting} args`
-                          : 'You have not fill any args'
+                          : 'You have not filled any args'
                       )
 
                     ];
