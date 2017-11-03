@@ -467,6 +467,15 @@ export default {
       })
       yield put({ type: 'setGetSectionLoading', payload: { loading: false } })
 
+      if(sections.length === 0){
+        yield put({
+          type: 'setShowGuidance',
+          payload: {
+            showGuidance: true
+          }
+        })
+      }
+
       // array to json
       const sectionsJson = arrayToJson(sections, '_id')
       if (categories === 'model') {

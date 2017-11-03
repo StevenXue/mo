@@ -2,7 +2,8 @@ import React from 'react'
 import { Icon } from 'antd'
 import styles from './index.less'
 
-function MyCard({ icon, text, style, onClick }) {
+function MyCard({ icon, text, style, onClick, type }) {
+  // if(type == '')
 
   return (
     <div className={styles.box} style={style} onClick={onClick} >
