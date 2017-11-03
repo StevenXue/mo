@@ -145,7 +145,7 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
         deploy_name = job_id + '-serving'
         service_name = "my-" + job_id + "-service"
         port = port_for.select_random(ports=set(range(30000, 32767)))
-        export_path = export_path.replace('/pyserver', '/home/root/work')
+        export_path = "/home/root/work/user_directory" + export_path.split("/user_directory", 1)[1]
         kube_json = {
             "apiVersion": "apps/v1beta1",
             "kind": "Deployment",
@@ -298,7 +298,8 @@ def resume_by_id(served_model_id, user_ID, model_name):
         deploy_name = job_id + '-serving'
         service_name = "my-" + job_id + "-service"
         port = port_for.select_random(ports=set(range(30000, 32767)))
-        export_path = export_path.replace('/pyserver', '/home/root/work')
+        export_path = "/home/root/work/user_directory" + \
+                      export_path.split("/user_directory", 1)[1]
         print('resume path', export_path)
         kube_json = {
             "apiVersion": "apps/v1beta1",
