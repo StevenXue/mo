@@ -33,7 +33,8 @@ def get_by_query_str(staging_data_set_id, **kwargs):
 
 
 def get_first_one_by_staging_data_set_id(staging_data_set_id):
-    return staging_data_business.get_first_one_by_staging_data_set_id(staging_data_set_id)
+    return staging_data_business.get_first_one_by_staging_data_set_id(
+        staging_data_set_id)
 
 
 def list_staging_data_sets_by_project_id(project_id, without_result=False):
@@ -386,11 +387,18 @@ def split_test_train(x_y_obj, schema='cv', **kwargs):
                 'x_te': x[divide_row:, :], 'y_te': y[divide_row:, :]}
     if schema == 'rand':
         ratio = ratio or DEFAULT_RATIO
-        print(x, y)
-        X_train, X_test, y_train, y_test = train_test_split(
-            x, y,
-            test_size=1 - ratio,
-            random_state=42)
+        if y.empty:
+            X_train, X_test = train_test_split(
+                x,
+                test_size=1 - ratio,
+                random_state=42)
+            y_train = []
+            y_test = []
+        else:
+            X_train, X_test, y_train, y_test = train_test_split(
+                x, y,
+                test_size=1 - ratio,
+                random_state=42)
         if isinstance(x, pd.DataFrame):
             return {'x_tr': pd.DataFrame(X_train),
                     'y_tr': pd.DataFrame(y_train),

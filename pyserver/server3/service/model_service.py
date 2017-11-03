@@ -46,7 +46,8 @@ user_directory = config.get_file_prop('UPLOAD_FOLDER')
 # user_directory = 'user_directory/'
 
 ModelType = {list(v)[1]: list(v)[0] for v in list(MODEL_TYPE)}
-TYPE = {list(v)[0]: list(v)[1] for v in list(TYPE)}
+TYPE = {list(v)[0]: list(v)[1] for v in list(TYPE) if
+        list(v)[1] != 'reinforcement_learning'}
 
 ZH_MAP = {
     'regression': '回归分析',
@@ -156,8 +157,8 @@ def kube_run_model(conf, project_id, data_source_id, model_id, job_obj,
 
     job_id = str(job_obj.id)
     print(job_id)
-    return run_model(conf, project_id, data_source_id, model_id, job_id,
-                     **kwargs)
+    # return run_model(conf, project_id, data_source_id, model_id, job_id,
+    #                  **kwargs)
     # return #
     cwd = os.getcwd()
     job_name = job_id + '-training-job'
@@ -484,7 +485,7 @@ def model_input_manager_unsupervised(x_cols, data_source_id, model_name,
     df_x = staging_data_service.mongo_to_df(train_cursor)
     schema = kwargs.pop('schema')
     obj = staging_data_service.split_test_train({'x': df_x,
-                                                 'y': df_x},
+                                                 'y': pd.DataFrame([])},
                                                 schema,
                                                 **kwargs)
     obj['y_tr'] = None

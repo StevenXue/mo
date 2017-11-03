@@ -243,8 +243,13 @@ def get_all_jobs_of_project(project_id, categories, status=None):
                     # 获取训练 served_model 时所用的数据的第一条
                     staging_data_demo= staging_data_service.get_first_one_by_staging_data_set_id(job_info['staging_data_set_id'])
                     one_input_data_demo = []
-                    for each_feture in job_info['params']['fit']['data_fields'][0]:
-                        one_input_data_demo.append(staging_data_demo[each_feture])
+                    data_fields = job_info['params']['fit']['data_fields']
+                    if isinstance(data_fields[0], list):
+                        for each_feture in data_fields[0]:
+                            one_input_data_demo.append(staging_data_demo[each_feture])
+                    else:
+                        for each_feture in data_fields:
+                            one_input_data_demo.append(staging_data_demo[each_feture])
                     input_data_demo_string = '['+",".join(str(x) for x in one_input_data_demo)+']'
                     input_data_demo_string = '['+input_data_demo_string+','+input_data_demo_string+']'
                     print(input_data_demo_string)

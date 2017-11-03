@@ -12,7 +12,7 @@ pandas>=0.20.1
 scipy
 flask_socketio>=2.9.0
 eventlet
-keras>=2.0.6
+keras>=2.0.9
 sklearn
 redis
 simplejson
@@ -20,7 +20,7 @@ hyperas
 hyperopt
 pillow
 h5py>=2.7.0
-tensorflow
+tensorflow==1.4.0
 kubernetes
 scikit-image
 port_for
