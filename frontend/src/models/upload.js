@@ -26,6 +26,8 @@ export default {
     dataSetDesc: '',
     dataSetTags: [],
 
+    sdsNames: [],
+
     currentPage: 1,
     totalPages: 10,
     pageSize: 4,
@@ -190,8 +192,9 @@ export default {
       if (payload !== 'new') {
         yield put({type: 'staged'})
         const url0 = location.hash.substr(1).replace('preview', '')
+        const url1 = url0.replace('select', '')
         // console.log('url0', url0)
-        yield put(routerRedux.replace(url0))
+        yield put(routerRedux.replace(url1))
 
       } else {
         const url1 = location.hash.substr(1).replace('preview', 'choice')
@@ -214,6 +217,9 @@ export default {
       } else {
         yield put({type: 'setStagingDataSet', payload: res.data})
         console.log(res.data)
+        const sdsnames = res.data.map((e) => (e.name))
+        yield put({type: 'setsdsNames', payload: sdsnames})
+        console.log(sdsnames)
         // yield put(routerRedux.push('list'))
         yield put({type:'setAddLoading', payload: false})
         yield put({type:'setSaveLoading', payload: false})
@@ -380,6 +386,13 @@ export default {
       return {
         ...state,
         saveAddLoading
+      }
+    },
+
+    setsdsNames(state, {payload: sdsNames}) {
+      return {
+        ...state,
+        sdsNames
       }
     }
   },
