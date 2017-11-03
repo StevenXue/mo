@@ -16,7 +16,7 @@ export default {
 
     setModels(state, action) {
       let lengthModelsJson = Object.keys(action.payload.modelsJson).length;
-
+      let focusModelId = null;
       if (lengthModelsJson !== 0) {
         for (let eachModel in action.payload.modelsJson) {
           let metrics = {
@@ -46,19 +46,17 @@ export default {
           action.payload.modelsJson[eachModel]['metrics_status'] = metrics;
         }
 
-        return {
-          ...state,
-          modelsJson: action.payload.modelsJson,
-          focusModelId: Object.keys(action.payload.modelsJson)[0]
+        if (state.focusModelId){
+          focusModelId = state.focusModelId
         }
-      }
-      else {
-        return {
-          ...state,
-          modelsJson: action.payload.modelsJson,
-          focusModelId: null
+        else{
+          focusModelId = Object.keys(action.payload.modelsJson)[0]
         }
-      }
+    return {
+      ...state,
+      modelsJson: action.payload.modelsJson,
+      focusModelId: focusModelId}
+    }
     },
 
     // 切换 focus model
@@ -167,18 +165,24 @@ export default {
     },
 
     // 首次部署模型
-    * firstDeployModel(action, {call, put, select}) {
+    firstDeployModel: function* (action, {call, put, select}) {
       yield put({type: 'showLoading', payload: {loadingState: true}});
       const focusModelId = yield select(state => state.deployment.focusModelId);
       const user_ID = yield select(state => state.login.user.user_ID);
       const model_name = yield select(state => state.deployment.modelsJson[focusModelId]['model']['name']);
-
+      const projectId = yield select(state => state.deployment.modelsJson[focusModelId]['project']);
       let payload = action.payload;
       payload.jobID = focusModelId;
       payload.user_ID = user_ID;
-      payload.model_name=model_name;
-      yield call(deploymentService.firstDeployModel, payload);
-      yield put({type: 'showLoading', payload: {loadingState: false}});
+      payload.model_name = model_name;
+      const {data: result} = yield call(deploymentService.firstDeployModel, payload);
+      if (result) {
+        yield put({type: 'showLoading', payload: {loadingState: false}});
+        yield put({
+          type: 'fetchModels',
+          payload: {projectId: projectId, categories: 'model'},
+        });
+      }
     },
 
     // 更新部署模型的信息
@@ -188,8 +192,8 @@ export default {
       const {data: result} = yield call(deploymentService.updateDeployModelInfo, payload);
       if (result === 'updated') {
         yield put({type: 'setModelHowToUse', payload: payload});
+        yield put({type: 'showLoading', payload: {loadingState: false}});
       }
-      yield put({type: 'showLoading', payload: {loadingState: false}});
     },
 
     // 部署Model
@@ -234,7 +238,6 @@ export default {
       const {data: result} = yield call(deploymentService.getPrediction, payload);
       yield put({type: 'getPredictionR', payload: result});
     },
-
   },
   subscriptions: {
     // 当进入该页面是 获取用户所有 Models
