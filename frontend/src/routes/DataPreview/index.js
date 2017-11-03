@@ -21,7 +21,7 @@ class DataPreview extends React.Component {
   }
 
   onCheck (event, e) {
-    console.log(this.props)
+
 
     const sels = this.props.upload.selected
     if (event.target.checked) {
@@ -41,6 +41,10 @@ class DataPreview extends React.Component {
         {chk: false}
       )
     }
+  }
+
+  onDelete = () => {
+    console.log(this.props.upload.dataSet)
   }
 
   onSelect (value, e) {
@@ -85,6 +89,7 @@ class DataPreview extends React.Component {
     const dels = this.props.upload.deleted
     const sels = this.props.upload.selected
     const flds = this.props.upload.fields
+    const showStaged = this.props.upload.showStaged
     const useless = ['data_set', '_id', 'staging_dataset_id']
     let dsColumns
     let old_col
@@ -100,12 +105,13 @@ class DataPreview extends React.Component {
       )
 
       const myHeader = (e) => <div className={styles.myheader}>
-        <Checkbox
-          onChange={(event) => {this.onCheck(event, e)}}
-          checked={sels.includes(e)}
-        >{e}
-        </Checkbox>
+        {showStaged?<Checkbox
+            onChange={(event) => {this.onCheck(event, e)}}
+            checked={sels.includes(e)}
+          >{e}
 
+          </Checkbox>
+          :<div title={e} className={styles.ttl}>{e}</div>}
         <Select className={styles.sel} defaultValue={flds[e]} onChange={(value) => {this.onSelect(value, e)}}>
           <Option key="string" value="string">String</Option>
           <Option key="integer" value="integer">Integer</Option>
@@ -135,8 +141,9 @@ class DataPreview extends React.Component {
               </div>:null }
           </div>
           <div className={styles.cright}>
-            <Button icon="edit"/>
-            <Button icon="delete"/>
+            {this.props.upload.showStaged? <Button
+              icon="edit"/>:null}
+            <Button icon="delete" onClick={this.onDelete}/>
           </div>
         </div>
         <div className={styles.whole}>
