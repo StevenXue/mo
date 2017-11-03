@@ -433,9 +433,11 @@ export default {
     },
 
     setSectionResult(state, action) {
-      const { sectionId, result } = action.payload
+      const { sectionId, result, visual_sds_id } = action.payload
       let section = state.sectionsJson[sectionId]
       section['result'] = result
+      section['visual_sds_id'] = visual_sds_id
+
       return {
         ...state,
         sectionsJson: {
@@ -605,7 +607,7 @@ export default {
 
       const projectId = yield select(state => state[namespace].projectId)
 
-      const { data: { result: { result } } } = yield call(dataAnalysisService.runJob, {
+      const { data: { result: { result, visual_sds_id } } } = yield call(dataAnalysisService.runJob, {
         ...action.payload,
         projectId: projectId,
       })
@@ -615,6 +617,7 @@ export default {
         type: 'setSectionResult', payload: {
           sectionId,
           result,
+          visual_sds_id
         },
       })
       yield put({

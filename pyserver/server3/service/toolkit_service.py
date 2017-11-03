@@ -427,6 +427,7 @@ def after_run_toolkit(project_id, staging_data_set_id,
                                                                  sds_name,
                                                                  'des',
                                                                  project_obj,
+
                                                                  type='result')
 
         # result_sds_obj = staging_data_set_business.add(sds_name, 'des',

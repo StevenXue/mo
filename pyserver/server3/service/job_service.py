@@ -446,7 +446,7 @@ def toolkit_steps_to_obj(job_obj, project_id):
     if len(job_obj.steps) > 2:
         args = job_obj.steps[2].get("args")
         for arg in args:
-            new_args[arg['name']] = int(arg['value'])
+            new_args[arg['name']] = arg['value']
 
     obj = {
         "staging_data_set_id": job_obj.steps[0]["args"][0]["value"],
@@ -625,9 +625,12 @@ def run_job(obj, job_obj):
 def save_result(job_id):
     job_obj = job_business.get_by_job_id(job_id)
     result = job_obj.result
+    toolkit = job_obj.toolkit
+
     sds_id = StepBusiness.get_datasource(job_obj.steps)
     print("sds_id", sds_id)
-    save_result_sub(result, sds_id)
+
+    save_result_sub(result, sds_id, toolkit)
 
 
 def save_as_result(job_id, new_sds_name):
@@ -640,11 +643,11 @@ def save_as_result(job_id, new_sds_name):
         description='des',
         project=project_obj,
         job=job_obj
-        )
+    )
     save_result_sub(result, sds_id)
 
 
-def save_result_sub(result, sds_id):
+def save_result_sub(result, sds_id, toolkit_obj):
     """
 
     :param result: job result
@@ -654,11 +657,25 @@ def save_result_sub(result, sds_id):
     :return: true or false
     :rtype:
     """
-    print("result", result)
-    sds_obj = staging_data_business.get_by_staging_data_set_id(staging_data_set_id=sds_id)
-    print('sds_obj', sds_obj)
+    # sds_obj = staging_data_business.get_by_staging_data_set_id(staging_data_set_id=sds_id)
+
+    result_spec = toolkit_obj.result_spec
+    field = result['fields']["source"]
 
     # TODO 帮我把result存进sds_obj中 @tianyi
+    for arg in result_spec["args"]:
+
+        if arg["if_add_column"]:
+            # 不能使用中文名
+            str_name = "%s_col" % toolkit_obj.entry_function
+            value = result[arg['name']]
+            try:
+                staging_data_service.new_update_many_with_new_fields(
+                    value, field, str_name, sds_id)
+            except (TypeError, ValueError) as e:
+                print("ERRORS in data saved to database")
+
+    # sds_obj.result =
 
     # staging_data_service.update_many_with_new_fields(value,
     #                                                  nan_index,
@@ -667,6 +684,7 @@ def save_result_sub(result, sds_id):
     #                                                  str_name,
     #                                                  staging_data_set_id)
     pass
+
 
 if __name__ == '__main__':
     pass

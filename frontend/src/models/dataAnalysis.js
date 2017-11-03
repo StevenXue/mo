@@ -2,7 +2,7 @@ import pathToRegexp from 'path-to-regexp';
 import modelExtend from 'dva-model-extend';
 import workBench from './workBench';
 
-import stagingDataService from '../services/stagingData';
+import  * as stagingDataService from '../services/stagingData';
 const categories = 'toolkit';
 
 const dataAnalysis = modelExtend(workBench, {

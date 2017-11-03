@@ -64,7 +64,13 @@ def get_staging_data_set(sds_id):
     response['field'] = getattr(data_set, 'related_field', None)
     response['tags'] = getattr(data_set, 'tags', None)
     response['related tasks'] = getattr(data_set, 'related_tasks', None)
-    response['data_set_type'] = data_set.file.type
+    # response['data_set_type'] = data_set.file.type
+    print("data_set", data_set)
+    if hasattr(data_set, 'file'):
+        if data_set.file:
+            print("data_set.file", data_set.file.__dict__)
+            response['data_set_type'] = data_set.file.type
+    # response['data_set_type'] = data_set.file.type
     response['columns'] = columns
 
     # update row col info
@@ -177,12 +183,14 @@ def remove_staging_data_set_by_ids(sds_id):
     return jsonify({'response': result}), 200
 
 
-@staging_data_app.route('/staging_data_sets/<string:sds_id>',
+@staging_data_app.route('/staging_data_sets/update_type',
                         methods=['PUT'])
-def save_staging_data_set_by_ids(sds_id):
+def update_staging_data_set():
     try:
-        result = staging_data_service.save_staging_data_set_by_ids(ObjectId(
-            sds_id))
+        data = request.get_json()
+        job_id = data['job_id']
+        # staging_data_set = staging_data_service.get_by_job_id(job_id=job_id)
+        result = staging_data_service.update_staging_data_set_by_job_id(job_id=job_id)
     except Exception as e:
         return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
     result = json_utility.convert_to_json(result.to_mongo())
