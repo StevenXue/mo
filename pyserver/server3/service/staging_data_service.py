@@ -387,13 +387,14 @@ def split_test_train(x_y_obj, schema='cv', **kwargs):
                 'x_te': x[divide_row:, :], 'y_te': y[divide_row:, :]}
     if schema == 'rand':
         ratio = ratio or DEFAULT_RATIO
-        if y.empty:
-            X_train, X_test = train_test_split(
-                x,
-                test_size=1 - ratio,
-                random_state=42)
-            y_train = []
-            y_test = []
+        if (isinstance(y, pd.DataFrame) and y.empty) or \
+                (isinstance(y, np.ndarray) and np.empty(y)):
+                X_train, X_test = train_test_split(
+                    x,
+                    test_size=1 - ratio,
+                    random_state=42)
+                y_train = []
+                y_test = []
         else:
             X_train, X_test, y_train, y_test = train_test_split(
                 x, y,
@@ -404,10 +405,11 @@ def split_test_train(x_y_obj, schema='cv', **kwargs):
                     'y_tr': pd.DataFrame(y_train),
                     'x_te': pd.DataFrame(X_test),
                     'y_te': pd.DataFrame(y_test)}
-        return {'x_tr': X_train,
-                'y_tr': y_train,
-                'x_te': X_test,
-                'y_te': y_test}
+        else:
+            return {'x_tr': X_train,
+                    'y_tr': y_train,
+                    'x_te': X_test,
+                    'y_te': y_test}
 
 
 def copy_staging_data_set(sds, belonged_project, **kwargs):
