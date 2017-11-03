@@ -172,7 +172,12 @@ def get_all_jobs_of_project(project_id, categories, status=None):
     :param status:
     :return:
     """
-    jobs = project_business.get_by_id(project_id)['jobs']
+    from server3.business import job_business
+
+    # jobs = project_business.get_by_id(project_id)['jobs']
+
+    jobs = job_business.get_by_project(project_id).order_by('-create_time')
+
     history_jobs = {c: [] for c in categories}
     for job in jobs:
         # keys = history_jobs.keys()
@@ -481,3 +486,4 @@ def get_playground(project_id):
     api = kube_service.service_api
     dep = api.read_namespaced_service(service_name, NAMESPACE)
     return dep.spec.ports[0].node_port
+

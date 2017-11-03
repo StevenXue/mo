@@ -176,3 +176,16 @@ def remove_staging_data_set_by_ids(sds_id):
         return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
     return jsonify({'response': result}), 200
 
+
+@staging_data_app.route('/staging_data_sets/<string:sds_id>',
+                        methods=['PUT'])
+def save_staging_data_set_by_ids(sds_id):
+    try:
+        result = staging_data_service.save_staging_data_set_by_ids(ObjectId(
+            sds_id))
+    except Exception as e:
+        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    result = json_utility.convert_to_json(result.to_mongo())
+    return jsonify({'response': result}), 200
+
+

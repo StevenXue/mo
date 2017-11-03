@@ -1,5 +1,5 @@
 import React from 'react';
-import {Spin} from 'antd';
+import {Spin, Button} from 'antd';
 
 import SideBar from '../components/SideBar/index';
 import MiddleArea from '../components/MiddleArea/index';
@@ -11,6 +11,8 @@ import styles from './index.less';
 function Common(props) {
   return (
     <div className={styles.container}>
+
+
       <Spin spinning={props.model.spinLoading.wholePage}>
 
         <div className={styles.content}>
@@ -31,6 +33,17 @@ function Common(props) {
           </div>
         </div>
       </Spin>
+
+      <div className={styles.go_guide}>
+        <Button onClick={() => props.dispatch({
+          type: props.namespace + '/setShowGuidance',
+          payload: {
+            showGuidance: true
+          }
+        })}>
+          go to guidance
+        </Button>
+      </div>
 
     </div>
   );

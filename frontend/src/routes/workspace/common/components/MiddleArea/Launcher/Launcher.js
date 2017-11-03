@@ -17,14 +17,25 @@ function callback(key) {
 
 class Launcher extends Component {
   onClick = (e) => {
-    this.props.dispatch({
-      type: this.props.namespace + '/addSection',
-      payload: {
-        algorithm_id: e._id,
-        namespace: this.props.namespace,
-        sectionId: this.props.sectionId,
-      },
-    });
+    if(this.props.type==='guidance'){
+      this.props.dispatch({
+        type: this.props.namespace + '/setShowGuidance',
+        payload: {
+          showGuidance: false
+        }
+      });
+    }
+    else{
+      this.props.dispatch({
+        type: this.props.namespace + '/addSection',
+        payload: {
+          algorithm_id: e._id,
+          namespace: this.props.namespace,
+          sectionId: this.props.sectionId,
+        },
+      });
+    }
+
 
   };
 

@@ -28,3 +28,10 @@ export function fetchStagingDataset(id) {
   })
 }
 
+// save staging data
+export function saveStagingDataset(payload) {
+  return request(`/api${PREFIX}/staging_data_sets/${payload.id}`, {
+    method: 'PUT'
+  })
+}
+

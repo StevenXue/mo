@@ -2,6 +2,7 @@ import pathToRegexp from 'path-to-regexp';
 import modelExtend from 'dva-model-extend';
 import workBench from './workBench';
 
+import stagingDataService from '../services/stagingData';
 const categories = 'toolkit';
 
 const dataAnalysis = modelExtend(workBench, {
@@ -13,6 +14,21 @@ const dataAnalysis = modelExtend(workBench, {
   },
   effects: {
 
+    *saveStagingDataset(action, { call, put, select }) {
+      const { id } = action.payload;
+      yield put({ type: 'setGetSectionLoading', payload: { loading: true } });
+
+      const projectId = yield select(state => state.dataAnalysis.projectId)
+
+
+      const { data } = yield call(stagingDataService.saveStagingDataset, {
+        id
+      })
+      console.log('data', data);
+
+      //保存完更新staging data sets
+      yield put({ type: 'preview/fetchStagingDatasetList', payload: { projectId: projectId } })
+    },
   },
 
   subscriptions: {

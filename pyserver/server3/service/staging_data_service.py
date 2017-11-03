@@ -412,3 +412,10 @@ def copy_staging_data_set(sds, belonged_project, **kwargs):
             sds, belonged_project, belonged_job)
         staging_data_business.copy_staging_data_by_staging_data_set_id(sds_cp)
         return sds_cp
+
+
+def save_staging_data_set_by_ids(sds):
+    sds_obj = staging_data_set_business.get_by_id(sds_id=sds)
+    sds_obj.type = 'save'
+    return sds_obj.save()
+
