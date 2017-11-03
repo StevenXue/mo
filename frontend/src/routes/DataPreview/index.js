@@ -143,7 +143,7 @@ class DataPreview extends React.Component {
           <div className={styles.cright}>
             {this.props.upload.showStaged? <Button
               icon="edit"/>:null}
-            <Button icon="delete" onClick={this.onDelete}/>
+            {/*<Button icon="delete" onClick={this.onDelete}/>*/}
           </div>
         </div>
         <div className={styles.whole}>
