@@ -189,7 +189,7 @@ def kube_run_model(conf, project_id, data_source_id, model_id, job_obj,
                     "containers": [
                         {
                             "name": job_id,
-                            "image": "10.52.14.192/gzyw/model_app",
+                            "image": "10.52.14.192/gzyw/model_app_pre",
                             "imagePullPolicy": "IfNotPresent",
                             "securityContext": {
                                 "privileged": True,

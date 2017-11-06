@@ -47,6 +47,8 @@ from server3.business import project_business
 from tensorflow.contrib.learn.python.learn import metric_spec
 
 temp_dir = '/tmp/model_results'
+# add handler to catch tensorflow log message
+mh = MetricsHandler()
 
 
 def custom_model(conf, model_fn, input_data, **kw):
@@ -89,8 +91,6 @@ def custom_model_help(model_fn, input_data, project_id, job_id, user_ID,
                       eval_params=None):
     tf.logging.set_verbosity(tf.logging.INFO)
 
-    # add handler to catch tensorflow log message
-    mh = MetricsHandler()
     # pass result staging data set for logger to save results
     mh.result_sds = result_sds
     mh.project_id = project_id

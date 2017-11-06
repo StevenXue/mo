@@ -516,15 +516,6 @@ def model_steps_to_obj(job_obj, project_id):
         if layers_idx:
             conf['layers'] = [{
                 'name': layer.get('name'),
-                'args': {arg.get('name'): arg.get('value')
-                                          or arg.get('values')
-                                          or arg.get('default')
-                         for arg in layer.get('args')}
-            }
-                for layer in steps[layers_idx]['args'][0]['values']]
-        if layers_idx:
-            conf['layers'] = [{
-                'name': layer.get('name'),
                 **get_args(layer.get('args'))}
                 for layer in steps[layers_idx]['args'][0]['values']]
 

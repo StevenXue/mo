@@ -20,7 +20,7 @@ const breadcrumbNameMap = {
   '/deployed_models': 'Deployed Models',
 }
 
-const RouterConfig = ({ history, location, login, projectDetail }) => {
+const RouterConfig = ({ history, location, projectDetail }) => {
   const pathSnippets = location.pathname.split('/').filter(i => i)
 
   const extraBreadcrumbItems = pathSnippets.map((_, index) => {
@@ -67,7 +67,7 @@ const RouterConfig = ({ history, location, login, projectDetail }) => {
   )
 }
 
-const Main = withRouter(connect(({ login, projectDetail }) => ({ login, projectDetail }))(RouterConfig))
+const Main = withRouter(connect(({ projectDetail }) => ({ projectDetail }))(RouterConfig))
 
 const App = ((props) =>
     <HashRouter>

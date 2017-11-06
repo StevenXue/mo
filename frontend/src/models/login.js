@@ -1,5 +1,6 @@
 import { login, tokenLogin } from '../services/login'
 import { routerRedux } from 'dva/router'
+import { message } from 'antd'
 import pathToRegexp from 'path-to-regexp'
 import io from 'socket.io-client'
 
@@ -18,13 +19,13 @@ export default {
         ...state,
         status: payload.status,
         type: payload.type,
-      };
+      }
     },
     changeSubmitting(state, { payload }) {
       return {
         ...state,
         submitting: payload,
-      };
+      }
     },
     showLoginLoading(state) {
       return {
@@ -56,31 +57,31 @@ export default {
       yield put({
         type: 'changeSubmitting',
         payload: true,
-      });
-      const response = yield call(fakeAccountLogin, payload);
+      })
+      const response = yield call(fakeAccountLogin, payload)
       yield put({
         type: 'changeLoginStatus',
         payload: response,
-      });
+      })
       yield put({
         type: 'changeSubmitting',
         payload: false,
-      });
+      })
     },
     *mobileSubmit(_, { call, put }) {
       yield put({
         type: 'changeSubmitting',
         payload: true,
-      });
-      const response = yield call(fakeMobileLogin);
+      })
+      const response = yield call(fakeMobileLogin)
       yield put({
         type: 'changeLoginStatus',
         payload: response,
-      });
+      })
       yield put({
         type: 'changeSubmitting',
         payload: false,
-      });
+      })
     },
     *logout(_, { put }) {
       yield put({
@@ -88,15 +89,21 @@ export default {
         payload: {
           status: false,
         },
-      });
-      yield put(routerRedux.push('/user/login'));
+      })
+      yield put(routerRedux.push('/user/login'))
     },
     *login({
              payload,
            }, { put, call }) {
-      yield put({ type: 'showLoginLoading' })
+      yield put({
+        type: 'changeSubmitting',
+        payload: true,
+      })
       const { data: data } = yield call(login, payload)
-      yield put({ type: 'hideLoginLoading' })
+      yield put({
+        type: 'changeSubmitting',
+        payload: false,
+      })
       if (data) {
         localStorage.setItem('token', data.token)
         localStorage.setItem('user_ID', data.user.user_ID)
@@ -138,20 +145,41 @@ export default {
       }
     },
     *handleSocket({ payload }, { call, put }) {
-      const { message, pathname } = payload
-      const projectIdMsg = message.project_id
-      const jobIdMsg = message.job_id
+      const { msg, pathname } = payload
+      const projectIdMsg = msg.project_id
+      const jobIdMsg = msg.job_id
       const match = pathToRegexp('/workspace/:projectId*').exec(pathname)
-      if(match) {
+      if (match) {
         const projectId = match[1]
-        if(projectId === projectIdMsg) {
+        if (projectId === projectIdMsg) {
+
           // in project
           yield put({
             type: 'modelling/setMetrics',
-            payload: {message}
+            payload: { msg },
           })
         }
       }
+    },
+    *handleError({ payload }, { call, put }) {
+      const { msg, pathname } = payload
+      const projectIdMsg = msg.project_id
+      const jobIdMsg = msg.job_id
+      message.error(JSON.stringify(msg))
+      yield put({ type: 'modelling/hideResult' })
+      console.log(msg.error)
+
+      // const match = pathToRegexp('/workspace/:projectId*').exec(pathname)
+      // if (match) {
+      //   const projectId = match[1]
+      //   if (projectId === projectIdMsg) {
+      //     // in project
+      //     yield put({
+      //       type: 'modelling/setMetrics',
+      //       payload: { message },
+      //     })
+      //   }
+      // }
     },
   },
   subscriptions: {
@@ -163,8 +191,11 @@ export default {
         const userId = localStorage.getItem('user_ID')
         if (userId) {
           const socket = io.connect(flaskServer + '/log/' + userId)
-          socket.on('log_epoch_end', (message) => {
-            dispatch({ type: 'handleSocket', payload: { message, pathname } })
+          socket.on('log_epoch_end', (msg) => {
+            dispatch({ type: 'handleSocket', payload: { msg, pathname } })
+          })
+          socket.on('error', (msg) => {
+            dispatch({ type: 'handleError', payload: { msg, pathname } })
           })
         }
       })

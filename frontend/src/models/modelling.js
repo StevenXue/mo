@@ -63,10 +63,10 @@ const modelling = modelExtend(workBench, {
       }
     },
     setMetrics(state, { payload }) {
-      const { message } = payload
-      const sectionId = message.job_id
+      const { msg } = payload
+      const sectionId = msg.job_id
       let sectionsJson = state.sectionsJson
-      console.log('message', message)
+      console.log('message', msg)
 
       let metrics = {
         'acc': [],
@@ -79,7 +79,7 @@ const modelling = modelExtend(workBench, {
         'val_loss': [],
       }
 
-      if(sectionsJson[sectionId].messages && sectionsJson[sectionId].messages.find(e => isEqual(e, message))) {
+      if(sectionsJson[sectionId].messages && sectionsJson[sectionId].messages.find(e => isEqual(e, msg))) {
         console.log('message')
         return {
           ...state,
@@ -89,18 +89,18 @@ const modelling = modelExtend(workBench, {
 
       if (sectionsJson[sectionId].metrics_status) {
         for (let metric in metrics) {
-          if (message[metric] !== undefined) {
+          if (msg[metric] !== undefined) {
             if (!sectionsJson[sectionId].metrics_status[metric]) {
-              sectionsJson[sectionId].metrics_status[metric] = [message[metric]]
+              sectionsJson[sectionId].metrics_status[metric] = [msg[metric]]
             } else {
-              sectionsJson[sectionId].metrics_status[metric].push(message[metric])
+              sectionsJson[sectionId].metrics_status[metric].push(msg[metric])
             }
           }
         }
       } else {
         for (let metric in metrics) {
-          if (message[metric] !== undefined) {
-            metric[metric].push(message[metric])
+          if (msg[metric] !== undefined) {
+            metric[metric].push(msg[metric])
           }
         }
 
@@ -113,16 +113,16 @@ const modelling = modelExtend(workBench, {
       }
 
       // receive batch
-      if(message.batch) {
-        sectionsJson[sectionId].batch = message.batch
+      if(msg.batch) {
+        sectionsJson[sectionId].batch = msg.batch
       }
 
       // record messages and prevent duplicate
-      if(message) {
+      if(msg) {
         if(!sectionsJson[sectionId].messages) {
-          sectionsJson[sectionId].messages= [message]
+          sectionsJson[sectionId].messages= [msg]
         } else {
-          sectionsJson[sectionId].messages.push(message)
+          sectionsJson[sectionId].messages.push(msg)
         }
       }
       console.log('sectionsJson', sectionsJson)
