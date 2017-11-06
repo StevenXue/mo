@@ -12,6 +12,8 @@ from mongoengine import IntField
 from mongoengine import DictField
 from mongoengine import ReferenceField
 from mongoengine import ListField
+from mongoengine import BooleanField
+
 
 INPUT_TYPES = ('image', '1darray', '2darray', 'ndarray')
 STATUS = ('running', 'stopped', 'terminated')
@@ -31,6 +33,7 @@ class ServedModel(DynamicDocument):
     job = ReferenceField('Job', required=True)
     status = StringField(choices=STATUS)
     user_name = StringField()
-    related_field = StringField(max_length=100)
-    tags = ListField(StringField(max_length=50))
-    related_tasks = StringField(max_length=50)
+    related_fields = ListField()
+    tags = ListField()
+    related_tasks = ListField()
+    private = BooleanField(required=True)

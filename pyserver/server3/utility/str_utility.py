@@ -1,7 +1,7 @@
 import re
 import unicodedata
-import random
 import string
+import random
 
 
 def generate_args_str(args):

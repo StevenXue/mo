@@ -15,7 +15,7 @@ app.model(require("./models/upload"));
 app.model(require("./models/preview"));
 app.model(require("./models/deployment"));
 app.model(require("./models/history"));
-
+app.model(require("./models/deployedmodels"));
 
 // 2. Plugins
 // app.use({});

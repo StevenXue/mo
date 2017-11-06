@@ -31,10 +31,10 @@ const menuConfig = [
     text: 'Projects',
   },
   {
-    key: '/deployed_models',
-    Link: '/deployed_models',
+    key: '/modelmarkets',
+    Link: '/modelmarkets',
     Icon: null,
-    text: 'Deployed Models',
+    text: 'Model Markets ',
   },
 
 ]

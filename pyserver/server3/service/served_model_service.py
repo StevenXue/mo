@@ -13,6 +13,7 @@ from server3.business import ownership_business
 from server3.business import served_model_business
 from server3.business import staging_data_set_business
 from server3.business import job_business
+from server3.business import project_business
 from server3.service import ownership_service
 from server3.service import model_service
 from server3.service import kube_service
@@ -21,7 +22,7 @@ from server3.entity.model import MODEL_TYPE
 from server3.constants import SERVING_PORT
 from server3.constants import NAMESPACE
 from server3.service.saved_model_services import general_model_services
-import tensorflow as tf
+from server3.utility import json_utility
 
 ModelType = {list(v)[1]: list(v)[0] for v in list(MODEL_TYPE)}
 
@@ -48,7 +49,8 @@ def first_save_to_db(user_ID, name, description, input_info, output_info,
                      examples, version,
                      deploy_name, server,
                      input_type, model_base_path, job,
-                     job_id, model_name, is_private=False,
+                     job_id, model_name, related_fields,
+                     related_tasks, tags, is_private=False,
                      service_name=None,
                      **optional):
     """
@@ -78,6 +80,9 @@ def first_save_to_db(user_ID, name, description, input_info, output_info,
                                              server,  input_type,
                                              model_base_path, job,
                                              service_name, model_name,
+                                             related_fields,
+                                             related_tasks,
+                                             tags, is_private,
                                              **optional)
     user = user_business.get_by_user_ID(user_ID)
     ownership_business.add(user, is_private, served_model=served_model)
@@ -85,32 +90,10 @@ def first_save_to_db(user_ID, name, description, input_info, output_info,
     return served_model
 
 
-def list_served_models_by_user_ID(user_ID, order=-1):
-    """
-
-    :param user_ID:
-    :param order:
-    :return:
-    """
-    if not user_ID:
-        raise ValueError('no user id')
-    public_sm = ownership_service.get_all_public_objects('served_model')
-    owned_sm = ownership_service. \
-        get_privacy_ownership_objects_by_user_ID(user_ID, 'served_model')
-    # set status
-    public_sm = [kube_service.get_deployment_status(sm) for sm in public_sm]
-    owned_sm = [kube_service.get_deployment_status(sm) for sm in owned_sm]
-    if order == -1:
-        public_sm.reverse()
-        owned_sm.reverse()
-    return public_sm, owned_sm
-
-
 def first_deploy(user_ID, job_id, name, description, input_info, output_info,
-                 examples, server, input_type, model_name, is_private=False,
+                 examples, server, input_type, model_name, projectId, is_private,
                  **optional):
     """
-
     :param user_ID:
     :param job_id:
     :param name:
@@ -126,6 +109,11 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
     :return:
     """
     job = job_business.get_by_job_id(job_id)
+
+    project = project_business.get_by_id(projectId)
+    related_fields = project.related_fields
+    related_tasks = project.related_tasks
+    tags = project.tags
 
     # if not deployed do the deployment
     try:
@@ -145,7 +133,8 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
         deploy_name = job_id + '-serving'
         service_name = "my-" + job_id + "-service"
         port = port_for.select_random(ports=set(range(30000, 32767)))
-        export_path = export_path.replace('/pyserver', '/home/root/work')
+        export_path = "/home/root/work/user_directory" + export_path.split("/user_directory", 1)[1]
+        # export_path = export_path.replace('/pyserver', '/home/root/work')
         kube_json = {
             "apiVersion": "apps/v1beta1",
             "kind": "Deployment",
@@ -241,7 +230,8 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
                                 deploy_name, server,
                                 input_type, export_path, job,
                                 job_id, model_name,
-                                is_private,
+                                related_fields,
+                                related_tasks,tags,is_private,
                                 service_name=service_name,
                                 **optional)
 
@@ -298,7 +288,9 @@ def resume_by_id(served_model_id, user_ID, model_name):
         deploy_name = job_id + '-serving'
         service_name = "my-" + job_id + "-service"
         port = port_for.select_random(ports=set(range(30000, 32767)))
-        export_path = export_path.replace('/pyserver', '/home/root/work')
+        # export_path = export_path.replace('/pyserver', '/home/root/work')
+        export_path = "/home/root/work/user_directory" + export_path.split("/user_directory", 1)[1]
+
         print('resume path', export_path)
         kube_json = {
             "apiVersion": "apps/v1beta1",
@@ -386,3 +378,41 @@ def resume_by_id(served_model_id, user_ID, model_name):
 
 def get_prediction_by_id(server, model_name, input_value, features):
     return general_model_services.get_prediction_by_id(server, model_name, input_value,features)
+
+
+def list_served_models_by_user_ID(user_ID, order=-1):
+    """
+
+    :param user_ID:
+    :param order:
+    :return:
+    """
+    if not user_ID:
+        raise ValueError('no user id')
+    public_sm = ownership_service.get_all_public_objects('served_model')
+    owned_sm = ownership_service. \
+        get_privacy_ownership_objects_by_user_ID(user_ID, 'served_model')
+    # set status
+    public_sm = [kube_service.get_deployment_status(sm) for sm in public_sm]
+    owned_sm = [kube_service.get_deployment_status(sm) for sm in owned_sm]
+    if order == -1:
+        public_sm.reverse()
+        owned_sm.reverse()
+    return public_sm, owned_sm
+
+
+def list_all_served_models(category):
+    """
+
+    :param category:
+    :return:
+    """
+
+    public_all = served_model_business.get_by_four_querys(privacy=False,
+                                                          related_fields=category)
+    # public_all = [each_model.to_mongo() for each_model in public_all]
+    print(public_all)
+    public_all = json_utility.me_obj_list_to_json_list(
+        public_all)
+    print(public_all)
+    return public_all
