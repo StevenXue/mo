@@ -36,7 +36,7 @@ def update_deploy_info(served_model_id):
 
     served_model = served_model_service.update_db(served_model_id, name,
                                                   description, input_info,
-                                                  output_info,  examples)
+                                                  output_info, examples)
     if not served_model:
         return jsonify({'response': 'updated'}), 200
     served_model = json_utility.convert_to_json(served_model.to_mongo())
@@ -72,7 +72,6 @@ def first_deploy(job_id):
         return jsonify({'response': 'already deployed'}), 400
     served_model = json_utility.convert_to_json(served_model.to_mongo())
     return jsonify({'response': served_model})
-
 
 
 @served_model_app.route('/<string:oid>', methods=['DELETE'])
@@ -135,7 +134,8 @@ def get_prediction(oid):
     model_name = data.pop('model_name')
     input_value = data.pop('input_value')
     features = data.pop('features')
-    result = served_model_service.get_prediction_by_id(server, model_name, input_value,features)
+    result = served_model_service.get_prediction_by_id(server, model_name,
+                                                       input_value, features)
     if result:
         return jsonify({'response': {'result': result}})
     else:
