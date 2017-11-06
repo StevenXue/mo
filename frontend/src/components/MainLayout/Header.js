@@ -43,13 +43,13 @@ function Header({ location, login, history, dispatch }) {
   const key = '/' + location.pathname.split('/')[1]
   const toLoginPage = () => {
     if (!login.user) {
-      history.push('/login')
+      history.push('/user/login')
     }
   }
   const logout = () => {
     localStorage.removeItem('token')
     dispatch({ type: 'resetUser' })
-    history.push('/login')
+    history.push('/user/login')
   }
   return (
     <div className={styles.container}>
@@ -79,7 +79,7 @@ function Header({ location, login, history, dispatch }) {
             className={styles.rightButton}
             title={
               <span onClick={toLoginPage}>
-                <Icon type="user"/>{login.user ? login.user.name : 'Login'}
+                <Icon type="user"/>{login.user ? login.user.user_ID : 'Login'}
               </span>
             }
           >

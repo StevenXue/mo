@@ -75,9 +75,9 @@ def add_staging_data_set_by_data_set_id(sds_name, sds_description, project_id,
     # update project info
     # note: related_field in data set become related_fields here
     project_business.update_items_to_list_field(
-        project_id, tags=ds.get('tags'),
-        related_tasks=ds.get('related_tasks'),
-        related_fields=ds.get('related_field'))
+        project_id, tags=ds.get('tags', []),
+        related_tasks=ds.get('related_tasks', []),
+        related_fields=ds.get('related_field', []))
 
     # generate the project volume path
     project = project_business.get_by_id(project_id)

@@ -13,6 +13,19 @@ export default {
     loginLoading: false,
   },
   reducers: {
+    changeLoginStatus(state, { payload }) {
+      return {
+        ...state,
+        status: payload.status,
+        type: payload.type,
+      };
+    },
+    changeSubmitting(state, { payload }) {
+      return {
+        ...state,
+        submitting: payload,
+      };
+    },
     showLoginLoading(state) {
       return {
         ...state,
@@ -39,6 +52,45 @@ export default {
     },
   },
   effects: {
+    *accountSubmit({ payload }, { call, put }) {
+      yield put({
+        type: 'changeSubmitting',
+        payload: true,
+      });
+      const response = yield call(fakeAccountLogin, payload);
+      yield put({
+        type: 'changeLoginStatus',
+        payload: response,
+      });
+      yield put({
+        type: 'changeSubmitting',
+        payload: false,
+      });
+    },
+    *mobileSubmit(_, { call, put }) {
+      yield put({
+        type: 'changeSubmitting',
+        payload: true,
+      });
+      const response = yield call(fakeMobileLogin);
+      yield put({
+        type: 'changeLoginStatus',
+        payload: response,
+      });
+      yield put({
+        type: 'changeSubmitting',
+        payload: false,
+      });
+    },
+    *logout(_, { put }) {
+      yield put({
+        type: 'changeLoginStatus',
+        payload: {
+          status: false,
+        },
+      });
+      yield put(routerRedux.push('/user/login'));
+    },
     *login({
              payload,
            }, { put, call }) {
@@ -77,12 +129,11 @@ export default {
           yield put(routerRedux.push('/workspace'))
         }
       } catch (err) {
-        console.log(err)
-        if (location.pathname !== '/login') {
+        if (!(location.href.includes('/user/login') || location.href.includes('/user/register'))) {
           let from = location.pathname
           // window.location = `${location.origin}/login?from=${from}`
           // window.location = `${location.origin}/#/login`
-          yield put(routerRedux.push('/login'))
+          yield put(routerRedux.push('/user/login'))
         }
       }
     },
@@ -106,7 +157,7 @@ export default {
   subscriptions: {
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
-        const match = pathToRegexp('/login').exec(pathname)
+        const match = pathToRegexp('/user/login').exec(pathname)
         if (!match) {dispatch({ type: 'query' })}
         //dispatch({ type: 'handleSocket', payload: { message:'', pathname } })
         const userId = localStorage.getItem('user_ID')
