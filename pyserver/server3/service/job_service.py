@@ -635,14 +635,13 @@ def save_result(job_id):
     toolkit = job_obj.toolkit
 
     sds_id = StepBusiness.get_datasource(job_obj.steps)
-    print("sds_id", sds_id)
-
     save_result_sub(result, sds_id, toolkit)
 
 
 def save_as_result(job_id, new_sds_name):
     job_obj = job_business.get_by_job_id(job_id)
     result = job_obj.result
+    toolkit = job_obj.toolkit
     project_obj = job_obj.project
 
     sds_id = staging_data_set_business.add(
@@ -651,7 +650,26 @@ def save_as_result(job_id, new_sds_name):
         project=project_obj,
         job=job_obj
     )
-    save_result_sub(result, sds_id)
+
+    # 拿到原表
+    old_sds = StepBusiness.get_datasource(job_obj.steps)
+    table = staging_data_business.get_by_staging_data_set_id(old_sds)
+
+    table_dict = []
+    for i in range(len(table)):
+        row = table[i].to_mongo().to_dict()
+        row.pop("_id")
+        row.pop("staging_data_set")
+        table_dict.append(row)
+
+    # 复制原表
+    staging_data_business.add_many(
+        staging_data_set=sds_id,
+        data_array=table_dict
+    )
+
+    # 保存结果
+    save_result_sub(result, sds_id, toolkit)
 
 
 def save_result_sub(result, sds_id, toolkit_obj):
@@ -661,37 +679,68 @@ def save_result_sub(result, sds_id, toolkit_obj):
     :type result: json object
     :param sds_id: staging_data_set id
     :type sds_id: ObjectId
+    :param sds_id: toolkit_obj
+    :type sds_id: toolkit obj
     :return: true or false
     :rtype:
     """
-    # sds_obj = staging_data_business.get_by_staging_data_set_id(staging_data_set_id=sds_id)
-
+    # 获取 update_many_with_new_fields 需要的东西
     result_spec = toolkit_obj.result_spec
     field = result['fields']["source"]
+    target_field = result['fields']["target"]
+    fields = [field, target_field]
+    index_nan = []
 
-    # TODO 帮我把result存进sds_obj中 @tianyi
+    # 从result中选取要存的列
     for arg in result_spec["args"]:
-
         if arg["if_add_column"]:
             # 不能使用中文名
             str_name = "%s_col" % toolkit_obj.entry_function
+            # 获取列值
             value = result[arg['name']]
+            value = data_utility.retrieve_nan_index(value, index_nan)
             try:
-                staging_data_service.new_update_many_with_new_fields(
-                    value, field, str_name, sds_id)
+                staging_data_service.update_many_with_new_fields(
+                    raw_data=value,
+                    index=index_nan,
+                    fields=fields,
+                    name=str_name,
+                    sds_id=sds_id,
+                )
             except (TypeError, ValueError) as e:
                 print("ERRORS in data saved to database")
 
-    # sds_obj.result =
 
-    # staging_data_service.update_many_with_new_fields(value,
-    #                                                  nan_index,
-    #                                                  fields[
-    #                                                      0],
-    #                                                  str_name,
-    #                                                  staging_data_set_id)
-    pass
+# def get_index_nan(fields, staging_data_set_id):
+#     """
+#
+#     :param fields:
+#     :type fields: 数据栏位 [x, y]
+#     :param staging_data_set_id: 数据源
+#     :type staging_data_set_id:
+#     :return:
+#     :rtype:
+#     """
+#     data = staging_data_business.get_by_staging_data_set_and_fields(
+#         ObjectId(staging_data_set_id), fields)
+#     col1, col2 = fields
+#     columns = col1 + col2 if col2 is not None else col1
+#     # 去除NaN
+#     index_nan = []
+#     arg_filter = []
+#     # print("data", data)
+#     # print("fields", fields)
+#     for index, item in enumerate(data):
+#         temp = [data_utility.convert_string_to_number_with_poss(item[i]) for i
+#                 in columns]
+#         if np.nan not in temp:
+#             arg_filter.append(temp)
+#         else:
+#             index_nan.append(index)
+#     return index_nan
 
 
 if __name__ == '__main__':
+    # save_result('59fbddb7d845c05927560783')
+    save_as_result('59fbddb7d845c05927560783', 'test12345')
     pass

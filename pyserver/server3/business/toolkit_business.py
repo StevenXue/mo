@@ -1852,8 +1852,6 @@ class StepTemplate(object):
     }
 
 
-
-
 def update_toolkit():
     KMEAN = Toolkit(name='K平均数算法',
                     description='计算所选数据集合的k-mean, 把一个把数据空间划分为k个子集',
@@ -2395,7 +2393,6 @@ def update_toolkit():
                              }
                          ])
 
-
     # TODO 增加fields
     select_k_best_chi2 = Toolkit(name='卡方选择法',
                                  description='选择K个最好的特征，返回选择特征后的数据',
@@ -2465,13 +2462,31 @@ def update_toolkit():
                                      },
                                      {
                                          **StepTemplate.fields,
+                                         'args': [
+                                             {
+                                                 **SPEC.ui_spec['multiple_choice'],
+                                                 'name': 'fields',
+                                                 'des': '',
+                                                 'len_range': [2, None],
+                                             }
+                                         ],
                                          'name': 'feature_fields',
-                                         'display_name': 'select x fields'
+                                         'display_name': 'select x fields',
+
                                      },
                                      {
                                          **StepTemplate.fields,
+                                         'args': [
+                                             {
+                                                 **SPEC.ui_spec['multiple_choice'],
+                                                 'name': 'fields',
+                                                 'des': '',
+                                                 'len_range': [1, 1],
+                                             }
+                                         ],
                                          'name': 'label_fields',
-                                         'display_name': 'select y fields'
+                                         'display_name': 'select y fields',
+
                                      },
                                      {
                                          **StepTemplate.parameters,
@@ -2769,65 +2784,65 @@ def update_toolkit():
     add_columns_append = Toolkit(
         name='合并添加列',
         description='通过其他数据表数据添加列',
-        # category=1,
-        # entry_function='ref',
-        target_py_code=inspect.getsource(preprocess_orig.ref),
-        parameter_spec={
-            "data": {
-                'name': 'input',
-                'type': {
-                    'key': 'transfer_box',
-                    'des': 'nD tensor with shape: (batch_size, ..., '
-                           'input_dim). The most common situation would be a '
-                           '2D input with shape (batch_size, input_dim).',
-                    'range': None
-                },
-                'default': None,
-                'required': True,
-                'x_len_range': [2, None],
-                'y_len_range': [1, 1],
-
-                'x_data_type': ['int', 'float'],
-                'y_data_type': ['int', 'float']
-            },
-            "args": [
-                {
-                    'name': 'n_features',
-                    'type': {
-                        'key': 'int',
-                        'des': 'select k best, k is number of features selected',
-                        'range': [1, None]
-                    },
-                    'default': 2,
-                    'required': True
-                }
-            ]
-        },
-        result_spec={
-            "if_reserved": True,
-            "args": [
-                {
-                    "name": "scores",
-                    "des": "每类特征得到的评分估算",
-                    "if_add_column": False,
-                    "attribute": "value",
-                    "usage": ["bar"]
-                },
-                {
-                    "name": "index",
-                    "des": "每类特征是否取用的标签",
-                    "if_add_column": False,
-                    "attribute": "label",
-                    "usage": ["bar", "table"]
-                },
-                {
-                    "name": "result",
-                    "des": "筛选出的所有特征值",
-                    "if_add_column": False,
-                    "attribute": "value",
-                }
-            ]
-        },
+        category=0,
+        entry_function='add_columns_append',
+        target_py_code=inspect.getsource(preprocess_orig.add_columns_append),
+        # parameter_spec={
+        #     "data": {
+        #         'name': 'input',
+        #         'type': {
+        #             'key': 'transfer_box',
+        #             'des': 'nD tensor with shape: (batch_size, ..., '
+        #                    'input_dim). The most common situation would be a '
+        #                    '2D input with shape (batch_size, input_dim).',
+        #             'range': None
+        #         },
+        #         'default': None,
+        #         'required': True,
+        #         'x_len_range': [2, None],
+        #         'y_len_range': [1, 1],
+        #
+        #         'x_data_type': ['int', 'float'],
+        #         'y_data_type': ['int', 'float']
+        #     },
+        #     "args": [
+        #         {
+        #             'name': 'n_features',
+        #             'type': {
+        #                 'key': 'int',
+        #                 'des': 'select k best, k is number of features selected',
+        #                 'range': [1, None]
+        #             },
+        #             'default': 2,
+        #             'required': True
+        #         }
+        #     ]
+        # },
+        # result_spec={
+        #     "if_reserved": True,
+        #     "args": [
+        #         {
+        #             "name": "scores",
+        #             "des": "每类特征得到的评分估算",
+        #             "if_add_column": False,
+        #             "attribute": "value",
+        #             "usage": ["bar"]
+        #         },
+        #         {
+        #             "name": "index",
+        #             "des": "每类特征是否取用的标签",
+        #             "if_add_column": False,
+        #             "attribute": "label",
+        #             "usage": ["bar", "table"]
+        #         },
+        #         {
+        #             "name": "result",
+        #             "des": "筛选出的所有特征值",
+        #             "if_add_column": False,
+        #             "attribute": "value",
+        #         }
+        #     ]
+        # },
         steps=[
             {
                 **StepTemplate.data_source,
@@ -2847,6 +2862,13 @@ def update_toolkit():
                         'name': 'target_datasource_index',
                         'display_name': 'target_datasource_index',
                         # "len_range": [1, 1],
+                        'range': {
+                            'type': 'from_step',
+                            'step_name': 'target_datasource',
+                            'step_index': 0,
+                            'arg_index': 0,
+                            'value_name': 'fields'
+                        },
                         "required": True,
                     },
                     {
@@ -2855,21 +2877,44 @@ def update_toolkit():
                         'display_name': 'from_datasource_index',
                         # "len_range": [1, 1],
                         "required": True,
+                        'range': {
+                            'type': 'from_step',
+                            'step_name': 'target_datasource',
+                            'step_index': 0,
+                            'arg_index': 0,
+                            'value_name': 'fields'
+                        },
                     }
                 ]
             },
             {
                 **StepTemplate.fields,
-                "name": 'from_fields'
+                "name": 'from_fields',
+                'display_name': 'select added fields',
+                'args': [
+                    {
+                        **SPEC.ui_spec['multiple_choice'],
+                        'name': 'fields',
+                        'des': '',
+                        'range': {
+                            'type': 'from_step',
+                            'step_name': 'from_datasource',
+                            'step_index': 1,
+                            'arg_index': 0,
+                            'value_name': 'fields'
+                        }
+                    }
+                ],
+
             },
             {
                 **StepTemplate.parameters,
                 'args': [
                     {
                         **SPEC.ui_spec['choice'],
-                        'name': 'action',
-                        'display_name': 'n_features',
-                        'value_type': 'int',
+                        'name': 'exception_handing',
+                        'display_name': 'exception handing',
+                        # 'value_type': '',
                         'des': 'action after the row without index of from datasource',
 
                         "range": [
@@ -2937,11 +2982,10 @@ def update_toolkit():
             '_id': ObjectId("5980149d8be34d34da32c19a"),
             "object": REF
         },
-
-        # {
-        #     '_id': None,
-        #     'object': add_columns_append
-        # }
+        {
+            '_id': ObjectId('5a014c9dd845c0523f3a9ff1'),
+            'object': add_columns_append
+        }
     ]
     user = user_business.get_by_user_ID('system')
 

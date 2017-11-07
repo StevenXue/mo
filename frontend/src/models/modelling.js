@@ -45,9 +45,6 @@ const modelling = modelExtend(workBench, {
           sectionsJson[modelKey]['metrics_status'] = metrics
         }
 
-
-
-
         return {
           ...state,
           sectionsJson: sectionsJson,

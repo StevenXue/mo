@@ -35,8 +35,6 @@ class Launcher extends Component {
         },
       });
     }
-
-
   };
 
   render() {
@@ -48,7 +46,7 @@ class Launcher extends Component {
           Choose a {this.props.step} to start
         </h1>
         <Spin spinning={this.props.model.spinLoading.getAlgorithms}>
-          <Tabs defaultActiveKey="1" onChange={callback}
+          <Tabs defaultActiveKey="0" onChange={callback}
                 tabBarStyle={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
             {this.props.model.algorithms.map((category, index) =>
               <TabPane tab={category.name} key={index}>

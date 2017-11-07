@@ -70,10 +70,6 @@ function Guidance(props) {
           Learn how to build and deploy on App Engine with a simple 'Hello World' app. If you're new to App Engine, then
           start here.
         </div>
-        {/*<div className={styles.title}>*/}
-        {/*description*/}
-        {/*</div>*/}
-
         <div className={styles.navCards}>
           {
             algorithms.map((algorithm,cardIndex)=>

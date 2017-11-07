@@ -92,6 +92,7 @@ class Repo:
     def update_unique_one(self, query, update):
         return self.__instance.objects.get(**query).modify(**update)
 
+    # delete fields
     def update_unset_fields_by_non_unique_field(self, field_name, field_value,
                                                 fields):
         update = {'unset__' + k: '' for k in fields}
