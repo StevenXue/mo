@@ -83,6 +83,14 @@ class DataPreview extends React.Component {
     });
   }
 
+  handleLast = () => {
+    this.props.dispatch({type:'upload/showInTable', payload:true})
+  }
+
+  handleFirst = () => {
+    this.props.dispatch({type:'upload/showInTable', payload:false})
+  }
+
 
   render () {
     const ds = this.props.upload.dataSet
@@ -176,6 +184,15 @@ class DataPreview extends React.Component {
               />
             }
 
+          </div>
+          <div className={styles.page}>
+            <Button onClick={this.handleFirst}
+                    loading={this.props.upload.firstLoading}
+            ><Icon type="left"/>First 5 rows</Button>
+
+            <Button onClick={this.handleLast}
+                    loading={this.props.upload.lastLoading}
+            >Last 5 rows<Icon type="right"/></Button>
           </div>
           <div className={styles.bottom}>
             <Button type="primary" className={styles.btn}

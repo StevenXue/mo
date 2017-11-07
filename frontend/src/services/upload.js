@@ -17,8 +17,14 @@ export async function fetchDataSets () {
   })
 }
 
-export async function fetchDataSet(dataSet_ID) {
-  let query = `/${dataSet_ID}?limit=5`;
+export async function fetchDataSet(dataSet_ID, isLast) {
+  let query
+  if (isLast) {
+    query = `/${dataSet_ID}?limit=5&isLast=true`;
+  } else {
+    query = `/${dataSet_ID}?limit=5`;
+  }
+
   return org_request(CORS + dataSets +query, {
     method: 'get',
   })
