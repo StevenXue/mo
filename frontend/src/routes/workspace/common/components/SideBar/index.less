@@ -1,3 +1,5 @@
+@import "../../../../../index";
+
 @paddingLR: 21px;
 
 .normal {
@@ -12,9 +14,8 @@
   background-color: white;
 }
 
-
 .first_row {
-  height:77px;
+  height: 77px;
   flex-direction: row-reverse;
   display: flex;
   align-items: center;
@@ -23,7 +24,7 @@
 }
 
 .add_row {
-  height:71px;
+  height: 71px;
   flex-direction: row;
   justify-content: space-between;
   display: flex;
@@ -39,24 +40,56 @@
 
 .row {
   display: flex;
-  height:50px;
+  height: 50px;
   justify-content: space-between;
   align-items: center;
   background-color: lightgrey;
   padding: 10px;
 }
 
-//.name {
-//  display: flex;
-//  justify-content: space-between;
-//
-//}
+.sectionRow {
+  width: 170px;
+}
 
+.status-g {
+  line-height: 24px;
+  float: right;
+}
+
+.time {
+  display: inline;
+  font-size: 11px;
+  vertical-align:middle;
+
+  .running {
+    //line-height: 18px;
+    .status-g;
+    color: @green;
+  }
+
+  .completed {
+    .status-g;
+    color: @custom-orange;
+  }
+
+  .error {
+    .status-g;
+    color: @red;
+  }
+
+  .light {
+    float: right;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: @custom-grey;
+  }
+}
 
 .left_column {
   display: flex;
   width: 40px;
-  height:180px;
+  height: 180px;
   justify-content: center;
   align-items: center;
   flex-direction: column-reverse;
@@ -72,5 +105,5 @@
   //display: flex;
   //flex-direction: column;
   width: 60px;
-  transform:rotate(270deg)
+  transform: rotate(270deg)
 }

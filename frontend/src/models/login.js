@@ -3,10 +3,11 @@ import { routerRedux } from 'dva/router'
 import { message } from 'antd'
 import pathToRegexp from 'path-to-regexp'
 import io from 'socket.io-client'
+import { invert } from 'lodash'
 
 import { queryURL } from '../utils'
 
-import { flaskServer } from '../constants'
+import { flaskServer, translateDict } from '../constants'
 
 export default {
   namespace: 'login',
@@ -167,19 +168,28 @@ export default {
       const jobIdMsg = msg.job_id
       message.error(JSON.stringify(msg))
       yield put({ type: 'modelling/hideResult' })
-      console.log(msg.error)
-
-      // const match = pathToRegexp('/workspace/:projectId*').exec(pathname)
-      // if (match) {
-      //   const projectId = match[1]
-      //   if (projectId === projectIdMsg) {
-      //     // in project
-      //     yield put({
-      //       type: 'modelling/setMetrics',
-      //       payload: { message },
-      //     })
-      //   }
-      // }
+      yield put({
+        type: invert(translateDict)[msg.type] + '/setStatus', payload: {
+          sectionId: jobIdMsg,
+          status: 300,
+        },
+      })
+      console.log(' '.join(msg.error))
+      // console.log(msg.error)
+    },
+    *handleSuccess({ payload }, { call, put }) {
+      const { msg, pathname } = payload
+      const projectIdMsg = msg.project_id
+      const jobIdMsg = msg.job_id
+      message.success(msg.content)
+      yield put({
+        type: invert(translateDict)[msg.type] + '/setStatus', payload: {
+          sectionId: jobIdMsg,
+          status: 200,
+        },
+      })
+      // console.log(' '.join(msg.error))
+      // console.log(msg.error)
     },
   },
   subscriptions: {
@@ -187,7 +197,6 @@ export default {
       return history.listen(({ pathname }) => {
         const match = pathToRegexp('/user/login').exec(pathname)
         if (!match) {dispatch({ type: 'query' })}
-        //dispatch({ type: 'handleSocket', payload: { message:'', pathname } })
         const userId = localStorage.getItem('user_ID')
         if (userId) {
           const socket = io.connect(flaskServer + '/log/' + userId)
@@ -195,7 +204,12 @@ export default {
             dispatch({ type: 'handleSocket', payload: { msg, pathname } })
           })
           socket.on('error', (msg) => {
+            console.log(msg)
             dispatch({ type: 'handleError', payload: { msg, pathname } })
+          })
+          socket.on('success', (msg) => {
+            console.log(msg)
+            dispatch({ type: 'handleSuccess', payload: { msg, pathname } })
           })
         }
       })

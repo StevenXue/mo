@@ -579,10 +579,10 @@ def run_toolkit_job(job_obj, project_id):
     data = staging_data_business.get_by_staging_data_set_and_fields(
         ObjectId(staging_data_set_id), fields)
 
-    print("data", data)
+    # print("data", data)
     # 数据库转to_mongo和to_dict
     data = [d.to_mongo().to_dict() for d in data]
-    print("data_after", data)
+    # print("data_after", data)
 
     # 拿到conf
     fields = [x_fields, y_fields]

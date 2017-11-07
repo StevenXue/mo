@@ -1,13 +1,14 @@
-import React from 'react';
-import {connect} from 'dva';
-import {Menu, Dropdown, Icon, Spin} from 'antd';
+import React from 'react'
+import { connect } from 'dva'
+import { Menu, Dropdown, Icon, Spin } from 'antd'
 
-import {translateDict, tempVariable} from '../../../../../constants';
-import {arrayToJson, JsonToArray} from '../../../../../utils/JsonUtils';
+import { translateDict, tempVariable, statusDict } from '../../../../../constants'
+import { arrayToJson, JsonToArray } from '../../../../../utils/JsonUtils'
+import { showTime } from '../../../../../utils/index'
 
-import styles from './index.less';
+import styles from './index.less'
 
-function Sidebar({model, dispatch, namespace}) {
+function Sidebar({ model, dispatch, namespace }) {
   //state
   const {
     isLeftSideBar,
@@ -15,31 +16,30 @@ function Sidebar({model, dispatch, namespace}) {
     activeSectionsId,
     focusSectionsId,
 
-    getSectionLoading
-  } = model;
+    getSectionLoading,
+  } = model
 
-  const sections = JsonToArray(sectionsJson);
+  const sections = JsonToArray(sectionsJson)
 
   // change state
   const toggleLeftSideBar = () => {
     dispatch({
-      type: namespace + '/toggleLeftSideBar'
-    });
-  };
+      type: namespace + '/toggleLeftSideBar',
+    })
+  }
   const addActiveSection = (sectionId) => {
     dispatch({
       type: namespace + '/addActiveSection',
-      sectionId: sectionId
-    });
-  };
+      sectionId: sectionId,
+    })
+  }
 
   const setFocusSection = (sectionId) => {
     dispatch({
       type: namespace + '/setFocusSection',
-      focusSectionsId: sectionId
-    });
-  };
-
+      focusSectionsId: sectionId,
+    })
+  }
 
   // functions
   // 当section 被点击
@@ -52,21 +52,21 @@ function Sidebar({model, dispatch, namespace}) {
     else {
       setFocusSection(sectionId)
     }
-  };
+  }
 
   // 新增 section launcher
   const onClickAdd = () => {
     //temp section id
-    addActiveSection('new_launcher ' + Math.random());
-  };
+    addActiveSection('new_launcher ' + Math.random())
+  }
 
   const onClickDelete = (e, sectionId) => {
-    e.stopPropagation();
+    e.stopPropagation()
     dispatch({
       type: namespace + '/deleteSection',
-      payload: {sectionId: sectionId}
-    });
-  };
+      payload: { sectionId: sectionId },
+    })
+  }
 
   const menu = (sectionId) => {
     return (
@@ -76,34 +76,33 @@ function Sidebar({model, dispatch, namespace}) {
         </Menu.Item>
       </Menu>
     )
-  };
+  }
 
   return (
-    isLeftSideBar ?
-      <div className={styles.container}>
-        <div className={styles.first_row}>
-          <Icon type="menu-fold" onClick={toggleLeftSideBar} style={{fontSize: 20}}/>
-        </div>
+    isLeftSideBar ? <div className={styles.container}>
+      <div className={styles.first_row}>
+        <Icon type="menu-fold" onClick={toggleLeftSideBar} style={{ fontSize: 20 }}/>
+      </div>
 
-        <div className={styles.add_row}>
-          <div className='custom-title-font'>
-            task list
-          </div>
-          <Icon type="plus" onClick={onClickAdd} style={{fontSize: 20}}/>
+      <div className={styles.add_row}>
+        <div className='custom-title-font'>
+          Task List
         </div>
-        <Spin spinning={getSectionLoading} >
-          <div className={styles.list}>
+        <Icon type="plus" onClick={onClickAdd} style={{ fontSize: 20 }}/>
+      </div>
+      <Spin spinning={getSectionLoading}>
+        <div className={styles.list}>
           {
             sections.map((section, i) => {
-                let backgroundColor;
-                let color;
+                let backgroundColor
+                let color
                 if (focusSectionsId && (section._id === focusSectionsId)) {
-                  backgroundColor = "#34C0E2";
-                  color = 'white';
+                  backgroundColor = '#34C0E2'
+                  color = 'white'
                 } else {
-                  backgroundColor = i % 2 ? "#F5F5F5"
-                    : "#FBFBFB";
-                  color = null;
+                  backgroundColor = i % 2 ? '#F5F5F5'
+                    : '#FBFBFB'
+                  color = null
                 }
                 return (
                   <div
@@ -112,10 +111,18 @@ function Sidebar({model, dispatch, namespace}) {
                     className={`${styles.row} custom-little-title-font`}
                     style={{
                       backgroundColor: backgroundColor,
-                      color: color
+                      color: color,
                     }}
                   >
-                    {section[tempVariable.nameOrId] || section[translateDict[namespace]].name}
+                    <div className={styles.sectionRow}>
+                      {section[tempVariable.nameOrId] || section[translateDict[namespace]].name}
+                      <br/>
+                      <div className={styles.time}>
+                        {showTime(section.create_time)}
+                        <span className={styles[statusDict[section.status]]}>{statusDict[section.status]}</span>
+                        {/*<div className={styles.light}/>*/}
+                      </div>
+                    </div>
                     <Dropdown overlay={menu(section._id)} trigger={['click']}>
                       <a className="ant-dropdown-link" href="#">
                         <Icon type="down"/>
@@ -123,18 +130,17 @@ function Sidebar({model, dispatch, namespace}) {
                     </Dropdown>
                   </div>
                 )
-              }
+              },
             )}
-          </div>
-        </Spin>
-      </div> :
-      <div className={styles.left_column}>
-        <div className={styles.text_reverse}>
-          Task List
         </div>
-        <Icon type="menu-unfold" onClick={toggleLeftSideBar} style={{height: 77, fontSize: 20}}/>
+      </Spin>
+    </div> : <div className={styles.left_column}>
+      <div className={styles.text_reverse}>
+        Task List
       </div>
-  );
+      <Icon type="menu-unfold" onClick={toggleLeftSideBar} style={{ height: 77, fontSize: 20 }}/>
+    </div>
+  )
 }
 
-export default Sidebar;
+export default Sidebar

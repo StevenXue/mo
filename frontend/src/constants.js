@@ -58,6 +58,12 @@ module.exports = {
   tempVariable: {
     // nameOrId: '_id',
     nameOrId: 'name',
+  },
+
+  statusDict: {
+    0: 'running',
+    200: 'completed',
+    300: 'error'
   }
 
 };

@@ -12,6 +12,7 @@ from server3.business import staging_data_set_business
 from server3.business import project_business
 from server3.business import ownership_business
 from server3.service.logger_service import emit_error
+from server3.service.logger_service import emit_success
 from server3.service.logger_service import save_job_status
 
 FLAGS = tf.app.flags.FLAGS
@@ -40,10 +41,19 @@ def main(unused_argv):
         exc_type, exc_value, exc_traceback = sys.exc_info()
         message = {
             'error': repr(traceback.format_exception(exc_type, exc_value,
-                                                     exc_traceback))}
+                                                     exc_traceback)),
+            'type': 'model'
+        }
         print(message)
         emit_error(message, str(project_id), job_id=job_id, user_ID=user_ID)
         save_job_status(job, error=message, status=300)
+    else:
+        message = {
+            'project_name': project.name,
+            'type': 'model',
+            'content': 'Model job completed in project ' + project.name
+        }
+        emit_success(message, str(project_id), job_id=job_id, user_ID=user_ID)
 
 
 if __name__ == '__main__':

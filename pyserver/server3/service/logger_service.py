@@ -62,6 +62,13 @@ def emit_error(message, project_id, **kw):
     socketio.emit('error', message, namespace='/log/%s' % user_ID)
 
 
+def emit_success(message, project_id, **kw):
+    job_id = kw.get('job_id')
+    user_ID = kw.get('user_ID')
+    message.update({'job_id': job_id, 'project_id': project_id})
+    socketio.emit('success', message, namespace='/log/%s' % user_ID)
+
+
 def emit_message_url(message, project_id):
     socketio.emit('send_message', message, namespace='/log/%s' % project_id)
 

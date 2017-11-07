@@ -79,13 +79,13 @@ const modelling = modelExtend(workBench, {
         'val_loss': [],
       }
 
-      if(sectionsJson[sectionId].messages && sectionsJson[sectionId].messages.find(e => isEqual(e, msg))) {
-        console.log('message')
-        return {
-          ...state,
-          sectionsJson,
-        }
-      }
+      // if(sectionsJson[sectionId].messages && sectionsJson[sectionId].messages.find(e => isEqual(e, msg))) {
+      //   console.log('message')
+      //   return {
+      //     ...state,
+      //     sectionsJson,
+      //   }
+      // }
 
       if (sectionsJson[sectionId].metrics_status) {
         for (let metric in metrics) {
@@ -117,14 +117,14 @@ const modelling = modelExtend(workBench, {
         sectionsJson[sectionId].batch = msg.batch
       }
 
-      // record messages and prevent duplicate
-      if(msg) {
-        if(!sectionsJson[sectionId].messages) {
-          sectionsJson[sectionId].messages= [msg]
-        } else {
-          sectionsJson[sectionId].messages.push(msg)
-        }
-      }
+      // // record messages and prevent duplicate
+      // if(msg) {
+      //   if(!sectionsJson[sectionId].messages) {
+      //     sectionsJson[sectionId].messages= [msg]
+      //   } else {
+      //     sectionsJson[sectionId].messages.push(msg)
+      //   }
+      // }
       console.log('sectionsJson', sectionsJson)
       return {
         ...state,
@@ -134,6 +134,7 @@ const modelling = modelExtend(workBench, {
     clearMetrics(state, { payload }) {
       let sectionsJson = state.sectionsJson
       sectionsJson[payload.sectionId].metrics_status = {}
+      sectionsJson[payload.sectionId].batch = undefined
       return {
         ...state,
         sectionsJson,
@@ -149,6 +150,12 @@ const modelling = modelExtend(workBench, {
         type: 'setLoading', payload: {
           key: 'wholePage',
           loading: true,
+        },
+      })
+      yield put({
+        type: 'setStatus', payload: {
+          sectionId,
+          status: 0,
         },
       })
 

@@ -153,7 +153,7 @@ def kube_run_model(conf, project_id, data_source_id, model_id, job_obj,
     job_obj = job_business.update_job_by_id(job_obj.id, model=model_obj,
                                             staging_data_set=staging_data_set_obj,
                                             project=project_obj, params=conf,
-                                            run_args=run_args)
+                                            run_args=run_args, status=0)
 
     job_id = str(job_obj.id)
     print(job_id)
