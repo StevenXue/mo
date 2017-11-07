@@ -155,7 +155,7 @@ const modelling = modelExtend(workBench, {
       yield put({
         type: 'setStatus', payload: {
           sectionId,
-          status: 0,
+          status: 100,
         },
       })
 

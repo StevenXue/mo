@@ -1,21 +1,19 @@
 import React from 'react'
 import styles from './index.less'
 import { connect } from 'dva'
+import { get, isEqual } from 'lodash'
+import { Select, Collapse, Button, Input, Progress, Icon, Tooltip } from 'antd'
 
-import { Select, Collapse, Button, Input, Popover, Icon, Tooltip } from 'antd'
-const Option = Select.Option
-const Panel = Collapse.Panel
-import {get, isEqual} from 'lodash'
 import ToolBar from './ToolBar/index'
 import ParamsMapper from '../../../../../../components/ParamsMapper/index'
-
 import LayerCard from '../../../../modelling/LayerCard/index'
-import {format} from '../../../../../../utils/base'
+import { format } from '../../../../../../utils/base'
+import { translateDict } from '../../../../../../constants'
 
-import {translateDict} from '../../../../../../constants'
+const Option = Select.Option
+const Panel = Collapse.Panel
 
-
-function FakePanel({children, header, headerClass, isActive, prefixCls, destroyInactivePanel, openAnimation, onItemClick}) {
+function FakePanel({ children, header, headerClass, isActive, prefixCls, destroyInactivePanel, openAnimation, onItemClick }) {
   return (
     <div>
       {children}
@@ -334,7 +332,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                       // backgroundColor: backgroundColor,
                       color: values.includes(fieldName) ? 'white' : 'grey',
                     }}
-                      className={styles.text}
+                       className={styles.text}
                     >{fieldName}</p>
                   </div>
                 )
@@ -451,7 +449,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                     baseValue={baseSteps[stepIndex].args[argIndex].range.find(e => e.name === value['name'])}
                     featureFields={featureFields}
                     labelFields={labelFields}
-                    {...{model, dispatch, namespace, stepIndex, argIndex, valueIdx}}
+                    {...{ model, dispatch, namespace, stepIndex, argIndex, valueIdx }}
                     funcs={{
                       addValue: (e) => addValue(e, stepIndex, argIndex, valueIdx),
                       deleteValue: (e) => deleteValue(e, stepIndex, argIndex, valueIdx),
@@ -485,7 +483,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                       setValue={(value, argIndex) => setValue(value, stepIndex, argIndex)}
                       setValueDefault={(value) => setValueDefault(value, stepIndex)}
                       baseArgs={baseSteps[stepIndex].args}
-                      {...{stepIndex}}
+                      {...{ stepIndex }}
         />
         <div className={styles.end_button}>
           {
@@ -591,7 +589,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
           }
         </div>
       </div>
-    );
+    )
     return (
       <div>
         {
@@ -624,20 +622,23 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
 
   function renderFakePanel(step, stepIndex, text) {
     return (
-      !active_steps.includes(stepIndex.toString()) ?
-        <FakePanel key={stepIndex + step.name + 'hint'}>
-          <div className={styles.fake_panel_container}>
-            <div className={styles.fake_panel}>
-              {text}
-            </div>
+      !active_steps.includes(stepIndex.toString()) ? <FakePanel key={stepIndex + step.name + 'hint'}>
+        <div className={styles.fake_panel_container}>
+          <div className={styles.fake_panel}>
+            {text}
           </div>
-        </FakePanel> : null
+        </div>
+      </FakePanel> : null
     )
   }
 
   return (
     <div>
       <ToolBar sectionId={sectionId} {...{ model, dispatch, namespace }}/>
+      {
+        namespace === 'modelling' &&
+        <Progress percent={50} status="active" />
+      }
       <div className={`${styles.container} my-collapse-arrow`}>
         <Collapse className={styles.collapse}
                   defaultActiveKey={['data_source']} onChange={callback}
@@ -658,8 +659,8 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                       key={stepIndex}
                     >
                       {dataSource(step.args, stepIndex)}
-                    </Panel>
-                    ];
+                    </Panel>,
+                    ]
                     if (!active_steps.includes(stepIndex.toString())) {
                       ret.push(
                         <FakePanel key={stepIndex + step.name + 'hint'}>
@@ -670,7 +671,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                           </div>
                         </FakePanel>)
                     }
-                    return ret;
+                    return ret
 
                   case 'fields':
                     return [
@@ -688,11 +689,10 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                       </Panel>,
 
                       renderFakePanel(step, stepIndex,
-                        step.args[0].values.length ?
-                          `You have selected ${step.args[0].values.length} fields`
-                          : 'You have not selected any fields'
-                      )
-                    ];
+                        step.args[0].values.length ? `You have selected ${step.args[0].values.length} fields`
+                          : 'You have not selected any fields',
+                      ),
+                    ]
 
                   case 'feature_fields':
                     return [
@@ -709,12 +709,11 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                       </Panel>,
 
                       renderFakePanel(step, stepIndex,
-                        step.args[0].values.length ?
-                          `You have selected ${step.args[0].values.length} fields`
-                          : 'You have not selected any fields'
-                      )
+                        step.args[0].values.length ? `You have selected ${step.args[0].values.length} fields`
+                          : 'You have not selected any fields',
+                      ),
 
-                    ];
+                    ]
 
                   case 'label_fields':
                     return [
@@ -731,21 +730,20 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                       </Panel>,
 
                       renderFakePanel(step, stepIndex,
-                        step.args[0].values.length ?
-                          `You have selected ${step.args[0].values.length} fields`
-                          : 'You have not selected any fields'
-                      )
+                        step.args[0].values.length ? `You have selected ${step.args[0].values.length} fields`
+                          : 'You have not selected any fields',
+                      ),
 
-                    ];
+                    ]
 
                   case 'parameters':
                     // num of args filled
-                    let numArgsFill = 0;
+                    let numArgsFill = 0
                     step.args.forEach((arg) => {
                       if (arg.value) {
                         numArgsFill += 1
                       }
-                    });
+                    })
                     return [
                       <Panel
                         header={
@@ -760,15 +758,14 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                       </Panel>,
 
                       renderFakePanel(step, stepIndex,
-                        numArgsFill ?
-                          `You have filled ${numArgsFill} args`
-                          : 'You have not filled any args'
-                      )
+                        numArgsFill ? `You have filled ${numArgsFill} args`
+                          : 'You have not filled any args',
+                      ),
 
-                    ];
+                    ]
 
                   case 'layers':
-                    let numOfLayer = 2;
+                    let numOfLayer = 2
                     return [
                       <Panel
                         header={
@@ -783,12 +780,11 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                       </Panel>,
 
                       renderFakePanel(step, stepIndex,
-                        numOfLayer !== 2 ?
-                          `You have added ${numOfLayer} layers`
-                          : 'You have not added any layers'
-                      )
+                        numOfLayer !== 2 ? `You have added ${numOfLayer} layers`
+                          : 'You have not added any layers',
+                      ),
 
-                    ];
+                    ]
 
                   // return (
                   //   <Panel header="Build Network" key={stepIndex}
@@ -800,12 +796,12 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                   case 'compile':
                   case 'fit':
                   case 'evaluate':
-                    let numArgsFillEvaluate = 0;
+                    let numArgsFillEvaluate = 0
                     step.args.forEach((arg) => {
                       if (arg.value) {
                         numArgsFill += 1
                       }
-                    });
+                    })
                     return [
                       <Panel
                         header={
@@ -820,12 +816,11 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                       </Panel>,
 
                       renderFakePanel(step, stepIndex,
-                        numArgsFillEvaluate ?
-                          `You have filled ${numArgsFillEvaluate} args`
-                          : 'You have not filled any args'
-                      )
+                        numArgsFillEvaluate ? `You have filled ${numArgsFillEvaluate} args`
+                          : 'You have not filled any args',
+                      ),
 
-                    ];
+                    ]
                   // return (
                   //   <Panel header={step.display_name} key={stepIndex}
                   //          className={styles.panel}>
@@ -833,12 +828,12 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                   //   </Panel>
                   // )
                   case 'setting':
-                    let numArgsFillSetting = 0;
+                    let numArgsFillSetting = 0
                     step.args.forEach((arg) => {
                       if (arg.value) {
                         numArgsFill += 1
                       }
-                    });
+                    })
                     return [
                       <Panel
                         header={
@@ -853,12 +848,11 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                       </Panel>,
 
                       renderFakePanel(step, stepIndex,
-                        numArgsFillSetting ?
-                          `You have filled ${numArgsFillSetting} args`
-                          : 'You have not filled any args'
-                      )
+                        numArgsFillSetting ? `You have filled ${numArgsFillSetting} args`
+                          : 'You have not filled any args',
+                      ),
 
-                    ];
+                    ]
                 }
               },
             )

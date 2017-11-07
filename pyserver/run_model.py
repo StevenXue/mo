@@ -51,6 +51,7 @@ def main(unused_argv):
         message = {
             'project_name': project.name,
             'type': 'model',
+            'complete': True,
             'content': 'Model job completed in project ' + project.name
         }
         emit_success(message, str(project_id), job_id=job_id, user_ID=user_ID)

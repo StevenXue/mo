@@ -24,10 +24,10 @@ from mongoengine import NULLIFY
 # from server3.entity import Project
 
 STATUS = (
-    (0, 'start'),
-    (100, 'processing'),
+    (0, 'ready'),
+    (100, 'running'),
     (200, 'completed'),
-    (300, 'interrupted')
+    (300, 'error')
 )
 
 

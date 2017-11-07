@@ -618,6 +618,12 @@ export default {
           loading: true,
         },
       })
+      yield put({
+        type: 'setStatus', payload: {
+          sectionId,
+          status: 100,
+        },
+      })
 
       const { namespace, sectionId } = action.payload
 

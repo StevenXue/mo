@@ -182,14 +182,15 @@ export default {
       const projectIdMsg = msg.project_id
       const jobIdMsg = msg.job_id
       message.success(msg.content)
-      yield put({
-        type: invert(translateDict)[msg.type] + '/setStatus', payload: {
-          sectionId: jobIdMsg,
-          status: 200,
-        },
-      })
-      // console.log(' '.join(msg.error))
-      // console.log(msg.error)
+      if(msg.complete) {
+        // set job state to complete
+        yield put({
+          type: invert(translateDict)[msg.type] + '/setStatus', payload: {
+            sectionId: jobIdMsg,
+            status: 200,
+          },
+        })
+      }
     },
   },
   subscriptions: {

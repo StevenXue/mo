@@ -61,7 +61,8 @@ module.exports = {
   },
 
   statusDict: {
-    0: 'running',
+    0: 'ready',
+    100: 'running',
     200: 'completed',
     300: 'error'
   }

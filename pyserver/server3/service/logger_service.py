@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
 from flask_socketio import SocketIO
-# from sio import socketio
 from server3.business import staging_data_business
 from server3.business import staging_data_set_business
 from server3.business import job_business
@@ -10,6 +9,17 @@ from server3.constants import REDIS_SERVER
 socketio = SocketIO(message_queue=REDIS_SERVER)
 
 epoch = 0
+
+
+class TrainingLogger():
+    step = 0
+
+    def __init__(self, total_steps, project_id, job_id, user_ID, result_sds):
+        self.total_steps = total_steps
+        self.project_id = project_id
+        self.job_id = job_id
+        self.user_ID = user_ID
+        self.result_sds = result_sds
 
 
 def log_epoch_begin(*args, **kw):
