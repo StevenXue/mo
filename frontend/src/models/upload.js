@@ -40,6 +40,9 @@ export default {
     delLoading: false,
     saveLoading: false,
     saveAddLoading: false,
+
+    firstLoading: false,
+    lastLoading: false,
   },
 
   subscriptions: {
@@ -75,7 +78,7 @@ export default {
       yield put({type:'setViewLoading', payload: true})
       const dataSetID = yield select(state => state.upload.dataSetID)
 
-      const data = yield call(fetchDataSet, dataSetID)
+      const data = yield call(fetchDataSet, dataSetID, false)
       // console.log(data)
       const orgflds = JSON.parse(JSON.stringify(data.fields))
       yield put({ type: 'setDataSet', payload: data.response})
@@ -85,6 +88,24 @@ export default {
       yield put(routerRedux.push('preview'))
       yield put({type:'setViewLoading', payload: false})
       yield put({ type: 'setUploading', payload: false })
+    },
+
+    * showInTable({payload}, { call, put, select }) {
+      if (payload) {
+        yield put({type:'setLastLoading', payload: true})
+      } else {
+        yield put({type: 'setFirstLoading', payload: true})
+      }
+      const dataSetID = yield select(state => state.upload.dataSetID)
+      const data = yield call(fetchDataSet, dataSetID, payload)
+      yield put({ type: 'setDataSet', payload: data.response})
+
+      if (payload) {
+        yield put({type:'setLastLoading', payload: false})
+      } else {
+        yield put({type: 'setFirstLoading', payload: false})
+      }
+
     },
 
 
@@ -402,6 +423,20 @@ export default {
       return {
         ...state,
         showStaged
+      }
+    },
+
+    setFirstLoading(state, {payload: firstLoading}) {
+      return {
+        ...state,
+        firstLoading
+      }
+    },
+
+    setLastLoading(state, {payload: lastLoading}) {
+      return {
+        ...state,
+        lastLoading
       }
     },
   },

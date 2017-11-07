@@ -1,6 +1,6 @@
 import modelExtend from 'dva-model-extend'
 import pathToRegexp from 'path-to-regexp'
-import { get } from 'lodash'
+import { get, isEqual } from 'lodash'
 import * as dataAnalysisService from '../services/dataAnalysis'
 
 import workBench from './workBench'
@@ -61,9 +61,10 @@ const modelling = modelExtend(workBench, {
     },
     setMetrics(state, { payload }) {
       const { message } = payload
-      console.log('message', message)
       const sectionId = message.job_id
       let sectionsJson = state.sectionsJson
+      console.log('message', message)
+
       let metrics = {
         'acc': [],
         'precision': [],
@@ -73,6 +74,14 @@ const modelling = modelExtend(workBench, {
         'val_precision': [],
         'val_recall': [],
         'val_loss': [],
+      }
+
+      if(sectionsJson[sectionId].messages && sectionsJson[sectionId].messages.find(e => isEqual(e, message))) {
+        console.log('message')
+        return {
+          ...state,
+          sectionsJson,
+        }
       }
 
       if (sectionsJson[sectionId].metrics_status) {
@@ -99,8 +108,19 @@ const modelling = modelExtend(workBench, {
         }
         sectionsJson[sectionId].metrics_status = metrics
       }
+
+      // receive batch
       if(message.batch) {
         sectionsJson[sectionId].batch = message.batch
+      }
+
+      // record messages and prevent duplicate
+      if(message) {
+        if(!sectionsJson[sectionId].messages) {
+          sectionsJson[sectionId].messages= [message]
+        } else {
+          sectionsJson[sectionId].messages.push(message)
+        }
       }
       console.log('sectionsJson', sectionsJson)
       return {

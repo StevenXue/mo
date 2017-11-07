@@ -160,7 +160,7 @@ export default class LearningCurve extends React.Component {
     return (
       <div>
         {this.props.batch}
-        <Spin spinning={isEmpty(this.props.data)}>
+        <Spin spinning={isEmpty(this.props.data)} tip="Initializing...">
           <div style={{ minHeight: 100 }}>
             {metircs.map((metric) => {
               if ((this.props.data[metric] && this.props.data[metric].length > 0)

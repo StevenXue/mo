@@ -34,6 +34,12 @@ class Repo:
     def read_first_one(self, query):
         return self.__instance.objects(**query).first()
 
+    def read_last(self, **query):
+        return self.__instance.objects(**query).order_by('-_id')
+
+    def read_last_limit(self, limit, **query):
+        return self.__instance.objects(**query).order_by('-_id').limit(limit)
+
     def read_unique_one(self, query):
         return self.__instance.objects.get(**query)
 

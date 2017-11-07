@@ -66,22 +66,30 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
 
       <ButtonGroup className={styles.button_group}>
 
-        <Button type="primary" className={styles.button}
+        <Button
+          // type="primary"
+          className={styles.button}
                 onClick={()=>onClickSave()}>
           <Icon type="save" className={styles.icon}/>
         </Button>
 
-        <Button type="primary" className={styles.button}
+        <Button
+          // type="primary"
+          className={styles.button}
                 onClick={()=>handleClickRun()}
         >
           <Icon type="play-circle" className={styles.icon}/>
         </Button>
 
-        <Button type="primary" className={styles.button}>
+        <Button
+          // type="primary"
+          className={styles.button}>
           <Icon type="pause-circle" className={styles.icon}/>
         </Button>
 
-        <Button type="primary" className={styles.button}>
+        <Button
+          // type="primary"
+          className={styles.button}>
           <Icon type="retweet" className={styles.icon}/>
         </Button>
 

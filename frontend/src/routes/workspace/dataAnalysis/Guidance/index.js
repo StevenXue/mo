@@ -1,5 +1,5 @@
-import React from 'react';
-import {Button} from 'antd'
+import React from 'react'
+import { Button } from 'antd'
 
 import styles from './index.less'
 
@@ -7,91 +7,91 @@ import MyCard from '../../../../components/MyCard/index'
 import Launcher from '../../common/components/MiddleArea/Launcher/Launcher'
 
 const Icons = [
-  "tablet",
+  'tablet',
   'line-chart',
-  "schedule",
-  "select"
+  'schedule',
+  'select',
 ]
 
 function Guidance(props) {
   const {
-    algorithms
+    algorithms,
   } = props.model
 
   function handleClick() {
-    console.log("handleClick")
+    console.log('handleClick')
     props.dispatch({
       type: props.namespace + '/setShowGuidance',
       payload: {
-        showGuidance: false
-      }
+        showGuidance: false,
+      },
     })
   }
 
-
   return (
-    props.namespace === 'dataAnalysis' ?
-      <div>
-        <div className={styles.title}>
-          Learn how to build and deploy on App Engine with a simple 'Hello World' app. If you're new to App Engine, then
-          start here.
-        </div>
-        {/*<div className={styles.title}>*/}
-        {/*description*/}
-        {/*</div>*/}
+    props.namespace === 'dataAnalysis' ? <div>
+      <div className={styles.title}>
+        Data anaysis tools help you to explore and analyze your data.
+        <br/>
+        If you're new to data anaysis, then start here.
+      </div>
+      {/*<div className={styles.title}>*/}
+      {/*description*/}
+      {/*</div>*/}
 
-        <div className={styles.navCards}>
-          {
-            algorithms.map((algorithm,cardIndex)=>
-              <MyCard key={algorithm.name}
-                icon={Icons[cardIndex]} text={algorithm.name} style={{marginRight: 50}}
-                      onClick={() => handleClick()}/>
-            )
-          }
-        </div>
-        {/*<Launcher*/}
-        {/*// sectionId={active_sectionId}*/}
-        {/*type='guidance'*/}
-        {/*{...props}/>*/}
+      <div className={styles.navCards}>
+        {
+          algorithms.map((algorithm, cardIndex) =>
+            <MyCard key={algorithm.name}
+                    icon={Icons[cardIndex]} text={algorithm.name} style={{ marginRight: 50 }}
+                    onClick={() => handleClick()}/>,
+          )
+        }
+      </div>
+      {/*<Launcher*/}
+      {/*// sectionId={active_sectionId}*/}
+      {/*type='guidance'*/}
+      {/*{...props}/>*/}
 
         <div className={styles.go_guide}>
-          <Button onClick={() => props.dispatch({
-            type: props.namespace + '/setShowGuidance',
-            payload: {
-              showGuidance: false
-            }
-          })}>
-            go to workspace
-          </Button>
+          {/*<Button onClick={() => props.dispatch({*/}
+            {/*type: props.namespace + '/setShowGuidance',*/}
+            {/*payload: {*/}
+              {/*showGuidance: false,*/}
+            {/*},*/}
+          {/*})}>*/}
+            {/*go to workspace*/}
+          {/*</Button>*/}
         </div>
       </div> :
       <div>
         <div className={styles.title}>
-          Learn how to build and deploy on App Engine with a simple 'Hello World' app. If you're new to App Engine, then
+          Learn how to build and deploy  a model with our modelling workspace.
+        <br/> If you're new to modelling, then
           start here.
         </div>
-        <div className={styles.navCards}>
+        <div  className={styles.navCards}>
           {
             algorithms.map((algorithm,cardIndex)=>
               <MyCard key={algorithm.name}
                       icon={Icons[cardIndex]} text={algorithm.name} style={{marginRight: 50}}
-                      onClick={() => handleClick()}/>
+                      onClick={() => handleClick()}/>,
             )
           }
         </div>
 
-        <div className={styles.go_guide}>
-          <Button onClick={() => props.dispatch({
-            type: props.namespace + '/setShowGuidance',
-            payload: {
-              showGuidance: false
-            }
-          })}>
-            go to workspace
-          </Button>
-        </div>
+      <div className={styles.go_guide}>
+        {/*<Button onClick={() => props.dispatch({*/}
+          {/*type: props.namespace + '/setShowGuidance',*/}
+          {/*payload: {*/}
+            {/*showGuidance: false,*/}
+          {/*},*/}
+        {/*})}>*/}
+          {/*go to workspace*/}
+        {/*</Button>*/}
       </div>
-  );
+    </div>
+  )
 }
 
-export default Guidance;
+export default Guidance
