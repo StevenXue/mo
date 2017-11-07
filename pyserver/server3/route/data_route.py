@@ -71,9 +71,15 @@ def list_data_sets_by_user_ID():
 @data_app.route('/data_sets/<string:data_set_id>', methods=['GET'])
 def get_data_set(data_set_id):
     limit = request.args.get('limit')
+    is_last = request.args.get('isLast')
+
     if not limit:
         limit = 100
-    data = data_business.get_by_data_set_limit(ObjectId(data_set_id),
+    if is_last == 'true':
+        data = data_business.get_last_limit_by_data_set(ObjectId(data_set_id),
+                                                  int(limit))
+    else:
+        data = data_business.get_by_data_set_limit(ObjectId(data_set_id),
                                                int(limit))
     data = json_utility.me_obj_list_to_json_list(data)
     fields = data_service.get_fields_with_types(ObjectId(data_set_id))

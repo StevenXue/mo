@@ -24,6 +24,14 @@ def get_by_data_set(data_set):
     return data_repo.read_by_non_unique_field('data_set', data_set)
 
 
+def get_last_by_data_set(data_set):
+    return data_repo.read_last(data_set=data_set)
+
+
+def get_last_limit_by_data_set(data_set, limit):
+    return data_repo.read_last_limit(limit, data_set=data_set)
+
+
 def get_by_data_set_limit(data_set, limit):
     return data_repo.read_by_non_unique_field_limit('data_set', data_set, limit)
 
