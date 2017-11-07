@@ -23,6 +23,8 @@ from server3.constants import SERVING_PORT
 from server3.constants import NAMESPACE
 from server3.service.saved_model_services import general_model_services
 from server3.utility import json_utility
+from datetime import datetime
+
 
 ModelType = {list(v)[1]: list(v)[0] for v in list(MODEL_TYPE)}
 
@@ -74,6 +76,8 @@ def first_save_to_db(user_ID, name, description, input_info, output_info,
     :param optional:
     :return:
     """
+    user = user_business.get_by_user_ID(user_ID)
+
     served_model = served_model_business.add(name, description, input_info,
                                              output_info,
                                              examples, version, deploy_name,
@@ -83,8 +87,10 @@ def first_save_to_db(user_ID, name, description, input_info, output_info,
                                              related_fields,
                                              related_tasks,
                                              tags, is_private,
+                                             create_time=datetime.utcnow(),
+                                             user=user,
                                              **optional)
-    user = user_business.get_by_user_ID(user_ID)
+
     ownership_business.add(user, is_private, served_model=served_model)
     job_business.update_job_by_id(job_id, served_model=served_model)
     return served_model

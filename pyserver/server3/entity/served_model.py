@@ -13,6 +13,7 @@ from mongoengine import DictField
 from mongoengine import ReferenceField
 from mongoengine import ListField
 from mongoengine import BooleanField
+from mongoengine import DateTimeField
 
 
 INPUT_TYPES = ('image', '1darray', '2darray', 'ndarray')
@@ -37,3 +38,6 @@ class ServedModel(DynamicDocument):
     tags = ListField()
     related_tasks = ListField()
     private = BooleanField(required=True)
+    create_time = DateTimeField(required=True)
+    user = ReferenceField('User', required=True)
+
