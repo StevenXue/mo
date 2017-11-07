@@ -447,7 +447,7 @@ def toolkit_steps_to_obj(job_obj, project_id):
         args = StepBusiness.get_parameters_step(job_obj.steps).get('args')
         # args = job_obj.steps[2].get("args")
         for arg in args:
-            new_args[arg['name']] = arg['value']
+            new_args[arg['name']] = arg['value'] if arg['value'] else arg['default']
 
     if StepBusiness.check_fields(job_obj.steps):
         data_fields = StepBusiness.get_fields(job_obj.steps)
@@ -554,7 +554,24 @@ def model_steps_to_obj(job_obj, project_id):
     return obj
 
 
+def run_toolkit_job_pro(job_obj, project_id):
+    from server3.lib import toolkit_orig
+    from server3.lib import preprocess_orig
+    # 将job的step直接传给对应的toolkit
+    toolkit_obj = job_obj.toolkit
+    if hasattr(toolkit_orig, toolkit_obj.entry_function):
+        func = getattr(toolkit_orig, toolkit_obj.entry_function)
+    else:
+        func = getattr(preprocess_orig, toolkit_obj.entry_function)
+    func_rst = func(steps=job_obj.steps)
+    return func_rst
+
+
+
 def run_toolkit_job(job_obj, project_id):
+    if job_obj.toolkit.category == 0:
+        return run_toolkit_job_pro(job_obj, project_id)
+
     data = toolkit_steps_to_obj(job_obj, project_id)
 
     staging_data_set_id = data.get('staging_data_set_id')
@@ -576,10 +593,8 @@ def run_toolkit_job(job_obj, project_id):
     data = staging_data_business.get_by_staging_data_set_and_fields(
         ObjectId(staging_data_set_id), fields)
 
-    print("data", data)
     # 数据库转to_mongo和to_dict
     data = [d.to_mongo().to_dict() for d in data]
-    print("data_after", data)
 
     # 拿到conf
     fields = [x_fields, y_fields]

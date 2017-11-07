@@ -1936,12 +1936,14 @@ def update_toolkit():
                                     'value_type': 'int',
                                     'range': [2, None],
                                     'des': 'the number of clustering numbers',
+                                    'default': 3,
+                                    'value': 2
                                 }
                             ]
                         },
-                        {
-                            **StepTemplate.setting,
-                        }
+                        # {
+                        #     **StepTemplate.setting,
+                        # }
                     ]
                     )
 
