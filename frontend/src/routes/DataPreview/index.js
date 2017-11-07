@@ -57,6 +57,11 @@ class DataPreview extends React.Component {
     return this.props.dispatch({type: 'upload/submit', payload: 'old'})
   }
 
+  onSaveStaged = () => {
+    // console.log(this.props.upload.fields)
+    return this.props.dispatch({type: 'upload/submitStaged'})
+  }
+
   onSaveAdd = () => {
     return this.props.dispatch({type: 'upload/submit', payload: 'new'})
   }
@@ -98,7 +103,7 @@ class DataPreview extends React.Component {
     const sels = this.props.upload.selected
     const flds = this.props.upload.fields
     const showStaged = this.props.upload.showStaged
-    const useless = ['data_set', '_id', 'staging_dataset_id']
+    const useless = ['data_set', '_id', 'staging_dataset_id', 'staging_data_set']
     let dsColumns
     let old_col
     let new_col
@@ -113,13 +118,13 @@ class DataPreview extends React.Component {
       )
 
       const myHeader = (e) => <div className={styles.myheader}>
-        {showStaged?<Checkbox
+        {showStaged?
+            <Checkbox
             onChange={(event) => {this.onCheck(event, e)}}
             checked={sels.includes(e)}
-          >{e}
-
+          ><div title={e} className={styles.ttl}>{e}</div>
           </Checkbox>
-          :<div title={e} className={styles.ttl}>{e}</div>}
+          :<div title={e} className={styles.ttl2}>{e}</div>}
         <Select className={styles.sel} defaultValue={flds[e]} onChange={(value) => {this.onSelect(value, e)}}>
           <Option key="string" value="string">String</Option>
           <Option key="integer" value="integer">Integer</Option>
@@ -183,8 +188,8 @@ class DataPreview extends React.Component {
                      scroll={{ x: this.getWidth(old_col), y: '100%' }}
               />
             }
-
           </div>
+
           <div className={styles.page}>
             <Button onClick={this.handleFirst}
                     loading={this.props.upload.firstLoading}
@@ -194,14 +199,26 @@ class DataPreview extends React.Component {
                     loading={this.props.upload.lastLoading}
             >Last 5 rows<Icon type="right"/></Button>
           </div>
-          <div className={styles.bottom}>
-            <Button type="primary" className={styles.btn}
-                    loading={this.props.upload.saveLoading}
-                    onClick={() => {this.onSave()}}>Save</Button>
-            <Button className={styles.btn}
-                    loading={this.props.upload.saveAddLoading}
-                    onClick={this.onSaveAdd}>Save & Add New</Button>
-          </div>
+          {this.props.upload.showStaged ?
+            <div className={styles.bottom}>
+              <Button type="primary" className={styles.btn}
+                      loading={this.props.upload.saveLoading}
+                      onClick={() => {
+                        this.onSaveStaged()
+                      }}>Save</Button>
+            </div>
+            :
+            <div className={styles.bottom}>
+              <Button type="primary" className={styles.btn}
+                      loading={this.props.upload.saveLoading}
+                      onClick={() => {
+                        this.onSave()
+                      }}>Save</Button>
+              <Button className={styles.btn}
+                      loading={this.props.upload.saveAddLoading}
+                      onClick={this.onSaveAdd}>Save & Add New</Button>
+            </div>
+          }
         </div>
       </div>
     )

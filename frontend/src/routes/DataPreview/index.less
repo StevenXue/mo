@@ -82,14 +82,28 @@
 }
 
 .myheader {
+  :global(.ant-checkbox) {
+    vertical-align: baseline;
+  }
 
-  .sel {
+  .chk {
+    display: flex;
   }
   .ttl {
+    display: inline-block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 50px;
+    line-height: 1;
+  }
+  .ttl2 {
+
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
     width: 80px;
+
   }
 }
 
