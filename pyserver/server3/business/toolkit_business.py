@@ -2786,7 +2786,7 @@ def update_toolkit():
     add_columns_append = Toolkit(
         name='合并添加列',
         description='通过其他数据表数据添加列',
-        category=0,
+        category=-1,
         entry_function='add_columns_append',
         target_py_code=inspect.getsource(preprocess_orig.add_columns_append),
         # parameter_spec={

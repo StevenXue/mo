@@ -578,7 +578,7 @@ def get_args(args):
 
 
 def run_toolkit_job(job_obj, project_id):
-    if job_obj.toolkit.category == 0:
+    if job_obj.toolkit.category == -1:
         return run_toolkit_job_pro(job_obj, project_id)
 
     data = toolkit_steps_to_obj(job_obj, project_id)
