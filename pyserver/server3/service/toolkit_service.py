@@ -67,6 +67,7 @@ NEW_TOOLKIT_CATEGORY = [
         'us_name': 'Data Quality Improve',
         'child': [
             '归一化',
+            '合并添加列'
         ],
         'children': []
     },
@@ -200,6 +201,27 @@ def toolkit_calculate(project_id, staging_data_set_id, toolkit_obj,
 # same as toolkit_calculate
 def run_toolkit_sub(project_id, staging_data_set_id, toolkit_obj,
                     fields, nan_index, job_obj, *argv, **kwargs):
+    """
+
+    :param project_id:
+    :type project_id:
+    :param staging_data_set_id:
+    :type staging_data_set_id:
+    :param toolkit_obj:
+    :type toolkit_obj:
+    :param fields:
+    :type fields:
+    :param nan_index:
+    :type nan_index:
+    :param job_obj:
+    :type job_obj:
+    :param argv:
+    :type argv:
+    :param kwargs: conf
+    :type kwargs:
+    :return:
+    :rtype:
+    """
     if hasattr(toolkit_orig, toolkit_obj.entry_function):
         func = getattr(toolkit_orig, toolkit_obj.entry_function)
     else:
@@ -235,19 +257,21 @@ def after_run_toolkit(project_id, staging_data_set_id,
     for arg in result_spec["args"]:
         value = result.pop(0)
         results.update({arg["name"]: value})
-        if arg["if_add_column"]:
-            # 不能使用中文名
-            str_name = "%s_col" % toolkit_obj.entry_function
-            value = data_utility.retrieve_nan_index(value, nan_index)
-            try:
-                staging_data_service.update_many_with_new_fields(value,
-                                                                 nan_index,
-                                                                 fields[
-                                                                     0],
-                                                                 str_name,
-                                                                 staging_data_set_id)
-            except (TypeError, ValueError) as e:
-                print("ERRORS in data saved to database")
+
+        # FIXED ME 暂时把save关掉，更换为用户选择
+        # if arg["if_add_column"]:
+        #     # 不能使用中文名
+        #     str_name = "%s_col" % toolkit_obj.entry_function
+        #     value = data_utility.retrieve_nan_index(value, nan_index)
+        #     try:
+        #         staging_data_service.update_many_with_new_fields(value,
+        #                                                          nan_index,
+        #                                                          fields[
+        #                                                              0],
+        #                                                          str_name,
+        #                                                          staging_data_set_id)
+        #     except (TypeError, ValueError) as e:
+        #         print("ERRORS in data saved to database")
 
         if arg.get("attribute", False) and arg["attribute"] == "label":
             labels = value
@@ -488,14 +512,33 @@ def convert_json_and_calculate(project_id, staging_data_set_id, toolkit_id,
 
 def run_toolkit(project_id, staging_data_set_id, toolkit_id,
                 fields, data, conf, job_obj):
+    """
+
+    :param project_id:
+    :type project_id:
+    :param staging_data_set_id:
+    :type staging_data_set_id:
+    :param toolkit_id:
+    :type toolkit_id:
+    :param fields:
+    :type fields:
+    :param data: to_mongo to dict 后的数据
+    :type data:
+    :param conf:
+    :type conf:
+    :param job_obj:
+    :type job_obj:
+    :return:
+    :rtype:
+    """
     """convert json list"""
     col1, col2 = fields
     columns = col1 + col2 if col2 is not None else col1
     # 去除NaN
     index_nan = []
     arg_filter = []
-    print("data", data)
-    print("fields", fields)
+    # print("data", data)
+    # print("fields", fields)
     for index, item in enumerate(data):
         temp = [data_utility.convert_string_to_number_with_poss(item[i]) for i
                 in columns]

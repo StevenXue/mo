@@ -120,32 +120,47 @@ def save_result():
     :return:
     :rtype:
     '''
-    data = {
-        "job_id": "59fbddb7d845c05927560783"
-    }
+    # data = {
+    #     "job_id": "59fbddb7d845c05927560783"
+    # }
     data = request.get_json()
-    job_id = data['job_id']
+    print("save_result data", data)
 
-    job_service.save_result(
-        job_id=job_id,
-    )
+    job_id = data['job_id']
+    try:
+        job_service.save_result(
+            job_id=job_id,
+        )
+        return jsonify({
+            "response": {
+                "result": 'save success'
+            }}), 200
+    except:
+        return jsonify({
+            "response": {
+                "result": 'save failed'
+            }}), 400
 
 
 @job_app.route("/save_as_result", methods=["POST"])
 def save_as_result():
-    data = {
-        'job_id': '59fbddb7d845c05927560783',
-        'new_sds_name': 'xxx',
-    }
+    # data = {
+    #     'job_id': '59fbddb7d845c05927560783',
+    #     'new_sds_name': 'xxx',
+    # }
     data = request.get_json()
+    print("save_as_result data", data)
     job_id = data['job_id']
     new_sds_name = data.get("new_sds_name")
-
     job_service.save_as_result(
         job_id=job_id,
         new_sds_name=new_sds_name
     )
 
+    return jsonify({
+        "response": {
+            "result": 'save as success'
+        }}), 200
 
 
 if __name__ == "__main__":

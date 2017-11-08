@@ -15,6 +15,10 @@ import pandas as pd
 from sklearn import preprocessing, feature_selection, decomposition
 from sklearn.feature_selection.from_model import _get_feature_importances as get_importance
 
+from server3.business import staging_data_business
+from server3.utility import json_utility
+import json
+
 
 # -----------------------
 
@@ -250,9 +254,79 @@ def lda(arr0, target, n_components):
     return label, coef.tolist(), mean.tolist(), priors.tolist(), scalings.tolist(), xbar.tolist()
 
 
+def table_to_json(table, index=None, with_new=False):
+    table_json = []
+    for row in table:
+        table_json.append(row.to_mongo().to_dict())
+        # source_table_pd.append(row.to_mongo().to_dict(), ignore_index=True)
+    table_json = json_utility.convert_to_json(table_json)
+    if with_new:
+        new_table_json = []
+        for table_row in table_json:
+            new_table_row = {}
+            for key, value in table_row.items():
+                if key == '_id':
+                    new_table_row[key] = value
+                    continue
+                if key in index:
+                    new_table_row[key] = value
+                else:
+                    new_table_row["new_" + key] = value
+            new_table_json.append(new_table_row)
+        return new_table_json
+    return table_json
+
+
 # 合并添加列
-def add_columns_append():
-    pass
+def add_columns_append(target_table_id, source_table_id, index, added_fields, nan_type, **kwargs):
+    # target table
+    target_table = staging_data_business.get_by_staging_data_set_id(
+        staging_data_set_id=target_table_id)
+
+    # table to json
+    target_table_json = table_to_json(target_table)
+
+    # json to pd
+    target_table_pd = pd.read_json(json.dumps(target_table_json))
+
+    # 展开source table
+    source_table = staging_data_business.get_by_staging_data_set_and_fields(
+        source_table_id,
+        fields=added_fields + index,
+        with_id=True
+    )
+    # table to json
+    source_table_json = table_to_json(source_table, index=index, with_new=True)
+    # json to pd
+    source_table_pd = pd.read_json(json.dumps(source_table_json))
+
+    # pd index
+    if len(index) != 0:
+        target_table_pd = target_table_pd.set_index(index)
+        source_table_pd = source_table_pd.set_index(index)
+
+    result = pd.concat([target_table_pd, source_table_pd],
+                       axis=1, join_axes=[target_table_pd.index])
+
+    # pandas dataframe to json
+    update_json = result.to_json(orient='index')
+    update_json = json.loads(update_json)
+    update_dict = []
+    if len(index) == 0:
+        for key, value in update_json.items():
+            update_dict.append({"_id": key, **value})
+    elif len(index) == 1:
+        for key, value in update_json.items():
+            update_dict.append({"_id": key, **value})
+    else:
+        for key, value in update_json.items():
+            ele = {}
+            key = json.loads(key)
+            for k, v in zip(index, key):
+                ele[k] = v
+            update_dict.append({**ele, **value})
+    print("update_dict", update_dict)
+    staging_data_business.update_many_with_new_fields(update_dict)
 
 
 # 合并添加行
@@ -281,7 +355,6 @@ def add_rows_append(target_table, source_table, **kwargs):
 
 
 def test_add_rows_append():
-    from server3.business import staging_data_business
     def sds_data_to_table(data):
         return [d.to_mongo().to_dict() for d in data]
 
@@ -297,5 +370,15 @@ def test_add_rows_append():
     )
 
 
+def test_add_column_append():
+    add_columns_append(
+        target_table_id='5a0012ccd845c02ce3da30c8',
+        source_table_id='5a0012ccd845c02ce3da30c8',
+        index=[],
+        added_fields=['Attention', 'Attention_dimension_reduction_PCA_col'],
+        nan_type='null'
+    )
+
+
 if __name__ == '__main__':
-    test_add_rows_append()
+    test_add_column_append()

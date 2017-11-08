@@ -1,16 +1,27 @@
 import React from 'react'
-import { BarChart, Histogram, PieChart, Scatter, SimpleScatter, SimpleTable, Table } from '../../../../../../../../components/visualization/index'
-import { flaskServer } from '../../../../../../../../constants'
-import { Card, Select, Spin, Popover, Icon, Button} from 'antd'
-import { isEmpty } from '../../../../../../../../utils/utils'
+import {
+  BarChart,
+  Histogram,
+  PieChart,
+  Scatter,
+  SimpleScatter,
+  SimpleTable,
+  Table
+} from '../../../../../../../../components/visualization/index'
+import {flaskServer} from '../../../../../../../../constants'
+import {Card, Select, Spin, Popover, Icon, Button, Input} from 'antd'
+import {isEmpty} from '../../../../../../../../utils/utils'
 import classnames from 'classnames';
 import style from './toolkit.css';
-import { connect } from 'dva';
+import {connect} from 'dva';
+import styles from './index.less'
 
 import JSONTree from 'react-json-tree'
 
+// import Inputs from "../../../../../../../../../../client/src/notebook/src/nteract/components/cell/inputs";
+
 class VisualizationPanel extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.state = {
       loading: false,
@@ -24,9 +35,9 @@ class VisualizationPanel extends React.Component {
     }
   }
 
-  componentDidMount(){
+  componentDidMount() {
 
-    if(this.props.visual_sds_id){
+    if (this.props.visual_sds_id) {
       this.setState({loading: true});
 
       fetch(flaskServer + '/visualization/visualization/usr2', {
@@ -46,23 +57,25 @@ class VisualizationPanel extends React.Component {
 
           console.log(res.response);
 
-          if(res.response.category && res.response.category === 2){
+          if (res.response.category && res.response.category === 2) {
             this.setState({selectedColOne: 0, selectedColTwo: 0})
-          }else if(res.response.category && res.response.category === 1){
+          } else if (res.response.category && res.response.category === 1) {
             this.setState({selected: res.response.X_fields[0]});
-            let data = {'x_domain': this.state.responseBody['scatter']['x_domain'][0],
-              'y_domain': this.state.responseBody['scatter']['y_domain']}
+            let data = {
+              'x_domain': this.state.responseBody['scatter']['x_domain'][0],
+              'y_domain': this.state.responseBody['scatter']['y_domain']
+            }
             this.setState({scatterData: data});
           }
 
-          if(res.response.hist_freq){
+          if (res.response.hist_freq) {
             let label = Object.keys(res.response.hist_freq);
             this.setState({dataSelected: res.response.hist_freq[label[0]]})
             console.log(res.response, label);
             this.setState({selected: Object.keys(res.response.hist_freq)[0]})
           }
         })
-        .catch((err)=>{
+        .catch((err) => {
           this.setState({loading: false});
         })
       ;
@@ -78,29 +91,31 @@ class VisualizationPanel extends React.Component {
     console.log(this.state.responseBody.hist_freq[values]);
   }
 
-  onSelectDataScatter(value){
+  onSelectDataScatter(value) {
     this.setState({selected: value});
     let i = this.state.responseBody['X_fields'].indexOf(value);
-    let data = {'x_domain': this.state.responseBody['scatter']['x_domain'][i],
-      'y_domain': this.state.responseBody['scatter']['y_domain']}
+    let data = {
+      'x_domain': this.state.responseBody['scatter']['x_domain'][i],
+      'y_domain': this.state.responseBody['scatter']['y_domain']
+    }
     this.setState({scatterData: data});
   }
 
-  renderArray(value){
-    if( value instanceof Array) {
+  renderArray(value) {
+    if (value instanceof Array) {
       return value.map((e) =>
         <div>
           <span key={e} style={{color: "#00AAAA"}}>{e}</span>
           <br/>
         </div>)
-    }else{
-      return(
-      <span style={{color: "#00AAAA"}}>{value}</span>
+    } else {
+      return (
+        <span style={{color: "#00AAAA"}}>{value}</span>
       )
     }
   }
 
-  renderColSelection(chart){
+  renderColSelection(chart) {
     let titles = chart.map((e, index) => ({
       'index': index,
       'name': e.field
@@ -112,23 +127,23 @@ class VisualizationPanel extends React.Component {
     )
   }
 
-  renderCase2BarChart(chart){
-    if(this.state.responseBody['bar1']) {
-      if(chart === 'bar1'){
+  renderCase2BarChart(chart) {
+    if (this.state.responseBody['bar1']) {
+      if (chart === 'bar1') {
         let x_len = this.state.responseBody['bar1'][this.state.selectedColOne].x_domain.length;
         let y_len = this.state.responseBody['bar1'][this.state.selectedColOne].y_domain.length;
-        if( x_len === y_len) {
-          return <BarChart data={this.state.responseBody['bar1'][this.state.selectedColOne]} />
-        }else{
-          return <Histogram data={this.state.responseBody['bar1'][this.state.selectedColOne]} />
+        if (x_len === y_len) {
+          return <BarChart data={this.state.responseBody['bar1'][this.state.selectedColOne]}/>
+        } else {
+          return <Histogram data={this.state.responseBody['bar1'][this.state.selectedColOne]}/>
         }
-      }else{
+      } else {
         let x_len = this.state.responseBody['bar2'][this.state.selectedColTwo].x_domain.length;
         let y_len = this.state.responseBody['bar2'][this.state.selectedColTwo].y_domain.length;
-        if( x_len === y_len) {
-          return <BarChart data={this.state.responseBody['bar2'][this.state.selectedColTwo]} />
-        }else{
-          return <Histogram data={this.state.responseBody['bar2'][this.state.selectedColTwo]} />
+        if (x_len === y_len) {
+          return <BarChart data={this.state.responseBody['bar2'][this.state.selectedColTwo]}/>
+        } else {
+          return <Histogram data={this.state.responseBody['bar2'][this.state.selectedColTwo]}/>
         }
       }
     }
@@ -136,9 +151,9 @@ class VisualizationPanel extends React.Component {
   }
 
   renderPanel() {
-    switch (this.state.responseBody.category){
+    switch (this.state.responseBody.category) {
       case 0:
-        return(
+        return (
           <div style={{display: 'flex', flexDirection: 'column'}}>
             <div style={{textAlign: 'center'}}>
               <h2>聚类</h2>
@@ -148,11 +163,12 @@ class VisualizationPanel extends React.Component {
                 {
                   !isEmpty(this.state.responseBody) &&
                   <div style={{marginTop: 50, marginLeft: '5%', marginBottom: -30}}>
-                    <div >
+                    <div>
                       <span>Number of Clusters: </span>
-                      <span style={{color: "#00AAAA"}}>{this.state.responseBody['general_info']['Number of Clusters']}</span>
+                      <span
+                        style={{color: "#00AAAA"}}>{this.state.responseBody['general_info']['Number of Clusters']}</span>
                     </div>
-                    <div >
+                    <div>
                       <span>SSE: </span>
                       <span style={{color: "#00AAAA"}}>{this.state.responseBody['general_info']['SSE']}</span>
                     </div>
@@ -160,19 +176,19 @@ class VisualizationPanel extends React.Component {
                 }
                 {
                   this.state.responseBody['centers'] &&
-                  <Scatter data={this.state.responseBody} />
+                  <Scatter data={this.state.responseBody}/>
                 }
               </Card>
               <div className="right-container" style={{width: '40%', display: 'flex', flexDirection: 'column'}}>
                 <Card title={"簇内点数数量占比"} style={{margin: 5}}>
-                  { this.state.responseBody['pie'] &&
-                  <PieChart data={this.state.responseBody} type={'cluster'} />
+                  {this.state.responseBody['pie'] &&
+                  <PieChart data={this.state.responseBody} type={'cluster'}/>
                   }
                 </Card>
                 <Card title={"数据分布"} style={{margin: 5}}>
-                {
-                  !isEmpty(this.state.responseBody) &&
-                    <div style={{ marginLeft: 20}}>
+                  {
+                    !isEmpty(this.state.responseBody) &&
+                    <div style={{marginLeft: 20}}>
                       <span style={{color: "#00AAAA"}}>选择栏位来预览数据分布图</span>
                       <Select className="dataset-select"
                               style={{width: 150, margin: 10, zIndex: 100, marginTop: 30}}
@@ -190,16 +206,16 @@ class VisualizationPanel extends React.Component {
                         }
                       </Select>
                     </div>
-                }
-                {
-                  !isEmpty(this.state.dataSelected) &&
+                  }
+                  {
+                    !isEmpty(this.state.dataSelected) &&
                     <div style={{marginTop: -30}}>
-                      {this.state.dataSelected.x_domain.length > this.state.dataSelected.y_domain.length?
-                        <Histogram data={this.state.dataSelected} />
-                        :<BarChart data={this.state.dataSelected} />
+                      {this.state.dataSelected.x_domain.length > this.state.dataSelected.y_domain.length ?
+                        <Histogram data={this.state.dataSelected}/>
+                        : <BarChart data={this.state.dataSelected}/>
                       }
                     </div>
-                }
+                  }
                 </Card>
               </div>
             </div>
@@ -207,63 +223,64 @@ class VisualizationPanel extends React.Component {
         );
 
       case 1:
-        return(
+        return (
           <div className="container" style={{display: 'flex', flexDirection: 'column'}}>
             <div style={{textAlign: 'center'}}>
               <h2>特征选择</h2>
             </div>
             {
               !isEmpty(this.state.responseBody) &&
-                <Table data={this.state.responseBody}/>
+              <Table data={this.state.responseBody}/>
             }
             {
               !isEmpty(this.state.responseBody) &&
               <div style={{display: 'flex', flexDirection: 'row'}}>
-                <Card title="被选择栏位评分" style={{width: '30%' , margin: 5}}>
+                <Card title="被选择栏位评分" style={{width: '30%', margin: 5}}>
                   <p>{"评分满分大部分为1分"}</p>
                   <div style={{marginTop: -20}}>
-                    <BarChart data={{x_domain: this.state.responseBody.X_fields, y_domain: this.state.responseBody.bar}}/>
+                    <BarChart
+                      data={{x_domain: this.state.responseBody.X_fields, y_domain: this.state.responseBody.bar}}/>
                   </div>
                 </Card>
                 {this.state.responseBody.scatter.y_domain &&
-                  <Card title="各栏位与目标项相关系数分析图" style={{ width: '40%', margin: 5 }}>
-                    <span style={{ marginLeft: 20 }}>Choose Field</span>
-                    <Select style={{ width: 100, marginTop: 5, marginLeft: 20, zIndex: 100 }}
-                            onChange={(values) => this.onSelectDataScatter(values)}
-                            allowClear={false}
-                            value={this.state.selected}
-                            placeholder="Choose Field">
+                <Card title="各栏位与目标项相关系数分析图" style={{width: '40%', margin: 5}}>
+                  <span style={{marginLeft: 20}}>Choose Field</span>
+                  <Select style={{width: 100, marginTop: 5, marginLeft: 20, zIndex: 100}}
+                          onChange={(values) => this.onSelectDataScatter(values)}
+                          allowClear={false}
+                          value={this.state.selected}
+                          placeholder="Choose Field">
 
-                      {
-                        this.state.responseBody.X_fields.map((e) =>
-                          <Select.Option value={e} key={e}>
-                            {e}
-                          </Select.Option>)
-                      }
-                    </Select>
                     {
-                      !isEmpty(this.state.scatterData) &&
-                      <div style={{ height: 270, marginTop: -20 }}>
-                        <SimpleScatter data={this.state.scatterData} yName={this.state.responseBody.Y_target[0]}
-                                       xName={this.state.selected}/>
-                      </div>
+                      this.state.responseBody.X_fields.map((e) =>
+                        <Select.Option value={e} key={e}>
+                          {e}
+                        </Select.Option>)
                     }
-                    {
-                      !isEmpty(this.state.scatterData) &&
-                      <div style={{ marginTop: -20 }}>
-                        <div>
-                          <span style={{ marginLeft: 20 }}>Pearsonr: </span>
-                          <span
-                            style={{ color: "#00AAAA" }}>{this.state.responseBody['scatter']['pearsonr'][this.state.responseBody['X_fields'].indexOf(this.state.selected)]}</span>
-                        </div>
-                        <div>
-                          <span style={{ marginLeft: 20 }}>MIC: </span>
-                          <span
-                            style={{ color: "#00AAAA" }}>{this.state.responseBody['scatter']['mic'][this.state.responseBody['X_fields'].indexOf(this.state.selected)]}</span>
-                        </div>
+                  </Select>
+                  {
+                    !isEmpty(this.state.scatterData) &&
+                    <div style={{height: 270, marginTop: -20}}>
+                      <SimpleScatter data={this.state.scatterData} yName={this.state.responseBody.Y_target[0]}
+                                     xName={this.state.selected}/>
+                    </div>
+                  }
+                  {
+                    !isEmpty(this.state.scatterData) &&
+                    <div style={{marginTop: -20}}>
+                      <div>
+                        <span style={{marginLeft: 20}}>Pearsonr: </span>
+                        <span
+                          style={{color: "#00AAAA"}}>{this.state.responseBody['scatter']['pearsonr'][this.state.responseBody['X_fields'].indexOf(this.state.selected)]}</span>
                       </div>
-                    }
-                  </Card>
+                      <div>
+                        <span style={{marginLeft: 20}}>MIC: </span>
+                        <span
+                          style={{color: "#00AAAA"}}>{this.state.responseBody['scatter']['mic'][this.state.responseBody['X_fields'].indexOf(this.state.selected)]}</span>
+                      </div>
+                    </div>
+                  }
+                </Card>
                 }
                 <Card title="图例和其它参数" style={{width: '30%', display: 'flex', flexDirection: 'column', margin: 5}}>
                   <div style={{marginLeft: 20, marginBottom: 10}}>
@@ -283,16 +300,16 @@ class VisualizationPanel extends React.Component {
                   </div>
                   {
                     !isEmpty(this.state.responseBody) &&
-                      <div style={{margin: 20}}>
-                        {
-                          Object.keys(this.state.responseBody['general_info']).map((e) =>
+                    <div style={{margin: 20}}>
+                      {
+                        Object.keys(this.state.responseBody['general_info']).map((e) =>
                           <div key={e}>
                             <span>{e + ": "}</span>
                             <span style={{color: "#00AAAA"}}>{this.state.responseBody['general_info'][e]}</span>
                           </div>
-                          )
-                        }
-                      </div>
+                        )
+                      }
+                    </div>
                   }
                 </Card>
               </div>
@@ -307,32 +324,34 @@ class VisualizationPanel extends React.Component {
               <h2>数值转换</h2>
             </div>
             <Card title="转换前">
-              <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
-                  <SimpleTable data={{
-                    table: this.state.responseBody['table1']['data'],
-                    target: this.state.responseBody['table1']['field']
-                  }}/>
-                  <div className="right-charts">
-                    <div style={{width: 300, height: 300}}>
-                      <span style={{color: '#00AAAA'}}>{"查看原始数据分布"}</span>
-                      <Select style={{width: 100, marginTop: 5, marginLeft: 20}}
-                              onChange={(values) => this.setState({selectedColOne: values})}
-                              allowClear={false}
-                              value={this.state.selectedColOne}
-                              placeholder="Choose Field">
-                        {
-                          this.renderColSelection(this.state.responseBody['bar1'])
-                        }
-                      </Select>
+              <div
+                style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
+                <SimpleTable data={{
+                  table: this.state.responseBody['table1']['data'],
+                  target: this.state.responseBody['table1']['field']
+                }}/>
+                <div className="right-charts">
+                  <div style={{width: 300, height: 300}}>
+                    <span style={{color: '#00AAAA'}}>{"查看原始数据分布"}</span>
+                    <Select style={{width: 100, marginTop: 5, marginLeft: 20}}
+                            onChange={(values) => this.setState({selectedColOne: values})}
+                            allowClear={false}
+                            value={this.state.selectedColOne}
+                            placeholder="Choose Field">
                       {
-                        this.renderCase2BarChart('bar1')
+                        this.renderColSelection(this.state.responseBody['bar1'])
                       }
-                    </div>
+                    </Select>
+                    {
+                      this.renderCase2BarChart('bar1')
+                    }
                   </div>
+                </div>
               </div>
             </Card>
             <Card title="转换后">
-              <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
+              <div
+                style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
                 <SimpleTable data={{
                   table: this.state.responseBody['table2']['data'],
                   target: this.state.responseBody['table2']['field']
@@ -360,7 +379,7 @@ class VisualizationPanel extends React.Component {
         )
 
       case 3:
-        return(
+        return (
           <div style={{display: 'flex', flexDirection: 'column'}}>
             <div style={{textAlign: 'center', marginBottom: 10}}>
               <h2>降维</h2>
@@ -376,10 +395,10 @@ class VisualizationPanel extends React.Component {
                 </div>
                 <div className={classnames(style.description)}>
                   <div>
-                      <div style={{ marginBottom: 10}}>
-                        <div style={{height: 20, width: 100, backgroundColor: '#C6DFB5'}}/>
-                        <span>选做目标的栏位</span>
-                      </div>
+                    <div style={{marginBottom: 10}}>
+                      <div style={{height: 20, width: 100, backgroundColor: '#C6DFB5'}}/>
+                      <span>选做目标的栏位</span>
+                    </div>
                     {
                       this.state.responseBody['general_info'].length !== 0 &&
                       this.state.responseBody['general_info'].map((e) =>
@@ -390,7 +409,7 @@ class VisualizationPanel extends React.Component {
                               <p style={{width: 100}}>{e[Object.keys(e)[0]]['description']}</p>
                             </div>
                           } title="Description">
-                            <Icon type="question-circle-o" style={{fontSize: 10, marginLeft:3, color: '#767676'}}/>
+                            <Icon type="question-circle-o" style={{fontSize: 10, marginLeft: 3, color: '#767676'}}/>
                           </Popover>
                           <br/>
                           {
@@ -409,16 +428,16 @@ class VisualizationPanel extends React.Component {
             </Card>
             <div style={{display: 'flex', flexDirection: 'row'}}>
               <Card title="降维前各栏位方差占比" className="pie_one" style={{width: '30%', margin: 5}}>
-                <PieChart data={{'pie': this.state.responseBody['pie1']}} />
+                <PieChart data={{'pie': this.state.responseBody['pie1']}}/>
               </Card>
               <Card title="降维前后各栏位方差大小" className="bar_chart" style={{width: '40%', margin: 5}}>
-                  <p>{"空白栏位用于分隔转换前和转换后数据"}</p>
-                  <div style={{marginTop: -20}}>
-                    <BarChart data={this.state.responseBody['bar']} type="dr"/>
-                  </div>
+                <p>{"空白栏位用于分隔转换前和转换后数据"}</p>
+                <div style={{marginTop: -20}}>
+                  <BarChart data={this.state.responseBody['bar']} type="dr"/>
+                </div>
               </Card>
               <Card title="降维后各栏位方差占比" className="pie_two" style={{width: '30%', margin: 5}}>
-                <PieChart data={{'pie': this.state.responseBody['pie2']}} />
+                <PieChart data={{'pie': this.state.responseBody['pie2']}}/>
               </Card>
             </div>
           </div>
@@ -426,59 +445,106 @@ class VisualizationPanel extends React.Component {
     }
   }
 
-  render(){
+  render() {
     const {
-      // sectionsJson,
-      focusSectionId,
-
+      sectionsJson,
+      focusSectionsId
     } = this.props.dataAnalysis
 
-    return(
-    <div style={{width: '100%'}}>
+    const {
+      toolkit: {
+        result_spec
+      }
+    } = sectionsJson[focusSectionsId];
 
-      <div style={{height: 200, overflowY: 'auto'}}>
-        <JSONTree data={ this.props.result }
-                  style={{width: '100%', height: 400}}
-                  theme={{
-                    scheme: 'google',
-                    author: 'seth wright (http://sethawright.com)',
-                    base00: '#1d1f21',
-                    base01: '#282a2e',
-                    base02: '#373b41',
-                    base03: '#969896',
-                    base04: '#b4b7b4',
-                    base05: '#c5c8c6',
-                    base06: '#e0e0e0',
-                    base07: '#ffffff',
-                    base08: '#CC342B',
-                    base09: '#F96A38',
-                    base0A: '#FBA922',
-                    base0B: '#198844',
-                    base0C: '#3971ED',
-                    base0D: '#3971ED',
-                    base0E: '#A36AC7',
-                    base0F: '#3971ED'
-                  }}
-                  invertTheme={true} />
-        <Button type="primary"
+    let save_names = []
+    result_spec.args.forEach((arg) => {
+      if (arg.if_add_column === true) {
+        save_names.push(arg.name)
+      }
+    })
+    console.log("save_names", save_names);
+
+    return (
+      <div style={{width: '100%'}}>
+
+        <div style={{height: 200, overflowY: 'auto'}} className={styles.result_and_button}>
+          <JSONTree data={this.props.result}
+                    style={{width: '100%', height: 400}}
+                    theme={{
+                      scheme: 'google',
+                      author: 'seth wright (http://sethawright.com)',
+                      base00: '#1d1f21',
+                      base01: '#282a2e',
+                      base02: '#373b41',
+                      base03: '#969896',
+                      base04: '#b4b7b4',
+                      base05: '#c5c8c6',
+                      base06: '#e0e0e0',
+                      base07: '#ffffff',
+                      base08: '#CC342B',
+                      base09: '#F96A38',
+                      base0A: '#FBA922',
+                      base0B: '#198844',
+                      base0C: '#3971ED',
+                      base0D: '#3971ED',
+                      base0E: '#A36AC7',
+                      base0F: '#3971ED'
+                    }}
+                    invertTheme={true}/>
+
+          {
+            save_names.length !== 0 ? <div className={styles.button_area}>
+              <div>
+                {save_names.map(name =>
+                  <div key={name}>{name}</div>
+                )}
+              </div>
+              <Button type="primary" className={styles.button}
                 // className={styles.button}
-                onClick={() =>
-          this.props.dispatch({
-            type: namespace + '/saveStagingDataset',
-            payload: {
-              id: focusSectionId,
-            },
-          })}>Save</Button>
+                      onClick={() =>
+                        this.props.dispatch({
+                          type: this.props.namespace + '/saveResult',
+                          payload: {
+                            id: focusSectionsId,
+                          },
+                        })}>Save</Button>
 
+              <div className={styles.save_as_button}>
+                <Input
+                  onChange={(e) => {
+                    this.setState({
+                      newSdsName: e.target.value
+                    })
+                  }}
+                  placeholder='new staging dataset name'
+                />
+                <Button type="primary" className={styles.button}
+
+                        onClick={() => {
+                          this.props.dispatch({
+                            type: this.props.namespace + '/saveAsResult',
+                            payload: {
+                              id: focusSectionsId,
+                              newSdsName: this.state.newSdsName
+                            },
+                          })
+                        }
+                        }>Save As</Button>
+              </div>
+            </div> : null
+          }
+
+
+        </div>
+
+
+        <Spin spinning={this.state.loading}>
+          {this.renderPanel()}
+        </Spin>
       </div>
-
-
-      <Spin spinning={this.state.loading}>
-        {this.renderPanel()}
-      </Spin>
-    </div>
     )
   }
 }
 
-export default connect(({ dataAnalysis }) => ({ dataAnalysis }))(VisualizationPanel)
+export default connect(({dataAnalysis}) => ({dataAnalysis}))(VisualizationPanel)

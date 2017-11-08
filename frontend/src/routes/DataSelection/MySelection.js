@@ -56,6 +56,14 @@ class MySelection extends React.Component {
     history.push(`/workspace/${match.params.projectID}/import/choice`)
   }
 
+  handleClickCard = (oid, name, desc, tags) => {
+    this.props.dispatch({ type: 'upload/setDataSetID', payload: oid})
+    this.props.dispatch({ type: 'upload/setDataSetName', payload: name})
+    this.props.dispatch({ type: 'upload/setDataSetDesc', payload: desc})
+    this.props.dispatch({ type: 'upload/setDataSetTags', payload: tags})
+    this.props.dispatch({ type: 'upload/showStaged' })
+  }
+
   renderCards (privacy, category) {
     let dataSets
     let sdsnames = this.props.upload.sdsNames
@@ -80,7 +88,7 @@ class MySelection extends React.Component {
     }
 
 
-    return dataSets.map((e) =>
+    const cards = dataSets.map((e) =>
       <div className={styles.mycard} key={e._id}
       >
         <div className={styles.content}>
@@ -93,17 +101,38 @@ class MySelection extends React.Component {
             </div>:null }
         </div>
 
-        {!this.props.isStaged?<div className={styles.buttons}>
+        <div className={styles.buttons}>
           <Button size="large" className={styles.top} loading={this.props.upload.viewLoading}
                   onClick={() => {this.handleView(e._id, e.name, e.description, e.tags)}} >
             <Icon type="eye"/>View</Button>
           <Button size="large" className={styles.bottom} loading={this.props.upload.addLoading}
                   onClick={() => {this.handleAdd(e._id, e.name, e.description)}} >
             Add to project</Button>
-        </div>:null}
+        </div>
       </div>
-
     );
+
+
+    const stagedCards = dataSets.map((e) =>
+      <div className={styles.mycard} style={{cursor:"pointer"}} key={e._id} onClick={() =>
+      {this.handleClickCard(e._id, e.name, e.description, e.tags)}}>
+        <div className={styles.content}>
+          <div className={styles.title}>{e.name}</div>
+          <div className={styles.desc}>{e.description}</div>
+          {e.tags.length > 0 ?
+            <div className={styles.tagzone}>
+              {e.tags.map((tag) => <Tag key={tag} color="#C1E4F6">
+                <span className={styles.tag}>{tag}</span></Tag>)}
+            </div>:null }
+        </div>
+      </div>
+    );
+
+    if (!this.props.isStaged) {
+      return cards
+    } else {
+      return stagedCards
+    }
 
   }
 
