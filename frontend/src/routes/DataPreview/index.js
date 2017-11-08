@@ -2,6 +2,7 @@ import React from 'react'
 import { Button, Table, Checkbox, Select, Modal, Icon, Spin, Tag } from 'antd'
 import { connect } from 'dva'
 import styles from './index.less'
+import DataModal from '../../components/DataModal'
 
 const Option = Select.Option;
 const confirm = Modal.confirm;
@@ -156,8 +157,11 @@ class DataPreview extends React.Component {
               </div>:null }
           </div>
           <div className={styles.cright}>
-            {this.props.upload.showStaged? <Button
-              icon="edit"/>:null}
+            {this.props.upload.showStaged?
+              <DataModal>
+                <Button icon="edit"/>
+              </DataModal>
+              :null}
             {/*<Button icon="delete" onClick={this.onDelete}/>*/}
           </div>
         </div>
