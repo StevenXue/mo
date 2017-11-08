@@ -87,25 +87,27 @@ def delete_served_model(oid):
 def list_served_models():
     user_ID = request.args.get('user_ID')
     category = request.args.get('category')
-    print('category', category)
-    if not user_ID:
+    model_ID = request.args.get('model_ID')
+    print('model_ID', model_ID)
+    if user_ID:
+        public_served_models, owned_served_models = \
+            served_model_service.list_served_models_by_user_ID(user_ID, order=-1)
+        public_served_models = json_utility.me_obj_list_to_json_list(
+            public_served_models)
+        owned_served_models = json_utility.me_obj_list_to_json_list(
+            owned_served_models)
+        result = {
+            'public_served_models': public_served_models,
+            'owned_served_models': owned_served_models
+        }
+        return jsonify({'response': result})
+    elif model_ID:
+        model = served_model_service.get_by_model_id(model_ID)
 
+        return jsonify({'response': model})
+    else:
         all_public_served_models = served_model_service.list_all_served_models(category)
         return jsonify({'response': all_public_served_models})
-
-    public_served_models, owned_served_models = \
-        served_model_service.list_served_models_by_user_ID(user_ID, order=-1)
-    public_served_models = json_utility.me_obj_list_to_json_list(
-        public_served_models)
-    owned_served_models = json_utility.me_obj_list_to_json_list(
-        owned_served_models)
-    result = {
-        'public_served_models': public_served_models,
-        'owned_served_models': owned_served_models
-    }
-    return jsonify({'response': result})
-
-
 # @served_model_app.route('/suspend/<string:oid>', methods=['PUT'])
 # def suspend_served_model(oid):
 #     if served_model_business.suspend_by_id(oid):

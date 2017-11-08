@@ -38,6 +38,8 @@ class ServedModel(DynamicDocument):
     tags = ListField()
     related_tasks = ListField()
     private = BooleanField(required=True)
+    data_fields = ListField()
+    input_data_demo_string = StringField()
     create_time = DateTimeField(required=True)
     user = ReferenceField('User', required=True)
 

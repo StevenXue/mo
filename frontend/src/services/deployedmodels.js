@@ -9,3 +9,10 @@ export function fetchAllPublicServedModels(payload) {
     payload.privacy = false}
   return request(`${CORS}/served_model/served_models?privacy=${payload.privacy}&category=${payload.category}`);
 }
+
+
+// 获取一个 public deployed models
+export function fetchOnePublicServedModels(payload) {
+  return request(`${CORS}/served_model/served_models?model_ID=${payload.model_ID}`);
+}
+

@@ -44,7 +44,15 @@ def add(name, description, input_info, output_info, examples, version,
         model_base_path, job, service_name, model_name,
         related_fields,
         related_tasks,
-        tags, is_private, create_time, user, **optional):
+        tags, is_private,  data_fields,
+        input_data_demo_string, create_time, user, **optional):
+
+    print('data_fields')
+    print(data_fields)
+
+    print('input_data_demo_string')
+    print(input_data_demo_string)
+
     model = ServedModel(name=name, description=description,
                         input_info=input_info,
                         output_info=output_info,
@@ -58,6 +66,8 @@ def add(name, description, input_info, output_info, examples, version,
                         related_fields=related_fields,
                         related_tasks=related_tasks,
                         tags=tags, private=is_private,
+                        data_fields=data_fields,
+                        input_data_demo_string=input_data_demo_string,
                         create_time=create_time,
                         user=user,
                         **optional)
