@@ -51,11 +51,18 @@ def list_staging_data_sets_by_project_id():
 @staging_data_app.route('/staging_data_sets/<string:sds_id>', methods=['GET'])
 def get_staging_data_set(sds_id):
     limit = request.args.get('limit')
+    is_last = request.args.get('isLast')
     if limit is None:
         limit = 10
     data_set = staging_data_set_business.get_by_id(sds_id)
-    response = staging_data_business. \
-        get_by_staging_data_set_id_limit(ObjectId(sds_id), int(limit))
+    if is_last == 'true':
+        response = staging_data_business.get_last_limit_by_staging_data_set(
+            ObjectId(sds_id), int(limit)
+        )
+    else:
+        response = staging_data_business.get_by_staging_data_set_id_limit(
+            ObjectId(sds_id), int(limit)
+        )
     response = json_utility.me_obj_list_to_json_list(response)
     response = {'data': response}
     columns = staging_data_service.get_fields_with_types(

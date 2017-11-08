@@ -112,8 +112,9 @@ class MySelection extends React.Component {
       </div>
     );
 
+
     const stagedCards = dataSets.map((e) =>
-      <div className={styles.mycard} key={e._id} onClick={() =>
+      <div className={styles.mycard} style={{cursor:"pointer"}} key={e._id} onClick={() =>
       {this.handleClickCard(e._id, e.name, e.description, e.tags)}}>
         <div className={styles.content}>
           <div className={styles.title}>{e.name}</div>
@@ -124,7 +125,6 @@ class MySelection extends React.Component {
                 <span className={styles.tag}>{tag}</span></Tag>)}
             </div>:null }
         </div>
-
       </div>
     );
 

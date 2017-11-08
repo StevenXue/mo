@@ -45,6 +45,8 @@ export default {
 
     firstLoading: false,
     lastLoading: false,
+
+    stagedLoading: false,
   },
 
   subscriptions: {
@@ -98,8 +100,13 @@ export default {
     },
 
     * showStaged(action, { call, put, select }) {
+      yield put({ type: 'setShowStaged', payload: true})
+      yield put({ type: 'setStagedLoading', payload: true})
+      const url0 = location.hash.substr(1)
+      yield put(routerRedux.replace(url0+'/preview'))
+
       const sdsid = yield select(state => state.upload.dataSetID)
-      const {data} = yield call(getStagingDataSet, sdsid)
+      const {data} = yield call(getStagingDataSet, sdsid, 1)
       // console.log(data)
       const flds = {}
       for (const v of data.columns) {
@@ -110,26 +117,27 @@ export default {
       yield put({ type: 'setDataSet', payload: data.data})
       yield put({ type: 'setOrgFields', payload: orgflds})
       yield put({ type: 'setFields', payload: flds})
-
-      yield put({ type: 'setShowStaged', payload: true})
-      const url0 = location.hash.substr(1)
-      console.log('url0', url0+'/preview')
-
-      yield put(routerRedux.replace(url0+'/preview'))
-
+      yield put({ type: 'setStagedLoading', payload: false})
     },
 
     * showInTable({payload}, { call, put, select }) {
-      if (payload) {
+      const {page, type} = payload
+      if (page === -1) {
         yield put({type:'setLastLoading', payload: true})
       } else {
         yield put({type: 'setFirstLoading', payload: true})
       }
       const dataSetID = yield select(state => state.upload.dataSetID)
-      const data = yield call(fetchDataSet, dataSetID, payload)
-      yield put({ type: 'setDataSet', payload: data.response})
 
-      if (payload) {
+      if (type === 'ds') {
+        const data = yield call(fetchDataSet, dataSetID, page)
+        yield put({ type: 'setDataSet', payload: data.response})
+      } else {
+        const {data} = yield call(getStagingDataSet, dataSetID, page)
+        yield put({ type: 'setDataSet', payload: data.data})
+      }
+
+      if (page === -1) {
         yield put({type:'setLastLoading', payload: false})
       } else {
         yield put({type: 'setFirstLoading', payload: false})
@@ -492,6 +500,13 @@ export default {
       return {
         ...state,
         lastLoading
+      }
+    },
+
+    setStagedLoading(state, {payload: stagedLoading}) {
+      return {
+        ...state,
+        stagedLoading
       }
     },
   },
