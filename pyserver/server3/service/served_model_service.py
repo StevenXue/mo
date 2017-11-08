@@ -444,9 +444,9 @@ def list_all_served_models(category):
     # print(public_all)
     public_all = json_utility.me_obj_list_to_json_list(
         public_all)
-    print(public_all)
-    myyy = [a['_id'] for a in public_all]
-    print(myyy)
+    # print(public_all)
+    # myyy = [a['_id'] for a in public_all]
+    # print(myyy)
     # print(public_all)
     return public_all
 
@@ -462,6 +462,7 @@ def get_by_model_id(model_ID):
     # public_all = [each_model.to_mongo() for each_model in public_all]
     model = json_utility.me_obj_list_to_json_list(
         [model])
+    print(model)
     model[0] = build_how_to_use_code(model[0])
     return model
 
@@ -470,6 +471,7 @@ def build_how_to_use_code(model):
     served_model_id = str(model['_id'])
     server = str(model['server'])
     served_model_name = model['model_name']
+    print(model['data_fields'])
     features = model['data_fields'][0]
     features_str = '[' + ",".join(('\'' + str(x) + '\'') for x in features) +']'
 

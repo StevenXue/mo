@@ -34,7 +34,7 @@ export default {
       return {
         ...state,
         focusModel: {
-          0:{newInfo}
+          0:newInfo
         }
       }
     },
@@ -77,7 +77,7 @@ export default {
         if (pathname === '/modelmarkets') {
           dispatch({ type: 'fetch', payload:{privacy: 'public',category: 'All' }})
         } else if (match) {
-          // console.log('match')
+          console.log('match')
           dispatch({ type: 'fetchone',  payload: {model_ID: match[1]}})
         }
       })
