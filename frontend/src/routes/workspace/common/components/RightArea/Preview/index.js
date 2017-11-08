@@ -74,15 +74,16 @@ function Preview({preview, model, dispatch, namespace}) {
         dataIndex: e[0],
         key: e[0],
         width: 120,
+        styles: {'backgroundColor': "red"}
       };
       let className = '';
 
       if(fields&&fields.includes(e[0])){
-        className += 'active-table-column';
+        className += ' active-table-column';
       }
 
       if(labelFields&&labelFields.includes(e[0])){
-        className += 'active-table-column-label';
+        className += ' active-table-column-label';
       }
 
       if(mouseOverField===e[0]){

@@ -1,8 +1,9 @@
 import React from 'react'
 import styles from './index.less'
-import { connect } from 'dva'
+import {connect} from 'dva'
 
-import { Select, Collapse, Button, Input, Popover, Icon, Tooltip } from 'antd'
+import {Select, Collapse, Button, Input, Popover, Icon, Tooltip} from 'antd'
+
 const Option = Select.Option
 const Panel = Collapse.Panel
 import {get, isEqual} from 'lodash'
@@ -39,7 +40,7 @@ const content = (content) => (
   </div>
 )
 
-function WorkBench({ section, model, dispatch, namespace, preview }) {
+function WorkBench({section, model, dispatch, namespace, preview}) {
   //state
   const {
     sectionsJson,
@@ -75,7 +76,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
 
     dispatch({
       type: namespace + '/setSections',
-      payload: { sectionsJson: sectionsJson },
+      payload: {sectionsJson: sectionsJson},
     })
     // 将预览设置
   }
@@ -274,10 +275,108 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
     })
   }
 
+  function renderFields(steps, step, stepIndex) {
+    let len_range = baseSteps[stepIndex].args[0].len_range;
+    let value_length = step.args[0].values.length;
+    let warningText = null;
+
+    if (len_range) {
+      if (len_range[0]) {
+        if (value_length < len_range[0]) {
+          warningText = `you have select ${value_length} fields, less than required ${len_range[0]}`
+        }
+      }
+      if (len_range[1]) {
+        if (value_length > len_range[1]) {
+          warningText = `you have select ${value_length} fields, more than required ${len_range[1]}`
+        }
+      }
+    }
+
+    return [
+      <Panel
+        header={
+          (
+            <div className={styles.panel_title_row}>
+              {getArgs(baseSteps, stepIndex).display_name}
+
+              <div className={styles.panel_title_hint}>
+                {warningText}
+              </div>
+            </div>)
+        }
+        key={stepIndex}
+        className={styles.panel}
+      >
+        {fieldSelector(steps[0], 0, step, stepIndex)}
+      </Panel>,
+
+      renderFakePanel(step, stepIndex,
+        step.args[0].values.length ?
+          `You have select ${step.args[0].values.length} fields`
+          : 'You have not select any fields'
+      )
+    ];
+  }
+
+  function renderFieldsPro(steps, step, stepIndex) {
+    let len_range = baseSteps[stepIndex].args[0].len_range;
+    let value_length = step.args[0].values.length;
+    let warningText = null;
+
+    if (len_range) {
+      if (len_range[0]) {
+        if (value_length < len_range[0]) {
+          warningText = `you have select ${value_length} fields, less than required ${len_range[0]}`
+        }
+      }
+      if (len_range[1]) {
+        if (value_length > len_range[1]) {
+          warningText = `you have select ${value_length} fields, more than required ${len_range[1]}`
+        }
+      }
+    }
+
+    let range = baseSteps[stepIndex].args[0].range;
+    let dataSourceStepIndex
+    if(range.hasOwnProperty('type')){
+      dataSourceStepIndex = range.step_index
+    }
+
+    // let dataSourceStepIndex =
+
+    return [
+      <Panel
+        header={
+          (
+            <div className={styles.panel_title_row}>
+              {getArgs(baseSteps, stepIndex).display_name}
+
+              <div className={styles.panel_title_hint}>
+                {warningText}
+              </div>
+            </div>)
+        }
+        key={stepIndex}
+        className={styles.panel}
+      >
+        {fieldSelector(steps[dataSourceStepIndex], 0, step, stepIndex)}
+      </Panel>,
+
+      renderFakePanel(step, stepIndex,
+        step.args[0].values.length ?
+          `You have select ${step.args[0].values.length} fields`
+          : 'You have not select any fields'
+      )
+    ];
+  }
+
+
   function fieldSelector(datasourceStep, datasourceStepIndex, step, stepIndex) {
     return (
       <div>
         <div className={styles.fields}>
+
           {
             step.args.map((arg, argIndex) => {
               const values = arg.values
@@ -334,7 +433,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
                       // backgroundColor: backgroundColor,
                       color: values.includes(fieldName) ? 'white' : 'grey',
                     }}
-                      className={styles.text}
+                       className={styles.text}
                     >{fieldName}</p>
                   </div>
                 )
@@ -539,6 +638,33 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
 
   const stepLength = steps.length
 
+  function renderDataSource(step, stepIndex){
+    let ret = [<Panel
+      className={styles.panel}
+      header={
+        (
+          <div className={styles.panel_title_row}>
+            {getArgs(baseSteps, stepIndex).display_name}
+          </div>)
+      }
+      key={stepIndex}
+    >
+      {dataSource(step.args, stepIndex)}
+    </Panel>
+    ];
+    if (!active_steps.includes(stepIndex.toString())) {
+      ret.push(
+        <FakePanel key={stepIndex + step.name + 'hint'}>
+          <div className={styles.fake_panel_container}>
+            <div className={styles.fake_panel}>
+              {step.args[0].value ? 'You have select 1 data' : 'You have not select any data'}
+            </div>
+          </div>
+        </FakePanel>)
+    }
+    return ret;
+  }
+
   function dataSource(args, stepIndex) {
     return (
       args.map((arg, argIndex) =>
@@ -547,7 +673,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
             key={arg.name + argIndex}
             className={styles.select}
             showSearch
-            style={{ width: 200 }}
+            style={{width: 200}}
             placeholder="Select a stagingData"
             optionFilterProp="children"
             onChange={(value) => handleChange(value, stepIndex, argIndex)}
@@ -637,7 +763,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
 
   return (
     <div>
-      <ToolBar sectionId={sectionId} {...{ model, dispatch, namespace }}/>
+      <ToolBar sectionId={sectionId} {...{model, dispatch, namespace}}/>
       <div className={`${styles.container} my-collapse-arrow`}>
         <Collapse className={styles.collapse}
                   defaultActiveKey={['data_source']} onChange={callback}
@@ -645,98 +771,51 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
           {
             steps.map((step, stepIndex) => {
                 switch (step.name) {
-
                   case 'data_source':
-                    let ret = [<Panel
-                      className={styles.panel}
-                      header={
-                        (
-                          <div className={styles.panel_title_row}>
-                            {getArgs(baseSteps, stepIndex).display_name}
-                          </div>)
-                      }
-                      key={stepIndex}
-                    >
-                      {dataSource(step.args, stepIndex)}
-                    </Panel>
-                    ];
-                    if (!active_steps.includes(stepIndex.toString())) {
-                      ret.push(
-                        <FakePanel key={stepIndex + step.name + 'hint'}>
-                          <div className={styles.fake_panel_container}>
-                            <div className={styles.fake_panel}>
-                              {step.args[0].value ? 'You have selected 1 data' : 'You have not selected any data'}
-                            </div>
-                          </div>
-                        </FakePanel>)
-                    }
-                    return ret;
+                    return renderDataSource(step, stepIndex)
+                    // let ret = [<Panel
+                    //   className={styles.panel}
+                    //   header={
+                    //     (
+                    //       <div className={styles.panel_title_row}>
+                    //         {getArgs(baseSteps, stepIndex).display_name}
+                    //       </div>)
+                    //   }
+                    //   key={stepIndex}
+                    // >
+                    //   {dataSource(step.args, stepIndex)}
+                    // </Panel>
+                    // ];
+                    // if (!active_steps.includes(stepIndex.toString())) {
+                    //   ret.push(
+                    //     <FakePanel key={stepIndex + step.name + 'hint'}>
+                    //       <div className={styles.fake_panel_container}>
+                    //         <div className={styles.fake_panel}>
+                    //           {step.args[0].value ? 'You have selected 1 data' : 'You have not selected any data'}
+                    //         </div>
+                    //       </div>
+                    //     </FakePanel>)
+                    // }
+                    // return ret;
+
+                  case 'target_datasource':
+                    return renderDataSource(step, stepIndex);
+                  case 'from_datasource':
+                    return renderDataSource(step, stepIndex);
+
+                  // case 'select_index':
 
                   case 'fields':
-                    return [
-                      <Panel
-                        header={
-                          (
-                            <div className={styles.panel_title_row}>
-                              {getArgs(baseSteps, stepIndex).display_name}
-                            </div>)
-                        }
-                        key={stepIndex}
-                        className={styles.panel}
-                      >
-                        {fieldSelector(steps[0], 0, step, stepIndex)}
-                      </Panel>,
-
-                      renderFakePanel(step, stepIndex,
-                        step.args[0].values.length ?
-                          `You have selected ${step.args[0].values.length} fields`
-                          : 'You have not selected any fields'
-                      )
-                    ];
+                    return renderFields(steps, step, stepIndex);
 
                   case 'feature_fields':
-                    return [
-                      <Panel
-                        header={
-                          (
-                            <div className={styles.panel_title_row}>
-                              {getArgs(baseSteps, stepIndex).display_name}
-                            </div>)
-                        }
-                        key={stepIndex}
-                        className={styles.panel}>
-                        {fieldSelector(steps[0], 0, step, stepIndex)}
-                      </Panel>,
-
-                      renderFakePanel(step, stepIndex,
-                        step.args[0].values.length ?
-                          `You have selected ${step.args[0].values.length} fields`
-                          : 'You have not selected any fields'
-                      )
-
-                    ];
+                    return renderFields(steps, step, stepIndex);
 
                   case 'label_fields':
-                    return [
-                      <Panel
-                        header={
-                          (
-                            <div className={styles.panel_title_row}>
-                              {getArgs(baseSteps, stepIndex).display_name}
-                            </div>)
-                        }
-                        key={stepIndex}
-                        className={styles.panel}>
-                        {fieldSelector(steps[0], 0, step, stepIndex)}
-                      </Panel>,
+                    return renderFields(steps, step, stepIndex);
 
-                      renderFakePanel(step, stepIndex,
-                        step.args[0].values.length ?
-                          `You have selected ${step.args[0].values.length} fields`
-                          : 'You have not selected any fields'
-                      )
-
-                    ];
+                  case 'from_fields':
+                    return renderFieldsPro(steps, step, stepIndex);
 
                   case 'parameters':
                     // num of args filled
@@ -869,4 +948,4 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
   )
 }
 
-export default connect(({ preview }) => ({ preview }))(WorkBench)
+export default connect(({preview}) => ({preview}))(WorkBench)

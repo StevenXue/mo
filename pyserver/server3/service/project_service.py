@@ -206,30 +206,25 @@ def get_all_jobs_of_project(project_id, categories, status=None):
 
                 # result sds info
                 # object 用的是 .id  json用 _id
-                try:
-                    result_sds = staging_data_set_business.get_by_job_id(
-                        job['id']).to_mongo()
+                if key == 'model':
+                    try:
+                        result_sds = staging_data_set_business.get_by_job_id(
+                            job['id']).to_mongo()
 
-                    if result_sds:
-                        if key == 'model':
+                        if result_sds:
                             # model results
                             job_info['results'] = result_sds
                             # FIXME too slow to get metrics status
                             # 已添加索引
                             metrics_status = [sd.to_mongo() for sd in
-                                              staging_data_business.get_by_staging_data_set_id(
-                                                  result_sds['_id'])]
+                                          staging_data_business.get_by_staging_data_set_id(
+                                              result_sds['_id'])]
                             metrics_status.sort(key=lambda x: x['n'])
                             job_info['metrics_status'] = metrics_status
-                        else:
-                            # toolkit results
-                            job_info['results'] = result_sds[
-                                'result'] if result_sds and "result" in result_sds else None
-                        job_info['results_staging_data_set_id'] = result_sds[
-                            '_id'] if result_sds else None
-                except DoesNotExist:
-                    result_sds = None
-
+                            job_info['results_staging_data_set_id'] = result_sds[
+                                '_id'] if result_sds else None
+                    except DoesNotExist:
+                        result_sds = None
                 if job['status'] == 200 and key == 'model':
                     temp_data_fields = job_info['params']['fit']['data_fields']
                     if not isinstance(temp_data_fields[0], list):
