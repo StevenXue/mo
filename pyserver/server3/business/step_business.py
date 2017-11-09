@@ -38,3 +38,9 @@ class StepBusiness:
             if step['name'] == 'parameters':
                 return step
 
+    @staticmethod
+    def get_step(steps, step_name):
+        for step in steps:
+            if step['name'] == step_name:
+                return step
+

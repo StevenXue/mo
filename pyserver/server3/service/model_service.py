@@ -1035,6 +1035,21 @@ def _update_model():
         }
     }
 
+    HyperLinearRegressor = {
+        "name": "Hyper Linear Regressor",
+        "description": "Linear Regressor with hyper parameters tuning",
+        # "target_py_code": "server3/lib/models/kmean",
+        # "entry_function": "kmeans_cluster_model_fn",
+        # "to_code_function": "custom_model_to_str",
+        # "category": 2,
+        # "model_type": 2,
+        # "steps": models.KmeansSteps,
+        # "parameter_spec": models.KmeansCluster,
+        # "input": {
+        #     "type": "DataFrame"
+        # }
+    }
+
     user = user_business.get_by_user_ID('system')
 
     MODEL_DICT = [
@@ -1085,7 +1100,13 @@ def _update_model():
             "is_private": False,
             "user_ID": user.user_ID,
             "obj": Kmeans
-        }
+        },
+        {
+            "_id": None,
+            "is_private": False,
+            "user_ID": user.user_ID,
+            "obj": HyperLinearRegressor
+        },
     ]
 
     for model in MODEL_DICT:

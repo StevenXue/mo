@@ -1805,20 +1805,20 @@ class StepTemplate(object):
         ]
     }
 
-    custom = {
-        'name': 'custom',
-        'display_name': 'custom step',
-        'args': [
-            {
-                **SPEC.ui_spec['input'],
-                'name': 'k',
-                'display_name': 'k',
-                'value_type': 'int',
-                'range': [2, None],
-                'des': 'the number of clustering numbers',
-            }
-        ]
-    }
+    # custom = {
+    #     'name': 'custom',
+    #     'display_name': 'custom step',
+    #     'args': [
+    #         {
+    #             **SPEC.ui_spec['input'],
+    #             'name': 'k',
+    #             'display_name': 'k',
+    #             'value_type': 'int',
+    #             'range': [2, None],
+    #             'des': 'the number of clustering numbers',
+    #         }
+    #     ]
+    # }
 
     setting = {
         'name': 'setting',
@@ -2820,40 +2820,42 @@ def update_toolkit():
         #         }
         #     ]
         # },
-        # result_spec={
-        #     "if_reserved": True,
-        #     "args": [
-        #         {
-        #             "name": "scores",
-        #             "des": "每类特征得到的评分估算",
-        #             "if_add_column": False,
-        #             "attribute": "value",
-        #             "usage": ["bar"]
-        #         },
-        #         {
-        #             "name": "index",
-        #             "des": "每类特征是否取用的标签",
-        #             "if_add_column": False,
-        #             "attribute": "label",
-        #             "usage": ["bar", "table"]
-        #         },
-        #         {
-        #             "name": "result",
-        #             "des": "筛选出的所有特征值",
-        #             "if_add_column": False,
-        #             "attribute": "value",
-        #         }
-        #     ]
-        # },
+        result_spec={
+            # "if_reserved": True,
+            "args": [
+                # {
+                #     "name": "scores",
+                #     "des": "每类特征得到的评分估算",
+                #     "if_add_column": False,
+                #     "attribute": "value",
+                #     "usage": ["bar"]
+                # },
+                # {
+                #     "name": "index",
+                #     "des": "每类特征是否取用的标签",
+                #     "if_add_column": False,
+                #     "attribute": "label",
+                #     "usage": ["bar", "table"]
+                # },
+                # {
+                #     "name": "result",
+                #     "des": "筛选出的所有特征值",
+                #     "if_add_column": False,
+                #     "attribute": "value",
+                # }
+            ]
+        },
         steps=[
             {
                 **StepTemplate.data_source,
-                "name": 'target_datasource'
+                "name": 'target_datasource',
+                'display_name': 'select target data source',
             },
 
             {
                 **StepTemplate.data_source,
-                "name": 'from_datasource'
+                "name": 'from_datasource',
+                'display_name': 'select from data source',
             },
             {
                 "name": 'select_index',
@@ -2871,22 +2873,22 @@ def update_toolkit():
                             'arg_index': 0,
                             'value_name': 'fields'
                         },
-                        "required": True,
+                        # "required": True,
                     },
-                    {
-                        **SPEC.ui_spec['multiple_choice'],
-                        'name': 'from_datasource_index',
-                        'display_name': 'from_datasource_index',
-                        # "len_range": [1, 1],
-                        "required": True,
-                        'range': {
-                            'type': 'from_step',
-                            'step_name': 'target_datasource',
-                            'step_index': 0,
-                            'arg_index': 0,
-                            'value_name': 'fields'
-                        },
-                    }
+                    # {
+                    #     **SPEC.ui_spec['multiple_choice'],
+                    #     'name': 'from_datasource_index',
+                    #     'display_name': 'from_datasource_index',
+                    #     # "len_range": [1, 1],
+                    #     "required": True,
+                    #     'range': {
+                    #         'type': 'from_step',
+                    #         'step_name': 'target_datasource',
+                    #         'step_index': 0,
+                    #         'arg_index': 0,
+                    #         'value_name': 'fields'
+                    #     },
+                    # }
                 ]
             },
             {
@@ -2920,12 +2922,109 @@ def update_toolkit():
                         'des': 'action after the row without index of from datasource',
 
                         "range": [
+                            'NAN'
                             "0",
                             "null",
                             "-1",
                         ],
-                        'default': 'null',
+                        'default': 'NAN',
+
                         # 'required': True,
+                    }
+                ]
+            }
+        ]
+    )
+
+    add_row_append = Toolkit(
+        name='合并添加行',
+        description='通过其他数据表数据添加行',
+        category=-1,
+        entry_function='add_rows_append',
+        target_py_code=inspect.getsource(preprocess_orig.add_rows_append),
+        # parameter_spec={
+        #     "data": {
+        #         'name': 'input',
+        #         'type': {
+        #             'key': 'transfer_box',
+        #             'des': 'nD tensor with shape: (batch_size, ..., '
+        #                    'input_dim). The most common situation would be a '
+        #                    '2D input with shape (batch_size, input_dim).',
+        #             'range': None
+        #         },
+        #         'default': None,
+        #         'required': True,
+        #         'x_len_range': [2, None],
+        #         'y_len_range': [1, 1],
+        #
+        #         'x_data_type': ['int', 'float'],
+        #         'y_data_type': ['int', 'float']
+        #     },
+        #     "args": [
+        #         {
+        #             'name': 'n_features',
+        #             'type': {
+        #                 'key': 'int',
+        #                 'des': 'select k best, k is number of features selected',
+        #                 'range': [1, None]
+        #             },
+        #             'default': 2,
+        #             'required': True
+        #         }
+        #     ]
+        # },
+        result_spec={
+            # "if_reserved": True,
+            "args": [
+                # {
+                #     "name": "scores",
+                #     "des": "每类特征得到的评分估算",
+                #     "if_add_column": False,
+                #     "attribute": "value",
+                #     "usage": ["bar"]
+                # },
+                # {
+                #     "name": "index",
+                #     "des": "每类特征是否取用的标签",
+                #     "if_add_column": False,
+                #     "attribute": "label",
+                #     "usage": ["bar", "table"]
+                # },
+                # {
+                #     "name": "result",
+                #     "des": "筛选出的所有特征值",
+                #     "if_add_column": False,
+                #     "attribute": "value",
+                # }
+            ]
+        },
+        steps=[
+            {
+                **StepTemplate.data_source,
+                "name": 'target_datasource',
+                'display_name': 'select target data source',
+            },
+
+            {
+                **StepTemplate.data_source,
+                "name": 'from_datasource',
+                'display_name': 'select from data source',
+            },
+            {
+                **StepTemplate.parameters,
+                'args': [
+                    {
+                        **SPEC.ui_spec['choice'],
+                        'name': 'exception_handing',
+                        'display_name': 'exception handing',
+                        'des': 'action after the row without index of from datasource',
+                        "range": [
+                            'NAN'
+                            "0",
+                            "null",
+                            "-1",
+                        ],
+                        'default': 'NAN',
                     }
                 ]
             }
@@ -2987,6 +3086,10 @@ def update_toolkit():
         {
             '_id': ObjectId('5a014c9dd845c0523f3a9ff1'),
             'object': add_columns_append
+        },
+        {
+            '_id': ObjectId("5a02cb1cd845c01d60bde956"),
+            'object': add_row_append
         }
     ]
     user = user_business.get_by_user_ID('system')

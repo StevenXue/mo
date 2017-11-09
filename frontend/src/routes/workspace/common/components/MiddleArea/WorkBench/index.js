@@ -772,32 +772,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
             steps.map((step, stepIndex) => {
                 switch (step.name) {
                   case 'data_source':
-                    return renderDataSource(step, stepIndex)
-                    // let ret = [<Panel
-                    //   className={styles.panel}
-                    //   header={
-                    //     (
-                    //       <div className={styles.panel_title_row}>
-                    //         {getArgs(baseSteps, stepIndex).display_name}
-                    //       </div>)
-                    //   }
-                    //   key={stepIndex}
-                    // >
-                    //   {dataSource(step.args, stepIndex)}
-                    // </Panel>
-                    // ];
-                    // if (!active_steps.includes(stepIndex.toString())) {
-                    //   ret.push(
-                    //     <FakePanel key={stepIndex + step.name + 'hint'}>
-                    //       <div className={styles.fake_panel_container}>
-                    //         <div className={styles.fake_panel}>
-                    //           {step.args[0].value ? 'You have selected 1 data' : 'You have not selected any data'}
-                    //         </div>
-                    //       </div>
-                    //     </FakePanel>)
-                    // }
-                    // return ret;
-
+                    return renderDataSource(step, stepIndex);
                   case 'target_datasource':
                     return renderDataSource(step, stepIndex);
                   case 'from_datasource':
@@ -815,6 +790,9 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                     return renderFields(steps, step, stepIndex);
 
                   case 'from_fields':
+                    return renderFieldsPro(steps, step, stepIndex);
+
+                  case 'select_index':
                     return renderFieldsPro(steps, step, stepIndex);
 
                   case 'parameters':

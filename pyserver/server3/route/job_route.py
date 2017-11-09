@@ -149,7 +149,6 @@ def save_as_result():
     #     'new_sds_name': 'xxx',
     # }
     data = request.get_json()
-    print("save_as_result data", data)
     job_id = data['job_id']
     new_sds_name = data.get("new_sds_name")
     job_service.save_as_result(

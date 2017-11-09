@@ -567,7 +567,6 @@ def run_toolkit_job_pro(job_obj, project_id):
     return func_rst
 
 
-
 def get_args(args):
     return {'args':
                 {arg.get('name'): arg.get('value')
@@ -579,7 +578,15 @@ def get_args(args):
 
 def run_toolkit_job(job_obj, project_id):
     if job_obj.toolkit.category == -1:
-        return run_toolkit_job_pro(job_obj, project_id)
+        result = run_toolkit_job_pro(job_obj, project_id)
+        # save result to job
+
+        job_obj.result = result
+        job_obj.save()
+        return {
+            "result": result,
+            "result_sds_obj": None,
+            }
 
     data = toolkit_steps_to_obj(job_obj, project_id)
 
@@ -672,7 +679,7 @@ def save_as_result(job_id, new_sds_name):
         name=new_sds_name,
         description='des',
         project=project_obj,
-        job=job_obj
+        # job=job_obj
     )
 
     # 拿到原表
