@@ -98,6 +98,20 @@ function Sidebar({ model, dispatch, namespace }) {
     })
   }
 
+  const overSection = (sectionId) => {
+    dispatch({
+      type: namespace + '/toggleDropButton',
+      payload: { sectionId, dropButton: true },
+    })
+  }
+
+  const leaveSection = (sectionId) => {
+    dispatch({
+      type: namespace + '/toggleDropButton',
+      payload: { sectionId, dropButton: false },
+    })
+  }
+
   const menu = (sectionId) => {
     return (
       <Menu>
@@ -145,6 +159,8 @@ function Sidebar({ model, dispatch, namespace }) {
                       backgroundColor: backgroundColor,
                       color: color,
                     }}
+                    onMouseOver={() => overSection(section._id)}
+                    onMouseLeave={() => leaveSection(section._id)}
                   >
                     <div className={styles.sectionRow}
                          title={section[tempVariable.nameOrId] || section[translateDict[namespace]].name}
@@ -160,15 +176,20 @@ function Sidebar({ model, dispatch, namespace }) {
                       <br/>
                       <div className={styles.time}>
                         {showTime(section.create_time)}
-                        <span className={styles[statusDict[section.status]]}>{statusDict[section.status]}</span>
+                        {/*<span className={styles[statusDict[section.status]]}>{statusDict[section.status]}</span>*/}
                         {/*<div className={styles.light}/>*/}
                       </div>
                     </div>
-                    <Dropdown overlay={menu(section._id)} trigger={['click']}>
-                      <a className="ant-dropdown-link" href="#">
-                        <Icon type="down"/>
-                      </a>
-                    </Dropdown>
+                    {
+                      section.dropButton ?
+                        <Dropdown overlay={menu(section._id)} trigger={['click']}>
+                          <a className="ant-dropdown-link" href="#">
+                            <Icon type="down"/>
+                          </a>
+                        </Dropdown> :
+                        <span className={styles[statusDict[section.status]]}>{statusDict[section.status]}</span>
+                    }
+
                   </div>
                 )
               },

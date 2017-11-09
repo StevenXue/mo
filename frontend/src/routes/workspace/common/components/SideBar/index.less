@@ -56,40 +56,42 @@
   .nameInput {
     border: none;
     border-radius: 0;
+    font-size: 15px;
   }
 }
 
 .status-g {
-  line-height: 24px;
+  line-height: 12px;
   float: right;
+  font-size: 12px;
+}
+
+.ready {
+  //line-height: 18px;
+  .status-g;
+  color: @custom-grey;
+}
+
+.running {
+  //line-height: 18px;
+  .status-g;
+  color: @green;
+}
+
+.completed {
+  .status-g;
+  color: @custom-orange;
+}
+
+.error {
+  .status-g;
+  color: @red;
 }
 
 .time {
   display: inline;
   font-size: 11px;
   vertical-align:middle;
-
-  .ready {
-    //line-height: 18px;
-    .status-g;
-    color: @custom-grey;
-  }
-
-  .running {
-    //line-height: 18px;
-    .status-g;
-    color: @green;
-  }
-
-  .completed {
-    .status-g;
-    color: @custom-orange;
-  }
-
-  .error {
-    .status-g;
-    color: @red;
-  }
 
   .light {
     float: right;
