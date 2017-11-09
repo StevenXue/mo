@@ -152,8 +152,8 @@ def kube_run_model(conf, project_id, data_source_id, model_id, job_obj,
 
     job_id = str(job_obj.id)
     print(job_id)
-    return run_model(conf, project_id, data_source_id, model_id, job_id,
-                     **kwargs)
+    # return run_model(conf, project_id, data_source_id, model_id, job_id,
+    #                  **kwargs)
     cwd = os.getcwd()
     job_name = job_id + '-training-job'
     client = kube_service.client

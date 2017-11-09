@@ -45,6 +45,12 @@ def mlp(conf, input, **kw):
 
 def mlp_main(result_sds, project_id, job_id, user_ID, result_dir, x_train,
              y_train, x_val,  y_val, x_test, y_test, f=None, e=None):
+
+    training_logger = logger_service.TrainingLogger(f['args']['epochs'],
+                                                    project_id,
+                                                    job_id,
+                                                    user_ID,
+                                                    result_sds)
     input_len = x_train.shape[1]
     output_len = y_train.shape[1]
 
@@ -69,28 +75,16 @@ def mlp_main(result_sds, project_id, job_id, user_ID, result_dir, x_train,
     # TODO custom to make database writing async
     batch_print_callback = LambdaCallback(on_epoch_begin=
                                           lambda epoch, logs:
-                                          logger_service.log_epoch_begin(
-                                              epoch, logs,
-                                              result_sds,
-                                              project_id,
-                                              job_id=job_id,
-                                              user_ID=user_ID),
+                                          training_logger.log_epoch_begin(
+                                              epoch, logs),
                                           on_epoch_end=
                                           lambda epoch, logs:
-                                          logger_service.log_epoch_end(
-                                              epoch, logs,
-                                              result_sds,
-                                              project_id,
-                                              job_id=job_id,
-                                              user_ID=user_ID),
+                                          training_logger.log_epoch_end(
+                                              epoch, logs),
                                           on_batch_end=
                                           lambda batch, logs:
-                                          logger_service.log_batch_end(
-                                              batch, logs,
-                                              result_sds,
-                                              project_id,
-                                              job_id=job_id,
-                                              user_ID=user_ID)
+                                          training_logger.log_batch_end(
+                                              batch, logs)
                                           )
 
     # checkpoint to save best weight

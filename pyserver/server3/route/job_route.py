@@ -203,5 +203,15 @@ def save_as_result():
             "result": 'save as success'
         }}), 200
 
+
+@job_app.route("/jobs/<string:job_id>", methods=["PUT"])
+def update_job(job_id):
+    data = request.get_json()
+    new_job = job_business.update_job_by_id(job_id, **data)
+    new_job = json_utility.convert_to_json(new_job.to_mongo())
+    return jsonify({
+        "response": new_job}), 200
+
+
 if __name__ == "__main__":
     create_job()
