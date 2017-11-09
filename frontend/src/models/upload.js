@@ -2,7 +2,7 @@ import { uploadFile, fetchDataSets, fetchDataSet,
   deleteDataColumns, changeTypes, stageData,
   fetchStagingDataSets, updateStagingDataSet,
   getStagingDataSet, changeStagedTypes,
-  deleteStagedDataColumns } from '../services/upload'
+  deleteStagedDataColumns, deleteStagingDataSet } from '../services/upload'
 
 import { message } from 'antd'
 import pathToRegexp from 'path-to-regexp';
@@ -287,8 +287,8 @@ export default {
       console.log(res)
       if (payload !== 'new') {
         yield put({type: 'staged'})
-        const url0 = location.hash.substr(1).replace('preview', '')
-        const url1 = url0.replace('select', '')
+        const url0 = location.hash.substr(1).replace('/preview', '')
+        const url1 = url0.replace('/select', '')
         // console.log('url0', url0)
         yield put(routerRedux.replace(url1))
 
@@ -338,6 +338,16 @@ export default {
       yield put({type: 'setDataSetTags', payload:tags.split(',')})
 
     },
+
+    * delStaged(action, { put, call, select }) {
+
+      const sdsid = yield select(state => state.upload.dataSetID)
+      const res = yield call(deleteStagingDataSet, sdsid)
+      console.log(res)
+      const url0 = location.hash.substr(1).replace('/preview', '')
+      yield put(routerRedux.replace(url0))
+
+    }
 
 
   },

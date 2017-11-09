@@ -23,7 +23,6 @@ class DataPreview extends React.Component {
 
   onCheck (event, e) {
 
-
     const sels = this.props.upload.selected
     if (event.target.checked) {
       sels.push(e)
@@ -44,8 +43,23 @@ class DataPreview extends React.Component {
     }
   }
 
-  onDelete = () => {
-    console.log(this.props.upload.dataSet)
+  onDeleteStaged = () => {
+    const { dispatch } = this.props
+
+    confirm({
+      title: 'Are you sure to delete this staging dataset?',
+      content: 'The operation will permanently delete your staging dataset!',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+
+      onOk: () => {
+        return dispatch({ type: 'upload/delStaged'})
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
   }
 
   onSelect (value, e) {
@@ -156,14 +170,14 @@ class DataPreview extends React.Component {
                   <span className={styles.tag}>{tag}</span></Tag>)}
               </div>:null }
           </div>
-          <div className={styles.cright}>
-            {this.props.upload.showStaged?
+          {this.props.upload.showStaged?
+            <div className={styles.cright}>
               <DataModal>
                 <Button icon="edit"/>
               </DataModal>
-              :null}
-            {/*<Button icon="delete" onClick={this.onDelete}/>*/}
-          </div>
+              <Button icon="delete" onClick={this.onDeleteStaged}/>
+            </div>
+            :null}
         </div>
         {this.props.upload.delLoading || this.props.upload.stagedLoading ? <Spin/> :
           <div className={styles.whole}>
