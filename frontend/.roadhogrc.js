@@ -15,7 +15,6 @@ export default {
       ]
     }
   },
-  "publicPath": "./public",
   "proxy": {
     "/api": {
       "target": "http://localhost:5000/",

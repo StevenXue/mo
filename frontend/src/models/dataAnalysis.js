@@ -3,6 +3,8 @@ import modelExtend from 'dva-model-extend';
 import workBench from './workBench';
 
 import  * as stagingDataService from '../services/stagingData';
+import  * as jobService from '../services/job';
+
 const categories = 'toolkit';
 
 const dataAnalysis = modelExtend(workBench, {
@@ -14,21 +16,29 @@ const dataAnalysis = modelExtend(workBench, {
   },
   effects: {
 
-    *saveStagingDataset(action, { call, put, select }) {
+    *saveResult(action, { call, put, select }) {
       const { id } = action.payload;
-      yield put({ type: 'setGetSectionLoading', payload: { loading: true } });
 
-      const projectId = yield select(state => state.dataAnalysis.projectId)
-
-
-      const { data } = yield call(stagingDataService.saveStagingDataset, {
+      const { data } = yield call(jobService.save_result, {
         id
-      })
-      console.log('data', data);
+      });
 
+    },
+
+
+    *saveAsResult(action, { call, put, select }) {
+      const { id, newSdsName } = action.payload;
+      console.log("id,name", id, newSdsName )
+      const { data } = yield call(jobService.save_as_result, {
+        id,
+        newSdsName
+      });
+
+      const projectId = yield select(state => state.dataAnalysis.projectId);
       //保存完更新staging data sets
       yield put({ type: 'preview/fetchStagingDatasetList', payload: { projectId: projectId } })
-    },
+    }
+
   },
 
   subscriptions: {

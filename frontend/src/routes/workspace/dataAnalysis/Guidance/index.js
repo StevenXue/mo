@@ -53,35 +53,32 @@ function Guidance(props) {
       {/*type='guidance'*/}
       {/*{...props}/>*/}
 
-      <div className={styles.go_guide}>
-        {/*<Button onClick={() => props.dispatch({*/}
-          {/*type: props.namespace + '/setShowGuidance',*/}
-          {/*payload: {*/}
-            {/*showGuidance: false,*/}
-          {/*},*/}
-        {/*})}>*/}
-          {/*go to workspace*/}
-        {/*</Button>*/}
-      </div>
-    </div> : <div>
-      <div className={styles.title}>
-        Learn how to build and deploy a model with our modelling workspace.
-        <br/>
-        If you're new to modelling, then start here.
-      </div>
-      {/*<div className={styles.title}>*/}
-      {/*description*/}
-      {/*</div>*/}
-
-      <div className={styles.navCards}>
-        {
-          algorithms.map((algorithm, cardIndex) =>
-            <MyCard key={algorithm.name}
-                    icon={Icons[cardIndex]} text={algorithm.name} style={{ marginRight: 50 }}
-                    onClick={() => handleClick()}/>,
-          )
-        }
-      </div>
+        <div className={styles.go_guide}>
+          {/*<Button onClick={() => props.dispatch({*/}
+            {/*type: props.namespace + '/setShowGuidance',*/}
+            {/*payload: {*/}
+              {/*showGuidance: false,*/}
+            {/*},*/}
+          {/*})}>*/}
+            {/*go to workspace*/}
+          {/*</Button>*/}
+        </div>
+      </div> :
+      <div>
+        <div className={styles.title}>
+          Learn how to build and deploy  a model with our modelling workspace.
+        <br/> If you're new to modelling, then
+          start here.
+        </div>
+        <div  className={styles.navCards}>
+          {
+            algorithms.map((algorithm,cardIndex)=>
+              <MyCard key={algorithm.name}
+                      icon={Icons[cardIndex]} text={algorithm.name} style={{marginRight: 50}}
+                      onClick={() => handleClick()}/>,
+            )
+          }
+        </div>
 
       <div className={styles.go_guide}>
         {/*<Button onClick={() => props.dispatch({*/}

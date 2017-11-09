@@ -8,7 +8,6 @@ import LearningCurve from '../../../../../../../../components/Charts/curve'
 class ResultButton extends Component {
   state = {
     onFocus: false,
-
     visible: false,
   }
 

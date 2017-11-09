@@ -32,11 +32,12 @@ class MySelection extends React.Component {
     })
   }
 
-  handleView = (oid, name, desc, tags) => {
+  handleView = (oid, name, desc, tags, field) => {
     this.props.dispatch({ type: 'upload/setDataSetID', payload: oid})
     this.props.dispatch({ type: 'upload/setDataSetName', payload: name})
     this.props.dispatch({ type: 'upload/setDataSetDesc', payload: desc})
     this.props.dispatch({ type: 'upload/setDataSetTags', payload: tags})
+    this.props.dispatch({ type: 'upload/setDataSetField', payload: field})
     this.props.dispatch({ type: 'upload/show' })
     // console.log(value)
   }
@@ -56,11 +57,12 @@ class MySelection extends React.Component {
     history.push(`/workspace/${match.params.projectID}/import/choice`)
   }
 
-  handleClickCard = (oid, name, desc, tags) => {
+  handleClickCard = (oid, name, desc, tags, field) => {
     this.props.dispatch({ type: 'upload/setDataSetID', payload: oid})
     this.props.dispatch({ type: 'upload/setDataSetName', payload: name})
     this.props.dispatch({ type: 'upload/setDataSetDesc', payload: desc})
     this.props.dispatch({ type: 'upload/setDataSetTags', payload: tags})
+    this.props.dispatch({ type: 'upload/setDataSetField', payload: field})
     this.props.dispatch({ type: 'upload/showStaged' })
   }
 
@@ -103,7 +105,7 @@ class MySelection extends React.Component {
 
         <div className={styles.buttons}>
           <Button size="large" className={styles.top} loading={this.props.upload.viewLoading}
-                  onClick={() => {this.handleView(e._id, e.name, e.description, e.tags)}} >
+                  onClick={() => {this.handleView(e._id, e.name, e.description, e.tags, e.related_field)}} >
             <Icon type="eye"/>View</Button>
           <Button size="large" className={styles.bottom} loading={this.props.upload.addLoading}
                   onClick={() => {this.handleAdd(e._id, e.name, e.description)}} >
@@ -112,9 +114,10 @@ class MySelection extends React.Component {
       </div>
     );
 
+
     const stagedCards = dataSets.map((e) =>
-      <div className={styles.mycard} key={e._id} onClick={() =>
-      {this.handleClickCard(e._id, e.name, e.description, e.tags)}}>
+      <div className={styles.mycard} style={{cursor:"pointer"}} key={e._id} onClick={() =>
+      {this.handleClickCard(e._id, e.name, e.description, e.tags, e.related_field)}}>
         <div className={styles.content}>
           <div className={styles.title}>{e.name}</div>
           <div className={styles.desc}>{e.description}</div>
@@ -124,7 +127,6 @@ class MySelection extends React.Component {
                 <span className={styles.tag}>{tag}</span></Tag>)}
             </div>:null }
         </div>
-
       </div>
     );
 

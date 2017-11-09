@@ -2,6 +2,7 @@ import React from 'react'
 import { Button, Table, Checkbox, Select, Modal, Icon, Spin, Tag } from 'antd'
 import { connect } from 'dva'
 import styles from './index.less'
+import DataModal from '../../components/DataModal'
 
 const Option = Select.Option;
 const confirm = Modal.confirm;
@@ -21,7 +22,6 @@ class DataPreview extends React.Component {
   }
 
   onCheck (event, e) {
-
 
     const sels = this.props.upload.selected
     if (event.target.checked) {
@@ -43,8 +43,23 @@ class DataPreview extends React.Component {
     }
   }
 
-  onDelete = () => {
-    console.log(this.props.upload.dataSet)
+  onDeleteStaged = () => {
+    const { dispatch } = this.props
+
+    confirm({
+      title: 'Are you sure to delete this staging dataset?',
+      content: 'The operation will permanently delete your staging dataset!',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+
+      onOk: () => {
+        return dispatch({ type: 'upload/delStaged'})
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
   }
 
   onSelect (value, e) {
@@ -89,11 +104,13 @@ class DataPreview extends React.Component {
   }
 
   handleLast = () => {
-    this.props.dispatch({type:'upload/showInTable', payload:true})
+    const tp = this.props.upload.showStaged ? 'sds' : 'ds'
+    this.props.dispatch({type:'upload/showInTable', payload:{page:-1, type: tp}})
   }
 
   handleFirst = () => {
-    this.props.dispatch({type:'upload/showInTable', payload:false})
+    const tp = this.props.upload.showStaged ? 'sds' : 'ds'
+    this.props.dispatch({type:'upload/showInTable', payload:{page:1, type: tp}})
   }
 
 
@@ -153,73 +170,80 @@ class DataPreview extends React.Component {
                   <span className={styles.tag}>{tag}</span></Tag>)}
               </div>:null }
           </div>
-          <div className={styles.cright}>
-            {this.props.upload.showStaged? <Button
-              icon="edit"/>:null}
-            {/*<Button icon="delete" onClick={this.onDelete}/>*/}
-          </div>
+          {this.props.upload.showStaged?
+            <div className={styles.cright}>
+              <DataModal>
+                <Button icon="edit"/>
+              </DataModal>
+              <Button icon="delete" onClick={this.onDeleteStaged}/>
+            </div>
+            :null}
         </div>
-        <div className={styles.whole}>
-          <div className={styles.info}>
-            <div className={styles.left}>
-            <p className={styles.title}>File Information</p>
-            <div className={styles.desc}>
-              <p>{dsColumns.length} columns, 5 rows for preview</p>
+        {this.props.upload.delLoading || this.props.upload.stagedLoading ? <Spin/> :
+          <div className={styles.whole}>
+            <div className={styles.info}>
+              <div className={styles.left}>
+                <p className={styles.title}>File Information</p>
+                <div className={styles.desc}>
+                  <p>{dsColumns.length} columns, 5 rows for preview</p>
+                </div>
+              </div>
+              <div className={styles.center}>
+              </div>
+              <div className={styles.right}>
+                {this.state.chk ? <Button
+                  className={styles.del}
+                  type="danger" onClick={() => {
+                  this.showDeleteConfirm()
+                }}>
+                  <Icon type="delete"/>Delete Columns
+                </Button> : null}
+              </div>
             </div>
-            </div>
-            <div className={styles.center}>
-            </div>
-            <div className={styles.right}>
-              {this.state.chk? <Button
-                className={styles.del}
-                type="danger" onClick={() => {this.showDeleteConfirm()}}>
-                <Icon type="delete"/>Delete Columns
-              </Button>:null}
-            </div>
-          </div>
 
-          <div>
-            {this.props.upload.delLoading?<Spin/>:
-              <Table style={{ marginTop: 5, width: '100%' }}
+            <div>
+
+              <Table style={{marginTop: 5, width: '100%'}}
                      dataSource={ds.map((e) => ({...e, key: e._id}))}
                      columns={old_col}
                      pagination={false}
                      bordered={true}
-                     scroll={{ x: this.getWidth(old_col), y: '100%' }}
+                     scroll={{x: this.getWidth(old_col), y: '100%'}}
               />
+
+            </div>
+
+            <div className={styles.page}>
+              <Button onClick={this.handleFirst}
+                      loading={this.props.upload.firstLoading}
+              ><Icon type="left"/>First 5 rows</Button>
+
+              <Button onClick={this.handleLast}
+                      loading={this.props.upload.lastLoading}
+              >Last 5 rows<Icon type="right"/></Button>
+            </div>
+            {this.props.upload.showStaged ?
+              <div className={styles.bottom}>
+                <Button type="primary" className={styles.btn}
+                        loading={this.props.upload.saveLoading}
+                        onClick={() => {
+                          this.onSaveStaged()
+                        }}>Save</Button>
+              </div>
+              :
+              <div className={styles.bottom}>
+                <Button type="primary" className={styles.btn}
+                        loading={this.props.upload.saveLoading}
+                        onClick={() => {
+                          this.onSave()
+                        }}>Save</Button>
+                <Button className={styles.btn}
+                        loading={this.props.upload.saveAddLoading}
+                        onClick={this.onSaveAdd}>Save & Add New</Button>
+              </div>
             }
           </div>
-
-          <div className={styles.page}>
-            <Button onClick={this.handleFirst}
-                    loading={this.props.upload.firstLoading}
-            ><Icon type="left"/>First 5 rows</Button>
-
-            <Button onClick={this.handleLast}
-                    loading={this.props.upload.lastLoading}
-            >Last 5 rows<Icon type="right"/></Button>
-          </div>
-          {this.props.upload.showStaged ?
-            <div className={styles.bottom}>
-              <Button type="primary" className={styles.btn}
-                      loading={this.props.upload.saveLoading}
-                      onClick={() => {
-                        this.onSaveStaged()
-                      }}>Save</Button>
-            </div>
-            :
-            <div className={styles.bottom}>
-              <Button type="primary" className={styles.btn}
-                      loading={this.props.upload.saveLoading}
-                      onClick={() => {
-                        this.onSave()
-                      }}>Save</Button>
-              <Button className={styles.btn}
-                      loading={this.props.upload.saveAddLoading}
-                      onClick={this.onSaveAdd}>Save & Add New</Button>
-            </div>
-          }
-        </div>
+        }
       </div>
     )
   }
