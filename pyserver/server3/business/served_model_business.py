@@ -44,9 +44,8 @@ def add(name, description, input_info, output_info, examples, version,
         model_base_path, job, service_name, model_name,
         related_fields,
         related_tasks,
-        tags, is_private,  data_fields,
+        tags, is_private, data_fields,
         input_data_demo_string, create_time, user, **optional):
-
     print('data_fields')
     print(data_fields)
 
@@ -119,11 +118,12 @@ def terminate_by_id(oid):
 
 
 def get_by_four_querys(related_fields=None, related_tasks=None, tags=None,
-                       privacy=None):
+                       privacy=None, skipping=None):
     return served_model_repo.query_four(related_fields=related_fields,
                                         related_tasks=related_tasks,
-                                        tags=tags,
+                                        tags=tags, skipping=skipping,
                                         privacy=privacy)
+
 
 # def suspend_by_id(oid):
 #     p = get_process_by_id(oid)

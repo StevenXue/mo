@@ -431,7 +431,7 @@ def list_served_models_by_user_ID(user_ID, order=-1):
     return public_sm, owned_sm
 
 
-def list_all_served_models(category):
+def list_all_served_models(category, skipping):
     """
 
     :param category:
@@ -439,12 +439,13 @@ def list_all_served_models(category):
     """
 
     public_all = served_model_business.get_by_four_querys(privacy=False,
-                                                          related_fields=category)
+                                                          related_fields=category,
+                                                          skipping=skipping)
     # public_all = [each_model.to_mongo() for each_model in public_all]
     # print(public_all)
     public_all = json_utility.me_obj_list_to_json_list(
         public_all)
-    # print(public_all)
+    print(public_all)
     # myyy = [a['_id'] for a in public_all]
     # print(myyy)
     # print(public_all)

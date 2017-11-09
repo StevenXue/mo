@@ -1,13 +1,14 @@
+import {request, config} from '../utils';
 
-import { request, config } from '../utils';
-
-const { CORS, api } = config
+const {CORS, api} = config
 
 // 获取所有 public deployed models
 export function fetchAllPublicServedModels(payload) {
-  if (payload.privacy === 'public'){
-    payload.privacy = false}
-  return request(`${CORS}/served_model/served_models?privacy=${payload.privacy}&category=${payload.category}`);
+  if (payload.privacy === 'public') {
+    payload.privacy = false
+  }
+  return request(`${CORS}/served_model/served_models?privacy=${payload.privacy}
+  &category=${payload.category}&skipping=${payload.skipping}`);
 }
 
 

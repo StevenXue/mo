@@ -20,7 +20,8 @@ function PublicServedModels({history, publicServedModels, dispatch}) {
 
   const {
     modelsJson,
-    focusModelId,
+    focusModel,
+    category
   } = publicServedModels;
 
   const models = JsonToArray(modelsJson);
@@ -29,6 +30,13 @@ function PublicServedModels({history, publicServedModels, dispatch}) {
     dispatch({type: 'publicServedModels/fetch',
       payload: {category: value}})
   }
+
+  const onClickMoreModels = () => {
+    dispatch({
+      type: 'publicServedModels/fetch',
+      payload: {category: category},
+    });
+  };
 
   function toModelDetail(_id, projectId, history) {
     dispatch({type: 'publicServedModels/fetchone',
@@ -63,6 +71,9 @@ function PublicServedModels({history, publicServedModels, dispatch}) {
           </Card>)}
         {/*{project.projects.public_projects.map(e => e.name)}*/}
       </div>
+      <div>
+      <Button type="primary"
+              onClick={() => onClickMoreModels()}>More</Button></div>
     </div>
   )
 }

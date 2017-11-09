@@ -36,7 +36,7 @@ def update_deploy_info(served_model_id):
 
     served_model = served_model_service.update_db(served_model_id, name,
                                                   description, input_info,
-                                                  output_info,  examples)
+                                                  output_info, examples)
     if not served_model:
         return jsonify({'response': 'updated'}), 200
     served_model = json_utility.convert_to_json(served_model.to_mongo())
@@ -68,13 +68,13 @@ def first_deploy(job_id):
                                                      output_info,
                                                      examples, server,
                                                      input_type, model_name,
-                                                     projectId,is_private=False,
+                                                     projectId,
+                                                     is_private=False,
                                                      **data)
     if not served_model:
         return jsonify({'response': 'already deployed'}), 400
     served_model = json_utility.convert_to_json(served_model.to_mongo())
     return jsonify({'response': served_model})
-
 
 
 @served_model_app.route('/<string:oid>', methods=['DELETE'])
@@ -88,10 +88,12 @@ def list_served_models():
     user_ID = request.args.get('user_ID')
     category = request.args.get('category')
     model_ID = request.args.get('model_ID')
+    skipping = request.args.get('skipping')
     print('model_ID', model_ID)
     if user_ID:
         public_served_models, owned_served_models = \
-            served_model_service.list_served_models_by_user_ID(user_ID, order=-1)
+            served_model_service.list_served_models_by_user_ID(user_ID,
+                                                               order=-1)
         public_served_models = json_utility.me_obj_list_to_json_list(
             public_served_models)
         owned_served_models = json_utility.me_obj_list_to_json_list(
@@ -106,8 +108,11 @@ def list_served_models():
 
         return jsonify({'response': model})
     else:
-        all_public_served_models = served_model_service.list_all_served_models(category)
+        all_public_served_models = served_model_service.list_all_served_models(
+            category, skipping)
         return jsonify({'response': all_public_served_models})
+
+
 # @served_model_app.route('/suspend/<string:oid>', methods=['PUT'])
 # def suspend_served_model(oid):
 #     if served_model_business.suspend_by_id(oid):
@@ -143,7 +148,8 @@ def get_prediction(oid):
     model_name = data.pop('model_name')
     input_value = data.pop('input_value')
     features = data.pop('features')
-    result = served_model_service.get_prediction_by_id(server, model_name, input_value,features)
+    result = served_model_service.get_prediction_by_id(server, model_name,
+                                                       input_value, features)
     if result:
         return jsonify({'response': {'result': result}})
     else:

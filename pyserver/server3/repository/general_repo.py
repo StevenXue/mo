@@ -31,7 +31,8 @@ class Repo:
     def read(self, query):
         return self.__instance.objects(**query)
 
-    def query_four(self, related_fields=None, related_tasks=None, tags=None, privacy=None):
+    def query_four(self, related_fields=None, related_tasks=None,
+                   tags=None, privacy=None, skipping=None):
         query = {}
         if related_fields != 'All':
             query["related_fields"] = related_fields
@@ -42,7 +43,12 @@ class Repo:
         if privacy:
             query['privacy'] = privacy
         print('query', query)
-        return self.__instance.objects(**query)
+        if skipping:
+            print('skipping:', skipping)
+            return self.__instance.objects(**query).order_by('-_id')[
+                   int(skipping):int(skipping) + 1]
+        else:
+            return self.__instance.objects(**query).order_by('-_id')
 
     def read_first_one(self, query):
         return self.__instance.objects(**query).first()
