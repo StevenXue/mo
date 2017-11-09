@@ -138,3 +138,13 @@ export function deleteStagedDataColumns(id, cols) {
     body: JSON.stringify({'fields': cols})
   })
 }
+
+
+// delete staging dataset
+export async function deleteStagingDataSet(sdsid) {
+
+  let query = `/${sdsid}`;
+  return request(CORS + getStagingData + query, {
+    method: 'delete',
+  })
+}

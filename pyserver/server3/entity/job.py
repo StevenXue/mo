@@ -16,6 +16,7 @@ from mongoengine import IntField
 from mongoengine import DateTimeField
 from mongoengine import DictField
 from mongoengine import CASCADE
+from mongoengine import NULLIFY
 
 # from server3.entity import StagingDataSet
 # from server3.entity import Toolkit
@@ -23,10 +24,10 @@ from mongoengine import CASCADE
 # from server3.entity import Project
 
 STATUS = (
-    (0, 'start'),
-    (100, 'processing'),
+    (0, 'ready'),
+    (100, 'running'),
     (200, 'completed'),
-    (300, 'interrupted')
+    (300, 'error')
 )
 
 
@@ -45,5 +46,5 @@ class Job(DynamicDocument):
     steps = ListField(DictField())
     active_steps = ListField(default=['0'])
     visual_sds_id = ReferenceField('StagingDataSet')
-    served_model = ReferenceField('ServedModel')
+    served_model = ReferenceField('ServedModel', reverse_delete_rule=NULLIFY)
     result = DictField()

@@ -1,15 +1,15 @@
-import fetch from 'dva/fetch';
-import { message } from 'antd';
-
+import fetch from 'dva/fetch'
+import { message } from 'antd'
 
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
     // message.success('This is a message of success');
-    return response;
+    return response
   }
-  // message.error('This is a message of error');
-  const error = new Error(response.statusText);
-  error.response = response;
+  const error = new Error(response.statusText)
+  error.response = response
+  message.error('This is a message of error: ' + response.statusText)
+
   // throw error;
 }
 
@@ -21,29 +21,29 @@ function checkStatus(response) {
  * @return {object}           An object containing either "data" or "err"
  */
 export default async function request(url, options) {
-  const response = await fetch(url, options);
+  const response = await fetch(url, options)
 
-  checkStatus(response);
+  checkStatus(response)
 
-  const data = await response.json();
+  const data = await response.json()
 
   const ret = {
     data: data.response,
     headers: {},
-  };
-
-  if (response.headers.get('x-total-count')) {
-    ret.headers['x-total-count'] = response.headers.get('x-total-count');
   }
 
-  return ret;
+  if (response.headers.get('x-total-count')) {
+    ret.headers['x-total-count'] = response.headers.get('x-total-count')
+  }
+
+  return ret
 }
 
 export async function org_request(url, options) {
-  const response = await fetch(url, options);
+  const response = await fetch(url, options)
 
-  checkStatus(response);
+  checkStatus(response)
 
-  return await response.json();
+  return await response.json()
 
 }

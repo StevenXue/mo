@@ -1,53 +1,116 @@
-.form {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin: -160px 0 0 -160px;
-  width: 320px;
-  height: 320px;
-  padding: 36px;
-  background-color: #ffffff;
-  border-radius: 4px;
-  //box-shadow: 0 0 100px rgba(0,0,0,.08);
+@import "~antd/lib/style/themes/default.less";
 
-  button {
-    width: 100%;
+.main {
+  width: 368px;
+  margin: 0 auto;
+
+  .input {
+    //height: 52px;
   }
 
-  p {
-    color: rgb(204, 204, 204);
-    text-align: center;
-    margin-top: 16px;
-
-    span {
-      &:first-child {
-        margin-right: 16px;
+  .tabs {
+    padding: 0 2px;
+    margin: 0 -2px;
+    :global {
+      .ant-tabs-tab {
+        font-size: 16px;
+        line-height: 24px;
+      }
+      .ant-input-affix-wrapper .ant-input:not(:first-child) {
+        padding-left: 34px;
       }
     }
   }
-}
 
-.logo {
-  text-align: center;
-  height: 40px;
-  line-height: 40px;
-  cursor: pointer;
-  margin-bottom: 24px;
+  :global {
+    .ant-tabs .ant-tabs-bar {
+      border-bottom: 0;
+      margin-bottom: 24px;
+      text-align: center;
+    }
 
-  img {
-    width: 40px;
-    margin-right: 8px;
+    .ant-form-item {
+      margin-bottom: 10px;
+    }
   }
 
-  span {
-    vertical-align: text-bottom;
-    /*font-size: 16px;*/
-    text-transform: uppercase;
+  .prefixIcon {
+    font-size: @font-size-base;
+    color: @disabled-color;
+  }
+
+  .getCaptcha {
+    display: block;
+    width: 100%;
+  }
+
+  .additional {
+    //display: flex;
+    //align-items: center;
+    //justify-content: space-between;
+    text-align: left;
+    vertical-align: bottom;
+    //line-height: 44px;
+
+    .forgot {
+      line-height: 32px;
+      float: right;
+    }
+
+    .submit {
+      //height: 44px;
+      width: 131px;
+      //margin-top: 24px;
+    }
+
+    :global {
+      .ant-form-item-control {
+        line-height: 22px;
+      }
+    }
+  }
+
+  .iconAlipay, .iconTaobao, .iconWeibo {
     display: inline-block;
+    width: 24px;
+    height: 24px;
+    background: url('https://gw.alipayobjects.com/zos/rmsportal/itDzjUnkelhQNsycranf.svg');
+    margin-left: 16px;
+    vertical-align: middle;
+    cursor: pointer;
   }
-}
 
-.ant-spin-container,
-.ant-spin-nested-loading {
-  height: 100%;
+  .iconAlipay {
+    background-position: -24px 0;
+
+    &:hover {
+      background-position: 0 0;
+    }
+  }
+
+  .iconTaobao {
+    background-position: -24px -24px;
+
+    &:hover {
+      background-position: 0 -24px;
+    }
+  }
+
+  .iconWeibo {
+    background-position: -24px -48px;
+
+    &:hover {
+      background-position: 0 -48px;
+    }
+  }
+
+  .other {
+    text-align: left;
+    margin-top: 24px;
+    line-height: 22px;
+
+    .register {
+      float: right;
+    }
+  }
 }

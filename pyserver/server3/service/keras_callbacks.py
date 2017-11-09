@@ -163,7 +163,7 @@ class MyModelCheckpoint(Callback):
         self.epochs_since_last_save += 1
         if self.epochs_since_last_save >= self.period:
             self.epochs_since_last_save = 0
-            filepath = self.filepath#.format(epoch=epoch, **logs)
+            filepath = self.filepath
             if self.save_best_only:
                 current = logs.get(self.monitor)
                 if current is None:
@@ -178,12 +178,9 @@ class MyModelCheckpoint(Callback):
                                      current, filepath))
                         self.best = current
                         if self.save_weights_only:
-                            self.model.save_weights(filepath[1],
-                                                    overwrite=True)
-                            # shutil.move(filepath[0], filepath[1])
+                            self.model.save_weights(filepath, overwrite=True)
                         else:
-                            self.model.save(filepath[1], overwrite=True)
-                            # shutil.move(filepath[0], filepath[1])
+                            self.model.save(filepath, overwrite=True)
                     else:
                         if self.verbose > 0:
                             print('Epoch %05d: %s did not improve' %
@@ -192,9 +189,7 @@ class MyModelCheckpoint(Callback):
                 if self.verbose > 0:
                     print('Epoch %05d: saving model to %s' % (epoch, filepath))
                 if self.save_weights_only:
-                    self.model.save_weights(filepath[1], overwrite=True)
-                    # shutil.move(filepath[0], filepath[1])
+                    self.model.save_weights(filepath, overwrite=True)
                 else:
-                    self.model.save(filepath[1], overwrite=True)
-                    # shutil.move(filepath[0], filepath[1])
+                    self.model.save(filepath, overwrite=True)
 

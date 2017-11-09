@@ -54,6 +54,17 @@ export default {
 
   },
   reducers: {
+    setStatus(state, action) {
+      console.log('status', action)
+      const { sectionId, status } = action.payload
+      let sections = state.sectionsJson
+      sections[sectionId].status = status
+      return {
+        ...state,
+        sectionsJson: sections
+      }
+    },
+
     hideResult(state, action) {
       return {
         ...state,
@@ -607,8 +618,15 @@ export default {
           loading: true,
         },
       })
+      yield put({
+        type: 'setStatus', payload: {
+          sectionId,
+          status: 100,
+        },
+      })
 
       const { namespace, sectionId } = action.payload
+
       // 先把 save section 复制过来
       const sectionsJson = yield select(state => state[namespace].sectionsJson)
       const section = sectionsJson[sectionId]

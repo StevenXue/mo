@@ -144,52 +144,46 @@ PARAMETER_SPEC = [
 ]
 
 
+general_spec = {
+        'name': None,
+        'display_name': None,
+        'type': 'input',
+        'value_type': 'int',
+        'range': None,  #[2, None],
+        "default": None,
+        "required": False,
+    }
+
+
 class SPEC(object):
     value_type = ['int', 'float', 'str']
     ui_spec = {
         'input': {
-            'name': None,
-            'display_name': None,
-            'type': 'input',
-            'value_type': 'int',
-            'range': None,  #[2, None],
-
-            "default": None,
-            "required": False,
+            **general_spec,
             'value': None,
         },
 
         "multiple_input": {
-            'name': None,
-            'display_name': None,
+            **general_spec,
             "type": "multiple_input",
-            'value_type': 'int',
             'range': [2, None],
             "len_range": None,
-
-            "default": None,
-            "required": False,
             'values': [],
         },
 
         "choice": {
-            'name': None,
-            'display_name': None,
+            **general_spec,
             "type": "choice",
             "range": [
                 "aa",
                 "bb",
                 "cc",
             ],
-
-            "default": None,
-            "required": False,
             'value': None,
         },
 
         "multiple_choice": {
-            'name': None,
-            'display_name': None,
+            **general_spec,
             "type": "multiple_choice",
             "range": [
                 "aa",
@@ -197,9 +191,6 @@ class SPEC(object):
                 "cc",
             ],
             "len_range": None,
-
-            "default": None,
-            "required": False,
             'values': [],
         },
 
