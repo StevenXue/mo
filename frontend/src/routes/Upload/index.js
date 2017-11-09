@@ -102,7 +102,7 @@ class UploadData extends Component {
           >
             {
               getFieldDecorator('description', {
-                initialValue: name,
+                // initialValue: name,
                 rules: [
                   { required: true, message: 'Please enter description' },
                 ],

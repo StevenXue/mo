@@ -27,6 +27,7 @@ export default {
     dataSetName: '',
     dataSetDesc: '',
     dataSetTags: [],
+    dataSetField: '',
 
     sdsNames: [],
 
@@ -35,6 +36,9 @@ export default {
     pageSize: 4,
 
     showStaged: false,
+
+    modalVisible: false,
+    editLoading: false,
 
     dataSetsLoading: false,
     viewLoading: false,
@@ -318,6 +322,23 @@ export default {
       }
 
     },
+    * editStaged({payload}, { put, call, select }) {
+      yield put({type: 'setEditLoading', payload:true})
+      const sdsid = yield select(state => state.upload.dataSetID)
+      const {name, description} = payload
+      const field = payload.related_field
+      const tags = payload.tags
+      const res = yield call(updateStagingDataSet,
+        sdsid, name, description, tags, field)
+      console.log(res)
+      yield put({type: 'setEditLoading', payload:false})
+      yield put({type: 'hideModal'})
+      yield put({type: 'setDataSetName', payload:name})
+      yield put({type: 'setDataSetDesc', payload:description})
+      yield put({type: 'setDataSetTags', payload:tags.split(',')})
+
+    },
+
 
   },
 
@@ -509,6 +530,29 @@ export default {
         stagedLoading
       }
     },
+
+    showModal(state) {
+      return { ...state, modalVisible: true }
+    },
+
+    hideModal(state) {
+      return { ...state, modalVisible: false }
+    },
+
+    setEditLoading(state, {payload: editLoading}) {
+      return {
+        ...state,
+        editLoading
+      }
+    },
+
+    setDataSetField(state, {payload: dataSetField}) {
+      return {
+        ...state,
+        dataSetField
+      }
+    },
+
   },
 
 }
