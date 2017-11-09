@@ -11,13 +11,16 @@ import MyProjects from './routes/workspace/info/Projects'
 import Projects from './routes/projects/Projects'
 import ProjectDetail from './routes/workspace/info/ProjectDetail'
 import MainLayout from './components/MainLayout/MainLayout'
+import PublicServedModels from  './routes/DeployedModels/ModelsList'
+import  PublicServedModelsDetail from  './routes/DeployedModels/ModelsDetail'
+
 const breadcrumbNameMap = {
   '/user': 'User',
   '/user/login': 'Login',
   '/user/register': 'Register',
   '/workspace': 'My Projects',
   '/projects': 'Projects',
-  '/deployed_models': 'Deployed Models',
+  '/modelmarkets': 'Model Markets',
 }
 
 const RouterConfig = ({ history, location, projectDetail }) => {
@@ -61,6 +64,8 @@ const RouterConfig = ({ history, location, projectDetail }) => {
           <Route path="/workspace/:projectId" component={ProjectDetail}/>
           <Route path="/workspace" component={MyProjects}/>
           <Route path="/projects" component={Projects}/>
+          <Route path="/modelmarkets/:modelsId" component={PublicServedModelsDetail}/>
+          <Route path="/modelmarkets" component={PublicServedModels}/>
         </Switch>
       </div>
     </MainLayout>

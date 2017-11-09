@@ -15,7 +15,6 @@
 # from minepy import MINE
 
 from bson import ObjectId
-
 # from lib import model_orig
 from server3.entity.model import Model
 from server3.repository.model_repo import ModelRepo

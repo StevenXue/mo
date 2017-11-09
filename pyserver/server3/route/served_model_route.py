@@ -58,6 +58,7 @@ def first_deploy(job_id):
     output_info = data.pop('deployOutput')
     examples = data.pop('deployExamples')
     model_name = data.pop('model_name')
+    projectId = data.pop('projectId')
     server = '10.52.14.182:9000'
     # 用户提供 or 从数据库 训练的dataset中 获取
     #
@@ -67,6 +68,8 @@ def first_deploy(job_id):
                                                      output_info,
                                                      examples, server,
                                                      input_type, model_name,
+                                                     projectId,
+                                                     is_private=False,
                                                      **data)
     if not served_model:
         return jsonify({'response': 'already deployed'}), 400
@@ -81,22 +84,33 @@ def delete_served_model(oid):
 
 
 @served_model_app.route('/served_models', methods=['GET'])
-def list_served_models_by_user_ID():
+def list_served_models():
     user_ID = request.args.get('user_ID')
-    if not user_ID:
-        return jsonify({'response': 'insufficient args'}), 400
+    category = request.args.get('category')
+    model_ID = request.args.get('model_ID')
+    skipping = request.args.get('skipping')
+    print('model_ID', model_ID)
+    if user_ID:
+        public_served_models, owned_served_models = \
+            served_model_service.list_served_models_by_user_ID(user_ID,
+                                                               order=-1)
+        public_served_models = json_utility.me_obj_list_to_json_list(
+            public_served_models)
+        owned_served_models = json_utility.me_obj_list_to_json_list(
+            owned_served_models)
+        result = {
+            'public_served_models': public_served_models,
+            'owned_served_models': owned_served_models
+        }
+        return jsonify({'response': result})
+    elif model_ID:
+        model = served_model_service.get_by_model_id(model_ID)
 
-    public_served_models, owned_served_models = \
-        served_model_service.list_served_models_by_user_ID(user_ID, order=-1)
-    public_served_models = json_utility.me_obj_list_to_json_list(
-        public_served_models)
-    owned_served_models = json_utility.me_obj_list_to_json_list(
-        owned_served_models)
-    result = {
-        'public_served_models': public_served_models,
-        'owned_served_models': owned_served_models
-    }
-    return jsonify({'response': result})
+        return jsonify({'response': model})
+    else:
+        all_public_served_models = served_model_service.list_all_served_models(
+            category, skipping)
+        return jsonify({'response': all_public_served_models})
 
 
 # @served_model_app.route('/suspend/<string:oid>', methods=['PUT'])

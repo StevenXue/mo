@@ -22,6 +22,14 @@ api = kube_service.deployment_api
 options = kube_service.options
 
 
+def get_by_privacy(privacy):
+    return served_model_repo.read(query={'private': privacy})
+
+
+def get_by_category(category):
+    return served_model_repo.read(query={'category': category})
+
+
 def get_by_id(model_obj):
     return served_model_repo.read_by_id(model_obj)
 
@@ -33,7 +41,17 @@ def get_by_job(job):
 def add(name, description, input_info, output_info, examples, version,
         deploy_name, server,
         input_type,
-        model_base_path, job, service_name, model_name, **optional):
+        model_base_path, job, service_name, model_name,
+        related_fields,
+        related_tasks,
+        tags, is_private, data_fields,
+        input_data_demo_string, create_time, user, **optional):
+    print('data_fields')
+    print(data_fields)
+
+    print('input_data_demo_string')
+    print(input_data_demo_string)
+
     model = ServedModel(name=name, description=description,
                         input_info=input_info,
                         output_info=output_info,
@@ -42,7 +60,17 @@ def add(name, description, input_info, output_info, examples, version,
                         server=server,
                         input_type=input_type,
                         model_base_path=model_base_path, job=job,
-                        service_name=service_name,model_name=model_name, **optional)
+                        service_name=service_name,
+                        model_name=model_name,
+                        related_fields=related_fields,
+                        related_tasks=related_tasks,
+                        tags=tags, private=is_private,
+                        data_fields=data_fields,
+                        input_data_demo_string=input_data_demo_string,
+                        create_time=create_time,
+                        user=user,
+                        **optional)
+
     return served_model_repo.create(model)
 
 
@@ -87,6 +115,14 @@ def terminate_by_id(oid):
     served_model = get_by_id(oid)
     api.delete_namespaced_deployment(served_model.deploy_name,
                                      NAMESPACE, options)
+
+
+def get_by_four_querys(related_fields=None, related_tasks=None, tags=None,
+                       privacy=None, skipping=None):
+    return served_model_repo.query_four(related_fields=related_fields,
+                                        related_tasks=related_tasks,
+                                        tags=tags, skipping=skipping,
+                                        privacy=privacy)
 
 
 # def suspend_by_id(oid):
