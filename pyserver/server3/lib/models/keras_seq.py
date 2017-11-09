@@ -36,6 +36,7 @@ def keras_seq(conf, input, **kw):
         raise RuntimeError('no result sds id passed to model')
     if project_id is None:
         raise RuntimeError('no project id passed to model')
+
     with graph.as_default():
         model = Sequential()
 
@@ -49,6 +50,12 @@ def keras_seq(conf, input, **kw):
         y_val = input['y_te']
         x_test = input['x_te']
         y_test = input['y_te']
+
+        training_logger = logger_service.TrainingLogger(f['args']['epochs'],
+                                                        project_id,
+                                                        job_id,
+                                                        user_ID,
+                                                        result_sds)
 
         # TODO add validator
         # op = comp['optimizer']
@@ -71,40 +78,26 @@ def keras_seq(conf, input, **kw):
         # callback to save metrics
         batch_print_callback = LambdaCallback(on_epoch_begin=
                                               lambda epoch, logs:
-                                              logger_service.log_epoch_begin(
-                                                  epoch, logs,
-                                                  result_sds,
-                                                  project_id,
-                                                  job_id=job_id,
-                                                  user_ID=user_ID),
+                                              training_logger.log_epoch_begin(
+                                                  epoch, logs),
                                               on_epoch_end=
                                               lambda epoch, logs:
-                                              logger_service.log_epoch_end(
-                                                  epoch, logs,
-                                                  result_sds,
-                                                  project_id,
-                                                  job_id=job_id,
-                                                  user_ID=user_ID),
+                                              training_logger.log_epoch_end(
+                                                  epoch, logs),
                                               on_batch_end=
                                               lambda batch, logs:
-                                              logger_service.log_batch_end(
-                                                  batch, logs,
-                                                  result_sds,
-                                                  project_id,
-                                                  job_id=job_id,
-                                                  user_ID=user_ID)
+                                              training_logger.log_batch_end(
+                                                  batch, logs)
                                               )
 
         # checkpoint to save best weight
         best_checkpoint = MyModelCheckpoint(
-            ['/pyserver/best.hdf5',
-             os.path.abspath(os.path.join(result_dir, 'best.hdf5'))],
+            os.path.abspath(os.path.join(result_dir, 'best.hdf5')),
             save_weights_only=True,
             verbose=1, save_best_only=True)
         # checkpoint to save latest weight
         general_checkpoint = MyModelCheckpoint(
-            ['/pyserver/latest.hdf5', os.path.abspath(os.path.join(result_dir,
-                                                                   'latest.hdf5'))],
+            os.path.abspath(os.path.join(result_dir, 'latest.hdf5')),
             save_weights_only=True,
             verbose=1)
 

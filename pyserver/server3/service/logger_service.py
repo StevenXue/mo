@@ -11,7 +11,7 @@ socketio = SocketIO(message_queue=REDIS_SERVER)
 epoch = 0
 
 
-class TrainingLogger():
+class TrainingLogger:
     step = 0
 
     def __init__(self, total_steps, project_id, job_id, user_ID, result_sds):
@@ -20,6 +20,22 @@ class TrainingLogger():
         self.job_id = job_id
         self.user_ID = user_ID
         self.result_sds = result_sds
+
+    def log_epoch_begin(self, n, logs):
+        self.step = n
+
+    def log_epoch_end(self, n, logs):
+        save_log('epoch', n, logs, self.result_sds, self.project_id)
+        emit_log('epoch', n, logs, self.project_id, self.job_id,
+                 self.user_ID, self.total_steps)
+
+    def log_batch_end(self, n, logs):
+        batch = 'Epoch: {}, Batch: {}'.format(self.step, n)
+        emit_message({"batch": batch}, self.project_id, self.job_id,
+                     self.user_ID)
+
+    def log_train_end(self, **results):
+        save_result(self.result_sds, **results)
 
 
 def log_epoch_begin(*args, **kw):
@@ -41,26 +57,20 @@ def log_batch_end(*args, **kw):
     emit_message({"batch": batch}, project_id, **kw)
 
 
-def log_train_end(*args, **kw):
-    save_result(*args, **kw)
+def log_train_end(*args, **results):
+    save_result(*args, **results)
     # emit_result(*args, **kw)
 
 
-def emit_log(event, n, logs, result_sds, project_id, **kwargs):
-    job_id = kwargs.get('job_id')
-    user_ID = kwargs.get('user_ID')
-    kw = {'n': n, 'event': event, 'project_id': project_id, 'job_id': job_id}
+def emit_log(event, n, logs, project_id, job_id=None, user_ID=None,
+             total_steps=1):
+    kw = {'n': n, 'event': event, 'project_id': project_id, 'job_id': job_id,
+          'total_steps': total_steps}
     kw.update(logs)
     socketio.emit('log_epoch_end', kw, namespace='/log/%s' % user_ID)
 
 
-# def emit_log(event, n, logs, result_sds, project_id):
-#     eventlet.spawn_n(emit_log_fn, event, n, logs, result_sds, project_id)
-
-
-def emit_message(message, project_id, **kw):
-    job_id = kw.get('job_id')
-    user_ID = kw.get('user_ID')
+def emit_message(message, project_id, job_id=None, user_ID=None):
     message.update({'job_id': job_id, 'project_id': project_id})
     socketio.emit('log_epoch_end', message, namespace='/log/%s' % user_ID)
 
@@ -81,10 +91,6 @@ def emit_success(message, project_id, **kw):
 
 def emit_message_url(message, project_id):
     socketio.emit('send_message', message, namespace='/log/%s' % project_id)
-
-
-# def emit_message(message, project_id):
-#     eventlet.spawn_n(emit_message_fn, message, project_id)
 
 
 def save_log(event, n, logs, result_sds, project_id, **kw):

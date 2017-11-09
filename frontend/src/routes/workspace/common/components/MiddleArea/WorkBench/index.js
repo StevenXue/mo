@@ -59,6 +59,7 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
   const {
     _id: sectionId,
     steps,
+    percent,
     active_steps,
     [translateDict[namespace]]: {
       steps: baseSteps,
@@ -632,12 +633,15 @@ function WorkBench({ section, model, dispatch, namespace, preview }) {
     )
   }
 
+  console.log('percent', percent)
   return (
     <div>
       <ToolBar sectionId={sectionId} {...{ model, dispatch, namespace }}/>
       {
         namespace === 'modelling' &&
-        <Progress percent={50} status="active" />
+        <div style={{ width: '98%', margin: 'auto' }}>
+          <Progress percent={percent} />
+        </div>
       }
       <div className={`${styles.container} my-collapse-arrow`}>
         <Collapse className={styles.collapse}

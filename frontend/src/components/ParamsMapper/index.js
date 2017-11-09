@@ -1,5 +1,5 @@
 import React from 'react'
-import {Form, Button, Select, Input, Tooltip, Icon} from 'antd'
+import { Form, Button, Select, Input, Tooltip, Icon } from 'antd'
 import styles from './index.less'
 
 const FormItem = Form.Item
@@ -17,6 +17,7 @@ function getArgs(baseSteps, stepIndex, argIndex) {
 const valueParser = {
   int: (e) => parseInt(e),
   float: (e) => parseFloat(e),
+  bool: (e) => e.toLowerCase() === 'true',
   str: (e) => (e),
 }
 
@@ -51,7 +52,7 @@ const splitHandler = (e, type, valueType) => {
         try {
           return splitValue.map(e => {
             let parsed = valueParser[valueType](e)
-            if(isNaN(parsed) || String(parsed) !== e) {
+            if (isNaN(parsed) || String(parsed).toLowerCase() !== e.toLowerCase()) {
               return e
             } else {
               return parsed
@@ -64,12 +65,13 @@ const splitHandler = (e, type, valueType) => {
     case 'input':
       try {
         let parsed = valueParser[valueType](e.target.value)
-        if(isNaN(parsed) || String(parsed) !== e.target.value) {
+        if (isNaN(parsed) || String(parsed).toLowerCase() !== e.target.value.toLowerCase()) {
           return e.target.value
         } else {
           return parsed
         }
       } catch (err) {
+        console.log(err, e.target.value)
         return e.target.value
       }
     default:
@@ -86,7 +88,7 @@ const switchComponent = (arg, baseArg) => {
 
     case 'choice':
       return (
-        <Select style={{width: 142}}>
+        <Select style={{ width: 142 }}>
           {
             arg.range.map((option) =>
               <Select.Option value={option} key={option}>{option}</Select.Option>,
@@ -97,7 +99,7 @@ const switchComponent = (arg, baseArg) => {
 
     case 'multiple_choice':
       return (
-        <Select style={{width: 142}} mode='multiple'>
+        <Select style={{ width: 142 }} mode='multiple'>
           {
             arg.range.map((option) =>
               <Select.Option value={option} key={option}>{option}</Select.Option>,
@@ -112,7 +114,7 @@ const switchComponent = (arg, baseArg) => {
 
 const formItems = (arg, i, getFieldDecorator, baseArg) => {
 
-  let v;
+  let v
   if (arg.value || (arg.values && arg.values.length > 0)) {
     v = arg.value || arg.values
   }
@@ -176,11 +178,11 @@ function ParamsMapper({
   )
 }
 
-const handleValuesChange = ({setValue}, values) => {
+const handleValuesChange = ({ setValue }, values) => {
   setValue(values)
 }
 
-export default Form.create({onValuesChange: (props, values) => handleValuesChange(props, values)})(ParamsMapper)
+export default Form.create({ onValuesChange: (props, values) => handleValuesChange(props, values) })(ParamsMapper)
 export {
-  formItems
+  formItems,
 }

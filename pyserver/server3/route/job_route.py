@@ -112,11 +112,13 @@ def run_job():
     try:
         if job_obj.toolkit:
             type = 'toolkit'
+            complete = True
             content = 'Toolkit job completed in project ' + project.name
             result = job_service.run_toolkit_job(project_id=project_id,
                                                  job_obj=job_obj)
         elif job_obj.model:
             type = 'model'
+            complete = False
             content = 'Model job successfully created in project ' + \
                       project.name
             result = job_service.run_model_job(project_id=project_id,
@@ -144,6 +146,7 @@ def run_job():
         message = {
             'project_name': project.name,
             'type': type,
+            'complete': complete,
             'content': content
         }
         emit_success(message, str(project_id), job_id=job_id,

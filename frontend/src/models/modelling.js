@@ -45,9 +45,6 @@ const modelling = modelExtend(workBench, {
           sectionsJson[modelKey]['metrics_status'] = metrics
         }
 
-
-
-
         return {
           ...state,
           sectionsJson: sectionsJson,
@@ -79,14 +76,6 @@ const modelling = modelExtend(workBench, {
         'val_loss': [],
       }
 
-      // if(sectionsJson[sectionId].messages && sectionsJson[sectionId].messages.find(e => isEqual(e, msg))) {
-      //   console.log('message')
-      //   return {
-      //     ...state,
-      //     sectionsJson,
-      //   }
-      // }
-
       if (sectionsJson[sectionId].metrics_status) {
         for (let metric in metrics) {
           if (msg[metric] !== undefined) {
@@ -113,19 +102,15 @@ const modelling = modelExtend(workBench, {
       }
 
       // receive batch
-      if(msg.batch) {
+      if (msg.batch) {
         sectionsJson[sectionId].batch = msg.batch
       }
 
-      // // record messages and prevent duplicate
-      // if(msg) {
-      //   if(!sectionsJson[sectionId].messages) {
-      //     sectionsJson[sectionId].messages= [msg]
-      //   } else {
-      //     sectionsJson[sectionId].messages.push(msg)
-      //   }
-      // }
-      console.log('sectionsJson', sectionsJson)
+      if (msg.total_steps !== undefined && msg.n !== undefined) {
+        sectionsJson[sectionId].percent = (msg.n + 1) / msg.total_steps * 100
+      }
+
+      console.log('sectionsJson', sectionsJson, sectionsJson[sectionId].percent)
       return {
         ...state,
         sectionsJson,
