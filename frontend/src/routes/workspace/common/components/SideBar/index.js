@@ -178,8 +178,6 @@ function Sidebar({ model, dispatch, namespace }) {
                       {section.editing ? <Input
                         className={styles.nameInput}
                         defaultValue={section[tempVariable.nameOrId] || section[translateDict[namespace]].name}
-                        // onFocus={(e) => onInputClick(e)}
-                        // onClick={(e) => onInputClick(e)}
                         onBlur={(e) => submitNewName(e, section._id)}
                         onPressEnter={(e) => submitNewName(e, section._id)}
                         autoFocus={true}/> : section[tempVariable.nameOrId] || section[translateDict[namespace]].name
@@ -187,8 +185,6 @@ function Sidebar({ model, dispatch, namespace }) {
                       <br/>
                       <div className={styles.time}>
                         {showTime(section.create_time)}
-                        {/*<span className={styles[statusDict[section.status]]}>{statusDict[section.status]}</span>*/}
-                        {/*<div className={styles.light}/>*/}
                       </div>
                     </div>
                     <Dropdown overlay={menu(section._id)} trigger={['click']}

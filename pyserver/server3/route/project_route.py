@@ -135,14 +135,19 @@ def update_project(project_id):
     related_fields = data.get('related_fields', '')
     tags = data.get('tags', '')
     related_tasks = data.get('related_tasks', '')
+    done_indices = data.get('done_indices', [])
 
-    related_fields = str_utility.split_without_empty(related_fields)
-    tags = str_utility.split_without_empty(tags)
-    related_tasks = str_utility.split_without_empty(related_tasks)
+    if not isinstance(related_fields, list):
+        related_fields = str_utility.split_without_empty(related_fields)
+    if not isinstance(tags, list):
+        tags = str_utility.split_without_empty(tags)
+    if not isinstance(related_tasks, list):
+        related_tasks = str_utility.split_without_empty(related_tasks)
 
     project_service.update_project(project_id, name, description, is_private,
                                    related_fields=related_fields,
-                                   tags=tags, related_tasks=related_tasks)
+                                   tags=tags, related_tasks=related_tasks,
+                                   done_indices=done_indices)
     return jsonify({'response': 'create project success'}), 200
 
 
