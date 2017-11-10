@@ -2,7 +2,7 @@ import { uploadFile, fetchDataSets, fetchDataSet,
   deleteDataColumns, changeTypes, stageData,
   fetchStagingDataSets, updateStagingDataSet,
   getStagingDataSet, changeStagedTypes,
-  deleteStagedDataColumns } from '../services/upload'
+  deleteStagedDataColumns, deleteStagingDataSet } from '../services/upload'
 
 import { message } from 'antd'
 import pathToRegexp from 'path-to-regexp';
@@ -27,6 +27,7 @@ export default {
     dataSetName: '',
     dataSetDesc: '',
     dataSetTags: [],
+    dataSetField: '',
 
     sdsNames: [],
 
@@ -35,6 +36,9 @@ export default {
     pageSize: 4,
 
     showStaged: false,
+
+    modalVisible: false,
+    editLoading: false,
 
     dataSetsLoading: false,
     viewLoading: false,
@@ -45,6 +49,8 @@ export default {
 
     firstLoading: false,
     lastLoading: false,
+
+    stagedLoading: false,
   },
 
   subscriptions: {
@@ -98,8 +104,13 @@ export default {
     },
 
     * showStaged(action, { call, put, select }) {
+      yield put({ type: 'setShowStaged', payload: true})
+      yield put({ type: 'setStagedLoading', payload: true})
+      const url0 = location.hash.substr(1)
+      yield put(routerRedux.replace(url0+'/preview'))
+
       const sdsid = yield select(state => state.upload.dataSetID)
-      const {data} = yield call(getStagingDataSet, sdsid)
+      const {data} = yield call(getStagingDataSet, sdsid, 1)
       // console.log(data)
       const flds = {}
       for (const v of data.columns) {
@@ -110,26 +121,27 @@ export default {
       yield put({ type: 'setDataSet', payload: data.data})
       yield put({ type: 'setOrgFields', payload: orgflds})
       yield put({ type: 'setFields', payload: flds})
-
-      yield put({ type: 'setShowStaged', payload: true})
-      const url0 = location.hash.substr(1)
-      console.log('url0', url0+'/preview')
-
-      yield put(routerRedux.replace(url0+'/preview'))
-
+      yield put({ type: 'setStagedLoading', payload: false})
     },
 
     * showInTable({payload}, { call, put, select }) {
-      if (payload) {
+      const {page, type} = payload
+      if (page === -1) {
         yield put({type:'setLastLoading', payload: true})
       } else {
         yield put({type: 'setFirstLoading', payload: true})
       }
       const dataSetID = yield select(state => state.upload.dataSetID)
-      const data = yield call(fetchDataSet, dataSetID, payload)
-      yield put({ type: 'setDataSet', payload: data.response})
 
-      if (payload) {
+      if (type === 'ds') {
+        const data = yield call(fetchDataSet, dataSetID, page)
+        yield put({ type: 'setDataSet', payload: data.response})
+      } else {
+        const {data} = yield call(getStagingDataSet, dataSetID, page)
+        yield put({ type: 'setDataSet', payload: data.data})
+      }
+
+      if (page === -1) {
         yield put({type:'setLastLoading', payload: false})
       } else {
         yield put({type: 'setFirstLoading', payload: false})
@@ -275,8 +287,8 @@ export default {
       console.log(res)
       if (payload !== 'new') {
         yield put({type: 'staged'})
-        const url0 = location.hash.substr(1).replace('preview', '')
-        const url1 = url0.replace('select', '')
+        const url0 = location.hash.substr(1).replace('/preview', '')
+        const url1 = url0.replace('/select', '')
         // console.log('url0', url0)
         yield put(routerRedux.replace(url1))
 
@@ -310,6 +322,33 @@ export default {
       }
 
     },
+    * editStaged({payload}, { put, call, select }) {
+      yield put({type: 'setEditLoading', payload:true})
+      const sdsid = yield select(state => state.upload.dataSetID)
+      const {name, description} = payload
+      const field = payload.related_field
+      const tags = payload.tags
+      const res = yield call(updateStagingDataSet,
+        sdsid, name, description, tags, field)
+      console.log(res)
+      yield put({type: 'setEditLoading', payload:false})
+      yield put({type: 'hideModal'})
+      yield put({type: 'setDataSetName', payload:name})
+      yield put({type: 'setDataSetDesc', payload:description})
+      yield put({type: 'setDataSetTags', payload:tags.split(',')})
+
+    },
+
+    * delStaged(action, { put, call, select }) {
+
+      const sdsid = yield select(state => state.upload.dataSetID)
+      const res = yield call(deleteStagingDataSet, sdsid)
+      console.log(res)
+      const url0 = location.hash.substr(1).replace('/preview', '')
+      yield put(routerRedux.replace(url0))
+
+    }
+
 
   },
 
@@ -494,6 +533,36 @@ export default {
         lastLoading
       }
     },
+
+    setStagedLoading(state, {payload: stagedLoading}) {
+      return {
+        ...state,
+        stagedLoading
+      }
+    },
+
+    showModal(state) {
+      return { ...state, modalVisible: true }
+    },
+
+    hideModal(state) {
+      return { ...state, modalVisible: false }
+    },
+
+    setEditLoading(state, {payload: editLoading}) {
+      return {
+        ...state,
+        editLoading
+      }
+    },
+
+    setDataSetField(state, {payload: dataSetField}) {
+      return {
+        ...state,
+        dataSetField
+      }
+    },
+
   },
 
 }

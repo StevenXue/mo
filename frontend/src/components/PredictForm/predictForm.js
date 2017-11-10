@@ -18,8 +18,17 @@ class GetPredictionForm extends React.Component {
   };
 
   get_prediction = (values) => {
+    console.log(location)
+    let dispatch_type
+    if (location.href.includes('deploy')){
+      dispatch_type = 'deployment/getPrediction'
+    }
+    else{
+      dispatch_type = 'publicServedModels/getPrediction'
+
+    }
     this.props.dispatch({
-      type: 'deployment/getPrediction',
+      type: dispatch_type,
       payload: {
         input_value: JSON.parse(values['get_prediction_input']),
       }

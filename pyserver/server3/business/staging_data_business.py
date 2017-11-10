@@ -117,6 +117,14 @@ def get_by_staging_data_set_id_limit(staging_data_set_id, limit):
                                                             limit)
 
 
+def get_last_by_staging_data_set(staging_data_set_id):
+    return staging_data_repo.read_last(staging_data_set=staging_data_set_id)
+
+
+def get_last_limit_by_staging_data_set(staging_data_set_id, limit):
+    return staging_data_repo.read_last_limit(limit, staging_data_set=staging_data_set_id)
+
+
 def get_by_staging_data_set_and_fields(staging_data_set_id, fields, **kwargs):
     """
     Get specific fields of a staging_data_set

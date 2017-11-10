@@ -145,21 +145,15 @@ def kube_run_model(conf, project_id, data_source_id, model_id, job_obj,
         "kwargs": kwargs
     }
 
-    # create model job
-    # job_obj = job_business.add_model_job(model_obj, staging_data_set_obj,
-    #                                      project_obj, params=conf,
-    #                                      run_args=run_args)
-
     job_obj = job_business.update_job_by_id(job_obj.id, model=model_obj,
                                             staging_data_set=staging_data_set_obj,
                                             project=project_obj, params=conf,
-                                            run_args=run_args)
+                                            run_args=run_args, status=100)
 
     job_id = str(job_obj.id)
     print(job_id)
     return run_model(conf, project_id, data_source_id, model_id, job_id,
                      **kwargs)
-    # return #
     cwd = os.getcwd()
     job_name = job_id + '-training-job'
     client = kube_service.client
@@ -189,7 +183,7 @@ def kube_run_model(conf, project_id, data_source_id, model_id, job_obj,
                     "containers": [
                         {
                             "name": job_id,
-                            "image": "10.52.14.192/gzyw/model_app",
+                            "image": "10.52.14.192/gzyw/model_app_pre",
                             "imagePullPolicy": "IfNotPresent",
                             "securityContext": {
                                 "privileged": True,

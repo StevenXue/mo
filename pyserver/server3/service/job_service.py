@@ -36,7 +36,10 @@ from server3.service import staging_data_service, logger_service, \
 from server3.service import toolkit_service
 from server3.utility import data_utility
 from server3.utility import json_utility
+from server3.entity.model import TYPE
 
+
+TYPE = {list(v)[0]: list(v)[1] for v in list(TYPE)}
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 
 
@@ -345,7 +348,7 @@ def create_model_job(project_id, staging_data_set_id, model_obj,
             # update a project
             project_business.insert_job_by_id(project_id, job_obj.id)
             project_business.update_items_to_list_field(
-                project_id, related_tasks=model_obj.category)
+                project_id, related_tasks=TYPE.get(model_obj.category, []))
             # create result sds for model
             sds_name = '%s_%s_result' % (model_obj['name'], job_obj['id'])
             try:
@@ -513,15 +516,6 @@ def model_steps_to_obj(job_obj, project_id):
         })
         if comp_idx:
             conf['compile'] = get_args(steps[comp_idx]['args'])
-        if layers_idx:
-            conf['layers'] = [{
-                'name': layer.get('name'),
-                'args': {arg.get('name'): arg.get('value')
-                                          or arg.get('values')
-                                          or arg.get('default')
-                         for arg in layer.get('args')}
-            }
-                for layer in steps[layers_idx]['args'][0]['values']]
         if layers_idx:
             conf['layers'] = [{
                 'name': layer.get('name'),

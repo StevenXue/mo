@@ -1,27 +1,24 @@
-import React from 'react';
-import {connect} from 'dva';
+import React from 'react'
+import { connect } from 'dva'
 
 import Common from '../../common/Common/index'
 import Guidance from '../../dataAnalysis/Guidance'
 
-
-function Modelling({location, dispatch, modelling}) {
+function Modelling({ location, dispatch, modelling }) {
   const props = {
     model: modelling,
     namespace: 'modelling',
     dispatch: dispatch,
-    step: 'model'
-  };
+    step: 'model',
+  }
 
   const {
-    showGuidance
-  } = modelling;
+    showGuidance,
+  } = props.model
 
   return (
-    showGuidance ?
-      <Guidance {...props}/> :
-      <Common {...props}/>
-  );
+    showGuidance ? <Guidance {...props}/> : <Common {...props}/>
+  )
 }
 
-export default connect(({modelling}) => ({modelling}))(Modelling);
+export default connect(({ modelling }) => ({ modelling }))(Modelling)

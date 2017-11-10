@@ -155,14 +155,12 @@ def model_main(result_sds, project_id, result_dir, train_data_dir,
 
     # checkpoint to save best weight
     best_checkpoint = MyModelCheckpoint(
-        ['/pyserver/best.hdf5',
-         os.path.abspath(os.path.join(result_dir, 'best.hdf5'))],
+        os.path.abspath(os.path.join(result_dir, 'best.hdf5')),
         save_weights_only=True,
         verbose=1, save_best_only=True)
     # checkpoint to save latest weight
     general_checkpoint = MyModelCheckpoint(
-        ['/pyserver/latest.hdf5', os.path.abspath(os.path.join(result_dir,
-                                                               'latest.hdf5'))],
+        os.path.abspath(os.path.join(result_dir, 'latest.hdf5')),
         save_weights_only=True,
         verbose=1)
 

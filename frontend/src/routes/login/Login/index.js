@@ -1,65 +1,130 @@
+import React, { Component } from 'react'
 import { connect } from 'dva'
-import { Button, Row, Form, Input } from 'antd'
-import { config } from '../../../utils'
+import { routerRedux, Link } from 'dva/router'
+import { Form, Input, Tabs, Button, Icon, Checkbox, Row, Col, Alert } from 'antd'
 import styles from './index.less'
 
 const FormItem = Form.Item
+const { TabPane } = Tabs
 
-const Login = ({
-                 login,
-                 dispatch,
-                 form: {
-                   getFieldDecorator,
-                   validateFieldsAndScroll,
-                 },
-               }) => {
-  const { loginLoading } = login
+class Login extends Component {
+  state = {
+    count: 0,
+    type: 'account',
+  }
 
-  function handleOk() {
-    validateFieldsAndScroll((errors, values) => {
-      if (errors) {
-        return
-      }
-      dispatch({ type: 'login/login', payload: values })
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.login.status === 'ok') {
+      this.props.dispatch(routerRedux.push('/'))
+    }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval)
+  }
+
+  onSwitch = (key) => {
+    this.setState({
+      type: key,
     })
   }
 
-  return (
-    <div className={`main-container`}>
-      <div className={styles.form}>
-        <div className={styles.logo}>
-          <img alt={'logo'} src={config.logo}/>
-          <span>{config.name}</span>
-        </div>
-        <form>
-          <FormItem hasFeedback>
-            {getFieldDecorator('user_ID', {
-              rules: [
-                {
-                  required: true,
-                },
-              ],
-            })(<Input size="large" onPressEnter={handleOk} placeholder="UserID"/>)}
-          </FormItem>
-          <FormItem hasFeedback>
-            {getFieldDecorator('password', {
-              rules: [
-                {
-                  required: true,
-                },
-              ],
-            })(<Input size="large" type="password" onPressEnter={handleOk} placeholder="Password"/>)}
-          </FormItem>
-          <Row>
-            <Button type="primary" size="large" onClick={handleOk} loading={loginLoading}>
-              Sign in
-            </Button>
-          </Row>
+  onGetCaptcha = () => {
+    let count = 59
+    this.setState({ count })
+    this.interval = setInterval(() => {
+      count -= 1
+      this.setState({ count })
+      if (count === 0) {
+        clearInterval(this.interval)
+      }
+    }, 1000)
+  }
 
-        </form>
+  handleSubmit = (e) => {
+    e.preventDefault()
+    const { type } = this.state
+    this.props.form.validateFields({ force: true },
+      (err, values) => {
+      console.log('values', values)
+        if (!err) {
+          this.props.dispatch({
+            type: `login/login`,
+            payload: values,
+          })
+        }
+      },
+    )
+  }
+
+  renderMessage = (message) => {
+    return (
+      <Alert
+        style={{ marginBottom: 24 }}
+        message={message}
+        type="error"
+        showIcon
+      />
+    )
+  }
+
+  render() {
+    const { form, login } = this.props
+    const { getFieldDecorator } = form
+    const { count, type } = this.state
+    return (
+      <div className={styles.main}>
+        <Form onSubmit={this.handleSubmit}>
+
+          {
+            login.status === 'error' &&
+            login.type === 'account' &&
+            login.submitting === false &&
+            this.renderMessage('Invalid user ID or password!')
+          }
+          <FormItem>
+            User ID
+            {getFieldDecorator('user_ID', {
+              rules: [{
+                required: type === 'account', message: 'Please enter user ID',
+              }],
+            })(
+              <Input
+                size="large"
+                className={styles.input}
+                // prefix={<Icon type="user" className={styles.prefixIcon}/>}
+                placeholder="admin"
+              />,
+            )}
+          </FormItem>
+          <FormItem>
+            Password
+            {getFieldDecorator('password', {
+              rules: [{
+                required: type === 'account', message: 'Please enter password!',
+              }],
+            })(
+              <Input
+                size="large"
+                className={styles.input}
+                // prefix={<Icon type="lock" className={styles.prefixIcon}/>}
+                type="password"
+                placeholder="888888"
+              />,
+            )}
+          </FormItem>
+
+          <FormItem className={styles.additional}  style={{marginTop: 20}}>
+            <Button size="large" loading={login.submitting} className={styles.submit} type="primary" htmlType="submit">
+              Login
+            </Button>
+            <a className={styles.forgot} href="">Forgot password?</a>
+          </FormItem>
+
+        </Form>
       </div>
-    </div>
-  )
+    )
+  }
 }
 
 export default connect(({ login }) => ({ login }))(Form.create()(Login))

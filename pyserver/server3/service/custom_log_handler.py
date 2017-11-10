@@ -17,10 +17,11 @@ class MetricsHandler(logging.StreamHandler):
     """
     A handler class which use to catch log message for tensorflow
     """
-    result_sds = None
-    job_id = None
-    project_id = None
-    user_ID = None
+    training_logger = None
+    # result_sds = None
+    # job_id = None
+    # project_id = None
+    # user_ID = None
 
     def emit(self, record):
         msg = self.format(record)
@@ -61,7 +62,5 @@ class MetricsHandler(logging.StreamHandler):
                     log_obj = {'val_' + k: v for k, v in log_obj.items()}
                 if is_val == -1 and is_tra == -1:
                     return
-                logger_service.log_epoch_end(n, log_obj, self.result_sds,
-                                             self.project_id,
-                                             job_id=self.job_id,
-                                             user_ID=self.user_ID)
+                self.training_logger.log_epoch_end(n, log_obj)
+

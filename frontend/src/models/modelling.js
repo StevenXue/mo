@@ -60,10 +60,10 @@ const modelling = modelExtend(workBench, {
       }
     },
     setMetrics(state, { payload }) {
-      const { message } = payload
-      const sectionId = message.job_id
+      const { msg } = payload
+      const sectionId = msg.job_id
       let sectionsJson = state.sectionsJson
-      console.log('message', message)
+      console.log('message', msg)
 
       let metrics = {
         'acc': [],
@@ -76,28 +76,20 @@ const modelling = modelExtend(workBench, {
         'val_loss': [],
       }
 
-      if(sectionsJson[sectionId].messages && sectionsJson[sectionId].messages.find(e => isEqual(e, message))) {
-        console.log('message')
-        return {
-          ...state,
-          sectionsJson,
-        }
-      }
-
       if (sectionsJson[sectionId].metrics_status) {
         for (let metric in metrics) {
-          if (message[metric] !== undefined) {
+          if (msg[metric] !== undefined) {
             if (!sectionsJson[sectionId].metrics_status[metric]) {
-              sectionsJson[sectionId].metrics_status[metric] = [message[metric]]
+              sectionsJson[sectionId].metrics_status[metric] = [msg[metric]]
             } else {
-              sectionsJson[sectionId].metrics_status[metric].push(message[metric])
+              sectionsJson[sectionId].metrics_status[metric].push(msg[metric])
             }
           }
         }
       } else {
         for (let metric in metrics) {
-          if (message[metric] !== undefined) {
-            metric[metric].push(message[metric])
+          if (msg[metric] !== undefined) {
+            metric[metric].push(msg[metric])
           }
         }
 
@@ -110,19 +102,15 @@ const modelling = modelExtend(workBench, {
       }
 
       // receive batch
-      if(message.batch) {
-        sectionsJson[sectionId].batch = message.batch
+      if (msg.batch) {
+        sectionsJson[sectionId].batch = msg.batch
       }
 
-      // record messages and prevent duplicate
-      if(message) {
-        if(!sectionsJson[sectionId].messages) {
-          sectionsJson[sectionId].messages= [message]
-        } else {
-          sectionsJson[sectionId].messages.push(message)
-        }
+      if (msg.total_steps !== undefined && msg.n !== undefined) {
+        sectionsJson[sectionId].percent = (msg.n + 1) / msg.total_steps * 100
       }
-      console.log('sectionsJson', sectionsJson)
+
+      console.log('sectionsJson', sectionsJson, sectionsJson[sectionId].percent)
       return {
         ...state,
         sectionsJson,
@@ -131,6 +119,7 @@ const modelling = modelExtend(workBench, {
     clearMetrics(state, { payload }) {
       let sectionsJson = state.sectionsJson
       sectionsJson[payload.sectionId].metrics_status = {}
+      sectionsJson[payload.sectionId].batch = undefined
       return {
         ...state,
         sectionsJson,
@@ -146,6 +135,12 @@ const modelling = modelExtend(workBench, {
         type: 'setLoading', payload: {
           key: 'wholePage',
           loading: true,
+        },
+      })
+      yield put({
+        type: 'setStatus', payload: {
+          sectionId,
+          status: 100,
         },
       })
 

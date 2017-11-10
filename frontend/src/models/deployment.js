@@ -172,9 +172,12 @@ export default {
       const model_name = yield select(state => state.deployment.modelsJson[focusModelId]['model']['name']);
       const projectId = yield select(state => state.deployment.modelsJson[focusModelId]['project']);
       let payload = action.payload;
+      payload.projectId = projectId;
       payload.jobID = focusModelId;
       payload.user_ID = user_ID;
       payload.model_name = model_name;
+      console.log(payload);
+
       const {data: result} = yield call(deploymentService.firstDeployModel, payload);
       if (result) {
         yield put({type: 'showLoading', payload: {loadingState: false}});

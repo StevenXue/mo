@@ -17,9 +17,9 @@ export async function fetchDataSets () {
   })
 }
 
-export async function fetchDataSet(dataSet_ID, isLast) {
+export async function fetchDataSet(dataSet_ID, page) {
   let query
-  if (isLast) {
+  if (page === -1) {
     query = `/${dataSet_ID}?limit=5&isLast=true`;
   } else {
     query = `/${dataSet_ID}?limit=5`;
@@ -82,8 +82,14 @@ export async function fetchStagingDataSets(prjid) {
 }
 
 // get staging dataset
-export async function getStagingDataSet(sdsid) {
-  let query = `/${sdsid}?limit=5`;
+export async function getStagingDataSet(sdsid, page) {
+  let query
+  if (page === -1) {
+    query = `/${sdsid}?limit=5&isLast=true`;
+  } else {
+    query = `/${sdsid}?limit=5`;
+  }
+
   return request(CORS + getStagingData + query, {
     method: 'get',
   })
@@ -130,5 +136,15 @@ export function deleteStagedDataColumns(id, cols) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({'fields': cols})
+  })
+}
+
+
+// delete staging dataset
+export async function deleteStagingDataSet(sdsid) {
+
+  let query = `/${sdsid}`;
+  return request(CORS + getStagingData + query, {
+    method: 'delete',
   })
 }
