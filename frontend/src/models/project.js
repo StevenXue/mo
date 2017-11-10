@@ -41,6 +41,11 @@ export default {
       yield put({ type: 'setProjects', payload: projects })
     },
 
+    *fetchOthers(action, { call, put, select, take }){
+      const { data: projects } = yield call(fetchProjects, { others: true })
+      yield put({ type: 'setProjects', payload: projects })
+    },
+
     *create({ body }, { call, put, select }) {
       // const user_ID = 'dev_1'
       // body['user_ID'] = yield select(state => state.login.user.user_ID)
@@ -56,7 +61,7 @@ export default {
         if (pathname === '/workspace') {
           dispatch({ type: 'fetch', privacy: 'all' })
         } else if (pathname === '/projects') {
-          dispatch({ type: 'fetch', privacy: 'all' })
+          dispatch({ type: 'fetchOthers' })
         }
       })
     },

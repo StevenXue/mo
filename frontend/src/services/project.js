@@ -7,7 +7,11 @@ const { projects } = api
 // 获取用户所有 projects
 export function fetchProjects(payload) {
   const user_ID = localStorage.getItem('user_ID')
-  return request(`${CORS}${projects}?user_ID=${user_ID}&privacy=${payload.privacy}`);
+  if (payload.others) {
+    return request(`${CORS}${projects}?user_ID=${user_ID}&others=true`)
+  } else {
+    return request(`${CORS}${projects}?user_ID=${user_ID}&privacy=${payload.privacy}`);
+  }
 }
 
 // 获取单个 project
