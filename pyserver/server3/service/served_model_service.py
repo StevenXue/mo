@@ -319,8 +319,7 @@ def resume_by_id(served_model_id, user_ID, model_name):
         port = port_for.select_random(ports=set(range(30000, 32767)))
         # export_path = "/home/root/work/user_directory" + \
         #               export_path.split("/user_directory", 1)[1]
-        export_path = "/home/root/work/user_directory" + \
-                      export_path.split("/user_directory", 1)[1]
+        export_path = "/home/root/work/user_directory" + export_path.split("/user_directory", 1)[1]
 
         # print('resume path', export_path)
         kube_json = {

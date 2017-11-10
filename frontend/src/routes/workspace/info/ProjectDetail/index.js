@@ -5,7 +5,7 @@ import {
   Switch
 } from 'react-router-dom'
 import { connect } from 'dva'
-import { Icon, Button, Tag } from 'antd'
+import { Icon, Button, Tag, Modal } from 'antd'
 
 // pages
 import DataImport from '../../../DataImport/index'
@@ -23,14 +23,27 @@ import ProjectModel from '../../../../components/ProjectModel/index'
 import { showTime } from '../../../../utils/index'
 import styles from './index.less'
 
+const confirm = Modal.confirm
+
 const pages = ['import', 'analysis', 'modelling', 'deploy']
 
 function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
 
   const projectId = match.params.projectId
 
-  function deleteProject() {
-    dispatch({ type: 'projectDetail/delete', payload: { projectId } })
+  const deleteProject = () => {
+    confirm({
+      title: 'Are you sure delete this project?',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        dispatch({ type: 'projectDetail/delete', payload: { projectId } })
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
   }
 
   if (location.pathname.split('/').length > 3) {

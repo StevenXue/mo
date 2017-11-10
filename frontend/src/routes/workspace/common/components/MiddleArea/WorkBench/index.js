@@ -757,13 +757,12 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
     )
   }
 
-  console.log('percent', percent)
   return (
     <div>
       <ToolBar sectionId={sectionId} {...{model, dispatch, namespace}}/>
       {
         namespace === 'modelling' &&
-        <div style={{ width: '98%', margin: 'auto' }}>
+        <div style={{ width: '97%', margin: 'auto' }}>
           <Progress percent={percent} />
         </div>
       }
@@ -776,30 +775,6 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                 switch (step.name) {
                   case 'data_source':
                     return renderDataSource(step, stepIndex)
-                    // let ret = [<Panel
-                    //   className={styles.panel}
-                    //   header={
-                    //     (
-                    //       <div className={styles.panel_title_row}>
-                    //         {getArgs(baseSteps, stepIndex).display_name}
-                    //       </div>)
-                    //   }
-                    //   key={stepIndex}
-                    // >
-                    //   {dataSource(step.args, stepIndex)}
-                    // </Panel>
-                    // ];
-                    // if (!active_steps.includes(stepIndex.toString())) {
-                    //   ret.push(
-                    //     <FakePanel key={stepIndex + step.name + 'hint'}>
-                    //       <div className={styles.fake_panel_container}>
-                    //         <div className={styles.fake_panel}>
-                    //           {step.args[0].value ? 'You have selected 1 data' : 'You have not selected any data'}
-                    //         </div>
-                    //       </div>
-                    //     </FakePanel>)
-                    // }
-                    // return ret;
 
                   case 'target_datasource':
                     return renderDataSource(step, stepIndex);

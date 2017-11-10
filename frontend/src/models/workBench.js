@@ -1,18 +1,19 @@
 import * as dataAnalysisService from '../services/dataAnalysis'
 import * as stagingDataService from '../services/stagingData'
 import * as modelService from '../services/model'
-import { arrayToJson, JsonToArray} from '../utils/JsonUtils'
+import * as jobService from '../services/job'
+import { arrayToJson, JsonToArray } from '../utils/JsonUtils'
 
 import pathToRegexp from 'path-to-regexp'
 import { cloneDeep } from 'lodash'
 
 const arrayToInitJson = (array, key) => {
-  let finalJson = {};
+  let finalJson = {}
   for (let i of array) {
-    finalJson[i[key]] = false;
+    finalJson[i[key]] = false
   }
   return finalJson
-};
+}
 
 export default {
   namespace: 'workBench',
@@ -50,32 +51,69 @@ export default {
     },
     resultVisible: false,
 
-    showGuidance: false
+    showGuidance: false,
 
   },
   reducers: {
+    toggleDropButton(state, action) {
+      const { sectionId, dropButton } = action.payload
+      let sections = state.sectionsJson
+      sections[sectionId].dropButton = dropButton
+      return {
+        ...state,
+        sectionsJson: sections,
+      }
+    },
+
     setStatus(state, action) {
       console.log('status', action)
       const { sectionId, status } = action.payload
       let sections = state.sectionsJson
       sections[sectionId].status = status
+      if (status === 200) {
+        sections[sectionId].percent = 100
+      }
       return {
         ...state,
-        sectionsJson: sections
+        sectionsJson: sections,
+      }
+    },
+
+    toggleRename(state, action) {
+      const { sectionId, editing } = action.payload
+      let sections = state.sectionsJson
+      sections[sectionId].editing = editing
+      return {
+        ...state,
+        sectionsJson: sections,
+      }
+    },
+
+    setStatus(state, action) {
+      console.log('status', action)
+      const { sectionId, status } = action.payload
+      let sections = state.sectionsJson
+      sections[sectionId].status = status
+      if (status === 200) {
+        sections[sectionId].percent = 100
+      }
+      return {
+        ...state,
+        sectionsJson: sections,
       }
     },
 
     hideResult(state, action) {
       return {
         ...state,
-        resultVisible: false
+        resultVisible: false,
       }
     },
 
     showResult(state, action) {
       return {
         ...state,
-        resultVisible: true
+        resultVisible: true,
       }
     },
 
@@ -89,16 +127,16 @@ export default {
 
     // 更新sections
     setSections(state, action) {
-      const sections = JsonToArray(action.payload.sectionsJson);
-      let showGuidance = state.showGuidance;
+      const sections = JsonToArray(action.payload.sectionsJson)
+      let showGuidance = state.showGuidance
 
       if (sections.length === 0) {
-        showGuidance= true
+        showGuidance = true
       }
       return {
         ...state,
         sectionsJson: action.payload.sectionsJson,
-        showGuidance
+        showGuidance,
       }
     },
 
@@ -246,12 +284,12 @@ export default {
       let sectionsJson = state.sectionsJson
 
       if (!values.includes(fieldName)) {
-        values.push(fieldName);
-        sectionsJson[sectionId].steps[datasourceStepIndex].args[argIndex].fieldsJson[fieldName] = true;
+        values.push(fieldName)
+        sectionsJson[sectionId].steps[datasourceStepIndex].args[argIndex].fieldsJson[fieldName] = true
         console.log('push', values)
       } else {
-        values.splice(values.indexOf(fieldName), 1);
-        sectionsJson[sectionId].steps[datasourceStepIndex].args[argIndex].fieldsJson[fieldName] = false;
+        values.splice(values.indexOf(fieldName), 1)
+        sectionsJson[sectionId].steps[datasourceStepIndex].args[argIndex].fieldsJson[fieldName] = false
         console.log('pop', values)
       }
       sectionsJson[sectionId].steps[stepIndex].args[argIndex].values = values
@@ -413,6 +451,16 @@ export default {
       }
     },
 
+    setSectionName(state, action) {
+      const { sectionId, name } = action.payload
+      let sectionsJson = state.sectionsJson
+      sectionsJson[sectionId].name = name
+      return {
+        ...state,
+        sectionsJson,
+      }
+    },
+
     setActiveKey(state, action) {
 
       const { sectionId, activeKey } = action.payload
@@ -433,7 +481,7 @@ export default {
     },
 
     setLoading(state, action) {
-      const {key, loading} = action.payload
+      const { key, loading } = action.payload
       return {
         ...state,
         spinLoading: {
@@ -459,12 +507,12 @@ export default {
     },
 
     setShowGuidance(state, action) {
-      const {showGuidance} = action.payload;
+      const { showGuidance } = action.payload
       return {
         ...state,
-        showGuidance
+        showGuidance,
       }
-    }
+    },
   },
   effects: {
     // 获取用户所有sections
@@ -478,12 +526,12 @@ export default {
       })
       yield put({ type: 'setGetSectionLoading', payload: { loading: false } })
 
-      if(sections.length === 0){
+      if (sections.length === 0) {
         yield put({
           type: 'setShowGuidance',
           payload: {
-            showGuidance: true
-          }
+            showGuidance: true,
+          },
         })
       }
 
@@ -558,14 +606,14 @@ export default {
 
     // 获取fields
     *getFields(action, { call, put, select }) {
-      const { stepIndex, argIndex, namespace } = action.payload;
+      const { stepIndex, argIndex, namespace } = action.payload
 
       const sectionsJson = yield select(state => state[namespace].sectionsJson)
       // const section = sectionsJson[action.payload.sectionId];
       const { data } = yield call(stagingDataService.fetchFields, action.payload.stagingDatasetId)
-      const fieldsJson = arrayToInitJson(data, 0);
-      sectionsJson[action.payload.sectionId].steps[stepIndex].args[argIndex].fields = data;
-      sectionsJson[action.payload.sectionId].steps[stepIndex].args[argIndex].fieldsJson = fieldsJson;
+      const fieldsJson = arrayToInitJson(data, 0)
+      sectionsJson[action.payload.sectionId].steps[stepIndex].args[argIndex].fields = data
+      sectionsJson[action.payload.sectionId].steps[stepIndex].args[argIndex].fieldsJson = fieldsJson
 
       yield put({ type: 'setSections', payload: { sectionsJson: sectionsJson } })
 
@@ -644,7 +692,7 @@ export default {
         type: 'setSectionResult', payload: {
           sectionId,
           result,
-          visual_sds_id
+          visual_sds_id,
         },
       })
       yield put({
@@ -654,7 +702,14 @@ export default {
         },
       })
     },
-
+    *rename(action, { call, put, select }) {
+      const { sectionId, name } = action.payload
+      yield put({
+        type: 'toggleRename', payload: { sectionId, editing: false },
+      })
+      const { data } = yield call(jobService.update, { name, sectionId })
+      yield put({ type: 'setSectionName', payload: { sectionId, name } })
+    },
   },
   subscriptions: {},
 }

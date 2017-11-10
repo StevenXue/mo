@@ -205,11 +205,9 @@ export default {
             dispatch({ type: 'handleSocket', payload: { msg, pathname } })
           })
           socket.on('error', (msg) => {
-            console.log(msg)
             dispatch({ type: 'handleError', payload: { msg, pathname } })
           })
           socket.on('success', (msg) => {
-            console.log(msg)
             dispatch({ type: 'handleSuccess', payload: { msg, pathname } })
           })
         }

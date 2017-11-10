@@ -1,12 +1,14 @@
 import React from 'react'
 import { connect } from 'dva'
-import { Menu, Dropdown, Icon, Spin } from 'antd'
+import { Menu, Dropdown, Icon, Spin, Modal, Input } from 'antd'
 
 import { translateDict, tempVariable, statusDict } from '../../../../../constants'
 import { arrayToJson, JsonToArray } from '../../../../../utils/JsonUtils'
 import { showTime } from '../../../../../utils/index'
 
 import styles from './index.less'
+
+const confirm = Modal.confirm
 
 function Sidebar({ model, dispatch, namespace }) {
   //state
@@ -62,9 +64,51 @@ function Sidebar({ model, dispatch, namespace }) {
 
   const onClickDelete = (e, sectionId) => {
     e.stopPropagation()
+
+    confirm({
+      title: 'Are you sure delete this task?',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        dispatch({
+          type: namespace + '/deleteSection',
+          payload: { sectionId },
+        })
+      },
+      onCancel() {
+        console.log('Cancel')
+      },
+    })
+  }
+
+  const onClickRename = (e, sectionId) => {
+    e.stopPropagation()
+
     dispatch({
-      type: namespace + '/deleteSection',
-      payload: { sectionId: sectionId },
+      type: namespace + '/toggleRename',
+      payload: { sectionId, editing: true },
+    })
+  }
+
+  const submitNewName = (e, sectionId) => {
+    dispatch({
+      type: namespace + '/rename',
+      payload: { sectionId, name: e.target.value },
+    })
+  }
+
+  const overSection = (sectionId) => {
+    dispatch({
+      type: namespace + '/toggleDropButton',
+      payload: { sectionId, dropButton: true },
+    })
+  }
+
+  const leaveSection = (sectionId) => {
+    dispatch({
+      type: namespace + '/toggleDropButton',
+      payload: { sectionId, dropButton: false },
     })
   }
 
@@ -72,6 +116,9 @@ function Sidebar({ model, dispatch, namespace }) {
     return (
       <Menu>
         <Menu.Item key="0">
+          <a onClick={(e) => onClickRename(e, sectionId)}>Rename</a>
+        </Menu.Item>
+        <Menu.Item key="1">
           <a onClick={(e) => onClickDelete(e, sectionId)}>DELETE</a>
         </Menu.Item>
       </Menu>
@@ -107,27 +154,42 @@ function Sidebar({ model, dispatch, namespace }) {
                 return (
                   <div
                     key={section._id + section.section_name}
-                    onClick={() => onClickSection(section._id)}
                     className={`${styles.row} custom-little-title-font`}
                     style={{
                       backgroundColor: backgroundColor,
                       color: color,
                     }}
+                    onMouseOver={() => overSection(section._id)}
+                    onMouseLeave={() => leaveSection(section._id)}
                   >
-                    <div className={styles.sectionRow}>
-                      {section[tempVariable.nameOrId] || section[translateDict[namespace]].name}
+                    <div className={styles.sectionRow}
+                         title={section[tempVariable.nameOrId] || section[translateDict[namespace]].name}
+                         onClick={() => onClickSection(section._id)}
+                    >
+                      {section.editing ? <Input
+                        className={styles.nameInput}
+                        defaultValue={section[tempVariable.nameOrId] || section[translateDict[namespace]].name}
+                        onBlur={(e) => submitNewName(e, section._id)}
+                        onPressEnter={(e) => submitNewName(e, section._id)}
+                        autoFocus={true}/> : section[tempVariable.nameOrId] || section[translateDict[namespace]].name
+                      }
                       <br/>
                       <div className={styles.time}>
                         {showTime(section.create_time)}
-                        <span className={styles[statusDict[section.status]]}>{statusDict[section.status]}</span>
+                        {/*<span className={styles[statusDict[section.status]]}>{statusDict[section.status]}</span>*/}
                         {/*<div className={styles.light}/>*/}
                       </div>
                     </div>
-                    <Dropdown overlay={menu(section._id)} trigger={['click']}>
-                      <a className="ant-dropdown-link" href="#">
-                        <Icon type="down"/>
-                      </a>
-                    </Dropdown>
+                    {
+                      section.dropButton ?
+                        <Dropdown overlay={menu(section._id)} trigger={['click']}>
+                          <a className="ant-dropdown-link" href="#">
+                            <Icon type="down"/>
+                          </a>
+                        </Dropdown> :
+                        <span className={styles[statusDict[section.status]]}>{statusDict[section.status]}</span>
+                    }
+
                   </div>
                 )
               },
