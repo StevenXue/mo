@@ -31,10 +31,10 @@ const menuConfig = [
     text: 'Projects',
   },
   {
-    key: '/deployed_models',
-    Link: '/deployed_models',
+    key: '/modelmarkets',
+    Link: '/modelmarkets',
     Icon: null,
-    text: 'Deployed Models',
+    text: 'Model Markets ',
   },
 
 ]
@@ -43,13 +43,13 @@ function Header({ location, login, history, dispatch }) {
   const key = '/' + location.pathname.split('/')[1]
   const toLoginPage = () => {
     if (!login.user) {
-      history.push('/login')
+      history.push('/user/login')
     }
   }
   const logout = () => {
     localStorage.removeItem('token')
     dispatch({ type: 'resetUser' })
-    history.push('/login')
+    history.push('/user/login')
   }
   return (
     <div className={styles.container}>
@@ -79,7 +79,7 @@ function Header({ location, login, history, dispatch }) {
             className={styles.rightButton}
             title={
               <span onClick={toLoginPage}>
-                <Icon type="user"/>{login.user ? login.user.name : 'Login'}
+                <Icon type="user"/>{login.user ? login.user.user_ID : 'Login'}
               </span>
             }
           >

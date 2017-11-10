@@ -1,0 +1,88 @@
+@import "../../../index";
+@import "~antd/lib/style/themes/default.less";
+
+.mainContainer {
+  background: @custom-grey-background;
+  //#center;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 60px;
+}
+
+.container {
+  background: #ffffff;
+  //background-image: url('https://gw.alipayobjects.com/zos/rmsportal/TVYTbAXWheQpRcWDaDMu.svg');
+  width: 430px;
+  //min-height: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  //background-size: 100%;
+  padding: 21px 0 21px 0;
+  border-radius: 4px;
+  position: relative;
+}
+
+.top {
+  width: 430px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  //justify-content: space-around;
+  //text-align: left;
+  //text-align: center;
+
+  .switcher {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    line-height: 78px;
+    font-size: 16px;
+
+    .selected {
+      color: #333333;
+    }
+
+    .unSelected {
+      color: #999999;
+    }
+  }
+}
+
+.header {
+  height: 44px;
+  line-height: 44px;
+  a {
+    text-decoration: none;
+  }
+}
+
+.logo {
+  height: 44px;
+  vertical-align: top;
+  margin-right: 16px;
+}
+
+.title {
+  font-size: 33px;
+  color: @heading-color;
+  font-family: 'Myriad Pro', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-weight: 600;
+  position: relative;
+  top: 2px;
+}
+
+.desc {
+  font-size: @font-size-base;
+  color: @text-color-secondary;
+  margin-top: 12px;
+  margin-bottom: 40px;
+}
+
+.footer {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+}

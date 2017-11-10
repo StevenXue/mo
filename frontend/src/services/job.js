@@ -31,3 +31,15 @@ export function save_as_result(payload) {
   })
 }
 
+export function update(payload) {
+  const jobId = payload.sectionId
+  delete payload.sectionId
+  return request(`/api${PREFIX}/jobs/${jobId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body:  JSON.stringify(payload)
+  })
+}
+

@@ -18,6 +18,7 @@ from server3.constants import MODEL_EXPORT_BASE
 from server3.lib.models.modified_tf_file.monitors import ValidationMonitor
 from server3.business import ownership_business
 from server3.business import project_business
+from server3.service import logger_service
 
 # 修改了 metric_spec 的部分内容，
 # 源代码为
@@ -47,6 +48,8 @@ from server3.business import project_business
 from tensorflow.contrib.learn.python.learn import metric_spec
 
 temp_dir = '/tmp/model_results'
+# add handler to catch tensorflow log message
+mh = MetricsHandler()
 
 
 def custom_model(conf, model_fn, input_data, **kw):
@@ -87,15 +90,17 @@ def custom_model_help(model_fn, input_data, project_id, job_id, user_ID,
                       result_dir, result_sds,
                       est_params=None, fit_params=None,
                       eval_params=None):
-    tf.logging.set_verbosity(tf.logging.INFO)
+    # init training logger
+    training_logger = logger_service.TrainingLogger(
+        fit_params['args']['steps'],
+        project_id,
+        job_id,
+        user_ID,
+        result_sds)
 
-    # add handler to catch tensorflow log message
-    mh = MetricsHandler()
+    tf.logging.set_verbosity(tf.logging.INFO)
     # pass result staging data set for logger to save results
-    mh.result_sds = result_sds
-    mh.project_id = project_id
-    mh.job_id = job_id
-    mh.user_ID = user_ID
+    mh.training_logger = training_logger
     logger = logging.getLogger('tensorflow')
     logger.setLevel(logging.DEBUG)
     logger.addHandler(mh)

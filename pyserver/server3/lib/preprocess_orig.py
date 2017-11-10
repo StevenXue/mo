@@ -18,8 +18,10 @@ from sklearn.feature_selection.from_model import _get_feature_importances as get
 from server3.business import staging_data_business
 from server3.utility import json_utility
 import json
+from server3.business.step_business import StepBusiness
 
-
+from bson import ObjectId
+import time
 # -----------------------
 
 
@@ -254,7 +256,8 @@ def lda(arr0, target, n_components):
     return label, coef.tolist(), mean.tolist(), priors.tolist(), scalings.tolist(), xbar.tolist()
 
 
-def table_to_json(table, index=None, with_new=False):
+def table_to_json(table, added_fields=[], with_new=False):
+    now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
     table_json = []
     for row in table:
         table_json.append(row.to_mongo().to_dict())
@@ -265,24 +268,37 @@ def table_to_json(table, index=None, with_new=False):
         for table_row in table_json:
             new_table_row = {}
             for key, value in table_row.items():
-                if key == '_id':
-                    new_table_row[key] = value
-                    continue
-                if key in index:
-                    new_table_row[key] = value
+                if key in added_fields:
+                    new_table_row["new_" + now + key] = value
                 else:
-                    new_table_row["new_" + key] = value
+                    new_table_row[key] = value
             new_table_json.append(new_table_row)
         return new_table_json
     return table_json
 
 
+def add_columns_append(steps):
+    target_table_id = StepBusiness.get_step(steps, 'target_datasource')['args'][0]['value']
+    source_table_id = StepBusiness.get_step(steps, 'from_datasource')['args'][0]['value']
+    index = StepBusiness.get_step(steps, 'select_index')['args'][0]['values']
+    added_fields = StepBusiness.get_step(steps, 'from_fields')['args'][0]['values']
+    nan_type = StepBusiness.get_step(steps, 'parameters')['args'][0]['value']
+    add_columns_append_in(target_table_id, source_table_id, index, added_fields, nan_type)
+    return {
+        "target_table_id": target_table_id,
+        "source_table_id": source_table_id,
+        "index": index,
+        "added_fields": added_fields,
+        "nan_type": nan_type
+    }
+
+
 # 合并添加列
-def add_columns_append(target_table_id, source_table_id, index, added_fields, nan_type, **kwargs):
+def add_columns_append_in(target_table_id, source_table_id, index, added_fields, nan_type,
+                          **kwargs):
     # target table
     target_table = staging_data_business.get_by_staging_data_set_id(
         staging_data_set_id=target_table_id)
-
     # table to json
     target_table_json = table_to_json(target_table)
 
@@ -296,7 +312,8 @@ def add_columns_append(target_table_id, source_table_id, index, added_fields, na
         with_id=True
     )
     # table to json
-    source_table_json = table_to_json(source_table, index=index, with_new=True)
+    source_table_json = table_to_json(source_table, added_fields=added_fields, with_new=True)
+
     # json to pd
     source_table_pd = pd.read_json(json.dumps(source_table_json))
 
@@ -325,12 +342,32 @@ def add_columns_append(target_table_id, source_table_id, index, added_fields, na
             for k, v in zip(index, key):
                 ele[k] = v
             update_dict.append({**ele, **value})
-    print("update_dict", update_dict)
-    staging_data_business.update_many_with_new_fields(update_dict)
+    new_update_dict = [
+        {**item, "_id": ObjectId(item["_id"]), "staging_data_set": ObjectId(
+            item["staging_data_set"])}
+        for item in update_dict]
+    staging_data_business.update_many_with_new_fields(new_update_dict)
 
 
 # 合并添加行
-def add_rows_append(target_table, source_table, **kwargs):
+def add_rows_append(steps):
+    target_table_id = StepBusiness.get_step(steps, 'target_datasource')['args'][0]['value']
+    source_table_id = StepBusiness.get_step(steps, 'from_datasource')['args'][0]['value']
+    # index = StepBusiness.get_step(steps, 'select_index')['args'][0]['values']
+    # added_fields = StepBusiness.get_step(steps, 'from_fields')['args'][0]['values']
+    nan_type = StepBusiness.get_step(steps, 'parameters')['args'][0]['value']
+
+    add_rows_append_in(target_table_id, source_table_id)
+    return {
+        "target_table_id": target_table_id,
+        "source_table_id": source_table_id,
+        # "index": index,
+        # "added_fields": added_fields,
+        "nan_type": nan_type
+    }
+
+
+def add_rows_append_in(target_table_id, source_table_id, **kwargs):
     """
     把两张表纵向拼起来，取target_table的fields
 
@@ -346,39 +383,61 @@ def add_rows_append(target_table, source_table, **kwargs):
     """
     # 无数据的单元格填充
     empty_cell_filling = None
+    # source table
+    source_table = staging_data_business.get_by_staging_data_set_id(
+        staging_data_set_id=source_table_id)
 
-    target = np.array(target_table)
-    source = np.array(source_table)
-    print("target", target)
+    added_dict = []
 
-    pass
+    for row in source_table:
+        new_row = {
+            **row.to_mongo().to_dict(),
+            # 'staging_data_set': ObjectId(target_table_id)
+        }
+        new_row.pop("_id")
+        new_row.pop("staging_data_set")
+        added_dict.append(new_row)
+    staging_data_business.add_many(target_table_id, added_dict)
 
 
 def test_add_rows_append():
-    def sds_data_to_table(data):
-        return [d.to_mongo().to_dict() for d in data]
 
-    target_sds_id = '59c21d71d845c0538f0faeb2'
-    target_data = staging_data_business.get_by_staging_data_set_id(target_sds_id)
-    source_data = staging_data_business.get_by_staging_data_set_and_fields(
-        staging_data_set_id=target_sds_id,
-        fields=['Attention', 'Attention_dimension_reduction_PCA_col']
-    )
-    add_rows_append(
-        target_table=sds_data_to_table(target_data),
-        source_table=sds_data_to_table(source_data)
-    )
+    add_rows_append_in("59fffa1ed845c026aa27fae9", "59fffa1ed845c026aa27fae9")
+
+    # def sds_data_to_table(data):
+    #     return [d.to_mongo().to_dict() for d in data]
+    #
+    # target_sds_id = '59c21d71d845c0538f0faeb2'
+    # target_data = staging_data_business.get_by_staging_data_set_id(target_sds_id)
+    # source_data = staging_data_business.get_by_staging_data_set_and_fields(
+    #     staging_data_set_id=target_sds_id,
+    #     fields=['Attention', 'Attention_dimension_reduction_PCA_col']
+    # )
+    # add_rows_append(
+    #     target_table=sds_data_to_table(target_data),
+    #     source_table=sds_data_to_table(source_data)
+    # )
 
 
 def test_add_column_append():
-    add_columns_append(
-        target_table_id='5a0012ccd845c02ce3da30c8',
-        source_table_id='5a0012ccd845c02ce3da30c8',
-        index=[],
-        added_fields=['Attention', 'Attention_dimension_reduction_PCA_col'],
-        nan_type='null'
-    )
+    # add_columns_append_in(
+    #     target_table_id='5a0012ccd845c02ce3da30c8',
+    #     source_table_id='5a0012ccd845c02ce3da30c8',
+    #     index=["_id"],
+    #     added_fields=['Attention', 'Attention_dimension_reduction_PCA_col'],
+    #     nan_type='null'
+    # )
+    # add_columns_append_in("59c21d71d845c0538f0faeb2",
+    #                       "59c21d71d845c0538f0faeb2",
+    #                       ["_id"],
+    #                       ['Excitement'],
+    #                       None)
+    add_columns_append_in("5a02b7bdd845c0147784cc34",
+                          "5a02b7bdd845c0147784cc34",
+                          [],
+                          ['day'],
+                          None)
 
 
 if __name__ == '__main__':
-    test_add_column_append()
+    test_add_rows_append()

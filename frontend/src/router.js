@@ -6,19 +6,24 @@ import pathToRegexp from 'path-to-regexp'
 import {get} from 'lodash'
 
 import Users from './routes/Users.js'
-import Login from './routes/login/Login'
+import Account from './routes/login/Account'
 import MyProjects from './routes/workspace/info/Projects'
 import Projects from './routes/projects/Projects'
 import ProjectDetail from './routes/workspace/info/ProjectDetail'
 import MainLayout from './components/MainLayout/MainLayout'
+import PublicServedModels from  './routes/DeployedModels/ModelsList'
+import  PublicServedModelsDetail from  './routes/DeployedModels/ModelsDetail'
+
 const breadcrumbNameMap = {
-  '/login': 'Login',
+  '/user': 'User',
+  '/user/login': 'Login',
+  '/user/register': 'Register',
   '/workspace': 'My Projects',
   '/projects': 'Projects',
-  '/deployed_models': 'Deployed Models',
+  '/modelmarkets': 'Model Markets',
 }
 
-const RouterConfig = ({ history, location, login, projectDetail }) => {
+const RouterConfig = ({ history, location, projectDetail }) => {
   const pathSnippets = location.pathname.split('/').filter(i => i)
 
   const extraBreadcrumbItems = pathSnippets.map((_, index) => {
@@ -55,18 +60,19 @@ const RouterConfig = ({ history, location, login, projectDetail }) => {
           {breadcrumbItems}
         </Breadcrumb>
         <Switch>
-          <Route path="/" exact component={Users}/>
-          <Route path="/login" component={Login}/>
+          <Route path="/user" component={Account}/>
           <Route path="/workspace/:projectId" component={ProjectDetail}/>
           <Route path="/workspace" component={MyProjects}/>
           <Route path="/projects" component={Projects}/>
+          <Route path="/modelmarkets/:modelsId" component={PublicServedModelsDetail}/>
+          <Route path="/modelmarkets" component={PublicServedModels}/>
         </Switch>
       </div>
     </MainLayout>
   )
 }
 
-const Main = withRouter(connect(({ login, projectDetail }) => ({ login, projectDetail }))(RouterConfig))
+const Main = withRouter(connect(({ projectDetail }) => ({ projectDetail }))(RouterConfig))
 
 const App = ((props) =>
     <HashRouter>

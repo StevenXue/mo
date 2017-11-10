@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
-import { Select, Button, Card } from 'antd'
+import { Select, Button, Card, Icon } from 'antd'
 import ProjectModel from '../../../../components/ProjectModel/index'
 import { showTime } from '../../../../utils/index'
 import { privacyChoices } from '../../../../constants'
@@ -30,7 +30,7 @@ function Projects({ history, project, dispatch }) {
         {/*<Select defaultValue="lucy" className={styles.select}  allowClear>*/}
         {/*<Option value="lucy">Lucy</Option>*/}
         {/*</Select>*/}
-        <ProjectModel new={true} >
+        <ProjectModel new={true}>
           <Button icon='plus-circle-o' type='primary' className={styles.rightButton}>New Project</Button>
         </ProjectModel>
       </div>
@@ -38,9 +38,12 @@ function Projects({ history, project, dispatch }) {
         {project.projects.map(e =>
           <Card key={e._id} title={e.name} className={styles.card}
                 onClick={() => toProjectDetail(e._id, history)} style={{ cursor: 'pointer' }}>
-            <div >
-              <p>Description: {e.description}</p>
-              <p>Create Time: {showTime(e.create_time)}</p>
+            <div>
+              <p className={styles.des}>{e.description}</p>
+              <p className={styles.other}>
+                <Icon type="clock-circle-o" style={{marginRight: 10}}/>
+                {showTime(e.create_time)}
+              </p>
               {e['user_name'] && <p>Owner: {e.user_name}</p>}
             </div>
           </Card>)}

@@ -28,7 +28,7 @@ Date.prototype.Format = function (fmt) {
   return fmt;
 }
 
-export function showTime(time, format = "yyyy-MM-dd hh:mm:ss") {
+export function showTime(time, format = "yyyy-MM-dd hh:mm") {
   if (typeof time === 'string' && time.toLowerCase().indexOf('z') === -1) {
     time = formatTimeZ(time);
   }

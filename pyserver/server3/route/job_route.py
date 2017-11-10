@@ -6,6 +6,7 @@ Author: Bingwei Chen
 Date: 2017.10.20
 
 """
+import sys, traceback
 
 from flask import Blueprint
 from flask import jsonify
@@ -19,7 +20,11 @@ from server3.business import job_business
 
 from server3.business import project_business
 from server3.business import toolkit_business
+from server3.business import ownership_business
 from server3.utility import json_utility
+from server3.service.logger_service import emit_error
+from server3.service.logger_service import emit_success
+from server3.service.logger_service import save_job_status
 
 PREFIX = "/job"
 
@@ -99,18 +104,54 @@ def run_job():
     project_id = data["project_id"]
 
     job_obj = job_business.get_by_job_id(job_id)
-    if job_obj.toolkit:
-        result = job_service.run_toolkit_job(project_id=project_id, job_obj=job_obj)
-    else:
-        if not job_obj.model:
+    project = project_business.get_by_id(project_id)
+    ow = ownership_business.get_ownership_by_owned_item(project, 'project')
+    # user ID
+    user_ID = ow.user.user_ID
+    type = None
+    try:
+        if job_obj.toolkit:
+            type = 'toolkit'
+            complete = True
+            content = 'Toolkit job completed in project ' + project.name
+            result = job_service.run_toolkit_job(project_id=project_id,
+                                                 job_obj=job_obj)
+        elif job_obj.model:
+            type = 'model'
+            complete = False
+            content = 'Model job successfully created in project ' + \
+                      project.name
+            result = job_service.run_model_job(project_id=project_id,
+                                               job_obj=job_obj)
+        else:
             return jsonify(
                 {"response": 'no model and toolkit in job object'}), 400
-        result = job_service.run_model_job(project_id=project_id, job_obj=job_obj)
-    result = json_utility.convert_to_json(result)
-    return jsonify({
-        "response": {
-            "result": result
-        }}), 200
+        result = json_utility.convert_to_json(result)
+    except Exception:
+        # if error send error, save error and raise error
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        message = {
+            'error': repr(traceback.format_exception(exc_type, exc_value,
+                                                     exc_traceback)),
+            'type': type
+        }
+        print(message)
+        emit_error(message, str(project_id), job_id=job_id, user_ID=user_ID)
+        save_job_status(job_obj, error=message, status=300)
+        return jsonify({
+            "response": {
+                "result": message
+            }}), 200
+    else:
+        message = {
+            'project_name': project.name,
+            'type': type,
+            'complete': complete,
+            'content': content
+        }
+        emit_success(message, str(project_id), job_id=job_id,
+                     user_ID=user_ID)
+        return jsonify({"response": {"result": result}}), 200
 
 
 @job_app.route("/save_result", methods=["POST"])
@@ -149,7 +190,6 @@ def save_as_result():
     #     'new_sds_name': 'xxx',
     # }
     data = request.get_json()
-    print("save_as_result data", data)
     job_id = data['job_id']
     new_sds_name = data.get("new_sds_name")
     job_service.save_as_result(
@@ -161,6 +201,15 @@ def save_as_result():
         "response": {
             "result": 'save as success'
         }}), 200
+
+
+@job_app.route("/jobs/<string:job_id>", methods=["PUT"])
+def update_job(job_id):
+    data = request.get_json()
+    new_job = job_business.update_job_by_id(job_id, **data)
+    new_job = json_utility.convert_to_json(new_job.to_mongo())
+    return jsonify({
+        "response": new_job}), 200
 
 
 if __name__ == "__main__":

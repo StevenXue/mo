@@ -13,7 +13,7 @@ function Common(props) {
     <div className={styles.container}>
 
 
-      <Spin spinning={props.model.spinLoading.wholePage}>
+      <Spin spinning={false}>
 
         <div className={styles.content}>
           <div className={styles.sidebar}>

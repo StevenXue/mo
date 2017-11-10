@@ -33,15 +33,9 @@ def register():
     data.pop('password')
     if user_ID is None or password is None:
         return jsonify({'response': 'invalid user or password'}), 400
-    # added_user = user_service.add(user_ID, password, data)
-    # added_user = json_utility.convert_to_json(added_user.to_mongo())
-    # added_user.pop('password')
-    try:
-        added_user = user_service.add(user_ID, password, data)
-        added_user = json_utility.convert_to_json(added_user.to_mongo())
-        added_user.pop('password')
-    except Exception as e:
-        return jsonify({'response': '%s: %s' % (str(Exception), e.args)}), 400
+    added_user = user_service.add(user_ID, password, data)
+    added_user = json_utility.convert_to_json(added_user.to_mongo())
+    added_user.pop('password')
     return jsonify({'response': added_user}), 200
 
 

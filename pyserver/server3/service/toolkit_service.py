@@ -67,7 +67,8 @@ NEW_TOOLKIT_CATEGORY = [
         'us_name': 'Data Quality Improve',
         'child': [
             '归一化',
-            '合并添加列'
+            '合并添加列',
+            '合并添加行'
         ],
         'children': []
     },

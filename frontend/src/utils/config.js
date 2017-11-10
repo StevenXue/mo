@@ -41,6 +41,7 @@ module.exports = {
     getDataFields: '/data/data_sets/fields',
     neuralStyle: '/model/neural_style',
     servedModel: '/served_model',
-    allModels: '/served_models'
+    allModels: '/served_models',
+    publicServedModels:'/public_served_models'
   },
 }
