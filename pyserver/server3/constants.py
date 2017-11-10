@@ -1,6 +1,6 @@
 from uuid import getnode as get_mac
 
-MONGO = 'EXTERNAL'
+MONGO = 'DEFAULT'
 # if get_mac() == 274973436731254:
 #     MONGO = 'DEFAULT'
 PORT = 5000
