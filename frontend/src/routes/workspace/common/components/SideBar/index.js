@@ -110,6 +110,10 @@ function Sidebar({ model, dispatch, namespace }) {
       type: namespace + '/toggleDropButton',
       payload: { sectionId, dropButton: false },
     })
+    // dispatch({
+    //   type: namespace + '/clickDrop',
+    //   payload: { sectionId, clickDrop: false },
+    // })
   }
 
   const menu = (sectionId) => {
@@ -123,6 +127,10 @@ function Sidebar({ model, dispatch, namespace }) {
         </Menu.Item>
       </Menu>
     )
+  }
+
+  const onInputClick = (e) => {
+    e.stopPropagation()
   }
 
   return (
@@ -154,6 +162,7 @@ function Sidebar({ model, dispatch, namespace }) {
                 return (
                   <div
                     key={section._id + section.section_name}
+                    id='section-area'
                     className={`${styles.row} custom-little-title-font`}
                     style={{
                       backgroundColor: backgroundColor,
@@ -169,6 +178,8 @@ function Sidebar({ model, dispatch, namespace }) {
                       {section.editing ? <Input
                         className={styles.nameInput}
                         defaultValue={section[tempVariable.nameOrId] || section[translateDict[namespace]].name}
+                        // onFocus={(e) => onInputClick(e)}
+                        // onClick={(e) => onInputClick(e)}
                         onBlur={(e) => submitNewName(e, section._id)}
                         onPressEnter={(e) => submitNewName(e, section._id)}
                         autoFocus={true}/> : section[tempVariable.nameOrId] || section[translateDict[namespace]].name
@@ -180,16 +191,17 @@ function Sidebar({ model, dispatch, namespace }) {
                         {/*<div className={styles.light}/>*/}
                       </div>
                     </div>
-                    {
-                      section.dropButton ?
-                        <Dropdown overlay={menu(section._id)} trigger={['click']}>
-                          <a className="ant-dropdown-link" href="#">
-                            <Icon type="down"/>
-                          </a>
-                        </Dropdown> :
-                        <span className={styles[statusDict[section.status]]}>{statusDict[section.status]}</span>
-                    }
-
+                    <Dropdown overlay={menu(section._id)} trigger={['click']}
+                              placement='bottomRight'
+                              getPopupContainer={() => document.getElementById('section-area')}>
+                      {!section.dropButton ? <span className={styles[statusDict[section.status]]}>
+                        {statusDict[section.status]}
+                        </span>
+                        : <a className="ant-dropdown-link" href="#">
+                          <Icon type="down"/>
+                        </a>
+                      }
+                    </Dropdown>
                   </div>
                 )
               },
