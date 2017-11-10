@@ -86,10 +86,12 @@ def delete_served_model(oid):
 @served_model_app.route('/served_models', methods=['GET'])
 def list_served_models():
     user_ID = request.args.get('user_ID')
-    category = request.args.get('category')
+    related_fields = request.args.get('category')
     model_ID = request.args.get('model_ID')
     skipping = request.args.get('skipping')
+    search_str = request.args.get('searchStr')
     print('model_ID', model_ID)
+    print('search_str', search_str)
     if user_ID:
         public_served_models, owned_served_models = \
             served_model_service.list_served_models_by_user_ID(user_ID,
@@ -109,7 +111,7 @@ def list_served_models():
         return jsonify({'response': model})
     else:
         all_public_served_models = served_model_service.list_all_served_models(
-            category, skipping)
+            related_fields=related_fields, skipping=skipping, search_str=search_str)
         return jsonify({'response': all_public_served_models})
 
 

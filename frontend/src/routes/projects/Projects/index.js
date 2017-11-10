@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
-import { Select, Button, Card } from 'antd'
+import { Select, Button, Card ,Icon} from 'antd'
 import { showTime } from '../../../utils/index'
 import { privacyChoices } from '../../../constants'
 

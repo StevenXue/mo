@@ -118,11 +118,12 @@ def terminate_by_id(oid):
 
 
 def get_by_four_querys(related_fields=None, related_tasks=None, tags=None,
-                       privacy=None, skipping=None):
+                       privacy=None, skipping=None, search_str=None):
     return served_model_repo.query_four(related_fields=related_fields,
                                         related_tasks=related_tasks,
                                         tags=tags, skipping=skipping,
-                                        privacy=privacy)
+                                        privacy=privacy,
+                                        search_str=search_str)
 
 
 # def suspend_by_id(oid):

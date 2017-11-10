@@ -17,3 +17,7 @@ export function fetchOnePublicServedModels(payload) {
   return request(`${CORS}/served_model/served_models?model_ID=${payload.model_ID}`);
 }
 
+// 获取一个 public deployed models
+export function search_served_models(payload) {
+  return request(`${CORS}/served_model/served_models?searchStr=${payload.searchStr}`);
+}

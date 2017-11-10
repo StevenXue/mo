@@ -9,7 +9,8 @@ import {
 } from '../services/project'
 import {
   fetchAllPublicServedModels,
-  fetchOnePublicServedModels
+  fetchOnePublicServedModels,
+  search_served_models
 } from '../services/deployedmodels'
 import {privacyChoices} from '../constants'
 import {arrayToJson} from '../utils/JsonUtils';
@@ -28,7 +29,7 @@ export default {
       return {
         ...state,
         modelsJson: action.payload.modelsJson,
-        skipping: 1,
+        skipping: 10,
       }
     },
 
@@ -41,7 +42,7 @@ export default {
       return {
         ...state,
         modelsJson: newInfo,
-        skipping: action.payload.skipping + 1,
+        skipping: action.payload.skipping + 10,
       }
     },
 
@@ -68,18 +69,14 @@ export default {
   effects: {
     // fetch 10
     * fetch(action, {call, put, select, take}) {
-      let skipping = yield select(state => state.publicServedModels.skipping);
-      console.log('skipping')
-      console.log(skipping)
+
       const {data: models} = yield call(fetchAllPublicServedModels, {
-        privacy: false, category: action.payload.category, skipping: skipping
+        privacy: false, category: action.payload.category, skipping: action.payload.skipping
       })
       const modelsJson = arrayToJson(models, '_id')
       // console.log('modelsJson')
       // console.log(modelsJson)
-
-      let category = yield select(state => state.publicServedModels.category);
-      if (action.payload.category !== category){
+      if (action.payload.skipping === 0){
         yield put({
           type: 'setPublicServedModels',
           payload: {modelsJson: modelsJson,
@@ -90,7 +87,7 @@ export default {
         yield put({
           type: 'addPublicServedModels',
           payload: {modelsJson: modelsJson,category:action.payload.category,
-            skipping:skipping}
+            skipping:action.payload.skipping}
         })
       }
 
@@ -104,6 +101,18 @@ export default {
       // yield put(routerRedux.push('/modelmarkets/' + action.payload.model_ID))
       // const modelJson = arrayToJson(model, '_id');
       yield put({type: 'setFocusModels', payload: {model: model}})
+    },
+
+
+    * search(action, {call, put, select, take}) {
+      const {data: modelsJson} = yield call(search_served_models, {
+        searchStr: action.payload.searchStr
+      })
+      yield put({
+        type: 'setPublicServedModels',
+        payload: {modelsJson: modelsJson,
+          category:action.payload.category}
+      })
     },
 
     * getPrediction(action, {call, put, select}) {
@@ -126,7 +135,7 @@ export default {
         if (pathname === '/modelmarkets') {
           dispatch({
             type: 'fetch',
-            payload: {privacy: 'public', category: 'All'}
+            payload: {privacy: 'public', category: 'All',skipping: 0,}
           })
         } else if (match) {
           console.log('match')
