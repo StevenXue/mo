@@ -406,6 +406,7 @@ LinearRegressorHyperSteps = [
     {
         "name": "data_source",
         "display_name": "Select Data Source",
+        "des": "select the datasource to process",
         "args": [
             {
                 "name": "input",
@@ -424,6 +425,7 @@ LinearRegressorHyperSteps = [
     {
         "name": "feature_fields",
         "display_name": "Select Feature Fields",
+
         "args": [
             {
                 "name": "fields",
@@ -546,7 +548,8 @@ LinearRegressorHyperSteps = [
     # hyper
     {
         'name': 'hyperparameters',
-        "display_name": "hyperparameters",
+        "display_name": "Hyperparameters",
+        "des": "the tuning hyperparametes and their settings",
         "args": [
             {
                 **SPEC.ui_spec['multiple_input'],

@@ -1763,12 +1763,14 @@ def remove_one_public_toolkit():
 
 
 # input = SPEC.ui_spec['input']
+############################################## new #################################################
 
 
 class StepTemplate(object):
     data_source = {
         'name': 'data_source',
-        'display_name': 'select data source',
+        'display_name': 'Select data source',
+        'des': 'select the datasource to process',
         'args': [
             {
                 **SPEC.ui_spec['choice'],
@@ -1995,7 +1997,7 @@ def update_toolkit():
                   steps=[
                       {
                           'name': 'data_source',
-                          'display_name': 'select data source',
+                          'display_name': 'Select data source',
                           'args': [
                               {
                                   **SPEC.ui_spec['choice'],
@@ -2006,7 +2008,7 @@ def update_toolkit():
                       },
                       {
                           'name': 'fields',
-                          'display_name': 'select fields',
+                          'display_name': 'Select fields',
                           'args': [
                               {
                                   **SPEC.ui_spec['multiple_choice'],
@@ -2017,7 +2019,7 @@ def update_toolkit():
                       },
                       {
                           'name': 'parameters',
-                          'display_name': 'input parameters',
+                          'display_name': 'Parameters',
                           'args': [
                               {
                                   **SPEC.ui_spec['input'],
