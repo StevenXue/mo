@@ -23,8 +23,8 @@ class StagingDataRepo(Repo):
                 query.update({field: {'$ne': math.nan}})
         # print(query)
         if with_id:
-            return Repo.read(self, query).fields(
-                **{field: 1 for field in fields})
-        else:
-            return Repo.read(self, query).fields(
-                **{field: 1 for field in fields}).exclude('id')
+            if '_id' in fields:
+                return Repo.read(self, query).fields(
+                    **{field: 1 for field in fields})
+        return Repo.read(self, query).fields(
+            **{field: 1 for field in fields}).exclude('id')

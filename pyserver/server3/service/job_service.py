@@ -487,6 +487,7 @@ def model_steps_to_obj(job_obj, project_id):
     layers_idx = None
     est_idx = None
     comp_idx = None
+    hyper_idx = None
 
     for i, step in enumerate(steps):
         if step.get('name') == 'fit':
@@ -497,6 +498,8 @@ def model_steps_to_obj(job_obj, project_id):
             est_idx = i
         if step.get('name') == 'compile':
             comp_idx = i
+        if step.get('name') == 'hyperparameters':
+            hyper_idx = i
 
     if not fit_idx:
         raise Exception('Error: no fit step')
@@ -536,6 +539,17 @@ def model_steps_to_obj(job_obj, project_id):
         if est_idx:
             conf['estimator'] = {'args': get_args(steps[est_idx]['args'])}
 
+    elif model_obj.category == 7:
+        conf['fit'].update({
+            "data_fields":
+                [steps[1]["args"][0]["values"],
+                 steps[2]["args"][0]["values"]]
+        })
+        if est_idx:
+            conf['estimator'] = get_args(steps[est_idx]['args'])
+
+        conf['hyperparameters'] = get_args(steps[hyper_idx]['args'])
+
     obj = {
         "data_source_id": job_obj.steps[0]["args"][0]["value"],
         "conf": conf,
@@ -561,7 +575,6 @@ def run_toolkit_job_pro(job_obj, project_id):
     return func_rst
 
 
-
 def get_args(args):
     return {'args':
                 {arg.get('name'): arg.get('value')
@@ -573,7 +586,15 @@ def get_args(args):
 
 def run_toolkit_job(job_obj, project_id):
     if job_obj.toolkit.category == -1:
-        return run_toolkit_job_pro(job_obj, project_id)
+        result = run_toolkit_job_pro(job_obj, project_id)
+        # save result to job
+
+        job_obj.result = result
+        job_obj.save()
+        return {
+            "result": result,
+            "result_sds_obj": None,
+            }
 
     data = toolkit_steps_to_obj(job_obj, project_id)
 
@@ -615,36 +636,36 @@ def run_model_job(job_obj, project_id):
     return model_service.kube_run_model(job_obj=job_obj, **obj)
 
 
-def run_job(obj, job_obj):
-    if obj.get('model_id'):
-        return model_service.kube_run_model(job_obj=job_obj, **obj)
-    else:
-        data = obj
-        staging_data_set_id = data.get('staging_data_set_id')
-        toolkit_id = data.get('toolkit_id')
-        project_id = data.get('project_id')
-        conf = data.get('conf')
-
-        # conf初步操作
-        flag = isinstance(conf["data_fields"][0], (list, tuple))
-        x_fields = conf["data_fields"][0] if flag else conf["data_fields"]
-        y_fields = conf["data_fields"][1] if flag else None
-        fields = x_fields + y_fields if flag else x_fields
-        data = staging_data_business.get_by_staging_data_set_and_fields(
-            ObjectId(staging_data_set_id), fields)
-
-        # 数据库转to_mongo和to_dict
-        data = [d.to_mongo().to_dict() for d in data]
-
-        # 拿到conf
-        fields = [x_fields, y_fields]
-        conf = conf.get('args')
-
-        result = toolkit_service.run_toolkit(project_id, staging_data_set_id,
-                                             toolkit_id,
-                                             fields, data, conf, job_obj)
-        result.update({"fields": [x_fields, y_fields]})
-        return result
+# def run_job(obj, job_obj):
+#     if obj.get('model_id'):
+#         return model_service.kube_run_model(job_obj=job_obj, **obj)
+#     else:
+#         data = obj
+#         staging_data_set_id = data.get('staging_data_set_id')
+#         toolkit_id = data.get('toolkit_id')
+#         project_id = data.get('project_id')
+#         conf = data.get('conf')
+#
+#         # conf初步操作
+#         flag = isinstance(conf["data_fields"][0], (list, tuple))
+#         x_fields = conf["data_fields"][0] if flag else conf["data_fields"]
+#         y_fields = conf["data_fields"][1] if flag else None
+#         fields = x_fields + y_fields if flag else x_fields
+#         data = staging_data_business.get_by_staging_data_set_and_fields(
+#             ObjectId(staging_data_set_id), fields)
+#
+#         # 数据库转to_mongo和to_dict
+#         data = [d.to_mongo().to_dict() for d in data]
+#
+#         # 拿到conf
+#         fields = [x_fields, y_fields]
+#         conf = conf.get('args')
+#
+#         result = toolkit_service.run_toolkit(project_id, staging_data_set_id,
+#                                              toolkit_id,
+#                                              fields, data, conf, job_obj)
+#         result.update({"fields": [x_fields, y_fields]})
+#         return result
 
 
 def save_result(job_id):
@@ -666,7 +687,7 @@ def save_as_result(job_id, new_sds_name):
         name=new_sds_name,
         description='des',
         project=project_obj,
-        job=job_obj
+        # job=job_obj
     )
 
     # 拿到原表

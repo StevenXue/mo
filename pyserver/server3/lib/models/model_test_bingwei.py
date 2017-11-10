@@ -5,13 +5,17 @@ from sklearn.model_selection import train_test_split
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials, rand, tpe, space_eval
 
 from server3.lib.models.linear_regressor import linear_regressor_model_fn
-from server3.lib.models import *
+from server3.lib.models import custom_model
 from server3.business import staging_data_set_business
 
 
 boston = load_boston()
 boston_feature = pd.DataFrame(data=np.c_[boston['data']],
                               columns=boston['feature_names'])
+
+# print("names", boston['feature_names'])
+# print(boston['target'])
+
 boston_label = pd.DataFrame(data=boston['target'],
                             columns=['target'])
 

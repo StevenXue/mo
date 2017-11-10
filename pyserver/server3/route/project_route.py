@@ -13,6 +13,7 @@ from flask import request
 from kubernetes import client
 
 from server3.service import project_service
+from server3.service import ownership_service
 from server3.business import project_business
 from server3.utility import json_utility
 from server3.utility import str_utility
@@ -40,8 +41,12 @@ def get_project(project_id):
 def list_projects():
     user_ID = request.args.get('user_ID')
     privacy = request.args.get('privacy')
-    projects = project_service. \
-        list_projects_by_user_ID(user_ID, -1, privacy=privacy)
+    others = request.args.get('others')
+    if others == 'true':
+        projects = ownership_service.get_all_public_projects_of_others(user_ID)
+    else:
+        projects = project_service. \
+            list_projects_by_user_ID(user_ID, -1, privacy=privacy)
     projects = json_utility. \
         me_obj_list_to_json_list(projects)
     return jsonify({'response': projects}), 200
