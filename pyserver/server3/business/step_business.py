@@ -1,5 +1,10 @@
-
 # TODO
+class BaseStepBusiness:
+    @staticmethod
+    def get_step(steps, step_name):
+        for step in steps:
+            if step['name'] == step_name:
+                return step
 
 
 class StepBusiness:
@@ -43,4 +48,21 @@ class StepBusiness:
         for step in steps:
             if step['name'] == step_name:
                 return step
+
+
+class StepBusinessZhao:
+    @staticmethod
+    def get_step(steps, step_name):
+        for step in steps:
+            if step['name'] == step_name:
+                return step
+
+    @staticmethod
+    def get_args(args):
+        return {'args':
+                    {arg.get('name'): arg.get('value')
+                                      or arg.get('values')
+                                      or arg.get('default')
+                     for arg in args}
+                }
 

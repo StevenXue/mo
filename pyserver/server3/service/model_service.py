@@ -157,8 +157,8 @@ def kube_run_model(conf, project_id, data_source_id, model_id, job_obj,
 
     job_id = str(job_obj.id)
     print(job_id)
-    # return run_model(conf, project_id, data_source_id, model_id, job_id,
-    #                  **kwargs)
+    return run_model(conf, project_id, data_source_id, model_id, job_id,
+                     **kwargs)
     # return #
     cwd = os.getcwd()
     job_name = job_id + '-training-job'
@@ -267,6 +267,17 @@ def run_model(conf, project_id, data_source_id, model_id, job_id, **kwargs):
                                     model, f, job_id, input_dict,
                                     file_id=data_source_id,
                                     result_dir=result_dir)
+    elif model['category'] == ModelType['hyperopt']:
+        f = getattr(models, model.entry_function)
+        fit = conf.get('fit', None)
+        data_fields = fit.get('data_fields', [[], []])
+        input_dict = model_input_manager_custom_supervised(data_fields,
+                                                           data_source_id,
+                                                           model.name,
+                                                           **kwargs)
+        return job_service.run_code(conf, project_id, data_source_id,
+                                    model, f, job_id, input_dict,
+                                    result_dir=result_dir)
     else:
         # custom models
         f = models.custom_model
@@ -287,6 +298,17 @@ def run_model(conf, project_id, data_source_id, model_id, job_id, **kwargs):
                                                           data_source_id,
                                                           model.name,
                                                           **kwargs)
+            return job_service.run_code(conf, project_id, data_source_id,
+                                        model, f, job_id, model_fn, input_dict,
+                                        result_dir=result_dir)
+
+
+        if model['category'] == ModelType['hyperopt']:
+            data_fields = fit.get('data_fields', [[], []])
+            input_dict = model_input_manager_custom_supervised(data_fields,
+                                                               data_source_id,
+                                                               model.name,
+                                                               **kwargs)
             return job_service.run_code(conf, project_id, data_source_id,
                                         model, f, job_id, model_fn, input_dict,
                                         result_dir=result_dir)
@@ -1038,16 +1060,16 @@ def _update_model():
     HyperLinearRegressor = {
         "name": "Hyper Linear Regressor",
         "description": "Linear Regressor with hyper parameters tuning",
-        # "target_py_code": "server3/lib/models/kmean",
-        # "entry_function": "kmeans_cluster_model_fn",
-        # "to_code_function": "custom_model_to_str",
-        # "category": 2,
-        # "model_type": 2,
-        # "steps": models.KmeansSteps,
-        # "parameter_spec": models.KmeansCluster,
-        # "input": {
-        #     "type": "DataFrame"
-        # }
+        "target_py_code": "server3/lib/models/linear_regressor_hyper.py",
+        "entry_function": "linear_regression_hyper_model_fn",
+        "to_code_function": "custom_model_to_str",
+        "category": 7,
+        "model_type": 0,
+        "steps": models.LinearRegressorHyperSteps,
+        "parameter_spec": models.LinearRegressor,
+        "input": {
+            "type": "DataFrame"
+        }
     }
 
     user = user_business.get_by_user_ID('system')
@@ -1102,7 +1124,7 @@ def _update_model():
             "obj": Kmeans
         },
         {
-            "_id": None,
+            "_id": ObjectId("5a0408f0d845c03b92e7bb35"),
             "is_private": False,
             "user_ID": user.user_ID,
             "obj": HyperLinearRegressor
@@ -1167,7 +1189,8 @@ if __name__ == '__main__':
     # run_model(conf, "595f32e4e89bde8ba70738a3", "5979da380c11f32674eb2788",
     #           "59687821d123abcfbfe8cab9")
 
-    temp()
+    # temp()
+    _update_model()
 
 
 def split_supervised_input(staging_data_set_id, x_fields, y_fields, schema,

@@ -3,7 +3,7 @@ from mongoengine import DynamicDocument
 from mongoengine import ReferenceField
 from mongoengine import StringField
 from mongoengine import IntField
-from mongoengine import ListField
+from mongoengine import ListField, DictField
 
 SUB_SET_PURPOSE = (
     (0, 'training'),
@@ -19,6 +19,8 @@ class StagingDataSet(DynamicDocument):
     file = ReferenceField('File')
     meta = {'allow_inheritance': True}
     # TODO when import the type of fields will be specified
+    result = DictField()
+    history = ListField(DictField())
     # stage = StringField(required=True, choices=STAGES)
     # source_data_sets = ListField(ReferenceField('DataSet'))
 

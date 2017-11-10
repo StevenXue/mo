@@ -34,6 +34,81 @@ from tensorflow.python.training import training as train
 
 from server3.constants import SPEC
 
+from hyperopt import fmin, tpe, hp, STATUS_OK, Trials, rand, tpe, space_eval
+from server3.lib.models import custom_model
+from server3.lib.models import linear_regressor_model_fn
+from server3.utility import json_utility
+
+
+########### main ##########
+def linear_regression_hyper_model_fn(conf, input, **kw):
+    print('conf')
+    print(conf)
+    print("kw", kw)
+
+    base_conf = conf
+    # base_conf.pop('hyperparameters')
+    result_sds = kw.pop("result_sds")
+    print("result_sds_id", result_sds.id)
+
+    result_sds.history = []
+    result_sds.save()
+
+    def objective(args):
+        base_conf['fit']["args"]['steps'] = args
+        # steps = args
+        # params['fit']['args']['steps'] = steps
+        # sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
+        result = custom_model(base_conf, linear_regressor_model_fn, input,
+                              result_sds=result_sds, **kw)
+        print("base_conf", base_conf)
+        print("history result", result)
+        print("old history", result_sds.history)
+        new_his = result_sds.history
+        new_his.append(result)
+        new_his = json_utility.convert_to_json(new_his)
+        print("new_his", new_his)
+        result_sds.history = new_his
+        result_sds.save()
+
+        return result['eval_metrics']['loss']
+
+    hyperparameters = conf['hyperparameters']["args"]
+    train_steps = hyperparameters["train_steps"]
+    hyper_tuning_method = hyperparameters["hyper_tuning_method"]
+    tuning_steps = hyperparameters["tuning_steps"]
+
+    algo = {
+        "rand.suggest": rand.suggest,
+        "tpe.suggest": tpe.suggest
+    }
+    space = [hp.uniform('train_steps', train_steps[0], train_steps[1])]
+    print("space", space)
+
+    best = fmin(objective, space, algo=algo[hyper_tuning_method], max_evals=tuning_steps)
+
+    print("best space: ", space_eval(space, best))
+    print("best : ", best)
+
+    # best space:  (400.0,)
+    # best :  {'train_steps': 400.0}
+
+    base_conf['fit']["args"]['steps'] = best['train_steps']
+    result = custom_model(base_conf, linear_regressor_model_fn, input,
+                          result_sds=result_sds, **kw)
+    print("result", result)
+
+    # 将结果存入 sds
+    print("result_sds_id", result_sds.id)
+
+    result_sds.result = {
+        'best': best,
+        'result': json_utility.convert_to_json(result)
+        }
+    result_sds.save()
+
+
+########### main ##########
 
 def train_hyperopt_model(conf, input):
     pass
@@ -327,7 +402,7 @@ LinearRegressionTemplate = {
 }
 
 
-LinearRegressorSteps = [
+LinearRegressorHyperSteps = [
     {
         "name": "data_source",
         "display_name": "Select Data Source",
@@ -466,6 +541,44 @@ LinearRegressorSteps = [
                 "default": 1,
                 "required": True
             },
+        ]
+    },
+    # hyper
+    {
+        'name': 'hyperparameters',
+        "display_name": "hyperparameters",
+        "args": [
+            {
+                **SPEC.ui_spec['multiple_input'],
+                "name": "train_steps",
+                "display_name": "Train Steps",
+                "des": "Number of steps of training",
+                # "default": 1,
+                'values': [400, 1000],
+                'len_range': [2, 2],
+                "required": True
+            },
+            {
+                **SPEC.ui_spec['choice'],
+                "name": "hyper_tuning_method",
+                "display_name": "hyper tuning method",
+                'des': 'hyper parameters tuning method',
+                'range': ['rand.suggest', 'tpe.suggest'],
+                'value': 'rand.suggest',
+                'required': True
+            },
+
+            {
+                **SPEC.ui_spec['input'],
+                "name": "tuning_steps",
+                "display_name": "Tuning steps",
+                "des": "Number of steps of Tuning",
+                'value_type': 'int',
+                'range': [1, 100],
+                'value': 10,
+                'required': True
+            }
+
         ]
     }
 ]

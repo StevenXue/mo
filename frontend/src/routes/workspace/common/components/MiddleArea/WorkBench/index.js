@@ -795,6 +795,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                   case 'select_index':
                     return renderFieldsPro(steps, step, stepIndex);
 
+                  case 'hyperparameters':
                   case 'parameters':
                     // num of args filled
                     let numArgsFill = 0;
@@ -823,6 +824,8 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                       )
 
                     ];
+
+
 
                   case 'layers':
                     let numOfLayer = 2;

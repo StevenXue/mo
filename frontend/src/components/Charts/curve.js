@@ -159,6 +159,7 @@ export default class LearningCurve extends React.Component {
   render() {
     return (
       <div>
+
         {this.props.batch}
         <Spin spinning={isEmpty(this.props.data)} tip="Initializing...">
           <div style={{ minHeight: 100 }}>
