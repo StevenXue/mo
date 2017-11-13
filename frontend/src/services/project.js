@@ -2,7 +2,7 @@
 import { request, config } from '../utils';
 
 const { CORS, api } = config
-const { projects } = api
+const { projects, fork } = api
 
 // 获取用户所有 projects
 export function fetchProjects(payload) {
@@ -47,5 +47,16 @@ export function deleteProject(payload) {
   const user_ID = localStorage.getItem('user_ID')
   return request(`${CORS}${projects}/${payload.projectId}?user_ID=${user_ID}`, {
     method: 'delete'
+  });
+}
+
+// fork project
+export function forkProject(prjID) {
+  const user_ID = localStorage.getItem('user_ID')
+  return request(`${CORS}${fork}/${prjID}?user_ID=${user_ID}`, {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
 }
