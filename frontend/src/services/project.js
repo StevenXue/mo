@@ -4,11 +4,11 @@ import { request, config } from '../utils';
 const { CORS, api } = config
 const { projects } = api
 
-// 获取用户 所有的project 下的 所有的 models
-export function fetchModels(payload) {
-  const user_ID = localStorage.getItem('user_ID')
-  return request(`${CORS}/project/models/${user_ID}?privacy=all`);
-}
+// 获取用户 所有的project 下的 所有的 deploy 过的 models
+// export function fetchDeployment(payload) {
+//   const user_ID = localStorage.getItem('user_ID')
+//   return request(`${CORS}/served_models/${user_ID}?privacy=all`);
+// }
 
 // 获取用户所有 projects
 export function fetchProjects(payload) {

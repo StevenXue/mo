@@ -261,7 +261,6 @@ def get_all_jobs_of_project(project_id, categories, status=None):
                 else:
                     served_model = None
                     job_info["served_model"] = served_model
-
                 history_jobs[key].append(job_info)
                 break
     return history_jobs

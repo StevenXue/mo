@@ -1,13 +1,10 @@
-import {routerRedux} from 'dva/router'
-import pathToRegexp from 'path-to-regexp'
 import {
-  fetchModels,
-} from '../services/project'
-import {arrayToJson} from '../utils/JsonUtils';
+  fetchServedModelsByUserID,
+} from '../services/deployedmodels'
 import * as deploymentService from '../services/deployment';
 
 export default {
-  namespace: 'MyService',
+  namespace: 'myService',
   state: {
     modelsJson: [],
     focusModel: null,
@@ -60,7 +57,7 @@ export default {
     // fetch 10
     * fetch(action, {call, put, select, take}) {
 
-      const {data: models} = yield call(fetchModels, {
+      const {data: models} = yield call(fetchServedModelsByUserID, {
         privacy: false, category: action.payload.category, skipping: action.payload.skipping
       })
       console.log('models')

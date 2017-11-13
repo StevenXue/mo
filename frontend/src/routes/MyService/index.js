@@ -17,18 +17,21 @@ const related_fields= ['All',
   'Social', 'Transportation', 'Science', 'Technology'];
 
 
-function MyService({history, MyService, dispatch}) {
+function MyService({history, myService, dispatch}) {
 
   const {
     modelsJson,
     focusModel,
     category,
     skipping
-  } = MyService;
+  } = myService;
+
+  console.log('myService')
+  console.log(myService)
 
   const props = {
-    model: MyService,
-    namespace: 'MyService',
+    model: myService,
+    namespace: 'myService',
     dispatch: dispatch,
   };
 
@@ -104,4 +107,4 @@ function MyService({history, MyService, dispatch}) {
   )
 }
 
-export default connect(({MyService}) => ({MyService}))(MyService)
+export default connect(({myService}) => ({myService}))(MyService)
