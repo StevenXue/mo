@@ -2,6 +2,14 @@ import {request, config} from '../utils';
 
 const {CORS, api} = config
 
+
+// 获取某一个用户下 所有 deployed models （包括serving中的和 没serving中的）
+export function fetchServedModelsByUserID(payload) {
+  const user_ID = localStorage.getItem('user_ID')
+  return request(`${CORS}/served_model/served_models?user_ID=${user_ID}`);
+}
+
+
 // 获取所有 public deployed models
 export function fetchAllPublicServedModels(payload) {
   if (payload.privacy === 'public') {

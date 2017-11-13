@@ -52,26 +52,28 @@ def list_projects():
     return jsonify({'response': projects}), 200
 
 
-@project_app.route('/models/<string:user_ID>', methods=['GET'])
-def get_jobs_of_user(user_ID):
-    privacy = request.args.get('privacy')
-    # categories = request.args.get('categories')
-    projects = project_service.list_projects_by_user_ID(user_ID, -1,
-                                                        privacy=privacy)
-    projects = json_utility.me_obj_list_to_json_list(projects)
-    print('projects')
-    print(projects)
-    all_models_of_user = {}
-    for each_project in projects:
-        all_models_in_this_project = project_service.get_all_jobs_of_project(
-            each_project['_id'],
-            categories=['model'])
-        all_models_in_this_project = json_utility.convert_to_json(all_models_in_this_project)
-        all_models_of_user.update(all_models_in_this_project)
-    print('models')
-    print(all_models_of_user)
-
-    return jsonify({'response': all_models_of_user}), 200
+# @project_app.route('/models/<string:user_ID>', methods=['GET'])
+# def get_service_of_user(user_ID):
+#
+#     # 本来从job里取所有的 model，现改为从service中筛自己的
+#
+#     privacy = request.args.get('privacy')
+#     status = 200
+#     # categories = request.args.get('categories')
+#     projects = project_service.list_projects_by_user_ID(user_ID, -1,
+#                                                         privacy=privacy)
+#     projects = json_utility.me_obj_list_to_json_list(projects)
+#
+#     all_models_of_user = {}
+#     for each_project in projects:
+#         all_models_in_this_project = project_service.get_all_jobs_of_project(
+#             each_project['_id'],
+#             categories=['model'],
+#             status=status)
+#         all_models_in_this_project = json_utility.convert_to_json(all_models_in_this_project)
+#         all_models_of_user.update(all_models_in_this_project)
+#
+#     return jsonify({'response': all_models_of_user['model']}), 200
 
 
 @project_app.route('/jobs/<string:project_id>', methods=['GET'])

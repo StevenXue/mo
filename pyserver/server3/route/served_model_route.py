@@ -104,6 +104,8 @@ def list_served_models():
             'public_served_models': public_served_models,
             'owned_served_models': owned_served_models
         }
+        print('result')
+        print(result)
         return jsonify({'response': result})
     elif model_ID:
         model = served_model_service.get_by_model_id(model_ID)
