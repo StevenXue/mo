@@ -448,14 +448,15 @@ class VisualizationPanel extends React.Component {
   render() {
     const {
       sectionsJson,
-      focusSectionsId
     } = this.props.dataAnalysis
+
+    const { sectionId } = this.props
 
     const {
       toolkit: {
         result_spec
       }
-    } = sectionsJson[focusSectionsId];
+    } = sectionsJson[sectionId];
 
     let save_names = []
     result_spec.args.forEach((arg) => {

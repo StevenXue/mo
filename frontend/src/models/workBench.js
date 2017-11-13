@@ -233,9 +233,18 @@ export default {
     },
 
     setProjectId(state, action) {
+      const {projectId} = action.payload
+      let activeSectionsId = state.activeSectionsId
+      let focusSectionsId = state.focusSectionsId
+      if(state.projectId !== projectId ){
+        activeSectionsId = ['new_launcher ' + 'init']
+        focusSectionsId = 'new_launcher ' + 'init'
+      }
       return {
         ...state,
         projectId: action.payload.projectId,
+        activeSectionsId,
+        focusSectionsId
       }
     },
 
