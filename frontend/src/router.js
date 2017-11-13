@@ -10,6 +10,7 @@ import Account from './routes/login/Account'
 import MyProjects from './routes/workspace/info/Projects'
 import Projects from './routes/projects/Projects'
 import ProjectDetail from './routes/workspace/info/ProjectDetail'
+import PublicProject from './routes/projects/PublicProject'
 import MainLayout from './components/MainLayout/MainLayout'
 import PublicServedModels from  './routes/DeployedModels/ModelsList'
 import  PublicServedModelsDetail from  './routes/DeployedModels/ModelsDetail'
@@ -65,6 +66,7 @@ const RouterConfig = ({ history, location, projectDetail }) => {
           <Route path="/user" component={Account}/>
           <Route path="/workspace/:projectId" component={ProjectDetail}/>
           <Route path="/workspace" component={MyProjects}/>
+          <Route path="/projects/:projectId" component={PublicProject}/>
           <Route path="/projects" component={Projects}/>
           <Route path="/modelmarkets/:modelsId" component={PublicServedModelsDetail}/>
           <Route path="/modelmarkets" component={PublicServedModels}/>
