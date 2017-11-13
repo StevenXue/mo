@@ -2,7 +2,7 @@ import React from 'react'
 import {
   Route,
   Link,
-  Switch
+  Switch,
 } from 'react-router-dom'
 import { connect } from 'dva'
 import { Icon, Button, Tag, Modal } from 'antd'
@@ -41,14 +41,14 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
         dispatch({ type: 'projectDetail/delete', payload: { projectId } })
       },
       onCancel() {
-        console.log('Cancel');
+        console.log('Cancel')
       },
-    });
+    })
   }
 
   if (location.pathname.split('/').length > 3) {
     return (
-      <ProjectDetail match={match} history={history} location={location} project={projectDetail}/>
+      <ProjectDetail match={match} history={history} location={location} projectDetail={projectDetail} dispatch={dispatch}/>
     )
   } else {
     if (projectDetail.project) {
@@ -95,12 +95,14 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
 
 }
 
-function ProjectDetail({ match, history, location, project }) {
+function ProjectDetail({ match, history, location, dispatch, projectDetail }) {
 
   return (
     <div className={`main-container ${styles.normal}`}>
       <div className={styles.step}>
-        <Steps match={match} history={history} location={location}/>
+        <Steps match={match} history={history} location={location}
+               dispatch={dispatch} projectDetail={projectDetail}
+        />
       </div>
       <Switch>
         <Route path="/workspace/:projectID/import/choice" component={DataImport}/>

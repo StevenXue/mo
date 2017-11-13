@@ -32,7 +32,7 @@ class Repo:
         return self.__instance.objects(**query)
 
     def query_four(self, related_fields=None, related_tasks=None,
-                   tags=None, privacy=None, skipping=None):
+                   tags=None, privacy=None, skipping=None, search_str=None):
         query = {}
         if related_fields != 'All':
             query["related_fields"] = related_fields
@@ -43,12 +43,17 @@ class Repo:
         if privacy:
             query['privacy'] = privacy
         print('query', query)
+        if search_str:
+            print('AAAAAAA')
+            return self.__instance.objects().search_text(search_str)
+
         if skipping:
             print('skipping:', skipping)
             return self.__instance.objects(**query).order_by('-_id')[
-                   int(skipping):int(skipping) + 1]
+                   int(skipping):int(skipping) + 10]
         else:
             return self.__instance.objects(**query).order_by('-_id')
+
 
     def read_first_one(self, query):
         return self.__instance.objects(**query).first()
@@ -184,8 +189,6 @@ class Repo:
         :return: None
         """
         # 组合时候添加一笔资料
-        update_list_dicts = [
-            UpdateOne({'_id': item.pop('_id')}, {'$set': item}) for item in
-            list_dicts]
+        update_list_dicts = [UpdateOne({'_id': item.pop('_id')}, {'$set': item}) for item in list_dicts]
         self.__instance._get_collection().bulk_write(update_list_dicts,
                                                      ordered=False)

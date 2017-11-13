@@ -1,11 +1,11 @@
 import React from 'react'
-import { connect } from 'dva'
+import {connect} from 'dva'
 
 import styles from './Header.less'
-import { Menu, Icon } from 'antd'
-import { Link, routerRedux } from 'dva/router'
-import { FormattedMessage } from 'react-intl'
-import { config } from '../../utils'
+import {Menu, Icon, Select} from 'antd'
+import {Link, routerRedux} from 'dva/router'
+import {FormattedMessage} from 'react-intl'
+import {config} from '../../utils'
 
 const logo = config.whiteLogo
 
@@ -23,6 +23,20 @@ const menuConfig = [
     Link: '/workspace',
     Icon: null,
     text: 'Workspace',
+    dropdown: [
+      {
+        key: '/myprojects',
+        Link: '/myprojects',
+        Icon: null,
+        text: 'My Projects',
+      },
+      {
+        key: '/mymodels',
+        Link: '/mymodels',
+        Icon: null,
+        text: 'My Models',
+      },
+    ]
   },
   {
     key: '/projects',
@@ -39,7 +53,7 @@ const menuConfig = [
 
 ]
 
-function Header({ location, login, history, dispatch }) {
+function Header({location, login, history, dispatch}) {
   const key = '/' + location.pathname.split('/')[1]
   const toLoginPage = () => {
     if (!login.user) {
@@ -48,7 +62,7 @@ function Header({ location, login, history, dispatch }) {
   }
   const logout = () => {
     localStorage.removeItem('token')
-    dispatch({ type: 'resetUser' })
+    dispatch({type: 'resetUser'})
     history.push('/user/login')
   }
   return (
@@ -67,13 +81,33 @@ function Header({ location, login, history, dispatch }) {
             </Link>
           </Menu.Item>
           {menuConfig.map(
-            (i) =>
-              <Menu.Item key={i.key}>
-                <Link to={i.Link}>
-                  {i.Icon && <Icon type={i.Icon}/>}
-                  <FormattedMessage id={i.text} defaultMessage={i.text}/>
-                </Link>
-              </Menu.Item>,
+            (e) => {
+              if (e.dropdown) {
+                return (
+                  <SubMenu title={<span>Workspace</span>}>
+                    {e.dropdown.map(
+                      (e) => {return(
+                        <Menu.Item key= {e.key} >
+                          <div onClick={() => {
+                            dispatch(routerRedux.push(e.Link))
+                          }}>
+                            {e.text}
+                          </div>
+                          </Menu.Item>
+                      )})}
+                  </SubMenu>
+                )
+              }
+              else {
+                return (
+                  <Menu.Item key={e.key}>
+                    <Link to={e.Link}>
+                      {e.Icon && <Icon type={e.Icon}/>}
+                      <FormattedMessage id={e.text} defaultMessage={e.text}/>
+                    </Link>
+                  </Menu.Item>)
+              }
+            }
           )}
           <SubMenu
             className={styles.rightButton}
@@ -97,4 +131,4 @@ function Header({ location, login, history, dispatch }) {
   )
 }
 
-export default connect(({ login }) => ({ login }))(Header)
+export default connect(({login}) => ({login}))(Header)

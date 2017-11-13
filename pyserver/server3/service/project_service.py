@@ -74,7 +74,8 @@ def create_project(name, description, user_ID, is_private=True,
 
 
 def update_project(project_id, name, description, is_private=True,
-                   related_fields=[], tags=[], related_tasks=[]):
+                   related_fields=[], tags=[], related_tasks=[],
+                   done_indices=[]):
     """
     Create a new project
 
@@ -91,7 +92,8 @@ def update_project(project_id, name, description, is_private=True,
                                   description=description,
                                   update_time=datetime.utcnow(),
                                   related_fields=related_fields,
-                                  tags=tags, related_tasks=related_tasks)
+                                  tags=tags, related_tasks=related_tasks,
+                                  done_indices=done_indices)
 
 
 
