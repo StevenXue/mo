@@ -184,8 +184,6 @@ class Repo:
         :return: None
         """
         # 组合时候添加一笔资料
-        update_list_dicts = [
-            UpdateOne({'_id': item.pop('_id')}, {'$set': item}) for item in
-            list_dicts]
+        update_list_dicts = [UpdateOne({'_id': item.pop('_id')}, {'$set': item}) for item in list_dicts]
         self.__instance._get_collection().bulk_write(update_list_dicts,
                                                      ordered=False)
