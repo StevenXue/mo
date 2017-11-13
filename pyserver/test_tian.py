@@ -41,8 +41,8 @@ if __name__ == '__main__':
     # print a.to_mongo(
 
     # 通过id找
-    # b = toolkit_business.get_by_toolkit_id(ObjectId("592546b18be34d179b95d96f"))
-    # print b.to_mongo()
+    b = toolkit_business.get_by_toolkit_id(ObjectId("5980149d8be34d34da32c160"))
+    print("ha ha", b.to_mongo())
 
     # 找到所有的public toolkit
     # c = toolkit_service.get_all_public_toolkit()
@@ -75,4 +75,4 @@ if __name__ == '__main__':
     # result = f([1,2,3,4])
 
     # 测试get collection
-    test = toolkit.Toolkit._get_collection()
+    # test = toolkit.Toolkit._get_collection()
