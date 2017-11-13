@@ -17,6 +17,7 @@ app.model(require("./models/preview"));
 app.model(require("./models/deployment"));
 app.model(require("./models/history"));
 app.model(require("./models/deployedmodels"));
+app.model(require("./models/notebook"));
 
 // 2. Plugins
 // app.use({});

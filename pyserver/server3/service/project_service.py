@@ -96,7 +96,6 @@ def update_project(project_id, name, description, is_private=True,
                                   done_indices=done_indices)
 
 
-
 def list_projects_by_user_ID(user_ID, order=-1, privacy='all'):
     """
     list all projects
@@ -113,7 +112,8 @@ def list_projects_by_user_ID(user_ID, order=-1, privacy='all'):
                 get_ownership_objects_by_user_ID(user_ID, 'project')
         elif privacy == 'private':
             projects = ownership_service. \
-                get_privacy_ownership_objects_by_user_ID(user_ID, 'project')
+                get_privacy_ownership_objects_by_user_ID(user_ID, 'project',
+                                                         private=True)
         elif privacy == 'public':
             projects = ownership_service. \
                 get_privacy_ownership_objects_by_user_ID(user_ID, 'project',
@@ -219,18 +219,26 @@ def get_all_jobs_of_project(project_id, categories, status=None):
                             # FIXME too slow to get metrics status
                             # 已添加索引
                             metrics_status = [sd.to_mongo() for sd in
-                                          staging_data_business.get_by_staging_data_set_id(
-                                              result_sds['_id'])]
-                            metrics_status.sort(key=lambda x: x['n'])
+                                              staging_data_business.get_by_staging_data_set_id(
+                                                  result_sds['_id']).order_by(
+                                                  'n')]
+                            # metrics_status.sort(key=lambda x: x['n'])
                             job_info['metrics_status'] = metrics_status
-                            job_info['results_staging_data_set_id'] = result_sds[
-                                '_id'] if result_sds else None
+                            total_steps = get_total_steps(job)
+                            job_info['percent'] = \
+                                metrics_status[-1]['n'] / total_steps * 100
+                            if job_info['status'] == 200:
+                                job_info['percent'] = 100
+                            job_info['results_staging_data_set_id'] = \
+                                result_sds[
+                                    '_id'] if result_sds else None
                     except DoesNotExist:
                         result_sds = None
                 if job['status'] == 200 and key == 'model':
                     temp_data_fields = job_info['params']['fit']['data_fields']
                     if not isinstance(temp_data_fields[0], list):
-                        job_info['params']['fit']['data_fields'] = [temp_data_fields]
+                        job_info['params']['fit']['data_fields'] = [
+                            temp_data_fields]
                     print(job_info['params']['fit']['data_fields'][0])
                 # model running status info
                 # if key == 'model':
@@ -243,20 +251,26 @@ def get_all_jobs_of_project(project_id, categories, status=None):
                     served_model = served_model_business.get_by_id(
                         served_model_id)
                     # 获取 kube 中部署模型的状态
-                    served_model = kube_service.get_deployment_status(served_model)
+                    served_model = kube_service.get_deployment_status(
+                        served_model)
                     served_model = served_model.to_mongo()
 
                     # 获取训练 served_model 时所用的数据的第一条
-                    staging_data_demo= staging_data_service.get_first_one_by_staging_data_set_id(job_info['staging_data_set_id'])
+                    staging_data_demo = staging_data_service.get_first_one_by_staging_data_set_id(
+                        job_info['staging_data_set_id'])
                     one_input_data_demo = []
-                    for each_feture in job_info['params']['fit']['data_fields'][0]:
-                        one_input_data_demo.append(staging_data_demo[each_feture])
-                    input_data_demo_string = '['+",".join(str(x) for x in one_input_data_demo)+']'
-                    input_data_demo_string = '['+input_data_demo_string+','+input_data_demo_string+']'
+                    for each_feture in \
+                            job_info['params']['fit']['data_fields'][0]:
+                        one_input_data_demo.append(
+                            staging_data_demo[each_feture])
+                    input_data_demo_string = '[' + ",".join(
+                        str(x) for x in one_input_data_demo) + ']'
+                    input_data_demo_string = '[' + input_data_demo_string + ',' + input_data_demo_string + ']'
                     print(input_data_demo_string)
                     # 生成use代码
                     job_info["served_model"] = served_model
-                    job_info["served_model"]["input_data_demo_string"]=input_data_demo_string
+                    job_info["served_model"][
+                        "input_data_demo_string"] = input_data_demo_string
                     job_info = build_how_to_use_code(job_info)
                 else:
                     served_model = None
@@ -267,23 +281,41 @@ def get_all_jobs_of_project(project_id, categories, status=None):
     return history_jobs
 
 
-def build_how_to_use_code(job_info):
+def get_total_steps(job):
+    try:
+        total_steps = \
+            job['run_args']['conf']['fit']['args'][
+                'steps']
+    except KeyError:
+        total_steps = None
+    if not total_steps:
+        try:
+            total_steps = \
+                job['run_args']['conf']['fit'][
+                    'args'][
+                    'epochs']
+        except KeyError:
+            total_steps = 1
+    return total_steps
 
+
+def build_how_to_use_code(job_info):
     served_model_id = str(job_info['served_model']['_id'])
     server = str(job_info['served_model']['server'])
     served_model_name = job_info['served_model']['model_name']
     features = job_info['params']['fit']['data_fields'][0]
-    features_str = '[' + ",".join(('\'' + str(x) + '\'') for x in features) +']'
+    features_str = '[' + ",".join(
+        ('\'' + str(x) + '\'') for x in features) + ']'
 
     str_js = "let url = 'http://localhost:5000/served_model/predict/" + \
-             served_model_id+"';\n"
+             served_model_id + "';\n"
     str_js += "let data = {\n"
     str_js += "  input_value: "
-    str_js += job_info["served_model"]["input_data_demo_string"]+",\n"
-    str_js += "  served_model_id:\"" + served_model_id+"\",\n"
+    str_js += job_info["served_model"]["input_data_demo_string"] + ",\n"
+    str_js += "  served_model_id:\"" + served_model_id + "\",\n"
     str_js += "  server:\"" + server + "\",\n"
-    str_js += "  model_name: \""+served_model_name+"\",\n"
-    str_js += "  features: "+features_str+",\n"
+    str_js += "  model_name: \"" + served_model_name + "\",\n"
+    str_js += "  features: " + features_str + ",\n"
     str_js += "};\n"
     str_js += "fetch(url, {\n"
     str_js += "  method: \"POST\",\n"
@@ -303,12 +335,13 @@ def build_how_to_use_code(job_info):
     str_py += "import json\n"
     str_py += "data = { \n"
     str_py += "  \"server\":\"" + server + "\",\n"
-    str_py += "  \"input_value\": " + job_info["served_model"]["input_data_demo_string"] + ",\n"
+    str_py += "  \"input_value\": " + job_info["served_model"][
+        "input_data_demo_string"] + ",\n"
     str_py += "  \"served_model_id\":\"" + served_model_id + "\",\n"
     str_py += "  \"model_name\":\"" + served_model_name + "\",\n"
     str_py += "  \"features\":" + features_str + ",\n"
     str_py += " }\n"
-    str_py += "r = requests.post(\"http://localhost:5000/served_model/predict/"+ \
+    str_py += "r = requests.post(\"http://localhost:5000/served_model/predict/" + \
               served_model_id + "\",json=data) \n"
     str_py += "result = r.json()['response']['result']\n"
     str_py += "print(result)\n"
@@ -316,6 +349,7 @@ def build_how_to_use_code(job_info):
     job_info['how_to_use_code']['js'] = str_js
     job_info['how_to_use_code']['py'] = str_py
     return job_info
+
 
 def publish_project(project_id):
     project = project_business.get_by_id(project_id)
@@ -503,4 +537,3 @@ def get_playground(project_id):
     api = kube_service.service_api
     dep = api.read_namespaced_service(service_name, NAMESPACE)
     return dep.spec.ports[0].node_port
-

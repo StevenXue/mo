@@ -37,6 +37,7 @@ function Projects({ history, project, dispatch }) {
       <div className={styles.projectList}>
         {project.projects.map(e =>
           <Card key={e._id} title={e.name} className={styles.card}
+                extra={e.is_private && <Icon type="lock" />}
                 onClick={() => toProjectDetail(e._id, history)} style={{ cursor: 'pointer' }}>
             <div>
               <p className={styles.des}>{e.description}</p>
