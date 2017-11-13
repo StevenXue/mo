@@ -6,7 +6,7 @@ import {Select, Collapse, Button, Input, Progress, Icon, Tooltip} from 'antd'
 import ToolBar from './ToolBar/index'
 import ParamsMapper from '../../../../../../components/ParamsMapper/index'
 import LayerCard from '../../../../modelling/LayerCard/index'
-import {format} from '../../../../../../utils/base'
+import {format, unifyType} from '../../../../../../utils/base'
 import {translateDict} from '../../../../../../constants'
 
 const Option = Select.Option
@@ -30,11 +30,6 @@ function getArgs(baseSteps, stepIndex, argIndex) {
 
 }
 
-const content = (content) => (
-  <div>
-    <p>{content}</p>
-  </div>
-)
 
 function WorkBench({section, model, dispatch, namespace, preview}) {
   //state
@@ -273,6 +268,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
   }
 
   function renderFields(steps, step, stepIndex) {
+    // 检验长度
     let len_range = baseSteps[stepIndex].args[0].len_range
     let value_length = step.args[0].values.length
     let warningText = null
@@ -289,6 +285,8 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
         }
       }
     }
+
+    // 检验数值类型
 
     return [
       renderPanel(fieldSelector(steps[0], 0, step, stepIndex), stepIndex,
@@ -357,6 +355,14 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
               let fieldsJson = get(datasourceStep, `args[${argIndex}].fieldsJson`, {})
               return fields.map((field) => {
                 const fieldName = field[0]
+                const fieldType = unifyType(field[1][0])
+                let disable;
+                const requiredFieldTypes = baseSteps[stepIndex]['args'][argIndex]['value_type']
+                if(requiredFieldTypes){
+                  if(!requiredFieldTypes.includes(fieldType)){
+                    disable = true
+                  }
+                }
 
                 let backgroundColor
                 let onClick
@@ -391,6 +397,12 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
 
                   }
                 }
+
+                if(disable){
+                  onClick = false
+                  className = styles.disable_field
+                }
+
                 return (
                   <div key={fieldName}
                        className={`${styles.field} ${className}`}
@@ -610,34 +622,34 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
         </div>
       </div>
     )
-    return (
-      <div>
-        {
-          step.args.map((arg, argIndex) =>
-            <div className={styles.pair} key={arg.name + argIndex}>
-                              <span>
-                                {getArgs(baseSteps, stepIndex, argIndex).display_name}
-                              </span>
-              <div className={styles.row}>
-                <Input placeholder="" defaultValue={arg.value}
-                       onChange={(e) => handleOnChangeArgs(e.target.value, stepIndex, argIndex)}/>
-                <div className={styles.help}>
-                  <Tooltip title={getArgs(baseSteps, stepIndex, argIndex).des}>
-                    <Icon type="question-circle-o"/>
-                  </Tooltip>
-                </div>
-
-              </div>
-            </div>,
-          )
-        }
-        <div className={styles.end_button}>
-          {
-            LastOrRunButton(stepIndex, stepLength)
-          }
-        </div>
-      </div>
-    )
+    // return (
+    //   <div>
+    //     {
+    //       step.args.map((arg, argIndex) =>
+    //         <div className={styles.pair} key={arg.name + argIndex}>
+    //                           <span>
+    //                             {getArgs(baseSteps, stepIndex, argIndex).display_name}
+    //                           </span>
+    //           <div className={styles.row}>
+    //             <Input placeholder="" defaultValue={arg.value}
+    //                    onChange={(e) => handleOnChangeArgs(e.target.value, stepIndex, argIndex)}/>
+    //             <div className={styles.help}>
+    //               <Tooltip title={getArgs(baseSteps, stepIndex, argIndex).des}>
+    //                 <Icon type="question-circle-o"/>
+    //               </Tooltip>
+    //             </div>
+    //
+    //           </div>
+    //         </div>,
+    //       )
+    //     }
+    //     <div className={styles.end_button}>
+    //       {
+    //         LastOrRunButton(stepIndex, stepLength)
+    //       }
+    //     </div>
+    //   </div>
+    // )
   }
 
   function renderFakePanel(step, stepIndex, text) {
@@ -678,7 +690,6 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
       {child}
     </Panel>
   }
-
 
   return (
     <div>

@@ -9,7 +9,6 @@ import JSONTree from 'react-json-tree'
 
 class ResultButton extends Component {
   state = {
-    onFocus: false,
     visible: false,
   }
 
@@ -19,35 +18,26 @@ class ResultButton extends Component {
       focusSectionsId,
     } = this.props.model
 
+    const { model, dispatch, namespace, sectionId } = this.props
+
     // const resultJson = {
     //   "history": get(sectionsJson[focusSectionId], 'results')
     // }
     console.log("this.props.model", this.props.model)
 
-    const history = get(sectionsJson[focusSectionsId].results, 'history', null)
-    const result = get(sectionsJson[focusSectionsId].results, 'result', null)
 
-    console.log("history", history)
-    console.log("result", result)
+    const history = get(sectionsJson[sectionId].results, 'history', null)
+    const result = get(sectionsJson[sectionId].results, 'result', null)
 
-
-
-
-    const { model, dispatch, namespace, sectionId } = this.props
     const visible = sectionId === model.focusSectionsId ? model.resultVisible : false
-    return (
-      <div onFocus={() => {
-        this.setState({
-          onFocus: true,
-        }, console.log('this.state.onFocus', this.state.onFocus))
-      }}
-           onClick={() => dispatch({ type: namespace + '/showResult' })}
 
+    return (
+      <div onClick={() => dispatch({ type: namespace + '/showResult' })}
            className={styles.result}
       >
         <Icon type="bar-chart" style={{ fontSize: 20, margin: 10, color: 'white' }}/>
         <span className={styles.text}>
-          Result {this.state.onFocus}
+          Result
         </span>
 
         <Modal title="Result Visualizations"

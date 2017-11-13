@@ -144,7 +144,9 @@ PARAMETER_SPEC = [
 ]
 
 
-general_spec = {
+class SPEC(object):
+    value_type = ['int', 'float', 'str']
+    general_spec = {
         'name': None,
         'display_name': None,
         'type': 'input',
@@ -153,10 +155,6 @@ general_spec = {
         "default": None,
         "required": False,
     }
-
-
-class SPEC(object):
-    value_type = ['int', 'float', 'str']
     ui_spec = {
         'input': {
             **general_spec,

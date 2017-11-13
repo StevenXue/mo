@@ -72,10 +72,10 @@ def get_staging_data_set(sds_id):
     response['tags'] = getattr(data_set, 'tags', None)
     response['related tasks'] = getattr(data_set, 'related_tasks', None)
     # response['data_set_type'] = data_set.file.type
-    print("data_set", data_set)
+    # print("data_set", data_set)
     if hasattr(data_set, 'file'):
         if data_set.file:
-            print("data_set.file", data_set.file.__dict__)
+            # print("data_set.file", data_set.file.__dict__)
             response['data_set_type'] = data_set.file.type
     # response['data_set_type'] = data_set.file.type
     response['columns'] = columns
