@@ -31,10 +31,10 @@ const menuConfig = [
         text: 'My Projects',
       },
       {
-        key: '/mymodels',
-        Link: '/mymodels',
+        key: '/myservice',
+        Link: '/myservice',
         Icon: null,
-        text: 'My Models',
+        text: 'My Service',
       },
     ]
   },
