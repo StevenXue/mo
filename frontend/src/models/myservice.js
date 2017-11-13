@@ -1,23 +1,10 @@
-import {routerRedux} from 'dva/router'
-import pathToRegexp from 'path-to-regexp'
-import {tokenLogin} from '../services/login'
 import {
-  fetchProjects,
-  createProject,
-  deleteProject,
-  updateProject
-} from '../services/project'
-import {
-  fetchAllPublicServedModels,
-  fetchOnePublicServedModels,
-  search_served_models
+  fetchServedModelsByUserID,
 } from '../services/deployedmodels'
-import {privacyChoices} from '../constants'
-import {arrayToJson} from '../utils/JsonUtils';
 import * as deploymentService from '../services/deployment';
 
 export default {
-  namespace: 'publicServedModels',
+  namespace: 'myService',
   state: {
     modelsJson: [],
     focusModel: null,
@@ -25,7 +12,7 @@ export default {
     category: 'All',
   },
   reducers: {
-    setPublicServedModels(state, action) {
+    setMyModels(state, action) {
       return {
         ...state,
         modelsJson: action.payload.modelsJson,
@@ -33,7 +20,7 @@ export default {
       }
     },
 
-    addPublicServedModels(state, action) {
+    addMymodels(state, action) {
       let newInfo = {
         ...state.modelsJson,
         ...action.payload.modelsJson,
@@ -70,32 +57,29 @@ export default {
     // fetch 10
     * fetch(action, {call, put, select, take}) {
 
-      const {data: models} = yield call(fetchAllPublicServedModels, {
+      const {data: models} = yield call(fetchServedModelsByUserID, {
         privacy: false, category: action.payload.category, skipping: action.payload.skipping
       })
-      const modelsJson = arrayToJson(models, '_id')
-      // console.log('modelsJson')
-      // console.log(modelsJson)
+      console.log('models')
+      console.log(models)
       if (action.payload.skipping === 0){
         yield put({
-          type: 'setPublicServedModels',
-          payload: {modelsJson: modelsJson,
+          type: 'setMyModels',
+          payload: {modelsJson: models,
              category:action.payload.category}
         })
       }
       else{
         yield put({
-          type: 'addPublicServedModels',
+          type: 'addMyModels',
           payload: {modelsJson: modelsJson,category:action.payload.category,
             skipping:action.payload.skipping}
         })
       }
-
-
     },
 
     * fetchone(action, {call, put, select, take}) {
-      const {data: model} = yield call(fetchOnePublicServedModels, {
+      const {data: model} = yield call(fetchOneMyModels, {
         model_ID: action.payload.model_ID
       })
       // yield put(routerRedux.push('/modelmarkets/' + action.payload.model_ID))
@@ -109,7 +93,7 @@ export default {
         searchStr: action.payload.searchStr
       })
       yield put({
-        type: 'setPublicServedModels',
+        type: 'setMyModels',
         payload: {modelsJson: modelsJson,
           category:action.payload.category}
       })
@@ -131,15 +115,11 @@ export default {
     // 当进入该页面是 获取用户所有 project
     setup({dispatch, history}) {
       return history.listen(({pathname}) => {
-        const match = pathToRegexp('/modelmarkets/:modelsId').exec(pathname)
-        if (pathname === '/modelmarkets') {
+        if (pathname === '/myservice') {
           dispatch({
             type: 'fetch',
             payload: {privacy: 'public', category: 'All',skipping: 0,}
           })
-        } else if (match) {
-          console.log('match')
-          dispatch({type: 'fetchone', payload: {model_ID: match[1]}})
         }
       })
     },

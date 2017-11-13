@@ -157,7 +157,6 @@ def run_job():
 @job_app.route("/save_result", methods=["POST"])
 def save_result():
     '''
-
     :return:
     :rtype:
     '''

@@ -5,10 +5,11 @@ const { CORS, api } = config;
 const { projectJobs, toolkits } = api;
 const PREFIX = '/models';
 
-// 获取用户所有models
+// 获取用户当前project下所有训练完成后的models
 export async function fetchModels(payload) {
   return await request(`${CORS}/project/jobs/${payload.projectId}?categories=${payload.categories}&status=200`);
 }
+
 
 // 首次 deploy model
 export async function firstDeployModel(payload) {

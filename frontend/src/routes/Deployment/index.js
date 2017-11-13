@@ -240,6 +240,7 @@ function Deployment({deployment, dispatch}) {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
+
         <div className={styles.sidebar}>
           <div className={styles.titleRow}>
             <div>Model List</div>
@@ -248,16 +249,18 @@ function Deployment({deployment, dispatch}) {
           </div>
           {
             models.map((model, i) => {
-              let backgroundColor;
-              let opacity;
-              let color = 'black';
+
+              let backgroundColor
+              let color
               if (focusModelId && (model._id === focusModelId)) {
-                backgroundColor = "#34C0E2";
-                color = 'white';
+                backgroundColor = '#34C0E2'
+                color = 'white'
               } else {
-                opacity = i % 2 ? 0.7 : 1;
-                color = 'black';
+                backgroundColor = i % 2 ? '#F5F5F5'
+                  : '#FBFBFB'
+                color = null
               }
+
               let state = get(model, 'served_model.status');
               if (state === 'terminated') {
                 state = ''
@@ -265,12 +268,10 @@ function Deployment({deployment, dispatch}) {
               return (
                 <div key={model._id + model.model.name}
                      onClick={() => onClickModel(model._id)}
-                     className={styles.row}
+                     className={`${styles.row} custom-little-title-font`}
                      style={{
-                       opacity: opacity,
                        backgroundColor: backgroundColor,
                        fontColor: color,
-                       padding: 20,
                      }}
                 >
                   <div>{model.model.name}</div>
@@ -280,6 +281,8 @@ function Deployment({deployment, dispatch}) {
             })
           }
         </div>
+
+
         <div className={styles.middleArea}>
           <Tabs
             defaultActiveKey="1"
@@ -326,6 +329,7 @@ function Deployment({deployment, dispatch}) {
                     {get(modelsJson, `[${focusModelId}].metrics_status`) ?
                       <LearningCurve
                         data={get(modelsJson, `[${focusModelId}].metrics_status`)}/> : null}
+
                   </div>
                 </div>
               </div>
