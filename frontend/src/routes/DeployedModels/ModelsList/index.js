@@ -5,7 +5,7 @@ import {showTime} from '../../../utils/index'
 import {dataCategory} from '../../../constants'
 import {arrayToJson, JsonToArray} from '../../../utils/JsonUtils';
 import {routerRedux} from 'dva/router'
-
+import List from '../../../components/List/index'
 
 import styles from './index.less'
 
@@ -25,6 +25,14 @@ function PublicServedModels({history, publicServedModels, dispatch}) {
     category,
     skipping
   } = publicServedModels;
+
+  const props = {
+    model: publicServedModels,
+    namespace: 'publicServedModels',
+    dispatch: dispatch,
+  };
+
+  return(<List {...props}/>)
 
   const models = JsonToArray(modelsJson);
 
@@ -52,7 +60,6 @@ function PublicServedModels({history, publicServedModels, dispatch}) {
       payload: {searchStr: value},
     });
   }
-
 
   return (
     <div className={`main-container ${styles.normal}`}>
