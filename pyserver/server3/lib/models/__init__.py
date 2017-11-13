@@ -84,3 +84,7 @@ from server3.lib.models.svm import svm_model_fn
 from server3.lib.models.hyperas_model import HYPERAS_SPEC
 
 from server3.lib.models.naturalDQN_to_str import naturalDQN_to_str
+
+# linear regressor
+from server3.lib.models.linear_regressor_hyper import LinearRegressorHyperSteps
+from server3.lib.models.linear_regressor_hyper import linear_regression_hyper_model_fn

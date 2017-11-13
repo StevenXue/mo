@@ -44,6 +44,7 @@ function Projects({ history, project, dispatch }) {
                 <Icon type="clock-circle-o" style={{marginRight: 10}}/>
                 {showTime(e.create_time)}
               </p>
+              <Icon type="user" style={{marginRight: 10}}/>
               {e['user_name'] && <p>Owner: {e.user_name}</p>}
             </div>
           </Card>)}
