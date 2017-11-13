@@ -83,7 +83,6 @@ function Common(props) {
   return (
     <div className={styles.container}>
 
-
       <Spin spinning={false}>
 
         <div className={styles.content}>

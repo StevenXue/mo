@@ -1,11 +1,11 @@
 import React from 'react'
 import {connect} from 'dva'
 import {Select, Button, Card,Icon,Input} from 'antd'
-import {showTime} from '../../../utils/index'
-import {dataCategory} from '../../../constants'
-import {arrayToJson, JsonToArray} from '../../../utils/JsonUtils';
+import {showTime} from '../../utils/index'
+import {dataCategory} from '../../constants'
+import {arrayToJson, JsonToArray} from '../../utils/JsonUtils';
 import {routerRedux} from 'dva/router'
-import List from '../../../components/List/index'
+import List from '../../components/List/index'
 
 import styles from './index.less'
 
@@ -17,18 +17,21 @@ const related_fields= ['All',
   'Social', 'Transportation', 'Science', 'Technology'];
 
 
-function PublicServedModels({history, publicServedModels, dispatch}) {
+function MyService({history, myService, dispatch}) {
 
   const {
     modelsJson,
     focusModel,
     category,
     skipping
-  } = publicServedModels;
+  } = myService;
+
+  console.log('myService')
+  console.log(myService)
 
   const props = {
-    model: publicServedModels,
-    namespace: 'publicServedModels',
+    model: myService,
+    namespace: 'myService',
     dispatch: dispatch,
   };
 
@@ -104,4 +107,4 @@ function PublicServedModels({history, publicServedModels, dispatch}) {
   )
 }
 
-export default connect(({publicServedModels}) => ({publicServedModels}))(PublicServedModels)
+export default connect(({myService}) => ({myService}))(MyService)

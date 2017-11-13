@@ -75,4 +75,4 @@ if __name__ == '__main__':
     # result = f([1,2,3,4])
 
     # 测试get collection
-    test = toolkit.Toolkit._get_collection()
+    # test = toolkit.Toolkit._get_collection()

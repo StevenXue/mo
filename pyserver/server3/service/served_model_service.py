@@ -26,7 +26,6 @@ from server3.service.saved_model_services import general_model_services
 from server3.utility import json_utility
 from datetime import datetime
 
-
 ModelType = {list(v)[1]: list(v)[0] for v in list(MODEL_TYPE)}
 
 
@@ -83,7 +82,7 @@ def first_save_to_db(user_ID, name, description, input_info, output_info,
     served_model = served_model_business.add(name, description, input_info,
                                              output_info,
                                              examples, version, deploy_name,
-                                             server,  input_type,
+                                             server, input_type,
                                              model_base_path, job,
                                              service_name, model_name,
                                              related_fields,
@@ -100,7 +99,8 @@ def first_save_to_db(user_ID, name, description, input_info, output_info,
 
 
 def first_deploy(user_ID, job_id, name, description, input_info, output_info,
-                 examples, server, input_type, model_name, projectId, is_private,
+                 examples, server, input_type, model_name, projectId,
+                 is_private,
                  **optional):
     """
     :param user_ID:
@@ -142,7 +142,8 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
         deploy_name = job_id + '-serving'
         service_name = "my-" + job_id + "-service"
         port = port_for.select_random(ports=set(range(30000, 32767)))
-        export_path = "/home/root/work/user_directory" + export_path.split("/user_directory", 1)[1]
+        export_path = "/home/root/work/user_directory" + \
+                      export_path.split("/user_directory", 1)[1]
         # export_path = "/home/root/work/user_directory" + export_path.split("/user_directory", 1)[1]
         kube_json = {
             "apiVersion": "apps/v1beta1",
@@ -236,19 +237,19 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
 
         data_fields = job_info['params']['fit']['data_fields']
 
-
         job_info['staging_data_set'] = job['staging_data_set'][
             'name'] if job['staging_data_set'] else None
         job_info['staging_data_set_id'] = job['staging_data_set'][
             'id'] if job['staging_data_set'] else None
 
-        staging_data_demo = staging_data_service.get_first_one_by_staging_data_set_id(job_info['staging_data_set_id'])
+        staging_data_demo = staging_data_service.get_first_one_by_staging_data_set_id(
+            job_info['staging_data_set_id'])
         one_input_data_demo = []
         for each_feture in job_info['params']['fit']['data_fields'][0]:
             one_input_data_demo.append(staging_data_demo[each_feture])
-        input_data_demo_string = '['+",".join(str(x) for x in one_input_data_demo)+']'
-        input_data_demo_string = '['+input_data_demo_string+','+input_data_demo_string+']'
-
+        input_data_demo_string = '[' + ",".join(
+            str(x) for x in one_input_data_demo) + ']'
+        input_data_demo_string = '[' + input_data_demo_string + ',' + input_data_demo_string + ']'
 
         return first_save_to_db(user_ID, name, description, input_info,
                                 output_info,
@@ -286,9 +287,7 @@ def undeploy_by_id(served_model_id):
     return True
 
 
-
 def resume_by_id(served_model_id, user_ID, model_name):
-
     """
 
     :param served_model_id:
@@ -318,6 +317,8 @@ def resume_by_id(served_model_id, user_ID, model_name):
         deploy_name = job_id + '-serving'
         service_name = "my-" + job_id + "-service"
         port = port_for.select_random(ports=set(range(30000, 32767)))
+        # export_path = "/home/root/work/user_directory" + \
+        #               export_path.split("/user_directory", 1)[1]
         export_path = "/home/root/work/user_directory" + export_path.split("/user_directory", 1)[1]
 
         # print('resume path', export_path)
@@ -397,7 +398,7 @@ def resume_by_id(served_model_id, user_ID, model_name):
                                                 namespace=NAMESPACE)
         s_api.create_namespaced_service(body=service_json, namespace=NAMESPACE)
         # 更新数据库中的port
-        new_server = '10.52.14.182:'+str(port)
+        new_server = '10.52.14.182:' + str(port)
         update = {'server': new_server}
         served_model_business.update_info(served_model_id, update)
         return new_server
@@ -406,7 +407,8 @@ def resume_by_id(served_model_id, user_ID, model_name):
 
 
 def get_prediction_by_id(server, model_name, input_value, features):
-    return general_model_services.get_prediction_by_id(server, model_name, input_value,features)
+    return general_model_services.get_prediction_by_id(server, model_name,
+                                                       input_value, features)
 
 
 def list_served_models_by_user_ID(user_ID, order=-1):
@@ -430,18 +432,27 @@ def list_served_models_by_user_ID(user_ID, order=-1):
     return public_sm, owned_sm
 
 
-def list_all_served_models(category, skipping):
+def list_all_served_models(related_fields=None, related_tasks=None, tags=None,
+                           privacy=None, skipping=None, search_str=None):
     """
 
-    :param category:
+    :param related_fields:
+    :param related_tasks:
+    :param tags:
+    :param privacy:
+    :param skipping:
+    :param search_str:
     :return:
     """
-
-    public_all = served_model_business.get_by_four_querys(privacy=False,
-                                                          related_fields=category,
-                                                          skipping=skipping)
+    privacy = False
+    public_all = served_model_business.get_by_four_querys(
+        related_fields=related_fields,
+        related_tasks=related_tasks,
+        tags=tags, skipping=skipping,
+        privacy=privacy,
+        search_str=search_str)
     # public_all = [each_model.to_mongo() for each_model in public_all]
-    # print(public_all)
+    print(public_all)
     public_all = json_utility.me_obj_list_to_json_list(
         public_all)
     print(public_all)
@@ -473,17 +484,18 @@ def build_how_to_use_code(model):
     served_model_name = model['model_name']
     print(model['data_fields'])
     features = model['data_fields'][0]
-    features_str = '[' + ",".join(('\'' + str(x) + '\'') for x in features) +']'
+    features_str = '[' + ",".join(
+        ('\'' + str(x) + '\'') for x in features) + ']'
 
     str_js = "let url = 'http://localhost:5000/served_model/predict/" + \
-             served_model_id+"';\n"
+             served_model_id + "';\n"
     str_js += "let data = {\n"
     str_js += "  input_value: "
-    str_js += model["input_data_demo_string"]+",\n"
-    str_js += "  served_model_id:\"" + served_model_id+"\",\n"
+    str_js += model["input_data_demo_string"] + ",\n"
+    str_js += "  served_model_id:\"" + served_model_id + "\",\n"
     str_js += "  server:\"" + server + "\",\n"
-    str_js += "  model_name: \""+served_model_name+"\",\n"
-    str_js += "  features: "+features_str+",\n"
+    str_js += "  model_name: \"" + served_model_name + "\",\n"
+    str_js += "  features: " + features_str + ",\n"
     str_js += "};\n"
     str_js += "fetch(url, {\n"
     str_js += "  method: \"POST\",\n"
@@ -508,7 +520,7 @@ def build_how_to_use_code(model):
     str_py += "  \"model_name\":\"" + served_model_name + "\",\n"
     str_py += "  \"features\":" + features_str + ",\n"
     str_py += " }\n"
-    str_py += "r = requests.post(\"http://localhost:5000/served_model/predict/"+ \
+    str_py += "r = requests.post(\"http://localhost:5000/served_model/predict/" + \
               served_model_id + "\",json=data) \n"
     str_py += "result = r.json()['response']['result']\n"
     str_py += "print(result)\n"

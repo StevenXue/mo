@@ -11,9 +11,18 @@ function format(data, type) {
       console.err("未知类型");
       return data;
   }
+}
 
+function unifyType(type){
+  switch (type) {
+    case 'integer': return 'int';
+
+    default:
+      return type
+  }
 }
 
 module.exports = {
-  format
+  format,
+  unifyType
 }

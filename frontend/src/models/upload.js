@@ -61,7 +61,8 @@ export default {
           dispatch({ type: 'fetch' })
         }
         const match2 = pathToRegexp('/workspace/:projectId/import').exec(pathname);
-        if (match2) {
+        const match3 = pathToRegexp('/projects/:projectId/import').exec(pathname);
+        if (match2 || match3) {
           dispatch({ type: 'staged' })
         }
       })

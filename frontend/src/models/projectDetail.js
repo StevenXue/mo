@@ -1,6 +1,6 @@
 import { routerRedux } from 'dva/router'
 
-import { fetchProject, deleteProject, updateProject } from '../services/project'
+import { fetchProject, deleteProject, updateProject, forkProject } from '../services/project'
 import { privacyChoices } from '../constants'
 import pathToRegexp from 'path-to-regexp'
 import {get} from 'lodash'
@@ -37,7 +37,7 @@ export default {
     },
   },
   effects: {
-    // 获取用户所有 project
+    // 获取该 project
     *fetch(action, { call, put, select }) {
       const { data: project } = yield call(fetchProject, { projectId: action.projectId })
       yield put({ type: 'setProject', payload: project })
@@ -64,14 +64,25 @@ export default {
       let { data: newProject } = yield call(updateProject, { body: project, projectId })
       // yield put({ type: 'setProject', payload: newProject })
     },
+    *fork({ payload }, { call, put, select }) {
+      const projectId = yield select(state => state.projectDetail.project._id)
+      const res = yield call(forkProject, projectId)
+      yield put({ type: 'setProject', payload: res.data })
+      const url0 = `/workspace/${res.data._id}`
+      yield put(routerRedux.replace(url0))
+    },
   },
   subscriptions: {
     // 当进入该页面获取project
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
         const match = pathToRegexp('/workspace/:projectId*').exec(pathname)
+        const match2 = pathToRegexp('/projects/:projectId*').exec(pathname)
         if (match) {
           const projectId = match[1]
+          dispatch({ type: 'fetch', projectId: projectId })
+        } else if (match2) {
+          const projectId = match2[1]
           dispatch({ type: 'fetch', projectId: projectId })
         }
       })

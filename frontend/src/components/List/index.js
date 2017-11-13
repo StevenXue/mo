@@ -1,11 +1,11 @@
 import React from 'react'
 import {connect} from 'dva'
 import {Select, Button, Card,Icon,Input} from 'antd'
-import {showTime} from '../../../utils/index'
-import {dataCategory} from '../../../constants'
-import {arrayToJson, JsonToArray} from '../../../utils/JsonUtils';
+import {showTime} from '../../utils/index'
+import {dataCategory} from '../../constants'
+import {arrayToJson, JsonToArray} from '../../utils/JsonUtils';
 import {routerRedux} from 'dva/router'
-import List from '../../../components/List/index'
+
 
 import styles from './index.less'
 
@@ -17,46 +17,37 @@ const related_fields= ['All',
   'Social', 'Transportation', 'Science', 'Technology'];
 
 
-function PublicServedModels({history, publicServedModels, dispatch}) {
+function List({ model, dispatch, namespace }) {
 
   const {
     modelsJson,
     focusModel,
     category,
     skipping
-  } = publicServedModels;
-
-  const props = {
-    model: publicServedModels,
-    namespace: 'publicServedModels',
-    dispatch: dispatch,
-  };
-
-  return(<List {...props}/>)
+  } = model;
 
   const models = JsonToArray(modelsJson);
 
   function handleChange(value) {
-    dispatch({type: 'publicServedModels/fetch',
+    dispatch({type: namespace +'/fetch',
       payload: {category: value,skipping:0}})
   }
 
   const onClickMoreModels = () => {
     dispatch({
-      type: 'publicServedModels/fetch',
+      type: namespace + '/fetch',
       payload: {category: category,skipping:skipping},
     });
   };
 
   function toModelDetail(_id, projectId, history) {
-    dispatch({type: 'publicServedModels/fetchone',
+    dispatch({type: namespace +'fetchone',
       payload: {model_ID: _id}})
-    // history.push(`/modelmarkets/${id}`)
   }
 
   function search(value){
     dispatch({
-      type: 'publicServedModels/search',
+      type: namespace + 'search',
       payload: {searchStr: value},
     });
   }
@@ -80,7 +71,6 @@ function PublicServedModels({history, publicServedModels, dispatch}) {
         {models.map((model, i) =>
           <Card key={model._id} title={model.name} className={styles.card}
                 onClick={() => {
-                  // toModelDetail(model._id,model.projectId, history)
                   dispatch(routerRedux.push('/modelmarkets/' + model._id))
                   // toModelDetail(model._id,model.projectId, history)
                 }}
@@ -104,4 +94,4 @@ function PublicServedModels({history, publicServedModels, dispatch}) {
   )
 }
 
-export default connect(({publicServedModels}) => ({publicServedModels}))(PublicServedModels)
+export default List;
