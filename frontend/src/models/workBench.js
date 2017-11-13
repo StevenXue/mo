@@ -55,6 +55,16 @@ export default {
 
   },
   reducers: {
+    clickDrop(state, action) {
+      const { sectionId, clickDrop } = action.payload
+      let sections = state.sectionsJson
+      sections[sectionId].clickDrop = clickDrop
+      return {
+        ...state,
+        sectionsJson: sections,
+      }
+    },
+
     toggleDropButton(state, action) {
       const { sectionId, dropButton } = action.payload
       let sections = state.sectionsJson
