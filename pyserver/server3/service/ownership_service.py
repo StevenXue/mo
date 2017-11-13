@@ -1,4 +1,6 @@
 # -*- coding: UTF-8 -*-
+from operator import itemgetter
+
 from server3.business import user_business
 from server3.business import ownership_business
 from server3.entity.project import Project
@@ -44,6 +46,15 @@ def get_all_public_objects(owned_type):
         owned_type, False)
     return [get_owned_item_with_user(os, owned_type) for os in ownerships if
             owned_type in os]
+
+
+def get_all_public_projects_of_others(user_ID):
+    user = user_business.get_by_user_ID(user_ID)
+    ownerships = ownership_business.list_ownership_by_type_and_private(
+        'project', False)
+    projects = [get_owned_item_with_user(os, 'project') for os in ownerships if os.user != user]
+    new_projects = sorted(projects, key=itemgetter('create_time'), reverse=True)
+    return new_projects
 
 
 def get_owned_item_with_user(os, owned_type):

@@ -23,7 +23,8 @@ MODEL_TYPE = (
     (3, 'semi_supervised'),  # none
     (4, 'unstructured'),  # input with directory path
     (5, 'hyperas'),
-    (6, 'advanced')  # eg, style transfer
+    (6, 'advanced'),  # eg, style transfer
+    (7, 'hyperopt')
 )
 
 TYPE = (

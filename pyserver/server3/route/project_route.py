@@ -13,6 +13,7 @@ from flask import request
 from kubernetes import client
 
 from server3.service import project_service
+from server3.service import ownership_service
 from server3.business import project_business
 from server3.utility import json_utility
 from server3.utility import str_utility
@@ -40,8 +41,12 @@ def get_project(project_id):
 def list_projects():
     user_ID = request.args.get('user_ID')
     privacy = request.args.get('privacy')
-    projects = project_service. \
-        list_projects_by_user_ID(user_ID, -1, privacy=privacy)
+    others = request.args.get('others')
+    if others == 'true':
+        projects = ownership_service.get_all_public_projects_of_others(user_ID)
+    else:
+        projects = project_service. \
+            list_projects_by_user_ID(user_ID, -1, privacy=privacy)
     projects = json_utility. \
         me_obj_list_to_json_list(projects)
     return jsonify({'response': projects}), 200
@@ -157,14 +162,19 @@ def update_project(project_id):
     related_fields = data.get('related_fields', '')
     tags = data.get('tags', '')
     related_tasks = data.get('related_tasks', '')
+    done_indices = data.get('done_indices', [])
 
-    related_fields = str_utility.split_without_empty(related_fields)
-    tags = str_utility.split_without_empty(tags)
-    related_tasks = str_utility.split_without_empty(related_tasks)
+    if not isinstance(related_fields, list):
+        related_fields = str_utility.split_without_empty(related_fields)
+    if not isinstance(tags, list):
+        tags = str_utility.split_without_empty(tags)
+    if not isinstance(related_tasks, list):
+        related_tasks = str_utility.split_without_empty(related_tasks)
 
     project_service.update_project(project_id, name, description, is_private,
                                    related_fields=related_fields,
-                                   tags=tags, related_tasks=related_tasks)
+                                   tags=tags, related_tasks=related_tasks,
+                                   done_indices=done_indices)
     return jsonify({'response': 'create project success'}), 200
 
 

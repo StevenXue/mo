@@ -24,7 +24,7 @@ function Preview({preview, model, dispatch, namespace}) {
 
   let fields;
   let labelFields;
-  if(focusSectionsId!=='new_launcher ' + 'init'){
+  if(!focusSectionsId.includes('new_launcher')){
     // fields = sectionsJson[focusSectionsId].steps[1].args[0].values;
     fields = get(sectionsJson[focusSectionsId], 'steps[1].args[0].values', []);
     if(namespace === 'modelling'){

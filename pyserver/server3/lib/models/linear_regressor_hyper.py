@@ -32,6 +32,83 @@ from tensorflow.python.ops import partitioned_variables
 from tensorflow.python.ops import variable_scope
 from tensorflow.python.training import training as train
 
+from server3.constants import SPEC
+
+from hyperopt import fmin, tpe, hp, STATUS_OK, Trials, rand, tpe, space_eval
+from server3.lib.models import custom_model
+from server3.lib.models import linear_regressor_model_fn
+from server3.utility import json_utility
+
+
+########### main ##########
+def linear_regression_hyper_model_fn(conf, input, **kw):
+    print('conf')
+    print(conf)
+    print("kw", kw)
+
+    base_conf = conf
+    # base_conf.pop('hyperparameters')
+    result_sds = kw.pop("result_sds")
+    print("result_sds_id", result_sds.id)
+
+    result_sds.history = []
+    result_sds.save()
+
+    def objective(args):
+        base_conf['fit']["args"]['steps'] = args
+        # steps = args
+        # params['fit']['args']['steps'] = steps
+        # sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
+        result = custom_model(base_conf, linear_regressor_model_fn, input,
+                              result_sds=result_sds, **kw)
+        print("base_conf", base_conf)
+        print("history result", result)
+        print("old history", result_sds.history)
+        new_his = result_sds.history
+        new_his.append(result)
+        new_his = json_utility.convert_to_json(new_his)
+        print("new_his", new_his)
+        result_sds.history = new_his
+        result_sds.save()
+
+        return result['eval_metrics']['loss']
+
+    hyperparameters = conf['hyperparameters']["args"]
+    train_steps = hyperparameters["train_steps"]
+    hyper_tuning_method = hyperparameters["hyper_tuning_method"]
+    tuning_steps = hyperparameters["tuning_steps"]
+
+    algo = {
+        "rand.suggest": rand.suggest,
+        "tpe.suggest": tpe.suggest
+    }
+    space = [hp.uniform('train_steps', train_steps[0], train_steps[1])]
+    print("space", space)
+
+    best = fmin(objective, space, algo=algo[hyper_tuning_method], max_evals=tuning_steps)
+
+    print("best space: ", space_eval(space, best))
+    print("best : ", best)
+
+    # best space:  (400.0,)
+    # best :  {'train_steps': 400.0}
+
+    base_conf['fit']["args"]['steps'] = best['train_steps']
+    result = custom_model(base_conf, linear_regressor_model_fn, input,
+                          result_sds=result_sds, **kw)
+    print("result", result)
+
+    # 将结果存入 sds
+    print("result_sds_id", result_sds.id)
+
+    result_sds.result = {
+        'best': best,
+        'result': json_utility.convert_to_json(result)
+        }
+    result_sds.save()
+
+
+########### main ##########
 
 def train_hyperopt_model(conf, input):
     pass
@@ -323,6 +400,191 @@ LinearRegressionTemplate = {
     "project_id": "595f32e4e89bde8ba70738a3",
     "staging_data_set_id": "5979da380c11f32674eb2788"
 }
+
+
+LinearRegressorHyperSteps = [
+    {
+        "name": "data_source",
+        "display_name": "Select Data Source",
+        "des": "select the datasource to process",
+        "args": [
+            {
+                "name": "input",
+                "des": "Please select input data source",
+                "type": "select_box",
+                "default": None,
+                "required": True,
+                "len_range": [
+                    1,
+                    1
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "feature_fields",
+        "display_name": "Select Feature Fields",
+
+        "args": [
+            {
+                "name": "fields",
+                "des": "",
+                "required": True,
+                "type": "multiple_choice",
+                "len_range": [
+                    1,
+                    None
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "label_fields",
+        "display_name": "Select Label Fields",
+        "args": [
+            {
+                "name": "fields",
+                "des": "",
+                "type": "multiple_choice",
+                "required": True,
+                "len_range": [
+                    1,
+                    None
+                ],
+                "values": []
+            }
+        ]
+    },
+    {
+        "name": "estimator",
+        "display_name": "Estimator Parameters",
+        'args': [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "weight_column_name",
+                "display_name": "Weight Column Name",
+                "value_type": "str",
+                "des": "A string defining feature column name "
+                       "representing "
+                       "weights. It is used to down weight or boost "
+                       "examples during training. It will be multiplied "
+                       "by "
+                       "the loss of the example."
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name": "gradient_clip_norm",
+                "display_name": "Gradient Clip Norm",
+                "value_type": "float",
+                "des": "A float > 0. If provided, gradients are clipped "
+                       "to their global norm with this clipping ratio.",
+                "range": [0.0, 100],
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name": "_joint_weights",
+                "display_name": "Joint weights",
+                "value_type": "bool",
+                "des": "If True, the weights for all columns will be "
+                       "stored in a single (possibly partitioned) "
+                       "variable. It's more efficient, but it's "
+                       "incompatible with SDCAOptimizer, and requires "
+                       "all feature columns are sparse and use"
+                       " the 'sum' combiner.",
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name": "enable_centered_bias",
+                "display_name": "Enable Centered Bias",
+                "value_type": "bool",
+                "des": "A bool. If True, estimator will learn a "
+                       "centered bias variable for each class. "
+                       "Rest of the model structure learns the residual "
+                       "after centered bias.",
+            },
+            {
+                **SPEC.ui_spec['input'],
+                "name": "label_dimension",
+                "display_name": "Label Dimension",
+                "des": "Number of regression targets per example. This "
+                       "is thesize of the last "
+                       "dimension of the labels and logits `Tensor` "
+                       "objects(typically, these "
+                       "have shape `[batch_size, label_dimension]`)",
+                "default": 1,
+            }
+        ]
+    },
+    {
+        "name": "fit",
+        "display_name": "Fit Parameters",
+        "args": [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "steps",
+                "display_name": "Steps",
+                "des": "Number of steps of training",
+                "default": 400,
+                "required": True
+            },
+        ],
+    },
+    {
+        "name": "evaluate",
+        "display_name": "Evaluate Parameters",
+        "args": [
+            {
+                **SPEC.ui_spec['input'],
+                "name": "steps",
+                "display_name": "Steps",
+                "des": "Number of steps of evaluate",
+                "default": 1,
+                "required": True
+            },
+        ]
+    },
+    # hyper
+    {
+        'name': 'hyperparameters',
+        "display_name": "Hyperparameters",
+        "des": "the tuning hyperparametes and their settings",
+        "args": [
+            {
+                **SPEC.ui_spec['multiple_input'],
+                "name": "train_steps",
+                "display_name": "Train Steps",
+                "des": "Number of steps of training",
+                # "default": 1,
+                'values': [400, 1000],
+                'len_range': [2, 2],
+                "required": True
+            },
+            {
+                **SPEC.ui_spec['choice'],
+                "name": "hyper_tuning_method",
+                "display_name": "hyper tuning method",
+                'des': 'hyper parameters tuning method',
+                'range': ['rand.suggest', 'tpe.suggest'],
+                'value': 'rand.suggest',
+                'required': True
+            },
+
+            {
+                **SPEC.ui_spec['input'],
+                "name": "tuning_steps",
+                "display_name": "Tuning steps",
+                "des": "Number of steps of Tuning",
+                'value_type': 'int',
+                'range': [1, 100],
+                'value': 10,
+                'required': True
+            }
+
+        ]
+    }
+]
 
 if __name__ == "__main__":
     space = conf_to_space(LinearRegressionTemplate["conf"])
