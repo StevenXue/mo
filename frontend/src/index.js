@@ -18,6 +18,12 @@ app.model(require("./models/deployment"));
 app.model(require("./models/history"));
 app.model(require("./models/deployedmodels"));
 app.model(require("./models/myservice"));
+
+
+// 通过dva g model test的，手动将这个models/test.js文件删除掉，会报错。
+// rm -r node_modules/.cache/babel-loader
+
+
 // 2. Plugins
 // app.use({});
 

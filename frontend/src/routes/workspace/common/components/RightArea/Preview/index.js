@@ -6,6 +6,8 @@ import {Select, Table, Spin} from 'antd';
 import {get} from 'lodash'
 const Option = Select.Option;
 
+import RevertTable from '../../../../../../components/RevertTable'
+
 function Preview({preview, model, dispatch, namespace}) {
 
   const {
@@ -27,9 +29,8 @@ function Preview({preview, model, dispatch, namespace}) {
   if(!focusSectionsId.includes('new_launcher')){
     // fields = sectionsJson[focusSectionsId].steps[1].args[0].values;
     fields = get(sectionsJson[focusSectionsId], 'steps[1].args[0].values', []);
-    if(namespace === 'modelling'){
-      labelFields = sectionsJson[focusSectionsId].steps[2].args[0].values;
-    }
+    // if(namespace === 'modelling'){}
+    labelFields = sectionsJson[focusSectionsId].steps[2].args[0].values;
   }
 
   function handleChange(value) {
@@ -63,18 +64,18 @@ function Preview({preview, model, dispatch, namespace}) {
   if (table.length !== 0) {
     columns = table.columns.map((e, index) => {
       const ret = {
-        title: <div className={styles.table_title}>
-          <div className={styles.table_title_name}>
-            {e[0]}
-          </div>
-          <div className={styles.table_title_type}>
-            {e[1][0]}
-          </div>
-        </div>,
+        // title: <div className={styles.table_title}>
+        //   <div className={styles.table_title_name}>
+        //     {e[0]}
+        //   </div>
+        //   <div className={styles.table_title_type}>
+        //     {e[1][0]}
+        //   </div>
+        // </div>,
         dataIndex: e[0],
         key: e[0],
         width: 120,
-        styles: {'backgroundColor': "red"}
+        // styles: {'backgroundColor': "red"}
       };
       let className = '';
 
@@ -118,13 +119,15 @@ function Preview({preview, model, dispatch, namespace}) {
           )}
         </Select>
       </div>
+
       {
         dataSource?<div className={styles.info_box}>
           {`${table.row} rows, ${table.col} columns`}
         </div>:null
       }
 
-      <Table dataSource={dataSource} columns={columns} scroll={{ x: 6000 , y: '100%'}}/>
+        <Table dataSource={dataSource} columns={columns} scroll={{ x: 6000 , y: '100%'}}/>
+        <RevertTable table={table} fields={fields} labelFields={labelFields}/>
       </Spin>
     </div>
   );

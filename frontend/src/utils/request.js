@@ -26,10 +26,12 @@ export default async function request(url, options) {
   checkStatus(response)
 
   const data = await response.json()
+  const status = response.status
 
   const ret = {
     data: data.response,
     headers: {},
+    status: status,
   }
 
   if (response.headers.get('x-total-count')) {

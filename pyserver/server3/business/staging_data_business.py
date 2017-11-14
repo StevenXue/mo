@@ -178,3 +178,17 @@ def copy_staging_data_by_staging_data_set_id(sds):
 def update_many_with_new_fields(list_dicts):
     staging_data_repo.update_many(list_dicts)
 
+
+def convert_row_column(data, columns):
+    print("data", data)
+    length = len(data)
+    reverse_data = []
+    for column in columns:
+        new_row = {
+            "name": column[0],
+            "type": column[1][0]
+        }
+        for i in range(length):
+            new_row[str(i)] = data[i].get(column[0], None)
+        reverse_data.append(new_row)
+    return reverse_data

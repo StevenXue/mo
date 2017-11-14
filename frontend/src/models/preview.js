@@ -64,7 +64,10 @@ export default {
         },
       })
 
-      const {data: table} = yield call(stagingDataService.fetchStagingDataset, action.payload._id);
+      const aa = yield call(stagingDataService.fetchStagingDataset, action.payload._id);
+      const {data: table} = aa
+      console.log("aa", aa)
+
       yield put({type: 'setTable', payload: {table}})
 
       yield put({
