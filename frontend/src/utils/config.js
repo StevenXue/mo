@@ -17,6 +17,7 @@ module.exports = {
   // apiPrefix: '/api/v1',
   //jupyterUrl: CONSTANT.,
   jupyterServer: CONSTANT.jupyterServer,
+  kubeServer: CONSTANT.kubeServer,
   api: {
     userLogin: '/user/login',
     refreshToken: '/refresh_token',
@@ -42,6 +43,7 @@ module.exports = {
     neuralStyle: '/model/neural_style',
     servedModel: '/served_model',
     allModels: '/served_models',
-    publicServedModels:'/public_served_models'
+    publicServedModels:'/public_served_models',
+    playground: '/project/playground/',
   },
 }

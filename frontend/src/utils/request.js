@@ -9,8 +9,7 @@ function checkStatus(response) {
   const error = new Error(response.statusText)
   error.response = response
   message.error('This is a message of error: ' + response.statusText)
-
-  // throw error;
+  // return error;
 }
 
 /**
@@ -29,7 +28,9 @@ export default async function request(url, options) {
 
   const ret = {
     data: data.response,
+    res: data,
     headers: {},
+    status: response.status
   }
 
   if (response.headers.get('x-total-count')) {
