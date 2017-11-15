@@ -140,6 +140,7 @@ class MySelection extends React.Component {
 
 
   render() {
+    const middle = location.hash.split('/')[1]
     return (
       <div className={styles.whole}>
         <div className={styles.selbar}>
@@ -150,7 +151,7 @@ class MySelection extends React.Component {
 
           <Select defaultValue="alltypes" className={styles.sel}>
             <Option key="alltypes" value="alltypes">All types</Option>
-            <Option key="others" value="others">others</Option>
+            <Option key="others" value="others">{middle}</Option>
           </Select>
           <Select defaultValue="allcategory" className={styles.sel} onChange={this.handleChangeCat}>
             <Option key="allcategory" value="allcategory">All Category</Option>
@@ -159,7 +160,7 @@ class MySelection extends React.Component {
           <div className={styles.center}>
           </div>
           <Search placeholder='Search' className={styles.searchbar}/>
-          {this.props.isStaged?<Button
+          {this.props.isStaged && middle === 'workspace'?<Button
             onClick={() => {this.handleNew()}}
             type="primary"
           ><Icon type="plus-circle-o"/>New Dataset</Button>:null}

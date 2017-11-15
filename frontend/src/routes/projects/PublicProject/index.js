@@ -52,9 +52,10 @@ function PublicProject({ match, history, location, dispatch, projectDetail }) {
             <div className={styles.tags}>
               {projectDetail.project.tags.map(e => <Tag color="#EEEEEE" style={{ color: '#666666' }} key={e}>{e}</Tag>)}
             </div>
+
           </div>
           <div className={styles.navCards}>
-            <MyCard icon='file-add' text='Data Import' style={{ marginRight: 50 }}
+            <MyCard icon='file-add' text='Data List' style={{ marginRight: 50 }}
                     onClick={() => history.push(`/projects/${match.params.projectId}/import`)}/>
             <MyCard icon='line-chart' text='Data Analysis' style={{ marginRight: 50 }}
                     />
