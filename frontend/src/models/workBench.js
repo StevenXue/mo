@@ -492,6 +492,17 @@ export default {
       }
     },
 
+    addDisplaySteps(state, action){
+      const { sectionId, displaySteps } = action.payload
+
+      let sectionsJson = state.sectionsJson
+      sectionsJson[sectionId].display_steps = state.sectionsJson[sectionId].display_steps.concat(displaySteps)
+      return {
+        ...state,
+        sectionsJson,
+      }
+    },
+
     setGetSectionLoading(state, action) {
       return {
         ...state,

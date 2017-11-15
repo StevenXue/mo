@@ -55,6 +55,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
     steps,
     percent,
     active_steps,
+    display_steps,
     [translateDict[namespace]]: {
       steps: baseSteps,
     },
@@ -89,6 +90,14 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
       type: namespace + '/setActiveKey',
       payload: {
         activeKey: [String(stepIndex + 1)],
+        sectionId: section._id,
+      },
+    })
+
+    dispatch({
+      type: namespace + '/addDisplaySteps',
+      payload: {
+        displaySteps: [String(stepIndex + 1)],
         sectionId: section._id,
       },
     })
@@ -521,6 +530,16 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                       sectionId: section._id,
                     },
                   })
+
+                  dispatch({
+                    type: namespace + '/addDisplaySteps',
+                    payload: {
+                      displaySteps: [String(stepIndex + 1)],
+                      sectionId: section._id,
+                    },
+                  })
+
+
                 }}>
           next
         </Button>
@@ -706,6 +725,10 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                   activeKey={active_steps}>
           {
             steps.map((step, stepIndex) => {
+
+              console.log("stepIndex", stepIndex)
+              console.log("displaySteps", display_steps)
+              if(display_steps.includes(String(stepIndex))){
                 switch (step.name) {
                   case 'data_source':
                   case 'target_datasource':
@@ -752,6 +775,8 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                       ),
                     ]
                 }
+              }
+
               },
             )
           }
