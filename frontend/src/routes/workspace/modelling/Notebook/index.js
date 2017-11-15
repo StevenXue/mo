@@ -8,31 +8,18 @@ import { Notebook, createStore } from '../../../../notebook/src/'
 import { setNotebook, recordResults, save, saveAs } from '../../../../notebook/src/actions'
 import * as enchannelBackend from '../../../../notebook/enchannel-notebook-backend'
 import style from './style.css'
+import { isEmpty } from 'lodash'
 // import CurveTest from '../model/realTime'
 // import Model from '../model/modelProcess'
 import io from 'socket.io-client'
 
-import 'normalize.css/normalize.css'
-import 'material-design-icons/iconfont/material-icons.css'
-import '../../../../notebook/src/toolbar/styles/base.less'
-import './codemirror.css'
-
-var hasOwnProperty = Object.prototype.hasOwnProperty
-
-function isEmpty (obj) {
-  if (obj == null) return true
-  if (obj.length > 0) return false
-  if (obj.length === 0) return true
-  if (typeof obj !== 'object') return true
-  for (var key in obj) {
-    if (hasOwnProperty.call(obj, key)) return false
-  }
-
-  return true
-}
+// import 'normalize.css/normalize.css'
+// import 'material-design-icons/iconfont/material-icons.css'
+// import '../../../../notebook/src/toolbar/styles/base.less'
+// import './codemirror.css'
 
 class JupyterNotebook extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     const { store, dispatch } = createStore({
@@ -65,11 +52,11 @@ class JupyterNotebook extends React.Component {
 
   }
 
-  componentWillMount () {
+  componentWillMount() {
     console.log(this.props.notebook_name)
   }
 
-  componentDidMount () {
+  componentDidMount() {
 
     //console.log("in jupyter"this.props.project.stagingData);
     // jupyter channel
@@ -93,13 +80,13 @@ class JupyterNotebook extends React.Component {
       )
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (this.props.notebook_name !== nextProps.notebook_name) {
       this.setState({ fileName: nextProps.notebook_name })
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     const domain = kubeBaseUrl.replace('8888', this.props.port).split('://').slice(1).join('://')
     const wsUrl = `ws://${domain}`
 
@@ -113,13 +100,13 @@ class JupyterNotebook extends React.Component {
 
   }
 
-  getResult (r) {
+  getResult(r) {
     r = r.split('\n')
     r = r.filter(Boolean)
     this.setState({ output: r })
   }
 
-  attachChannels () {
+  attachChannels() {
     const domain = kubeBaseUrl.replace('8888', this.props.port).split('://').slice(1).join('://')
     const wsUrl = `ws://${domain}`
 
@@ -151,14 +138,14 @@ class JupyterNotebook extends React.Component {
     })
   }
 
-  createFileReader () {
+  createFileReader() {
     this.reader = new FileReader()
     this.reader.addEventListener('loadend', () => {
       this.dispatch(setNotebook(JSON.parse(this.reader.result)))
     })
   }
 
-  handleFileChange () {
+  handleFileChange() {
     const input = this.refs['ipynb-file']
 
     if (input.files[0]) {
@@ -169,19 +156,19 @@ class JupyterNotebook extends React.Component {
     }
   }
 
-  onClickButton () {
+  onClickButton() {
     this.setState({
       visible: true,
     })
   }
 
-  onClickSave () {
+  onClickSave() {
     this.setState({
       getOutput: true,
     })
   }
 
-  onSelectDataSet (values) {
+  onSelectDataSet(values) {
     console.log(values)
     let selected = this.props.project.stagingData.filter((el) => el._id === values)
     let selectedName = selected[0].name
@@ -200,7 +187,7 @@ class JupyterNotebook extends React.Component {
       .catch((err) => console.log('Error: /staging_data/staging_data_sets/fields', err))
   }
 
-  saveTrigger (notebook) {
+  saveTrigger(notebook) {
     let ntb = notebook
     console.log('notebook', ntb.toJS())
     let nbData = ntb.toJS()
@@ -224,7 +211,6 @@ class JupyterNotebook extends React.Component {
         },
       ).then((response) => response.json())
         .then((res) => {
-          console.log(res)
           if (res.path) {
             let p = res.path.split('/')
             this.setState({
@@ -274,19 +260,19 @@ class JupyterNotebook extends React.Component {
     }
   }
 
-  onReceiveCode (code) {
+  onReceiveCode(code) {
     console.log('this is code', code)
     this.setState({ forceSource: code })
     message.success('Code Copied!!')
   }
 
-  renderResult () {
+  renderResult() {
     if (!isEmpty(this.state.ioData)) {
       return <CurveTest data={this.state.ioData}/>
     }
   }
 
-  renderNotebook (type) {
+  renderNotebook(type) {
     if (this.state.channels) {
       return (
         <Notebook
@@ -309,7 +295,7 @@ class JupyterNotebook extends React.Component {
     return <div/>
   }
 
-  renderInputForm () {
+  renderInputForm() {
     return (
       <div style={{ marginTop: 10 }}>
         <a className={style.file}>选择文件
@@ -321,7 +307,7 @@ class JupyterNotebook extends React.Component {
     )
   }
 
-  render () {
+  render() {
     return (
       <div>
         <div>

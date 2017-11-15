@@ -9,6 +9,8 @@ import { queryURL } from '../utils'
 
 import { flaskServer, translateDict } from '../constants'
 
+let connected = false
+
 export default {
   namespace: 'login',
   state: {
@@ -182,7 +184,7 @@ export default {
       const projectIdMsg = msg.project_id
       const jobIdMsg = msg.job_id
       message.success(msg.content)
-      if(msg.complete) {
+      if (msg.complete) {
         // set job state to complete
         yield put({
           type: invert(translateDict)[msg.type] + '/setStatus', payload: {
@@ -199,7 +201,7 @@ export default {
         const match = pathToRegexp('/user/login').exec(pathname)
         if (!match) {dispatch({ type: 'query' })}
         const userId = localStorage.getItem('user_ID')
-        if (userId) {
+        if (userId && !connected) {
           const socket = io.connect(flaskServer + '/log/' + userId)
           socket.on('log_epoch_end', (msg) => {
             dispatch({ type: 'handleSocket', payload: { msg, pathname } })
@@ -210,6 +212,7 @@ export default {
           socket.on('success', (msg) => {
             dispatch({ type: 'handleSuccess', payload: { msg, pathname } })
           })
+          connected = true
         }
       })
     },

@@ -65,7 +65,7 @@ export function saveAs(filename, notebook) {
 }
 
 export function setNotebook(nbData) {
-  console.log(nbData);
+  console.log('nbData', nbData);
   return (subject) => {
     const data = commutable.fromJS(nbData);
     subject.next({
