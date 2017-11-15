@@ -84,7 +84,7 @@ function Header({location, login, history, dispatch}) {
             (e) => {
               if (e.dropdown) {
                 return (
-                  <SubMenu key={e.key} title={<span>Workspace</span>} key={e.key}>
+                  <SubMenu title={<span>Workspace</span>} key={e.key}>
                     {e.dropdown.map(
                       (e) => {return(
                         <Menu.Item key={e.key} >

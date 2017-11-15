@@ -48,6 +48,8 @@ export default {
       getSections: false,
       getAlgorithms: false,
       wholePage: false,
+
+      modal: false
     },
     resultVisible: false,
 

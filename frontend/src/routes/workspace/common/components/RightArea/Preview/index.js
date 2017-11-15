@@ -64,14 +64,14 @@ function Preview({preview, model, dispatch, namespace}) {
   if (table.length !== 0) {
     columns = table.columns.map((e, index) => {
       const ret = {
-        // title: <div className={styles.table_title}>
-        //   <div className={styles.table_title_name}>
-        //     {e[0]}
-        //   </div>
-        //   <div className={styles.table_title_type}>
-        //     {e[1][0]}
-        //   </div>
-        // </div>,
+        title: <div className={styles.table_title}>
+          <div className={styles.table_title_name}>
+            {e[0]}
+          </div>
+          <div className={styles.table_title_type}>
+            {e[1][0]}
+          </div>
+        </div>,
         dataIndex: e[0],
         key: e[0],
         width: 120,

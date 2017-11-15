@@ -27,8 +27,14 @@ const dataAnalysis = modelExtend(workBench, {
 
 
     *saveAsResult(action, { call, put, select }) {
+      yield put({
+        type: 'setLoading', payload: {
+          key: 'modal',
+          loading: true,
+        },
+      })
+
       const { id, newSdsName } = action.payload;
-      console.log("id,name", id, newSdsName )
       const { data } = yield call(jobService.save_as_result, {
         id,
         newSdsName
@@ -37,6 +43,15 @@ const dataAnalysis = modelExtend(workBench, {
       const projectId = yield select(state => state.dataAnalysis.projectId);
       //保存完更新staging data sets
       yield put({ type: 'preview/fetchStagingDatasetList', payload: { projectId: projectId } })
+      yield put({ type: 'hideResult' })
+
+      yield put({
+        type: 'setLoading', payload: {
+          key: 'modal',
+          loading: false,
+        },
+      })
+
     }
 
   },
