@@ -26,7 +26,7 @@ const menuConfig = [
     dropdown: [
       {
         key: '/myprojects',
-        Link: '/myprojects',
+        Link: '/workspace',
         Icon: null,
         text: 'My Projects',
       },

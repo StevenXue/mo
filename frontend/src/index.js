@@ -24,6 +24,8 @@ app.model(require("./models/myservice"));
 // rm -r node_modules/.cache/babel-loader
 
 
+app.model(require("./models/notebook"));
+
 // 2. Plugins
 // app.use({});
 

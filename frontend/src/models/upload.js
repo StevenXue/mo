@@ -61,7 +61,8 @@ export default {
           dispatch({ type: 'fetch' })
         }
         const match2 = pathToRegexp('/workspace/:projectId/import').exec(pathname);
-        if (match2) {
+        const match3 = pathToRegexp('/projects/:projectId/import').exec(pathname);
+        if (match2 || match3) {
           dispatch({ type: 'staged' })
         }
       })
@@ -149,11 +150,8 @@ export default {
     },
 
 
-    * upload ({
-                payload,
-              }, { put, call, select }) {
+    * upload ({payload,}, { put, call, select }) {
 
-      // const user = yield select(state => state['app'].user)
       console.log('enter upload model')
       console.log(payload)
       let formData = new FormData()
@@ -299,14 +297,11 @@ export default {
         yield put({type:'setAddLoading', payload: false})
       }
 
-
     },
 
     * staged (action, { put, call, select }) {
       const prjID = location.hash.split('/')[2]
       const res = yield call(fetchStagingDataSets, prjID)
-      const url0 = location.hash.substr(1).replace('list', '')
-      console.log(location.hash.split('/')[3])
 
       if (res.data.length === 0) {
         yield put(routerRedux.push('import/choice'))
@@ -336,7 +331,6 @@ export default {
       yield put({type: 'setDataSetName', payload:name})
       yield put({type: 'setDataSetDesc', payload:description})
       yield put({type: 'setDataSetTags', payload:tags.split(',')})
-
     },
 
     * delStaged(action, { put, call, select }) {
@@ -348,8 +342,6 @@ export default {
       yield put(routerRedux.replace(url0))
 
     }
-
-
   },
 
   reducers: {

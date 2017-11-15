@@ -4,7 +4,8 @@ module.exports = {
   apiPrefix: '/api',
   // apiPrefix: 'http://122.224.116.44:5005',
 
-  jupyterServer: 'http://192.168.65.2:8888/api/contents/',  // kube master node ip
+  jupyterServer: 'http://10.52.14.182:8888/api/contents/',  // kube master node ip
+  kubeServer: 'http://10.52.14.182:8888/api/contents/',  // kube master node ip
   // jupyterServer: 'http://10.52.14.182:8888/api/contents/',
   // jupyterServer: 'http://122.224.116.44:9001/api/contents/',
 
@@ -14,7 +15,7 @@ module.exports = {
   // flaskServer: 'http://122.224.116.44:5005',
 
   //jupyter
-  baseUrl: 'http://192.168.65.2:8888',  // kube master node ip
+  kubeBaseUrl: 'http://10.52.14.182:8888',  // kube master node ip
   // baseUrl: 'http://10.52.14.182:8888',
   // baseUrl: 'http://122.224.116.44:9001',
 

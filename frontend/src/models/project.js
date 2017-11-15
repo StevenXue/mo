@@ -7,12 +7,20 @@ export default {
   namespace: 'project',
   state: {
     projects: [],
+    projectsLoading: false,
   },
   reducers: {
     setProjects(state, { payload: projects }) {
       return {
         ...state,
         projects,
+      }
+    },
+
+    setProjectsLoading(state, {payload: projectsLoading }) {
+      return {
+        ...state,
+        projectsLoading
       }
     },
 
@@ -42,8 +50,10 @@ export default {
     },
 
     *fetchOthers(action, { call, put, select, take }){
+      yield put({type: 'setProjectsLoading', payload: true})
       const { data: projects } = yield call(fetchProjects, { others: true })
       yield put({ type: 'setProjects', payload: projects })
+      yield put({type: 'setProjectsLoading', payload: false})
     },
 
     *create({ body }, { call, put, select }) {

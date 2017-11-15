@@ -115,6 +115,7 @@ class DataPreview extends React.Component {
 
 
   render () {
+    const middle = location.hash.split('/')[1]
     const ds = this.props.upload.dataSet
     const dels = this.props.upload.deleted
     const sels = this.props.upload.selected
@@ -134,20 +135,24 @@ class DataPreview extends React.Component {
         (el) => !dels.includes(el)
       )
 
-      const myHeader = (e) => <div className={styles.myheader}>
-        {showStaged?
-            <Checkbox
-            onChange={(event) => {this.onCheck(event, e)}}
-            checked={sels.includes(e)}
-          ><div title={e} className={styles.ttl}>{e}</div>
-          </Checkbox>
-          :<div title={e} className={styles.ttl2}>{e}</div>}
-        <Select className={styles.sel} defaultValue={flds[e]} onChange={(value) => {this.onSelect(value, e)}}>
-          <Option key="string" value="string">String</Option>
-          <Option key="integer" value="integer">Integer</Option>
-          <Option key="float" value="float">Float</Option>
-        </Select>
-      </div>
+      const myHeader = (e) =>
+        <div className={styles.myheader}>
+          {showStaged && middle === 'workspace'?
+              <Checkbox
+              onChange={(event) => {this.onCheck(event, e)}}
+              checked={sels.includes(e)}
+            ><div title={e} className={styles.ttl}>{e}</div>
+            </Checkbox>
+            :<div title={e} className={styles.ttl2}>{e}</div>}
+          {middle === 'workspace'?
+            <Select className={styles.sel} defaultValue={flds[e]} onChange={(value) => {this.onSelect(value, e)}}>
+              <Option key="string" value="string">String</Option>
+              <Option key="integer" value="integer">Integer</Option>
+              <Option key="float" value="float">Float</Option>
+            </Select>
+            :null
+          }
+        </div>
 
       old_col = dsColumns.map((e) => ({
           title: myHeader(e),
@@ -170,7 +175,7 @@ class DataPreview extends React.Component {
                   <span className={styles.tag}>{tag}</span></Tag>)}
               </div>:null }
           </div>
-          {this.props.upload.showStaged?
+          {this.props.upload.showStaged && middle === 'workspace'?
             <div className={styles.cright}>
               <DataModal>
                 <Button icon="edit"/>
@@ -222,7 +227,8 @@ class DataPreview extends React.Component {
                       loading={this.props.upload.lastLoading}
               >Last 5 rows<Icon type="right"/></Button>
             </div>
-            {this.props.upload.showStaged ?
+            {middle === 'projects'? null :
+              this.props.upload.showStaged ?
               <div className={styles.bottom}>
                 <Button type="primary" className={styles.btn}
                         loading={this.props.upload.saveLoading}
