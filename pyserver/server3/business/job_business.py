@@ -129,10 +129,11 @@ def copy_job(job, belonged_project, staging_data_set):
     return j
 
 
-def update_job_steps(job_id, steps, active_steps):
+def update_job_steps(job_id, steps, active_steps, display_steps):
     job_obj = get_by_job_id(job_id)
     job_obj.steps = steps
-    job_obj.active_steps = active_steps
+    job_obj.active_steps = active_steps,
+    job_obj.display_steps = display_steps
     return job_obj.save()
 
 

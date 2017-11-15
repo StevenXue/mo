@@ -75,9 +75,9 @@ def create_job():
 def update_job_steps():
     data = request.get_json()
     # print("data", data)
-    job_id, steps, active_steps = ObjectId(data["_id"]), data['steps'], data[
-        'active_steps']
-    result = job_business.update_job_steps(job_id, steps, active_steps)
+    job_id, steps, active_steps, display_steps = ObjectId(data["_id"]), data['steps'], data[
+        'active_steps'], data['display_steps']
+    result = job_business.update_job_steps(job_id, steps, active_steps, display_steps)
     result = json_utility.convert_to_json(result.to_mongo())
     return jsonify({
         "response": {

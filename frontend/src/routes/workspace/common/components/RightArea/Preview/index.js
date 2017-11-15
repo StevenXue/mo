@@ -75,9 +75,9 @@ function Preview({preview, model, dispatch, namespace}) {
         dataIndex: e[0],
         key: e[0],
         width: 120,
-        // styles: {'backgroundColor': "red"}
+        // styles: {'backgroundColor': "red", "display": "flex"}
       };
-      let className = '';
+      let className = null;
 
       if(fields&&fields.includes(e[0])){
         className += ' active-table-column';
@@ -126,7 +126,7 @@ function Preview({preview, model, dispatch, namespace}) {
         </div>:null
       }
 
-        <Table dataSource={dataSource} columns={columns} scroll={{ x: 6000 , y: '100%'}}/>
+        <Table dataSource={dataSource} columns={columns} scroll={{ x: true }}/>
         <RevertTable table={table} fields={fields} labelFields={labelFields}/>
       </Spin>
     </div>
