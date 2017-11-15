@@ -15,6 +15,7 @@ const related_fields= ['All',
   'Business', 'Government', 'Education', 'Environment',
   'Health', 'Housing & Development', 'Public Services',
   'Social', 'Transportation', 'Science', 'Technology'];
+const privacy_set= ['All','Private','Public'];
 
 
 function MyService({history, myService, dispatch}) {
@@ -23,11 +24,10 @@ function MyService({history, myService, dispatch}) {
     modelsJson,
     focusModel,
     category,
-    skipping
-  } = myService;
+    skipping,
+    privacy,
 
-  console.log('myService')
-  console.log(myService)
+  } = myService;
 
   const props = {
     model: myService,
@@ -35,26 +35,55 @@ function MyService({history, myService, dispatch}) {
     dispatch: dispatch,
   };
 
-  return(<List {...props}/>)
+  return(
+    <div className={`main-container ${styles.normal}`}>
+      <div className={styles.header}>
+        <p>Privacy </p>
+        <Select defaultValue="All" className={styles.select}
+                onChange={handlePrivacyChange}>
+          {privacy_set.map(e =>
+            <Option key={e} value={e}>{e}</Option>,
+          )}
+        </Select>
+        <p>Category </p>
+        <Select defaultValue="All" className={styles.select}
+                onChange={handleCategoryChange}>
+          {related_fields.map(e =>
+            <Option key={e} value={e}>{e}</Option>,
+          )}
+        </Select>
+        <Search
+          placeholder="search"
+          style={{ width: 200 }}
+          onSearch={value => search(value)}
+        />
+      </div>
+      <List {...props}/>
+    </div>
+  )
 
   const models = JsonToArray(modelsJson);
 
-  function handleChange(value) {
-    dispatch({type: 'publicServedModels/fetch',
-      payload: {category: value,skipping:0}})
+  function handleCategoryChange(value) {
+    dispatch({type: 'myService/fetch',
+      payload: {category: value,skipping:0,privacy:privacy}})
+  }
+
+  function handlePrivacyChange(value) {
+    dispatch({type: 'myService/fetch',
+      payload: {privacy: value,skipping:0,category:category}})
   }
 
   const onClickMoreModels = () => {
     dispatch({
       type: 'publicServedModels/fetch',
-      payload: {category: category,skipping:skipping},
+      payload: {category: category,skipping:skipping,privacy:privacy},
     });
   };
 
   function toModelDetail(_id, projectId, history) {
     dispatch({type: 'publicServedModels/fetchone',
       payload: {model_ID: _id}})
-    // history.push(`/modelmarkets/${id}`)
   }
 
   function search(value){

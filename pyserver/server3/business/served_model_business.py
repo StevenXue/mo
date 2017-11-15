@@ -45,13 +45,7 @@ def add(name, description, input_info, output_info, examples, version,
         related_fields,
         related_tasks,
         tags, is_private, data_fields,
-        input_data_demo_string, create_time, user, **optional):
-    print('data_fields')
-    print(data_fields)
-
-    print('input_data_demo_string')
-    print(input_data_demo_string)
-
+        input_data_demo_string, create_time, user, user_ID,projectId, **optional):
     model = ServedModel(name=name, description=description,
                         input_info=input_info,
                         output_info=output_info,
@@ -68,7 +62,8 @@ def add(name, description, input_info, output_info, examples, version,
                         data_fields=data_fields,
                         input_data_demo_string=input_data_demo_string,
                         create_time=create_time,
-                        user=user,
+                        user=user,user_ID=user_ID,
+                        projectId=projectId,
                         **optional)
 
     return served_model_repo.create(model)
@@ -117,13 +112,32 @@ def terminate_by_id(oid):
                                      NAMESPACE, options)
 
 
-def get_by_four_querys(related_fields=None, related_tasks=None, tags=None,
-                       privacy=None, skipping=None, search_str=None):
-    return served_model_repo.query_four(related_fields=related_fields,
-                                        related_tasks=related_tasks,
-                                        tags=tags, skipping=skipping,
-                                        privacy=privacy,
-                                        search_str=search_str)
+def get_by_query(user_ID=None, related_fields=None,
+                 related_tasks=None, tags=None,
+                 privacy=None, skipping=None, search_str=None):
+
+    query = {}
+    if related_fields != 'All':
+        query["related_fields"] = related_fields
+    if related_tasks:
+        query["related_tasks__in"] = related_tasks
+    if tags:
+        query["tags__in"] = tags
+    if privacy == 'Public':
+        query['private'] = True
+    if privacy == 'Private':
+        query['private'] = False
+    if user_ID:
+        query['user_ID'] = user_ID
+    print('query', query)
+    return served_model_repo.read_skipping_order(query, skipping)
+
+    # return served_model_repo.query_four(user_ID=user_ID,
+    #                                     related_fields=related_fields,
+    #                                     related_tasks=related_tasks,
+    #                                     tags=tags, skipping=skipping,
+    #                                     privacy=privacy,
+    #                                     search_str=search_str)
 
 
 # def suspend_by_id(oid):

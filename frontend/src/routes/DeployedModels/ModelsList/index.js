@@ -32,7 +32,27 @@ function PublicServedModels({history, publicServedModels, dispatch}) {
     dispatch: dispatch,
   };
 
-  return(<List {...props}/>)
+  return(
+    <div className={`main-container ${styles.normal}`}>
+      <div className={styles.header}>
+        <p>Category</p>
+        <Select defaultValue="All" className={styles.select}
+                onChange={handleChange}>
+          {related_fields.map(e =>
+            <Option key={e} value={e}>{e}</Option>,
+          )}
+        </Select>
+        <Search
+          placeholder="search"
+          style={{ width: 200 }}
+          onSearch={value => search(value)}
+        />
+      </div>
+      <List {...props}/>
+    </div>
+  )
+
+
 
   const models = JsonToArray(modelsJson);
 

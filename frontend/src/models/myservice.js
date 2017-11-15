@@ -1,7 +1,7 @@
 import {
   fetchServedModelsByUserID,
 } from '../services/deployedmodels'
-import * as deploymentService from '../services/deployment';
+import * as deploymentService from '../services/deployment'
 
 export default {
   namespace: 'myService',
@@ -10,6 +10,7 @@ export default {
     focusModel: null,
     skipping: 0,
     category: 'All',
+    privacy: 'All'
   },
   reducers: {
     setMyModels(state, action) {
@@ -24,7 +25,7 @@ export default {
       let newInfo = {
         ...state.modelsJson,
         ...action.payload.modelsJson,
-      };
+      }
 
       return {
         ...state,
@@ -44,7 +45,7 @@ export default {
       let newInfo = {
         ...state.focusModel[0],
         predict_result: action.payload.result,
-      };
+      }
       return {
         ...state,
         focusModel: {
@@ -52,28 +53,46 @@ export default {
         }
       }
     },
+    changePriCatState(state, action) {
+        return {
+          ...state,
+          privacy: action.payload.privacy,
+          category:action.payload.category,
+        }
+      }
   },
   effects: {
     // fetch 10
     * fetch(action, {call, put, select, take}) {
-
+      const user_ID = localStorage.getItem('user_ID')
       const {data: models} = yield call(fetchServedModelsByUserID, {
-        privacy: false, category: action.payload.category, skipping: action.payload.skipping
+        user_ID: user_ID,
+        privacy: action.payload.privacy,
+        category: action.payload.category,
+        skipping: action.payload.skipping
       })
       console.log('models')
       console.log(models)
-      if (action.payload.skipping === 0){
+
+      yield put({type: 'myService/changePriCatState', payload: {privacy: action.payload.privacy,
+        category: action.payload.category}})
+
+      if (action.payload.skipping === 0) {
         yield put({
           type: 'setMyModels',
-          payload: {modelsJson: models,
-             category:action.payload.category}
+          payload: {
+            modelsJson: models,
+            category: action.payload.category
+          }
         })
       }
-      else{
+      else {
         yield put({
           type: 'addMyModels',
-          payload: {modelsJson: modelsJson,category:action.payload.category,
-            skipping:action.payload.skipping}
+          payload: {
+            modelsJson: modelsJson, category: action.payload.category,
+            skipping: action.payload.skipping
+          }
         })
       }
     },
@@ -94,31 +113,39 @@ export default {
       })
       yield put({
         type: 'setMyModels',
-        payload: {modelsJson: modelsJson,
-          category:action.payload.category}
+        payload: {
+          modelsJson: modelsJson,
+          category: action.payload.category
+        }
       })
     },
 
     * getPrediction(action, {call, put, select}) {
-      const user_ID = yield select(state => state.login.user.user_ID);
-      let payload = action.payload;
-      payload.served_model_id = yield select(state => state.publicServedModels.focusModel[0]['_id']);
-      payload.server = yield select(state => state.publicServedModels.focusModel[0]['server']);
+      const user_ID = yield select(state => state.login.user.user_ID)
+      let payload = action.payload
+      payload.served_model_id = yield select(state => state.publicServedModels.focusModel[0]['_id'])
+      payload.server = yield select(state => state.publicServedModels.focusModel[0]['server'])
       // payload.name=yield select(state => state.deployment.modelsJson[focusModelId]['served_model']['name']);
-      payload.model_name = yield select(state => state.publicServedModels.focusModel[0]['model_name']);
-      payload.features = yield select(state => state.publicServedModels.focusModel[0]['data_fields'][0]);
-      const {data: result} = yield call(deploymentService.getPrediction, payload);
-      yield put({type: 'getPredictionR', payload: result});
+      payload.model_name = yield select(state => state.publicServedModels.focusModel[0]['model_name'])
+      payload.features = yield select(state => state.publicServedModels.focusModel[0]['data_fields'][0])
+      const {data: result} = yield call(deploymentService.getPrediction, payload)
+      yield put({type: 'getPredictionR', payload: result})
     },
   },
   subscriptions: {
     // 当进入该页面是 获取用户所有 project
     setup({dispatch, history}) {
+      const user_ID = localStorage.getItem('user_ID')
       return history.listen(({pathname}) => {
         if (pathname === '/myservice') {
           dispatch({
             type: 'fetch',
-            payload: {privacy: 'public', category: 'All',skipping: 0,}
+            payload: {
+              user_ID: user_ID,
+              privacy: 'All',
+              category: 'All',
+              skipping: 0,
+            }
           })
         }
       })

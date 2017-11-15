@@ -54,7 +54,7 @@ def first_save_to_db(user_ID, name, description, input_info, output_info,
                      job_id, model_name, related_fields,
                      related_tasks, tags, is_private, data_fields,
                      input_data_demo_string,
-                     service_name=None,
+                     service_name,projectId,
                      **optional):
     """
 
@@ -90,7 +90,8 @@ def first_save_to_db(user_ID, name, description, input_info, output_info,
                                              tags, is_private, data_fields,
                                              input_data_demo_string,
                                              create_time=datetime.utcnow(),
-                                             user=user,
+                                             user=user, user_ID=user_ID,
+                                             projectId=projectId,
                                              **optional)
 
     ownership_business.add(user, is_private, served_model=served_model)
@@ -260,7 +261,7 @@ def first_deploy(user_ID, job_id, name, description, input_info, output_info,
                                 related_fields,
                                 related_tasks, tags, is_private, data_fields,
                                 input_data_demo_string,
-                                service_name=service_name,
+                                service_name,projectId,
                                 **optional)
 
 
@@ -411,7 +412,7 @@ def get_prediction_by_id(server, model_name, input_value, features):
                                                        input_value, features)
 
 
-def list_served_models_by_user_ID(user_ID, order=-1):
+def list_served_models_by_user_ID(user_ID, order=-1, privacy='all'):
     """
 
     :param user_ID:
@@ -432,7 +433,7 @@ def list_served_models_by_user_ID(user_ID, order=-1):
     return public_sm, owned_sm
 
 
-def list_all_served_models(related_fields=None, related_tasks=None, tags=None,
+def list_all_served_models(user_ID=None, related_fields=None, related_tasks=None, tags=None,
                            privacy=None, skipping=None, search_str=None):
     """
 
@@ -444,18 +445,17 @@ def list_all_served_models(related_fields=None, related_tasks=None, tags=None,
     :param search_str:
     :return:
     """
-    privacy = False
-    public_all = served_model_business.get_by_four_querys(
+
+    public_all = served_model_business.get_by_query(
+        user_ID=user_ID,
         related_fields=related_fields,
         related_tasks=related_tasks,
         tags=tags, skipping=skipping,
         privacy=privacy,
         search_str=search_str)
     # public_all = [each_model.to_mongo() for each_model in public_all]
-    print(public_all)
     public_all = json_utility.me_obj_list_to_json_list(
         public_all)
-    print(public_all)
     # myyy = [a['_id'] for a in public_all]
     # print(myyy)
     # print(public_all)

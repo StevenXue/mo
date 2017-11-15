@@ -86,34 +86,37 @@ def delete_served_model(oid):
 @served_model_app.route('/served_models', methods=['GET'])
 def list_served_models():
     user_ID = request.args.get('user_ID')
+    privacy = request.args.get('privacy')
     related_fields = request.args.get('category')
     model_ID = request.args.get('model_ID')
     skipping = request.args.get('skipping')
     search_str = request.args.get('searchStr')
+    print('privacy',privacy)
     print('model_ID', model_ID)
     print('search_str', search_str)
-    if user_ID:
-        public_served_models, owned_served_models = \
-            served_model_service.list_served_models_by_user_ID(user_ID,
-                                                               order=-1)
-        public_served_models = json_utility.me_obj_list_to_json_list(
-            public_served_models)
-        owned_served_models = json_utility.me_obj_list_to_json_list(
-            owned_served_models)
-        result = {
-            'public_served_models': public_served_models,
-            'owned_served_models': owned_served_models
-        }
-        print('result')
-        print(result)
-        return jsonify({'response': result})
-    elif model_ID:
+    # if user_ID:
+    #     public_served_models, owned_served_models = \
+    #         served_model_service.list_served_models_by_user_ID(user_ID,
+    #                                                            order=-1)
+    #     public_served_models = json_utility.me_obj_list_to_json_list(
+    #         public_served_models)
+    #     owned_served_models = json_utility.me_obj_list_to_json_list(
+    #         owned_served_models)
+    #     result = {
+    #         'public_served_models': public_served_models,
+    #         'owned_served_models': owned_served_models
+    #     }
+    #     print('result')
+    #     print(result)
+    #     return jsonify({'response': result})
+    if model_ID:
         model = served_model_service.get_by_model_id(model_ID)
 
         return jsonify({'response': model})
     else:
         all_public_served_models = served_model_service.list_all_served_models(
-            related_fields=related_fields, skipping=skipping, search_str=search_str)
+            user_ID=user_ID, related_fields=related_fields,
+            skipping=skipping, search_str=search_str, privacy=privacy)
         return jsonify({'response': all_public_served_models})
 
 

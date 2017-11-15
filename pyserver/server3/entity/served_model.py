@@ -42,4 +42,6 @@ class ServedModel(DynamicDocument):
     input_data_demo_string = StringField()
     create_time = DateTimeField(required=True)
     user = ReferenceField('User', required=True)
+    user_ID = StringField()
+    projectId = StringField()
 
