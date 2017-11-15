@@ -65,7 +65,7 @@ export default {
     },
   },
   subscriptions: {
-    // 当进入该页面是 获取用户所有 project
+    // 当进入该页面是 获取 project list
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
         if (pathname === '/workspace') {

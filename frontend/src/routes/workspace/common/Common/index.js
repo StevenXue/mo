@@ -8,10 +8,12 @@ import MiddleArea from '../components/MiddleArea/index'
 import RightArea from '../components/RightArea/index'
 import styles from './index.less'
 
+
 function Common(props) {
-  const { notebook, dispatch } = props
+  const { notebook, projectDetail, dispatch } = props
 
   const renderNotebookSection = () => {
+    console.log('notebook store', notebook)
     return (
       <div>
         <Button className='notebook-start-button' type='primary' style={{ marginTop: 20, width: 120 }}
@@ -23,12 +25,12 @@ function Common(props) {
           </a>
         </Button>
         <div id="notebookSection">
-          {notebook.start_notebook &&
+          {notebook.start_notebook && projectDetail.project &&
           <JupyterNotebook user_id={notebook.userId}
                            notebook_content={notebook.notebook}
                            notebook_name={notebook.notebookName}
-                           project_name={notebook.name}
-                           project_id={notebook._id}
+                           project_name={projectDetail.project.name}
+                           project_id={projectDetail.project._id}
                            dataset_name={'dd'}
                            dataset_id={'11'}
                            spawn_new={notebook.spawn_new}
@@ -120,6 +122,6 @@ function Common(props) {
   )
 }
 
-export default connect(({ notebook }) => ({ notebook }))(Common)
+export default connect(({ notebook, projectDetail }) => ({ notebook, projectDetail }))(Common)
 
 // export default Common;

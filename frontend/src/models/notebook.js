@@ -4,13 +4,36 @@ import * as notebookService from '../services/notebook'
 import { privacyChoices } from '../constants'
 import pathToRegexp from 'path-to-regexp'
 import { cloneDeep, isEmpty } from 'lodash'
+import empty from '../routes/workspace/modelling/Notebook/empty.ipynb'
+
 
 export default {
   namespace: 'notebook',
   state: {
-    // doneIndices: new Set([]),
+    fileList: [],
+    notebookName: '',
+    notebookPath: {},
+    editing: false,
+    data_id: '',
+    start_notebook: false,
+    visible: false,
+    data_prop: 'owned_ds',
+    selectedData: '',
+    dataSet: [],
+    dataset_name: 'DataSet Selected',
+    to_disconnect: false,
+    notebook: empty,
+    spawn_new: false,
+    columns: [],
+    stagingDataID: '',
   },
   reducers: {
+    setProjectId(state, { payload: { project_id } }) {
+      return {
+        ...state,
+        project_id,
+      }
+    },
     setPort(state, { payload: { userId } }) {
       return {
         ...state,

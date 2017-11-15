@@ -48,6 +48,7 @@ from server3.service import logger_service
 from tensorflow.contrib.learn.python.learn import metric_spec
 
 temp_dir = '/tmp/model_results'
+
 # add handler to catch tensorflow log message
 mh = MetricsHandler()
 
@@ -78,18 +79,29 @@ def custom_model(conf, model_fn, input_data, **kw):
 
     # def eval_input_fn():
     #     return input_fn(test, continuous_cols, categorical_cols, label_col)
+
+    logging_flag = kw.pop('logging', True)
     return custom_model_help(model_fn, input_data, project_id, job_id,
                              user_ID,
                              result_dir,
                              result_sds,
                              est_params, fit_params,
-                             eval_params)
+                             eval_params, logging_flag)
 
 
 def custom_model_help(model_fn, input_data, project_id, job_id, user_ID,
                       result_dir, result_sds,
                       est_params=None, fit_params=None,
-                      eval_params=None):
+                      eval_params=None, logging_flag=True):
+
+    tf.logging.set_verbosity(tf.logging.INFO)
+    # pass result staging data set for logger to save results
+    logger = logging.getLogger('tensorflow')
+    logger.setLevel(logging.DEBUG)
+    if logging_flag:
+        # add logger only when logging flag set to true
+        logger.addHandler(mh)
+
     # init training logger
     training_logger = logger_service.TrainingLogger(
         fit_params['args']['steps'],
@@ -98,12 +110,7 @@ def custom_model_help(model_fn, input_data, project_id, job_id, user_ID,
         user_ID,
         result_sds)
 
-    tf.logging.set_verbosity(tf.logging.INFO)
-    # pass result staging data set for logger to save results
     mh.training_logger = training_logger
-    logger = logging.getLogger('tensorflow')
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(mh)
 
     # input_data 是一整个数据集，分割 为训练集和测试集
     # X_train, X_test, y_train, y_test = train_test_split(
@@ -202,24 +209,21 @@ def custom_model_help(model_fn, input_data, project_id, job_id, user_ID,
         predictions = estimator.predict(predict_feature, as_iterable=True)
         result['predictions'] = predictions
 
-    # export saved model
-    features = {k: constant_op.constant(X_train[k].values,
-                                        shape=[X_train.shape[0], 1],
-                                        dtype=dtypes.float32) for k in
-                X_train.columns}
-    serving_input_fn = input_fn_utils.build_default_serving_input_fn(features)
-    saved_model_path = estimator.export_savedmodel(
-        os.path.abspath(result_dir),
-        # temp_dir,
-        serving_input_fn)
-    # files = os.listdir(temp_dir)
-    # for f in files:
-    #     shutil.move(os.path.join(temp_dir, f), os.path.abspath(result_dir))
+    if logging_flag:
+        # export saved model
+        features = {k: constant_op.constant(X_train[k].values,
+                                            shape=[X_train.shape[0], 1],
+                                            dtype=dtypes.float32) for k in
+                    X_train.columns}
+        serving_input_fn = input_fn_utils.build_default_serving_input_fn(features)
+        saved_model_path = estimator.export_savedmodel(
+            os.path.abspath(result_dir),
+            serving_input_fn)
 
-    # add saved_model_path to result staging data set
-    staging_data_set_business.update(result_sds.id,
-                                     saved_model_path=saved_model_path.decode(
-                                         'ascii'))
+        # add saved_model_path to result staging data set
+        staging_data_set_business.update(result_sds.id,
+                                         saved_model_path=saved_model_path.decode(
+                                             'ascii'))
     return result
 
 

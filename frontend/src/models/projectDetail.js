@@ -3,7 +3,7 @@ import { routerRedux } from 'dva/router'
 import { fetchProject, deleteProject, updateProject, forkProject } from '../services/project'
 import { privacyChoices } from '../constants'
 import pathToRegexp from 'path-to-regexp'
-import {get} from 'lodash'
+import { get } from 'lodash'
 
 export default {
   namespace: 'projectDetail',
@@ -20,10 +20,10 @@ export default {
     setStep(state, { payload }) {
       const { index } = payload
       let project = state.project
-      if(!project) {
+      if (!project) {
         return state
       }
-      if(project.done_indices) {
+      if (project.done_indices) {
         let indices = new Set(project.done_indices)
         indices.add(index)
         project.done_indices = [...indices]
@@ -57,7 +57,7 @@ export default {
       yield put({ type: 'fetch', projectId })
     },
     *setDoneStep({ payload }, { call, put, select }) {
-      yield put({ type: 'setStep', payload})
+      yield put({ type: 'setStep', payload })
       const project = yield select(state => get(state, 'projectDetail.project'))
       const projectId = project._id
       delete project._id
