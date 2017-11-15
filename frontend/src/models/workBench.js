@@ -679,6 +679,7 @@ export default {
     },
 
     *runSection(action, { call, put, select }) {
+      const { sectionId, namespace } = action.payload
       yield put({
         type: 'setLoading', payload: {
           key: 'wholePage',
@@ -691,8 +692,6 @@ export default {
           status: 100,
         },
       })
-
-      const { namespace, sectionId } = action.payload
 
       // 先把 save section 复制过来
       const sectionsJson = yield select(state => state[namespace].sectionsJson)
@@ -720,6 +719,9 @@ export default {
           loading: false,
         },
       })
+
+      yield put({ type: 'showResult' })
+
     },
     *rename(action, { call, put, select }) {
       const { sectionId, name } = action.payload

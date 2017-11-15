@@ -12,8 +12,6 @@ function RevertTable({table, fields, labelFields}) {
   //处理dataSource
   let dataSource = null;
 
-  console.log("table", table)
-
   if (table.length !== 0) {
     dataSource = table.reverse_data.map((e, index) => {
       return {

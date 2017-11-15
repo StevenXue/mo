@@ -30,7 +30,7 @@ function Preview({preview, model, dispatch, namespace}) {
     // fields = sectionsJson[focusSectionsId].steps[1].args[0].values;
     fields = get(sectionsJson[focusSectionsId], 'steps[1].args[0].values', []);
     // if(namespace === 'modelling'){}
-    labelFields = sectionsJson[focusSectionsId].steps[2].args[0].values;
+    labelFields = get(sectionsJson[focusSectionsId], 'steps[2].args[0].values', []);
   }
 
   function handleChange(value) {
