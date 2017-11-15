@@ -3,6 +3,7 @@ import { Select, Button, Input, Card, Pagination, Tag, Icon, Spin } from 'antd'
 import { connect } from 'dva'
 import styles from './index.less'
 import { dataCategory } from '../../constants'
+import {get} from 'lodash'
 
 const Option = Select.Option;
 const Search = Input.Search;
@@ -96,7 +97,7 @@ class MySelection extends React.Component {
         <div className={styles.content}>
           <div className={styles.title}>{e.name}</div>
           <div className={styles.desc}>{e.description}</div>
-          {e.tags.length > 0 ?
+          {e.tags && e.tags.length > 0 ?
             <div className={styles.tagzone}>
               {e.tags.map((tag) => <Tag key={tag} color="#C1E4F6">
                 <span className={styles.tag}>{tag}</span></Tag>)}
@@ -121,7 +122,7 @@ class MySelection extends React.Component {
         <div className={styles.content}>
           <div className={styles.title}>{e.name}</div>
           <div className={styles.desc}>{e.description}</div>
-          {e.tags.length > 0 ?
+          {e.tags && e.tags.length > 0 ?
             <div className={styles.tagzone}>
               {e.tags.map((tag) => <Tag key={tag} color="#C1E4F6">
                 <span className={styles.tag}>{tag}</span></Tag>)}
