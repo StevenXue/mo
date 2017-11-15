@@ -211,5 +211,13 @@ def update_job(job_id):
         "response": new_job}), 200
 
 
+@job_app.route("/jobs/<string:job_id>", methods=["GET"])
+def get_job(job_id):
+    job = job_business.get_by_job_id(job_id)
+    job = json_utility.convert_to_json(job.to_mongo())
+    return jsonify({
+        "response": job}), 200
+
+
 if __name__ == "__main__":
     create_job()
