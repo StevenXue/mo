@@ -84,10 +84,10 @@ function Header({location, login, history, dispatch}) {
             (e) => {
               if (e.dropdown) {
                 return (
-                  <SubMenu title={<span>Workspace</span>}>
+                  <SubMenu title={<span>Workspace</span>} key={e.key}>
                     {e.dropdown.map(
                       (e) => {return(
-                        <Menu.Item key= {e.key} >
+                        <Menu.Item key={e.key} >
                           <div onClick={() => {
                             dispatch(routerRedux.push(e.Link))
                           }}>

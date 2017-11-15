@@ -48,6 +48,7 @@ from server3.service import logger_service
 from tensorflow.contrib.learn.python.learn import metric_spec
 
 temp_dir = '/tmp/model_results'
+
 # add handler to catch tensorflow log message
 mh = MetricsHandler()
 
@@ -90,6 +91,13 @@ def custom_model_help(model_fn, input_data, project_id, job_id, user_ID,
                       result_dir, result_sds,
                       est_params=None, fit_params=None,
                       eval_params=None):
+
+    tf.logging.set_verbosity(tf.logging.INFO)
+    # pass result staging data set for logger to save results
+    logger = logging.getLogger('tensorflow')
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(mh)
+
     # init training logger
     training_logger = logger_service.TrainingLogger(
         fit_params['args']['steps'],
@@ -98,12 +106,7 @@ def custom_model_help(model_fn, input_data, project_id, job_id, user_ID,
         user_ID,
         result_sds)
 
-    tf.logging.set_verbosity(tf.logging.INFO)
-    # pass result staging data set for logger to save results
     mh.training_logger = training_logger
-    logger = logging.getLogger('tensorflow')
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(mh)
 
     # input_data 是一整个数据集，分割 为训练集和测试集
     # X_train, X_test, y_train, y_test = train_test_split(

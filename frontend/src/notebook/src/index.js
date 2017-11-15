@@ -113,7 +113,6 @@ export class Notebook extends React.Component {
   render() {
     const dispatch = this.dispatch;
     const store = this.store;
-
     return (
       <Provider rx={{ dispatch, store }}  store="">
         <div >
