@@ -3,6 +3,7 @@ import { Button, Table, Checkbox, Select, Modal, Icon, Spin, Tag } from 'antd'
 import { connect } from 'dva'
 import styles from './index.less'
 import DataModal from '../../components/DataModal'
+import {get} from 'lodash'
 
 const Option = Select.Option;
 const confirm = Modal.confirm;
@@ -169,7 +170,7 @@ class DataPreview extends React.Component {
           <div className={styles.cleft}>
             <p className={styles.ctitle}>{this.props.upload.dataSetName}</p>
             <p className={styles.cdesc}>{this.props.upload.dataSetDesc}</p>
-            {this.props.upload.dataSetTags.length > 0 ?
+            {this.props.upload.dataSetTags && this.props.upload.dataSetTags.length > 0 ?
               <div className={styles.tagzone}>
                 {this.props.upload.dataSetTags.map((tag) => <Tag key={tag} color="#C1E4F6">
                   <span className={styles.tag}>{tag}</span></Tag>)}
@@ -190,7 +191,7 @@ class DataPreview extends React.Component {
               <div className={styles.left}>
                 <p className={styles.title}>File Information</p>
                 <div className={styles.desc}>
-                  <p>{dsColumns.length} columns, 5 rows for preview</p>
+                  <p>{get(dsColumns, 'length', 'unknown')} columns, 5 rows for preview</p>
                 </div>
               </div>
               <div className={styles.center}>

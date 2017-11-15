@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Modal, Form, Input, Radio, Select, Tag, Tooltip, Button } from 'antd'
 import { connect } from 'dva'
 import styles from './index.less'
+import {get} from 'lodash'
 
 import { dataCategory } from '../../constants'
 
@@ -145,7 +146,7 @@ class DataModal extends Component {
             >
               {
                 getFieldDecorator('tags', {
-                  initialValue: dataSetTags.join(','),
+                  initialValue: dataSetTags?dataSetTags.join(','):'',
                   getValueFromEvent: (e) => {
                     return [...this.state.tags, e.target.value].join(',')
                   },
