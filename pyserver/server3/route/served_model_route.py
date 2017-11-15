@@ -114,6 +114,7 @@ def list_served_models():
 
         return jsonify({'response': model})
     else:
+        print('related_fields', related_fields)
         all_public_served_models = served_model_service.list_all_served_models(
             user_ID=user_ID, related_fields=related_fields,
             skipping=skipping, search_str=search_str, privacy=privacy)

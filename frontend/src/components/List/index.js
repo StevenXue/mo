@@ -17,24 +17,17 @@ const related_fields = ['All',
   'Social', 'Transportation', 'Science', 'Technology']
 const privacy_set = ['All', 'Private', 'Public']
 
-function List({model, dispatch, namespace}) {
+function List({model, dispatch, namespace,toModelDetail}) {
 
   const {
     modelsJson,
     focusModel,
     category,
     privacy,
-    skipping
+    skipping,
   } = model
 
   const models = JsonToArray(modelsJson)
-
-  function handleChange(value) {
-    dispatch({
-      type: namespace + '/fetch',
-      payload: {category: value, skipping: 0}
-    })
-  }
 
   const onClickMoreModels = () => {
     dispatch({
@@ -43,12 +36,6 @@ function List({model, dispatch, namespace}) {
     })
   }
 
-  function toModelDetail(_id, projectId, history) {
-    dispatch({
-      type: namespace + 'fetchone',
-      payload: {model_ID: _id}
-    })
-  }
 
   function search(value) {
     dispatch({
@@ -63,8 +50,8 @@ function List({model, dispatch, namespace}) {
         {models.map((model, i) =>
           <Card key={model._id} title={model.name} className={styles.card}
                 onClick={() => {
-                  dispatch(routerRedux.push('/modelmarkets/' + model._id))
-                  // toModelDetail(model._id,model.projectId, history)
+                  console.log('click')
+                  toModelDetail(model)
                 }}
                 style={{cursor: 'pointer'}}>
             <div className={styles.listDetails}>
@@ -73,7 +60,7 @@ function List({model, dispatch, namespace}) {
             {namespace !== 'myService' ?
               <div className={styles.listDetails}>
                 <Icon type="user" style={{marginRight: 10}}/>
-                {model['user_name'] && <p>{model.user_name}</p>}
+                {model['user_ID'] && <p>{model.user_ID}</p>}
                 <Icon type="clock-circle-o"
                       style={{marginLeft: 20, marginRight: 10}}/>
                 {model['create_time'] && <p>{showTime(model.create_time)}</p>}

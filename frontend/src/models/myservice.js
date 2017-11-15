@@ -65,16 +65,15 @@ export default {
     // fetch 10
     * fetch(action, {call, put, select, take}) {
       const user_ID = localStorage.getItem('user_ID')
+      console.log('category',action.payload.category)
       const {data: models} = yield call(fetchServedModelsByUserID, {
         user_ID: user_ID,
         privacy: action.payload.privacy,
         category: action.payload.category,
         skipping: action.payload.skipping
       })
-      console.log('models')
-      console.log(models)
 
-      yield put({type: 'myService/changePriCatState', payload: {privacy: action.payload.privacy,
+      yield put({type: 'changePriCatState', payload: {privacy: action.payload.privacy,
         category: action.payload.category}})
 
       if (action.payload.skipping === 0) {
