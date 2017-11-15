@@ -98,8 +98,6 @@ export default {
       const {data: model} = yield call(fetchOnePublicServedModels, {
         model_ID: action.payload.model_ID
       })
-      // yield put(routerRedux.push('/modelmarkets/' + action.payload.model_ID))
-      // const modelJson = arrayToJson(model, '_id');
       yield put({type: 'setFocusModels', payload: {model: model}})
     },
 

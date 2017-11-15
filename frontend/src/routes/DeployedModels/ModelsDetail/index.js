@@ -3,17 +3,11 @@ import {connect} from 'dva';
 import {routerRedux} from 'dva/router'
 import styles from './index.less';
 import {Tabs, Switch, Button, Input, Icon, Spin, Modal} from 'antd';
-import {arrayToJson, JsonToArray} from '../../../utils/JsonUtils';
-import LearningCurve from '../../../components/Charts/curve';
-import HeatmapOnCartesianChart from '../../../components/Charts/heatmapOnCartesianChart';
-import DeployModal from '../../../components/deployModal/deployModal';
 import GetPredictionForm from '../../../components/PredictForm/predictForm';
-import {get} from 'lodash';
 import Highlight from 'react-highlight'
 
 const {TextArea} = Input;
 const TabPane = Tabs.TabPane;
-const confirm = Modal.confirm;
 
 
 function GetPredictionPage({publicServedModels, dispatch}) {

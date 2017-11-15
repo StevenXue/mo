@@ -31,29 +31,35 @@ class Repo:
     def read(self, query):
         return self.__instance.objects(**query)
 
-    def query_four(self, related_fields=None, related_tasks=None,
-                   tags=None, privacy=None, skipping=None, search_str=None):
-        query = {}
-        if related_fields != 'All':
-            query["related_fields"] = related_fields
-        if related_tasks:
-            query["related_tasks__in"] = related_tasks
-        if tags:
-            query["tags__in"] = tags
-        if privacy:
-            query['privacy'] = privacy
-        print('query', query)
-        if search_str:
-            print('AAAAAAA')
-            return self.__instance.objects().search_text(search_str)
+    def read_skipping_order(self, query, skipping):
+        return self.__instance.objects(**query).order_by('-_id')[
+               int(skipping):int(skipping) + 10]
 
-        if skipping:
-            print('skipping:', skipping)
-            return self.__instance.objects(**query).order_by('-_id')[
-                   int(skipping):int(skipping) + 10]
-        else:
-            return self.__instance.objects(**query).order_by('-_id')
-
+    # def query_four(self, user_ID=None, related_fields=None,
+    #                related_tasks=None,
+    #                tags=None, privacy=None,
+    #                skipping=None, search_str=None):
+    #     query = {}
+    #     if related_fields != 'All':
+    #         query["related_fields"] = related_fields
+    #     if related_tasks:
+    #         query["related_tasks__in"] = related_tasks
+    #     if tags:
+    #         query["tags__in"] = tags
+    #     if privacy:
+    #         query['privacy'] = privacy
+    #     if user_ID:
+    #         query['user_ID'] = user_ID
+    #     print('query', query)
+    #     if search_str:
+    #         return self.__instance.objects().search_text(search_str)
+    #
+    #     if skipping:
+    #         print('skipping:', skipping)
+    #         return self.__instance.objects(**query).order_by('-_id')[
+    #                int(skipping):int(skipping) + 10]
+    #     else:
+    #         return self.__instance.objects(**query).order_by('-_id')
 
     def read_first_one(self, query):
         return self.__instance.objects(**query).first()
