@@ -1,6 +1,14 @@
 @import "../../../../../../index";
 .normal {
 }
+.container {
+  text-align: center;
+  :global {
+    .ant-table-row {
+      text-align: left;
+    }
+  }
+}
 
 .first_line {
   padding: 10px;
@@ -15,13 +23,13 @@
 .table_title {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: left;
   width: 120px;
   //background: @custom-grey;
 }
 
 .table_title_name {
-  text-align: center;
+  text-align: left;
 }
 
 .table_title_type {
