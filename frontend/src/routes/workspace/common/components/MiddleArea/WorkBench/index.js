@@ -618,14 +618,6 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
     )
   }
 
-  // function setting(args, stepIndex) {
-  //   return (
-  //     args.map((arg, argIndex) => {
-  //
-  //     })
-  //   )
-  // }
-
   function parameters(step, stepIndex) {
     return (
       <div>
@@ -753,7 +745,7 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
       {notebook.on[sectionId] ? renderNotebook() : <div className={`${styles.container} my-collapse-arrow`}>
         <Collapse className={styles.collapse}
                   defaultActiveKey={active_steps} onChange={callback}
-                  // activeKey={active_steps}
+                  activeKey={active_steps}
           >
           {
             steps.map((step, stepIndex) => {

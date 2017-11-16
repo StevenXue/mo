@@ -28,17 +28,27 @@ function RevertTable({table, fields, labelFields}) {
     let length = table.data.length
     columns = [
       {
-        title: "field_name",
+        title: <div className={styles.table_title}>
+          <div className={styles.table_title_name}>
+            field_name
+          </div>
+        </div>,
+        // title: "field_name",
         dataIndex: "name",
         key: "field_name",
-        width: 80,
-        // fixed: "left",
+        width: 120,
+        className: 'revert-table-header',
+        fixed: "left",
       },
       {
-        title: "type",
+        title: <div className={styles.table_title}>
+          <div className={styles.table_title_name}>
+            type
+          </div>
+        </div>,
         dataIndex: "type",
         key: "type",
-        width: 80,
+        width: 120,
         // fixed: true
       },
 
@@ -47,26 +57,27 @@ function RevertTable({table, fields, labelFields}) {
     for ( let i = 0; i < length; i++ ) {
       columns.push(
         {
-          title: i,
+          title: <div className={styles.table_title}>
+            <div className={styles.table_title_name}>
+              {i}
+            </div>
+          </div>,
           dataIndex: String(i),
           key: i,
-          width: 80,
+          width: 120,
         }
       )
     }
   }
 
 
-
-
-
   return (
-    <div className={styles.normal}>
       <Table dataSource={dataSource} columns={columns}
-             scroll={{ x: 6000 , y: '100%'}}
+             scroll={{x: true}}
              pagination={false}
+             // showHeader={false}
              rowClassName={(record, index)=>{
-               let className = '';
+               let className = null;
 
                if(fields&&fields.includes(record.name)){
                  className += ' active-table-column';
@@ -78,8 +89,8 @@ function RevertTable({table, fields, labelFields}) {
                return className
              }}
 
+
       />
-    </div>
   );
 }
 
