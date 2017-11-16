@@ -26,6 +26,8 @@ from server3.service import job_service, staging_data_service, \
 from server3.business import toolkit_business, ownership_business, \
     user_business, job_business, \
     result_business, project_business, staging_data_set_business
+
+from server3.business.toolkit_bussiness_2 import ToolkitDictCategory
 from server3.utility import data_utility, json_utility
 # from server3.business import ownership_business
 import copy
@@ -38,51 +40,40 @@ TOOLKIT_CATEGORY_DICT = {
     4: '概率统计推断'
 }
 
+data_explore_array = [e["object"].name for e in ToolkitDictCategory.data_explore]
+data_quality_improve_array = \
+    [e["object"].name for e in ToolkitDictCategory.data_quality_improve]
+feature_selection_array = \
+    [e["object"].name for e in ToolkitDictCategory.feature_selection]
+simple_toolkit_array = [e["object"].name for e in ToolkitDictCategory.simple]
+
 NEW_TOOLKIT_CATEGORY = [
     {
         'name': 'simple_toolkit',
         'zh_name': '简单的toolkit',
         'us_name': 'Simple Toolkit',
-        'child': [
-            '简单的K平均数算法',
-        ],
+        'child': simple_toolkit_array,
         'children': []
     },
     {
         'name': 'data_explore',
         'zh_name': '初探数据集',
         'us_name': 'Data Explore',
-        'child': [
-            'K平均数算法',
-            '移动平均值',
-            '皮尔森相关系数',
-            '变异系数',
-            '数据互相关'
-        ],
+        'child': data_explore_array,
         'children': []
     },
     {
         'name': 'data_quality_improve',
         'zh_name': '提升数据质量',
         'us_name': 'Data Quality Improve',
-        'child': [
-            '归一化',
-            '合并添加列',
-            '合并添加行'
-        ],
+        'child': data_quality_improve_array,
         'children': []
     },
     {
         'name': 'feature_selection',
         'zh_name': '特征提取',
         'us_name': 'Feature Selection',
-        'child': [
-            '方差选择法',
-            '卡方选择法',
-            '相关系数选择法',
-            '互信息选择法',
-            '递归特征消除法'
-        ],
+        'child': feature_selection_array,
         'children': []
     },
     # {

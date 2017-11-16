@@ -67,6 +67,8 @@ export default {
       getSections: false,
       getAlgorithms: false,
       wholePage: false,
+
+      modal: false
     },
     resultVisible: false,
 
@@ -511,6 +513,17 @@ export default {
       }
     },
 
+    addDisplaySteps(state, action){
+      const { sectionId, displaySteps } = action.payload
+
+      let sectionsJson = state.sectionsJson
+      sectionsJson[sectionId].display_steps = state.sectionsJson[sectionId].display_steps.concat(displaySteps)
+      return {
+        ...state,
+        sectionsJson,
+      }
+    },
+
     setGetSectionLoading(state, action) {
       return {
         ...state,
@@ -698,6 +711,7 @@ export default {
     },
 
     *runSection(action, { call, put, select }) {
+      const { sectionId, namespace } = action.payload
       yield put({
         type: 'setLoading', payload: {
           key: 'wholePage',
@@ -710,8 +724,6 @@ export default {
           status: 100,
         },
       })
-
-      const { namespace, sectionId } = action.payload
 
       yield call(saveSection, { payload: { namespace, sectionId } }, { call, put, select })
 
@@ -736,6 +748,9 @@ export default {
           loading: false,
         },
       })
+
+      yield put({ type: 'showResult' })
+
     },
     *rename(action, { call, put, select }) {
       const { sectionId, name } = action.payload

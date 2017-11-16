@@ -15,14 +15,9 @@ class ResultButton extends Component {
   render() {
     const {
       sectionsJson,
-      focusSectionsId,
     } = this.props.model
 
     const { model, dispatch, namespace, sectionId } = this.props
-
-    // const resultJson = {
-    //   "history": get(sectionsJson[focusSectionId], 'results')
-    // }
 
     const history = get(sectionsJson[sectionId].results, 'history', null)
     const result = get(sectionsJson[sectionId].results, 'result', null)

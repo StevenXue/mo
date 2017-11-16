@@ -55,6 +55,7 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
     steps,
     percent,
     active_steps,
+    display_steps,
     [translateDict[namespace]]: {
       steps: baseSteps,
     },
@@ -89,6 +90,14 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
       type: namespace + '/setActiveKey',
       payload: {
         activeKey: [String(stepIndex + 1)],
+        sectionId: section._id,
+      },
+    })
+
+    dispatch({
+      type: namespace + '/addDisplaySteps',
+      payload: {
+        displaySteps: [String(stepIndex + 1)],
         sectionId: section._id,
       },
     })
@@ -517,6 +526,16 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
                       sectionId: section._id,
                     },
                   })
+
+                  dispatch({
+                    type: namespace + '/addDisplaySteps',
+                    payload: {
+                      displaySteps: [String(stepIndex + 1)],
+                      sectionId: section._id,
+                    },
+                  })
+
+
                 }}>
           next
         </Button>
@@ -733,10 +752,13 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
       }
       {notebook.on[sectionId] ? renderNotebook() : <div className={`${styles.container} my-collapse-arrow`}>
         <Collapse className={styles.collapse}
-                  defaultActiveKey={['data_source']} onChange={callback}
-                  activeKey={active_steps}>
+                  defaultActiveKey={active_steps} onChange={callback}
+                  // activeKey={active_steps}
+          >
           {
             steps.map((step, stepIndex) => {
+
+              if(display_steps.includes(String(stepIndex))){
                 switch (step.name) {
                   case 'data_source':
                   case 'target_datasource':
@@ -783,6 +805,8 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
                       ),
                     ]
                 }
+              }
+
               },
             )
           }

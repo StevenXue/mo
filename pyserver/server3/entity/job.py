@@ -48,3 +48,5 @@ class Job(DynamicDocument):
     visual_sds_id = ReferenceField('StagingDataSet')
     served_model = ReferenceField('ServedModel', reverse_delete_rule=NULLIFY)
     result = DictField()
+    display_steps = ListField(default=['0'])
+
