@@ -93,7 +93,7 @@ class Login extends Component {
                 size="large"
                 className={styles.input}
                 // prefix={<Icon type="user" className={styles.prefixIcon}/>}
-                placeholder="admin"
+                placeholder="user ID"
               />,
             )}
           </FormItem>
@@ -109,7 +109,7 @@ class Login extends Component {
                 className={styles.input}
                 // prefix={<Icon type="lock" className={styles.prefixIcon}/>}
                 type="password"
-                placeholder="888888"
+                placeholder="password"
               />,
             )}
           </FormItem>

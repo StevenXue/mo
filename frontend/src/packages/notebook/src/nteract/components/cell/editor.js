@@ -2,10 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import CodeMirror from 'react-code-mirror';
+// import {UnControlled as CodeMirror} from 'react-codemirror2'
 
 import { updateCellSource } from '../../../actions';
 
 import './codemirror.css';
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/theme/monokai.css'
 
 export default class Editor extends React.Component {
   static propTypes = {
@@ -94,11 +97,7 @@ export default class Editor extends React.Component {
             ref="codemirror"
             className="cell_cm"
             mode={this.props.language}
-            textAreaClassName={['editor']}
-            textAreaStyle={{
-              minHeight: '10em',
-              backgroundColor: 'red',
-            }}
+
             lineNumbers={this.props.lineNumbers}
             theme={this.props.theme}
             onChange={this.onChange}

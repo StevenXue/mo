@@ -15,6 +15,25 @@ const arrayToInitJson = (array, key) => {
   return finalJson
 }
 
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}
+
+export function *saveSection(action, { call, put, select }) {
+  const { namespace, sectionId } = action.payload
+
+  const sectionsJson = yield select(state => state[namespace].sectionsJson)
+  const section = sectionsJson[sectionId]
+  const { data: result } = yield call(dataAnalysisService.saveSection, { section: section })
+  console.log('saveSection', result)
+  // 没有后续操作了？
+}
+
 export default {
   namespace: 'workBench',
   state: {
@@ -597,16 +616,16 @@ export default {
     },
 
     // 保存section
-    *saveSection(action, { call, put, select }) {
-      const { namespace, sectionId } = action.payload
-
-      const sectionsJson = yield select(state => state[namespace].sectionsJson)
-      const section = sectionsJson[sectionId]
-
-      const { data: result } = yield call(dataAnalysisService.saveSection, { section: section })
-      // 没有后续操作了？
-    },
-
+    // *saveSection(action, { call, put, select }) {
+    //   const { namespace, sectionId } = action.payload
+    //
+    //   const sectionsJson = yield select(state => state[namespace].sectionsJson)
+    //   const section = sectionsJson[sectionId]
+    //   const { data: result } = yield call(dataAnalysisService.saveSection, { section: section })
+    //   console.log('saveSection', result)
+    //   // 没有后续操作了？
+    // },
+    saveSection,
     //删除section
     *deleteSection(action, { call, put, select }) {
       //1. 后端删除
@@ -694,10 +713,7 @@ export default {
 
       const { namespace, sectionId } = action.payload
 
-      // 先把 save section 复制过来
-      const sectionsJson = yield select(state => state[namespace].sectionsJson)
-      const section = sectionsJson[sectionId]
-      yield call(dataAnalysisService.saveSection, { section: section })
+      yield call(saveSection, { payload: { namespace, sectionId } }, { call, put, select })
 
       const projectId = yield select(state => state[namespace].projectId)
 

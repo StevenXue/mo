@@ -13,10 +13,10 @@ import CurveTest from '../model/realTime'
 import Model from '../model/modelProcess'
 import io from 'socket.io-client'
 
-import 'normalize.css/normalize.css'
-import 'material-design-icons/iconfont/material-icons.css'
-import '../../../notebook/src/toolbar/styles/base.less'
-import './codemirror.css'
+// import 'normalize.css/normalize.css'
+// import 'material-design-icons/iconfont/material-icons.css'
+// import '../../../notebook/src/toolbar/styles/base.less'
+// import './codemirror.css'
 
 var hasOwnProperty = Object.prototype.hasOwnProperty
 

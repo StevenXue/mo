@@ -550,6 +550,7 @@ def model_steps_to_obj(job_obj, project_id):
 
         conf['hyperparameters'] = get_args(steps[hyper_idx]['args'])
 
+    print("job_obj.steps", job_obj.steps)
     obj = {
         "data_source_id": job_obj.steps[0]["args"][0]["value"],
         "conf": conf,
@@ -634,6 +635,11 @@ def run_toolkit_job(job_obj, project_id):
 def run_model_job(job_obj, project_id):
     obj = model_steps_to_obj(job_obj, project_id)
     return model_service.kube_run_model(job_obj=job_obj, **obj)
+
+
+def model_job_to_code(job_obj, project_id):
+    obj = model_steps_to_obj(job_obj, project_id)
+    return model_service.model_to_code(job_obj=job_obj, **obj)
 
 
 # def run_job(obj, job_obj):

@@ -68,6 +68,7 @@ export function setNotebook(nbData) {
   console.log('nbData', nbData);
   return (subject) => {
     const data = commutable.fromJS(nbData);
+    console.log('data', data);
     subject.next({
       type: constants.SET_NOTEBOOK,
       data,

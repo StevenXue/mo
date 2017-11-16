@@ -23,8 +23,6 @@ class ResultButton extends Component {
     // const resultJson = {
     //   "history": get(sectionsJson[focusSectionId], 'results')
     // }
-    console.log("this.props.model", this.props.model)
-
 
     const history = get(sectionsJson[sectionId].results, 'history', null)
     const result = get(sectionsJson[sectionId].results, 'result', null)
