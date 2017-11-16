@@ -77,6 +77,9 @@ def update_job_steps():
     # print("data", data)
     job_id, steps, active_steps, display_steps = ObjectId(data["_id"]), data['steps'], data[
         'active_steps'], data['display_steps']
+
+    print("active_steps", active_steps)
+
     result = job_business.update_job_steps(job_id, steps, active_steps, display_steps)
     result = json_utility.convert_to_json(result.to_mongo())
     return jsonify({
@@ -127,7 +130,7 @@ def run_job():
             return jsonify(
                 {"response": 'no model and toolkit in job object'}), 400
         result = json_utility.convert_to_json(result)
-    except Exception:
+    except Exception as e:
         # if error send error, save error and raise error
         exc_type, exc_value, exc_traceback = sys.exc_info()
         message = {
@@ -138,10 +141,11 @@ def run_job():
         print(message)
         emit_error(message, str(project_id), job_id=job_id, user_ID=user_ID)
         save_job_status(job_obj, error=message, status=300)
-        return jsonify({
-            "response": {
-                "result": message
-            }}), 200
+        raise e
+        # return jsonify({
+        #     "response": {
+        #         "result": message
+        #     }}), 200
     else:
         message = {
             'project_name': project.name,

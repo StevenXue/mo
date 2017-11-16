@@ -721,13 +721,12 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
       }
       <div className={`${styles.container} my-collapse-arrow`}>
         <Collapse className={styles.collapse}
-                  defaultActiveKey={['data_source']} onChange={callback}
-                  activeKey={active_steps}>
+                  defaultActiveKey={active_steps} onChange={callback}
+                  // activeKey={active_steps}
+          >
           {
             steps.map((step, stepIndex) => {
 
-              console.log("stepIndex", stepIndex)
-              console.log("displaySteps", display_steps)
               if(display_steps.includes(String(stepIndex))){
                 switch (step.name) {
                   case 'data_source':
