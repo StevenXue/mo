@@ -480,14 +480,7 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
                 )
               }
               <div className={styles.end_button}>
-                <Button type="primary" className={styles.button} onClick={() =>
-                  dispatch({
-                    type: namespace + '/setActiveKey',
-                    payload: {
-                      activeKey: [String(stepIndex), String(stepIndex + 1)],
-                      sectionId: section._id,
-                    },
-                  })}>next</Button>
+                {LastOrRunButton(stepIndex, stepLength)}
               </div>
             </div>)
         })}
@@ -506,10 +499,10 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
         />
         <div className={styles.end_button}>
           {
-            LastOrRunButton(stepIndex, stepLength)
+            [LastOrRunButton(stepIndex, stepLength),
+              namespace === 'modelling' && editInNotebook(steps, stepIndex)]
           }
         </div>
-        {editInNotebook(steps, stepIndex)}
       </div>
     )
   }
@@ -534,7 +527,6 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
                       sectionId: section._id,
                     },
                   })
-
 
                 }}>
           next
@@ -700,7 +692,7 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
   function editInNotebook(steps, stepIndex) {
     if (steps.length - 1 === stepIndex) {
       return (
-        <Button className='notebook-start-button' type='primary' style={{ marginTop: 20, width: 120 }}
+        <Button className='notebook-start-button' type='default' icon='edit'
                 onClick={() => dispatch({ type: 'notebook/startNotebook', payload: { sectionId } })}>
           Edit in Notebook
         </Button>
@@ -746,58 +738,58 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
         <Collapse className={styles.collapse}
                   defaultActiveKey={active_steps} onChange={callback}
                   activeKey={active_steps}
-          >
+        >
           {
             steps.map((step, stepIndex) => {
 
-              if(display_steps.includes(String(stepIndex))){
-                switch (step.name) {
-                  case 'data_source':
-                  case 'target_datasource':
-                  case 'from_datasource':
-                    return renderDataSource(step, stepIndex)
-                  case 'fields':
-                  case 'feature_fields':
-                  case 'label_fields':
-                    return renderFields(steps, step, stepIndex)
-                  //等把后端的 fields的range更换为从某step取值后，将fields更换
-                  case 'from_fields':
-                  case 'select_index':
-                    return renderFieldsPro(steps, step, stepIndex)
-                  case 'layers':
-                    let numOfLayer = 2
-                    return [
-                      renderPanel(
-                        networkBuilder(step, stepIndex, steps[1].args[0].values, steps[2].args[0].values),
-                        stepIndex),
-                      renderFakePanel(step, stepIndex,
-                        numOfLayer !== 2 ? `You have added ${numOfLayer} layers`
-                          : 'You have not added any layers',
-                      ),
-                    ]
-                  case 'estimator':
-                  case 'compile':
-                  case 'fit':
-                  case 'setting':
-                  case 'evaluate':
-                  case 'hyperparameters':
-                  case 'parameters':
-                    // num of args filled
-                    let numArgsFill = 0
-                    step.args.forEach((arg) => {
-                      if (arg.value) {
-                        numArgsFill += 1
-                      }
-                    })
-                    return [
-                      renderPanel(renderParameters(step, stepIndex), stepIndex),
-                      renderFakePanel(step, stepIndex,
-                        numArgsFill ? `You have filled ${numArgsFill} args`
-                          : 'You have not filled any args',
-                      ),
-                    ]
+                if (display_steps.includes(String(stepIndex))) {
+                  switch (step.name) {
+                    case 'data_source':
+                    case 'target_datasource':
+                    case 'from_datasource':
+                      return renderDataSource(step, stepIndex)
+                    case 'fields':
+                    case 'feature_fields':
+                    case 'label_fields':
+                      return renderFields(steps, step, stepIndex)
+                    //等把后端的 fields的range更换为从某step取值后，将fields更换
+                    case 'from_fields':
+                    case 'select_index':
+                      return renderFieldsPro(steps, step, stepIndex)
+                    case 'layers':
+                      let numOfLayer = 2
+                      return [
+                        renderPanel(
+                          networkBuilder(step, stepIndex, steps[1].args[0].values, steps[2].args[0].values),
+                          stepIndex),
+                        renderFakePanel(step, stepIndex,
+                          numOfLayer !== 2 ? `You have added ${numOfLayer} layers`
+                            : 'You have not added any layers',
+                        ),
+                      ]
+                    case 'estimator':
+                    case 'compile':
+                    case 'fit':
+                    case 'setting':
+                    case 'evaluate':
+                    case 'hyperparameters':
+                    case 'parameters':
+                      // num of args filled
+                      let numArgsFill = 0
+                      step.args.forEach((arg) => {
+                        if (arg.value) {
+                          numArgsFill += 1
+                        }
+                      })
+                      return [
+                        renderPanel(renderParameters(step, stepIndex), stepIndex),
+                        renderFakePanel(step, stepIndex,
+                          numArgsFill ? `You have filled ${numArgsFill} args`
+                            : 'You have not filled any args',
+                        ),
+                      ]
+                  }
                 }
-              }
 
               },
             )
