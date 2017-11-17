@@ -63,6 +63,25 @@ class DataPreview extends React.Component {
     });
   }
 
+  onDeleteDataSet = () => {
+    const { dispatch } = this.props
+
+    confirm({
+      title: 'Are you sure to delete this dataset?',
+      content: 'The operation will permanently delete your dataset!',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+
+      onOk: () => {
+        return dispatch({ type: 'upload/delDataSet'})
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
+  }
+
   onSelect (value, e) {
     this.props.dispatch({type: 'upload/setField', payload: {[e]: value}})
 
@@ -176,14 +195,19 @@ class DataPreview extends React.Component {
                   <span className={styles.tag}>{tag}</span></Tag>)}
               </div>:null }
           </div>
-          {this.props.upload.showStaged && middle === 'workspace'?
+          {middle === 'workspace'?
+            this.props.upload.showStaged?
             <div className={styles.cright}>
               <DataModal>
                 <Button icon="edit"/>
               </DataModal>
               <Button icon="delete" onClick={this.onDeleteStaged}/>
             </div>
-            :null}
+            :
+            <div className={styles.cright}>
+              <Button icon="delete" onClick={this.onDeleteDataSet}/>
+            </div>
+          :null}
         </div>
         {this.props.upload.delLoading || this.props.upload.stagedLoading ? <Spin/> :
           <div className={styles.whole}>

@@ -2,7 +2,8 @@ import { uploadFile, fetchDataSets, fetchDataSet,
   deleteDataColumns, changeTypes, stageData,
   fetchStagingDataSets, updateStagingDataSet,
   getStagingDataSet, changeStagedTypes,
-  deleteStagedDataColumns, deleteStagingDataSet } from '../services/upload'
+  deleteStagedDataColumns, deleteStagingDataSet,
+  deleteDataSet, deleteFile } from '../services/upload'
 
 import { message } from 'antd'
 import pathToRegexp from 'path-to-regexp';
@@ -21,6 +22,7 @@ export default {
     orgFields: {},
     fields: {},
     dataSetID: '',
+    fileID: '',
     selected: [],
     deleted: [],
     stagingDataSet: [],
@@ -173,11 +175,23 @@ export default {
       console.log(data)
       message.success('upload success')
       console.log('44')
-
+      yield put({type:'setFileID', payload: data.data._id})
       yield put({ type: 'setDataSetID', payload: data.data.data_set })
       yield put({type: 'setDataSetName', payload: payload.data_set_name })
       yield put({type: 'setDataSetDesc', payload: payload.description})
       yield put( {type: 'show'})
+    },
+
+    * delDataSet({ payload }, { put, call, select }) {
+      // const fileID = yield select(state => state.upload.fileID)
+      const dataSetID = yield select(state => state.upload.dataSetID)
+      // const resf = yield call(deleteFile, fileID)
+      // console.log(resf)
+      const resds = yield call(deleteDataSet, dataSetID)
+      console.log(resds)
+
+      const url0 = location.hash.substr(1).replace('/preview', '')
+      yield put(routerRedux.replace(url0))
     },
 
     * delCol ({ payload }, { put, call, select }) {
@@ -389,6 +403,13 @@ export default {
       return {
         ...state,
         dataSetID,
+      }
+    },
+
+    setFileID(state, {payload:fileID}) {
+      return {
+        ...state,
+        fileID,
       }
     },
 
