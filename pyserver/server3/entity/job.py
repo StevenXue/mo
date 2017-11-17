@@ -13,6 +13,7 @@ from mongoengine import DynamicDocument
 from mongoengine import ReferenceField
 from mongoengine import ListField
 from mongoengine import IntField
+from mongoengine import StringField
 from mongoengine import DateTimeField
 from mongoengine import DictField
 from mongoengine import CASCADE
@@ -44,7 +45,9 @@ class Job(DynamicDocument):
     file = ReferenceField('File')
     run_args = DictField()
     steps = ListField(DictField())
-    active_steps = ListField(default=['0'])
+    active_steps = ListField(StringField(), default=['0'])
     visual_sds_id = ReferenceField('StagingDataSet')
     served_model = ReferenceField('ServedModel', reverse_delete_rule=NULLIFY)
     result = DictField()
+    display_steps = ListField(default=['0'])
+

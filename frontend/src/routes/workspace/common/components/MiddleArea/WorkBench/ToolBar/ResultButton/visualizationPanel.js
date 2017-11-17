@@ -11,9 +11,9 @@ import {
 import {flaskServer} from '../../../../../../../../constants'
 import {Card, Select, Spin, Popover, Icon, Button, Input} from 'antd'
 import {isEmpty} from '../../../../../../../../utils/utils'
-import classnames from 'classnames';
-import style from './toolkit.css';
-import {connect} from 'dva';
+import classnames from 'classnames'
+import style from './toolkit.css'
+import {connect} from 'dva'
 import styles from './index.less'
 
 import JSONTree from 'react-json-tree'
@@ -22,7 +22,7 @@ import JSONTree from 'react-json-tree'
 
 class VisualizationPanel extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       loading: false,
       responseBody: {},
@@ -38,7 +38,7 @@ class VisualizationPanel extends React.Component {
   componentDidMount() {
 
     if (this.props.visual_sds_id) {
-      this.setState({loading: true});
+      this.setState({loading: true})
 
       fetch(flaskServer + '/visualization/visualization/usr2', {
         method: 'post',
@@ -53,32 +53,32 @@ class VisualizationPanel extends React.Component {
           this.setState({
             loading: false,
             responseBody: res.response,
-          });
+          })
 
-          console.log(res.response);
+          console.log(res.response)
 
           if (res.response.category && res.response.category === 2) {
             this.setState({selectedColOne: 0, selectedColTwo: 0})
           } else if (res.response.category && res.response.category === 1) {
-            this.setState({selected: res.response.X_fields[0]});
+            this.setState({selected: res.response.X_fields[0]})
             let data = {
               'x_domain': this.state.responseBody['scatter']['x_domain'][0],
               'y_domain': this.state.responseBody['scatter']['y_domain']
             }
-            this.setState({scatterData: data});
+            this.setState({scatterData: data})
           }
 
           if (res.response.hist_freq) {
-            let label = Object.keys(res.response.hist_freq);
+            let label = Object.keys(res.response.hist_freq)
             this.setState({dataSelected: res.response.hist_freq[label[0]]})
-            console.log(res.response, label);
+            console.log(res.response, label)
             this.setState({selected: Object.keys(res.response.hist_freq)[0]})
           }
         })
         .catch((err) => {
-          this.setState({loading: false});
+          this.setState({loading: false})
         })
-      ;
+
     }
 
   }
@@ -87,18 +87,18 @@ class VisualizationPanel extends React.Component {
     this.setState({
       selected: values,
       dataSelected: this.state.responseBody.hist_freq[values]
-    });
-    console.log(this.state.responseBody.hist_freq[values]);
+    })
+    console.log(this.state.responseBody.hist_freq[values])
   }
 
   onSelectDataScatter(value) {
-    this.setState({selected: value});
-    let i = this.state.responseBody['X_fields'].indexOf(value);
+    this.setState({selected: value})
+    let i = this.state.responseBody['X_fields'].indexOf(value)
     let data = {
       'x_domain': this.state.responseBody['scatter']['x_domain'][i],
       'y_domain': this.state.responseBody['scatter']['y_domain']
     }
-    this.setState({scatterData: data});
+    this.setState({scatterData: data})
   }
 
   renderArray(value) {
@@ -130,16 +130,16 @@ class VisualizationPanel extends React.Component {
   renderCase2BarChart(chart) {
     if (this.state.responseBody['bar1']) {
       if (chart === 'bar1') {
-        let x_len = this.state.responseBody['bar1'][this.state.selectedColOne].x_domain.length;
-        let y_len = this.state.responseBody['bar1'][this.state.selectedColOne].y_domain.length;
+        let x_len = this.state.responseBody['bar1'][this.state.selectedColOne].x_domain.length
+        let y_len = this.state.responseBody['bar1'][this.state.selectedColOne].y_domain.length
         if (x_len === y_len) {
           return <BarChart data={this.state.responseBody['bar1'][this.state.selectedColOne]}/>
         } else {
           return <Histogram data={this.state.responseBody['bar1'][this.state.selectedColOne]}/>
         }
       } else {
-        let x_len = this.state.responseBody['bar2'][this.state.selectedColTwo].x_domain.length;
-        let y_len = this.state.responseBody['bar2'][this.state.selectedColTwo].y_domain.length;
+        let x_len = this.state.responseBody['bar2'][this.state.selectedColTwo].x_domain.length
+        let y_len = this.state.responseBody['bar2'][this.state.selectedColTwo].y_domain.length
         if (x_len === y_len) {
           return <BarChart data={this.state.responseBody['bar2'][this.state.selectedColTwo]}/>
         } else {
@@ -220,7 +220,7 @@ class VisualizationPanel extends React.Component {
               </div>
             </div>
           </div>
-        );
+        )
 
       case 1:
         return (
@@ -441,22 +441,25 @@ class VisualizationPanel extends React.Component {
               </Card>
             </div>
           </div>
-        );
+        )
     }
   }
 
   render() {
     const {
       sectionsJson,
+      spinLoading: {
+        modal
+      }
     } = this.props.dataAnalysis
 
-    const { sectionId } = this.props
+    const {sectionId} = this.props
 
     const {
       toolkit: {
         result_spec
       }
-    } = sectionsJson[sectionId];
+    } = sectionsJson[sectionId]
 
     let save_names = []
     result_spec.args.forEach((arg) => {
@@ -464,86 +467,88 @@ class VisualizationPanel extends React.Component {
         save_names.push(arg.name)
       }
     })
-    console.log("save_names", save_names);
+    console.log("save_names", save_names)
 
     return (
-      <div style={{width: '100%'}}>
+      <Spin spinning={modal}>
+        <div style={{width: '100%'}}>
 
-        <div style={{height: 200, overflowY: 'auto'}} className={styles.result_and_button}>
-          <JSONTree data={this.props.result}
-                    style={{width: '100%', height: 400}}
-                    theme={{
-                      scheme: 'google',
-                      author: 'seth wright (http://sethawright.com)',
-                      base00: '#1d1f21',
-                      base01: '#282a2e',
-                      base02: '#373b41',
-                      base03: '#969896',
-                      base04: '#b4b7b4',
-                      base05: '#c5c8c6',
-                      base06: '#e0e0e0',
-                      base07: '#ffffff',
-                      base08: '#CC342B',
-                      base09: '#F96A38',
-                      base0A: '#FBA922',
-                      base0B: '#198844',
-                      base0C: '#3971ED',
-                      base0D: '#3971ED',
-                      base0E: '#A36AC7',
-                      base0F: '#3971ED'
-                    }}
-                    invertTheme={true}/>
+          <div style={{height: 200, overflowY: 'auto'}} className={styles.result_and_button}>
+            <JSONTree data={this.props.result}
+                      style={{width: '100%', height: 400}}
+                      theme={{
+                        scheme: 'google',
+                        author: 'seth wright (http://sethawright.com)',
+                        base00: '#1d1f21',
+                        base01: '#282a2e',
+                        base02: '#373b41',
+                        base03: '#969896',
+                        base04: '#b4b7b4',
+                        base05: '#c5c8c6',
+                        base06: '#e0e0e0',
+                        base07: '#ffffff',
+                        base08: '#CC342B',
+                        base09: '#F96A38',
+                        base0A: '#FBA922',
+                        base0B: '#198844',
+                        base0C: '#3971ED',
+                        base0D: '#3971ED',
+                        base0E: '#A36AC7',
+                        base0F: '#3971ED'
+                      }}
+                      invertTheme={true}/>
 
-          {
-            save_names.length !== 0 ? <div className={styles.button_area}>
-              <div>
-                {save_names.map(name =>
-                  <div key={name}>{name}</div>
-                )}
-              </div>
-              <Button type="primary" className={styles.button}
-                // className={styles.button}
-                      onClick={() =>
-                        this.props.dispatch({
-                          type: this.props.namespace + '/saveResult',
-                          payload: {
-                            id: focusSectionsId,
-                          },
-                        })}>Save</Button>
-
-              <div className={styles.save_as_button}>
-                <Input
-                  onChange={(e) => {
-                    this.setState({
-                      newSdsName: e.target.value
-                    })
-                  }}
-                  placeholder='new staging dataset name'
-                />
+            {
+              save_names.length !== 0 ? <div className={styles.button_area}>
+                <div>
+                  {save_names.map(name =>
+                    <div key={name}>{name}</div>
+                  )}
+                </div>
                 <Button type="primary" className={styles.button}
-
-                        onClick={() => {
+                  // className={styles.button}
+                        onClick={() =>
                           this.props.dispatch({
-                            type: this.props.namespace + '/saveAsResult',
+                            type: this.props.namespace + '/saveResult',
                             payload: {
-                              id: focusSectionsId,
-                              newSdsName: this.state.newSdsName
+                              id: sectionId,
                             },
-                          })
-                        }
-                        }>Save As</Button>
-              </div>
-            </div> : null
-          }
+                          })}>Save</Button>
+
+                <div className={styles.save_as_button}>
+                  <Input
+                    onChange={(e) => {
+                      this.setState({
+                        newSdsName: e.target.value
+                      })
+                    }}
+                    placeholder='new staging dataset name'
+                  />
+                  <Button type="primary" className={styles.button}
+
+                          onClick={() => {
+                            this.props.dispatch({
+                              type: this.props.namespace + '/saveAsResult',
+                              payload: {
+                                id: sectionId,
+                                newSdsName: this.state.newSdsName
+                              },
+                            })
+                          }
+                          }>Save As</Button>
+                </div>
+              </div> : null
+            }
 
 
+          </div>
+
+
+          <Spin spinning={this.state.loading}>
+            {this.renderPanel()}
+          </Spin>
         </div>
-
-
-        <Spin spinning={this.state.loading}>
-          {this.renderPanel()}
-        </Spin>
-      </div>
+      </Spin>
     )
   }
 }

@@ -80,6 +80,7 @@ def get_staging_data_set(sds_id):
     # response['data_set_type'] = data_set.file.type
     response['columns'] = columns
 
+    response["reverse_data"] = staging_data_business.convert_row_column(response["data"], columns)
     # update row col info
     response.update(staging_data_service.get_row_col_info(ObjectId(sds_id)))
     return jsonify({'response': response}), 200

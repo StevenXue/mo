@@ -121,7 +121,7 @@ class DraggableCell extends React.Component {
         className={'draggable-cell'}
       >
         {
-          <Cell {...this.props} forceSource={this.state.forceSource}/>
+          <Cell {...this.props} forceSource={this.props.forceSource}/>
         }
       </div>
     ));

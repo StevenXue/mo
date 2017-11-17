@@ -16,7 +16,7 @@ function format(data, type) {
 function unifyType(type){
   switch (type) {
     case 'integer': return 'int';
-
+    case 'string': return 'str';
     default:
       return type
   }

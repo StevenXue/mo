@@ -188,23 +188,23 @@ class ProjectModal extends Component {
             </Select>,
           )}
             </FormItem>
-            <FormItem
-              {...formItemLayout}
-              label="Related Tasks"
-            >
-          {getFieldDecorator('related_tasks', {
-            initialValue: related_tasks,
-            rules: [
-              { required: false },
-            ],
-          })(
-            <Select mode="multiple">
-              {
-                tasks.map((e) => <Option value={e} key={e}>{e}</Option>)
-              }
-            </Select>,
-          )}
-        </FormItem>
+            {/*<FormItem*/}
+              {/*{...formItemLayout}*/}
+              {/*label="Related Tasks"*/}
+            {/*>*/}
+          {/*{getFieldDecorator('related_tasks', {*/}
+            {/*initialValue: related_tasks,*/}
+            {/*rules: [*/}
+              {/*{ required: false },*/}
+            {/*],*/}
+          {/*})(*/}
+            {/*<Select mode="multiple">*/}
+              {/*{*/}
+                {/*tasks.map((e) => <Option value={e} key={e}>{e}</Option>)*/}
+              {/*}*/}
+            {/*</Select>,*/}
+          {/*)}*/}
+        {/*</FormItem>*/}
             <FormItem
               {...formItemLayout}
               label="Tags"

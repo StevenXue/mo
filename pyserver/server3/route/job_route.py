@@ -75,9 +75,12 @@ def create_job():
 def update_job_steps():
     data = request.get_json()
     # print("data", data)
-    job_id, steps, active_steps = ObjectId(data["_id"]), data['steps'], data[
-        'active_steps']
-    result = job_business.update_job_steps(job_id, steps, active_steps)
+    job_id, steps, active_steps, display_steps = ObjectId(data["_id"]), data['steps'], data[
+        'active_steps'], data['display_steps']
+
+    print("active_steps", active_steps)
+
+    result = job_business.update_job_steps(job_id, steps, active_steps, display_steps)
     result = json_utility.convert_to_json(result.to_mongo())
     return jsonify({
         "response": {
@@ -127,7 +130,7 @@ def run_job():
             return jsonify(
                 {"response": 'no model and toolkit in job object'}), 400
         result = json_utility.convert_to_json(result)
-    except Exception:
+    except Exception as e:
         # if error send error, save error and raise error
         exc_type, exc_value, exc_traceback = sys.exc_info()
         message = {
@@ -138,10 +141,11 @@ def run_job():
         print(message)
         emit_error(message, str(project_id), job_id=job_id, user_ID=user_ID)
         save_job_status(job_obj, error=message, status=300)
-        return jsonify({
-            "response": {
-                "result": message
-            }}), 200
+        raise e
+        # return jsonify({
+        #     "response": {
+        #         "result": message
+        #     }}), 200
     else:
         message = {
             'project_name': project.name,
@@ -152,6 +156,22 @@ def run_job():
         emit_success(message, str(project_id), job_id=job_id,
                      user_ID=user_ID)
         return jsonify({"response": {"result": result}}), 200
+
+
+@job_app.route("/to_code", methods=["POST"])
+def to_code():
+    data = request.get_json()
+    job_id = data['section_id']
+    project_id = data["project_id"]
+
+    job_obj = job_business.get_by_job_id(job_id)
+    project = project_business.get_by_id(project_id)
+    ow = ownership_business.get_ownership_by_owned_item(project, 'project')
+    # user ID
+    user_ID = ow.user.user_ID
+    code = job_service.model_job_to_code(project_id=project_id,
+                                           job_obj=job_obj)
+    return jsonify({"response": {"code": code}}), 200
 
 
 @job_app.route("/save_result", methods=["POST"])

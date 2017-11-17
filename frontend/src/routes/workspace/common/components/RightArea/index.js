@@ -1,14 +1,14 @@
-import React, {Component} from 'react';
-import styles from './index.less';
-import {connect} from 'dva';
+import React, {Component} from 'react'
+import styles from './index.less'
+import {connect} from 'dva'
 
-import {Tabs} from 'antd';
+import {Tabs} from 'antd'
 // import {, Collapse, Button, Input} from 'antd';
 
-const TabPane = Tabs.TabPane;
+const TabPane = Tabs.TabPane
 
-import Preview from './Preview/index';
-import History from './History/index';
+import Preview from './Preview/index'
+import History from './History/index'
 
 // todo 自己写tab 以实现样式自定义
 const tabs = [
@@ -20,20 +20,20 @@ const tabs = [
     text: 'History',
     key: 1
   }
-];
+]
 
 
 class RightArea extends Component {
   state = {
     status: 0
-  };
+  }
 
-  renderChildren(){
+  renderChildren() {
     switch (this.state.status) {
       case 0:
-        return <Preview {...this.props}/>;
+        return <Preview {...this.props}/>
       case 1:
-        return <History {...this.props}/>;
+        return <History {...this.props}/>
     }
 
   }
@@ -43,15 +43,15 @@ class RightArea extends Component {
       <div className="card-container">
         <div className={styles.row}>
           {
-            tabs.map(tab=>
+            tabs.map(tab =>
 
               <div className={styles.button}
                    key={tab.key}
                    style={{
-                     backgroundColor: this.state.status===tab.key?'#34C0E2':'white',
-                     color: this.state.status===tab.key?'white': 'grey',
+                     backgroundColor: this.state.status === tab.key ? '#34C0E2' : 'white',
+                     color: this.state.status === tab.key ? 'white' : 'grey',
                    }}
-                   onClick={()=>{
+                   onClick={() => {
                      this.setState({
                        status: tab.key
                      })
@@ -62,13 +62,17 @@ class RightArea extends Component {
             )
           }
         </div>
-        {
-          this.renderChildren()
-        }
+
+        <div className={styles.container}>
+          {
+
+            this.renderChildren()
+          }
+        </div>
       </div>
     )
   }
 }
 
 
-export default RightArea;
+export default RightArea

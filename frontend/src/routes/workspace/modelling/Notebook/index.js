@@ -4,9 +4,9 @@ import { connect } from 'dva'
 import PropTypes from 'prop-types'
 import { kubeServer, kubeBaseUrl, flaskServer } from '../../../../constants'
 import { Button, message, Modal, Select, Spin } from 'antd'
-import { Notebook, createStore } from '../../../../notebook/src/'
-import { setNotebook, recordResults, save, saveAs } from '../../../../notebook/src/actions'
-import * as enchannelBackend from '../../../../notebook/enchannel-notebook-backend'
+import { Notebook, createStore } from '../../../../packages/notebook/src/'
+import { setNotebook, recordResults, save, saveAs } from '../../../../packages/notebook/src/actions'
+import * as enchannelBackend from '../../../../packages/notebook/enchannel-notebook-backend'
 import style from './style.css'
 import { isEmpty } from 'lodash'
 // import CurveTest from '../model/realTime'
@@ -282,7 +282,7 @@ class JupyterNotebook extends React.Component {
           spawn_new={this.props.spawn_new}
           ui={type}
           channels={this.state.channels}
-          forceSource={this.state.forceSource}
+          forceSource={this.props.forceSource}
           result={(r) => this.getResult(r)}
           saveTrigger={(notebook) => this.saveTrigger(notebook)}
           project_id={this.props.project_id}
@@ -310,19 +310,20 @@ class JupyterNotebook extends React.Component {
   render() {
     return (
       <div>
-        <div>
-          {this.renderInputForm()}
-        </div>
+        {/*<div>*/}
+          {/*{this.renderInputForm()}*/}
+        {/*</div>*/}
         <div style={{ marginTop: 10 }}>
 
           <div style={{ display: 'flex', flexDirection: 'row' }}>
-            <div style={{ width: '70%' }}>
+            <div style={{ width: '100%' }}>
               {this.renderNotebook('nteract')}
             </div>
-            <div style={{ width: '30%', height: 600, border: '1px solid #f2f2f2', zIndex: 999, marginTop: 20 }}>
-              {this.renderResult()}
-            </div>
+            {/*<div style={{ width: '30%', height: 600, border: '1px solid #f2f2f2', zIndex: 999, marginTop: 20 }}>*/}
+              {/*{this.renderResult()}*/}
+            {/*</div>*/}
           </div>
+          <Button onClick={() => this.props.dispatch({type: 'notebook/toggleNotebook'})}>Back</Button>
         </div>
       </div>
     )

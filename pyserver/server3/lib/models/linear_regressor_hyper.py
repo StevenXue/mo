@@ -42,15 +42,10 @@ from server3.utility import json_utility
 
 ########### main ##########
 def linear_regression_hyper_model_fn(conf, input, **kw):
-    print('conf')
     print(conf)
-    print("kw", kw)
 
     base_conf = conf
-    # base_conf.pop('hyperparameters')
     result_sds = kw.pop("result_sds")
-    print("result_sds_id", result_sds.id)
-
     result_sds.history = []
     result_sds.save()
 
@@ -60,7 +55,7 @@ def linear_regression_hyper_model_fn(conf, input, **kw):
         # params['fit']['args']['steps'] = steps
         # sds = staging_data_set_business.get_by_id('595cb76ed123ab59779604c3')
         result = custom_model(base_conf, linear_regressor_model_fn, input,
-                              result_sds=result_sds, **kw)
+                              result_sds=result_sds, logging=False, **kw)
         print("base_conf", base_conf)
         print("history result", result)
         print("old history", result_sds.history)

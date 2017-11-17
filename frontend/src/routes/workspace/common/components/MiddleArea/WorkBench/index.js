@@ -1,18 +1,19 @@
 import React from 'react'
 import styles from './index.less'
-import {connect} from 'dva'
-import {get, isEqual} from 'lodash'
-import {Select, Collapse, Button, Input, Progress, Icon, Tooltip} from 'antd'
+import { connect } from 'dva'
+import { get, isEqual } from 'lodash'
+import { Select, Collapse, Button, Input, Progress, Icon, Tooltip, Spin } from 'antd'
 import ToolBar from './ToolBar/index'
+import JupyterNotebook from '../../../../modelling/Notebook'
 import ParamsMapper from '../../../../../../components/ParamsMapper/index'
 import LayerCard from '../../../../modelling/LayerCard/index'
-import {format, unifyType} from '../../../../../../utils/base'
-import {translateDict} from '../../../../../../constants'
+import { format, unifyType } from '../../../../../../utils/base'
+import { translateDict } from '../../../../../../constants'
 
 const Option = Select.Option
 const Panel = Collapse.Panel
 
-function FakePanel({children, header, headerClass, isActive, prefixCls, destroyInactivePanel, openAnimation, onItemClick}) {
+function FakePanel({ children, header, headerClass, isActive, prefixCls, destroyInactivePanel, openAnimation, onItemClick }) {
   return (
     <div>
       {children}
@@ -30,8 +31,7 @@ function getArgs(baseSteps, stepIndex, argIndex) {
 
 }
 
-
-function WorkBench({section, model, dispatch, namespace, preview}) {
+function WorkBench({ section, model, dispatch, namespace, preview, notebook, projectDetail }) {
   //state
   const {
     sectionsJson,
@@ -55,6 +55,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
     steps,
     percent,
     active_steps,
+    display_steps,
     [translateDict[namespace]]: {
       steps: baseSteps,
     },
@@ -68,7 +69,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
 
     dispatch({
       type: namespace + '/setSections',
-      payload: {sectionsJson: sectionsJson},
+      payload: { sectionsJson: sectionsJson },
     })
     // 将预览设置
   }
@@ -89,6 +90,14 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
       type: namespace + '/setActiveKey',
       payload: {
         activeKey: [String(stepIndex + 1)],
+        sectionId: section._id,
+      },
+    })
+
+    dispatch({
+      type: namespace + '/addDisplaySteps',
+      payload: {
+        displaySteps: [String(stepIndex + 1)],
         sectionId: section._id,
       },
     })
@@ -294,10 +303,9 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
           {warningText}
         </div>),
       renderFakePanel(step, stepIndex,
-        step.args[0].values.length ?
-          `You have select ${step.args[0].values.length} fields`
-          : 'You have not select any fields'
-      )
+        step.args[0].values.length ? `You have select ${step.args[0].values.length} fields`
+          : 'You have not select any fields',
+      ),
     ]
   }
 
@@ -332,15 +340,12 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
           {warningText}
         </div>),
 
-
       renderFakePanel(step, stepIndex,
-        step.args[0].values.length ?
-          `You have select ${step.args[0].values.length} fields`
-          : 'You have not select any fields'
-      )
+        step.args[0].values.length ? `You have select ${step.args[0].values.length} fields`
+          : 'You have not select any fields',
+      ),
     ]
   }
-
 
   function fieldSelector(datasourceStep, datasourceStepIndex, step, stepIndex) {
     return (
@@ -356,10 +361,10 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
               return fields.map((field) => {
                 const fieldName = field[0]
                 const fieldType = unifyType(field[1][0])
-                let disable;
+                let disable
                 const requiredFieldTypes = baseSteps[stepIndex]['args'][argIndex]['value_type']
-                if(requiredFieldTypes){
-                  if(!requiredFieldTypes.includes(fieldType)){
+                if (requiredFieldTypes) {
+                  if (!requiredFieldTypes.includes(fieldType)) {
                     disable = true
                   }
                 }
@@ -398,7 +403,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                   }
                 }
 
-                if(disable){
+                if (disable) {
                   onClick = false
                   className = styles.disable_field
                 }
@@ -435,7 +440,6 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
     )
   }
 
-
   function getTitle(valueIndex, length) {
     if (valueIndex === 0) {
       return 'Input Layer'
@@ -464,7 +468,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                     baseValue={baseSteps[stepIndex].args[argIndex].range.find(e => e.name === value['name'])}
                     featureFields={featureFields}
                     labelFields={labelFields}
-                    {...{model, dispatch, namespace, stepIndex, argIndex, valueIdx}}
+                    {...{ model, dispatch, namespace, stepIndex, argIndex, valueIdx }}
                     funcs={{
                       addValue: (e) => addValue(e, stepIndex, argIndex, valueIdx),
                       deleteValue: (e) => deleteValue(e, stepIndex, argIndex, valueIdx),
@@ -476,14 +480,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                 )
               }
               <div className={styles.end_button}>
-                <Button type="primary" className={styles.button} onClick={() =>
-                  dispatch({
-                    type: namespace + '/setActiveKey',
-                    payload: {
-                      activeKey: [String(stepIndex), String(stepIndex + 1)],
-                      sectionId: section._id,
-                    },
-                  })}>next</Button>
+                {LastOrRunButton(stepIndex, stepLength)}
               </div>
             </div>)
         })}
@@ -498,11 +495,12 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                       setValue={(value, argIndex) => setValue(value, stepIndex, argIndex)}
                       setValueDefault={(value) => setValueDefault(value, stepIndex)}
                       baseArgs={baseSteps[stepIndex].args}
-                      {...{stepIndex}}
+                      {...{ stepIndex }}
         />
         <div className={styles.end_button}>
           {
-            LastOrRunButton(stepIndex, stepLength)
+            [LastOrRunButton(stepIndex, stepLength),
+              namespace === 'modelling' && editInNotebook(steps, stepIndex)]
           }
         </div>
       </div>
@@ -521,6 +519,15 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
                       sectionId: section._id,
                     },
                   })
+
+                  dispatch({
+                    type: namespace + '/addDisplaySteps',
+                    payload: {
+                      displaySteps: [String(stepIndex + 1)],
+                      sectionId: section._id,
+                    },
+                  })
+
                 }}>
           next
         </Button>
@@ -577,7 +584,7 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
             key={arg.name + argIndex}
             className={styles.select}
             showSearch
-            style={{width: 200}}
+            style={{ width: 200 }}
             placeholder="Select a stagingData"
             optionFilterProp="children"
             onChange={(value) => handleChange(value, stepIndex, argIndex)}
@@ -602,14 +609,6 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
       )
     )
   }
-
-  // function setting(args, stepIndex) {
-  //   return (
-  //     args.map((arg, argIndex) => {
-  //
-  //     })
-  //   )
-  // }
 
   function parameters(step, stepIndex) {
     return (
@@ -672,13 +671,12 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
             <div className={styles.panel_title}>
               {getArgs(baseSteps, stepIndex).display_name}
 
-              {getArgs(baseSteps, stepIndex).des?
-                <div className={styles.help}>
+              {getArgs(baseSteps, stepIndex).des ? <div className={styles.help}>
                   <Tooltip title={getArgs(baseSteps, stepIndex).des}>
                     <Icon type="question-circle-o"/>
                   </Tooltip>
                 </div>
-                :null}
+                : null}
 
             </div>
 
@@ -691,74 +689,116 @@ function WorkBench({section, model, dispatch, namespace, preview}) {
     </Panel>
   }
 
+  function editInNotebook(steps, stepIndex) {
+    if (steps.length - 1 === stepIndex) {
+      return (
+        <Button className='notebook-start-button' type='default' icon='edit'
+                onClick={() => dispatch({ type: 'notebook/startNotebook', payload: { sectionId } })}>
+          Edit in Notebook
+        </Button>
+      )
+    }
+  }
+
+  function renderNotebook() {
+    return (
+      <Spin spinning={notebook.notebookLoading} tip='Notebook initializing...' className={styles.notebookSection}>
+        <div id="notebookSection" className={styles.notebookSection}>
+          {notebook.start_notebook && projectDetail.project &&
+          <JupyterNotebook user_id={notebook.userId}
+                           key={sectionId}
+                           notebook_content={notebook.notebook}
+                           notebook_name={notebook.notebookName}
+                           project_name={projectDetail.project.name}
+                           project_id={projectDetail.project._id}
+                           dataset_name={'dd'}
+                           dataset_id={'11'}
+                           spawn_new={notebook.spawn_new}
+                           columns={notebook.columns}
+                           port={notebook.port}
+                           forceSource={notebook.forceSource[sectionId]}
+          />
+          }
+
+        </div>
+      </Spin>
+    )
+  }
+
   return (
     <div>
-      <ToolBar sectionId={sectionId} {...{model, dispatch, namespace}}/>
+      <ToolBar sectionId={sectionId} {...{ model, dispatch, namespace }}/>
       {
-        namespace === 'modelling' &&
-        <div style={{width: '97%', margin: 'auto'}}>
+        namespace === 'modelling' && !notebook.on[sectionId] &&
+        <div style={{ width: '97%', margin: 'auto' }}>
           <Progress percent={percent}/>
         </div>
       }
-      <div className={`${styles.container} my-collapse-arrow`}>
+      {notebook.on[sectionId] ? renderNotebook() : <div className={`${styles.container} my-collapse-arrow`}>
         <Collapse className={styles.collapse}
-                  defaultActiveKey={['data_source']} onChange={callback}
-                  activeKey={active_steps}>
+                  defaultActiveKey={active_steps} onChange={callback}
+                  activeKey={active_steps}
+        >
           {
             steps.map((step, stepIndex) => {
-                switch (step.name) {
-                  case 'data_source':
-                  case 'target_datasource':
-                  case 'from_datasource':
-                    return renderDataSource(step, stepIndex)
-                  case 'fields':
-                  case 'feature_fields':
-                  case 'label_fields':
-                    return renderFields(steps, step, stepIndex)
-                  //等把后端的 fields的range更换为从某step取值后，将fields更换
-                  case 'from_fields':
-                  case 'select_index':
-                    return renderFieldsPro(steps, step, stepIndex)
-                  case 'layers':
-                    let numOfLayer = 2
-                    return [
-                      renderPanel(
-                        networkBuilder(step, stepIndex, steps[1].args[0].values, steps[2].args[0].values),
-                        stepIndex),
-                      renderFakePanel(step, stepIndex,
-                        numOfLayer !== 2 ? `You have added ${numOfLayer} layers`
-                          : 'You have not added any layers',
-                      ),
-                    ]
-                  case 'estimator':
-                  case 'compile':
-                  case 'fit':
-                  case 'setting':
-                  case 'evaluate':
-                  case 'hyperparameters':
-                  case 'parameters':
-                    // num of args filled
-                    let numArgsFill = 0
-                    step.args.forEach((arg) => {
-                      if (arg.value) {
-                        numArgsFill += 1
-                      }
-                    })
-                    return [
-                      renderPanel(renderParameters(step, stepIndex), stepIndex),
-                      renderFakePanel(step, stepIndex,
-                        numArgsFill ? `You have filled ${numArgsFill} args`
-                          : 'You have not filled any args',
-                      ),
-                    ]
+
+                if (display_steps.includes(String(stepIndex))) {
+                  switch (step.name) {
+                    case 'data_source':
+                    case 'target_datasource':
+                    case 'from_datasource':
+                      return renderDataSource(step, stepIndex)
+                    case 'fields':
+                    case 'feature_fields':
+                    case 'label_fields':
+                      return renderFields(steps, step, stepIndex)
+                    //等把后端的 fields的range更换为从某step取值后，将fields更换
+                    case 'from_fields':
+                    case 'select_index':
+                      return renderFieldsPro(steps, step, stepIndex)
+                    case 'layers':
+                      let numOfLayer = 2
+                      return [
+                        renderPanel(
+                          networkBuilder(step, stepIndex, steps[1].args[0].values, steps[2].args[0].values),
+                          stepIndex),
+                        renderFakePanel(step, stepIndex,
+                          numOfLayer !== 2 ? `You have added ${numOfLayer} layers`
+                            : 'You have not added any layers',
+                        ),
+                      ]
+                    case 'estimator':
+                    case 'compile':
+                    case 'fit':
+                    case 'setting':
+                    case 'evaluate':
+                    case 'hyperparameters':
+                    case 'parameters':
+                      // num of args filled
+                      let numArgsFill = 0
+                      step.args.forEach((arg) => {
+                        if (arg.value) {
+                          numArgsFill += 1
+                        }
+                      })
+                      return [
+                        renderPanel(renderParameters(step, stepIndex), stepIndex),
+                        renderFakePanel(step, stepIndex,
+                          numArgsFill ? `You have filled ${numArgsFill} args`
+                            : 'You have not filled any args',
+                        ),
+                      ]
+                  }
                 }
+
               },
             )
           }
         </Collapse>
       </div>
+      }
     </div>
   )
 }
 
-export default connect(({preview}) => ({preview}))(WorkBench)
+export default connect(({ preview, notebook, projectDetail }) => ({ preview, notebook, projectDetail }))(WorkBench)

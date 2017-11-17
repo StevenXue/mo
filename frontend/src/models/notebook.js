@@ -1,15 +1,20 @@
 import { routerRedux } from 'dva/router'
 
 import * as notebookService from '../services/notebook'
+import * as jobService from '../services/job'
+import * as dataAnalysisService from '../services/dataAnalysis'
 import { privacyChoices } from '../constants'
 import pathToRegexp from 'path-to-regexp'
 import { cloneDeep, isEmpty } from 'lodash'
+import { saveSection } from './workBench'
 import empty from '../routes/workspace/modelling/Notebook/empty.ipynb'
-
 
 export default {
   namespace: 'notebook',
   state: {
+    notebookLoading: false,
+    on: {},
+    forceSource: {},
     fileList: [],
     notebookName: '',
     notebookPath: {},
@@ -28,13 +33,33 @@ export default {
     stagingDataID: '',
   },
   reducers: {
+    setForceSource(state, { payload: { forceSource: _forceSource, sectionId } }) {
+      let forceSource = state.forceSource
+      forceSource[sectionId] = _forceSource
+      return {
+        ...state,
+        forceSource,
+      }
+    },
+    toggleNotebook(state, { payload: { sectionId } }) {
+      let on = state.on
+      if(on[sectionId] !== undefined) {
+        on[sectionId] = !on[sectionId]
+      } else {
+        on[sectionId] = true
+      }
+      return {
+        ...state,
+        on,
+      }
+    },
     setProjectId(state, { payload: { project_id } }) {
       return {
         ...state,
         project_id,
       }
     },
-    setPort(state, { payload: { userId } }) {
+    setUserId(state, { payload: { userId } }) {
       return {
         ...state,
         userId,
@@ -67,20 +92,37 @@ export default {
         start_notebook: true,
       }
     },
+    setLoading(state, action) {
+      const { key, loading } = action.payload
+      return {
+        ...state,
+        [key]: loading,
+      }
+    },
   },
   effects: {
     // 获取用户所有 project
-    *startNotebook(action, { call, put, select }) {
+    *startNotebook({ payload }, { call, put, select }) {
+      const { sectionId } = payload
+      const namespace = 'modelling'
+      yield put({ type: 'setLoading', payload: { key: 'notebookLoading', loading: true } })
+      yield put({ type: 'toggleNotebook', payload: { sectionId } })
       const projectId = yield select(state => state.projectDetail.project._id)
       const userId = yield select(state => state.login.user.user_ID)
+
+      yield call(saveSection, { payload: { namespace: 'modelling', sectionId } }, { call, put, select })
+
+      // yield* put({ type: 'modelling/saveSection', payload: { sectionId, namespace: 'modelling' } })
       yield put({ type: 'setUserId', payload: { userId } })
+
+      let { data: { code: forceSource } } = yield call(jobService.jobToCode, { projectId, sectionId })
+      yield put({ type: 'setForceSource', payload: { sectionId, forceSource } })
 
       let { data: port, status } = yield call(notebookService.startNotebook, { projectId })
       if (status !== 200) {
         ({ data: port, status } = yield call(notebookService.createNotebook, { projectId }))
       }
-      // console.log('data', data)
-      // const port = data
+
       yield put({ type: 'setPort', payload: { port } })
       const { res } = yield call(notebookService.enterNotebook, { port })
       let notebook_content = {}
@@ -110,6 +152,7 @@ export default {
           yield put({ type: 'start' })
         }
       }
+      yield put({ type: 'setLoading', payload: { key: 'notebookLoading', loading: false } })
     },
   },
   subscriptions: {

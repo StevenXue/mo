@@ -49,7 +49,7 @@ const CodeCell = (props, context) => {
           language={props.language}
           forceSource={props.forceSource}
         />
-        <Button onClick={(e) => onClick()}>Add Code</Button>
+        {/*<Button onClick={(e) => onClick()}>Add Code</Button>*/}
       </div>
       <Display
         className="cell_display"

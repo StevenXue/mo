@@ -10,6 +10,7 @@ import Immutable from 'immutable';
 import 'codemirror/mode/markdown/markdown';
 import 'codemirror/mode/python/python';
 
+
 class Notebook extends React.Component {
   static propTypes = {
     channels: React.PropTypes.any,
@@ -67,7 +68,7 @@ class Notebook extends React.Component {
           displayOrder={this.props.displayOrder}
           transforms={this.props.transforms}
           moveCell={this.moveCell}
-          forceSource={this.state.forceSource}
+          forceSource={this.props.forceSource}
         />
         <CellCreator key={`creator-${id}`} id={id} above={false} />
       </div>);
