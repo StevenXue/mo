@@ -85,6 +85,7 @@ def toolkit_std(arr0):
 
 
 # 变异系数  new mean(data) / std(data)  ！！！
+# FIXME 其定义为标准差与平均值之比
 def toolkit_cv(arr0):
     return toolkit_average(arr0) / toolkit_std(arr0)
 
