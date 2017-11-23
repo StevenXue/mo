@@ -344,7 +344,8 @@ def run_hyperas_model(conf, project_id, data_source_id, model_id, **kwargs):
                                **kwargs)
 
 
-def model_to_code(conf, project_id, data_source_id, model_id, **kwargs):
+def model_to_code(conf, project_id, data_source_id, model_id, job_obj,
+                  **kwargs):
     """
     run model by model_id and the parameter config
 
@@ -372,11 +373,16 @@ def model_to_code(conf, project_id, data_source_id, model_id, **kwargs):
         "kwargs": kwargs
     }
 
-    # create model job
-    job_obj = job_business.add_model_job(model_obj, staging_data_set_obj,
-                                         project_obj, params=conf,
-                                         run_args=run_args,
-                                         **file_dict)
+    # # create model job
+    # job_obj = job_business.add_model_job(model_obj, staging_data_set_obj,
+    #                                      project_obj, params=conf,
+    #                                      run_args=run_args,
+    #                                      **file_dict)
+
+    job_obj = job_business.update_job_by_id(job_obj.id, model=model_obj,
+                                            staging_data_set=staging_data_set_obj,
+                                            project=project_obj, params=conf,
+                                            run_args=run_args, status=100)
     job_id = str(job_obj.id)
 
     # model_obj = model_business.get_by_model_id(model_id)

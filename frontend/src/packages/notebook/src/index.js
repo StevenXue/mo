@@ -4,6 +4,10 @@ import Jupyter from './jupyter/';
 import Provider from './util/provider';
 import Immutable from 'immutable';
 
+import 'material-design-icons/iconfont/material-icons.css'
+import './index.less'
+import './nteract/styles/base.less'
+
 import createStoreRx from './store';
 import {
   setNotebook,
@@ -89,19 +93,23 @@ export class Notebook extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     if(prevState.notebook === undefined && this.props.spawn_new === true){
-      let source = `# this is the id of the project you are editting \n` +
+      let source = `# this is the id of the project you are editing \n` +
         `project_id = "${this.props.project_id}" \n` +
         "# you might need to use it some where in your code\n"+
         "import os\n"+
         "import sys\n"+
-        "sys.path.append('../')\n"
+        "# your data files are under volume folder, try copy and run 'ls ./volume'\n"
+
       const cellOrder = this.state.notebook.get('cellOrder');
       let id = cellOrder.get(0, null);
+      let id2 = cellOrder.get(1, null);
+
       this.dispatch(updateCellSource(id, source));
-      this.dispatch(executeCell(this.props.channels,
-        id,
-        source));
-      this.dispatch(createCellAfter('code', id));
+      this.dispatch(updateCellSource(id2, this.props.forceSource));
+
+      this.dispatch(executeCell(this.props.channels, id, source));
+      this.dispatch(createCellAfter('code', id2));
+
     }
 
     if (this.state.results !== prevState.results) {
@@ -115,7 +123,7 @@ export class Notebook extends React.Component {
     const store = this.store;
     return (
       <Provider rx={{ dispatch, store }}  store="">
-        <div >
+        <div className='nteract'>
           {
             this.state.err &&
             <pre>{this.state.err.toString()}</pre>
@@ -125,7 +133,7 @@ export class Notebook extends React.Component {
             <Nteract
               notebook={this.state.notebook}
               channels={this.state.channels}
-              forceSource={this.state.forceSource}
+              forceSource={this.props.forceSource}
             />
           }
         </div>

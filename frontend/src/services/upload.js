@@ -30,6 +30,22 @@ export async function fetchDataSet(dataSet_ID, page) {
   })
 }
 
+// delete dataset
+export async function deleteDataSet(id) {
+  let query = `/${id}`;
+  return request(CORS + dataSets + query, {
+    method: 'delete',
+  })
+}
+
+// delete file
+export async function deleteFile(id) {
+  let query = `/${id}`;
+  return request(CORS + files + query, {
+    method: 'delete',
+  })
+}
+
 // delete data columns
 export function deleteDataColumns(id, cols) {
   let query = `/fields/${id}`;

@@ -17,6 +17,10 @@ def get_by_user(user_obj):
     return file_repo.read_by_unique_field('user', user_obj)
 
 
+def get_by_data_set(ds_id):
+    return file_repo.read_by_unique_field('data_set', ds_id)
+
+
 def get_by_id(file_id):
     return file_repo.read_by_id(file_id)
 

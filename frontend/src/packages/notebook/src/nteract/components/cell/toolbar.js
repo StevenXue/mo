@@ -1,6 +1,6 @@
 import React from 'react';
-import '../../styles/main.css';
-import '../../styles/cm-composition.css';
+import '../../styles/main.less';
+import '../../styles/cm-composition.less';
 import { executeCell, removeCell } from '../../../actions';
 
 class Toolbar extends React.Component {

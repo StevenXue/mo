@@ -158,6 +158,22 @@ def run_job():
         return jsonify({"response": {"result": result}}), 200
 
 
+@job_app.route("/to_code", methods=["POST"])
+def to_code():
+    data = request.get_json()
+    job_id = data['section_id']
+    project_id = data["project_id"]
+
+    job_obj = job_business.get_by_job_id(job_id)
+    project = project_business.get_by_id(project_id)
+    ow = ownership_business.get_ownership_by_owned_item(project, 'project')
+    # user ID
+    user_ID = ow.user.user_ID
+    code = job_service.model_job_to_code(project_id=project_id,
+                                           job_obj=job_obj)
+    return jsonify({"response": {"code": code}}), 200
+
+
 @job_app.route("/save_result", methods=["POST"])
 def save_result():
     '''

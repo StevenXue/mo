@@ -7,7 +7,8 @@ from server3.business import data_business
 from server3.business import data_set_business
 from server3.business import ownership_business
 from server3.business import user_business
-# from server3.service import file_service
+from server3.business import file_business
+from server3.service import file_service
 from server3.service import ownership_service
 from server3.utility import json_utility
 from server3.utility import data_utility
@@ -180,6 +181,8 @@ def update_data(update):
 
 
 def remove_data_set_by_id(data_set_id):
+    file = file_business.get_by_data_set(data_set_id)
+    file_service.remove_file_by_id(file.id)
     data_business.remove_data_by_data_set_id(data_set_id)
     return data_set_business.remove_by_id(data_set_id)
 

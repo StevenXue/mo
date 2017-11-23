@@ -57,7 +57,7 @@ class Cell extends React.Component {
         {
         type === 'markdown' ?
           <MarkdownCell {...this.props} /> :
-          <CodeCell {...this.props} forceSource={this.state.forceSource} />
+          <CodeCell {...this.props} forceSource={this.props.forceSource} />
         }
       </div>
     );

@@ -212,21 +212,19 @@ def get_all_jobs_of_project(project_id, categories, status=None):
                     try:
                         result_sds = staging_data_set_business.get_by_job_id(
                             job['id']).to_mongo()
-
                         if result_sds:
                             # model results
                             job_info['results'] = result_sds
-                            # FIXME too slow to get metrics status
-                            # 已添加索引
                             metrics_status = [sd.to_mongo() for sd in
                                               staging_data_business.get_by_staging_data_set_id(
                                                   result_sds['_id']).order_by(
                                                   'n')]
                             # metrics_status.sort(key=lambda x: x['n'])
                             job_info['metrics_status'] = metrics_status
-                            total_steps = get_total_steps(job)
-                            job_info['percent'] = \
-                                metrics_status[-1]['n'] / total_steps * 100
+                            if len(metrics_status) > 0:
+                                total_steps = get_total_steps(job)
+                                job_info['percent'] = \
+                                    metrics_status[-1]['n'] / total_steps * 100
                             if job_info['status'] == 200:
                                 job_info['percent'] = 100
                             job_info['results_staging_data_set_id'] = \

@@ -43,3 +43,16 @@ export function update(payload) {
   })
 }
 
+export function jobToCode(payload) {
+  return request(`/api/job/to_code`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      "section_id": payload.sectionId,
+      "project_id": payload.projectId
+    })
+  });
+}
+
