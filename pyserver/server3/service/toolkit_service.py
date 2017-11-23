@@ -53,28 +53,32 @@ NEW_TOOLKIT_CATEGORY = [
         'zh_name': '简单的toolkit',
         'us_name': 'Simple Toolkit',
         'child': simple_toolkit_array,
-        'children': []
+        'children': [],
+        'des': 'provide some simple toolkit for starter'
     },
     {
         'name': 'data_explore',
         'zh_name': '初探数据集',
         'us_name': 'Data Explore',
         'child': data_explore_array,
-        'children': []
+        'children': [],
+        'des': 'explore the data',
     },
     {
         'name': 'data_quality_improve',
         'zh_name': '提升数据质量',
         'us_name': 'Data Quality Improve',
         'child': data_quality_improve_array,
-        'children': []
+        'children': [],
+        'des': 'improve the quality of the data'
     },
     {
         'name': 'feature_selection',
         'zh_name': '特征提取',
         'us_name': 'Feature Selection',
         'child': feature_selection_array,
-        'children': []
+        'children': [],
+        'des': 'feature selection of data'
     },
     # {
     #     'name': 'finished_toolkit',

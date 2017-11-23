@@ -1,10 +1,8 @@
 import React from 'react'
-import { Button } from 'antd'
 
 import styles from './index.less'
 
 import MyCard from '../../../../components/MyCard/index'
-import Launcher from '../../common/components/MiddleArea/Launcher/Launcher'
 
 const Icons = [
   'tablet',
@@ -35,34 +33,20 @@ function Guidance(props) {
         <br/>
         If you're new to data anaysis, then start here.
       </div>
-      {/*<div className={styles.title}>*/}
-      {/*description*/}
-      {/*</div>*/}
 
       <div className={styles.navCards}>
         {
           algorithms.map((algorithm, cardIndex) =>
             <MyCard key={algorithm.name}
-                    icon={Icons[cardIndex]} text={algorithm.name} style={{ marginRight: 50 }}
+                    icon={Icons[cardIndex]}
+                    text={algorithm.us_name}
+                    style={{ marginRight: 50 }}
+                    hasDescription={true}
+                    description={algorithm.des}
                     onClick={() => handleClick()}/>,
           )
         }
       </div>
-      {/*<Launcher*/}
-      {/*// sectionId={active_sectionId}*/}
-      {/*type='guidance'*/}
-      {/*{...props}/>*/}
-
-        <div className={styles.go_guide}>
-          {/*<Button onClick={() => props.dispatch({*/}
-            {/*type: props.namespace + '/setShowGuidance',*/}
-            {/*payload: {*/}
-              {/*showGuidance: false,*/}
-            {/*},*/}
-          {/*})}>*/}
-            {/*go to workspace*/}
-          {/*</Button>*/}
-        </div>
       </div> :
       <div>
         <div className={styles.title}>
@@ -74,22 +58,16 @@ function Guidance(props) {
           {
             algorithms.map((algorithm,cardIndex)=>
               <MyCard key={algorithm.name}
-                      icon={Icons[cardIndex]} text={algorithm.name} style={{marginRight: 50}}
+                      icon={Icons[cardIndex]}
+                      text={algorithm.name}
+                      style={{marginRight: 50}}
+
+                      hasDescription={true}
+                      description={algorithm.des}
                       onClick={() => handleClick()}/>,
             )
           }
         </div>
-
-      <div className={styles.go_guide}>
-        {/*<Button onClick={() => props.dispatch({*/}
-          {/*type: props.namespace + '/setShowGuidance',*/}
-          {/*payload: {*/}
-            {/*showGuidance: false,*/}
-          {/*},*/}
-        {/*})}>*/}
-          {/*go to workspace*/}
-        {/*</Button>*/}
-      </div>
     </div>
   )
 }
