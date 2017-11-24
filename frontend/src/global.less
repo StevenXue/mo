@@ -22,7 +22,6 @@
     //background: #fff;
   }
 
-
   .custom-title-font {
     font-size: large;
   }
@@ -35,11 +34,11 @@
     font-size: small;
   }
 
-  .active-table-column{
+  .active-table-column {
     background-color: #34C0E2;
   }
 
-  .active-table-column-label{
+  .active-table-column-label {
     background-color: lightblue;
   }
 
@@ -59,13 +58,48 @@
     //border-color: @custom-purple !important;
   }
 
-  .revert-table-header{
+  .revert-table-header {
     background: #f7f7f7;
     font-weight: 500;
     -webkit-transition: background .3s ease;
     transition: background .3s ease;
     text-align: left;
-    color: rgba(0,0,0,.85);
+    color: rgba(0, 0, 0, .85);
     width: 120px;
   }
+
+  .ant-table-head {
+    background-color: red;
+  }
+
+  .ant-tabs-bar .ant-tabs-tab-active {
+    background: #fff;
+    border-color: #d9d9d9;
+    color: @custom-blue-active !important;
+    padding-bottom: 5px;
+  }
+
+  .ant-tabs-ink-bar {
+    z-index: 1;
+    position: absolute;
+    left: 0;
+    bottom: 1px;
+    box-sizing: border-box;
+    height: 2px;
+    background-color: @custom-blue-active !important;
+    -webkit-transform-origin: 0 0;
+    -ms-transform-origin: 0 0;
+    transform-origin: 0 0;
+  }
+
+
+  .button-edit-user {
+    background-color: gray;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 16px 16px;
+    /*-webkit-mask-position: 6px 6px;*/
+    -webkit-mask-image: url(./img/model_into01.png);
+    mask-image: url(./img/model_into01.png);
+  }
 }
+

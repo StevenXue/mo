@@ -2,30 +2,52 @@
 .normal {
 }
 .container {
-  text-align: center;
+  //text-align: center;
   :global {
     .ant-table-row {
       text-align: left;
     }
+    .ant-table-thead>tr>th {
+      background: @custom-blue-table-head;
+      font-weight: 500;
+      -webkit-transition: background .3s ease;
+      transition: background .3s ease;
+      text-align: left;
+      color: rgba(0,0,0,.85);
+    }
   }
+
 }
 
 .first_line {
-  padding: 10px;
+  padding: 10px 15px;
+
 }
 
 .info_box {
-  height: 58px;
-  background: @custom-grey;
-  #center
+  height: 50px;
+  //background: @custom-grey;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
+  .text {
+    font-size: 12px;
+  }
+  .icon {
+    margin-right: 20px;
+    cursor: pointer;
+  }
+  //#center
 }
+
 
 .table_title {
   display: flex;
   flex-direction: column;
   align-items: left;
   width: 120px;
-  //background: @custom-grey;
+  //background: @custom-blue-table-head;
 }
 
 .table_title_name {

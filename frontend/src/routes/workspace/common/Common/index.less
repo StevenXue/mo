@@ -1,5 +1,15 @@
-
 @import "../../../../index.less";
+
+//:global {
+//  .sss {
+//    .ant-tabs-tab-active {
+//      background: #fff;
+//      border-color: #d9d9d9;
+//      color: red;
+//      padding-bottom: 5px;
+//    }
+//  }
+//}
 
 .container {
   // 使用 position: absolute; 可以左右填满，但是ant design 组件会乱滑动
@@ -10,6 +20,14 @@
   //right: 0;
   //margin: 0 -500px 0 -500px;
   background-color: @custom-grey-background;
+  //:global{
+  //  .ant-tabs-bar .ant-tabs-tab-active{
+  //    background: #fff;
+  //    border-color: #d9d9d9;
+  //    color: @custom-blue-active;
+  //    padding-bottom: 5px;
+  //  }
+  //}
 }
 
 .content {
@@ -18,7 +36,15 @@
   //min-width: 100%;
   //max-width: 100%;
   display: flex;
-  //height: 500px;
+  height: 500px;
+  //:global {
+  //  .ant-tabs-tab-active {
+  //    background: #fff;
+  //    border-color: #d9d9d9;
+  //    color: red;
+  //    padding-bottom: 5px;
+  //  }
+  //}
 }
 
 .sidebar {
@@ -30,7 +56,6 @@
   //background-color: white;
 }
 
-
 .middle_area {
   flex: 1;
   //display: flex;
@@ -38,8 +63,6 @@
   width: 30%;
 
 }
-
-
 
 .right_area {
   //display: flex;

@@ -11,6 +11,8 @@ export default {
       fetchTable: false,
     },
 
+    visible: false
+
   },
   reducers: {
     setProjectId(state, action) {
@@ -45,6 +47,13 @@ export default {
         },
       }
     },
+
+    toggleVisible(state, action) {
+      return {
+        ...state,
+        visible: !state.visible
+      }
+    }
 
   },
   effects: {

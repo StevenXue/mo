@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from './index.less'
 import {connect} from 'dva'
-import {Select, Table, Spin} from 'antd'
+import {Select, Table, Spin, Icon, Modal, Button} from 'antd'
 
 import {get} from 'lodash'
 
@@ -16,7 +16,8 @@ function Preview({preview, model, dispatch, namespace}) {
     table,
     spinLoading: {
       fetchTable
-    }
+    },
+    visible
   } = preview
 
   const {
@@ -124,16 +125,47 @@ function Preview({preview, model, dispatch, namespace}) {
 
           {
             dataSource ? <div className={styles.info_box}>
+              <div className={styles.text}>
               {`${table.row} rows, ${table.col} columns`}
+              </div>
+              <Icon className={styles.icon} type="arrows-alt" onClick={()=>{
+                dispatch({ type: 'preview' + '/toggleVisible' })
+              }}/>
             </div> : null
           }
 
-          <Table dataSource={dataSource} columns={columns}
+          <Table dataSource={dataSource}
+                 columns={columns}
                  scroll={{x: true}}
+                 pagination={false}
+
+                 // rowClassName={()=>'ant-table-head'}
           />
-          <RevertTable table={table} fields={fields} labelFields={labelFields}/>
+          <RevertTable table={table}
+                       fields={fields}
+                       labelFields={labelFields}/>
         </div>
       </Spin>
+
+      <Modal title="Preview Table"
+             width={1200}
+             visible={visible}
+             onOk={() => dispatch({ type: 'preview' + '/toggleVisible' })}
+             onCancel={() => dispatch({ type: 'preview' + '/toggleVisible' })}
+             footer={[
+               <Button key="submit" type="primary" size="large"
+                       onClick={() => dispatch({ type: 'preview' + '/toggleVisible' })}>
+                 OK
+               </Button>,
+             ]}
+      >
+        <Table dataSource={dataSource}
+               columns={columns}
+               scroll={{x: true}}
+               pagination={false}
+        />
+
+      </Modal>
     </div>
   )
 }

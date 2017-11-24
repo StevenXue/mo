@@ -3,13 +3,8 @@ import React from 'react'
 import styles from './index.less'
 
 import MyCard from '../../../../components/MyCard/index'
+import {IconDict} from '../../../../utils/constant'
 
-const Icons = [
-  'tablet',
-  'line-chart',
-  'schedule',
-  'select',
-]
 
 function Guidance(props) {
   const {
@@ -27,7 +22,7 @@ function Guidance(props) {
   }
 
   return (
-    props.namespace === 'dataAnalysis' ? <div>
+    props.namespace === 'dataAnalysis' ? <div className={styles.container}>
       <div className={styles.title}>
         Data anaysis tools help you to explore and analyze your data.
         <br/>
@@ -38,12 +33,14 @@ function Guidance(props) {
         {
           algorithms.map((algorithm, cardIndex) =>
             <MyCard key={algorithm.name}
-                    icon={Icons[cardIndex]}
+                    // icon={Icons[cardIndex]}
                     text={algorithm.us_name}
                     style={{ marginRight: 50 }}
                     hasDescription={true}
                     description={algorithm.des}
-                    onClick={() => handleClick()}/>,
+                    onClick={() => handleClick()}
+                    imgPath={IconDict[algorithm.name]}
+            />,
           )
         }
       </div>
@@ -58,13 +55,16 @@ function Guidance(props) {
           {
             algorithms.map((algorithm,cardIndex)=>
               <MyCard key={algorithm.name}
-                      icon={Icons[cardIndex]}
+                      // icon={Icons[cardIndex]}
                       text={algorithm.name}
                       style={{marginRight: 50}}
 
                       hasDescription={true}
                       description={algorithm.des}
-                      onClick={() => handleClick()}/>,
+                      onClick={() => handleClick()}
+                      imgPath={IconDict[algorithm.name]}
+              />,
+
             )
           }
         </div>
@@ -72,4 +72,4 @@ function Guidance(props) {
   )
 }
 
-export default Guidance
+export default Guidance;

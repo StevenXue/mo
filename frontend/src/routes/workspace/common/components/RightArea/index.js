@@ -16,10 +16,10 @@ const tabs = [
     text: 'View',
     key: 0
   },
-  {
-    text: 'History',
-    key: 1
-  }
+  // {
+  //   text: 'History',
+  //   key: 1
+  // }
 ]
 
 
@@ -48,8 +48,8 @@ class RightArea extends Component {
               <div className={styles.button}
                    key={tab.key}
                    style={{
-                     backgroundColor: this.state.status === tab.key ? '#34C0E2' : 'white',
-                     color: this.state.status === tab.key ? 'white' : 'grey',
+                     backgroundColor: this.state.status === tab.key ? '#FAFAFA' : 'white',
+                     color: this.state.status === tab.key ? 'grey' : 'grey',
                    }}
                    onClick={() => {
                      this.setState({

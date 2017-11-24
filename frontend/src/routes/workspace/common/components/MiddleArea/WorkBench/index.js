@@ -9,6 +9,10 @@ import ParamsMapper from '../../../../../../components/ParamsMapper/index'
 import LayerCard from '../../../../modelling/LayerCard/index'
 import { format, unifyType } from '../../../../../../utils/base'
 import { translateDict } from '../../../../../../constants'
+import ProcessBar from '../../../../../../components/ProcessBar';
+
+import { Steps } from 'antd';
+const Step = Steps.Step;
 
 const Option = Select.Option
 const Panel = Collapse.Panel
@@ -550,6 +554,14 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
                       sectionId: section._id,
                     },
                   })
+                  dispatch({
+                    type: namespace + '/addDisplaySteps',
+                    payload: {
+                      displaySteps: [String(stepIndex + 1)],
+                      sectionId: section._id,
+                    },
+                  })
+
                 }}>
           run
         </Button>
@@ -728,6 +740,9 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
   return (
     <div>
       <ToolBar sectionId={sectionId} {...{ model, dispatch, namespace }}/>
+
+      <ProcessBar numSteps={steps.length+1} finishedSteps={Math.max(...display_steps)}/>
+
       {
         namespace === 'modelling' && !notebook.on[sectionId] &&
         <div style={{ width: '97%', margin: 'auto' }}>

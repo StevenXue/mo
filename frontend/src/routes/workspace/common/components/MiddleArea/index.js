@@ -90,14 +90,14 @@ function MiddleArea({model, dispatch, namespace, step}) {
       activeKey={focusSectionsId}
       type="editable-card"
       onEdit={onEdit}
-      tabBarStyle={{
-        //TODO 设置tab样式
-        // flex: 1, display: 'flex', flexDirection: 'row',
-        // backgroundColor:"#C7C7C7"
-        // height: 49,
-        // borderWidth: 2,
-
-      }}
+      // tabBarStyle={{
+      //   //TODO 设置tab样式
+      //   // flex: 1, display: 'flex', flexDirection: 'row',
+      //   // backgroundColor:"#C7C7C7"
+      //   // height: 49,
+      //   // borderWidth: 2,
+      //
+      // }}
       // className={styles.tab_area}
       animated={true}
     >

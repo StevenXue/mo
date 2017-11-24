@@ -72,7 +72,8 @@ function RevertTable({table, fields, labelFields}) {
 
 
   return (
-      <Table dataSource={dataSource} columns={columns}
+      <Table dataSource={dataSource}
+             columns={columns}
              scroll={{x: true}}
              pagination={false}
              // showHeader={false}

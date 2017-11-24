@@ -2,15 +2,12 @@ import React from 'react'
 import {Icon} from 'antd'
 import styles from './index.less'
 
-function MyCard({icon, text, style, onClick, hasDescription=false, description}) {
+function MyCard({icon, text, style, onClick, hasDescription=false, description, imgPath}) {
   if (hasDescription === true) {
     return (
       <div className={styles.box_with_description} style={style} onClick={onClick}>
         <div className={styles.row}>
-          <Icon
-            type={icon}
-            className={styles.anticon}
-          />
+          <img className={styles.anticon} src={imgPath} alt="img"/>
           <div className={styles.title}>
             {text}
           </div>
