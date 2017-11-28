@@ -22,28 +22,28 @@ function ProgressBar(props){
 
   return (
     <Steps progressDot current={finishedSteps}>
-      {array.map((e)=><Step />)}
+      {array.map((e, i)=><Step key={i}/>)}
     </Steps>
   )
 
-  return (
-    <div className={styles.normal}>
-      <div className={styles.bar}>
-        {array.map((e)=>(
-          <div>
-            <div className={styles.circle}>
-
-            </div>
-            <div className={styles.line}>
-
-            </div>
-          </div>
-        ))}
-
-      </div>
-
-    </div>
-  )
+  // return (
+  //   <div className={styles.normal}>
+  //     <div className={styles.bar}>
+  //       {array.map((e)=>(
+  //         <div>
+  //           <div className={styles.circle}>
+  //
+  //           </div>
+  //           <div className={styles.line}>
+  //
+  //           </div>
+  //         </div>
+  //       ))}
+  //
+  //     </div>
+  //
+  //   </div>
+  // )
 }
 
 export default ProgressBar;

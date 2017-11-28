@@ -49,6 +49,7 @@ function RevertTable({table, fields, labelFields}) {
         dataIndex: "type",
         key: "type",
         width: 120,
+        // className: 'revert-table-header',
         // fixed: true
       },
 
@@ -65,6 +66,7 @@ function RevertTable({table, fields, labelFields}) {
           dataIndex: String(i),
           key: i,
           width: 120,
+          // className: 'revert-table-header',
         }
       )
     }
@@ -77,6 +79,7 @@ function RevertTable({table, fields, labelFields}) {
              scroll={{x: true}}
              pagination={false}
              // showHeader={false}
+             bordered
              rowClassName={(record, index)=>{
                let className = null;
 

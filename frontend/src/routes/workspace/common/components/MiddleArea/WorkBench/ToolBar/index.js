@@ -69,6 +69,26 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
     })
   }
 
+  function handleClickShowAll(){
+    dispatch({
+      type: namespace + '/showAll',
+      payload: {
+        sectionId,
+      }
+    })
+  }
+
+  function handleClickPackAll(){
+    console.log("handleClickPackAll")
+
+    dispatch({
+      type: namespace + '/packAll',
+      payload: {
+        sectionId,
+      }
+    })
+  }
+
   return (
     <div>
     <div className={styles.container}>
@@ -90,16 +110,16 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
       </div>
 
       <div className={styles.right}>
-        <div className={styles.button} style={{marginRight:20}}>
+        <div className={styles.button} style={{marginRight:20}} onClick={() => onClickSave()}>
           <img className={styles.img} src={save} alt="img"/>
         </div>
-        <div className={styles.button}>
+        <div className={styles.button}  onClick={() => handleClickRun()}>
           <img className={styles.img} src={play} alt="img"/>
         </div>
-        <div className={styles.button}>
+        <div className={styles.button} onClick={() => handleClickShowAll()}>
           <img className={styles.img} src={stop} alt="img"/>
         </div>
-        <div className={styles.button}>
+        <div className={styles.button} onClick={() => handleClickPackAll()}>
           <img className={styles.img} src={clear} alt="img"/>
         </div>
 

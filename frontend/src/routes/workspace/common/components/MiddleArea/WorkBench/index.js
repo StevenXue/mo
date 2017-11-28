@@ -10,6 +10,7 @@ import LayerCard from '../../../../modelling/LayerCard/index'
 import { format, unifyType } from '../../../../../../utils/base'
 import { translateDict } from '../../../../../../constants'
 import ProcessBar from '../../../../../../components/ProcessBar';
+import { message } from 'antd'
 
 import { Steps } from 'antd';
 const Step = Steps.Step;
@@ -47,11 +48,9 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
   } = preview
 
   function handleBlur() {
-    console.log('blur')
   }
 
   function handleFocus() {
-    console.log('focus')
   }
 
   const {
@@ -60,10 +59,23 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
     percent,
     active_steps,
     display_steps,
+    used_steps,
     [translateDict[namespace]]: {
       steps: baseSteps,
     },
   } = section
+
+  function isFirst(stepIndex){
+    /*
+    检查是否第一次出现
+     */
+
+    if(used_steps.includes(String(stepIndex))){
+      return false
+    }else {
+      return true
+    }
+  }
 
   //functions 下拉框选择
   function handleChange(value, index, argIndex) {
@@ -79,6 +91,10 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
   }
 
   function handleNext(stagingDatasetId, stepIndex, argIndex) {
+    if(!stagingDatasetId){
+      message.error('please select one datasource')
+      return
+    }
     dispatch({
       type: namespace + '/getFields',
       payload: {
@@ -105,6 +121,14 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
         sectionId: section._id,
       },
     })
+
+    dispatch({
+      type: namespace + '/addUsedSteps',
+      payload: {
+        usedSteps: [String(stepIndex)],
+        sectionId: section._id,
+      },
+    })
   }
 
   function callback(key) {
@@ -126,6 +150,14 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
         fieldName,
         sectionId: section._id,
         datasourceStepIndex,
+      },
+    })
+
+    dispatch({
+      type: namespace + '/addUsedSteps',
+      payload: {
+        usedSteps: [String(stepIndex)],
+        sectionId: section._id,
       },
     })
   }
@@ -286,51 +318,97 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
     let value_length = step.args[0].values.length
     let warningText = null
 
-    if (len_range) {
-      if (len_range[0]) {
-        if (value_length < len_range[0]) {
-          warningText = `you have select ${value_length} fields, less than required ${len_range[0]}`
+    let headerChild;
+    let waringChild;
+    let isWarning=false
+    if(!isFirst(stepIndex)){
+      if (len_range) {
+        if (len_range[0]) {
+          if (value_length < len_range[0]) {
+            warningText = `you have select ${value_length} fields, less than required ${len_range[0]}`
+            isWarning = true
+          }
+        }
+        if (len_range[1]) {
+          if (value_length > len_range[1]) {
+            warningText = `you have select ${value_length} fields, more than required ${len_range[1]}`
+            isWarning = true
+          }
         }
       }
-      if (len_range[1]) {
-        if (value_length > len_range[1]) {
-          warningText = `you have select ${value_length} fields, more than required ${len_range[1]}`
+
+      if(!warningText){
+        headerChild = <div className={styles.panel_title_hint}>
+          {`You have select ${step.args[0].values.length} fields`}
+        </div>
+      }
+      else{
+        if(active_steps.includes(stepIndex.toString())){
+          waringChild = <div  className={styles.panel_title_hint}>
+            {warningText}
+          </div>
+        }else {
+          headerChild = <div  className={styles.panel_title_warning}>
+            {warningText}
+          </div>
         }
       }
     }
 
-    // 检验数值类型
-
     return [
       renderPanel(fieldSelector(steps[0], 0, step, stepIndex), stepIndex,
-        <div className={styles.panel_title_hint}>
-          {warningText}
-        </div>),
-      renderFakePanel(step, stepIndex,
-        step.args[0].values.length ? `You have select ${step.args[0].values.length} fields`
-          : 'You have not select any fields',
-      ),
+        headerChild, waringChild, isWarning)
+      // renderFakePanel(step, stepIndex,
+      //   step.args[0].values.length ? `You have select ${step.args[0].values.length} fields`
+      //     : 'You have not select any fields',
+      // ),
     ]
   }
 
   // 以后将render fields 更改为pro， 可以根据提供的range字段获得该step需要的datasource
   function renderFieldsPro(steps, step, stepIndex) {
+    // 检验长度
     let len_range = baseSteps[stepIndex].args[0].len_range
     let value_length = step.args[0].values.length
     let warningText = null
 
-    if (len_range) {
-      if (len_range[0]) {
-        if (value_length < len_range[0]) {
-          warningText = `you have select ${value_length} fields, less than required ${len_range[0]}`
+    let headerChild;
+    let waringChild;
+    let isWarning=false
+    if(!isFirst(stepIndex)){
+      if (len_range) {
+        if (len_range[0]) {
+          if (value_length < len_range[0]) {
+            warningText = `you have select ${value_length} fields, less than required ${len_range[0]}`
+            isWarning = true
+          }
+        }
+        if (len_range[1]) {
+          if (value_length > len_range[1]) {
+            warningText = `you have select ${value_length} fields, more than required ${len_range[1]}`
+            isWarning = true
+          }
         }
       }
-      if (len_range[1]) {
-        if (value_length > len_range[1]) {
-          warningText = `you have select ${value_length} fields, more than required ${len_range[1]}`
+
+      if(!warningText){
+        headerChild = <div className={styles.panel_title_hint}>
+          {`You have select ${step.args[0].values.length} fields`}
+        </div>
+      }
+      else{
+        if(active_steps.includes(stepIndex.toString())){
+          waringChild = <div  className={styles.panel_title_hint}>
+            {warningText}
+          </div>
+        }else {
+          headerChild = <div  className={styles.panel_title_warning}>
+            {warningText}
+          </div>
         }
       }
     }
+
 
     let range = baseSteps[stepIndex].args[0].range
     let dataSourceStepIndex
@@ -340,18 +418,20 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
 
     return [
       renderPanel(fieldSelector(steps[dataSourceStepIndex], 0, step, stepIndex), stepIndex,
-        <div className={styles.panel_title_hint}>
-          {warningText}
-        </div>),
+        headerChild, waringChild, isWarning),
 
-      renderFakePanel(step, stepIndex,
-        step.args[0].values.length ? `You have select ${step.args[0].values.length} fields`
-          : 'You have not select any fields',
-      ),
+      // renderFakePanel(step, stepIndex,
+      //   step.args[0].values.length ? `You have select ${step.args[0].values.length} fields`
+      //     : 'You have not select any fields',
+      // ),
     ]
   }
 
   function fieldSelector(datasourceStep, datasourceStepIndex, step, stepIndex) {
+    if(!datasourceStep.args[0].fields){
+      return null
+    }
+
     return (
       <div>
         <div className={styles.fields}>
@@ -492,7 +572,7 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
     )
   }
 
-  function renderParameters(step, stepIndex) {
+  function parameters(step, stepIndex) {
     return (
       <div>
         <ParamsMapper args={step.args}
@@ -514,7 +594,9 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
   function LastOrRunButton(stepIndex, stepLength) {
     if (stepIndex !== stepLength - 1) {
       return (
-        <Button type="primary" className={styles.button}
+        <Button
+          key={`${stepIndex}Next`}
+          type="primary" className={styles.button}
                 onClick={() => {
                   dispatch({
                     type: namespace + '/setActiveKey',
@@ -532,13 +614,23 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
                     },
                   })
 
+                  dispatch({
+                    type: namespace + '/addUsedSteps',
+                    payload: {
+                      usedSteps: [String(stepIndex)],
+                      sectionId: section._id,
+                    },
+                  })
+
                 }}>
           next
         </Button>
       )
     } else {
       return (
-        <Button type="primary" className={styles.button}
+        <Button
+          key={`${stepIndex}Run`}
+          type="primary" className={styles.button}
                 onClick={() => {
                   dispatch({
                     type: namespace + '/runSection',
@@ -572,19 +664,44 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
   const stepLength = steps.length
 
   function renderDataSource(step, stepIndex) {
-    let ret = [
-      renderPanel(dataSource(step.args, stepIndex), stepIndex),
-    ]
-    if (!active_steps.includes(stepIndex.toString())) {
-      ret.push(
-        <FakePanel key={stepIndex + step.name + 'hint'}>
-          <div className={styles.fake_panel_container}>
-            <div className={styles.fake_panel}>
-              {step.args[0].value ? 'You have select 1 data' : 'You have not select any data'}
-            </div>
+    // 检查是否是第一次
+    let headerChild;
+    let waringChild;
+    let isWarning;
+
+    if(!isFirst(stepIndex)){
+      if(step.args[0].value){
+        headerChild = <div className={styles.panel_title_hint}>
+          You have select 1 data
+        </div>
+      }
+      else{
+        if(active_steps.includes(stepIndex.toString())){
+          waringChild = <div  className={styles.panel_title_hint}>
+            You have not select any data
           </div>
-        </FakePanel>)
+        }else {
+          headerChild = <div  className={styles.panel_title_warning}>
+            You have not select any data
+          </div>
+          isWarning = true
+        }
+      }
     }
+
+    let ret = [
+      renderPanel(dataSource(step.args, stepIndex), stepIndex, headerChild, waringChild, isWarning),
+    ]
+    // if (!active_steps.includes(stepIndex.toString())) {
+    //   ret.push(
+    //     <FakePanel key={stepIndex + step.name + 'hint'}>
+    //       <div className={styles.fake_panel_container}>
+    //         <div className={styles.fake_panel}>
+    //           {step.args[0].value ? 'You have select 1 data' : 'You have not select any data'}
+    //         </div>
+    //       </div>
+    //     </FakePanel>)
+    // }
     return ret
   }
 
@@ -622,46 +739,46 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
     )
   }
 
-  function parameters(step, stepIndex) {
-    return (
-      <div>
-        <ParamsMapper args={step.args} setValue={(value, argIndex) => setValue(value, stepIndex, argIndex)}/>
-        <div className={styles.end_button}>
-          {
-            LastOrRunButton(stepIndex, stepLength)
-          }
-        </div>
-      </div>
-    )
-    // return (
-    //   <div>
-    //     {
-    //       step.args.map((arg, argIndex) =>
-    //         <div className={styles.pair} key={arg.name + argIndex}>
-    //                           <span>
-    //                             {getArgs(baseSteps, stepIndex, argIndex).display_name}
-    //                           </span>
-    //           <div className={styles.row}>
-    //             <Input placeholder="" defaultValue={arg.value}
-    //                    onChange={(e) => handleOnChangeArgs(e.target.value, stepIndex, argIndex)}/>
-    //             <div className={styles.help}>
-    //               <Tooltip title={getArgs(baseSteps, stepIndex, argIndex).des}>
-    //                 <Icon type="question-circle-o"/>
-    //               </Tooltip>
-    //             </div>
-    //
-    //           </div>
-    //         </div>,
-    //       )
-    //     }
-    //     <div className={styles.end_button}>
-    //       {
-    //         LastOrRunButton(stepIndex, stepLength)
-    //       }
-    //     </div>
-    //   </div>
-    // )
-  }
+  // function parameters(step, stepIndex) {
+  //   return (
+  //     <div>
+  //       <ParamsMapper args={step.args} setValue={(value, argIndex) => setValue(value, stepIndex, argIndex)}/>
+  //       <div className={styles.end_button}>
+  //         {
+  //           LastOrRunButton(stepIndex, stepLength)
+  //         }
+  //       </div>
+  //     </div>
+  //   )
+  //   // return (
+  //   //   <div>
+  //   //     {
+  //   //       step.args.map((arg, argIndex) =>
+  //   //         <div className={styles.pair} key={arg.name + argIndex}>
+  //   //                           <span>
+  //   //                             {getArgs(baseSteps, stepIndex, argIndex).display_name}
+  //   //                           </span>
+  //   //           <div className={styles.row}>
+  //   //             <Input placeholder="" defaultValue={arg.value}
+  //   //                    onChange={(e) => handleOnChangeArgs(e.target.value, stepIndex, argIndex)}/>
+  //   //             <div className={styles.help}>
+  //   //               <Tooltip title={getArgs(baseSteps, stepIndex, argIndex).des}>
+  //   //                 <Icon type="question-circle-o"/>
+  //   //               </Tooltip>
+  //   //             </div>
+  //   //
+  //   //           </div>
+  //   //         </div>,
+  //   //       )
+  //   //     }
+  //   //     <div className={styles.end_button}>
+  //   //       {
+  //   //         LastOrRunButton(stepIndex, stepLength)
+  //   //       }
+  //   //     </div>
+  //   //   </div>
+  //   // )
+  // }
 
   function renderFakePanel(step, stepIndex, text) {
     return (
@@ -675,7 +792,7 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
     )
   }
 
-  function renderPanel(child, stepIndex, headerChild = null) {
+  function renderPanel(child, stepIndex, headerChild = null, warningChild=null, isWarning=false) {
     return <Panel
       header={
         (
@@ -691,13 +808,25 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
                 : null}
 
             </div>
-
-            {headerChild}
+            {headerChild?<div className={styles.panel_title}>
+              {isWarning?
+                <Icon type="exclamation-circle" style={{ fontSize: 14, color: '#EA5D5F', marginRight: 10 }}/>:
+                null}
+              {headerChild}
+            </div>:null}
           </div>)
       }
       key={stepIndex}
       className={styles.panel}>
-      {child}
+
+      {warningChild? <div className={styles.warning_area}>
+        <Icon type="exclamation-circle" style={{ fontSize: 14, color: '#EA5D5F', marginRight: 10 }}/>
+        {warningChild}
+      </div>:null}
+
+      <div>
+        {child}
+      </div>
     </Panel>
   }
 
@@ -737,12 +866,46 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
     )
   }
 
+  function renderParameters(step, stepIndex){
+    // num of args filled
+    let numArgsFill = 0
+    step.args.forEach((arg) => {
+      if (arg.value) {
+        numArgsFill += 1
+      }
+    })
+
+    let headerChild;
+    let waringChild;
+    let isWarning;
+    if(numArgsFill){
+      headerChild = <div className={styles.panel_title_hint}>
+        {`You have filled ${numArgsFill} args`}
+      </div>
+    }else{
+      headerChild = <div className={styles.panel_title_hint}>
+        You have not filled any args
+      </div>
+    }
+
+
+    return [
+      renderPanel(parameters(step, stepIndex), stepIndex, headerChild),
+      // renderFakePanel(step, stepIndex,
+      //   numArgsFill ? `You have filled ${numArgsFill} args`
+      //     : 'You have not filled any args',
+      // ),
+    ]
+
+  }
+
   return (
     <div>
       <ToolBar sectionId={sectionId} {...{ model, dispatch, namespace }}/>
 
-      <ProcessBar numSteps={steps.length+1} finishedSteps={Math.max(...display_steps)}/>
-
+      <div className={styles.process_bar}>
+        <ProcessBar numSteps={steps.length+1} finishedSteps={Math.max(...display_steps)}/>
+      </div>
       {
         namespace === 'modelling' && !notebook.on[sectionId] &&
         <div style={{ width: '97%', margin: 'auto' }}>
@@ -789,20 +952,21 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
                     case 'evaluate':
                     case 'hyperparameters':
                     case 'parameters':
-                      // num of args filled
-                      let numArgsFill = 0
-                      step.args.forEach((arg) => {
-                        if (arg.value) {
-                          numArgsFill += 1
-                        }
-                      })
-                      return [
-                        renderPanel(renderParameters(step, stepIndex), stepIndex),
-                        renderFakePanel(step, stepIndex,
-                          numArgsFill ? `You have filled ${numArgsFill} args`
-                            : 'You have not filled any args',
-                        ),
-                      ]
+                      return renderParameters(step, stepIndex)
+                      // // num of args filled
+                      // let numArgsFill = 0
+                      // step.args.forEach((arg) => {
+                      //   if (arg.value) {
+                      //     numArgsFill += 1
+                      //   }
+                      // })
+                      // return [
+                      //   renderPanel(parameters(step, stepIndex), stepIndex),
+                      //   renderFakePanel(step, stepIndex,
+                      //     numArgsFill ? `You have filled ${numArgsFill} args`
+                      //       : 'You have not filled any args',
+                      //   ),
+                      // ]
                   }
                 }
 

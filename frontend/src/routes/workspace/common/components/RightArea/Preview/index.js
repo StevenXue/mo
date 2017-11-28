@@ -138,12 +138,13 @@ function Preview({preview, model, dispatch, namespace}) {
                  columns={columns}
                  scroll={{x: true}}
                  pagination={false}
-
+                 bordered
                  // rowClassName={()=>'ant-table-head'}
           />
-          <RevertTable table={table}
-                       fields={fields}
-                       labelFields={labelFields}/>
+
+          {/*<RevertTable table={table}*/}
+                       {/*fields={fields}*/}
+                       {/*labelFields={labelFields}/>*/}
         </div>
       </Spin>
 
@@ -163,6 +164,7 @@ function Preview({preview, model, dispatch, namespace}) {
                columns={columns}
                scroll={{x: true}}
                pagination={false}
+               bordered
         />
 
       </Modal>

@@ -50,4 +50,5 @@ class Job(DynamicDocument):
     served_model = ReferenceField('ServedModel', reverse_delete_rule=NULLIFY)
     result = DictField()
     display_steps = ListField(default=['0'])
+    used_steps = ListField(default=[])
 

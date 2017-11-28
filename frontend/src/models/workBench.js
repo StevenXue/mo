@@ -3,6 +3,7 @@ import * as stagingDataService from '../services/stagingData'
 import * as modelService from '../services/model'
 import * as jobService from '../services/job'
 import { arrayToJson, JsonToArray } from '../utils/JsonUtils'
+import {message} from 'antd'
 
 import pathToRegexp from 'path-to-regexp'
 import { cloneDeep } from 'lodash'
@@ -30,6 +31,11 @@ export function *saveSection(action, { call, put, select }) {
   const sectionsJson = yield select(state => state[namespace].sectionsJson)
   const section = sectionsJson[sectionId]
   const { data: result } = yield call(dataAnalysisService.saveSection, { section: section })
+  message.config({
+    top: 100,
+    duration: 2,
+  });
+  message.success("save success");
   console.log('saveSection', result)
   // 没有后续操作了？
 }
@@ -502,9 +508,7 @@ export default {
     },
 
     setActiveKey(state, action) {
-
       const { sectionId, activeKey } = action.payload
-
       let sectionsJson = state.sectionsJson
       sectionsJson[sectionId].active_steps = activeKey
       return {
@@ -513,11 +517,50 @@ export default {
       }
     },
 
+    showAll(state, action) {
+      const { sectionId } = action.payload
+      let num = state.sectionsJson[sectionId].steps.length
+      let active_steps = []
+      for(let i=0; i<num; i++){
+        active_steps.push(String(i))
+      }
+
+      let sectionsJson = state.sectionsJson
+      sectionsJson[sectionId].active_steps = active_steps
+      return {
+        ...state,
+        sectionsJson,
+      }
+    },
+
+
+    packAll(state, action) {
+      const { sectionId } = action.payload
+      let sectionsJson = state.sectionsJson
+      sectionsJson[sectionId].active_steps = []
+      return {
+        ...state,
+        sectionsJson,
+      }
+    },
+
+
     addDisplaySteps(state, action){
       const { sectionId, displaySteps } = action.payload
 
       let sectionsJson = state.sectionsJson
       sectionsJson[sectionId].display_steps = state.sectionsJson[sectionId].display_steps.concat(displaySteps)
+      return {
+        ...state,
+        sectionsJson,
+      }
+    },
+
+    // 类似display steps 用于记录是否第一次操作
+    addUsedSteps(state, action){
+      const { sectionId, usedSteps } = action.payload
+      let sectionsJson = state.sectionsJson
+      sectionsJson[sectionId].used_steps = state.sectionsJson[sectionId].used_steps.concat(usedSteps)
       return {
         ...state,
         sectionsJson,
@@ -733,6 +776,8 @@ export default {
         ...action.payload,
         projectId: projectId,
       })
+
+      message.success("run success");
 
       // 更新result
       yield put({

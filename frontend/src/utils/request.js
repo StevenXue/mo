@@ -1,5 +1,5 @@
 import fetch from 'dva/fetch'
-import { message } from 'antd'
+import {message} from 'antd'
 
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
@@ -22,9 +22,9 @@ function checkStatus(response) {
 export default async function request(url, options) {
   const response = await fetch(url, options)
 
-  checkStatus(response)
+  const newRes = checkStatus(response)
 
-  const data = await response.json()
+  const data = await newRes.json()
 
   const ret = {
     data: data.response,
