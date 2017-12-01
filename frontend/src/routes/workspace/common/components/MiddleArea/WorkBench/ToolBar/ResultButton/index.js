@@ -28,7 +28,9 @@ class ResultButton extends Component {
       <div onClick={() => dispatch({ type: namespace + '/showResult' })}
            className={styles.result}
       >
-        <Icon type="bar-chart" style={{ fontSize: 20, margin: 10, color: 'white' }}/>
+        <img src={require('../../../../../../../../img/result.png')} alt="img" style={{ fontSize: 20, margin: 10, color: 'white' }}/>
+        {/*<Icon type="bar-chart" style={{ fontSize: 20, margin: 10, color: 'white' }}/>*/}
+
         <span className={styles.text}>
           Result
         </span>

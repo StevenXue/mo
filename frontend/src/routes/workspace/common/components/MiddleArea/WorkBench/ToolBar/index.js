@@ -69,7 +69,7 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
     })
   }
 
-  function handleClickShowAll(){
+  function handleClickShowAll() {
     dispatch({
       type: namespace + '/showAll',
       payload: {
@@ -78,7 +78,7 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
     })
   }
 
-  function handleClickPackAll(){
+  function handleClickPackAll() {
     console.log("handleClickPackAll")
 
     dispatch({
@@ -91,51 +91,61 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
 
   return (
     <div>
-    <div className={styles.container}>
-      <div className={styles.left}>
-        <img className={styles.icon_img} src={IconDict[getFatherName(algorithms, name)]} alt="img"/>
+      <div className={styles.container}>
+        <div className={styles.left}>
+          <img className={styles.icon_img} src={IconDict[getFatherName(algorithms, name)]} alt="img"/>
 
-        <div className={styles.text_container}>
-          <div className={styles.title}>
-            {name}
+          <Tooltip title={description}>
+            <div className={styles.text_container}>
+              <div className={styles.title}>
+                {name}
+              </div>
+
+              {/*<div className={styles.help}>*/}
+
+              {/*<Icon type="question-circle-o" />*/}
+
+              {/*</div>*/}
+
+            </div>
+          </Tooltip>
+        </div>
+
+        <div className={styles.right}>
+
+          <Tooltip title={"save"}>
+            <div className={styles.button} style={{marginRight: 20}} onClick={() => onClickSave()}>
+              <img className={styles.img} src={save} alt="img"/>
+            </div>
+          </Tooltip>
+          <div className={styles.button} onClick={() => handleClickRun()}>
+            <img className={styles.img} src={play} alt="img"/>
           </div>
 
-          <div className={styles.help}>
-            <Tooltip title={description}>
-              <Icon type="question-circle-o" />
-            </Tooltip>
+
+          <Tooltip title={"show all"}>
+            <div className={styles.button} onClick={() => handleClickShowAll()}>
+              <img className={styles.img} src={stop} alt="img"/>
+            </div>
+          </Tooltip>
+          <Tooltip title={"pack all"}>
+            <div className={styles.button} onClick={() => handleClickPackAll()}>
+              <img className={styles.img} src={clear} alt="img"/>
+            </div>
+          </Tooltip>
+          <div>
+            <ResultButton visual_sds_id={visual_sds_id}
+                          data={metrics_status}
+                          batch={batch}
+                          result={result}
+                          namespace={namespace}
+                          model={model}
+                          dispatch={dispatch}
+                          sectionId={sectionId}
+            />
           </div>
-
         </div>
       </div>
-
-      <div className={styles.right}>
-        <div className={styles.button} style={{marginRight:20}} onClick={() => onClickSave()}>
-          <img className={styles.img} src={save} alt="img"/>
-        </div>
-        <div className={styles.button}  onClick={() => handleClickRun()}>
-          <img className={styles.img} src={play} alt="img"/>
-        </div>
-        <div className={styles.button} onClick={() => handleClickShowAll()}>
-          <img className={styles.img} src={stop} alt="img"/>
-        </div>
-        <div className={styles.button} onClick={() => handleClickPackAll()}>
-          <img className={styles.img} src={clear} alt="img"/>
-        </div>
-
-        <div>
-          <ResultButton visual_sds_id={visual_sds_id}
-                        data={metrics_status}
-                        batch={batch}
-                        result={result}
-                        namespace={namespace}
-                        model={model}
-                        dispatch={dispatch}
-                        sectionId={sectionId}
-          />
-        </div>
-      </div>
-    </div>
 
 
     </div>
@@ -203,7 +213,6 @@ function ToolBar({model, dispatch, namespace, sectionId}) {
     </div>
   )
 }
-
 
 
 export default ToolBar

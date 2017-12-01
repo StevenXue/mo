@@ -19,6 +19,17 @@ function MyCard({icon, text, style, onClick, hasDescription=false, description, 
     )
   }
 
+  if(imgPath){
+    return (
+      <div className={styles.box} style={style} onClick={onClick}>
+        <img className={styles.anticon} src={imgPath} alt="img"/>
+        <div className={styles.description}>
+          {text}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={styles.box} style={style} onClick={onClick}>
       <Icon

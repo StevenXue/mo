@@ -45,7 +45,7 @@ function Guidance(props) {
         }
       </div>
       </div> :
-      <div>
+      <div className={styles.container}>
         <div className={styles.title}>
           Learn how to build and deploy  a model with our modelling workspace.
         <br/> If you're new to modelling, then

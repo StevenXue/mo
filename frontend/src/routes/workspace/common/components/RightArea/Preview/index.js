@@ -2,6 +2,7 @@ import React from 'react'
 import styles from './index.less'
 import {connect} from 'dva'
 import {Select, Table, Spin, Icon, Modal, Button} from 'antd'
+import {InputNumber} from 'antd'
 
 import {get} from 'lodash'
 
@@ -10,14 +11,14 @@ const Option = Select.Option
 import RevertTable from '../../../../../../components/RevertTable'
 
 function Preview({preview, model, dispatch, namespace}) {
-
   const {
     stagingDataList,
     table,
     spinLoading: {
       fetchTable
     },
-    visible
+    visible,
+    decimal
   } = preview
 
   const {
@@ -54,9 +55,18 @@ function Preview({preview, model, dispatch, namespace}) {
 
   if (table.length !== 0) {
     dataSource = table.data.map((e, index) => {
+      let newE = JSON.parse(JSON.stringify(e))
+      if (decimal !== false) {
+        // 处理小数保留几位
+        table.columns.forEach((column) => {
+          if (column[1][0] === 'float') {
+            newE[column[0]] = parseFloat(newE[column[0]]).toFixed(decimal)
+          }
+        })
+      }
       return {
         key: index,
-        ...e
+        ...newE
       }
     })
   }
@@ -126,10 +136,10 @@ function Preview({preview, model, dispatch, namespace}) {
           {
             dataSource ? <div className={styles.info_box}>
               <div className={styles.text}>
-              {`${table.row} rows, ${table.col} columns`}
+                {`${table.row} rows, ${table.col} columns`}
               </div>
-              <Icon className={styles.icon} type="arrows-alt" onClick={()=>{
-                dispatch({ type: 'preview' + '/toggleVisible' })
+              <Icon className={styles.icon} type="arrows-alt" onClick={() => {
+                dispatch({type: 'preview' + '/toggleVisible'})
               }}/>
             </div> : null
           }
@@ -139,27 +149,44 @@ function Preview({preview, model, dispatch, namespace}) {
                  scroll={{x: true}}
                  pagination={false}
                  bordered
-                 // rowClassName={()=>'ant-table-head'}
+            // rowClassName={()=>'ant-table-head'}
           />
 
           {/*<RevertTable table={table}*/}
-                       {/*fields={fields}*/}
-                       {/*labelFields={labelFields}/>*/}
+          {/*fields={fields}*/}
+          {/*labelFields={labelFields}/>*/}
+
         </div>
       </Spin>
 
       <Modal title="Preview Table"
              width={1200}
              visible={visible}
-             onOk={() => dispatch({ type: 'preview' + '/toggleVisible' })}
-             onCancel={() => dispatch({ type: 'preview' + '/toggleVisible' })}
+             onOk={() => dispatch({type: 'preview' + '/toggleVisible'})}
+             onCancel={() => dispatch({type: 'preview' + '/toggleVisible'})}
              footer={[
                <Button key="submit" type="primary" size="large"
-                       onClick={() => dispatch({ type: 'preview' + '/toggleVisible' })}>
+                       onClick={() => dispatch({type: 'preview' + '/toggleVisible'})}>
                  OK
                </Button>,
              ]}
+             className={styles.modal}
       >
+        <div style={{"display": "flex", "alignItems": "center"}}>
+          <div style={{"margin": "5px 10px"}}>
+            num of decimal
+          </div>
+          <InputNumber min={1} max={10} defaultValue={3}
+                       onChange={(e) => {
+                         dispatch({
+                           type: 'preview' + '/setDecimal',
+                           payload: {decimal: e}
+                         })
+
+                       }}
+          />
+        </div>
+
         <Table dataSource={dataSource}
                columns={columns}
                scroll={{x: true}}

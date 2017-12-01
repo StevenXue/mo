@@ -23,6 +23,7 @@ import ProjectModel from '../../../../components/ProjectModel/index'
 import { showTime } from '../../../../utils/index'
 import styles from './index.less'
 
+import {projectDetailIcon} from '../../../../utils/constant';
 const confirm = Modal.confirm
 
 const pages = ['import', 'analysis', 'modelling', 'deploy']
@@ -79,13 +80,21 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
           </div>
           <div className={styles.navCards}>
             <MyCard icon='file-add' text='Data Import' style={{ marginRight: 50 }}
-                    onClick={() => history.push(`/workspace/${match.params.projectId}/import`)}/>
+                    onClick={() => history.push(`/workspace/${match.params.projectId}/import`)}
+                    imgPath={projectDetailIcon['project_step01']}
+            />
             <MyCard icon='line-chart' text='Data Analysis' style={{ marginRight: 50 }}
-                    onClick={() => history.push(`/workspace/${match.params.projectId}/analysis`)}/>
+                    onClick={() => history.push(`/workspace/${match.params.projectId}/analysis`)}
+                    imgPath={projectDetailIcon['project_step02']}
+            />
             <MyCard icon='edit' text='Model Design' style={{ marginRight: 50 }}
-                    onClick={() => history.push(`/workspace/${match.params.projectId}/modelling`)}/>
+                    onClick={() => history.push(`/workspace/${match.params.projectId}/modelling`)}
+                    imgPath={projectDetailIcon['project_step03']}
+            />
             <MyCard icon='api' text='Model Deployment'
-                    onClick={() => history.push(`/workspace/${match.params.projectId}/deploy`)}/>
+                    onClick={() => history.push(`/workspace/${match.params.projectId}/deploy`)}
+                    imgPath={projectDetailIcon['project_step04']}
+            />
           </div>
         </div>
       )

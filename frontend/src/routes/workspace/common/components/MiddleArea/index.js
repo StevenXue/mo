@@ -56,11 +56,15 @@ function MiddleArea({model, dispatch, namespace, step}) {
     eval(action)(targetKey);
   };
 
-  // const add = () => {
-  //   const activeKey = `newTab${Math.random()}`;
-  //   addActiveSection(activeKey);
-  //
-  // };
+  const add = () => {
+    addActiveSection('new_launcher ' + Math.random())
+  };
+  const addActiveSection = (sectionId) => {
+    dispatch({
+      type: namespace + '/addActiveSection',
+      sectionId: sectionId,
+    })
+  }
 
   // 被 onEdit 调用
   const remove = (targetKey) => {
@@ -85,7 +89,7 @@ function MiddleArea({model, dispatch, namespace, step}) {
 
   return (
     <Tabs
-      hideAdd
+      // hideAdd
       onChange={onChange}
       activeKey={focusSectionsId}
       type="editable-card"

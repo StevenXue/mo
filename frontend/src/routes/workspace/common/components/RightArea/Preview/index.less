@@ -60,7 +60,21 @@
   color: @custom-green;
 }
 
-
+.modal {
+  :global {
+    .ant-table-row {
+      text-align: left;
+    }
+    .ant-table-thead>tr>th {
+      background: @custom-blue-table-head;
+      font-weight: 500;
+      -webkit-transition: background .3s ease;
+      transition: background .3s ease;
+      text-align: left;
+      color: rgba(0,0,0,.85);
+    }
+  }
+}
 //.column {
 //  background-color: red;
 //}

@@ -810,14 +810,20 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
             </div>
             {headerChild?<div className={styles.panel_title}>
               {isWarning?
-                <Icon type="exclamation-circle" style={{ fontSize: 14, color: '#EA5D5F', marginRight: 10 }}/>:
+                <Icon type="exclamation-circle" style={{ fontSize: 14, color: '#FF5858', marginRight: 10 }}/>:
                 null}
               {headerChild}
             </div>:null}
           </div>)
       }
       key={stepIndex}
-      className={styles.panel}>
+      className={styles.panel}
+      style={{
+        border: "1px solid #d9d9d9",
+        borderRadius: 1,
+      }}
+    >
+
 
       {warningChild? <div className={styles.warning_area}>
         <Icon type="exclamation-circle" style={{ fontSize: 14, color: '#EA5D5F', marginRight: 10 }}/>
@@ -901,10 +907,11 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
 
   return (
     <div>
-      <ToolBar sectionId={sectionId} {...{ model, dispatch, namespace }}/>
-
+      <div>
+        <ToolBar sectionId={sectionId} {...{ model, dispatch, namespace }}/>
+      </div>
       <div className={styles.process_bar}>
-        <ProcessBar numSteps={steps.length+1} finishedSteps={Math.max(...display_steps)}/>
+        <ProcessBar numSteps={steps.length+1} finishedSteps={Math.max(...display_steps)} steps={steps}/>
       </div>
       {
         namespace === 'modelling' && !notebook.on[sectionId] &&

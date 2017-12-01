@@ -35,16 +35,17 @@
   }
 
   .active-table-column {
-    background-color: #34C0E2;
+    //background-color: #34C0E2;
   }
 
   .active-table-column-label {
-    background-color: lightblue;
+    //background-color: lightblue;
   }
 
   .mouse-over-table-column {
     color: green;
     margin-right: -100px;
+    background-color: lightgrey;
   }
 
   .center {
@@ -92,7 +93,6 @@
     transform-origin: 0 0;
   }
 
-
   .button-edit-user {
     background-color: gray;
     -webkit-mask-repeat: no-repeat;
@@ -101,5 +101,10 @@
     -webkit-mask-image: url(./img/model_into01.png);
     mask-image: url(./img/model_into01.png);
   }
+
+  .ant-collapse > .ant-collapse-item:last-child, .ant-collapse > .ant-collapse-item:last-child > .ant-collapse-header {
+    border-radius: 0 0 0 0;
+  }
+
 }
 

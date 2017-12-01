@@ -48,6 +48,13 @@ module.exports = {
     "regression": require("../img/model_into01.png"),
     "classification": require("../img/model_into02.png"),
     "clustering": require("../img/model_into03.png"),
+  },
 
+  projectDetailIcon: {
+    "project_step01": require("../img/project_steps/project_step01.png"),
+    "project_step02": require("../img/project_steps/project_step02.png"),
+    "project_step03": require("../img/project_steps/project_step03.png"),
+    "project_step04": require("../img/project_steps/project_step04.png"),
   }
+
 };

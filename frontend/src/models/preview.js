@@ -11,7 +11,9 @@ export default {
       fetchTable: false,
     },
 
-    visible: false
+    visible: false,
+
+    decimal: false
 
   },
   reducers: {
@@ -53,6 +55,14 @@ export default {
         ...state,
         visible: !state.visible
       }
+    },
+
+    setDecimal(state, action){
+      return {
+        ...state,
+        decimal: action.payload.decimal
+      }
+
     }
 
   },
