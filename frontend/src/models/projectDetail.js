@@ -76,8 +76,8 @@ export default {
     // 当进入该页面获取project
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
-        const match = pathToRegexp('/workspace/:projectId*').exec(pathname)
-        const match2 = pathToRegexp('/projects/:projectId*').exec(pathname)
+        const match = pathToRegexp('/workspace/:projectId/:anything?').exec(pathname)
+        const match2 = pathToRegexp('/projects/:projectId/:anything?').exec(pathname)
         if (match) {
           const projectId = match[1]
           dispatch({ type: 'fetch', projectId: projectId })

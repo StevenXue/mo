@@ -20,6 +20,6 @@ case "$1" in
     exit
 esac
 
-cd /Users/zhaofengli/Documents/goldersgreen/goldersgreen
+cd /Users/zhaofengli/projects/goldersgreen
 docker build -f ${dockerfile} -t ${image} .
 docker save ${image} | bzip2 | pv | ssh root@${cluster_ip} 'cat | docker load'

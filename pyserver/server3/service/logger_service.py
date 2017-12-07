@@ -38,6 +38,9 @@ class TrainingLogger:
         save_result(self.result_sds, **results)
 
 
+# Message Emitting
+
+
 def log_epoch_begin(*args, **kw):
     global epoch
     epoch = args[0]
@@ -60,6 +63,9 @@ def log_batch_end(*args, **kw):
 def log_train_end(*args, **results):
     save_result(*args, **results)
     # emit_result(*args, **kw)
+
+
+# Database Management
 
 
 def emit_log(event, n, logs, project_id, job_id=None, user_ID=None,

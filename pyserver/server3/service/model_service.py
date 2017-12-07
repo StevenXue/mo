@@ -1163,7 +1163,7 @@ if __name__ == '__main__':
     pass
     # import os
     # import sys
-    # sys.path.append('/Users/zhaofengli/Documents/goldersgreen/goldersgreen/pyserver/')
+    # sys.path.append('/Users/zhaofengli/projects/goldersgreen/pyserver/')
     # conf = {
     #     'estimator':{
     #         'args': {

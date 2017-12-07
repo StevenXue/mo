@@ -21,6 +21,15 @@ const valueParser = {
   str: (e) => (e),
 }
 
+const parse = (e, valueType) => {
+  let parsed = valueParser[valueType](e)
+  if (isNaN(parsed) || String(parsed).toLowerCase() !== e.toLowerCase()) {
+    return e
+  } else {
+    return parsed
+  }
+}
+
 const typeParser = (type, valueType) => {
   const typeDict = {
     int: 'integer',
@@ -50,31 +59,20 @@ const splitHandler = (e, type, valueType) => {
         return e.target.value
       } else {
         try {
-          return splitValue.map(e => {
-            let parsed = valueParser[valueType](e)
-            if (isNaN(parsed) || String(parsed).toLowerCase() !== e.toLowerCase()) {
-              return e
-            } else {
-              return parsed
-            }
-          })
+          return splitValue.map(e => parse(e, valueType))
         } catch (err) {
           return e.target.value
         }
       }
     case 'input':
       try {
-        let parsed = valueParser[valueType](e.target.value)
-        if (isNaN(parsed) || String(parsed).toLowerCase() !== e.target.value.toLowerCase()) {
-          return e.target.value
-        } else {
-          return parsed
-        }
+        return parse(e.target.value, valueType)
       } catch (err) {
         console.log(err, e.target.value)
         return e.target.value
       }
     default:
+      // choice or multiple_choice
       return e
   }
 }
@@ -83,7 +81,6 @@ const switchComponent = (arg, baseArg) => {
   switch (arg.type) {
     case 'multiple_input':
     case 'input':
-      // return <Input/>
       return <Input/>
 
     case 'choice':
@@ -146,31 +143,16 @@ const formItems = (arg, i, getFieldDecorator, baseArg) => {
 }
 
 function ParamsMapper({
-                        args,
-                        layerIndex,
-                        baseArgs,
-                        stepIndex,
-                        form: {
-                          getFieldValue,
-                          getFieldsValue,
-                          getFieldDecorator,
-                          validateFields,
-                        },
-
+                        args, layerIndex, baseArgs,
+                        form: { getFieldDecorator },
                       }) {
 
   return (
     <Form layout='inline' className={styles.form}
           key={`params-form-${layerIndex}`}
-      // onSubmit={handleSubmit}
     >
       {
         args.map((arg, i) => {
-
-          // let v = arg.value || arg.values
-          // if (arg.value || (arg.values && arg.values.length > 0)) {
-          //   setValueDefault({ [arg.name]: v })
-          // }
           return formItems(arg, i, getFieldDecorator, baseArgs[i])
         })
       }

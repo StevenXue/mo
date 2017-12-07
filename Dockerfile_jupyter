@@ -2,7 +2,7 @@ FROM jupyter/tensorflow-notebook
 
 USER root:root
 
-WORKDIR /home/root/work
+WORKDIR /home/root/work/pyserver
 
 # replace apt-get source with USTC mirror
 RUN sudo sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
