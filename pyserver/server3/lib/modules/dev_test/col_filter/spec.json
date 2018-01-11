@@ -1,0 +1,27 @@
+{
+  "name": "Linear Regression",
+  "description": "Custom linear regression model",
+  "target_py_code": "server3/lib/models/linear_regressor.py",
+  "entry_function": "linear_regressor_model_fn",
+  "inputs": [
+    {
+      "id": "dataset",
+      "name": "Data Set",
+      "type": "DataFrame"
+    },
+    {
+      "id": "col_list",
+      "name": "Array of Column Names",
+      "type": "list"
+    }
+  ],
+  "outputs": [
+    {
+      "id": "dataset",
+      "name": "Filtered Data Set",
+      "type": "DataFrame"
+    },
+  ],
+  "args": [
+  ]
+}

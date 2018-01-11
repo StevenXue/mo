@@ -1,0 +1,75 @@
+{
+  "name": "Linear Regression",
+  "description": "Custom linear regression model",
+  "target_py_code": "server3/lib/models/linear_regressor.py",
+  "entry_function": "linear_regressor_model_fn",
+  "inputs": [
+    {
+      "id": "dataset",
+      "name": "Data Set",
+      "type": "DataFrame"
+    },
+    {
+      "id": "feature_fields",
+      "name": "Feature Fields",
+      "type": "list"
+    },
+    {
+      "id": "label_field",
+      "name": "Label Field",
+      "type": "str"
+    }
+  ],
+  "outputs": [
+    {
+      "id": "score",
+      "name": "Score",
+      "des": "Evaluate Score",
+      "type": "int"
+    }
+  ],
+  "args": [
+    {
+      "id": "weight_column_name",
+      "name": "Weight Column Name",
+      "type": "str",
+      "des": "A string defining feature column name representing weights. It is used to down weight or boost examples during training. It will be multiplied by the loss of the example."
+    },
+    {
+      "id": "gradient_clip_norm",
+      "name": "Gradient Clip Norm",
+      "type": "float",
+      "des": "A float > 0. If provided, gradients are clipped to their global norm with this clipping ratio."
+    },
+    {
+      "id": "_joint_weights",
+      "name": "Joint weights",
+      "type": "bool",
+      "des": "If True, the weights for all columns will be stored in a single (possibly partitioned) variable. It's more efficient, but it's incompatible with SDCAOptimizer, and requires all feature columns are sparse and use the 'sum' combiner."
+    },
+    {
+      "id": "enable_centered_bias",
+      "name": "Enable Centered Bias",
+      "type": "bool",
+      "des": "A bool. If True, estimator will learn a centered bias variable for each class. Rest of the model structure learns the residual after centered bias."
+    },
+    {
+      "id": "label_dimension",
+      "name": "Label Dimension",
+      "type": "int",
+      "des": "Number of regression targets per example. This is thesize of the last dimension of the labels and logits `Tensor` objects(typically, these have shape `[batch_size, label_dimension]`)"
+    },
+    {
+      "id": "fit_steps",
+      "name": "Fit Steps",
+      "type": "int",
+      "des": "Number of steps of training"
+    },
+    {
+      "id": "evaluate_steps",
+      "name": "Evaluate Steps",
+      "type": "int",
+      "des": "Number of steps of evaluate"
+    }
+  ]
+}

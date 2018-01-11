@@ -1,0 +1,11 @@
+syntax = "proto3";
+package parameter;
+
+import "ndarray.proto";
+
+message Parameters {
+    repeated NDArrayBytes datasets = 1;
+    string name = 2;
+    float ratio = 3;
+}
+

@@ -1,0 +1,20 @@
+syntax = "proto3";
+package parameter;
+
+message NDArray {
+    repeated double array = 1;
+    repeated int32 shape = 2;
+    string dtype = 3;
+}
+
+message NDArrayPacked {
+    repeated double array = 1 [packed=true];
+    repeated int32 shape = 2;
+    string dtype = 3;
+}
+
+message NDArrayBytes {
+    bytes data_bytes = 1;
+    repeated int32 shape = 2;
+    string dtype = 3;
+}
