@@ -50,6 +50,12 @@ const menuConfig = [
     Icon: null,
     text: 'Model Markets ',
   },
+  {
+    key: '/demo',
+    Link: '/demo',
+    Icon: null,
+    text: 'Demo ',
+  },
 
 ]
 

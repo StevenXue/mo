@@ -36,7 +36,6 @@ function List({model, dispatch, namespace,toModelDetail}) {
     })
   }
 
-
   function search(value) {
     dispatch({
       type: namespace + 'search',
