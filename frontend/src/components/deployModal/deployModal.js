@@ -15,7 +15,6 @@ function hasErrors(fieldsError) {
 
 class DeployModal extends React.Component {
 
-
   setModelHowToUse = (values) => {
     this.props.dispatch({
       type: 'deployment/undateDeployModelInfo',

@@ -2,10 +2,13 @@ import React from 'react'
 import {connect} from 'dva'
 
 import styles from './Header.less'
-import {Menu, Icon, Select} from 'antd'
+import {Menu, Icon, Select, Input,Button } from 'antd'
 import {Link, routerRedux} from 'dva/router'
 import {FormattedMessage} from 'react-intl'
 import {config} from '../../utils'
+import PostRequestModal from '../../components/postRequestModal/postRequestModal';
+
+const Search = Input.Search
 
 const logo = config.whiteLogo
 
@@ -50,16 +53,9 @@ const menuConfig = [
     Icon: null,
     text: 'Model Markets ',
   },
-  {
-    key: '/demo',
-    Link: '/demo',
-    Icon: null,
-    text: 'Demo ',
-  },
-
 ]
 
-function Header({location, login, history, dispatch}) {
+function Header({location, login, history, dispatch, allRequest}) {
   const key = '/' + location.pathname.split('/')[1]
   const toLoginPage = () => {
     if (!login.user) {
@@ -71,6 +67,14 @@ function Header({location, login, history, dispatch}) {
     dispatch({type: 'resetUser'})
     history.push('/user/login')
   }
+
+  const onClickModifyModal = (modalState) => {
+    dispatch({
+      type: 'allRequest/showModal',
+      payload: {modalState: modalState},
+    });
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.box}>
@@ -92,15 +96,17 @@ function Header({location, login, history, dispatch}) {
                 return (
                   <SubMenu title={<span>Workspace</span>} key={e.key}>
                     {e.dropdown.map(
-                      (e) => {return(
-                        <Menu.Item key={e.key} >
-                          <div onClick={() => {
-                            dispatch(routerRedux.push(e.Link))
-                          }}>
-                            {e.text}
-                          </div>
+                      (e) => {
+                        return (
+                          <Menu.Item key={e.key}>
+                            <div onClick={() => {
+                              dispatch(routerRedux.push(e.Link))
+                            }}>
+                              {e.text}
+                            </div>
                           </Menu.Item>
-                      )})}
+                        )
+                      })}
                   </SubMenu>
                 )
               }
@@ -115,6 +121,23 @@ function Header({location, login, history, dispatch}) {
               }
             }
           )}
+
+          <Menu.Item key={'/search'}>
+            <div>
+              <Search
+                placeholder="input search text"
+                onSearch={value => console.log(value)}
+              />
+            </div>
+          </Menu.Item>
+
+          <Menu.Item key={'/postRequest'}>
+
+            <Button type="primary"
+                    onClick={() => onClickModifyModal(true)}>Post Request</Button>
+            <PostRequestModal dispatch={dispatch} visible={allRequest.modalState} />
+          </Menu.Item>
+
           <SubMenu
             className={styles.rightButton}
             title={
@@ -137,4 +160,4 @@ function Header({location, login, history, dispatch}) {
   )
 }
 
-export default connect(({login}) => ({login}))(Header)
+export default connect(({login,allRequest}) => ({login,allRequest}))(Header)
