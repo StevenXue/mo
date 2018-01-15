@@ -17,9 +17,9 @@ class PostRequestModal extends React.Component {
     this.props.dispatch({
       type: 'allRequest/makeNewRequest',
       payload: {
-        // served_model_id: get(this.props.deployment.modelsJson, `[${this.props.deployment.focusModelId}]['served_model']['_id']`),
         requestTitle: values['requestTitle'],
         requestDescription: values['requestDescription'],
+        requestDataset: values['requestDataset'],
       }
     })
   }

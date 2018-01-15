@@ -11,6 +11,7 @@ from mongoengine import CASCADE
 # from server3.entity import Project
 # from server3.entity import Model
 # from server3.entity import User
+from server3.entity.user_request import UserRequest
 
 OWNERSHIP_LEVEL = ('public', 'private')
 
@@ -24,4 +25,5 @@ class Ownership(Document):
     toolkit = ReferenceField('Toolkit', reverse_delete_rule=CASCADE)
     file = ReferenceField('File', reverse_delete_rule=CASCADE)
     served_model = ReferenceField('ServedModel', reverse_delete_rule=CASCADE)
+    user_request = ReferenceField('UserRequest', reverse_delete_rule=CASCADE)
 

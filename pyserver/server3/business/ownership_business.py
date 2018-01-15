@@ -6,9 +6,10 @@ from server3.repository.ownership_repo import OwnershipRepo
 ownership_repo = OwnershipRepo(Ownership)
 
 
-def add(user, is_private, **owned_obj):
+def add(user, is_private=False, **owned_obj):
     # owned = owned_obj['project'] or owned_obj['data_set'] or \
     #         owned_obj['model'] or owned_obj['toolkit'] or owned_obj['file']
+    #         or owned_obj['user_request']
     if not 0 < len(list(owned_obj.items())) <= 1:
         raise ValueError('invalid owned_obj')
     if not isinstance(user, User) or not isinstance(is_private, bool):
@@ -49,3 +50,6 @@ def list_ownership_by_type_and_private(owned_type, is_private):
 def get_owner(owned, owned_type):
     return get_ownership_by_owned_item(owned, owned_type).user
 
+
+def list_ownership_by_type(owned_type):
+    return ownership_repo.read_by_type(owned_type)

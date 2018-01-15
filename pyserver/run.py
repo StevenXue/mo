@@ -47,6 +47,8 @@ from server3.route import model_route
 from server3.route import visualization_route
 from server3.route import served_model_route
 from server3.route import job_route
+from server3.route import request_route
+
 
 
 app.register_blueprint(file_route.file_app)
@@ -61,6 +63,7 @@ app.register_blueprint(monitor_route.monitor_app)
 app.register_blueprint(visualization_route.visualization_app)
 app.register_blueprint(served_model_route.served_model_app)
 app.register_blueprint(job_route.job_app)
+app.register_blueprint(request_route.user_request_app)
 
 
 # This method will get whatever object is passed into the
