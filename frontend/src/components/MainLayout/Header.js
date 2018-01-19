@@ -48,10 +48,10 @@ const menuConfig = [
     text: 'Projects',
   },
   {
-    key: '/modelmarkets',
-    Link: '/modelmarkets',
+    key: '/modelmarket',
+    Link: '/modelmarket',
     Icon: null,
-    text: 'Model Markets ',
+    text: 'Model Market',
   },
 ]
 
@@ -125,8 +125,8 @@ function Header({location, login, history, dispatch, allRequest}) {
           <Menu.Item key={'/search'}>
             <div>
               <Search
-                placeholder="input search text"
-                onSearch={value => console.log(value)}
+                placeholder="Search"
+                onSearch={value => console.log(values)}
               />
             </div>
           </Menu.Item>

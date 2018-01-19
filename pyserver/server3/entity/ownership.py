@@ -12,6 +12,7 @@ from mongoengine import CASCADE
 # from server3.entity import Model
 # from server3.entity import User
 from server3.entity.user_request import UserRequest
+from server3.entity.user_request_comments import UserRequestComments
 
 OWNERSHIP_LEVEL = ('public', 'private')
 
@@ -26,4 +27,6 @@ class Ownership(Document):
     file = ReferenceField('File', reverse_delete_rule=CASCADE)
     served_model = ReferenceField('ServedModel', reverse_delete_rule=CASCADE)
     user_request = ReferenceField('UserRequest', reverse_delete_rule=CASCADE)
+    user_request_comments = ReferenceField('UserRequestComments',
+                                           reverse_delete_rule=CASCADE)
 

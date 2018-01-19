@@ -107,7 +107,7 @@ export default {
 
 
     * search(action, {call, put, select, take}) {
-      const {data: modelsJson} = yield call(search_served_models, {
+      const {data: modelsJson} = yield call(searchUserRequest, {
         searchStr: action.payload.searchStr
       })
       yield put({

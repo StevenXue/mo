@@ -1,5 +1,9 @@
 import * as userRequestService from '../services/userRequest';
 import * as stagingDataService from '../services/stagingData';
+import * as userRequestCommentsService from '../services/userRequestComments';
+
+
+
 import {arrayToJson} from '../utils/JsonUtils';
 import {getRound} from '../utils/number';
 import pathToRegexp from 'path-to-regexp';
@@ -8,27 +12,42 @@ export default {
   namespace: 'allRequest',
   state: {
     //用户拥有的 models
-    userRequestJson: [],
+    userRequest: [],
+    focusUserRequest: null,
     loadingState: false,
     modalState:false
   },
   reducers: {
     // 获取所有的models
-    setModels(state, action) {
-      let lengthUserRequestJson = Object.keys(action.payload.userRequestJson).length;
-      if (lengthUserRequestJson !== 0) {
+    setAllRequest(state, action) {
+      let lengthUserRequest = Object.keys(action.payload.userRequest).length;
+      if (lengthUserRequest !== 0) {
         return {
           ...state,
-          userRequestJson: action.payload.userRequestJson,
+          userRequest: action.payload.userRequest,
           }
         }
     },
 
     // 切换 focus model
-    setFocusModel(state, action) {
+    setFocusUserRequest(state, action) {
       return {
         ...state,
-        focusModelId: action.payload.focusModelId,
+        focusUserRequest: action.payload.focusUserRequest,
+      }
+    },
+
+    // 获取focus model 的所有评论
+    setAllCommentsOfThisRequest(state, action) {
+      let length = Object.keys(action.payload.allCommentsOfThisRequest).length;
+      if (length !== 0) {
+        return {
+          ...state,
+          focusUserRequest: {
+            ...state.focusUserRequest,
+            comments: action.payload.allCommentsOfThisRequest,
+          }
+        }
       }
     },
 
@@ -45,48 +64,31 @@ export default {
         loadingState: action.payload.loadingState,
       }
     },
-
-    // changeModelStatus
-    changeModelStatus: function (state, action) {
-      let newInfo = {
-        ...state.modelsJson[state.focusModelId]['served_model'],
-        status: action.payload.status,
-        server: action.payload.server,
-      };
-      // 使用新的 server 替换旧的，防止 用户undeploy后又resume导致server信息不更新的问题
-      let how_to_use_code = state.modelsJson[state.focusModelId]['how_to_use_code'];
-      if (action.payload.status === 'serving') {
-        for (let each_code of Object.keys(how_to_use_code)) {
-          how_to_use_code[each_code] = how_to_use_code[each_code].replace(/\"[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*\:[0-9]*/, '"' + action.payload.server)
-        }
-      }
-      console.log('action.payload.server')
-      console.log(action.payload.server)
-      return {
-        ...state,
-        modelsJson: {
-          ...state.modelsJson,
-          [state.focusModelId]: {
-            ...state.modelsJson[state.focusModelId],
-            ['how_to_use_code']: how_to_use_code,
-            ['served_model']: newInfo,
-          }
-        }
-      }
-    },
   },
+
   effects: {
     // 获取所有request
     * fetchAllRequest(action, {call, put}) {
-      const {data: {[action.payload.categories]: models}} = yield call(userRequestService.fetchAllUserRequest, {});
-      // array to json
-      const modelsJson = arrayToJson(models, '_id');
-      // 查询 部署的状态
-      yield put({type: 'setUserRequest', payload: {modelsJson: modelsJson}})
+      const {data: userRequest} = yield call(userRequestService.fetchAllUserRequest, {});
+      if (userRequest.length>0) {
+        yield put({type: 'setAllRequest', payload: {userRequest: userRequest}})
+      }
+    },
+
+    * fetchOneRequest(action, {call, put}) {
+      const {data: focusUserRequest} = yield call(userRequestService.fetchOneUserRequest,
+        {user_request_ID:action.payload.userrequestId});
+      yield put({type: 'setFocusUserRequest', payload: {focusUserRequest: focusUserRequest}})
+      const {data: allCommentsOfThisRequest} = yield call(userRequestCommentsService.
+        fetchAllCommentsOfThisUserRequest, {user_request_ID:action.payload.userrequestId});
+      console.log(allCommentsOfThisRequest)
+      if (allCommentsOfThisRequest.length>0) {
+        yield put({type: 'setAllCommentsOfThisRequest', payload: {
+          allCommentsOfThisRequest: allCommentsOfThisRequest}})}
     },
 
     // 发布新request
-    makeNewRequest: function* (action, {call, put, select}) {
+    * makeNewRequest(action, {call, put, select}) {
       yield put({type: 'showLoading', payload: {loadingState: true}});
       const user_ID = yield select(state => state.login.user.user_ID);
       let payload = action.payload;
@@ -104,22 +106,50 @@ export default {
     },
 
 
+    * fetchAllCommentsOfThisRequest(action, {call, put}) {
+      console.log('action')
+      const {data: allCommentsOfThisRequest} = yield call(userRequestCommentsService.
+        fetchAllCommentsOfThisUserRequest, {user_request_ID:action.payload.userrequestId});
+      console.log(allCommentsOfThisRequest)
+      if (allCommentsOfThisRequest.length>0) {
+        yield put({type: 'setAllCommentsOfThisRequest', payload: {
+          allCommentsOfThisRequest: allCommentsOfThisRequest}})}
+    },
+
+    // 发布新request
+    * makeNewRequestComment (action, {call, put, select}) {
+      const user_ID = yield select(state => state.login.user.user_ID);
+      const user_request_id = yield select(state => state.allRequest.focusUserRequest._id)
+      let payload = action.payload;
+      payload.user_id = user_ID;
+      payload.user_request_id = user_request_id;
+      console.log(payload);
+      const {data: result} = yield call(userRequestCommentsService.createNewUserRequestComments, payload);
+      if (result) {
+        yield put({
+          type: 'fetchAllCommentsOfThisRequest',
+          payload: {userrequestId:user_request_id},
+        });
+      }
+    },
+
   },
   subscriptions: {
     // 当进入该页面是 获取用户所有 Models
     setup({dispatch, history}) {
       return history.listen(({pathname}) => {
-        const match = pathToRegexp('/workspace/:projectId/deploy').exec(pathname);
-        if (match) {
-          const projectId = match[1];
-          // console.log('projectId')
-          // console.log(projectId)
+        const match = pathToRegexp('/userrequest/:userrequestId').exec(pathname)
+        if (pathname === '/userrequest') {
           dispatch({
-            type: 'fetchModels',
-            payload: {projectId: projectId, categories: 'userRequest'},
-          });
+            type: 'fetchAllRequest',
+            payload: {}
+          })
+        } else if (match) {
+          console.log('match')
+          dispatch({type: 'fetchOneRequest', payload: {userrequestId: match[1]}})
+          // dispatch({type: 'fetchAllCommentsOfThisRequest', payload: {userrequestId: match[1]}})
         }
-      });
+      })
     },
   },
 };

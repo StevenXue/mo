@@ -37,12 +37,13 @@ export function fetchAllUserRequest() {
 }
 
 
-// 获取一个 public deployed models
+// 获取一个
 export function fetchOneUserRequest(payload) {
-  return request(`${CORS}/user_request?user_request_ID=${payload.user_request_ID}`);
+  return request(`${CORS}/user_request?user_request_id=${payload.user_request_ID}`);
 }
 
-// 关键词搜索 deployed models
-export function search_served_models(payload) {
+
+// 关键词搜索
+export function searchUserRequest(payload) {
   return request(`${CORS}/user_request?searchStr=${payload.searchStr}`);
 }
