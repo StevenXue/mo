@@ -102,7 +102,7 @@ class PostRequestModal extends React.Component {
                 />
               )}
             </FormItem>
-            <h2>Description</h2>
+            <h2>Description(Optional)</h2>
             <FormItem
               validateStatus={inputFieldError ? 'error' : ''}
               help={inputFieldError || ''}
@@ -110,8 +110,8 @@ class PostRequestModal extends React.Component {
               {getFieldDecorator('requestDescription', {
                 initialValue: this.initialValue('requestDescription'),
                 rules: [{
-                  required: true,
-                  message: 'Description is missing'
+                  required: false,
+                  message: 'hello'
                 }],
               })(
                 <TextArea className={styles.inputtext}

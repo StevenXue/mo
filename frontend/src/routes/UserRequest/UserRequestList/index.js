@@ -40,13 +40,6 @@ function AllRequest({history, allRequest, dispatch}) {
   return (
     <div className={`main-container ${styles.normal}`}>
       <div className={styles.header}>
-        <p>Category</p>
-        <Select defaultValue="All" className={styles.select}
-                onChange={handleCategoryChange}>
-          {related_fields.map(e =>
-            <Option key={e} value={e}>{e}</Option>,
-          )}
-        </Select>
         <Search
           placeholder="search"
           style={{width: 200}}
@@ -58,7 +51,7 @@ function AllRequest({history, allRequest, dispatch}) {
         <Card key={e._id} title={e.title} className={styles.card}
               onClick={() => toUserRequestDetail(e, history)} style={{ cursor: 'pointer' }}>
           <div>
-            <p>Description: {e.description}</p>
+            <p>Description: {e.request_description}</p>
             <p>Create Time: {showTime(e.create_time)}</p>
             {e['user_id'] && <p>Requester: {e.user_id}</p>}
           </div>

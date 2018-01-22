@@ -59,12 +59,16 @@ def create_user_request():
         return jsonify({'response': 'insufficient arguments'}), 400
     data = request.get_json()
     request_title = data['request_title']
-    request_description = data.get('request_description')
     user_id = data['user_id']
-    request_dataset = data.get('request_dataset')
-    user_request_service.create_user_request(request_title, request_description,
-                                             user_id,
-                                             request_dataset=request_dataset)
+    request_dataset = data.get('request_dataset', None)
+    request_description = data.get('request_description', None)
+    kwargs = {}
+    if request_dataset:
+        kwargs['request_dataset']=request_dataset
+    if request_description:
+        kwargs['request_description']=request_description
+    user_request_service.create_user_request(request_title, user_id,
+                                             **kwargs)
     return jsonify({'response': 'create user_request success'}), 200
 
 
