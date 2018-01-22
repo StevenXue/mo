@@ -22,7 +22,7 @@ def get_by_id(user_request_id):
 
 def create_user_request(request_title, request_description,
                         user_id, request_dataset=None):
-    # create a new project object
+    # create a new user_request object
     created_user_request = user_request_business.add_user_request(title=request_title,
                                                                   description=request_description,
                                                                   user_id=user_id,

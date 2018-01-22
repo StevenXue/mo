@@ -5,7 +5,6 @@ import {showTime} from '../../../utils/index'
 import {dataCategory} from '../../../constants'
 import {arrayToJson, JsonToArray} from '../../../utils/JsonUtils'
 import {routerRedux} from 'dva/router'
-import List from '../../../components/List/index'
 
 import styles from './index.less'
 
@@ -17,21 +16,7 @@ const related_fields = ['All',
   'Social', 'Transportation', 'Science', 'Technology']
 
 
-function PublicServedModels({history, publicServedModels, dispatch}) {
-
-  const {
-    modelsJson,
-    focusModel,
-    category,
-    skipping
-  } = publicServedModels
-
-  const props = {
-    model: publicServedModels,
-    namespace: 'publicServedModels',
-    dispatch: dispatch,
-    toModelDetail: toModelDetail
-  }
+function AllRequest({history, allRequest, dispatch}) {
 
   function handleCategoryChange(value) {
     dispatch({
@@ -40,15 +25,9 @@ function PublicServedModels({history, publicServedModels, dispatch}) {
     })
   }
 
-  const onClickMoreModels = () => {
-    dispatch({
-      type: 'publicServedModels/fetch',
-      payload: {category: category, skipping: skipping},
-    })
-  }
 
-  function toModelDetail(model) {
-    dispatch(routerRedux.push('/modelmarket/' + model._id))
+  function toUserRequestDetail(user_request) {
+    dispatch(routerRedux.push('/userrequest/' + user_request._id))
   }
 
   function search(value) {
@@ -74,9 +53,19 @@ function PublicServedModels({history, publicServedModels, dispatch}) {
           onSearch={value => search(value)}
         />
       </div>
-      <List {...props}/>
+      <div className={styles.requestList}>
+      {allRequest.userRequest.map(e =>
+        <Card key={e._id} title={e.title} className={styles.card}
+              onClick={() => toUserRequestDetail(e, history)} style={{ cursor: 'pointer' }}>
+          <div>
+            <p>Description: {e.description}</p>
+            <p>Create Time: {showTime(e.create_time)}</p>
+            {e['user_id'] && <p>Requester: {e.user_id}</p>}
+          </div>
+        </Card>)}
+      </div>
     </div>
   )
 }
 
-export default connect(({publicServedModels}) => ({publicServedModels}))(PublicServedModels)
+export default connect(({allRequest}) => ({allRequest}))(AllRequest)
