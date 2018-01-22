@@ -36,11 +36,19 @@ def get_matched_apis():
             "score": synonyms.compare(content, api.keyword, seg=True)
         })
     score_list = sorted(score_list, key=lambda item: -item["score"])
+    # 最大值
+    max_score = score_list[0]["score"]
+    if max_score < 0.5:
+        return jsonify({'response': {
+           "message": "no api matched",
+           "status": False
+        }}), 200
     score_list = score_list[:5]
     api_list = json_utility.convert_to_json(score_list[:5])
 
     return jsonify({'response': {
-        "api_list": api_list
+        "api_list": api_list,
+        "status": True
     }}), 200
 
 

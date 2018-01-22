@@ -10,9 +10,9 @@ class Search extends Component {
     super(props)
 
     this.state = {
-      apiList: [],
-      trigger: false,
-      result: false
+      apiList: null,
+      displayText: null
+      // result: false
     }
   }
 
@@ -23,41 +23,47 @@ class Search extends Component {
     fetch(`/api/chat/get_matched_apis?content=${keyWord}`, {method: 'GET'})
       .then((response) => response.json())
       .then(({response}) => {
-        //匹配成功
-        this.setState({
-          apiList: response["api_list"],
-          trigger: true
-        })
-        //匹配失败
-
-        // this.props.triggerNextStep({trigger: "issue"})
-
+        if (response.status) {
+          //匹配成功
+          this.setState({
+            apiList: response["api_list"],
+            // displayText: "匹配成功"
+          })
+        }
+        else {
+          //匹配失败
+          this.setState({
+            displayText: '对不起，你的需求未匹配到任何服务',
+          }, () => this.props.triggerNextStep({trigger: "does_not_match"}))
+        }
       })
       .catch(() => {
         console.log("error")
         // 网络出错，重新输入
         this.setState({
-          result: '出错了，请重新输入',
-          trigger: true
+          displayText: '请求出错了，请重新尝试输入',
         }, () => this.props.triggerNextStep({trigger: "issue"}))
       })
   }
 
 
   render() {
-    const {apiList, result} = this.state
-
-    if (result) {
-      return <pre>
-        {result}
-      </pre>
-    }
+    const {apiList, displayText} = this.state
+    // if(apiList){
+    //
+    // }
+    //
+    // if (result) {
+    //   return <pre>
+    //     {result}
+    //   </pre>
+    // }
     return (
       <div>
         {
-          apiList.map((api) =>
+          apiList ? apiList.map((api) =>
             <Card
-              title={<a onClick={()=>message.info('will go to the api detail page')}>{api.name}</a>}
+              title={<a onClick={() => message.info('will go to the api detail page')}>{api.name}</a>}
               extra={<div style={{color: "grey"}}>{api.score}</div>} style={{width: 200}}
               key={api._id}
 
@@ -69,7 +75,7 @@ class Search extends Component {
                 <div style={{color: "grey"}}>{api.keyword}</div>
               </div>
             </Card>
-          )
+          ) : <div> {displayText} </div>
         }
       </div>
     )
@@ -147,7 +153,7 @@ class UISearch extends Component {
         {
           apiList.map((api) =>
             <Card
-              title={<a onClick={()=>message.info('will go to the api detail page')}>{api.name}</a>}
+              title={<a onClick={() => message.info('will go to the api detail page')}>{api.name}</a>}
               extra={<div style={{color: "grey"}}>{api.score}</div>} style={{width: 200}}
               key={api._id}
 

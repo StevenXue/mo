@@ -54,7 +54,7 @@ const steps = [
     id: 'search',
     component: <Search/>,
     waitAction: true,
-    trigger: 'show_api_detail',
+    // trigger: 'show_api_detail',
     asMessage: true
   },
   {
@@ -72,23 +72,29 @@ const steps = [
     asMessage: true
   },
 
+  // {
+  //   id: 'does_not_match',
+  //   message: "对不起，你的需求未匹配到任何服务",
+  //   trigger: 'select',
+  // },
   {
     id: 'does_not_match',
-    message: "对不起，你的需求未匹配到任何服务",
-    trigger: 'select',
-  },
-  {
-    id: 'select',
     options: [
-      {value: 1, label: '重新告知需求', trigger: 'issue'},
-      {value: 2, label: '发起提问', trigger: ''},
+      {value: 1, label: '重新告知需求', trigger: '1'},
+      {value: 2, label: '发起提问', trigger: 'asking'},
     ],
   },
 
   {
     id: 'asking',
+    message: '请输入你的问题？',
+    trigger: 'asking_1'
+  },
+
+  {
+    id: 'asking_1',
     user: true,
-    trigger: 'search',
+    trigger: 'asking_2',
     validator: (value) => {
       if (value.trim() === '') {
         return '输入不能为空'
@@ -101,7 +107,7 @@ const steps = [
     id: "asking_2",
     component: <Asking/>,
     waitAction: true,
-    trigger: 'show_api_detail',
+    // trigger: 'show_api_detail',
     asMessage: true
   }
 
