@@ -18,9 +18,9 @@ def get_by_user_request_id(user_request_id):
     return user_request_repo.read_by_unique_field('id', user_request_id)
 
 
-def add_user_request(title, description, **kwargs):
+def add_user_request(title, **kwargs):
     now = datetime.utcnow()
-    user_request_obj = UserRequest(title=title, description=description,
+    user_request_obj = UserRequest(title=title,
                                    create_time=now, **kwargs)
     return user_request_repo.create(user_request_obj)
 

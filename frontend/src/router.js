@@ -25,7 +25,8 @@ const breadcrumbNameMap = {
   '/workspace': 'My Projects',
   '/projects': 'Projects',
   '/modelmarket': 'Model Market',
-  '/myservice':'My service'
+  '/myservice':'My Service',
+  '/userrequest':'User Request'
 }
 
 const RouterConfig = ({ history, location, projectDetail }) => {

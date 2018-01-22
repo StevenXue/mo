@@ -58,7 +58,7 @@ class CommentForm extends React.Component {
           {getFieldDecorator('comment', {
             rules: [{required: true, message: ''}],
           })(
-            <Input placeholder="Any idea to help?"/>
+            <Input className={styles.inputtext} placeholder="Any idea to help?"/>
           )}
         </FormItem>
         <FormItem>
@@ -82,11 +82,11 @@ function UserRequestDetail({allRequest, dispatch}) {
 
   if (focusUserRequest !== null) {
     return (
-      <div style={{padding: 40}}>
+      <div className={`main-container ${styles.normal}`}>
         <h2
           style={{paddingBottom: 10}}>{focusUserRequest['title']}
         </h2>
-        <p>{get(focusUserRequest, 'title') ? get(focusUserRequest, 'title') : none}</p>
+        <p>{get(focusUserRequest, 'request_description') ? get(focusUserRequest, 'request_description') : null}</p>
         <h2 style={{padding: '20px 0 0 0'}}>Comments</h2>
 
         {focusUserRequest.comments && focusUserRequest.comments.map(e =>
@@ -98,7 +98,7 @@ function UserRequestDetail({allRequest, dispatch}) {
             </div>
           </Card>)}
 
-        <div>
+        <div style={{margin: '20px 8px 8px 0'}}>
           <WrappedCommentForm dispatch={dispatch}/>
         </div>
       </div>

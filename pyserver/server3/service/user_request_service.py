@@ -20,14 +20,12 @@ def get_by_id(user_request_id):
     return user_request
 
 
-def create_user_request(request_title, request_description,
-                        user_id, request_dataset=None):
+def create_user_request(request_title, user_id, **kwargs):
     # create a new user_request object
     created_user_request = user_request_business.add_user_request(title=request_title,
-                                                                  description=request_description,
                                                                   user_id=user_id,
-                                                                  request_dataset=request_dataset,
-                                                                  status=0)
+                                                                  status=0,
+                                                                  **kwargs)
     if created_user_request:
         # get user object
         user = user_business.get_by_user_ID(user_ID=user_id)
