@@ -86,8 +86,6 @@ def list_public_model_name():
     return all_names
 
 
-
-
 def add_model_with_ownership(user_ID, is_private, name, description, category,
                              target_py_code, entry_function, model_type,
                              to_code_function, parameter_spec, input, steps):

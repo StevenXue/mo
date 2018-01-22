@@ -28,6 +28,7 @@
     "material-design-icons": "^3.0.1",
     "md5": "^2.2.1",
     "normalize.css": "^7.0.0",
+    "path-to-regexp": "^2.1.0",
     "react": "^15.4.0",
     "react-code-mirror": "^3.1.0",
     "react-codemirror2": "^3.0.7",
@@ -39,8 +40,10 @@
     "react-json-tree": "^0.11.0",
     "react-jupyter": "^0.1.0",
     "react-markdown": "^2.5.1",
+    "react-simple-chatbot": "^0.2.6",
     "rxjs": "^5.5.2",
-    "socket.io-client": "^2.0.4"
+    "socket.io-client": "^2.0.4",
+    "styled-components": "^2.4.0"
   },
   "devDependencies": {
     "babel-eslint": "^7.1.1",
