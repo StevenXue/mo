@@ -142,6 +142,7 @@ class WebChat extends Component {
         <ChatBot
           floating={true}
           headerTitle="智能机器人"
+          // recognitionEnable={true}
           placeholder="请输入你的问题"
           steps={steps}
           // steps={uiSteps}

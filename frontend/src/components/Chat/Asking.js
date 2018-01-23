@@ -17,6 +17,9 @@ class Asking extends Component {
     //fetch
     fetch(`/api/user_request`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
         "request_title": value,
         "user_id": user_ID
