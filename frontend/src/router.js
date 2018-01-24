@@ -17,6 +17,8 @@ import PublicServedModelsDetail from  './routes/DeployedModels/ModelsDetail'
 import UserRequest from  './routes/UserRequest/UserRequestList'
 import UserRequestDetail from  './routes/UserRequest/UserRequestDetail'
 import MyService from './routes/MyService'
+import {ModuleList, Module} from './routes/Module'
+import Profile from './routes/Profile'
 
 const breadcrumbNameMap = {
   '/user': 'User',
@@ -26,7 +28,9 @@ const breadcrumbNameMap = {
   '/projects': 'Projects',
   '/modelmarket': 'Model Market',
   '/myservice':'My Service',
-  '/userrequest':'User Request'
+  '/userrequest':'User Request',
+  '/modellist':'Module',
+  'profile': "Profile"
 }
 
 const RouterConfig = ({ history, location, projectDetail }) => {
@@ -76,6 +80,10 @@ const RouterConfig = ({ history, location, projectDetail }) => {
           <Route path="/myservice" component={MyService}/>
           <Route path="/userrequest/:userrequestId" component={UserRequestDetail}/>
           <Route path="/userrequest" component={UserRequest}/>
+
+          <Route path="/modulelist/:moduleId" component={Module}/>
+          <Route path="/modulelist" component={ModuleList}/>
+          <Route path="/profile" component={Profile}/>
         </Switch>
       </div>
     </MainLayout>

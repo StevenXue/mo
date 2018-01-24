@@ -153,6 +153,15 @@ function Header({location, login, history, dispatch, allRequest}) {
               </div>
             </Menu.Item>
             }
+
+            {login.user &&
+            <Menu.Item key={'/profile'}>
+              <div onClick={()=>history.push('/profile')}>
+                Profile
+              </div>
+            </Menu.Item>
+            }
+
           </SubMenu>
         </Menu>
       </div>
