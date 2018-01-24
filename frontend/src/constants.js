@@ -1,7 +1,7 @@
 const mainColor = '#108ee9';
 
 module.exports = {
-  apiPrefix: '/api',
+  apiPrefix: '/pyapi',
   // apiPrefix: 'http://122.224.116.44:5005',
 
   jupyterServer: 'http://10.52.14.182:8888/api/contents/',  // kube master node ip

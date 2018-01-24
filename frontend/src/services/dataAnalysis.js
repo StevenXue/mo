@@ -21,7 +21,7 @@ const myDict = {
 
 // 添加section
 export function addSection(payload) {
-  return request('/api/job/job', {
+  return request('/pyapi/job/job', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -36,7 +36,7 @@ export function addSection(payload) {
 
 // 删除section
 export function deleteSection(payload) {
-  return request(`/api/job/job`, {
+  return request(`/pyapi/job/job`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -52,7 +52,7 @@ export function saveSection(payload) {
 
   // console.log('sectionId', sectionId);
   console.log('upload_section', payload.section);
-  return request(`/api/job/job_steps`, {
+  return request(`/pyapi/job/job_steps`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ export async function fetchToolkits(payload) {
 }
 
 export function runToolkits(payload) {
-  return request(`/api/toolkit/toolkits/staging_data_set`, {
+  return request(`/pyapi/toolkit/toolkits/staging_data_set`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ export function runToolkits(payload) {
 }
 
 export function runJob(payload) {
-  return request(`/api/job/run_job`, {
+  return request(`/pyapi/job/run_job`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

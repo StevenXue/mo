@@ -1,5 +1,19 @@
+const fs = require('fs');
+const path = require('path');
+// const re = /src\/jupyterlab\/packages\/.+\/style\/.+\.css$/
+const re = /.+\.css$/
+
+const walkSync = (dir) =>
+  fs.readdirSync(dir)
+    .reduce((files, file) =>
+        fs.statSync(path.join(dir, file)).isDirectory() ?
+          files.concat(walkSync(path.join(dir, file))) :
+          files.concat(path.join(dir, file)),
+      []);
+const jupyterPackageCSS = walkSync('./src/packages/jupyterlab/packages/').filter(file => re.test(file))
+
 export default {
-  "entry": "src/index.js",
+  "entry": ['whatwg-fetch', 'src/index.js'],
   "env": {
     "development": {
       "extraBabelPlugins": [
@@ -15,11 +29,14 @@ export default {
       ]
     }
   },
+  "cssModulesExclude": [
+    ...jupyterPackageCSS
+  ],
   "proxy": {
-    "/api": {
+    "/pyapi": {
       "target": "http://localhost:5000/",
       "changeOrigin": true,
-      "pathRewrite": { "^/api" : "" }
+      "pathRewrite": { "^/pyapi" : "" }
     },
   },
   "theme": {

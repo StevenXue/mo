@@ -15,7 +15,14 @@ from server3.lib import tf
 K.set_learning_phase(0)
 
 
-def export(new_model, export_path_base,weights_dir):
+def export(new_model, export_path_base, weights_dir):
+    """
+
+    :param new_model: model structure load from json
+    :param export_path_base: path to export model
+    :param weights_dir: path where weights stored, h5 file
+    :return:
+    """
     # Exporting the model
     # new_model.load_weights(weights_dir)
     model_version = 1

@@ -2,19 +2,19 @@ import { stringify } from 'qs';
 import request from '../utils/request';
 
 export async function queryProjectNotice() {
-  return request('/api/project/notice');
+  return request('/pyapi/project/notice');
 }
 
 export async function queryActivities() {
-  return request('/api/activities');
+  return request('/pyapi/activities');
 }
 
 export async function queryRule(params) {
-  return request(`/api/rule?${stringify(params)}`);
+  return request(`/pyapi/rule?${stringify(params)}`);
 }
 
 export async function removeRule(params) {
-  return request('/api/rule', {
+  return request('/pyapi/rule', {
     method: 'POST',
     body: {
       ...params,
@@ -24,7 +24,7 @@ export async function removeRule(params) {
 }
 
 export async function addRule(params) {
-  return request('/api/rule', {
+  return request('/pyapi/rule', {
     method: 'POST',
     body: {
       ...params,
@@ -34,48 +34,48 @@ export async function addRule(params) {
 }
 
 export async function fakeSubmitForm(params) {
-  return request('/api/forms', {
+  return request('/pyapi/forms', {
     method: 'POST',
     body: params,
   });
 }
 
 export async function fakeChartData() {
-  return request('/api/fake_chart_data');
+  return request('/pyapi/fake_chart_data');
 }
 
 export async function queryTags() {
-  return request('/api/tags');
+  return request('/pyapi/tags');
 }
 
 export async function queryBasicProfile() {
-  return request('/api/profile/basic');
+  return request('/pyapi/profile/basic');
 }
 
 export async function queryAdvancedProfile() {
-  return request('/api/profile/advanced');
+  return request('/pyapi/profile/advanced');
 }
 
 export async function queryFakeList(params) {
-  return request(`/api/fake_list?${stringify(params)}`);
+  return request(`/pyapi/fake_list?${stringify(params)}`);
 }
 
 export async function fakeAccountLogin(params) {
-  return request('/api/login/account', {
+  return request('/pyapi/login/account', {
     method: 'POST',
     body: params,
   });
 }
 
 export async function fakeMobileLogin(params) {
-  return request('/api/login/mobile', {
+  return request('/pyapi/login/mobile', {
     method: 'POST',
     body: params,
   });
 }
 
 export async function register(params) {
-  return request('/api/user/register', {
+  return request('/pyapi/user/register', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -85,5 +85,5 @@ export async function register(params) {
 }
 
 export async function queryNotices() {
-  return request('/api/notices');
+  return request('/pyapi/notices');
 }
