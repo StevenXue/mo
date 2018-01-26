@@ -22,3 +22,12 @@ export function fetchModuleList(payload) {
 export function fetchModule(payload) {
   return request(`${prefix}/${payload.moduleId}`);
 }
+
+export function updateModule(payload) {
+  return request(`${prefix}/update_module`, {
+    method: 'POST',
+    body: {
+      ...payload
+    }
+  });
+}

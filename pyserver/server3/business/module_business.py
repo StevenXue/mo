@@ -5,17 +5,17 @@ import datetime
 module_repo = Repo(Module)
 
 
-def add(user, name, **kwargs):
+def add(user, name, user_ID, **kwargs):
     try:
         module_path = kwargs.pop("module_path")
     except KeyError:
         module_path = "/" + user.user_ID + "/" + name
-    # if not module_path:
-    #     module_path = "/" + user.user_ID + "/" + name
 
     create_time = datetime.datetime.utcnow()
     model = Module(
-        user=user, name=name, module_path=module_path, create_time=create_time, **kwargs)
+        user=user, name=name, user_ID=user_ID,
+        module_path=module_path,
+        create_time=create_time, **kwargs)
     return module_repo.create(model)
 
 
@@ -28,5 +28,5 @@ def get_by_module_id(model_obj):
     return module_repo.read_by_id(model_obj)
 
 
-def update_by_id(model_id, **update):
-    return module_repo.update_one_by_id(model_id, update)
+def update_by_id(module_id, **update):
+    return module_repo.update_one_by_id(module_id, update)

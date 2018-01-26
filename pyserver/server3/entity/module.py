@@ -35,6 +35,11 @@ TYPE = (
     (3, 'reinforcement_learning')
 )
 
+PUBLISH_TYPE = (
+    (0, 'no published'),
+    (1, 'published')
+)
+
 
 class Module(DynamicDocument):
     # required
@@ -49,6 +54,12 @@ class Module(DynamicDocument):
     submit_time = DateTimeField()
     description = StringField(max_length=140)
     doc = StringField()
+    publish = IntField(required=True, choices=MODEL_TYPE, default=0)
+
+    # alogorithmia
+    # tagline
+    # desciption (doc)
+    # sample input
 
 
     # entry_function = StringField(required=True)

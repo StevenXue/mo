@@ -25,6 +25,8 @@
 //   }
 // }
 // module.exports = Global
+
+
 module.exports = {
   color: {
     green: '#64ea91',

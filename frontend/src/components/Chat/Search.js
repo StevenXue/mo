@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import styles from './index.less'
 import {Card, message} from 'antd'
 
+import {WebChatId} from './WebChat'
+
 // import ChatBot, {Loading} from 'react-simple-chatbot';
 
 class Search extends Component {
@@ -18,7 +20,7 @@ class Search extends Component {
 
   componentWillMount() {
     const {steps} = this.props
-    const keyWord = steps.issue.value
+    const keyWord = steps[WebChatId.requirement.input].value
 
     fetch(`/api/chat/get_matched_apis?content=${keyWord}`, {method: 'GET'})
       .then((response) => response.json())
@@ -34,7 +36,7 @@ class Search extends Component {
           //匹配失败
           this.setState({
             displayText: '对不起，你的需求未匹配到任何服务',
-          }, () => this.props.triggerNextStep({trigger: "does_not_match"}))
+          }, () => this.props.triggerNextStep({trigger: WebChatId.failed.requirement_failed_select}))
         }
       })
       .catch(() => {
@@ -42,22 +44,13 @@ class Search extends Component {
         // 网络出错，重新输入
         this.setState({
           displayText: '请求出错了，请重新尝试输入',
-        }, () => this.props.triggerNextStep({trigger: "issue"}))
+        }, () => this.props.triggerNextStep({trigger: WebChatId.requirement.input}))
       })
   }
 
 
   render() {
     const {apiList, displayText} = this.state
-    // if(apiList){
-    //
-    // }
-    //
-    // if (result) {
-    //   return <pre>
-    //     {result}
-    //   </pre>
-    // }
     return (
       <div>
         {
@@ -69,7 +62,7 @@ class Search extends Component {
 
             >
               <div className={styles.card_container}
-                   onClick={() => this.props.triggerNextStep({value: api, trigger: "show_api_detail"})}
+                   onClick={() => this.props.triggerNextStep({value: api, trigger: WebChatId.requirement.api_detail})}
               >
                 <div style={{color: "grey"}}>{api.description}</div>
                 <div style={{color: "grey"}}>{api.keyword}</div>
@@ -151,7 +144,7 @@ class UISearch extends Component {
     return (
       <div>
         {
-          apiList.map((api) =>
+          apiList ? apiList.map((api) =>
             <Card
               title={<a onClick={() => message.info('will go to the api detail page')}>{api.name}</a>}
               extra={<div style={{color: "grey"}}>{api.score}</div>} style={{width: 200}}
@@ -159,13 +152,13 @@ class UISearch extends Component {
 
             >
               <div className={styles.card_container}
-                   onClick={() => this.props.triggerNextStep({value: api, trigger: "show_api_detail"})}
+                   onClick={() => this.props.triggerNextStep({value: api, trigger: WebChatId.requirement.api_detail})}
               >
                 <div style={{color: "grey"}}>{api.description}</div>
                 <div style={{color: "grey"}}>{api.keyword}</div>
               </div>
             </Card>
-          )
+          ) : <div> {displayText} </div>
         }
       </div>
     )
@@ -173,7 +166,7 @@ class UISearch extends Component {
 }
 
 
-export default {
+export  {
   Search,
   UISearch
 }

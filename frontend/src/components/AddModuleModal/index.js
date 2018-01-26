@@ -42,7 +42,6 @@ class AddModuleModal extends React.Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         console.log('Received values of form: ', values)
-
         //发送请求
         this.props.dispatch({
           type: 'module/create',
@@ -51,7 +50,6 @@ class AddModuleModal extends React.Component {
             description: values.description
           }
         })
-
         // 隐藏
         this.props.dispatch({
           type: 'module/updateState',
@@ -66,7 +64,7 @@ class AddModuleModal extends React.Component {
   }
 
   initialValue = (deployInfo) => {
-    return []
+    return ""
   }
 
 
@@ -117,7 +115,7 @@ class AddModuleModal extends React.Component {
               })(
                 <TextArea className={styles.inputtext}
                           autosize={{minRows: 4, maxRows: 50}}
-                          placeholder="Provide a complete description of your request"
+                          placeholder="Provide a complete description of your module"
                 />
               )}
             </FormItem>

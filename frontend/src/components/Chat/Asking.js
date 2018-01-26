@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import {connect} from 'dva'
+import {WebChatId} from './WebChat'
 
 class Asking extends Component {
   constructor(props) {
@@ -10,9 +11,8 @@ class Asking extends Component {
   }
 
   componentWillMount() {
-    console.log("this.props",  this.props)
     // 提问 api
-    const {asking_1: {value}} = this.props.steps
+    const {[WebChatId.asking.input]: {value}} = this.props.steps
     const {user_ID} = this.props.login.user
     //fetch
     fetch(`/api/user_request`, {
@@ -34,14 +34,14 @@ class Asking extends Component {
         console.log("/api/user_request response", response)
         this.setState({
           displayText: "提问成功"
-        }, () => this.props.triggerNextStep({trigger: "1"}))
+        }, () => this.props.triggerNextStep({trigger: WebChatId.functionSelect.text}))
       })
       .catch(() => {
         console.log("error")
         // 网络出错，重新输入
         this.setState({
           displayText: '请求出错了',
-        }, () => this.props.triggerNextStep({trigger: "asking"}))
+        }, () => this.props.triggerNextStep({trigger: WebChatId.functionSelect.text}))
       })
   }
 

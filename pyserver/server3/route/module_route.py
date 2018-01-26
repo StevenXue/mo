@@ -18,7 +18,7 @@ def add():
         user_ID = data.pop("user_ID")
         name = data.pop("name")
         user = user_business.get_by_user_ID(user_ID)
-        result = module_business.add(user=user, name=name, **data)
+        result = module_business.add(user=user, name=name, user_ID=user_ID, **data)
         print("result", result)
         result = json_utility.convert_to_json(result.to_mongo())
         return jsonify({
@@ -44,11 +44,35 @@ def get_module_list():
 
 @module_app.route('/<module_id>', methods=['GET'])
 def get_module(module_id):
-    module = module_business.get_by_module_id(module_id)
-    module = json_utility.me_obj_list_to_json_list(module)
+    cus_module = module_business.get_by_module_id(module_id)
+    cus_module = json_utility.convert_to_json(cus_module.to_mongo())
     return jsonify({
-        "response": module
+        "response": cus_module
     }), 200
+
+
+@module_app.route('/update_module', methods=['POST'])
+def update_module():
+    data = request.get_json()
+    try:
+        module_id = data.pop("module_id")
+        result = module_business.update_by_id(module_id=module_id, **data)
+        print("result", result)
+        result = json_utility.convert_to_json(result.to_mongo())
+        return jsonify({
+            "response": result
+        }), 200
+
+    except KeyError:
+        return jsonify({
+            "response": {"message": "no enough params"}
+        }), 300
+    except:
+        print("Unexpected error:", sys.exc_info()[0])
+        raise
+
+    # module_id = module_business.get_by_module_id()
+
 
 # @module_app.route('update_doc', methods=['POST'])
 # def update_doc():

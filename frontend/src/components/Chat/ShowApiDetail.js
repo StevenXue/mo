@@ -2,14 +2,13 @@ import React, {Component} from 'react'
 import {Form, Icon, Input, Button} from 'antd'
 
 import PropTypes from 'prop-types'
-import styles from './index.less'
-// import ChatBot, {Loading} from 'react-simple-chatbot';
 const FormItem = Form.Item
+
+import {WebChatId} from './WebChat'
 
 function hasErrors(fieldsError) {
   return Object.keys(fieldsError).some(field => fieldsError[field])
 }
-
 
 class ShowApiDetail extends Component {
   constructor(props) {
@@ -21,7 +20,7 @@ class ShowApiDetail extends Component {
 
   }
   componentWillMount(){
-    const {steps: {search}} = this.props
+    const {steps: {[WebChatId.requirement.search]: search}} = this.props
     this.setState({search})
   }
 
@@ -123,27 +122,19 @@ class HorizontalLoginForm extends React.Component {
               'Content-Type': 'application/json',
             },
             method: 'POST',
-            body:  JSON.stringify(
-              {
+            body:  JSON.stringify({
                 input,
                 "api_id": _id
-              }
-            )
+              })
           }
-
         )
           .then((response) => response.json())
           .then(({response}) => {
-            console.log("response", response)
-
-            this.props.triggerNextStep({value: response, trigger: "show_api_result"})
+            this.props.triggerNextStep({value: response, trigger: WebChatId.requirement.api_result})
           })
           .catch(() => {
             console.log("error")
-
           })
-
-        console.log("input", input)
       }
     })
   }
@@ -198,4 +189,4 @@ class HorizontalLoginForm extends React.Component {
 
 const WrappedHorizontalLoginForm = Form.create()(HorizontalLoginForm)
 
-export default {ShowApiDetail, UIShowApiDetail}
+export {ShowApiDetail, UIShowApiDetail}
