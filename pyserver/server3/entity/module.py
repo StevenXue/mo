@@ -13,6 +13,8 @@ from mongoengine import StringField
 from mongoengine import IntField
 from mongoengine import DictField
 from mongoengine import ListField
+from mongoengine import DateTimeField
+from mongoengine import ReferenceField
 
 # type for
 MODEL_TYPE = (
@@ -33,16 +35,40 @@ TYPE = (
     (3, 'reinforcement_learning')
 )
 
+PUBLISH_TYPE = (
+    (0, 'no published'),
+    (1, 'published')
+)
+
 
 class Module(DynamicDocument):
+    # required
     name = StringField(max_length=50, required=True)
-    description = StringField(max_length=140, required=True)
-    target_py_code = StringField(required=True)     # 显示路径
-    entry_function = StringField(required=True)
-    to_code_function = StringField(required=True)
-    category = IntField(required=True, choices=MODEL_TYPE)
-    model_type = IntField(required=True, choices=TYPE)
-    parameter_spec = DictField(required=True)
-    steps = ListField(DictField())
-    input = DictField(required=True)
-    user_name = StringField(max_length=50)
+    module_path = StringField(required=True)
+    user = ReferenceField("User", required=True)
+
+    # option
+    language = StringField()
+    tags = ListField(StringField())
+    create_time = DateTimeField()
+    submit_time = DateTimeField()
+    description = StringField(max_length=140)
+    doc = StringField()
+    publish = IntField(required=True, choices=MODEL_TYPE, default=0)
+
+    # alogorithmia
+    # tagline
+    # desciption (doc)
+    # sample input
+
+
+    # entry_function = StringField(required=True)
+    # to_code_function = StringField(required=True)
+    # category = IntField(required=True, choices=MODEL_TYPE)
+    # model_type = IntField(required=True, choices=TYPE)
+    # parameter_spec = DictField(required=True)
+    # steps = ListField(DictField())
+    # input = DictField(required=True)
+    # user_name = StringField(max_length=50)
+
+

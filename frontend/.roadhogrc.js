@@ -10,7 +10,7 @@ const walkSync = (dir) =>
           files.concat(walkSync(path.join(dir, file))) :
           files.concat(path.join(dir, file)),
       []);
-const jupyterPackageCSS = walkSync('./src/packages/jupyterlab/packages/').filter(file => re.test(file))
+const jupyterPackageCSS = walkSync('./src/packages/jupyterlab_package/packages/').filter(file => re.test(file))
 
 export default {
   "entry": ['whatwg-fetch', 'src/index.js'],

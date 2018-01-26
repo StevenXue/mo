@@ -159,6 +159,20 @@ def run_job():
         return jsonify({"response": {"result": result}}), 200
 
 
+@job_app.route("/run", methods=["POST"])
+def run_in_docker():
+    data = request.get_json()
+    print(data['code'])
+    return jsonify({"response": {"code": 11}})
+
+
+@job_app.route("/deploy", methods=["POST"])
+def deploy_in_docker():
+    data = request.get_json()
+    job_service.deploy_in_faas(data['path'], data['user_ID'])
+    return jsonify({"response": {"code": 11}})
+
+
 @job_app.route("/to_code", methods=["POST"])
 def to_code():
     data = request.get_json()

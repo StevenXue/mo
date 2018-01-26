@@ -5,7 +5,7 @@
 # IntelliJ projectDetail files
 out
 gen
-/.idea/
+.idea
 goldersgreen.iml
 
 # ignore all .pyc files
@@ -17,3 +17,4 @@ goldersgreen.iml
 
 # ignore user directory
 pyserver/user_directory/
+

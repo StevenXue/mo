@@ -5,7 +5,7 @@
 
 
 .jp-FileEditor {
-    
+
 }
 
 .jp-FileEditor > .jp-Toolbar {
@@ -14,8 +14,9 @@
     border-bottom: 1px solid var(--jp-toolbar-border-color);
     box-shadow: var(--jp-toolbar-box-shadow);
     z-index: 10;
+    /* new */
+    height: 28px !important;
 }
-
 
 /*-----------------------------------------------------------------------------
 | Presentation Mode (.jp-mod-presentationMode)

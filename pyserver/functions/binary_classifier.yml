@@ -1,0 +1,9 @@
+provider:
+  name: faas
+  gateway: http://localhost:8080
+
+functions:
+  binary_classifier:
+    lang: python3
+    handler: ./binary_classifier
+    image: binary_classifier

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import { Card, Button, Row } from 'antd'
+import { Card, Button, Row, Col } from 'antd'
 
 import {
   NotebookActions,
@@ -8,7 +8,7 @@ import {
 
 import ParamsMapper from './ParamsMapper'
 
-import { getModels } from './services'
+import { getModules, getModule } from './services'
 
 function genConf(args) {
   return JSON.stringify(args).replace(/'/g, '`')
@@ -26,46 +26,60 @@ class IndexPage extends React.Component {
 
   onSuccess = (res) => {
     this.setState({
-      modules: res.response[1].children,
+      modules: res.response,
+    })
+  }
+
+  onModuleSuccess = (res, func) => {
+    this.setState({
+      moduleId: res.response._id,
+      module: res.response,
+      func: func,
+      args: Object.values(res.response.args[func]),
     })
   }
 
   componentDidMount() {
-    getModels(this.onSuccess)
+    getModules(this.onSuccess)
     NotebookActions.insertCode(this.props.panel.notebook,
       [
-        `# Please use './volume' folder to store your data and models\n`,
+        `# Please use current (work) folder to store your data and models\n`,
         `import os\n`,
-        `import module_client\n`,
-        `import conf_parser\n`,
+        `import sys\n`,
+        `sys.path.append('../')\n`,
+        `\n`,
+        `from modules import json_parser\n`,
+        `from modules import Client\n`,
+        `\n`,
+        `client = Client('fackAPI')\n`,
+        `run = client.run\n`,
+        `train = client.train\n`,
+        `predict = client.predict`,
       ],
     )
   }
 
-  clickModule(module) {
-    // console.log('app', this.props.app)
-    // console.log('notebook', this.props.panel)
-    this.setState({
-      moduleId: module._id,
-      module: module,
-      args: module.steps[3].args,
-    })
+  clickModule(module, func) {
+    getModule({ moduleId: module._id }, (res) => this.onModuleSuccess(res, func))
   }
 
   backToList(module) {
     this.setState({
       moduleId: undefined,
       module: undefined,
+      func: undefined,
       args: undefined,
     })
   }
 
   insertCode() {
+    const user_ID = localStorage.getItem('user_ID')
     console.log('notebook', this.props.panel)
     NotebookActions.insertCode(this.props.panel.notebook,
       [
         `conf = '${genConf(this.state.args)}'\n`,
-        `module_client('${this.state.module.entry_function}', conf_parser(conf))\n`,
+        `conf = json_parser(conf)\n`,
+        `predict('${user_ID}/${this.state.module.name}', conf)\n`,
       ],
     )
   }
@@ -90,7 +104,7 @@ class IndexPage extends React.Component {
       <div>
         <ParamsMapper args={this.state.args}
                       setValue={(values) => this.setValue(values)}
-                      baseArgs={this.state.module.steps[3].args}
+                      baseArgs={Object.values(this.state.module.args[this.state.func])}
         />
       </div>
     )
@@ -100,7 +114,7 @@ class IndexPage extends React.Component {
 
     if (this.state.moduleId !== undefined) {
       return (
-        <div style={{ height: 100 }}>
+        <div style={{ minHeight: 100, overflowY: 'auto' }}>
           <h2>{this.state.module.name}</h2>
           {this.renderParameters()}
           <Row>
@@ -114,9 +128,15 @@ class IndexPage extends React.Component {
         <div style={{ height: 100 }}>
           {this.state.modules.map((module) =>
             <Card key={module.name} title={module.name}
-                  onClick={() => this.clickModule(module)}
+              // onClick={() => this.clickModule(module)}
                   style={{ margin: '5px 3px', cursor: 'pointer' }}>
-              {module.description}
+              <Col>
+                {module.description}
+                <Row>
+                  <Button onClick={() => this.clickModule(module, 'train')}>train</Button>
+                  <Button onClick={() => this.clickModule(module, 'predict')}>predict</Button>
+                </Row>
+              </Col>
             </Card>)}
         </div>
       )

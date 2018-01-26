@@ -193,7 +193,7 @@ namespace ToolbarItems {
         // const current = panel;
         // const notebookPath = URLExt.encodeParts(current.context.path);
         const notebookName = panel.context.session.name;
-        NotebookActions.insertCodeBelow(panel.notebook, [`!jupyter nbconvert --to script ${notebookName}`])
+        NotebookActions.insertCodeBelow(panel.notebook, [`!jupyter nbconvert --to py ${notebookName}`])
         NotebookActions.runAllBelow(panel.notebook, panel.session);
 
         // const baseUrl = 'http://localhost:8000/user/zhaofengli'

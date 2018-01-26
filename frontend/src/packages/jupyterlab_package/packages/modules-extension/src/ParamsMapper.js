@@ -119,7 +119,7 @@ const formItems = (arg, i, getFieldDecorator, baseArg) => {
 
   return <FormItem
     key={i}
-    label={arg.display_name}
+    label={arg.name}
   >
     <div className='parameter-row'>
       {

@@ -10,6 +10,8 @@
 """
 import os
 import random
+import shutil
+from subprocess import call
 
 import functools
 import os
@@ -17,7 +19,6 @@ from itertools import compress
 
 import numpy as np
 from bson import ObjectId
-from itertools import compress
 from mongoengine import DoesNotExist
 
 from server3.business import job_business
@@ -38,9 +39,9 @@ from server3.utility import data_utility
 from server3.utility import json_utility
 from server3.entity.model import TYPE
 
-
 TYPE = {list(v)[0]: list(v)[1] for v in list(TYPE)}
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
+base_path = './server3/lib/modules'
 
 
 def create_job(project_id, toolkit_id, model_id):
@@ -450,7 +451,8 @@ def toolkit_steps_to_obj(job_obj, project_id):
         args = StepBusiness.get_parameters_step(job_obj.steps).get('args')
         # args = job_obj.steps[2].get("args")
         for arg in args:
-            new_args[arg['name']] = arg['value'] if arg['value'] else arg['default']
+            new_args[arg['name']] = arg['value'] if arg['value'] else arg[
+                'default']
 
     if StepBusiness.check_fields(job_obj.steps):
         data_fields = StepBusiness.get_fields(job_obj.steps)
@@ -595,7 +597,7 @@ def run_toolkit_job(job_obj, project_id):
         return {
             "result": result,
             "result_sds_obj": None,
-            }
+        }
 
     data = toolkit_steps_to_obj(job_obj, project_id)
 
@@ -754,6 +756,38 @@ def save_result_sub(result, sds_id, toolkit_obj):
                 )
             except (TypeError, ValueError) as e:
                 print("ERRORS in data saved to database")
+
+
+def deploy_in_faas(path, user_ID):
+    name = 'flight_predict_service2'
+    base_func_path = './functions'
+    modules = ['zhaofengli/flight_delay_prediction', 'zhaofengli/weather_prediction']
+    handler_path = os.path.join(user_directory, user_ID, path.replace('work/',
+                                                                      ''))
+    # faas new in functions dir
+    call(['faas-cli', 'new', name, '--lang=python3'], cwd=base_func_path)
+    # target path = new path
+    func_path = os.path.join(base_func_path, name)
+    module_dir_path = os.path.join(func_path, 'modules')
+    # copy handler.py
+    shutil.copy(handler_path, func_path)
+    # copy modules
+    for module in modules:
+        [owner_ID, module_name] = module.split('/')
+        module_path = os.path.join(base_path, module)
+        module_path_target = os.path.join(module_dir_path, module)
+        try:
+            os.makedirs(os.path.join(module_dir_path, owner_ID))
+        except FileExistsError:
+            print('dir exists, no need to create')
+        # copy module tree to target path
+        shutil.copytree(module_path, module_path_target)
+    # deploy
+    call(['faas-cli', 'build', '-f', './{name}.yml'.format(name=name)],
+          cwd=base_func_path)
+    call(['faas-cli', 'deploy', '-f', './{name}.yml'.format(name=name)],
+          cwd=base_func_path)
+
 
 
 # def get_index_nan(fields, staging_data_set_id):

@@ -25,6 +25,20 @@ import {
   Message
 } from '@phosphor/messaging';
 
+import {
+  Toolbar, ToolbarButton
+} from '@jupyterlab/apputils';
+
+/**
+ * The data attribute added to a widget that can run code.
+ */
+const RUNNER_URL = 'http://localhost:5000/job/run';
+
+/**
+ * The data attribute added to a widget that can run code.
+ */
+const DEPOLY_URL = 'http://localhost:5000/job/deploy';
+
 /**
  * The data attribute added to a widget that can run code.
  */
@@ -40,6 +54,64 @@ const UNDOER = 'jpUndoer';
  */
 const DIRTY_CLASS = 'jp-mod-dirty';
 
+/**
+ * The class name added to toolbar run button.
+ */
+const TOOLBAR_RUN_CLASS = 'jp-RunIcon';
+
+/**
+ * The class name added to toolbar deploy button.
+ */
+const TOOLBAR_DEPLOY_CLASS = 'jp-LauncherIcon';
+
+/**
+ * Create a toExecutable toolbar item.
+ */
+export
+function createRunButton(model: CodeEditor.IModel): ToolbarButton {
+
+  return new ToolbarButton({
+    className: TOOLBAR_RUN_CLASS,
+    onClick: () => {
+      console.log('click', model.value.text);
+      fetch(RUNNER_URL, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code: model.value.text
+        }),
+      });
+    },
+    tooltip: 'Run Script'
+  });
+}
+
+/**
+ * Create a deploy toolbar item.
+ */
+export
+function createDeployButton(context: DocumentRegistry.CodeContext): ToolbarButton {
+
+  return new ToolbarButton({
+    className: TOOLBAR_DEPLOY_CLASS,
+    onClick: () => {
+      console.log('click', context);
+      fetch(DEPOLY_URL, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          path: context.path,
+          user_ID: localStorage.getItem('user_ID')
+        }),
+      });
+    },
+    tooltip: 'Deploy Script'
+  });
+}
 
 /**
  * A code editor wrapper for the file editor.
@@ -209,11 +281,14 @@ class FileEditor extends Widget implements DocumentRegistry.IReadyWidget {
 
 
     let layout = this.layout = new BoxLayout({ spacing: 0 });
-    let toolbar = new Widget();
-    toolbar.addClass('jp-Toolbar');
+    // let toolbar = new Widget();
+    // toolbar.addClass('jp-Toolbar');
+    let toolbar = new Toolbar();
+    toolbar.addItem('run', createRunButton(this.model));
+    toolbar.addItem('deploy', createDeployButton(context));
 
     layout.addWidget(toolbar);
-    BoxLayout.setStretch(toolbar, 0);
+    // BoxLayout.setStretch(toolbar, 0);
     layout.addWidget(editorWidget);
     BoxLayout.setStretch(editorWidget, 1);
   }
