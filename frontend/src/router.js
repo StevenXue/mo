@@ -14,7 +14,11 @@ import PublicProject from './routes/projects/PublicProject'
 import MainLayout from './components/MainLayout/MainLayout'
 import PublicServedModels from  './routes/DeployedModels/ModelsList'
 import PublicServedModelsDetail from  './routes/DeployedModels/ModelsDetail'
+import UserRequest from  './routes/UserRequest/UserRequestList'
+import UserRequestDetail from  './routes/UserRequest/UserRequestDetail'
 import MyService from './routes/MyService'
+import {ModuleList, Module} from './routes/Module'
+import Profile from './routes/Profile'
 
 const breadcrumbNameMap = {
   '/user': 'User',
@@ -22,8 +26,11 @@ const breadcrumbNameMap = {
   '/user/register': 'Register',
   '/workspace': 'My Projects',
   '/projects': 'Projects',
-  '/modelmarkets': 'Model Markets',
-  '/myservice':'My service'
+  '/modelmarket': 'Model Market',
+  '/myservice':'My Service',
+  '/userrequest':'User Request',
+  '/modellist':'Module',
+  'profile': "Profile"
 }
 
 const RouterConfig = ({ history, location, projectDetail }) => {
@@ -68,9 +75,15 @@ const RouterConfig = ({ history, location, projectDetail }) => {
           <Route path="/workspace" component={MyProjects}/>
           <Route path="/projects/:projectId" component={PublicProject}/>
           <Route path="/projects" component={Projects}/>
-          <Route path="/modelmarkets/:modelsId" component={PublicServedModelsDetail}/>
-          <Route path="/modelmarkets" component={PublicServedModels}/>
+          <Route path="/modelmarket/:modelsId" component={PublicServedModelsDetail}/>
+          <Route path="/modelmarket" component={PublicServedModels}/>
           <Route path="/myservice" component={MyService}/>
+          <Route path="/userrequest/:userrequestId" component={UserRequestDetail}/>
+          <Route path="/userrequest" component={UserRequest}/>
+
+          <Route path="/modulelist/:moduleId" component={Module}/>
+          <Route path="/modulelist" component={ModuleList}/>
+          <Route path="/profile" component={Profile}/>
         </Switch>
       </div>
     </MainLayout>

@@ -17,6 +17,7 @@ class OwnershipRepo(Repo):
     def delete_by_item(self, owned_item, owned_type):
         return Repo.delete_unique_one(self, {owned_type: owned_item})
 
-
+    def read_by_type(self, owned_type):
+        return Repo.read(self, {'%s__exists' % owned_type: True})
 
 

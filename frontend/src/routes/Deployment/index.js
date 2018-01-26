@@ -155,8 +155,7 @@ function UseThisAPIPage({deployment, dispatch}) {
             backgroundColor: modelsJson[focusModelId]['served_model']['status'] === 'serving' ? 'red' : '',
             borderColor: modelsJson[focusModelId]['served_model']['status'] === 'serving' ? 'red' : '',
             margin: 10
-          }} type="primary"
-                                                     onClick={() => onClickModel(modelsJson[focusModelId]['served_model']['status'])}>
+          }} type="primary" onClick={() => onClickModel(modelsJson[focusModelId]['served_model']['status'])}>
             {modelsJson[focusModelId]['served_model']['status'] === 'serving' ? 'Stop Service' : 'Resume Service'}
           </Button></div>
         </Spin></div>
@@ -214,11 +213,7 @@ function input_output_card(featuresTargetsCards){
         </div>
         </div>)
   }
-
-
-
 }
-
 
 function Deployment({deployment, dispatch}) {
   const {

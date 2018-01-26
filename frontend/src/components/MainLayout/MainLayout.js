@@ -5,6 +5,7 @@ import {
 } from 'antd';
 import {IntlProvider} from 'react-intl';
 import enUS from 'antd/lib/locale-provider/en_US';
+import {WebChat} from "../Chat"
 
 // ant design 组件国际化包
 import moment from 'moment';
@@ -80,6 +81,8 @@ class OutMainLayout extends React.Component {
           </IntlProvider>
 
         </LocaleProvider>
+
+        <WebChat/>
       </div>
     );
   }

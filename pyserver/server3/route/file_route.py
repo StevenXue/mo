@@ -6,6 +6,7 @@ Author: Zhaofeng Li
 Date: 2017.05.22
 """
 from copy import deepcopy
+import os
 
 from bson import ObjectId
 from flask import Blueprint
@@ -14,19 +15,69 @@ from flask import make_response
 from flask import redirect
 from flask import request
 from flask import send_from_directory
+from werkzeug.utils import secure_filename
 
 from server3.repository import config
 from server3.service import file_service
 from server3.utility import json_utility
 from server3.constants import PREDICT_FOLDER
+from server3.business import module_business
+
+# from server3.service import file_service
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
 PREFIX = '/file'
-UPLOAD_URL = '/uploads/'
+UPLOAD_URL = '/upload/'
 REQUEST_FILE_NAME = 'uploaded_file'
+MODULE_FILE_PATH = os.path.abspath(os.curdir) + '/server3/lib/'
 
 file_app = Blueprint("file_app", __name__, url_prefix=PREFIX)
+
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'zip'])
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@file_app.route('/module', methods=['POST'])
+def upload_file_module():
+    # check if the post request has the file part
+    if 'file' not in request.files:
+        return jsonify({
+            "response": "No file part"
+        }), 399
+    file = request.files['file']
+    # if user does not select file, browser also
+    # submit a empty part without filename
+    if file.filename == '':
+        return jsonify({
+            "response": "No selected file'"
+        }), 399
+
+    data = dict(request.form.items())
+    user_ID = data["user_ID"]
+    module_id = data["module_id"]
+    module = module_business.get_by_module_id(module_id)
+    store_path = '{}{}/{}/'.format(MODULE_FILE_PATH, user_ID, module.name)
+
+    # 如果路径不存在创建路径
+    if os.path.isdir(store_path):
+        pass
+    else:
+        os.mkdir(store_path)
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(store_path, filename))
+        # 解压缩
+        file_size, file_uri, folder_name = \
+            file_service.extract_files_and_get_size(file, store_path)
+        return jsonify({
+            "response": "upload success"
+        }), 200
 
 
 @file_app.route('/files', methods=['POST'])
