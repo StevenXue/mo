@@ -129,8 +129,8 @@ export default {
     // 当进入该页面是 获取用户所有 project
     setup({dispatch, history}) {
       return history.listen(({pathname}) => {
-        const match = pathToRegexp('/modelmarkets/:modelsId').exec(pathname)
-        if (pathname === '/modelmarkets') {
+        const match = pathToRegexp('/modelmarket/:modelsId').exec(pathname)
+        if (pathname === '/modelmarket') {
           dispatch({
             type: 'fetch',
             payload: {privacy: 'public', category: 'All',skipping: 0,}

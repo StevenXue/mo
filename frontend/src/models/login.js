@@ -113,7 +113,7 @@ export default {
         if (from) {
           yield put(routerRedux.push(from))
         } else {
-          yield put(routerRedux.push('/workspace'))
+          yield put(routerRedux.push('/userrequest'))
         }
       } else {
         throw data

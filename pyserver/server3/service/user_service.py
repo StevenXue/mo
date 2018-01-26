@@ -17,3 +17,11 @@ def authenticate(user_ID, password):
         return user
     return False
 
+
+def add_favor_api(user_ID, api):
+    user = user_business.get_by_user_ID(user_ID=user_ID)
+    favor_apis = user.favor_apis
+    favor_apis.append(api)
+    user.favor_apis = favor_apis
+    return user.save()
+

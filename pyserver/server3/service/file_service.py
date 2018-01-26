@@ -157,8 +157,8 @@ def save_file_and_get_size(file, path):
 
 def extract_files_and_get_size(file, path):
     folder_name = safe_unzip(file, path)
-    uri = path + folder_name
-    return get_tree_size(os.path.join(uri)), uri, folder_name
+    uri = os.path.join(path, folder_name)
+    return get_tree_size(uri), uri, folder_name
 
 
 def get_tree_size(path):

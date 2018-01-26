@@ -82,6 +82,7 @@ class GetPredictionForm extends React.Component {
 }
 
 const WrappedGetPredictionForm = Form.create()(GetPredictionForm);
+
 connect(({deployment}) => ({deployment}))(WrappedGetPredictionForm);
 export default WrappedGetPredictionForm
 

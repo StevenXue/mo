@@ -6,6 +6,8 @@ import MainLayout from '../components/MainLayout/MainLayout'
 function IndexPage({location}) {
   return (
     <MainLayout location={location}>
+      {/*<WebChat/>*/}
+
       <div className={styles.normal}>
         <h1 className={styles.title}>Yay! Welcome to dva!</h1>
         <div className={styles.welcome}/>

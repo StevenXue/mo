@@ -41,8 +41,10 @@
     "react-json-tree": "^0.11.0",
     "react-jupyter": "^0.1.0",
     "react-markdown": "^2.5.1",
+    "react-simple-chatbot": "^0.2.6",
     "rxjs": "^5.5.2",
-    "socket.io-client": "^2.0.4"
+    "socket.io-client": "^2.0.4",
+    "styled-components": "^2.4.0"
   },
   "devDependencies": {
     "babel-eslint": "^7.1.1",

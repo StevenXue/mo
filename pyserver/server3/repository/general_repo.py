@@ -29,7 +29,7 @@ class Repo:
         return self.__instance(**content).save()
 
     def read(self, query):
-        return self.__instance.objects(**query)
+        return self.__instance.objects(**query).order_by('-_id')
 
     def read_skipping_order(self, query, skipping):
         return self.__instance.objects(**query).order_by('-_id')[

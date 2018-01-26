@@ -48,7 +48,7 @@ function PublicServedModels({history, publicServedModels, dispatch}) {
   }
 
   function toModelDetail(model) {
-    dispatch(routerRedux.push('/modelmarkets/' + model._id))
+    dispatch(routerRedux.push('/modelmarket/' + model._id))
   }
 
   function search(value) {

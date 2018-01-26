@@ -3,7 +3,12 @@ from operator import itemgetter
 
 from server3.business import user_business
 from server3.business import ownership_business
-from server3.entity.project import Project
+
+
+def get_all_user_request(owned_type):
+    ownerships = ownership_business.list_ownership_by_type(owned_type)
+    return [get_owned_item_with_user(os, owned_type) for os in ownerships if
+            owned_type in os]
 
 
 def get_ownership_objects_by_user_ID(user_ID, owned_type):
