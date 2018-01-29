@@ -17,7 +17,7 @@ function Modelling({ location, dispatch, modelling }) {
   } = props.model
 
   return (
-    showGuidance ? <Guidance {...props}/> : <Common {...props}/>
+    <Common {...props}/>
   )
 }
 

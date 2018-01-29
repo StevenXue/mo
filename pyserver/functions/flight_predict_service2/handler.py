@@ -14,7 +14,7 @@ import pandas as pd
 from function.modules import json_parser
 from function.modules import Client
 
-client = Client('fackAPI')
+client = Client('fackAPI', silent=True)
 run = client.run
 train = client.train
 predict = client.predict
