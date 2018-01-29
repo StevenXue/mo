@@ -13,12 +13,12 @@ import {
 // } from '@phosphor/algorithm';
 
 import {
-  TabBar, Widget
+  Widget
 } from '@phosphor/widgets';
 
 import '../style/index.css';
 
-import renderReact from './react'
+import renderReact from './react_index';
 
 /**
  * The default tab manager extension.
@@ -27,14 +27,10 @@ const plugin: JupyterLabPlugin<void> = {
   id: '@jupyterlab/modules-extension:plugin',
   activate: (app: JupyterLab, restorer: ILayoutRestorer, tracker: INotebookTracker): void => {
     const { shell } = app;
-    const tabs = new TabBar<Widget>({ orientation: 'vertical' });
-    // const tabs = document.createElement('div');
-    const header = document.createElement('header');
+    const tabs = new Widget();
     restorer.add(tabs, 'tab-manager');
     tabs.id = 'tab-manager';
     tabs.title.label = 'Modules';
-    header.textContent = 'Module List';
-    tabs.node.insertBefore(header, tabs.contentNode);
     shell.addToRightArea(tabs, { rank: 600 });
     // renderReact(tabs.contentNode);
 
@@ -57,7 +53,7 @@ const plugin: JupyterLabPlugin<void> = {
       // populate();
       // renderReact(header);
 
-      renderReact(tabs.contentNode, app, tracker.currentWidget);
+      renderReact(tabs.node, app, tracker.currentWidget);
 
     });
   },

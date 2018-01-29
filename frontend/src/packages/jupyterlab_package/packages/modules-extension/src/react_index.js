@@ -20,7 +20,6 @@ class IndexPage extends React.Component {
     super()
     this.state = {
       modules: [],
-      moduleId: undefined,
     }
   }
 
@@ -79,7 +78,7 @@ class IndexPage extends React.Component {
       [
         `conf = '${genConf(this.state.args)}'\n`,
         `conf = json_parser(conf)\n`,
-        `predict('${user_ID}/${this.state.module.name}', conf)\n`,
+        `${this.state.func}('${user_ID}/${this.state.module.name}', conf)\n`,
       ],
     )
   }

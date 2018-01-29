@@ -82,7 +82,7 @@ const switchComponent = (arg, baseArg) => {
   switch (arg.type) {
     case 'multiple_input':
     case 'input':
-      return <Input/>
+      return <Input  />
 
     case 'choice':
       return (
@@ -118,7 +118,7 @@ const formItems = (arg, i, getFieldDecorator, baseArg) => {
   }
 
   return <FormItem
-    key={i}
+    key={arg.name}
     label={arg.name}
   >
     <div className='parameter-row'>
@@ -144,13 +144,12 @@ const formItems = (arg, i, getFieldDecorator, baseArg) => {
 }
 
 function ParamsMapper({
-                        args, layerIndex, baseArgs,
+                        args, baseArgs,
                         form: { getFieldDecorator },
                       }) {
-
   return (
     <Form layout='inline' className='parameter-form'
-          key={`params-form-${layerIndex}`}
+          key={`params-form`}
     >
       {
         args.map((arg, i) => {

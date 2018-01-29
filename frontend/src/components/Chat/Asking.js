@@ -15,7 +15,7 @@ class Asking extends Component {
     const {[WebChatId.asking.input]: {value}} = this.props.steps
     const {user_ID} = this.props.login.user
     //fetch
-    fetch(`/api/user_request`, {
+    fetch(`/pyapi/user_request`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -31,7 +31,7 @@ class Asking extends Component {
         }
       })
       .then(({response}) => {
-        console.log("/api/user_request response", response)
+        console.log("/pyapi/user_request response", response)
         this.setState({
           displayText: "提问成功"
         }, () => this.props.triggerNextStep({trigger: WebChatId.functionSelect.text}))

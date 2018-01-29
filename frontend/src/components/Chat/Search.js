@@ -22,7 +22,7 @@ class Search extends Component {
     const {steps} = this.props
     const keyWord = steps[WebChatId.requirement.input].value
 
-    fetch(`/api/chat/get_matched_apis?content=${keyWord}`, {method: 'GET'})
+    fetch(`/pyapi/chat/get_matched_apis?content=${keyWord}`, {method: 'GET'})
       .then((response) => response.json())
       .then(({response}) => {
         if (response.status) {
