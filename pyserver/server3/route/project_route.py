@@ -11,6 +11,7 @@ from flask import jsonify
 from flask import make_response
 from flask import request
 from kubernetes import client
+from flask_jwt_extended import jwt_required
 
 from server3.service import project_service
 from server3.service import ownership_service
@@ -122,13 +123,14 @@ def project_unpublish(project_id):
 
 
 @project_app.route('/projects', methods=['POST'])
+@jwt_required
 def create_project():
     if not request.json \
             or 'name' not in request.json \
             or 'user_ID' not in request.json \
             or 'is_private' not in request.json:
         return jsonify({'response': 'insufficient arguments'}), 400
-
+    token = request.headers.get('Authorization').split()[1]
     data = request.get_json()
     name = data['name']
     description = data['description']
@@ -145,7 +147,8 @@ def create_project():
 
     project_service.create_project(name, description, user_ID,
                                    is_private, related_fields=related_fields,
-                                   tags=tags, related_tasks=related_tasks)
+                                   tags=tags, related_tasks=related_tasks,
+                                   token=token)
     return jsonify({'response': 'create project success'}), 200
 
 

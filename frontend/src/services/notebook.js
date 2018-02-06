@@ -1,6 +1,5 @@
 import { request, config } from '../utils'
-
-const { CORS, kubeServer, api } = config
+const { CORS, kubeServer, api, hubPrefix } = config
 const { playground } = api
 
 export function startNotebook(payload) {
@@ -21,4 +20,24 @@ export function enterNotebook(payload) {
 export function openNotebook(payload) {
   const { path, port } = payload
   return request(`${kubeServer}`.replace('8888', port)+path)
+}
+
+export function startLab(payload) {
+  const { hubUserName, hubToken } = payload
+  return request(`${hubPrefix}/hub/api/users/${hubUserName}/server`, {
+    method: 'post',
+    headers: {
+      'Authorization': `token ${hubToken}`,
+    },
+  })
+}
+
+export function getLabConfig(payload) {
+  const { hubUserName, hubToken, onSuccess } = payload
+  return request(`${hubPrefix}/user/${hubUserName}/lab`, {
+    method: 'get',
+    headers: {
+      'Authorization': `token ${hubToken}`,
+    },
+  }, onSuccess)
 }

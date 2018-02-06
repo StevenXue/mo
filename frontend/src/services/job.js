@@ -55,11 +55,11 @@ export function jobToCode(payload) {
 }
 
 export function jobsByProject(payload) {
-  console.log('jobs of ', payload.projectId)
-  return org_request(`/hub_api/user/${localStorage.getItem('user_ID')}/api/sessions?${(new Date()).getTime()}`, {
+  const { hubUserName, hubToken } = payload
+  return org_request(`/hub_api/user/${hubUserName}/api/sessions?${(new Date()).getTime()}`, {
     method: 'get',
     headers: {
-      'Authorization': 'token 3dff9236c0404344929729fd8fe7d376',
+      'Authorization': `token ${hubToken}`,
     },
   })
 }

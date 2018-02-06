@@ -20,7 +20,7 @@ project_repo = ProjectRepo(Project)
 
 
 def add(name, description, related_fields,
-        tags, related_tasks):
+        tags, related_tasks, hub_token):
     """
     Add a new Project.
 
@@ -32,7 +32,8 @@ def add(name, description, related_fields,
     project_obj = Project(name=name, description=description,
                           create_time=datetime.utcnow(),
                           related_fields=related_fields,
-                          tags=tags, related_tasks=related_tasks)
+                          tags=tags, related_tasks=related_tasks,
+                          hub_token=hub_token)
     return project_repo.create(project_obj)
 
 

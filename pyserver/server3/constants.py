@@ -12,6 +12,7 @@ MODEL_SCRIPT_PATH = './run_model.py'
 SERVING_PORT = 9000
 REDIS_SERVER = 'redis://10.52.14.182:6379'
 # REDIS_SERVER = 'redis://localhost:6379'
+HUB_SERVER = 'http://localhost:8000'
 USER_DIR = './user_directory'
 NAMESPACE = 'default'
 KUBE_NAME = {

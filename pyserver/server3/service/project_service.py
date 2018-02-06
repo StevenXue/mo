@@ -3,11 +3,13 @@ from datetime import datetime
 from copy import deepcopy
 import shutil
 import os
+import requests
 
 from mongoengine import DoesNotExist
 from kubernetes import client
 from kubernetes import config as kube_config
 import port_for
+from flask_jwt_extended import get_raw_jwt
 
 from server3.service import job_service
 from server3.business import project_business
@@ -28,6 +30,7 @@ from server3.constants import USER_DIR
 from server3.utility import network_utility
 from server3.constants import NAMESPACE
 from server3.constants import KUBE_NAME
+from server3.constants import HUB_SERVER
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
@@ -43,7 +46,7 @@ def get_by_id(project_id):
 
 
 def create_project(name, description, user_ID, is_private=True,
-                   related_fields=[], tags=[], related_tasks=[]):
+                   related_fields=[], tags=[], related_tasks=[], token=''):
     """
     Create a new project
 
@@ -53,10 +56,17 @@ def create_project(name, description, user_ID, is_private=True,
     :param is_private: boolean
     :return: a new created project object
     """
+    # auth jupyterhub with user token
+    res = requests.post('{hub_server}/hub/api/authorizations/token'.
+                        format(hub_server=HUB_SERVER),
+                        json={'username': user_ID + '+' + name,
+                              'password': token}
+                        ).json()
 
     # create a new project object
     created_project = project_business.add(name, description, related_fields,
-                                           tags, related_tasks)
+                                           tags, related_tasks,
+                                           res.get('token'))
     if created_project:
         project_path = os.path.join(USER_DIR, user_ID, name)
         if not os.path.exists(project_path):
@@ -65,10 +75,11 @@ def create_project(name, description, user_ID, is_private=True,
         user = user_business.get_by_user_ID(user_ID)
 
         # create ownership relation
-        if ownership_business.add(user, is_private, project=created_project):
-            return created_project
-        else:
+        if not ownership_business.add(user, is_private,
+                                      project=created_project):
             raise RuntimeError('Cannot create ownership of the new project')
+        else:
+            return created_project
     else:
         raise RuntimeError('Cannot create the new project')
 

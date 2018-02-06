@@ -5,7 +5,7 @@ import SideBar from '../components/SideBar/index'
 import MiddleArea from '../components/MiddleArea/index'
 import RightArea from '../components/RightArea/index'
 import styles from './index.less'
-import { hubPrefix, hubWSAddress } from '../../../../utils/config'
+import { hubPrefix } from '../../../../utils/config'
 
 const loadnStartJL = () => {
   // ES6 Promise polyfill
@@ -63,15 +63,10 @@ const insertConfigData = (html) => {
   el.body.innerHTML = html
   let JCD = el.getElementById('jupyter-config-data')
   let jupyterConfigData = JSON.parse(JCD.innerHTML)
-  const baseUrl = jupyterConfigData['baseUrl']
   for (let key in jupyterConfigData) {
     if (key === 'wsUrl' || key === 'pageUrl' || key === 'themesUrl') {
       continue
     }
-    // if(key === 'wsUrl') {
-    //   jupyterConfigData[key] = hubWSAddress + baseUrl
-    //   continue
-    // }
     if (key.includes('Url')) {
       let value = jupyterConfigData[key]
       jupyterConfigData[key] = hubPrefix + value
@@ -84,25 +79,27 @@ const insertConfigData = (html) => {
 class Common extends Component {
 
   componentDidMount() {
-    // TODO different token for every user
-    fetch(`${hubPrefix}/hub/api/users/${localStorage.getItem('user_ID')}/server`, {
-      method: 'post',
-      headers: {
-        'Authorization': 'token 7e375739d7fd4859a114696e5390f759',
-      },
-    }).then((res) => {
-      fetch(`${hubPrefix}/user/${localStorage.getItem('user_ID')}/lab`, {
-        method: 'get',
-        headers: {
-          'Authorization': 'token 7e375739d7fd4859a114696e5390f759',
-        },
-      }).then((res) => {
-        return res.text()
-      }).then((html) => {
-        insertConfigData(html)
-        loadnStartJL()
-      })
-    })
+    // const { projectDetail } = this.props
+    // const { project } = projectDetail
+    // const hubUserName = `${localStorage.getItem('user_ID')}~${project.name}`
+    // fetch(`${hubPrefix}/hub/api/users/${hubUserName}/server`, {
+    //   method: 'post',
+    //   headers: {
+    //     'Authorization': `token ${project.hub_token}`,
+    //   },
+    // }).then((res) => {
+    //   fetch(`${hubPrefix}/user/${hubUserName}/lab`, {
+    //     method: 'get',
+    //     headers: {
+    //       'Authorization': `token ${project.hub_token}`,
+    //     },
+    //   }).then((res) => {
+    //     return res.text()
+    //   }).then((html) => {
+    //     insertConfigData(html)
+    //     loadnStartJL()
+    //   })
+    // })
   }
 
   render() {

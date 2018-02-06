@@ -14,5 +14,7 @@ class SuperSecureAuthenticator(Authenticator):
         # decode token:
         token_data = jwt.decode(data['password'], SECRET, algorithms=[
             ALGORITHM])
-        if token_data[IDENTITY] == tmp_username.split('/')[0]:
+        print(tmp_username, token_data[IDENTITY])
+        if token_data[IDENTITY] == tmp_username.split('+')[0]:
+        # if token_data[IDENTITY] == 'zhaofengli':
             return tmp_username
