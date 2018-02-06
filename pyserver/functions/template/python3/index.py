@@ -9,7 +9,9 @@ def get_stdin():
     buf = ""
     while(True):
         line = sys.stdin.readline()
-        buf += line
+        handler.handle(line)
+        # print(line)
+        # buf += line
         if line=="":
             break
     return buf
@@ -20,6 +22,6 @@ def get_stdin():
 
 if(__name__ == "__main__"):
     st = get_stdin()
-    st = json.loads(st)
-    handler.handle(st)
+    # st = json.loads(st)
+
 

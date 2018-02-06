@@ -12,6 +12,7 @@ def handle(st):
     # b = b''
     # for s in st:
     #     b += s
-    sys.stdout.buffer.write(st)
+    sys.stdout.write(st)
+    sys.stdout.write('line\n')
 
 

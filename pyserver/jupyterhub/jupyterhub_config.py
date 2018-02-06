@@ -75,7 +75,8 @@ c.JupyterHub.service_tokens = {
 #  - takes two arguments: (handler, data),
 #    where `handler` is the calling web.RequestHandler,
 #    and `data` is the POST form data from the login page.
-c.JupyterHub.authenticator_class = 'jupyterhub.auth.PAMAuthenticator'
+c.JupyterHub.authenticator_class = 'authenticator.SuperSecureAuthenticator'
+# c.JupyterHub.authenticator_class = 'jupyterhub.auth.PAMAuthenticator'
 
 ## The base URL of the entire application
 #c.JupyterHub.base_url = '/'
@@ -759,7 +760,7 @@ c.Authenticator.admin_users = {'zhaofengli'}
 ## The number of threads to allocate for encryption
 #c.CryptKeeper.n_threads = 8
 
-c.DockerSpawner.container_image = 'singleuser:latest'
+c.DockerSpawner.image = 'singleuser:latest'
 c.DockerSpawner.remove_containers = True
 # c.DockerSpawner.use_internal_ip =
 c.DockerSpawner.volumes = { '/Users/zhaofengli/projects/goldersgreen/pyserver/user_directory/{username}': '/home/jovyan/work',

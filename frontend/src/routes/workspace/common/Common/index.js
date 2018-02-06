@@ -6,65 +6,103 @@ import MiddleArea from '../components/MiddleArea/index'
 import RightArea from '../components/RightArea/index'
 import styles from './index.less'
 
-
-// ES6 Promise polyfill
-require('es6-promise/auto')
+const loadnStartJL = () => {
+  // ES6 Promise polyfill
+  require('es6-promise/auto')
 
 // Load the core theming before any other package.
-require('../../../../packages/jupyterlab_package/packages/theme-light-extension/style/embed.css')
-require('../../../../packages/jupyterlab_package/node_modules/font-awesome/css/font-awesome.min.css')
+  require('../../../../packages/jupyterlab_package/packages/theme-light-extension/style/embed.css')
+  require('../../../../packages/jupyterlab_package/node_modules/font-awesome/css/font-awesome.min.css')
 
-let JupyterLab = require('../../../../packages/jupyterlab_package/packages/application').JupyterLab
+  let JupyterLab = require('../../../../packages/jupyterlab_package/packages/application').JupyterLab
 
-let mods = [
-  require('../../../../packages/jupyterlab_package/packages/application-extension'),
-  require('../../../../packages/jupyterlab_package/packages/apputils-extension'),
-  require('../../../../packages/jupyterlab_package/packages/codemirror-extension'),
-  require('../../../../packages/jupyterlab_package/packages/completer-extension'),
-  require('../../../../packages/jupyterlab_package/packages/console-extension'),
-  require('../../../../packages/jupyterlab_package/packages/csvviewer-extension'),
-  require('../../../../packages/jupyterlab_package/packages/docmanager-extension'),
-  require('../../../../packages/jupyterlab_package/packages/fileeditor-extension'),
-  require('../../../../packages/jupyterlab_package/packages/faq-extension'),
-  require('../../../../packages/jupyterlab_package/packages/filebrowser-extension'),
-  require('../../../../packages/jupyterlab_package/packages/help-extension'),
-  require('../../../../packages/jupyterlab_package/packages/imageviewer-extension'),
-  require('../../../../packages/jupyterlab_package/packages/inspector-extension'),
-  require('../../../../packages/jupyterlab_package/packages/launcher-extension'),
-  require('../../../../packages/jupyterlab_package/packages/mainmenu-extension'),
-  require('../../../../packages/jupyterlab_package/packages/markdownviewer-extension'),
-  require('../../../../packages/jupyterlab_package/packages/mathjax2-extension'),
-  require('../../../../packages/jupyterlab_package/packages/notebook-extension'),
-  require('../../../../packages/jupyterlab_package/packages/rendermime-extension'),
-  require('../../../../packages/jupyterlab_package/packages/running-extension'),
-  require('../../../../packages/jupyterlab_package/packages/settingeditor-extension'),
-  require('../../../../packages/jupyterlab_package/packages/shortcuts-extension'),
-  require('../../../../packages/jupyterlab_package/packages/tabmanager-extension'),
-  require('../../../../packages/jupyterlab_package/packages/terminal-extension'),
-  require('../../../../packages/jupyterlab_package/packages/theme-dark-extension'),
-  require('../../../../packages/jupyterlab_package/packages/theme-light-extension'),
-  require('../../../../packages/jupyterlab_package/packages/tooltip-extension'),
+  let mods = [
+    require('../../../../packages/jupyterlab_package/packages/application-extension'),
+    require('../../../../packages/jupyterlab_package/packages/apputils-extension'),
+    require('../../../../packages/jupyterlab_package/packages/codemirror-extension'),
+    require('../../../../packages/jupyterlab_package/packages/completer-extension'),
+    require('../../../../packages/jupyterlab_package/packages/console-extension'),
+    require('../../../../packages/jupyterlab_package/packages/csvviewer-extension'),
+    require('../../../../packages/jupyterlab_package/packages/docmanager-extension'),
+    require('../../../../packages/jupyterlab_package/packages/fileeditor-extension'),
+    require('../../../../packages/jupyterlab_package/packages/faq-extension'),
+    require('../../../../packages/jupyterlab_package/packages/filebrowser-extension'),
+    require('../../../../packages/jupyterlab_package/packages/help-extension'),
+    require('../../../../packages/jupyterlab_package/packages/imageviewer-extension'),
+    require('../../../../packages/jupyterlab_package/packages/inspector-extension'),
+    require('../../../../packages/jupyterlab_package/packages/launcher-extension'),
+    require('../../../../packages/jupyterlab_package/packages/mainmenu-extension'),
+    require('../../../../packages/jupyterlab_package/packages/markdownviewer-extension'),
+    require('../../../../packages/jupyterlab_package/packages/mathjax2-extension'),
+    require('../../../../packages/jupyterlab_package/packages/notebook-extension'),
+    require('../../../../packages/jupyterlab_package/packages/rendermime-extension'),
+    require('../../../../packages/jupyterlab_package/packages/running-extension'),
+    require('../../../../packages/jupyterlab_package/packages/settingeditor-extension'),
+    require('../../../../packages/jupyterlab_package/packages/shortcuts-extension'),
+    require('../../../../packages/jupyterlab_package/packages/tabmanager-extension'),
+    require('../../../../packages/jupyterlab_package/packages/terminal-extension'),
+    require('../../../../packages/jupyterlab_package/packages/theme-dark-extension'),
+    require('../../../../packages/jupyterlab_package/packages/theme-light-extension'),
+    require('../../../../packages/jupyterlab_package/packages/tooltip-extension'),
 
-  require('../../../../packages/jupyterlab_package/packages/modules-extension')
-]
+    require('../../../../packages/jupyterlab_package/packages/modules-extension'),
+  ]
+
+  let lab = new JupyterLab({
+    name: 'Mo Lab',
+    namespace: 'mo-lab',
+    version: 'unknown',
+  })
+  lab.registerPluginModules(mods)
+  lab.start({ hostID: 'mo-jlContainer' })
+}
+
+const insertConfigData = (html) => {
+  let el = document.implementation.createHTMLDocument()
+  el.body.innerHTML = html
+  let JCD = el.getElementById('jupyter-config-data')
+  let jupyterConfigData = JSON.parse(JCD.innerHTML)
+  for (let key in jupyterConfigData) {
+    if (key === 'wsUrl' || key === 'pageUrl' || key === 'themesUrl') {
+      continue
+    }
+    if (key.includes('Url')) {
+      let value = jupyterConfigData[key]
+      jupyterConfigData[key] = '/hub_api' + value
+    }
+  }
+  console.log(jupyterConfigData, JSON.stringify(jupyterConfigData))
+  JCD.innerHTML = JSON.stringify(jupyterConfigData)
+  document.head.insertBefore(JCD, document.head.children[3])
+}
 
 class Common extends Component {
 
   componentDidMount() {
-    let lab = new JupyterLab({
-      name: 'Mo Lab',
-      namespace: 'mo-lab',
-      version: 'unknown'
+    // TODO different token for every user
+    fetch(`/hub_api/hub/api/users/${localStorage.getItem('user_ID')}/server`, {
+      method: 'post',
+      headers: {
+        'Authorization': 'token 3dff9236c0404344929729fd8fe7d376',
+      },
+    }).then((res) => {
+      fetch(`/hub_api/user/${localStorage.getItem('user_ID')}/lab`, {
+        method: 'get',
+        headers: {
+          'Authorization': 'token 3dff9236c0404344929729fd8fe7d376',
+        },
+      }).then((res) => {
+        return res.text()
+      }).then((html) => {
+        insertConfigData(html)
+        loadnStartJL()
+      })
     })
-    lab.registerPluginModules(mods)
-    lab.start({ hostID: 'mo-jlContainer' })
   }
 
   render() {
     return (
       <div className={styles.container} id='mo-jlContainer'>
-
-
       </div>
     )
   }

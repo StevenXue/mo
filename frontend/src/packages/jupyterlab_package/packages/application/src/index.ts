@@ -22,7 +22,7 @@ import {
 
 import {
   ServiceManager
-  , Drive, ServerConnection
+  // , Drive, ServerConnection
 } from '@jupyterlab/services';
 
 import {
@@ -76,21 +76,21 @@ class JupyterLab extends Application<ApplicationShell> {
     //   token: '597293565868fa9d55096844dce32f96b7d7291b7e194f4f'
     // });
 
-    // jupyter lab in hub backend
-    const ss = ServerConnection.makeSettings({
-      baseUrl: 'http://localhost:8000/user/zhaofengli',
-      wsUrl: 'ws://localhost:8000/user/zhaofengli',
-      pageUrl: '/lab',
-      // token: '597293565868fa9d55096844dce32f96b7d7291b7e194f4f'
-      token: '3dff9236c0404344929729fd8fe7d376'
-    });
+    // // jupyter lab in hub backend
+    // const ss = ServerConnection.makeSettings({
+    //   baseUrl: 'http://localhost:8000/user/zhaofengli',
+    //   wsUrl: 'ws://localhost:8000/user/zhaofengli',
+    //   pageUrl: '/lab',
+    //   // token: '597293565868fa9d55096844dce32f96b7d7291b7e194f4f'
+    //   token: '3dff9236c0404344929729fd8fe7d376'
+    // });
+    //
+    // this.serviceManager = new ServiceManager({
+    //   serverSettings: ss,
+    //   defaultDrive: new Drive({serverSettings: ss})
+    // });
 
-    this.serviceManager = new ServiceManager({
-      serverSettings: ss,
-      defaultDrive: new Drive({serverSettings: ss})
-    });
-
-    // this.serviceManager = new ServiceManager();
+    this.serviceManager = new ServiceManager();
 
     let linker = new CommandLinker({ commands: this.commands });
     this.commandLinker = linker;

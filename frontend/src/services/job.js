@@ -1,7 +1,6 @@
+import request, { org_request } from '../utils/request'
 
-import request from '../utils/request';
-
-const PREFIX = "/job";
+const PREFIX = '/job'
 
 // 保存
 export function save_result(payload) {
@@ -10,12 +9,11 @@ export function save_result(payload) {
     headers: {
       'Content-Type': 'application/json',
     },
-    body:  JSON.stringify({
-      "job_id": payload.id
-    })
+    body: JSON.stringify({
+      'job_id': payload.id,
+    }),
   })
 }
-
 
 // 另存为
 export function save_as_result(payload) {
@@ -24,10 +22,10 @@ export function save_as_result(payload) {
     headers: {
       'Content-Type': 'application/json',
     },
-    body:  JSON.stringify({
-      "job_id": payload.id,
-      'new_sds_name': payload.newSdsName
-    })
+    body: JSON.stringify({
+      'job_id': payload.id,
+      'new_sds_name': payload.newSdsName,
+    }),
   })
 }
 
@@ -39,7 +37,7 @@ export function update(payload) {
     headers: {
       'Content-Type': 'application/json',
     },
-    body:  JSON.stringify(payload)
+    body: JSON.stringify(payload),
   })
 }
 
@@ -50,9 +48,18 @@ export function jobToCode(payload) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      "section_id": payload.sectionId,
-      "project_id": payload.projectId
-    })
-  });
+      'section_id': payload.sectionId,
+      'project_id': payload.projectId,
+    }),
+  })
 }
 
+export function jobsByProject(payload) {
+  console.log('jobs of ', payload.projectId)
+  return org_request(`/hub_api/user/${localStorage.getItem('user_ID')}/api/sessions?${(new Date()).getTime()}`, {
+    method: 'get',
+    headers: {
+      'Authorization': 'token 3dff9236c0404344929729fd8fe7d376',
+    },
+  })
+}

@@ -24,4 +24,3 @@ def add_favor_api(user_ID, api):
     favor_apis.append(api)
     user.favor_apis = favor_apis
     return user.save()
-

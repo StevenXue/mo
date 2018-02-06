@@ -1,6 +1,7 @@
 import { routerRedux } from 'dva/router'
 
 import { fetchProject, deleteProject, updateProject, forkProject } from '../services/project'
+import { jobsByProject } from '../services/job'
 import { privacyChoices } from '../constants'
 import pathToRegexp from 'path-to-regexp'
 import { get } from 'lodash'
@@ -15,6 +16,12 @@ export default {
       return {
         ...state,
         project,
+      }
+    },
+    setJobs(state, { payload: jobs }) {
+      return {
+        ...state,
+        jobs,
       }
     },
     setStep(state, { payload }) {
@@ -38,9 +45,14 @@ export default {
   },
   effects: {
     // 获取该 project
-    *fetch(action, { call, put, select }) {
+    *fetch(action, { call, put }) {
       const { data: project } = yield call(fetchProject, { projectId: action.projectId })
       yield put({ type: 'setProject', payload: project })
+    },
+    // 获取该 project 的 Jobs
+    *fetchJobs(action, { call, put }) {
+      const jobs = yield call(jobsByProject, { projectId: action.projectId })
+      yield put({ type: 'setJobs', payload: jobs })
     },
     *delete({ payload }, { call, put, select }) {
       // const user_ID = 'dev_1'
@@ -81,6 +93,7 @@ export default {
         if (match) {
           const projectId = match[1]
           dispatch({ type: 'fetch', projectId: projectId })
+          dispatch({ type: 'fetchJobs', projectId: projectId })
         } else if (match2) {
           const projectId = match2[1]
           dispatch({ type: 'fetch', projectId: projectId })

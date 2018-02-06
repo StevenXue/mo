@@ -48,10 +48,12 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
   }
 
   if (location.pathname.split('/').length > 3) {
+    // project 4 step pages
     return (
       <ProjectDetail match={match} history={history} location={location} projectDetail={projectDetail} dispatch={dispatch}/>
     )
   } else {
+    // project info page
     if (projectDetail.project) {
       return (
         <div className={`main-container ${styles.normal}`}>
@@ -73,6 +75,9 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
             </div>
             <div className={styles.description}>
               <p>{projectDetail.project.description}</p>
+              <br/>
+              <h3>Jobs: </h3>
+              {projectDetail.jobs.map((job) => <p>{job.path}</p>)}
             </div>
             <div className={styles.tags}>
               {projectDetail.project.tags.map(e => <Tag color="#EEEEEE" style={{ color: '#666666' }} key={e}>{e}</Tag>)}

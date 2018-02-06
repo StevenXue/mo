@@ -38,6 +38,11 @@ export default {
       "changeOrigin": true,
       "pathRewrite": { "^/pyapi" : "" }
     },
+    "/hub_api": {
+      "target": "http://localhost:8000/",
+      "changeOrigin": true,
+      "pathRewrite": { "^/hub_api" : "" }
+    },
   },
   "theme": {
     "primary-color": "#34C0E2",
