@@ -13,6 +13,8 @@ module.exports = {
   baseURL: 'http://localhost:8000/api/v1',
   YQL: ['http://www.zuimeitianqi.com'],
   CORS: CONSTANT.apiPrefix,
+  hubPrefix: '/hub_api',
+  hubWSAddress: 'ws://localhost:8000',
   openPages: ['/login'],
   // apiPrefix: '/api/v1',
   //jupyterUrl: CONSTANT.,

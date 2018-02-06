@@ -5,6 +5,7 @@ import SideBar from '../components/SideBar/index'
 import MiddleArea from '../components/MiddleArea/index'
 import RightArea from '../components/RightArea/index'
 import styles from './index.less'
+import { hubPrefix, hubWSAddress } from '../../../../utils/config'
 
 const loadnStartJL = () => {
   // ES6 Promise polyfill
@@ -62,16 +63,20 @@ const insertConfigData = (html) => {
   el.body.innerHTML = html
   let JCD = el.getElementById('jupyter-config-data')
   let jupyterConfigData = JSON.parse(JCD.innerHTML)
+  const baseUrl = jupyterConfigData['baseUrl']
   for (let key in jupyterConfigData) {
     if (key === 'wsUrl' || key === 'pageUrl' || key === 'themesUrl') {
       continue
     }
+    // if(key === 'wsUrl') {
+    //   jupyterConfigData[key] = hubWSAddress + baseUrl
+    //   continue
+    // }
     if (key.includes('Url')) {
       let value = jupyterConfigData[key]
-      jupyterConfigData[key] = '/hub_api' + value
+      jupyterConfigData[key] = hubPrefix + value
     }
   }
-  console.log(jupyterConfigData, JSON.stringify(jupyterConfigData))
   JCD.innerHTML = JSON.stringify(jupyterConfigData)
   document.head.insertBefore(JCD, document.head.children[3])
 }
@@ -80,13 +85,13 @@ class Common extends Component {
 
   componentDidMount() {
     // TODO different token for every user
-    fetch(`/hub_api/hub/api/users/${localStorage.getItem('user_ID')}/server`, {
+    fetch(`${hubPrefix}/hub/api/users/${localStorage.getItem('user_ID')}/server`, {
       method: 'post',
       headers: {
         'Authorization': 'token 3dff9236c0404344929729fd8fe7d376',
       },
     }).then((res) => {
-      fetch(`/hub_api/user/${localStorage.getItem('user_ID')}/lab`, {
+      fetch(`${hubPrefix}/user/${localStorage.getItem('user_ID')}/lab`, {
         method: 'get',
         headers: {
           'Authorization': 'token 3dff9236c0404344929729fd8fe7d376',

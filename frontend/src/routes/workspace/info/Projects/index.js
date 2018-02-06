@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'dva'
 import { Select, Button, Card, Icon } from 'antd'
-import ProjectModel from '../../../../components/ProjectModel/index'
+import ProjectModel from '../../../../components/ProjectModal/index'
 import { showTime } from '../../../../utils/index'
 import { privacyChoices } from '../../../../constants'
 

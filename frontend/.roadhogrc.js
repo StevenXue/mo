@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 // const re = /src\/jupyterlab\/packages\/.+\/style\/.+\.css$/
 const re = /.+\.css$/
+const paths = require('./paths');
 
 const walkSync = (dir) =>
   fs.readdirSync(dir)
@@ -29,6 +30,10 @@ export default {
       ]
     }
   },
+  // TODO upload roadhog to 2.x to support alias
+  "alias": {
+    'config': paths.config
+  },
   "cssModulesExclude": [
     ...jupyterPackageCSS
   ],
@@ -37,6 +42,12 @@ export default {
       "target": "http://localhost:5000/",
       "changeOrigin": true,
       "pathRewrite": { "^/pyapi" : "" }
+    },
+    "ws://localhost:8989/hub_api": {
+      "target": "ws://localhost:8000/",
+      "changeOrigin": true,
+      "ws": true,
+      "pathRewrite": { "^/hub_api" : "" }
     },
     "/hub_api": {
       "target": "http://localhost:8000/",

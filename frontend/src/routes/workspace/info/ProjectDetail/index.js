@@ -19,7 +19,7 @@ import DataPreview from '../../../DataPreview/index'
 // components
 import Steps from '../../../../components/Steps/index'
 import MyCard from '../../../../components/MyCard/index'
-import ProjectModel from '../../../../components/ProjectModel/index'
+import ProjectModel from '../../../../components/ProjectModal/index'
 import { showTime } from '../../../../utils/index'
 import styles from './index.less'
 
