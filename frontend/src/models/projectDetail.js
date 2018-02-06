@@ -9,6 +9,7 @@ import { get } from 'lodash'
 export default {
   namespace: 'projectDetail',
   state: {
+    jobs: []
     // doneIndices: new Set([]),
   },
   reducers: {

@@ -77,7 +77,7 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
               <p>{projectDetail.project.description}</p>
               <br/>
               <h3>Jobs: </h3>
-              {projectDetail.jobs.map((job) => <p>{job.path}</p>)}
+              {projectDetail.jobs.map((job) => <p key={job.id}>{job.path}</p>)}
             </div>
             <div className={styles.tags}>
               {projectDetail.project.tags.map(e => <Tag color="#EEEEEE" style={{ color: '#666666' }} key={e}>{e}</Tag>)}

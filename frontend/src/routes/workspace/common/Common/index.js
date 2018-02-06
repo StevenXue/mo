@@ -88,13 +88,13 @@ class Common extends Component {
     fetch(`${hubPrefix}/hub/api/users/${localStorage.getItem('user_ID')}/server`, {
       method: 'post',
       headers: {
-        'Authorization': 'token 3dff9236c0404344929729fd8fe7d376',
+        'Authorization': 'token 7e375739d7fd4859a114696e5390f759',
       },
     }).then((res) => {
       fetch(`${hubPrefix}/user/${localStorage.getItem('user_ID')}/lab`, {
         method: 'get',
         headers: {
-          'Authorization': 'token 3dff9236c0404344929729fd8fe7d376',
+          'Authorization': 'token 7e375739d7fd4859a114696e5390f759',
         },
       }).then((res) => {
         return res.text()
