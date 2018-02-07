@@ -90,6 +90,14 @@ def create_project(name, description, user_ID, is_private=True,
     :param is_private: boolean
     :return: a new created project object
     """
+    # check and create project dir
+    project_path = os.path.join(USER_DIR, user_ID, name)
+    if not os.path.exists(project_path):
+        os.makedirs(project_path)
+    else:
+        # if exists means project exists
+        raise Exception('project exists')
+
     # auth jupyterhub with user token
     res = auth_hub_user(user_ID, name, token)
 
@@ -98,9 +106,6 @@ def create_project(name, description, user_ID, is_private=True,
                                            tags, related_tasks,
                                            res.get('token'))
     if created_project:
-        project_path = os.path.join(USER_DIR, user_ID, name)
-        if not os.path.exists(project_path):
-            os.makedirs(project_path)
         # get user object
         user = user_business.get_by_user_ID(user_ID)
 

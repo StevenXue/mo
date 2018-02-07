@@ -82,9 +82,6 @@ const insertConfigData = (html) => {
 const onSuccess = async (res) => {
   const html = await res.text()
   insertConfigData(html)
-  if (document.getElementById('mo-jlContainer') !== null && document.getElementsByClassName('p-Widget jp-ApplicationShell').length === 0) {
-    loadnStartJL()
-  }
 }
 
 export default {
@@ -137,6 +134,9 @@ export default {
 
       if (document.getElementById('jupyter-config-data') === null) {
         yield call(getLabConfig, { hubUserName, hubToken, onSuccess })
+      }
+      if (document.getElementById('mo-jlContainer') !== null && document.getElementsByClassName('p-Widget jp-ApplicationShell').length === 0) {
+        loadnStartJL()
       }
       // fetch jobs
       const jobs = yield call(jobsByProject, { hubUserName, hubToken })
