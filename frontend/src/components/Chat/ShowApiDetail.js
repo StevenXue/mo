@@ -116,7 +116,7 @@ class HorizontalLoginForm extends React.Component {
         }
 
         // 发送请求
-        fetch(`/api/chat/api_predict`,
+        fetch(`/pyapi/chat/api_predict`,
           {
             headers: {
               'Content-Type': 'application/json',

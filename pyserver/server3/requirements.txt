@@ -26,5 +26,6 @@ scikit-image
 port_for
 kubernetes
 grpcio
+synonyms
 
 

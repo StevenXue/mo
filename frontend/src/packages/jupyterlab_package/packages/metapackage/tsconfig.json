@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-//    "declaration": true,
+    "declaration": true,
     "noImplicitAny": false,
     "noEmitOnError": true,
     "noUnusedLocals": true,
@@ -15,7 +15,7 @@
       "ES2015.Promise",
       "DOM"
     ],
-    "allowSyntheticDefaultImports": true,
+//    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
       "@jupyterlab/*": [
@@ -30,7 +30,7 @@
     },
     "jsx": "react",
     "inlineSources": true,
-    "allowJs": true,
+//    "allowJs": true,
     "sourceMap": true
   }
 }
