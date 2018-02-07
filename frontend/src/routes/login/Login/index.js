@@ -51,7 +51,7 @@ class Login extends Component {
           this.props.dispatch({
             type: `login/login`,
             payload: values,
-          })
+          });
         }
       },
     )

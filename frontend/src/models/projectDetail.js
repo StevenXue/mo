@@ -81,10 +81,8 @@ const insertConfigData = (html) => {
 
 const onSuccess = async (res) => {
   const html = await res.text()
-  if(document.getElementById('jupyter-config-data') === null) {
-    insertConfigData(html)
-  }
-  if(document.getElementsByClassName('p-Widget jp-ApplicationShell').length === 0) {
+  insertConfigData(html)
+  if (document.getElementById('mo-jlContainer') !== null && document.getElementsByClassName('p-Widget jp-ApplicationShell').length === 0) {
     loadnStartJL()
   }
 }
@@ -92,7 +90,7 @@ const onSuccess = async (res) => {
 export default {
   namespace: 'projectDetail',
   state: {
-    jobs: []
+    jobs: [],
     // doneIndices: new Set([]),
   },
   reducers: {
@@ -136,7 +134,10 @@ export default {
       const hubToken = project.hub_token
       // start lab
       yield call(startLab, { hubUserName, hubToken })
-      yield call(getLabConfig, { hubUserName, hubToken, onSuccess})
+
+      if (document.getElementById('jupyter-config-data') === null) {
+        yield call(getLabConfig, { hubUserName, hubToken, onSuccess })
+      }
       // fetch jobs
       const jobs = yield call(jobsByProject, { hubUserName, hubToken })
       yield put({ type: 'setJobs', payload: jobs })

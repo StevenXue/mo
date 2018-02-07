@@ -59,10 +59,9 @@ c.JupyterHub.admin_access = True
 #  
 #  Consider using service_tokens for general services that talk to the JupyterHub
 #  API.
-# c.JupyterHub.service_tokens = {
-#     '3dff9236c0404344929729fd8fe7d376': 'zhaofengli',
-    # '597293565868fa9d55096844dce32f96b7d7291b7e194f4f': 'zhaofengli',
-# }
+c.JupyterHub.service_tokens = {
+    '1d4afa72b00c4ffd9db82f26e1628f89': 'admin',
+}
 
 ## Class for authenticating users.
 #  
@@ -633,7 +632,7 @@ c.Spawner.default_url = '/lab'
 #  Admin access should be treated the same way root access is.
 #  
 #  Defaults to an empty set, in which case no user has admin access.
-c.Authenticator.admin_users = {'zhaofengli'}
+c.Authenticator.admin_users = {'admin'}
 
 ## Automatically begin the login process
 #  

@@ -25,9 +25,10 @@ function checkStatus(response) {
  * @param  {string} url       The URL we want to request
  * @param  {object} [options] The options we want to pass to "fetch"
  * @param  {function} [onSuccess] onSuccess function
+ * @param  {function} [onError] onError function
  * @return {object}           An object containing either "data" or "err"
  */
-export default async function request(url, options, onSuccess = onSuccessDef) {
+export default async function request(url, options, onSuccess=onSuccessDef, onError=onErrorDef) {
   try {
 
     const response = await fetch(url, options)
@@ -51,6 +52,7 @@ export default async function request(url, options, onSuccess = onSuccessDef) {
     return ret
   } catch (err) {
     console.log(url, err)
+    await onError(err)
   }
 }
 

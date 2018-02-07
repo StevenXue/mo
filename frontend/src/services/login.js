@@ -1,7 +1,7 @@
 import { request, config } from '../utils'
 
-const { CORS, api } = config;
-const { userLogin, refreshToken } = api;
+const { CORS, api } = config
+const { userLogin, refreshToken } = api
 
 export function login(body) {
   return request(CORS + userLogin, {

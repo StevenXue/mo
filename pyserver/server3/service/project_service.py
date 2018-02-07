@@ -4,6 +4,7 @@ from copy import deepcopy
 import shutil
 import os
 import requests
+from urllib.parse import quote
 
 from mongoengine import DoesNotExist
 from kubernetes import client
@@ -31,11 +32,44 @@ from server3.utility import network_utility
 from server3.constants import NAMESPACE
 from server3.constants import KUBE_NAME
 from server3.constants import HUB_SERVER
+from server3.constants import ADMIN_TOKEN
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
 
 # NAMESPACE = 'default'
+
+
+def auth_hub_user(user_ID, project_name, token):
+    """
+    auth jupyterhub with user token
+    :param user_ID:
+    :param project_name:
+    :param token:
+    :return: dict of res json
+    """
+    return requests.post('{hub_server}/hub/api/authorizations/token'.
+                         format(hub_server=HUB_SERVER),
+                         json={'username': user_ID + '+' + project_name,
+                               'password': token}
+                         ).json()
+
+
+def delete_hub_user(user_ID, project_name):
+    """
+    auth jupyterhub with user token
+    :param user_ID:
+    :param project_name:
+    :param token:
+    :return: dict of res json
+    """
+    url = '{hub_server}/hub/api/users/{user_ID}+{project_name}'.format(
+        hub_server=HUB_SERVER, user_ID=user_ID,
+        project_name=project_name)
+    return requests.delete(url,
+                           headers={
+                               'Authorization': 'token {}'.format(ADMIN_TOKEN)
+                           })
 
 
 def get_by_id(project_id):
@@ -57,11 +91,7 @@ def create_project(name, description, user_ID, is_private=True,
     :return: a new created project object
     """
     # auth jupyterhub with user token
-    res = requests.post('{hub_server}/hub/api/authorizations/token'.
-                        format(hub_server=HUB_SERVER),
-                        json={'username': user_ID + '+' + name,
-                              'password': token}
-                        ).json()
+    res = auth_hub_user(user_ID, name, token)
 
     # create a new project object
     created_project = project_business.add(name, description, related_fields,
@@ -149,13 +179,8 @@ def remove_project_by_id(project_id, user_ID):
                                                                'project')
     if user_ID != ownership.user.user_ID:
         raise ValueError('project not belong to this user, cannot delete')
-    # try:
-    #     for job in project['jobs']:
-    #         job_business.remove_by_id(job['id'])
-    #     for result in project['results']:
-    #         result_business.remove_by_id(result['id'])
-    # except TypeError:
-    #     pass
+    # delete tmp jupyterhub user
+    delete_hub_user(user_ID, project.name)
     # delete project directory
     project_directory = UPLOAD_FOLDER + user_ID + '/' + project.name
     if os.path.isdir(project_directory):
