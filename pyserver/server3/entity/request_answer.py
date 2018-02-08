@@ -3,6 +3,8 @@ from mongoengine import ListField
 from mongoengine import StringField
 from mongoengine import DateTimeField
 from mongoengine import IntField
+from mongoengine import ReferenceField
+from mongoengine import CASCADE
 
 STATUS = (
     (0, 'open'),
@@ -14,15 +16,10 @@ RELATED_FIELDS = ('Business', 'Government', 'Education', 'Environment',
                   'Social', 'Transportation', 'Science', 'Technology')
 
 
-class UserRequest(DynamicDocument):
-    title = StringField(max_length=200, required=True)
-    category = ListField(StringField(max_length=100))
-    description = StringField()
+class RequestAnswer(DynamicDocument):
+    user_request_id = ReferenceField('UserRequest', reverse_delete_rule=CASCADE)
+    answer = StringField()
     create_time = DateTimeField(required=True)
-    request_dataset = StringField()
-    tags = ListField(StringField(max_length=50))
-    user_id = StringField(required=True)
-    status = IntField(choices=STATUS, required=True)
-    input = StringField()
-    output = StringField()
-    comments_number = IntField(default=0)
+    edit_time = DateTimeField()
+    answer_user_id = StringField(required=True)
+    vote_number = IntField(default=0)

@@ -78,8 +78,8 @@ class JupyterLab extends Application<ApplicationShell> {
 
     // jupyter lab in hub backend
     const ss = ServerConnection.makeSettings({
-      baseUrl: 'http://localhost:8000/user/zhaofengli',
-      wsUrl: 'ws://localhost:8000/user/zhaofengli',
+      baseUrl: 'http://192.168.31.19:8000/user/zhaofengli',
+      wsUrl: 'ws://192.168.31.19:8000/user/zhaofengli',
       pageUrl: '/lab',
       // token: '597293565868fa9d55096844dce32f96b7d7291b7e194f4f'
       token: '3dff9236c0404344929729fd8fe7d376'

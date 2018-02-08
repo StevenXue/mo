@@ -53,6 +53,12 @@ const menuConfig = [
     Icon: null,
     text: 'Model Market',
   },
+  {
+    key: '/userrequest',
+    Link: '/userrequest',
+    Icon: null,
+    text: 'Request',
+  },
 ]
 
 function Header({location, login, history, dispatch, allRequest}) {

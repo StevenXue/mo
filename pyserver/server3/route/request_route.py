@@ -24,7 +24,9 @@ def get_user_request():
                                                          for i in user_request])
         except Exception as e:
             return make_response(jsonify({'response': '%s: %s' %
-                                                      (str(Exception), e.args)}), 400)
+                                                      (
+                                                      str(Exception), e.args)}),
+                                 400)
         return make_response(jsonify({'response': user_request}), 200)
     try:
         print('haha')
@@ -43,7 +45,8 @@ def list_user_request():
     if not user_id:
         return jsonify({'response': 'no user_id arg'}), 400
     else:
-        user_request = user_request_service.list_user_request_by_user_ID(user_id)
+        user_request = user_request_service.list_user_request_by_user_ID(
+            user_id)
         user_request = json_utility. \
             me_obj_list_to_json_list(user_request)
         return jsonify({'response': user_request}), 200
@@ -62,11 +65,26 @@ def create_user_request():
     user_id = data['user_id']
     request_dataset = data.get('request_dataset', None)
     request_description = data.get('request_description', None)
+    request_input = data.get('request_input', None)
+    request_output = data.get('request_output', None)
+    request_tags = data.get('request_tags', None)
+    request_category = data.get('request_category', None)
+
     kwargs = {}
     if request_dataset:
-        kwargs['request_dataset']=request_dataset
+        kwargs['request_dataset'] = request_dataset
     if request_description:
-        kwargs['request_description']=request_description
+        kwargs['description'] = request_description
+    if request_input:
+        kwargs['input'] = request_input
+    if request_tags:
+        request_tags = request_tags.split(",")
+        kwargs['tags'] = request_tags
+    if request_category:
+        print('request_category', request_category)
+        kwargs['category'] = request_category
+    if request_output:
+        kwargs['output'] = request_output
     user_request_service.create_user_request(request_title, user_id,
                                              **kwargs)
     return jsonify({'response': 'create user_request success'}), 200

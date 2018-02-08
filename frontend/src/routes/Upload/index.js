@@ -76,11 +76,9 @@ class UploadData extends Component {
     let tags = this.state.tags
     return (
       <div className={styles.whole}>
-
         <div className={styles.head}>
           Upload new file
         </div>
-
         <Form onSubmit={this.handleSubmit}>
           <FormItem
             { ...formItemLayout }
@@ -95,7 +93,6 @@ class UploadData extends Component {
               })(<Input />)
             }
           </FormItem>
-
           <FormItem
             { ...formItemLayout }
             label={<span className={styles.formItem}>Description</span>}
@@ -109,7 +106,6 @@ class UploadData extends Component {
               })(<Input.TextArea/>)
             }
           </FormItem>
-
           <FormItem
             { ...formItemLayout }
             label={<span className={styles.formItem}>Category</span>}
@@ -127,10 +123,7 @@ class UploadData extends Component {
                 </Select>
               )
             }
-
           </FormItem>
-
-
           <FormItem
             { ...formItemLayout }
             label={<span className={styles.formItem}>Tag</span>}
@@ -172,7 +165,6 @@ class UploadData extends Component {
               )
             }
           </FormItem>
-
           <FormItem
             {...formItemLayout }
             label={<span className={styles.formItem}>Upload</span>}

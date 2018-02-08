@@ -17,7 +17,11 @@ export function createNewUserRequest(payload) {
     body: JSON.stringify({
       user_id:payload.user_ID,
       request_title:payload.requestTitle,
+      request_input:payload.requestInput,
+      request_output:payload.requestOutput,
       request_description:payload.requestDescription,
+      request_tags:payload.requestTags,
+      request_category:payload.requestCategory,
       request_dataset:payload.requestDataset,
     }),
   });

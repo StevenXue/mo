@@ -15,6 +15,7 @@ from server3.entity.data import Data
 from server3.entity.ownership import Ownership
 from server3.entity.user_request import UserRequest
 from server3.entity.user_request_comments import UserRequestComments
+from server3.entity.request_answer import RequestAnswer
 
 # ——————————————————————————————————————————————————————— external delete rules
 #                                            Defined here to avoid import loops

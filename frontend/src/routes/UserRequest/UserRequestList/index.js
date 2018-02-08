@@ -1,6 +1,6 @@
 import React from 'react'
 import {connect} from 'dva'
-import {Select, Button, Card, Icon, Input} from 'antd'
+import {Select,  Card, Input,Icon } from 'antd'
 import {showTime} from '../../../utils/index'
 import {dataCategory} from '../../../constants'
 import {arrayToJson, JsonToArray} from '../../../utils/JsonUtils'
@@ -51,9 +51,15 @@ function AllRequest({history, allRequest, dispatch}) {
         <Card key={e._id} title={e.title} className={styles.card}
               onClick={() => toUserRequestDetail(e, history)} style={{ cursor: 'pointer' }}>
           <div>
-            <p>Description: {e.request_description}</p>
-            <p>Create Time: {showTime(e.create_time)}</p>
-            {e['user_id'] && <p>Requester: {e.user_id}</p>}
+            <div>
+             {e['user_id'] &&  <p><Icon type="user" />  {e.user_id}</p>}
+             {e['tags'] &&  <p><Icon type="tag" />  {e.tags}</p>}
+             {<p><Icon type="message" /> {e.comments_number}</p>}
+              <Icon type="star" />
+            </div>
+            <div>
+            <p><Icon type="clock-circle-o" /> {showTime(e.create_time)}</p>
+            </div>
           </div>
         </Card>)}
       </div>
