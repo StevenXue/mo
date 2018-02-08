@@ -10,13 +10,15 @@ import { hubPrefix } from '../utils/config'
 import * as dataAnalysisService from '../services/dataAnalysis'
 import { message } from 'antd/lib/index'
 
-const loadnStartJL = () => {
-  // ES6 Promise polyfill
-  require('es6-promise/auto')
+// ES6 Promise polyfill
+require('es6-promise/auto')
 
 // Load the core theming before any other package.
-  require('../packages/jupyterlab_package/packages/theme-light-extension/style/embed.css')
-  require('../packages/jupyterlab_package/node_modules/font-awesome/css/font-awesome.min.css')
+require('../packages/jupyterlab_package/packages/theme-light-extension/style/embed.css')
+require('../packages/jupyterlab_package/node_modules/font-awesome/css/font-awesome.min.css')
+
+
+const loadnStartJL = () => {
 
   let JupyterLab = require('../packages/jupyterlab_package/packages/application').JupyterLab
 
@@ -135,7 +137,13 @@ export default {
       if (document.getElementById('jupyter-config-data') === null) {
         yield call(getLabConfig, { hubUserName, hubToken, onSuccess })
       }
-      if (document.getElementById('mo-jlContainer') !== null && document.getElementsByClassName('p-Widget jp-ApplicationShell').length === 0) {
+      if (document.getElementById('mo-jlContainer') !== null) {
+        let apps = document.getElementsByClassName('p-Widget jp-ApplicationShell')
+        if (apps.length !== 0) {
+          for (let app of apps) {
+            app.remove()
+          }
+        }
         loadnStartJL()
       }
       // fetch jobs

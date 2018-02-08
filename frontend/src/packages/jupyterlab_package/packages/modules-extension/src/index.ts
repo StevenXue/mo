@@ -12,14 +12,16 @@ import {
 //   each
 // } from '@phosphor/algorithm';
 
-import {
-  Widget
-} from '@phosphor/widgets';
+// import {
+//   Widget
+// } from '@phosphor/widgets';
 
 import '../style/index.css';
 
-import renderReact from './react_index';
-
+// import renderReact from './react_index';
+import {
+  ModulePageWrapper
+} from './vdomWrapper';
 /**
  * The default tab manager extension.
  */
@@ -27,35 +29,12 @@ const plugin: JupyterLabPlugin<void> = {
   id: '@jupyterlab/modules-extension:plugin',
   activate: (app: JupyterLab, restorer: ILayoutRestorer, tracker: INotebookTracker): void => {
     const { shell } = app;
-    const tabs = new Widget();
-    restorer.add(tabs, 'tab-manager');
-    tabs.id = 'tab-manager';
-    tabs.title.label = 'Modules';
-    shell.addToRightArea(tabs, { rank: 600 });
-    // renderReact(tabs.contentNode);
-
-    app.restored.then(() => {
-      // const populate = () => {
-      //   tabs.clearTabs();
-      //   each(shell.widgets('main'), widget => { tabs.addTab(widget.title); });
-      // };
-      //
-      // // Connect signal handlers.
-      // shell.layoutModified.connect(() => { populate(); });
-      // tabs.tabActivateRequested.connect((sender, tab) => {
-      //   shell.activateById(tab.title.owner.id);
-      // });
-      // tabs.tabCloseRequested.connect((sender, tab) => {
-      //   tab.title.owner.close();
-      // });
-      //
-      // // Populate the tab manager.
-      // populate();
-      // renderReact(header);
-
-      renderReact(tabs.node, app, tracker.currentWidget);
-
-    });
+    const modulePage = new ModulePageWrapper(app, tracker);
+    restorer.add(modulePage, 'modules-manager');
+    modulePage.id = 'modules-manager';
+    modulePage.title.label = 'Modules';
+    shell.addToRightArea(modulePage, { rank: 600 });
+    shell.activateById(modulePage.id);
   },
   autoStart: true,
   requires: [ILayoutRestorer, INotebookTracker]

@@ -5,7 +5,7 @@ import {
   Switch,
 } from 'react-router-dom'
 import { connect } from 'dva'
-import { Icon, Button, Tag, Modal } from 'antd'
+import { Icon, Button, Tag, Modal, Affix, Spin, Row, Col } from 'antd'
 
 // pages
 import DataImport from '../../../DataImport/index'
@@ -23,7 +23,8 @@ import ProjectModel from '../../../../components/ProjectModal/index'
 import { showTime } from '../../../../utils/index'
 import styles from './index.less'
 
-import {projectDetailIcon} from '../../../../utils/constant';
+import { projectDetailIcon } from '../../../../utils/constant'
+
 const confirm = Modal.confirm
 
 const pages = ['import', 'analysis', 'modelling', 'deploy']
@@ -50,7 +51,8 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
   if (location.pathname.split('/').length > 3) {
     // project 4 step pages
     return (
-      <ProjectDetail match={match} history={history} location={location} projectDetail={projectDetail} dispatch={dispatch}/>
+      <ProjectDetail match={match} history={history} location={location} projectDetail={projectDetail}
+                     dispatch={dispatch}/>
     )
   } else {
     // project info page
@@ -73,52 +75,54 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
                 Create Time: {showTime(projectDetail.project.create_time)}
               </p>
             </div>
-            <div className={styles.description}>
-              <p>{projectDetail.project.description}</p>
-              <br/>
-              <h3>Jobs: </h3>
-              {projectDetail.jobs.map((job) => <p key={job.id}>{job.path}</p>)}
-            </div>
-            <div className={styles.tags}>
-              {projectDetail.project.tags.map(e => <Tag color="#EEEEEE" style={{ color: '#666666' }} key={e}>{e}</Tag>)}
+            <div className={styles.body}>
+              <div className={styles.description}>
+                <p>{projectDetail.project.description}</p>
+              </div>
+              <div className={styles.tags}>
+                {projectDetail.project.tags.map(e => <Tag color="#EEEEEE" style={{ color: '#666666' }} key={e}>{e}</Tag>)}
+              </div>
+              <Button type="primary" className={styles.enterNotebook}
+                      onClick={() => history.push(`/workspace/${match.params.projectId}/notebook`)}>
+                Enter Notebook
+              </Button>
             </div>
           </div>
-          <div className={styles.navCards}>
-            <MyCard icon='file-add' text='Data Import' style={{ marginRight: 50 }}
-                    onClick={() => history.push(`/workspace/${match.params.projectId}/import`)}
-                    imgPath={projectDetailIcon['project_step01']}
-            />
-            <MyCard icon='line-chart' text='Data Analysis' style={{ marginRight: 50 }}
-                    onClick={() => history.push(`/workspace/${match.params.projectId}/analysis`)}
-                    imgPath={projectDetailIcon['project_step02']}
-            />
-            <MyCard icon='edit' text='Model Design' style={{ marginRight: 50 }}
-                    onClick={() => history.push(`/workspace/${match.params.projectId}/modelling`)}
-                    imgPath={projectDetailIcon['project_step03']}
-            />
-            <MyCard icon='api' text='Model Deployment'
-                    onClick={() => history.push(`/workspace/${match.params.projectId}/deploy`)}
-                    imgPath={projectDetailIcon['project_step04']}
-            />
+          <div className={styles.jobs}>
+            <h2>Jobs: </h2>
+            <p>
+              <span className={styles.done}>10</span> have done&nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.running}>9</span> are running&nbsp;&nbsp;&nbsp;&nbsp;
+              <span className={styles.error}>2</span> went error&nbsp;&nbsp;&nbsp;&nbsp;
+            </p>
+            {projectDetail.jobs.map((job) => <p key={job.id}>{job.path}</p>)}
+            <Row>
+              <Col span={12}>col-12</Col>
+              <Col span={12}>col-12</Col>
+            </Row>
+            <Row>
+              <Col span={12}>col-12</Col>
+              <Col span={12}>col-12</Col>
+            </Row>
           </div>
         </div>
       )
     }
-    return <div/>
+    return <Spin spinning={true}>Loading...</Spin>
   }
-
 }
 
 function ProjectDetail({ match, history, location, dispatch, projectDetail }) {
 
   return (
     <div className={`main-container ${styles.normal}`}>
-      <div className={styles.step}>
-        <Steps match={match} history={history} location={location}
-               dispatch={dispatch} projectDetail={projectDetail}
-        />
-      </div>
+      {/*<div className={styles.step}>*/}
+        {/*<Steps match={match} history={history} location={location}*/}
+               {/*dispatch={dispatch} projectDetail={projectDetail}*/}
+        {/*/>*/}
+      {/*</div>*/}
       <Switch>
+        <Route path="/workspace/:projectID/notebook" component={Modelling}/>
         <Route path="/workspace/:projectID/import/choice" component={DataImport}/>
         <Route path="/workspace/:projectID/import/preview" component={DataPreview}/>
         <Route path="/workspace/:projectID/import/select" component={DataSelection}/>

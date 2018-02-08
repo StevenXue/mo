@@ -57,7 +57,7 @@ export default {
   },
   "theme": {
     "primary-color": "#34C0E2",
-    "font-family": "Roboto",
+    // "font-family": "Roboto",
     'text-color': 'fade(#000, 90%)',
     // "font-family": "Helvetica Neue","Helvetica","PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑", "Arial", "sans-serif"
 
