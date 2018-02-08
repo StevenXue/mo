@@ -13,7 +13,6 @@ import ParamsMapper from './ParamsMapper'
 
 import { getModules, getModule } from './services'
 import { ModulePage } from './reactIndex'
-import { ILauncher, ILauncherItem } from '../../metapackage/lib/launcher/src'
 
 function genConf(args) {
   return JSON.stringify(args).replace(/'/g, '`')

@@ -113,7 +113,6 @@ class ModulePage extends React.Component {
   }
 
   render() {
-    console.log('render', this.props)
     if (this.state.moduleId !== undefined) {
       return (
         <div style={{ minHeight: 100, overflowY: 'auto' }}>
