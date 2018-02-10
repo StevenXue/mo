@@ -29,3 +29,15 @@ export function fetchAllAnswerOfThisUserRequest(payload) {
   return request(`${CORS}/request_answer?user_request_id=${payload.user_request_ID}`);
 }
 
+export function votesUpAnswer(payload) {
+  return request(`${CORS}/request_answer/votes`, {
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      votes_user_id : payload.votes_user_id,
+      request_answer_id : payload.request_answer_id
+    }),
+  });
+}

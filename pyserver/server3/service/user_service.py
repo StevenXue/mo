@@ -23,7 +23,8 @@ def authenticate(user_ID, password):
 
 def update_request_vote(user_request_id, user_ID):
     user = user_business.get_by_user_ID(user_ID)
-    user_request = user_request_business.get_by_user_request_id(user_request_id)
+    user_request = user_request_business.\
+        get_by_user_request_id(user_request_id)
 
     if user_request in user.request_vote_up:
         user.request_vote_up.remove(user_request)
@@ -38,12 +39,8 @@ def update_request_vote(user_request_id, user_ID):
     else:
         user_request.votes_up_user.append(user)
         user_request_result = user_request.save()
-
     if user_result and user_request_result:
-        return {
-            "user": user_result.to_mongo(),
-            "user_request": user_request_result.to_mongo()
-        }
+        return user_request_result.to_mongo()
 
 
 def update_answer_vote(request_answer_id, user_ID):
@@ -55,7 +52,7 @@ def update_answer_vote(request_answer_id, user_ID):
         user.answer_vote_up.remove(request_answer)
         user_result = user.save()
     else:
-        user.request_vote_up.append(request_answer)
+        user.answer_vote_up.append(request_answer)
         user_result = user.save()
 
     if user in request_answer.votes_up_user:
@@ -66,10 +63,7 @@ def update_answer_vote(request_answer_id, user_ID):
         request_answer_result = request_answer.save()
 
     if user_result and request_answer_result:
-        return {
-            "user": user_result.to_mongo(),
-            "request_answer": request_answer_result.to_mongo()
-        }
+        return request_answer_result.to_mongo()
 
 
 def favor_api(user_ID, api_id):

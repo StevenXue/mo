@@ -7,6 +7,7 @@ import {get} from 'lodash'
 import {showTime} from '../../../utils/index'
 import BraftEditor from 'braft-editor'
 import 'braft-editor/dist/braft.css'
+import {JsonToArray} from "../../../utils/JsonUtils"
 
 const {TextArea} = Input
 const TabPane = Tabs.TabPane
@@ -161,13 +162,16 @@ function callback(key) {
   console.log(key)
 }
 
-function UserRequestDetail({allRequest, dispatch}) {
+function UserRequestDetail({allRequest,login, dispatch}) {
   const {
     focusUserRequest,
   } = allRequest
 
-  function votesup() {
-    console.log('????????')
+  const {_id:user_obj_id}
+  = login.user
+
+
+  function requestvotesup() {
     dispatch({
       type: 'allRequest/votesUpRequest',
       payload: {
@@ -176,13 +180,24 @@ function UserRequestDetail({allRequest, dispatch}) {
     })
   }
 
+  function answervotesup(request_answer_id) {
+    dispatch({
+      type: 'allRequest/votesUpAnswer',
+      payload: {
+        request_answer_id: request_answer_id,
+      }
+    })
+  }
 
   if (focusUserRequest !== null) {
     return (
       <div className={`main-container ${styles.normal}`}>
         <div>
-          <Button icon="caret-up" onClick={()=>votesup()}></Button>
-          {focusUserRequest['votes']}
+          <Button icon="caret-up"
+                  onClick={()=>requestvotesup()}
+                  type = {focusUserRequest['votes_up_user'].includes(user_obj_id)?'primary':''}
+          />
+          {focusUserRequest['votes_up_user'].length }
         </div>
         <h2
           style={{paddingBottom: 10}}>{focusUserRequest['title']}
@@ -190,25 +205,29 @@ function UserRequestDetail({allRequest, dispatch}) {
         <p>{get(focusUserRequest, 'description') ? get(focusUserRequest, 'description') : null}</p>
         <h2 style={{padding: '20px 0 0 0'}}>Comments</h2>
         {focusUserRequest.comments && focusUserRequest.comments.map(e =>
-          <Card key={e._id} style={{cursor: 'pointer'}}>
+          <div>
             <div>
               <p>{e.comments}</p>
               <p>- {e.comments_user_id}</p>
               <p>{showTime(e.create_time)}</p>
             </div>
-          </Card>)}
+          </div>)}
         <div style={{margin: '20px 8px 8px 0'}}>
           <WrappedCommentForm dispatch={dispatch} comments_type={'request'}/>
         </div>
         <div>
           <h2>Answers</h2>
           <div>
-            Text
 
           </div>
           <div>
-            {focusUserRequest.answer && focusUserRequest.answer.map(e =>
-              <Card key={e._id} style={{cursor: 'pointer'}}>
+            {focusUserRequest.answer && JsonToArray(focusUserRequest.answer).map(e =>
+              <div>
+                <Button icon="caret-up"
+                        onClick={()=>answervotesup(e._id)}
+                        type = {e['votes_up_user'].includes(user_obj_id)?'primary':''}
+                        />
+                {e['votes_up_user'].length }
                 <div>
                   <div dangerouslySetInnerHTML={{
                     __html: e.answer
@@ -227,7 +246,7 @@ function UserRequestDetail({allRequest, dispatch}) {
                 <WrappedCommentForm dispatch={dispatch}
                                     comments_type={'answer'}
                                     request_answer_id={e._id}/>
-              </Card>)}
+              </div>)}
           </div>
         </div>
         <div className="demo">
@@ -245,4 +264,4 @@ function UserRequestDetail({allRequest, dispatch}) {
 }
 
 const WrappedCommentForm = Form.create()(CommentForm)
-export default connect(({allRequest}) => ({allRequest}))(UserRequestDetail)
+export default connect(({allRequest,login}) => ({allRequest,login}))(UserRequestDetail)

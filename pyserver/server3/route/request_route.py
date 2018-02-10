@@ -95,8 +95,10 @@ def update_user_request_votes():
     data = request.get_json()
     user_request_id = data["user_request_id"]
     votes_user_id = data["votes_user_id"]
-    user_service.update_request_vote(user_request_id, votes_user_id)
-    return jsonify({'response': 'update_user_request_votes'}), 200
+    result = user_service.update_request_vote(user_request_id, votes_user_id)
+    result = json_utility.convert_to_json(result)
+    print('update_user_request_votes')
+    return jsonify({'response': result}), 200
 
 
 @user_request_app.route('', methods=['PUT'])

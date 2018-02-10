@@ -3,6 +3,7 @@ from mongoengine import ListField
 from mongoengine import StringField
 from mongoengine import DateTimeField
 from mongoengine import IntField
+from mongoengine import ReferenceField
 
 STATUS = (
     (0, 'open'),
@@ -26,4 +27,4 @@ class UserRequest(DynamicDocument):
     input = StringField()
     output = StringField()
     comments_number = IntField(default=0)
-    votes_up_user = ListField(StringField())
+    votes_up_user = ListField(ReferenceField('User'))

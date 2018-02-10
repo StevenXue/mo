@@ -8,6 +8,7 @@ from flask import request
 from server3.service import comments_service
 from server3.service import request_answer_service
 from server3.utility import json_utility
+from server3.service import user_service
 
 PREFIX = '/request_answer'
 
@@ -92,4 +93,15 @@ def remove_request_answer():
         return jsonify({'response': 'no user_ID arg'}), 400
     result = request_answer_service.remove_request_answer_by_id(
         ObjectId(request_answer_id), user_id)
+    return jsonify({'response': result}), 200
+
+
+@request_answer_app.route('/votes', methods=['PUT'])
+def update_request_answer_votes():
+    data = request.get_json()
+    request_answer_id = data["request_answer_id"]
+    votes_user_id = data["votes_user_id"]
+    result = user_service.update_answer_vote(request_answer_id, votes_user_id)
+    result = json_utility.convert_to_json(result)
+    print('update_request_answer_votes')
     return jsonify({'response': result}), 200

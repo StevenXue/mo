@@ -47,7 +47,7 @@ function AllRequest({history, allRequest, dispatch}) {
         />
       </div>
       <div className={styles.requestList}>
-      {allRequest.userRequest.map(e =>
+      {JsonToArray(allRequest.userRequestDic).map(e =>
         <Card key={e._id} title={e.title} className={styles.card}
               onClick={() => toUserRequestDetail(e, history)} style={{ cursor: 'pointer' }}>
           <div>
