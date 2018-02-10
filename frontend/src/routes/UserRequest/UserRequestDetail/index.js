@@ -60,7 +60,6 @@ class CommentForm extends React.Component {
     const {getFieldDecorator, getFieldsError, getFieldError, isFieldTouched} = this.props.form
     // Only show error after a field is touched.
     const emptyCommentError = isFieldTouched('comment') && getFieldError('comment')
-
     return (
       <Form layout="inline" onSubmit={this.handleSubmit}>
         <FormItem
@@ -167,9 +166,24 @@ function UserRequestDetail({allRequest, dispatch}) {
     focusUserRequest,
   } = allRequest
 
+  function votesup() {
+    console.log('????????')
+    dispatch({
+      type: 'allRequest/votesUpRequest',
+      payload: {
+        user_request_id: focusUserRequest['_id'],
+      }
+    })
+  }
+
+
   if (focusUserRequest !== null) {
     return (
       <div className={`main-container ${styles.normal}`}>
+        <div>
+          <Button icon="caret-up" onClick={()=>votesup()}></Button>
+          {focusUserRequest['votes']}
+        </div>
         <h2
           style={{paddingBottom: 10}}>{focusUserRequest['title']}
         </h2>

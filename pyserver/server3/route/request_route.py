@@ -6,6 +6,7 @@ from flask import make_response
 from flask import request
 
 from server3.service import user_request_service
+from server3.service import user_service
 from server3.utility import json_utility
 
 PREFIX = '/user_request'
@@ -30,6 +31,7 @@ def get_user_request():
         return make_response(jsonify({'response': user_request}), 200)
     try:
         print('haha')
+        print(user_request_id)
         user_request = user_request_service.get_by_id(user_request_id)
         user_request = json_utility.convert_to_json(user_request.to_mongo())
         print('user_request', user_request)
@@ -54,8 +56,6 @@ def list_user_request():
 
 @user_request_app.route('', methods=['POST'])
 def create_user_request():
-    print('aha')
-    print(request.json)
     if not request.json \
             or 'request_title' not in request.json \
             or 'user_id' not in request.json:
@@ -88,6 +88,16 @@ def create_user_request():
     user_request_service.create_user_request(request_title, user_id,
                                              **kwargs)
     return jsonify({'response': 'create user_request success'}), 200
+
+
+@user_request_app.route('/votes', methods=['PUT'])
+def update_user_request_votes():
+    data = request.get_json()
+    user_request_id = data["user_request_id"]
+    votes_user_id = data["votes_user_id"]
+    user_request_service.update_votes(user_request_id, votes_user_id)
+    user_service.update_request_vote(user_request_id, votes_user_id)
+    return jsonify({'response': 'update_user_request_votes'}), 200
 
 
 @user_request_app.route('', methods=['PUT'])

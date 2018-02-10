@@ -51,3 +51,16 @@ export function fetchOneUserRequest(payload) {
 export function searchUserRequest(payload) {
   return request(`${CORS}/user_request?searchStr=${payload.searchStr}`);
 }
+
+export function votesUpRequest(payload) {
+  return request(`${CORS}/user_request/votes`, {
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      votes_user_id : payload.votes_user_id,
+      user_request_id : payload.user_request_id
+    }),
+  });
+}

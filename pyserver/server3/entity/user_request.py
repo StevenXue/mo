@@ -26,3 +26,4 @@ class UserRequest(DynamicDocument):
     input = StringField()
     output = StringField()
     comments_number = IntField(default=0)
+    votes_up_user = ListField(StringField())

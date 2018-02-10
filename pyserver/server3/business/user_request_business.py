@@ -5,6 +5,7 @@ from datetime import datetime
 
 from server3.entity.user_request import UserRequest
 from server3.repository.user_request_repo import UserRequestRepo
+from server3.utility import json_utility
 
 user_request_repo = UserRequestRepo(UserRequest)
 
@@ -31,4 +32,3 @@ def update_user_request_by_id(user_request_id, **kwargs):
 
 def remove_by_id(user_request_id):
     return user_request_repo.delete_by_id(user_request_id)
-

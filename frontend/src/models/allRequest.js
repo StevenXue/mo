@@ -149,6 +149,8 @@ export default {
       if (result) {
         yield call(fetchAllCommentsOfThisRequest, {payload: {userrequestId: payload.user_request_id}}, {
           call, put})
+        yield call(fetchAllAnswerOfThisRequest, {payload: {userrequestId: payload.user_request_id}}, {
+          call, put})
       }
     },
     // 发布新回答
@@ -163,6 +165,15 @@ export default {
       if (result) {
         yield call(fetchAllAnswerOfThisRequest, {payload: {userrequestId: payload.user_request_id}}, {
           call, put})
+      }
+    },
+
+    * votesUpRequest(action, {call, put, select}) {
+      let payload = action.payload;
+      payload['votes_user_id'] = yield select(state => state.login.user.user_ID);
+      const {data: userRequest} = yield call(userRequestService.votesUpRequest, payload);
+      if (userRequest.length>0) {
+        yield put({type: 'setAllRequest', payload: {userRequest: userRequest}})
       }
     },
   },

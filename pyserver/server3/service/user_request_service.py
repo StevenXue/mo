@@ -5,7 +5,7 @@ from server3.business import user_business
 from server3.business import ownership_business
 from server3.service import ownership_service
 from server3.repository import config
-
+from server3.utility import json_utility
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
@@ -20,12 +20,26 @@ def get_by_id(user_request_id):
     return user_request
 
 
+def update_votes(user_request_id, votes_user_id):
+    user_request = user_request_business.get_by_user_request_id(user_request_id)
+    user_request = json_utility.convert_to_json(user_request.to_mongo())
+    all_votes_user_id = user_request['votes_up_user']
+    if votes_user_id in all_votes_user_id:
+        all_votes_user_id.remove(votes_user_id)
+    else:
+        all_votes_user_id.append(votes_user_id)
+
+    user_request_business. \
+        update_user_request_by_id(user_request_id,
+                                  votes_up_user=all_votes_user_id)
+
 def create_user_request(request_title, user_id, **kwargs):
     # create a new user_request object
-    created_user_request = user_request_business.add_user_request(title=request_title,
-                                                                  user_id=user_id,
-                                                                  status=0,
-                                                                  **kwargs)
+    created_user_request = user_request_business.add_user_request(
+        title=request_title,
+        user_id=user_id,
+        status=0,
+        **kwargs)
     if created_user_request:
         # get user object
         user = user_business.get_by_user_ID(user_ID=user_id)
@@ -33,20 +47,22 @@ def create_user_request(request_title, user_id, **kwargs):
         if ownership_business.add(user, user_request=created_user_request):
             return created_user_request
         else:
-            raise RuntimeError('Cannot create ownership of the new user_request')
+            raise RuntimeError(
+                'Cannot create ownership of the new user_request')
     else:
         raise RuntimeError('Cannot create the new user_request')
 
 
 def update_user_request(user_request_id, request_title, request_description,
                         request_dataset=None):
-
     user_request = user_request_business.get_by_user_request_id(user_request_id)
-    ow = ownership_business.get_ownership_by_owned_item(user_request, 'user_request')
-    user_request_business.update_user_request_by_id(user_request_id=user_request_id,
-                                                    request_title=request_title,
-                                                    request_description=request_description,
-                                                    request_dataset=request_dataset)
+    ow = ownership_business.get_ownership_by_owned_item(user_request,
+                                                        'user_request')
+    user_request_business.update_user_request_by_id(
+        user_request_id=user_request_id,
+        request_title=request_title,
+        request_description=request_description,
+        request_dataset=request_dataset)
 
 
 def list_user_request_by_user_ID(user_ID, order=-1):
@@ -68,4 +84,3 @@ def remove_user_request_by_id(user_request_id, user_ID):
     if user_ID != ownership.user.user_ID:
         raise ValueError('this request not belong to this user, cannot delete')
     return user_request_business.remove_by_id(user_request_id)
-

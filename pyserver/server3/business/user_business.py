@@ -22,4 +22,9 @@ def remove_by_id(user_id):
     return user_repo.delete_by_id(user_id)
 
 
+def update_user_request_by_id(user_ID, **kwargs):
+    return user_repo.update_one_by_id(user_ID, kwargs)
+
+
+
 

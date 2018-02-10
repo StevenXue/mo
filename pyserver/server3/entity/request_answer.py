@@ -22,4 +22,4 @@ class RequestAnswer(DynamicDocument):
     create_time = DateTimeField(required=True)
     edit_time = DateTimeField()
     answer_user_id = StringField(required=True)
-    vote_number = IntField(default=0)
+    votes_up_user = ListField(StringField())
