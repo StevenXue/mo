@@ -21,7 +21,7 @@ function checkStatus(response) {
  */
 export default async function request(url, options) {
   // concat url
-  const newUrl = `/api${url}`
+  const newUrl = `/pyapi${url}`
 
   // get token from storage
   // const token = await Storage.get('token', '')

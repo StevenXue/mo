@@ -4,7 +4,7 @@ from mongoengine import StringField
 from mongoengine import EmailField
 from mongoengine import IntField
 from mongoengine import ListField
-
+from mongoengine import ReferenceField
 GENDER = (
     (0, 'female'),
     (1, 'male')
@@ -24,3 +24,6 @@ class User(DynamicDocument):
     request_vote_up = ListField(StringField())
     answer_vote_up = ListField(StringField())
 
+    favor_apis = ListField(ReferenceField("Api"))
+    # 用户点赞的api列表
+    star_apis = ListField(ReferenceField("Api"))

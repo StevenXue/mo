@@ -60,7 +60,8 @@ c.JupyterHub.admin_access = True
 #  Consider using service_tokens for general services that talk to the JupyterHub
 #  API.
 c.JupyterHub.service_tokens = {
-    '3dff9236c0404344929729fd8fe7d376': 'zhaofengli',
+    '3dff9236c0404344929729fd8fe7d376': 'chen',
+    # '3dff9236c0404344929729fd8fe7d376': 'zhaofengli',
     # '597293565868fa9d55096844dce32f96b7d7291b7e194f4f': 'zhaofengli',
 }
 
@@ -632,7 +633,7 @@ c.Spawner.default_url = '/lab'
 #  Admin access should be treated the same way root access is.
 #  
 #  Defaults to an empty set, in which case no user has admin access.
-c.Authenticator.admin_users = {'zhaofengli'}
+c.Authenticator.admin_users = {'chen'}
 
 ## Automatically begin the login process
 #  
@@ -762,5 +763,5 @@ c.Authenticator.admin_users = {'zhaofengli'}
 c.DockerSpawner.container_image = 'singleuser:latest'
 c.DockerSpawner.remove_containers = True
 # c.DockerSpawner.use_internal_ip =
-c.DockerSpawner.volumes = { '/Users/zhaofengli/projects/goldersgreen/pyserver/user_directory/{username}': '/home/jovyan/work',
-                            '/Users/zhaofengli/projects/goldersgreen/pyserver/server3/lib/modules': '/home/jovyan/modules'}
+c.DockerSpawner.volumes = { '/Users/chen/myPoject/gitRepo/goldersgreen/pyserver/user_directory/{username}': '/home/jovyan/work',
+                            '/Users/chen/myPoject/gitRepo/goldersgreen/pyserver/server3/lib/modules': '/home/jovyan/modules'}

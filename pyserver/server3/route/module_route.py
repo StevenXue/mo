@@ -1,3 +1,12 @@
+"""
+Blueprint for api
+
+Author: Bingwei Chen
+Date: 2018.01.28
+
+module_route 即U4上传的 module 模块，本文件将实现所有关于 module 应用的服务
+新增module，获取单个module，获取module列表，修改module
+"""
 import sys
 from flask import Blueprint
 from flask import jsonify
@@ -15,10 +24,10 @@ module_app = Blueprint("module_app", __name__, url_prefix=PREFIX)
 def add():
     data = request.get_json()
     try:
-        user_ID = data.pop("user_ID")
         name = data.pop("name")
+        user_ID = data.pop("user_ID")
         user = user_business.get_by_user_ID(user_ID)
-        result = module_business.add(user=user, name=name, user_ID=user_ID, **data)
+        result = module_business.add(name=name, user=user, **data)
         print("result", result)
         result = json_utility.convert_to_json(result.to_mongo())
         return jsonify({
@@ -73,9 +82,9 @@ def update_module():
         print("Unexpected error:", sys.exc_info()[0])
         raise
 
-    # module_id = module_business.get_by_module_id()
+        # module_id = module_business.get_by_module_id()
 
 
-# @module_app.route('update_doc', methods=['POST'])
-# def update_doc():
-#     data = request.get_json()
+        # @module_app.route('update_doc', methods=['POST'])
+        # def update_doc():
+        #     data = request.get_json()

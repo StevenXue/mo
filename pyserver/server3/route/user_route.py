@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 """
-Blueprint for file
+Blueprint for user
+
+新增 用户收藏api，取消收藏api
 
 Author: Zhaofeng Li
 Date: 2017.05.22
@@ -58,3 +60,71 @@ def login():
     response = {'response': {'token': create_access_token(identity=user),
                              'user': user_obj}}
     return jsonify(response), 200
+
+
+@user_app.route('/favor_api', methods=['PUT'])
+def favor_api():
+    """
+    在用户和api下都存一份
+    用户存api_id
+    api存 user_ID
+    :return:
+    :rtype:
+    """
+    user_ID = request.json.get('user_ID', None)
+    api_id = request.json.get('api_id', None)
+    result = user_service.favor_api(user_ID=user_ID, api_id=api_id)
+    if result:
+        result = json_utility.convert_to_json(result)
+        return jsonify({
+            'message': "success",
+            'response': result
+                        }), 200
+    else:
+        return jsonify({'response': "failed"}), 400
+
+
+@user_app.route('/star_api', methods=['PUT'])
+def star_api():
+    """
+    在用户和api下都存一份
+    用户存api_id
+    api存 user_ID
+    :return:
+    :rtype:
+    """
+    user_ID = request.json.get('user_ID', None)
+    api_id = request.json.get('api_id', None)
+    result = user_service.star_api(user_ID=user_ID, api_id=api_id)
+    if result:
+        result = json_utility.convert_to_json(result)
+        return jsonify({
+            'message': "success",
+            'response': result
+        }), 200
+    else:
+        return jsonify({'response': "failed"}), 400
+
+
+
+
+# @user_app.route('/un_favor_api', methods=['PUT'])
+# def un_favor_api():
+#     """
+#     在用户和api下都存一份
+#     用户存api_id
+#     api存 user_ID
+#     :return:
+#     :rtype:
+#     """
+#     user_ID = request.json.get('user_ID', None)
+#     api_id = request.json.get('api_id', None)
+#     result = user_service.un_favor_api(user_ID=user_ID, api_id=api_id)
+#     if result:
+#         result = json_utility.convert_to_json(result)
+#         return jsonify({
+#             'message': "success",
+#             'response': result
+#         }), 200
+#     else:
+#         return jsonify({'response': "failed"}), 400
