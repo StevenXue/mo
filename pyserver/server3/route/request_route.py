@@ -95,7 +95,6 @@ def update_user_request_votes():
     data = request.get_json()
     user_request_id = data["user_request_id"]
     votes_user_id = data["votes_user_id"]
-    user_request_service.update_votes(user_request_id, votes_user_id)
     user_service.update_request_vote(user_request_id, votes_user_id)
     return jsonify({'response': 'update_user_request_votes'}), 200
 

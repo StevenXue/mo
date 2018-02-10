@@ -20,19 +20,6 @@ def get_by_id(user_request_id):
     return user_request
 
 
-def update_votes(user_request_id, votes_user_id):
-    user_request = user_request_business.get_by_user_request_id(user_request_id)
-    user_request = json_utility.convert_to_json(user_request.to_mongo())
-    all_votes_user_id = user_request['votes_up_user']
-    if votes_user_id in all_votes_user_id:
-        all_votes_user_id.remove(votes_user_id)
-    else:
-        all_votes_user_id.append(votes_user_id)
-
-    user_request_business. \
-        update_user_request_by_id(user_request_id,
-                                  votes_up_user=all_votes_user_id)
-
 def create_user_request(request_title, user_id, **kwargs):
     # create a new user_request object
     created_user_request = user_request_business.add_user_request(

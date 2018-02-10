@@ -23,7 +23,6 @@ def remove_by_id(user_id):
 
 
 def update_user_request_by_id(user_ID, **kwargs):
-    print(kwargs)
     query = {'user_ID': user_ID}
     return user_repo.update_one(query, kwargs)
 

@@ -26,9 +26,6 @@ def add_user_request(title, **kwargs):
     return user_request_repo.create(user_request_obj)
 
 
-def update_user_request_by_id(user_request_id, **kwargs):
-    return user_request_repo.update_one_by_id(user_request_id, kwargs)
-
 
 def remove_by_id(user_request_id):
     return user_request_repo.delete_by_id(user_request_id)

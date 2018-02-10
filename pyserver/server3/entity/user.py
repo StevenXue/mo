@@ -19,11 +19,11 @@ class User(DynamicDocument):
     phone = StringField(unique=True)
     gender = IntField(choices=GENDER)
     age = IntField()
+    # 用户点赞的request列表
+    request_vote_up = ListField(ReferenceField("UserRequest"))
+    # 用户点赞的answer列表
+    answer_vote_up = ListField(ReferenceField("RequestAnswer"))
     # 用户收藏的api列表
-    favor_apis = ListField()
-    request_vote_up = ListField(StringField())
-    answer_vote_up = ListField(StringField())
-
     favor_apis = ListField(ReferenceField("Api"))
     # 用户点赞的api列表
     star_apis = ListField(ReferenceField("Api"))
