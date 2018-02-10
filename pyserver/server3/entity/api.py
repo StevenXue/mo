@@ -3,6 +3,8 @@ from mongoengine import DynamicDocument
 from mongoengine import StringField
 from mongoengine import IntField
 from mongoengine import DictField
+from mongoengine import ListField
+from mongoengine import ReferenceField
 
 RE_TYPE = (
     (0, 'disabled'),
@@ -28,3 +30,7 @@ class Api(DynamicDocument):
     status = IntField(choices=RE_TYPE)
     # 模拟的数据
     fake_response = StringField()
+    # 收藏这条api的用户
+    favor_users = ListField(ReferenceField("User"))
+    # 点赞这条api的用户
+    star_users = ListField(ReferenceField("User"))
