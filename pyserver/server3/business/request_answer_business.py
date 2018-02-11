@@ -16,6 +16,11 @@ def get_all_answer_of_this_user_request(user_request_id):
     return request_answer_repo.read(query)
 
 
+def get_answer_number_of_this_user_request(user_request_id):
+    query = {'user_request_id': ObjectId(user_request_id)}
+    return request_answer_repo.read(query).count()
+
+
 def get_by_request_answer_id(request_answer_id):
     return request_answer_repo.read_by_unique_field(
         'id',

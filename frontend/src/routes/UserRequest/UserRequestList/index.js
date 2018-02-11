@@ -1,6 +1,6 @@
 import React from 'react'
 import {connect} from 'dva'
-import {Select,  Card, Input,Icon,Button } from 'antd'
+import {Select, Card, Input, Icon, Button} from 'antd'
 import {showTime} from '../../../utils/index'
 import {dataCategory} from '../../../constants'
 import {arrayToJson, JsonToArray} from '../../../utils/JsonUtils'
@@ -47,21 +47,20 @@ function AllRequest({history, allRequest, dispatch}) {
         />
       </div>
       <div className={styles.requestList}>
-      {JsonToArray(allRequest.userRequestDic).map(e =>
-        <Card key={e._id} title={e.title} className={styles.card}
-              onClick={() => toUserRequestDetail(e, history)} style={{ cursor: 'pointer' }}>
-          <div>
+        {JsonToArray(allRequest.userRequestDic).map(e =>
+          <Card key={e._id} title={e.title} className={styles.card}
+                onClick={() => toUserRequestDetail(e, history)}
+                style={{cursor: 'pointer'}}>
             <div>
-             {e['user_id'] &&  <p><Icon type="user" />  {e.user_id}</p>}
-             {e['tags'] &&  <p><Icon type="tag" />  {e.tags}</p>}
-             {<p><Icon type="message" /> {e.comments_number}</p>}
-              <Icon type="star" />
+              <div>
+                {e['user_id'] && <p><Icon type="user"/> {e.user_id}</p>}
+                {e['tags'] && <p><Icon type="tag"/> {e.tags}</p>}
+                <Button icon="caret-up">&emsp;{e['votes_up_user'].length}</Button>&emsp;&emsp;
+                <Button icon="star">收藏</Button>&emsp;&emsp;
+                <Icon type="clock-circle-o"/> {showTime(e.create_time)}
+              </div>
             </div>
-            <div>
-            <p><Icon type="clock-circle-o" /> {showTime(e.create_time)}</p>
-            </div>
-          </div>
-        </Card>)}
+          </Card>)}
       </div>
     </div>
   )

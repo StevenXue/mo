@@ -64,3 +64,18 @@ export function votesUpRequest(payload) {
     }),
   });
 }
+
+
+
+export function starRequest(payload) {
+  return request(`${CORS}/user_request/star`, {
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      star_user_id : payload.star_user_id,
+      user_request_id : payload.user_request_id
+    }),
+  });
+}

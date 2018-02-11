@@ -6,6 +6,8 @@ from flask import make_response
 from flask import request
 
 from server3.service import user_request_service
+from server3.service import request_answer_service
+
 from server3.service import user_service
 from server3.utility import json_utility
 
@@ -23,10 +25,16 @@ def get_user_request():
             user_request = user_request_service.get_all_user_request()
             user_request = json_utility.convert_to_json([i.to_mongo()
                                                          for i in user_request])
+            # 查询每个request下的答案数
+            for each_request in user_request:
+                each_request['answer_number'] = \
+                    request_answer_service.get_answer_number_of_this_user_request(
+                        each_request['_id'])
         except Exception as e:
             return make_response(jsonify({'response': '%s: %s' %
                                                       (
-                                                      str(Exception), e.args)}),
+                                                          str(Exception),
+                                                          e.args)}),
                                  400)
         return make_response(jsonify({'response': user_request}), 200)
     try:
@@ -98,6 +106,17 @@ def update_user_request_votes():
     result = user_service.update_request_vote(user_request_id, votes_user_id)
     result = json_utility.convert_to_json(result)
     print('update_user_request_votes')
+    return jsonify({'response': result}), 200
+
+
+@user_request_app.route('/star', methods=['PUT'])
+def update_user_request_star():
+    data = request.get_json()
+    user_request_id = data["user_request_id"]
+    star_user_id = data["star_user_id"]
+    result = user_service.update_request_star(user_request_id, star_user_id)
+    result = json_utility.convert_to_json(result)
+    print('update_user_request_star')
     return jsonify({'response': result}), 200
 
 

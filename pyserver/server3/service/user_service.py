@@ -43,6 +43,28 @@ def update_request_vote(user_request_id, user_ID):
         return user_request_result.to_mongo()
 
 
+def update_request_star(user_request_id, user_ID):
+    user = user_business.get_by_user_ID(user_ID)
+    user_request = user_request_business. \
+        get_by_user_request_id(user_request_id)
+
+    if user_request in user.request_star:
+        user.request_star.remove(user_request)
+        user_result = user.save()
+    else:
+        user.request_star.append(user_request)
+        user_result = user.save()
+
+    if user in user_request.star_user:
+        user_request.star_user.remove(user)
+        user_request_result = user_request.save()
+    else:
+        user_request.star_user.append(user)
+        user_request_result = user_request.save()
+    if user_result and user_request_result:
+        return user_request_result.to_mongo()
+
+
 def update_answer_vote(request_answer_id, user_ID):
     user = user_business.get_by_user_ID(user_ID)
     request_answer = request_answer_business.\

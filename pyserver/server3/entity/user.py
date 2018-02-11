@@ -21,6 +21,8 @@ class User(DynamicDocument):
     age = IntField()
     # 用户点赞的request列表
     request_vote_up = ListField(ReferenceField("UserRequest"))
+    # 用户star的request列表
+    request_star = ListField(ReferenceField("UserRequest"))
     # 用户点赞的answer列表
     answer_vote_up = ListField(ReferenceField("RequestAnswer"))
     # 用户收藏的api列表

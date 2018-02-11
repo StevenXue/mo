@@ -180,6 +180,15 @@ function UserRequestDetail({allRequest,login, dispatch}) {
     })
   }
 
+  function requeststar() {
+    dispatch({
+      type: 'allRequest/starRequest',
+      payload: {
+        user_request_id: focusUserRequest['_id'],
+      }
+    })
+  }
+
   function answervotesup(request_answer_id) {
     dispatch({
       type: 'allRequest/votesUpAnswer',
@@ -198,6 +207,10 @@ function UserRequestDetail({allRequest,login, dispatch}) {
                   type = {focusUserRequest['votes_up_user'].includes(user_obj_id)?'primary':''}
           />
           {focusUserRequest['votes_up_user'].length }
+          <Button icon="star"
+                  onClick={()=>requeststar()}
+                  type = {focusUserRequest['star_user'].includes(user_obj_id)?'primary':''}
+          />
         </div>
         <h2
           style={{paddingBottom: 10}}>{focusUserRequest['title']}

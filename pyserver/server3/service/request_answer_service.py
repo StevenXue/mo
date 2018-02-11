@@ -6,12 +6,15 @@ from server3.service import ownership_service
 
 
 def get_all_answer_of_this_user_request(user_request_id):
-    print('user_request_id')
-    print(user_request_id)
     request_answer = request_answer_business. \
         get_all_answer_of_this_user_request(user_request_id)
-    print(request_answer)
     return request_answer
+
+
+def get_answer_number_of_this_user_request(user_request_id):
+    request_answer_number = request_answer_business. \
+        get_answer_number_of_this_user_request(user_request_id)
+    return request_answer_number
 
 
 def get_by_id(request_answer_id):

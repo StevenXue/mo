@@ -52,7 +52,7 @@ export default {
         }
       }
     },
-    // 点击喜爱后 改变 requset 的状态
+    // 点击votesup后 改变 requset 的状态
     updateRequestVotesUp(state, action) {
       let requestAfterVotesUp = action.payload.requestAfterVotesUp
       let request_id = requestAfterVotesUp._id
@@ -82,7 +82,40 @@ export default {
         }
       }
     },
-// 点击喜爱后 改变 requset 的状态
+
+
+    // 点击star后 改变 requset 的状态
+    updateRequestStar(state, action) {
+      let requestAfterStar = action.payload.requestAfterStar
+      let request_id = requestAfterStar._id
+      if (state.focusUserRequest._id === request_id) {
+        return {
+          ...state,
+          userRequestDic:
+            {
+              ...state.userRequestDic,
+              [request_id]: action.payload.requestAfterStar
+            },
+          focusUserRequest:
+            {
+              ...state.focusUserRequest,
+              star_user: requestAfterStar.star_user
+            }
+        }
+      }
+      else {
+        return {
+          ...state,
+          userRequestDic:
+            {
+              ...state.userRequestDic,
+              [request_id]: action.payload.requestAfterStar
+            }
+        }
+      }
+    },
+
+// 点击喜爱后 改变 answer 的状态
     updateAnswerVotesUp(state, action) {
       let answerAfterVotesUp = action.payload.answerAfterVotesUp
       let answer_id = answerAfterVotesUp._id
@@ -238,6 +271,16 @@ export default {
       yield put({
         type: 'updateRequestVotesUp',
         payload: {requestAfterVotesUp: requestAfterVotesUp}
+      })
+    },
+
+    * starRequest(action, {call, put, select}) {
+      let payload = action.payload
+      payload['star_user_id'] = yield select(state => state.login.user.user_ID)
+      const {data: requestAfterStar} = yield call(userRequestService.starRequest, payload)
+      yield put({
+        type: 'updateRequestStar',
+        payload: {requestAfterStar: requestAfterStar}
       })
     },
 
