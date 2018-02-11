@@ -50,8 +50,11 @@ class Module(DynamicDocument):
     # option
     language = StringField()
     tags = ListField(StringField())
+    # 创建时间
     create_time = DateTimeField()
-    submit_time = DateTimeField()
+    # 更新时间
+    update_time = DateTimeField()
+    # submit_time = DateTimeField()
     description = StringField(max_length=140)
     doc = StringField()
     publish = IntField(required=True, choices=MODEL_TYPE, default=0)

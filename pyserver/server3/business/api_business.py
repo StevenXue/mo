@@ -4,7 +4,8 @@ import datetime
 
 from server3.entity.api import Api
 from server3.repository.general_repo import Repo
-
+from server3.business import world_business
+from server3.entity.world import Channel
 api_repo = Repo(Api)
 
 
@@ -25,9 +26,12 @@ def add(name, user, **kwargs):
     :return:
     :rtype:
     """
+    message = "{}创建了app{}".format(user.name, name)
+    world_business.system_send(channel=Channel.api, message=message)
     url = "/" + user.user_ID + "/" + name + "/" + uuid.uuid4()
     create_time = datetime.datetime.utcnow()
-    api = Api(name=name, user=user, url=url, create_time=create_time, **kwargs)
+    api = Api(name=name, user=user, url=url, create_time=create_time, update_time=create_time,
+              **kwargs)
     return api_repo.create(api)
 
 
@@ -58,6 +62,9 @@ def remove_by_id(api_id):
 
 
 def update_by_id(api_id, **update):
+    # 增加最新更新时间
+    update_time = datetime.datetime.utcnow()
+    update["update_time"] = update_time
     return api_repo.update_one_by_id(api_id, update)
 
 

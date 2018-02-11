@@ -6,7 +6,8 @@ from server3.business import ownership_business
 from server3.service import ownership_service
 from server3.repository import config
 from server3.utility import json_utility
-
+from server3.business import world_business
+from server3.entity.world import Channel
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
 
@@ -20,6 +21,13 @@ def get_by_id(user_request_id):
     return user_request
 
 
+def create_request_message(request):
+    # tmp = "用户super_user发布了需求匹配夫妻脸"
+    user_id = request.user_id
+    user = user_business.get_by_user_ID(user_id)
+    return "用户{}发布了需求{}".format(user.name, request.title)
+
+
 def create_user_request(request_title, user_id, **kwargs):
     # create a new user_request object
     created_user_request = user_request_business.add_user_request(
@@ -28,6 +36,8 @@ def create_user_request(request_title, user_id, **kwargs):
         status=0,
         **kwargs)
     if created_user_request:
+        message = create_request_message(created_user_request)
+        world_business.system_send(channel=Channel.request, message=message)
         # get user object
         user = user_business.get_by_user_ID(user_ID=user_id)
         # create ownership relation

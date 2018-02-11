@@ -5,7 +5,7 @@ from mongoengine import IntField
 from mongoengine import DictField
 from mongoengine import ListField
 from mongoengine import ReferenceField
-
+from mongoengine import DateTimeField
 RE_TYPE = (
     (0, 'disabled'),
     (1, 'active')
@@ -44,6 +44,10 @@ class Api(DynamicDocument):
     star_users = ListField(ReferenceField("User"))
     # 调用次数
     usage_count = IntField(default=0)
+    # 创建时间
+    create_time = DateTimeField()
+    # 更新时间
+    update_time = DateTimeField()
 
     meta = {'indexes': [
         {'fields': ['$name', "$keyword", '$description'],
