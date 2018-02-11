@@ -1,4 +1,6 @@
 # -*- coding: UTF-8 -*-
+import uuid
+import datetime
 
 from server3.entity.api import Api
 from server3.repository.general_repo import Repo
@@ -6,14 +8,35 @@ from server3.repository.general_repo import Repo
 api_repo = Repo(Api)
 
 
-# def add(data_set, other_fields_dict):
-#     if not data_set or not other_fields_dict:
-#         raise ValueError('no data_set or no other_fields')
-#     return data_repo.create(Data(data_set=data_set, **other_fields_dict))
+def add(name, user, **kwargs):
+    """
+    根据 name, userId 生成url
+    未来提供自定义 url
+    :param name:
+    :type name:
+    :param user:
+    :type user:
+    :param kwargs:
+    :type kwargs:
+    :return:
+    :rtype:
+    """
+    url = "/" + user.user_ID + "/" + name + "/" + uuid.uuid4()
+    create_time = datetime.datetime.utcnow()
+    api = Api(name=name, user=user, url=url, create_time=create_time, **kwargs)
+    return api_repo.create(api)
+
+
+def get_all():
+    return api_repo.read({})
 
 
 def get_by_api_id(api_id):
     return api_repo.read_by_id(api_id)
+
+
+def get_by_api_ids(api_ids):
+    return [get_by_api_id(api_id) for api_id in api_ids]
 
 
 # 通过url字段找api
@@ -34,14 +57,7 @@ def update_by_id(api_id, **update):
     return api_repo.update_one_by_id(api_id, update)
 
 
-def add_api(json):
-    api = Api(**json)
-    return api_repo.create(api)
-
-
-def get_all():
-    return api_repo.read({})
-
+# def get_favor_apis()
 
 if __name__ == '__main__':
     api_json = {
@@ -68,5 +84,5 @@ if __name__ == '__main__':
         "fake_response": "预计延迟3小时",
         "domain": "http://192.168.31.6:5000"
     }
-    result = add_api(api_json)
+    result = add(api_json)
     print("result", result)

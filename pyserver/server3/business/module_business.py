@@ -12,7 +12,7 @@ base_path = './server3/lib/modules'
 tail_path = 'src/module_spec.yml'
 
 
-def add(user, name, user_ID, **kwargs):
+def add(name, user, **kwargs):
     try:
         module_path = kwargs.pop("module_path")
     except KeyError:
@@ -20,8 +20,8 @@ def add(user, name, user_ID, **kwargs):
 
     create_time = datetime.datetime.utcnow()
     model = Module(
-        user=user, name=name, user_ID=user_ID,
-        path=module_path,
+        user=user, name=name,
+        module_path=module_path,
         create_time=create_time, **kwargs)
     return module_repo.create(model)
 

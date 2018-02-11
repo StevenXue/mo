@@ -6,7 +6,7 @@ import {showTime} from '../../utils/index'
 
 import styles from './index.less'
 
-function ModuleList({moduleList, dispatch}) {
+function ModuleList({moduleList, dispatch, itemOnClick}) {
   return (
     <div className={`main-container ${styles.normal}`}>
       <div className={styles.requestList}>
@@ -14,6 +14,7 @@ function ModuleList({moduleList, dispatch}) {
           <Card key={e._id} title={e.name} className={styles.card}
                 style={{cursor: 'pointer'}}
                 onClick={() => dispatch(routerRedux.push('/modulelist/' + e._id))}
+                // onClick={itemOnClick(e._id)}
           >
             <div>
               <p>Description: {e.description}</p>

@@ -15,6 +15,8 @@ export function createNewUserRequestComments(payload) {
       user_id:payload.user_id,
       user_request_id:payload.user_request_id,
       comments:payload.comments,
+      comments_type:payload.comments_type,
+      request_answer_id:payload.request_answer_id
     }),
   });
 }

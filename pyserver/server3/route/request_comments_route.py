@@ -5,7 +5,7 @@ from flask import jsonify
 from flask import make_response
 from flask import request
 
-from server3.service import user_request_comments_service
+from server3.service import comments_service
 from server3.utility import json_utility
 
 PREFIX = '/user_request_comments'
@@ -18,14 +18,15 @@ user_request_comments_app = Blueprint("user_request_comments_app", __name__,
 def list_user_request_comments():
     user_request_id = request.args.get("user_request_id")
     user_id = request.args.get("user_ID")
+
     if user_request_id:
-        user_request_comments = user_request_comments_service. \
-            get_all_comments_of_this_user_request(user_request_id)
+        user_request_comments = comments_service. \
+            get_comments_of_this_user_request(user_request_id)
         user_request_comments = json_utility. \
             me_obj_list_to_json_list(user_request_comments)
         return jsonify({'response': user_request_comments}), 200
     elif user_id:
-        user_request_comments = user_request_comments_service.\
+        user_request_comments = comments_service.\
             list_user_request_comments_by_user_id(user_id)
         user_request_comments = json_utility. \
             me_obj_list_to_json_list(user_request_comments)
@@ -36,7 +37,6 @@ def list_user_request_comments():
 
 @user_request_comments_app.route('', methods=['POST'])
 def create_user_request_comments():
-    print('aha')
     if not request.json \
             or 'comments' not in request.json \
             or 'user_request_id' not in request.json \
@@ -46,11 +46,10 @@ def create_user_request_comments():
     comments = data['comments']
     user_id = data['user_id']
     user_request_id = data['user_request_id']
-    print('user_request_id')
-    print(user_request_id)
-
-    user_request_comments_service.create_user_request_comments(
-        user_request_id, user_id, comments)
+    comments_type = data['comments_type']
+    request_answer_id = data.get('request_answer_id', None)
+    comments_service.create_user_request_comments(
+        user_request_id, user_id, comments, comments_type, request_answer_id)
     return jsonify({'response': 'create user_request_comments success'}), 200
 
 
@@ -65,7 +64,7 @@ def update_user_request_comments():
     data = request.get_json()
     comments = data['comments']
     user_id = data['user_id']
-    user_request_comments_service.update_user_request_comments(
+    comments_service.update_user_request_comments(
         user_request_comments_id, user_id, comments)
     return jsonify({'response': 'update user_request_comments success'}), 200
 
@@ -78,6 +77,6 @@ def remove_user_request_comments():
         return jsonify({'response': 'no user_request_comments_id arg'}), 400
     if not user_id:
         return jsonify({'response': 'no user_ID arg'}), 400
-    result = user_request_comments_service.remove_user_request_comments_by_id(
+    result = comments_service.remove_user_request_comments_by_id(
         ObjectId(user_request_comments_id), user_id)
     return jsonify({'response': result}), 200
