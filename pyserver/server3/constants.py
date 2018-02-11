@@ -153,7 +153,7 @@ class SPEC(object):
         'display_name': None,
         'type': 'input',
         'value_type': 'int',
-        'range': None,  #[2, None],
+        'range': None,  # [2, None],
         "default": None,
         "required": False,
     }
@@ -194,4 +194,24 @@ class SPEC(object):
             'values': [],
         },
 
+    }
+
+
+class Error(Exception):
+    pass
+
+
+class Warning(Exception):
+    pass
+
+
+class ErrorMessage(Exception):
+    no_match_apis = {
+        "key": "无匹配服务",
+        "hint_message": "提示：无匹配服务\n"
+    }
+
+    error_get_type = {
+        "key": "错误的获取类型",
+        "hint_message": "提示：错误的获取类型\n"
     }

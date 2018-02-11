@@ -12,6 +12,14 @@ RE_TYPE = (
 )
 
 
+class ApiGetType:
+    all = "all"
+    favor = "favor"
+    star = "star"
+    used = "used"
+    chat = 'chat'
+
+
 class Api(DynamicDocument):
     name = StringField(max_length=50)
     # api对应的网址尾缀如: /api/xxx/xxxx
@@ -34,3 +42,10 @@ class Api(DynamicDocument):
     favor_users = ListField(ReferenceField("User"))
     # 点赞这条api的用户
     star_users = ListField(ReferenceField("User"))
+
+    meta = {'indexes': [
+        {'fields': ['$name', "$keyword", '$description'],
+         'default_language': "english",
+         'weights': {'name': 10, 'keyword': 8, 'description': 2}
+         }
+    ]}

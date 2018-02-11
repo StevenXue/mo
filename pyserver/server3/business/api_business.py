@@ -8,6 +8,10 @@ from server3.repository.general_repo import Repo
 api_repo = Repo(Api)
 
 
+def get(**kwargs):
+    return api_repo.read(kwargs)
+
+
 def add(name, user, **kwargs):
     """
     根据 name, userId 生成url
@@ -57,7 +61,8 @@ def update_by_id(api_id, **update):
     return api_repo.update_one_by_id(api_id, update)
 
 
-# def get_favor_apis()
+
+
 
 if __name__ == '__main__':
     api_json = {
