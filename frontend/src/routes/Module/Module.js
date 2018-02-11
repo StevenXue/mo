@@ -58,7 +58,7 @@ class Modules extends React.Component {
             style={{paddingBottom: 10}}>{get(moduleDetail, 'name', "名称")}
           </h2>
 
-          <Card key={moduleDetail._id} title={get(moduleDetail, 'module_path', "路径")}>
+          <Card key={moduleDetail._id} title={get(moduleDetail, 'path', "路径")}>
             <div>
               <p>{get(moduleDetail, 'description', "描述")}</p>
               <p>{get(moduleDetail, 'create_time') ? showTime(get(moduleDetail, 'create_time')) : '时间'}</p>

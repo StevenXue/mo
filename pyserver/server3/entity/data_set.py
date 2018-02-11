@@ -21,13 +21,22 @@ RELATED_FIELDS = ('Business', 'Government', 'Education', 'Environment',
 
 
 class DataSet(DynamicDocument):
+    # required
     name = StringField(max_length=50, required=True)
+    create_time = DateTimeField(required=True)
+    update_time = DateTimeField(required=True)
+    url = StringField(unique=True, required=True)
+    path = StringField(required=True)
+    size = IntField(required=True)  # by bytes
+
+    # optional
     description = StringField(max_length=140)
-    related_field = StringField(max_length=100, choices=RELATED_FIELDS)
     tags = ListField(StringField(max_length=50))
-    related_tasks = ListField(StringField(max_length=50))
+
+    # deprecated
     user_name = StringField(max_length=50)
-    file = ReferenceField('File')
+    related_field = StringField(max_length=100, choices=RELATED_FIELDS)
+    related_tasks = ListField(StringField(max_length=50))
     # file_obj = EmbeddedDocumentField('File')
     # meta = {'allow_inheritance': True}
     # url = StringField(unique=True, required=True)

@@ -44,14 +44,14 @@ PUBLISH_TYPE = (
 class Module(DynamicDocument):
     # required
     name = StringField(max_length=50, required=True)
-    module_path = StringField(required=True)
+    path = StringField(required=True)
     user = ReferenceField("User", required=True)
+    create_time = DateTimeField(required=True)
+    update_time = DateTimeField(required=True)
 
-    # option
+    # optional
     language = StringField()
     tags = ListField(StringField())
-    create_time = DateTimeField()
-    submit_time = DateTimeField()
     description = StringField(max_length=140)
     doc = StringField()
     publish = IntField(required=True, choices=MODEL_TYPE, default=0)

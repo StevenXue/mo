@@ -44,22 +44,6 @@ class ModulePage extends React.Component {
 
   componentDidMount() {
     getModules(this.onSuccess)
-    // NotebookActions.insertCode(this.props.tracker.currentWidget.notebook,
-    //   [
-    //     `# Please use current (work) folder to store your data and models\n`,
-    //     `import os\n`,
-    //     `import sys\n`,
-    //     `sys.path.append('../')\n`,
-    //     `\n`,
-    //     `from modules import json_parser\n`,
-    //     `from modules import Client\n`,
-    //     `\n`,
-    //     `client = Client('fackAPI')\n`,
-    //     `run = client.run\n`,
-    //     `train = client.train\n`,
-    //     `predict = client.predict`,
-    //   ],
-    // )
   }
 
   clickModule(module, func) {
@@ -81,7 +65,7 @@ class ModulePage extends React.Component {
       [
         `conf = '${genConf(this.state.args)}'\n`,
         `conf = json_parser(conf)\n`,
-        `${this.state.func}('${user_ID}/${this.state.module.name}', conf)\n`,
+        `result = ${this.state.func}('${user_ID}/${this.state.module.name}', conf)\n`,
       ],
     )
   }

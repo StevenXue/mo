@@ -30,6 +30,13 @@ function checkStatus(response) {
  */
 export default async function request(url, options, onSuccess=onSuccessDef, onError=onErrorDef) {
   try {
+    const token = localStorage.getItem('token')
+    if (token) {
+      options = {
+        ...options,
+        'Authentication': 'Bearer ' + token
+      }
+    }
 
     const response = await fetch(url, options)
 

@@ -21,7 +21,7 @@ def add(user, name, user_ID, **kwargs):
     create_time = datetime.datetime.utcnow()
     model = Module(
         user=user, name=name, user_ID=user_ID,
-        module_path=module_path,
+        path=module_path,
         create_time=create_time, **kwargs)
     return module_repo.create(model)
 
