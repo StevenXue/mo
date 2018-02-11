@@ -15,7 +15,6 @@
       "ES2015.Promise",
       "DOM"
     ],
-//    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
       "@jupyterlab/*": [
@@ -26,11 +25,13 @@
       ],
       "@jupyterlab/modules-extension": [
         "../modules-extension/src"
+      ],
+      "@jupyterlab/datasets-extension": [
+        "../datasets-extension/src"
       ]
     },
     "jsx": "react",
     "inlineSources": true,
-//    "allowJs": true,
     "sourceMap": true
   }
 }

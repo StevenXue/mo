@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from mongoengine import Document
+from mongoengine import DynamicDocument
 from mongoengine import BooleanField
 from mongoengine import ReferenceField
 from mongoengine import CASCADE
@@ -17,7 +17,7 @@ from server3.entity.user_request_comments import UserRequestComments
 OWNERSHIP_LEVEL = ('public', 'private')
 
 
-class Ownership(Document):
+class Ownership(DynamicDocument):
     private = BooleanField(required=True)
     user = ReferenceField('User', required=True)
     project = ReferenceField('Project', reverse_delete_rule=CASCADE)

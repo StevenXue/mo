@@ -9,6 +9,7 @@ from bson import ObjectId
 from flask import Blueprint
 from flask import jsonify
 from flask import request
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server3.service import data_service
 from server3.utility import json_utility
@@ -21,8 +22,10 @@ data_app = Blueprint("data_app", __name__, url_prefix=PREFIX)
 
 
 @data_app.route('/data_sets', methods=['GET'])
+@jwt_required
 def list_data_sets_by_user_ID():
-    user_ID = request.args.get('user_ID')
+    print(get_jwt_identity())
+    user_ID = get_jwt_identity()
     related_field = request.args.get('related_field')
     tag = request.args.get('tag')
     related_task = request.args.get('related_task')

@@ -1,0 +1,121 @@
+/*-----------------------------------------------------------------------------
+| Copyright (c) Jupyter Development Team.
+| Distributed under the terms of the Modified BSD License.
+|----------------------------------------------------------------------------*/
+
+/*-----------------------------------------------------------------------------
+| Variables
+|----------------------------------------------------------------------------*/
+
+:root {
+  --jp-private-modules-manager-active-top-border: 2px;
+  --jp-private-modules-manager-tab-height: 32px;
+  --jp-private-modules-manager-tab-padding-top: 8px;
+}
+
+/*-----------------------------------------------------------------------------
+| Tabs in the dock panel
+|----------------------------------------------------------------------------*/
+
+#modules-manager {
+  background: var(--jp-layout-color1);
+  overflow: visible;
+  color: var(--jp-ui-font-color1);
+  font-size: var(--jp-ui-font-size1);
+}
+
+#modules-manager header {
+  border-bottom: var(--jp-border-width) solid var(--jp-border-color2);
+  flex: 0 0 auto;
+  font-size: var(--jp-ui-font-size0);
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin: 0px;
+  padding: 12px 0 4px 12px;
+  text-transform: uppercase;
+}
+
+#modules-manager .p-TabBar-tab {
+  margin-left: calc(-1 * var(--jp-border-width));
+  height: var(--jp-private-modules-manager-tab-height);
+  padding: 0px 8px;
+  border-top: var(--jp-border-width) solid transparent;
+  border-bottom: var(--jp-border-width) solid transparent;
+  position: relative;
+  overflow: visible;
+}
+
+#modules-manager .p-TabBar-tab:hover:not(.jp-mod-active) {
+  background: var(--jp-layout-color2);
+}
+
+#modules-manager .p-TabBar-tab:first-child {
+  margin-left: 0;
+}
+
+#modules-manager .p-TabBar-tab.jp-mod-active {
+  color: white;
+  background: var(--jp-brand-color1);
+}
+
+#modules-manager .p-TabBar-tabIcon,
+#modules-manager .p-TabBar-tabLabel,
+#modules-manager .p-TabBar-tabCloseIcon {
+  display: inline-block;
+}
+
+#modules-manager .p-TabBar-tabLabel {
+  padding-top: var(--jp-private-modules-manager-tab-padding-top);
+  padding-left: 4px;
+}
+
+#modules-manager .p-TabBar-tab .p-TabBar-tabIcon {
+  width: 14px;
+  background-position: left center;
+  background-repeat: no-repeat;
+  margin-right: 2px;
+}
+
+#modules-manager .p-TabBar-tab.p-mod-current .p-TabBar-tabIcon {
+  margin-bottom: var(--jp-border-width);
+}
+
+#modules-manager .p-TabBar-tab.p-mod-closable > .p-TabBar-tabCloseIcon {
+  margin-left: 4px;
+  padding-top: 12px;
+  background-size: 16px;
+  height: 16px;
+  width: 16px;
+  background-image: var(--jp-icon-close);
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+#modules-manager .p-TabBar-tab.p-mod-closable.jp-mod-dirty > .p-TabBar-tabCloseIcon {
+  background-size: 10px;
+  background-image: var(--jp-icon-circle);
+}
+
+#modules-manager .p-TabBar-tab.p-mod-closable.jp-mod-dirty.jp-mod-active > .p-TabBar-tabCloseIcon {
+  background-size: 10px;
+  background-image: var(--jp-icon-inverse-circle);
+}
+
+#modules-manager .p-TabBar-tab.p-mod-closable.jp-mod-active > .p-TabBar-tabCloseIcon {
+  background-image: var(--jp-icon-inverse-close);
+}
+
+#modules-manager .p-TabBar-tab.p-mod-closable > .p-TabBar-tabCloseIcon:hover {
+  background-size: 16px;
+  background-image: var(--jp-icon-close-circle);
+}
+
+#modules-manager .p-TabBar-tab.p-mod-closable.jp-mod-active > .p-TabBar-tabCloseIcon:hover {
+  background-size: 16px;
+  background-image: var(--jp-icon-inverse-close-circle);
+}
+
+#modules-manager .list {
+  height: 100%;
+  overflow: auto;
+}

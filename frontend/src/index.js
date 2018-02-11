@@ -3,17 +3,17 @@ import '../node_modules/highlight.js/styles/mono-blue.css'
 import './global.less'
 import './index.less'
 import modelling from './models/modelling'
+import projectDetail from './models/projectDetail'
 
 // 1. Initialize
 const app = dva({
   onError(e) {
-    e.preventDefault();
-    console.log(e)
+    // e.preventDefault();
+    // console.log(e)
   }
 })
 
 app.model(require('./models/dataAnalysis'))
-app.model(require('./models/projectDetail'))
 app.model(require('./models/project'))
 app.model(require('./models/login'))
 app.model(require('./models/register'))
@@ -26,6 +26,7 @@ app.model(require('./models/myservice'))
 app.model(require('./models/allRequest'))
 app.model(require('./models/module'))
 app.model(modelling)
+app.model(projectDetail)
 
 // 通过dva g model test的，手动将这个models/test.js文件删除掉，会报错。
 // rm -r node_modules/.cache/babel-loader
