@@ -61,7 +61,10 @@ def update_by_id(api_id, **update):
     return api_repo.update_one_by_id(api_id, update)
 
 
-
+def increment_usage_count(api_id):
+    api = get_by_api_id(api_id)
+    api.usage_count += 1
+    return api.save()
 
 
 if __name__ == '__main__':

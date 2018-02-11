@@ -156,6 +156,26 @@ def star_api(user_ID, api_id):
         }
 
 
+def add_used_api(user_ID, api_id):
+    """
+    为用户增加 使用过的api
+    :param user_ID:
+    :type user_ID:
+    :param api_id:
+    :type api_id:
+    :return:
+    :rtype:
+    """
+    user = user_business.get_by_user_ID(user_ID=user_ID)
+    api = api_business.get_by_api_id(api_id=api_id)
+    user_result = None
+    if api not in user.used_apis:
+        user.used_apis.append(api)
+        user_result = user.save()
+    if user_result:
+        return {
+            "user": user_result.to_mongo(),
+        }
 # def un_favor_api(user_ID, api_id):
 #     user = user_business.get_by_user_ID(user_ID=user_ID)
 #     api = api_business.get_by_api_id(api_id=api_id)

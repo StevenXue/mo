@@ -42,6 +42,8 @@ class Api(DynamicDocument):
     favor_users = ListField(ReferenceField("User"))
     # 点赞这条api的用户
     star_users = ListField(ReferenceField("User"))
+    # 调用次数
+    usage_count = IntField(default=0)
 
     meta = {'indexes': [
         {'fields': ['$name', "$keyword", '$description'],

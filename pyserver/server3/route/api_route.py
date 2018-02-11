@@ -25,6 +25,7 @@ from server3.business import api_business, user_business
 from server3.entity.api import ApiGetType
 from server3.utility import json_utility
 from server3.constants import Error, Warning
+
 PREFIX = '/apis'
 
 api_app = Blueprint("api_app", __name__, url_prefix=PREFIX)
@@ -126,14 +127,26 @@ def update_api():
         raise
 
 
-@api_app.route('/predict', methods=['POST'])
-def api_predict():
-    # api_id = request.args.get('api_id')
+@api_app.route('/run', methods=['POST'])
+def run_api():
     data = request.get_json()
-    api_id = data["api_id"]
-    input = data["input"]
+    user_ID = data.pop("user_ID")
+
+    api_id = data["api"]["api_id"]
+    input = data["api"]["input"]
+
     api = api_business.get_by_api_id(api_id=api_id)
     # filled_api_detail = data["filled_api_detail"]
+
+    run_result = True
+    # 成功调用后后
+    # 增加api调用次数
+    # 在用户下增加 used_api
+    if run_result:
+        user = user_service.add_used_api(
+            user_ID=user_ID,
+            api_id=api_id)
+        api_result = api_business.increment_usage_count(api_id)
 
     if api.status == 0:
         return jsonify({'response': api.fake_response}), 200
