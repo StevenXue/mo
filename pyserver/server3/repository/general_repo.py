@@ -118,7 +118,7 @@ class Repo:
         return self.__instance.objects(**query).update(**update)
 
     def update_one(self, query, update):
-        modified_obj = self.__instance.objects(**query).update_one(**update)
+        modified_obj = self.__instance.objects(**query).modify(**update)
         return modified_obj.reload()
 
     def update_one_by_id(self, obj_id, update):

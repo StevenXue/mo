@@ -1,31 +1,37 @@
 # -*- coding: UTF-8 -*-
-from server3.business import user_request_comments_business
+from server3.business import comments_business
 from server3.business import user_business
 from server3.business import ownership_business
 from server3.service import ownership_service
 
 
-def get_all_comments_of_this_user_request(user_request_id):
-    print('user_request_id')
-    print(user_request_id)
-    user_request_comments = user_request_comments_business. \
-        get_all_comments_of_this_user_request(user_request_id)
-    print(user_request_comments)
+def get_comments_of_this_user_request(user_request_id):
+    user_request_comments = comments_business. \
+        get_comments_of_this_user_request(user_request_id)
+    return user_request_comments
+
+
+def get_comments_of_this_answer(request_answer_id):
+    user_request_comments = comments_business. \
+        get_comments_of_this_answer(request_answer_id)
     return user_request_comments
 
 
 def get_by_id(user_request_comments_id):
-    user_request_comments = user_request_comments_business.\
+    user_request_comments = comments_business.\
         get_by_user_request_comments_id(user_request_comments_id)
     return user_request_comments
 
 
-def create_user_request_comments(user_request_id, user_id, comments):
+def create_user_request_comments(user_request_id, user_id, comments,
+                                 comments_type,request_answer_id):
     # create a new user_request_comments object
-    created_user_request_comments = user_request_comments_business.\
+    created_user_request_comments = comments_business.\
         add_user_request_comments(user_request_id=user_request_id,
                                   comments_user_id=user_id,
-                                  comments=comments)
+                                  comments=comments,
+                                  comments_type=comments_type,
+                                  request_answer_id=request_answer_id)
     if created_user_request_comments:
         # get user object
         user = user_business.get_by_user_ID(user_ID=user_id)
@@ -42,7 +48,7 @@ def create_user_request_comments(user_request_id, user_id, comments):
 
 
 def update_user_request_comments(user_request_comments_id, user_id, comments):
-    user_request_comments = user_request_comments_business.\
+    user_request_comments = comments_business.\
         get_by_user_request_comments_id(user_request_comments_id)
     ownership = ownership_business.get_ownership_by_owned_item(
         user_request_comments, 'user_request_comments'
@@ -51,7 +57,7 @@ def update_user_request_comments(user_request_comments_id, user_id, comments):
         raise RuntimeError(
             'this request not belong to this user, cannot update')
     else:
-        user_request_comments_business.update_user_request_comments_by_id(
+        comments_business.update_user_request_comments_by_id(
             user_request_comments_id=user_request_comments_id,
             comments=comments
         )
@@ -66,7 +72,7 @@ def list_user_request_comments_by_user_id(user_id, order=-1):
 
 
 def remove_user_request_comments_by_id(user_request_comments_id, user_ID):
-    user_request_comments = user_request_comments_business.\
+    user_request_comments = comments_business.\
         get_by_user_request_comments_id(user_request_comments_id)
     # check ownership
     ownership = ownership_business.\
@@ -74,5 +80,5 @@ def remove_user_request_comments_by_id(user_request_comments_id, user_ID):
             user_request_comments, 'user_request_comments')
     if user_ID != ownership.user.user_ID:
         raise ValueError('this request not belong to this user, cannot delete')
-    return user_request_comments_business.remove_by_id(user_request_comments_id)
+    return comments_business.remove_by_id(user_request_comments_id)
 

@@ -17,7 +17,11 @@ export function createNewUserRequest(payload) {
     body: JSON.stringify({
       user_id:payload.user_ID,
       request_title:payload.requestTitle,
+      request_input:payload.requestInput,
+      request_output:payload.requestOutput,
       request_description:payload.requestDescription,
+      request_tags:payload.requestTags,
+      request_category:payload.requestCategory,
       request_dataset:payload.requestDataset,
     }),
   });
@@ -46,4 +50,32 @@ export function fetchOneUserRequest(payload) {
 // 关键词搜索
 export function searchUserRequest(payload) {
   return request(`${CORS}/user_request?searchStr=${payload.searchStr}`);
+}
+
+export function votesUpRequest(payload) {
+  return request(`${CORS}/user_request/votes`, {
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      votes_user_id : payload.votes_user_id,
+      user_request_id : payload.user_request_id
+    }),
+  });
+}
+
+
+
+export function starRequest(payload) {
+  return request(`${CORS}/user_request/star`, {
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      star_user_id : payload.star_user_id,
+      user_request_id : payload.user_request_id
+    }),
+  });
 }
