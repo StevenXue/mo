@@ -15,8 +15,8 @@ class User(Document):
     user_ID = StringField(max_length=20, unique=True, required=True)
     password = StringField(required=True)
     name = StringField(max_length=50)
-    email = EmailField(unique=True)
-    phone = StringField(unique=True)
+    email = EmailField(unique=True, sparse=True)
+    phone = StringField(unique=True, sparse=True)
     gender = IntField(choices=GENDER)
     age = IntField()
 

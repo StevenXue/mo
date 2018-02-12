@@ -14,6 +14,7 @@ from flask_jwt_extended import get_raw_jwt
 
 from server3.service import job_service
 from server3.business import project_business
+from server3.business.project_business import ProjectBusiness
 from server3.business import job_business
 from server3.business import user_business
 from server3.business import ownership_business
@@ -76,8 +77,8 @@ def get_by_id(project_id):
     return project
 
 
-def create_project(name, description, user_ID, is_private=True, tags=[],
-                   user_token='', type='app'):
+def create_project(name, description, user_ID, tags=[], user_token='',
+                   type='app'):
     """
     Create a new project
 
@@ -90,32 +91,10 @@ def create_project(name, description, user_ID, is_private=True, tags=[],
     :param user_token: string
     :return: a new created project object
     """
-    # check and create project dir
-    project_path = os.path.join(USER_DIR, user_ID, name)
-    if not os.path.exists(project_path):
-        os.makedirs(project_path)
-    else:
-        # if exists means project exists
-        raise Exception('project exists')
-    print(user_ID, name, user_token)
-    # auth jupyterhub with user token
-    res = auth_hub_user(user_ID, name, user_token)
-    print(res)
-    # create a new project object
-    created_project = project_business.add(name, description, tags, type,
-                                           res.get('token'), project_path)
-    if created_project:
-        # get user object
-        user = user_business.get_by_user_ID(user_ID)
-
-        # create ownership relation
-        if not ownership_business.add(user, is_private,
-                                      project=created_project):
-            raise RuntimeError('Cannot create ownership of the new project')
-        else:
-            return created_project
-    else:
-        raise RuntimeError('Cannot create the new project')
+    user = user_business.get_by_user_ID(user_ID)
+    ProjectBusiness.create_project(name=name, description=description,
+                                   type=type, tags=tags, user=user,
+                                   user_token=user_token)
 
 
 def update_project(project_id, name, description, is_private=True,

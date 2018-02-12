@@ -12,8 +12,15 @@ const { projects, fork } = api
 const PREFIX = 'project'
 
 // 获取用户所有 projects
-export function getProjects({ query }) {
-  return request(path.join(CORS, PREFIX) + `?query=${query}`)
+export function getProjects({ query, privacy }) {
+  let params = ''
+  if (query) {
+    params += '&query=' + query
+  }
+  if (privacy) {
+    params += '&privacy=' + privacy
+  }
+  return request(path.join(CORS, PREFIX) + `?${params}`)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////

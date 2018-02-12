@@ -13,14 +13,16 @@ from mongoengine import PULL
 class Project(DynamicDocument):
     # required
     name = StringField(max_length=50, required=True)
-    description = StringField(max_length=140)
     create_time = DateTimeField(required=True)
     update_time = DateTimeField(required=True)
     type = StringField(choices=('app', 'module', 'dataset'), required=True)
     hub_token = StringField(required=True)
     path = StringField(required=True)
+    user = ReferenceField("User", required=True)
+    privacy = StringField(choices=['private', 'public'], required=True)
 
     # optional
+    description = StringField(max_length=140)
     datasets = ListField(ReferenceField('DataSet', reverse_delete_rule=PULL))
     jobs = ListField(ReferenceField('Job', reverse_delete_rule=PULL))
     # if forked project, which project fork from

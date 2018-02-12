@@ -17,10 +17,10 @@ export default {
       }
     },
 
-    setProjectsLoading(state, {payload: projectsLoading }) {
+    setProjectsLoading(state, { payload: projectsLoading }) {
       return {
         ...state,
-        projectsLoading
+        projectsLoading,
       }
     },
 
@@ -34,7 +34,7 @@ export default {
   },
   effects: {
     // 获取用户所有 project
-    *fetch(action, { call, put, select, take }) {
+    *fetch({ query, privacy }, { call, put, select, take }) {
       // yield put({type: 'login/query'})
       // const { data: data } = yield call(tokenLogin)
       // console.log(data)
@@ -43,18 +43,17 @@ export default {
       //   payload: data.user,
       // })
       // yield put({ type: 'setProjects', payload: [] })
-
       // const user_ID = yield select(state => state.login.user.user_ID)
       // const { data: projects } = yield call(fetchProjects, { privacy: action.privacy })
-      const { data: projects } = yield call(getProjects, { query: 'lll' })
+      const { data: projects } = yield call(getProjects, { query, privacy })
       yield put({ type: 'setProjects', payload: projects })
     },
 
-    *fetchOthers(action, { call, put, select, take }){
-      yield put({type: 'setProjectsLoading', payload: true})
+    *fetchOthers(action, { call, put, select, take }) {
+      yield put({ type: 'setProjectsLoading', payload: true })
       const { data: projects } = yield call(fetchProjects, { others: true })
       yield put({ type: 'setProjects', payload: projects })
-      yield put({type: 'setProjectsLoading', payload: false})
+      yield put({ type: 'setProjectsLoading', payload: false })
     },
 
     *create({ body }, { call, put, select }) {
@@ -70,7 +69,7 @@ export default {
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
         if (pathname === '/workspace') {
-          dispatch({ type: 'fetch', privacy: 'all' })
+          dispatch({ type: 'fetch' })
         } else if (pathname === '/projects') {
           dispatch({ type: 'fetchOthers' })
         }

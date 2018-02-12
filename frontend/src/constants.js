@@ -39,7 +39,7 @@ module.exports = {
   },
 
   privacyChoices: [
-    {value: 'all', text: 'All'},
+    {value: 'all', text: 'Privacy'},
     {value: 'private', text: 'Private'},
     {value: 'public', text: 'Public'}
   ],

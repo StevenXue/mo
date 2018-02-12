@@ -12,7 +12,7 @@ const Option = Select.Option
 function Projects({ history, project, dispatch }) {
 
   function handleChange(value) {
-    dispatch({ type: 'project/fetch', privacy: value })
+    dispatch({ type: 'project/fetch', privacy: value === 'all' ? undefined : value })
   }
 
   function toProjectDetail(id, history) {
@@ -22,7 +22,8 @@ function Projects({ history, project, dispatch }) {
   return (
     <div className={`main-container ${styles.normal}`}>
       <div className={styles.header}>
-        <Select defaultValue="all" className={styles.select} onChange={handleChange}>
+        <Select defaultValue='all' className={styles.select}
+                onChange={handleChange}>
           {privacyChoices.map(e =>
             <Option key={e.value} value={e.value}>{e.text}</Option>,
           )}
@@ -37,15 +38,15 @@ function Projects({ history, project, dispatch }) {
       <div className={styles.projectList}>
         {project.projects.map(e =>
           <Card key={e._id} title={e.name} className={styles.card}
-                extra={e.is_private && <Icon type="lock" />}
+                extra={e.is_private && <Icon type="lock"/>}
                 onClick={() => toProjectDetail(e._id, history)} style={{ cursor: 'pointer' }}>
             <div>
               <p className={styles.des}>{e.description}</p>
               <p className={styles.other}>
-                <Icon type="clock-circle-o" style={{marginRight: 10}}/>
+                <Icon type="clock-circle-o" style={{ marginRight: 10 }}/>
                 {showTime(e.create_time)}
               </p>
-              <Icon type="user" style={{marginRight: 10}}/>
+              <Icon type="user" style={{ marginRight: 10 }}/>
               {e['user_name'] && <p>Owner: {e.user_name}</p>}
             </div>
           </Card>)}

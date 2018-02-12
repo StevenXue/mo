@@ -36,7 +36,9 @@ export default async function request(url, options, onSuccess = onSuccessDef, on
       if (!options) {
         options = {}
       }
-      _.set(options, 'headers.Authorization', 'Bearer ' + token)
+      if(!_.get(options, 'headers.Authorization')) {
+        _.set(options, 'headers.Authorization', 'Bearer ' + token)
+      }
     }
     const response = await fetch(url, options)
 

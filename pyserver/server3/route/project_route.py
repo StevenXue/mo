@@ -20,7 +20,6 @@ from server3.utility import json_utility
 from server3.utility import str_utility
 from server3.constants import Error, Warning
 
-
 PREFIX = '/project'
 DEFAULT_CAT = ['model', 'toolkit']
 
@@ -33,12 +32,14 @@ def list_projects_by_query():
     user_ID = get_jwt_identity
     page_no = int(request.args.get('page_no', 1))
     page_size = int(request.args.get('page_size', 5))
-    search_query = request.args.get('search_query', None)
+    search_query = request.args.get('query', None)
+    privacy = request.args.get('privacy', None)
     default_max_score = float(request.args.get('max_score', 0.4))
 
     try:
         projects = ProjectBusiness.get_objects(
             search_query=search_query,
+            privacy=privacy,
             user_ID=user_ID,
             page_no=page_no,
             page_size=page_size,
@@ -60,12 +61,14 @@ def list_projects_by_query():
         }), 200
 
 
+# new
 @project_app.route('/projects/<string:project_id>', methods=['GET'])
+@jwt_required
 def get_project(project_id):
     if not project_id:
         return jsonify({'response': 'no project_id arg'}), 400
     try:
-        project = project_service.get_by_id(project_id)
+        project = ProjectBusiness.get_by_id(project_id)
         project = json_utility.convert_to_json(project.to_mongo())
     except Exception as e:
         return make_response(jsonify({'response': '%s: %s' % (str(
@@ -157,6 +160,7 @@ def project_unpublish(project_id):
     return jsonify({'response': update_num}), 200
 
 
+# new
 @project_app.route('/projects', methods=['POST'])
 @jwt_required
 def create_project():
@@ -173,49 +177,31 @@ def create_project():
     name = data['name']
     type = data['type']
     description = data['description']
-    is_private = str(data['is_private']).lower() == 'true'
-    # related_fields = data.get('related_fields', '')
     tags = data.get('tags', '')
+    # related_fields = data.get('related_fields', '')
     # related_tasks = data.get('related_tasks', '')
 
-    # related_fields = str_utility.split_without_empty(related_fields)
     tags = str_utility.split_without_empty(tags)
+    # related_fields = str_utility.split_without_empty(related_fields)
     # related_tasks = str_utility.split_without_empty(related_tasks)
 
-    project_service.create_project(name, description, user_ID,
-                                   is_private, tags=tags, type=type,
-                                   user_token=user_token)
+    project_service.create_project(name, description, user_ID, tags=tags,
+                                   type=type, user_token=user_token)
     return jsonify({'response': 'create project success'}), 200
 
 
 @project_app.route('/projects/<string:project_id>', methods=['PUT'])
 def update_project(project_id):
-    if not request.json \
-            or 'name' not in request.json \
-            or 'is_private' not in request.json:
-        return jsonify({'response': 'insufficient arguments'}), 400
-
     data = request.get_json()
-    name = data.get('name')
     description = data.get('description')
-    is_private = data.get('is_private')
-    is_private = str(is_private).lower() == 'true'
-    related_fields = data.get('related_fields', '')
+    privacy = data.get('privacy')
     tags = data.get('tags', '')
-    related_tasks = data.get('related_tasks', '')
-    done_indices = data.get('done_indices', [])
 
-    if not isinstance(related_fields, list):
-        related_fields = str_utility.split_without_empty(related_fields)
     if not isinstance(tags, list):
         tags = str_utility.split_without_empty(tags)
-    if not isinstance(related_tasks, list):
-        related_tasks = str_utility.split_without_empty(related_tasks)
 
-    project_service.update_project(project_id, name, description, is_private,
-                                   related_fields=related_fields,
-                                   tags=tags, related_tasks=related_tasks,
-                                   done_indices=done_indices)
+    ProjectBusiness.update_project(project_id, description, privacy,
+                                   tags=tags)
     return jsonify({'response': 'create project success'}), 200
 
 
@@ -226,8 +212,7 @@ def remove_project(project_id):
         return jsonify({'response': 'no project_id arg'}), 400
     if not user_ID:
         return jsonify({'response': 'no user_ID arg'}), 400
-    result = project_service.remove_project_by_id(ObjectId(project_id),
-                                                  user_ID)
+    result = ProjectBusiness.remove_project_by_id(project_id, user_ID)
     return jsonify({'response': result}), 200
 
 
