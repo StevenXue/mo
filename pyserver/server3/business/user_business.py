@@ -19,6 +19,10 @@ def get_by_user_object_id(object_id):
     return user_repo.read_by_id(object_id)
 
 
+def get_by_phone(phone):
+    return user_repo.read_by_unique_field('phone', phone)
+
+
 def remove_by_id(user_id):
     return user_repo.delete_by_id(user_id)
 
