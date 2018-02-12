@@ -11,18 +11,53 @@ from flask import jsonify
 from flask import make_response
 from flask import request
 from kubernetes import client
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server3.service import project_service
 from server3.service import ownership_service
-from server3.business import project_business
+from server3.business.project_business import ProjectBusiness
 from server3.utility import json_utility
 from server3.utility import str_utility
+from server3.constants import Error, Warning
+
 
 PREFIX = '/project'
 DEFAULT_CAT = ['model', 'toolkit']
 
 project_app = Blueprint("project_app", __name__, url_prefix=PREFIX)
+
+
+@project_app.route('', methods=['GET'])
+@jwt_required
+def list_projects_by_query():
+    user_ID = get_jwt_identity
+    page_no = int(request.args.get('page_no', 1))
+    page_size = int(request.args.get('page_size', 5))
+    search_query = request.args.get('search_query', None)
+    default_max_score = float(request.args.get('max_score', 0.4))
+
+    try:
+        projects = ProjectBusiness.get_objects(
+            search_query=search_query,
+            user_ID=user_ID,
+            page_no=page_no,
+            page_size=page_size,
+            default_max_score=default_max_score
+        )
+    except Warning as e:
+        return jsonify({
+            "response": [],
+            "message": e.args[0]["hint_message"]
+        }), 200
+    except Error as e:
+        return jsonify({
+            "message": e.args[0]["hint_message"]
+        }), 404
+    else:
+        projects = json_utility.me_obj_list_to_json_list(projects)
+        return jsonify({
+            "response": projects
+        }), 200
 
 
 @project_app.route('/projects/<string:project_id>', methods=['GET'])
@@ -127,28 +162,29 @@ def project_unpublish(project_id):
 def create_project():
     if not request.json \
             or 'name' not in request.json \
-            or 'user_ID' not in request.json \
+            or 'type' not in request.json \
             or 'is_private' not in request.json:
         return jsonify({'response': 'insufficient arguments'}), 400
-    token = request.headers.get('Authorization').split()[1]
+
+    user_token = request.headers.get('Authorization').split()[1]
+    user_ID = get_jwt_identity()
+
     data = request.get_json()
     name = data['name']
+    type = data['type']
     description = data['description']
-    user_ID = data['user_ID']
-    is_private = data['is_private']
-    is_private = str(is_private).lower() == 'true'
-    related_fields = data.get('related_fields', '')
+    is_private = str(data['is_private']).lower() == 'true'
+    # related_fields = data.get('related_fields', '')
     tags = data.get('tags', '')
-    related_tasks = data.get('related_tasks', '')
+    # related_tasks = data.get('related_tasks', '')
 
-    related_fields = str_utility.split_without_empty(related_fields)
+    # related_fields = str_utility.split_without_empty(related_fields)
     tags = str_utility.split_without_empty(tags)
-    related_tasks = str_utility.split_without_empty(related_tasks)
+    # related_tasks = str_utility.split_without_empty(related_tasks)
 
     project_service.create_project(name, description, user_ID,
-                                   is_private, related_fields=related_fields,
-                                   tags=tags, related_tasks=related_tasks,
-                                   token=token)
+                                   is_private, tags=tags, type=type,
+                                   user_token=user_token)
     return jsonify({'response': 'create project success'}), 200
 
 

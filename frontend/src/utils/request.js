@@ -1,5 +1,6 @@
 import fetch from 'dva/fetch'
 import { message } from 'antd'
+import _ from 'lodash'
 
 const onSuccessDef = function (response) {
 }
@@ -28,16 +29,15 @@ function checkStatus(response) {
  * @param  {function} [onError] onError function
  * @return {object}           An object containing either "data" or "err"
  */
-export default async function request(url, options, onSuccess=onSuccessDef, onError=onErrorDef) {
+export default async function request(url, options, onSuccess = onSuccessDef, onError = onErrorDef) {
   try {
     const token = localStorage.getItem('token')
     if (token) {
-      options = {
-        ...options,
-        'Authentication': 'Bearer ' + token
+      if (!options) {
+        options = {}
       }
+      _.set(options, 'headers.Authorization', 'Bearer ' + token)
     }
-
     const response = await fetch(url, options)
 
     const newRes = checkStatus(response)

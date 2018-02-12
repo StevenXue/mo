@@ -16,24 +16,45 @@ from server3.entity.project import Project
 # from server3.repository import job_repo
 from server3.repository.project_repo import ProjectRepo
 
+PAGE_NO = 1
+PAGE_SIZE = 5
+
 project_repo = ProjectRepo(Project)
 
 
-def add(name, description, related_fields,
-        tags, related_tasks, hub_token):
+class ProjectBusiness:
+    repo = project_repo
+
+    @classmethod
+    def get_objects(cls, search_query, user_ID, page_no=PAGE_NO,
+                    page_size=PAGE_SIZE, default_max_score=0.4):
+        start = (page_no - 1) * page_size
+        end = page_no * page_size
+        # 获取所有的
+        if search_query:
+            # apis = Api.objects.search_text(search_query).order_by('$text_score')
+            objects = cls.repo.search(search_query)
+        else:
+            objects = cls.repo.read({})  # 分页
+        return objects.order_by('-create_time')[start:end]
+
+
+def add(name, description, tags, type, hub_token, project_path):
     """
     Add a new Project.
 
     :param name: str
     :param description: str
-    :param create_time: utc time
+    :param tags: list
+    :param type: str
+    :param hub_token: str
     :return: added Project object
     """
+    create_time = datetime.utcnow()
     project_obj = Project(name=name, description=description,
-                          create_time=datetime.utcnow(),
-                          related_fields=related_fields,
-                          tags=tags, related_tasks=related_tasks,
-                          hub_token=hub_token)
+                          create_time=create_time, update_time=create_time,
+                          type=type, tags=tags, hub_token=hub_token,
+                          path=project_path)
     return project_repo.create(project_obj)
 
 

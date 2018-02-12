@@ -1,5 +1,5 @@
-
-import { request, config } from '../utils';
+import path from 'path'
+import { request, config } from '../utils'
 
 const { CORS, api } = config
 const { projects, fork } = api
@@ -9,20 +9,27 @@ const { projects, fork } = api
 //   const user_ID = localStorage.getItem('user_ID')
 //   return request(`${CORS}/served_models/${user_ID}?privacy=all`);
 // }
+const PREFIX = 'project'
 
+// 获取用户所有 projects
+export function getProjects({ query }) {
+  return request(path.join(CORS, PREFIX) + `?query=${query}`)
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
 // 获取用户所有 projects
 export function fetchProjects(payload) {
   const user_ID = localStorage.getItem('user_ID')
   if (payload.others) {
     return request(`${CORS}${projects}?user_ID=${user_ID}&others=true`)
   } else {
-    return request(`${CORS}${projects}?user_ID=${user_ID}&privacy=${payload.privacy}`);
+    return request(`${CORS}${projects}?user_ID=${user_ID}&privacy=${payload.privacy}`)
   }
 }
 
 // 获取单个 project
 export function fetchProject(payload) {
-  return request(`${CORS}${projects}/${payload.projectId}`);
+  return request(`${CORS}${projects}/${payload.projectId}`)
 }
 
 // 新建 project
@@ -35,7 +42,7 @@ export function createProject(payload) {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     },
     body: JSON.stringify(payload.body),
-  });
+  })
 }
 
 // 更新 project
@@ -46,15 +53,15 @@ export function updateProject(payload) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(payload.body),
-  });
+  })
 }
 
 // 删除 project
 export function deleteProject(payload) {
   const user_ID = localStorage.getItem('user_ID')
   return request(`${CORS}${projects}/${payload.projectId}?user_ID=${user_ID}`, {
-    method: 'delete'
-  });
+    method: 'delete',
+  })
 }
 
 // fork project
@@ -65,5 +72,5 @@ export function forkProject(prjID) {
     headers: {
       'Content-Type': 'application/json',
     },
-  });
+  })
 }

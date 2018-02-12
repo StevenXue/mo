@@ -31,5 +31,4 @@ class Ownership(DynamicDocument):
     user_request_comments = ReferenceField('UserRequestComments',
                                            reverse_delete_rule=CASCADE)
     request_answer = ReferenceField('RequestAnswer',
-                                           reverse_delete_rule=CASCADE)
-
+                                    reverse_delete_rule=CASCADE)

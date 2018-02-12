@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-
+from mongoengine import Q
 from mongoengine import connect
 from pymongo import UpdateOne
 
@@ -198,3 +198,10 @@ class Repo:
         update_list_dicts = [UpdateOne({'_id': item.pop('_id')}, {'$set': item}) for item in list_dicts]
         self.__instance._get_collection().bulk_write(update_list_dicts,
                                                      ordered=False)
+
+    def search(self, search_query):
+        return self.__instance.objects(
+            Q(name__icontains=search_query) | Q(
+                keyword__icontains=search_query)
+            | Q(description__icontains=search_query)
+        )

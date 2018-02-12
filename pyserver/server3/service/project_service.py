@@ -37,21 +37,18 @@ from server3.constants import ADMIN_TOKEN
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
 
-# NAMESPACE = 'default'
-
-
-def auth_hub_user(user_ID, project_name, token):
+def auth_hub_user(user_ID, project_name, user_token):
     """
     auth jupyterhub with user token
     :param user_ID:
     :param project_name:
-    :param token:
+    :param user_token:
     :return: dict of res json
     """
     return requests.post('{hub_server}/hub/api/authorizations/token'.
                          format(hub_server=HUB_SERVER),
                          json={'username': user_ID + '+' + project_name,
-                               'password': token}
+                               'password': user_token}
                          ).json()
 
 
@@ -79,8 +76,8 @@ def get_by_id(project_id):
     return project
 
 
-def create_project(name, description, user_ID, is_private=True,
-                   related_fields=[], tags=[], related_tasks=[], token=''):
+def create_project(name, description, user_ID, is_private=True, tags=[],
+                   user_token='', type='app'):
     """
     Create a new project
 
@@ -88,6 +85,9 @@ def create_project(name, description, user_ID, is_private=True,
     :param description: str
     :param user_ID: ObjectId
     :param is_private: boolean
+    :param type: string (app/module/dataset)
+    :param tags: list of string
+    :param user_token: string
     :return: a new created project object
     """
     # check and create project dir
@@ -97,14 +97,13 @@ def create_project(name, description, user_ID, is_private=True,
     else:
         # if exists means project exists
         raise Exception('project exists')
-
+    print(user_ID, name, user_token)
     # auth jupyterhub with user token
-    res = auth_hub_user(user_ID, name, token)
-
+    res = auth_hub_user(user_ID, name, user_token)
+    print(res)
     # create a new project object
-    created_project = project_business.add(name, description, related_fields,
-                                           tags, related_tasks,
-                                           res.get('token'))
+    created_project = project_business.add(name, description, tags, type,
+                                           res.get('token'), project_path)
     if created_project:
         # get user object
         user = user_business.get_by_user_ID(user_ID)

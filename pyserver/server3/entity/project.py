@@ -5,6 +5,8 @@ from mongoengine import StringField
 from mongoengine import DateTimeField
 from mongoengine import ReferenceField
 from mongoengine import ListField
+from mongoengine import DictField
+from mongoengine import IntField
 from mongoengine import PULL
 
 
@@ -15,6 +17,8 @@ class Project(DynamicDocument):
     create_time = DateTimeField(required=True)
     update_time = DateTimeField(required=True)
     type = StringField(choices=('app', 'module', 'dataset'), required=True)
+    hub_token = StringField(required=True)
+    path = StringField(required=True)
 
     # optional
     datasets = ListField(ReferenceField('DataSet', reverse_delete_rule=PULL))
@@ -22,9 +26,42 @@ class Project(DynamicDocument):
     # if forked project, which project fork from
     source_project = ReferenceField('Project')
     tags = ListField(StringField(max_length=50))
+    favor_users = ListField(ReferenceField("User"))
+    star_users = ListField(ReferenceField("User"))
 
     # deprecated
     related_tasks = ListField(StringField(max_length=50))
     related_fields = ListField(StringField(max_length=100))
     user_name = StringField(max_length=50)
     results = ListField(ReferenceField('Result', reverse_delete_rule=PULL))
+
+    meta = {
+        'allow_inheritance': True,
+        'indexes': [
+            {'fields': ['$name', '$description'],
+             'default_language': "english",
+             'weights': {'name': 10, 'description': 5}
+             }
+        ]}
+
+
+class Dataset(Project):
+    size = IntField()  # by bytes
+
+
+class Module(Project):
+    category = StringField(choices=('model', 'toolkit'), required=True)
+
+
+RE_TYPE = (
+    (0, 'disabled'),
+    (1, 'active')
+)
+
+
+class App(Project):
+    url = StringField(max_length=50)
+    keyword = StringField(max_length=30, unique=True, required=True)
+    input = DictField()
+    output = DictField()
+    status = IntField(choices=RE_TYPE)

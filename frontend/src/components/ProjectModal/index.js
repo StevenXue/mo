@@ -10,6 +10,7 @@ const Option = Select.Option
 const fields = ['Business', 'Government', 'Education', 'Environment', 'Health', 'Housing & Development',
   'Public Services', 'Social', 'Transportation', 'Science', 'Technology']
 const tasks = ['Classification', 'Regression', 'Clustering', 'Reinforcement Learning']
+const TYPE = ['app', 'module', 'dataset']
 
 class ProjectModal extends Component {
   constructor(props) {
@@ -38,20 +39,21 @@ class ProjectModal extends Component {
 
   }
 
-  okHandler = (values) => {
-    this.props.form.validateFields((err, values) => {
+  okHandler = () => {
+    const {form} = this.props
+    form.validateFields((err, values) => {
       if (!err) {
         if (values.related_fields) {
-          values.related_fields = values.related_fields.join(',')
+          form.setFieldsValue({related_fields: values.related_fields.join(',')})
         }
         if (values.related_tasks) {
-          values.related_tasks = values.related_tasks.join(',')
+          form.setFieldsValue({related_tasks: values.related_tasks.join(',')})
         }
         // let body = {
         //   ...values,
         //   is_private: this.state.is_private,
         // }
-        if(!values.is_private) {
+        if (!values.is_private) {
           values.is_private = 'true'
         }
         if (this.props.new) {
@@ -104,10 +106,10 @@ class ProjectModal extends Component {
       labelCol: { span: 6 },
       wrapperCol: { span: 14 },
     }
-    let name, description, related_fields, related_tasks, is_private
+    let name, description, type, is_private
     let tags = this.state.tags
     if (projectDetail) {
-      ({ name, description, related_fields, related_tasks, is_private } = projectDetail.project)
+      ({ name, description, type, is_private } = projectDetail.project)
       is_private = String(is_private)
       tags = tags.length > 0 ? tags : projectDetail.project.tags
     }
@@ -123,7 +125,7 @@ class ProjectModal extends Component {
           onOk={this.okHandler}
           onCancel={this.hideModelHandler}
         >
-          <Form layout='horizontal' onSubmit={() => this.okHandler(values)}>
+          <Form layout='horizontal' onSubmit={() => this.okHandler()}>
             <FormItem
               {...formItemLayout}
               label="Project Name"
@@ -173,38 +175,21 @@ class ProjectModal extends Component {
             </FormItem>}
             <FormItem
               {...formItemLayout}
-              label="Fields"
+              label="Project Type"
             >
-          {getFieldDecorator('related_fields', {
-            initialValue: related_fields,
+          {getFieldDecorator('type', {
+            initialValue: type,
             rules: [
-              { required: false },
+              { required: true },
             ],
           })(
-            <Select mode="multiple">
+            <Select>
               {
-                fields.map((e) => <Option value={e} key={e}>{e}</Option>)
+                TYPE.map((e) => <Option value={e} key={e}>{e}</Option>)
               }
             </Select>,
           )}
-            </FormItem>
-            {/*<FormItem*/}
-              {/*{...formItemLayout}*/}
-              {/*label="Related Tasks"*/}
-            {/*>*/}
-          {/*{getFieldDecorator('related_tasks', {*/}
-            {/*initialValue: related_tasks,*/}
-            {/*rules: [*/}
-              {/*{ required: false },*/}
-            {/*],*/}
-          {/*})(*/}
-            {/*<Select mode="multiple">*/}
-              {/*{*/}
-                {/*tasks.map((e) => <Option value={e} key={e}>{e}</Option>)*/}
-              {/*}*/}
-            {/*</Select>,*/}
-          {/*)}*/}
-        {/*</FormItem>*/}
+        </FormItem>
             <FormItem
               {...formItemLayout}
               label="Tags"

@@ -1,6 +1,6 @@
 import { routerRedux } from 'dva/router'
 import { tokenLogin } from '../services/login'
-import { fetchProjects, createProject, deleteProject, updateProject } from '../services/project'
+import { fetchProjects, createProject, deleteProject, updateProject, getProjects } from '../services/project'
 import { privacyChoices } from '../constants'
 
 export default {
@@ -45,7 +45,8 @@ export default {
       // yield put({ type: 'setProjects', payload: [] })
 
       // const user_ID = yield select(state => state.login.user.user_ID)
-      const { data: projects } = yield call(fetchProjects, { privacy: action.privacy })
+      // const { data: projects } = yield call(fetchProjects, { privacy: action.privacy })
+      const { data: projects } = yield call(getProjects, { query: 'lll' })
       yield put({ type: 'setProjects', payload: projects })
     },
 
