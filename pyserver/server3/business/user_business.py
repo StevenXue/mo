@@ -7,6 +7,7 @@ user_repo = UserRepo(User)
 
 def add(user_ID, password, kwargs):
     user = User(user_ID=user_ID, password=password, **kwargs)
+    print("user", user)
     return user_repo.create(user)
 
 

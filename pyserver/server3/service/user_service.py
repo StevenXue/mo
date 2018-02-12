@@ -8,6 +8,7 @@ from server3.business import api_business
 from server3.business import user_request_business
 from server3.business import request_answer_business
 
+
 def add(user_ID, password, kwargs):
     hashed_password = generate_password_hash(password)
     return user_business.add(user_ID, hashed_password, kwargs)
@@ -23,7 +24,7 @@ def authenticate(user_ID, password):
 
 def update_request_vote(user_request_id, user_ID):
     user = user_business.get_by_user_ID(user_ID)
-    user_request = user_request_business.\
+    user_request = user_request_business. \
         get_by_user_request_id(user_request_id)
 
     if user_request in user.request_vote_up:
@@ -67,7 +68,7 @@ def update_request_star(user_request_id, user_ID):
 
 def update_answer_vote(request_answer_id, user_ID):
     user = user_business.get_by_user_ID(user_ID)
-    request_answer = request_answer_business.\
+    request_answer = request_answer_business. \
         get_by_request_answer_id(request_answer_id)
 
     if request_answer in user.answer_vote_up:
@@ -176,6 +177,7 @@ def add_used_api(user_ID, api_id):
         return {
             "user": user_result.to_mongo(),
         }
+
 # def un_favor_api(user_ID, api_id):
 #     user = user_business.get_by_user_ID(user_ID=user_ID)
 #     api = api_business.get_by_api_id(api_id=api_id)
@@ -191,7 +193,3 @@ def add_used_api(user_ID, api_id):
 #             "user": user_result.to_mongo(),
 #             "api": api_result.to_mongo()
 #         }
-
-
-
-
