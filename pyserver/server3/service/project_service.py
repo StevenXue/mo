@@ -15,6 +15,9 @@ from flask_jwt_extended import get_raw_jwt
 from server3.service import job_service
 from server3.business import project_business
 from server3.business.project_business import ProjectBusiness
+from server3.business.app_business import AppBusiness
+from server3.business.module_business import ModuleBusiness
+from server3.business.data_set_business import DatasetBusiness
 from server3.business import job_business
 from server3.business import user_business
 from server3.business import ownership_business
@@ -36,6 +39,23 @@ from server3.constants import HUB_SERVER
 from server3.constants import ADMIN_TOKEN
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
+# TYPE_MAPPER = {
+#     'project': ProjectBusiness,
+#     'app': AppBusiness,
+#     'module': ModuleBusiness,
+#     'dataset': DatasetBusiness,
+# }
+
+
+class TypeMapper:
+    project = ProjectBusiness
+    app = AppBusiness
+    module = ModuleBusiness
+    dataset = DatasetBusiness
+
+    @classmethod
+    def get(cls, attr='project'):
+        return getattr(cls, attr)
 
 
 def auth_hub_user(user_ID, project_name, user_token):
@@ -78,7 +98,7 @@ def get_by_id(project_id):
 
 
 def create_project(name, description, user_ID, tags=[], user_token='',
-                   type='app'):
+                   type='project', **kwargs):
     """
     Create a new project
 
@@ -92,9 +112,10 @@ def create_project(name, description, user_ID, tags=[], user_token='',
     :return: a new created project object
     """
     user = user_business.get_by_user_ID(user_ID)
-    ProjectBusiness.create_project(name=name, description=description,
-                                   type=type, tags=tags, user=user,
-                                   user_token=user_token)
+    cls = TypeMapper.get(type)
+    cls.create_project(name=name, description=description,
+                       type=type, tags=tags, user=user,
+                       user_token=user_token, **kwargs)
 
 
 def update_project(project_id, name, description, is_private=True,
@@ -148,6 +169,25 @@ def list_projects_by_user_ID(user_ID, order=-1, privacy='all'):
     if order == -1:
         projects.reverse()
     return projects
+
+
+def list_projects(search_query, page_no=None, page_size=None,
+                  default_max_score=0.4, privacy=None, type='project'):
+    """
+    list projects
+    :param user_ID:
+    :param order:
+    :param privacy:
+    :return:
+    """
+    cls = TypeMapper.get(type)
+    return cls.get_objects(
+        search_query=search_query,
+        privacy=privacy,
+        page_no=page_no,
+        page_size=page_size,
+        default_max_score=default_max_score
+    )
 
 
 def remove_project_by_id(project_id, user_ID):

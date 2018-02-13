@@ -29,21 +29,22 @@ project_app = Blueprint("project_app", __name__, url_prefix=PREFIX)
 @project_app.route('', methods=['GET'])
 @jwt_required
 def list_projects_by_query():
-    user_ID = get_jwt_identity
+    user_ID = get_jwt_identity()
     page_no = int(request.args.get('page_no', 1))
     page_size = int(request.args.get('page_size', 5))
     search_query = request.args.get('query', None)
     privacy = request.args.get('privacy', None)
     default_max_score = float(request.args.get('max_score', 0.4))
+    type = request.args.get('type', 'project')
 
     try:
-        projects = ProjectBusiness.get_objects(
+        projects = project_service.list_projects(
             search_query=search_query,
             privacy=privacy,
-            user_ID=user_ID,
             page_no=page_no,
             page_size=page_size,
-            default_max_score=default_max_score
+            default_max_score=default_max_score,
+            type=type
         )
     except Warning as e:
         return jsonify({
@@ -166,27 +167,22 @@ def project_unpublish(project_id):
 def create_project():
     if not request.json \
             or 'name' not in request.json \
-            or 'type' not in request.json \
-            or 'is_private' not in request.json:
+            or 'type' not in request.json:
         return jsonify({'response': 'insufficient arguments'}), 400
 
     user_token = request.headers.get('Authorization').split()[1]
     user_ID = get_jwt_identity()
 
     data = request.get_json()
-    name = data['name']
-    type = data['type']
-    description = data['description']
-    tags = data.get('tags', '')
-    # related_fields = data.get('related_fields', '')
-    # related_tasks = data.get('related_tasks', '')
+    name = data.pop('name')
+    type = data.pop('type')
+    description = data.pop('description')
+    tags = data.pop('tags', '')
 
     tags = str_utility.split_without_empty(tags)
-    # related_fields = str_utility.split_without_empty(related_fields)
-    # related_tasks = str_utility.split_without_empty(related_tasks)
 
     project_service.create_project(name, description, user_ID, tags=tags,
-                                   type=type, user_token=user_token)
+                                   type=type, user_token=user_token, **data)
     return jsonify({'response': 'create project success'}), 200
 
 

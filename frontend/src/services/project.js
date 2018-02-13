@@ -12,13 +12,19 @@ const { projects, fork } = api
 const PREFIX = 'project'
 
 // 获取用户所有 projects
-export function getProjects({ query, privacy }) {
+export function getProjects({ filter }) {
   let params = ''
-  if (query) {
-    params += '&query=' + query
-  }
-  if (privacy) {
-    params += '&privacy=' + privacy
+  for (let key in filter) {
+    if (!filter.hasOwnProperty(key)) {
+      continue
+    }
+    if (filter[key]) {
+      const value = filter[key]
+      if (key === 'projectType') {
+        key = 'type'
+      }
+      params += `&${key}=${value}`
+    }
   }
   return request(path.join(CORS, PREFIX) + `?${params}`)
 }
@@ -41,7 +47,6 @@ export function fetchProject(payload) {
 
 // 新建 project
 export function createProject(payload) {
-  payload.body.user_ID = localStorage.getItem('user_ID')
   return request(`${CORS}${projects}`, {
     method: 'post',
     headers: {

@@ -8,8 +8,28 @@ export default {
   state: {
     projects: [],
     projectsLoading: false,
+    privacy: undefined,
+    projectType: 'project',
   },
   reducers: {
+    setPrivacy(state, { payload: privacy }) {
+      return {
+        ...state,
+        privacy,
+      }
+    },
+    setType(state, { payload: projectType }) {
+      return {
+        ...state,
+        projectType,
+      }
+    },
+    setFilter(state, { payload: { key, value } }) {
+      return {
+        ...state,
+        key: value,
+      }
+    },
     setProjects(state, { payload: projects }) {
       return {
         ...state,
@@ -34,7 +54,7 @@ export default {
   },
   effects: {
     // 获取用户所有 project
-    *fetch({ query, privacy }, { call, put, select, take }) {
+    *fetch({ payload }, { call, put, select, take }) {
       // yield put({type: 'login/query'})
       // const { data: data } = yield call(tokenLogin)
       // console.log(data)
@@ -45,10 +65,30 @@ export default {
       // yield put({ type: 'setProjects', payload: [] })
       // const user_ID = yield select(state => state.login.user.user_ID)
       // const { data: projects } = yield call(fetchProjects, { privacy: action.privacy })
-      const { data: projects } = yield call(getProjects, { query, privacy })
+      let filter = {}
+      yield select(state => {
+        const project = state.project;
+        ['query', 'projectType', 'privacy'].forEach((key) => {
+          if (project[key]) {
+            filter[key] = project[key]
+          }
+        })
+      })
+      if (payload) {
+        for (let key in payload) {
+          if (!payload.hasOwnProperty(key)) {
+            continue
+          }
+          if (payload[key]) {
+            filter[key] = payload[key]
+            yield put({ type: 'setFilter', payload: { key, value: payload[key] } })
+          }
+        }
+      }
+      console.log(filter)
+      const { data: projects } = yield call(getProjects, { filter })
       yield put({ type: 'setProjects', payload: projects })
     },
-
     *fetchOthers(action, { call, put, select, take }) {
       yield put({ type: 'setProjectsLoading', payload: true })
       const { data: projects } = yield call(fetchProjects, { others: true })

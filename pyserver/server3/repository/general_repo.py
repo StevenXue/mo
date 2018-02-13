@@ -25,10 +25,12 @@ class Repo:
     def create_many(self, objects):
         return self.__instance.objects.insert(objects, load_bulk=False)
 
-    def create_one(self, content):
+    def create_one(self, **content):
         return self.__instance(**content).save()
 
-    def read(self, query):
+    def read(self, query=None):
+        if query is None:
+            query = {}
         return self.__instance.objects(**query).order_by('-_id')
 
     def read_skipping_order(self, query, skipping):

@@ -14,7 +14,7 @@ def get(**kwargs):
 
 def add(name, user, **kwargs):
     """
-    根据 name, userId 生成url
+    根据 name, userId 生成 url
     未来提供自定义 url
     :param name:
     :type name:
@@ -59,9 +59,6 @@ def remove_by_id(api_id):
 
 def update_by_id(api_id, **update):
     return api_repo.update_one_by_id(api_id, update)
-
-
-
 
 
 if __name__ == '__main__':

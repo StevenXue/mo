@@ -28,166 +28,6 @@ PAGE_SIZE = 5
 project_repo = ProjectRepo(Project)
 
 
-class ProjectBusiness:
-    repo = project_repo
-
-    @staticmethod
-    def auth_hub_user(user_ID, project_name, user_token):
-        """
-        auth jupyterhub with user token
-        :param user_ID:
-        :param project_name:
-        :param user_token:
-        :return: dict of res json
-        """
-        return requests.post('{hub_server}/hub/api/authorizations/token'.
-                             format(hub_server=HUB_SERVER),
-                             json={'username': user_ID + '+' + project_name,
-                                   'password': user_token}
-                             ).json()
-
-    @staticmethod
-    def delete_hub_user(user_ID, project_name):
-        """
-        auth jupyterhub with user token
-        :param user_ID:
-        :param project_name:
-        :param token:
-        :return: dict of res json
-        """
-        url = '{hub_server}/hub/api/users/{user_ID}+{project_name}'.format(
-            hub_server=HUB_SERVER, user_ID=user_ID,
-            project_name=project_name)
-        return requests.delete(url,
-                               headers={
-                                   'Authorization': 'token {}'.format(
-                                       ADMIN_TOKEN)
-                               })
-
-    @staticmethod
-    def gen_dir(user_ID, name):
-        """
-        auth jupyterhub with user token
-        :param user_ID:
-        :param project_name:
-        :param token:
-        :return: dict of res json
-        """
-        # check and create project dir
-        project_path = os.path.join(USER_DIR, user_ID, name)
-        if not os.path.exists(project_path):
-            os.makedirs(project_path)
-        else:
-            # if exists means project exists
-            raise Exception('project exists')
-        return project_path
-
-    @classmethod
-    def get_objects(cls, search_query, user_ID, page_no=PAGE_NO,
-                    page_size=PAGE_SIZE, default_max_score=0.4, privacy=None):
-        """
-        Search for objects
-
-        :param search_query:
-        :param user_ID:
-        :param page_no:
-        :param page_size:
-        :param default_max_score:
-        :return:
-        """
-        start = (page_no - 1) * page_size
-        end = page_no * page_size
-        # 获取所有的
-        if search_query:
-            # apis = Api.objects.search_text(search_query).order_by('$text_score')
-            objects = cls.repo.search(search_query)
-        else:
-            objects = cls.repo.read({})  # 分页
-        if privacy:
-            objects = objects(privacy=privacy)
-        return objects.order_by('-create_time')[start:end]
-
-    @classmethod
-    def create_project(cls, name, description, user, privacy='private',
-                       tags=[], user_token='', type='app'):
-        """
-        Create a new project
-
-        :param name: str
-        :param description: str
-        :param user_ID: ObjectId
-        :param is_private: boolean
-        :param type: string (app/module/dataset)
-        :param tags: list of string
-        :param user_token: string
-        :return: a new created project object
-        """
-        user_ID = user.user_ID
-
-        # generate project dir
-        project_path = cls.gen_dir(user_ID, name)
-
-        # auth jupyterhub with user token
-        res = cls.auth_hub_user(user_ID, name, user_token)
-
-        # create a new project object
-        create_time = datetime.utcnow()
-        print(dict(name=name, description=description,
-                   create_time=create_time, update_time=create_time,
-                   type=type, tags=tags, hub_token=res.get('token'),
-                   path=project_path, user=user, privacy=privacy))
-        project_obj = Project(name=name, description=description,
-                              create_time=create_time, update_time=create_time,
-                              type=type, tags=tags, hub_token=res.get('token'),
-                              path=project_path, user=user, privacy=privacy)
-        return project_repo.create(project_obj)
-
-    @classmethod
-    def get_by_id(cls, object_id):
-        """
-        Get a project object by its ObjectId
-
-        :param object_id: ObjectId
-        :return: a matched Project object
-        """
-        return cls.repo.read_by_id(object_id)
-
-    @classmethod
-    def remove_project_by_id(cls, project_id, user_ID):
-        """
-        remove project by its object_id
-        :param project_id: object_id of project to remove
-        :return:
-        """
-        project = cls.get_by_id(project_id)
-        # check ownership
-        if user_ID != project.user.user_ID:
-            raise ValueError('project not belong to this user, cannot delete')
-        # delete tmp jupyterhub user
-        cls.delete_hub_user(user_ID, project.name)
-        # delete project directory
-        if os.path.isdir(project.path):
-            shutil.rmtree(project.path)
-        # delete project object
-        return cls.repo.delete_by_id(project_id)
-
-    @classmethod
-    def update_project(cls, project_id, description, privacy='private',
-                       tags=[]):
-        """
-        Update project
-
-        :param name: str
-        :param description: str
-        :param user_ID: ObjectId
-        :param is_private: boolean
-        :return: a new created project object
-        """
-        cls.repo.update_one_by_id(project_id, dict(description=description,
-                                                   update_time=datetime.utcnow(),
-                                                   tags=tags, privacy=privacy))
-
-
 def add(name, description, tags, type, hub_token, project_path):
     """
     Add a new Project.
@@ -262,3 +102,166 @@ def copy(project):
     project_cp.jobs = []
     project_repo.create(project_cp)
     return project_cp
+
+
+class ProjectBusiness:
+    repo = ProjectRepo(Project)
+
+    @staticmethod
+    def auth_hub_user(user_ID, project_name, user_token):
+        """
+        auth jupyterhub with user token
+        :param user_ID:
+        :param project_name:
+        :param user_token:
+        :return: dict of res json
+        """
+        return requests.post('{hub_server}/hub/api/authorizations/token'.
+                             format(hub_server=HUB_SERVER),
+                             json={'username': user_ID + '+' + project_name,
+                                   'password': user_token}
+                             ).json()
+
+    @staticmethod
+    def delete_hub_user(user_ID, project_name):
+        """
+        auth jupyterhub with user token
+        :param user_ID:
+        :param project_name:
+        :param token:
+        :return: dict of res json
+        """
+        url = '{hub_server}/hub/api/users/{user_ID}+{project_name}'.format(
+            hub_server=HUB_SERVER, user_ID=user_ID,
+            project_name=project_name)
+        return requests.delete(url,
+                               headers={
+                                   'Authorization': 'token {}'.format(
+                                       ADMIN_TOKEN)
+                               })
+
+    @staticmethod
+    def gen_dir(user_ID, name):
+        """
+        auth jupyterhub with user token
+        :param user_ID:
+        :param project_name:
+        :param token:
+        :return: dict of res json
+        """
+        # check and create project dir
+        project_path = os.path.join(USER_DIR, user_ID, name)
+        if not os.path.exists(project_path):
+            os.makedirs(project_path)
+        else:
+            # if exists means project exists
+            raise Exception('project exists')
+        return project_path
+
+    @classmethod
+    def get_objects(cls, search_query, user=None, page_no=PAGE_NO,
+                    page_size=PAGE_SIZE, default_max_score=0.4, privacy=None):
+        """
+        Search for objects
+
+        :param search_query:
+        :param user_ID:
+        :param page_no:
+        :param page_size:
+        :param default_max_score:
+        :return:
+        """
+        start = (page_no - 1) * page_size
+        end = page_no * page_size
+        # 获取所有的
+        if search_query:
+            objects = cls.repo.search(search_query)
+        else:
+            objects = cls.repo.read()  # 分页
+        if privacy:
+            objects = objects(privacy=privacy)
+        if user:
+            objects = objects(user=user)
+        return objects.order_by('-create_time')[start:end]
+
+    @classmethod
+    def create_project(cls, name, description, user, privacy='private',
+                       tags=[], user_token='', type='app'):
+        """
+        Create a new project
+
+        :param name: str
+        :param description: str
+        :param user_ID: ObjectId
+        :param is_private: boolean
+        :param type: string (app/module/dataset)
+        :param tags: list of string
+        :param user_token: string
+        :return: a new created project object
+        """
+        user_ID = user.user_ID
+
+        # generate project dir
+        project_path = cls.gen_dir(user_ID, name)
+
+        # auth jupyterhub with user token
+        res = cls.auth_hub_user(user_ID, name, user_token)
+
+        # create a new project object
+        create_time = datetime.utcnow()
+        # project_obj = Project(name=name, description=description,
+        #                       create_time=create_time, update_time=create_time,
+        #                       type=type, tags=tags, hub_token=res.get('token'),
+        #                       path=project_path, user=user, privacy=privacy)
+        return cls.repo.create_one(name=name, description=description,
+                                   create_time=create_time,
+                                   update_time=create_time,
+                                   type=type, tags=tags,
+                                   hub_token=res.get('token'),
+                                   path=project_path, user=user,
+                                   privacy=privacy)
+
+    @classmethod
+    def get_by_id(cls, object_id):
+        """
+        Get a project object by its ObjectId
+
+        :param object_id: ObjectId
+        :return: a matched Project object
+        """
+        return cls.repo.read_by_id(object_id)
+
+    @classmethod
+    def remove_project_by_id(cls, project_id, user_ID):
+        """
+        remove project by its object_id
+        :param project_id: object_id of project to remove
+        :return:
+        """
+        project = cls.get_by_id(project_id)
+        # check ownership
+        if user_ID != project.user.user_ID:
+            raise ValueError('project not belong to this user, cannot delete')
+        # delete tmp jupyterhub user
+        cls.delete_hub_user(user_ID, project.name)
+        # delete project directory
+        if os.path.isdir(project.path):
+            shutil.rmtree(project.path)
+        # delete project object
+        return cls.repo.delete_by_id(project_id)
+
+    @classmethod
+    def update_project(cls, project_id, description, privacy='private',
+                       tags=[]):
+        """
+        Update project
+
+        :param name: str
+        :param description: str
+        :param user_ID: ObjectId
+        :param is_private: boolean
+        :return: a new created project object
+        """
+        cls.repo.update_one_by_id(project_id, dict(description=description,
+                                                   update_time=datetime.utcnow(),
+                                                   tags=tags, privacy=privacy))

@@ -44,6 +44,13 @@ module.exports = {
     {value: 'public', text: 'Public'}
   ],
 
+  projectChoices: [
+    {value: 'project', text: 'Project Type'},
+    {value: 'app', text: 'App'},
+    {value: 'module', text: 'Module'},
+    {value: 'dataset', text: 'Dataset'},
+  ],
+
   dataCategory: [
     'Business', 'Government', 'Education', 'Environment',
     'Health', 'Housing & Development', 'Public Services',

@@ -40,9 +40,9 @@ class Project(DynamicDocument):
     meta = {
         'allow_inheritance': True,
         'indexes': [
-            {'fields': ['$name', '$description'],
+            {'fields': ['$name', '$description', '$path'],
              'default_language': "english",
-             'weights': {'name': 10, 'description': 5}
+             'weights': {'name': 10, 'description': 5, 'path': 5}
              }
         ]}
 
@@ -52,7 +52,7 @@ class Dataset(Project):
 
 
 class Module(Project):
-    category = StringField(choices=('model', 'toolkit'), required=True)
+    category = StringField(choices=('model', 'toolkit'))
 
 
 RE_TYPE = (
@@ -63,7 +63,7 @@ RE_TYPE = (
 
 class App(Project):
     url = StringField(max_length=50)
-    keyword = StringField(max_length=30, unique=True, required=True)
+    keyword = StringField(max_length=30)
     input = DictField()
     output = DictField()
     status = IntField(choices=RE_TYPE)
