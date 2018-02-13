@@ -25,11 +25,15 @@ function checkStatus(response) {
  *
  * @param  {string} url       The URL we want to request
  * @param  {object} [options] The options we want to pass to "fetch"
- * @param  {function} [onSuccess] onSuccess function
- * @param  {function} [onError] onError function
+ * @param  {function, object} [onSuccess] onSuccess function
+ * @param  {function, object} [onJson] onJson function
+ * @param  {function, object} [onError] onError function
  * @return {object}           An object containing either "data" or "err"
  */
-export default async function request(url, options, onSuccess = onSuccessDef, onError = onErrorDef) {
+export default async function request(url, options,
+                                      onSuccess = () => {},
+                                      onJson = () => {},
+                                      onError = () => {}) {
   try {
     const token = localStorage.getItem('token')
     if (token) {
@@ -47,6 +51,8 @@ export default async function request(url, options, onSuccess = onSuccessDef, on
     await onSuccess(newRes)
 
     const data = await newRes.json()
+
+    await onJson(data.response)
 
     const ret = {
       data: data.response,

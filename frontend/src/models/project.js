@@ -85,7 +85,6 @@ export default {
           }
         }
       }
-      console.log(filter)
       const { data: projects } = yield call(getProjects, { filter })
       yield put({ type: 'setProjects', payload: projects })
     },

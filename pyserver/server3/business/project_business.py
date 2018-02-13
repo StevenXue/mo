@@ -18,6 +18,7 @@ from datetime import datetime
 from server3.entity.project import Project
 # from server3.repository import job_repo
 from server3.repository.project_repo import ProjectRepo
+from server3.business import user_business
 from server3.constants import USER_DIR
 from server3.constants import HUB_SERVER
 from server3.constants import ADMIN_TOKEN
@@ -165,7 +166,7 @@ class ProjectBusiness:
         Search for objects
 
         :param search_query:
-        :param user_ID:
+        :param user:
         :param page_no:
         :param page_size:
         :param default_max_score:

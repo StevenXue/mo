@@ -29,14 +29,16 @@ project_app = Blueprint("project_app", __name__, url_prefix=PREFIX)
 @project_app.route('', methods=['GET'])
 @jwt_required
 def list_projects_by_query():
-    user_ID = get_jwt_identity()
+    group = request.args.get('group')
     page_no = int(request.args.get('page_no', 1))
     page_size = int(request.args.get('page_size', 5))
     search_query = request.args.get('query', None)
     privacy = request.args.get('privacy', None)
     default_max_score = float(request.args.get('max_score', 0.4))
     type = request.args.get('type', 'project')
-
+    user_ID = None
+    if group == 'my':
+        user_ID = get_jwt_identity()
     try:
         projects = project_service.list_projects(
             search_query=search_query,
@@ -44,7 +46,8 @@ def list_projects_by_query():
             page_no=page_no,
             page_size=page_size,
             default_max_score=default_max_score,
-            type=type
+            type=type,
+            user_ID=user_ID
         )
     except Warning as e:
         return jsonify({

@@ -12,7 +12,7 @@ const { projects, fork } = api
 const PREFIX = 'project'
 
 // 获取用户所有 projects
-export function getProjects({ filter }) {
+export function getProjects({ filter, onJson }) {
   let params = ''
   for (let key in filter) {
     if (!filter.hasOwnProperty(key)) {
@@ -26,6 +26,25 @@ export function getProjects({ filter }) {
       params += `&${key}=${value}`
     }
   }
+  return request(path.join(CORS, PREFIX) + `?${params}`, undefined, undefined, onJson)
+}
+
+// 获取用户所有 projects
+export function getMyProjects({ filter }) {
+  let params = ''
+  for (let key in filter) {
+    if (!filter.hasOwnProperty(key)) {
+      continue
+    }
+    if (filter[key]) {
+      const value = filter[key]
+      if (key === 'projectType') {
+        key = 'type'
+      }
+      params += `&${key}=${value}`
+    }
+  }
+  params += `&group=my`
   return request(path.join(CORS, PREFIX) + `?${params}`)
 }
 

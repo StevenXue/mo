@@ -172,7 +172,8 @@ def list_projects_by_user_ID(user_ID, order=-1, privacy='all'):
 
 
 def list_projects(search_query, page_no=None, page_size=None,
-                  default_max_score=0.4, privacy=None, type='project'):
+                  default_max_score=0.4, privacy=None, type='project',
+                  user_ID=None):
     """
     list projects
     :param user_ID:
@@ -180,13 +181,17 @@ def list_projects(search_query, page_no=None, page_size=None,
     :param privacy:
     :return:
     """
+    user = None
+    if user_ID:
+        user = user_business.get_by_user_ID(user_ID)
     cls = TypeMapper.get(type)
     return cls.get_objects(
         search_query=search_query,
         privacy=privacy,
         page_no=page_no,
         page_size=page_size,
-        default_max_score=default_max_score
+        default_max_score=default_max_score,
+        user=user
     )
 
 
