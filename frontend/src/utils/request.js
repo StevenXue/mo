@@ -25,22 +25,15 @@ function checkStatus(response) {
  *
  * @param  {string} url       The URL we want to request
  * @param  {object} [options] The options we want to pass to "fetch"
- * @param  {function, object} [onSuccess] onSuccess function
- * @param  {function, object} [onJson] onJson function
- * @param  {function, object} [onError] onError function
+ * @param  {object} [funcs] callback functions
  * @return {object}           An object containing either "data" or "err"
  */
-export default async function request(url, options,
-                                      onSuccess = () => {},
-                                      onJson = () => {},
-                                      onError = () => {}) {
+export default async function request(url, options = {}, funcs = {}) {
+  const { onSuccess, onJson, onError } = funcs
   try {
     const token = localStorage.getItem('token')
     if (token) {
-      if (!options) {
-        options = {}
-      }
-      if(!_.get(options, 'headers.Authorization')) {
+      if (!_.get(options, 'headers.Authorization')) {
         _.set(options, 'headers.Authorization', 'Bearer ' + token)
       }
     }
@@ -48,11 +41,11 @@ export default async function request(url, options,
 
     const newRes = checkStatus(response)
 
-    await onSuccess(newRes)
+    await onSuccess && onSuccess(newRes)
 
     const data = await newRes.json()
 
-    await onJson(data.response)
+    await onJson && onJson(data.response)
 
     const ret = {
       data: data.response,
@@ -67,7 +60,7 @@ export default async function request(url, options,
     return ret
   } catch (err) {
     console.log(url, err)
-    await onError(err)
+    await onError && onError(err)
   }
 }
 

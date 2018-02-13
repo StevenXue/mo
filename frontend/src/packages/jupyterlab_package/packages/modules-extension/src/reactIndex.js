@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Card, Button, Row, Col } from 'antd'
+import { Card, Button, Row, Col, Input } from 'antd'
 
 import {
   VDomRenderer
@@ -11,11 +11,16 @@ import {
 
 import ParamsMapper from './ParamsMapper'
 
-import { getModules, getModule } from './services'
+import { getModules, getModule, getProjects } from './services'
 
 function genConf(args) {
   return JSON.stringify(args).replace(/'/g, '`')
 }
+
+const Search = Input.Search
+
+const type = 'module'
+const privacy = 'public'
 
 export
 class ModulePage extends React.Component {
@@ -23,40 +28,66 @@ class ModulePage extends React.Component {
   constructor() {
     super()
     this.state = {
-      modules: [],
+      projects: [],
     }
   }
 
-  onSuccess = (res) => {
-    this.setState({
-      modules: res.response,
-    })
-  }
-
-  onModuleSuccess = (res, func) => {
-    this.setState({
-      moduleId: res.response._id,
-      module: res.response,
-      func: func,
-      args: Object.values(res.response.args[func]),
-    })
-  }
-
   componentDidMount() {
-    getModules(this.onSuccess)
+    this.fetchData({})
   }
 
-  clickModule(module, func) {
-    getModule({ moduleId: module._id }, (res) => this.onModuleSuccess(res, func))
+  fetchData({ payload }) {
+    let filter = { type, privacy };
+    ['query', 'privacy'].forEach((key) => {
+      if (this.state[key]) {
+        filter[key] = this.stats[key]
+      }
+    })
+    if (payload) {
+      for (let key in payload) {
+        if (!payload.hasOwnProperty(key)) {
+          continue
+        }
+        if (payload[key]) {
+          filter[key] = payload[key]
+          this.setState({
+            key: payload[key],
+          })
+        }
+      }
+    }
+    getProjects({
+      filter,
+      onJson: (projects) => this.setState({
+        projects,
+      })
+    })
   }
 
-  backToList(module) {
+  onModuleSuccess = (response, func) => {
     this.setState({
-      moduleId: undefined,
-      module: undefined,
+      projectId: response._id,
+      project: response,
+      func: func,
+      args: Object.values(response.args[func]),
+    })
+  }
+
+  clickProject(project, func) {
+    getModule({ projectId: project._id }, (response) => this.onModuleSuccess(response, func))
+  }
+
+  backToList(project) {
+    this.setState({
+      projectId: undefined,
+      project: undefined,
       func: undefined,
       args: undefined,
     })
+  }
+
+  handleQueryChange(value) {
+    this.fetchData({ payload: { query: value } })
   }
 
   insertCode() {
@@ -65,7 +96,7 @@ class ModulePage extends React.Component {
       [
         `conf = '${genConf(this.state.args)}'\n`,
         `conf = json_parser(conf)\n`,
-        `result = ${this.state.func}('${user_ID}/${this.state.module.name}', conf)\n`,
+        `result = ${this.state.func}('${user_ID}/${this.state.project.name}', conf)\n`,
       ],
     )
   }
@@ -90,17 +121,17 @@ class ModulePage extends React.Component {
       <div>
         <ParamsMapper args={this.state.args}
                       setValue={(values) => this.setValue(values)}
-                      baseArgs={Object.values(this.state.module.args[this.state.func])}
+                      baseArgs={Object.values(this.state.project.args[this.state.func])}
         />
       </div>
     )
   }
 
   render() {
-    if (this.state.moduleId !== undefined) {
+    if (this.state.projectId !== undefined) {
       return (
         <div style={{ minHeight: 100, overflowY: 'auto' }}>
-          <h2>{this.state.module.name}</h2>
+          <h2>{this.state.project.name}</h2>
           {this.renderParameters()}
           <Row>
             <Button type='primary' onClick={() => this.insertCode()}>Insert Code</Button>
@@ -112,16 +143,20 @@ class ModulePage extends React.Component {
       return (
         <div style={{ height: '100%' }}>
           <header>MODULE LIST</header>
+          <Search
+            placeholder="input search text"
+            onSearch={(value) => this.handleQueryChange(value)}
+          />
           <div className='list'>
-          {this.state.modules.map((module) =>
-            <Card key={module.name} title={module.name}
-              // onClick={() => this.clickModule(module)}
+          {this.state.projects.map((project) =>
+            <Card key={project.name} title={project.name}
+              // onClick={() => this.clickModule(project)}
                   style={{ margin: '5px 3px', cursor: 'pointer' }}>
               <Col>
-                {module.description}
+                {project.description}
                 <Row>
-                  <Button onClick={() => this.clickModule(module, 'train')}>train</Button>
-                  <Button onClick={() => this.clickModule(module, 'predict')}>predict</Button>
+                  <Button onClick={() => this.clickProject(project, 'train')}>train</Button>
+                  <Button onClick={() => this.clickProject(project, 'predict')}>predict</Button>
                 </Row>
               </Col>
             </Card>)}

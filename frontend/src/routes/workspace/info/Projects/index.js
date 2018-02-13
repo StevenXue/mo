@@ -15,7 +15,7 @@ const TabPane = Tabs.TabPane
 function Projects({ history, project, dispatch }) {
 
   function callback(key) {
-    console.log(key)
+    // console.log(key)
   }
 
   return (
@@ -108,7 +108,7 @@ class ProjectList extends Component {
             onSearch={(value) => this.handleQueryChange(value)}
             style={{ width: 200 }}
           />
-          <ProjectModel new={true}>
+          <ProjectModel new={true} fetchData={() => this.fetchData({})}>
             <Button icon='plus-circle-o' type='primary' className={styles.rightButton}>New Project</Button>
           </ProjectModel>
         </div>

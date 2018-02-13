@@ -18,7 +18,7 @@ const checker = (value, arr) =>
 const extFilter = {
   app: [],
   module: [],
-  dataset: ['modules-extension'],
+  dataset: ['datasets-extension'],
 }
 
 // ES6 Promise polyfill
