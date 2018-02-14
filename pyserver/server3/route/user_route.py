@@ -60,7 +60,7 @@ def verify_code():
         }), 200
 
 
-@user_app.route('/verify_code', methods=['post'])
+@user_app.route('/reset_password', methods=['post'])
 def reset_password():
     """
     提供更改密码接口

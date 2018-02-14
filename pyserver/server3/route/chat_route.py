@@ -37,13 +37,13 @@ def get_intent():
     data = request.get_json()
     content = data.pop('content')
     intent_list = data.get("intent_list")
-    intent_list =[
-        {
-            "value": 1,
-            "label": '使用平台服务',
-            "trigger": "WebChatId.requirement.text",
-        },
-    ]
+    # intent_list =[
+    #     {
+    #         "value": 1,
+    #         "label": '使用平台服务',
+    #         "trigger": "WebChatId.requirement.text",
+    #     },
+    # ]
     for index, intent in enumerate(intent_list):
         intent["score"] = synonyms.compare(content, intent["label"], seg=True)
         intent_list[index] = intent
@@ -56,13 +56,14 @@ def get_intent():
         return jsonify({
             "response": {
                 "type": "tuling",
-                "message": "hello"
+                "message": "没有匹配到服务，图灵机器人回答你， hello"
             }
         }), 200
     return jsonify({
         "response": {
             "type": "intent",
-            "message": intent_list[0]["label"]
+            "message": intent_list[0]["label"],
+            "trigger": intent_list[0]["trigger"]
         }
     }), 200
 
