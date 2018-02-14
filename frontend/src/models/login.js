@@ -99,17 +99,17 @@ export default {
       yield put({
         type: 'changeSubmitting',
         payload: true,
-      });
+      })
       const { data: data } = yield call(login, payload)
       yield put({
         type: 'changeSubmitting',
         payload: false,
-      });
+      })
       if (data) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user_ID', data.user.user_ID);
-        const from = queryURL('from');
-        yield put({ type: 'setUser', payload: data.user });
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('user_ID', data.user.user_ID)
+        const from = queryURL('from')
+        yield put({ type: 'setUser', payload: data.user })
         if (from) {
           yield put(routerRedux.push(from))
         } else {

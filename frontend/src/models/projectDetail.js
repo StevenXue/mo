@@ -1,13 +1,20 @@
 import { routerRedux } from 'dva/router'
 
 import { fetchProject, deleteProject, updateProject, forkProject } from '../services/project'
+import { jobsByProject } from '../services/job'
 import { privacyChoices } from '../constants'
 import pathToRegexp from 'path-to-regexp'
 import { get } from 'lodash'
+import { hubPrefix } from '../utils/config'
+import * as dataAnalysisService from '../services/dataAnalysis'
+import { message } from 'antd/lib/index'
+
+import { startLabBack } from './modelling'
 
 export default {
   namespace: 'projectDetail',
   state: {
+    jobs: [],
     // doneIndices: new Set([]),
   },
   reducers: {
@@ -15,6 +22,12 @@ export default {
       return {
         ...state,
         project,
+      }
+    },
+    setJobs(state, { payload: jobs }) {
+      return {
+        ...state,
+        jobs,
       }
     },
     setStep(state, { payload }) {
@@ -38,10 +51,23 @@ export default {
   },
   effects: {
     // 获取该 project
-    *fetch(action, { call, put, select }) {
+    *fetch(action, { call, put }) {
       const { data: project } = yield call(fetchProject, { projectId: action.projectId })
       yield put({ type: 'setProject', payload: project })
+      const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
+      const hubToken = project.hub_token
+      yield call(startLabBack, { payload: { hubUserName, hubToken } }, { call })
+      // yield call(startLabFront)
+      // fetch jobs
+      const jobs = yield call(jobsByProject, { hubUserName, hubToken })
+      yield put({ type: 'setJobs', payload: jobs })
     },
+    // 获取该 project 的 Jobs
+    // *fetchJobs(action, { call, put }) {
+    //   // const hubUserName = `${localStorage.getItem('user_ID')}+${project.name}`
+    //   const jobs = yield call(jobsByProject, { projectId: action.projectId })
+    //   yield put({ type: 'setJobs', payload: jobs })
+    // },
     *delete({ payload }, { call, put, select }) {
       // const user_ID = 'dev_1'
       // payload['user_ID'] = yield select(state => state.login.user.user_ID)
@@ -81,6 +107,7 @@ export default {
         if (match) {
           const projectId = match[1]
           dispatch({ type: 'fetch', projectId: projectId })
+          // dispatch({ type: 'fetchJobs', projectId: projectId })
         } else if (match2) {
           const projectId = match2[1]
           dispatch({ type: 'fetch', projectId: projectId })

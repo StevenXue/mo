@@ -25,6 +25,10 @@ import {
   Widget
 } from '@phosphor/widgets';
 
+import {
+  NotebookActions
+} from '@jupyterlab/notebook';
+
 import '../style/index.css';
 
 
@@ -70,6 +74,23 @@ function activate(app: JupyterLab, palette: ICommandPalette): ILauncher {
       const callback = (item: Widget) => {
         shell.addToMainArea(item, { ref: id });
         shell.activateById(item.id);
+        if (item.hasOwnProperty('notebook')) {
+          NotebookActions.insertInitCode((item as any).notebook,
+            [
+              `# Please use current (work) folder to store your data and models\n`,
+              `import os\n`,
+              `import sys\n`,
+              `sys.path.append('../')\n`,
+              `\n`,
+              `from modules import json_parser\n`,
+              `from modules import Client\n`,
+              `\n`,
+              `client = Client('fackAPI')\n`,
+              `run = client.run\n`,
+              `train = client.train\n`,
+              `predict = client.predict`,
+            ], (item as any).session);
+        }
       };
       const launcher = new Launcher({ cwd, callback });
 

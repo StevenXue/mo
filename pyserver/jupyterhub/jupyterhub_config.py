@@ -60,9 +60,7 @@ c.JupyterHub.admin_access = True
 #  Consider using service_tokens for general services that talk to the JupyterHub
 #  API.
 c.JupyterHub.service_tokens = {
-    '3dff9236c0404344929729fd8fe7d376': 'chen',
-    # '3dff9236c0404344929729fd8fe7d376': 'zhaofengli',
-    # '597293565868fa9d55096844dce32f96b7d7291b7e194f4f': 'zhaofengli',
+    '1d4afa72b00c4ffd9db82f26e1628f89': 'admin',
 }
 
 ## Class for authenticating users.
@@ -76,7 +74,8 @@ c.JupyterHub.service_tokens = {
 #  - takes two arguments: (handler, data),
 #    where `handler` is the calling web.RequestHandler,
 #    and `data` is the POST form data from the login page.
-c.JupyterHub.authenticator_class = 'jupyterhub.auth.PAMAuthenticator'
+c.JupyterHub.authenticator_class = 'authenticator.SuperSecureAuthenticator'
+# c.JupyterHub.authenticator_class = 'jupyterhub.auth.PAMAuthenticator'
 
 ## The base URL of the entire application
 #c.JupyterHub.base_url = '/'
@@ -283,7 +282,7 @@ c.JupyterHub.ip = '0.0.0.0'
 #  
 #  Should be a subclass of Spawner.
 # c.JupyterHub.spawner_class = 'jupyterhub.spawner.LocalProcessSpawner'
-c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
+c.JupyterHub.spawner_class = 'mydockerspawner.MyDockerSpawner'
 
 ## Path to SSL certificate file for the public facing interface of the proxy
 #  
@@ -633,7 +632,7 @@ c.Spawner.default_url = '/lab'
 #  Admin access should be treated the same way root access is.
 #  
 #  Defaults to an empty set, in which case no user has admin access.
-c.Authenticator.admin_users = {'chen'}
+c.Authenticator.admin_users = {'admin'}
 
 ## Automatically begin the login process
 #  
@@ -760,8 +759,12 @@ c.Authenticator.admin_users = {'chen'}
 ## The number of threads to allocate for encryption
 #c.CryptKeeper.n_threads = 8
 
-c.DockerSpawner.container_image = 'singleuser:latest'
+
+c.DockerSpawner.image = 'singleuser:latest'
 c.DockerSpawner.remove_containers = True
 # c.DockerSpawner.use_internal_ip =
-c.DockerSpawner.volumes = { '/Users/chen/myPoject/gitRepo/goldersgreen/pyserver/user_directory/{username}': '/home/jovyan/work',
-                            '/Users/chen/myPoject/gitRepo/goldersgreen/pyserver/server3/lib/modules': '/home/jovyan/modules'}
+# TODO mount project folder instead of user folder
+c.DockerSpawner.volumes = \
+    {
+    '/Users/zhaofengli/projects/goldersgreen/pyserver/user_directory/{user_ID}/{project_name}': '/home/jovyan/work',
+    '/Users/zhaofengli/projects/goldersgreen/pyserver/server3/lib/modules': '/home/jovyan/modules'}

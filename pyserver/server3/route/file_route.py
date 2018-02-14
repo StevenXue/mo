@@ -16,6 +16,7 @@ from flask import redirect
 from flask import request
 from flask import send_from_directory
 from werkzeug.utils import secure_filename
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server3.repository import config
 from server3.service import file_service
@@ -81,9 +82,10 @@ def upload_file_module():
 
 
 @file_app.route('/files', methods=['POST'])
+@jwt_required
 def upload_file():
     data = dict(request.form.items())
-    user_ID = data.pop('user_ID')
+    user_ID = get_jwt_identity()
     data_set_name = data.pop('data_set_name')
     is_private = data.pop('if_private')
     description = data.pop('description')

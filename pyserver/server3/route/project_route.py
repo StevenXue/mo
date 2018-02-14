@@ -11,12 +11,14 @@ from flask import jsonify
 from flask import make_response
 from flask import request
 from kubernetes import client
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server3.service import project_service
 from server3.service import ownership_service
-from server3.business import project_business
+from server3.business.project_business import ProjectBusiness
 from server3.utility import json_utility
 from server3.utility import str_utility
+from server3.constants import Error, Warning
 
 PREFIX = '/project'
 DEFAULT_CAT = ['model', 'toolkit']
@@ -24,12 +26,53 @@ DEFAULT_CAT = ['model', 'toolkit']
 project_app = Blueprint("project_app", __name__, url_prefix=PREFIX)
 
 
+@project_app.route('', methods=['GET'])
+@jwt_required
+def list_projects_by_query():
+    group = request.args.get('group')
+    page_no = int(request.args.get('page_no', 1))
+    page_size = int(request.args.get('page_size', 5))
+    search_query = request.args.get('query', None)
+    privacy = request.args.get('privacy', None)
+    default_max_score = float(request.args.get('max_score', 0.4))
+    type = request.args.get('type', 'project')
+    user_ID = None
+    if group == 'my':
+        user_ID = get_jwt_identity()
+    try:
+        projects = project_service.list_projects(
+            search_query=search_query,
+            privacy=privacy,
+            page_no=page_no,
+            page_size=page_size,
+            default_max_score=default_max_score,
+            type=type,
+            user_ID=user_ID
+        )
+    except Warning as e:
+        return jsonify({
+            "response": [],
+            "message": e.args[0]["hint_message"]
+        }), 200
+    except Error as e:
+        return jsonify({
+            "message": e.args[0]["hint_message"]
+        }), 404
+    else:
+        projects = json_utility.me_obj_list_to_json_list(projects)
+        return jsonify({
+            "response": projects
+        }), 200
+
+
+# new
 @project_app.route('/projects/<string:project_id>', methods=['GET'])
+@jwt_required
 def get_project(project_id):
     if not project_id:
         return jsonify({'response': 'no project_id arg'}), 400
     try:
-        project = project_service.get_by_id(project_id)
+        project = ProjectBusiness.get_by_id(project_id)
         project = json_utility.convert_to_json(project.to_mongo())
     except Exception as e:
         return make_response(jsonify({'response': '%s: %s' % (str(
@@ -121,62 +164,43 @@ def project_unpublish(project_id):
     return jsonify({'response': update_num}), 200
 
 
+# new
 @project_app.route('/projects', methods=['POST'])
+@jwt_required
 def create_project():
     if not request.json \
             or 'name' not in request.json \
-            or 'user_ID' not in request.json \
-            or 'is_private' not in request.json:
+            or 'type' not in request.json:
         return jsonify({'response': 'insufficient arguments'}), 400
 
+    user_token = request.headers.get('Authorization').split()[1]
+    user_ID = get_jwt_identity()
+
     data = request.get_json()
-    name = data['name']
-    description = data['description']
-    user_ID = data['user_ID']
-    is_private = data['is_private']
-    is_private = str(is_private).lower() == 'true'
-    related_fields = data.get('related_fields', '')
-    tags = data.get('tags', '')
-    related_tasks = data.get('related_tasks', '')
+    name = data.pop('name')
+    type = data.pop('type')
+    description = data.pop('description')
+    tags = data.pop('tags', '')
 
-    related_fields = str_utility.split_without_empty(related_fields)
     tags = str_utility.split_without_empty(tags)
-    related_tasks = str_utility.split_without_empty(related_tasks)
 
-    project_service.create_project(name, description, user_ID,
-                                   is_private, related_fields=related_fields,
-                                   tags=tags, related_tasks=related_tasks)
+    project_service.create_project(name, description, user_ID, tags=tags,
+                                   type=type, user_token=user_token, **data)
     return jsonify({'response': 'create project success'}), 200
 
 
 @project_app.route('/projects/<string:project_id>', methods=['PUT'])
 def update_project(project_id):
-    if not request.json \
-            or 'name' not in request.json \
-            or 'is_private' not in request.json:
-        return jsonify({'response': 'insufficient arguments'}), 400
-
     data = request.get_json()
-    name = data.get('name')
     description = data.get('description')
-    is_private = data.get('is_private')
-    is_private = str(is_private).lower() == 'true'
-    related_fields = data.get('related_fields', '')
+    privacy = data.get('privacy')
     tags = data.get('tags', '')
-    related_tasks = data.get('related_tasks', '')
-    done_indices = data.get('done_indices', [])
 
-    if not isinstance(related_fields, list):
-        related_fields = str_utility.split_without_empty(related_fields)
     if not isinstance(tags, list):
         tags = str_utility.split_without_empty(tags)
-    if not isinstance(related_tasks, list):
-        related_tasks = str_utility.split_without_empty(related_tasks)
 
-    project_service.update_project(project_id, name, description, is_private,
-                                   related_fields=related_fields,
-                                   tags=tags, related_tasks=related_tasks,
-                                   done_indices=done_indices)
+    ProjectBusiness.update_project(project_id, description, privacy,
+                                   tags=tags)
     return jsonify({'response': 'create project success'}), 200
 
 
@@ -187,8 +211,7 @@ def remove_project(project_id):
         return jsonify({'response': 'no project_id arg'}), 400
     if not user_ID:
         return jsonify({'response': 'no user_ID arg'}), 400
-    result = project_service.remove_project_by_id(ObjectId(project_id),
-                                                  user_ID)
+    result = ProjectBusiness.remove_project_by_id(project_id, user_ID)
     return jsonify({'response': result}), 200
 
 

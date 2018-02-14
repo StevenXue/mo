@@ -18,9 +18,7 @@ function DataAnalysis({location, dispatch, dataAnalysis}) {
   } = dataAnalysis;
 
   return (
-    showGuidance ?
-      <Guidance {...props}/> :
-      <Common {...props}/>
+    <Common {...props}/>
   );
 }
 

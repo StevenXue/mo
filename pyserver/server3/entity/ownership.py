@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from mongoengine import Document
+from mongoengine import DynamicDocument
 from mongoengine import BooleanField
 from mongoengine import ReferenceField
 from mongoengine import CASCADE
@@ -18,7 +18,7 @@ from server3.entity.request_answer import RequestAnswer
 OWNERSHIP_LEVEL = ('public', 'private')
 
 
-class Ownership(Document):
+class Ownership(DynamicDocument):
     private = BooleanField(required=True)
     user = ReferenceField('User', required=True)
     project = ReferenceField('Project', reverse_delete_rule=CASCADE)
@@ -31,5 +31,4 @@ class Ownership(Document):
     user_request_comments = ReferenceField('UserRequestComments',
                                            reverse_delete_rule=CASCADE)
     request_answer = ReferenceField('RequestAnswer',
-                                           reverse_delete_rule=CASCADE)
-
+                                    reverse_delete_rule=CASCADE)

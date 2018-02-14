@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 import math
+import os
 from bson import Code
 from bson import ObjectId
 
@@ -12,7 +13,10 @@ from server3.service import file_service
 from server3.service import ownership_service
 from server3.utility import json_utility
 from server3.utility import data_utility
+from server3.repository import config
 from server3 import constants
+
+UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
 
 def field_mapper_reducer():
@@ -47,8 +51,9 @@ def field_mapper_reducer():
     return mapper, reducer
 
 
-def add_data_set(user_ID, is_private, *args, **kwargs):
-    ds = data_set_business.add(*args, **kwargs)
+def add_data_set(user_ID, is_private, name, description):
+    path = os.path.join(UPLOAD_FOLDER, user_ID, name)
+    ds = data_set_business.add(name=name, description=description, path=path)
     user = user_business.get_by_user_ID(user_ID)
     ownership_business.add(user, is_private, data_set=ds)
     return ds
