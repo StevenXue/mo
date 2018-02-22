@@ -39,9 +39,16 @@ module.exports = {
   },
 
   privacyChoices: [
-    {value: 'all', text: 'All'},
+    {value: 'all', text: 'Privacy'},
     {value: 'private', text: 'Private'},
     {value: 'public', text: 'Public'}
+  ],
+
+  projectChoices: [
+    {value: 'project', text: 'Project Type'},
+    {value: 'app', text: 'App'},
+    {value: 'module', text: 'Module'},
+    {value: 'dataset', text: 'Dataset'},
   ],
 
   dataCategory: [

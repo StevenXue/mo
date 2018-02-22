@@ -3,6 +3,7 @@
 
 import {
   BoxLayout, Widget
+  // , PanelLayout, Panel
 } from '@phosphor/widgets';
 
 import {
@@ -27,7 +28,12 @@ import {
 
 import {
   Toolbar, ToolbarButton
+  , Dialog, showDialog
 } from '@jupyterlab/apputils';
+
+import {
+  Form
+} from './reactComponents';
 
 /**
  * The data attribute added to a widget that can run code.
@@ -37,7 +43,7 @@ const RUNNER_URL = 'http://localhost:5000/job/run';
 /**
  * The data attribute added to a widget that can run code.
  */
-const DEPOLY_URL = 'http://localhost:5000/job/deploy';
+// const DEPOLY_URL = 'http://localhost:5000/job/deploy';
 
 /**
  * The data attribute added to a widget that can run code.
@@ -65,10 +71,46 @@ const TOOLBAR_RUN_CLASS = 'jp-RunIcon';
 const TOOLBAR_DEPLOY_CLASS = 'jp-LauncherIcon';
 
 /**
+ * A widget used to rename a file.
+ */
+class DeployForm extends Form {
+
+  /**
+   * Get the input text node.
+   */
+  get inputNode(): HTMLInputElement {
+    return this.node.getElementsByTagName('input')[0] as HTMLInputElement;
+  }
+
+  /**
+   * Get the value of the widget.
+   */
+  getValue(): string {
+    return this.inputNode.value;
+  }
+}
+
+// /**
+//  * Deploy model service.
+//  */
+// function deploy(context: DocumentRegistry.CodeContext): void {
+//   fetch(DEPOLY_URL, {
+//     method: 'post',
+//     headers: {
+//       'Content-Type': 'application/json',
+//     },
+//     body: JSON.stringify({
+//       path: context.path,
+//       user_ID: localStorage.getItem('user_ID')
+//     }),
+//   });
+// }
+
+
+/**
  * Create a toExecutable toolbar item.
  */
-export
-function createRunButton(model: CodeEditor.IModel): ToolbarButton {
+export function createRunButton(model: CodeEditor.IModel): ToolbarButton {
 
   return new ToolbarButton({
     className: TOOLBAR_RUN_CLASS,
@@ -88,25 +130,52 @@ function createRunButton(model: CodeEditor.IModel): ToolbarButton {
   });
 }
 
+// /**
+//  * Create a deploy toolbar item.
+//  */
+// export
+// function createDeployButton(context: DocumentRegistry.CodeContext): ToolbarButton {
+//
+//   return new ToolbarButton({
+//     className: TOOLBAR_DEPLOY_CLASS,
+//     onClick: () => {
+//       console.log('click', context);
+//       fetch(DEPOLY_URL, {
+//         method: 'post',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({
+//           path: context.path,
+//           user_ID: localStorage.getItem('user_ID')
+//         }),
+//       });
+//     },
+//     tooltip: 'Deploy Script'
+//   });
+// }
+
 /**
  * Create a deploy toolbar item.
  */
-export
-function createDeployButton(context: DocumentRegistry.CodeContext): ToolbarButton {
+export function createDeployButton(context: DocumentRegistry.CodeContext): ToolbarButton {
 
   return new ToolbarButton({
     className: TOOLBAR_DEPLOY_CLASS,
     onClick: () => {
-      console.log('click', context);
-      fetch(DEPOLY_URL, {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          path: context.path,
-          user_ID: localStorage.getItem('user_ID')
+      return showDialog({
+        title: 'Rename File',
+        body: new DeployForm(() => {
+          console.log('click');
         }),
+        focusNodeSelector: 'input',
+        buttons: [Dialog.cancelButton(), Dialog.okButton({label: 'DEPLOY'})]
+      }).then(result => {
+        if (!result.value) {
+          return null;
+        }
+        console.log(result.value);
+        // return deploy(context);
       });
     },
     tooltip: 'Deploy Script'
@@ -116,8 +185,7 @@ function createDeployButton(context: DocumentRegistry.CodeContext): ToolbarButto
 /**
  * A code editor wrapper for the file editor.
  */
-export
-class FileEditorCodeWrapper extends CodeEditorWrapper {
+export class FileEditorCodeWrapper extends CodeEditorWrapper {
   /**
    * Construct a new editor widget.
    */
@@ -135,7 +203,9 @@ class FileEditorCodeWrapper extends CodeEditorWrapper {
     this.node.dataset[UNDOER] = 'true';
 
     editor.model.value.text = context.model.toString();
-    context.ready.then(() => { this._onContextReady(); });
+    context.ready.then(() => {
+      this._onContextReady();
+    });
 
     if (context.model.modelDB.isCollaborative) {
       let modelDB = context.model.modelDB;
@@ -260,8 +330,7 @@ class FileEditorCodeWrapper extends CodeEditorWrapper {
 /**
  * A document widget for editors.
  */
-export
-class FileEditor extends Widget implements DocumentRegistry.IReadyWidget {
+export class FileEditor extends Widget implements DocumentRegistry.IReadyWidget {
   /**
    * Construct a new editor widget.
    */
@@ -280,13 +349,12 @@ class FileEditor extends Widget implements DocumentRegistry.IReadyWidget {
     this._onPathChanged();
 
 
-    let layout = this.layout = new BoxLayout({ spacing: 0 });
+    let layout = this.layout = new BoxLayout({spacing: 0});
     // let toolbar = new Widget();
     // toolbar.addClass('jp-Toolbar');
     let toolbar = new Toolbar();
     toolbar.addItem('run', createRunButton(this.model));
     toolbar.addItem('deploy', createDeployButton(context));
-
     layout.addWidget(toolbar);
     // BoxLayout.setStretch(toolbar, 0);
     layout.addWidget(editorWidget);
@@ -322,11 +390,11 @@ class FileEditor extends Widget implements DocumentRegistry.IReadyWidget {
       return;
     }
     switch (event.type) {
-    case 'mousedown':
-      this._ensureFocus();
-      break;
-    default:
-      break;
+      case 'mousedown':
+        this._ensureFocus();
+        break;
+      default:
+        break;
     }
   }
 
@@ -386,13 +454,11 @@ class FileEditor extends Widget implements DocumentRegistry.IReadyWidget {
 /**
  * The namespace for editor widget statics.
  */
-export
-namespace FileEditor {
+export namespace FileEditor {
   /**
    * The options used to create an editor widget.
    */
-  export
-  interface IOptions {
+  export interface IOptions {
     /**
      * A code editor factory.
      */
@@ -414,8 +480,7 @@ namespace FileEditor {
 /**
  * A widget factory for editors.
  */
-export
-class FileEditorFactory extends ABCWidgetFactory<FileEditor, DocumentRegistry.ICodeModel> {
+export class FileEditorFactory extends ABCWidgetFactory<FileEditor, DocumentRegistry.ICodeModel> {
   /**
    * Construct a new editor widget factory.
    */
@@ -442,17 +507,14 @@ class FileEditorFactory extends ABCWidgetFactory<FileEditor, DocumentRegistry.IC
   private _services: IEditorServices;
 }
 
-
 /**
  * The namespace for `FileEditorFactory` class statics.
  */
-export
-namespace FileEditorFactory {
+export namespace FileEditorFactory {
   /**
    * The options used to create an editor widget factory.
    */
-  export
-  interface IOptions {
+  export interface IOptions {
     /**
      * The editor services used by the factory.
      */
@@ -464,3 +526,35 @@ namespace FileEditorFactory {
     factoryOptions: DocumentRegistry.IWidgetFactoryOptions;
   }
 }
+
+/**
+ * A namespace for private data.
+ */
+// namespace Private {
+//   /**
+//    * Create the node for a rename handler.
+//    */
+//   export function createDeployInfoNode(): HTMLElement {
+//     let body = document.createElement('div');
+//     body.className = 'jp-Deploy-body';
+//     // let existingLabel = document.createElement('label');
+//     // existingLabel.textContent = 'File Path';
+//     // let existingPath = document.createElement('span');
+//     // existingPath.textContent = 'ksksks';
+//     //
+//     // let nameTitle = document.createElement('label');
+//     // nameTitle.textContent = 'New Name';
+//     // nameTitle.className = 'kkkkk';
+//     // let name = document.createElement('input');
+//     // let input = document.createElement('input');
+//     // body.appendChild(existingLabel);
+//     // body.appendChild(existingPath);
+//     // body.appendChild(nameTitle);
+//     // body.appendChild(name);
+//     // body.appendChild(input);
+//     body.appendChild(new Form(() => {
+//       console.log('click');
+//     }).node);
+//     return body;
+//   }
+// }

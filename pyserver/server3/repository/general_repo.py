@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-
+from mongoengine import Q
 from mongoengine import connect
 from pymongo import UpdateOne
 
@@ -25,10 +25,12 @@ class Repo:
     def create_many(self, objects):
         return self.__instance.objects.insert(objects, load_bulk=False)
 
-    def create_one(self, content):
+    def create_one(self, **content):
         return self.__instance(**content).save()
 
-    def read(self, query):
+    def read(self, query=None):
+        if query is None:
+            query = {}
         return self.__instance.objects(**query).order_by('-_id')
 
     def read_skipping_order(self, query, skipping):
@@ -198,3 +200,10 @@ class Repo:
         update_list_dicts = [UpdateOne({'_id': item.pop('_id')}, {'$set': item}) for item in list_dicts]
         self.__instance._get_collection().bulk_write(update_list_dicts,
                                                      ordered=False)
+
+    def search(self, search_query):
+        return self.__instance.objects(
+            Q(name__icontains=search_query) | Q(
+                keyword__icontains=search_query)
+            | Q(description__icontains=search_query)
+        )

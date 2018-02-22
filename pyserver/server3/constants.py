@@ -12,6 +12,8 @@ MODEL_SCRIPT_PATH = './run_model.py'
 SERVING_PORT = 9000
 REDIS_SERVER = 'redis://10.52.14.182:6379'
 # REDIS_SERVER = 'redis://localhost:6379'
+HUB_SERVER = 'http://localhost:8000'
+ADMIN_TOKEN = '1d4afa72b00c4ffd9db82f26e1628f89'
 USER_DIR = './user_directory'
 NAMESPACE = 'default'
 KUBE_NAME = {
@@ -151,7 +153,7 @@ class SPEC(object):
         'display_name': None,
         'type': 'input',
         'value_type': 'int',
-        'range': None,  #[2, None],
+        'range': None,  # [2, None],
         "default": None,
         "required": False,
     }
@@ -192,4 +194,24 @@ class SPEC(object):
             'values': [],
         },
 
+    }
+
+
+class Error(Exception):
+    pass
+
+
+class Warning(Exception):
+    pass
+
+
+class ErrorMessage(Exception):
+    no_match_apis = {
+        "key": "无匹配服务",
+        "hint_message": "提示：无匹配服务\n"
+    }
+
+    error_get_type = {
+        "key": "错误的获取类型",
+        "hint_message": "提示：错误的获取类型\n"
     }

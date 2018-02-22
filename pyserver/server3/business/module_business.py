@@ -1,10 +1,12 @@
-import datetime
 import os
 import yaml
 from importlib import import_module
+from datetime import datetime
 
 from server3.entity.module import Module
+from server3.entity import project
 from server3.repository.general_repo import Repo
+from server3.business.project_business import ProjectBusiness
 
 module_repo = Repo(Module)
 
@@ -18,7 +20,7 @@ def add(name, user, **kwargs):
     except KeyError:
         module_path = "/" + user.user_ID + "/" + name
 
-    create_time = datetime.datetime.utcnow()
+    create_time = datetime.utcnow()
     model = Module(
         user=user, name=name,
         module_path=module_path,
@@ -47,3 +49,41 @@ def get_by_module_id(model_obj, yml=False):
 
 def update_by_id(module_id, **update):
     return module_repo.update_one_by_id(module_id, update)
+
+
+class ModuleBusiness(ProjectBusiness):
+    repo = Repo(project.Module)
+
+    @classmethod
+    def create_project(cls, name, description, user, privacy='private',
+                       tags=[], user_token='', type='app', category='model'):
+        """
+        Create a new project
+
+        :param name: str
+        :param description: str
+        :param user_ID: ObjectId
+        :param is_private: boolean
+        :param type: string (app/module/dataset)
+        :param tags: list of string
+        :param user_token: string
+        :return: a new created project object
+        """
+        user_ID = user.user_ID
+
+        # generate project dir
+        project_path = cls.gen_dir(user_ID, name)
+
+        # auth jupyterhub with user token
+        res = cls.auth_hub_user(user_ID, name, user_token)
+
+        # create a new project object
+        create_time = datetime.utcnow()
+
+        return cls.repo.create_one(name=name, description=description,
+                                   create_time=create_time,
+                                   update_time=create_time,
+                                   type=type, tags=tags,
+                                   hub_token=res.get('token'),
+                                   path=project_path, user=user,
+                                   privacy=privacy, category=category)

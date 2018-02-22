@@ -55,6 +55,7 @@ class weather_prediction(object):
             'WindSpeed_x': random.uniform(10, 40),
             'WindSpeed_y': random.uniform(10, 40)
         }
+        print('1111')
         return result
 
     def load_model(self):

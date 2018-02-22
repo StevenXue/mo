@@ -1,14 +1,22 @@
 import fetch from 'dva/fetch'
-import {message} from 'antd'
+import { message } from 'antd'
+import _ from 'lodash'
+
+const onSuccessDef = function (response) {
+}
+
+const onErrorDef = function (error) {
+}
 
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
     // message.success('This is a message of success');
     return response
   }
-  const error = new Error(response.statusText)
-  error.response = response
+  // const error = new Error(response.statusText)
+  // error.response = response
   message.error('This is a message of error: ' + response.statusText)
+  // return response
   // return error;
 }
 
@@ -17,27 +25,50 @@ function checkStatus(response) {
  *
  * @param  {string} url       The URL we want to request
  * @param  {object} [options] The options we want to pass to "fetch"
+ * @param  {function, object} [onSuccess] onSuccess function
+ * @param  {function, object} [onJson] onJson function
+ * @param  {function, object} [onError] onError function
  * @return {object}           An object containing either "data" or "err"
  */
-export default async function request(url, options) {
-  const response = await fetch(url, options)
+export default async function request(url, options,
+                                      onSuccess = () => {},
+                                      onJson = () => {},
+                                      onError = () => {}) {
+  try {
+    const token = localStorage.getItem('token')
+    if (token) {
+      if (!options) {
+        options = {}
+      }
+      if(!_.get(options, 'headers.Authorization')) {
+        _.set(options, 'headers.Authorization', 'Bearer ' + token)
+      }
+    }
+    const response = await fetch(url, options)
 
-  const newRes = checkStatus(response)
+    const newRes = checkStatus(response)
 
-  const data = await newRes.json()
+    await onSuccess(newRes)
 
-  const ret = {
-    data: data.response,
-    res: data,
-    headers: {},
-    status: response.status
+    const data = await newRes.json()
+
+    await onJson(data.response)
+
+    const ret = {
+      data: data.response,
+      res: data,
+      headers: {},
+      status: response.status,
+    }
+    if (response.headers.get('x-total-count')) {
+      ret.headers['x-total-count'] = response.headers.get('x-total-count')
+    }
+
+    return ret
+  } catch (err) {
+    console.log(url, err)
+    await onError(err)
   }
-
-  if (response.headers.get('x-total-count')) {
-    ret.headers['x-total-count'] = response.headers.get('x-total-count')
-  }
-
-  return ret
 }
 
 export async function org_request(url, options) {

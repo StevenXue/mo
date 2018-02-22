@@ -9,6 +9,7 @@ from bson import ObjectId
 from flask import Blueprint
 from flask import jsonify
 from flask import request
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server3.service import data_service
 from server3.utility import json_utility
@@ -21,8 +22,9 @@ data_app = Blueprint("data_app", __name__, url_prefix=PREFIX)
 
 
 @data_app.route('/data_sets', methods=['GET'])
+@jwt_required
 def list_data_sets_by_user_ID():
-    user_ID = request.args.get('user_ID')
+    user_ID = get_jwt_identity()
     related_field = request.args.get('related_field')
     tag = request.args.get('tag')
     related_task = request.args.get('related_task')
@@ -47,25 +49,27 @@ def list_data_sets_by_user_ID():
     return jsonify({'response': 'insufficient arguments'}), 400
 
 
-# @data_app.route('/data_sets', methods=['POST'])
-# def import_data_from_file_id():
-#     data = request.get_json()
-#     user_ID = data.pop('user_ID')
-#     file_id = data.pop('file_id')
-#     data_set_name = data.pop('data_set_name')
-#     ds_description = data.pop('ds_description')
-#     is_private = data.pop('is_private')
-#     is_private = str(is_private).lower() == 'true'
-#     names = data.pop('names', None)
-#     saved_ds = data_service.import_data_from_file_id(ObjectId(file_id),
-#                                                      data_set_name,
-#                                                      ds_description,
-#                                                      user_ID,
-#                                                      is_private,
-#                                                      names,
-#                                                      **data)
-#     ds_json = json_utility.convert_to_json(saved_ds.to_mongo())
-#     return jsonify({'response': ds_json}), 200
+@data_app.route('/data_sets', methods=['POST'])
+@jwt_required
+def create_dataset():
+    """
+
+    :json_key data_set_name:
+    :json_key if_private:
+    :json_key description:
+    :return:
+    """
+    data = request.get_json()
+    user_ID = get_jwt_identity()
+    data_set_name = data.pop('data_set_name')
+    is_private = data.pop('if_private')
+    description = data.pop('description')
+    # convert string to bool
+    is_private = str(is_private).lower() == 'true'
+    saved_ds = data_service.add_data_set(user_ID, is_private, data_set_name,
+                                         description)
+    ds_json = json_utility.convert_to_json(saved_ds.to_mongo())
+    return jsonify({'response': ds_json}), 200
 
 
 @data_app.route('/data_sets/<string:data_set_id>', methods=['GET'])

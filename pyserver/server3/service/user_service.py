@@ -1,4 +1,6 @@
 # -*- coding: UTF-8 -*-
+import json
+import requests
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 
@@ -7,10 +9,24 @@ from server3.utility import json_utility
 from server3.business import api_business
 from server3.business import user_request_business
 from server3.business import request_answer_business
+from server3.constants import Error, ErrorMessage
+
 
 def add(user_ID, password, kwargs):
     hashed_password = generate_password_hash(password)
     return user_business.add(user_ID, hashed_password, kwargs)
+
+
+def reset_password(phone, message_id, code, new_password):
+    # 验证
+    result = verify_code(code, message_id)
+    if result:
+        user = user_business.get_by_phone(phone=phone)
+        user.password = generate_password_hash(new_password)
+        return user.save()
+    # else:
+    #     raise Error(ErrorMessage)
+
 
 
 def authenticate(user_ID, password):
@@ -23,7 +39,7 @@ def authenticate(user_ID, password):
 
 def update_request_vote(user_request_id, user_ID):
     user = user_business.get_by_user_ID(user_ID)
-    user_request = user_request_business.\
+    user_request = user_request_business. \
         get_by_user_request_id(user_request_id)
 
     if user_request in user.request_vote_up:
@@ -67,7 +83,7 @@ def update_request_star(user_request_id, user_ID):
 
 def update_answer_vote(request_answer_id, user_ID):
     user = user_business.get_by_user_ID(user_ID)
-    request_answer = request_answer_business.\
+    request_answer = request_answer_business. \
         get_by_request_answer_id(request_answer_id)
 
     if request_answer in user.answer_vote_up:
@@ -156,6 +172,28 @@ def star_api(user_ID, api_id):
         }
 
 
+def add_used_api(user_ID, api_id):
+    """
+    为用户增加 使用过的api
+    :param user_ID:
+    :type user_ID:
+    :param api_id:
+    :type api_id:
+    :return:
+    :rtype:
+    """
+    user = user_business.get_by_user_ID(user_ID=user_ID)
+    api = api_business.get_by_api_id(api_id=api_id)
+    user_result = None
+    if api not in user.used_apis:
+        user.used_apis.append(api)
+        user_result = user.save()
+    if user_result:
+        return {
+            "user": user_result.to_mongo(),
+        }
+
+
 # def un_favor_api(user_ID, api_id):
 #     user = user_business.get_by_user_ID(user_ID=user_ID)
 #     api = api_business.get_by_api_id(api_id=api_id)
@@ -173,5 +211,47 @@ def star_api(user_ID, api_id):
 #         }
 
 
+def get_verification_code(phone):
+    """
+
+    :param phone:
+    :type phone:
+    :return: {message_id: aalalals}
+    :rtype:
+    """
+    url = "https://api.sms.jpush.cn/v1/codes"
+    payload = json.dumps({
+        'mobile': phone,
+        'temp_id': 1,
+    })
+    headers = {
+        'content-type': "application/json",
+        'authorization': "Basic MjZlZWFhM2QyNzljMzIyZTg0Zjk1NDQxOmYwMjQ2NzdiOWNjM2QxZWZmNDE0ODQxMA==",
+    }
+    response = requests.request("POST", url, data=payload, headers=headers)
+    result = response.json()
+    if "error" in result:
+        raise Error(result["error"])
+    return response.json()["message_id"]
 
 
+def verify_code(code, message_id):
+    url = 'https://api.sms.jpush.cn/v1/codes/' + message_id + '/valid'
+    payload = json.dumps({
+        'code': code
+    })
+    headers = {
+        'content-type': "application/json",
+        'authorization': "Basic MjZlZWFhM2QyNzljMzIyZTg0Zjk1NDQxOmYwMjQ2NzdiOWNjM2QxZWZmNDE0ODQxMA==",
+    }
+    response = requests.request("POST", url, data=payload, headers=headers)
+    result = response.json()
+    if "error" in result:
+        raise Error(result["error"])
+    return response.json()["is_valid"]
+    # if is_valid:
+    #     return response.json()
+    # else:
+    #     return make_response(jsonify({
+    #         "response": response.json()
+    #     }), 300)

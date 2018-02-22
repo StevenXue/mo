@@ -7,6 +7,8 @@ Blueprint for user
 Author: Zhaofeng Li
 Date: 2017.05.22
 """
+import json
+import requests
 
 from flask import Blueprint
 from flask import jsonify
@@ -20,10 +22,67 @@ from server3.repository import config
 from server3.business import user_business
 from server3.service import user_service
 from server3.utility import json_utility
+from server3.constants import Error
 
 PREFIX = '/user'
 
 user_app = Blueprint("user_app", __name__, url_prefix=PREFIX)
+
+
+# appKey = '26eeaa3d279c322e84f95441'
+# masterSecret = 'f024677b9cc3d1eff4148410'
+# auth_string = appKey + ':' + masterSecret
+
+
+@user_app.route('/get_verification_code/<phone>', methods=['get'])
+def get_verification_code(phone):
+    message_id = user_service.get_verification_code(phone)
+    if message_id:
+        return make_response(jsonify({
+            "response": message_id
+        }), 200)
+
+
+@user_app.route('/verify_code', methods=['post'])
+def verify_code():
+    data = request.get_json()
+    try:
+        result = user_service.verify_code(code=data["code"], message_id=data["message_id"])
+    except Error as e:
+        print("Error", e)
+        print("e.args[0]", e.args[0])
+        return jsonify({
+            "message": e.args[0]
+        }), 300
+    if result:
+        return jsonify({
+            "response": True,
+        }), 200
+
+
+@user_app.route('/reset_password', methods=['post'])
+def reset_password():
+    """
+    提供更改密码接口
+    :return:
+    :rtype:
+    """
+    data = request.get_json()
+    phone = data.pop("phone")
+    message_id = data.pop("message_id")
+    code = data.pop("code")
+    new_password = data.pop("new_password")
+    try:
+        user = user_service.reset_password(phone, message_id, code, new_password)
+    except Error as e:
+        return jsonify({
+            "message": e.args[0]
+        })
+    if user:
+        user = json_utility.convert_to_json(user.to_mongo())
+        return jsonify({
+            "response": user
+        })
 
 
 @user_app.route('/register', methods=['POST'])
@@ -62,6 +121,26 @@ def login():
     return jsonify(response), 200
 
 
+@user_app.route('/login_with_phone', methods=['POST'])
+def login_with_phone():
+    """
+    通过手机号登录，
+    :return:
+    :rtype:
+    """
+    data = request.get_json()
+    phone = data.pop("phone")
+    message_id = data.pop("message_id")
+    code = data.pop("code")
+    result = user_service.verify_code(code=code, message_id=message_id)
+    if result:
+        user = user_business.get_by_phone(phone=phone)
+        response = {'response': {
+            'token': create_access_token(identity=user),
+            'user': json_utility.convert_to_json(user.to_mongo())}}
+        return jsonify(response), 200
+
+
 @user_app.route('/favor_api', methods=['PUT'])
 def favor_api():
     """
@@ -79,7 +158,7 @@ def favor_api():
         return jsonify({
             'message': "success",
             'response': result
-                        }), 200
+        }), 200
     else:
         return jsonify({'response': "failed"}), 400
 
@@ -108,23 +187,25 @@ def star_api():
 
 
 
-# @user_app.route('/un_favor_api', methods=['PUT'])
-# def un_favor_api():
-#     """
-#     在用户和api下都存一份
-#     用户存api_id
-#     api存 user_ID
-#     :return:
-#     :rtype:
-#     """
-#     user_ID = request.json.get('user_ID', None)
-#     api_id = request.json.get('api_id', None)
-#     result = user_service.un_favor_api(user_ID=user_ID, api_id=api_id)
-#     if result:
-#         result = json_utility.convert_to_json(result)
-#         return jsonify({
-#             'message': "success",
-#             'response': result
-#         }), 200
-#     else:
-#         return jsonify({'response': "failed"}), 400
+        # @user_app.route('/un_favor_api', methods=['PUT'])
+        # def un_favor_api():
+        #     """
+        #     在用户和api下都存一份
+        #     用户存api_id
+        #     api存 user_ID
+        #     :return:
+        #     :rtype:
+        #     """
+        #     user_ID = request.json.get('user_ID', None)
+        #     api_id = request.json.get('api_id', None)
+        #     result = user_service.un_favor_api(user_ID=user_ID, api_id=api_id)
+        #     if result:
+        #         result = json_utility.convert_to_json(result)
+        #         return jsonify({
+        #             'message': "success",
+        #             'response': result
+        #         }), 200
+        #     else:
+        #         return jsonify({'response': "failed"}), 400
+
+        # curl --insecure -X POST -v https://api.sms.jpush.cn/v1/codes -H "Content-Type: application/json"  -u "26eeaa3d279c322e84f95441:f024677b9cc3d1eff4148410" -d '{"mobile":"15988731660","temp_id":1}'

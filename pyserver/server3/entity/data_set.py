@@ -21,12 +21,23 @@ RELATED_FIELDS = ('Business', 'Government', 'Education', 'Environment',
 
 
 class DataSet(DynamicDocument):
+    # required
     name = StringField(max_length=50, required=True)
+    create_time = DateTimeField(required=True)
+    update_time = DateTimeField(required=True)
+    # TODO add to enable download
+    # url = StringField(unique=True, required=True)
+    path = StringField(required=True)
+
+    # optional
     description = StringField(max_length=140)
-    related_field = StringField(max_length=100, choices=RELATED_FIELDS)
     tags = ListField(StringField(max_length=50))
-    related_tasks = ListField(StringField(max_length=50))
+    size = IntField()  # by bytes
+
+    # deprecated
     user_name = StringField(max_length=50)
+    related_field = StringField(max_length=100, choices=RELATED_FIELDS)
+    related_tasks = ListField(StringField(max_length=50))
     file = ReferenceField('File')
     # file_obj = EmbeddedDocumentField('File')
     # meta = {'allow_inheritance': True}
@@ -37,6 +48,7 @@ class DataSet(DynamicDocument):
     # predict = BooleanField(required=True)
     # upload_time = DateTimeField()
     # size = IntField()
+
 
 # class FileDataSet(DataSet):
 #     upload_time = DateTimeField(required=True)

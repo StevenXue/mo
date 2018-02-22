@@ -1,24 +1,15 @@
 import React from 'react'
 import { connect } from 'dva'
 
-import Common from '../../common/Common/index'
-import Guidance from '../../dataAnalysis/Guidance'
+import styles from './index.less'
 
-function Modelling({ location, dispatch, modelling }) {
-  const props = {
-    model: modelling,
-    namespace: 'modelling',
-    dispatch: dispatch,
-    step: 'model',
-  }
 
-  const {
-    showGuidance,
-  } = props.model
+function Modelling() {
 
   return (
-    showGuidance ? <Guidance {...props}/> : <Common {...props}/>
+    <div className={styles.container} id='mo-jlContainer'>
+    </div>
   )
 }
 
-export default connect(({ modelling }) => ({ modelling }))(Modelling)
+export default connect()(Modelling)

@@ -31,7 +31,7 @@ class Asking extends Component {
         }
       })
       .then(({response}) => {
-        console.log("/api/user_request response", response)
+        console.log("/pyapi/user_request response", response)
         this.setState({
           displayText: "提问成功"
         }, () => this.props.triggerNextStep({trigger: WebChatId.functionSelect.text}))

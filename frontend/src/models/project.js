@@ -1,6 +1,6 @@
 import { routerRedux } from 'dva/router'
 import { tokenLogin } from '../services/login'
-import { fetchProjects, createProject, deleteProject, updateProject } from '../services/project'
+import { fetchProjects, createProject, deleteProject, updateProject, getProjects } from '../services/project'
 import { privacyChoices } from '../constants'
 
 export default {
@@ -8,8 +8,28 @@ export default {
   state: {
     projects: [],
     projectsLoading: false,
+    privacy: undefined,
+    projectType: 'project',
   },
   reducers: {
+    setPrivacy(state, { payload: privacy }) {
+      return {
+        ...state,
+        privacy,
+      }
+    },
+    setType(state, { payload: projectType }) {
+      return {
+        ...state,
+        projectType,
+      }
+    },
+    setFilter(state, { payload: { key, value } }) {
+      return {
+        ...state,
+        key: value,
+      }
+    },
     setProjects(state, { payload: projects }) {
       return {
         ...state,
@@ -17,10 +37,10 @@ export default {
       }
     },
 
-    setProjectsLoading(state, {payload: projectsLoading }) {
+    setProjectsLoading(state, { payload: projectsLoading }) {
       return {
         ...state,
-        projectsLoading
+        projectsLoading,
       }
     },
 
@@ -34,7 +54,7 @@ export default {
   },
   effects: {
     // 获取用户所有 project
-    *fetch(action, { call, put, select, take }) {
+    *fetch({ payload }, { call, put, select, take }) {
       // yield put({type: 'login/query'})
       // const { data: data } = yield call(tokenLogin)
       // console.log(data)
@@ -43,17 +63,36 @@ export default {
       //   payload: data.user,
       // })
       // yield put({ type: 'setProjects', payload: [] })
-
       // const user_ID = yield select(state => state.login.user.user_ID)
-      const { data: projects } = yield call(fetchProjects, { privacy: action.privacy })
+      // const { data: projects } = yield call(fetchProjects, { privacy: action.privacy })
+      let filter = {}
+      yield select(state => {
+        const project = state.project;
+        ['query', 'projectType', 'privacy'].forEach((key) => {
+          if (project[key]) {
+            filter[key] = project[key]
+          }
+        })
+      })
+      if (payload) {
+        for (let key in payload) {
+          if (!payload.hasOwnProperty(key)) {
+            continue
+          }
+          if (payload[key]) {
+            filter[key] = payload[key]
+            yield put({ type: 'setFilter', payload: { key, value: payload[key] } })
+          }
+        }
+      }
+      const { data: projects } = yield call(getProjects, { filter })
       yield put({ type: 'setProjects', payload: projects })
     },
-
-    *fetchOthers(action, { call, put, select, take }){
-      yield put({type: 'setProjectsLoading', payload: true})
+    *fetchOthers(action, { call, put, select, take }) {
+      yield put({ type: 'setProjectsLoading', payload: true })
       const { data: projects } = yield call(fetchProjects, { others: true })
       yield put({ type: 'setProjects', payload: projects })
-      yield put({type: 'setProjectsLoading', payload: false})
+      yield put({ type: 'setProjectsLoading', payload: false })
     },
 
     *create({ body }, { call, put, select }) {
@@ -69,7 +108,7 @@ export default {
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
         if (pathname === '/workspace') {
-          dispatch({ type: 'fetch', privacy: 'all' })
+          dispatch({ type: 'fetch' })
         } else if (pathname === '/projects') {
           dispatch({ type: 'fetchOthers' })
         }

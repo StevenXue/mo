@@ -1,5 +1,5 @@
 """
-Blueprint for api
+Blueprint for module
 
 Author: Bingwei Chen
 Date: 2018.01.28

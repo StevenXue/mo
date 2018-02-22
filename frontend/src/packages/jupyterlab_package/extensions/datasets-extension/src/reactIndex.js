@@ -1,6 +1,9 @@
 import * as React from 'react'
-import * as ReactDOM from 'react-dom'
 import { Card, Button, Row, Col } from 'antd'
+
+import {
+  VDomRenderer
+} from '@jupyterlab/apputils';
 
 import {
   NotebookActions,
@@ -14,13 +17,13 @@ function genConf(args) {
   return JSON.stringify(args).replace(/'/g, '`')
 }
 
-class IndexPage extends React.Component {
+export
+class ModulePage extends React.Component {
 
   constructor() {
     super()
     this.state = {
       modules: [],
-      moduleId: undefined,
     }
   }
 
@@ -41,22 +44,6 @@ class IndexPage extends React.Component {
 
   componentDidMount() {
     getModules(this.onSuccess)
-    NotebookActions.insertCode(this.props.panel.notebook,
-      [
-        `# Please use current (work) folder to store your data and models\n`,
-        `import os\n`,
-        `import sys\n`,
-        `sys.path.append('../')\n`,
-        `\n`,
-        `from modules import json_parser\n`,
-        `from modules import Client\n`,
-        `\n`,
-        `client = Client('fackAPI')\n`,
-        `run = client.run\n`,
-        `train = client.train\n`,
-        `predict = client.predict`,
-      ],
-    )
   }
 
   clickModule(module, func) {
@@ -74,12 +61,11 @@ class IndexPage extends React.Component {
 
   insertCode() {
     const user_ID = localStorage.getItem('user_ID')
-    console.log('notebook', this.props.panel)
-    NotebookActions.insertCode(this.props.panel.notebook,
+    NotebookActions.insertCode(this.props.tracker.currentWidget.notebook,
       [
         `conf = '${genConf(this.state.args)}'\n`,
         `conf = json_parser(conf)\n`,
-        `predict('${user_ID}/${this.state.module.name}', conf)\n`,
+        `result = ${this.state.func}('${user_ID}/${this.state.module.name}', conf)\n`,
       ],
     )
   }
@@ -111,7 +97,6 @@ class IndexPage extends React.Component {
   }
 
   render() {
-
     if (this.state.moduleId !== undefined) {
       return (
         <div style={{ minHeight: 100, overflowY: 'auto' }}>
@@ -125,7 +110,9 @@ class IndexPage extends React.Component {
       )
     } else {
       return (
-        <div style={{ height: 100 }}>
+        <div style={{ height: '100%' }}>
+          <header>MODULE LIST</header>
+          <div className='list'>
           {this.state.modules.map((module) =>
             <Card key={module.name} title={module.name}
               // onClick={() => this.clickModule(module)}
@@ -138,6 +125,7 @@ class IndexPage extends React.Component {
                 </Row>
               </Col>
             </Card>)}
+          </div>
         </div>
       )
     }
@@ -145,8 +133,3 @@ class IndexPage extends React.Component {
 
 }
 
-// const IndexPageDva = connect()(IndexPage)
-
-export default function renderReact(node, app, panel) {
-  ReactDOM.render(<IndexPage app={app} panel={panel}/>, node)
-}
