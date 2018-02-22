@@ -28,7 +28,6 @@ def reset_password(phone, message_id, code, new_password):
     #     raise Error(ErrorMessage)
 
 
-
 def authenticate(user_ID, password):
     user = user_business.get_by_user_ID(user_ID)
     if user and check_password_hash(user.password, password):

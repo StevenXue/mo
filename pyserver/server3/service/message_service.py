@@ -15,6 +15,13 @@ def get_by_user_id(user_id):
     return messages
 
 
+def get_by_user_ID(user_ID):
+    user = user_business.get_by_user_ID(user_ID)
+    user_id = user.id
+    messages = message_business.get_by_user_id(user_id)
+    return messages
+
+
 def create_message(sender, message_type, receivers,  **kwargs):
     # create a new message object
     created_message = message_business.add_message\

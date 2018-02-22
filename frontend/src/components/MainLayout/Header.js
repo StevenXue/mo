@@ -7,6 +7,7 @@ import {Link, routerRedux} from 'dva/router'
 import {FormattedMessage} from 'react-intl'
 import {config} from '../../utils'
 import PostRequestModal from '../../components/postRequestModal/postRequestModal'
+import NotificationMenu from '../../components/NotificationMenu/notificationMenu'
 
 const Search = Input.Search
 
@@ -61,7 +62,7 @@ const menuConfig = [
   },
 ]
 
-function Header({location, login, history, dispatch, allRequest}) {
+function Header({location, login, history, dispatch, allRequest,message}) {
   const key = '/' + location.pathname.split('/')[1]
   const toLoginPage = () => {
     if (!login.user) {
@@ -81,120 +82,135 @@ function Header({location, login, history, dispatch, allRequest}) {
     })
   }
 
-  return (
-    <div className={styles.container}>
-      <div className={styles.box}>
+  // 计算未读信息的数量
+  const numberOfUnreadMessage= () => {
+    let unread = 0
+    message.messages.forEach((item) => {
+      if (item['is_read'] === false){
+        unread += 1
+      }
+    })
+    return unread
+  }
+  // 点击未读信息，进入详情
+  const toMessage= (id) => {
+    history.push('/userrequest/'+ id)
+  }
 
-        <Menu
-          className={styles.normal}
-          mode='horizontal'
-          theme='dark'
-          selectedKeys={[key]}
-        >
-          <Menu.Item key='logo' className={styles.logoBox}>
-            <Link to={'/'}>
-              <img src={logo} className={styles.logo}/>
-            </Link>
-          </Menu.Item>
-          {menuConfig.map(
-            (e) => {
-              if (e.dropdown) {
-                return (
-                  <SubMenu title={<span>Workspace</span>} key={e.key}>
-                    {e.dropdown.map(
-                      (e) => {
-                        return (
-                          <Menu.Item key={e.key}>
-                            <div onClick={() => {
-                              dispatch(routerRedux.push(e.Link))
-                            }}>
-                              {e.text}
-                            </div>
-                          </Menu.Item>
-                        )
-                      })}
-                  </SubMenu>
-                )
-              }
-              else {
-                return (
-                  <Menu.Item key={e.key}>
-                    <Link to={e.Link}>
-                      {e.Icon && <Icon type={e.Icon}/>}
-                      <FormattedMessage id={e.text} defaultMessage={e.text}/>
-                    </Link>
-                  </Menu.Item>)
-              }
+  return <div className={styles.container}>
+    <div className={styles.box}>
+
+      <Menu
+        className={styles.normal}
+        mode='horizontal'
+        theme='dark'
+        selectedKeys={[key]}
+      >
+        <Menu.Item key='logo' className={styles.logoBox}>
+          <Link to={'/'}>
+            <img src={logo} className={styles.logo}/>
+          </Link>
+        </Menu.Item>
+        {menuConfig.map(
+          (e) => {
+            if (e.dropdown) {
+              return (
+                <SubMenu title={<span>Workspace</span>} key={e.key}>
+                  {e.dropdown.map(
+                    (e) => {
+                      return (
+                        <Menu.Item key={e.key}>
+                          <div onClick={() => {
+                            dispatch(routerRedux.push(e.Link))
+                          }}>
+                            {e.text}
+                          </div>
+                        </Menu.Item>
+                      )
+                    })}
+                </SubMenu>
+              )
             }
-          )}
+            else {
+              return (
+                <Menu.Item key={e.key}>
+                  <Link to={e.Link}>
+                    {e.Icon && <Icon type={e.Icon}/>}
+                    <FormattedMessage id={e.text} defaultMessage={e.text}/>
+                  </Link>
+                </Menu.Item>)
+            }
+          }
+        )}
 
-          <Menu.Item key={'/search'}>
-            <div>
-              <Search
-                placeholder="Search"
-                onSearch={value => console.log(values)}
-              />
-            </div>
-          </Menu.Item>
+        <Menu.Item key={'/search'}>
+          <div>
+            <Search
+              placeholder="Search"
+              onSearch={value => console.log(values)}
+            />
+          </div>
+        </Menu.Item>
 
-          <Menu.Item key={'/postRequest'}>
+        <Menu.Item key={'/postRequest'}>
 
-            <Button type="primary"
-                    onClick={() => onClickModifyModal(true)}>Post
-              Request</Button>
-            <PostRequestModal dispatch={dispatch}
-                              visible={allRequest.modalState}/>
-          </Menu.Item>
+          <Button type="primary"
+                  onClick={() => onClickModifyModal(true)}>Post
+            Request</Button>
+          <PostRequestModal dispatch={dispatch}
+                            visible={allRequest.modalState}/>
+        </Menu.Item>
 
+        {/*<NotificationMenu />*/}
 
-          <SubMenu
-            className={styles.rightButton}
-            title={
-              <span onClick={toLoginPage}>
-                <Badge count={login.user ? 5 : 0}>
+        <SubMenu
+          className={styles.rightButton}
+          title={
+            <span onClick={toLoginPage}>
+                <Badge count={login.user ? numberOfUnreadMessage() : 0}>
                 <Icon type="message"/>
                 </Badge>
               </span>
-            }
-          >
-            {login.user &&
-            <Menu.Item key={'/logout'}>
-              <div onClick={logout}>
-                Logout
+          }
+        >
+          {login.user && message.messages.map(e =>
+            <Menu.Item key={e._id}>
+              <div onClick={() => toMessage(e.user_request)}>
+                {e.user_ID}评论了您关注的需求{e.user_request_title}
               </div>
             </Menu.Item>
-            }
-          </SubMenu>
+          )
+          }
+        </SubMenu>
 
-          <SubMenu
-            className={styles.rightButton}
-            title={
-              <span onClick={toLoginPage}>
+        <SubMenu
+          className={styles.rightButton}
+          title={
+            <span onClick={toLoginPage}>
                 <Icon type="user"/>{login.user ? login.user.user_ID : 'Login'}
               </span>
-            }
-          >
-            {login.user &&
-            <Menu.Item key={'/logout'}>
-              <div onClick={logout}>
-                Logout
-              </div>
-            </Menu.Item>
-            }
+          }
+        >
+          {login.user &&
+          <Menu.Item key={'/logout'}>
+            <div onClick={logout}>
+              Logout
+            </div>
+          </Menu.Item>
+          }
 
-            {login.user &&
-            <Menu.Item key={'/profile'}>
-              <div onClick={() => history.push('/profile')}>
-                Profile
-              </div>
-            </Menu.Item>
-            }
+          {login.user &&
+          <Menu.Item key={'/profile'}>
+            <div onClick={() => history.push('/profile')}>
+              Profile
+            </div>
+          </Menu.Item>
+          }
 
-          </SubMenu>
-        </Menu>
-      </div>
+        </SubMenu>
+      </Menu>
     </div>
-  )
+  </div>
 }
 
-export default connect(({login, allRequest}) => ({login, allRequest}))(Header)
+export default connect(({login, allRequest,message}) => ({login, allRequest,message}))(Header)

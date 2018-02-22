@@ -25,6 +25,7 @@ app.model(require('./models/deployedmodels'))
 app.model(require('./models/myservice'))
 app.model(require('./models/allRequest'))
 app.model(require('./models/module'))
+app.model(require('./models/message'))
 app.model(modelling)
 app.model(projectDetail)
 

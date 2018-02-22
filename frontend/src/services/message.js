@@ -25,6 +25,6 @@ export function createNewMessage(payload) {
 }
 
 // 获取所有的 request
-export function fetchMessage(user_id) {
-  return request(`${CORS}/message?user_id=${user_id}`);
+export function fetchMessage() {
+  return request(`${CORS}/message`);
 }

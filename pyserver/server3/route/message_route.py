@@ -6,6 +6,7 @@ from flask import redirect
 from flask import request
 from flask_jwt_extended import create_access_token
 from mongoengine import DoesNotExist
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server3.repository import config
 from server3.service import message_service
@@ -16,6 +17,7 @@ message_app = Blueprint("message_app", __name__, url_prefix=PREFIX)
 
 
 @message_app.route('', methods=['POST'])
+@jwt_required
 def create_message():
     if not request.json \
             or 'message_type' not in request.json:
@@ -35,7 +37,9 @@ def create_message():
 
 
 @message_app.route('', methods=['GET'])
+@jwt_required
 def get_message():
-    user_id = request.args.get("user_obj_id")
-    messages = message_service.get_by_user_id(user_id)
+    user_ID = get_jwt_identity()
+    # user_id = request.args.get("user_obj_id")
+    messages = message_service.get_by_user_ID(user_ID)
     return jsonify({'response': messages}), 200
