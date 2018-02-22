@@ -2,6 +2,7 @@ import * as userRequestService from '../services/userRequest'
 import * as stagingDataService from '../services/stagingData'
 import * as userRequestCommentsService from '../services/userRequestComments'
 import * as requestAnswerService from '../services/userRequestAnwser'
+import * as messageService from '../services/message'
 import {arrayToJson, JsonToArray} from '../utils/JsonUtils'
 import {getRound} from '../utils/number'
 import pathToRegexp from 'path-to-regexp'
@@ -239,6 +240,7 @@ export default {
       console.log('payload')
       console.log(payload)
       const {data: result} = yield call(userRequestCommentsService.createNewUserRequestComments, payload)
+
       if (result) {
         yield call(fetchAllCommentsOfThisRequest, {payload: {userrequestId: payload.user_request_id}}, {
           call, put

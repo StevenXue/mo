@@ -2,11 +2,11 @@ import React from 'react'
 import {connect} from 'dva'
 
 import styles from './Header.less'
-import {Menu, Icon, Select, Input,Button } from 'antd'
+import {Menu, Icon, Select, Input, Button, Badge} from 'antd'
 import {Link, routerRedux} from 'dva/router'
 import {FormattedMessage} from 'react-intl'
 import {config} from '../../utils'
-import PostRequestModal from '../../components/postRequestModal/postRequestModal';
+import PostRequestModal from '../../components/postRequestModal/postRequestModal'
 
 const Search = Input.Search
 
@@ -78,8 +78,8 @@ function Header({location, login, history, dispatch, allRequest}) {
     dispatch({
       type: 'allRequest/showModal',
       payload: {modalState: modalState},
-    });
-  };
+    })
+  }
 
   return (
     <div className={styles.container}>
@@ -140,9 +140,31 @@ function Header({location, login, history, dispatch, allRequest}) {
           <Menu.Item key={'/postRequest'}>
 
             <Button type="primary"
-                    onClick={() => onClickModifyModal(true)}>Post Request</Button>
-            <PostRequestModal dispatch={dispatch} visible={allRequest.modalState} />
+                    onClick={() => onClickModifyModal(true)}>Post
+              Request</Button>
+            <PostRequestModal dispatch={dispatch}
+                              visible={allRequest.modalState}/>
           </Menu.Item>
+
+
+          <SubMenu
+            className={styles.rightButton}
+            title={
+              <span onClick={toLoginPage}>
+                <Badge count={login.user ? 5 : 0}>
+                <Icon type="message"/>
+                </Badge>
+              </span>
+            }
+          >
+            {login.user &&
+            <Menu.Item key={'/logout'}>
+              <div onClick={logout}>
+                Logout
+              </div>
+            </Menu.Item>
+            }
+          </SubMenu>
 
           <SubMenu
             className={styles.rightButton}
@@ -162,7 +184,7 @@ function Header({location, login, history, dispatch, allRequest}) {
 
             {login.user &&
             <Menu.Item key={'/profile'}>
-              <div onClick={()=>history.push('/profile')}>
+              <div onClick={() => history.push('/profile')}>
                 Profile
               </div>
             </Menu.Item>
@@ -175,4 +197,4 @@ function Header({location, login, history, dispatch, allRequest}) {
   )
 }
 
-export default connect(({login,allRequest}) => ({login,allRequest}))(Header)
+export default connect(({login, allRequest}) => ({login, allRequest}))(Header)

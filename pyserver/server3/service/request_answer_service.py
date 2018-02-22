@@ -3,6 +3,8 @@ from server3.business import request_answer_business
 from server3.business import user_business
 from server3.business import ownership_business
 from server3.service import ownership_service
+from server3.service import message_service
+from server3.business import user_request_business
 
 
 def get_all_answer_of_this_user_request(user_request_id):
@@ -36,7 +38,24 @@ def create_request_answer(user_request_id, user_id, answer):
         if ownership_business.add(user,
                                   request_answer=
                                   created_request_answer):
-            return created_request_answer
+
+            #  新建通知消息
+            admin_user = user_business.get_by_user_ID('admin')
+            user_request = user_request_business.\
+                get_by_user_request_id(user_request_id)
+            receivers = list({'obj_id': el} for el in user_request.star_user)
+            if message_service.create_message(
+                    sender=admin_user,
+                    message_type='answer',
+                    receivers=receivers,
+                    title='Notification',
+                    user=user,
+                    user_request=user_request,
+            ):
+                return created_request_answer
+            else:
+                raise RuntimeError(
+                    'Cannot create message of the new request_answer')
         else:
             raise RuntimeError(
                 'Cannot create ownership of the new request_answer')

@@ -26,16 +26,14 @@ def list_request_answer():
         request_answer = json_utility. \
             me_obj_list_to_json_list(request_answer)
         # 得到每一个answer下的comments
-        print('request_answer')
-        print(request_answer)
+
         for answer in request_answer:
             answer_comment = comments_service.get_comments_of_this_answer(
                 answer['_id'])
             answer_comment = json_utility. \
                 me_obj_list_to_json_list(answer_comment)
             answer['comment'] = answer_comment
-        print('request_answer')
-        print(request_answer)
+
         return jsonify({'response': request_answer}), 200
     elif user_id:
         request_answer = request_answer_service.\
