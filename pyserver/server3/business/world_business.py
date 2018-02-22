@@ -29,6 +29,8 @@ def add(**kwargs):
     """
     create_time = datetime.datetime.utcnow()
     world = World(create_time=create_time, **kwargs)
+
+    # TODO 添加成功后推送到前端
     return world_repo.create(world)
 
 

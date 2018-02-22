@@ -154,6 +154,15 @@ def run_api():
         # result =
         return jsonify({'response': "真实api结果"}), 200
 
+
+@api_app.route('/<api_id>', methods=['delete'])
+def delete(api_id):
+    api = api_business.delete(api_id)
+    api = json_utility.convert_to_json(api.to_mongo())
+    return jsonify({
+        "response": api
+    }), 200
+
 # 使用统一 get_api_list
 # @api_app.route('/get_matched_apis', methods=['GET'])
 # def get_matched_apis():

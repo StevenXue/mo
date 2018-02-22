@@ -131,3 +131,4 @@ if __name__ == '__main__':
 # import re
 # regex = re.compile('.*bob.*')
 # Person.objects(name=regex)
+# User.objects.exec_js("db.getCollectionNames()")

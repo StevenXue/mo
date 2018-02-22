@@ -74,6 +74,10 @@ def increment_usage_count(api_id):
     return api.save()
 
 
+def delete(api_id):
+    return api_repo.delete_by_id(api_id)
+
+
 if __name__ == '__main__':
     api_json = {
         "url": "/predict_flight_delay",

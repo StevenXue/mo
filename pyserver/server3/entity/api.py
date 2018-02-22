@@ -48,6 +48,8 @@ class Api(DynamicDocument):
     create_time = DateTimeField()
     # 更新时间
     update_time = DateTimeField()
+    # tags
+    tags = ListField(StringField())
 
     meta = {'indexes': [
         {'fields': ['$name', "$keyword", '$description'],

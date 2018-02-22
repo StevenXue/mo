@@ -7,6 +7,7 @@ user_repo = UserRepo(User)
 
 def add(user_ID, password, kwargs):
     user = User(user_ID=user_ID, password=password, **kwargs)
+    print("user", user)
     return user_repo.create(user)
 
 
@@ -16,6 +17,10 @@ def get_by_user_ID(user_ID):
 
 def get_by_user_object_id(object_id):
     return user_repo.read_by_id(object_id)
+
+
+def get_by_phone(phone):
+    return user_repo.read_by_unique_field('phone', phone)
 
 
 def remove_by_id(user_id):
