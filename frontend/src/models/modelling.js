@@ -4,6 +4,10 @@ import _, { get, isEqual } from 'lodash'
 import * as dataAnalysisService from '../services/dataAnalysis'
 import { startLab, getLabConfig } from '../services/notebook'
 
+import {
+  PageConfig,
+} from '../packages/jupyterlab_package/packages/coreutils'
+
 import workBench from './workBench'
 
 import { getRound } from '../utils/number'
@@ -21,13 +25,9 @@ const extFilter = {
   dataset: ['datasets-extension'],
 }
 
-// ES6 Promise polyfill
-require('es6-promise/auto')
-
 // Load the core theming before any other package.
 require('../packages/jupyterlab_package/packages/theme-light-extension/style/embed.css')
 require('../packages/jupyterlab_package/node_modules/font-awesome/css/font-awesome.min.css')
-const PageConfig = require('../packages/jupyterlab_package/packages/coreutils').PageConfig
 
 const loadnStartJL = (projectType) => {
 
@@ -73,14 +73,11 @@ const loadnStartJL = (projectType) => {
       return !checker(p.default.id, extFilter[projectType])
     }
   })
-  console.log(document.getElementById('jupyter-config-data'))
-  // debugger;
   let lab = new JupyterLab({
     name: 'Mo Lab',
     namespace: 'mo-lab',
-    version: 'unknown',
+    version: 'v0.1',
   })
-  console.log('new lab', lab, PageConfig.getBaseUrl())
   lab.registerPluginModules(mods)
   lab.start({ hostID: 'mo-jlContainer' })
 }
@@ -99,9 +96,10 @@ const insertConfigData = (html) => {
       jupyterConfigData[key] = hubPrefix + value
     }
   }
-  // for (let key in jupyterConfigData) {
-  //   PageConfig.setOption(key, jupyterConfigData[key])
-  // }
+  for (let key in jupyterConfigData) {
+    PageConfig.setOption(key, jupyterConfigData[key])
+  }
+  localStorage.setItem('name', Math.random())
   JCD.innerHTML = JSON.stringify(jupyterConfigData)
   document.head.insertBefore(JCD, document.head.children[3])
 }
@@ -109,18 +107,25 @@ const insertConfigData = (html) => {
 const onSuccess = async (res) => {
   const html = await res.text()
   insertConfigData(html)
-  console.log('111')
 }
 
-export function *startLabFront({ payload: { projectType } }) {
+export function *startLabFront({ payload: { projectType } }, { call }) {
   // load lab frontend
-  if (document.getElementById('mo-jlContainer') !== null) {
-    let apps = document.getElementsByClassName('p-Widget jp-ApplicationShell')
-    if (apps.length !== 0) {
-      for (let app of apps) {
-        app.remove()
-      }
+  let labContainer = document.getElementById('mo-jlContainer')
+  if (labContainer !== null) {
+
+    while (labContainer.firstChild) {
+      console.log('delete')
+      labContainer.removeChild(labContainer.firstChild)
     }
+    // let apps = document.getElementsByClassName('p-Widget jp-ApplicationShell')
+    // if (apps.length !== 0) {
+    //   for (let app of apps) {
+    //     app.remove()
+    //   }
+    // }
+    console.log('app2', labContainer.firstChild)
+
     loadnStartJL(projectType)
   }
 }
@@ -137,7 +142,6 @@ export function *insertLabConfig({ payload: { hubUserName, hubToken } }, { call 
     configDataNode.remove()
   }
   yield call(getLabConfig, { hubUserName, hubToken, onSuccess })
-  console.log('222')
 }
 
 const modelling = modelExtend(workBench, {
@@ -264,11 +268,15 @@ const modelling = modelExtend(workBench, {
         ({ data: project } = yield call(fetchProject, { projectId }))
         // yield put({ type: 'projectDetail/setProject', payload: project })
       }
+      document.title = `${project.name}:${projectType.charAt(0).toUpperCase() + projectType.substring(1)} - MO`
+
       const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
       const hubToken = project.hub_token
       yield call(startLabBack, { payload: { hubUserName, hubToken } }, { call })
       yield call(insertLabConfig, { payload: { hubUserName, hubToken } }, { call })
-      yield call(startLabFront, { payload: { projectType } })
+      // loadnStartJL(projectType)
+      document.body = document.createElement('body')
+      yield call(loadnStartJL, projectType)
     },
     *runSection(action, { call, put, select }) {
       const { namespace, sectionId } = action.payload

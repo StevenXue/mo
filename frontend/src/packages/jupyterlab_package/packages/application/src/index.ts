@@ -77,14 +77,8 @@ class JupyterLab extends Application<ApplicationShell> {
     // });
 
     // // jupyter lab in hub backend
-    // const ss = ServerConnection.makeSettings({
-    //   baseUrl: 'http://localhost:8000/user/zhaofengli',
-    //   wsUrl: 'ws://localhost:8000/user/zhaofengli',
-    //   pageUrl: '/lab',
-    //   // token: '597293565868fa9d55096844dce32f96b7d7291b7e194f4f'
-    //   token: '3dff9236c0404344929729fd8fe7d376'
-    // });
-    //
+    // const ss = ServerConnection.makeSettings(options.serverOpts);
+    // console.log('options', options);
     // this.serviceManager = new ServiceManager({
     //   serverSettings: ss,
     //   defaultDrive: new Drive({serverSettings: ss})
@@ -247,6 +241,16 @@ namespace JupyterLab {
       readonly themes: string
     };
 
+    // /**
+    //  * The urls used by the application.
+    //  */
+    // readonly serverOpts: {
+    //   readonly baseUrl: string,
+    //   readonly pageUrl: string,
+    //   readonly wsUrl: string,
+    //   readonly token: string
+    // };
+
     /**
      * The local directories used by the application.
      */
@@ -284,6 +288,12 @@ namespace JupyterLab {
       settings: PageConfig.getOption('settingsUrl'),
       themes: PageConfig.getOption('themesUrl')
     },
+    // serverOpts: {
+    //   baseUrl: PageConfig.getBaseUrl(),
+    //   pageUrl: PageConfig.getOption('pageUrl'),
+    //   wsUrl: PageConfig.getWsUrl(),
+    //   token: PageConfig.getToken(),
+    // },
     directories: {
       appSettings: PageConfig.getOption('appSettingsDir'),
       schemas: PageConfig.getOption('schemasDir'),
@@ -295,6 +305,44 @@ namespace JupyterLab {
     },
     filesCached: PageConfig.getOption('cacheFiles').toLowerCase() === 'true'
   };
+
+  // /**
+  //  * The default application info.
+  //  */
+  // export
+  // function getDefaultInfo(): IInfo {
+  //   return {
+  //     name: PageConfig.getOption('appName') || 'JupyterLab',
+  //     namespace: PageConfig.getOption('appNamespace'),
+  //     version: PageConfig.getOption('appVersion') || 'unknown',
+  //     devMode: PageConfig.getOption('devMode').toLowerCase() === 'true',
+  //     deferred: {patterns: [], matches: []},
+  //     disabled: {patterns: [], matches: []},
+  //     mimeExtensions: [],
+  //     urls: {
+  //       page: PageConfig.getOption('pageUrl'),
+  //       public: PageConfig.getOption('publicUrl'),
+  //       settings: PageConfig.getOption('settingsUrl'),
+  //       themes: PageConfig.getOption('themesUrl')
+  //     },
+  //     serverOpts: {
+  //       baseUrl: PageConfig.getBaseUrl(),
+  //       pageUrl: PageConfig.getOption('pageUrl'),
+  //       wsUrl: PageConfig.getWsUrl(),
+  //       token: PageConfig.getToken(),
+  //     },
+  //     directories: {
+  //       appSettings: PageConfig.getOption('appSettingsDir'),
+  //       schemas: PageConfig.getOption('schemasDir'),
+  //       static: PageConfig.getOption('staticDir'),
+  //       templates: PageConfig.getOption('templatesDir'),
+  //       themes: PageConfig.getOption('themesDir'),
+  //       userSettings: PageConfig.getOption('userSettingsDir'),
+  //       serverRoot: PageConfig.getOption('serverRoot')
+  //     },
+  //     filesCached: PageConfig.getOption('cacheFiles').toLowerCase() === 'true'
+  //   };
+  // }
 
   /**
    * The interface for a module that exports a plugin or plugins as

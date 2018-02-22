@@ -67,7 +67,7 @@ const RouterConfig = ({ history, location, projectDetail }) => {
     <MainLayout location={location} history={history}>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <Breadcrumb>
-          {breadcrumbItems}
+          {extraBreadcrumbItems}
         </Breadcrumb>
         <Switch>
           <Route path="/user" component={Account}/>

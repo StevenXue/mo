@@ -125,13 +125,13 @@
 
 .jp-JupyterIcon {
   background-image: var(--jp-image-jupyter);
-  background-size: 16px;
+  background-size: 20px;
   margin: 2px;
+  margin-top: 4px;
   margin-left: 8px;
   margin-right: 0px;
   padding-right: 0px;
 }
-
 
 .jp-LauncherIcon {
   background-image: var(--jp-icon-launcher);
