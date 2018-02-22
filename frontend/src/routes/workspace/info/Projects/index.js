@@ -108,8 +108,8 @@ class ProjectList extends Component {
             onSearch={(value) => this.handleQueryChange(value)}
             style={{ width: 200 }}
           />
-          <ProjectModel new={true} fetchData={() => this.fetchData({})}>
-            <Button icon='plus-circle-o' type='primary' className={styles.rightButton}>New Project</Button>
+          <ProjectModel new={true} fetchData={() => this.fetchData({})} type={this.props.type}>
+            <Button icon='plus-circle-o' type='primary' className={styles.rightButton}>New {this.props.type}</Button>
           </ProjectModel>
         </div>
         <div className={styles.projectList}>

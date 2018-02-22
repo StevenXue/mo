@@ -187,7 +187,7 @@ class ProjectBusiness:
 
     @classmethod
     def create_project(cls, name, description, user, privacy='private',
-                       tags=[], user_token='', type='app'):
+                       tags=None, user_token='', type='app'):
         """
         Create a new project
 
@@ -200,6 +200,8 @@ class ProjectBusiness:
         :param user_token: string
         :return: a new created project object
         """
+        if tags is None:
+            tags = []
         user_ID = user.user_ID
 
         # generate project dir
@@ -236,6 +238,7 @@ class ProjectBusiness:
     def remove_project_by_id(cls, project_id, user_ID):
         """
         remove project by its object_id
+        :param user_ID:
         :param project_id: object_id of project to remove
         :return:
         """

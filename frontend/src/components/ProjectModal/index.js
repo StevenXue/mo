@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Modal, Form, Input, Radio, Select, Tag, Tooltip, Button } from 'antd'
 import { connect } from 'dva'
 import { createProject, updateProject, getMyProjects, getProjects } from '../../services/project'
+import { routerRedux } from 'dva/router'
 
 const FormItem = Form.Item
 const RadioButton = Radio.Button
@@ -43,20 +44,25 @@ class ProjectModal extends Component {
   okHandler = () => {
     const {form} = this.props
     form.validateFields((err, values) => {
+      const body = {
+        ...values,
+        type: this.props.type
+      }
       if (!err) {
         if (this.props.new) {
           createProject({
-            body: values,
-            onSuccess: () => {
+            body,
+            onJson: (response) => {
               this.props.fetchData && this.props.fetchData()
               this.props.dispatch({ type: 'project/hideModal' })
+              this.props.dispatch(routerRedux.push('/workspace/'+response._id))
             }
           })
         } else {
           updateProject({
-            body: values,
+            body,
             projectId: this.props.projectDetail.project._id,
-            onSuccess: () => {
+            onJson: () => {
               this.props.fetchData && this.props.fetchData()
               this.props.dispatch({ type: 'project/hideModal' })
             }
@@ -173,23 +179,23 @@ class ProjectModal extends Component {
               )}
 
             </FormItem>}
-            <FormItem
-              {...formItemLayout}
-              label="Project Type"
-            >
-          {getFieldDecorator('type', {
-            initialValue: type,
-            rules: [
-              { required: true },
-            ],
-          })(
-            <Select disabled={!this.props.new}>
-              {
-                TYPE.map((e) => <Option value={e} key={e}>{e}</Option>)
-              }
-            </Select>,
-          )}
-        </FormItem>
+            {/*<FormItem*/}
+              {/*{...formItemLayout}*/}
+              {/*label="Project Type"*/}
+            {/*>*/}
+          {/*{getFieldDecorator('type', {*/}
+            {/*initialValue: type,*/}
+            {/*rules: [*/}
+              {/*{ required: true },*/}
+            {/*],*/}
+          {/*})(*/}
+            {/*<Select disabled={!this.props.new}>*/}
+              {/*{*/}
+                {/*TYPE.map((e) => <Option value={e} key={e}>{e}</Option>)*/}
+              {/*}*/}
+            {/*</Select>,*/}
+          {/*)}*/}
+        {/*</FormItem>*/}
             <FormItem
               {...formItemLayout}
               label="Tags"

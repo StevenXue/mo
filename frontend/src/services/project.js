@@ -65,7 +65,7 @@ export function fetchProject(payload) {
 }
 
 // 新建 project
-export function createProject({ body, onSuccess }) {
+export function createProject({ body, onJson }) {
   return request(`${CORS}${projects}`, {
     method: 'post',
     headers: {
@@ -73,18 +73,18 @@ export function createProject({ body, onSuccess }) {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     },
     body: JSON.stringify(body),
-  }, {onSuccess})
+  }, {onJson})
 }
 
 // 更新 project
-export function updateProject({ body, projectId, onSuccess }) {
+export function updateProject({ body, projectId, onJson }) {
   return request(`${CORS}${projects}/${projectId}`, {
     method: 'put',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
-  }, {onSuccess})
+  }, {onJson})
 }
 
 // 删除 project
