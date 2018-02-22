@@ -26,7 +26,7 @@ export function getProjects({ filter, onJson }) {
       params += `&${key}=${value}`
     }
   }
-  return request(path.join(CORS, PREFIX) + `?${params}`, undefined, undefined, onJson)
+  return request(path.join(CORS, PREFIX) + `?${params}`, undefined, { onJson })
 }
 
 // 获取用户所有 projects
@@ -65,26 +65,26 @@ export function fetchProject(payload) {
 }
 
 // 新建 project
-export function createProject(payload) {
+export function createProject({ body, onJson }) {
   return request(`${CORS}${projects}`, {
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     },
-    body: JSON.stringify(payload.body),
-  })
+    body: JSON.stringify(body),
+  }, {onJson})
 }
 
 // 更新 project
-export function updateProject(payload) {
-  return request(`${CORS}${projects}/${payload.projectId}`, {
+export function updateProject({ body, projectId, onJson }) {
+  return request(`${CORS}${projects}/${projectId}`, {
     method: 'put',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(payload.body),
-  })
+    body: JSON.stringify(body),
+  }, {onJson})
 }
 
 // 删除 project
