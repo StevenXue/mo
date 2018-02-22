@@ -41,11 +41,11 @@ export default async function request(url, options = {}, funcs = {}) {
 
     const newRes = checkStatus(response)
 
-    await onSuccess && onSuccess(newRes)
+    onSuccess && await onSuccess(newRes)
 
     const data = await newRes.json()
 
-    await onJson && onJson(data.response)
+    onJson && await onJson(data.response)
 
     const ret = {
       data: data.response,
@@ -60,7 +60,7 @@ export default async function request(url, options = {}, funcs = {}) {
     return ret
   } catch (err) {
     console.log(url, err)
-    await onError && onError(err)
+    onError && await onError(err)
   }
 }
 

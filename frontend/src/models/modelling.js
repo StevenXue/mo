@@ -27,6 +27,7 @@ require('es6-promise/auto')
 // Load the core theming before any other package.
 require('../packages/jupyterlab_package/packages/theme-light-extension/style/embed.css')
 require('../packages/jupyterlab_package/node_modules/font-awesome/css/font-awesome.min.css')
+const PageConfig = require('../packages/jupyterlab_package/packages/coreutils').PageConfig
 
 const loadnStartJL = (projectType) => {
 
@@ -63,6 +64,7 @@ const loadnStartJL = (projectType) => {
   ]
 
   const JupyterLab = require('../packages/jupyterlab_package/packages/application').JupyterLab
+
   // filter packages
   const mods = allPackages.filter((p) => {
     if (_.isArray(p.default)) {
@@ -71,11 +73,14 @@ const loadnStartJL = (projectType) => {
       return !checker(p.default.id, extFilter[projectType])
     }
   })
+  console.log(document.getElementById('jupyter-config-data'))
+  // debugger;
   let lab = new JupyterLab({
     name: 'Mo Lab',
     namespace: 'mo-lab',
     version: 'unknown',
   })
+  console.log('new lab', lab, PageConfig.getBaseUrl())
   lab.registerPluginModules(mods)
   lab.start({ hostID: 'mo-jlContainer' })
 }
@@ -94,6 +99,9 @@ const insertConfigData = (html) => {
       jupyterConfigData[key] = hubPrefix + value
     }
   }
+  // for (let key in jupyterConfigData) {
+  //   PageConfig.setOption(key, jupyterConfigData[key])
+  // }
   JCD.innerHTML = JSON.stringify(jupyterConfigData)
   document.head.insertBefore(JCD, document.head.children[3])
 }
@@ -101,6 +109,7 @@ const insertConfigData = (html) => {
 const onSuccess = async (res) => {
   const html = await res.text()
   insertConfigData(html)
+  console.log('111')
 }
 
 export function *startLabFront({ payload: { projectType } }) {
@@ -119,12 +128,16 @@ export function *startLabFront({ payload: { projectType } }) {
 export function *startLabBack({ payload: { hubUserName, hubToken } }, { call }) {
   // auth hub fake user and start lab backend
   yield call(startLab, { hubUserName, hubToken })
+}
+
+export function *insertLabConfig({ payload: { hubUserName, hubToken } }, { call }) {
   // insert lab config from hub
   const configDataNode = document.getElementById('jupyter-config-data')
   if (configDataNode !== null) {
     configDataNode.remove()
   }
   yield call(getLabConfig, { hubUserName, hubToken, onSuccess })
+  console.log('222')
 }
 
 const modelling = modelExtend(workBench, {
@@ -254,6 +267,7 @@ const modelling = modelExtend(workBench, {
       const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
       const hubToken = project.hub_token
       yield call(startLabBack, { payload: { hubUserName, hubToken } }, { call })
+      yield call(insertLabConfig, { payload: { hubUserName, hubToken } }, { call })
       yield call(startLabFront, { payload: { projectType } })
     },
     *runSection(action, { call, put, select }) {
