@@ -61,6 +61,7 @@ const loadnStartJL = (projectType) => {
     require('../packages/jupyterlab_package/packages/tooltip-extension'),
     require('../packages/jupyterlab_package/packages/modules-extension'),
     require('../packages/jupyterlab_package/packages/datasets-extension'),
+    require('../packages/jupyterlab_package/packages/moduledeploy-extension'),
   ]
 
   const JupyterLab = require('../packages/jupyterlab_package/packages/application').JupyterLab

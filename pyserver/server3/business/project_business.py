@@ -106,6 +106,7 @@ def copy(project):
 
 
 class ProjectBusiness:
+    project = None
     repo = ProjectRepo(Project)
 
     @staticmethod
@@ -232,7 +233,9 @@ class ProjectBusiness:
         :param object_id: ObjectId
         :return: a matched Project object
         """
-        return cls.repo.read_by_id(object_id)
+        project = cls.repo.read_by_id(object_id)
+        cls.project = project
+        return project
 
     @classmethod
     def remove_project_by_id(cls, project_id, user_ID):

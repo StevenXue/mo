@@ -28,6 +28,12 @@
       ],
       "@jupyterlab/datasets-extension": [
         "../datasets-extension/src"
+      ],
+      "@jupyterlab/moduledeploy-extension:plugin": [
+        "../moduledeploy-extension/src"
+      ],
+      "@jupyterlab/moduledeploy-extension": [
+        "../moduledeploy-extension/src"
       ]
     },
     "jsx": "react",
