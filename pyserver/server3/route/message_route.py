@@ -43,3 +43,15 @@ def get_message():
     # user_id = request.args.get("user_obj_id")
     messages = message_service.get_by_user_ID(user_ID)
     return jsonify({'response': messages}), 200
+
+
+@message_app.route('/read', methods=['PUT'])
+@jwt_required
+def read_message():
+    data = request.get_json()
+    print('data')
+    print(data)
+    receiver_id = data['receiver_id']
+    user_ID = get_jwt_identity()
+    message_service.read_message(user_ID, receiver_id)
+    return jsonify({'response': 'update success'}), 200

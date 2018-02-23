@@ -31,3 +31,9 @@ def create_message(sender, message_type, receivers,  **kwargs):
     else:
         raise RuntimeError('Cannot create the new message')
 
+
+def read_message(user_ID, receiver_id):
+    user = user_business.get_by_user_ID(user_ID)
+    user_id = user.id
+    # 用户点击未读信息后，将信息状态更改为已读
+    message_business.read_message(user_id, receiver_id)

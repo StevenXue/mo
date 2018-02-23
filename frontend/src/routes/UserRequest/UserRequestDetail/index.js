@@ -2,7 +2,7 @@ import React from 'react'
 import {connect} from 'dva'
 import {routerRedux} from 'dva/router'
 import styles from './index.less'
-import {Tabs, Switch, Button, Input, Form, Card} from 'antd'
+import {Tabs, Switch, Button, Input, Form, Card, Icon} from 'antd'
 import {get} from 'lodash'
 import {showTime} from '../../../utils/index'
 import BraftEditor from 'braft-editor'
@@ -202,21 +202,22 @@ function UserRequestDetail({allRequest,login, dispatch}) {
     return (
       <div className={`main-container ${styles.normal}`}>
         <div>
+          <h2
+            style={{paddingBottom: 10 }}>{focusUserRequest['title']}
+          </h2>
           <Button icon="caret-up"
                   onClick={()=>requestvotesup()}
                   type = {focusUserRequest['votes_up_user'].includes(user_obj_id)?'primary':''}
           />
           {focusUserRequest['votes_up_user'].length }
-          <Button icon="star"
-                  onClick={()=>requeststar()}
-                  type = {focusUserRequest['star_user'].includes(user_obj_id)?'primary':''}
-          />
+          <Icon type={focusUserRequest['star_user'].includes(user_obj_id)?"star":"star-o"}
+                style={{fontSize: '22px', color: '#34c0e2'}}
+                onClick={()=>requeststar()}/>
         </div>
-        <h2
-          style={{paddingBottom: 10}}>{focusUserRequest['title']}
-        </h2>
-        <p>{get(focusUserRequest, 'description') ? get(focusUserRequest, 'description') : null}</p>
-        <h2 style={{padding: '20px 0 0 0'}}>Comments</h2>
+
+        <p className={styles.description}>{get(focusUserRequest, 'description') ? get(focusUserRequest, 'description') : null}</p>
+         <h2 style={{padding: '20px 0 0 0', fontSize:'14px'}}>{focusUserRequest.comments.length} Comments</h2>
+        <hr />
         {focusUserRequest.comments && focusUserRequest.comments.map(e =>
           <div>
             <div>
@@ -224,6 +225,7 @@ function UserRequestDetail({allRequest,login, dispatch}) {
               <p>- {e.comments_user_id}</p>
               <p>{showTime(e.create_time)}</p>
             </div>
+            <hr />
           </div>)}
         <div style={{margin: '20px 8px 8px 0'}}>
           <WrappedCommentForm dispatch={dispatch} comments_type={'request'}/>

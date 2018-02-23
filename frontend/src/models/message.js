@@ -18,6 +18,20 @@ export default {
         messages: payload.messages,
       }
     },
+
+    changeMessageState(state, {payload}){
+      let receiver_id=payload.receiver_id
+      return{
+        ...state,
+        messages: {
+          ...state.messages,
+          [receiver_id]: {
+            ...state.messages[receiver_id],
+            is_read: true
+          }
+        }
+      }
+    }
   },
 
   effects: {
@@ -27,9 +41,18 @@ export default {
       if (messages.length > 0) {
         yield put({
           type: 'setMessage',
-          payload: {messages: messages}
+          payload: {messages: arrayToJson(messages, 'receiver_id')}
         })
       }
+    },
+
+    * readMessage(action, {call, put, select}) {
+      let payload = action.payload
+      yield call(messageService.readMessage, payload)
+      yield put({
+        type: 'changeMessageState',
+        payload: {receiver_id: payload.receiver_id}
+      })
     },
   },
 
@@ -38,7 +61,6 @@ export default {
     setup({dispatch, history}) {
       return history.listen(({pathname}) => {
         if (pathname === '/userrequest') {
-          console.log('????kkkkkk')
           dispatch({
             type: 'fetchAllMessage',
             payload: {}

@@ -23,7 +23,7 @@ function* fetchAllCommentsOfThisRequest(action, {call, put}) {
 function* fetchAllAnswerOfThisRequest(action, {call, put}) {
   console.log('action')
   const {data: allAnswerOfThisRequest} = yield call(requestAnswerService.fetchAllAnswerOfThisUserRequest, {user_request_ID: action.payload.userrequestId})
-  console.log(allAnswerOfThisRequest)
+  // console.log(allAnswerOfThisRequest)
   if (allAnswerOfThisRequest.length > 0) {
     yield put({
       type: 'setAllAnswerOfThisRequest', payload: {
@@ -219,8 +219,8 @@ export default {
       const user_ID = yield select(state => state.login.user.user_ID)
       let payload = action.payload
       payload.user_ID = user_ID
-      console.log('halo')
-      console.log(payload)
+      // console.log('halo')
+      // console.log(payload)
       const {data: result} = yield call(userRequestService.createNewUserRequest, payload)
       if (result) {
         yield put({type: 'showLoading', payload: {loadingState: false}})
@@ -237,8 +237,8 @@ export default {
       let payload = action.payload
       payload.user_id = user_ID
       payload.user_request_id = user_request_id
-      console.log('payload')
-      console.log(payload)
+      // console.log('payload')
+      // console.log(payload)
       const {data: result} = yield call(userRequestCommentsService.createNewUserRequestComments, payload)
 
       if (result) {
@@ -257,7 +257,7 @@ export default {
       let payload = action.payload
       payload.user_id = user_ID
       payload.user_request_id = user_request_id
-      console.log(payload)
+      // console.log(payload)
       const {data: result} = yield call(requestAnswerService.createNewUserRequestAnswer, payload)
       if (result) {
         yield call(fetchAllAnswerOfThisRequest, {payload: {userrequestId: payload.user_request_id}}, {

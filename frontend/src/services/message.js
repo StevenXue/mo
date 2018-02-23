@@ -28,3 +28,19 @@ export function createNewMessage(payload) {
 export function fetchMessage() {
   return request(`${CORS}/message`);
 }
+
+// 更改message的状态为已读
+export function readMessage(payload) {
+  // return request(`${CORS}/message/read?receiver_id=${payload.receiver_id}`);
+  // console.log('payload')
+  // console.log(payload)
+  return request(`${CORS}/message/read`, {
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      receiver_id: payload.receiver_id,
+    }),
+  })
+}

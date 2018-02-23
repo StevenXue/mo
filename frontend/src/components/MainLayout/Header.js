@@ -7,7 +7,7 @@ import {Link, routerRedux} from 'dva/router'
 import {FormattedMessage} from 'react-intl'
 import {config} from '../../utils'
 import PostRequestModal from '../../components/postRequestModal/postRequestModal'
-import NotificationMenu from '../../components/NotificationMenu/notificationMenu'
+import {JsonToArray} from "../../utils/JsonUtils"
 
 const Search = Input.Search
 
@@ -62,6 +62,7 @@ const menuConfig = [
   },
 ]
 
+
 function Header({location, login, history, dispatch, allRequest,message}) {
   const key = '/' + location.pathname.split('/')[1]
   const toLoginPage = () => {
@@ -85,7 +86,7 @@ function Header({location, login, history, dispatch, allRequest,message}) {
   // 计算未读信息的数量
   const numberOfUnreadMessage= () => {
     let unread = 0
-    message.messages.forEach((item) => {
+    JsonToArray(message.messages).forEach((item) => {
       if (item['is_read'] === false){
         unread += 1
       }
@@ -93,8 +94,12 @@ function Header({location, login, history, dispatch, allRequest,message}) {
     return unread
   }
   // 点击未读信息，进入详情
-  const toMessage= (id) => {
-    history.push('/userrequest/'+ id)
+  const toMessage= (user_request,receiver_id) => {
+    history.push('/userrequest/'+ user_request)
+    dispatch({
+      type: 'message/readMessage',
+      payload: {receiver_id: receiver_id},
+    })
   }
 
   return <div className={styles.container}>
@@ -161,28 +166,6 @@ function Header({location, login, history, dispatch, allRequest,message}) {
                             visible={allRequest.modalState}/>
         </Menu.Item>
 
-        {/*<NotificationMenu />*/}
-
-        <SubMenu
-          className={styles.rightButton}
-          title={
-            <span onClick={toLoginPage}>
-                <Badge count={login.user ? numberOfUnreadMessage() : 0}>
-                <Icon type="message"/>
-                </Badge>
-              </span>
-          }
-        >
-          {login.user && message.messages.map(e =>
-            <Menu.Item key={e._id}>
-              <div onClick={() => toMessage(e.user_request)}>
-                {e.user_ID}评论了您关注的需求{e.user_request_title}
-              </div>
-            </Menu.Item>
-          )
-          }
-        </SubMenu>
-
         <SubMenu
           className={styles.rightButton}
           title={
@@ -208,6 +191,27 @@ function Header({location, login, history, dispatch, allRequest,message}) {
           }
 
         </SubMenu>
+        <SubMenu
+          className={styles.rightButton}
+          title={
+            <span onClick={toLoginPage}>
+                <Badge count={login.user ? numberOfUnreadMessage() : 0}>
+                <Icon type="message"/>
+                </Badge>
+              </span>
+          }
+        >
+          {login.user && JsonToArray(message.messages).map(e =>
+            <Menu.Item key={e._id}>
+              <div onClick={() => toMessage(e.user_request,e.receiver_id)}>
+                {e.user_ID}评论了您关注的需求{e.user_request_title}
+              </div>
+            </Menu.Item>
+          )
+          }
+        </SubMenu>
+
+
       </Menu>
     </div>
   </div>

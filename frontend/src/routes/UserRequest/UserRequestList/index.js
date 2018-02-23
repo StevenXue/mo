@@ -1,6 +1,6 @@
 import React from 'react'
 import {connect} from 'dva'
-import {Select, Card, Input, Icon, Button} from 'antd'
+import {Select, Card, Input, Icon, Button, Row, Col} from 'antd'
 import {showTime} from '../../../utils/index'
 import {dataCategory} from '../../../constants'
 import {arrayToJson, JsonToArray} from '../../../utils/JsonUtils'
@@ -48,17 +48,50 @@ function AllRequest({history, allRequest, dispatch}) {
       </div>
       <div className={styles.requestList}>
         {JsonToArray(allRequest.userRequestDic).map(e =>
-          <Card key={e._id} title={e.title} className={styles.card}
-                onClick={() => toUserRequestDetail(e, history)}
-                style={{cursor: 'pointer'}}>
+          <Card key={e._id} className={styles.card}>
+            {/*style={{cursor: 'pointer'}}*/}
             <div>
-              <div>
-                {e['user_id'] && <p><Icon type="user"/> {e.user_id}</p>}
-                {e['tags'] && <p><Icon type="tag"/> {e.tags}</p>}
-                <Button icon="caret-up">&emsp;{e['votes_up_user'].length}</Button>&emsp;&emsp;
-                <Button icon="star">收藏</Button>&emsp;&emsp;
-                <Icon type="clock-circle-o"/> {showTime(e.create_time)}
-              </div>
+              <Row>
+                <Col span={3}>
+                  <div onClick={() => toUserRequestDetail(e, history)}>
+                    <div className={styles.starDiv}>
+                      <p
+                        className={styles.starNumber}>{e['star_user'].length}</p>
+                      <p className={styles.starText}>Star</p>
+                    </div>
+                    <div className={styles.starDiv}>
+                      <p className={styles.starNumber}>{e['answer_number']}</p>
+                      <p className={styles.starText}>Answer</p>
+                    </div>
+                  </div>
+                </Col>
+                <Col span={21}>
+                  <div>
+                    <p className={styles.title}
+                       onClick={() => toUserRequestDetail(e, history)}>{e.title}</p>
+                    {/*<p className={styles.description}>{e.description}</p>*/}
+                    <div>
+                      {e['tags'].length>0 && <p className={styles.tags}>{e.tags}</p>}
+                      <div className={styles.timeAndUserDiv}>
+
+
+                        <p className={styles.showTime}>{showTime(e.create_time)}</p>
+                        <p className={styles.showTime}>&nbsp;&nbsp; asked at &nbsp;&nbsp;</p>
+                        <p className={styles.showTime}>{e.user_id} </p>
+
+                      </div>
+                    </div>
+                  </div>
+                </Col>
+
+              </Row>
+              {/*<Row>*/}
+              {/*{e['user_id'] && <p><Icon type="user"/> {e.user_id}</p>}*/}
+              {/*{e['tags'] && <p><Icon type="tag"/> {e.tags}</p>}*/}
+              {/*<Button icon="caret-up">&emsp;{e['votes_up_user'].length}</Button>&emsp;&emsp;*/}
+              {/*<Button icon="star">收藏</Button>&emsp;&emsp;*/}
+              {/*<Icon type="clock-circle-o"/> {showTime(e.create_time)}*/}
+              {/*</Row>*/}
             </div>
           </Card>)}
       </div>

@@ -38,8 +38,8 @@ def add_user_request_comments(user_request_id, comments_user_id, comments,
         'comments': comments,
         'comments_type': comments_type,
     }
-    print('request_answer_id')
-    print(request_answer_id)
+    # print('request_answer_id')
+    # print(request_answer_id)
     if request_answer_id:
         kw['request_answer_id'] = ObjectId(request_answer_id)
     user_request_comments_obj = UserRequestComments(**kw)
