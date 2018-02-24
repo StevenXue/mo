@@ -16,6 +16,7 @@ from flask_jwt_extended import jwt_required
 from bson import ObjectId
 
 from server3.service import job_service
+from server3.business.app_business import AppBusiness
 
 from server3.business import job_business
 
@@ -41,10 +42,18 @@ def run_in_docker():
 
 @app_app.route("/deploy/<app_id>", methods=["POST"])
 @jwt_required
-def deploy_in_docker():
+def deploy_in_docker(app_id):
+    app = AppBusiness.deploy(app_id)
+    return jsonify({"response": json_utility.convert_to_json(app.to_mongo())})
+
+
+@app_app.route("/add_used_module/<app_id>", methods=["PUT"])
+@jwt_required
+def add_used_module(app_id):
     data = request.get_json()
-    job_service.deploy_in_faas(app_id)
-    return jsonify({"response": {"code": 11}})
+    used_modules = data.get('used_modules', [])
+    app = AppBusiness.add_used_module(app_id, used_modules)
+    return jsonify({"response": json_utility.convert_to_json(app.to_mongo())})
 
 
 if __name__ == "__main__":

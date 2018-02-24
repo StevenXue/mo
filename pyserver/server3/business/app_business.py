@@ -16,7 +16,7 @@ class AppBusiness(ProjectBusiness):
     @classmethod
     def deploy(cls, app_id):
         app = cls.get_by_id(app_id)
-        modules = app.used_modules
+        modules = [m.user.user_ID + '/' + m.name for m in app.used_modules]
         if modules is None:
             modules = ['zhaofengli/flight_delay_prediction',
                        'zhaofengli/weather_prediction']
@@ -46,3 +46,7 @@ class AppBusiness(ProjectBusiness):
         call(
             ['faas-cli', 'deploy', '-f', './{name}.yml'.format(name=app.name)],
             cwd=cls.base_func_path)
+
+    @classmethod
+    def add_used_module(cls, app_id, used_modules):
+        return cls.repo.add_to_set(app_id, used_modules=used_modules)

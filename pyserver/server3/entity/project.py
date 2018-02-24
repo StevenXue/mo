@@ -64,7 +64,7 @@ RE_TYPE = (
 
 class App(Project):
     url = StringField(max_length=50)
-    used_modules = StringField(max_length=50)
+    used_modules = ListField(ReferenceField(Module))
     keyword = StringField(max_length=30)
     input = DictField()
     output = DictField()

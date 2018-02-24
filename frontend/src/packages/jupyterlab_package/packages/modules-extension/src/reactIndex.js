@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { Card, Button, Row, Col, Input } from 'antd'
-
+import * as pathToRegexp from 'path-to-regexp'
 import {
-  VDomRenderer
-} from '@jupyterlab/apputils';
+  VDomRenderer,
+} from '@jupyterlab/apputils'
 
 import {
   NotebookActions,
@@ -11,7 +11,7 @@ import {
 
 import ParamsMapper from './ParamsMapper'
 
-import { getModules, getModule, getProjects } from './services'
+import { addModuleToApp, getModule, getProjects } from './services'
 
 function genConf(args) {
   return JSON.stringify(args).replace(/'/g, '`')
@@ -22,13 +22,17 @@ const Search = Input.Search
 const type = 'module'
 const privacy = 'public'
 
-export
-class ModulePage extends React.Component {
+export class ModulePage extends React.Component {
 
   constructor() {
     super()
     this.state = {
       projects: [],
+    }
+    const hash = window.location.hash;
+    const match = pathToRegexp('#/workspace/:appId/:type').exec(hash);
+    if (match) {
+      this.appId = match[1];
     }
   }
 
@@ -60,7 +64,7 @@ class ModulePage extends React.Component {
       filter,
       onJson: (projects) => this.setState({
         projects,
-      })
+      }),
     })
   }
 
@@ -74,7 +78,10 @@ class ModulePage extends React.Component {
   }
 
   clickProject(project, func) {
-    getModule({ projectId: project._id }, (response) => this.onModuleSuccess(response, func))
+    getModule({
+      moduleId: project._id,
+      onJson: (response) => this.onModuleSuccess(response, func),
+    })
   }
 
   backToList(project) {
@@ -96,9 +103,10 @@ class ModulePage extends React.Component {
       [
         `conf = '${genConf(this.state.args)}'\n`,
         `conf = json_parser(conf)\n`,
-        `result = ${this.state.func}('${user_ID}/${this.state.project.name}', conf)\n`,
+        `result = ${this.state.func}('${user_ID}/${this.state.project.name}', conf)`,
       ],
     )
+    addModuleToApp({appId: this.appId, moduleId: this.state.projectId})
   }
 
   setValue(values) {
@@ -130,7 +138,7 @@ class ModulePage extends React.Component {
   render() {
     if (this.state.projectId !== undefined) {
       return (
-        <div style={{ minHeight: 100, overflowY: 'auto' }}>
+        <div style={{ height: '100%', overflowY: 'auto' }}>
           <h2>{this.state.project.name}</h2>
           {this.renderParameters()}
           <Row>
@@ -148,18 +156,18 @@ class ModulePage extends React.Component {
             onSearch={(value) => this.handleQueryChange(value)}
           />
           <div className='list'>
-          {this.state.projects.map((project) =>
-            <Card key={project.name} title={project.name}
-              // onClick={() => this.clickModule(project)}
-                  style={{ margin: '5px 3px', cursor: 'pointer' }}>
-              <Col>
-                {project.description}
-                <Row>
-                  <Button onClick={() => this.clickProject(project, 'train')}>train</Button>
-                  <Button onClick={() => this.clickProject(project, 'predict')}>predict</Button>
-                </Row>
-              </Col>
-            </Card>)}
+            {this.state.projects.map((project) =>
+              <Card key={project.name} title={project.name}
+                // onClick={() => this.clickModule(project)}
+                    style={{ margin: '5px 3px', cursor: 'pointer' }}>
+                <Col>
+                  {project.description}
+                  <Row>
+                    <Button onClick={() => this.clickProject(project, 'train')}>train</Button>
+                    <Button onClick={() => this.clickProject(project, 'predict')}>predict</Button>
+                  </Row>
+                </Col>
+              </Card>)}
           </div>
         </div>
       )

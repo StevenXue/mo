@@ -59,6 +59,7 @@ from server3.route import module_route
 from server3.route import request_comments_route
 from server3.route import request_answer_route
 from server3.route import api_route
+from server3.route import app_route
 
 app.register_blueprint(file_route.file_app)
 app.register_blueprint(ownership_route.ownership_app)
@@ -78,6 +79,7 @@ app.register_blueprint(module_route.module_app)
 app.register_blueprint(request_comments_route.user_request_comments_app)
 app.register_blueprint(request_answer_route.request_answer_app)
 app.register_blueprint(api_route.api_app)
+app.register_blueprint(app_route.app_app)
 
 
 # This method will get whatever object is passed into the
