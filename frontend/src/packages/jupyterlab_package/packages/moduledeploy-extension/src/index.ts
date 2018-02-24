@@ -44,10 +44,7 @@ const extension: JupyterLabPlugin<void> = {
     autoStart: true,
     requires: [IFileBrowserFactory],
     activate: (app: JupyterLab, fb: IFileBrowserFactory) => {
-        console.log(app, fb.defaultBrowser);
-        const widget = fb.defaultBrowser;
-
-        widget.toolbar.insertItem(4, 'publishModule', createDeployButton());
+        fb.defaultBrowser.toolbar.addItem('publishModule', createDeployButton());
     }
 };
 
@@ -85,10 +82,9 @@ export function createDeployButton(): ToolbarButton {
             className: TOOLBAR_DEPLOY_CLASS,
             onClick: () => {
                 return showDialog({
-                    title: 'Publishing ' + document.title.split(' - ')[0],
+                    title: 'Publish ' + document.title.split(' - ')[0],
                     body: new DeployForm(() => {
                         console.log('click');
-                        publish({projectId});
                     }),
                     focusNodeSelector: 'input',
                     buttons: [Dialog.cancelButton(), Dialog.okButton({label: 'PUBLISH'})]

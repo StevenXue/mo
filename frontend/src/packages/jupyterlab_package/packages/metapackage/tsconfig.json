@@ -34,6 +34,9 @@
       ],
       "@jupyterlab/moduledeploy-extension": [
         "../moduledeploy-extension/src"
+      ],
+      "@jupyterlab/appeploy-extension": [
+        "../appdeploy-extension/src"
       ]
     },
     "jsx": "react",

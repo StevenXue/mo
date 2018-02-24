@@ -32,6 +32,7 @@
     "watch:files": "node watch-files.js"
   },
   "dependencies": {
+    "@jupyterlab/appeploy-extension": "^0.1.0",
     "@jupyterlab/application": "^0.15.1",
     "@jupyterlab/application-extension": "^0.15.1",
     "@jupyterlab/apputils": "^0.15.1",

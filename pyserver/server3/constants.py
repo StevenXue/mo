@@ -21,6 +21,7 @@ KUBE_NAME = {
     'jupyter': '{project_id}-jupyter',
     'serving': '{job_id}-serving'
 }
+MODULE_DIR = './server3/lib/modules'
 PARAMETER_SPEC = [
     {
         "name": "validation",

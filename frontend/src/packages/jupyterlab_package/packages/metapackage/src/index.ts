@@ -1,6 +1,7 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
 
+import '@jupyterlab/appeploy-extension';
 import '@jupyterlab/application';
 import '@jupyterlab/application-extension';
 import '@jupyterlab/apputils';

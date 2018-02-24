@@ -10,6 +10,7 @@
     "watch": "webpack --watch"
   },
   "dependencies": {
+    "@jupyterlab/appeploy-extension": "^0.1.0",
     "@jupyterlab/application": "^0.15.1",
     "@jupyterlab/application-extension": "^0.15.1",
     "@jupyterlab/apputils": "^0.15.1",
@@ -120,6 +121,7 @@
   },
   "jupyterlab": {
     "extensions": {
+      "@jupyterlab/appeploy-extension": "",
       "@jupyterlab/application-extension": "",
       "@jupyterlab/apputils-extension": "",
       "@jupyterlab/codemirror-extension": "",
@@ -209,6 +211,7 @@
     ],
     "version": "0.31.1",
     "linkedPackages": {
+      "@jupyterlab/appeploy-extension": "../packages/appdeploy-extension",
       "@jupyterlab/application": "../packages/application",
       "@jupyterlab/application-extension": "../packages/application-extension",
       "@jupyterlab/apputils": "../packages/apputils",

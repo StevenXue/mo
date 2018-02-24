@@ -110,6 +110,14 @@ class ProjectBusiness:
     repo = ProjectRepo(Project)
 
     @staticmethod
+    def copytree(o, dst):
+        # if dir exists, remove it and copytree, cause copytree will
+        #  create the dir
+        if os.path.exists(dst):
+            shutil.rmtree(dst)
+        shutil.copytree(o, dst)
+
+    @staticmethod
     def auth_hub_user(user_ID, project_name, user_token):
         """
         auth jupyterhub with user token
@@ -269,6 +277,7 @@ class ProjectBusiness:
         :param is_private: boolean
         :return: a new created project object
         """
-        cls.repo.update_one_by_id(project_id, dict(description=description,
-                                                   update_time=datetime.utcnow(),
-                                                   tags=tags, privacy=privacy))
+        return cls.repo.update_one_by_id(project_id,
+                                         dict(description=description,
+                                              update_time=datetime.utcnow(),
+                                              tags=tags, privacy=privacy))

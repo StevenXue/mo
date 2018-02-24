@@ -20,9 +20,9 @@ const checker = (value, arr) =>
   arr.some(element => value.includes(element))
 
 const extFilter = {
-  app: [],
-  module: [],
-  dataset: ['datasets-extension'],
+  app: ['moduledeploy-extension'],
+  module: ['appdeploy-extension'],
+  dataset: ['moduledeploy-extension', 'datasets-extension', 'appdeploy-extension'],
 }
 
 // Load the core theming before any other package.
@@ -62,6 +62,7 @@ const loadnStartJL = (projectType) => {
     require('../packages/jupyterlab_package/packages/modules-extension'),
     require('../packages/jupyterlab_package/packages/datasets-extension'),
     require('../packages/jupyterlab_package/packages/moduledeploy-extension'),
+    require('../packages/jupyterlab_package/packages/appdeploy-extension'),
   ]
 
   const JupyterLab = require('../packages/jupyterlab_package/packages/application').JupyterLab
