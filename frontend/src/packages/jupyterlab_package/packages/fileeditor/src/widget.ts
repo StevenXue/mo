@@ -2,37 +2,41 @@
 // Distributed under the terms of the Modified BSD License.
 
 import {
-  BoxLayout, Widget
+  BoxLayout, Widget,
   // , PanelLayout, Panel
 } from '@phosphor/widgets';
 
 import {
-  IChangedArgs, PathExt
+  IChangedArgs, PathExt,
 } from '@jupyterlab/coreutils';
 
 import {
-  ABCWidgetFactory, DocumentRegistry
+  ABCWidgetFactory, DocumentRegistry,
 } from '@jupyterlab/docregistry';
 
 import {
-  CodeEditor, IEditorServices, IEditorMimeTypeService, CodeEditorWrapper
+  CodeEditor, IEditorServices, IEditorMimeTypeService, CodeEditorWrapper,
 } from '@jupyterlab/codeeditor';
 
 import {
-  PromiseDelegate
+  PromiseDelegate,
 } from '@phosphor/coreutils';
 
 import {
-  Message
+  Message,
 } from '@phosphor/messaging';
 
 import {
   Toolbar, ToolbarButton
-  , Dialog, showDialog
+  , Dialog, showDialog, getProjectId,
 } from '@jupyterlab/apputils';
 
 import {
-  Form
+  request,
+} from '@jupyterlab/services';
+
+import {
+  Form,
 } from './reactComponents';
 
 /**
@@ -106,27 +110,26 @@ class DeployForm extends Form {
 //   });
 // }
 
-
 /**
  * Create a toExecutable toolbar item.
  */
-export function createRunButton(model: CodeEditor.IModel): ToolbarButton {
+export function createRunButton(context: DocumentRegistry.CodeContext): ToolbarButton {
 
   return new ToolbarButton({
     className: TOOLBAR_RUN_CLASS,
     onClick: () => {
-      console.log('click', model.value.text);
-      fetch(RUNNER_URL, {
+      console.log('click', context.path);
+      request(RUNNER_URL + '/' + getProjectId(), {
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          code: model.value.text
+          path: context.path,
         }),
       });
     },
-    tooltip: 'Run Script'
+    tooltip: 'Run Script',
   });
 }
 
@@ -169,7 +172,7 @@ export function createDeployButton(context: DocumentRegistry.CodeContext): Toolb
           console.log('click');
         }),
         focusNodeSelector: 'input',
-        buttons: [Dialog.cancelButton(), Dialog.okButton({label: 'DEPLOY'})]
+        buttons: [Dialog.cancelButton(), Dialog.okButton({ label: 'DEPLOY' })],
       }).then(result => {
         if (!result.value) {
           return null;
@@ -178,7 +181,7 @@ export function createDeployButton(context: DocumentRegistry.CodeContext): Toolb
         // return deploy(context);
       });
     },
-    tooltip: 'Deploy Script'
+    tooltip: 'Deploy Script',
   });
 }
 
@@ -192,7 +195,7 @@ export class FileEditorCodeWrapper extends CodeEditorWrapper {
   constructor(options: FileEditor.IOptions) {
     super({
       factory: options.factory,
-      model: options.context.model
+      model: options.context.model,
     });
 
     const context = this._context = options.context;
@@ -221,7 +224,7 @@ export class FileEditorCodeWrapper extends CodeEditorWrapper {
 
         this.editor.selectionStyle = {
           ...CodeEditor.defaultSelectionStyle,
-          color: localCollaborator.color
+          color: localCollaborator.color,
         };
 
         collaborators.changed.connect(this._onCollaboratorsChanged, this);
@@ -326,7 +329,6 @@ export class FileEditorCodeWrapper extends CodeEditorWrapper {
   private _ready = new PromiseDelegate<void>();
 }
 
-
 /**
  * A document widget for editors.
  */
@@ -348,12 +350,11 @@ export class FileEditor extends Widget implements DocumentRegistry.IReadyWidget 
     context.pathChanged.connect(this._onPathChanged, this);
     this._onPathChanged();
 
-
-    let layout = this.layout = new BoxLayout({spacing: 0});
+    let layout = this.layout = new BoxLayout({ spacing: 0 });
     // let toolbar = new Widget();
     // toolbar.addClass('jp-Toolbar');
     let toolbar = new Toolbar();
-    toolbar.addItem('run', createRunButton(this.model));
+    toolbar.addItem('run', createRunButton(context));
     // toolbar.addItem('deploy', createDeployButton(context));
     layout.addWidget(toolbar);
     BoxLayout.setStretch(toolbar, 0);
@@ -450,7 +451,6 @@ export class FileEditor extends Widget implements DocumentRegistry.IReadyWidget 
   private _mimeTypeService: IEditorMimeTypeService;
 }
 
-
 /**
  * The namespace for editor widget statics.
  */
@@ -476,7 +476,6 @@ export namespace FileEditor {
   }
 }
 
-
 /**
  * A widget factory for editors.
  */
@@ -500,7 +499,7 @@ export class FileEditorFactory extends ABCWidgetFactory<FileEditor, DocumentRegi
     return new FileEditor({
       factory,
       context,
-      mimeTypeService: this._services.mimeTypeService
+      mimeTypeService: this._services.mimeTypeService,
     });
   }
 

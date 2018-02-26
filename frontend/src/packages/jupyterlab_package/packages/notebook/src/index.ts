@@ -12,3 +12,4 @@ export * from './panel';
 export * from './tracker';
 export * from './widget';
 export * from './widgetfactory';
+export * from './request';
