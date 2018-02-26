@@ -14,6 +14,7 @@ import shutil
 import requests
 from copy import deepcopy
 from datetime import datetime
+from distutils.dir_util import copy_tree
 
 from server3.entity.project import Project
 # from server3.repository import job_repo
@@ -111,11 +112,7 @@ class ProjectBusiness:
 
     @staticmethod
     def copytree(o, dst):
-        # if dir exists, remove it and copytree, cause copytree will
-        #  create the dir
-        if os.path.exists(dst):
-            shutil.rmtree(dst)
-        shutil.copytree(o, dst)
+        copy_tree(o, dst)
 
     @staticmethod
     def auth_hub_user(user_ID, project_name, user_token):

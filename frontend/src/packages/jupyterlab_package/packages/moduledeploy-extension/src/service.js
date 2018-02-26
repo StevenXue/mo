@@ -1,7 +1,6 @@
 import * as path from 'path'
 import request from './request'
 
-
 // 获取用户 所有的project 下的 所有的 deploy 过的 models
 // export function fetchDeployment(payload) {
 //   const user_ID = localStorage.getItem('user_ID')
@@ -46,15 +45,13 @@ export function getMyProjects({ filter }) {
   return request(path.join('/pyapi', PREFIX) + `?${params}`)
 }
 
-
 // 获取单个 project
 export function fetchProject({ projectId, onJson }) {
   return request(path.join('/pyapi', PREFIX, 'projects', projectId), undefined, { onJson })
 }
 
-
-export function publish({ projectId }) {
+export function publish({ projectId, onJson }) {
   return request(path.join('/pyapi', 'module', 'publish', projectId), {
-    method: 'post'
-  })
+    method: 'post',
+  }, { onJson })
 }

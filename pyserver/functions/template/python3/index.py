@@ -5,13 +5,12 @@ import sys
 import json
 from function import handler
 
+
 def get_stdin():
     buf = ""
     while(True):
         line = sys.stdin.readline()
-        handler.handle(line)
-        # print(line)
-        # buf += line
+        buf += line
         if line=="":
             break
     return buf
@@ -22,6 +21,7 @@ def get_stdin():
 
 if(__name__ == "__main__"):
     st = get_stdin()
-    # st = json.loads(st)
+    st = json.loads(st)
+    handler.handle(st)
 
 

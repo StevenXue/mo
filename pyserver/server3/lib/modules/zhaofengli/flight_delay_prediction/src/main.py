@@ -17,7 +17,6 @@ from sklearn.externals import joblib
 sys.path.insert(0, os.path.dirname(__file__))
 
 
-
 class flight_delay_prediction(object):
     def __init__(self):
         '''
@@ -54,7 +53,7 @@ class flight_delay_prediction(object):
         joblib.dump(self.cat_pipeline, feed[
             'data_path']+'/demo_cat_pipeline.pkl')
         joblib.dump(self.log_reg, feed['data_path']+'/demo_model.pkl')
-        print('train ok')
+        # print('train ok')
 
     def predict(self, feed={}):
         '''
@@ -83,7 +82,7 @@ class flight_delay_prediction(object):
         self.num_pipeline = joblib.load(self.checkpoint_dir + '/demo_num_pipeline.pkl')
         self.cat_pipeline = joblib.load(self.checkpoint_dir + '/demo_cat_pipeline.pkl')
         self.log_reg = joblib.load(self.checkpoint_dir + '/demo_model.pkl')
-        print('model load ok')
+        # print('model load ok')
 
 
 # test = flight_delay_prediction()

@@ -23,13 +23,13 @@ class AppBusiness(ProjectBusiness):
             modules = ['zhaofengli/flight_delay_prediction',
                        'zhaofengli/weather_prediction']
 
+        service_name = app.user.user_ID + '-' + app.name
         # faas new in functions dir
-        call(['faas-cli', 'new', app.name, '--lang=python3'],
+        call(['faas-cli', 'new', service_name, '--lang=python3'],
              cwd=cls.base_func_path)
         # target path = new path
-        func_path = os.path.join(cls.base_func_path, app.name)
+        func_path = os.path.join(cls.base_func_path, service_name)
         module_dir_path = os.path.join(func_path, 'modules')
-        # copy tree
         cls.copytree(app.path, func_path)
         # copy modules
         for module in modules:
@@ -43,11 +43,14 @@ class AppBusiness(ProjectBusiness):
             # copy module tree to target path
             cls.copytree(module_path, module_path_target)
         # deploy
-        call(['faas-cli', 'build', '-f', './{name}.yml'.format(name=app.name)],
+        call(['faas-cli', 'build', '-f', './{name}.yml'.format(
+            name=service_name)],
              cwd=cls.base_func_path)
         call(
-            ['faas-cli', 'deploy', '-f', './{name}.yml'.format(name=app.name)],
+            ['faas-cli', 'deploy', '-f', './{name}.yml'.format(
+                name=service_name)],
             cwd=cls.base_func_path)
+        return service_name
 
     @classmethod
     def add_used_module(cls, app_id, used_modules):
@@ -73,4 +76,3 @@ class AppBusiness(ProjectBusiness):
                           r"""from function.modules import \1""",
                           line.rstrip())
             print(line)
-

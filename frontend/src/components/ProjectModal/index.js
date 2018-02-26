@@ -42,11 +42,11 @@ class ProjectModal extends Component {
   }
 
   okHandler = () => {
-    const {form} = this.props
+    const { form } = this.props
     form.validateFields((err, values) => {
       const body = {
         ...values,
-        type: this.props.type
+        type: this.props.type,
       }
       if (!err) {
         if (this.props.new) {
@@ -55,8 +55,8 @@ class ProjectModal extends Component {
             onJson: (response) => {
               this.props.fetchData && this.props.fetchData()
               this.props.dispatch({ type: 'project/hideModal' })
-              this.props.dispatch(routerRedux.push('/workspace/'+response._id))
-            }
+              this.props.dispatch(routerRedux.push('/workspace/' + response._id))
+            },
           })
         } else {
           updateProject({
@@ -65,7 +65,12 @@ class ProjectModal extends Component {
             onJson: () => {
               this.props.fetchData && this.props.fetchData()
               this.props.dispatch({ type: 'project/hideModal' })
-            }
+              this.props.dispatch({
+                type: 'projectDetail/fetch',
+                projectId: this.props.projectDetail.project._id,
+                notStartLab: true,
+              })
+            },
           })
         }
       }
@@ -180,22 +185,22 @@ class ProjectModal extends Component {
 
             </FormItem>}
             {/*<FormItem*/}
-              {/*{...formItemLayout}*/}
-              {/*label="Project Type"*/}
+            {/*{...formItemLayout}*/}
+            {/*label="Project Type"*/}
             {/*>*/}
-          {/*{getFieldDecorator('type', {*/}
+            {/*{getFieldDecorator('type', {*/}
             {/*initialValue: type,*/}
             {/*rules: [*/}
-              {/*{ required: true },*/}
+            {/*{ required: true },*/}
             {/*],*/}
-          {/*})(*/}
+            {/*})(*/}
             {/*<Select disabled={!this.props.new}>*/}
-              {/*{*/}
-                {/*TYPE.map((e) => <Option value={e} key={e}>{e}</Option>)*/}
-              {/*}*/}
+            {/*{*/}
+            {/*TYPE.map((e) => <Option value={e} key={e}>{e}</Option>)*/}
+            {/*}*/}
             {/*</Select>,*/}
-          {/*)}*/}
-        {/*</FormItem>*/}
+            {/*)}*/}
+            {/*</FormItem>*/}
             <FormItem
               {...formItemLayout}
               label="Tags"
