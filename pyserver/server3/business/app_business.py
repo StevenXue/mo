@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 import os
 import shutil
+import re
+import fileinput
 from subprocess import call
 
 from server3.entity import project
@@ -50,3 +52,25 @@ class AppBusiness(ProjectBusiness):
     @classmethod
     def add_used_module(cls, app_id, used_modules):
         return cls.repo.add_to_set(app_id, used_modules=used_modules)
+
+    @classmethod
+    def nb_to_script(cls, app_id, nb_path):
+        app = cls.get_by_id(app_id)
+        call(['jupyter', 'nbconvert', '--to', 'script', nb_path],
+             cwd=app.path)
+        full_path = os.path.join(app.path, nb_path)
+        script_path = full_path.replace('ipynb', 'py')
+        for line in fileinput.input(files=script_path, inplace=1):
+            line = re.sub(
+                r"# Please use current \(work\) folder to store your data "
+                r"and models",
+                r'', line.rstrip())
+            line = re.sub(r"sys.path.append\('\.\./'\)", r'', line.rstrip())
+            line = re.sub(r"""client = Client\('(.+)'\)""",
+                          r"""client = Client('\1', silent=True)""",
+                          line.rstrip())
+            line = re.sub(r"""from modules import (.+)""",
+                          r"""from function.modules import \1""",
+                          line.rstrip())
+            print(line)
+

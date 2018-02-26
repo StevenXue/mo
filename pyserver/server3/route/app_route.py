@@ -56,5 +56,14 @@ def add_used_module(app_id):
     return jsonify({"response": json_utility.convert_to_json(app.to_mongo())})
 
 
+@app_app.route("/nb_to_script/<app_id>", methods=["POST"])
+@jwt_required
+def nb_to_script(app_id):
+    data = request.get_json()
+    nb_path = data.get('nb_path')
+    AppBusiness.nb_to_script(app_id, nb_path)
+    return jsonify({"response": 1})
+
+
 if __name__ == "__main__":
     pass

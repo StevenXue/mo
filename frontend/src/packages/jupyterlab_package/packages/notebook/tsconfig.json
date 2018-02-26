@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "declaration": true,
+//    "declaration": true,
     "noImplicitAny": true,
     "noEmitOnError": true,
     "noUnusedLocals": true,
@@ -9,6 +9,10 @@
     "target": "ES5",
     "outDir": "./lib",
     "lib": ["ES5", "ES2015.Promise", "DOM", "ES2015.Collection"],
+    "allowJs": true,
+    "jsx": "react",
+    "inlineSources": true,
+    "sourceMap": true,
     "types": []
   },
   "include": ["src/*"]

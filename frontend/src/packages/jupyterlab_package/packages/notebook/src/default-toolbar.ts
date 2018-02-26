@@ -1,38 +1,41 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
+import * as pathToRegexp from 'path-to-regexp';
+import { message } from 'antd';
 
 import {
-  Message
+  Message,
 } from '@phosphor/messaging';
 
 import {
-  Widget
+  Widget,
 } from '@phosphor/widgets';
 
 import {
-  NotebookActions
+  NotebookActions,
 } from './actions';
 
 import {
-  showDialog, Dialog, Styling, Toolbar, ToolbarButton
+  showDialog, Dialog, Styling, Toolbar, ToolbarButton,
 } from '@jupyterlab/apputils';
 
 import {
-  nbformat
+  nbformat,
 } from '@jupyterlab/coreutils';
 
 import {
-  NotebookPanel
+  NotebookPanel,
 } from './panel';
 
 import {
-  Notebook
+  Notebook,
 } from './widget';
 
-// import {
-//   URLExt
-// } from '@jupyterlab/coreutils';
+import request from './request';
 
+import {
+  URLExt,
+} from '@jupyterlab/coreutils';
 
 /**
  * The class name added to toolbar save button.
@@ -79,17 +82,14 @@ const TOOLBAR_CELLTYPE_DROPDOWN_CLASS = 'jp-Notebook-toolbarCellTypeDropdown';
  */
 const TOOLBAR_PYTHON_CLASS = 'jp-PythonIcon';
 
-
 /**
  * A namespace for the default toolbar items.
  */
-export
-namespace ToolbarItems {
+export namespace ToolbarItems {
   /**
    * Create save button toolbar item.
    */
-  export
-  function createSaveButton(panel: NotebookPanel): ToolbarButton {
+  export function createSaveButton(panel: NotebookPanel): ToolbarButton {
     return new ToolbarButton({
       className: TOOLBAR_SAVE_CLASS,
       onClick: () => {
@@ -97,7 +97,7 @@ namespace ToolbarItems {
           return showDialog({
             title: 'Cannot Save',
             body: 'Document is read-only',
-            buttons: [Dialog.okButton()]
+            buttons: [Dialog.okButton()],
           });
         }
         panel.context.save().then(() => {
@@ -106,95 +106,105 @@ namespace ToolbarItems {
           }
         });
       },
-      tooltip: 'Save the notebook contents and create checkpoint'
+      tooltip: 'Save the notebook contents and create checkpoint',
     });
   }
 
   /**
    * Create an insert toolbar item.
    */
-  export
-  function createInsertButton(panel: NotebookPanel): ToolbarButton {
+  export function createInsertButton(panel: NotebookPanel): ToolbarButton {
     return new ToolbarButton({
       className: TOOLBAR_INSERT_CLASS,
       onClick: () => {
         NotebookActions.insertBelow(panel.notebook);
       },
-      tooltip: 'Insert a cell below'
+      tooltip: 'Insert a cell below',
     });
   }
 
   /**
    * Create a cut toolbar item.
    */
-  export
-  function createCutButton(panel: NotebookPanel): ToolbarButton {
+  export function createCutButton(panel: NotebookPanel): ToolbarButton {
     return new ToolbarButton({
       className: TOOLBAR_CUT_CLASS,
       onClick: () => {
         NotebookActions.cut(panel.notebook);
       },
-      tooltip: 'Cut the selected cells'
+      tooltip: 'Cut the selected cells',
     });
   }
 
   /**
    * Create a copy toolbar item.
    */
-  export
-  function createCopyButton(panel: NotebookPanel): ToolbarButton {
+  export function createCopyButton(panel: NotebookPanel): ToolbarButton {
     return new ToolbarButton({
       className: TOOLBAR_COPY_CLASS,
       onClick: () => {
         NotebookActions.copy(panel.notebook);
       },
-      tooltip: 'Copy the selected cells'
+      tooltip: 'Copy the selected cells',
     });
   }
 
   /**
    * Create a paste toolbar item.
    */
-  export
-  function createPasteButton(panel: NotebookPanel): ToolbarButton {
+  export function createPasteButton(panel: NotebookPanel): ToolbarButton {
     return new ToolbarButton({
       className: TOOLBAR_PASTE_CLASS,
       onClick: () => {
         NotebookActions.paste(panel.notebook);
       },
-      tooltip: 'Paste cells from the clipboard'
+      tooltip: 'Paste cells from the clipboard',
     });
   }
 
   /**
    * Create a run toolbar item.
    */
-  export
-  function createRunButton(panel: NotebookPanel): ToolbarButton {
+  export function createRunButton(panel: NotebookPanel): ToolbarButton {
     return new ToolbarButton({
       className: TOOLBAR_RUN_CLASS,
       onClick: () => {
         NotebookActions.runAndAdvance(panel.notebook, panel.session);
       },
-      tooltip: 'Run the selected cells and advance'
+      tooltip: 'Run the selected cells and advance',
     });
   }
 
   /**
    * Create a toExecutable toolbar item.
    */
-  export
-  function createToExecutableButton(panel: NotebookPanel): ToolbarButton {
+  export function createToExecutableButton(panel: NotebookPanel): ToolbarButton {
 
     return new ToolbarButton({
       className: TOOLBAR_PYTHON_CLASS,
       onClick: () => {
-        // console.log(panel)
-        // const current = panel;
-        // const notebookPath = URLExt.encodeParts(current.context.path);
-        const notebookName = panel.context.session.name;
-        NotebookActions.insertCodeBelow(panel.notebook, [`!jupyter nbconvert --to py ${notebookName}`])
-        NotebookActions.runAllBelow(panel.notebook, panel.session);
+        const notebookPath = URLExt.encodeParts(panel.context.path);
+        console.log(notebookPath, panel);
+        const hash = window.location.hash;
+        const match = pathToRegexp('#/workspace/:appId/:type').exec(hash);
+        if (match) {
+          request(`pyapi/app/nb_to_script/${match[1]}`, {
+            method: 'post',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              nb_path: notebookPath.replace('work/', ''),
+            }),
+          }, {
+            onSuccess: () => {
+              message.success(`${notebookPath} successfully export to script!`);
+            },
+          });
+        }
+        // const notebookName = panel.context.session.name;
+        // NotebookActions.insertCodeBelow(panel.notebook, [`!jupyter nbconvert --to py ${notebookName}`])
+        // NotebookActions.runAllBelow(panel.notebook, panel.session);
 
         // const baseUrl = 'http://localhost:8000/user/zhaofengli'
         //
@@ -227,7 +237,7 @@ namespace ToolbarItems {
         // });
 
       },
-      tooltip: 'Export Notebook to Executable Script'
+      tooltip: 'Export Notebook to Executable Script',
     });
   }
 
@@ -242,16 +252,14 @@ namespace ToolbarItems {
    * cell types of the selected cells.
    * It can handle a change to the context.
    */
-  export
-  function createCellTypeItem(panel: NotebookPanel): Widget {
+  export function createCellTypeItem(panel: NotebookPanel): Widget {
     return new CellTypeSwitcher(panel.notebook);
   }
 
   /**
    * Add the default items to the panel toolbar.
    */
-  export
-  function populateDefaults(panel: NotebookPanel): void {
+  export function populateDefaults(panel: NotebookPanel): void {
     let toolbar = panel.toolbar;
     toolbar.addItem('save', createSaveButton(panel));
     toolbar.addItem('insert', createInsertButton(panel));
@@ -268,7 +276,6 @@ namespace ToolbarItems {
     toolbar.addItem('kernelStatus', Toolbar.createKernelStatusItem(panel.session));
   }
 }
-
 
 /**
  * A toolbar widget that switches cell types.
@@ -312,14 +319,14 @@ class CellTypeSwitcher extends Widget {
    */
   handleEvent(event: Event): void {
     switch (event.type) {
-    case 'change':
-      this._evtChange(event);
-      break;
-    case 'keydown':
-      this._evtKeyDown(event as KeyboardEvent);
-      break;
-    default:
-      break;
+      case 'change':
+        this._evtChange(event);
+        break;
+      case 'keydown':
+        this._evtKeyDown(event as KeyboardEvent);
+        break;
+      default:
+        break;
     }
   }
 
@@ -397,7 +404,6 @@ class CellTypeSwitcher extends Widget {
   private _select: HTMLSelectElement = null;
   private _notebook: Notebook = null;
 }
-
 
 /**
  * Create the node for the cell type switcher.
