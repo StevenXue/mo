@@ -9,6 +9,7 @@ from server3.service import comments_service
 from server3.service import request_answer_service
 from server3.utility import json_utility
 from server3.service import user_service
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 PREFIX = '/request_answer'
 
@@ -26,16 +27,14 @@ def list_request_answer():
         request_answer = json_utility. \
             me_obj_list_to_json_list(request_answer)
         # 得到每一个answer下的comments
-        print('request_answer')
-        print(request_answer)
+
         for answer in request_answer:
             answer_comment = comments_service.get_comments_of_this_answer(
                 answer['_id'])
             answer_comment = json_utility. \
                 me_obj_list_to_json_list(answer_comment)
             answer['comment'] = answer_comment
-        print('request_answer')
-        print(request_answer)
+
         return jsonify({'response': request_answer}), 200
     elif user_id:
         request_answer = request_answer_service.\
@@ -105,3 +104,14 @@ def update_request_answer_votes():
     result = json_utility.convert_to_json(result)
     print('update_request_answer_votes')
     return jsonify({'response': result}), 200
+
+
+@request_answer_app.route('/accept', methods=['PUT'])
+@jwt_required
+def accept_request_answer():
+    data = request.get_json()
+    user_request_id = data['user_request_id']
+    user_ID = get_jwt_identity()
+    request_answer_id = data["request_answer_id"]
+    request_answer_service.accept_request_answer(user_request_id, user_ID, request_answer_id)
+    return jsonify({'response': 'accept success'}), 200
