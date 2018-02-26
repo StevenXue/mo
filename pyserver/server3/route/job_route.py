@@ -162,7 +162,7 @@ def run_job():
 @job_app.route("/run/<project_id>", methods=["POST"])
 def run_in_docker(project_id):
     data = request.get_json()
-    print(data['path'], project_id)
+    job_service.create_job(project_id, data['path'])
     return jsonify({"response": {"code": 11}})
 
 

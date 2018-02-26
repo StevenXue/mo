@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { Card, Button, Row, Col, Input } from 'antd'
+import { Card, Button, Row, Col, Input, message } from 'antd'
 
-import {
-  VDomRenderer
-} from '@jupyterlab/apputils';
+// import {
+//   Clipboard
+// } from '@jupyterlab/apputils';
 
 import {
   NotebookActions,
@@ -22,9 +22,7 @@ const Search = Input.Search
 const type = 'dataset'
 const privacy = 'public'
 
-
-export
-class DatasetPage extends React.Component {
+export class DatasetPage extends React.Component {
 
   constructor() {
     super()
@@ -64,7 +62,7 @@ class DatasetPage extends React.Component {
       filter,
       onJson: (projects) => this.setState({
         projects,
-      })
+      }),
     })
   }
 
@@ -75,10 +73,10 @@ class DatasetPage extends React.Component {
   }
 
   clickProject(project) {
-      this.setState({
-          projectId: project._id,
-          project: project,
-      })
+    this.setState({
+      projectId: project._id,
+      project: project,
+    })
     // getproject({ projectId: project._id }, (res) => this.onprojectSuccess(res, func))
   }
 
@@ -100,6 +98,16 @@ class DatasetPage extends React.Component {
     )
   }
 
+  copyPath() {
+    let that = document.getElementById('copy-p')
+    let inp = document.createElement('input')
+    document.body.appendChild(inp)
+    inp.value = that.textContent
+    inp.select()
+    document.execCommand('copy', false)
+    inp.remove()
+    message.info('Successfully copied the dataset path!')
+  }
 
   handleQueryChange(value) {
     this.fetchData({ payload: { query: value } })
@@ -137,8 +145,9 @@ class DatasetPage extends React.Component {
         <div style={{ minHeight: 100, overflowY: 'auto' }}>
           <h2>{this.state.project.name}</h2>
           <p>{this.state.project.description}</p>
+          <p id='copy-p'>{this.state.project.path}</p>
           <Row>
-            <Button type='primary' onClick={() => this.insertCode()}>Insert Code</Button>
+            <Button type='primary' onClick={(e) => this.copyPath()}>Copy Path</Button>
             <Button onClick={() => this.backToList()}>Cancel</Button>
           </Row>
         </div>
@@ -152,14 +161,14 @@ class DatasetPage extends React.Component {
             onSearch={(value) => this.handleQueryChange(value)}
           />
           <div className='list'>
-          {this.state.projects.map((project) =>
-            <Card key={project.name} title={project.name}
-              onClick={() => this.clickProject(project)}
-                  style={{ margin: '5px 3px', cursor: 'pointer' }}>
-              <Col>
-                {project.description}
-              </Col>
-            </Card>)}
+            {this.state.projects.map((project) =>
+              <Card key={project.name} title={project.name}
+                    onClick={() => this.clickProject(project)}
+                    style={{ margin: '5px 3px', cursor: 'pointer' }}>
+                <Col>
+                  {project.description}
+                </Col>
+              </Card>)}
           </div>
         </div>
       )

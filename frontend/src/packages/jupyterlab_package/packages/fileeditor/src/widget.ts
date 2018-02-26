@@ -125,7 +125,7 @@ export function createRunButton(context: DocumentRegistry.CodeContext): ToolbarB
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          path: context.path,
+          path: context.path.replace('work/', ''),
         }),
       });
     },

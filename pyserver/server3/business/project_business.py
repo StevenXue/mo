@@ -218,10 +218,7 @@ class ProjectBusiness:
 
         # create a new project object
         create_time = datetime.utcnow()
-        # project_obj = Project(name=name, description=description,
-        #                       create_time=create_time, update_time=create_time,
-        #                       type=type, tags=tags, hub_token=res.get('token'),
-        #                       path=project_path, user=user, privacy=privacy)
+
         return cls.repo.create_one(name=name, description=description,
                                    create_time=create_time,
                                    update_time=create_time,
