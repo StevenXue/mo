@@ -5,7 +5,7 @@ from server3.business import ownership_business
 from server3.service import ownership_service
 from server3.service import message_service
 from server3.business import user_request_business
-
+from bson import ObjectId
 
 def get_all_answer_of_this_user_request(user_request_id):
     request_answer = request_answer_business. \
@@ -61,6 +61,22 @@ def create_request_answer(user_request_id, user_id, answer):
                 'Cannot create ownership of the new request_answer')
     else:
         raise RuntimeError('Cannot create the new request_answer')
+
+
+def accept_request_answer(user_request_id, user_ID, request_answer_id):
+    user_request = user_request_business. \
+        get_by_user_request_id(user_request_id)
+    ownership = ownership_business.get_ownership_by_owned_item(
+        user_request, 'user_request'
+    )
+    if ownership.user.user_ID != user_ID:
+        raise RuntimeError(
+            'this request not belong to this user, cannot update')
+    else:
+        user_request_business.update_user_request_by_id(
+            user_request_id=user_request_id,
+            accept_answer=ObjectId(request_answer_id)
+        )
 
 
 def update_request_answer(request_answer_id, user_id, answer):

@@ -12,7 +12,8 @@ function* fetchAllCommentsOfThisRequest(action, {call, put}) {
   const {data: allCommentsOfThisRequest} = yield call(userRequestCommentsService.fetchAllCommentsOfThisUserRequest, {user_request_ID: action.payload.userrequestId})
   if (allCommentsOfThisRequest.length > 0) {
     yield put({
-      type: 'setAllCommentsOfThisRequest', payload: {
+      type: 'setAllCommentsOfThisRequest',
+      payload: {
         allCommentsOfThisRequest: allCommentsOfThisRequest
       }
     })
@@ -21,10 +22,11 @@ function* fetchAllCommentsOfThisRequest(action, {call, put}) {
 
 // get 此request下所有的的 answer 和 comment
 function* fetchAllAnswerOfThisRequest(action, {call, put}) {
-  console.log('action')
   const {data: allAnswerOfThisRequest} = yield call(requestAnswerService.fetchAllAnswerOfThisUserRequest, {user_request_ID: action.payload.userrequestId})
-  // console.log(allAnswerOfThisRequest)
   if (allAnswerOfThisRequest.length > 0) {
+    allAnswerOfThisRequest.forEach(function(element) {
+      element['commentState'] = false
+    });
     yield put({
       type: 'setAllAnswerOfThisRequest', payload: {
         allAnswerOfThisRequest: arrayToJson(allAnswerOfThisRequest, '_id')
@@ -137,16 +139,32 @@ export default {
       }
     },
 
-    // 切换 focus model
-    setFocusUserRequest(state, action) {
+// 点击采纳 后 改变 采纳 的状态
+    updateAcceptAnswer(state, action) {
+      let request_answer_id = action.payload.request_answer_id
       return {
         ...state,
-        focusUserRequest: action.payload.focusUserRequest,
+        focusUserRequest:
+          {
+            ...state.focusUserRequest,
+            accept_answer:request_answer_id
+          }
+      }
+    },
+
+    // 切换 focus model
+    setFocusUserRequest(state, action) {
+      let focusUserRequest = action.payload.focusUserRequest
+      focusUserRequest['commentState'] = false
+      return {
+        ...state,
+        focusUserRequest: focusUserRequest,
       }
     },
 
     // 获取focus model 的所有评论
     setAllCommentsOfThisRequest(state, action) {
+      console.log('setAllCommentsOfThisRequest')
       let length = Object.keys(action.payload.allCommentsOfThisRequest).length
       if (length !== 0) {
         return {
@@ -183,6 +201,38 @@ export default {
       return {
         ...state,
         loadingState: action.payload.loadingState,
+      }
+    },
+
+    showAnswerCommentInput(state,action){
+      let answer_id = action.payload.request_answer_id
+      let commentState = state.focusUserRequest.answer[answer_id].commentState
+      return {
+        ...state,
+        focusUserRequest:
+          {
+            ...state.focusUserRequest,
+            answer:
+              {
+                ...state.focusUserRequest.answer,
+                [answer_id]: {
+                  ...state.focusUserRequest.answer[answer_id],
+                  commentState: !commentState
+                }
+              }
+          }
+      }
+    },
+
+    // 获取focus model 的所有评论
+    showRequestCommentInput(state, action) {
+      let commentState = state.focusUserRequest.commentState
+      return {
+        ...state,
+        focusUserRequest: {
+          ...state.focusUserRequest,
+          commentState: !commentState,
+        }
       }
     },
   },
@@ -293,6 +343,15 @@ export default {
       yield put({
         type: 'updateAnswerVotesUp',
         payload: {answerAfterVotesUp: answerAfterVotesUp}
+      })
+    },
+
+    * acceptAnswer(action, {call, put, select}) {
+      let payload = action.payload
+      yield call(requestAnswerService.acceptAnswer, payload)
+      yield put({
+        type: 'updateAcceptAnswer',
+        payload: {request_answer_id:payload.request_answer_id}
       })
     },
   },

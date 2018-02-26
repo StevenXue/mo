@@ -71,19 +71,15 @@ function AllRequest({history, allRequest, dispatch}) {
                        onClick={() => toUserRequestDetail(e, history)}>{e.title}</p>
                     {/*<p className={styles.description}>{e.description}</p>*/}
                     <div>
-                      {e['tags'].length>0 && <p className={styles.tags}>{e.tags}</p>}
+                      {e['tags'].length>0 && e['tags'].map(e =><p className={styles.tags}>{e}</p>)}
                       <div className={styles.timeAndUserDiv}>
-
-
                         <p className={styles.showTime}>{showTime(e.create_time)}</p>
                         <p className={styles.showTime}>&nbsp;&nbsp; asked at &nbsp;&nbsp;</p>
                         <p className={styles.showTime}>{e.user_id} </p>
-
                       </div>
                     </div>
                   </div>
                 </Col>
-
               </Row>
               {/*<Row>*/}
               {/*{e['user_id'] && <p><Icon type="user"/> {e.user_id}</p>}*/}

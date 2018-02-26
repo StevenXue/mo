@@ -40,7 +40,6 @@ def add_request_answer(user_request_id, answer_user_id, answer):
 
 
 def update_request_answer_by_id(request_answer_id, **kwargs):
-    kwargs['create_time'] = datetime.utcnow()
     return request_answer_repo.update_one_by_id(
         request_answer_id, kwargs)
 
