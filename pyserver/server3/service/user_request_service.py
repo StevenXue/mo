@@ -38,7 +38,8 @@ def create_user_request(request_title, user_id, **kwargs):
         **kwargs)
     if created_user_request:
         # 默认发布者star
-        user_service.update_request_star(created_user_request.id, user_id)
+        user_service.update_request_star(
+            created_user_request.id, user_id)
         # 消息推送
         message = create_request_message(created_user_request)
         world_business.system_send(channel=Channel.request, message=message)

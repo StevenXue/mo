@@ -49,7 +49,7 @@ class ProjectList extends Component {
   fetchData({ payload }) {
     const { type } = this.props
 
-    let filter = { type };
+    let filter = { type, group: 'my' };
     ['query', 'privacy'].forEach((key) => {
       if (this.state[key]) {
         filter[key] = this.stats[key]

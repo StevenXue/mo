@@ -110,7 +110,7 @@ def update_user_request_star():
     user_request_id = data["user_request_id"]
     star_user_id = data["star_user_id"]
     result = user_service.update_request_star(user_request_id, star_user_id)
-    result = json_utility.convert_to_json(result)
+    result = json_utility.convert_to_json(result.to_mongo())
     print('update_user_request_star')
     return jsonify({'response': result}), 200
 
