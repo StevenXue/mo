@@ -41,3 +41,17 @@ export function votesUpAnswer(payload) {
     }),
   });
 }
+
+
+export function acceptAnswer(payload) {
+  return request(`${CORS}/request_answer/accept`, {
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      user_request_id : payload.user_request_id,
+      request_answer_id : payload.request_answer_id
+    }),
+  });
+}

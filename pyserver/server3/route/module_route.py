@@ -13,6 +13,7 @@ from flask import jsonify
 from flask import request
 
 from server3.business import module_business, user_business
+from server3.business.module_business import ModuleBusiness
 from server3.utility import json_utility
 
 PREFIX = '/module'
@@ -55,7 +56,7 @@ def get_module_list():
 def get_module(module_id):
     yml = request.args.get('yml')
     yml = str(yml).lower() == 'true'
-    module = module_business.get_by_module_id(module_id, yml=yml)
+    module = ModuleBusiness.get_by_id(module_id, yml=yml)
     module = json_utility.convert_to_json(module.to_mongo())
     return jsonify({
         "response": module
@@ -88,3 +89,9 @@ def update_module():
         # @module_app.route('update_doc', methods=['POST'])
         # def update_doc():
         #     data = request.get_json()
+
+
+@module_app.route("/publish/<project_id>", methods=["POST"])
+def deploy_in_docker(project_id):
+    ModuleBusiness.publish(project_id)
+    return jsonify({"response": {"code": 11}})

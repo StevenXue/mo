@@ -163,5 +163,20 @@ def emit_result(*args, **kw):
     # message.update({'job_id': job_id, 'project_id': project_id})
     # socketio.emit('log_epoch_end', message, namespace='/log/%s' % user_ID)
 
+
+def emit_notification(message, created_receivers):
+    for receiver in created_receivers:
+        receiver_user = receiver.obj_id.to_mongo()
+        message_info = message.to_mongo()
+        message_info['user_ID'] = message.user.user_ID
+        message_info['user_request_title'] = message.user_request.title
+        message_info['is_read'] = False
+        message_info['receiver_id'] = receiver_user['_id'],
+        msg = json_utility.convert_to_json(
+            {'receiver_id': receiver.id,
+             'message': message_info,
+             })
+        socketio.emit('notification', msg,
+                      namespace='/log/%s' % receiver_user['user_ID'])
 # if __name__ == '__main__':
 #     emit_log(1, {'loss': 0.3}, {'id': '11'})

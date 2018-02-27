@@ -5,6 +5,9 @@ import './index.less'
 import modelling from './models/modelling'
 import projectDetail from './models/projectDetail'
 
+// ES6 Promise polyfill
+require('es6-promise/auto')
+
 // 1. Initialize
 const app = dva({
   onError(e) {
@@ -25,6 +28,7 @@ app.model(require('./models/deployedmodels'))
 app.model(require('./models/myservice'))
 app.model(require('./models/allRequest'))
 app.model(require('./models/module'))
+app.model(require('./models/message'))
 app.model(modelling)
 app.model(projectDetail)
 

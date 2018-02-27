@@ -184,9 +184,12 @@ def create_project():
 
     tags = str_utility.split_without_empty(tags)
 
-    project_service.create_project(name, description, user_ID, tags=tags,
-                                   type=type, user_token=user_token, **data)
-    return jsonify({'response': 'create project success'}), 200
+    project = project_service.create_project(name, description, user_ID,
+                                             tags=tags,
+                                             type=type, user_token=user_token,
+                                             **data)
+    project = json_utility.convert_to_json(project.to_mongo())
+    return jsonify({'response': project}), 200
 
 
 @project_app.route('/projects/<string:project_id>', methods=['PUT'])

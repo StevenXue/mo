@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 
+from server3.service import user_service
 from server3.business import user_request_business
 from server3.business import user_business
 from server3.business import ownership_business
@@ -36,6 +37,9 @@ def create_user_request(request_title, user_id, **kwargs):
         status=0,
         **kwargs)
     if created_user_request:
+        # 默认发布者star
+        user_service.update_request_star(created_user_request.id, user_id)
+        # 消息推送
         message = create_request_message(created_user_request)
         world_business.system_send(channel=Channel.request, message=message)
         # get user object
@@ -63,10 +67,8 @@ def update_user_request(user_request_id, request_title, request_description,
 
 
 def list_user_request_by_user_ID(user_ID, order=-1):
-    if not user_ID:
-        user_request = ownership_service.get_all_user_request('user_request')
-    else:
-        user_request = ownership_service. \
+
+    user_request = ownership_service. \
             get_ownership_objects_by_user_ID(user_ID, 'user_request')
     if order == -1:
         user_request.reverse()

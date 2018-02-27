@@ -14,6 +14,7 @@ import shutil
 import requests
 from copy import deepcopy
 from datetime import datetime
+from distutils.dir_util import copy_tree
 
 from server3.entity.project import Project
 # from server3.repository import job_repo
@@ -106,7 +107,12 @@ def copy(project):
 
 
 class ProjectBusiness:
+    project = None
     repo = ProjectRepo(Project)
+
+    @staticmethod
+    def copytree(o, dst):
+        copy_tree(o, dst)
 
     @staticmethod
     def auth_hub_user(user_ID, project_name, user_token):
@@ -187,7 +193,7 @@ class ProjectBusiness:
 
     @classmethod
     def create_project(cls, name, description, user, privacy='private',
-                       tags=[], user_token='', type='app'):
+                       tags=None, user_token='', type='app'):
         """
         Create a new project
 
@@ -200,6 +206,8 @@ class ProjectBusiness:
         :param user_token: string
         :return: a new created project object
         """
+        if tags is None:
+            tags = []
         user_ID = user.user_ID
 
         # generate project dir
@@ -230,12 +238,15 @@ class ProjectBusiness:
         :param object_id: ObjectId
         :return: a matched Project object
         """
-        return cls.repo.read_by_id(object_id)
+        project = cls.repo.read_by_id(object_id)
+        cls.project = project
+        return project
 
     @classmethod
     def remove_project_by_id(cls, project_id, user_ID):
         """
         remove project by its object_id
+        :param user_ID:
         :param project_id: object_id of project to remove
         :return:
         """
@@ -263,6 +274,7 @@ class ProjectBusiness:
         :param is_private: boolean
         :return: a new created project object
         """
-        cls.repo.update_one_by_id(project_id, dict(description=description,
-                                                   update_time=datetime.utcnow(),
-                                                   tags=tags, privacy=privacy))
+        return cls.repo.update_one_by_id(project_id,
+                                         dict(description=description,
+                                              update_time=datetime.utcnow(),
+                                              tags=tags, privacy=privacy))

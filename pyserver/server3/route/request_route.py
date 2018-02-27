@@ -11,15 +11,26 @@ from server3.service import request_answer_service
 from server3.service import user_service
 from server3.utility import json_utility
 
-PREFIX = '/user_request'
+PREFIX = '/user_requests'
 
 user_request_app = Blueprint("user_request_app", __name__, url_prefix=PREFIX)
 
 
+@user_request_app.route('/<user_request_id>', methods=['GET'])
+def get_user_request(user_request_id):
+    try:
+        user_request = user_request_service.get_by_id(user_request_id)
+        user_request = json_utility.convert_to_json(user_request.to_mongo())
+    except Exception as e:
+        return make_response(jsonify({'response': '%s: %s' % (str(
+            Exception), e.args)}), 400)
+    return make_response(jsonify({'response': user_request}), 200)
+
+
 @user_request_app.route('', methods=['GET'])
-def get_user_request():
-    user_request_id = request.args.get("user_request_id")
-    if not user_request_id:
+def list_user_request():
+    user_ID = request.args.get("user_ID")
+    if not user_ID:
         # 返回所有的 user_request
         try:
             user_request = user_request_service.get_all_user_request()
@@ -37,26 +48,9 @@ def get_user_request():
                                                           e.args)}),
                                  400)
         return make_response(jsonify({'response': user_request}), 200)
-    try:
-        print('haha')
-        print(user_request_id)
-        user_request = user_request_service.get_by_id(user_request_id)
-        user_request = json_utility.convert_to_json(user_request.to_mongo())
-        print('user_request', user_request)
-    except Exception as e:
-        return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}), 400)
-    return make_response(jsonify({'response': user_request}), 200)
-
-
-@user_request_app.route('', methods=['GET'])
-def list_user_request():
-    user_id = request.args.get("user_ID")
-    if not user_id:
-        return jsonify({'response': 'no user_id arg'}), 400
     else:
         user_request = user_request_service.list_user_request_by_user_ID(
-            user_id)
+            user_ID)
         user_request = json_utility. \
             me_obj_list_to_json_list(user_request)
         return jsonify({'response': user_request}), 200
@@ -95,6 +89,7 @@ def create_user_request():
         kwargs['output'] = request_output
     user_request_service.create_user_request(request_title, user_id,
                                              **kwargs)
+
     return jsonify({'response': 'create user_request success'}), 200
 
 

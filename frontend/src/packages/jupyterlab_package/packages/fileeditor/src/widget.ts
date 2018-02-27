@@ -354,9 +354,9 @@ export class FileEditor extends Widget implements DocumentRegistry.IReadyWidget 
     // toolbar.addClass('jp-Toolbar');
     let toolbar = new Toolbar();
     toolbar.addItem('run', createRunButton(this.model));
-    toolbar.addItem('deploy', createDeployButton(context));
+    // toolbar.addItem('deploy', createDeployButton(context));
     layout.addWidget(toolbar);
-    // BoxLayout.setStretch(toolbar, 0);
+    BoxLayout.setStretch(toolbar, 0);
     layout.addWidget(editorWidget);
     BoxLayout.setStretch(editorWidget, 1);
   }

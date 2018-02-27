@@ -47,7 +47,7 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
   }
 
   function callback(key) {
-    console.log(key);
+    // console.log(key);
   }
 
   if (location.pathname.split('/').length > 3) {
@@ -65,7 +65,9 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
             {/*info head*/}
             <div className={styles.name}>
               <h1>
-                {projectDetail.project.name}
+                {projectDetail.project.name}&nbsp;
+                <Icon type={projectDetail.project.privacy === 'private'?'lock':'unlock'}
+                      style={{ fontSize: 20}}/>
                 <span className={styles.rightButton}>
                   <ProjectModel new={false} projectDetail={projectDetail}>
                     <Button icon='edit' style={{ marginRight: 15 }}/>
@@ -85,20 +87,34 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
                 <p>{projectDetail.project.description}</p>
               </div>
               <div className={styles.tags}>
-                {projectDetail.project.tags.map(e => <Tag color="#EEEEEE" style={{ color: '#666666' }}
-                                                          key={e}>{e}</Tag>)}
+                {projectDetail.project.tags.length > 0 ?
+                  projectDetail.project.tags.map(e => <Tag color="#EEEEEE" style={{ color: '#666666' }}
+                                                          key={e}>{e}</Tag>)
+                  :<p style={{color: 'rgba(0,0,0,0.54)'}}>(no tags)</p>}
               </div>
-              <Button type="primary" className={styles.enterNotebook}
-                      onClick={() => history.push(`/workspace/${match.params.projectId}/${projectDetail.project.type}`)}>
+              <div className={styles.enterNotebook}>
+              <Button type="primary"
+                      onClick={() => {
+                        // history.push(`/workspace/${match.params.projectId}/${projectDetail.project.type}`)
+                        window.open(`/#/workspace/${match.params.projectId}/${projectDetail.project.type}`)
+                        // FIXME
+                        // window.location.reload()
+                      }}>
                 Enter Notebook
               </Button>
-
+              </div>
             </div>
           </div>
 
           {/*content tabs*/}
           <Tabs defaultActiveKey="1" onChange={callback} className={styles.jobs}>
-            <TabPane tab="Overview" key="1">Content of Tab Pane 1</TabPane>
+            <TabPane tab="Overview" key="1">
+              Some Description
+              <br/>
+              Some Description
+              <br/>
+              Some Description
+            </TabPane>
             <TabPane tab="Jobs" key="2">
                 <h2>Jobs: </h2>
                 <p>
@@ -117,7 +133,13 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
                 </Row>
             </TabPane>
 
-            <TabPane tab="Tab 3" key="3">Content of Tab Pane 3</TabPane>
+            <TabPane tab="Examples" key="3">
+              Some Description
+              <br/>
+              Some Description
+              <br/>
+              Some Description
+            </TabPane>
           </Tabs>
 
         </div>

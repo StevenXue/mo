@@ -113,7 +113,7 @@ def create_project(name, description, user_ID, tags=[], user_token='',
     """
     user = user_business.get_by_user_ID(user_ID)
     cls = TypeMapper.get(type)
-    cls.create_project(name=name, description=description,
+    return cls.create_project(name=name, description=description,
                        type=type, tags=tags, user=user,
                        user_token=user_token, **kwargs)
 

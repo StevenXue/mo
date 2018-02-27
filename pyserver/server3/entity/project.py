@@ -53,6 +53,7 @@ class Dataset(Project):
 
 class Module(Project):
     category = StringField(choices=('model', 'toolkit'))
+    module_path = StringField()
 
 
 RE_TYPE = (
@@ -63,6 +64,7 @@ RE_TYPE = (
 
 class App(Project):
     url = StringField(max_length=50)
+    used_modules = ListField(ReferenceField(Module))
     keyword = StringField(max_length=30)
     input = DictField()
     output = DictField()

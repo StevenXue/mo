@@ -56,7 +56,7 @@ export default {
       yield put({ type: 'setProject', payload: project })
       const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
       const hubToken = project.hub_token
-      yield call(startLabBack, { payload: { hubUserName, hubToken } }, { call })
+      yield !action.notStartLab && call(startLabBack, { payload: { hubUserName, hubToken } }, { call })
       // yield call(startLabFront)
       // fetch jobs
       const jobs = yield call(jobsByProject, { hubUserName, hubToken })
@@ -74,11 +74,17 @@ export default {
       yield call(deleteProject, payload)
       yield put(routerRedux.push('/workspace'))
     },
-    *update({ body }, { call, put, select }) {
+    *update({ body, fetchData }, { call, put, select }) {
       const projectId = yield select(state => state.projectDetail.project._id)
       // const user_ID = 'dev_1'
       // body['user_ID'] = user_ID
-      yield call(updateProject, { body, projectId })
+      yield call(updateProject, {
+        body, projectId,
+        onJson: () => {
+          fetchData && this.props.fetchData()
+          this.props.dispatch({ type: 'project/hideModal' })
+        },
+      })
       yield put({ type: 'project/hideModal' })
       yield put({ type: 'fetch', projectId })
     },

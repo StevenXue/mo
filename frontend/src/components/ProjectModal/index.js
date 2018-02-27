@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { Modal, Form, Input, Radio, Select, Tag, Tooltip, Button } from 'antd'
 import { connect } from 'dva'
+import { createProject, updateProject, getMyProjects, getProjects } from '../../services/project'
+import { routerRedux } from 'dva/router'
 
 const FormItem = Form.Item
 const RadioButton = Radio.Button
@@ -40,26 +42,36 @@ class ProjectModal extends Component {
   }
 
   okHandler = () => {
-    const {form} = this.props
+    const { form } = this.props
     form.validateFields((err, values) => {
+      const body = {
+        ...values,
+        type: this.props.type,
+      }
       if (!err) {
-        // if (values.related_fields) {
-        //   form.setFieldsValue({related_fields: values.related_fields.join(',')})
-        // }
-        // if (values.related_tasks) {
-        //   form.setFieldsValue({related_tasks: values.related_tasks.join(',')})
-        // }
-        // let body = {
-        //   ...values,
-        //   is_private: this.state.is_private,
-        // }
-        // if (!values.is_private) {
-        //   values.is_private = 'true'
-        // }
         if (this.props.new) {
-          this.props.dispatch({ type: 'project/create', body: values })
+          createProject({
+            body,
+            onJson: (response) => {
+              this.props.fetchData && this.props.fetchData()
+              this.props.dispatch({ type: 'project/hideModal' })
+              this.props.dispatch(routerRedux.push('/workspace/' + response._id))
+            },
+          })
         } else {
-          this.props.dispatch({ type: 'projectDetail/update', body: values })
+          updateProject({
+            body,
+            projectId: this.props.projectDetail.project._id,
+            onJson: () => {
+              this.props.fetchData && this.props.fetchData()
+              this.props.dispatch({ type: 'project/hideModal' })
+              this.props.dispatch({
+                type: 'projectDetail/fetch',
+                projectId: this.props.projectDetail.project._id,
+                notStartLab: true,
+              })
+            },
+          })
         }
       }
     })
@@ -172,23 +184,23 @@ class ProjectModal extends Component {
               )}
 
             </FormItem>}
-            <FormItem
-              {...formItemLayout}
-              label="Project Type"
-            >
-          {getFieldDecorator('type', {
-            initialValue: type,
-            rules: [
-              { required: true },
-            ],
-          })(
-            <Select disabled={!this.props.new}>
-              {
-                TYPE.map((e) => <Option value={e} key={e}>{e}</Option>)
-              }
-            </Select>,
-          )}
-        </FormItem>
+            {/*<FormItem*/}
+            {/*{...formItemLayout}*/}
+            {/*label="Project Type"*/}
+            {/*>*/}
+            {/*{getFieldDecorator('type', {*/}
+            {/*initialValue: type,*/}
+            {/*rules: [*/}
+            {/*{ required: true },*/}
+            {/*],*/}
+            {/*})(*/}
+            {/*<Select disabled={!this.props.new}>*/}
+            {/*{*/}
+            {/*TYPE.map((e) => <Option value={e} key={e}>{e}</Option>)*/}
+            {/*}*/}
+            {/*</Select>,*/}
+            {/*)}*/}
+            {/*</FormItem>*/}
             <FormItem
               {...formItemLayout}
               label="Tags"

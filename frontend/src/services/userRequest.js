@@ -9,7 +9,7 @@ export function createNewUserRequest(payload) {
   // let category = encodeURIComponent(payload.category)
   // payload.user_ID = localStorage.getItem('user_ID')
   // noinspection JSAnnotator
-  return request(`${CORS}/user_request`, {
+  return request(`${CORS}/user_requests`, {
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
@@ -31,29 +31,29 @@ export function createNewUserRequest(payload) {
 // 获取某一个用户下 所有 request
 export function fetchUserRequestByUserID(payload) {
   let category = encodeURIComponent(payload.category)
-  return request(`${CORS}/user_request?user_ID=${payload.user_ID}&category=${category}&skipping=${payload.skipping}`);
+  return request(`${CORS}/user_requests?user_ID=${payload.user_ID}&category=${category}&skipping=${payload.skipping}`);
 }
 
 
 // 获取所有的 request
 export function fetchAllUserRequest() {
-  return request(`${CORS}/user_request`);
+  return request(`${CORS}/user_requests`);
 }
 
 
 // 获取一个
 export function fetchOneUserRequest(payload) {
-  return request(`${CORS}/user_request?user_request_id=${payload.user_request_ID}`);
+  return request(`${CORS}/user_requests/${payload.user_request_ID}`);
 }
 
 
 // 关键词搜索
 export function searchUserRequest(payload) {
-  return request(`${CORS}/user_request?searchStr=${payload.searchStr}`);
+  return request(`${CORS}/user_requests?searchStr=${payload.searchStr}`);
 }
 
 export function votesUpRequest(payload) {
-  return request(`${CORS}/user_request/votes`, {
+  return request(`${CORS}/user_requests/votes`, {
     method: 'put',
     headers: {
       'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ export function votesUpRequest(payload) {
 
 
 export function starRequest(payload) {
-  return request(`${CORS}/user_request/star`, {
+  return request(`${CORS}/user_requests/star`, {
     method: 'put',
     headers: {
       'Content-Type': 'application/json',
