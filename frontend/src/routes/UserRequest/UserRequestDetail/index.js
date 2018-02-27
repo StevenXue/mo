@@ -197,8 +197,6 @@ function UserRequestDetail({allRequest, login, dispatch}) {
     focusUserRequest,
   } = allRequest
 
-  const {_id: user_obj_id}
-    = login.user
 
 
   function requestVotesUp() {
@@ -239,7 +237,9 @@ function UserRequestDetail({allRequest, login, dispatch}) {
   }
 
 
-  if (focusUserRequest !== null) {
+  if (login.user && focusUserRequest !== null) {
+    const {_id: user_obj_id}
+      = login.user
     return (
       <div className={`main-container ${styles.normal}`}>
         <div>
@@ -276,7 +276,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
         <hr/>
         {/*{focusUserRequest.comments && <hr className={styles.eachCommentDiv}/>}*/}
         {focusUserRequest.comments && focusUserRequest.comments.map(e =>
-          <div>
+          <div key={e._id}>
             <div className={styles.eachCommentDiv}>
               <p>{e.comments} - {e.comments_user_id} {showTime(e.create_time)}</p>
             </div>
@@ -301,7 +301,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
           </div>
           <div>
             {focusUserRequest.answer && JsonToArray(focusUserRequest.answer).map(e =>
-              <div>
+              <div key={e._id}>
                 <Row className={styles.eachAnswerDiv}>
                   <Col span={2}>
                     <div style={{
@@ -378,7 +378,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                     </div>
                     {e.comment && <hr/>}
                     {e.comment && e.comment.map(e =>
-                      <div>
+                      <div key={e._id}>
                         <div className={styles.eachAnswerComment}>
                           <p>{e.comments} - {e.comments_user_id} at {showTime(e.create_time)}</p>
                         </div>

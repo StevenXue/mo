@@ -45,11 +45,12 @@ def add_message(sender, message_type, receivers, **kwargs):
                           message_type=message_type,
                           **kwargs)
     message = message_repo.create(message_obj)
+    created_receivers = []
     for el in receivers:
-        receiver_repo.create(Receiver(
+        created_receivers.append(receiver_repo.create(Receiver(
             obj_id=el.get('obj_id', None), message=message
-        ))
-    return message
+        )))
+    return message, created_receivers
 
 
 def remove_by_id(user_request_id):

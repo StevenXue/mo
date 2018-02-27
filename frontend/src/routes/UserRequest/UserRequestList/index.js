@@ -71,7 +71,7 @@ function AllRequest({history, allRequest, dispatch}) {
                        onClick={() => toUserRequestDetail(e, history)}>{e.title}</p>
                     {/*<p className={styles.description}>{e.description}</p>*/}
                     <div>
-                      {e['tags'].length>0 && e['tags'].map(e =><p className={styles.tags}>{e}</p>)}
+                      {e['tags'].length>0 && e['tags'].map(e =><p key={e} className={styles.tags}>{e}</p>)}
                       <div className={styles.timeAndUserDiv}>
                         <p className={styles.showTime}>{showTime(e.create_time)}</p>
                         <p className={styles.showTime}>&nbsp;&nbsp; asked at &nbsp;&nbsp;</p>
