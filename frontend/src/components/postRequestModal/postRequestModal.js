@@ -193,13 +193,13 @@ class PostRequestModal extends React.Component {
             >
               {
                 getFieldDecorator('requestTitle', {
+                  initialValue: this.state.searchvalue,
                   rules: [
-                    { required: false },
+                    { required: true },
                   ],
                 })(
             <Select
               mode="combobox"
-              value={this.state.searchvalue}
               placeholder={this.props.placeholder}
               style={this.props.style}
               defaultActiveFirstOption={false}

@@ -8,7 +8,7 @@ from server3.repository import config
 from server3.utility import json_utility
 from server3.business import message_business
 from server3.business import user_business
-
+from server3.service import logger_service
 
 def get_by_user_id(user_id):
     messages = message_business.get_by_user_id(user_id)
@@ -24,9 +24,10 @@ def get_by_user_ID(user_ID):
 
 def create_message(sender, message_type, receivers,  **kwargs):
     # create a new message object
-    created_message = message_business.add_message\
+    created_message, created_receivers = message_business.add_message\
         (sender, message_type, receivers, **kwargs)
     if created_message:
+        logger_service.emit_notification(created_message, created_receivers)
         return created_message
     else:
         raise RuntimeError('Cannot create the new message')
