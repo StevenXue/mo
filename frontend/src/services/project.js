@@ -60,8 +60,8 @@ export function fetchProjects(payload) {
 }
 
 // 获取单个 project
-export function fetchProject(payload) {
-  return request(`${CORS}${projects}/${payload.projectId}`)
+export function fetchProject({ projectId, onJson }) {
+  return request(`${CORS}${projects}/${projectId}`, undefined, { onJson })
 }
 
 // 新建 project
@@ -73,7 +73,7 @@ export function createProject({ body, onJson }) {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     },
     body: JSON.stringify(body),
-  }, {onJson})
+  }, { onJson })
 }
 
 // 更新 project
@@ -84,7 +84,7 @@ export function updateProject({ body, projectId, onJson }) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
-  }, {onJson})
+  }, { onJson })
 }
 
 // 删除 project

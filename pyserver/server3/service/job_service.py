@@ -38,10 +38,10 @@ from server3.service import toolkit_service
 from server3.utility import data_utility
 from server3.utility import json_utility
 from server3.entity.model import TYPE
+from server3.constants import MODULE_DIR
 
 TYPE = {list(v)[0]: list(v)[1] for v in list(TYPE)}
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
-base_path = './server3/lib/modules'
 
 
 def create_job(project_id, toolkit_id, model_id):
@@ -758,7 +758,7 @@ def save_result_sub(result, sds_id, toolkit_obj):
                 print("ERRORS in data saved to database")
 
 
-def deploy_in_faas(path, user_ID):
+def deploy_in_faas(app_id):
     name = 'flight_predict_service2'
     base_func_path = './functions'
     modules = ['zhaofengli/flight_delay_prediction', 'zhaofengli/weather_prediction']
@@ -774,7 +774,7 @@ def deploy_in_faas(path, user_ID):
     # copy modules
     for module in modules:
         [owner_ID, module_name] = module.split('/')
-        module_path = os.path.join(base_path, module)
+        module_path = os.path.join(MODULE_DIR, module)
         module_path_target = os.path.join(module_dir_path, module)
         try:
             os.makedirs(os.path.join(module_dir_path, owner_ID))

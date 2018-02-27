@@ -1,0 +1,49 @@
+{
+  "name": "@jupyterlab/appeploy-extension",
+  "version": "0.1.0",
+  "description": "add deploy button for module",
+  "keywords": [
+    "jupyter",
+    "jupyterlab",
+    "jupyterlab-extension"
+  ],
+  "homepage": "https://github.com/my_name/jupyterlab_myextension",
+  "bugs": {
+    "url": "https://github.com/my_name/jupyterlab_myextension/issues"
+  },
+  "license": "BSD-3-Clause",
+  "author": "zhaofengli",
+  "files": [
+    "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
+    "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/my_name/jupyterlab_myextension.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf lib",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@jupyterlab/application": "^0.15.1",
+    "@jupyterlab/apputils": "^0.15.1",
+    "@jupyterlab/docregistry": "^0.15.1",
+    "@jupyterlab/filebrowser": "^0.15.1",
+    "@jupyterlab/notebook": "^0.15.1",
+    "@phosphor/disposable": "^1.1.2",
+    "@types/dva": "^1.1.0",
+    "path-to-regexp": "~2.1.0",
+    "react": "~16.0.0"
+  },
+  "devDependencies": {
+    "rimraf": "~2.6.2",
+    "typescript": "~2.6.2"
+  },
+  "jupyterlab": {
+    "extension": true
+  }
+}

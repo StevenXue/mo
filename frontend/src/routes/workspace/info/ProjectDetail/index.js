@@ -94,7 +94,12 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
               </div>
               <div className={styles.enterNotebook}>
               <Button type="primary"
-                      onClick={() => history.push(`/workspace/${match.params.projectId}/${projectDetail.project.type}`)}>
+                      onClick={() => {
+                        // history.push(`/workspace/${match.params.projectId}/${projectDetail.project.type}`)
+                        window.open(`/#/workspace/${match.params.projectId}/${projectDetail.project.type}`)
+                        // FIXME
+                        // window.location.reload()
+                      }}>
                 Enter Notebook
               </Button>
               </div>

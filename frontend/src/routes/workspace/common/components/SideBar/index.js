@@ -180,7 +180,8 @@ function Sidebar({ model, dispatch, namespace }) {
                         defaultValue={section[tempVariable.nameOrId] || section[translateDict[namespace]].name}
                         onBlur={(e) => submitNewName(e, section._id)}
                         onPressEnter={(e) => submitNewName(e, section._id)}
-                        autoFocus={true}/> : section[tempVariable.nameOrId] || section[translateDict[namespace]].name
+                        autoFocus={true}/>
+                        : section[tempVariable.nameOrId] || section[translateDict[namespace]].name
                       }
                       <br/>
                       <div className={styles.time}>

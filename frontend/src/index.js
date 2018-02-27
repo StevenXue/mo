@@ -5,6 +5,9 @@ import './index.less'
 import modelling from './models/modelling'
 import projectDetail from './models/projectDetail'
 
+// ES6 Promise polyfill
+require('es6-promise/auto')
+
 // 1. Initialize
 const app = dva({
   onError(e) {

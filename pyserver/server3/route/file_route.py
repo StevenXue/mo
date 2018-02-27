@@ -23,6 +23,7 @@ from server3.service import file_service
 from server3.utility import json_utility
 from server3.constants import PREDICT_FOLDER
 from server3.business import module_business
+from server3.business.module_business import ModuleBusiness
 
 # from server3.service import file_service
 
@@ -61,7 +62,7 @@ def upload_file_module():
     data = dict(request.form.items())
     user_ID = data["user_ID"]
     module_id = data["module_id"]
-    module = module_business.get_by_module_id(module_id)
+    module = ModuleBusiness.get_by_id(module_id)
     store_path = '{}{}/{}/'.format(MODULE_FILE_PATH, user_ID, module.name)
 
     # 如果路径不存在创建路径

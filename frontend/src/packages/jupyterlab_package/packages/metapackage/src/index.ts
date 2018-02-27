@@ -1,6 +1,7 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
 
+import '@jupyterlab/appeploy-extension';
 import '@jupyterlab/application';
 import '@jupyterlab/application-extension';
 import '@jupyterlab/apputils';
@@ -37,6 +38,7 @@ import '@jupyterlab/mainmenu';
 import '@jupyterlab/mainmenu-extension';
 import '@jupyterlab/markdownviewer-extension';
 import '@jupyterlab/mathjax2-extension';
+import '@jupyterlab/moduledeploy-extension';
 import '@jupyterlab/modules-extension';
 import '@jupyterlab/notebook';
 import '@jupyterlab/notebook-extension';

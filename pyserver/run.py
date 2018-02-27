@@ -1,12 +1,16 @@
 # -*- coding: UTF-8 -*-
 import eventlet
+
 eventlet.monkey_patch(thread=False)
 eventlet.import_patched('mongoengine')
 
+import os
+import requests
 from datetime import timedelta
 
 from flask import Flask
 from flask import jsonify
+from flask import request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_jwt_extended import jwt_required
@@ -17,7 +21,9 @@ from server3.repository import config
 from server3.utility import json_utility
 from server3.constants import PORT
 from server3.constants import REDIS_SERVER
-
+from server3.constants import USER_DIR
+from server3.constants import HUB_SERVER
+from server3.constants import ADMIN_TOKEN
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
@@ -53,6 +59,7 @@ from server3.route import module_route
 from server3.route import request_comments_route
 from server3.route import request_answer_route
 from server3.route import api_route
+from server3.route import app_route
 from server3.route import message_route
 
 app.register_blueprint(file_route.file_app)
@@ -73,6 +80,7 @@ app.register_blueprint(module_route.module_app)
 app.register_blueprint(request_comments_route.user_request_comments_app)
 app.register_blueprint(request_answer_route.request_answer_app)
 app.register_blueprint(api_route.api_app)
+app.register_blueprint(app_route.app_app)
 app.register_blueprint(message_route.message_app)
 
 # This method will get whatever object is passed into the
@@ -103,6 +111,17 @@ def refresh_token():
     # current_user = get_jwt_identity()
     claims = get_jwt_claims()
     return jsonify({'response': {'user': claims['user']}}), 200
+
+
+@app.route('/hub_png/user/<hub_username>/kernelspecs/<language>/<filename>',
+           methods=['GET'])
+def hub_png(hub_username, language, filename):
+    return requests.get(
+        os.path.join(HUB_SERVER, 'user', '%2B'.join(hub_username.split('+')),
+                     'kernelspecs', language, filename),
+        headers={'Authorization': 'token ' +
+                                  'cd780b98aeb34a7e9a88e9c0892751c5'}
+        ).content
 
 
 if __name__ == '__main__':

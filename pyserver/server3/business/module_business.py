@@ -1,5 +1,6 @@
 import os
 import yaml
+import shutil
 from importlib import import_module
 from datetime import datetime
 
@@ -7,10 +8,9 @@ from server3.entity.module import Module
 from server3.entity import project
 from server3.repository.general_repo import Repo
 from server3.business.project_business import ProjectBusiness
-
+from server3.constants import MODULE_DIR
 module_repo = Repo(Module)
 
-base_path = './server3/lib/modules'
 tail_path = 'src/module_spec.yml'
 
 
@@ -39,7 +39,7 @@ def get_by_module_id(model_obj, yml=False):
         print(module)
         user_ID = module.user_ID
         module_name = module.name
-        yml_path = os.path.join(base_path, user_ID, module_name, tail_path)
+        yml_path = os.path.join(MODULE_DIR, user_ID, module_name, tail_path)
         with open(yml_path, 'r') as stream:
             obj = yaml.load(stream)
             module.args = obj['module_params']
@@ -79,11 +79,39 @@ class ModuleBusiness(ProjectBusiness):
 
         # create a new project object
         create_time = datetime.utcnow()
-
+        dir_path = os.path.join(MODULE_DIR, user_ID, name)
         return cls.repo.create_one(name=name, description=description,
                                    create_time=create_time,
                                    update_time=create_time,
                                    type=type, tags=tags,
                                    hub_token=res.get('token'),
                                    path=project_path, user=user,
-                                   privacy=privacy, category=category)
+                                   privacy=privacy, category=category,
+                                   module_path=dir_path)
+
+    @classmethod
+    def get_by_id(cls, project_id, yml=False):
+        module = ProjectBusiness.get_by_id(project_id)
+        # TODO 完全加入这个参数后去掉
+        if module.module_path is None:
+            user_ID = module.user.user_ID
+            dir_path = os.path.join(MODULE_DIR, user_ID, module.name)
+            module.module_path = dir_path
+            module.save()
+        if yml:
+            yml_path = os.path.join(module.module_path, tail_path)
+            with open(yml_path, 'r') as stream:
+                obj = yaml.load(stream)
+                module.args = obj['module_params']
+
+        return module
+
+    @classmethod
+    def publish(cls, project_id):
+        module = cls.get_by_id(project_id, yml=False)
+        dst = module.module_path
+        # if dir exists, remove it and copytree, cause copytree will
+        #  create the dir
+        if os.path.exists(dst):
+            shutil.rmtree(dst)
+        shutil.copytree(module.path, dst)
