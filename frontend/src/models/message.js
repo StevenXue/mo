@@ -1,5 +1,5 @@
-import { message } from 'antd'
-import { routerRedux } from 'dva/router'
+import {message} from 'antd'
+import {routerRedux} from 'dva/router'
 import * as messageService from '../services/message'
 import {arrayToJson} from "../utils/JsonUtils"
 import pathToRegexp from "path-to-regexp/index"
@@ -19,9 +19,21 @@ export default {
       }
     },
 
-    changeMessageState(state, {payload}){
-      let receiver_id=payload.receiver_id
-      return{
+    updateNewMessage(state, {payload}) {
+      let receiver_id = payload.msg.receiver_id
+      return {
+        ...state,
+        messages: {
+          ...state.messages,
+          [receiver_id]:
+            payload.msg.message,
+        }
+      }
+    },
+
+    changeMessageState(state, {payload}) {
+      let receiver_id = payload.receiver_id
+      return {
         ...state,
         messages: {
           ...state.messages,

@@ -244,18 +244,20 @@ function UserRequestDetail({allRequest, login, dispatch}) {
       <div className={`main-container ${styles.normal}`}>
         <div>
 
-          <Button icon="caret-up"
-                  onClick={() => requestVotesUp()}
-                  type={focusUserRequest['votes_up_user'].includes(user_obj_id) ? 'primary' : ''}
-          />
-          {focusUserRequest['votes_up_user'].length}
+          {/*<Button icon="caret-up"*/}
+                  {/*onClick={() => requestVotesUp()}*/}
+                  {/*type={focusUserRequest['votes_up_user'].includes(user_obj_id) ? 'primary' : ''}*/}
+          {/*/>*/}
+          {/*{focusUserRequest['votes_up_user'].length}*/}
 
-          <Icon
-            type={focusUserRequest['star_user'].includes(user_obj_id) ? "star" : "star-o"}
-            style={{fontSize: '22px', color: '#34c0e2'}}
-            onClick={() => requestStar()}/>
+
           <h2
-            style={{paddingBottom: 10}}>{focusUserRequest['title']}
+            style={{paddingBottom: 10}}>
+            <Icon
+              type={focusUserRequest['star_user'].includes(user_obj_id) ? "star" : "star-o"}
+              style={{fontSize: '22px', color: '#34c0e2'}}
+              onClick={() => requestStar()}/>
+            {focusUserRequest['title']}
           </h2>
         </div>
         <div className={styles.requestuser}>
@@ -328,15 +330,15 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                     }}>
                       <Icon type="caret-down"/>
                     </div>
-                    <div style={{
-                      width: '100%',
-                      textAlign: 'center',
-                      fontSize: '26px',
-                      color: '#34c0e2',
-                      cursor: 'pointer'
-                    }}>
-                      <Icon type="star-o"/>
-                    </div>
+                    {/*<div style={{*/}
+                      {/*width: '100%',*/}
+                      {/*textAlign: 'center',*/}
+                      {/*fontSize: '26px',*/}
+                      {/*color: '#34c0e2',*/}
+                      {/*cursor: 'pointer'*/}
+                    {/*}}>*/}
+                      {/*<Icon type="star-o"/>*/}
+                    {/*</div>*/}
                     {login.user.user_ID === focusUserRequest.user_id &&
                     !focusUserRequest.accept_answer &&
                     <div style={{

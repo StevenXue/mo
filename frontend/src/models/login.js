@@ -210,6 +210,10 @@ export default {
           socket.on('success', (msg) => {
             dispatch({ type: 'handleSuccess', payload: { msg, pathname } })
           })
+
+          socket.on('notification', (msg) => {
+            dispatch({ type: 'message/updateNewMessage', payload: { msg } })
+          })
           connected = true
         }
       })
