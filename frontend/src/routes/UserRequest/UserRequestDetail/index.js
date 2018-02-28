@@ -267,12 +267,12 @@ function UserRequestDetail({allRequest, login, dispatch}) {
               style={{fontSize: '22px', color: '#34c0e2'}}
               onClick={() => requestStar()}/>
             {focusUserRequest['title']} &nbsp;&nbsp;
-            {focusUserRequest['user_id']===user_ID && <Icon type="close" onClick={() => deleteUserRequest()}/>}
+            {focusUserRequest['user_ID']===user_ID && <Icon type="close" onClick={() => deleteUserRequest()}/>}
           </h2>
         </div>
         <div className={styles.requestuser}>
           <Icon
-            type="user"/>&nbsp;{focusUserRequest['user_id']} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            type="user"/>&nbsp;{focusUserRequest['user_ID']} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           {focusUserRequest['tags'].length > 0 && <Icon type="tag-o"/>}&nbsp;
           {focusUserRequest['tags'].length > 0 && focusUserRequest['tags'].join(",")}
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -349,7 +349,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                     {/*}}>*/}
                       {/*<Icon type="star-o"/>*/}
                     {/*</div>*/}
-                    {user_ID === focusUserRequest.user_id &&
+                    {user_ID === focusUserRequest.user_ID &&
                     !focusUserRequest.accept_answer &&
                     <div style={{
                       width: '100%',

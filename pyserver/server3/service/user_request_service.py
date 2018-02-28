@@ -44,9 +44,10 @@ def list_user_request_by_user_ID(user_ID, order=-1):
 def get_list(search_query, user_ID, page_no, page_size, entity_type='userRequest'):
     user = user_business.get_by_user_ID(user_ID) if user_ID else None
     cls = EntityMapper.get(entity_type)
-    user_request = cls.get_list(search_query, user, False,
-                                page_no, page_size)
-    return user_request
+    user_request, total_number = cls.get_list(search_query, user, False,
+                                              page_no, page_size,
+                                              get_total_number=True)
+    return user_request, total_number
 
 
 def get_by_id(user_request_id, entity_type='userRequest'):
@@ -61,10 +62,15 @@ def remove_by_id(user_request_id, user_ID, entity_type='userRequest'):
     return cls.remove_by_id(user_request_id, user_ID)
 
 
+def remove_by_user_ID(user_ID, entity_type='userRequest'):
+    user = user_business.get_by_user_ID(user_ID)
+    cls = EntityMapper.get(entity_type)
+    return cls.remove_all_by_user(user)
+
+
 def create_request_message(request):
     # tmp = "用户super_user发布了需求匹配夫妻脸"
-    user_id = request.user_id
-    user = user_business.get_by_user_ID(user_id)
+    user = request.user
     return "用户{}发布了需求{}".format(user.name, request.title)
 
 

@@ -12,6 +12,7 @@ from server3.service import request_answer_service
 from server3.service import user_service
 from server3.utility import json_utility
 
+from server3.business import user_business
 PREFIX = '/user_requests'
 
 user_request_app = Blueprint("user_request_app", __name__, url_prefix=PREFIX)
@@ -21,11 +22,12 @@ user_request_app = Blueprint("user_request_app", __name__, url_prefix=PREFIX)
 def get_user_request(user_request_id):
     try:
         user_request = user_request_service.get_by_id(user_request_id)
-        user_request = json_utility.convert_to_json(user_request.to_mongo())
+        user_request_info = json_utility.convert_to_json(user_request.to_mongo())
+        user_request_info['user_ID'] = user_request.user.user_ID
     except Exception as e:
         return make_response(jsonify({'response': '%s: %s' % (str(
             Exception), e.args)}), 400)
-    return make_response(jsonify({'response': user_request}), 200)
+    return make_response(jsonify({'response': user_request_info}), 200)
 
 
 @user_request_app.route('', methods=['GET'])
@@ -39,45 +41,25 @@ def list_user_request():
     if group == 'my':
         user_ID = get_jwt_identity()
 
-    user_request = user_request_service.get_list(
+    user_requests, total_number = user_request_service.get_list(
         search_query=search_query,
         page_no=page_no,
         page_size=page_size,
         user_ID=user_ID
     )
-    user_request = json_utility.me_obj_list_to_json_list(user_request)
+    # user_requests_info = json_utility.me_obj_list_to_json_list(user_requests)
     # 读取每个request下anser的数量
-    for each_request in user_request:
-        each_request['answer_number'] = \
+    user_requests_info = []
+    for each_request in user_requests:
+        each_request_info = json_utility.convert_to_json(
+            each_request.to_mongo())
+        each_request_info['answer_number'] = \
             request_answer_service.get_all_answer_of_this_user_request(
-                each_request['_id'],get_number=True)
-    return jsonify({'response': user_request}), 200
-
-    user_ID = request.args.get("user_ID")
-    if not user_ID:
-        # 返回所有的 user_request
-        try:
-            user_request = user_request_service.get_all_user_request()
-            user_request = json_utility.convert_to_json([i.to_mongo()
-                                                         for i in user_request])
-            # 查询每个request下的答案数
-            for each_request in user_request:
-                each_request['answer_number'] = \
-                    request_answer_service.get_answer_number_of_this_user_request(
-                        each_request['_id'])
-        except Exception as e:
-            return make_response(jsonify({'response': '%s: %s' %
-                                                      (
-                                                          str(Exception),
-                                                          e.args)}),
-                                 400)
-        return make_response(jsonify({'response': user_request}), 200)
-    else:
-        user_request = user_request_service.list_user_request_by_user_ID(
-            user_ID)
-        user_request = json_utility. \
-            me_obj_list_to_json_list(user_request)
-        return jsonify({'response': user_request}), 200
+                each_request_info['_id'], get_number=True)
+        each_request_info['user_ID'] = each_request.user.user_ID
+        user_requests_info.append(each_request_info)
+    return jsonify({'response': {'user_request': user_requests_info,
+                                 'total_number': total_number}}), 200
 
 
 @user_request_app.route('', methods=['POST'])
@@ -157,8 +139,18 @@ def update_user_request():
 
 @user_request_app.route('/<user_request_id>', methods=['DELETE'])
 @jwt_required
-def remove_user_request(user_request_id):
+def remove_user_request_by_id(user_request_id):
     user_ID = get_jwt_identity()
     result = user_request_service.remove_by_id(ObjectId(
         user_request_id), user_ID)
+    return jsonify({'response': result}), 200
+
+
+@user_request_app.route('', methods=['DELETE'])
+# @jwt_required
+def remove_user_request():
+    data = request.get_json()
+    user_ID = data['user_ID']
+    # user_ID = get_jwt_identity()
+    result = user_request_service.remove_by_user_ID(user_ID)
     return jsonify({'response': result}), 200

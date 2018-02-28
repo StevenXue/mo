@@ -58,7 +58,8 @@ class EntityBusiness:
     @classmethod
     def get_list(cls, search_query, user, privacy,
                  page_no=DEFAULT_PAGE_NO,
-                 page_size=DEFAULT_PAGE_SIZE):
+                 page_size=DEFAULT_PAGE_SIZE,
+                 get_total_number=False):
 
         start = (page_no - 1) * page_size
         end = page_no * page_size
@@ -71,7 +72,12 @@ class EntityBusiness:
             objects = objects(privacy=privacy)
         if user:
             objects = objects(user=user)
-        return objects.order_by('-create_time')[start:end]
+        if get_total_number:
+            number_of_objects = objects.count()
+            return objects.order_by('-create_time')[start:end], number_of_objects
+        else:
+            return objects.order_by('-create_time')[start:end]
+
 
     @classmethod
     def remove_by_id(cls, object_id, user_ID):
@@ -91,3 +97,8 @@ class UserRequestBusiness(EntityBusiness):
     entity = UserRequest
     repo = UserRequestRepo(UserRequest)
 
+    @classmethod
+    def remove_all_by_user(cls, user):
+        objects = cls.repo.read()
+        objects = objects(user=user)
+        objects.delete()

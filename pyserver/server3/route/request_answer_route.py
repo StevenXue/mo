@@ -113,5 +113,6 @@ def accept_request_answer():
     user_request_id = data['user_request_id']
     user_ID = get_jwt_identity()
     request_answer_id = data["request_answer_id"]
-    request_answer_service.accept_request_answer(user_request_id, user_ID, request_answer_id)
+    request_answer_service.accept_request_answer(user_request_id, user_ID,
+                                                 request_answer_id)
     return jsonify({'response': 'accept success'}), 200

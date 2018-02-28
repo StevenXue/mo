@@ -32,13 +32,21 @@ function AllRequest({history, allRequest, dispatch}) {
 
   function search(value) {
     dispatch({
-      type: 'publicServedModels/search',
+      type: 'allRequest/search',
       payload: {searchStr: value},
     })
   }
 
   function onShowSizeChange(current, pageSize) {
-    console.log(current, pageSize);
+    dispatch({
+      type: 'allRequest/changePageNoSize',
+      payload: {pageNo:current,
+                pageSize:pageSize},
+    })
+    dispatch({
+      type: 'allRequest/fetchAllRequest',
+      payload: {},
+    })
   }
 
   return (
@@ -79,7 +87,7 @@ function AllRequest({history, allRequest, dispatch}) {
                       <div className={styles.timeAndUserDiv}>
                         <p className={styles.showTime}>{showTime(e.create_time)}</p>
                         <p className={styles.showTime}>&nbsp;&nbsp; asked at &nbsp;&nbsp;</p>
-                        <p className={styles.showTime}>{e.user_id} </p>
+                        <p className={styles.showTime}>{e.user_ID} </p>
                       </div>
                     </div>
                   </div>
@@ -96,7 +104,9 @@ function AllRequest({history, allRequest, dispatch}) {
           </Card>)}
       </div>
       <div className={styles.pagination}>
-        <Pagination showSizeChanger onShowSizeChange={onShowSizeChange} defaultCurrent={3} total={500} />
+        <Pagination showSizeChanger onShowSizeChange={onShowSizeChange}
+                    onChange={onShowSizeChange}
+                    defaultCurrent={1} total={allRequest.totalNumber} />
       </div>
     </div>
   )
