@@ -182,7 +182,9 @@ class ProjectBusiness:
         end = page_no * page_size
         # 获取所有的
         if search_query:
-            objects = cls.repo.search(search_query)
+            objects = cls.repo.search(search_query, {'name': 'icontains',
+                                                     'description': 'icontains',
+                                                     'tags': 'in'})
         else:
             objects = cls.repo.read()  # 分页
         if privacy:
