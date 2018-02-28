@@ -24,6 +24,7 @@ from mongoengine import DoesNotExist
 from server3.business import job_business
 from server3.business import model_business
 from server3.business import project_business
+from server3.business.project_business import ProjectBusiness
 from server3.business import result_business
 from server3.business import staging_data_business
 from server3.business import staging_data_set_business
@@ -44,30 +45,34 @@ TYPE = {list(v)[0]: list(v)[1] for v in list(TYPE)}
 user_directory = config.get_file_prop('UPLOAD_FOLDER')
 
 
-def create_job(project_id, toolkit_id, model_id):
-    if toolkit_id:
-        # create a job
-        toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
-        project_obj = project_business.get_by_id(project_id)
-        job_obj = job_business.add_toolkit_job(
-            toolkit_obj=toolkit_obj,
-            model_obj=None,
-            staging_data_set_obj=None,
-            project_obj=project_obj,
-        )
-    else:
-        # create a job
-        model_obj = model_business.get_by_model_id(model_id)
-        project_obj = project_business.get_by_id(project_id)
-        job_obj = job_business.add_toolkit_job(
-            model_obj=model_obj,
-            toolkit_obj=None,
-            staging_data_set_obj=None,
-            project_obj=project_obj,
-        )
-    # update a project
-    project_business.insert_job_by_id(project_id, job_obj.id)
-    return job_obj
+# def create_job(project_id, toolkit_id, model_id):
+#     if toolkit_id:
+#         # create a job
+#         toolkit_obj = toolkit_business.get_by_toolkit_id(toolkit_id)
+#         project_obj = project_business.get_by_id(project_id)
+#         job_obj = job_business.add_toolkit_job(
+#             toolkit_obj=toolkit_obj,
+#             model_obj=None,
+#             staging_data_set_obj=None,
+#             project_obj=project_obj,
+#         )
+#     else:
+#         # create a job
+#         model_obj = model_business.get_by_model_id(model_id)
+#         project_obj = project_business.get_by_id(project_id)
+#         job_obj = job_business.add_toolkit_job(
+#             model_obj=model_obj,
+#             toolkit_obj=None,
+#             staging_data_set_obj=None,
+#             project_obj=project_obj,
+#         )
+#     # update a project
+#     project_business.insert_job_by_id(project_id, job_obj.id)
+#     return job_obj
+
+def create_job(project_id, script_path):
+    working_path = ProjectBusiness.get_by_id(project_id).path
+    print(working_path, script_path)
 
 
 def create_toolkit_job(project_id, staging_data_set_id, toolkit_obj, fields,

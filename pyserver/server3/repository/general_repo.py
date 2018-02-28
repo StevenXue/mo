@@ -197,13 +197,20 @@ class Repo:
         :return: None
         """
         # 组合时候添加一笔资料
-        update_list_dicts = [UpdateOne({'_id': item.pop('_id')}, {'$set': item}) for item in list_dicts]
+        update_list_dicts = [
+            UpdateOne({'_id': item.pop('_id')}, {'$set': item}) for item in
+            list_dicts]
         self.__instance._get_collection().bulk_write(update_list_dicts,
                                                      ordered=False)
 
-    def search(self, search_query):
-        return self.__instance.objects(
-            Q(name__icontains=search_query) | Q(
-                keyword__icontains=search_query)
-            | Q(description__icontains=search_query)
-        )
+    def search(self, search_query, q_dict):
+        # Turn list of values into list of Q objects
+        q_list = [Q(**{field + '__' + q: search_query})
+                      for field, q in list(q_dict.items())]
+        # Take one Q object from the list
+        query = q_list.pop()
+
+        # Or the Q object with the ones remaining in the list
+        for item in q_list:
+            query |= item
+        return self.__instance.objects(query)

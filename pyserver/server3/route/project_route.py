@@ -36,9 +36,11 @@ def list_projects_by_query():
     privacy = request.args.get('privacy', None)
     default_max_score = float(request.args.get('max_score', 0.4))
     type = request.args.get('type', 'project')
-    user_ID = None
     if group == 'my':
         user_ID = get_jwt_identity()
+    else:
+        user_ID = None
+        privacy = 'public'
     try:
         projects = project_service.list_projects(
             search_query=search_query,
