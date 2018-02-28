@@ -75,13 +75,13 @@ class PostRequestModal extends React.Component {
     this.props.dispatch({
       type: 'allRequest/makeNewRequest',
       payload: {
-        requestTitle: values['requestTitle'],
-        requestDescription: values['requestDescription'],
-        requestDataset: values['requestDataset'],
-        requestInput: values['requestInput'],
-        requestOutput: values['requestOutput'],
-        requestTags: values['requestTags'],
-        requestCategory: values['requestCategory'],
+        title: values['requestTitle'],
+        description: values['requestDescription'],
+        dataset: values['requestDataset'],
+        input: values['requestInput'],
+        output: values['requestOutput'],
+        tags: values['requestTags'],
+        category: values['requestCategory'],
       }
     })
   }

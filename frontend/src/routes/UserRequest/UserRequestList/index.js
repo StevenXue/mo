@@ -32,8 +32,8 @@ function AllRequest({history, allRequest, dispatch}) {
 
   function search(value) {
     dispatch({
-      type: 'allRequest/search',
-      payload: {searchStr: value},
+      type: 'allRequest/fetchAllRequest',
+      payload: {search_query: value},
     })
   }
 

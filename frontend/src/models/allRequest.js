@@ -260,8 +260,6 @@ export default {
       console.log(payload)
       const {data: {user_request:userRequest,total_number:totalNumber}} = yield call(
         userRequestService.fetchAllUserRequest, payload)
-
-
       if (userRequest.length > 0) {
         yield put({
           type: 'setAllRequest',
@@ -270,6 +268,9 @@ export default {
         })
       }
     },
+
+
+
     * fetchOneRequest(action, {call, put}) {
       const {data: focusUserRequest} = yield call(userRequestService.fetchOneUserRequest,
         {user_request_ID: action.payload.userrequestId})
@@ -288,11 +289,9 @@ export default {
     // 发布新request
     * makeNewRequest(action, {call, put, select}) {
       yield put({type: 'showLoading', payload: {loadingState: true}})
-      const user_ID = yield select(state => state.login.user.user_ID)
       let payload = action.payload
-      payload.user_ID = user_ID
       // console.log('halo')
-      // console.log(payload)
+      console.log(payload)
       const {data: result} = yield call(userRequestService.createNewUserRequest, payload)
       if (result) {
         yield put({type: 'showLoading', payload: {loadingState: false}})

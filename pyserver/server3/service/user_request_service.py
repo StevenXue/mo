@@ -74,11 +74,11 @@ def create_request_message(request):
     return "用户{}发布了需求{}".format(user.name, request.title)
 
 
-def create_user_request(request_title, user_ID, **kwargs):
+def create_user_request(title, user_ID, **kwargs):
     # create a new user_request object
     user = user_business.get_by_user_ID(user_ID)
     created_user_request = user_request_business.add_user_request(
-        title=request_title,
+        title=title,
         user=user,
         status=0,
         **kwargs)

@@ -15,14 +15,13 @@ export function createNewUserRequest(payload) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      user_id:payload.user_ID,
-      request_title:payload.requestTitle,
-      request_input:payload.requestInput,
-      request_output:payload.requestOutput,
-      request_description:payload.requestDescription,
-      request_tags:payload.requestTags,
-      request_category:payload.requestCategory,
-      request_dataset:payload.requestDataset,
+      title:payload.title,
+      input:payload.input,
+      output:payload.output,
+      description:payload.description,
+      tags:payload.tags,
+      category:payload.category,
+      dataset:payload.dataset,
     }),
   });
 }
@@ -37,9 +36,17 @@ export function fetchUserRequestByUserID(payload) {
 
 // 获取所有的 request
 export function fetchAllUserRequest(payload) {
-  let page_no = payload.page_no;
-  let page_size = payload.page_size;
-  return request(`${CORS}/user_requests?page_no=${page_no}&page_size=${page_size}`);
+  let params = ''
+  for (let key in payload) {
+    if (!payload.hasOwnProperty(key)) {
+      continue
+    }
+    if (payload[key]) {
+      const value = payload[key]
+      params += `&${key}=${value}`
+    }
+  }
+  return request(`${CORS}/user_requests?${params}`);
 }
 
 

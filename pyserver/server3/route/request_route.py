@@ -36,7 +36,7 @@ def list_user_request():
     group = request.args.get('group')
     page_no = int(request.args.get('page_no', 1))
     page_size = int(request.args.get('page_size', 5))
-    search_query = request.args.get('query', None)
+    search_query = request.args.get('search_query', None)
     user_ID = None
     if group == 'my':
         user_ID = get_jwt_identity()
@@ -66,35 +66,14 @@ def list_user_request():
 @jwt_required
 def create_user_request():
     if not request.json \
-            or 'request_title' not in request.json:
+            or 'title' not in request.json:
         return jsonify({'response': 'insufficient arguments'}), 400
     data = request.get_json()
-    request_title = data['request_title']
+    title = data.pop('title')
     user_ID = get_jwt_identity()
-    # user_ID = data['user_ID']
-    request_dataset = data.get('request_dataset', None)
-    request_description = data.get('request_description', None)
-    request_input = data.get('request_input', None)
-    request_output = data.get('request_output', None)
-    request_tags = data.get('request_tags', None)
-    request_category = data.get('request_category', None)
-
-    kwargs = {}
-    if request_dataset:
-        kwargs['request_dataset'] = request_dataset
-    if request_description:
-        kwargs['description'] = request_description
-    if request_input:
-        kwargs['input'] = request_input
-    if request_tags:
-        request_tags = request_tags.split(",")
-        kwargs['tags'] = request_tags
-    if request_category:
-        kwargs['category'] = request_category
-    if request_output:
-        kwargs['output'] = request_output
-    user_request_service.create_user_request(request_title, user_ID,
-                                             **kwargs)
+    data['tags'] = data['tags'].split(",") if data['tags'] else None
+    user_request_service.create_user_request(title, user_ID,
+                                             **data)
 
     return jsonify({'response': 'create user_request success'}), 200
 
@@ -147,10 +126,10 @@ def remove_user_request_by_id(user_request_id):
 
 
 @user_request_app.route('', methods=['DELETE'])
-# @jwt_required
+@jwt_required
 def remove_user_request():
-    data = request.get_json()
-    user_ID = data['user_ID']
-    # user_ID = get_jwt_identity()
+    # data = request.get_json()
+    # user_ID = data['user_ID']
+    user_ID = get_jwt_identity()
     result = user_request_service.remove_by_user_ID(user_ID)
     return jsonify({'response': result}), 200
