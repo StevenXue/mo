@@ -14,6 +14,7 @@ from mongoengine import CASCADE
 from server3.entity.user_request import UserRequest
 from server3.entity.user_request_comments import UserRequestComments
 from server3.entity.request_answer import RequestAnswer
+from server3.entity.message import Message
 
 OWNERSHIP_LEVEL = ('public', 'private')
 

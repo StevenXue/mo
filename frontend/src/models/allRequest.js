@@ -354,6 +354,11 @@ export default {
         payload: {request_answer_id:payload.request_answer_id}
       })
     },
+
+    * deleteUserRequest(action, {call, put, select}){
+      let payload = action.payload
+      yield call(userRequestService.removeRequest, payload)
+    }
   },
 
   subscriptions: {

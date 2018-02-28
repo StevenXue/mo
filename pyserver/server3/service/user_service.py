@@ -77,7 +77,7 @@ def update_request_star(user_request_id, user_ID):
         user_request.star_user.append(user)
         user_request_result = user_request.save()
     if user_result and user_request_result:
-        return user_request_result.to_mongo()
+        return user_request_result
 
 
 def update_answer_vote(request_answer_id, user_ID):

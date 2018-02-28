@@ -4,6 +4,7 @@ from mongoengine import StringField
 from mongoengine import DateTimeField
 from mongoengine import IntField
 from mongoengine import ReferenceField
+from mongoengine import CASCADE
 
 STATUS = (
     (0, 'open'),
@@ -22,6 +23,7 @@ class UserRequest(DynamicDocument):
     create_time = DateTimeField(required=True)
     request_dataset = StringField()
     tags = ListField(StringField(max_length=50))
+    user = ReferenceField('User')
     user_id = StringField(required=True)
     status = IntField(choices=STATUS, required=True)
     accept_answer = ReferenceField('RequestAnswer')

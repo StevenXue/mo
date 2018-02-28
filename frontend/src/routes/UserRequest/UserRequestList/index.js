@@ -1,6 +1,6 @@
 import React from 'react'
 import {connect} from 'dva'
-import {Select, Card, Input, Icon, Button, Row, Col} from 'antd'
+import {Select, Card, Input, Icon, Button, Row, Col, Pagination } from 'antd'
 import {showTime} from '../../../utils/index'
 import {dataCategory} from '../../../constants'
 import {arrayToJson, JsonToArray} from '../../../utils/JsonUtils'
@@ -35,6 +35,10 @@ function AllRequest({history, allRequest, dispatch}) {
       type: 'publicServedModels/search',
       payload: {searchStr: value},
     })
+  }
+
+  function onShowSizeChange(current, pageSize) {
+    console.log(current, pageSize);
   }
 
   return (
@@ -90,6 +94,9 @@ function AllRequest({history, allRequest, dispatch}) {
               {/*</Row>*/}
             </div>
           </Card>)}
+      </div>
+      <div className={styles.pagination}>
+        <Pagination showSizeChanger onShowSizeChange={onShowSizeChange} defaultCurrent={3} total={500} />
       </div>
     </div>
   )

@@ -11,8 +11,9 @@ from flask import jsonify
 from flask import make_response
 from flask import request
 from mongoengine import DoesNotExist
-
 from server3.service import ownership_service
+from server3.business import ownership_business
+from server3.business import user_business
 from server3.utility import json_utility
 
 PREFIX = '/ownership'
@@ -64,8 +65,9 @@ def get_ownership_objects_by_user_ID():
     if not owned_type or not user_ID:
         jsonify({'response': 'insufficient args'}), 400
     try:
-        ownerships = ownership_service.get_ownership_objects_by_user_ID(
-            user_ID, owned_type)
+        user = user_business.get_by_user_ID(user_ID)
+        ownerships = ownership_business.get_ownership_objects_by_user(
+            user, owned_type)
         ownerships = [ownership.to_mongo() for ownership in ownerships]
         ownerships = json_utility.convert_to_json(ownerships)
     except DoesNotExist as e:

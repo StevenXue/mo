@@ -79,3 +79,8 @@ export function starRequest(payload) {
     }),
   });
 }
+
+export function removeRequest(payload) {
+  return request(`${CORS}/user_requests/${payload.user_request_id}`, {
+    method: 'delete'});
+}

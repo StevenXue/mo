@@ -4,6 +4,7 @@ from flask import Blueprint
 from flask import jsonify
 from flask import make_response
 from flask import request
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server3.service import user_request_service
 from server3.service import request_answer_service
@@ -28,7 +29,30 @@ def get_user_request(user_request_id):
 
 
 @user_request_app.route('', methods=['GET'])
+@jwt_required
 def list_user_request():
+    group = request.args.get('group')
+    page_no = int(request.args.get('page_no', 1))
+    page_size = int(request.args.get('page_size', 5))
+    search_query = request.args.get('query', None)
+    user_ID = None
+    if group == 'my':
+        user_ID = get_jwt_identity()
+
+    user_request = user_request_service.get_list(
+        search_query=search_query,
+        page_no=page_no,
+        page_size=page_size,
+        user_ID=user_ID
+    )
+    user_request = json_utility.me_obj_list_to_json_list(user_request)
+    # 读取每个request下anser的数量
+    for each_request in user_request:
+        each_request['answer_number'] = \
+            request_answer_service.get_all_answer_of_this_user_request(
+                each_request['_id'],get_number=True)
+    return jsonify({'response': user_request}), 200
+
     user_ID = request.args.get("user_ID")
     if not user_ID:
         # 返回所有的 user_request
@@ -57,14 +81,15 @@ def list_user_request():
 
 
 @user_request_app.route('', methods=['POST'])
+@jwt_required
 def create_user_request():
     if not request.json \
-            or 'request_title' not in request.json \
-            or 'user_id' not in request.json:
+            or 'request_title' not in request.json:
         return jsonify({'response': 'insufficient arguments'}), 400
     data = request.get_json()
     request_title = data['request_title']
-    user_id = data['user_id']
+    user_ID = get_jwt_identity()
+    # user_ID = data['user_ID']
     request_dataset = data.get('request_dataset', None)
     request_description = data.get('request_description', None)
     request_input = data.get('request_input', None)
@@ -83,11 +108,10 @@ def create_user_request():
         request_tags = request_tags.split(",")
         kwargs['tags'] = request_tags
     if request_category:
-        print('request_category', request_category)
         kwargs['category'] = request_category
     if request_output:
         kwargs['output'] = request_output
-    user_request_service.create_user_request(request_title, user_id,
+    user_request_service.create_user_request(request_title, user_ID,
                                              **kwargs)
 
     return jsonify({'response': 'create user_request success'}), 200
@@ -110,7 +134,7 @@ def update_user_request_star():
     user_request_id = data["user_request_id"]
     star_user_id = data["star_user_id"]
     result = user_service.update_request_star(user_request_id, star_user_id)
-    result = json_utility.convert_to_json(result)
+    result = json_utility.convert_to_json(result.to_mongo())
     print('update_user_request_star')
     return jsonify({'response': result}), 200
 
@@ -131,14 +155,10 @@ def update_user_request():
     return jsonify({'response': 'update user_request success'}), 200
 
 
-@user_request_app.route('', methods=['DELETE'])
-def remove_user_request():
-    user_request_id = request.args.get("user_request_id")
-    user_id = request.args.get('user_ID')
-    if not user_request_id:
-        return jsonify({'response': 'no user_request_id arg'}), 400
-    if not user_id:
-        return jsonify({'response': 'no user_ID arg'}), 400
-    result = user_request_service.remove_user_request_by_id(ObjectId(
-        user_request_id), user_id)
+@user_request_app.route('/<user_request_id>', methods=['DELETE'])
+@jwt_required
+def remove_user_request(user_request_id):
+    user_ID = get_jwt_identity()
+    result = user_request_service.remove_by_id(ObjectId(
+        user_request_id), user_ID)
     return jsonify({'response': result}), 200
