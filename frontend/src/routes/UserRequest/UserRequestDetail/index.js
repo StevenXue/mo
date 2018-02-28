@@ -236,33 +236,43 @@ function UserRequestDetail({allRequest, login, dispatch}) {
     })
   }
 
+  function deleteUserRequest() {
+    dispatch({
+      type: 'allRequest/deleteUserRequest',
+      payload: {
+        user_request_id: focusUserRequest['_id'],
+      }
+    })
+
+    dispatch(routerRedux.push('/userrequest'))
+
+  }
 
   if (login.user && focusUserRequest !== null) {
-    const {_id: user_obj_id}
+    const {_id: user_obj_id,
+            user_ID}
       = login.user
     return (
       <div className={`main-container ${styles.normal}`}>
         <div>
-
           {/*<Button icon="caret-up"*/}
                   {/*onClick={() => requestVotesUp()}*/}
                   {/*type={focusUserRequest['votes_up_user'].includes(user_obj_id) ? 'primary' : ''}*/}
           {/*/>*/}
           {/*{focusUserRequest['votes_up_user'].length}*/}
-
-
           <h2
             style={{paddingBottom: 10}}>
             <Icon
               type={focusUserRequest['star_user'].includes(user_obj_id) ? "star" : "star-o"}
               style={{fontSize: '22px', color: '#34c0e2'}}
               onClick={() => requestStar()}/>
-            {focusUserRequest['title']}
+            {focusUserRequest['title']} &nbsp;&nbsp;
+            {focusUserRequest['user_ID']===user_ID && <Icon type="close" onClick={() => deleteUserRequest()}/>}
           </h2>
         </div>
         <div className={styles.requestuser}>
           <Icon
-            type="user"/>&nbsp;{focusUserRequest['user_id']} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            type="user"/>&nbsp;{focusUserRequest['user_ID']} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           {focusUserRequest['tags'].length > 0 && <Icon type="tag-o"/>}&nbsp;
           {focusUserRequest['tags'].length > 0 && focusUserRequest['tags'].join(",")}
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -339,7 +349,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                     {/*}}>*/}
                       {/*<Icon type="star-o"/>*/}
                     {/*</div>*/}
-                    {login.user.user_ID === focusUserRequest.user_id &&
+                    {user_ID === focusUserRequest.user_ID &&
                     !focusUserRequest.accept_answer &&
                     <div style={{
                       width: '100%',

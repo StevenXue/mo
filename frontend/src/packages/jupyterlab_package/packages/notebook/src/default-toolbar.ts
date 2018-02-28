@@ -31,7 +31,7 @@ import {
   Notebook,
 } from './widget';
 
-import request from './request';
+import {request} from './request';
 
 import {
   URLExt,
@@ -200,6 +200,8 @@ export namespace ToolbarItems {
             onSuccess: () => {
               message.success(`${notebookPath} successfully export to script!`);
             },
+            onJson: undefined,
+            onError: undefined
           });
         }
         // const notebookName = panel.context.session.name;

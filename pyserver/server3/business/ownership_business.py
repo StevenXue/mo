@@ -53,3 +53,29 @@ def get_owner(owned, owned_type):
 
 def list_ownership_by_type(owned_type):
     return ownership_repo.read_by_type(owned_type)
+
+
+def get_ownership_objects_by_user(user, owned_type):
+    """
+    get different type of objects belong to a user, by user_Id
+    :param user:
+    :param owned_type: object type
+    :return: list of objects
+    """
+    ownerships = list_by_user_ID(user)
+    ow_list = []
+    for os in ownerships:
+        if owned_type in os:
+            item = os[owned_type]
+            item.is_private = os.private
+            ow_list.append(item)
+    return ow_list
+
+
+def list_by_user_ID(user):
+    """
+    list all owned items of a user, by user_ID
+    :param user_ID:
+    :return: ownership list
+    """
+    return list_ownership_by_user(user)

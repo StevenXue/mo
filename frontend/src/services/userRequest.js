@@ -36,8 +36,10 @@ export function fetchUserRequestByUserID(payload) {
 
 
 // 获取所有的 request
-export function fetchAllUserRequest() {
-  return request(`${CORS}/user_requests`);
+export function fetchAllUserRequest(payload) {
+  let page_no = payload.page_no;
+  let page_size = payload.page_size;
+  return request(`${CORS}/user_requests?page_no=${page_no}&page_size=${page_size}`);
 }
 
 
@@ -78,4 +80,9 @@ export function starRequest(payload) {
       user_request_id : payload.user_request_id
     }),
   });
+}
+
+export function removeRequest(payload) {
+  return request(`${CORS}/user_requests/${payload.user_request_id}`, {
+    method: 'delete'});
 }

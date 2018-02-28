@@ -6,8 +6,26 @@ from bson import ObjectId
 from server3.entity.request_answer import RequestAnswer
 from server3.repository.request_answer_repo import \
     RequestAnswerRepo
+from server3.business.user_request_business import EntityBusiness
 
 request_answer_repo = RequestAnswerRepo(RequestAnswer)
+
+
+class RequestAnswerBusiness(EntityBusiness):
+    entity = RequestAnswer
+    repo = RequestAnswerRepo(RequestAnswer)
+
+    @classmethod
+    def get_by_user_request_id(cls, user_request_id, get_number=False):
+        query = {'user_request_id': ObjectId(user_request_id)}
+        if get_number:
+            # 返回request的answer的数目
+            return cls.repo.read(query).count()
+        else:
+            # 返回answer
+            return cls.repo.read(query)
+
+
 
 
 # 获取当前user_request下的所有

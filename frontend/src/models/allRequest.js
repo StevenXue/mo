@@ -42,7 +42,10 @@ export default {
     userRequestDic: {},
     focusUserRequest: null,
     loadingState: false,
-    modalState: false
+    modalState: false,
+    pageNo:1,
+    pageSize:10,
+    totalNumber:0
   },
   reducers: {
     // 获取所有的request
@@ -52,9 +55,19 @@ export default {
         return {
           ...state,
           userRequestDic: action.payload.userRequestDic,
+          totalNumber: action.payload.totalNumber
         }
       }
     },
+
+    changePageNoSize(state, action){
+      return {
+        ...state,
+        pageNo: action.payload.pageNo,
+        pageSize:action.payload.pageSize,
+      }
+    },
+
     // 点击votesup后 改变 requset 的状态
     updateRequestVotesUp(state, action) {
       let requestAfterVotesUp = action.payload.requestAfterVotesUp
@@ -239,12 +252,21 @@ export default {
 
   effects: {
     // 获取所有request
-    * fetchAllRequest(action, {call, put}) {
-      const {data: userRequest} = yield call(userRequestService.fetchAllUserRequest, {})
+    * fetchAllRequest(action, {call, put, select}) {
+      let payload =  action.payload
+      payload.page_no = yield select(state => state.allRequest.pageNo)
+      payload.page_size = yield select(state => state.allRequest.pageSize)
+      console.log('payload')
+      console.log(payload)
+      const {data: {user_request:userRequest,total_number:totalNumber}} = yield call(
+        userRequestService.fetchAllUserRequest, payload)
+
+
       if (userRequest.length > 0) {
         yield put({
           type: 'setAllRequest',
-          payload: {userRequestDic: arrayToJson(userRequest, '_id')}
+          payload: {userRequestDic: arrayToJson(userRequest, '_id'),
+                    totalNumber:totalNumber}
         })
       }
     },
@@ -354,6 +376,11 @@ export default {
         payload: {request_answer_id:payload.request_answer_id}
       })
     },
+
+    * deleteUserRequest(action, {call, put, select}){
+      let payload = action.payload
+      yield call(userRequestService.removeRequest, payload)
+    }
   },
 
   subscriptions: {

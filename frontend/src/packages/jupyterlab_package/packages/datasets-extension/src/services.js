@@ -1,5 +1,5 @@
 import * as path from 'path'
-import request from './request'
+import { request } from '@jupyterlab/services'
 
 const prefix = 'data'
 

@@ -63,9 +63,10 @@ def update_user_request_comments(user_request_comments_id, user_id, comments):
         )
 
 
-def list_user_request_comments_by_user_id(user_id, order=-1):
-    user_request_comments = ownership_service. \
-            get_ownership_objects_by_user_ID(user_id, 'user_request_comments')
+def list_user_request_comments_by_user_id(user_ID, order=-1):
+    user = user_business.get_by_user_ID(user_ID)
+    user_request_comments = ownership_business. \
+            get_ownership_objects_by_user(user, 'user_request_comments')
     if order == -1:
         user_request_comments.reverse()
     return user_request_comments

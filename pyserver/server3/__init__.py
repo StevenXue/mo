@@ -1,5 +1,6 @@
 from mongoengine import CASCADE
 from mongoengine import NULLIFY
+from mongoengine import PULL
 
 from server3.entity.staging_data_set import StagingDataSet
 from server3.entity.toolkit import Toolkit
@@ -22,3 +23,5 @@ from server3.entity.request_answer import RequestAnswer
 Project.register_delete_rule(Job, 'project', CASCADE)
 DataSet.register_delete_rule(File, 'data_set', CASCADE)
 File.register_delete_rule(DataSet, 'file', NULLIFY)
+UserRequest.register_delete_rule(User, 'request_star', PULL)
+User.register_delete_rule(UserRequest, 'star_user', PULL)
