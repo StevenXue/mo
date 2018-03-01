@@ -33,20 +33,6 @@ def get_all():
     return model_list
 
 
-def get_by_module_id(model_obj, yml=False):
-    module = module_repo.read_by_id(model_obj)
-    if yml:
-        print(module)
-        user_ID = module.user_ID
-        module_name = module.name
-        yml_path = os.path.join(MODULE_DIR, user_ID, module_name, tail_path)
-        with open(yml_path, 'r') as stream:
-            obj = yaml.load(stream)
-            module.args = obj['module_params']
-
-    return module
-
-
 def update_by_id(module_id, **update):
     return module_repo.update_one_by_id(module_id, update)
 
@@ -99,12 +85,16 @@ class ModuleBusiness(ProjectBusiness):
             module.module_path = dir_path
             module.save()
         if yml:
-            yml_path = os.path.join(module.module_path, tail_path)
-            with open(yml_path, 'r') as stream:
-                obj = yaml.load(stream)
-                module.args = obj['module_params']
+            module.args = cls.load_module_params(module)
 
         return module
+
+    @staticmethod
+    def load_module_params(module):
+        yml_path = os.path.join(module.module_path, tail_path)
+        with open(yml_path, 'r') as stream:
+            obj = yaml.load(stream)
+            return obj['module_params']
 
     @classmethod
     def publish(cls, project_id):

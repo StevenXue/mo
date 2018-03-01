@@ -31,14 +31,15 @@ export function getModule({moduleId, onJson}) {
   return request(`pyapi/${prefix}/${moduleId}?yml=true`, undefined, {onJson})
 }
 
-export function addModuleToApp({appId, moduleId}) {
+export function addModuleToApp({appId, moduleId, func}) {
   return request(`pyapi/app/add_used_module/${appId}`, {
     method: 'put',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      used_modules: [moduleId]
+      used_modules: [moduleId],
+      func
     })
   })
 }

@@ -44,8 +44,10 @@ class ProjectModal extends Component {
   okHandler = () => {
     const { form } = this.props
     form.validateFields((err, values) => {
+      console.log('confirm', this.state.tags, values)
       const body = {
         ...values,
+        tags: this.state.tags,
         type: this.props.type,
       }
       if (!err) {
@@ -83,14 +85,14 @@ class ProjectModal extends Component {
     })
   }
 
-  handleClose(removedTag) {
-    const tags = this.state.tags.filter(tag => tag !== removedTag).filter(e => e)
-    this.setState({ tags })
+  handleClose(tags, removedTag) {
+    tags = tags.filter(tag => tag !== removedTag).filter(e => e)
+    this.setState({ tags, inputValue: undefined })
     // dispatch({ type: 'upload/removeTag', payload: tags })
   }
 
-  showInput() {
-    this.setState({ inputVisible: true })
+  showInput(tags) {
+    this.setState({ inputVisible: true, tags })
     // dispatch({ type: 'upload/showInput' })
   }
 
@@ -99,9 +101,9 @@ class ProjectModal extends Component {
     // dispatch({ type: 'upload/setInputValue', payload: e.target.value })
   }
 
-  handleInputConfirm() {
-    if (this.state.inputValue && this.state.tags.indexOf(this.state.inputValue) === -1) {
-      const tags = [...this.state.tags, this.state.inputValue]
+  handleInputConfirm(tags) {
+    if (this.state.inputValue && tags.indexOf(this.state.inputValue) === -1) {
+      tags = [...tags, this.state.inputValue]
       this.setState({ tags, inputValue: undefined, inputVisible: false })
     }
 
@@ -120,6 +122,7 @@ class ProjectModal extends Component {
     }
     let name, description, type, privacy
     let tags = this.state.tags
+    // let tags = this.state.tags
     if (projectDetail) {
       ({ name, description, type, privacy } = projectDetail.project)
       tags = tags.length > 0 ? tags : projectDetail.project.tags
@@ -209,17 +212,17 @@ class ProjectModal extends Component {
             getFieldDecorator('tags', {
               initialValue: tags.join(','),
               getValueFromEvent: (e) => {
-                return [...this.state.tags, e.target.value].join(',')
+                return [...tags, e.target.value].join(',')
               },
               rules: [
                 { required: false },
               ],
             })(
               <div>
-                {tags.length !== 0 && tags.map((tag, index) => {
+                {tags.length > 0 && tags.map((tag, index) => {
                   const isLongTag = tag.length > 15
                   const tagElem = (
-                    <Tag key={tag} closable={true} afterClose={() => this.handleClose(tag)}>
+                    <Tag key={tag} closable={true} afterClose={() => this.handleClose(tags, tag)}>
                       {isLongTag ? `${tag.slice(0, 15)}...` : tag}
                     </Tag>
                   )
@@ -233,10 +236,10 @@ class ProjectModal extends Component {
                     style={{ width: 78 }}
                     value={this.state.inputValue}
                     onChange={(e) => this.handleInputChange(e)}
-                    onBlur={() => this.handleInputConfirm()}
-                    onPressEnter={() => this.handleInputConfirm()}
+                    onBlur={() => this.handleInputConfirm(tags)}
+                    onPressEnter={() => this.handleInputConfirm(tags)}
                   />
-                ) : <Button size="small" type="dashed" onClick={() => this.showInput()}>+ New Tag</Button>}
+                ) : <Button size="small" type="dashed" onClick={() => this.showInput(tags)}>+ New Tag</Button>}
               </div>,
             )}
             </FormItem>

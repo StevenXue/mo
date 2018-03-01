@@ -15,18 +15,10 @@ from flask import request
 from flask_jwt_extended import jwt_required
 from bson import ObjectId
 
-from server3.service import job_service
+from server3.service import app_service
 from server3.business.app_business import AppBusiness
 
-from server3.business import job_business
-
-from server3.business import project_business
-from server3.business import toolkit_business
-from server3.business import ownership_business
 from server3.utility import json_utility
-from server3.service.logger_service import emit_error
-from server3.service.logger_service import emit_success
-from server3.service.logger_service import save_job_status
 
 PREFIX = "/app"
 
@@ -52,7 +44,8 @@ def deploy_in_docker(app_id):
 def add_used_module(app_id):
     data = request.get_json()
     used_modules = data.get('used_modules', [])
-    app = AppBusiness.add_used_module(app_id, used_modules)
+    func = data.get('func')
+    app = app_service.add_used_module(app_id, used_modules, func)
     return jsonify({"response": json_utility.convert_to_json(app.to_mongo())})
 
 
