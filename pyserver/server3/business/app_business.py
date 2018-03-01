@@ -10,7 +10,9 @@ from server3.entity import project
 from server3.business.project_business import ProjectBusiness
 from server3.repository.general_repo import Repo
 from server3.utility.json_utility import args_converter
+from server3.constants import APP_DIR
 from server3.constants import MODULE_DIR
+from server3.constants import INIT_RES
 
 yaml_tail_path = 'app_spec.yml'
 
@@ -54,18 +56,22 @@ class AppBusiness(ProjectBusiness):
             ['faas-cli', 'deploy', '-f', './{name}.yml'.format(
                 name=service_name)],
             cwd=cls.base_func_path)
+
+        user_ID = app.user.user_ID
+        dir_path = os.path.join(APP_DIR, user_ID + '-' + app.name)
+        cls.update_project(app_id, app_path=dir_path)
         return service_name
 
     @classmethod
     def get_by_id(cls, project_id, yml=False):
         app = ProjectBusiness.get_by_id(project_id)
-        if yml:
+        if yml and app.app_path:
             app.args = cls.load_app_params(app)
         return app
 
     @staticmethod
     def load_app_params(app):
-        yml_path = os.path.join(app.path, yaml_tail_path)
+        yml_path = os.path.join(app.app_path, yaml_tail_path)
         with open(yml_path, 'r') as stream:
             obj = yaml.load(stream)
             return obj
@@ -120,26 +126,28 @@ class AppBusiness(ProjectBusiness):
         full_path = os.path.join(app.path, nb_path)
         script_path = full_path.replace('ipynb', 'py')
         for line in fileinput.input(files=script_path, inplace=1):
-            line = re.sub(
-                r"# Please use current \(work\) folder to store your data "
-                r"and models",
-                r'', line.rstrip())
-            line = re.sub(r"sys.path.append\('\.\./'\)", r'', line.rstrip())
-            line = re.sub(r"""client = Client\('(.+)'\)""",
-                          r"""client = Client('\1', silent=True)""",
-                          line.rstrip())
-            line = re.sub(r"""from modules import (.+)""",
-                          r"""from function.modules import \1""",
-                          line.rstrip())
-            # add handle function
-            line = re.sub(
-                r"predict = client\.predict",
-                r"\n\ndef handle(conf):\n"
-                r"\t# paste your code here\n"
-                r"\tprint(result)\n",
-                line.rstrip())
             # remove input tag comments
-            line = re.sub(
-                r"# In\[(\d+)\]:",
-                r"", line.rstrip())
+            line = re.sub(r"# In\[(\d+)\]:", r"", line.rstrip())
+            if any(re.search(reg, line.rstrip()) for reg in INIT_RES):
+                line = re.sub(
+                    r"# Please use current \(work\) folder to store your data "
+                    r"and models",
+                    r'', line.rstrip())
+                line = re.sub(r"sys.path.append\('\.\./'\)", r'',
+                              line.rstrip())
+                line = re.sub(r"""client = Client\('(.+)'\)""",
+                              r"""client = Client('\1', silent=True)""",
+                              line.rstrip())
+                line = re.sub(r"""from modules import (.+)""",
+                              r"""from function.modules import \1""",
+                              line.rstrip())
+                # add handle function
+                line = re.sub(
+                    r"predict = client\.predict",
+                    r"predict = client.predict\n\n"
+                    r"def handle(conf):\n"
+                    r"\t# paste your code here",
+                    line.rstrip())
+            else:
+                line = '\t' + line
             print(line)
