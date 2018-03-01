@@ -91,7 +91,7 @@ class ProjectModal extends Component {
     // dispatch({ type: 'upload/removeTag', payload: tags })
   }
 
-  showInput(tags) {
+  showInput() {
     this.setState({ inputVisible: true })
     // dispatch({ type: 'upload/showInput' })
   }
@@ -228,13 +228,13 @@ class ProjectModal extends Component {
                 })}
                 {this.state.inputVisible ? (
                   <Input
-                    //ref={input => this.input = input}
+                    ref={input => input && input.focus()}
                     type="text"
                     size="small"
                     style={{ width: 78 }}
                     value={this.state.inputValue}
                     onChange={(e) => this.handleInputChange(e)}
-                    onBlur={() => this.handleInputConfirm(tags)}
+                    // onBlur={() => this.handleInputConfirm(tags)}
                     onPressEnter={() => this.handleInputConfirm(tags)}
                   />
                 ) : <Button size="small" type="dashed" onClick={() => this.showInput()}>+ New Tag</Button>}
