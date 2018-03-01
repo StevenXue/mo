@@ -55,6 +55,7 @@ class Dataset(Project):
 class Module(Project):
     category = StringField(choices=('model', 'toolkit'))
     module_path = StringField()
+    args = DictField()
 
 
 RE_TYPE = (

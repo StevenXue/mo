@@ -58,5 +58,16 @@ def nb_to_script(app_id):
     return jsonify({"response": 1})
 
 
+@app_app.route('/<app_id>', methods=['GET'])
+def get_module(app_id):
+    yml = request.args.get('yml')
+    yml = str(yml).lower() == 'true'
+    app = AppBusiness.get_by_id(app_id, yml=yml)
+    app = json_utility.convert_to_json(app.to_mongo())
+    return jsonify({
+        "response": app
+    }), 200
+
+
 if __name__ == "__main__":
     pass

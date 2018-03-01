@@ -92,7 +92,7 @@ class ProjectModal extends Component {
   }
 
   showInput(tags) {
-    this.setState({ inputVisible: true, tags })
+    this.setState({ inputVisible: true })
     // dispatch({ type: 'upload/showInput' })
   }
 
@@ -115,14 +115,12 @@ class ProjectModal extends Component {
   render() {
     const { children, projectDetail } = this.props
     const { getFieldDecorator } = this.props.form
-    // const { name, description, privacy } = this.props.record
     const formItemLayout = {
       labelCol: { span: 6 },
       wrapperCol: { span: 14 },
     }
     let name, description, type, privacy
     let tags = this.state.tags
-    // let tags = this.state.tags
     if (projectDetail) {
       ({ name, description, type, privacy } = projectDetail.project)
       tags = tags.length > 0 ? tags : projectDetail.project.tags
@@ -239,7 +237,7 @@ class ProjectModal extends Component {
                     onBlur={() => this.handleInputConfirm(tags)}
                     onPressEnter={() => this.handleInputConfirm(tags)}
                   />
-                ) : <Button size="small" type="dashed" onClick={() => this.showInput(tags)}>+ New Tag</Button>}
+                ) : <Button size="small" type="dashed" onClick={() => this.showInput()}>+ New Tag</Button>}
               </div>,
             )}
             </FormItem>

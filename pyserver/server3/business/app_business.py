@@ -3,6 +3,7 @@ import os
 import yaml
 import re
 import fileinput
+from copy import deepcopy
 from subprocess import call
 
 from server3.entity import project
@@ -12,6 +13,7 @@ from server3.utility.json_utility import args_converter
 from server3.constants import MODULE_DIR
 
 yaml_tail_path = 'app_spec.yml'
+
 
 class AppBusiness(ProjectBusiness):
     repo = Repo(project.App)
@@ -55,13 +57,27 @@ class AppBusiness(ProjectBusiness):
         return service_name
 
     @classmethod
+    def get_by_id(cls, project_id, yml=False):
+        app = ProjectBusiness.get_by_id(project_id)
+        if yml:
+            app.args = cls.load_app_params(app)
+        return app
+
+    @staticmethod
+    def load_app_params(app):
+        yml_path = os.path.join(app.path, yaml_tail_path)
+        with open(yml_path, 'r') as stream:
+            obj = yaml.load(stream)
+            return obj
+
+    @classmethod
     def add_used_module(cls, app_id, used_modules, func):
         app = cls.get_by_id(app_id)
         app_yaml_path = os.path.join(app.path, yaml_tail_path)
         args = {}
         # copy module yaml to app yaml
         for module in used_modules:
-            func_args = module.args[func]
+            func_args = module.to_mongo()['args'][func]
             if os.path.isfile(app_yaml_path):
                 with open(app_yaml_path, 'r') as stream:
                     # read args
@@ -77,7 +93,7 @@ class AppBusiness(ProjectBusiness):
                                                    module.name)
             # write new args
             with open(app_yaml_path, 'w') as stream:
-                yaml.dump(dict(args), stream, default_flow_style=False)
+                yaml.dump(args, stream, default_flow_style=False)
         return cls.repo.add_to_set(app_id, used_modules=used_modules)
 
     @staticmethod
