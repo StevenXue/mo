@@ -75,4 +75,15 @@ class AppBusiness(ProjectBusiness):
             line = re.sub(r"""from modules import (.+)""",
                           r"""from function.modules import \1""",
                           line.rstrip())
+            # add handle function
+            line = re.sub(
+                r"predict = client\.predict",
+                r"\n\ndef handle(conf):\n"
+                r"\t# paste your code here\n"
+                r"\tprint(result)\n",
+                line.rstrip())
+            # remove input tag comments
+            line = re.sub(
+                r"# In\[(\d+)\]:",
+                r"", line.rstrip())
             print(line)
