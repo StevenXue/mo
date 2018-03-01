@@ -42,7 +42,7 @@ class ModuleBusiness(ProjectBusiness):
 
     @classmethod
     def create_project(cls, name, description, user, privacy='private',
-                       tags=[], user_token='', type='app', category='model'):
+                       tags=None, user_token='', type='app', category='model'):
         """
         Create a new project
 
@@ -55,6 +55,8 @@ class ModuleBusiness(ProjectBusiness):
         :param user_token: string
         :return: a new created project object
         """
+        if tags is None:
+            tags = []
         user_ID = user.user_ID
 
         # generate project dir
@@ -65,15 +67,13 @@ class ModuleBusiness(ProjectBusiness):
 
         # create a new project object
         create_time = datetime.utcnow()
-        dir_path = os.path.join(MODULE_DIR, user_ID, name)
         return cls.repo.create_one(name=name, description=description,
                                    create_time=create_time,
                                    update_time=create_time,
                                    type=type, tags=tags,
                                    hub_token=res.get('token'),
                                    path=project_path, user=user,
-                                   privacy=privacy, category=category,
-                                   module_path=dir_path)
+                                   privacy=privacy, category=category)
 
     @classmethod
     def get_by_id(cls, project_id, yml=False):
@@ -84,7 +84,7 @@ class ModuleBusiness(ProjectBusiness):
             dir_path = os.path.join(MODULE_DIR, user_ID, module.name)
             module.module_path = dir_path
             module.save()
-        if yml:
+        if yml and module.module_path:
             module.args = cls.load_module_params(module)
 
         return module
@@ -99,6 +99,9 @@ class ModuleBusiness(ProjectBusiness):
     @classmethod
     def publish(cls, project_id):
         module = cls.get_by_id(project_id, yml=False)
+        module.module_path = os.path.join(MODULE_DIR, module.user.user_ID,
+                                          module.name)
+        module.save()
         dst = module.module_path
         # if dir exists, remove it and copytree, cause copytree will
         #  create the dir

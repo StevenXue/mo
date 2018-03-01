@@ -208,9 +208,9 @@ class ProjectModal extends Component {
             >
           {
             getFieldDecorator('tags', {
-              initialValue: tags.join(','),
+              initialValue: tags,
               getValueFromEvent: (e) => {
-                return [...tags, e.target.value].join(',')
+                return [...tags, e.target.value]
               },
               rules: [
                 { required: false },

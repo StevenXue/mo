@@ -184,7 +184,8 @@ def create_project():
     description = data.pop('description')
     tags = data.pop('tags', '')
 
-    tags = str_utility.split_without_empty(tags)
+    if not isinstance(tags, list) and tags is not None:
+        data['tags'] = str_utility.split_without_empty(tags)
 
     project = project_service.create_project(name, description, user_ID,
                                              tags=tags,
