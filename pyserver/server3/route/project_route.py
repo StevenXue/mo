@@ -236,10 +236,16 @@ def remove_project(project_id):
     return jsonify({'response': result}), 200
 
 
-@project_app.route('/tensorboard/<string:project_id>', methods=['GET'])
-def get_tb(project_id):
-    # TODO
-    return jsonify({'response': 1}), 200
+# @project_app.route('/tensorboard/<string:project_id>', methods=['GET'])
+# def get_tb(project_id):
+#     return project_service.tb_proxy(project_id)
+#     # return jsonify({'response': 1}), 200
+#
+#
+# @project_app.route('/tensorboard/data', methods=['GET'])
+# def get_tb(project_id):
+#     # TODO
+#     return project_service.tb_proxy(project_id)
 
 
 @project_app.route('/playground/<string:project_id>', methods=['POST'])

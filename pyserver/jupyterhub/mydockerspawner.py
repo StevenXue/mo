@@ -33,14 +33,14 @@ class MyDockerSpawner(DockerSpawner):
         port = int(tb_resp[0]['HostPort'])
         return port
 
-    @staticmethod
-    def update_project_tb_port(project_name, tb_port):
+    def update_project_tb_port(self, project_name, tb_port):
         """
         auth jupyterhub with user token
         :param tb_port:
         :param project_name:
         :return: dict of res json
         """
+        print('update project tb_port: ', project_name, tb_port)
         return requests.put('{server}/project/projects/{project_name}?by=name'.
                             format(server='http://localhost:5000',
                                    project_name=project_name),
@@ -157,7 +157,6 @@ class MyDockerSpawner(DockerSpawner):
             self.user.server.ip = ip
             self.user.server.port = port
         tb_port = yield self.get_tb_port()
-        project_name = self.container_name.split('jupyter-')[1]
-        self.update_project_tb_port(project_name, tb_port)
+        self.update_project_tb_port(self.user.name, tb_port)
         # jupyterhub 0.7 prefers returning ip, port:
         return (ip, port)

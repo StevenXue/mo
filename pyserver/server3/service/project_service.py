@@ -39,6 +39,8 @@ from server3.constants import HUB_SERVER
 from server3.constants import ADMIN_TOKEN
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
+
+
 # TYPE_MAPPER = {
 #     'project': ProjectBusiness,
 #     'app': AppBusiness,
@@ -56,6 +58,15 @@ class TypeMapper:
     @classmethod
     def get(cls, attr='project'):
         return getattr(cls, attr)
+
+
+def tb_proxy(project_id):
+    port = ProjectBusiness.get_by_id(project_id).tb_port
+    resp = requests.post('{localhost}:{port}'.
+                         format(localhost='http://localhost', port=port)
+                         )
+    print(resp.content)
+    return resp.content
 
 
 def auth_hub_user(user_ID, project_name, user_token):
@@ -114,8 +125,8 @@ def create_project(name, description, user_ID, tags=[], user_token='',
     user = user_business.get_by_user_ID(user_ID)
     cls = TypeMapper.get(type)
     return cls.create_project(name=name, description=description,
-                       type=type, tags=tags, user=user,
-                       user_token=user_token, **kwargs)
+                              type=type, tags=tags, user=user,
+                              user_token=user_token, **kwargs)
 
 
 def update_project(project_id, name, description, is_private=True,

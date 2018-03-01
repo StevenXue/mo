@@ -286,8 +286,7 @@ class ProjectBusiness:
         :param description: str
         :return: a new created project object
         """
-        print(project_name)
-        [user_ID, project_name] = project_name.split('_2B')
+        [user_ID, project_name] = project_name.split('+')
         user = user_business.get_by_user_ID(user_ID)
         return cls.repo.update_unique_one(dict(name=project_name, user=user),
                                           data)
