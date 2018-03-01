@@ -5,26 +5,29 @@ const {CORS, api} = config
 
 
 // 新建 request
-export function createNewUserRequest(payload) {
+export function createNewUserRequest({body, onJson}) {
   // let category = encodeURIComponent(payload.category)
   // payload.user_ID = localStorage.getItem('user_ID')
   // noinspection JSAnnotator
+  console.log(body)
   return request(`${CORS}/user_requests`, {
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      title:payload.title,
-      input:payload.input,
-      output:payload.output,
-      description:payload.description,
-      tags:payload.tags,
-      category:payload.category,
-      dataset:payload.dataset,
-    }),
-  });
+    body: JSON.stringify(body),
+  }, { onJson });
 }
+
+// 更新 project
+export function updateUserRequest({ body, userRequestId, onJson }) {
+  return request(`${CORS}/user_requests/${userRequestId}`, {
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  }, { onJson })}
 
 
 // 获取某一个用户下 所有 request
@@ -35,7 +38,7 @@ export function fetchUserRequestByUserID(payload) {
 
 
 // 获取所有的 request
-export function fetchAllUserRequest(payload) {
+export function fetchAllUserRequest({payload, onJson}) {
   let params = ''
   for (let key in payload) {
     if (!payload.hasOwnProperty(key)) {
@@ -46,7 +49,7 @@ export function fetchAllUserRequest(payload) {
       params += `&${key}=${value}`
     }
   }
-  return request(`${CORS}/user_requests?${params}`);
+  return request(`${CORS}/user_requests?${params}`, undefined, { onJson });
 }
 
 

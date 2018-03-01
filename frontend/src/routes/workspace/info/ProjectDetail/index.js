@@ -69,7 +69,8 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
                 <Icon type={projectDetail.project.privacy === 'private'?'lock':'unlock'}
                       style={{ fontSize: 20}}/>
                 <span className={styles.rightButton}>
-                  <ProjectModel new={false} projectDetail={projectDetail}>
+                  <ProjectModel new={false} projectDetail={projectDetail}
+                                >
                     <Button icon='edit' style={{ marginRight: 15 }}/>
                   </ProjectModel>
                   <Button icon='delete' onClick={() => deleteProject()}/>

@@ -15,9 +15,12 @@ RELATED_FIELDS = ('Business', 'Government', 'Education', 'Environment',
                   'Health', 'Housing & Development', 'Public Services',
                   'Social', 'Transportation', 'Science', 'Technology')
 
+VALID_TYPE = ('app', 'module', 'dataset')
+
 
 class UserRequest(DynamicDocument):
     title = StringField(max_length=200, required=True)
+    type = StringField(choices=VALID_TYPE, required=True)
     category = ListField(StringField(max_length=100))
     description = StringField()
     create_time = DateTimeField(required=True)

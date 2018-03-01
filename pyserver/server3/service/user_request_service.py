@@ -41,10 +41,10 @@ def list_user_request_by_user_ID(user_ID, order=-1):
     return user_request
 
 
-def get_list(search_query, user_ID, page_no, page_size, entity_type='userRequest'):
+def get_list(type, search_query, user_ID, page_no, page_size, entity_type='userRequest'):
     user = user_business.get_by_user_ID(user_ID) if user_ID else None
     cls = EntityMapper.get(entity_type)
-    user_request, total_number = cls.get_list(search_query, user, False,
+    user_request, total_number = cls.get_list(type, search_query, user, False,
                                               page_no, page_size,
                                               get_total_number=True)
     return user_request, total_number
@@ -100,16 +100,9 @@ def create_user_request(title, user_ID, **kwargs):
         raise RuntimeError('Cannot create the new user_request')
 
 
-def update_user_request(user_request_id, request_title, request_description,
-                        request_dataset=None):
-    user_request = user_request_business.get_by_user_request_id(user_request_id)
-    ow = ownership_business.get_ownership_by_owned_item(user_request,
-                                                        'user_request')
-    user_request_business.update_user_request_by_id(
-        user_request_id=user_request_id,
-        request_title=request_title,
-        request_description=request_description,
-        request_dataset=request_dataset)
+def update_user_request(user_request_id, **kwargs):
+    return user_request_business.update_user_request_by_id(
+        user_request_id=user_request_id, **kwargs)
 
 
 def remove_user_request_by_id(user_request_id, user_ID):

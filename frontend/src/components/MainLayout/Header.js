@@ -6,7 +6,7 @@ import {Menu, Icon, Select, Input, Button, Badge} from 'antd'
 import {Link, routerRedux} from 'dva/router'
 import {FormattedMessage} from 'react-intl'
 import {config} from '../../utils'
-import PostRequestModal from '../../components/postRequestModal/postRequestModal'
+// import PostRequestModal from '../../components/postRequestModal/postRequestModal'
 import {JsonToArray} from "../../utils/JsonUtils"
 
 const Search = Input.Search
@@ -147,25 +147,6 @@ function Header({location, login, history, dispatch, allRequest,message}) {
             }
           }
         )}
-
-        <Menu.Item key={'/search'}>
-          <div>
-            <Search
-              placeholder="Search"
-              onSearch={value => console.log(values)}
-            />
-          </div>
-        </Menu.Item>
-
-        <Menu.Item key={'/postRequest'}>
-
-          <Button type="primary"
-                  onClick={() => onClickModifyModal(true)}>Post
-            Request</Button>
-          <PostRequestModal dispatch={dispatch}
-                            visible={allRequest.modalState}/>
-        </Menu.Item>
-
         <SubMenu
           className={styles.rightButton}
           title={
@@ -210,8 +191,6 @@ function Header({location, login, history, dispatch, allRequest,message}) {
           )
           }
         </SubMenu>
-
-
       </Menu>
     </div>
   </div>

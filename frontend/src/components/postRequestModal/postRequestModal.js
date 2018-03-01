@@ -14,6 +14,7 @@ const FormItem = Form.Item
 import {get} from 'lodash'
 import { dataCategory } from '../../constants'
 
+
 let timeout;
 let currentValue;
 
@@ -57,6 +58,7 @@ function hasErrors(fieldsError) {
 }
 
 class PostRequestModal extends React.Component {
+
   constructor (props) {
     super(props);
     this.state = {
@@ -76,8 +78,8 @@ class PostRequestModal extends React.Component {
       type: 'allRequest/makeNewRequest',
       payload: {
         title: values['requestTitle'],
+        type: values['requestType'].lower(),
         description: values['requestDescription'],
-        dataset: values['requestDataset'],
         input: values['requestInput'],
         output: values['requestOutput'],
         tags: values['requestTags'],
@@ -170,7 +172,7 @@ class PostRequestModal extends React.Component {
     const inputFieldError = isFieldTouched('inputField') && getFieldError('inputField')
     let tags = this.state.tags
     let options = this.state.data.map(d => <Option key={d.value}>{d.text}</Option>);
-
+    let requestType = ['App', 'Module', 'Dataset']
 
     return (
       <div>
@@ -232,6 +234,25 @@ class PostRequestModal extends React.Component {
                 {/*/>*/}
               {/*)}*/}
             {/*</FormItem>*/}
+            <h2>Type</h2>
+            <FormItem
+              validateStatus={inputFieldError ? 'error' : ''}
+              help={inputFieldError || ''}
+            >
+              {
+                getFieldDecorator('requestType', {
+                  rules: [
+                    { required: true },
+                  ],
+                })(
+                  <Select mode="multiple">
+                    {
+                      requestType.map(e => <Option key={e} value={e}>{e}</Option>)
+                    }
+                  </Select>
+                )
+              }
+            </FormItem>
 
             <h2>Category (Optional)</h2>
             <FormItem
@@ -346,24 +367,6 @@ class PostRequestModal extends React.Component {
                 <TextArea className={styles.inputtext}
                           autosize={{minRows: 2, maxRows: 50}}
                           placeholder="Define your output"
-                />
-              )}
-            </FormItem>
-            <h2>Dataset (Optional)</h2>
-            <FormItem
-              validateStatus={inputFieldError ? 'error' : ''}
-              help={inputFieldError || ''}
-            >
-              {getFieldDecorator('requestDataset', {
-                initialValue: this.initialValue('requestDataset'),
-                rules: [{
-                  required: false,
-                  message: 'hello'
-                }],
-              })(
-                <TextArea className={styles.inputtext}
-                          autosize={{minRows: 2, maxRows: 50}}
-                          placeholder="URL to your dataset"
                 />
               )}
             </FormItem>

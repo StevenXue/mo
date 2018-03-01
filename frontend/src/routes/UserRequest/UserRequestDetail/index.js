@@ -8,6 +8,7 @@ import {showTime} from '../../../utils/index'
 import BraftEditor from 'braft-editor'
 import 'braft-editor/dist/braft.css'
 import {JsonToArray} from "../../../utils/JsonUtils"
+import RequestModal from '../../../components/RequestModal/index'
 
 const {TextArea} = Input
 const TabPane = Tabs.TabPane
@@ -267,7 +268,13 @@ function UserRequestDetail({allRequest, login, dispatch}) {
               style={{fontSize: '22px', color: '#34c0e2'}}
               onClick={() => requestStar()}/>
             {focusUserRequest['title']} &nbsp;&nbsp;
-            {focusUserRequest['user_ID']===user_ID && <Icon type="close" onClick={() => deleteUserRequest()}/>}
+            {focusUserRequest['user_ID']===user_ID && <span className={styles.rightButton}>
+                  <RequestModal new={false} requestDetail={focusUserRequest}>
+                    <Button icon='edit' style={{ marginRight: 15 }}/>
+                  </RequestModal>
+                  <Button icon='delete' onClick={() => deleteUserRequest()}/>
+                </span>}
+            {/*{focusUserRequest['user_ID']===user_ID && <Icon type="close" onClick={() => deleteUserRequest()}/>}*/}
           </h2>
         </div>
         <div className={styles.requestuser}>

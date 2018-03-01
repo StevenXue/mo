@@ -42,10 +42,10 @@ export default {
     userRequestDic: {},
     focusUserRequest: null,
     loadingState: false,
-    modalState: false,
     pageNo:1,
     pageSize:10,
-    totalNumber:0
+    totalNumber:0,
+    modalVisible: false,
   },
   reducers: {
     // 获取所有的request
@@ -59,6 +59,15 @@ export default {
         }
       }
     },
+
+    showModal(state) {
+      return { ...state, modalVisible: true }
+    },
+
+    hideModal(state) {
+      return { ...state, modalVisible: false }
+    },
+
 
     changePageNoSize(state, action){
       return {
@@ -203,12 +212,7 @@ export default {
         }
       }
     },
-    showModal(state, action) {
-      return {
-        ...state,
-        modalState: action.payload.modalState,
-      }
-    },
+
 
     showLoading(state, action) {
       return {
@@ -256,8 +260,6 @@ export default {
       let payload =  action.payload
       payload.page_no = yield select(state => state.allRequest.pageNo)
       payload.page_size = yield select(state => state.allRequest.pageSize)
-      console.log('payload')
-      console.log(payload)
       const {data: {user_request:userRequest,total_number:totalNumber}} = yield call(
         userRequestService.fetchAllUserRequest, payload)
       if (userRequest.length > 0) {
@@ -388,10 +390,10 @@ export default {
       return history.listen(({pathname}) => {
         const match = pathToRegexp('/userrequest/:userrequestId').exec(pathname)
         if (pathname === '/userrequest') {
-          dispatch({
-            type: 'fetchAllRequest',
-            payload: {}
-          })
+          // dispatch({
+          //   type: 'fetchAllRequest',
+          //   payload: {}
+          // })
         } else if (match) {
           console.log('match')
           dispatch({

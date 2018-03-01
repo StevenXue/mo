@@ -56,7 +56,7 @@ class EntityBusiness:
         return entity
 
     @classmethod
-    def get_list(cls, search_query, user, privacy,
+    def get_list(cls, type, search_query, user, privacy,
                  page_no=DEFAULT_PAGE_NO,
                  page_size=DEFAULT_PAGE_SIZE,
                  get_total_number=False):
@@ -73,6 +73,8 @@ class EntityBusiness:
                                       })
         else:
             objects = cls.repo.read()  # 分页
+        if type:
+            objects = objects(type=type)
         if privacy:
             objects = objects(privacy=privacy)
         if user:
