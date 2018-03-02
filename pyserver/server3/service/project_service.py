@@ -32,7 +32,6 @@ from server3.business import served_model_business
 from server3.business import world_business
 from server3.entity.world import CHANNEL
 
-
 from server3.utility import json_utility
 from server3.repository import config
 from server3.constants import USER_DIR
@@ -642,3 +641,36 @@ class ProjectService:
         return cls.business.create_project(name=name, description=description,
                                            type=type, tags=tags, user=user,
                                            user_token=user_token, **kwargs)
+
+    @classmethod
+    def list_projects(cls, search_query, page_no=None, page_size=None,
+                      default_max_score=0.4, privacy=None,user_ID=None):
+        """
+        list projects
+        :param search_query:
+        :type search_query:
+        :param page_no:
+        :type page_no:
+        :param page_size:
+        :type page_size:
+        :param default_max_score:
+        :type default_max_score:
+        :param privacy:
+        :type privacy:
+        :param user_ID:
+        :type user_ID:
+        :return:
+        :rtype:
+        """
+
+        user = None
+        if user_ID:
+            user = user_business.get_by_user_ID(user_ID)
+        return cls.business.get_objects(
+            search_query=search_query,
+            privacy=privacy,
+            page_no=page_no,
+            page_size=page_size,
+            default_max_score=default_max_score,
+            user=user
+        )

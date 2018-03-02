@@ -5,20 +5,24 @@ import re
 import fileinput
 from copy import deepcopy
 from subprocess import call
+import synonyms
 
 from server3.entity import project
 from server3.business.project_business import ProjectBusiness
+from server3.business.general_business import GeneralBusiness
 from server3.repository.general_repo import Repo
 from server3.utility.json_utility import args_converter
 from server3.constants import APP_DIR
 from server3.constants import MODULE_DIR
 from server3.constants import INIT_RES
+from server3.constants import Error, Warning, ErrorMessage
 
 yaml_tail_path = 'app_spec.yml'
 
 
-class AppBusiness(ProjectBusiness):
+class AppBusiness(ProjectBusiness, GeneralBusiness):
     repo = Repo(project.App)
+    __cls = project.App
     base_func_path = './functions'
 
     @classmethod
@@ -156,5 +160,48 @@ class AppBusiness(ProjectBusiness):
     def create_project(cls, name, description, user, privacy='private',
                        tags=None, user_token='', type='app'):
         pass
+
+    @classmethod
+    def list_projects_chat(cls, search_query, page_no=None, page_size=None,
+                           default_max_score=0.4,):
+        start = (page_no - 1) * page_size
+        end = page_no * page_size
+
+        all_apps = cls.get_all()
+        #  比对打分
+        for app in all_apps:
+            # 是否赋值？
+            app.score = synonyms.compare(search_query, app.keyword, seg=True)
+        apps_score = sorted(all_apps, key=lambda item: -item.score)
+        max_score = apps_score[0]["score"]
+        if max_score < default_max_score:
+            raise Warning(ErrorMessage.no_match_apis)
+        else:
+            apps = apps_score
+            return apps[start:end]
+
+            # app_json = app.to_mongo()
+            # apps_score.append({
+            #     **app_json,
+            #     "score": synonyms.compare(search_query, app.keyword, seg=True)
+            # })
+
+            # TODO 以后可以更换成 object
+            # for api in apis:
+            #     api.score = synonyms.compare(search_query, api.keyword, seg=True)
+            # api_json = api.to_mongo()
+            # apis_score.append({
+            #     **api_json,
+            #     "score": synonyms.compare(search_query, api.keyword, seg=True)
+            # })
+
+        # apis_score = sorted(apps_score, key=lambda item: -item["score"])
+        # # 最大值
+        # max_score = apis_score[0]["score"]
+        # if max_score < default_max_score:
+        #     raise Warning(ErrorMessage.no_match_apis)
+        # else:
+        #     apis = apis_score
+        #     return apis[start:end]
 
 
