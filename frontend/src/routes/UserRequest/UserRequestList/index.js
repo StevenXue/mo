@@ -1,6 +1,6 @@
 import React from 'react'
 import {connect} from 'dva'
-import {Select, Card, Input, Icon, Button, Row, Col} from 'antd'
+import {Select, Card, Input, Icon, Button, Row, Col, Pagination } from 'antd'
 import {showTime} from '../../../utils/index'
 import {dataCategory} from '../../../constants'
 import {arrayToJson, JsonToArray} from '../../../utils/JsonUtils'
@@ -32,8 +32,20 @@ function AllRequest({history, allRequest, dispatch}) {
 
   function search(value) {
     dispatch({
-      type: 'publicServedModels/search',
+      type: 'allRequest/search',
       payload: {searchStr: value},
+    })
+  }
+
+  function onShowSizeChange(current, pageSize) {
+    dispatch({
+      type: 'allRequest/changePageNoSize',
+      payload: {pageNo:current,
+                pageSize:pageSize},
+    })
+    dispatch({
+      type: 'allRequest/fetchAllRequest',
+      payload: {},
     })
   }
 
@@ -75,7 +87,7 @@ function AllRequest({history, allRequest, dispatch}) {
                       <div className={styles.timeAndUserDiv}>
                         <p className={styles.showTime}>{showTime(e.create_time)}</p>
                         <p className={styles.showTime}>&nbsp;&nbsp; asked at &nbsp;&nbsp;</p>
-                        <p className={styles.showTime}>{e.user_id} </p>
+                        <p className={styles.showTime}>{e.user_ID} </p>
                       </div>
                     </div>
                   </div>
@@ -90,6 +102,11 @@ function AllRequest({history, allRequest, dispatch}) {
               {/*</Row>*/}
             </div>
           </Card>)}
+      </div>
+      <div className={styles.pagination}>
+        <Pagination showSizeChanger onShowSizeChange={onShowSizeChange}
+                    onChange={onShowSizeChange}
+                    defaultCurrent={1} total={allRequest.totalNumber} />
       </div>
     </div>
   )

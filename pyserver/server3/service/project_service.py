@@ -164,8 +164,9 @@ def list_projects_by_user_ID(user_ID, order=-1, privacy='all'):
         projects = ownership_service.get_all_public_objects('project')
     else:
         if privacy == 'all':
+            user = user_business.get_by_user_ID(user_ID)
             projects = ownership_service. \
-                get_ownership_objects_by_user_ID(user_ID, 'project')
+                get_ownership_objects_by_user_ID(user, 'project')
         elif privacy == 'private':
             projects = ownership_service. \
                 get_privacy_ownership_objects_by_user_ID(user_ID, 'project',

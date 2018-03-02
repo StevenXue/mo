@@ -192,7 +192,7 @@ function Header({location, login, history, dispatch, allRequest,message}) {
 
         </SubMenu>
         <SubMenu
-          className={styles.rightButton}
+          className={styles.messageSubmenu}
           title={
             <span onClick={toLoginPage}>
                 <Badge count={login.user ? numberOfUnreadMessage() : 0}>
@@ -202,7 +202,7 @@ function Header({location, login, history, dispatch, allRequest,message}) {
           }
         >
           {login.user && JsonToArray(message.messages).map(e =>
-            <Menu.Item key={e._id}>
+            <Menu.Item key={e._id} className={styles.messageMenuItem}>
               <div onClick={() => toMessage(e.user_request,e.receiver_id)}>
                 {e.user_ID}评论了您关注的需求{e.user_request_title}
               </div>

@@ -6,10 +6,15 @@ from server3.service import ownership_service
 from server3.service import message_service
 from server3.business import user_request_business
 from bson import ObjectId
+from server3.service.user_request_service import EntityMapper
 
-def get_all_answer_of_this_user_request(user_request_id):
-    request_answer = request_answer_business. \
-        get_all_answer_of_this_user_request(user_request_id)
+
+def get_all_answer_of_this_user_request(user_request_id, get_number=False,
+                                        entity_type='requestAnswer'):
+    # request_answer = request_answer_business. \
+    #     get_all_answer_of_this_user_request(user_request_id)
+    cls = EntityMapper.get(entity_type)
+    request_answer = cls.get_by_user_request_id(user_request_id, get_number)
     return request_answer
 
 
@@ -95,9 +100,10 @@ def update_request_answer(request_answer_id, user_id, answer):
         )
 
 
-def list_request_answer_by_user_id(user_id, order=-1):
-    request_answer = ownership_service. \
-        get_ownership_objects_by_user_ID(user_id, 'request_answer')
+def list_request_answer_by_user_id(user_ID, order=-1):
+    user = user_business.get_by_user_ID(user_ID)
+    request_answer = ownership_business. \
+        get_ownership_objects_by_user(user, 'request_answer')
     if order == -1:
         request_answer.reverse()
     return request_answer
