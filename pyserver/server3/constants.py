@@ -22,6 +22,17 @@ KUBE_NAME = {
     'serving': '{job_id}-serving'
 }
 MODULE_DIR = './server3/lib/modules'
+APP_DIR = './functions'
+INIT_RES = [
+    r"# coding: utf-8",
+    r"import os",
+    r"import sys",
+    r"# Please use current \(work\) folder to store your data and models",
+    r"sys.path.append\('\.\./'\)",
+    r"client = Client\('(.+)'\)",
+    r"from modules import (.+)",
+    r"(\S+) = client\.(\S+)",
+]
 PARAMETER_SPEC = [
     {
         "name": "validation",

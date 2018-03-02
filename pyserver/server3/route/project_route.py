@@ -184,7 +184,8 @@ def create_project():
     description = data.pop('description')
     tags = data.pop('tags', '')
 
-    tags = str_utility.split_without_empty(tags)
+    if not isinstance(tags, list) and tags is not None:
+        data['tags'] = str_utility.split_without_empty(tags)
 
     project = project_service.create_project(name, description, user_ID,
                                              tags=tags,
@@ -194,18 +195,34 @@ def create_project():
     return jsonify({'response': project}), 200
 
 
-@project_app.route('/projects/<string:project_id>', methods=['PUT'])
-def update_project(project_id):
+# @project_app.route('/projects/<string:project_id>', methods=['PUT'])
+# def update_project(project_id):
+#     data = request.get_json()
+#     description = data.get('description')
+#     privacy = data.get('privacy')
+#     tags = data.get('tags', '')
+#     tb_port = data.get('tb_port', None)
+#
+#     if not isinstance(tags, list):
+#         tags = str_utility.split_without_empty(tags)
+#
+#     ProjectBusiness.update_project(project_id, description, privacy,
+#                                    tags=tags, tb_port=tb_port)
+#     return jsonify({'response': 'create project success'}), 200
+
+
+@project_app.route('/projects/<string:project_identity>', methods=['PUT'])
+def update_project(project_identity):
     data = request.get_json()
-    description = data.get('description')
-    privacy = data.get('privacy')
-    tags = data.get('tags', '')
 
-    if not isinstance(tags, list):
-        tags = str_utility.split_without_empty(tags)
+    tags = data.get('tags')
+    if not isinstance(tags, list) and tags is not None:
+        data['tags'] = str_utility.split_without_empty(tags)
 
-    ProjectBusiness.update_project(project_id, description, privacy,
-                                   tags=tags)
+    if request.args.get('by') == 'name':
+        ProjectBusiness.update_project_by_name(project_identity, **data)
+    else:
+        ProjectBusiness.update_project(project_identity, **data)
     return jsonify({'response': 'create project success'}), 200
 
 
@@ -218,6 +235,18 @@ def remove_project(project_id):
         return jsonify({'response': 'no user_ID arg'}), 400
     result = ProjectBusiness.remove_project_by_id(project_id, user_ID)
     return jsonify({'response': result}), 200
+
+
+# @project_app.route('/tensorboard/<string:project_id>', methods=['GET'])
+# def get_tb(project_id):
+#     return project_service.tb_proxy(project_id)
+#     # return jsonify({'response': 1}), 200
+#
+#
+# @project_app.route('/tensorboard/data', methods=['GET'])
+# def get_tb(project_id):
+#     # TODO
+#     return project_service.tb_proxy(project_id)
 
 
 @project_app.route('/playground/<string:project_id>', methods=['POST'])

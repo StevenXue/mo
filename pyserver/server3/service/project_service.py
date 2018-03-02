@@ -64,6 +64,15 @@ class TypeMapper:
         return getattr(cls, attr)
 
 
+def tb_proxy(project_id):
+    port = ProjectBusiness.get_by_id(project_id).tb_port
+    resp = requests.post('{localhost}:{port}'.
+                         format(localhost='http://localhost', port=port)
+                         )
+    print(resp.content)
+    return resp.content
+
+
 def auth_hub_user(user_ID, project_name, user_token):
     """
     auth jupyterhub with user token

@@ -23,11 +23,9 @@ from server3.service.app_service import AppService
 from server3.service.logger_service import emit_error
 from server3.service.logger_service import emit_success
 from server3.service.logger_service import save_job_status
+from server3.service import app_service
 from server3.business.app_business import AppBusiness
-from server3.business import job_business
-from server3.business import project_business
-from server3.business import toolkit_business
-from server3.business import ownership_business
+
 from server3.utility import json_utility
 from server3.utility import str_utility
 
@@ -55,7 +53,8 @@ def deploy_in_docker(app_id):
 def add_used_module(app_id):
     data = request.get_json()
     used_modules = data.get('used_modules', [])
-    app = AppBusiness.add_used_module(app_id, used_modules)
+    func = data.get('func')
+    app = app_service.add_used_module(app_id, used_modules, func)
     return jsonify({"response": json_utility.convert_to_json(app.to_mongo())})
 
 
@@ -98,6 +97,17 @@ def add():
         **data)
     project = json_utility.convert_to_json(project.to_mongo())
     return jsonify({'response': project}), 200
+
+
+@app_app.route('/<app_id>', methods=['GET'])
+def get_module(app_id):
+    yml = request.args.get('yml')
+    yml = str(yml).lower() == 'true'
+    app = AppBusiness.get_by_id(app_id, yml=yml)
+    app = json_utility.convert_to_json(app.to_mongo())
+    return jsonify({
+        "response": app
+    }), 200
 
 
 if __name__ == "__main__":

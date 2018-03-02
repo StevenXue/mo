@@ -29,10 +29,10 @@ export class ModulePage extends React.Component {
     this.state = {
       projects: [],
     }
-    const hash = window.location.hash;
-    const match = pathToRegexp('#/workspace/:appId/:type').exec(hash);
+    const hash = window.location.hash
+    const match = pathToRegexp('#/workspace/:appId/:type').exec(hash)
     if (match) {
-      this.appId = match[1];
+      this.appId = match[1]
     }
   }
 
@@ -106,7 +106,7 @@ export class ModulePage extends React.Component {
         `result = ${this.state.func}('${user_ID}/${this.state.project.name}', conf)`,
       ],
     )
-    addModuleToApp({appId: this.appId, moduleId: this.state.projectId})
+    addModuleToApp({ appId: this.appId, moduleId: this.state.projectId, func: this.state.func })
   }
 
   setValue(values) {
@@ -162,10 +162,12 @@ export class ModulePage extends React.Component {
                     style={{ margin: '5px 3px', cursor: 'pointer' }}>
                 <Col>
                   {project.description}
-                  <Row>
+                  {project.category ? <Row>
                     <Button onClick={() => this.clickProject(project, 'train')}>train</Button>
                     <Button onClick={() => this.clickProject(project, 'predict')}>predict</Button>
-                  </Row>
+                  </Row> : <Row>
+                    <Button onClick={() => this.clickProject(project, 'run')}>train</Button>
+                  </Row>}
                 </Col>
               </Card>)}
           </div>
