@@ -70,6 +70,8 @@ def get_api_list():
     user_ID = request.args.get('user_ID', None)
     default_max_score = float(request.args.get('max_score', 0.4))
 
+    print("get_type", get_type)
+
     try:
         api_list = api_service.get_api_list(
             get_type=get_type,

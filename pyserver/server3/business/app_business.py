@@ -76,3 +76,10 @@ class AppBusiness(ProjectBusiness):
                           r"""from function.modules import \1""",
                           line.rstrip())
             print(line)
+
+    @classmethod
+    def create_project(cls, name, description, user, privacy='private',
+                       tags=None, user_token='', type='app'):
+        pass
+
+

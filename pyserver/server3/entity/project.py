@@ -62,10 +62,58 @@ RE_TYPE = (
 )
 
 
+class AppGetType:
+    all = "all"
+    favor = "favor"
+    star = "star"
+    used = "used"
+    chat = 'chat'
+
+
 class App(Project):
-    url = StringField(max_length=50)
-    used_modules = ListField(ReferenceField(Module))
-    keyword = StringField(max_length=30)
+    # 继承Project
+    # # 名称
+    # name = StringField(max_length=50)
+    # # 创建时间
+    # create_time = DateTimeField()
+    # # 更新时间
+    # update_time = DateTimeField()
+    # # api目的描述
+    # description = StringField(max_length=50, required=True)
+    # # 收藏这条api的用户
+    # favor_users = ListField(ReferenceField("User"))
+    # # 点赞这条api的用户
+    # star_users = ListField(ReferenceField("User"))
+    # # tags
+    # tags = ListField(StringField())
+    # # 发布者
+    # user = ReferenceField("User")
+
+    # api对应的网址尾缀如: /api/xxx/xxxx
+    url = StringField(max_length=50, required=True)
+    # 此条api对应的关键词匹配
+    keyword = StringField(max_length=30, unique=True, required=True)
+    # 输入格式 url的额外信息 如body,parameters
     input = DictField()
+    # 输出格式
     output = DictField()
+    # api status
     status = IntField(choices=RE_TYPE)
+    # 模拟的数据
+    fake_response = StringField()
+    # 调用次数
+    usage_count = IntField(default=0)
+    # 文档字符串
+    doc = StringField()
+    # 使用过的modules
+    used_modules = ListField(ReferenceField(Module))
+
+    # # http_req是get还是post 全部是post
+    # http_req = StringField(required=True)
+
+    # url = StringField(max_length=50)
+    # used_modules = ListField(ReferenceField(Module))
+    # keyword = StringField(max_length=30)
+    # input = DictField()
+    # output = DictField()
+    # status = IntField(choices=RE_TYPE)

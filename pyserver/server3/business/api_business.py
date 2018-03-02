@@ -5,7 +5,7 @@ import datetime
 from server3.entity.api import Api
 from server3.repository.general_repo import Repo
 from server3.business import world_business
-from server3.entity.world import Channel
+from server3.entity.world import CHANNEL
 api_repo = Repo(Api)
 
 
@@ -27,7 +27,7 @@ def add(name, user, **kwargs):
     :rtype:
     """
     message = "{}创建了app{}".format(user.name, name)
-    world_business.system_send(channel=Channel.api, message=message)
+    world_business.system_send(channel=CHANNEL.api, message=message)
     url = "/" + user.user_ID + "/" + name + "/" + uuid.uuid4()
     create_time = datetime.datetime.utcnow()
     api = Api(name=name, user=user, url=url, create_time=create_time, update_time=create_time,

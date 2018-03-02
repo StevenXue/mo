@@ -15,18 +15,21 @@ from flask import request
 from flask_jwt_extended import jwt_required
 from bson import ObjectId
 
-from server3.service import job_service
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
+from server3.service import job_service, project_service
+from server3.service.app_service import AppService
+
+from server3.service.logger_service import emit_error
+from server3.service.logger_service import emit_success
+from server3.service.logger_service import save_job_status
 from server3.business.app_business import AppBusiness
-
 from server3.business import job_business
-
 from server3.business import project_business
 from server3.business import toolkit_business
 from server3.business import ownership_business
 from server3.utility import json_utility
-from server3.service.logger_service import emit_error
-from server3.service.logger_service import emit_success
-from server3.service.logger_service import save_job_status
+from server3.utility import str_utility
 
 PREFIX = "/app"
 
@@ -63,6 +66,38 @@ def nb_to_script(app_id):
     nb_path = data.get('nb_path')
     AppBusiness.nb_to_script(app_id, nb_path)
     return jsonify({"response": 1})
+
+
+@app_app.route("/", methods=["POST"])
+@jwt_required
+def add():
+    """
+    :return:
+    :rtype:
+    """
+    if not request.json \
+        or 'name' not in request.json \
+        or 'type' not in request.json:
+        return jsonify({'response': 'insufficient arguments'}), 400
+
+    user_token = request.headers.get('Authorization').split()[1]
+    user_ID = get_jwt_identity()
+
+    data = request.get_json()
+    name = data.pop('name')
+    type = "app"  # data.pop('type')
+    description = data.pop('description')
+    tags = data.pop('tags', '')
+
+    tags = str_utility.split_without_empty(tags)
+
+    project = AppService.create_project(
+        name, description, user_ID,
+        tags=tags,
+        type=type, user_token=user_token,
+        **data)
+    project = json_utility.convert_to_json(project.to_mongo())
+    return jsonify({'response': project}), 200
 
 
 if __name__ == "__main__":

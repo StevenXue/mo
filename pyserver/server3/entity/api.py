@@ -54,6 +54,7 @@ class Api(DynamicDocument):
     user = ReferenceField("User")
     # 文档字符串
     doc = StringField()
+
     meta = {'indexes': [
         {'fields': ['$name', "$keyword", '$description'],
          'default_language': "english",

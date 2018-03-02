@@ -66,7 +66,7 @@ def list_user_request():
 @jwt_required
 def create_user_request():
     if not request.json \
-            or 'request_title' not in request.json:
+            or 'request_title' not in request.json :
         return jsonify({'response': 'insufficient arguments'}), 400
     data = request.get_json()
     request_title = data['request_title']
@@ -125,7 +125,7 @@ def update_user_request_star():
 def update_user_request():
     user_request_id = request.args.get("user_request_id")
     if not request.json \
-            or 'requestTitle' not in request.json:
+        or 'requestTitle' not in request.json:
         return jsonify({'response': 'insufficient arguments'}), 400
     data = request.get_json()
     request_title = data['requestTitle']
