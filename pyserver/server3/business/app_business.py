@@ -83,7 +83,7 @@ class AppBusiness(ProjectBusiness):
         args = {}
         # copy module yaml to app yaml
         for module in used_modules:
-            func_args = module.to_mongo()['args'][func]
+            func_args = dict(module.args)[func]
             if os.path.isfile(app_yaml_path):
                 with open(app_yaml_path, 'r') as stream:
                     # read args
