@@ -21,5 +21,6 @@ class RequestAnswer(DynamicDocument):
     answer = StringField()
     create_time = DateTimeField(required=True)
     edit_time = DateTimeField()
-    answer_user_id = StringField(required=True)
+    answer_user_ID = StringField(required=True)
     votes_up_user = ListField(ReferenceField('User'))
+    select_project = ReferenceField('Project')

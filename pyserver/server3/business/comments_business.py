@@ -29,12 +29,12 @@ def get_by_user_request_comments_id(user_request_comments_id):
     )
 
 
-def add_user_request_comments(user_request_id, comments_user_id, comments,
+def add_user_request_comments(user_request_id, comments_user_ID, comments,
                               comments_type, request_answer_id):
     kw = {
         'user_request_id': ObjectId(user_request_id),
         'create_time': datetime.utcnow(),
-        'comments_user_id': comments_user_id,
+        'comments_user_ID': comments_user_ID,
         'comments': comments,
         'comments_type': comments_type,
     }

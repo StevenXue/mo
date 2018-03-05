@@ -123,7 +123,7 @@ class ProjectModal extends Component {
     let tags = this.state.tags
     if (projectDetail) {
       ({ name, description, type, privacy } = projectDetail.project)
-      tags = tags.length > 0 ? tags : projectDetail.project.tags
+      tags = tags.length > 0 ? [...projectDetail.project.tags, ...tags] : projectDetail.project.tags
     }
 
     return (

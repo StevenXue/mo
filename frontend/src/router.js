@@ -19,6 +19,8 @@ import UserRequestDetail from  './routes/UserRequest/UserRequestDetail'
 import MyService from './routes/MyService'
 import {ModuleList, Module} from './routes/Module'
 import Profile from './routes/Profile'
+import MarketList from './routes/market/ProjectList'
+import MarketDetail from './routes/market/ProjectDetail'
 
 const breadcrumbNameMap = {
   '/user': 'User',
@@ -30,7 +32,8 @@ const breadcrumbNameMap = {
   '/myservice':'My Service',
   '/userrequest':'User Request',
   '/modellist':'Module',
-  'profile': "Profile"
+  '/profile': "Profile",
+  '/market':'MarketList'
 }
 
 const RouterConfig = ({ history, location, projectDetail }) => {
@@ -75,6 +78,10 @@ const RouterConfig = ({ history, location, projectDetail }) => {
           <Route path="/workspace" component={MyProjects}/>
           <Route path="/projects/:projectId" component={PublicProject}/>
           <Route path="/projects" component={Projects}/>
+
+          <Route path="/market/:projectId" component={MarketDetail}/>
+          <Route path="/market" component={MarketList}/>
+
           <Route path="/modelmarket/:modelsId" component={PublicServedModelsDetail}/>
           <Route path="/modelmarket" component={PublicServedModels}/>
           <Route path="/myservice" component={MyService}/>

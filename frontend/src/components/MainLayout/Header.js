@@ -6,7 +6,7 @@ import {Menu, Icon, Select, Input, Button, Badge} from 'antd'
 import {Link, routerRedux} from 'dva/router'
 import {FormattedMessage} from 'react-intl'
 import {config} from '../../utils'
-import PostRequestModal from '../../components/postRequestModal/postRequestModal'
+// import PostRequestModal from '../../components/postRequestModal/postRequestModal'
 import {JsonToArray} from "../../utils/JsonUtils"
 
 const Search = Input.Search
@@ -27,32 +27,38 @@ const menuConfig = [
     Link: '/workspace',
     Icon: null,
     text: 'Workspace',
-    dropdown: [
-      {
-        key: '/myprojects',
-        Link: '/workspace',
-        Icon: null,
-        text: 'My Projects',
-      },
-      {
-        key: '/myservice',
-        Link: '/myservice',
-        Icon: null,
-        text: 'My Service',
-      },
-    ]
+    // dropdown: [
+    //       {
+    //     key: '/myprojects',
+    //     Link: '/workspace',
+    //     Icon: null,
+    //     text: 'My Projects',
+    //   },
+    //   {
+    //     key: '/myservice',
+    //     Link: '/myservice',
+    //     Icon: null,
+    //     text: 'My Service',
+    //   },
+    // ]
   },
+  // {
+  //   key: '/projects',
+  //   Link: '/projects',
+  //   Icon: null,
+  //   text: 'Projects',
+  // },
+  // {
+  //   key: '/modelmarket',
+  //   Link: '/modelmarket',
+  //   Icon: null,
+  //   text: 'Model Market',
+  // },
   {
-    key: '/projects',
-    Link: '/projects',
+    key: '/market',
+    Link: '/market',
     Icon: null,
-    text: 'Projects',
-  },
-  {
-    key: '/modelmarket',
-    Link: '/modelmarket',
-    Icon: null,
-    text: 'Model Market',
+    text: 'Market',
   },
   {
     key: '/userrequest',
@@ -147,25 +153,6 @@ function Header({location, login, history, dispatch, allRequest,message}) {
             }
           }
         )}
-
-        <Menu.Item key={'/search'}>
-          <div>
-            <Search
-              placeholder="Search"
-              onSearch={value => console.log(values)}
-            />
-          </div>
-        </Menu.Item>
-
-        <Menu.Item key={'/postRequest'}>
-
-          <Button type="primary"
-                  onClick={() => onClickModifyModal(true)}>Post
-            Request</Button>
-          <PostRequestModal dispatch={dispatch}
-                            visible={allRequest.modalState}/>
-        </Menu.Item>
-
         <SubMenu
           className={styles.rightButton}
           title={
@@ -210,8 +197,6 @@ function Header({location, login, history, dispatch, allRequest,message}) {
           )
           }
         </SubMenu>
-
-
       </Menu>
     </div>
   </div>

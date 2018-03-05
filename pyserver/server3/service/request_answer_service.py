@@ -30,15 +30,13 @@ def get_by_id(request_answer_id):
     return request_answer
 
 
-def create_request_answer(user_request_id, user_id, answer):
+def create_request_answer(**data):
     # create a new request_answer object
     created_request_answer = request_answer_business. \
-        add_request_answer(user_request_id=user_request_id,
-                           answer_user_id=user_id,
-                           answer=answer)
+        add_request_answer(**data)
     if created_request_answer:
         # get user object
-        user = user_business.get_by_user_ID(user_ID=user_id)
+        user = user_business.get_by_user_ID(user_ID=data['answer_user_ID'])
         # create ownership relation
         if ownership_business.add(user,
                                   request_answer=
@@ -46,8 +44,8 @@ def create_request_answer(user_request_id, user_id, answer):
 
             #  新建通知消息
             admin_user = user_business.get_by_user_ID('admin')
-            user_request = user_request_business.\
-                get_by_user_request_id(user_request_id)
+            user_request = user_request_business. \
+                get_by_user_request_id(data['user_request_id'])
             receivers = list({'obj_id': el} for el in user_request.star_user)
             if message_service.create_message(
                     sender=admin_user,

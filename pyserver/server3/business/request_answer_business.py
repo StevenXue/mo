@@ -46,13 +46,10 @@ def get_by_request_answer_id(request_answer_id):
     )
 
 
-def add_request_answer(user_request_id, answer_user_id, answer):
+def add_request_answer(**data):
     now = datetime.utcnow()
     request_answer_obj = RequestAnswer(
-        user_request_id=ObjectId(user_request_id),
-        create_time=now,
-        answer_user_id=answer_user_id,
-        answer=answer
+        create_time=now, **data
         )
     return request_answer_repo.create(request_answer_obj)
 
