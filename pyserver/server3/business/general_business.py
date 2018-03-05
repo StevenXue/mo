@@ -3,7 +3,7 @@ from server3.repository.general_repo import Repo
 
 class GeneralBusiness:
     # 实例化后的 instance 走general repo
-    repo = Repo()
+    repo = Repo(None)
     # class 不走general repo
     __cls = None
 

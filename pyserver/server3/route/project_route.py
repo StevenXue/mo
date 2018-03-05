@@ -61,7 +61,7 @@ def list_projects_by_query():
             "message": e.args[0]["hint_message"]
         }), 404
     else:
-        projects = json_utility.me_obj_list_to_json_list(projects)
+        projects = json_utility.me_obj_list_to_json_list(projects.objects)
         return jsonify({
             "response": projects
         }), 200

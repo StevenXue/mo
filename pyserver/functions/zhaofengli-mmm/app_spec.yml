@@ -205,17 +205,6 @@ flight_delay_prediction_param_9:
   type: input
   value: null
   value_type: float
-sesese_param_23: &id001 !!python/object/new:mongoengine.base.datastructures.BaseDict
-  dictitems:
-    default: null
-    des: ''
-    name: data_path
-    range: null
-    required: false
-    type: input
-    value: null
-    value_type: str
-  state: *id001
 weather_prediction_param_1:
   default: null
   des: ''

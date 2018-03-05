@@ -6,6 +6,8 @@ Author: Bingwei Chen
 Date: 2017.10.20
 
 """
+# Todo 获取用户 自己使用过的apis，自己收藏的apis, 自己star的apis,  移到user那边
+
 import sys, traceback
 
 from flask import Blueprint
@@ -104,7 +106,7 @@ def get_module(app_id):
     }), 200
 
 
-@app_app.route('/', methods=['GET'])
+@app_app.route('', methods=['GET'])
 @jwt_required
 def get_api_list():
     """
@@ -124,7 +126,6 @@ def get_api_list():
             default_max_score=default_max_score, privacy=None,
             user_ID=None
         )
-
     except Warning as e:
         return jsonify({
             "response": [],
@@ -135,13 +136,20 @@ def get_api_list():
             "message": e.args[0]["hint_message"]
         }), 404
     else:
-        api_list = json_utility.me_obj_list_to_json_list(api_list)
+        objects = api_list.objects
+        # objects = api_list["objects"]
+        objects = json_utility.me_obj_list_to_json_list(objects)
         return jsonify({
-            "response": api_list
+            "response": {
+                "objects": objects,
+                "count": api_list.count,
+                "page_no": api_list.page_no,
+                "page_size": api_list.page_size
+
+            },
         }), 200
 
 
-# 获取用户 自己使用过的apis，自己收藏的apis, 自己star的apis,  移到user那边
 # 这个获取 chat
 @app_app.route('/chat', methods=['GET'])
 @jwt_required
@@ -156,6 +164,9 @@ def get_chat_api_list():
     page_size = int(request.args.get('page_size', 5))
     search_query = request.args.get('search_query', None)
     default_max_score = float(request.args.get('max_score', 0.4))
+
+    if not search_query:
+        return jsonify({'response': 'no search_query arg'}), 400
     try:
         api_list = AppBusiness.list_projects_chat(
             search_query, page_no=page_no, page_size=page_size,
@@ -171,12 +182,25 @@ def get_chat_api_list():
             "message": e.args[0]["hint_message"]
         }), 404
     else:
-        api_list = json_utility.convert_to_json(api_list)
+
+        objects = json_utility.me_obj_list_to_json_list(api_list.objects)
         return jsonify({
-            "response": api_list
+            "response": {
+                "objects": objects,
+                "count": api_list.count,
+                "page_no": api_list.page_no,
+                "page_size": api_list.page_size,
+            }
         }), 200
 
 
+@app_app.route("/run/<app_id>", methods=["POST"])
+@jwt_required
+def run_app(app_id):
+    data = request.get_json()
+    input_json = data["app"]["input"]
+    result = AppService.run_app(app_id, input_json=input_json)
+    return jsonify({"response": result})
 
-if __name__ == "__main__":
-    pass
+# if __name__ == "__main__":
+#     pass

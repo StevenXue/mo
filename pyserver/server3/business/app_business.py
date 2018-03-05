@@ -16,7 +16,7 @@ from server3.constants import APP_DIR
 from server3.constants import MODULE_DIR
 from server3.constants import INIT_RES
 from server3.constants import Error, Warning, ErrorMessage
-
+from server3.entity.general_entity import Objects
 yaml_tail_path = 'app_spec.yml'
 
 
@@ -170,38 +170,46 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         all_apps = cls.get_all()
         #  比对打分
         for app in all_apps:
-            # 是否赋值？
-            app.score = synonyms.compare(search_query, app.keyword, seg=True)
-        apps_score = sorted(all_apps, key=lambda item: -item.score)
-        max_score = apps_score[0]["score"]
-        if max_score < default_max_score:
-            raise Warning(ErrorMessage.no_match_apis)
-        else:
-            apps = apps_score
-            return apps[start:end]
+            name_score = synonyms.compare(search_query, app.name, seg=True)
+            description_score = synonyms.compare(search_query, app.description, seg=True)
+            app.score = (name_score + description_score) / 2
+        # 筛选掉小于 description_score
+        apps = list(filter(lambda app: app.score >= default_max_score, all_apps))
 
-            # app_json = app.to_mongo()
-            # apps_score.append({
-            #     **app_json,
-            #     "score": synonyms.compare(search_query, app.keyword, seg=True)
-            # })
-
-            # TODO 以后可以更换成 object
-            # for api in apis:
-            #     api.score = synonyms.compare(search_query, api.keyword, seg=True)
-            # api_json = api.to_mongo()
-            # apis_score.append({
-            #     **api_json,
-            #     "score": synonyms.compare(search_query, api.keyword, seg=True)
-            # })
-
-        # apis_score = sorted(apps_score, key=lambda item: -item["score"])
-        # # 最大值
-        # max_score = apis_score[0]["score"]
+        count = len(apps)
+        apps = sorted(apps, key=lambda item: -item.score)
+        return Objects(
+            objects=apps[start:end],
+            count=count,
+            page_no=page_no,
+            page_size=page_size
+        )
+        # apps_score.count()
+        # max_score = apps_score[0].score
         # if max_score < default_max_score:
         #     raise Warning(ErrorMessage.no_match_apis)
         # else:
-        #     apis = apis_score
-        #     return apis[start:end]
+        #     apps = apps_score
+        #     count = apps_score.count()
+        #     return {
+        #         "objects": apps[start:end],
+        #         "count": count,
+        #         "page_no": page_no,
+        #         "page_size": page_size,
+        #     }
+        #     # return apps[start:end]
+    # @classmethod
+    # def run_app(cls, app_id, input_json):
+    #     app = AppBusiness.get_by_id(project_id=app_id)
+    #     url = app.user.user_ID+"-"+app.name
+    #     domin = "192.168.31.23:8080/function/"
+    #     url = domin+url
+    #     payload = input_json
+    #     headers = {
+    #         'content-type': "application/json",
+    #     }
+    #     response = requests.request("POST", url, data=payload, headers=headers)
+    #     return response.json()
+
 
 

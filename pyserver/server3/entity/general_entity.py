@@ -3,6 +3,7 @@
 from mongoengine import connect
 from mongoengine import DynamicDocument
 from pymongo import UpdateOne
+import collections
 
 from server3.repository import config
 import json
@@ -21,3 +22,6 @@ class GeneralDynamicDocument(DynamicDocument):
     @classmethod
     def read(cls, query):
         return cls.objects(**query).order_by('-_id')
+
+
+Objects = collections.namedtuple('Objects', ('objects', 'count', 'page_no', 'page_size'))

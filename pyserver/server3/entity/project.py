@@ -94,7 +94,7 @@ class App(Project):
     # api对应的网址尾缀如: /api/xxx/xxxx
     url = StringField(max_length=50, required=True)
     # 此条api对应的关键词匹配
-    keyword = StringField(max_length=30, unique=True, required=True)
+    # keyword = StringField(max_length=30, unique=True, required=True)
     # 输入格式 url的额外信息 如body,parameters
     input = DictField()
     # 输出格式
