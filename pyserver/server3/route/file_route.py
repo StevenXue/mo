@@ -44,7 +44,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@file_app.route('/module', methods=['POST'])
+@file_app.route('/project_file', methods=['POST'])
 def upload_file_module():
     # check if the post request has the file part
     if 'file' not in request.files:
@@ -61,8 +61,8 @@ def upload_file_module():
 
     data = dict(request.form.items())
     user_ID = data["user_ID"]
-    module_id = data["module_id"]
-    module = ModuleBusiness.get_by_id(module_id)
+    project_id = data["project_id"]
+    module = ModuleBusiness.get_by_id(project_id)
     store_path = '{}{}/{}/'.format(MODULE_FILE_PATH, user_ID, module.name)
 
     # 如果路径不存在创建路径

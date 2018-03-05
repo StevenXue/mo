@@ -228,7 +228,6 @@ class ProjectModal extends Component {
                 })}
                 {this.state.inputVisible ? (
                   <Input
-                    // auto focus but cannot use onBlur
                     ref={input => input && input.focus()}
                     type="text"
                     size="small"

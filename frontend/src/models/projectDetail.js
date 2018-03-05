@@ -74,6 +74,11 @@ export default {
       yield call(deleteProject, payload)
       yield put(routerRedux.push('/workspace'))
     },
+    *setEntered({ projectId }, { call, put }) {
+      console.log(projectId)
+      yield call(updateProject, {projectId, body: {entered: true}})
+      yield put({ type: 'fetch', projectId })
+    },
     *update({ body, fetchData }, { call, put, select }) {
       const projectId = yield select(state => state.projectDetail.project._id)
       // const user_ID = 'dev_1'
