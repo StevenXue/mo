@@ -19,4 +19,4 @@ goldersgreen.iml
 pyserver/user_directory/
 
 /pyserver/jupyterhub/jupyterhub_cookie_secret
-/pyserver/jupyterhub/jupyterhub.sqlite
+/jupyterhub/jupyterhub__.sqlite

@@ -1,0 +1,135 @@
+default: &default
+  default: null
+  name: ''
+  des: ''
+  range: null
+  required: false
+  type: input
+  value: null
+  value_type: str
+
+author_name: luxu
+module_name: flight_delay_prediction
+module_description: A MO module
+module_params:
+  predict: &params
+    param_1:
+      <<: *default
+      name: DayofMonth,
+      value_type: int
+      range: null
+    param_2:
+      <<: *default
+      name: DayOfWeek
+      value_type: int
+      range: null
+    param_3:
+      <<: *default
+      name: OriginAirportID
+      value_type: int
+      range: null
+    param_4:
+      <<: *default
+      name: DestAirportID
+      value_type: int
+      range: null
+    param_5:
+      <<: *default
+      name: CRSDepTime
+      value_type: int
+      range: null
+    param_6:
+      <<: *default
+      name: CRSArrTime
+      value_type: int
+      range: null
+    param_7:
+      <<: *default
+      name: Visibility_x
+      value_type: float
+      range: null
+    param_8:
+      <<: *default
+      name: DryBulbFarenheit_x
+      value_type: float
+      range: null
+    param_9:
+      <<: *default
+      name: DryBulbCelsius_x
+      value_type: float
+      range: null
+    param_10:
+      <<: *default
+      name: DewPointFarenheit_x
+      value_type: float
+      range: null
+    param_11:
+      <<: *default
+      name: DewPointCelsius_x
+      value_type: float
+      range: null
+    param_12:
+      <<: *default
+      name: RelativeHumidity_x
+      value_type: float
+      range: null
+    param_13:
+      <<: *default
+      name: WindSpeed_x
+      value_type: float
+      range: null
+    param_14:
+      <<: *default
+      name: Altimeter_x
+      value_type: float
+      range: null
+    param_15:
+      <<: *default
+      name: Visibility_y
+      value_type: float
+      range: null
+    param_16:
+      <<: *default
+      name: DryBulbFarenheit_y
+      value_type: float
+      range: null
+    param_17:
+      <<: *default
+      name: DryBulbCelsius_y
+      value_type: float
+      range: null
+    param_18:
+      <<: *default
+      name: DewPointFarenheit_y
+      value_type: float
+      range: null
+    param_19:
+      <<: *default
+      name: DewPointCelsius_y
+      value_type: float
+      range: null
+    param_20:
+      <<: *default
+      name: RelativeHumidity_y
+      value_type: float
+      range: null
+    param_21:
+      <<: *default
+      name: WindSpeed_y
+      value_type: float
+      range: null
+    param_22:
+      <<: *default
+      name: Altimeter_y
+      value_type: float
+      range: null
+  train:
+    param_23:
+      <<: *default
+      name: data_path
+      value_type: str
+      range: null
+
+
+    
+  

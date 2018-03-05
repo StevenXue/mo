@@ -121,7 +121,7 @@ export function createDeployButton(): ToolbarButton {
             console.log('click');
           }),
           focusNodeSelector: 'input',
-          buttons: [Dialog.cancelButton(), Dialog.okButton({ label: 'PUBLISH' })],
+          buttons: [Dialog.cancelButton(), Dialog.okButton({ label: 'DEPLOY' })],
         }).then(result => {
           console.log('then');
           if (!result.value) {

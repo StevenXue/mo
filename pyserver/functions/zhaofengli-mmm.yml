@@ -1,0 +1,9 @@
+provider:
+  name: faas
+  gateway: http://localhost:8080
+
+functions:
+  zhaofengli-mmm:
+    lang: python3
+    handler: ./zhaofengli-mmm
+    image: zhaofengli-mmm

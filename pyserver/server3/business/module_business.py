@@ -33,20 +33,6 @@ def get_all():
     return model_list
 
 
-def get_by_module_id(model_obj, yml=False):
-    module = module_repo.read_by_id(model_obj)
-    if yml:
-        print(module)
-        user_ID = module.user_ID
-        module_name = module.name
-        yml_path = os.path.join(MODULE_DIR, user_ID, module_name, tail_path)
-        with open(yml_path, 'r') as stream:
-            obj = yaml.load(stream)
-            module.args = obj['module_params']
-
-    return module
-
-
 def update_by_id(module_id, **update):
     return module_repo.update_one_by_id(module_id, update)
 
@@ -56,7 +42,7 @@ class ModuleBusiness(ProjectBusiness):
 
     @classmethod
     def create_project(cls, name, description, user, privacy='private',
-                       tags=[], user_token='', type='app', category='model'):
+                       tags=None, user_token='', type='app', category='model'):
         """
         Create a new project
 
@@ -69,6 +55,8 @@ class ModuleBusiness(ProjectBusiness):
         :param user_token: string
         :return: a new created project object
         """
+        if tags is None:
+            tags = []
         user_ID = user.user_ID
 
         # generate project dir
@@ -79,15 +67,13 @@ class ModuleBusiness(ProjectBusiness):
 
         # create a new project object
         create_time = datetime.utcnow()
-        dir_path = os.path.join(MODULE_DIR, user_ID, name)
         return cls.repo.create_one(name=name, description=description,
                                    create_time=create_time,
                                    update_time=create_time,
                                    type=type, tags=tags,
                                    hub_token=res.get('token'),
                                    path=project_path, user=user,
-                                   privacy=privacy, category=category,
-                                   module_path=dir_path)
+                                   privacy=privacy, category=category)
 
     @classmethod
     def get_by_id(cls, project_id, yml=False):
@@ -98,17 +84,24 @@ class ModuleBusiness(ProjectBusiness):
             dir_path = os.path.join(MODULE_DIR, user_ID, module.name)
             module.module_path = dir_path
             module.save()
-        if yml:
-            yml_path = os.path.join(module.module_path, tail_path)
-            with open(yml_path, 'r') as stream:
-                obj = yaml.load(stream)
-                module.args = obj['module_params']
+        if yml and module.module_path:
+            module.args = cls.load_module_params(module)
 
         return module
+
+    @staticmethod
+    def load_module_params(module):
+        yml_path = os.path.join(module.module_path, tail_path)
+        with open(yml_path, 'r') as stream:
+            obj = yaml.load(stream)
+            return obj['module_params']
 
     @classmethod
     def publish(cls, project_id):
         module = cls.get_by_id(project_id, yml=False)
+        module.module_path = os.path.join(MODULE_DIR, module.user.user_ID,
+                                          module.name)
+        module.save()
         dst = module.module_path
         # if dir exists, remove it and copytree, cause copytree will
         #  create the dir

@@ -23,6 +23,7 @@ class Project(DynamicDocument):
 
     # optional
     description = StringField(max_length=140)
+    tb_port = StringField()
     datasets = ListField(ReferenceField('DataSet', reverse_delete_rule=PULL))
     jobs = ListField(ReferenceField('Job', reverse_delete_rule=PULL))
     # if forked project, which project fork from
@@ -54,6 +55,7 @@ class Dataset(Project):
 class Module(Project):
     category = StringField(choices=('model', 'toolkit'))
     module_path = StringField()
+    args = DictField()
 
 
 RE_TYPE = (
@@ -64,6 +66,7 @@ RE_TYPE = (
 
 class App(Project):
     url = StringField(max_length=50)
+    app_path = StringField()
     used_modules = ListField(ReferenceField(Module))
     keyword = StringField(max_length=30)
     input = DictField()

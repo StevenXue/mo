@@ -240,7 +240,8 @@ c.JupyterHub.ip = '0.0.0.0'
 #c.JupyterHub.proxy_check_interval = 30
 
 ## Select the Proxy API implementation.
-#c.JupyterHub.proxy_class = 'jupyterhub.proxy.ConfigurableHTTPProxy'
+# c.JupyterHub.proxy_class = 'jupyterhub.proxy.ConfigurableHTTPProxy'
+# c.JupyterHub.proxy_class = 'myproxy.MyProxy'
 
 ## DEPRECATED since version 0.8. Use ConfigurableHTTPProxy.command
 #c.JupyterHub.proxy_cmd = []
@@ -383,7 +384,7 @@ c.JupyterHub.spawner_class = 'mydockerspawner.MyDockerSpawner'
 #  environment variables. Most, including the default, do not. Consult the
 #  documentation for your spawner to verify!
 # c.Spawner.cmd = ['jupyter', 'labhub']
-c.Spawner.cmd = ['jupyter', 'labhub', "--NotebookApp.allow_origin=*", "--NotebookApp.token=''"]
+c.Spawner.cmd = ['bash', '/home/jovyan/run.sh']
 
 ## Minimum number of cpu-cores a single-user notebook server is guaranteed to
 #  have available.

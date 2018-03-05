@@ -262,8 +262,7 @@ class ProjectBusiness:
         return cls.repo.delete_by_id(project_id)
 
     @classmethod
-    def update_project(cls, project_id, description, privacy='private',
-                       tags=[]):
+    def update_project(cls, project_id, **data):
         """
         Update project
 
@@ -273,7 +272,21 @@ class ProjectBusiness:
         :param is_private: boolean
         :return: a new created project object
         """
-        return cls.repo.update_one_by_id(project_id,
-                                         dict(description=description,
-                                              update_time=datetime.utcnow(),
-                                              tags=tags, privacy=privacy))
+        return cls.repo.update_one_by_id(project_id, data)
+
+    @classmethod
+    def update_project_by_name(cls, project_name, **data):
+        """
+        Update project
+
+        :param project_name:
+        :param tb_port:
+        :param privacy:
+        :param tags:
+        :param description: str
+        :return: a new created project object
+        """
+        [user_ID, project_name] = project_name.split('+')
+        user = user_business.get_by_user_ID(user_ID)
+        return cls.repo.update_unique_one(dict(name=project_name, user=user),
+                                          data)
