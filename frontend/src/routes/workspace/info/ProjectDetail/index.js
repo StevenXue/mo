@@ -75,12 +75,16 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
   } else {
     // project info page
     if (projectDetail.project) {
+
+      const oddJobs = projectDetail.jobs.filter((_, v) => v % 2)
+      const evenJobs = projectDetail.jobs.filter((_, v) => !(v % 2))
+
       // optional component list by project type
       const components = projectTypeDict[projectDetail.project.type]
-
+      console.log('help-modal', components)
       return (
         <div className={`main-container ${styles.normal}`}>
-          {'help-modal' in components &&
+          {components.includes('help-modal') &&
           <HelpModal visible={!projectDetail.project.entered} projectType={projectDetail.project.type}/>}
           <div className={styles.info}>
             {/*info head*/}
@@ -158,14 +162,15 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
                 <span className={styles.running}>9</span> are running&nbsp;&nbsp;&nbsp;&nbsp;
                 <span className={styles.error}>2</span> went error&nbsp;&nbsp;&nbsp;&nbsp;
               </p>
-              {projectDetail.jobs.map((job) => <p key={job.id}>{job.path}</p>)}
               <Row>
-                <Col span={12}>col-12</Col>
-                <Col span={12}>col-12</Col>
+                {oddJobs.map((job) => <p key={job.id}>{job.path}</p>)}
+                <Col span={12}>111</Col>
+                <Col span={12}>333</Col>
               </Row>
               <Row>
-                <Col span={12}>col-12</Col>
-                <Col span={12}>col-12</Col>
+                {evenJobs.map((job) => <p key={job.id}>{job.path}</p>)}
+                <Col span={12}>222</Col>
+                <Col span={12}>444</Col>
               </Row>
             </TabPane>
 

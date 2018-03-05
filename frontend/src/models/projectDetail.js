@@ -76,7 +76,7 @@ export default {
     },
     *setEntered({ projectId }, { call, put }) {
       console.log(projectId)
-      yield call(updateProject, {projectId, body: {entered: true}})
+      yield call(updateProject, { projectId, body: { entered: true } })
       yield put({ type: 'fetch', projectId })
     },
     *update({ body, fetchData }, { call, put, select }) {

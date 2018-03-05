@@ -228,13 +228,15 @@ def get_file_content(file_uri, names):
 
 
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return True
+    # return '.' in filename and \
+    #        filename.rsplit('.', 1)[-1].lower() in ALLOWED_EXTENSIONS
 
 
 def allowed_file_or_folder(filename):
-    return any(x in filename for x in PASSED_FILES) or '.' not in filename or \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return True
+    # return any(x in filename for x in PASSED_FILES) or '.' not in filename or \
+    #        filename.rsplit('.', 1)[-1].lower() in ALLOWED_EXTENSIONS
 
 
 def remove_file_by_uri(uri):

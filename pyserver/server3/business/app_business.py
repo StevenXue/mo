@@ -81,26 +81,39 @@ class AppBusiness(ProjectBusiness):
         app = cls.get_by_id(app_id)
         app_yaml_path = os.path.join(app.path, yaml_tail_path)
         args = {}
+        output = {}
         # copy module yaml to app yaml
         for module in used_modules:
             func_args = module.to_mongo()['args'][func]
+            output_args = module.to_mongo()['output'].get(func, {})
             if os.path.isfile(app_yaml_path):
                 with open(app_yaml_path, 'r') as stream:
                     # read args
-                    args = yaml.load(stream)
-                    # find duplicate arg name of module_arg and app_arg and
-                    # replace the name
-                    args = cls.replace_dup_name(args, func_args, module.name)
-                    # edit app args
-                    args = cls.update_with_module_name(args, func_args,
-                                                       module.name)
+                    obj = yaml.load(stream)
+                    args = cls.replace_dup_n_update(obj['input'], func_args,
+                                                    module.name)
+                    output = cls.update_with_module_name(obj.get('output', {}),
+                                                      output_args,
+                                                      module.name)
             else:
                 args = cls.update_with_module_name(args, func_args,
                                                    module.name)
+                output = cls.update_with_module_name(output, output_args,
+                                                     module.name)
             # write new args
             with open(app_yaml_path, 'w') as stream:
-                yaml.dump(args, stream, default_flow_style=False)
+                yaml.dump({'input': args, 'output': output}, stream,
+                          default_flow_style=False)
         return cls.repo.add_to_set(app_id, used_modules=used_modules)
+
+    @classmethod
+    def replace_dup_n_update(cls, args, func_args, module_name):
+        # find duplicate arg name of module_arg and app_arg and
+        # replace the name
+        args = cls.replace_dup_name(args, func_args, module_name)
+        # edit app args
+        return cls.update_with_module_name(args, func_args,
+                                           module_name)
 
     @staticmethod
     def replace_dup_name(args, func_args, module_name):

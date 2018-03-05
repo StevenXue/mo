@@ -277,8 +277,7 @@ const modelling = modelExtend(workBench, {
       yield call(startLabBack, { payload: { hubUserName, hubToken } }, { call })
       yield call(insertLabConfig, { payload: { hubUserName, hubToken } }, { call })
       // loadnStartJL(projectType)
-      document.body = document.createElement('body')
-      // document.body.setAttribute('style', "overflow: auto;")
+      document.body.innerHTML = ''
       yield call(loadnStartJL, projectType)
     },
     *runSection(action, { call, put, select }) {
