@@ -6,10 +6,7 @@ Author: Bingwei Chen
 Date: 2017.10.20
 
 """
-# Todo 获取用户 自己使用过的apis，自己收藏的apis, 自己star的apis,  移到user那边
-
 import sys, traceback
-
 from flask import Blueprint
 from flask import jsonify
 from flask import make_response

@@ -9,8 +9,9 @@ from server3.utility import json_utility
 from server3.business import api_business
 from server3.business import user_request_business
 from server3.business import request_answer_business
+from server3.business.app_business import AppBusiness
 from server3.constants import Error, ErrorMessage
-
+from server3.entity.general_entity import FavorAppReturn
 
 def add(user_ID, password, kwargs):
     hashed_password = generate_password_hash(password)
@@ -193,23 +194,6 @@ def add_used_api(user_ID, api_id):
         }
 
 
-# def un_favor_api(user_ID, api_id):
-#     user = user_business.get_by_user_ID(user_ID=user_ID)
-#     api = api_business.get_by_api_id(api_id=api_id)
-#     # 1. 在user下删除favor_apis
-#     user.favor_apis.remove(api)
-#     user_result = user.save()
-#     # 2. 在api下删除favor_users
-#     api.favor_users.remove(user)
-#     api_result = api.save()
-#
-#     if user_result and api_result:
-#         return {
-#             "user": user_result.to_mongo(),
-#             "api": api_result.to_mongo()
-#         }
-
-
 def get_verification_code(phone):
     """
 
@@ -254,3 +238,30 @@ def verify_code(code, message_id):
     #     return make_response(jsonify({
     #         "response": response.json()
     #     }), 300)
+
+
+class UserService:
+    @classmethod
+    def favor_app(cls, user_ID, app_id):
+        user = user_business.get_by_user_ID(user_ID=user_ID)
+        app = AppBusiness.get_by_id(project_id=app_id)
+        # 1. 在user下存favor_apps
+        if app not in user.favor_apps:
+            user.favor_apps.append(app)
+            user_result = user.save()
+        else:
+            user.favor_apps.remove(app)
+            user_result = user.save()
+        # 2. 在app下存favor_users
+        if user not in app.favor_users:
+            app.favor_users.append(user)
+            app_result = app.save()
+        else:
+            app.favor_users.remove(user)
+            app_result = app.save()
+
+        if user_result and app_result:
+            return FavorAppReturn(user=user_result, app=app_result)
+
+
+

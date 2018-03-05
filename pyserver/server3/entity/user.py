@@ -28,11 +28,11 @@ class User(Document):
     answer_vote_up = ListField(ReferenceField("RequestAnswer"))
 
     # 用户收藏的api列表
-    favor_apis = ListField(ReferenceField("Api"))
+    favor_apps = ListField(ReferenceField("App"))
     # 用户点赞的api列表
-    star_apis = ListField(ReferenceField("Api"))
+    star_apps = ListField(ReferenceField("App"))
     # 用户使用过的api列表
-    used_apis = ListField(ReferenceField("Api"))
+    used_apps = ListField(ReferenceField("App"))
 
     # 用户收藏的module列表
     favor_modules = ListField(ReferenceField("Module"))
@@ -40,3 +40,11 @@ class User(Document):
     star_modules = ListField(ReferenceField("Module"))
     # 用户使用过的的module列表
     used_modules = ListField(ReferenceField("Module"))
+
+    # TODO 将数据库内数据删除后删掉
+    # 用户收藏的api列表
+    favor_apis = ListField(ReferenceField("Api"))
+    # 用户点赞的api列表
+    star_apis = ListField(ReferenceField("Api"))
+    # 用户使用过的api列表
+    used_apis = ListField(ReferenceField("Api"))

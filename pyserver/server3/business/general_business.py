@@ -12,6 +12,7 @@ class GeneralBusiness:
         project = cls.repo.read()
         return project
 
+    # 另一种方式
     # @classmethod
     # def get_all(cls):
     #     return cls.__cls.objects().order_by('-_id')
@@ -22,6 +23,11 @@ class GeneralBusiness:
             query = {}
         return cls.__cls.objects(**query).order_by('-_id')
 
-    # @classmethod
-    # def objects(cls, ):
+    @classmethod
+    def get_by_id(cls, object_id):
+        return cls.repo.read_by_id(object_id=object_id)
+
+
+
+
 
