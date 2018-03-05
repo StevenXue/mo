@@ -325,10 +325,8 @@ export default {
     },
     // 发布新回答
     * makeNewRequestAnswer(action, {call, put, select}) {
-      const user_ID = yield select(state => state.login.user.user_ID)
       const user_request_id = yield select(state => state.allRequest.focusUserRequest._id)
       let payload = action.payload
-      payload.user_id = user_ID
       payload.user_request_id = user_request_id
       // console.log(payload)
       const {data: result} = yield call(requestAnswerService.createNewUserRequestAnswer, payload)

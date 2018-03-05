@@ -10,11 +10,7 @@ export function createNewUserRequestAnswer(payload) {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      user_id:payload.user_id,
-      user_request_id:payload.user_request_id,
-      answer:payload.answer,
-    }),
+    body: JSON.stringify(payload),
   });
 }
 

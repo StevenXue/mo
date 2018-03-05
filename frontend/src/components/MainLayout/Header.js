@@ -27,32 +27,38 @@ const menuConfig = [
     Link: '/workspace',
     Icon: null,
     text: 'Workspace',
-    dropdown: [
-      {
-        key: '/myprojects',
-        Link: '/workspace',
-        Icon: null,
-        text: 'My Projects',
-      },
-      {
-        key: '/myservice',
-        Link: '/myservice',
-        Icon: null,
-        text: 'My Service',
-      },
-    ]
+    // dropdown: [
+    //       {
+    //     key: '/myprojects',
+    //     Link: '/workspace',
+    //     Icon: null,
+    //     text: 'My Projects',
+    //   },
+    //   {
+    //     key: '/myservice',
+    //     Link: '/myservice',
+    //     Icon: null,
+    //     text: 'My Service',
+    //   },
+    // ]
   },
+  // {
+  //   key: '/projects',
+  //   Link: '/projects',
+  //   Icon: null,
+  //   text: 'Projects',
+  // },
+  // {
+  //   key: '/modelmarket',
+  //   Link: '/modelmarket',
+  //   Icon: null,
+  //   text: 'Model Market',
+  // },
   {
-    key: '/projects',
-    Link: '/projects',
+    key: '/market',
+    Link: '/market',
     Icon: null,
-    text: 'Projects',
-  },
-  {
-    key: '/modelmarket',
-    Link: '/modelmarket',
-    Icon: null,
-    text: 'Model Market',
+    text: 'Market',
   },
   {
     key: '/userrequest',

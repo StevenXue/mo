@@ -62,6 +62,11 @@ def list_projects_by_query():
         }), 404
     else:
         projects = json_utility.me_obj_list_to_json_list(projects)
+        print(type)
+        print(projects)
+        print(search_query)
+        print(group)
+        print(privacy)
         return jsonify({
             "response": projects
         }), 200

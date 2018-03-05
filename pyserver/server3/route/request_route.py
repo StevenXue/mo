@@ -37,6 +37,8 @@ def list_user_request():
     page_size = int(request.args.get('page_size', 5))
     search_query = request.args.get('search_query', None)
     type = request.args.get('type', None)
+    if type == 'all':
+        type = None
     user_ID = None
     if group == 'my':
         user_ID = get_jwt_identity()
@@ -74,7 +76,7 @@ def create_user_request():
     data = request.get_json()
     title = data.pop('title')
     user_ID = get_jwt_identity()
-    data['tags'] = data['tags'].split(",") if data['tags'] else None
+    # data['tags'] = data['tags'].split(",") if data['tags'] else None
     user_request = user_request_service.create_user_request(title, user_ID,
                                              **data)
     user_request = json_utility.convert_to_json(user_request.to_mongo())
@@ -87,8 +89,6 @@ def update_user_request(user_request_id):
     data = request.get_json()
     result = user_request_service.update_user_request(user_request_id, **data)
     result = json_utility.convert_to_json(result.to_mongo())
-    print('??????????')
-    print(result)
     return jsonify({'response': result}), 200
 
 
