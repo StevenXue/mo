@@ -5,7 +5,8 @@ MONGO = 'DEFAULT'
 #     MONGO = 'DEFAULT'
 PORT = 5000
 FILL_BLANK = 'BLANK_GRID'
-ALLOWED_EXTENSIONS = {'zip', 'csv', 'png', 'jpg', 'jpeg', 'txt', 'py'}
+ALLOWED_EXTENSIONS = {'zip', 'csv', 'png', 'jpg', 'jpeg', 'txt', 'py', 'md',
+                      'h5', 'npz', 'pkl', 'pdf', 'doc', 'docx'}
 PREDICT_FOLDER = 'predict_data/'
 MODEL_EXPORT_BASE = '/tmp'
 MODEL_SCRIPT_PATH = './run_model.py'

@@ -44,6 +44,7 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
       }
       if (info.file.status === 'done') {
         message.success(`${info.file.name} file uploaded successfully`)
+        window.open(`/#/workspace/${projectId}/${projectDetail.project.type}`)
       } else if (info.file.status === 'error') {
         message.error(`${info.file.name} file upload failed.`)
       }
@@ -125,7 +126,7 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
                   <Button type="primary"
                           onClick={() => {
                             // history.push(`/workspace/${match.params.projectId}/${projectDetail.project.type}`)
-                            window.open(`/#/workspace/${match.params.projectId}/${projectDetail.project.type}`)
+                            window.open(`/#/workspace/${projectId}/${projectDetail.project.type}`)
                           }}>
                   Enter Notebook
                   </Button>
