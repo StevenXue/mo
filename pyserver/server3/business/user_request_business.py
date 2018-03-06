@@ -109,3 +109,5 @@ class UserRequestBusiness(EntityBusiness):
         objects = cls.repo.read()
         objects = objects(user=user)
         objects.delete()
+
+
