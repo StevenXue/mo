@@ -56,7 +56,7 @@ export function jobToCode(payload) {
 
 export function jobsByProject(payload) {
   const { hubUserName, hubToken } = payload
-  return org_request(`/hub_api/user/${hubUserName}/api/sessions?${(new Date()).getTime()}`, {
+  return org_request(`/hub_api/user/${hubUserName}/api/terminals?${(new Date()).getTime()}`, {
     method: 'get',
     headers: {
       'Authorization': `token ${hubToken}`,

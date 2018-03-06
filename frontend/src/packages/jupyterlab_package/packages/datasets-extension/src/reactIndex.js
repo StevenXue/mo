@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { Card, Button, Row, Col, Input, message } from 'antd'
 
-// import {
-//   Clipboard
-// } from '@jupyterlab/apputils';
+import {
+  Clipboard
+} from '@jupyterlab/apputils';
 
 import {
   NotebookActions,
@@ -100,12 +100,13 @@ export class DatasetPage extends React.Component {
 
   copyPath() {
     let that = document.getElementById('copy-p')
-    let inp = document.createElement('input')
-    document.body.appendChild(inp)
-    inp.value = that.textContent
-    inp.select()
-    document.execCommand('copy', false)
-    inp.remove()
+    // let inp = document.createElement('input')
+    Clipboard.copyToSystem(that.textContent)
+    // document.body.appendChild(inp)
+    // inp.value = that.textContent
+    // inp.select()
+    // document.execCommand('copy', false)
+    // inp.remove()
     message.info('Successfully copied the dataset path!')
   }
 

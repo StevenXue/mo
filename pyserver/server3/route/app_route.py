@@ -53,8 +53,9 @@ def add_used_module(app_id):
 @jwt_required
 def nb_to_script(app_id):
     data = request.get_json()
+    optimise = data.get('optimise')
     nb_path = data.get('nb_path')
-    AppBusiness.nb_to_script(app_id, nb_path)
+    AppBusiness.nb_to_script(app_id, nb_path, optimise)
     return jsonify({"response": 1})
 
 

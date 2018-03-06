@@ -132,7 +132,7 @@ class AppBusiness(ProjectBusiness):
         return app_args
 
     @classmethod
-    def nb_to_script(cls, app_id, nb_path):
+    def nb_to_script(cls, app_id, nb_path, optimise=True):
         app = cls.get_by_id(app_id)
         call(['jupyter', 'nbconvert', '--to', 'script', nb_path],
              cwd=app.path)
@@ -141,26 +141,28 @@ class AppBusiness(ProjectBusiness):
         for line in fileinput.input(files=script_path, inplace=1):
             # remove input tag comments
             line = re.sub(r"# In\[(\d+)\]:", r"", line.rstrip())
-            if any(re.search(reg, line.rstrip()) for reg in INIT_RES):
-                line = re.sub(
-                    r"# Please use current \(work\) folder to store your data "
-                    r"and models",
-                    r'', line.rstrip())
-                line = re.sub(r"sys.path.append\('\.\./'\)", r'',
-                              line.rstrip())
-                line = re.sub(r"""client = Client\('(.+)'\)""",
-                              r"""client = Client('\1', silent=True)""",
-                              line.rstrip())
-                line = re.sub(r"""from modules import (.+)""",
-                              r"""from function.modules import \1""",
-                              line.rstrip())
-                # add handle function
-                line = re.sub(
-                    r"predict = client\.predict",
-                    r"predict = client.predict\n\n"
-                    r"def handle(conf):\n"
-                    r"\t# paste your code here",
-                    line.rstrip())
-            else:
-                line = '\t' + line
+
+            if optimise:
+                if any(re.search(reg, line.rstrip()) for reg in INIT_RES):
+                    line = re.sub(
+                        r"# Please use current \(work\) folder to store your data "
+                        r"and models",
+                        r'', line.rstrip())
+                    line = re.sub(r"sys.path.append\('\.\./'\)", r'',
+                                  line.rstrip())
+                    line = re.sub(r"""client = Client\('(.+)'\)""",
+                                  r"""client = Client('\1', silent=True)""",
+                                  line.rstrip())
+                    line = re.sub(r"""from modules import (.+)""",
+                                  r"""from function.modules import \1""",
+                                  line.rstrip())
+                    # add handle function
+                    line = re.sub(
+                        r"predict = client\.predict",
+                        r"predict = client.predict\n\n"
+                        r"def handle(conf):\n"
+                        r"\t# paste your code here",
+                        line.rstrip())
+                else:
+                    line = '\t' + line
             print(line)

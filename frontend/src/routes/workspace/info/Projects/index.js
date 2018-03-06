@@ -72,7 +72,7 @@ class ProjectList extends Component {
       filter,
       onJson: (projects) => this.setState({
         projects,
-      })
+      }),
     })
   }
 
@@ -123,6 +123,13 @@ class ProjectList extends Component {
                 <p className={styles.other}>
                   <Icon type="clock-circle-o" style={{ marginRight: 10 }}/>
                   {showTime(e.create_time)}
+                  <Button style={{ float: 'right' }}
+                          onClick={(ev) => {
+                            ev.stopPropagation()
+                            window.open(`/#/workspace/${e._id}/${e.type}`)
+                          }}>
+                    Notebook ->
+                  </Button>
                 </p>
                 {/*<Icon type="user" style={{ marginRight: 10 }}/>*/}
                 {/*{e['user_name'] && <p>Owner: {e.user_name}</p>}*/}

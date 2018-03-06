@@ -67,6 +67,10 @@
     padding: 10px 25px;
     column-count: 2;
 
+    .overall {
+      margin: 5px 0;
+    }
+
     .done {
       color: @done-green;
     }
@@ -77,6 +81,22 @@
 
     .error {
       color: @error-red;
+    }
+
+    .jobCols {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 5px 0;
+
+      .jobCell {
+        margin: 5px 0;
+        width: 50%;
+        //flex-direction: column;
+
+        .jobInfo {
+          //float: right;
+        }
+      }
     }
   }
 }

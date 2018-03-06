@@ -76,12 +76,9 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
     // project info page
     if (projectDetail.project) {
 
-      const oddJobs = projectDetail.jobs.filter((_, v) => v % 2)
-      const evenJobs = projectDetail.jobs.filter((_, v) => !(v % 2))
-
       // optional component list by project type
       const components = projectTypeDict[projectDetail.project.type]
-      console.log('help-modal', components)
+
       return (
         <div className={`main-container ${styles.normal}`}>
           {components.includes('help-modal') &&
@@ -132,7 +129,7 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
                             // history.push(`/workspace/${match.params.projectId}/${projectDetail.project.type}`)
                             window.open(`/#/workspace/${projectId}/${projectDetail.project.type}`)
                           }}>
-                  Enter Notebook
+                    Notebook ->
                   </Button>
 
                 </span>
@@ -157,21 +154,18 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
                      </Button>
                 </span>
               </h2>
-              <p>
+              <p className={styles.overall}>
                 <span className={styles.done}>10</span> have done&nbsp;&nbsp;&nbsp;&nbsp;
                 <span className={styles.running}>9</span> are running&nbsp;&nbsp;&nbsp;&nbsp;
                 <span className={styles.error}>2</span> went error&nbsp;&nbsp;&nbsp;&nbsp;
               </p>
-              <Row>
-                {oddJobs.map((job) => <p key={job.id}>{job.path}</p>)}
-                <Col span={12}>111</Col>
-                <Col span={12}>333</Col>
-              </Row>
-              <Row>
-                {evenJobs.map((job) => <p key={job.id}>{job.path}</p>)}
-                <Col span={12}>222</Col>
-                <Col span={12}>444</Col>
-              </Row>
+              <div className={styles.jobCols}>
+                {projectDetail.jobs.map((job) =>
+                  <div key={job.name} className={styles.jobCell}>
+                  {job.name}
+                  <p className={styles.jobInfo}>o Running Time: Start Time:</p>
+                  </div>)}
+              </div>
             </TabPane>
 
             <TabPane tab="Examples" key="3">
