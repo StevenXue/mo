@@ -264,6 +264,10 @@ class UserService:
         if user_result and app_result:
             return FavorAppReturn(user=user_result, app=app_result)
 
+    @classmethod
+    def star_app(cls, user_ID, app_id):
+        return StarApp.action(user_ID, app_id)
+
 
 # 尝试合并代码
 class Action:
