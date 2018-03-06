@@ -83,6 +83,27 @@
       color: @error-red;
     }
 
+    .busy {
+      color: @busy-yellow;
+    }
+
+    .bulb {
+      display: inline-flex;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .bulbIdle {
+      .bulb;
+      border: 1px solid grey;
+    }
+
+    .bulbBusy {
+      .bulb;
+      background: grey;
+    }
+
     .jobCols {
       display: flex;
       flex-wrap: wrap;
@@ -91,9 +112,11 @@
       .jobCell {
         margin: 5px 0;
         width: 50%;
+        line-height: 25px;
         //flex-direction: column;
 
         .jobInfo {
+          //flex-direction: row;
           //float: right;
         }
       }

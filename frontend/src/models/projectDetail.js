@@ -1,7 +1,7 @@
 import { routerRedux } from 'dva/router'
 
 import { fetchProject, deleteProject, updateProject, forkProject } from '../services/project'
-import { jobsByProject } from '../services/job'
+import { getSessions, getTerminals } from '../services/job'
 import { privacyChoices } from '../constants'
 import pathToRegexp from 'path-to-regexp'
 import { get } from 'lodash'
@@ -14,7 +14,8 @@ import { startLabBack } from './modelling'
 export default {
   namespace: 'projectDetail',
   state: {
-    jobs: [],
+    terminals: [],
+    sessions: [],
     // doneIndices: new Set([]),
   },
   reducers: {
@@ -24,10 +25,16 @@ export default {
         project,
       }
     },
-    setJobs(state, { payload: jobs }) {
+    setTermianls(state, { payload: terminals }) {
       return {
         ...state,
-        jobs,
+        terminals,
+      }
+    },
+    setSessions(state, { payload: sessions }) {
+      return {
+        ...state,
+        sessions,
       }
     },
     setStep(state, { payload }) {
@@ -59,8 +66,10 @@ export default {
       yield !action.notStartLab && call(startLabBack, { payload: { hubUserName, hubToken } }, { call })
       // yield call(startLabFront)
       // fetch jobs
-      const jobs = yield call(jobsByProject, { hubUserName, hubToken })
-      yield put({ type: 'setJobs', payload: jobs })
+      const terminals = yield call(getTerminals, { hubUserName, hubToken })
+      const sessions = yield call(getSessions, { hubUserName, hubToken })
+      yield put({ type: 'setTerminals', payload: terminals })
+      yield put({ type: 'setSessions', payload: sessions })
     },
     // 获取该 project 的 Jobs
     // *fetchJobs(action, { call, put }) {

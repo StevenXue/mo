@@ -23,6 +23,12 @@ const projectTypeDict = {
   dataset: [],
 }
 
+const myShowTime = (time) => {
+  const format = "yyyy-MM-dd hh:mm"
+  let date = new Date(time).Format(format);
+  return date.toLocaleString();
+}
+
 function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
 
   const projectId = match.params.projectId
@@ -150,21 +156,35 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
               <h2>Jobs:
                 <span className={styles.rightButton}>
                      <Button onClick={() => {window.open(`http://localhost:${projectDetail.project.tb_port}`)}}>
-                       View Jobs
+                       Jobs Visualization
                      </Button>
                 </span>
               </h2>
               <p className={styles.overall}>
-                <span className={styles.done}>10</span> have done&nbsp;&nbsp;&nbsp;&nbsp;
-                <span className={styles.running}>9</span> are running&nbsp;&nbsp;&nbsp;&nbsp;
-                <span className={styles.error}>2</span> went error&nbsp;&nbsp;&nbsp;&nbsp;
+                <span className={styles.done}>{projectDetail.sessions.filter(e => e.kernel.execution_state === 'idle').length}</span> idle&nbsp;&nbsp;&nbsp;&nbsp;
+                <span className={styles.busy}>{projectDetail.sessions.filter(e => e.kernel.execution_state === 'busy').length}</span> busy&nbsp;&nbsp;&nbsp;&nbsp;
+                {/*<span className={styles.error}>2</span> went error&nbsp;&nbsp;&nbsp;&nbsp;*/}
               </p>
               <div className={styles.jobCols}>
-                {projectDetail.jobs.map((job) =>
+                {projectDetail.terminals.map((job) =>
                   <div key={job.name} className={styles.jobCell}>
                   {job.name}
-                  <p className={styles.jobInfo}>o Running Time: Start Time:</p>
+                  {/*<p className={styles.jobInfo}>o Running Time: Start Time:</p>*/}
                   </div>)}
+                {projectDetail.sessions.map((job) =>
+                {
+                  const blobDict = {
+                    busy: styles.bulbBusy,
+                    idle: styles.bulbIdle,
+                  }
+                  return <div key={job.id} className={styles.jobCell}>
+                    <h4>{job.path}</h4>
+                    <p className={styles.jobInfo}>
+                      <div className={blobDict[job.kernel.execution_state]}/>
+                      &nbsp;&nbsp;
+                      Last Activity: {myShowTime(job.kernel.last_activity)}</p>
+                  </div>
+                })}
               </div>
             </TabPane>
 
