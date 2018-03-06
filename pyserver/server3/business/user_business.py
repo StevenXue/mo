@@ -38,22 +38,54 @@ class UserBusiness(GeneralBusiness):
     repo = UserRepo(User)
 
     @classmethod
-    def get_favor_apps(cls, user_ID, page_no, page_size):
+    def get_by_user_ID(cls, user_ID):
+        return cls.repo.read_by_unique_field('user_ID', user_ID)
+
+    @classmethod
+    def prepare(cls, user_ID, page_no, page_size):
         user = cls.get_by_user_ID(user_ID=user_ID)
         start = (page_no - 1) * page_size
         end = page_no * page_size
-        return Objects(objects=user.favor_apps[start:end],
-                       count=len(user.favor_apps), page_no=page_no, page_size=page_size)
-
+        return user, start, end
 
     @classmethod
-    def get_star_apps(cls, user_ID):
+    def get(cls, user_ID, page_no, page_size, attr):
         user = cls.get_by_user_ID(user_ID=user_ID)
-        return user.star_apps
+        start = (page_no - 1) * page_size
+        end = page_no * page_size
+        return Objects(
+            objects=getattr(user, attr)[start:end],
+            count=len(getattr(user, attr)),
+            page_no=page_no,
+            page_size=page_size)
+
+    # method 1
+    @classmethod
+    def get_favor_apps(cls, user_ID, page_no, page_size):
+        return cls.get(user_ID, page_no, page_size, "favor_apps")
+
+    # method 2 对比一下 1 和 2
+    # @classmethod
+    # def get_favor_apps(cls, user_ID, page_no, page_size):
+    #     user, start, end = cls.prepare(user_ID, page_no, page_size)
+    #     return Objects(
+    #         objects=user.favor_apps[start:end],
+    #         count=len(user.favor_apps),
+    #         page_no=page_no,
+    #         page_size=page_size)
+
+    # method 3
+    # def get_favor_apps(cls, user_ID, page_no, page_size):
+    #     user = cls.get_by_user_ID(user_ID=user_ID)
+    #     start = (page_no - 1) * page_size
+    #     end = page_no * page_size
+    #
+    #     return Objects(objects=user.favor_apps[start:end],
+    #                    count=len(user.favor_apps), page_no=page_no, page_size=page_size)
 
     @classmethod
-    def get_by_user_ID(cls, user_ID):
-        return cls.repo.read_by_unique_field('user_ID', user_ID)
+    def get_star_apps(cls, user_ID, page_no, page_size):
+        return cls.get(user_ID, page_no, page_size, "star_apps")
 
 
 if __name__ == "__main__":
