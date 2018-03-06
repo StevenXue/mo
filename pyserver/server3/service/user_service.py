@@ -270,9 +270,11 @@ class Action:
     business = None  # app / module
     action_type = None  # favor / star /
     # favor_apps
-    user_keyword = '{business}_{action_type}s'.format(business=business, action_type=action_type)
+    user_keyword = None
+    # user_keyword = '{business}_{action_type}s'.format(business=business, action_type=action_type)
     # favor_users
-    object_keyword = '{action_type}_users'.format(action_type=action_type)
+    # object_keyword = '{action_type}_users'.format(action_type=action_type)
+    object_keyword = None
 
     @classmethod
     def action(cls, user_ID, object_id):
@@ -299,11 +301,15 @@ class Action:
 class FavorApp(Action):
     business = AppBusiness
     action_type = 'favor'
+    user_keyword = 'favor_apps'
+    object_keyword = 'favor_users'
 
 
 class StarApp(Action):
     business = AppBusiness
     action_type = 'star'
+    user_keyword = 'star_apps'
+    object_keyword = 'favor_users'
 
 
 class FavorModule(Action):

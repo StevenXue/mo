@@ -43,7 +43,7 @@ class UserBusiness(GeneralBusiness):
         start = (page_no - 1) * page_size
         end = page_no * page_size
         return Objects(objects=user.favor_apps[start:end],
-                       count=len(user.favor_appss), page_no=page_no, page_size=page_size)
+                       count=len(user.favor_apps), page_no=page_no, page_size=page_size)
 
 
     @classmethod

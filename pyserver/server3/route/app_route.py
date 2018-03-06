@@ -97,7 +97,11 @@ def get_module(app_id):
     yml = request.args.get('yml')
     yml = str(yml).lower() == 'true'
     app = AppBusiness.get_by_id(app_id, yml=yml)
+
+    # 将app.user 更换为 user_ID 还是name?
+    user_ID = app.user.user_ID
     app = json_utility.convert_to_json(app.to_mongo())
+    app["user"] = user_ID
     return jsonify({
         "response": app
     }), 200
@@ -115,7 +119,7 @@ def get_api_list():
     page_no = int(request.args.get('page_no', 1))
     page_size = int(request.args.get('page_size', 5))
     search_query = request.args.get('search_query', None)
-    default_max_score = float(request.args.get('max_score', 0.4))
+    default_max_score = float(request.args.get('max_score', 0.1))
 
     try:
         api_list = AppService.list_projects(
@@ -160,7 +164,7 @@ def get_chat_api_list():
     page_no = int(request.args.get('page_no', 1))
     page_size = int(request.args.get('page_size', 5))
     search_query = request.args.get('search_query', None)
-    default_max_score = float(request.args.get('max_score', 0.4))
+    default_max_score = float(request.args.get('max_score', 0.1))
 
     if not search_query:
         return jsonify({'response': 'no search_query arg'}), 400

@@ -22,7 +22,7 @@ class Project(DynamicDocument):
     privacy = StringField(choices=['private', 'public'], required=True)
 
     # optional
-    description = StringField(max_length=140)
+    description = StringField()
     tb_port = StringField()
     datasets = ListField(ReferenceField('DataSet', reverse_delete_rule=PULL))
     jobs = ListField(ReferenceField('Job', reverse_delete_rule=PULL))
@@ -110,6 +110,8 @@ class App(Project):
     # 使用过的modules
     used_modules = ListField(ReferenceField(Module))
 
+    # app 路径
+    app_path = StringField(default=None)
     # # http_req是get还是post 全部是post
     # http_req = StringField(required=True)
 
