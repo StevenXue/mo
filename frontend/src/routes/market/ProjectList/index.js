@@ -49,7 +49,7 @@ class ProjectList extends Component {
   fetchData({ payload }) {
     const { type } = this.props
 
-    let filter = { type, group: 'my' };
+    let filter = { type };
     ['query', 'privacy'].forEach((key) => {
       if (this.state[key]) {
         filter[key] = this.stats[key]
@@ -114,7 +114,8 @@ class ProjectList extends Component {
         </div>
         <div className={styles.projectList}>
           {this.state.projects.map(e =>
-            <Card key={e._id} className={styles.card}
+            <Card noHovering={true}
+                  key={e._id} className={styles.card}
                   title={e.name}
                   extra={e.is_private && <Icon type="lock"/>}
                   onClick={() => this.toProjectDetail(e._id, history)} style={{ cursor: 'pointer' }}>

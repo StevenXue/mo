@@ -162,17 +162,17 @@ function Header({location, login, history, dispatch, allRequest,message}) {
           }
         >
           {login.user &&
-          <Menu.Item key={'/logout'}>
-            <div onClick={logout}>
-              Logout
+          <Menu.Item key={'/profile'}>
+            <div onClick={() => history.push('/profile')}>
+              Profile
             </div>
           </Menu.Item>
           }
 
           {login.user &&
-          <Menu.Item key={'/profile'}>
-            <div onClick={() => history.push('/profile')}>
-              Profile
+          <Menu.Item key={'/logout'}>
+            <div onClick={logout}>
+              Logout
             </div>
           </Menu.Item>
           }

@@ -11,6 +11,7 @@ const FormItem = Form.Item
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
 const Option = Select.Option
+const { TextArea } = Input;
 
 const fields = ['Business', 'Government', 'Education', 'Environment', 'Health', 'Housing & Development',
   'Public Services', 'Social', 'Transportation', 'Science', 'Technology']
@@ -31,7 +32,7 @@ class RequestModal extends Component {
   }
 
   showModelHandler = (e) => {
-    if (e) e.stopPropagation()
+    // if (e) e.stopPropagation()
     // this.setState({
     //   visible: true,
     // });
@@ -68,10 +69,11 @@ class RequestModal extends Component {
           updateUserRequest({
             body,
             userRequestId: this.props.requestDetail._id,
-            onJson: () => {
+            onJson: (response) => {
               this.props.fetchData && this.props.fetchData()
               this.props.dispatch({type: 'allRequest/hideModal'})
-              this.props.dispatch(routerRedux.push('/userrequest/' + response._id))
+              this.props.dispatch({type: 'allRequest/fetchOneRequest',
+                payload: {userrequestId: response._id}})
             },
           })
         }
@@ -162,7 +164,7 @@ class RequestModal extends Component {
                       required: false,
                     },
                   ],
-                })(<Input/>)
+                })(<TextArea autosize={{ minRows: 3, maxRows: 20 }}/>)
               }
             </FormItem>
             <FormItem

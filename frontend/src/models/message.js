@@ -72,7 +72,7 @@ export default {
     // 登陆后
     setup({dispatch, history}) {
       return history.listen(({pathname}) => {
-        if (pathname === '/userrequest') {
+        if (pathname === '/') {
           dispatch({
             type: 'fetchAllMessage',
             payload: {}
