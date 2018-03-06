@@ -2,6 +2,7 @@ import { routerRedux } from 'dva/router'
 
 import { fetchProject, deleteProject, updateProject, forkProject } from '../services/project'
 import { getSessions, getTerminals } from '../services/job'
+import { deleteLab } from '../services/notebook'
 import { privacyChoices } from '../constants'
 import pathToRegexp from 'path-to-regexp'
 import { get } from 'lodash'
@@ -78,10 +79,13 @@ export default {
     //   yield put({ type: 'setJobs', payload: jobs })
     // },
     *delete({ payload }, { call, put, select }) {
-      // const user_ID = 'dev_1'
-      // payload['user_ID'] = yield select(state => state.login.user.user_ID)
+      let project = yield select(state => state.projectDetail['project'])
+      const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
+      const hubToken = project.hub_token
       yield call(deleteProject, payload)
       yield put(routerRedux.push('/workspace'))
+      yield call(deleteLab,  { hubUserName, hubToken })
+
     },
     *setEntered({ projectId }, { call, put }) {
       console.log(projectId)

@@ -33,6 +33,16 @@ export function startLab(payload) {
   })
 }
 
+export function deleteLab(payload) {
+  const { hubUserName, hubToken } = payload
+  return request(`${hubPrefix}/hub/api/users/${hubUserName}/server`, {
+    method: 'delete',
+    headers: {
+      'Authorization': `token ${hubToken}`,
+    },
+  })
+}
+
 export function getLabConfig(payload) {
   const { hubUserName, hubToken, onSuccess } = payload
   return request(`${hubPrefix}/user/${hubUserName}/lab`, {
