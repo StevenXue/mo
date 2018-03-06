@@ -220,9 +220,17 @@ def favor_app(app_id):
 @jwt_required
 def get_favor_apps():
     user_ID = get_jwt_identity()
-    apps = UserBusiness.get_favor_apps(user_ID=user_ID)
+    page_no = int(request.args.get('page_no', 1))
+    page_size = int(request.args.get('page_size', 5))
+
+    apps = UserBusiness.get_favor_apps(user_ID=user_ID, page_no=page_no, page_size=page_size)
     return jsonify({
-        'response': json_utility.me_obj_list_to_json_list(apps)
+        'response': {
+            "objects": json_utility.me_obj_list_to_json_list(apps.objects),
+            "count": apps.count,
+            "page_no": apps.page_no,
+            "page_size": apps.page_size
+        }
     })
 
 

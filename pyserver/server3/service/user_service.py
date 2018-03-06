@@ -13,6 +13,7 @@ from server3.business.app_business import AppBusiness
 from server3.constants import Error, ErrorMessage
 from server3.entity.general_entity import FavorAppReturn
 
+
 def add(user_ID, password, kwargs):
     hashed_password = generate_password_hash(password)
     return user_business.add(user_ID, hashed_password, kwargs)
@@ -25,8 +26,8 @@ def reset_password(phone, message_id, code, new_password):
         user = user_business.get_by_phone(phone=phone)
         user.password = generate_password_hash(new_password)
         return user.save()
-    # else:
-    #     raise Error(ErrorMessage)
+        # else:
+        #     raise Error(ErrorMessage)
 
 
 def authenticate(user_ID, password):
@@ -264,4 +265,47 @@ class UserService:
             return FavorAppReturn(user=user_result, app=app_result)
 
 
+# 尝试合并代码
+class Action:
+    business = None  # app / module
+    action_type = None  # favor / star /
+    # favor_apps
+    user_keyword = '{business}_{action_type}s'.format(business=business, action_type=action_type)
+    # favor_users
+    object_keyword = '{action_type}_users'.format(action_type=action_type)
 
+    @classmethod
+    def action(cls, user_ID, object_id):
+        user = user_business.get_by_user_ID(user_ID=user_ID)
+        app = cls.business.get_by_id(project_id=object_id)
+
+        if app not in user[cls.user_keyword]:
+            user[cls.user_keyword].append(app)
+            user_result = user.save()
+        else:
+            user[cls.user_keyword].remove(app)
+            user_result = user.save()
+        # 2. 在app下存favor_users
+        if user not in app[cls.object_keyword]:
+            app[cls.object_keyword].append(user)
+            app_result = app.save()
+        else:
+            app[cls.object_keyword].remove(user)
+            app_result = app.save()
+        if user_result and app_result:
+            return FavorAppReturn(user=user_result, app=app_result)
+
+
+class FavorApp(Action):
+    business = AppBusiness
+    action_type = 'favor'
+
+
+class StarApp(Action):
+    business = AppBusiness
+    action_type = 'star'
+
+
+class FavorModule(Action):
+    # business = ModuleBusiness
+    pass

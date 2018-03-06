@@ -2,6 +2,7 @@
 from server3.entity.user import User
 from server3.repository.user_repo import UserRepo
 from server3.business.general_business import GeneralBusiness
+from server3.entity.general_entity import Objects
 
 user_repo = UserRepo(User)
 
@@ -37,9 +38,13 @@ class UserBusiness(GeneralBusiness):
     repo = UserRepo(User)
 
     @classmethod
-    def get_favor_apps(cls, user_ID):
+    def get_favor_apps(cls, user_ID, page_no, page_size):
         user = cls.get_by_user_ID(user_ID=user_ID)
-        return user.favor_apps
+        start = (page_no - 1) * page_size
+        end = page_no * page_size
+        return Objects(objects=user.favor_apps[start:end],
+                       count=len(user.favor_appss), page_no=page_no, page_size=page_size)
+
 
     @classmethod
     def get_star_apps(cls, user_ID):
