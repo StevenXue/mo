@@ -1,7 +1,7 @@
 import { routerRedux } from 'dva/router'
 
 import { fetchProject, deleteProject, updateProject, forkProject } from '../services/project'
-import { getSessions, getTerminals } from '../services/job'
+import { getSessions, getTerminals, deleteSession, deleteTerminal } from '../services/job'
 import { deleteLab } from '../services/notebook'
 import { privacyChoices } from '../constants'
 import pathToRegexp from 'path-to-regexp'
@@ -26,7 +26,7 @@ export default {
         project,
       }
     },
-    setTermianls(state, { payload: terminals }) {
+    setTerminals(state, { payload: terminals }) {
       return {
         ...state,
         terminals,
@@ -67,10 +67,18 @@ export default {
       yield !action.notStartLab && call(startLabBack, { payload: { hubUserName, hubToken } }, { call })
       // yield call(startLabFront)
       // fetch jobs
-      const terminals = yield call(getTerminals, { hubUserName, hubToken })
-      const sessions = yield call(getSessions, { hubUserName, hubToken })
+      const { data: terminals } = yield call(getTerminals, { hubUserName, hubToken })
+      const { data: sessions } = yield call(getSessions, { hubUserName, hubToken })
       yield put({ type: 'setTerminals', payload: terminals })
       yield put({ type: 'setSessions', payload: sessions })
+    },
+    *closeSession({ sessionId, terminalName }, { call, put, select }) {
+      const project = yield select(state => get(state, 'projectDetail.project'))
+      const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
+      const hubToken = project.hub_token
+      yield sessionId && call(deleteSession, { hubUserName, hubToken, sessionId })
+      yield terminalName && call(deleteTerminal, { hubUserName, hubToken, terminalName })
+      yield put({ type: 'fetch', projectId: project._id })
     },
     // 获取该 project 的 Jobs
     // *fetchJobs(action, { call, put }) {
@@ -84,7 +92,7 @@ export default {
       const hubToken = project.hub_token
       yield call(deleteProject, payload)
       yield put(routerRedux.push('/workspace'))
-      yield call(deleteLab,  { hubUserName, hubToken })
+      yield call(deleteLab, { hubUserName, hubToken })
 
     },
     *setEntered({ projectId }, { call, put }) {

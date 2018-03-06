@@ -104,22 +104,45 @@
       background: grey;
     }
 
+    .subTitle {
+      margin-top: 15px;
+    }
+
     .jobCols {
       display: flex;
       flex-wrap: wrap;
-      padding: 5px 0;
+      margin: 5px 0;
 
       .jobCell {
         margin: 5px 0;
+        padding-right: 45px;
         width: 50%;
         line-height: 25px;
         //flex-direction: column;
 
-        .jobInfo {
-          //flex-direction: row;
-          //float: right;
+        .jobContainer {
+          padding: 5px 10px;
+          .shutDown {
+            display: none;
+            float: right;
+            cursor: pointer;
+          }
+
+          .jobInfo {
+            //flex-direction: row;
+            //float: right;
+          }
+        }
+        .jobContainer:hover {
+          background: @custom-grey-background;
+
+          .shutDown {
+            display: initial;
+          }
         }
       }
+
+
     }
   }
 }

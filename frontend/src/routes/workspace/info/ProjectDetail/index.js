@@ -24,9 +24,9 @@ const projectTypeDict = {
 }
 
 const myShowTime = (time) => {
-  const format = "yyyy-MM-dd hh:mm"
-  let date = new Date(time).Format(format);
-  return date.toLocaleString();
+  const format = 'yyyy-MM-dd hh:mm'
+  let date = new Date(time).Format(format)
+  return date.toLocaleString()
 }
 
 function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
@@ -144,7 +144,7 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
           </div>
 
           {/*content tabs*/}
-          <Tabs defaultActiveKey="1" onChange={callback} className={styles.jobs}>
+          <Tabs defaultActiveKey="2" onChange={callback} className={styles.jobs}>
             <TabPane tab="Overview" key="1">
               Some Description
               <br/>
@@ -153,41 +153,8 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
               Some Description
             </TabPane>
             <TabPane tab="Jobs" key="2">
-              <h2>Jobs:
-                <span className={styles.rightButton}>
-                     <Button onClick={() => {window.open(`http://localhost:${projectDetail.project.tb_port}`)}}>
-                       Jobs Visualization
-                     </Button>
-                </span>
-              </h2>
-              <p className={styles.overall}>
-                <span className={styles.done}>{projectDetail.sessions.filter(e => e.kernel.execution_state === 'idle').length}</span> idle&nbsp;&nbsp;&nbsp;&nbsp;
-                <span className={styles.busy}>{projectDetail.sessions.filter(e => e.kernel.execution_state === 'busy').length}</span> busy&nbsp;&nbsp;&nbsp;&nbsp;
-                {/*<span className={styles.error}>2</span> went error&nbsp;&nbsp;&nbsp;&nbsp;*/}
-              </p>
-              <div className={styles.jobCols}>
-                {projectDetail.terminals.map((job) =>
-                  <div key={job.name} className={styles.jobCell}>
-                  {job.name}
-                  {/*<p className={styles.jobInfo}>o Running Time: Start Time:</p>*/}
-                  </div>)}
-                {projectDetail.sessions.map((job) =>
-                {
-                  const blobDict = {
-                    busy: styles.bulbBusy,
-                    idle: styles.bulbIdle,
-                  }
-                  return <div key={job.id} className={styles.jobCell}>
-                    <h4>{job.path}</h4>
-                    <p className={styles.jobInfo}>
-                      <div className={blobDict[job.kernel.execution_state]}/>
-                      &nbsp;&nbsp;
-                      Last Activity: {myShowTime(job.kernel.last_activity)}</p>
-                  </div>
-                })}
-              </div>
+              <Jobs projectDetail={projectDetail} dispatch={dispatch}/>
             </TabPane>
-
             <TabPane tab="Examples" key="3">
               Some Description
               <br/>
@@ -202,6 +169,65 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
     }
     return <Spin spinning={true}>Loading...</Spin>
   }
+}
+
+const Jobs = ({ projectDetail, dispatch }) => {
+  return (
+    <div>
+      <h2>Jobs:
+        <span className={styles.rightButton}>
+                     <Button onClick={() => {window.open(`http://localhost:${projectDetail.project.tb_port}`)}}>
+                       Jobs Visualization
+                     </Button>
+                </span>
+      </h2>
+      <p className={styles.overall}>
+        <span className={styles.done}>
+          {projectDetail.sessions.filter(e => e.kernel.execution_state === 'idle').length}
+          </span> idle&nbsp;&nbsp;&nbsp;&nbsp;
+        <span className={styles.busy}>
+          {projectDetail.sessions.filter(e => e.kernel.execution_state === 'busy').length}
+          </span> busy&nbsp;&nbsp;&nbsp;&nbsp;
+        {/*<span className={styles.error}>2</span> went error&nbsp;&nbsp;&nbsp;&nbsp;*/}
+      </p>
+
+      <h3 className={styles.subTitle}>Sessions (Notebooks):</h3>
+      <div className={styles.jobCols}>
+        {projectDetail.sessions.map((job) => {
+          const blobDict = {
+            busy: styles.bulbBusy,
+            idle: styles.bulbIdle,
+          }
+          return <div key={job.id} className={styles.jobCell}>
+            <div className={styles.jobContainer}>
+              <h4>{job.path}
+                <Icon className={styles.shutDown} type='close'
+                      onClick={() => dispatch({ type: 'projectDetail/closeSession', sessionId: job.id })}/>
+              </h4>
+              <p className={styles.jobInfo}>
+                <span className={blobDict[job.kernel.execution_state]}/>
+                &nbsp;&nbsp;
+                Last Activity: {myShowTime(job.kernel.last_activity)}</p>
+            </div>
+          </div>
+        })}
+      </div>
+
+      <h3 className={styles.subTitle}>Terminals:</h3>
+      <div className={styles.jobCols}>
+        {projectDetail.terminals.map((job) =>
+          <div key={job.name} className={styles.jobCell}>
+            <div className={styles.jobContainer}>
+              <h4>{'Terminal/'}{job.name}
+                <Icon className={styles.shutDown} type='close'
+                      onClick={() => dispatch({ type: 'projectDetail/closeSession', terminalName: job.name })}/>
+              </h4>
+            </div>
+          </div>)}
+      </div>
+    </div>
+
+  )
 }
 
 function ProjectDetail({ match, history, location, dispatch, projectDetail }) {

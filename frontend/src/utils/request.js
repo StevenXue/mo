@@ -8,15 +8,15 @@ const onSuccessDef = function (response) {
 const onErrorDef = function (error) {
 }
 
-function checkStatus(response) {
+function checkStatus(response, noErrorMsg) {
   if (response.status >= 200 && response.status < 300) {
     // message.success('This is a message of success');
     return response
   }
-  // const error = new Error(response.statusText)
-  // error.response = response
-  message.error('This is a message of error: ' + response.statusText)
-  // return response
+  if(!noErrorMsg) {
+    message.error('This is a message of error: ' + response.statusText)
+  }
+  return response
   // return error;
 }
 
@@ -30,6 +30,7 @@ function checkStatus(response) {
  */
 export default async function request(url, options = {}, funcs = {}) {
   const { onSuccess, onJson, onError } = funcs
+
   try {
     const token = localStorage.getItem('token')
     if (token) {
@@ -38,26 +39,31 @@ export default async function request(url, options = {}, funcs = {}) {
       }
     }
     const response = await fetch(url, options)
-
-    const newRes = checkStatus(response)
+    const { noErrorMsg } = options
+    delete options.noErrorMsg
+    const newRes = checkStatus(response, noErrorMsg)
 
     onSuccess && await onSuccess(newRes)
 
     const data = await newRes.json()
 
-    onJson && await onJson(data.response)
+    const res = data.response || data
+
+    onJson && await onJson(res)
 
     const ret = {
-      data: data.response,
+      data: res,
       res: data,
       headers: {},
       status: response.status,
     }
+
     if (response.headers.get('x-total-count')) {
       ret.headers['x-total-count'] = response.headers.get('x-total-count')
     }
 
     return ret
+
   } catch (err) {
     console.log(url, err)
     onError && await onError(err)

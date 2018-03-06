@@ -30,6 +30,7 @@ export function startLab(payload) {
     headers: {
       'Authorization': `token ${hubToken}`,
     },
+    noErrorMsg: true
   })
 }
 
