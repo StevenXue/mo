@@ -12,16 +12,18 @@ class MessageType:
     user = "user"
 
 
-class Channel:
+class CHANNEL:
     chat = "chat"
     request = "request"
     api = "api"
     module = "module"
 
+    project = "project"
+
 
 class World(DynamicDocument):
     message_type = StringField(default=MessageType.admin)
     sender = ReferenceField("User")
-    channel = StringField(default=Channel.chat)
+    channel = StringField(default=CHANNEL.chat)
     message = StringField()
 

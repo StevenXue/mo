@@ -214,3 +214,6 @@ class Repo:
         for item in q_list:
             query |= item
         return self.__instance.objects(query)
+
+
+

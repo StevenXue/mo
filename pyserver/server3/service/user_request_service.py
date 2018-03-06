@@ -7,7 +7,7 @@ from server3.business import ownership_business
 from server3.repository import config
 from server3.utility import json_utility
 from server3.business import world_business
-from server3.entity.world import Channel
+from server3.entity.world import CHANNEL
 from server3.business.user_request_business import UserRequestBusiness
 from server3.business.request_answer_business import RequestAnswerBusiness
 
@@ -87,7 +87,7 @@ def create_user_request(title, user_ID, **kwargs):
         created_user_request = user_service.update_request_star(created_user_request.id, user_ID)
         # 消息推送
         message = create_request_message(created_user_request)
-        world_business.system_send(channel=Channel.request, message=message)
+        world_business.system_send(channel=CHANNEL.request, message=message)
         # get user object
         user = user_business.get_by_user_ID(user_ID=user_ID)
         # create ownership relation

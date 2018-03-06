@@ -71,7 +71,7 @@ def list_user_request():
 @jwt_required
 def create_user_request():
     if not request.json \
-            or 'title' not in request.json:
+            or 'title' not in request.json :
         return jsonify({'response': 'insufficient arguments'}), 400
     data = request.get_json()
     title = data.pop('title')
@@ -112,7 +112,6 @@ def update_user_request_star():
     result = json_utility.convert_to_json(result.to_mongo())
     print('update_user_request_star')
     return jsonify({'response': result}), 200
-
 
 
 

@@ -29,6 +29,9 @@ from server3.service import kube_service
 from server3.business import staging_data_set_business
 from server3.business import staging_data_business
 from server3.business import served_model_business
+from server3.business import world_business
+from server3.entity.world import CHANNEL
+
 from server3.utility import json_utility
 from server3.repository import config
 from server3.constants import USER_DIR
@@ -334,7 +337,7 @@ def get_all_jobs_of_project(project_id, categories, status=None):
                         job_info['staging_data_set_id'])
                     one_input_data_demo = []
                     for each_feture in \
-                            job_info['params']['fit']['data_fields'][0]:
+                        job_info['params']['fit']['data_fields'][0]:
                         one_input_data_demo.append(
                             staging_data_demo[each_feture])
                     input_data_demo_string = '[' + ",".join(
@@ -610,3 +613,64 @@ def get_playground(project_id):
     api = kube_service.service_api
     dep = api.read_namespaced_service(service_name, NAMESPACE)
     return dep.spec.ports[0].node_port
+
+
+class ProjectService:
+    business = ProjectBusiness
+    channel = CHANNEL.project
+
+    @classmethod
+    def create_project(cls, name, description, user_ID, tags=[], user_token='',
+                       type='project', **kwargs):
+        """
+        Create a new project
+
+        :param name: str
+        :param description: str
+        :param user_ID: ObjectId
+        :param is_private: boolean
+        :param type: string (app/module/dataset)
+        :param tags: list of string
+        :param user_token: string
+        :return: a new created project object
+        """
+        user = user_business.get_by_user_ID(user_ID)
+        message = "{}创建了app{}".format(user.name, name)
+        world_business.system_send(channel=cls.channel, message=message)
+
+        return cls.business.create_project(name=name, description=description,
+                                           type=type, tags=tags, user=user,
+                                           user_token=user_token, **kwargs)
+
+    @classmethod
+    def list_projects(cls, search_query, page_no=None, page_size=None,
+                      default_max_score=0.4, privacy=None,user_ID=None):
+        """
+        list projects
+        :param search_query:
+        :type search_query:
+        :param page_no:
+        :type page_no:
+        :param page_size:
+        :type page_size:
+        :param default_max_score:
+        :type default_max_score:
+        :param privacy:
+        :type privacy:
+        :param user_ID:
+        :type user_ID:
+        :return:
+        :rtype:
+        """
+
+        user = None
+        if user_ID:
+            user = user_business.get_by_user_ID(user_ID)
+        return cls.business.get_objects(
+            search_query=search_query,
+            privacy=privacy,
+            page_no=page_no,
+            page_size=page_size,
+            default_max_score=default_max_score,
+            user=user
+        )

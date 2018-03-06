@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 from server3.entity.user import User
 from server3.repository.user_repo import UserRepo
+from server3.business.general_business import GeneralBusiness
+from server3.entity.general_entity import Objects
 
 user_repo = UserRepo(User)
 
@@ -32,7 +34,31 @@ def update_user_request_by_id(user_ID, **kwargs):
     return user_repo.update_one(query, kwargs)
 
 
+class UserBusiness(GeneralBusiness):
+    repo = UserRepo(User)
+
+    @classmethod
+    def get_favor_apps(cls, user_ID, page_no, page_size):
+        user = cls.get_by_user_ID(user_ID=user_ID)
+        start = (page_no - 1) * page_size
+        end = page_no * page_size
+        return Objects(objects=user.favor_apps[start:end],
+                       count=len(user.favor_apps), page_no=page_no, page_size=page_size)
 
 
+    @classmethod
+    def get_star_apps(cls, user_ID):
+        user = cls.get_by_user_ID(user_ID=user_ID)
+        return user.star_apps
+
+    @classmethod
+    def get_by_user_ID(cls, user_ID):
+        return cls.repo.read_by_unique_field('user_ID', user_ID)
 
 
+if __name__ == "__main__":
+    # import sys
+    # sys.path.append('../../')
+    # user = get_by_user_ID(user_ID="bingwei")
+    # print("user", user)
+    UserBusiness.get_favor_apps(user_ID="bingwei")
