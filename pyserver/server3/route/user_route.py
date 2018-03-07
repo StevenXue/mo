@@ -203,6 +203,7 @@ def set_action_entity(entity_id):
     """
     user_ID = get_jwt_identity()
     data = request.get_json()
+    print('data')
     action = data.pop("action")
     entity = data.pop("entity")
 

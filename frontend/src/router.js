@@ -20,7 +20,7 @@ import MyService from './routes/MyService'
 import {ModuleList, Module} from './routes/Module'
 import Profile from './routes/Profile'
 import MarketList from './routes/market/ProjectList'
-import MarketDetail from './routes/market/ProjectDetail'
+// import MarketDetail from './routes/market/ProjectDetail'
 
 const breadcrumbNameMap = {
   '/user': 'User',
@@ -79,7 +79,7 @@ const RouterConfig = ({ history, location, projectDetail }) => {
           <Route path="/projects/:projectId" component={PublicProject}/>
           <Route path="/projects" component={Projects}/>
 
-          <Route path="/market/:projectId" component={MarketDetail}/>
+          <Route path="/market/:projectId" render={(props) => <ProjectDetail {...props} market_use={true} />}/>
           <Route path="/market" component={MarketList}/>
 
           <Route path="/modelmarket/:modelsId" component={PublicServedModelsDetail}/>

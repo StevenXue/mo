@@ -23,10 +23,14 @@ const projectTypeDict = {
   dataset: [],
 }
 
-function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
+function ProjectInfo({ market_use, match, history, location, dispatch, projectDetail,login }) {
 
   const projectId = match.params.projectId
   const user_ID = localStorage.getItem('user_ID')
+  const {
+    _id: user_obj_id,
+  }
+    = login.user
 
   const props1 = {
     name: 'file',
@@ -61,8 +65,15 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
     })
   }
 
-  function appStar(){
-
+  function appStarFavor(action){
+    dispatch({
+      type: 'projectDetail/star_favor',
+      payload: {
+        entity_id: projectDetail.project['_id'],
+        action:action,
+        entity:projectDetail.project.type
+      }
+    })
   }
 
   function callback(key) {
@@ -80,7 +91,6 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
     if (projectDetail.project) {
       // optional component list by project type
       const components = projectTypeDict[projectDetail.project.type]
-
       return (
         <div className={`main-container ${styles.normal}`}>
           {'help-modal' in components &&
@@ -89,24 +99,21 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
             {/*info head*/}
             <div className={styles.name}>
               <h1>
-                {/*<Icon*/}
-                  {/*type={focusUserRequest['star_user'].includes(user_obj_id) ? "star" : "star-o"}*/}
-                  {/*style={{fontSize: '22px', color: '#34c0e2'}}*/}
-                  {/*onClick={() =>appStar()}/>*/}
                 <Icon
-                type={ "star-o" }
+                  // type="star"
+                  type={projectDetail.project.favor_users.includes(user_obj_id) ? "star" : "star-o"}
                 style={{fontSize: '22px', color: '#34c0e2'}}
-                onClick={() =>appStar()}/>
+                onClick={() =>appStarFavor('favor')}/>
                 {projectDetail.project.name}&nbsp;
-                <Icon type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
-                      style={{ fontSize: 20 }}/>
-                <span className={styles.rightButton}>
+                {!market_use?<Icon type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
+                      style={{ fontSize: 20 }}/>:null}
+                {!market_use?<span className={styles.rightButton}>
                   <ProjectModel new={false} projectDetail={projectDetail}
                                 >
                     <Button icon='edit' style={{ marginRight: 15 }}/>
                   </ProjectModel>
                   <Button icon='delete' onClick={() => deleteProject()}/>
-                </span>
+                </span>:null}
               </h1>
               <p className={styles.text} style={{ fontSize: 14, marginTop: 6 }}>
                 <Icon type="clock-circle-o" style={{ marginRight: 10 }}/>
@@ -197,6 +204,10 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
   }
 }
 
+ProjectInfo.defaultProps={
+  market_use:false
+}
+
 function ProjectDetail({ match, history, location, dispatch, projectDetail }) {
 
   return (
@@ -221,4 +232,4 @@ function ProjectDetail({ match, history, location, dispatch, projectDetail }) {
   )
 }
 
-export default connect(({ projectDetail }) => ({ projectDetail }))(ProjectInfo)
+export default connect(({ projectDetail, login }) => ({ projectDetail, login }))(ProjectInfo)

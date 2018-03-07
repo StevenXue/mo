@@ -10,6 +10,8 @@ import * as dataAnalysisService from '../services/dataAnalysis'
 import { message } from 'antd/lib/index'
 
 import { startLabBack } from './modelling'
+import * as UserStarFavorService from "../services/user"
+
 
 export default {
   namespace: 'projectDetail',
@@ -48,6 +50,14 @@ export default {
         project,
       }
     },
+
+    updateStarFavor(state, action){
+      return {
+        ...state,
+        project:action.payload.project,
+      }
+    }
+
   },
   effects: {
     // 获取该 project
@@ -101,6 +111,7 @@ export default {
       let { data: newProject } = yield call(updateProject, { body: project, projectId })
       // yield put({ type: 'setProject', payload: newProject })
     },
+
     *fork({ payload }, { call, put, select }) {
       const projectId = yield select(state => state.projectDetail.project._id)
       const res = yield call(forkProject, projectId)
@@ -108,13 +119,23 @@ export default {
       const url0 = `/workspace/${res.data._id}`
       yield put(routerRedux.replace(url0))
     },
+
+    *star_favor(action, {call, put, select}){
+      let payload = action.payload
+      const {data: project} = yield call(UserStarFavorService.set_star_favor, payload)
+      yield put({
+        type: 'updateStarFavor',
+        payload: project
+      })
+
+    }
   },
   subscriptions: {
     // 当进入该页面获取project
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
         const match = pathToRegexp('/workspace/:projectId/:anything?').exec(pathname)
-        const match2 = pathToRegexp('/projects/:projectId/:anything?').exec(pathname)
+        const match2 = pathToRegexp('/market/:projectId/:anything?').exec(pathname)
         if (match) {
           const projectId = match[1]
           dispatch({ type: 'fetch', projectId: projectId })

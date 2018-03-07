@@ -14,6 +14,7 @@ from server3.business.app_business import AppBusiness
 from server3.constants import Error, ErrorMessage
 from server3.entity.general_entity import UserEntity
 from server3.business.user_request_business import UserRequestBusiness
+from server3.business.data_set_business import DatasetBusiness
 
 def add(user_ID, password, kwargs):
     hashed_password = generate_password_hash(password)
@@ -250,6 +251,7 @@ class UserService:
             "app": AppBusiness,
             "module": model_business,
             "request": UserRequestBusiness,
+            "dataset": DatasetBusiness,
         }
         business = business_maper[entity]
         object = business.get_by_id(entity_id)

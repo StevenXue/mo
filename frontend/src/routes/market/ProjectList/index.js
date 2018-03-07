@@ -88,8 +88,8 @@ class ProjectList extends Component {
     this.fetchData({ payload: { query: value } })
   }
 
-  toProjectDetail(id, history) {
-    history.push(`/market/${id}`)
+  toProjectDetail(id, history ) {
+    this.props.dispatch({ type: 'project/push', id,route:'market' })
   }
 
   render() {

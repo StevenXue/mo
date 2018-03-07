@@ -114,8 +114,6 @@ def update_user_request_star():
     return jsonify({'response': result}), 200
 
 
-
-
 @user_request_app.route('/<user_request_id>', methods=['DELETE'])
 @jwt_required
 def remove_user_request_by_id(user_request_id):

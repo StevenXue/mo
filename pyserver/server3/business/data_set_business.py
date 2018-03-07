@@ -7,6 +7,7 @@ from server3.business.project_business import ProjectBusiness
 from server3.repository.data_set_repo import DataSetRepo
 from server3.repository.general_repo import Repo
 from server3.repository import config
+from server3.business.general_business import GeneralBusiness
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
@@ -38,5 +39,5 @@ def remove(data_set_obj):
     return data_set_repo.delete_by_id(data_set_obj.id)
 
 
-class DatasetBusiness(ProjectBusiness):
+class DatasetBusiness(ProjectBusiness, GeneralBusiness):
     repo = Repo(project.Dataset)
