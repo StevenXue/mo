@@ -18,9 +18,8 @@ RUN pip install jupyterlab==0.31.0 && jupyter serverextension enable --py jupyte
 
 RUN jupyter labextension install @jupyterlab/hub-extension
 RUN pip install tensorflow -U
+RUN pip install virtualenvwrapper
 #RUN apt-get install curl
-ADD jupyterhub_config.py .
 ADD run.sh .
 #ADD modules ./modules
-#RUN tensorboard --logdir=/home/jovyan/work/logs
 CMD ['bash', '/home/jovyan/run.sh']

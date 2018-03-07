@@ -75,7 +75,7 @@ const RouterConfig = ({ history, location, projectDetail }) => {
           <Route path="/workspace" component={MyProjects}/>
           <Route path="/projects/:projectId" component={PublicProject}/>
           <Route path="/projects" component={Projects}/>
-          <Route path="/modelmarket/:modelsId" component={PublicServedModelsDetail}/>
+          <Route path="/modelmarket/:modelsId" render={(props) => <ProjectDetail {...props} />}/>
           <Route path="/modelmarket" component={PublicServedModels}/>
           <Route path="/myservice" component={MyService}/>
           <Route path="/userrequest/:userrequestId" component={UserRequestDetail}/>

@@ -23,8 +23,7 @@ const projectTypeDict = {
   dataset: [],
 }
 
-const myShowTime = (time) => {
-  const format = 'yyyy-MM-dd hh:mm'
+const myShowTime = (time, format = 'yyyy-MM-dd hh:mm') => {
   let date = new Date(time).Format(format)
   return date.toLocaleString()
 }
