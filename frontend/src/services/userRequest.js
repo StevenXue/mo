@@ -5,27 +5,29 @@ const {CORS, api} = config
 
 
 // 新建 request
-export function createNewUserRequest(payload) {
+export function createNewUserRequest({body, onJson}) {
   // let category = encodeURIComponent(payload.category)
   // payload.user_ID = localStorage.getItem('user_ID')
   // noinspection JSAnnotator
+  console.log(body)
   return request(`${CORS}/user_requests`, {
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      user_id:payload.user_ID,
-      request_title:payload.requestTitle,
-      request_input:payload.requestInput,
-      request_output:payload.requestOutput,
-      request_description:payload.requestDescription,
-      request_tags:payload.requestTags,
-      request_category:payload.requestCategory,
-      request_dataset:payload.requestDataset,
-    }),
-  });
+    body: JSON.stringify(body),
+  }, { onJson });
 }
+
+// 更新 project
+export function updateUserRequest({ body, userRequestId, onJson }) {
+  return request(`${CORS}/user_requests/${userRequestId}`, {
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  }, { onJson })}
 
 
 // 获取某一个用户下 所有 request
@@ -36,10 +38,18 @@ export function fetchUserRequestByUserID(payload) {
 
 
 // 获取所有的 request
-export function fetchAllUserRequest(payload) {
-  let page_no = payload.page_no;
-  let page_size = payload.page_size;
-  return request(`${CORS}/user_requests?page_no=${page_no}&page_size=${page_size}`);
+export function fetchAllUserRequest({payload, onJson}) {
+  let params = ''
+  for (let key in payload) {
+    if (!payload.hasOwnProperty(key)) {
+      continue
+    }
+    if (payload[key]) {
+      const value = payload[key]
+      params += `&${key}=${value}`
+    }
+  }
+  return request(`${CORS}/user_requests?${params}`, undefined, { onJson });
 }
 
 

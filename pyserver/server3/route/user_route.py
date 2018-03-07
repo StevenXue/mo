@@ -17,12 +17,15 @@ from flask import redirect
 from flask import request
 from flask_jwt_extended import create_access_token
 from mongoengine import DoesNotExist
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server3.repository import config
 from server3.business import user_business
 from server3.service import user_service
 from server3.utility import json_utility
 from server3.constants import Error
+from server3.service.user_service import UserService
+from server3.business.user_business import UserBusiness
 
 PREFIX = '/user'
 
@@ -141,8 +144,56 @@ def login_with_phone():
         return jsonify(response), 200
 
 
-@user_app.route('/favor_api', methods=['PUT'])
-def favor_api():
+# @user_app.route('/favor_api', methods=['PUT'])
+# def favor_api():
+#     """
+#     在用户和api下都存一份
+#     用户存api_id
+#     api存 user_ID
+#     :return:
+#     :rtype:
+#     """
+#     user_ID = request.json.get('user_ID', None)
+#     api_id = request.json.get('api_id', None)
+#     result = user_service.favor_api(user_ID=user_ID, api_id=api_id)
+#     if result:
+#         result = json_utility.convert_to_json(result)
+#         return jsonify({
+#             'message': "success",
+#             'response': result
+#         }), 200
+#     else:
+#         return jsonify({'response': "failed"}), 400
+#
+#
+# @user_app.route('/star_api', methods=['PUT'])
+# def star_api():
+#     """
+#     在用户和api下都存一份
+#     用户存api_id
+#     api存 user_ID
+#     :return:
+#     :rtype:
+#     """
+#     user_ID = request.json.get('user_ID', None)
+#     api_id = request.json.get('api_id', None)
+#     result = user_service.star_api(user_ID=user_ID, api_id=api_id)
+#     if result:
+#         result = json_utility.convert_to_json(result)
+#         return jsonify({
+#             'message': "success",
+#             'response': result
+#         }), 200
+#     else:
+#         return jsonify({'response': "failed"}), 400
+
+
+# new routes
+# TODO 写获取统一接口 传入 type: favor/star/used, entity: app/module/dataset/request
+# TODO 写统一执行动作 type: favor/star, entity: app/module/dataset/request
+@user_app.route('/action_entity/<entity_id>', methods=['PUT'])
+@jwt_required
+def set_action_entity(entity_id):
     """
     在用户和api下都存一份
     用户存api_id
@@ -150,62 +201,94 @@ def favor_api():
     :return:
     :rtype:
     """
-    user_ID = request.json.get('user_ID', None)
-    api_id = request.json.get('api_id', None)
-    result = user_service.favor_api(user_ID=user_ID, api_id=api_id)
+    user_ID = get_jwt_identity()
+    data = request.get_json()
+    print('data')
+    action = data.pop("action")
+    entity = data.pop("entity")
+
+    result = UserService.action_entity(
+        user_ID=user_ID, entity_id=entity_id, action=action, entity=entity)
+
     if result:
-        result = json_utility.convert_to_json(result)
         return jsonify({
             'message': "success",
-            'response': result
+            'response': {
+                "entity": json_utility.convert_to_json(result.entity.to_mongo()),
+                "user": json_utility.convert_to_json(result.user.to_mongo())
+            }
         }), 200
     else:
         return jsonify({'response': "failed"}), 400
 
 
-@user_app.route('/star_api', methods=['PUT'])
-def star_api():
-    """
-    在用户和api下都存一份
-    用户存api_id
-    api存 user_ID
-    :return:
-    :rtype:
-    """
-    user_ID = request.json.get('user_ID', None)
-    api_id = request.json.get('api_id', None)
-    result = user_service.star_api(user_ID=user_ID, api_id=api_id)
-    if result:
-        result = json_utility.convert_to_json(result)
-        return jsonify({
-            'message': "success",
-            'response': result
-        }), 200
-    else:
-        return jsonify({'response': "failed"}), 400
+@user_app.route('/action_entity', methods=['GET'])
+@jwt_required
+def get_action_entity():
+    user_ID = get_jwt_identity()
+    action_entity = request.args.get("action_entity")
+    page_no = int(request.args.get('page_no', 1))
+    page_size = int(request.args.get('page_size', 5))
+    apps = UserBusiness.get_action_entity(
+        user_ID=user_ID, action_entity=action_entity,
+        page_no=page_no, page_size=page_size)
+    return jsonify({
+        'response': {
+            "objects": json_utility.me_obj_list_to_json_list(apps.objects),
+            "page_size": apps.page_size,
+            "page_no": apps.page_no,
+            "count": apps.count,
+        }
+    })
 
 
-
-
-        # @user_app.route('/un_favor_api', methods=['PUT'])
-        # def un_favor_api():
-        #     """
-        #     在用户和api下都存一份
-        #     用户存api_id
-        #     api存 user_ID
-        #     :return:
-        #     :rtype:
-        #     """
-        #     user_ID = request.json.get('user_ID', None)
-        #     api_id = request.json.get('api_id', None)
-        #     result = user_service.un_favor_api(user_ID=user_ID, api_id=api_id)
-        #     if result:
-        #         result = json_utility.convert_to_json(result)
-        #         return jsonify({
-        #             'message': "success",
-        #             'response': result
-        #         }), 200
-        #     else:
-        #         return jsonify({'response': "failed"}), 400
-
-        # curl --insecure -X POST -v https://api.sms.jpush.cn/v1/codes -H "Content-Type: application/json"  -u "26eeaa3d279c322e84f95441:f024677b9cc3d1eff4148410" -d '{"mobile":"15988731660","temp_id":1}'
+# @user_app.route('/favor_app/<app_id>', methods=['PUT'])
+# @jwt_required
+# def favor_app(app_id):
+#     """
+#     在用户和api下都存一份
+#     用户存api_id
+#     api存 user_ID
+#     :return:
+#     :rtype:
+#     """
+#     user_ID = get_jwt_identity()
+#     result = UserService.favor_app(user_ID=user_ID, app_id=app_id)
+#     if result:
+#         return jsonify({
+#             'message': "success",
+#             'response': {
+#                 "app": json_utility.convert_to_json(result.app.to_mongo()),
+#                 "user": json_utility.convert_to_json(result.user.to_mongo())
+#             }
+#         }), 200
+#     else:
+#         return jsonify({'response': "failed"}), 400
+#
+#
+# @user_app.route('/favor_apps', methods=['GET'])
+# @jwt_required
+# def get_favor_apps():
+#     user_ID = get_jwt_identity()
+#     page_no = int(request.args.get('page_no', 1))
+#     page_size = int(request.args.get('page_size', 5))
+#
+#     apps = UserBusiness.get_favor_apps(user_ID=user_ID, page_no=page_no, page_size=page_size)
+#     return jsonify({
+#         'response': {
+#             "objects": json_utility.me_obj_list_to_json_list(apps.objects),
+#             "count": apps.count,
+#             "page_no": apps.page_no,
+#             "page_size": apps.page_size
+#         }
+#     })
+#
+#
+# @user_app.route('/star_apps', methods=['GET'])
+# @jwt_required
+# def get_star_apps():
+#     user_ID = get_jwt_identity()
+#     apps = UserBusiness.get_star_apps(user_ID=user_ID)
+#     return jsonify({
+#         'response': json_utility.me_obj_list_to_json_list(apps)
+#     })

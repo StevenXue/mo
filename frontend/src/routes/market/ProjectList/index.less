@@ -1,0 +1,101 @@
+
+.normal {
+  //width: 100%;
+
+  .header {
+
+    .select {
+      width: 140px;
+      margin-right: 20px;
+    }
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .rightButton {
+    float: right;
+  }
+
+  .projectList {
+    margin: 24px 0;
+    display: flex;
+    background-color: white;
+    .card {
+      margin: 15px 0;
+      .des {
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+      .other {
+        font-size: 12px;
+      }
+
+    }
+  }
+}
+
+.projectCard {
+  width: 270px;
+  height: 280px;
+  margin: 10px 10px 10px 10px;
+  //padding: 5px 5px 5px 5px;
+  //border: 1px solid #CECECE;
+  position: relative;
+  box-shadow: 0px 2px 7px #CECECE;
+  .name {
+    font-size: 18px;
+    height: 40px;
+    position: absolute;
+    top: 8px;
+    left: 80px;
+  }
+  .description {
+    height: 83px;
+    position: absolute;
+    top: 67px;
+    left: 13px;
+    font-size: 12px;
+  }
+
+  .authorDateDiv {
+    height: 35px;
+    position: absolute;
+    top: 150px;
+    left: 13px;
+    display: flex;
+    .authorDiv {
+      width: 130px;
+      .authorP {
+        color: #A7A8AA;
+        font-size: 12px;
+      }
+    }
+    .dateDiv {
+      .dateP {
+        color: #A7A8AA;
+        font-size: 12px;
+      }
+    }
+  }
+
+  .categoryDiv {
+    position: absolute;
+    top: 200px;
+    left: 13px;
+    .categoryP {
+      color: #A7A8AA;
+      font-size: 12px;
+    }
+  }
+  .starFavorDiv{
+    width: 100%;
+    border-top: 1px solid #E9E9E9;
+    height: 30px;
+    position: absolute;
+    bottom: 2px;
+  }
+}

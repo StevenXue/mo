@@ -95,6 +95,11 @@ export default {
       yield put({ type: 'setProjectsLoading', payload: false })
     },
 
+    *push({id, route}, { call, put, select, take }) {
+      yield put({ type: 'projectDetail/setProject', payload: undefined })
+      yield put(routerRedux.push(`/${route}/${id}`))
+    },
+
     *create({ body }, { call, put, select }) {
       // const user_ID = 'dev_1'
       // body['user_ID'] = yield select(state => state.login.user.user_ID)

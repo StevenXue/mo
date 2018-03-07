@@ -20,49 +20,50 @@ request_answer_app = Blueprint("request_answer_app", __name__,
 @request_answer_app.route('', methods=['GET'])
 def list_request_answer():
     user_request_id = request.args.get("user_request_id")
-    user_id = request.args.get("user_ID")
+    user_ID = request.args.get("user_ID")
     if user_request_id:
         request_answer = request_answer_service. \
             get_all_answer_of_this_user_request(user_request_id)
-        request_answer = json_utility. \
+        request_answer_info = json_utility. \
             me_obj_list_to_json_list(request_answer)
-        # 得到每一个answer下的comments
+        # 得到每一个answer下的comments 和 selcet project
 
-        for answer in request_answer:
+        for index, answer in enumerate(request_answer_info):
             answer_comment = comments_service.get_comments_of_this_answer(
                 answer['_id'])
-            answer_comment = json_utility. \
+            answer_comment_info = json_utility. \
                 me_obj_list_to_json_list(answer_comment)
-            answer['comment'] = answer_comment
-
-        return jsonify({'response': request_answer}), 200
-    elif user_id:
+            answer['comment'] = answer_comment_info
+            if 'select_project' in answer:
+                answer['select_project'] = json_utility.convert_to_json(
+                request_answer[index].select_project.to_mongo())
+        print(request_answer_info)
+        return jsonify({'response': request_answer_info}), 200
+    elif user_ID:
         request_answer = request_answer_service.\
-            list_request_answer_by_user_id(user_id)
-        request_answer = json_utility. \
+            list_request_answer_by_user_id(user_ID)
+        request_answer_info = json_utility. \
             me_obj_list_to_json_list(request_answer)
-        return jsonify({'response': request_answer}), 200
+        return jsonify({'response': request_answer_info}), 200
     else:
         return jsonify({'response': 'insufficient arguments'}), 400
 
 
 @request_answer_app.route('', methods=['POST'])
+@jwt_required
 def create_request_answer():
-    print('aha')
     if not request.json \
             or 'answer' not in request.json \
-            or 'user_request_id' not in request.json \
-            or 'user_id' not in request.json:
+            or 'user_request_id' not in request.json:
         return jsonify({'response': 'insufficient arguments'}), 400
     data = request.get_json()
-    answer = data['answer']
-    user_id = data['user_id']
-    user_request_id = data['user_request_id']
-    print('user_request_id')
-    print(user_request_id)
-
-    request_answer_service.create_request_answer(
-        user_request_id, user_id, answer)
+    data['answer_user_ID'] = get_jwt_identity()
+    select_project = data.pop('selectProject')
+    if select_project:
+        select_project = ObjectId(select_project)
+        data['select_project'] = select_project
+    data['user_request_id'] = ObjectId(data['user_request_id'])
+    request_answer_service.create_request_answer(**data)
     return jsonify({'response': 'create request_answer success'}), 200
 
 

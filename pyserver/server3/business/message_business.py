@@ -17,12 +17,12 @@ receiver_repo = ReceiverRepo(Receiver)
 
 def get_by_user_id(user_id):
     receivers = receiver_repo.read({'obj_id': ObjectId(user_id)})
-    receivers = json_utility.convert_to_json([i.to_mongo()
+    receivers_info = json_utility.convert_to_json([i.to_mongo()
                                               for i in receivers])
     print('receivers')
     print(receivers)
     messages = []
-    for receiver in receivers:
+    for receiver in receivers_info:
         message = message_repo.read_unique_one(
             {'_id': ObjectId(receiver['message'])})
         message_info = message.to_mongo()

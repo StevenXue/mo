@@ -23,18 +23,18 @@ def get_by_id(user_request_comments_id):
     return user_request_comments
 
 
-def create_user_request_comments(user_request_id, user_id, comments,
+def create_user_request_comments(user_request_id, user_ID, comments,
                                  comments_type,request_answer_id):
     # create a new user_request_comments object
     created_user_request_comments = comments_business.\
         add_user_request_comments(user_request_id=user_request_id,
-                                  comments_user_id=user_id,
+                                  comments_user_ID=user_ID,
                                   comments=comments,
                                   comments_type=comments_type,
                                   request_answer_id=request_answer_id)
     if created_user_request_comments:
         # get user object
-        user = user_business.get_by_user_ID(user_ID=user_id)
+        user = user_business.get_by_user_ID(user_ID=user_ID)
         # create ownership relation
         if ownership_business.add(user,
                                   user_request_comments=
@@ -47,13 +47,13 @@ def create_user_request_comments(user_request_id, user_id, comments,
         raise RuntimeError('Cannot create the new user_request_comments')
 
 
-def update_user_request_comments(user_request_comments_id, user_id, comments):
+def update_user_request_comments(user_request_comments_id, user_ID, comments):
     user_request_comments = comments_business.\
         get_by_user_request_comments_id(user_request_comments_id)
     ownership = ownership_business.get_ownership_by_owned_item(
         user_request_comments, 'user_request_comments'
     )
-    if ownership.user.user_ID != user_id:
+    if ownership.user.user_ID != user_ID:
         raise RuntimeError(
             'this request not belong to this user, cannot update')
     else:

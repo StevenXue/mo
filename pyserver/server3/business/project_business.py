@@ -23,11 +23,13 @@ from server3.business import user_business
 from server3.constants import USER_DIR
 from server3.constants import HUB_SERVER
 from server3.constants import ADMIN_TOKEN
-
+from server3.entity.general_entity import Objects
 PAGE_NO = 1
 PAGE_SIZE = 5
 
 project_repo = ProjectRepo(Project)
+
+# Objects = collections.namedtuple('Objects', ('objects', 'count', 'page_no', 'page_size'))
 
 
 def add(name, description, tags, type, hub_token, project_path):
@@ -178,6 +180,7 @@ class ProjectBusiness:
         :param default_max_score:
         :return:
         """
+
         start = (page_no - 1) * page_size
         end = page_no * page_size
         # 获取所有的
@@ -191,7 +194,14 @@ class ProjectBusiness:
             objects = objects(privacy=privacy)
         if user:
             objects = objects(user=user)
-        return objects.order_by('-create_time')[start:end]
+        count = objects.count()
+        return Objects(objects=objects, count=count, page_no=page_no, page_size=page_size)
+        # return {
+        #     "objects": objects.order_by('-create_time')[start:end],
+        #     "count": count,
+        #     "page_no": page_no,
+        #     "page_size": page_size,
+        # }
 
     @classmethod
     def create_project(cls, name, description, user, privacy='private',
@@ -290,3 +300,5 @@ class ProjectBusiness:
         user = user_business.get_by_user_ID(user_ID)
         return cls.repo.update_unique_one(dict(name=project_name, user=user),
                                           data)
+
+    # @classmethod

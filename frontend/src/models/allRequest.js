@@ -42,10 +42,10 @@ export default {
     userRequestDic: {},
     focusUserRequest: null,
     loadingState: false,
-    modalState: false,
     pageNo:1,
     pageSize:10,
-    totalNumber:0
+    totalNumber:0,
+    modalVisible: false,
   },
   reducers: {
     // 获取所有的request
@@ -59,6 +59,15 @@ export default {
         }
       }
     },
+
+    showModal(state) {
+      return { ...state, modalVisible: true }
+    },
+
+    hideModal(state) {
+      return { ...state, modalVisible: false }
+    },
+
 
     changePageNoSize(state, action){
       return {
@@ -203,12 +212,7 @@ export default {
         }
       }
     },
-    showModal(state, action) {
-      return {
-        ...state,
-        modalState: action.payload.modalState,
-      }
-    },
+
 
     showLoading(state, action) {
       return {
@@ -256,12 +260,8 @@ export default {
       let payload =  action.payload
       payload.page_no = yield select(state => state.allRequest.pageNo)
       payload.page_size = yield select(state => state.allRequest.pageSize)
-      console.log('payload')
-      console.log(payload)
       const {data: {user_request:userRequest,total_number:totalNumber}} = yield call(
         userRequestService.fetchAllUserRequest, payload)
-
-
       if (userRequest.length > 0) {
         yield put({
           type: 'setAllRequest',
@@ -270,6 +270,9 @@ export default {
         })
       }
     },
+
+
+
     * fetchOneRequest(action, {call, put}) {
       const {data: focusUserRequest} = yield call(userRequestService.fetchOneUserRequest,
         {user_request_ID: action.payload.userrequestId})
@@ -288,11 +291,9 @@ export default {
     // 发布新request
     * makeNewRequest(action, {call, put, select}) {
       yield put({type: 'showLoading', payload: {loadingState: true}})
-      const user_ID = yield select(state => state.login.user.user_ID)
       let payload = action.payload
-      payload.user_ID = user_ID
       // console.log('halo')
-      // console.log(payload)
+      console.log(payload)
       const {data: result} = yield call(userRequestService.createNewUserRequest, payload)
       if (result) {
         yield put({type: 'showLoading', payload: {loadingState: false}})
@@ -324,10 +325,8 @@ export default {
     },
     // 发布新回答
     * makeNewRequestAnswer(action, {call, put, select}) {
-      const user_ID = yield select(state => state.login.user.user_ID)
       const user_request_id = yield select(state => state.allRequest.focusUserRequest._id)
       let payload = action.payload
-      payload.user_id = user_ID
       payload.user_request_id = user_request_id
       // console.log(payload)
       const {data: result} = yield call(requestAnswerService.createNewUserRequestAnswer, payload)
@@ -389,10 +388,10 @@ export default {
       return history.listen(({pathname}) => {
         const match = pathToRegexp('/userrequest/:userrequestId').exec(pathname)
         if (pathname === '/userrequest') {
-          dispatch({
-            type: 'fetchAllRequest',
-            payload: {}
-          })
+          // dispatch({
+          //   type: 'fetchAllRequest',
+          //   payload: {}
+          // })
         } else if (match) {
           console.log('match')
           dispatch({

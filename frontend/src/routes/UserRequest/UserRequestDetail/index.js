@@ -2,16 +2,23 @@ import React from 'react'
 import {connect} from 'dva'
 import {routerRedux} from 'dva/router'
 import styles from './index.less'
-import {Tabs, Switch, Button, Input, Form, Card, Icon, Row, Col} from 'antd'
+import {
+  Tabs, Switch, Button, Input, Form, Card, Icon,
+  Row, Col, Select, Spin, Modal
+} from 'antd'
+import debounce from 'lodash.debounce'
 import {get} from 'lodash'
 import {showTime} from '../../../utils/index'
 import BraftEditor from 'braft-editor'
 import 'braft-editor/dist/braft.css'
 import {JsonToArray} from "../../../utils/JsonUtils"
+import RequestModal from '../../../components/RequestModal/index'
+import {getProjects} from "../../../services/project"
 
 const {TextArea} = Input
 const TabPane = Tabs.TabPane
 const FormItem = Form.Item
+const confirm = Modal.confirm
 
 function hasErrors(fieldsError) {
   return Object.keys(fieldsError).some(field => fieldsError[field])
@@ -102,19 +109,81 @@ class CommentForm extends React.Component {
 
 class AnswerForm extends React.Component {
 
+
+  constructor() {
+    super()
+    this.lastFetchId = 0
+    this.fetchData = debounce(this.fetchData, 800)
+  }
+
   state = {
     content: null,
     html: null,
+    data: [],
+    value: [],
+    fetching: false,
+    projects: [],
+    selected: [],
+    inputValue: null
+  }
+
+  fetchData = (value) => {
+    this.setState({
+      fetching: true
+    })
+    const {type} = this.props
+    this.setState({projects: [], fetching: true, query: value})
+    let filter = {'type': type, 'query': value}
+    getProjects({
+      filter,
+      onJson: (projects) => this.setState({
+        projects, fetching: false
+      })
+    })
+
+  }
+
+  handleSelectChange = (value) => {
+    console.log('dwf')
+    console.log(value)
+
+    this.setState({
+      value,
+      data: [],
+      fetching: false,
+      selected: this.state.projects.filter(function (element) {
+        return (element['_id'] == value.key)
+      })
+    })
+  }
+
+  clearSelect = () => {
+    this.setState({
+      value: [],
+      data: [],
+      fetching: false,
+      selected: []
+    })
   }
 
   handleSubmit = () => {
-    console.log(this.state.html)
+    console.log(this.state)
+    let selectProjectID = null
+    if (this.state.selected.length > 0) {
+      selectProjectID = this.state.selected[0]['_id']
+    }
+    console.log('selectProjectID')
+    console.log(selectProjectID)
     this.props.dispatch({
       type: 'allRequest/makeNewRequestAnswer',
       payload: {
-        answer: this.state.html,
+        // answer: this.state.html,
+        answer: this.state.inputValue,
+        selectProject: selectProjectID
       }
     })
+    this.clearSelect()
+    this.setState({inputValue: null})
   }
 
   handleChange = (content) => {
@@ -137,9 +206,16 @@ class AnswerForm extends React.Component {
     return file.size < 1024 * 100
   }
 
+
+  handleInputChange(e) {
+    this.setState({inputValue: e.target.value})
+  }
+
+
   render() {
+
     const editorProps = {
-      placeholder: 'Hello World!',
+      placeholder: 'More description about your answer more help',
       height: 200,
       language: 'en',
       initialContent: this.state.content,
@@ -153,13 +229,43 @@ class AnswerForm extends React.Component {
         uploadFn: null // 指定上传函数
       }
     }
+    const {fetching, data, value, projects, inputValue} = this.state
+    // console.log('lll')
+    // console.log(this.state)
     return (
       <div className="demo">
-        <BraftEditor {...editorProps}/>
+        {this.state.selected.length > 0 ?
+          <Card title={this.state.selected[0].name}
+                extra={<Icon type="close" onClick={this.clearSelect}/>}>
+            <p>{this.state.selected[0].description}</p></Card> : null}
+        {this.state.selected.length === 0 ? <Select
+          mode="combobox"
+          labelInValue
+          value={value}
+          placeholder={"Select " + this.props.type}
+          notFoundContent={fetching ? <Spin size="small"/> : null}
+          filterOption={false}
+          onSearch={this.fetchData.bind(this)}
+          onChange={this.handleSelectChange}
+          style={{width: '100%'}}
+        >
+          {projects.map(d => <Select.Option
+            key={d._id}>{d.name}</Select.Option>)}
+        </Select> : null}
+        {/*<BraftEditor {...editorProps}/>*/}
+        <div style={{margin: '24px 0'}}/>
+        <TextArea
+          value={inputValue}
+          placeholder="More description about your answer more help"
+          autosize={{minRows: 5, maxRows: 50}}
+          onChange={(e) => this.handleInputChange(e)}
+        />
+        <div style={{margin: '24px 0'}}/>
         <Button
           type="primary"
           htmlType="submit"
-          disabled={this.state.html === null}
+          // disabled={this.state.html === null}
+          disabled={this.state.inputValue === null}
           onClick={this.handleSubmit}
         >
           Post Your Answer
@@ -198,7 +304,6 @@ function UserRequestDetail({allRequest, login, dispatch}) {
   } = allRequest
 
 
-
   function requestVotesUp() {
     dispatch({
       type: 'allRequest/votesUpRequest',
@@ -226,38 +331,65 @@ function UserRequestDetail({allRequest, login, dispatch}) {
     })
   }
 
-  function acceptAnswer(request_answer_id) {
-    dispatch({
-      type: 'allRequest/acceptAnswer',
-      payload: {
-        user_request_id: focusUserRequest['_id'],
-        request_answer_id: request_answer_id,
+  // function acceptAnswer(request_answer_id) {
+  //   dispatch({
+  //     type: 'allRequest/acceptAnswer',
+  //     payload: {
+  //       user_request_id: focusUserRequest['_id'],
+  //       request_answer_id: request_answer_id,
+  //     }
+  //   })
+  // }
+
+  const acceptAnswer = (request_answer_id) => {
+    confirm({
+      title: 'Are you sure accept this answer?',
+      okText: 'Yes',
+      okType: 'normal',
+      cancelText: 'No',
+      onOk() {
+        dispatch({
+          type: 'allRequest/acceptAnswer',
+          payload: {
+            user_request_id: focusUserRequest['_id'],
+            request_answer_id: request_answer_id,
+          }
+        })
       }
     })
   }
 
-  function deleteUserRequest() {
-    dispatch({
-      type: 'allRequest/deleteUserRequest',
-      payload: {
-        user_request_id: focusUserRequest['_id'],
+
+  const deleteUserRequest = () => {
+    confirm({
+      title: 'Are you sure delete this request?',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        dispatch({
+          type: 'allRequest/deleteUserRequest',
+          payload: {
+            user_request_id: focusUserRequest['_id'],
+          }
+        })
+        dispatch(routerRedux.push('/userrequest'))
       }
     })
-
-    dispatch(routerRedux.push('/userrequest'))
-
   }
 
   if (login.user && focusUserRequest !== null) {
-    const {_id: user_obj_id,
-            user_ID}
+    const {
+      _id: user_obj_id,
+      user_ID
+    }
       = login.user
     return (
       <div className={`main-container ${styles.normal}`}>
         <div>
           {/*<Button icon="caret-up"*/}
-                  {/*onClick={() => requestVotesUp()}*/}
-                  {/*type={focusUserRequest['votes_up_user'].includes(user_obj_id) ? 'primary' : ''}*/}
+          {/*onClick={() => requestVotesUp()}*/}
+          {/*type={focusUserRequest['votes_up_user'].includes(user_obj_id) ? 'primary' : ''}*/}
           {/*/>*/}
           {/*{focusUserRequest['votes_up_user'].length}*/}
           <h2
@@ -267,7 +399,14 @@ function UserRequestDetail({allRequest, login, dispatch}) {
               style={{fontSize: '22px', color: '#34c0e2'}}
               onClick={() => requestStar()}/>
             {focusUserRequest['title']} &nbsp;&nbsp;
-            {focusUserRequest['user_ID']===user_ID && <Icon type="close" onClick={() => deleteUserRequest()}/>}
+            {focusUserRequest['user_ID'] === user_ID &&
+            <span className={styles.rightButton}>
+                  <RequestModal new={false} requestDetail={focusUserRequest}>
+                    <Button icon='edit' style={{marginRight: 15}}/>
+                  </RequestModal>
+                  <Button icon='delete' onClick={() => deleteUserRequest()}/>
+                </span>}
+            {/*{focusUserRequest['user_ID']===user_ID && <Icon type="close" onClick={() => deleteUserRequest()}/>}*/}
           </h2>
         </div>
         <div className={styles.requestuser}>
@@ -279,8 +418,11 @@ function UserRequestDetail({allRequest, login, dispatch}) {
           <Icon
             type="clock-circle-o"/>&nbsp;{showTime(focusUserRequest['create_time'])}
         </div>
+
         <p
           className={styles.description}>{get(focusUserRequest, 'description') ? get(focusUserRequest, 'description') : null}</p>
+        {focusUserRequest.input?<div style={{margin: '16px 0'}}><p>Input: {focusUserRequest.input}</p></div>:null}
+        {focusUserRequest.output?<div style={{margin: '16px 0'}}><p>Output: {focusUserRequest.output}</p></div>:null}
         <h2
           className={styles.commentsAnswers}>{focusUserRequest.comments ? focusUserRequest.comments.length : 0} Comments</h2>
         <hr/>
@@ -288,7 +430,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
         {focusUserRequest.comments && focusUserRequest.comments.map(e =>
           <div key={e._id}>
             <div className={styles.eachCommentDiv}>
-              <p>{e.comments} - {e.comments_user_id} {showTime(e.create_time)}</p>
+              <p>{e.comments} - {e.comments_user_ID} {showTime(e.create_time)}</p>
             </div>
             <hr className={styles.eachCommentDiv}/>
           </div>)}
@@ -341,13 +483,13 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                       <Icon type="caret-down"/>
                     </div>
                     {/*<div style={{*/}
-                      {/*width: '100%',*/}
-                      {/*textAlign: 'center',*/}
-                      {/*fontSize: '26px',*/}
-                      {/*color: '#34c0e2',*/}
-                      {/*cursor: 'pointer'*/}
+                    {/*width: '100%',*/}
+                    {/*textAlign: 'center',*/}
+                    {/*fontSize: '26px',*/}
+                    {/*color: '#34c0e2',*/}
+                    {/*cursor: 'pointer'*/}
                     {/*}}>*/}
-                      {/*<Icon type="star-o"/>*/}
+                    {/*<Icon type="star-o"/>*/}
                     {/*</div>*/}
                     {user_ID === focusUserRequest.user_ID &&
                     !focusUserRequest.accept_answer &&
@@ -375,6 +517,12 @@ function UserRequestDetail({allRequest, login, dispatch}) {
 
                   </Col>
                   <Col span={22}>
+                    {e.select_project ?
+                      <Card title={e.select_project.name}
+                            style={{cursor: 'pointer'}}
+                            onClick={() =>
+                              window.open("/#/workspace/" + e.select_project._id)}>
+                        <p>{e.select_project.description}</p></Card> : null}
                     <div>
                       <div className={styles.eachAnswer}>
                         <div dangerouslySetInnerHTML={{
@@ -382,7 +530,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                         }}/>
                       </div>
                       <div className={styles.eachAnswerContentDiv}>
-                        <p>- {e.answer_user_id}</p>
+                        <p>- {e.answer_user_ID}</p>
                         <p>{showTime(e.create_time)}</p>
                       </div>
                     </div>
@@ -390,7 +538,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                     {e.comment && e.comment.map(e =>
                       <div key={e._id}>
                         <div className={styles.eachAnswerComment}>
-                          <p>{e.comments} - {e.comments_user_id} at {showTime(e.create_time)}</p>
+                          <p>{e.comments} - {e.comments_user_ID} at {showTime(e.create_time)}</p>
                         </div>
                         <hr/>
                       </div>
@@ -413,7 +561,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
           <h2
             style={{paddingBottom: 10}}> Your Answer
           </h2>
-          <AnswerForm dispatch={dispatch}/>
+          <AnswerForm dispatch={dispatch} type={focusUserRequest.type}/>
         </div>
       </div>
     )
