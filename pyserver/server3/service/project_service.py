@@ -644,7 +644,7 @@ class ProjectService:
 
     @classmethod
     def list_projects(cls, search_query, page_no=None, page_size=None,
-                      default_max_score=0.4, privacy=None,user_ID=None):
+                      default_max_score=0.4, privacy=None, user_ID=None):
         """
         list projects
         :param search_query:

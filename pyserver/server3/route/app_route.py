@@ -120,7 +120,6 @@ def get_api_list():
     page_size = int(request.args.get('page_size', 5))
     search_query = request.args.get('search_query', None)
     default_max_score = float(request.args.get('max_score', 0.1))
-
     try:
         api_list = AppService.list_projects(
             search_query=search_query, page_no=page_no, page_size=page_size,
@@ -139,6 +138,8 @@ def get_api_list():
     else:
         objects = api_list.objects
         # objects = api_list["objects"]
+        for object in objects:
+            object.user_user_ID = object.user.user_ID
         objects = json_utility.me_obj_list_to_json_list(objects)
         return jsonify({
             "response": {

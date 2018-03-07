@@ -41,6 +41,13 @@ class User(Document):
     # 用户使用过的的module列表
     used_modules = ListField(ReferenceField("Module"))
 
+    # 用户收藏的dataset列表
+    favor_datasets = ListField(ReferenceField("Dataset"))
+    # 用户点赞的dataset列表
+    star_datasets = ListField(ReferenceField("Dataset"))
+    # 用户使用过的的dataset列表
+    used_datasets = ListField(ReferenceField("Dataset"))
+
     # TODO 将数据库内数据删除后删掉
     # 用户收藏的api列表
     favor_apis = ListField(ReferenceField("Api"))

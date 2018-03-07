@@ -6,6 +6,7 @@ from server3.service.project_service import ProjectService
 from server3.business.module_business import ModuleBusiness
 from server3.business.app_business import AppBusiness
 
+
 class AppService(ProjectService):
     business = AppBusiness
 
