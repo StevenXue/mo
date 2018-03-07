@@ -77,11 +77,7 @@ function Profile({login, dispatch, history}) {
                 defaultActiveKey="1"
                 onChange={callback}>
             <TabPane tab="Favourite" key="1" >
-              Some Description
-              <br/>
-              Some Description
-              <br/>
-              Some Description
+              <MyFavouriteList history={history}/>
             </TabPane>
             <TabPane tab="My request" key="2">
               <MyRequestList history={history}/>
@@ -174,10 +170,10 @@ class MyFavouriteList extends Component {
       <div className={styles.bottomRow}>
         <div className={styles.radioGroupDiv}>
           <RadioGroup onChange={this.typeChange} value={this.state.type}>
-            <Radio value={'all'} className={styles.radio}>All</Radio>
             <Radio value={'app'} className={styles.radio}>App</Radio>
             <Radio value={'module'} className={styles.radio}>Module</Radio>
             <Radio value={'dataset'} className={styles.radio}>Dataset</Radio>
+            <Radio value={'request'} className={styles.radio}>Request</Radio>
           </RadioGroup>
           <Search className={styles.search}
                   placeholder="input search text"

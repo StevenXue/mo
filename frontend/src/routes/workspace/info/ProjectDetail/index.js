@@ -61,6 +61,10 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
     })
   }
 
+  function appStar(){
+
+  }
+
   function callback(key) {
     // console.log(key);
   }
@@ -85,6 +89,14 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
             {/*info head*/}
             <div className={styles.name}>
               <h1>
+                {/*<Icon*/}
+                  {/*type={focusUserRequest['star_user'].includes(user_obj_id) ? "star" : "star-o"}*/}
+                  {/*style={{fontSize: '22px', color: '#34c0e2'}}*/}
+                  {/*onClick={() =>appStar()}/>*/}
+                <Icon
+                type={ "star-o" }
+                style={{fontSize: '22px', color: '#34c0e2'}}
+                onClick={() =>appStar()}/>
                 {projectDetail.project.name}&nbsp;
                 <Icon type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
                       style={{ fontSize: 20 }}/>

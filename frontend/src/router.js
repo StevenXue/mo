@@ -33,7 +33,7 @@ const breadcrumbNameMap = {
   '/userrequest':'User Request',
   '/modellist':'Module',
   '/profile': "Profile",
-  '/market':'MarketList'
+  '/market':'Market'
 }
 
 const RouterConfig = ({ history, location, projectDetail }) => {

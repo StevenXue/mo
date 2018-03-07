@@ -66,15 +66,6 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
             <div className={styles.name}>
               <h1>
                 {projectDetail.project.name}&nbsp;
-                {/*<Icon type={projectDetail.project.privacy === 'private'?'lock':'unlock'}*/}
-                      {/*style={{ fontSize: 20}}/>*/}
-                <span className={styles.rightButton}>
-                  {/*<ProjectModel new={false} projectDetail={projectDetail}*/}
-                                {/*>*/}
-                    {/*<Button icon='edit' style={{ marginRight: 15 }}/>*/}
-                  {/*</ProjectModel>*/}
-                  <Button icon='delete' onClick={() => deleteProject()}/>
-                </span>
               </h1>
               <p className={styles.text} style={{ fontSize: 14, marginTop: 6 }}>
                 <Icon type="clock-circle-o" style={{ marginRight: 10 }}/>
@@ -114,25 +105,7 @@ function ProjectInfo({ match, history, location, dispatch, projectDetail }) {
               <br/>
               Some Description
             </TabPane>
-            <TabPane tab="Jobs" key="2">
-                <h2>Jobs: </h2>
-                <p>
-                  <span className={styles.done}>10</span> have done&nbsp;&nbsp;&nbsp;&nbsp;
-                  <span className={styles.running}>9</span> are running&nbsp;&nbsp;&nbsp;&nbsp;
-                  <span className={styles.error}>2</span> went error&nbsp;&nbsp;&nbsp;&nbsp;
-                </p>
-                {projectDetail.jobs.map((job) => <p key={job.id}>{job.path}</p>)}
-                <Row>
-                  <Col span={12}>col-12</Col>
-                  <Col span={12}>col-12</Col>
-                </Row>
-                <Row>
-                  <Col span={12}>col-12</Col>
-                  <Col span={12}>col-12</Col>
-                </Row>
-            </TabPane>
-
-            <TabPane tab="Examples" key="3">
+            <TabPane tab="Examples" key="2">
               Some Description
               <br/>
               Some Description

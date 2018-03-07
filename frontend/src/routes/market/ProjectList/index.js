@@ -89,7 +89,7 @@ class ProjectList extends Component {
   }
 
   toProjectDetail(id, history) {
-    history.push(`/workspace/${id}`)
+    history.push(`/market/${id}`)
   }
 
   render() {
