@@ -26,3 +26,5 @@ class GeneralDynamicDocument(DynamicDocument):
 
 Objects = collections.namedtuple('Objects', ('objects', 'count', 'page_no', 'page_size'))
 FavorAppReturn = collections.namedtuple('FavorAppReturn', ('user', 'app'))
+
+UserEntity = collections.namedtuple('UserEntity', ('user', 'entity'))

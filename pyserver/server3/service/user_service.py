@@ -7,12 +7,13 @@ from werkzeug.security import check_password_hash
 from server3.business import user_business
 from server3.utility import json_utility
 from server3.business import api_business
+from server3.business import model_business
 from server3.business import user_request_business
 from server3.business import request_answer_business
 from server3.business.app_business import AppBusiness
 from server3.constants import Error, ErrorMessage
-from server3.entity.general_entity import FavorAppReturn
-
+from server3.entity.general_entity import UserEntity
+from server3.business.user_request_business import UserRequestBusiness
 
 def add(user_ID, password, kwargs):
     hashed_password = generate_password_hash(password)
@@ -243,26 +244,69 @@ def verify_code(code, message_id):
 
 class UserService:
     @classmethod
-    def favor_app(cls, user_ID, app_id):
+    def action_entity(cls, user_ID, entity_id, action, entity):
         user = user_business.get_by_user_ID(user_ID=user_ID)
-        app = AppBusiness.get_by_id(project_id=app_id)
-        # 1. 在user下存favor_apps
-        if app not in user.favor_apps:
-            user.favor_apps.append(app)
-            user_result = user.save()
+        business_maper = {
+            "app": AppBusiness,
+            "module": model_business,
+            "request": UserRequestBusiness,
+        }
+        business = business_maper[entity]
+        object = business.get_by_id(entity_id)
+        if entity == "request":
+            user_keyword = '{action}_{entity}'.format(action=action, entity=entity)
+            object_keyword = '{action}_user'.format(action=action)
         else:
-            user.favor_apps.remove(app)
-            user_result = user.save()
-        # 2. 在app下存favor_users
-        if user not in app.favor_users:
-            app.favor_users.append(user)
-            app_result = app.save()
-        else:
-            app.favor_users.remove(user)
-            app_result = app.save()
+            user_keyword = '{action}_{entity}s'.format(action=action, entity=entity)
+            object_keyword = '{action}_users'.format(action=action)
 
-        if user_result and app_result:
-            return FavorAppReturn(user=user_result, app=app_result)
+        # 1. 在user下存favor_apps
+        if object not in user[user_keyword]:
+            user[user_keyword].append(object)
+            user_result = user.save()
+        else:
+            user[user_keyword].remove(object)
+            user_result = user.save()
+        # 2. 在object下存favor_users
+        if user not in object[object_keyword]:
+            object[object_keyword].append(user)
+            object_result = object.save()
+        else:
+            object[object_keyword].remove(user)
+            object_result = object.save()
+        if user_result and object_result:
+            return UserEntity(user=user_result, entity=object_result)
+    
+    @classmethod
+    def favor_app(cls, user_ID, app_id):
+        return FavorApp.action(user_ID, app_id)
+        # user = user_business.get_by_user_ID(user_ID=user_ID)
+        # app = AppBusiness.get_by_id(project_id=app_id)
+        # # 1. 在user下存favor_apps
+        # if app not in user.favor_apps:
+        #     user.favor_apps.append(app)
+        #     user_result = user.save()
+        # else:
+        #     user.favor_apps.remove(app)
+        #     user_result = user.save()
+        # # 2. 在app下存favor_users
+        # if user not in app.favor_users:
+        #     app.favor_users.append(user)
+        #     app_result = app.save()
+        # else:
+        #     app.favor_users.remove(user)
+        #     app_result = app.save()
+        #
+        # if user_result and app_result:
+        #     return FavorAppReturn(user=user_result, app=app_result)
+
+    @classmethod
+    def star_app(cls, user_ID, app_id):
+        return StarApp.action(user_ID, app_id)
+
+    @classmethod
+    def star_request(cls, user_ID, app_id):
+        return StarApp.action(user_ID, app_id)
 
 
 # 尝试合并代码
@@ -307,6 +351,13 @@ class FavorApp(Action):
 
 class StarApp(Action):
     business = AppBusiness
+    action_type = 'star'
+    user_keyword = 'star_apps'
+    object_keyword = 'favor_users'
+
+
+class StarRequest(Action):
+    business = UserRequestBusiness
     action_type = 'star'
     user_keyword = 'star_apps'
     object_keyword = 'favor_users'
