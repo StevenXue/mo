@@ -15,6 +15,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server3.service import project_service
 from server3.service import ownership_service
+from server3.service.app_service import AppService
 from server3.business.project_business import ProjectBusiness
 from server3.utility import json_utility
 from server3.utility import str_utility
@@ -171,8 +172,8 @@ def project_unpublish(project_id):
 @jwt_required
 def create_project():
     if not request.json \
-            or 'name' not in request.json \
-            or 'type' not in request.json:
+        or 'name' not in request.json \
+        or 'type' not in request.json:
         return jsonify({'response': 'insufficient arguments'}), 400
 
     user_token = request.headers.get('Authorization').split()[1]
@@ -187,10 +188,25 @@ def create_project():
     if not isinstance(tags, list) and tags is not None:
         data['tags'] = str_utility.split_without_empty(tags)
 
-    project = project_service.create_project(name, description, user_ID,
-                                             tags=tags,
-                                             type=type, user_token=user_token,
-                                             **data)
+    # func = {
+    #     "app": AppService.create_project(name, description, user_ID,
+    #                                      tags=tags,
+    #                                      type=type, user_token=user_token,
+    #                                      **data),
+    #
+    # }
+    # project = func[type](name, description, user_ID,
+    #                      tags=tags,
+    #                      type=type, user_token=user_token,
+    #                      **data)
+    if type == 'app':
+        project = AppService.create_project(
+            name, description, user_ID, tags=tags,
+            type=type, user_token=user_token, **data),
+    else:
+        project = project_service.create_project(
+            name, description, user_ID, tags=tags,
+            type=type, user_token=user_token, **data)
     project = json_utility.convert_to_json(project.to_mongo())
     return jsonify({'response': project}), 200
 
