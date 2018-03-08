@@ -107,3 +107,4 @@ class ModuleBusiness(ProjectBusiness):
         if os.path.exists(dst):
             shutil.rmtree(dst)
         shutil.copytree(module.path, dst)
+

@@ -9,7 +9,7 @@ import ProjectModel from '../../../../components/ProjectModal/index'
 import HelpModal from '../../../../components/HelpModal'
 import { showTime } from '../../../../utils/index'
 import styles from './index.less'
-import { get } from 'lodash'
+import _ from 'lodash'
 import { message } from 'antd/lib/index'
 
 const confirm = Modal.confirm
@@ -28,14 +28,11 @@ const myShowTime = (time, format = 'yyyy-MM-dd hh:mm') => {
   return date.toLocaleString()
 }
 
-function ProjectInfo({ market_use, match, history, location, dispatch, projectDetail }) {
+function ProjectInfo({ market_use, match, history, location, dispatch, projectDetail, login }) {
 
   const projectId = match.params.projectId
   const user_ID = localStorage.getItem('user_ID')
-  const {
-    _id: user_obj_id,
-  }
-    = login.user
+  const userObjId = _.get(login, 'user._id')
 
   const props1 = {
     name: 'file',
@@ -71,14 +68,14 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
     })
   }
 
-  function appStarFavor(action){
+  function appStarFavor(action) {
     dispatch({
       type: 'projectDetail/star_favor',
       payload: {
         entity_id: projectDetail.project['_id'],
-        action:action,
-        entity:projectDetail.project.type
-      }
+        action: action,
+        entity: projectDetail.project.type,
+      },
     })
   }
 
@@ -106,21 +103,21 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
             {/*info head*/}
             <div className={styles.name}>
               <h1>
-                <Icon
+                {market_use && <Icon
                   // type="star"
-                  type={projectDetail.project.favor_users.includes(user_obj_id) ? "star" : "star-o"}
-                style={{fontSize: '22px', color: '#34c0e2'}}
-                onClick={() =>appStarFavor('favor')}/>
+                  type={projectDetail.project.favor_users.includes(userObjId) ? 'star' : 'star-o'}
+                  style={{ fontSize: '22px', color: '#34c0e2' }}
+                  onClick={() => appStarFavor('favor')}/>}
                 {projectDetail.project.name}&nbsp;
-                {!market_use?<Icon type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
-                      style={{ fontSize: 20 }}/>:null}
-                {!market_use?<span className={styles.rightButton}>
+                {!market_use && <Icon type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
+                                      style={{ fontSize: 20 }}/>}
+                {!market_use && <span className={styles.rightButton}>
                   <ProjectModel new={false} projectDetail={projectDetail}
-                                >
+                  >
                     <Button icon='edit' style={{ marginRight: 15 }}/>
                   </ProjectModel>
                   <Button icon='delete' onClick={() => deleteProject()}/>
-                </span>:null}
+                </span>}
               </h1>
               <p className={styles.text} style={{ fontSize: 14, marginTop: 6 }}>
                 <Icon type="clock-circle-o" style={{ marginRight: 10 }}/>
@@ -249,8 +246,8 @@ const Jobs = ({ projectDetail, dispatch }) => {
   )
 }
 
-ProjectInfo.defaultProps={
-  market_use:false
+ProjectInfo.defaultProps = {
+  market_use: false,
 }
 
 function ProjectDetail({ match, history, location, dispatch, projectDetail }) {

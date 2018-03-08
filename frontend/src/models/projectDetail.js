@@ -11,8 +11,7 @@ import * as dataAnalysisService from '../services/dataAnalysis'
 import { message } from 'antd/lib/index'
 
 import { startLabBack } from './modelling'
-import * as UserStarFavorService from "../services/user"
-
+import * as UserStarFavorService from '../services/user'
 
 export default {
   namespace: 'projectDetail',
@@ -59,23 +58,31 @@ export default {
       }
     },
 
-    updateStarFavor(state, action){
+    updateStarFavor(state, action) {
       return {
         ...state,
-        project:action.payload.project,
+        project: action.payload.project,
       }
-    }
+    },
 
   },
   effects: {
     // 获取该 project
-    *fetch(action, { call, put }) {
-      const { data: project } = yield call(fetchProject, { projectId: action.projectId })
+    *fetch({ projectId, notStartLab }, { call, put }) {
+      // fetch and set project
+      let { data: project } = yield call(fetchProject, { projectId })
       yield put({ type: 'setProject', payload: project })
+      // start lab backend
       const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
       const hubToken = project.hub_token
-      yield !action.notStartLab && call(startLabBack, { payload: { hubUserName, hubToken } }, { call })
-      // yield call(startLabFront)
+      if(!notStartLab) {
+        yield call(startLabBack, { payload: { hubUserName, hubToken } }, { call })
+      }
+
+      // fetch and set project
+      ({ data: project } = (yield call(fetchProject, { projectId })))
+      yield put({ type: 'setProject', payload: project })
+
       // fetch jobs
       const { data: terminals } = yield call(getTerminals, { hubUserName, hubToken })
       const { data: sessions } = yield call(getSessions, { hubUserName, hubToken })
@@ -141,15 +148,15 @@ export default {
       yield put(routerRedux.replace(url0))
     },
 
-    *star_favor(action, {call, put, select}){
+    *star_favor(action, { call, put, select }) {
       let payload = action.payload
-      const {data: project} = yield call(UserStarFavorService.set_star_favor, payload)
+      const { data: project } = yield call(UserStarFavorService.set_star_favor, payload)
       yield put({
         type: 'updateStarFavor',
-        payload: project
+        payload: project,
       })
 
-    }
+    },
   },
   subscriptions: {
     // 当进入该页面获取project

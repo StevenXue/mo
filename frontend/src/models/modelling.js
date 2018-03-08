@@ -333,8 +333,8 @@ const modelling = modelExtend(workBench, {
           let projectId = match[1]
           let type = match[2]
           dispatch({ type: 'startLabBnF', projectId, projectType: type })
-          dispatch({ type: 'fetchSections', projectId, categories })
-          dispatch({ type: 'fetchAlgorithms', categories })
+          // dispatch({ type: 'fetchSections', projectId, categories })
+          // dispatch({ type: 'fetchAlgorithms', categories })
           // dispatch({ type: 'fetchStagingDatasetList', projectId: projectId })
 
           //将project id存起来
