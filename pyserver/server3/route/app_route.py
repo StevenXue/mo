@@ -137,7 +137,6 @@ def get_api_list():
         }), 404
     else:
         objects = api_list.objects
-        # objects = api_list["objects"]
         for object in objects:
             object.user_user_ID = object.user.user_ID
         objects = json_utility.me_obj_list_to_json_list(objects)
