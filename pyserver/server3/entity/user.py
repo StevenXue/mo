@@ -5,6 +5,8 @@ from mongoengine import EmailField
 from mongoengine import IntField
 from mongoengine import ListField
 from mongoengine import ReferenceField
+
+from server3.entity.project import Module
 GENDER = (
     (0, 'female'),
     (1, 'male')
@@ -42,11 +44,11 @@ class User(Document):
     used_apps = ListField(ReferenceField("App"))
 
     # 用户收藏的module列表
-    favor_modules = ListField(ReferenceField("Module"))
+    favor_modules = ListField(ReferenceField(Module))
     # 用户点赞的module列表
-    star_modules = ListField(ReferenceField("Module"))
+    star_modules = ListField(ReferenceField(Module))
     # 用户使用过的的module列表
-    used_modules = ListField(ReferenceField("Module"))
+    used_modules = ListField(ReferenceField(Module))
 
     # 用户收藏的dataset列表
     favor_datasets = ListField(ReferenceField("Dataset"))
