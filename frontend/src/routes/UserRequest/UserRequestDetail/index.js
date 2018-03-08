@@ -144,9 +144,6 @@ class AnswerForm extends React.Component {
   }
 
   handleSelectChange = (value) => {
-    console.log('dwf')
-    console.log(value)
-
     this.setState({
       value,
       data: [],
@@ -172,8 +169,6 @@ class AnswerForm extends React.Component {
     if (this.state.selected.length > 0) {
       selectProjectID = this.state.selected[0]['_id']
     }
-    console.log('selectProjectID')
-    console.log(selectProjectID)
     this.props.dispatch({
       type: 'allRequest/makeNewRequestAnswer',
       payload: {

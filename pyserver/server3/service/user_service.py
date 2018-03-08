@@ -11,6 +11,7 @@ from server3.business import model_business
 from server3.business import user_request_business
 from server3.business import request_answer_business
 from server3.business.app_business import AppBusiness
+from server3.business.module_business import ModuleBusiness
 from server3.constants import Error, ErrorMessage
 from server3.entity.general_entity import UserEntity
 from server3.business.user_request_business import UserRequestBusiness
@@ -249,7 +250,7 @@ class UserService:
         user = user_business.get_by_user_ID(user_ID=user_ID)
         business_maper = {
             "app": AppBusiness,
-            "module": model_business,
+            "module": ModuleBusiness,
             "request": UserRequestBusiness,
             "dataset": DatasetBusiness,
         }
@@ -263,6 +264,7 @@ class UserService:
             object_keyword = '{action}_users'.format(action=action)
 
         # 1. 在user下存favor_apps
+        print(object)
         if object not in user[user_keyword]:
             user[user_keyword].append(object)
             user_result = user.save()

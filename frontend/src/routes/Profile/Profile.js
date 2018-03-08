@@ -8,7 +8,9 @@ const Search = Input.Search
 
 import styles from './index.less'
 import {fetchAllUserRequest} from "../../services/userRequest"
+import {countMyProjects} from "../../services/project"
 import {showTime} from "../../utils"
+import {routerRedux} from "dva/router"
 
 const RadioGroup = Radio.Group
 
@@ -16,10 +18,18 @@ function callback(key) {
   console.log(key)
 }
 
+function toWorkspace(dispatch,tabPane) {
+  dispatch(routerRedux.push({
+    pathname:`/workspace`,
+    search: tabPane,}))
+}
+
+
 
 function Profile({login, dispatch, history}) {
   if (login.user) {
-    const {age, email, name, phone, user_ID} = login.user
+    const {age, email, name, phone, user_ID, projectNumber} = login.user
+    console.log(projectNumber)
     return (
       <div className={`main-container ${styles.container}`}>
         <div className={styles.headerRow}>
@@ -39,31 +49,34 @@ function Profile({login, dispatch, history}) {
                 <div>
                   <Row type="flex" justify="start">
                     <Col span={2}>
-                      <div className={styles.appDiv}>
+                      <div className={styles.appDiv}
+                           onClick={() => toWorkspace(dispatch,'App')}>
                         <p className={styles.appText}>App</p>
-                        <p className={styles.appNumber}>3</p>
+                        <p className={styles.appNumber}>{projectNumber?projectNumber[0]:null}</p>
                       </div>
                     </Col>
                     <Col span={1}>
-                      <div className={styles.appDiv}>
-                        <div className={styles.appDivider} />
+                      <div className={styles.divider}>
+                        <div className={styles.dividerDiv} />
                       </div>
                     </Col>
                     <Col span={2}>
-                      <div className={styles.appDiv}>
+                      <div className={styles.appDiv}
+                           onClick={() => toWorkspace(dispatch,'Module')}>
                         <p className={styles.appText}>Module</p>
-                        <p className={styles.appNumber}>1</p>
+                        <p className={styles.appNumber}>{projectNumber?projectNumber[1]:null}</p>
                       </div>
                     </Col>
                     <Col span={1}>
-                      <div className={styles.appDiv}>
-                        <div className={styles.appDivider} />
+                      <div className={styles.divider}>
+                        <div className={styles.dividerDiv} />
                       </div>
                     </Col>
                     <Col span={2}>
-                      <div className={styles.appDiv}>
+                      <div className={styles.appDiv}
+                           onClick={() => toWorkspace(dispatch,'Dataset')}>
                         <p className={styles.appText}>Dataset</p>
-                        <p className={styles.appNumber}>12</p>
+                        <p className={styles.appNumber}>{projectNumber?projectNumber[2]:null}</p>
                       </div>
                     </Col>
                   </Row>

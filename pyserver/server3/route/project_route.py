@@ -27,6 +27,26 @@ DEFAULT_CAT = ['model', 'toolkit']
 project_app = Blueprint("project_app", __name__, url_prefix=PREFIX)
 
 
+@project_app.route('/count', methods=['GET'])
+@jwt_required
+def count_projects():
+    # type = request.args.get('type', 'project')
+    types = ['app', 'module', 'dataset']
+    user_ID = get_jwt_identity()
+    counts = []
+    for type in types:
+        count = project_service.list_projects(
+            type=type,
+            user_ID=user_ID,
+            count_only=True)
+        counts.append(count)
+    print('count')
+    print(counts)
+    return jsonify({
+        "response": counts
+    }), 200
+
+
 @project_app.route('', methods=['GET'])
 @jwt_required
 def list_projects_by_query():
@@ -172,8 +192,8 @@ def project_unpublish(project_id):
 @jwt_required
 def create_project():
     if not request.json \
-        or 'name' not in request.json \
-        or 'type' not in request.json:
+            or 'name' not in request.json \
+            or 'type' not in request.json:
         return jsonify({'response': 'insufficient arguments'}), 400
 
     user_token = request.headers.get('Authorization').split()[1]

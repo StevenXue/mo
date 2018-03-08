@@ -6,8 +6,9 @@ import io from 'socket.io-client'
 import { invert } from 'lodash'
 
 import { queryURL } from '../utils'
-
+import * as projectService from '../services/project'
 import { flaskServer, translateDict } from '../constants'
+import * as userRequestService from "../services/userRequest"
 
 let connected = false
 
@@ -54,8 +55,29 @@ export default {
         user: undefined,
       }
     },
+    updateProjectNumber(state, action){
+      console.log('action',action)
+      return{
+        ...state,
+        user:{
+          ...state.user,
+          projectNumber:action.payload.projectNumber,
+        }
+      }
+    }
   },
   effects: {
+
+    *fetchProjectNumber(action, {call, put, select}){
+      const {data: projectNumber} = yield call(
+        projectService.countMyProjects, {})
+
+      yield put({
+        type: 'updateProjectNumber',
+        payload: {projectNumber: projectNumber}
+      })
+    },
+
     *accountSubmit({ payload }, { call, put }) {
       yield put({
         type: 'changeSubmitting',
@@ -108,6 +130,7 @@ export default {
       if (data) {
         localStorage.setItem('token', data.token)
         localStorage.setItem('user_ID', data.user.user_ID)
+        localStorage.setItem('user_obj_id', data.user._id)
         const from = queryURL('from')
         yield put({ type: 'setUser', payload: data.user })
         if (from) {
@@ -196,6 +219,11 @@ export default {
   subscriptions: {
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
+        if (pathname === '/profile') {
+          dispatch({
+            type: 'fetchProjectNumber',
+          })
+        }
         const match = pathToRegexp('/user/login').exec(pathname)
         if (!match) {dispatch({ type: 'query' })}
         const userId = localStorage.getItem('user_ID')

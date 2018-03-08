@@ -12,15 +12,16 @@ const Option = Select.Option
 const Search = Input.Search
 const TabPane = Tabs.TabPane
 
-function Projects({ history, project, dispatch }) {
+function Projects({ history, project, dispatch ,location}) {
 
   function callback(key) {
     // console.log(key)
   }
-
+  let defaultActiveKeyDic = {"?App":"1","?Module":"2","?Dataset":"3"}
   return (
     <div className={`main-container ${styles.normal}`}>
-      <Tabs defaultActiveKey="1" onChange={callback}>
+      <Tabs defaultActiveKey={defaultActiveKeyDic[location.search]}
+            onChange={callback}>
         <TabPane tab="Apps" key="1">
           <ProjectList {...{ history, project, dispatch }} type='app'/>
         </TabPane>

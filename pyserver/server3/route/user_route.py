@@ -22,6 +22,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from server3.repository import config
 from server3.business import user_business
 from server3.service import user_service
+from server3.service import project_service
 from server3.utility import json_utility
 from server3.constants import Error
 from server3.service.user_service import UserService
@@ -204,6 +205,7 @@ def set_action_entity(entity_id):
     user_ID = get_jwt_identity()
     data = request.get_json()
     print('data')
+    print(data)
     action = data.pop("action")
     entity = data.pop("entity")
 

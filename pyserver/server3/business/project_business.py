@@ -169,7 +169,8 @@ class ProjectBusiness:
 
     @classmethod
     def get_objects(cls, search_query, user=None, page_no=PAGE_NO,
-                    page_size=PAGE_SIZE, default_max_score=0.4, privacy=None):
+                    page_size=PAGE_SIZE, default_max_score=0.4,
+                    privacy=None,count_only=False):
         """
         Search for objects
 
@@ -195,6 +196,8 @@ class ProjectBusiness:
         if user:
             objects = objects(user=user)
         count = objects.count()
+        if count_only:
+            return count
         return Objects(objects=objects, count=count, page_no=page_no, page_size=page_size)
         # return {
         #     "objects": objects.order_by('-create_time')[start:end],

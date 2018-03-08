@@ -96,6 +96,32 @@ class ProjectList extends Component {
     this.props.dispatch({type: 'project/push', id, route: 'market'})
   }
 
+  starFavor(action, id, type) {
+    const user_obj_id = localStorage.getItem('user_obj_id')
+
+    function findById(element) {
+      return element._id === id
+    }
+
+    let toUpdateIndex = this.state.projects.findIndex(findById)
+    console.log(toUpdateIndex)
+    let toUpdate = this.state.projects[toUpdateIndex]
+    if (action === 'star') {
+      toUpdate.star_users.includes(user_obj_id) ? toUpdate.star_users.pop(user_obj_id) : toUpdate.star_users.push(user_obj_id)
+    }
+    else {
+      toUpdate.favor_users.includes(user_obj_id) ? toUpdate.favor_users.pop(user_obj_id) : toUpdate.favor_users.push(user_obj_id)
+    }
+    this.props.dispatch({
+      type: 'projectDetail/star_favor',
+      payload: {
+        entity_id: id,
+        action: action,
+        entity: type
+      }
+    })
+  }
+
   render() {
     const {history, project, dispatch} = this.props
     console.log(this.state.projects)
@@ -113,16 +139,14 @@ class ProjectList extends Component {
             onSearch={(value) => this.handleQueryChange(value)}
             style={{width: 200}}
           />
-          {/*<ProjectModel new={true} fetchData={() => this.fetchData({})} type={this.props.type}>*/}
-          {/*<Button icon='plus-circle-o' type='primary' className={styles.rightButton}>New {this.props.type}</Button>*/}
-          {/*</ProjectModel>*/}
         </div>
         <div className={styles.projectList}>
           {this.state.projects.map(e =>
-
-            <ProjectCard key={e._id} project={e}/>
+            <ProjectCard key={e._id} project={e}
+                         onClickToDetail={() => this.toProjectDetail(e._id, history)}
+                         onClickStarFavor={(action) => this.starFavor(action, e._id, e.type)}
+            />
           )}
-          {/*{project.projects.public_projects.map(e => e.name)}*/}
         </div>
       </div>
     )
@@ -130,28 +154,42 @@ class ProjectList extends Component {
   }
 }
 
-function ProjectCard({project}) {
+function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
+  const user_obj_id = localStorage.getItem('user_obj_id')
+  console.log(project)
   return (
     <div className={styles.projectCard}>
-      <div className={styles.name}>
-        <p>{project.name}</p>
-      </div>
-      <div className={styles.description}>
-        <p>{project.description}</p>
-      </div>
-      <div>
-        <div className={styles.authorDateDiv}>
-          <div className={styles.authorDiv}><p
-            className={styles.authorP}>AUTHOR</p><p>{project.user}</p></div>
-          <div className={styles.dateDiv}><p className={styles.dateP}>DATE</p>
-            <p>{showTime(project.create_time, "yyyy-MM-dd")}</p></div>
+      <div className={styles.toDetail} onClick={() => onClickToDetail()}>
+        <div className={styles.pic}>
         </div>
-        <div className={styles.categoryDiv}>
-          <p className={styles.categoryP}>CATEGORY</p><p>{project.category}</p></div>
+        <div className={styles.name}>
+          <p>{project.name}</p>
+        </div>
+        <div className={styles.description}>
+          <p>{project.description}</p>
+        </div>
+        <div>
+          <div className={styles.authorDateDiv}>
+            <div className={styles.authorDiv}><p
+              className={styles.authorP}>AUTHOR</p><p>user</p></div>
+            <div className={styles.dateDiv}><p className={styles.dateP}>DATE</p>
+              <p>{showTime(project.create_time, "yyyy-MM-dd")}</p></div>
+          </div>
+          <div className={styles.categoryDiv}>
+            <p className={styles.categoryP}>CATEGORY</p>
+            <p>{project.category}</p></div>
+        </div>
       </div>
       <div className={styles.starFavorDiv}>
-        <div >
-          <Icon type="star"/>
+        <div className={styles.starFavorRightDiv}>
+          <Icon className={styles.bottomIcon}
+                type={project.star_users.includes(user_obj_id) ? "star" : "star-o"}
+                onClick={() => onClickStarFavor('star')}/>
+          <p className={styles.bottomNumber}>{project.star_users.length}</p>
+          <Icon className={styles.bottomIcon}
+                type={project.favor_users.includes(user_obj_id) ? "like" : "like-o"}
+                onClick={() => onClickStarFavor('favor')}/>
+          <p className={styles.bottomNumber}>{project.favor_users.length}</p>
         </div>
       </div>
     </div>
