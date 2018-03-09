@@ -170,7 +170,7 @@ def emit_notification(message, created_receivers):
         message.user_ID = message.user.user_ID
         message.user_request_title = message.user_request.title
         message.is_read = False
-        message.receiver_id = receiver_user.id
+        message.receiver_id = receiver.id
         msg = json_utility.convert_to_json(
             {'receiver_id': receiver.id,
              'message': message.to_mongo(),

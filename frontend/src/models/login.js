@@ -12,6 +12,16 @@ import * as userRequestService from "../services/userRequest"
 
 let connected = false
 
+
+function* fetchProjectNumber(action, {call, put, select}){
+  const {data: projectNumber} = yield call(
+    projectService.countMyProjects, {})
+  yield put({
+    type: 'updateProjectNumber',
+    payload: {projectNumber: projectNumber}
+  })
+}
+
 export default {
   namespace: 'login',
   state: {
@@ -68,15 +78,7 @@ export default {
   },
   effects: {
 
-    *fetchProjectNumber(action, {call, put, select}){
-      const {data: projectNumber} = yield call(
-        projectService.countMyProjects, {})
 
-      yield put({
-        type: 'updateProjectNumber',
-        payload: {projectNumber: projectNumber}
-      })
-    },
 
     *accountSubmit({ payload }, { call, put }) {
       yield put({
@@ -148,6 +150,9 @@ export default {
         yield put({
           type: 'setUser',
           payload: data.user,
+        })
+        yield call(fetchProjectNumber, {}, {
+          call, put,
         })
         // FIXME regex can't catch whole url
         // const from = queryURL('from')
