@@ -26,6 +26,8 @@ from server3.utility import json_utility
 from server3.constants import Error
 from server3.service.user_service import UserService
 from server3.business.user_business import UserBusiness
+from server3.business.statistics_business import StatisticsBusiness
+
 
 PREFIX = '/user'
 
@@ -242,6 +244,43 @@ def get_action_entity():
     })
 
 
+@user_app.route('/statistics', methods=['GET'])
+@jwt_required
+def get_statistics():
+    user_ID = get_jwt_identity()
+    page_no = int(request.args.get('page_no', 1))
+    page_size = int(request.args.get('page_size', 5))
+
+    action = request.args.get("action")
+    entity_type = request.args.get("entity_type")
+
+    user_obj = UserBusiness.get_by_user_ID(user_ID=user_ID)
+    statistics = StatisticsBusiness.get_pagination(
+        query={
+            "action": action,
+            "entity_type": entity_type,
+            "caller": user_obj
+        },
+        page_no=page_no, page_size=page_size)
+
+    # for object in statistics.objects:
+    #     # print("tom", json_utility.convert_to_json(object.app.to_mongo()))
+    #     # object.app_obj = "111"
+    #     app = json.dumps(object.app.to_mongo())#json_utility.convert_to_json(object.app.to_mongo())
+    #     object.app_obj = app
+    #
+    #     # object = json_utility.convert_to_json(object.to_mongo())
+    #     # object["app_obj"] = app
+    print("statistics.objects", statistics.objects)
+
+    return jsonify({
+        'response': {
+            "objects": json_utility.objs_to_json_with_args(statistics.objects, ["app", "caller"]),
+            "page_size": statistics.page_size,
+            "page_no": statistics.page_no,
+            "count": statistics.count,
+        }
+    })
 # @user_app.route('/favor_app/<app_id>', methods=['PUT'])
 # @jwt_required
 # def favor_app(app_id):

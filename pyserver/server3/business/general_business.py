@@ -1,4 +1,5 @@
 from server3.repository.general_repo import Repo
+from server3.entity.general_entity import Objects
 
 
 class GeneralBusiness:
@@ -27,7 +28,21 @@ class GeneralBusiness:
     def get_by_id(cls, object_id):
         return cls.repo.read_by_id(object_id=object_id)
 
+    @classmethod
+    def get_pagination(cls, query, page_no, page_size):
+        start = (page_no - 1) * page_size
+        end = page_no * page_size
+        objects = cls.repo.read(query=query)
+        count = objects.count()
+        return Objects(objects=objects[start: end], count=count, page_no=page_no,
+                       page_size=page_size)
 
+    @classmethod
+    def create(cls, obj):
+        cls.repo.create(obj)
 
+    @classmethod
+    def create_one(cls, **kwargs):
+        cls.repo.create_one(**kwargs)
 
 
