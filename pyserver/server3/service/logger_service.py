@@ -180,3 +180,8 @@ def emit_notification(message, created_receivers):
                       namespace='/log/%s' % receiver_user['user_ID'])
 # if __name__ == '__main__':
 #     emit_log(1, {'loss': 0.3}, {'id': '11'})
+
+
+def emit_world_message(world):
+    world_message = json_utility.convert_to_json(world.to_mongo())
+    socketio.emit('notification', world_message, namespace='/log')

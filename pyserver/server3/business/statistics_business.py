@@ -21,7 +21,6 @@ class StatisticsBusiness(GeneralBusiness):
 
     @classmethod
     def action(cls, user_obj, entity_obj, entity_type, action):
-
         # 用于动态加入 attribute 对象元素
         dict = {
             entity_type: entity_obj

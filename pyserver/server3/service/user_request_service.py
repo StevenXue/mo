@@ -1,12 +1,13 @@
 # -*- coding: UTF-8 -*-
 
 from server3.service import user_service
+from server3.service.world_service import WorldService
+
 from server3.business import user_request_business
 from server3.business import user_business
 from server3.business import ownership_business
 from server3.repository import config
 from server3.utility import json_utility
-from server3.business.world_business import WorldBusiness
 from server3.entity.world import CHANNEL
 from server3.business.user_request_business import UserRequestBusiness
 from server3.business.request_answer_business import RequestAnswerBusiness
@@ -86,24 +87,21 @@ def create_user_request(title, user_ID, **kwargs):
         **kwargs)
 
     # 记录历史记录
-    StatisticsBusiness.action(
+    statistics = StatisticsBusiness.action(
         user_obj=user,
         entity_obj=created_user_request,
         entity_type="userRequest",
         action="create"
     )
-    # 记录世界频道消息
-    WorldBusiness.system_send(
+
+    # 记录世界频道消息  # 推送消息
+    world = WorldService.system_send(
         channel=CHANNEL.request,
         message=f"用户{created_user_request.user.user_ID}发布了需求{created_user_request.title}")
-
-    # 推送消息
-
 
     if created_user_request:
         # 默认发布者star
         created_user_request = user_service.update_request_star(created_user_request.id, user_ID)
-
 
         # get user object
         user = user_business.get_by_user_ID(user_ID=user_ID)
