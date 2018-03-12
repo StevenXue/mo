@@ -8,7 +8,7 @@ const Search = Input.Search
 
 import styles from './index.less'
 import {fetchAllUserRequest} from "../../services/userRequest"
-import {countMyProjects} from "../../services/project"
+import {get_star_favor} from "../../services/user"
 import {showTime} from "../../utils"
 import {routerRedux} from "dva/router"
 
@@ -119,32 +119,30 @@ class MyFavouriteList extends Component {
   constructor() {
     super()
     this.state = {
-      projects:[],
-      requests: [],
+      objects: [],
       totalNumber: 0,
-      requestsLoading: false,
       pageNo: 1,
       pageSize: 10,
-      type: 'app',
+      action_entity: 'favor_apps',
     }
   }
 
   fetchData({payload}) {
     if (payload) {
-      payload['type'] = this.state.type
+      payload['action_entity'] = this.state.action_entity
     }
     else {
-      payload = {'type': this.state.type}
+      payload = {'action_entity': this.state.action_entity}
     }
     payload['page_no'] = this.state.current
     payload['page_size'] = this.state.pageSize
     payload['group'] = 'my'
 
-    fetchAllUserRequest({
+    get_star_favor({
       payload,
-      onJson: ({user_request: requests, total_number: totalNumber}) => {
+      onJson: ({objects: objects, count: totalNumber}) => {
         this.setState({
-          requests, totalNumber
+          objects, totalNumber
         })
       }
     })
@@ -152,10 +150,10 @@ class MyFavouriteList extends Component {
 
   fetchProject({payload}){
     if (payload) {
-      payload['type'] = this.state.type
+      payload['action_entity'] = this.state.action_entity
     }
     else {
-      payload = {'type': this.state.type}
+      payload = {'action_entity': this.state.action_entity}
     }
     payload['page_no'] = this.state.current
     payload['page_size'] = this.state.pageSize
@@ -175,8 +173,8 @@ class MyFavouriteList extends Component {
     })
   }
 
-  toUserRequestDetail(id, history) {
-    history.push(`/userrequest/${id}`)
+  toObjectDetail(id, history) {
+    history.push(`/market/${id}`)
   }
 
   onShowSizeChange = (current, pageSize) => {
@@ -184,13 +182,12 @@ class MyFavouriteList extends Component {
       pageNo: current,
       pageSize: pageSize
     }, () => this.fetchData({payload: {}}))
-
   }
 
   typeChange = (e) => {
     console.log('radio checked', e.target.value)
     this.setState({
-      type: e.target.value,
+      action_entity: e.target.value,
       pageNo: 1,
     }, () => this.fetchData({}))
 
@@ -201,10 +198,10 @@ class MyFavouriteList extends Component {
     return (
       <div className={styles.bottomRow}>
         <div className={styles.radioGroupDiv}>
-          <RadioGroup onChange={this.typeChange} value={this.state.type}>
-            <Radio value={'app'} className={styles.radio}>App</Radio>
-            <Radio value={'module'} className={styles.radio}>Module</Radio>
-            <Radio value={'dataset'} className={styles.radio}>Dataset</Radio>
+          <RadioGroup onChange={this.typeChange} value={this.state.action_entity}>
+            <Radio value={'favor_apps'} className={styles.radio}>App</Radio>
+            <Radio value={'favor_modules'} className={styles.radio}>Module</Radio>
+            <Radio value={'favor_datasets'} className={styles.radio}>Dataset</Radio>
             <Radio value={'request'} className={styles.radio}>Request</Radio>
           </RadioGroup>
           <Search className={styles.search}
@@ -214,39 +211,33 @@ class MyFavouriteList extends Component {
           />
         </div>
         <div className={styles.requestList}>
-          {this.state.requests.map(e =>
+          {this.state.objects.map(e =>
             <Card noHovering={true} key={e._id}  bordered={false} >
               <div>
                 <Row>
-                  <Col span={3}>
+                  {this.state.action_entity === 'request'?<Col span={3}>
                     <div
-                      onClick={() => this.toUserRequestDetail(e._id, history)}>
+                      onClick={() => this.toObjectDetail(e._id, history)}>
                       <div className={styles.starDiv}>
-                        <p
-                          className={styles.starNumber}>{e['star_user'].length}</p>
                         <p className={styles.starText}>Star</p>
                       </div>
                       <div className={styles.starDiv}>
-                        <p
-                          className={styles.starNumber}>{e['answer_number']}</p>
                         <p className={styles.starText}>Answer</p>
                       </div>
                     </div>
-                  </Col>
+                  </Col>:null}
                   <Col span={21}>
                     <div>
                       <p className={styles.title}
-                         onClick={() => this.toUserRequestDetail(e._id, history)}>{e.title}</p>
-                      {/*<p className={styles.description}>{e.description}</p>*/}
+                         onClick={() => this.toObjectDetail(e._id, history)}>{e.name}</p>
+                      <p className={styles.description}>{e.description}</p>
+                      <Icon type="user" style={{fontSize: 12, color: '#08c',}}/>
+                      <Icon type="tags" style={{fontSize: 12, color: '#08c',}}/>
                       <div>
-                        {e['tags'].length > 0 && e['tags'].map(e => <p key={e}
-                                                                       className={styles.tags}>{e}</p>)}
+                        <p className={styles.showTime}>{e.user} </p>
                         <div className={styles.timeAndUserDiv}>
                           <p
                             className={styles.showTime}>{showTime(e.create_time)}</p>
-                          <p className={styles.showTime}>&nbsp;&nbsp; asked
-                            at &nbsp;&nbsp;</p>
-                          <p className={styles.showTime}>{e.user_ID} </p>
                         </div>
                       </div>
                     </div>
