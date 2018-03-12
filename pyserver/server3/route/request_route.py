@@ -37,11 +37,9 @@ def list_user_request():
     page_size = int(request.args.get('page_size', 5))
     search_query = request.args.get('search_query', None)
     type = request.args.get('type', None)
+    user_ID = request.args.get('user_ID', get_jwt_identity())
     if type == 'all':
         type = None
-    user_ID = None
-    if group == 'my':
-        user_ID = get_jwt_identity()
 
     user_requests, total_number = user_request_service.get_list(
         type=type,

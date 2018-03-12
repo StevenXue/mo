@@ -14,3 +14,7 @@ export function set_star_favor(payload) {
     }),
   });
 }
+
+export function get_user_info({user_ID}) {
+  return request(`${CORS}/user/profile/${user_ID}`)
+}

@@ -25,11 +25,19 @@ function toWorkspace(dispatch,tabPane) {
 }
 
 
+// class Profile extends Component {
+//   constructor() {
+//     super()
+//     this.state = {
+//     }
+//   }
+// }
 
-function Profile({login, dispatch, history}) {
+
+function Profile({login,profile, dispatch, history}) {
   if (login.user) {
-    const {age, email, name, phone, user_ID, projectNumber} = login.user
-    console.log(projectNumber)
+    const {age, email, name, phone, user_ID} = profile.userInfo
+    const {projectNumber} = profile
     return (
       <div className={`main-container ${styles.container}`}>
         <div className={styles.headerRow}>
@@ -90,15 +98,14 @@ function Profile({login, dispatch, history}) {
                 defaultActiveKey="1"
                 onChange={callback}>
             <TabPane tab="Favourite" key="1" >
-              <MyFavouriteList history={history}/>
+              <MyFavouriteList history={history} user_ID={user_ID}/>
             </TabPane>
             <TabPane tab="My request" key="2">
-              <MyRequestList history={history}/>
+              <MyRequestList history={history} user_ID={user_ID}/>
             </TabPane>
             <TabPane tab="My answer" key="3">
             </TabPane>
           </Tabs>
-
         </div>
       </div>
     )
@@ -112,12 +119,13 @@ class MyFavouriteList extends Component {
   constructor() {
     super()
     this.state = {
+      projects:[],
       requests: [],
       totalNumber: 0,
       requestsLoading: false,
       pageNo: 1,
       pageSize: 10,
-      type: 'all',
+      type: 'app',
     }
   }
 
@@ -140,6 +148,17 @@ class MyFavouriteList extends Component {
         })
       }
     })
+  }
+
+  fetchProject({payload}){
+    if (payload) {
+      payload['type'] = this.state.type
+    }
+    else {
+      payload = {'type': this.state.type}
+    }
+    payload['page_no'] = this.state.current
+    payload['page_size'] = this.state.pageSize
   }
 
   componentDidMount() {
@@ -273,6 +292,7 @@ class MyRequestList extends Component {
     payload['page_no'] = this.state.current
     payload['page_size'] = this.state.pageSize
     payload['group'] = 'my'
+    payload['user_ID'] = this.props.user_ID
 
     fetchAllUserRequest({
       payload,
@@ -320,7 +340,7 @@ class MyRequestList extends Component {
   }
 
   render() {
-    const {history, project, dispatch} = this.props
+    const {history, user_ID} = this.props
     return (
       <div className={styles.bottomRow}>
         <div className={styles.radioGroupDiv}>
@@ -392,4 +412,4 @@ class MyRequestList extends Component {
   }
 }
 
-export default connect(({login, allRequest}) => ({login, allRequest}))(Profile)
+export default connect(({login, allRequest,profile}) => ({login, allRequest,profile}))(Profile)

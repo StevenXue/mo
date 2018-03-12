@@ -13,15 +13,6 @@ import * as userRequestService from "../services/userRequest"
 let connected = false
 
 
-function* fetchProjectNumber(action, {call, put, select}){
-  const {data: projectNumber} = yield call(
-    projectService.countMyProjects, {})
-  yield put({
-    type: 'updateProjectNumber',
-    payload: {projectNumber: projectNumber}
-  })
-}
-
 export default {
   namespace: 'login',
   state: {
@@ -151,9 +142,6 @@ export default {
           type: 'setUser',
           payload: data.user,
         })
-        yield call(fetchProjectNumber, {}, {
-          call, put,
-        })
         // FIXME regex can't catch whole url
         // const from = queryURL('from')
         // if (from) {
@@ -224,11 +212,6 @@ export default {
   subscriptions: {
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
-        if (pathname === '/profile') {
-          dispatch({
-            type: 'fetchProjectNumber',
-          })
-        }
         const match = pathToRegexp('/user/login').exec(pathname)
         if (!match) {dispatch({ type: 'query' })}
         const userId = localStorage.getItem('user_ID')

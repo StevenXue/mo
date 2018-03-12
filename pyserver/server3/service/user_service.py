@@ -12,6 +12,7 @@ from server3.business import user_request_business
 from server3.business import request_answer_business
 from server3.business.app_business import AppBusiness
 from server3.business.module_business import ModuleBusiness
+from server3.business.user_business import UserBusiness
 
 from server3.constants import Error, ErrorMessage
 from server3.entity.general_entity import UserEntity
@@ -313,6 +314,11 @@ class UserService:
     def star_request(cls, user_ID, app_id):
         return StarApp.action(user_ID, app_id)
 
+    @classmethod
+    def get_user_info(cls, user_ID):
+        user = UserBusiness.get_by_user_ID(user_ID)
+        user = json_utility.convert_to_json(user.to_mongo())
+        return user
 
 # 尝试合并代码
 class Action:

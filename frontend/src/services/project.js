@@ -29,8 +29,8 @@ export function getProjects({ filter, onJson }) {
   return request(path.join(CORS, PREFIX) + `?${params}`, undefined, { onJson })
 }
 
-export function countMyProjects(){
-   return request(path.join(CORS, PREFIX) + `/count`)
+export function countProjects({user_ID}){
+   return request(path.join(CORS, PREFIX) + `/count?user_ID=${user_ID}`)
 }
 
 // 获取用户所有 projects

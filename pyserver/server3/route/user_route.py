@@ -244,6 +244,14 @@ def get_action_entity():
     })
 
 
+@user_app.route('/profile/<user_ID>', methods=['GET'])
+def get_user_info(user_ID):
+    result = UserService.get_user_info(user_ID=user_ID)
+    print('result')
+    print(result)
+    return jsonify({'response': result}), 200
+
+
 # @user_app.route('/favor_app/<app_id>', methods=['PUT'])
 # @jwt_required
 # def favor_app(app_id):

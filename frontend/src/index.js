@@ -29,6 +29,7 @@ app.model(require('./models/myservice'))
 app.model(require('./models/allRequest'))
 app.model(require('./models/module'))
 app.model(require('./models/message'))
+app.model(require('./models/profile'))
 app.model(modelling)
 app.model(projectDetail)
 
