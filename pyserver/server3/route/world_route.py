@@ -16,10 +16,10 @@ from flask import Blueprint
 from flask import jsonify
 from flask import request
 
-from server3.service import user_service, world_service
-from server3.business import world_business, user_business
+from server3.service.world_service import WorldService
+from server3.business.world_business import WorldBusiness
 from server3.utility import json_utility
-from server3.constants import Error, Warning
+# from server3.constants import Error, Warning
 
 PREFIX = '/world_message'
 
@@ -37,7 +37,7 @@ def send():
     user_ID = data.pop("user_ID")
     channel = data.pop("channel")
     message = data.pop("message")
-    result = world_service.use_send(user_ID, channel, message)
+    result = WorldService.user_send(user_ID, channel, message)
     if result:
         result = json_utility.convert_to_json(result.to_mongo())
         return jsonify({
@@ -49,9 +49,14 @@ def send():
 def get():
     data = request.get_json()
     channel = data.pop("channel")
-    world_messages = world_business.get(channel=channel)
+    page_no = int(request.args.get('page_no', 1))
+    page_size = int(request.args.get('page_size', 50))
+    world_messages = WorldBusiness.get_pagination(
+        query={"channel": channel},
+        page_no=page_no, page_size=page_size)
     if world_messages:
-        world_messages = json_utility.me_obj_list_to_dict_list(world_messages)
         return jsonify({
-            "response": world_messages
+            "response": {
+                "objects": json_utility.me_obj_list_to_dict_list(world_messages.objects)
+            }
         }), 200

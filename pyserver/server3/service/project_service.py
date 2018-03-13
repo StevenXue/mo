@@ -635,8 +635,8 @@ class ProjectService:
         :return: a new created project object
         """
         user = user_business.get_by_user_ID(user_ID)
-        message = "{}创建了app{}".format(user.name, name)
-        world_business.system_send(channel=cls.channel, message=message)
+        # message = "{}创建了app{}".format(user.name, name)
+        # world_business.system_send(channel=cls.channel, message=message)
 
         return cls.business.create_project(name=name, description=description,
                                            type=type, tags=tags, user=user,

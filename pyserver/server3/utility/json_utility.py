@@ -121,3 +121,26 @@ def get_args(args):
 def args_converter(args):
     return {arg.get('name'): {'key': key, **arg}
             for key, arg in args.items()}
+
+
+def objs_to_json_with_arg(objects, arg):
+    return [{
+        **convert_to_json(me_obj.to_mongo()),
+        f'{arg}_obj': convert_to_json(me_obj[arg].to_mongo())} for me_obj in
+            objects]
+
+
+def objs_to_json_with_args(objects, args):
+    return_objects = []
+    for object in objects:
+        new_object = convert_to_json(object.to_mongo())
+        for arg in args:
+            new_object[f'{arg}_obj'] = convert_to_json(object[arg].to_mongo())
+        return_objects.append(new_object)
+    return return_objects
+    # return [
+    #     {
+    #     **convert_to_json(me_obj.to_mongo()),
+    #
+    #     **[{f'{arg}_obj': convert_to_json(me_obj[arg].to_mongo())} for arg in args]
+    # } for me_obj in objects]

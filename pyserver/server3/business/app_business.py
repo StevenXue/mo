@@ -18,6 +18,7 @@ from server3.constants import MODULE_DIR
 from server3.constants import INIT_RES
 from server3.constants import Error, Warning, ErrorMessage
 from server3.entity.general_entity import Objects
+
 yaml_tail_path = 'app_spec.yml'
 
 
@@ -188,7 +189,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
 
     @classmethod
     def list_projects_chat(cls, search_query, page_no=None, page_size=None,
-                           default_max_score=0.4,):
+                           default_max_score=0.4, ):
         start = (page_no - 1) * page_size
         end = page_no * page_size
 
@@ -209,6 +210,12 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
             page_no=page_no,
             page_size=page_size
         )
+
+    @classmethod
+    def increment_usage_count(cls, api_id):
+        app = cls.get_by_id(api_id)
+        app.usage_count += 1
+        return app.save()
         # apps_score.count()
         # max_score = apps_score[0].score
         # if max_score < default_max_score:
@@ -223,18 +230,20 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         #         "page_size": page_size,
         #     }
         #     # return apps[start:end]
-    # @classmethod
-    # def run_app(cls, app_id, input_json):
-    #     app = AppBusiness.get_by_id(project_id=app_id)
-    #     url = app.user.user_ID+"-"+app.name
-    #     domin = "192.168.31.23:8080/function/"
-    #     url = domin+url
-    #     payload = input_json
-    #     headers = {
-    #         'content-type': "application/json",
-    #     }
-    #     response = requests.request("POST", url, data=payload, headers=headers)
-    #     return response.json()
+        # @classmethod
+        # def run_app(cls, app_id, input_json):
+        #     app = AppBusiness.get_by_id(project_id=app_id)
+        #     url = app.user.user_ID+"-"+app.name
+        #     domin = "192.168.31.23:8080/function/"
+        #     url = domin+url
+        #     payload = input_json
+        #     headers = {
+        #         'content-type': "application/json",
+        #     }
+        #     response = requests.request("POST", url, data=payload, headers=headers)
+        #     return response.json()
 
 
-
+if __name__ == "__main__":
+    # apps = project.App.objects(user=)
+    pass
