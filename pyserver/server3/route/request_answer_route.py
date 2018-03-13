@@ -2,7 +2,6 @@
 from bson import ObjectId
 from flask import Blueprint
 from flask import jsonify
-from flask import make_response
 from flask import request
 
 from server3.service import comments_service
@@ -15,16 +14,17 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 PREFIX = '/request_answer'
 
 request_answer_app = Blueprint("request_answer_app", __name__,
-                                      url_prefix=PREFIX)
+                               url_prefix=PREFIX)
 
 
 @request_answer_app.route('', methods=['GET'])
 def list_request_answer():
     user_request_id = request.args.get("user_request_id")
     user_ID = request.args.get("user_ID")
-    page_no = request.args.get("page_no")
-    page_size = request.args.get("page_size")
+    page_no = int(request.args.get("page_no", 1))
+    page_size = int(request.args.get("page_size", 10))
     type = request.args.get("type")
+    search_query = request.args.get("search_query")
     if user_request_id:
         request_answer = request_answer_service. \
             get_all_answer_of_this_user_request(user_request_id)
@@ -44,11 +44,12 @@ def list_request_answer():
             answer['comment'] = answer_comment_info
             if 'select_project' in answer:
                 answer['select_project'] = json_utility.convert_to_json(
-                request_answer[index].select_project.to_mongo())
+                    request_answer[index].select_project.to_mongo())
         return jsonify({'response': request_answer_info}), 200
     elif user_ID:
         request_answer, total_number = request_answer_service. \
-            get_all_answer_by_user_ID(user_ID,page_no,page_size,type)
+            get_all_answer_by_user_ID(user_ID, page_no, page_size,
+                                      type, search_query)
         request_answer_info = json_utility. \
             me_obj_list_to_json_list(request_answer)
         return jsonify({'response': {'request_answer_info': request_answer_info,
@@ -71,7 +72,9 @@ def create_request_answer():
     if select_project:
         select_project = ObjectId(select_project)
         data['select_project'] = select_project
-    data['user_request'] = ObjectId(data['user_request_id'])
+    user_request_id = data.pop('user_request_id')
+    data['user_request'] = ObjectId(user_request_id)
+
     request_answer_service.create_request_answer(**data)
     return jsonify({'response': 'create request_answer success'}), 200
 
@@ -81,7 +84,7 @@ def update_request_answer():
     request_answer_id = request.args.get("request_answer_id")
     if not request.json \
             or 'answer' not in request.json \
-            or 'user_id' not in request.json :
+            or 'user_id' not in request.json:
         return jsonify({'response': 'insufficient arguments'}), 400
     data = request.get_json()
     answer = data['answer']

@@ -48,13 +48,11 @@ class RequestAnswerBusiness(EntityBusiness):
 
         if type != 'all':
             objects = RequestAnswer.objects(
-                user_request_id__in=UserRequest.objects(type=type))
-
+                user_request__in=UserRequest.objects(type=type))
         objects = objects(answer_user=user)
         if get_total_number:
             number_of_objects = objects.count()
-            return objects.order_by('-create_time')[
-                   start:end], number_of_objects
+            return objects.order_by('-create_time')[start:end], number_of_objects
         else:
             return objects.order_by('-create_time')[start:end]
 

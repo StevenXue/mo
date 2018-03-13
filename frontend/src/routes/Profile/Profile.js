@@ -109,6 +109,7 @@ function Profile({login, profile, dispatch, history}) {
               <MyRequestList history={history} user_ID={user_ID}/>
             </TabPane>
             <TabPane tab="My answer" key="3">
+              <MyAnswerList  history={history} user_ID={user_ID}/>
             </TabPane>
           </Tabs>
         </div>
@@ -284,7 +285,7 @@ class MyRequestList extends Component {
     else {
       payload = {'type': this.state.type}
     }
-    payload['page_no'] = this.state.current
+    payload['page_no'] = this.state.pageNo
     payload['page_size'] = this.state.pageSize
     payload['group'] = 'my'
     payload['user_ID'] = this.props.user_ID
@@ -426,13 +427,14 @@ class MyAnswerList extends Component {
     else {
       payload = {'type': this.state.type}
     }
-    payload['page_no'] = this.state.current
+    payload['page_no'] = this.state.pageNo
     payload['page_size'] = this.state.pageSize
     payload['user_ID'] = this.props.user_ID
 
     fetchUserRequestAnswerByUserID({
       payload,
       onJson: ({request_answer_info: requests, total_number: totalNumber}) => {
+        console.log(requests)
         this.setState({
           requests, totalNumber
         })
@@ -497,32 +499,12 @@ class MyAnswerList extends Component {
             <Card noHovering={true} key={e._id} bordered={false}>
               <div>
                 <Row>
-                  <Col span={3}>
-                    <div className={styles.starAnswerDiv}
-                         onClick={() => this.toUserRequestDetail(e._id, history)}>
-                      <div className={styles.starDiv}>
-                        {e.accept_answer ? <p className={styles.starNumber}>
-                          <Icon style={{'color':'#439A46', 'fontSize':'18px'}} type="check-circle"/></p> : <p
-                          className={styles.starNumber} >{e['answer_number']}</p>}
-                        <p className={styles.starText}  style={e.accept_answer ?{'color':'#439A46' }:null}>Answer</p>
-                      </div>
-                      <div className={styles.starDiv}>
-                        <p
-                          className={styles.starNumber}>{e['star_user'].length}</p>
-                        <p className={styles.starText}>Star</p>
-                      </div>
-
-                    </div>
-                  </Col>
                   <Col span={21}>
                     <div className={styles.rightArea}>
                       <p className={styles.title}
-                         onClick={() => this.toUserRequestDetail(e._id, history)}>{e.title}</p>
-                      {/*<p className={styles.description}>{e.description}</p>*/}
+                         onClick={() => this.toUserRequestDetail(e.user_request, history)}>{e.user_request_title}</p>
+                      <p className={styles.description}>{e.answer}</p>
                       <div className={styles.footer}>
-                        <Icon type="tags" className={styles.tagsIcon}/>
-                        {e['tags'].length > 0 &&
-                        <p key={e}>{e['tags'].join(',')}</p>}
                         <Icon type="clock-circle-o"
                               className={styles.clockIcon}/>
                         <p>{showTime(e.create_time)}</p>

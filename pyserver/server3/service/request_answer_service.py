@@ -11,18 +11,19 @@ from server3.business.request_answer_business import RequestAnswerBusiness
 from server3.utility import json_utility
 
 
-def get_all_answer_by_user_ID(user_ID, page_no, page_size,type,
+def get_all_answer_by_user_ID(user_ID, page_no, page_size, type, search_query,
                               get_total_number=True):
     cls = RequestAnswerBusiness
     user = user_business.get_by_user_ID(user_ID)
     answers, total_number = cls. \
         get_by_answer_user(user,
+                           search_query=search_query,
                            get_total_number=get_total_number,
                            page_no=page_no,
                            page_size=page_size,
-                           type = type)
+                           type=type)
     for answer in answers:
-        answer.user_request_title = answer.user_request_id.title
+        answer.user_request_title = answer.user_request.title
     return answers, total_number
 
 

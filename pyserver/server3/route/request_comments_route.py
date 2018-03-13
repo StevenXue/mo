@@ -48,7 +48,7 @@ def create_user_request_comments():
     user_ID = get_jwt_identity()
     user_request_id = data['user_request_id']
     comments_type = data['comments_type']
-    request_answer_id = data.get('request_answer', None)
+    request_answer_id = data.get('request_answer_id', None)
     comments_service.create_user_request_comments(
         user_request_id, user_ID, comments, comments_type, request_answer_id)
     return jsonify({'response': 'create user_request_comments success'}), 200

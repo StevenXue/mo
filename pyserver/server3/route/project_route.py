@@ -200,6 +200,7 @@ def create_project():
     user_ID = get_jwt_identity()
 
     data = request.get_json()
+    print(data)
     name = data.pop('name')
     type = data.pop('type')
     description = data.pop('description')
@@ -222,7 +223,8 @@ def create_project():
     if type == 'app':
         project = AppService.create_project(
             name, description, user_ID, tags=tags,
-            type=type, user_token=user_token, **data),
+            type=type, user_token=user_token, **data)
+        print(project)
     else:
         project = project_service.create_project(
             name, description, user_ID, tags=tags,
