@@ -4,6 +4,8 @@ from tornado import gen
 import jupyterhub
 import requests
 
+SERVER = 'http://localhost:5000'
+
 
 def default_format_volume_name(template, spawner):
     return template.format(username=spawner.user.name,
@@ -41,11 +43,18 @@ class MyDockerSpawner(DockerSpawner):
         :return: dict of res json
         """
         print('update project tb_port: ', project_name, tb_port)
-        return requests.put('{server}/project/projects/{project_name}?by=name'.
-                            format(server='http://localhost:5000',
-                                   project_name=project_name),
-                            json={'tb_port': str(tb_port)}
-                            )
+        return requests.put(f'{SERVER}/project/projects/{project_name}?by=name'
+                            , json={'tb_port': str(tb_port)})
+
+    def insert_envs(self, project_name):
+        """
+        auth jupyterhub with user token
+        :param tb_port:
+        :param project_name:
+        :return: dict of res json
+        """
+        print('update project tb_port: ', project_name)
+        return requests.put(f'{SERVER}/apps/insert_envs/{project_name}')
 
     @gen.coroutine
     def start(self, image=None, extra_create_kwargs=None,
@@ -158,5 +167,6 @@ class MyDockerSpawner(DockerSpawner):
             self.user.server.port = port
         tb_port = yield self.get_tb_port()
         self.update_project_tb_port(self.user.name, tb_port)
+        self.insert_envs(self.user.name)
         # jupyterhub 0.7 prefers returning ip, port:
         return (ip, port)
