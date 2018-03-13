@@ -65,6 +65,7 @@
       position: absolute;
       top: 8px;
       left: 80px;
+
     }
     .description {
       height: 83px;
@@ -72,6 +73,13 @@
       top: 67px;
       left: 13px;
       font-size: 12px;
+      .p{
+        display:-webkit-box;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        -webkit-line-clamp:3;
+        -webkit-box-orient:vertical;
+      }
     }
 
     .authorDateDiv {

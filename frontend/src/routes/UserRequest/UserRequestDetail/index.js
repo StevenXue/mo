@@ -326,12 +326,12 @@ function UserRequestDetail({allRequest, login, dispatch}) {
     })
   }
 
-  // function acceptAnswer(request_answer_id) {
+  // function acceptAnswer(request_answer) {
   //   dispatch({
   //     type: 'allRequest/acceptAnswer',
   //     payload: {
-  //       user_request_id: focusUserRequest['_id'],
-  //       request_answer_id: request_answer_id,
+  //       user_request: focusUserRequest['_id'],
+  //       request_answer: request_answer,
   //     }
   //   })
   // }

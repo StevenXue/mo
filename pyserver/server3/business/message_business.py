@@ -55,7 +55,7 @@ def add_message(sender, message_type, receivers, **kwargs):
 
 def remove_by_id(user_request_id):
     pass
-    # return user_request_repo.delete_by_id(user_request_id)
+    # return user_request_repo.delete_by_id(user_request)
 
 
 def read_message(user_id, receiver_id):

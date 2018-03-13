@@ -7,12 +7,29 @@ from server3.service import message_service
 from server3.business import user_request_business
 from bson import ObjectId
 from server3.service.user_request_service import EntityMapper
+from server3.business.request_answer_business import RequestAnswerBusiness
+from server3.utility import json_utility
+
+
+def get_all_answer_by_user_ID(user_ID, page_no, page_size,type,
+                              get_total_number=True):
+    cls = RequestAnswerBusiness
+    user = user_business.get_by_user_ID(user_ID)
+    answers, total_number = cls. \
+        get_by_answer_user(user,
+                           get_total_number=get_total_number,
+                           page_no=page_no,
+                           page_size=page_size,
+                           type = type)
+    for answer in answers:
+        answer.user_request_title = answer.user_request_id.title
+    return answers, total_number
 
 
 def get_all_answer_of_this_user_request(user_request_id, get_number=False,
                                         entity_type='requestAnswer'):
     # request_answer = request_answer_business. \
-    #     get_all_answer_of_this_user_request(user_request_id)
+    #     get_all_answer_of_this_user_request(user_request)
     cls = EntityMapper.get(entity_type)
     request_answer = cls.get_by_user_request_id(user_request_id, get_number)
     return request_answer
@@ -36,7 +53,7 @@ def create_request_answer(**data):
         add_request_answer(**data)
     if created_request_answer:
         # get user object
-        user = user_business.get_by_user_ID(user_ID=data['answer_user_ID'])
+        user = data['answer_user']
         # create ownership relation
         if ownership_business.add(user,
                                   request_answer=
@@ -45,7 +62,7 @@ def create_request_answer(**data):
             #  新建通知消息
             admin_user = user_business.get_by_user_ID('admin')
             user_request = user_request_business. \
-                get_by_user_request_id(data['user_request_id'])
+                get_by_user_request_id(data['user_request'])
             receivers = list({'obj_id': el} for el in user_request.star_user)
             if message_service.create_message(
                     sender=admin_user,

@@ -17,10 +17,10 @@ RELATED_FIELDS = ('Business', 'Government', 'Education', 'Environment',
 
 
 class RequestAnswer(DynamicDocument):
-    user_request_id = ReferenceField('UserRequest', reverse_delete_rule=CASCADE)
+    user_request = ReferenceField('UserRequest', reverse_delete_rule=CASCADE)
     answer = StringField()
     create_time = DateTimeField(required=True)
     edit_time = DateTimeField()
-    answer_user_ID = StringField(required=True)
+    answer_user = ReferenceField('User')
     votes_up_user = ListField(ReferenceField('User'))
     select_project = ReferenceField('Project')

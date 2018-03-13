@@ -166,7 +166,7 @@ function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
           <p>{project.name}</p>
         </div>
         <div className={styles.description}>
-          <p>{project.description}</p>
+          <p className={styles.p}>{project.description}</p>
         </div>
         <div>
           <div className={styles.authorDateDiv}>

@@ -227,7 +227,6 @@ def set_action_entity(entity_id):
 @user_app.route('/action_entity', methods=['GET'])
 @jwt_required
 def get_action_entity():
-    print('find')
     user_ID = request.args.get("user_ID", get_jwt_identity())
     action_entity = request.args.get("action_entity")
     page_no = int(request.args.get('page_no', 1))
@@ -235,6 +234,8 @@ def get_action_entity():
     apps = UserBusiness.get_action_entity(
         user_ID=user_ID, action_entity=action_entity,
         page_no=page_no, page_size=page_size)
+    for app in apps.objects:
+        app.user_ID = app.user.user_ID
     return jsonify({
         'response': {
             "objects": json_utility.me_obj_list_to_json_list(apps.objects),

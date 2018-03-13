@@ -9,22 +9,7 @@
     margin-top: 20px;
   }
 
-  .card {
-    min-height: 1rem;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    background-color: #fff;
-    color: rgba(0,0,0,0.87);
-    border: none;
-    border-radius: 2px;
-    box-shadow: 0 0.125rem 0.25rem 0 rgba(0,0,0,0.14), 0 0.1875rem 0.25rem 0 rgba(0,0,0,0.12), 0 0.0625rem 0.3125rem 0 rgba(0,0,0,0.2);
 
-    width: 250px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
 
   .headerRow {
     margin: 0 0 20px 0;
@@ -33,7 +18,7 @@
   .bottomRow {
     color: black;
     .radioGroupDiv{
-      margin: 0 0 20px 50px;
+      margin: 0 0 0 50px;
       .radio{
         margin: 0 10px 0 10px;
         font-size: 14px;
@@ -110,9 +95,94 @@
       margin: 0 0;
       width: 100%;
     }
+    .rightArea{
+      margin-left: 40px;
+    }
+    .title {
+      color: black;
+      font-size: 22px;
+      margin: -15px 0 20px 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      cursor: pointer;
+    }
+
+    .description {
+      font-size: 14px;
+      margin: 0 0 0 1px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      color: #828A92;
+    }
+    .starAnswerDiv{
+      display: flex;
+    }
+    .starDiv{
+      width: 50%;
+      //height: 138px;
+      cursor: pointer;
+      color: #828A92;
+    }
+    .starNumber{
+      font-size: 22px;
+      text-align: center;
+    }
+    .starText{
+      font-size: 14px;
+      text-align: center;
+    }
+    .tags{
+      font-size: 16px;
+      background-color: #e1ecf4;
+      float:left;
+      padding: 2px 5px 2px 5px;
+      margin: 2px 5px 2px 5px;
+      cursor: default;
+    }
+    .showTime{
+      text-align: right;
+      float: right;
+      font-size: 14px;
+      cursor: default;
+    }
+    .footer {
+      display: flex;
+      align-items: center;
+      color: #828A92;
+      margin: 5px 0 0 3px;
+      .tagsIcon{
+        margin-left: 1px;
+        margin-right: 4px;
+      }
+      .clockIcon{
+        margin-left: 21px;
+        margin-right: 4px;
+      }
+      //justify-content: center;
+    }
+    .timeAndUserDiv{
+
+    }
+  }
+
+
+  .favorList {
+    margin: 0 0;
+    width: 100%;
+
+    .card {
+      margin: 0 0;
+      width: 100%;
+    }
 
     .title {
-      color: #005999;
+      color: black;
       font-size: 22px;
       margin: 5px 0 5px 0;
       overflow: hidden;
@@ -160,11 +230,24 @@
       font-size: 14px;
       cursor: default;
     }
-
-    .timeAndUserDiv{
-
+    .footer {
+      display: flex;
+      align-items: center;
+      color: #828A92;
+      margin: 5px 0 0 3px;
+      .userIcon{
+        margin-right: 4px;
+      }
+      .tagsIcon{
+        margin-left: 21px;
+        margin-right: 4px;
+      }
+      //justify-content: center;
     }
+
   }
+
+
   .pagination{
     margin: 0 0 0 50px;
   }

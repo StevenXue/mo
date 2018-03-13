@@ -37,7 +37,7 @@ def list_user_request():
     page_size = int(request.args.get('page_size', 5))
     search_query = request.args.get('search_query', None)
     type = request.args.get('type', None)
-    user_ID = request.args.get('user_ID', get_jwt_identity())
+    user_ID = request.args.get('user_ID', None)
     if type == 'all':
         type = None
 
@@ -93,7 +93,7 @@ def update_user_request(user_request_id):
 @user_request_app.route('/votes', methods=['PUT'])
 def update_user_request_votes():
     data = request.get_json()
-    user_request_id = data["user_request_id"]
+    user_request_id = data["user_request"]
     votes_user_id = data["votes_user_id"]
     result = user_service.update_request_vote(user_request_id, votes_user_id)
     result = json_utility.convert_to_json(result)
@@ -104,7 +104,7 @@ def update_user_request_votes():
 @user_request_app.route('/star', methods=['PUT'])
 def update_user_request_star():
     data = request.get_json()
-    user_request_id = data["user_request_id"]
+    user_request_id = data["user_request"]
     star_user_id = data["star_user_id"]
     result = user_service.update_request_star(user_request_id, star_user_id)
     result = json_utility.convert_to_json(result.to_mongo())
