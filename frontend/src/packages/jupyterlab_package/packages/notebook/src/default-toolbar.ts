@@ -225,7 +225,7 @@ export namespace ToolbarItems {
             // focusNodeSelector: 'input',
             buttons: [Dialog.cancelButton({ label: 'KEEP ORIGINAL' }), Dialog.okButton({ label: 'OPTIMISE' })],
           }).then(result => {
-            request(`pyapi/app/nb_to_script/${match[1]}`, {
+            request(`pyapi/apps/nb_to_script/${match[1]}`, {
               method: 'post',
               headers: {
                 'Content-Type': 'application/json',

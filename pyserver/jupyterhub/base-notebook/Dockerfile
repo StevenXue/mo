@@ -86,13 +86,12 @@ USER $NB_UID
 RUN mkdir /home/$NB_USER/work && \
     fix-permissions /home/$NB_USER
 ENV WORK=/home/$NB_USER/work
+#ENV WORKON_HOME=/home/$NB_USER/work/.virtualenvs
 WORKDIR $HOME
 
 # make pip and python command using python3
 RUN /bin/bash -c "alias python=python3.6"
 RUN /bin/bash -c "alias pip=pip3"
-#RUN /bin/bash -c "echo 'alias python=python3.6' > .bashrc"
-#RUN /bin/bash -c "echo 'alias pip=pip3' > .bashrc"
 
 
 RUN fix-permissions $LOCAL_DIR && \
@@ -108,7 +107,7 @@ RUN pipenv --python 3.6
 RUN pipenv install \
     'notebook==5.2.*' \
     'jupyterhub==0.8.*' \
-    'jupyterlab==0.31.1'
+    'jupyterlab==0.31.*'
 RUN pipenv run jupyter labextension install @jupyterlab/hub-extension@^0.8.0 && \
 #    npm cache clean && \
     rm -rf $LOCAL_DIR/share/jupyter/lab/staging && \
@@ -209,9 +208,9 @@ RUN pipenv install \
     # Activate ipywidgets extension in the environment that runs the notebook server
 RUN pipenv run jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
     # Also activate ipywidgets extension for JupyterLab
-    pipenv run jupyter labextension install @jupyter-widgets/jupyterlab-manager@^0.33.1 && \
+    pipenv run jupyter labextension install @jupyter-widgets/jupyterlab-manager@^0.33.1
 #    npm cache clean && \
-    rm -rf $LOCAL_DIR/share/jupyter/lab/staging && \
+RUN rm -rf $LOCAL_DIR/share/jupyter/lab/staging && \
     rm -rf /home/$NB_USER/.cache/yarn && \
     rm -rf /home/$NB_USER/.node-gyp && \
     fix-permissions $LOCAL_DIR && \
@@ -225,6 +224,8 @@ RUN cd /tmp && \
     rm -rf /tmp/facets && \
     fix-permissions $LOCAL_DIR && \
     fix-permissions /home/$NB_USER
+
+WORKDIR $HOME
 
 # Import matplotlib the first time to build the font cache.
 ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
@@ -244,7 +245,22 @@ RUN pipenv install \
 
 ### my notebook
 
-RUN pipenv install keras
+RUN pipenv update tensorflow==1.6.* keras==2.1.* notebook==5.4.*
+#RUN pipenv install jupyterlab==0.31.0
+#RUN pipenv run jupyter serverextension enable --py jupyterlab --sys-prefix
 
-ADD run.sh .
+# for interactive shell
+RUN echo 'alias python=python3.6' >> ~/.bashrc
+RUN echo 'alias pip=pip3' >> ~/.bashrc
+RUN echo 'export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3.6' >> ~/.bashrc
+RUN echo 'export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv' >> ~/.bashrc
+RUN echo 'source /usr/local/bin/virtualenvwrapper.sh' >> ~/.bashrc
+
+#RUN /bin/bash -c "export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3.6"
+#RUN /bin/bash -c "export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv"
+#RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh"
+#RUN source ~/.bashrc
+
+ADD run.sh /home/jovyan
+ADD add_venv.sh /home/jovyan
 CMD ['bash', '/home/jovyan/run.sh']

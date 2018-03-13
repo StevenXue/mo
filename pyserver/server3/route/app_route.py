@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 """
-Blueprint for job
+Blueprint for app
 
 Author: Bingwei Chen
 Date: 2017.10.20

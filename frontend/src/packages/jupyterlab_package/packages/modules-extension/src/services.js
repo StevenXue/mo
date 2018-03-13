@@ -33,7 +33,7 @@ export function getModule({ moduleId, onJson }) {
 }
 
 export function addModuleToApp({ appId, moduleId, func }) {
-  return request(`pyapi/app/add_used_module/${appId}`, {
+  return request(`pyapi/apps/add_used_module/${appId}`, {
     method: 'put',
     headers: {
       'Content-Type': 'application/json',

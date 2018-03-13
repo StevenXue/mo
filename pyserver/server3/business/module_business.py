@@ -1,6 +1,7 @@
 import os
 import yaml
 import shutil
+import subprocess
 from importlib import import_module
 from datetime import datetime
 
@@ -107,4 +108,5 @@ class ModuleBusiness(ProjectBusiness):
         if os.path.exists(dst):
             shutil.rmtree(dst)
         shutil.copytree(module.path, dst)
-
+        # WORKON_HOME=./ pipenv install vv
+        subprocess.call(['bash', 'install_venv.sh', os.path.abspath(dst)])
