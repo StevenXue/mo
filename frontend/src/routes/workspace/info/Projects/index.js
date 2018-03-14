@@ -13,11 +13,12 @@ const Search = Input.Search
 const TabPane = Tabs.TabPane
 
 function Projects({ history, project, dispatch ,location}) {
+  const defaultActiveKeyDic = {"?App":"1","?Module":"2","?Dataset":"3"}
+  const paramList = Object.keys(defaultActiveKeyDic)
 
   function callback(key) {
-    // console.log(key)
+    history.push(`workspace${paramList[parseInt(key)-1]}`)
   }
-  let defaultActiveKeyDic = {"?App":"1","?Module":"2","?Dataset":"3"}
   return (
     <div className={`main-container ${styles.normal}`}>
       <Tabs defaultActiveKey={defaultActiveKeyDic[location.search]}
