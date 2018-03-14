@@ -6,10 +6,12 @@ import io from 'socket.io-client'
 import { invert } from 'lodash'
 
 import { queryURL } from '../utils'
-
+import * as projectService from '../services/project'
 import { flaskServer, translateDict } from '../constants'
+import * as userRequestService from "../services/userRequest"
 
 let connected = false
+
 
 export default {
   namespace: 'login',
@@ -54,8 +56,21 @@ export default {
         user: undefined,
       }
     },
+    updateProjectNumber(state, action){
+      console.log('action',action)
+      return{
+        ...state,
+        user:{
+          ...state.user,
+          projectNumber:action.payload.projectNumber,
+        }
+      }
+    }
   },
   effects: {
+
+
+
     *accountSubmit({ payload }, { call, put }) {
       yield put({
         type: 'changeSubmitting',
@@ -108,6 +123,7 @@ export default {
       if (data) {
         localStorage.setItem('token', data.token)
         localStorage.setItem('user_ID', data.user.user_ID)
+        localStorage.setItem('user_obj_id', data.user._id)
         const from = queryURL('from')
         yield put({ type: 'setUser', payload: data.user })
         if (from) {

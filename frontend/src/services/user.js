@@ -14,3 +14,22 @@ export function set_star_favor(payload) {
     }),
   });
 }
+
+export function get_star_favor({payload, onJson}) {
+  let params = ''
+  for (let key in payload) {
+    if (!payload.hasOwnProperty(key)) {
+      continue
+    }
+    if (payload[key]) {
+      const value = payload[key]
+      params += `&${key}=${value}`
+    }
+  }
+  return request(`${CORS}/user/action_entity?${params}`, undefined, { onJson });
+}
+
+
+export function get_user_info({user_ID}) {
+  return request(`${CORS}/user/profile/${user_ID}`)
+}

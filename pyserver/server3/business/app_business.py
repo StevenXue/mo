@@ -185,10 +185,10 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
                     line = '\t' + line
             print(line)
 
-    @classmethod
-    def create_project(cls, name, description, user, privacy='private',
-                       tags=None, user_token='', type='app'):
-        pass
+    # @classmethod
+    # def create_project(cls, name, description, user, privacy='private',
+    #                    tags=None, user_token='', type='app'):
+    #     pass
 
     @classmethod
     def list_projects_chat(cls, search_query, page_no=None, page_size=None,
