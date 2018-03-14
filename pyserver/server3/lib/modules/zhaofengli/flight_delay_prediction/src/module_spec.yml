@@ -11,7 +11,7 @@ default: &default
 author_name: luxu
 module_name: flight_delay_prediction
 module_description: A MO module
-module_params:
+input:
   predict: &params
     param_1:
       <<: *default
@@ -130,7 +130,13 @@ module_params:
       name: data_path
       value_type: str
       range: null
-
-
+output:
+    predict:
+        flight_no:
+          type: int
+          value: null
+        flight_date:
+          type: str
+          value: null
     
   

@@ -22,8 +22,10 @@ from server3.repository import config
 from server3.service import file_service
 from server3.utility import json_utility
 from server3.constants import PREDICT_FOLDER
+from server3.constants import USER_DIR
 from server3.business import module_business
 from server3.business.module_business import ModuleBusiness
+from server3.business.project_business import ProjectBusiness
 
 # from server3.service import file_service
 
@@ -62,8 +64,8 @@ def upload_file_module():
     data = dict(request.form.items())
     user_ID = data["user_ID"]
     project_id = data["project_id"]
-    module = ModuleBusiness.get_by_id(project_id)
-    store_path = '{}{}/{}/'.format(MODULE_FILE_PATH, user_ID, module.name)
+    project = ProjectBusiness.get_by_id(project_id)
+    store_path = os.path.join(USER_DIR, user_ID, project.name)
 
     # 如果路径不存在创建路径
     if os.path.isdir(store_path):
@@ -71,12 +73,14 @@ def upload_file_module():
     else:
         os.mkdir(store_path)
 
-    if file and allowed_file(file.filename):
+    if file and file_service.allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(store_path, filename))
-        # 解压缩
-        file_size, file_uri, folder_name = \
-            file_service.extract_files_and_get_size(file, store_path)
+        if file.filename.split('.')[-1] == 'zip':
+            # 解压缩
+            file_size, file_uri, folder_name = \
+                file_service.extract_files_and_get_size(file, store_path)
+            print(file_size)
         return jsonify({
             "response": "upload success"
         }), 200

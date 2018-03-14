@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 """
-Blueprint for job
+Blueprint for app
 
 Author: Bingwei Chen
 Date: 2017.10.20
@@ -55,8 +55,9 @@ def add_used_module(app_id):
 @jwt_required
 def nb_to_script(app_id):
     data = request.get_json()
+    optimise = data.get('optimise')
     nb_path = data.get('nb_path')
-    AppBusiness.nb_to_script(app_id, nb_path)
+    AppBusiness.nb_to_script(app_id, nb_path, optimise)
     return jsonify({"response": 1})
 
 
@@ -198,9 +199,11 @@ def get_chat_api_list():
 @app_app.route("/run/<app_id>", methods=["POST"])
 @jwt_required
 def run_app(app_id):
+    user_ID = get_jwt_identity()
     data = request.get_json()
     input_json = data["app"]["input"]
-    result = AppService.run_app(app_id, input_json=input_json)
+    result = AppService.run_app(app_id, input_json=input_json, user_ID=user_ID)
+
     return jsonify({"response": result})
 
 # if __name__ == "__main__":

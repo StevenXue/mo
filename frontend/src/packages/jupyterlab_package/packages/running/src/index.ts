@@ -1,32 +1,33 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
+import * as pathToRegexp from 'path-to-regexp';
 
 import {
-  Message
+  Message,
 } from '@phosphor/messaging';
 
 import {
-  ISignal, Signal
+  ISignal, Signal,
 } from '@phosphor/signaling';
 
 import {
-  ElementExt
+  ElementExt,
 } from '@phosphor/domutils';
 
 import {
-  Widget
+  Widget,
 } from '@phosphor/widgets';
 
 import {
- Dialog, DOMUtils, showDialog
+  Dialog, DOMUtils, showDialog,
 } from '@jupyterlab/apputils';
 
 import {
-  PathExt
+  PathExt,
 } from '@jupyterlab/coreutils';
 
 import {
-  ServiceManager, Session, TerminalSession
+  ServiceManager, Session, TerminalSession, request,
 } from '@jupyterlab/services';
 
 import '../style/index.css';
@@ -50,6 +51,7 @@ const REFRESH_CLASS = 'jp-RunningSessions-headerRefresh';
  * The class name added to a shutdown all button.
  */
 const SHUTDOWN_CLASS = 'jp-RunningSessions-headerShutdownAll';
+const VIEW_CLASS = 'jp-RunningSessions-headerViewAll';
 
 /**
  * The class name added to the running terminal sessions section.
@@ -121,18 +123,16 @@ const FILE_ICON_CLASS = 'jp-mod-file';
  */
 const TERMINAL_ICON_CLASS = 'jp-mod-terminal';
 
-
 /**
  * A class that exposes the running terminal and kernel sessions.
  */
-export
-class RunningSessions extends Widget {
+export class RunningSessions extends Widget {
   /**
    * Construct a new running widget.
    */
   constructor(options: RunningSessions.IOptions) {
     super({
-      node: (options.renderer || RunningSessions.defaultRenderer).createNode()
+      node: (options.renderer || RunningSessions.defaultRenderer).createNode(),
     });
     let manager = this._manager = options.manager;
     this._renderer = options.renderer || RunningSessions.defaultRenderer;
@@ -300,6 +300,7 @@ class RunningSessions extends Widget {
     let sessionList = DOMUtils.findElement(sessionSection, LIST_CLASS);
     let refresh = DOMUtils.findElement(this.node, REFRESH_CLASS);
     let shutdown = DOMUtils.findElement(this.node, SHUTDOWN_CLASS);
+    let view = DOMUtils.findElement(this.node, VIEW_CLASS);
     let renderer = this._renderer;
     let clientX = event.clientX;
     let clientY = event.clientY;
@@ -316,14 +317,27 @@ class RunningSessions extends Widget {
         title: 'Shutdown All?',
         body: 'Shut down all kernels and terminals?',
         buttons: [
-          Dialog.cancelButton(), Dialog.warnButton({ label: 'SHUTDOWN' })
-        ]
+          Dialog.cancelButton(), Dialog.warnButton({ label: 'SHUTDOWN' }),
+        ],
       }).then(result => {
         if (result.button.accept) {
           this._manager.sessions.shutdownAll();
           this._manager.terminals.shutdownAll();
         }
       });
+    }
+
+    // Check for a refresh.
+    if (ElementExt.hitTest(view, clientX, clientY)) {
+      const hash = window.location.hash;
+      const match = pathToRegexp('#/workspace/:appId/:type').exec(hash);
+      if (match) {
+        request(`pyapi/project/projects/${match[1]}`,
+          undefined,
+          {
+            onJson: (project: any) => window.open(`http://localhost:${project.tb_port}`),
+          });
+      }
     }
 
     // Create a dummy div if terminals are not available.
@@ -388,17 +402,14 @@ class RunningSessions extends Widget {
   private _terminalOpenRequested = new Signal<this, TerminalSession.IModel>(this);
 }
 
-
 /**
  * The namespace for the `RunningSessions` class statics.
  */
-export
-namespace RunningSessions {
+export namespace RunningSessions {
   /**
    * An options object for creating a running sessions widget.
    */
-  export
-  interface IOptions {
+  export interface IOptions {
     /**
      * A service manager instance.
      */
@@ -415,8 +426,7 @@ namespace RunningSessions {
   /**
    * A renderer for use with a running sessions widget.
    */
-  export
-  interface IRenderer {
+  export interface IRenderer {
     /**
      * Create the root node for the running sessions widget.
      */
@@ -515,12 +525,10 @@ namespace RunningSessions {
     updateSessionNode(node: HTMLLIElement, model: Session.IModel, kernelName: string): void;
   }
 
-
   /**
    * The default implementation of `IRenderer`.
    */
-  export
-  class Renderer implements IRenderer {
+  export class Renderer implements IRenderer {
     /**
      * Create the root node for the running sessions widget.
      */
@@ -542,6 +550,11 @@ namespace RunningSessions {
       shutdown.title = 'Shutdown All Kernels…';
       shutdown.className = SHUTDOWN_CLASS;
       header.appendChild(shutdown);
+
+      let view = document.createElement('button');
+      view.title = 'View Runnings';
+      view.className = VIEW_CLASS;
+      header.appendChild(view);
 
       node.appendChild(header);
       node.appendChild(terminals);
@@ -706,6 +719,5 @@ namespace RunningSessions {
   /**
    * The default `Renderer` instance.
    */
-  export
-  const defaultRenderer = new Renderer();
+  export const defaultRenderer = new Renderer();
 }

@@ -198,7 +198,8 @@ class ProjectBusiness:
         count = objects.count()
         if count_only:
             return count
-        return Objects(objects=objects, count=count, page_no=page_no, page_size=page_size)
+        return Objects(objects=objects[start: end], count=count, page_no=page_no,
+                       page_size=page_size)
         # return {
         #     "objects": objects.order_by('-create_time')[start:end],
         #     "count": count,

@@ -55,7 +55,8 @@ class Dataset(Project):
 class Module(Project):
     category = StringField(choices=('model', 'toolkit'))
     module_path = StringField()
-    args = DictField()
+    input = DictField()
+    output = DictField()
 
 
 RE_TYPE = (
@@ -109,9 +110,10 @@ class App(Project):
     doc = StringField()
     # 使用过的modules
     used_modules = ListField(ReferenceField(Module))
-
     # app 路径
     app_path = StringField(default=None)
+
+
     # # http_req是get还是post 全部是post
     # http_req = StringField(required=True)
 

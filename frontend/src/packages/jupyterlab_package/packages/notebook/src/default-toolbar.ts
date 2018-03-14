@@ -31,7 +31,7 @@ import {
   Notebook,
 } from './widget';
 
-import {request} from './request';
+import { request } from './request';
 
 import {
   URLExt,
@@ -61,6 +61,7 @@ const TOOLBAR_COPY_CLASS = 'jp-CopyIcon';
  * The class name added to toolbar paste button.
  */
 const TOOLBAR_PASTE_CLASS = 'jp-PasteIcon';
+const TOOLBAR_BUG_CLASS = 'jp-BugIcon';
 
 /**
  * The class name added to toolbar run button.
@@ -163,6 +164,36 @@ export namespace ToolbarItems {
   }
 
   /**
+   * Create a paste toolbar item.
+   */
+  export function createCaptureOutputButton(panel: NotebookPanel): ToolbarButton {
+    return new ToolbarButton({
+      className: TOOLBAR_BUG_CLASS,
+      onClick: () => {
+        NotebookActions.insertCodeBelow(panel.notebook, `%%capture output\n` +
+          `# The output of code below this command would be captured\n` +
+          `# and could be restored using 'output.show()'`);
+      },
+      tooltip: 'Insert code to record long run output',
+    });
+  }
+
+  // function insertAtCursor(myField: HTMLTextAreaElement, myValue: string) {
+  //   if (myField.selectionStart || myField.selectionStart === 0) {
+  //     console.log('modern');
+  //     let startPos = myField.selectionStart;
+  //     let endPos = myField.selectionEnd;
+  //     myField.value = myField.value.substring(0, startPos)
+  //       + myValue
+  //       + myField.value.substring(endPos, myField.value.length);
+  //     myField.selectionStart = startPos + myValue.length;
+  //     myField.selectionEnd = startPos + myValue.length;
+  //   } else {
+  //     myField.value += myValue;
+  //   }
+  // }
+
+  /**
    * Create a run toolbar item.
    */
   export function createRunButton(panel: NotebookPanel): ToolbarButton {
@@ -188,56 +219,30 @@ export namespace ToolbarItems {
         const hash = window.location.hash;
         const match = pathToRegexp('#/workspace/:appId/:type').exec(hash);
         if (match) {
-          request(`pyapi/app/nb_to_script/${match[1]}`, {
-            method: 'post',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              nb_path: notebookPath.replace('work/', ''),
-            }),
-          }, {
-            onSuccess: () => {
-              message.success(`${notebookPath} successfully export to script!`);
-            },
-            onJson: undefined,
-            onError: undefined
+          return showDialog({
+            title: 'Convert ' + notebookPath,
+            body: 'If optimise for deployment?',
+            // focusNodeSelector: 'input',
+            buttons: [Dialog.cancelButton({ label: 'KEEP ORIGINAL' }), Dialog.okButton({ label: 'OPTIMISE' })],
+          }).then(result => {
+            request(`pyapi/apps/nb_to_script/${match[1]}`, {
+              method: 'post',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                optimise: result.button.accept,
+                nb_path: notebookPath.replace('work/', ''),
+              }),
+            }, {
+              onSuccess: () => {
+                message.success(`${notebookPath} successfully export to script!`);
+              },
+              onJson: undefined,
+              onError: undefined,
+            });
           });
         }
-        // const notebookName = panel.context.session.name;
-        // NotebookActions.insertCodeBelow(panel.notebook, [`!jupyter nbconvert --to py ${notebookName}`])
-        // NotebookActions.runAllBelow(panel.notebook, panel.session);
-
-        // const baseUrl = 'http://localhost:8000/user/zhaofengli'
-        //
-        // const exportToFormat = { 'format': 'script', 'label': 'Executable Script' };
-        //
-        // let args = { 'format': exportToFormat['format'], 'label': exportToFormat['label'], 'isPalette': true };
-        // const current = panel;
-        //
-        // if (!current) {
-        //   return;
-        // }
-        //
-        // const notebookPath = URLExt.encodeParts(current.context.path);
-        // const url = URLExt.join(
-        //   baseUrl,
-        //   'nbconvert',
-        //   (args['format']) as string,
-        //   notebookPath
-        // );
-        // const child = window.open('', '_blank');
-        // const { context } = current;
-        //
-        // if (context.model.dirty && !context.model.readOnly) {
-        //   return context.save().then(() => { child.location.assign(url); });
-        // }
-        //
-        // return new Promise<void>((resolve) => {
-        //   child.location.assign(url);
-        //   resolve(undefined);
-        // });
-
       },
       tooltip: 'Export Notebook to Executable Script',
     });
@@ -258,6 +263,10 @@ export namespace ToolbarItems {
     return new CellTypeSwitcher(panel.notebook);
   }
 
+  export function createCaptureItem(panel: NotebookPanel): Widget {
+    return new CaptureSwitcher(panel.notebook);
+  }
+
   /**
    * Add the default items to the panel toolbar.
    */
@@ -273,6 +282,8 @@ export namespace ToolbarItems {
     toolbar.addItem('interrupt', Toolbar.createInterruptButton(panel.session));
     toolbar.addItem('restart', Toolbar.createRestartButton(panel.session));
     toolbar.addItem('cellType', createCellTypeItem(panel));
+    // toolbar.addItem('captureOutput', createCaptureOutputButton(panel));
+    toolbar.addItem('captureOutput', createCaptureItem(panel));
     toolbar.addItem('spacer', Toolbar.createSpacerItem());
     toolbar.addItem('kernelName', Toolbar.createKernelNameItem(panel.session));
     toolbar.addItem('kernelStatus', Toolbar.createKernelStatusItem(panel.session));
@@ -422,4 +433,124 @@ function createCellTypeSwitcherNode(): HTMLElement {
   select.className = TOOLBAR_CELLTYPE_DROPDOWN_CLASS;
   div.appendChild(select);
   return div;
+}
+
+/**
+ * Create the node for the cell type switcher.
+ */
+function createCaptureSwitcherNode(): HTMLElement {
+  let div = document.createElement('div');
+  let select = document.createElement('select');
+  for (let t of ['Insert Code', 'Capture Output', 'Restore Output']) {
+    let option = document.createElement('option');
+    option.value = t.toLowerCase();
+    option.textContent = t;
+    select.appendChild(option);
+  }
+  select.className = TOOLBAR_CELLTYPE_DROPDOWN_CLASS;
+  div.appendChild(select);
+  return div;
+}
+
+class CaptureSwitcher extends Widget {
+  /**
+   * Construct a new cell type switcher.
+   */
+  constructor(widget: Notebook) {
+    super({ node: createCaptureSwitcherNode() });
+    this.addClass(TOOLBAR_CELLTYPE_CLASS);
+
+    this._select = this.node.firstChild as HTMLSelectElement;
+    Styling.wrapSelect(this._select);
+    this._wildCard = document.createElement('option');
+    this._wildCard.value = '-';
+    this._wildCard.textContent = '-';
+    this._notebook = widget;
+
+    // Set the initial value.
+    this._select.value = 'insert code';
+
+    // Follow the type of the active cell.
+    // widget.activeCellChanged.connect(this._updateValue, this);
+
+    // Follow a change in the selection.
+    // widget.selectionChanged.connect(this._updateValue, this);
+  }
+
+  /**
+   * Handle the DOM events for the widget.
+   *
+   * @param event - The DOM event sent to the widget.
+   *
+   * #### Notes
+   * This method implements the DOM `EventListener` interface and is
+   * called in response to events on the dock panel's node. It should
+   * not be called directly by user code.
+   */
+  handleEvent(event: Event): void {
+    switch (event.type) {
+      case 'change':
+        this._evtChange(event);
+        break;
+      case 'keydown':
+        this._evtKeyDown(event as KeyboardEvent);
+        break;
+      default:
+        break;
+    }
+  }
+
+  /**
+   * Handle `after-attach` messages for the widget.
+   */
+  protected onAfterAttach(msg: Message): void {
+    this._select.addEventListener('change', this);
+    this._select.addEventListener('keydown', this);
+  }
+
+  /**
+   * Handle `before-detach` messages for the widget.
+   */
+  protected onBeforeDetach(msg: Message): void {
+    this._select.removeEventListener('change', this);
+    this._select.removeEventListener('keydown', this);
+  }
+
+  /**
+   * Handle `changed` events for the widget.
+   */
+  private _evtChange(event: Event): void {
+    let select = this._select;
+    if (select.value === 'insert code') {
+      return;
+    }
+
+    interface ICodeDict {
+      'capture output': string;
+      'restore output': string;
+    }
+    const codeDict: ICodeDict = {
+      'capture output': `%%capture output\n` +
+      `# The output of code below this command would be captured\n` +
+      `# and could be restored using 'output.show()'\n`,
+      'restore output': `output.show()\n` +
+      `# The captured output can be printed by running this code`
+    };
+    const code = codeDict[select.value as keyof ICodeDict];
+    NotebookActions.insertCodeBelow(this._notebook, code);
+  }
+
+  /**
+   * Handle `keydown` events for the widget.
+   */
+  private _evtKeyDown(event: KeyboardEvent): void {
+    if (event.keyCode === 13) {  // Enter
+      this._notebook.activate();
+    }
+  }
+
+  // private _changeGuard = false;
+  private _wildCard: HTMLOptionElement = null;
+  private _select: HTMLSelectElement = null;
+  private _notebook: Notebook = null;
 }

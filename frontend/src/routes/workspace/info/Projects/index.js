@@ -73,7 +73,7 @@ class ProjectList extends Component {
       filter,
       onJson: (projects) => this.setState({
         projects,
-      })
+      }),
     })
   }
 
@@ -116,7 +116,7 @@ class ProjectList extends Component {
         <div className={styles.projectList}>
           {this.state.projects.map(e =>
             <Card key={e._id} className={styles.card}
-                  title={e.name}
+                  title={<h3>{e.name}</h3>}
                   extra={e.is_private && <Icon type="lock"/>}
                   onClick={() => this.toProjectDetail(e._id, history)} style={{ cursor: 'pointer' }}>
               <div>
@@ -124,6 +124,13 @@ class ProjectList extends Component {
                 <p className={styles.other}>
                   <Icon type="clock-circle-o" style={{ marginRight: 10 }}/>
                   {showTime(e.create_time)}
+                  <Button style={{ float: 'right' }}
+                          onClick={(ev) => {
+                            ev.stopPropagation()
+                            window.open(`/#/workspace/${e._id}/${e.type}`)
+                          }}>
+                    Notebook ->
+                  </Button>
                 </p>
                 {/*<Icon type="user" style={{ marginRight: 10 }}/>*/}
                 {/*{e['user_name'] && <p>Owner: {e.user_name}</p>}*/}

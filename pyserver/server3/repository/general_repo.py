@@ -33,6 +33,9 @@ class Repo:
             query = {}
         return self.__instance.objects(**query).order_by('-_id')
 
+    def objects(self, **kwargs):
+        return self.__instance.objects(**kwargs).order_by('-_id')
+
     def read_skipping_order(self, query, skipping):
         return self.__instance.objects(**query).order_by('-_id')[
                int(skipping):int(skipping) + 10]

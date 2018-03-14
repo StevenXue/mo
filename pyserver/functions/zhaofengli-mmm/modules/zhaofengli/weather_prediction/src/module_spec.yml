@@ -11,7 +11,7 @@ default: &default
 author_name: luxu
 module_name: weather_prediction
 module_description: A MO module
-module_params:
+input:
   predict: &params
     param_1:
       <<: *default
@@ -23,6 +23,12 @@ module_params:
       name: flight_date
       value_type: int
       range: null
+output:
+  predict:
+    out1:
+        type: int
+        value: null
+    
 
 
     

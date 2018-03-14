@@ -158,7 +158,7 @@ def save_file_and_get_size(file, path):
 def extract_files_and_get_size(file, path):
     folder_name = safe_unzip(file, path)
     uri = os.path.join(path, folder_name)
-    return get_tree_size(uri), uri, folder_name
+    return get_tree_size(path), uri, folder_name
 
 
 def get_tree_size(path):
@@ -228,13 +228,15 @@ def get_file_content(file_uri, names):
 
 
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return True
+    # return '.' in filename and \
+    #        filename.rsplit('.', 1)[-1].lower() in ALLOWED_EXTENSIONS
 
 
 def allowed_file_or_folder(filename):
-    return any(x in filename for x in PASSED_FILES) or '.' not in filename or \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return True
+    # return any(x in filename for x in PASSED_FILES) or '.' not in filename or \
+    #        filename.rsplit('.', 1)[-1].lower() in ALLOWED_EXTENSIONS
 
 
 def remove_file_by_uri(uri):

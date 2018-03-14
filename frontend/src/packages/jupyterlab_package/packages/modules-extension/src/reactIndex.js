@@ -73,7 +73,7 @@ export class ModulePage extends React.Component {
       projectId: response._id,
       project: response,
       func: func,
-      args: Object.values(response.args[func]),
+      args: Object.values(response.input[func]),
     })
   }
 
@@ -129,7 +129,7 @@ export class ModulePage extends React.Component {
       <div>
         <ParamsMapper args={this.state.args}
                       setValue={(values) => this.setValue(values)}
-                      baseArgs={Object.values(this.state.project.args[this.state.func])}
+                      baseArgs={Object.values(this.state.project.input[this.state.func])}
         />
       </div>
     )

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Modal, Input, Button } from 'antd'
+import { Modal, Input, Button, message } from 'antd'
 import classNames from 'classnames';
 import { connect } from 'dva'
 import styles from './index.less'
@@ -26,15 +26,18 @@ const HelpModal = ({visible, projectDetail, dispatch}) => {
     document.execCommand("Copy");
 
     /* Alert the copied text */
-    alert("Copied the text: " + copyText.value);
+    message.success("Copied the text: " + copyText.value);
   }
 
   return (
     <Modal
       title="Get Started"
-      visible={true}
+      visible={visible}
       onOk={okHandler}
       onCancel={hideModelHandler}
+      footer={[
+        <Button key="ok" type='primary' onClick={okHandler}>Ok</Button>
+      ]}
     >
       <h1>Clone Your Module</h1>
       Clone your module template with git to start working locally.

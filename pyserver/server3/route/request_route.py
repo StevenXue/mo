@@ -69,7 +69,7 @@ def list_user_request():
 @jwt_required
 def create_user_request():
     if not request.json \
-            or 'title' not in request.json :
+            or 'title' not in request.json or 'type' not in request.json :
         return jsonify({'response': 'insufficient arguments'}), 400
     data = request.get_json()
     title = data.pop('title')

@@ -22,6 +22,13 @@ class User(Document):
     gender = IntField(choices=GENDER)
     age = IntField()
 
+    # 用户收藏的api列表
+    favor_apps = ListField(ReferenceField("App"))
+    # 用户点赞的api列表
+    star_apps = ListField(ReferenceField("App"))
+    # 用户使用过的api列表
+    used_apps = ListField(ReferenceField("App"))
+
     # 用户点赞的request列表
     request_vote_up = ListField(ReferenceField("UserRequest"))
     # 用户star的request列表
@@ -37,11 +44,11 @@ class User(Document):
     used_apps = ListField(ReferenceField("App"))
 
     # 用户收藏的module列表
-    favor_modules = ListField(ReferenceField(Module))
+    favor_modules = ListField(ReferenceField("Module"))
     # 用户点赞的module列表
-    star_modules = ListField(ReferenceField(Module))
+    star_modules = ListField(ReferenceField("Module"))
     # 用户使用过的的module列表
-    used_modules = ListField(ReferenceField(Module))
+    used_modules = ListField(ReferenceField("Module"))
 
     # 用户收藏的dataset列表
     favor_datasets = ListField(ReferenceField("Dataset"))

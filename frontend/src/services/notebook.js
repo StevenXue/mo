@@ -30,6 +30,17 @@ export function startLab(payload) {
     headers: {
       'Authorization': `token ${hubToken}`,
     },
+    noErrorMsg: true
+  })
+}
+
+export function deleteLab(payload) {
+  const { hubUserName, hubToken } = payload
+  return request(`${hubPrefix}/hub/api/users/${hubUserName}/server`, {
+    method: 'delete',
+    headers: {
+      'Authorization': `token ${hubToken}`,
+    },
   })
 }
 

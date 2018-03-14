@@ -1,5 +1,6 @@
-import request from './request'
-import * as path from "path"
+// import request from './request'
+import { request } from '@jupyterlab/services'
+import * as path from 'path'
 
 const PREFIX = 'project'
 
@@ -21,56 +22,54 @@ export function getProjects({ filter, onJson }) {
   return request(path.join('/pyapi', PREFIX) + `?${params}`, undefined, { onJson })
 }
 
-const prefix = "/module"
+const prefix = 'module'
 
 export function getModules(onSuccess) {
-  return request(`pyapi/${prefix}/module_list`, null, {onSuccess})
+  return request(`pyapi/${prefix}/module_list`, null, { onSuccess })
 }
 
-export function getModule({moduleId, onJson}) {
-  return request(`pyapi/${prefix}/${moduleId}?yml=true`, undefined, {onJson})
+export function getModule({ moduleId, onJson }) {
+  return request(`pyapi/${prefix}/${moduleId}?yml=true`, undefined, { onJson })
 }
 
-export function addModuleToApp({appId, moduleId, func}) {
-  return request(`pyapi/app/add_used_module/${appId}`, {
+export function addModuleToApp({ appId, moduleId, func }) {
+  return request(`pyapi/apps/add_used_module/${appId}`, {
     method: 'put',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       used_modules: [moduleId],
-      func
-    })
+      func,
+    }),
   })
 }
-
 
 // 新建 module
 export function createModule(payload) {
   return request(`${prefix}`, {
     method: 'POST',
     body: {
-      user_ID:payload.user_ID,
-      name:payload.name,
-      description: payload.description
-    }
-  });
+      user_ID: payload.user_ID,
+      name: payload.name,
+      description: payload.description,
+    },
+  })
 }
 
 export function fetchModuleList(payload) {
-  return request(`${prefix}/module_list`);
+  return request(`${prefix}/module_list`)
 }
 
-
 export function fetchModule(payload) {
-  return request(`${prefix}/${payload.moduleId}`);
+  return request(`${prefix}/${payload.moduleId}`)
 }
 
 export function updateModule(payload) {
   return request(`${prefix}/update_module`, {
     method: 'POST',
     body: {
-      ...payload
-    }
-  });
+      ...payload,
+    },
+  })
 }

@@ -1,40 +1,41 @@
 import os
 import yaml
 import shutil
+import subprocess
 from importlib import import_module
 from datetime import datetime
 
-from server3.entity.module import Module
+# from server3.entity.module import Module
 from server3.entity import project
 from server3.repository.general_repo import Repo
 from server3.business.project_business import ProjectBusiness
 from server3.constants import MODULE_DIR
-module_repo = Repo(Module)
+# module_repo = Repo(Module)
 
 tail_path = 'src/module_spec.yml'
 
 
-def add(name, user, **kwargs):
-    try:
-        module_path = kwargs.pop("module_path")
-    except KeyError:
-        module_path = "/" + user.user_ID + "/" + name
-
-    create_time = datetime.utcnow()
-    model = Module(
-        user=user, name=name,
-        module_path=module_path,
-        create_time=create_time, **kwargs)
-    return module_repo.create(model)
-
-
-def get_all():
-    model_list = module_repo.read({})
-    return model_list
-
-
-def update_by_id(module_id, **update):
-    return module_repo.update_one_by_id(module_id, update)
+# def add(name, user, **kwargs):
+#     try:
+#         module_path = kwargs.pop("module_path")
+#     except KeyError:
+#         module_path = "/" + user.user_ID + "/" + name
+#
+#     create_time = datetime.utcnow()
+#     model = Module(
+#         user=user, name=name,
+#         module_path=module_path,
+#         create_time=create_time, **kwargs)
+#     return module_repo.create(model)
+#
+#
+# def get_all():
+#     model_list = module_repo.read({})
+#     return model_list
+#
+#
+# def update_by_id(module_id, **update):
+#     return module_repo.update_one_by_id(module_id, update)
 
 
 class ModuleBusiness(ProjectBusiness):
@@ -85,8 +86,7 @@ class ModuleBusiness(ProjectBusiness):
             module.module_path = dir_path
             module.save()
         if yml and module.module_path:
-            module.args = cls.load_module_params(module)
-
+            module.input, module.output = cls.load_module_params(module)
         return module
 
     @staticmethod
@@ -94,7 +94,7 @@ class ModuleBusiness(ProjectBusiness):
         yml_path = os.path.join(module.module_path, tail_path)
         with open(yml_path, 'r') as stream:
             obj = yaml.load(stream)
-            return obj['module_params']
+            return obj.get('input'), obj.get('output')
 
     @classmethod
     def publish(cls, project_id):
@@ -108,3 +108,5 @@ class ModuleBusiness(ProjectBusiness):
         if os.path.exists(dst):
             shutil.rmtree(dst)
         shutil.copytree(module.path, dst)
+        # WORKON_HOME=./ pipenv install vv
+        subprocess.call(['bash', 'install_venv.sh', os.path.abspath(dst)])

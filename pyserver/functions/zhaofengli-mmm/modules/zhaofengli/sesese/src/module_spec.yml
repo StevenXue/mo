@@ -129,7 +129,14 @@ module_params:
       name: data_path
       value_type: str
       range: null
-
+output:
+    predict:
+        flight_no:
+          type: int
+          value: null
+        flight_date:
+          type: str
+          value: null
 
     
   
