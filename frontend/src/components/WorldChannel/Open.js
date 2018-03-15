@@ -18,14 +18,22 @@ class worldChannelC extends React.Component {
   }
 
   render() {
-    const {worldMessages, onClickIcon, isRight, dispatch} = this.props
+    const {worldMessages, onClickIcon, isRight, dispatch, login} = this.props
+    if (!login.user) {
+      return (
+        <div />
+      )
+    }
+    else{
+      return <Open worldMessages={worldMessages}
+                   onClickIcon={onClickIcon}
+                   dispatch={dispatch}
+                   isRight={isRight}
 
-    return <Open worldMessages={worldMessages}
-                 onClickIcon={onClickIcon}
-                 dispatch={dispatch}
-                 isRight={isRight}
+      />
+    }
 
-    />
+
 
 
     // return isRight ?
@@ -165,5 +173,5 @@ class Open extends React.Component {
 //   )
 // }
 
-export default connect(({worldChannel}) => ({...worldChannel}))(worldChannelC)
+export default connect(({login, worldChannel}) => ({login, ...worldChannel}))(worldChannelC)
 
