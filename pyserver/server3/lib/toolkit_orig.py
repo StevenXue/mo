@@ -11,7 +11,7 @@
 
 import numpy as np
 from sklearn.cluster import KMeans
-from minepy import MINE
+# from minepy import MINE
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 import scipy.stats as stats
@@ -136,15 +136,17 @@ def toolkit_pearson(arr0):
 
 # 最大互信息数
 def toolkit_mic(arr0):
-    matrix = np.array(arr0)
-    t_matrix = np.transpose(matrix).astype(float)
-    # mine = MINE(alpha, c, est="mic_approx")
-    mine = MINE(alpha=0.6, c=15, est="mic_approx")
-    mic_result = []
-    for t_matr in t_matrix[1:]:
-        mine.compute_score(t_matrix[0], t_matr)
-        mic_result.append(mine.mic())
-    return mic_result
+    pass
+# def toolkit_mic(arr0):
+#     matrix = np.array(arr0)
+#     t_matrix = np.transpose(matrix).astype(float)
+#     # mine = MINE(alpha, c, est="mic_approx")
+#     mine = MINE(alpha=0.6, c=15, est="mic_approx")
+#     mic_result = []
+#     for t_matr in t_matrix[1:]:
+#         mine.compute_score(t_matrix[0], t_matr)
+#         mic_result.append(mine.mic())
+#     return mic_result
 
 ######################################################################
 # 数据处理 Data Pre-processing

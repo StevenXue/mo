@@ -29,60 +29,60 @@ const extFilter = {
 require('../packages/jupyterlab_package/packages/theme-light-extension/style/embed.css')
 require('../packages/jupyterlab_package/node_modules/font-awesome/css/font-awesome.min.css')
 
-const loadnStartJL = (projectType) => {
-
-  const allPackages = [
-    require('../packages/jupyterlab_package/packages/application-extension'),
-    require('../packages/jupyterlab_package/packages/apputils-extension'),
-    require('../packages/jupyterlab_package/packages/codemirror-extension'),
-    require('../packages/jupyterlab_package/packages/completer-extension'),
-    require('../packages/jupyterlab_package/packages/console-extension'),
-    require('../packages/jupyterlab_package/packages/csvviewer-extension'),
-    require('../packages/jupyterlab_package/packages/docmanager-extension'),
-    require('../packages/jupyterlab_package/packages/fileeditor-extension'),
-    require('../packages/jupyterlab_package/packages/faq-extension'),
-    require('../packages/jupyterlab_package/packages/filebrowser-extension'),
-    require('../packages/jupyterlab_package/packages/help-extension'),
-    require('../packages/jupyterlab_package/packages/imageviewer-extension'),
-    require('../packages/jupyterlab_package/packages/inspector-extension'),
-    require('../packages/jupyterlab_package/packages/launcher-extension'),
-    require('../packages/jupyterlab_package/packages/mainmenu-extension'),
-    require('../packages/jupyterlab_package/packages/markdownviewer-extension'),
-    require('../packages/jupyterlab_package/packages/mathjax2-extension'),
-    require('../packages/jupyterlab_package/packages/notebook-extension'),
-    require('../packages/jupyterlab_package/packages/rendermime-extension'),
-    require('../packages/jupyterlab_package/packages/running-extension'),
-    require('../packages/jupyterlab_package/packages/settingeditor-extension'),
-    require('../packages/jupyterlab_package/packages/shortcuts-extension'),
-    require('../packages/jupyterlab_package/packages/tabmanager-extension'),
-    require('../packages/jupyterlab_package/packages/terminal-extension'),
-    require('../packages/jupyterlab_package/packages/theme-dark-extension'),
-    require('../packages/jupyterlab_package/packages/theme-light-extension'),
-    require('../packages/jupyterlab_package/packages/tooltip-extension'),
-    require('../packages/jupyterlab_package/packages/modules-extension'),
-    require('../packages/jupyterlab_package/packages/datasets-extension'),
-    require('../packages/jupyterlab_package/packages/moduledeploy-extension'),
-    require('../packages/jupyterlab_package/packages/appdeploy-extension'),
-  ]
-
-  const JupyterLab = require('../packages/jupyterlab_package/packages/application').JupyterLab
-
-  // filter packages
-  const mods = allPackages.filter((p) => {
-    if (_.isArray(p.default)) {
-      return !p.default.find(ext => checker(ext.id, extFilter[projectType]))
-    } else {
-      return !checker(p.default.id, extFilter[projectType])
-    }
-  })
-  let lab = new JupyterLab({
-    name: 'Mo Lab',
-    namespace: 'mo-lab',
-    version: 'v0.1',
-  })
-  lab.registerPluginModules(mods)
-  lab.start({ hostID: 'mo-jlContainer' })
-}
+// const loadnStartJL = (projectType) => {
+//
+//   const allPackages = [
+//     require('../packages/jupyterlab_package/packages/application-extension'),
+//     require('../packages/jupyterlab_package/packages/apputils-extension'),
+//     require('../packages/jupyterlab_package/packages/codemirror-extension'),
+//     require('../packages/jupyterlab_package/packages/completer-extension'),
+//     require('../packages/jupyterlab_package/packages/console-extension'),
+//     require('../packages/jupyterlab_package/packages/csvviewer-extension'),
+//     require('../packages/jupyterlab_package/packages/docmanager-extension'),
+//     require('../packages/jupyterlab_package/packages/fileeditor-extension'),
+//     require('../packages/jupyterlab_package/packages/faq-extension'),
+//     require('../packages/jupyterlab_package/packages/filebrowser-extension'),
+//     require('../packages/jupyterlab_package/packages/help-extension'),
+//     require('../packages/jupyterlab_package/packages/imageviewer-extension'),
+//     require('../packages/jupyterlab_package/packages/inspector-extension'),
+//     require('../packages/jupyterlab_package/packages/launcher-extension'),
+//     require('../packages/jupyterlab_package/packages/mainmenu-extension'),
+//     require('../packages/jupyterlab_package/packages/markdownviewer-extension'),
+//     require('../packages/jupyterlab_package/packages/mathjax2-extension'),
+//     require('../packages/jupyterlab_package/packages/notebook-extension'),
+//     require('../packages/jupyterlab_package/packages/rendermime-extension'),
+//     require('../packages/jupyterlab_package/packages/running-extension'),
+//     require('../packages/jupyterlab_package/packages/settingeditor-extension'),
+//     require('../packages/jupyterlab_package/packages/shortcuts-extension'),
+//     require('../packages/jupyterlab_package/packages/tabmanager-extension'),
+//     require('../packages/jupyterlab_package/packages/terminal-extension'),
+//     require('../packages/jupyterlab_package/packages/theme-dark-extension'),
+//     require('../packages/jupyterlab_package/packages/theme-light-extension'),
+//     require('../packages/jupyterlab_package/packages/tooltip-extension'),
+//     require('../packages/jupyterlab_package/packages/modules-extension'),
+//     require('../packages/jupyterlab_package/packages/datasets-extension'),
+//     require('../packages/jupyterlab_package/packages/moduledeploy-extension'),
+//     require('../packages/jupyterlab_package/packages/appdeploy-extension'),
+//   ]
+//
+//   const JupyterLab = require('../packages/jupyterlab_package/packages/application').JupyterLab
+//
+//   // filter packages
+//   const mods = allPackages.filter((p) => {
+//     if (_.isArray(p.default)) {
+//       return !p.default.find(ext => checker(ext.id, extFilter[projectType]))
+//     } else {
+//       return !checker(p.default.id, extFilter[projectType])
+//     }
+//   })
+//   let lab = new JupyterLab({
+//     name: 'Mo Lab',
+//     namespace: 'mo-lab',
+//     version: 'v0.1',
+//   })
+//   lab.registerPluginModules(mods)
+//   lab.start({ hostID: 'mo-jlContainer' })
+// }
 
 const insertConfigData = (html) => {
   let el = document.implementation.createHTMLDocument()
@@ -277,8 +277,8 @@ const modelling = modelExtend(workBench, {
       yield call(startLabBack, { payload: { hubUserName, hubToken } }, { call })
       yield call(insertLabConfig, { payload: { hubUserName, hubToken } }, { call })
       // loadnStartJL(projectType)
-      document.body.innerHTML = ''
-      yield call(loadnStartJL, projectType)
+      document.body = document.createElement('body')
+      // yield call(loadnStartJL, projectType)
     },
     *runSection(action, { call, put, select }) {
       const { namespace, sectionId } = action.payload
@@ -333,8 +333,8 @@ const modelling = modelExtend(workBench, {
           let projectId = match[1]
           let type = match[2]
           dispatch({ type: 'startLabBnF', projectId, projectType: type })
-          // dispatch({ type: 'fetchSections', projectId, categories })
-          // dispatch({ type: 'fetchAlgorithms', categories })
+          dispatch({ type: 'fetchSections', projectId, categories })
+          dispatch({ type: 'fetchAlgorithms', categories })
           // dispatch({ type: 'fetchStagingDatasetList', projectId: projectId })
 
           //将project id存起来
