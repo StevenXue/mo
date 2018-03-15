@@ -224,7 +224,6 @@ def create_project():
         project = AppService.create_project(
             name, description, user_ID, tags=tags,
             type=type, user_token=user_token, **data)
-        print(project)
     else:
         project = project_service.create_project(
             name, description, user_ID, tags=tags,

@@ -9,7 +9,9 @@ class WorldService:
     @classmethod
     def user_send(cls, user_ID, channel, message):
         sender = UserBusiness.get_by_user_ID(user_ID)
-        return WorldBusiness.user_send(sender=sender, channel=channel, message=message)
+        world = WorldBusiness.user_send(sender=sender, channel=channel, message=message)
+        logger_service.emit_world_message(world)
+        return world
 
     @classmethod
     def system_send(cls, channel, message):

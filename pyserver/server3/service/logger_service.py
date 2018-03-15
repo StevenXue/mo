@@ -183,4 +183,4 @@ def emit_notification(message, created_receivers):
 
 def emit_world_message(world):
     world_message = json_utility.convert_to_json(world.to_mongo())
-    socketio.emit('notification', world_message, namespace='/log')
+    socketio.emit('world', world_message, namespace='/log')
