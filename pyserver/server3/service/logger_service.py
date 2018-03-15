@@ -182,5 +182,10 @@ def emit_notification(message, created_receivers):
 
 
 def emit_world_message(world):
+    if hasattr(world, "sender") and world.sender:
+        world.sender_user_ID = world.sender.user_ID
+    else:
+        world.sender_user_ID = "system"
+
     world_message = json_utility.convert_to_json(world.to_mongo())
     socketio.emit('world', world_message, namespace='/log')

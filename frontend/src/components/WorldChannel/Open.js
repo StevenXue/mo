@@ -12,7 +12,7 @@ class worldChannelC extends React.Component {
     this.props.dispatch({
       type: "worldChannel/getWorldMessages",
       payload: {
-        channel: "request"
+        channel: "all"
       }
     })
   }
@@ -76,7 +76,7 @@ class Open extends React.Component {
     this.props.dispatch({
       type: "worldChannel/sendMessage",
       payload: {
-        channel: "request",
+        channel: "all",
         message: inputMessage
       }
     })
