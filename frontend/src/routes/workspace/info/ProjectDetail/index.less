@@ -67,6 +67,10 @@
     padding: 10px 25px;
     column-count: 2;
 
+    .overall {
+      margin: 5px 0;
+    }
+
     .done {
       color: @done-green;
     }
@@ -77,6 +81,68 @@
 
     .error {
       color: @error-red;
+    }
+
+    .busy {
+      color: @busy-yellow;
+    }
+
+    .bulb {
+      display: inline-flex;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .bulbIdle {
+      .bulb;
+      border: 1px solid grey;
+    }
+
+    .bulbBusy {
+      .bulb;
+      background: grey;
+    }
+
+    .subTitle {
+      margin-top: 15px;
+    }
+
+    .jobCols {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 5px 0;
+
+      .jobCell {
+        margin: 5px 0;
+        padding-right: 45px;
+        width: 50%;
+        line-height: 25px;
+        //flex-direction: column;
+
+        .jobContainer {
+          padding: 5px 10px;
+          .shutDown {
+            display: none;
+            float: right;
+            cursor: pointer;
+          }
+
+          .jobInfo {
+            //flex-direction: row;
+            //float: right;
+          }
+        }
+        .jobContainer:hover {
+          background: @custom-grey-background;
+
+          .shutDown {
+            display: initial;
+          }
+        }
+      }
+
+
     }
   }
 }

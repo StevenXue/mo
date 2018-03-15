@@ -186,9 +186,9 @@ def list_projects_by_user_ID(user_ID, order=-1, privacy='all'):
     return projects
 
 
-def list_projects(search_query, page_no=None, page_size=None,
+def list_projects(search_query=None, page_no=1, page_size=10,
                   default_max_score=0.4, privacy=None, type='project',
-                  user_ID=None):
+                  user_ID=None,count_only=False):
     """
     list projects
     :param user_ID:
@@ -206,7 +206,8 @@ def list_projects(search_query, page_no=None, page_size=None,
         page_no=page_no,
         page_size=page_size,
         default_max_score=default_max_score,
-        user=user
+        user=user,
+        count_only=count_only,
     )
 
 

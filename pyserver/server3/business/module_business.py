@@ -1,6 +1,7 @@
 import os
 import yaml
 import shutil
+import subprocess
 from importlib import import_module
 from datetime import datetime
 
@@ -85,8 +86,7 @@ class ModuleBusiness(ProjectBusiness):
             module.module_path = dir_path
             module.save()
         if yml and module.module_path:
-            module.args = cls.load_module_params(module)
-
+            module.input, module.output = cls.load_module_params(module)
         return module
 
     @staticmethod
@@ -94,7 +94,7 @@ class ModuleBusiness(ProjectBusiness):
         yml_path = os.path.join(module.module_path, tail_path)
         with open(yml_path, 'r') as stream:
             obj = yaml.load(stream)
-            return obj['module_params']
+            return obj.get('input'), obj.get('output')
 
     @classmethod
     def publish(cls, project_id):
@@ -108,3 +108,5 @@ class ModuleBusiness(ProjectBusiness):
         if os.path.exists(dst):
             shutil.rmtree(dst)
         shutil.copytree(module.path, dst)
+        # WORKON_HOME=./ pipenv install vv
+        subprocess.call(['bash', 'install_venv.sh', os.path.abspath(dst)])

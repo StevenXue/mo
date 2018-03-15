@@ -51,7 +51,7 @@ export function fetchProject({ projectId, onJson }) {
 }
 
 export function deploy({ projectId, onJson }) {
-  return request(path.join('/pyapi', 'app', 'deploy', projectId), {
+  return request(path.join('/pyapi', 'apps', 'deploy', projectId), {
     method: 'post',
   }, { onJson })
 }

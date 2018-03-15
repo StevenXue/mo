@@ -26,7 +26,7 @@ class ProjectModal extends Component {
   }
 
   showModelHandler = (e) => {
-    if (e) e.stopPropagation()
+    // if (e) e.stopPropagation()
     // this.setState({
     //   visible: true,
     // });
@@ -34,6 +34,7 @@ class ProjectModal extends Component {
   }
 
   hideModelHandler = () => {
+    // if (e) e.stopPropagation()
     // this.setState({
     //   visible: false,
     // });

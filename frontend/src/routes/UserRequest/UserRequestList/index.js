@@ -31,25 +31,6 @@ const related_fields = ['All',
 
 function AllRequest({history, allRequest, dispatch}) {
 
-
-  function toUserRequestDetail(user_request) {
-    dispatch(routerRedux.push('/userrequest/' + user_request._id))
-  }
-
-  function onShowSizeChange(current, pageSize) {
-    dispatch({
-      type: 'allRequest/changePageNoSize',
-      payload: {
-        pageNo: current,
-        pageSize: pageSize
-      },
-    })
-    dispatch({
-      type: 'allRequest/fetchAllRequest',
-      payload: {},
-    })
-  }
-
   function callback(key) {
     // console.log(key)
   }
@@ -67,57 +48,6 @@ function AllRequest({history, allRequest, dispatch}) {
           <RequestList {...{history, allRequest, dispatch}} type='dataset'/>
         </TabPane>
       </Tabs>
-    </div>
-
-  )
-  return (
-    <div className={`main-container ${styles.normal}`}>
-      <div className={styles.requestList}>
-        {JsonToArray(allRequest.userRequestDic).map(e =>
-          <Card key={e._id} className={styles.card}>
-            {/*style={{cursor: 'pointer'}}*/}
-            <div>
-              <Row>
-                <Col span={3}>
-                  <div onClick={() => toUserRequestDetail(e, history)}>
-                    <div className={styles.starDiv}>
-                      <p
-                        className={styles.starNumber}>{e['star_user'].length}</p>
-                      <p className={styles.starText}>Star</p>
-                    </div>
-                    <div className={styles.starDiv}>
-                      <p className={styles.starNumber}>{e['answer_number']}</p>
-                      <p className={styles.starText}>Answer</p>
-                    </div>
-                  </div>
-                </Col>
-                <Col span={21}>
-                  <div>
-                    <p className={styles.title}
-                       onClick={() => toUserRequestDetail(e, history)}>{e.title}</p>
-                    {/*<p className={styles.description}>{e.description}</p>*/}
-                    <div>
-                      {e['tags'].length > 0 && e['tags'].map(e => <p key={e}
-                                                                     className={styles.tags}>{e}</p>)}
-                      <div className={styles.timeAndUserDiv}>
-                        <p
-                          className={styles.showTime}>{showTime(e.create_time)}</p>
-                        <p className={styles.showTime}>&nbsp;&nbsp; asked
-                          at &nbsp;&nbsp;</p>
-                        <p className={styles.showTime}>{e.user_ID} </p>
-                      </div>
-                    </div>
-                  </div>
-                </Col>
-              </Row>
-            </div>
-          </Card>)}
-      </div>
-      <div className={styles.pagination}>
-        <Pagination showSizeChanger onShowSizeChange={onShowSizeChange}
-                    onChange={onShowSizeChange}
-                    defaultCurrent={1} total={allRequest.totalNumber}/>
-      </div>
     </div>
   )
 }
@@ -177,6 +107,11 @@ class RequestList extends Component {
     history.push(`/userrequest/${id}`)
   }
 
+
+  toUserProfile(user_ID, history) {
+    history.push(`/profile/${user_ID}`)
+  }
+
   onShowSizeChange = (current, pageSize) => {
     this.setState({
       pageNo: current,
@@ -234,7 +169,8 @@ class RequestList extends Component {
                             className={styles.showTime}>{showTime(e.create_time)}</p>
                           <p className={styles.showTime}>&nbsp;&nbsp; asked
                             at &nbsp;&nbsp;</p>
-                          <p className={styles.showTime}>{e.user_ID} </p>
+                          <p className={styles.user_ID}
+                             onClick={() => this.toUserProfile(e.user_ID, history)}>{e.user_ID} </p>
                         </div>
                       </div>
                     </div>

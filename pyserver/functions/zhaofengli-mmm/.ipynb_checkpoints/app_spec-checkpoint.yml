@@ -1,216 +1,23 @@
-flight_delay_prediction_param_1:
-  default: null
-  des: ''
-  name: DayofMonth,
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: int
-flight_delay_prediction_param_10:
-  default: null
-  des: ''
-  name: DewPointFarenheit_x
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: float
-flight_delay_prediction_param_11:
-  default: null
-  des: ''
-  name: DewPointCelsius_x
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: float
-flight_delay_prediction_param_12:
-  default: null
-  des: ''
-  name: RelativeHumidity_x
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: float
-flight_delay_prediction_param_13:
-  default: null
-  des: ''
-  name: WindSpeed_x
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: float
-flight_delay_prediction_param_14:
-  default: null
-  des: ''
-  name: Altimeter_x
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: float
-flight_delay_prediction_param_15:
-  default: null
-  des: ''
-  name: Visibility_y
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: float
-flight_delay_prediction_param_16:
-  default: null
-  des: ''
-  name: DryBulbFarenheit_y
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: float
-flight_delay_prediction_param_17:
-  default: null
-  des: ''
-  name: DryBulbCelsius_y
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: float
-flight_delay_prediction_param_18:
-  default: null
-  des: ''
-  name: DewPointFarenheit_y
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: float
-flight_delay_prediction_param_19:
-  default: null
-  des: ''
-  name: DewPointCelsius_y
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: float
-flight_delay_prediction_param_2:
-  default: null
-  des: ''
-  name: DayOfWeek
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: int
-flight_delay_prediction_param_20:
-  default: null
-  des: ''
-  name: RelativeHumidity_y
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: float
-flight_delay_prediction_param_21:
-  default: null
-  des: ''
-  name: WindSpeed_y
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: float
-flight_delay_prediction_param_22:
-  default: null
-  des: ''
-  name: Altimeter_y
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: float
-flight_delay_prediction_param_3:
-  default: null
-  des: ''
-  name: OriginAirportID
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: int
-flight_delay_prediction_param_4:
-  default: null
-  des: ''
-  name: DestAirportID
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: int
-flight_delay_prediction_param_5:
-  default: null
-  des: ''
-  name: CRSDepTime
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: int
-flight_delay_prediction_param_6:
-  default: null
-  des: ''
-  name: CRSArrTime
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: int
-flight_delay_prediction_param_7:
-  default: null
-  des: ''
-  name: Visibility_x
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: float
-flight_delay_prediction_param_8:
-  default: null
-  des: ''
-  name: DryBulbFarenheit_x
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: float
-flight_delay_prediction_param_9:
-  default: null
-  des: ''
-  name: DryBulbCelsius_x
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: float
-weather_prediction_param_1:
-  default: null
-  des: ''
-  name: flight_no
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: int
-weather_prediction_param_2:
-  default: null
-  des: ''
-  name: flight_date
-  range: null
-  required: false
-  type: input
-  value: null
-  value_type: int
+input:
+  weather_prediction_param_1:
+    default: null
+    des: ''
+    name: flight_no
+    range: null
+    required: false
+    type: input
+    value: null
+    value_type: int
+  weather_prediction_param_2:
+    default: null
+    des: ''
+    name: flight_date
+    range: null
+    required: false
+    type: input
+    value: null
+    value_type: int
+output:
+  weather_prediction_out1:
+    type: int
+    value: null

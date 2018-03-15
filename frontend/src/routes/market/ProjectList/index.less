@@ -45,57 +45,101 @@
   //padding: 5px 5px 5px 5px;
   //border: 1px solid #CECECE;
   position: relative;
-  box-shadow: 0px 2px 7px #CECECE;
-  .name {
-    font-size: 18px;
-    height: 40px;
-    position: absolute;
-    top: 8px;
-    left: 80px;
-  }
-  .description {
-    height: 83px;
-    position: absolute;
-    top: 67px;
-    left: 13px;
-    font-size: 12px;
-  }
-
-  .authorDateDiv {
-    height: 35px;
-    position: absolute;
-    top: 150px;
-    left: 13px;
-    display: flex;
-    .authorDiv {
-      width: 130px;
-      .authorP {
-        color: #A7A8AA;
-        font-size: 12px;
-      }
+  box-shadow: 0 2px 7px #CECECE;
+  .toDetail {
+    height: 280px;
+    cursor: pointer;
+    .pic {
+      height: 60px;
+      width: 60px;
+      border: 1px solid #CECECE;
+      border-radius: 30px;
+      position: absolute;
+      top: -15px;
+      left: 10px;
     }
-    .dateDiv {
-      .dateP {
-        color: #A7A8AA;
-        font-size: 12px;
-      }
-    }
-  }
 
-  .categoryDiv {
-    position: absolute;
-    top: 200px;
-    left: 13px;
-    .categoryP {
-      color: #A7A8AA;
+    .name {
+      font-size: 18px;
+      height: 40px;
+      position: absolute;
+      top: 8px;
+      left: 80px;
+
+    }
+    .description {
+      height: 83px;
+      position: absolute;
+      top: 67px;
+      left: 13px;
       font-size: 12px;
+      .p{
+        display:-webkit-box;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        -webkit-line-clamp:3;
+        -webkit-box-orient:vertical;
+      }
+    }
+
+    .authorDateDiv {
+      height: 35px;
+      position: absolute;
+      top: 150px;
+      left: 13px;
+      display: flex;
+      .authorDiv {
+        width: 130px;
+        .authorP {
+          width: 130px;
+          color: #A7A8AA;
+          font-size: 12px;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+      }
+      .dateDiv {
+        .dateP {
+          color: #A7A8AA;
+          font-size: 12px;
+        }
+      }
+    }
+
+    .categoryDiv {
+      position: absolute;
+      top: 200px;
+      left: 13px;
+      .categoryP {
+        color: #A7A8AA;
+        font-size: 12px;
+      }
     }
   }
-  .starFavorDiv{
+  .starFavorDiv {
     width: 100%;
     border-top: 1px solid #E9E9E9;
     height: 30px;
     position: absolute;
-    bottom: 2px;
+    bottom: 0;
+    display: flex;
+    padding-left: 160px;
+    align-items: center;
+    justify-content: center;
+    .starFavorRightDiv {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .bottomIcon {
+      font-size: 22px;
+      margin: 5px;
+      color: #34c0e2
+    }
+    .bottomNumber {
+      font-size: 12px;
+      margin: 3px 20px 3px 3px;
+    }
   }
 }

@@ -1,7 +1,8 @@
 import { routerRedux } from 'dva/router'
 
 import { fetchProject, deleteProject, updateProject, forkProject } from '../services/project'
-import { jobsByProject } from '../services/job'
+import { getSessions, getTerminals, deleteSession, deleteTerminal } from '../services/job'
+import { deleteLab } from '../services/notebook'
 import { privacyChoices } from '../constants'
 import pathToRegexp from 'path-to-regexp'
 import { get } from 'lodash'
@@ -10,13 +11,13 @@ import * as dataAnalysisService from '../services/dataAnalysis'
 import { message } from 'antd/lib/index'
 
 import { startLabBack } from './modelling'
-import * as UserStarFavorService from "../services/user"
-
+import * as UserStarFavorService from '../services/user'
 
 export default {
   namespace: 'projectDetail',
   state: {
-    jobs: [],
+    terminals: [],
+    sessions: [],
     // doneIndices: new Set([]),
   },
   reducers: {
@@ -26,10 +27,16 @@ export default {
         project,
       }
     },
-    setJobs(state, { payload: jobs }) {
+    setTerminals(state, { payload: terminals }) {
       return {
         ...state,
-        jobs,
+        terminals,
+      }
+    },
+    setSessions(state, { payload: sessions }) {
+      return {
+        ...state,
+        sessions,
       }
     },
     setStep(state, { payload }) {
@@ -51,26 +58,44 @@ export default {
       }
     },
 
-    updateStarFavor(state, action){
+    updateStarFavor(state, action) {
       return {
         ...state,
-        project:action.payload.project,
+        project: action.payload.project,
       }
-    }
+    },
 
   },
   effects: {
     // 获取该 project
-    *fetch(action, { call, put }) {
-      const { data: project } = yield call(fetchProject, { projectId: action.projectId })
+    *fetch({ projectId, notStartLab }, { call, put }) {
+      // fetch and set project
+      let { data: project } = yield call(fetchProject, { projectId })
       yield put({ type: 'setProject', payload: project })
+      // start lab backend
       const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
       const hubToken = project.hub_token
-      yield !action.notStartLab && call(startLabBack, { payload: { hubUserName, hubToken } }, { call })
-      // yield call(startLabFront)
+      if(!notStartLab) {
+        yield call(startLabBack, { payload: { hubUserName, hubToken } }, { call })
+      }
+
+      // fetch and set project
+      ({ data: project } = (yield call(fetchProject, { projectId })))
+      yield put({ type: 'setProject', payload: project })
+
       // fetch jobs
-      const jobs = yield call(jobsByProject, { hubUserName, hubToken })
-      yield put({ type: 'setJobs', payload: jobs })
+      const { data: terminals } = yield call(getTerminals, { hubUserName, hubToken })
+      const { data: sessions } = yield call(getSessions, { hubUserName, hubToken })
+      yield put({ type: 'setTerminals', payload: terminals })
+      yield put({ type: 'setSessions', payload: sessions })
+    },
+    *closeSession({ sessionId, terminalName }, { call, put, select }) {
+      const project = yield select(state => get(state, 'projectDetail.project'))
+      const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
+      const hubToken = project.hub_token
+      yield sessionId && call(deleteSession, { hubUserName, hubToken, sessionId })
+      yield terminalName && call(deleteTerminal, { hubUserName, hubToken, terminalName })
+      yield put({ type: 'fetch', projectId: project._id })
     },
     // 获取该 project 的 Jobs
     // *fetchJobs(action, { call, put }) {
@@ -79,14 +104,17 @@ export default {
     //   yield put({ type: 'setJobs', payload: jobs })
     // },
     *delete({ payload }, { call, put, select }) {
-      // const user_ID = 'dev_1'
-      // payload['user_ID'] = yield select(state => state.login.user.user_ID)
+      let project = yield select(state => state.projectDetail['project'])
+      const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
+      const hubToken = project.hub_token
       yield call(deleteProject, payload)
       yield put(routerRedux.push('/workspace'))
+      yield call(deleteLab, { hubUserName, hubToken })
+
     },
     *setEntered({ projectId }, { call, put }) {
       console.log(projectId)
-      yield call(updateProject, {projectId, body: {entered: true}})
+      yield call(updateProject, { projectId, body: { entered: true } })
       yield put({ type: 'fetch', projectId })
     },
     *update({ body, fetchData }, { call, put, select }) {
@@ -120,15 +148,15 @@ export default {
       yield put(routerRedux.replace(url0))
     },
 
-    *star_favor(action, {call, put, select}){
+    *star_favor(action, { call, put, select }) {
       let payload = action.payload
-      const {data: project} = yield call(UserStarFavorService.set_star_favor, payload)
+      const { data: project } = yield call(UserStarFavorService.set_star_favor, payload)
       yield put({
         type: 'updateStarFavor',
-        payload: project
+        payload: project,
       })
 
-    }
+    },
   },
   subscriptions: {
     // 当进入该页面获取project

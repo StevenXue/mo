@@ -54,7 +54,7 @@ def get_list(type, search_query, user_ID, page_no, page_size, entity_type='userR
 
 
 def get_by_id(user_request_id, entity_type='userRequest'):
-    # user_request = user_request_business.get_by_user_request_id(user_request_id)
+    # user_request = user_request_business.get_by_user_request_id(user_request)
     cls = EntityMapper.get(entity_type)
     user_request = cls.get_by_id(user_request_id)
     return user_request

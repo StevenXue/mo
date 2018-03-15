@@ -20,6 +20,8 @@ export default {
     },
 
     updateNewMessage(state, {payload}) {
+      console.log('payload')
+      console.log(payload)
       let receiver_id = payload.msg.receiver_id
       return {
         ...state,
@@ -60,6 +62,7 @@ export default {
 
     * readMessage(action, {call, put, select}) {
       let payload = action.payload
+      console.log(payload)
       yield call(messageService.readMessage, payload)
       yield put({
         type: 'changeMessageState',

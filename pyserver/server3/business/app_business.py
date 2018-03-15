@@ -6,6 +6,7 @@ import fileinput
 from copy import deepcopy
 from subprocess import call
 import synonyms
+import docker
 
 from server3.entity import project
 from server3.business.project_business import ProjectBusiness
@@ -86,26 +87,48 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         app = cls.get_by_id(app_id)
         app_yaml_path = os.path.join(app.path, yaml_tail_path)
         args = {}
+        output = {}
+        client = docker.from_env()
         # copy module yaml to app yaml
         for module in used_modules:
-            func_args = dict(module.args)[func]
+            # copy venv
+            # TODO instead, using docker run to add venv
+            # call(['bash', 'add_venv.sh', os.path.abspath(dst)])
+            user_ID = module.user.user_ID
+            container = client.containers.get(f'jupyter-{user_ID}_2B{app.name}')
+            print(container.exec_run(['/bin/bash', '/home/jovyan/add_venv.sh',
+                                      f'{user_ID}/{module.name}']).decode('ascii'))
+            # copy yaml
+            func_args = module.to_mongo()['args'][func]
+            output_args = module.to_mongo()['output'].get(func, {})
             if os.path.isfile(app_yaml_path):
                 with open(app_yaml_path, 'r') as stream:
                     # read args
-                    args = yaml.load(stream)
-                    # find duplicate arg name of module_arg and app_arg and
-                    # replace the name
-                    args = cls.replace_dup_name(args, func_args, module.name)
-                    # edit app args
-                    args = cls.update_with_module_name(args, func_args,
-                                                       module.name)
+                    obj = yaml.load(stream)
+                    args = cls.replace_dup_n_update(obj['input'], func_args,
+                                                    module.name)
+                    output = cls.update_with_module_name(obj.get('output', {}),
+                                                      output_args,
+                                                      module.name)
             else:
                 args = cls.update_with_module_name(args, func_args,
                                                    module.name)
+                output = cls.update_with_module_name(output, output_args,
+                                                     module.name)
             # write new args
             with open(app_yaml_path, 'w') as stream:
-                yaml.dump(args, stream, default_flow_style=False)
+                yaml.dump({'input': args, 'output': output}, stream,
+                          default_flow_style=False)
         return cls.repo.add_to_set(app_id, used_modules=used_modules)
+
+    @classmethod
+    def replace_dup_n_update(cls, args, func_args, module_name):
+        # find duplicate arg name of module_arg and app_arg and
+        # replace the name
+        args = cls.replace_dup_name(args, func_args, module_name)
+        # edit app args
+        return cls.update_with_module_name(args, func_args,
+                                           module_name)
 
     @staticmethod
     def replace_dup_name(args, func_args, module_name):
@@ -124,7 +147,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         return app_args
 
     @classmethod
-    def nb_to_script(cls, app_id, nb_path):
+    def nb_to_script(cls, app_id, nb_path, optimise=True):
         app = cls.get_by_id(app_id)
         call(['jupyter', 'nbconvert', '--to', 'script', nb_path],
              cwd=app.path)
@@ -133,28 +156,30 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         for line in fileinput.input(files=script_path, inplace=1):
             # remove input tag comments
             line = re.sub(r"# In\[(\d+)\]:", r"", line.rstrip())
-            if any(re.search(reg, line.rstrip()) for reg in INIT_RES):
-                line = re.sub(
-                    r"# Please use current \(work\) folder to store your data "
-                    r"and models",
-                    r'', line.rstrip())
-                line = re.sub(r"sys.path.append\('\.\./'\)", r'',
-                              line.rstrip())
-                line = re.sub(r"""client = Client\('(.+)'\)""",
-                              r"""client = Client('\1', silent=True)""",
-                              line.rstrip())
-                line = re.sub(r"""from modules import (.+)""",
-                              r"""from function.modules import \1""",
-                              line.rstrip())
-                # add handle function
-                line = re.sub(
-                    r"predict = client\.predict",
-                    r"predict = client.predict\n\n"
-                    r"def handle(conf):\n"
-                    r"\t# paste your code here",
-                    line.rstrip())
-            else:
-                line = '\t' + line
+
+            if optimise:
+                if any(re.search(reg, line.rstrip()) for reg in INIT_RES):
+                    line = re.sub(
+                        r"# Please use current \(work\) folder to store your data "
+                        r"and models",
+                        r'', line.rstrip())
+                    line = re.sub(r"sys.path.append\('\.\./'\)", r'',
+                                  line.rstrip())
+                    line = re.sub(r"""client = Client\('(.+)'\)""",
+                                  r"""client = Client('\1', silent=True)""",
+                                  line.rstrip())
+                    line = re.sub(r"""from modules import (.+)""",
+                                  r"""from function.modules import \1""",
+                                  line.rstrip())
+                    # add handle function
+                    line = re.sub(
+                        r"predict = client\.predict",
+                        r"predict = client.predict\n\n"
+                        r"def handle(conf):\n"
+                        r"\t# paste your code here",
+                        line.rstrip())
+                else:
+                    line = '\t' + line
             print(line)
 
     # @classmethod

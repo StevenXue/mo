@@ -22,6 +22,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from server3.repository import config
 from server3.business import user_business
 from server3.service import user_service
+from server3.service import project_service
 from server3.utility import json_utility
 from server3.constants import Error
 from server3.service.user_service import UserService
@@ -206,6 +207,7 @@ def set_action_entity(entity_id):
     user_ID = get_jwt_identity()
     data = request.get_json()
     print('data')
+    print(data)
     action = data.pop("action")
     entity = data.pop("entity")
 
@@ -227,13 +229,15 @@ def set_action_entity(entity_id):
 @user_app.route('/action_entity', methods=['GET'])
 @jwt_required
 def get_action_entity():
-    user_ID = get_jwt_identity()
+    user_ID = request.args.get("user_ID", get_jwt_identity())
     action_entity = request.args.get("action_entity")
     page_no = int(request.args.get('page_no', 1))
     page_size = int(request.args.get('page_size', 5))
     apps = UserBusiness.get_action_entity(
         user_ID=user_ID, action_entity=action_entity,
         page_no=page_no, page_size=page_size)
+    for app in apps.objects:
+        app.user_ID = app.user.user_ID
     return jsonify({
         'response': {
             "objects": json_utility.me_obj_list_to_json_list(apps.objects),
@@ -242,6 +246,14 @@ def get_action_entity():
             "count": apps.count,
         }
     })
+
+
+@user_app.route('/profile/<user_ID>', methods=['GET'])
+def get_user_info(user_ID):
+    result = UserService.get_user_info(user_ID=user_ID)
+    print('result')
+    print(result)
+    return jsonify({'response': result}), 200
 
 
 @user_app.route('/statistics', methods=['GET'])

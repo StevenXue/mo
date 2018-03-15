@@ -163,7 +163,7 @@ function Header({location, login, history, dispatch, allRequest,message}) {
         >
           {login.user &&
           <Menu.Item key={'/profile'}>
-            <div onClick={() => history.push('/profile')}>
+            <div onClick={() => history.push('/profile/'+login.user.user_ID)}>
               Profile
             </div>
           </Menu.Item>

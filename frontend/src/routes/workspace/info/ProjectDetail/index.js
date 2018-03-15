@@ -9,7 +9,7 @@ import ProjectModel from '../../../../components/ProjectModal/index'
 import HelpModal from '../../../../components/HelpModal'
 import { showTime } from '../../../../utils/index'
 import styles from './index.less'
-import { get } from 'lodash'
+import _ from 'lodash'
 import { message } from 'antd/lib/index'
 
 const confirm = Modal.confirm
@@ -23,14 +23,16 @@ const projectTypeDict = {
   dataset: [],
 }
 
-function ProjectInfo({ market_use, match, history, location, dispatch, projectDetail,login }) {
+const myShowTime = (time, format = 'yyyy-MM-dd hh:mm') => {
+  let date = new Date(time).Format(format)
+  return date.toLocaleString()
+}
+
+function ProjectInfo({ market_use, match, history, location, dispatch, projectDetail, login }) {
 
   const projectId = match.params.projectId
   const user_ID = localStorage.getItem('user_ID')
-  const {
-    _id: user_obj_id,
-  }
-    = login.user
+  const userObjId = _.get(login, 'user._id')
 
   const props1 = {
     name: 'file',
@@ -48,6 +50,7 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
       }
       if (info.file.status === 'done') {
         message.success(`${info.file.name} file uploaded successfully`)
+        window.open(`/#/workspace/${projectId}/${projectDetail.project.type}`)
       } else if (info.file.status === 'error') {
         message.error(`${info.file.name} file upload failed.`)
       }
@@ -65,14 +68,14 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
     })
   }
 
-  function appStarFavor(action){
+  function appStarFavor(action) {
     dispatch({
       type: 'projectDetail/star_favor',
       payload: {
         entity_id: projectDetail.project['_id'],
-        action:action,
-        entity:projectDetail.project.type
-      }
+        action: action,
+        entity: projectDetail.project.type,
+      },
     })
   }
 
@@ -89,31 +92,32 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
   } else {
     // project info page
     if (projectDetail.project) {
+
       // optional component list by project type
       const components = projectTypeDict[projectDetail.project.type]
       return (
         <div className={`main-container ${styles.normal}`}>
-          {'help-modal' in components &&
+          {components.includes('help-modal') &&
           <HelpModal visible={!projectDetail.project.entered} projectType={projectDetail.project.type}/>}
           <div className={styles.info}>
             {/*info head*/}
             <div className={styles.name}>
               <h1>
-                <Icon
+                {market_use && <Icon
                   // type="star"
-                  type={projectDetail.project.favor_users.includes(user_obj_id) ? "star" : "star-o"}
-                style={{fontSize: '22px', color: '#34c0e2'}}
-                onClick={() =>appStarFavor('favor')}/>
+                  type={projectDetail.project.favor_users.includes(userObjId) ? 'star' : 'star-o'}
+                  style={{ fontSize: '22px', color: '#34c0e2' }}
+                  onClick={() => appStarFavor('favor')}/>}
                 {projectDetail.project.name}&nbsp;
-                {!market_use?<Icon type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
-                      style={{ fontSize: 20 }}/>:null}
-                {!market_use?<span className={styles.rightButton}>
+                {!market_use && <Icon type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
+                                      style={{ fontSize: 20 }}/>}
+                {!market_use && <span className={styles.rightButton}>
                   <ProjectModel new={false} projectDetail={projectDetail}
-                                >
+                  >
                     <Button icon='edit' style={{ marginRight: 15 }}/>
                   </ProjectModel>
                   <Button icon='delete' onClick={() => deleteProject()}/>
-                </span>:null}
+                </span>}
               </h1>
               <p className={styles.text} style={{ fontSize: 14, marginTop: 6 }}>
                 <Icon type="clock-circle-o" style={{ marginRight: 10 }}/>
@@ -145,9 +149,9 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
                   <Button type="primary"
                           onClick={() => {
                             // history.push(`/workspace/${match.params.projectId}/${projectDetail.project.type}`)
-                            window.open(`/#/workspace/${match.params.projectId}/${projectDetail.project.type}`)
+                            window.open(`/#/workspace/${projectId}/${projectDetail.project.type}`)
                           }}>
-                  Enter Notebook
+                    Notebook ->
                   </Button>
 
                 </span>
@@ -156,7 +160,7 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
           </div>
 
           {/*content tabs*/}
-          <Tabs defaultActiveKey="1" onChange={callback} className={styles.jobs}>
+          <Tabs defaultActiveKey="2" onChange={callback} className={styles.jobs}>
             <TabPane tab="Overview" key="1">
               Some Description
               <br/>
@@ -165,29 +169,8 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
               Some Description
             </TabPane>
             <TabPane tab="Jobs" key="2">
-              <h2>Jobs:
-                <span className={styles.rightButton}>
-                     <Button onClick={() => {window.open(`http://localhost:${projectDetail.project.tb_port}`)}}>
-                       View Jobs
-                     </Button>
-                </span>
-              </h2>
-              <p>
-                <span className={styles.done}>10</span> have done&nbsp;&nbsp;&nbsp;&nbsp;
-                <span className={styles.running}>9</span> are running&nbsp;&nbsp;&nbsp;&nbsp;
-                <span className={styles.error}>2</span> went error&nbsp;&nbsp;&nbsp;&nbsp;
-              </p>
-              {projectDetail.jobs.map((job) => <p key={job.id}>{job.path}</p>)}
-              <Row>
-                <Col span={12}>col-12</Col>
-                <Col span={12}>col-12</Col>
-              </Row>
-              <Row>
-                <Col span={12}>col-12</Col>
-                <Col span={12}>col-12</Col>
-              </Row>
+              <Jobs projectDetail={projectDetail} dispatch={dispatch}/>
             </TabPane>
-
             <TabPane tab="Examples" key="3">
               Some Description
               <br/>
@@ -204,8 +187,67 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
   }
 }
 
-ProjectInfo.defaultProps={
-  market_use:false
+const Jobs = ({ projectDetail, dispatch }) => {
+  return (
+    <div>
+      <h2>Jobs:
+        <span className={styles.rightButton}>
+                     <Button onClick={() => {window.open(`http://localhost:${projectDetail.project.tb_port}`)}}>
+                       Jobs Visualization
+                     </Button>
+                </span>
+      </h2>
+      <p className={styles.overall}>
+        <span className={styles.done}>
+          {projectDetail.sessions.filter(e => e.kernel.execution_state === 'idle').length}
+          </span> idle&nbsp;&nbsp;&nbsp;&nbsp;
+        <span className={styles.busy}>
+          {projectDetail.sessions.filter(e => e.kernel.execution_state === 'busy').length}
+          </span> busy&nbsp;&nbsp;&nbsp;&nbsp;
+        {/*<span className={styles.error}>2</span> went error&nbsp;&nbsp;&nbsp;&nbsp;*/}
+      </p>
+
+      <h3 className={styles.subTitle}>Sessions (Notebooks):</h3>
+      <div className={styles.jobCols}>
+        {projectDetail.sessions.map((job) => {
+          const blobDict = {
+            busy: styles.bulbBusy,
+            idle: styles.bulbIdle,
+          }
+          return <div key={job.id} className={styles.jobCell}>
+            <div className={styles.jobContainer}>
+              <h4>{job.path}
+                <Icon className={styles.shutDown} type='close'
+                      onClick={() => dispatch({ type: 'projectDetail/closeSession', sessionId: job.id })}/>
+              </h4>
+              <p className={styles.jobInfo}>
+                <span className={blobDict[job.kernel.execution_state]}/>
+                &nbsp;&nbsp;
+                Last Activity: {myShowTime(job.kernel.last_activity)}</p>
+            </div>
+          </div>
+        })}
+      </div>
+
+      <h3 className={styles.subTitle}>Terminals:</h3>
+      <div className={styles.jobCols}>
+        {projectDetail.terminals.map((job) =>
+          <div key={job.name} className={styles.jobCell}>
+            <div className={styles.jobContainer}>
+              <h4>{'Terminal/'}{job.name}
+                <Icon className={styles.shutDown} type='close'
+                      onClick={() => dispatch({ type: 'projectDetail/closeSession', terminalName: job.name })}/>
+              </h4>
+            </div>
+          </div>)}
+      </div>
+    </div>
+
+  )
+}
+
+ProjectInfo.defaultProps = {
+  market_use: false,
 }
 
 function ProjectDetail({ match, history, location, dispatch, projectDetail }) {

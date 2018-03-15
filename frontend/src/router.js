@@ -90,7 +90,7 @@ const RouterConfig = ({ history, location, projectDetail }) => {
 
           <Route path="/modulelist/:moduleId" component={Module}/>
           <Route path="/modulelist" component={ModuleList}/>
-          <Route path="/profile" component={Profile}/>
+          <Route path="/profile/:userId" component={Profile}/>
         </Switch>
       </div>
     </MainLayout>

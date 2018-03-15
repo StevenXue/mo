@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
-jupyter labhub --NotebookApp.allow_origin=* --NotebookApp.token='' &
-tensorboard --logdir=/home/jovyan/work/logs
+mktmpenv
+toggleglobalsitepackages
+tensorboard --logdir=/home/jovyan/work/logs &
+jupyter labhub --NotebookApp.allow_origin=* --NotebookApp.token=''
 #python -m http.server 6006

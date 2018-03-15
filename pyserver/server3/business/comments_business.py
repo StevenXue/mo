@@ -12,13 +12,13 @@ user_request_comments_repo = UserRequestCommentsRepo(UserRequestComments)
 
 # 获取当前user_request下的所有
 def get_comments_of_this_user_request(user_request_id):
-    query = {'user_request_id': ObjectId(user_request_id),
+    query = {'user_request': ObjectId(user_request_id),
              'comments_type': 'request'}
     return user_request_comments_repo.read(query)
 
 
 def get_comments_of_this_answer(request_answer_id):
-    query = {'request_answer_id': ObjectId(request_answer_id)}
+    query = {'request_answer': ObjectId(request_answer_id)}
     return user_request_comments_repo.read(query)
 
 
@@ -32,16 +32,16 @@ def get_by_user_request_comments_id(user_request_comments_id):
 def add_user_request_comments(user_request_id, comments_user_ID, comments,
                               comments_type, request_answer_id):
     kw = {
-        'user_request_id': ObjectId(user_request_id),
+        'user_request': ObjectId(user_request_id),
         'create_time': datetime.utcnow(),
         'comments_user_ID': comments_user_ID,
         'comments': comments,
         'comments_type': comments_type,
     }
-    # print('request_answer_id')
-    # print(request_answer_id)
+    # print('request_answer')
+    # print(request_answer)
     if request_answer_id:
-        kw['request_answer_id'] = ObjectId(request_answer_id)
+        kw['request_answer'] = ObjectId(request_answer_id)
     user_request_comments_obj = UserRequestComments(**kw)
     return user_request_comments_repo.create(user_request_comments_obj)
 

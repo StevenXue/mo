@@ -14,6 +14,9 @@ import 'braft-editor/dist/braft.css'
 import {JsonToArray} from "../../../utils/JsonUtils"
 import RequestModal from '../../../components/RequestModal/index'
 import {getProjects} from "../../../services/project"
+import ProjectModal from '../../../components/ProjectModal/index'
+
+
 
 const {TextArea} = Input
 const TabPane = Tabs.TabPane
@@ -144,9 +147,6 @@ class AnswerForm extends React.Component {
   }
 
   handleSelectChange = (value) => {
-    console.log('dwf')
-    console.log(value)
-
     this.setState({
       value,
       data: [],
@@ -172,8 +172,6 @@ class AnswerForm extends React.Component {
     if (this.state.selected.length > 0) {
       selectProjectID = this.state.selected[0]['_id']
     }
-    console.log('selectProjectID')
-    console.log(selectProjectID)
     this.props.dispatch({
       type: 'allRequest/makeNewRequestAnswer',
       payload: {
@@ -238,7 +236,7 @@ class AnswerForm extends React.Component {
           <Card title={this.state.selected[0].name}
                 extra={<Icon type="close" onClick={this.clearSelect}/>}>
             <p>{this.state.selected[0].description}</p></Card> : null}
-        {this.state.selected.length === 0 ? <Select
+        {this.state.selected.length === 0 ? <div><Select
           mode="combobox"
           labelInValue
           value={value}
@@ -247,11 +245,14 @@ class AnswerForm extends React.Component {
           filterOption={false}
           onSearch={this.fetchData.bind(this)}
           onChange={this.handleSelectChange}
-          style={{width: '100%'}}
+          style={{width: '40%'}}
         >
           {projects.map(d => <Select.Option
             key={d._id}>{d.name}</Select.Option>)}
-        </Select> : null}
+        </Select>
+          <ProjectModal new={true}  type={this.props.type}>
+          <Button icon='plus-circle-o' type='primary' style={{'marginLeft':'30px'}}>New {this.props.type}</Button>
+          </ProjectModal></div> : null}
         {/*<BraftEditor {...editorProps}/>*/}
         <div style={{margin: '24px 0'}}/>
         <TextArea
@@ -331,12 +332,12 @@ function UserRequestDetail({allRequest, login, dispatch}) {
     })
   }
 
-  // function acceptAnswer(request_answer_id) {
+  // function acceptAnswer(request_answer) {
   //   dispatch({
   //     type: 'allRequest/acceptAnswer',
   //     payload: {
-  //       user_request_id: focusUserRequest['_id'],
-  //       request_answer_id: request_answer_id,
+  //       user_request: focusUserRequest['_id'],
+  //       request_answer: request_answer,
   //     }
   //   })
   // }
@@ -482,15 +483,6 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                     }}>
                       <Icon type="caret-down"/>
                     </div>
-                    {/*<div style={{*/}
-                    {/*width: '100%',*/}
-                    {/*textAlign: 'center',*/}
-                    {/*fontSize: '26px',*/}
-                    {/*color: '#34c0e2',*/}
-                    {/*cursor: 'pointer'*/}
-                    {/*}}>*/}
-                    {/*<Icon type="star-o"/>*/}
-                    {/*</div>*/}
                     {user_ID === focusUserRequest.user_ID &&
                     !focusUserRequest.accept_answer &&
                     <div style={{
