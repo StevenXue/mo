@@ -13,7 +13,6 @@
 import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
-from minepy import MINE
 
 from bson.objectid import ObjectId
 import inspect

@@ -1,6 +1,16 @@
 import React, {Component} from 'react'
 import {connect} from 'dva'
-import {Card, Tabs, Icon, Radio, Row, Col, Input, Pagination} from 'antd'
+import {
+  Card,
+  Tabs,
+  Icon,
+  Radio,
+  Row,
+  Col,
+  Input,
+  Pagination,
+  Button
+} from 'antd'
 
 const TabPane = Tabs.TabPane
 const {Meta} = Card
@@ -14,6 +24,7 @@ import {showTime} from "../../utils"
 import {routerRedux} from "dva/router"
 
 const RadioGroup = Radio.Group
+const ButtonGroup = Button.Group
 
 function callback(key) {
   console.log(key)
@@ -109,7 +120,7 @@ function Profile({login, profile, dispatch, history}) {
               <MyRequestList history={history} user_ID={user_ID}/>
             </TabPane>
             <TabPane tab="My answer" key="3">
-              <MyAnswerList  history={history} user_ID={user_ID}/>
+              <MyAnswerList history={history} user_ID={user_ID}/>
             </TabPane>
           </Tabs>
         </div>
@@ -125,26 +136,42 @@ class MyFavouriteList extends Component {
   constructor() {
     super()
     this.state = {
-      requests: [],
+      pOrR: 'project',
       objects: [],
       totalNumber: 0,
       pageNo: 1,
       pageSize: 10,
-      action_entity: 'favor_apps',
+      type: 'app',
     }
   }
 
+  changePOrR(pOrR) {
+    console.log(pOrR)
+    this.setState({
+      pOrR: pOrR,
+      pageNo: 1,
+      pageSize: 10,
+      objects: []
+    }, () => this.fetchData({}))
+  }
+
+
   fetchData({payload}) {
     if (payload) {
-      payload['action_entity'] = this.state.action_entity
+      payload['user_ID'] = this.props.user_ID
     }
     else {
-      payload = {'action_entity': this.state.action_entity}
+      payload = {'user_ID': this.props.user_ID}
     }
-    payload['page_no'] = this.state.current
+    payload['page_no'] = this.state.pageNo
     payload['page_size'] = this.state.pageSize
-    payload['group'] = 'my'
-    payload['user_ID'] = this.props.user_ID
+    if (this.state.pOrR === 'request') {
+      payload['action_entity'] = 'request_star'
+      payload['type'] = this.state.type
+    }
+    else {
+      payload['action_entity'] = 'favor_'.concat(this.state.type).concat('s')
+    }
 
     get_star_favor({
       payload,
@@ -152,20 +179,11 @@ class MyFavouriteList extends Component {
         this.setState({
           objects, totalNumber
         })
+        console.log(this.state.objects)
       }
     })
   }
 
-  fetchProject({payload}) {
-    if (payload) {
-      payload['action_entity'] = this.state.action_entity
-    }
-    else {
-      payload = {'action_entity': this.state.action_entity}
-    }
-    payload['page_no'] = this.state.current
-    payload['page_size'] = this.state.pageSize
-  }
 
   componentDidMount() {
     this.fetchData({
@@ -185,6 +203,10 @@ class MyFavouriteList extends Component {
     history.push(`/market/${id}`)
   }
 
+  toUserRequestDetail(id, history) {
+    history.push(`/userrequest/${id}`)
+  }
+
   onShowSizeChange = (current, pageSize) => {
     this.setState({
       pageNo: current,
@@ -195,7 +217,7 @@ class MyFavouriteList extends Component {
   typeChange = (e) => {
     console.log('radio checked', e.target.value)
     this.setState({
-      action_entity: e.target.value,
+      type: e.target.value,
       pageNo: 1,
     }, () => this.fetchData({}))
   }
@@ -205,14 +227,21 @@ class MyFavouriteList extends Component {
     return (
       <div className={styles.bottomRow}>
         <div className={styles.radioGroupDiv}>
+          <ButtonGroup>
+            <Button onClick={() => this.changePOrR('project')}
+                    type={this.state.pOrR === 'project' ? "primary" : "default"}>
+              Project</Button>
+            <Button onClick={() => this.changePOrR('request')}
+                    type={this.state.pOrR === 'request' ? "primary" : "default"}>
+              Request</Button>
+          </ButtonGroup>
           <RadioGroup onChange={this.typeChange}
-                      value={this.state.action_entity}>
-            <Radio value={'favor_apps'} className={styles.radio}>App</Radio>
-            <Radio value={'favor_modules'}
+                      value={this.state.type}>
+            <Radio value={'app'} className={styles.radio}>App</Radio>
+            <Radio value={'module'}
                    className={styles.radio}>Module</Radio>
-            <Radio value={'favor_datasets'}
+            <Radio value={'dataset'}
                    className={styles.radio}>Dataset</Radio>
-            <Radio value={'request'} className={styles.radio}>Request</Radio>
           </RadioGroup>
           <Search className={styles.search}
                   placeholder="input search text"
@@ -220,46 +249,93 @@ class MyFavouriteList extends Component {
                   style={{width: 200}}
           />
         </div>
+        {this.state.pOrR === 'project' &&
         <div className={styles.favorList}>
           {this.state.objects.map(e =>
             <Card noHovering={true} key={e._id} bordered={false}>
               <div>
                 <Row>
+                  <div>
                     <div>
-                      <div>
-                        <p className={styles.title}
-                           onClick={() => this.toObjectDetail(e._id, history)}>{e.name}</p>
+                      <p className={styles.title}
+                         onClick={() => this.toObjectDetail(e._id, history)}>{e.name}</p>
+                    </div>
+                    <div>
+                      <p className={styles.description}>{e.description}</p>
+                    </div>
+                    <div className={styles.footer}>
+                      <Icon type="user" className={styles.userIcon}/>
+                      <p>{e.user_ID} </p>
+                      <Icon type="tags" className={styles.tagsIcon}/>
+                      <p>{e.tags}</p>
+                      <Icon type="clock-circle-o"
+                            className={styles.tagsIcon}/>
+                      <p>{showTime(e.create_time)}</p>
+                    </div>
+                  </div>
+                  {/*<div className={styles.timeAndUserDiv}>*/}
+                  {/*<p*/}
+                  {/*className={styles.showTime}>{showTime(e.create_time)}</p>*/}
+                  {/*</div>*/}
+                </Row>
+              </div>
+            </Card>)}
+        </div>}
+        {this.state.pOrR === 'request' && <div className={styles.requestList}>
+          {this.state.objects.map(e =>
+            <Card noHovering={true} key={e._id} bordered={false}>
+              <div>
+                <Row>
+                  <Col span={3}>
+                    <div className={styles.starAnswerDiv}
+                         onClick={() => this.toUserRequestDetail(e._id, history)}>
+                      <div className={styles.starDiv}>
+                        {e.accept_answer ? <p className={styles.starNumber}>
+                          <Icon style={{'color': '#439A46', 'fontSize': '18px'}}
+                                type="check-circle"/></p> : <p
+                          className={styles.starNumber}>{e['answer_number']}</p>}
+                        <p className={styles.starText}
+                           style={e.accept_answer ? {'color': '#439A46'} : null}>Answer</p>
                       </div>
-                      <div>
-                        <p className={styles.description}>{e.description}</p>
+                      <div className={styles.starDiv}>
+                        <p
+                          className={styles.starNumber}>{e['star_user'].length}</p>
+                        <p className={styles.starText}>Star</p>
                       </div>
+                    </div>
+                  </Col>
+                  <Col span={21}>
+                    <div className={styles.rightArea}>
+                      <p className={styles.title}
+                         onClick={() => this.toUserRequestDetail(e._id, history)}>{e.title}</p>
+                      {/*<p className={styles.description}>{e.description}</p>*/}
                       <div className={styles.footer}>
                         <Icon type="user" className={styles.userIcon}/>
                         <p>{e.user_ID} </p>
                         <Icon type="tags" className={styles.tagsIcon}/>
-                        <p>{e.tags}</p>
+                        {e['tags'].length > 0 &&
+                        <p key={e}>{e['tags'].join(',')}</p>}
                         <Icon type="clock-circle-o"
-                              className={styles.tagsIcon}/>
+                              className={styles.clockIcon}/>
                         <p>{showTime(e.create_time)}</p>
                       </div>
                     </div>
-                    {/*<div className={styles.timeAndUserDiv}>*/}
-                    {/*<p*/}
-                    {/*className={styles.showTime}>{showTime(e.create_time)}</p>*/}
-                    {/*</div>*/}
+                  </Col>
                 </Row>
               </div>
             </Card>)}
-          <div className={styles.pagination}>
-            <Pagination showSizeChanger
-                        onShowSizeChange={this.onShowSizeChange.bind(this)}
-                        onChange={this.onShowSizeChange}
-                        defaultCurrent={1}
-                        defaultPageSize={this.state.pageSize}
-                        pageSizeOptions={['5', '10', '15', '20', '25']}
-                        total={this.state.totalNumber}/>
-          </div>
+        </div>}
+
+        <div className={styles.pagination}>
+          <Pagination showSizeChanger
+                      onShowSizeChange={this.onShowSizeChange.bind(this)}
+                      onChange={this.onShowSizeChange}
+                      defaultCurrent={1}
+                      defaultPageSize={this.state.pageSize}
+                      pageSizeOptions={['5', '10', '15', '20', '25']}
+                      total={this.state.totalNumber}/>
         </div>
+
       </div>
     )
   }
@@ -362,9 +438,11 @@ class MyRequestList extends Component {
                          onClick={() => this.toUserRequestDetail(e._id, history)}>
                       <div className={styles.starDiv}>
                         {e.accept_answer ? <p className={styles.starNumber}>
-                          <Icon style={{'color':'#439A46', 'fontSize':'18px'}} type="check-circle"/></p> : <p
-                          className={styles.starNumber} >{e['answer_number']}</p>}
-                        <p className={styles.starText}  style={e.accept_answer ?{'color':'#439A46' }:null}>Answer</p>
+                          <Icon style={{'color': '#439A46', 'fontSize': '18px'}}
+                                type="check-circle"/></p> : <p
+                          className={styles.starNumber}>{e['answer_number']}</p>}
+                        <p className={styles.starText}
+                           style={e.accept_answer ? {'color': '#439A46'} : null}>Answer</p>
                       </div>
                       <div className={styles.starDiv}>
                         <p
