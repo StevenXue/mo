@@ -57,6 +57,17 @@ def get():
     world_messages = WorldBusiness.get_pagination(
         query={"channel": channel},
         page_no=page_no, page_size=page_size)
+    for message in world_messages.objects:
+        print("message")
+        if hasattr(message, "sender") and message.sender:
+            message.sender_user_ID = message.sender.user_ID
+        else:
+            message.sender_user_ID = "system"
+
+        # if message.message_type == 'admin':
+        #     message.sender_user_ID = "system"
+        # else:
+        #     message.sender_user_ID =
     if world_messages:
         return jsonify({
             "response": {

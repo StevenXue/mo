@@ -19,11 +19,20 @@ class worldChannelC extends React.Component {
 
   render() {
     const {worldMessages, onClickIcon, isRight, dispatch} = this.props
-    return isRight ?
-      <Open worldMessages={worldMessages} onClickIcon={onClickIcon}
-            dispatch={dispatch}
-      /> :
-      <Close worldMessages={worldMessages} onClickIcon={onClickIcon}/>
+
+    return <Open worldMessages={worldMessages}
+                 onClickIcon={onClickIcon}
+                 dispatch={dispatch}
+                 isRight={isRight}
+
+    />
+
+
+    // return isRight ?
+    //   <Open worldMessages={worldMessages} onClickIcon={onClickIcon}
+    //         dispatch={dispatch}
+    //   /> :
+    //   <Close worldMessages={worldMessages} onClickIcon={onClickIcon}/>
   }
 }
 
@@ -67,56 +76,94 @@ class Open extends React.Component {
   }
 
   render() {
-    const {worldMessages, onClickIcon} = this.props
+    const {worldMessages, onClickIcon, isRight} = this.props
     return (
-      <div className={styles.container}>
-        <div className={styles.first_row}>
-          <Icon type="right" onClick={onClickIcon} style={{fontSize: 20}}/>
-          <div className={styles.title}>
-            ALL
-          </div>
-        </div>
+      <div className={styles.container}
+           style={{width: isRight ? 300 : 50}}
+      >
+        {
+          isRight ?
+            <div className={styles.first_row}>
 
-        <div className={styles.black_line}/>
+              <Icon type="right" onClick={onClickIcon}
+                    className={styles.icon_container}
+              />
 
+              <div className={styles.title}>
+                ALL
+              </div>
+
+              <Icon type="question"
+                    className={styles.icon_container}
+              />
+            </div> :
+
+            <div className={styles.first_row}>
+              <Icon type="left" onClick={onClickIcon}
+                    className={styles.icon_container}
+              />
+            </div>
+        }
+
+
+        {/*<div className={styles.black_line}/>*/}
 
         <WorldMessages
           worldMessages={worldMessages}
           ref1={(el) => {
             this.scrollView = el
           }}
+          isRight={isRight}
         />
+        {
+          isRight &&
+          <div className={styles.input}>
+            <Input
+              placeholder="输入"
+              onPressEnter={this.handleSendMessage}
+            />
 
-        <Input
-          className={styles.input}
-          placeholder="输入"
-          onPressEnter={this.handleSendMessage}
-        />
+            <img
+              style={{
+                height: 20, width: 20,
+                marginLeft: 10,
+                marginRight: 10,
+                display: "flex",
+                justifyContent: "center",
+                alignItem: "center"
+              }}
+              src={require('../../img/icon/aircraft.png')}
+              // onClick={this.handleSendMessage}
+            />
+
+          </div>
+        }
+
       </div>
 
     )
   }
 }
 
-const Close = ({onClickIcon, worldMessages}) => {
-  return (
-    <div className={styles.close_container}>
-      <div className={styles.first_row}>
-        <Icon type="left" onClick={onClickIcon} style={{fontSize: 20}}/>
-        {/*<div className={styles.title}>*/}
-          {/*ALL*/}
-        {/*</div>*/}
-      </div>
-      <div className={styles.messages_container}>
-
-      {worldMessages.map((worldMessage) => {
-
-        return <CloseWorldMessageItem key={worldMessage._id} worldMessage={worldMessage}/>
-      })}
-      </div>
-    </div>
-  )
-}
+// const Close = ({onClickIcon, worldMessages}) => {
+//   return (
+//     <div className={styles.close_container}>
+//       <div className={styles.first_row}>
+//         <Icon type="left" onClick={onClickIcon} style={{fontSize: 20}}/>
+//         {/*<div className={styles.title}>*/}
+//         {/*ALL*/}
+//         {/*</div>*/}
+//       </div>
+//       <div className={styles.messages_container}>
+//
+//         {worldMessages.map((worldMessage) => {
+//
+//           return <CloseWorldMessageItem key={worldMessage._id} worldMessage={worldMessage}/>
+//         })}
+//       </div>
+//     </div>
+//   )
+// }
 
 export default connect(({worldChannel}) => ({...worldChannel}))(worldChannelC)
 
