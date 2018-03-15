@@ -20,6 +20,7 @@ class Project(DynamicDocument):
     path = StringField(required=True)
     user = ReferenceField("User", required=True)
     privacy = StringField(choices=['private', 'public'], required=True)
+    overview = StringField()
 
     # optional
     description = StringField()

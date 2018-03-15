@@ -45,10 +45,11 @@
     "react-intl": "^2.4.0",
     "react-json-tree": "^0.11.0",
     "react-jupyter": "^0.1.0",
-    "react-markdown": "^2.5.1",
+    "react-markdown": "^3.3.0",
     "react-mde": "^4.0.3",
     "react-simple-chatbot": "^0.2.6",
     "rxjs": "^5.5.2",
+    "showdown": "^1.8.6",
     "socket.io-client": "^2.0.4",
     "styled-components": "^2.4.0"
   },
