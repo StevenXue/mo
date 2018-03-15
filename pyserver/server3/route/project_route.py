@@ -202,7 +202,7 @@ def create_project():
     if type == 'app':
         project = AppService.create_project(
             name, description, user_ID, tags=tags,
-            type=type, user_token=user_token, **data),
+            type=type, user_token=user_token, **data)
     else:
         project = project_service.create_project(
             name, description, user_ID, tags=tags,
