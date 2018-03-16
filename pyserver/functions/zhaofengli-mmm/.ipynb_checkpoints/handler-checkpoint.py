@@ -28,7 +28,9 @@ def handle(conf):
 
 
     result = predict('zhaofengli/flight_delay_prediction', weather_predict)
-    print(result.tolist())
+    import json
+    print(json.dumps({'weather_prediction_out1': int(result.tolist()[0])}))
+
     
 
 

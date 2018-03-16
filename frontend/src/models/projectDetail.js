@@ -1,6 +1,7 @@
 import { routerRedux } from 'dva/router'
 
 import { fetchProject, deleteProject, updateProject, forkProject } from '../services/project'
+import { fetchApp } from '../services/app'
 import { getSessions, getTerminals, deleteSession, deleteTerminal } from '../services/job'
 import { deleteLab } from '../services/notebook'
 import { privacyChoices } from '../constants'
@@ -68,9 +69,15 @@ export default {
   },
   effects: {
     // 获取该 project
-    *fetch({ projectId, notStartLab }, { call, put }) {
+    *fetch({ projectId, notStartLab, projectType }, { call, put }) {
+      const fetchMapper = {
+        app: fetchApp,
+        module: fetchProject,
+        dataset: fetchProject,
+        project: fetchProject
+      }
       // fetch and set project
-      let { data: project } = yield call(fetchProject, { projectId })
+      let { data: project } = yield call(fetchMapper[projectType], { projectId })
       yield put({ type: 'setProject', payload: project })
       // start lab backend
       const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
@@ -80,7 +87,7 @@ export default {
       }
 
       // fetch and set project
-      ({ data: project } = (yield call(fetchProject, { projectId })))
+      ({ data: project } = (yield call(fetchMapper[projectType], { projectId })))
       yield put({ type: 'setProject', payload: project })
 
       // fetch jobs
@@ -162,15 +169,17 @@ export default {
     // 当进入该页面获取project
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
-        const match = pathToRegexp('/workspace/:projectId/:anything?').exec(pathname)
-        const match2 = pathToRegexp('/market/:projectId/:anything?').exec(pathname)
+        const match = pathToRegexp('/workspace/:projectId/:type?').exec(pathname)
+        const match2 = pathToRegexp('/market/:projectId/:type?').exec(pathname)
+        let url = new URL(location.href.replace('/#', ''));
+        const projectType = url.searchParams.get('type')
         if (match) {
           const projectId = match[1]
-          dispatch({ type: 'fetch', projectId: projectId })
+          dispatch({ type: 'fetch', projectId, projectType })
           // dispatch({ type: 'fetchJobs', projectId: projectId })
         } else if (match2) {
           const projectId = match2[1]
-          dispatch({ type: 'fetch', projectId: projectId })
+          dispatch({ type: 'fetch', projectId, projectType })
         }
       })
     },
