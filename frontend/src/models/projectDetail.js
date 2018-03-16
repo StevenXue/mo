@@ -20,8 +20,24 @@ export default {
     terminals: [],
     sessions: [],
     // doneIndices: new Set([]),
+    overviewEditState:false,
   },
   reducers: {
+    showOverviewEditState(state){
+      return {
+        ...state,
+        overviewEditState:true,
+      }
+    },
+
+    hideOverviewEditState(state){
+      return {
+        ...state,
+        overviewEditState:false,
+      }
+    },
+
+
     setProject(state, { payload: project }) {
       return {
         ...state,
@@ -87,6 +103,42 @@ export default {
       }
 
       // fetch and set project
+      ({ data: project } = (yield call(fetchProject, { projectId })))
+
+      const defaultDocs = "## Overview\n" +
+        "\n" +
+        "_Provide a short overview of your algorithm that explains the value and primary use cases._\n" +
+        "\n" +
+        "## Usage\n" +
+        "\n" +
+        "### Input\n" +
+        "\n" +
+        "_Describe the input fields for your algorithm. For example:_\n" +
+        "\n" +
+        "\n" +
+        "| Parameter | Description |\n" +
+        "| --------- | ----------- |\n" +
+        "| field     | Description of field |\n" +
+        "\n" +
+        "### Output\n" +
+        "\n" +
+        "_Describe the output fields for your algorithm. For example:_\n" +
+        "\n" +
+        "\n" +
+        "| Parameter | Description | \n" +
+        "| --------- | ----------- | \n" +
+        "| field     | Description of field | \n" +
+        "\n" +
+        "## Examples\n" +
+        "\n" +
+        "_Provide and explain examples of input and output for your algorithm._\n" +
+        "\n"
+
+      if(!project.overview) {
+        project['overview']=defaultDocs
+      }
+
+      // fetch and set project
       ({ data: project } = (yield call(fetchMapper[projectType], { projectId })))
       yield put({ type: 'setProject', payload: project })
 
@@ -133,6 +185,7 @@ export default {
         onJson: () => {
           fetchData && this.props.fetchData()
           this.props.dispatch({ type: 'project/hideModal' })
+          this.props.dispatch({ type: 'projectDetail/hideOverviewEditState'})
         },
       })
       yield put({ type: 'project/hideModal' })

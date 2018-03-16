@@ -1,6 +1,6 @@
 import datetime
 
-from server3.entity.world import World
+from server3.entity.world import World, MessageType
 from server3.repository.general_repo import Repo
 from server3.business.general_business import GeneralBusiness
 
@@ -17,7 +17,9 @@ class WorldBusiness(GeneralBusiness):
             create_time=create_time,
             sender=sender,
             channel=channel,
-            message=message)
+            message=message,
+            message_type=MessageType.user
+        )
         return cls.repo.create(world)
 
     # 2. 系统发送

@@ -1,5 +1,6 @@
 import fetch from 'dva/fetch'
 import {message} from 'antd'
+import _ from 'lodash'
 
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
@@ -24,13 +25,20 @@ export default async function request(url, options) {
   const newUrl = `/pyapi${url}`
 
   // get token from storage
-  // const token = await Storage.get('token', '')
+  const token = localStorage.getItem('token')
+  if (token) {
+    if (!_.get(options, 'headers.Authorization')) {
+      _.set(options, 'headers.Authorization', 'Bearer ' + token)
+    }
+  }
 
   const defaultOptions = {
     credentials: 'include',
   }
   const newOptions = {...defaultOptions, ...options}
-  if (newOptions.method === 'POST' || newOptions.method === 'PUT') {
+  if (newOptions.method === 'POST' || newOptions.method === 'PUT' ||
+    newOptions.method === 'post' || newOptions.method === 'put'
+  ) {
     newOptions.headers = {
       "Accept": 'application/json',
       'Content-Type': 'application/json; charset=utf-8',

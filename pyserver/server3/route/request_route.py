@@ -59,8 +59,6 @@ def list_user_request():
                 each_request_info['_id'], get_number=True)
         each_request_info['user_ID'] = each_request.user.user_ID
         user_requests_info.append(each_request_info)
-    print('user_requests_info')
-    print(user_requests_info)
     return jsonify({'response': {'user_request': user_requests_info,
                                  'total_number': total_number}}), 200
 

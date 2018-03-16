@@ -20,13 +20,15 @@ from server3.service.world_service import WorldService
 from server3.business.world_business import WorldBusiness
 from server3.utility import json_utility
 # from server3.constants import Error, Warning
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
-PREFIX = '/world_message'
+PREFIX = '/world_messages'
 
 world_app = Blueprint("world_app", __name__, url_prefix=PREFIX)
 
 
 @world_app.route('', methods=['POST'])
+@jwt_required
 def send():
     """
     用户发送 世界频道消息
@@ -34,9 +36,10 @@ def send():
     :rtype:
     """
     data = request.get_json()
-    user_ID = data.pop("user_ID")
+    user_ID = get_jwt_identity()
     channel = data.pop("channel")
     message = data.pop("message")
+    print("user_ID", user_ID)
     result = WorldService.user_send(user_ID, channel, message)
     if result:
         result = json_utility.convert_to_json(result.to_mongo())
@@ -47,16 +50,27 @@ def send():
 
 @world_app.route('', methods=['GET'])
 def get():
-    data = request.get_json()
-    channel = data.pop("channel")
+    # data = request.ar()s
+    channel = request.args.get("channel")
     page_no = int(request.args.get('page_no', 1))
     page_size = int(request.args.get('page_size', 50))
     world_messages = WorldBusiness.get_pagination(
         query={"channel": channel},
         page_no=page_no, page_size=page_size)
+    for message in world_messages.objects:
+        print("message")
+        if hasattr(message, "sender") and message.sender:
+            message.sender_user_ID = message.sender.user_ID
+        else:
+            message.sender_user_ID = "system"
+
+        # if message.message_type == 'admin':
+        #     message.sender_user_ID = "system"
+        # else:
+        #     message.sender_user_ID =
     if world_messages:
         return jsonify({
             "response": {
-                "objects": json_utility.me_obj_list_to_dict_list(world_messages.objects)
+                "objects": json_utility.me_obj_list_to_json_list(world_messages.objects)
             }
         }), 200

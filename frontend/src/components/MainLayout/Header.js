@@ -78,7 +78,7 @@ function Header({location, login, history, dispatch, allRequest,message}) {
   }
   const logout = () => {
     localStorage.removeItem('token')
-    dispatch({type: 'resetUser'})
+    dispatch({type: 'login/resetUser'})
     history.push('/user/login')
   }
 

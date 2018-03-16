@@ -3,6 +3,10 @@ from server3.entity.user import User
 from server3.repository.user_repo import UserRepo
 from server3.business.general_business import GeneralBusiness
 from server3.entity.general_entity import Objects
+from server3.entity.user_request import UserRequest
+from server3.repository.user_request_repo import UserRequestRepo
+from server3.repository.project_repo import ProjectRepo
+from server3.entity.project import Project
 
 user_repo = UserRepo(User)
 
@@ -42,13 +46,43 @@ class UserBusiness(GeneralBusiness):
         return cls.repo.read_by_unique_field('user_ID', user_ID)
 
     @classmethod
-    def get_action_entity(cls, user_ID, page_no, page_size, action_entity):
+    def get_action_entity(cls, user_ID, page_no, page_size, action_entity,
+                          type, search_query):
         user = cls.get_by_user_ID(user_ID=user_ID)
         start = (page_no - 1) * page_size
         end = page_no * page_size
+        if action_entity == 'request_star':
+            list_objects = getattr(user, action_entity)
+            objectsId = [e.id for e in list_objects]
+            if search_query:
+                objects = UserRequestRepo(UserRequest). \
+                    search(search_query,
+                           q_dict={
+                               'title': 'icontains',
+                               'description': 'icontains',
+                               'tags': 'icontains'
+                           })
+            else:
+                objects = UserRequest.objects
+            objects = objects.filter(id__in=objectsId)
+            objects = objects(type=type)
+        else:
+            if search_query:
+                list_objects = getattr(user, action_entity)
+                objectsId = [e.id for e in list_objects]
+                objects = ProjectRepo(Project). \
+                    search(search_query,
+                           q_dict={
+                               'title': 'icontains',
+                               'description': 'icontains',
+                               'tags': 'icontains'
+                           })
+                objects = objects.filter(id__in=objectsId)
+            else:
+                objects = getattr(user, action_entity)
         return Objects(
-            objects=getattr(user, action_entity)[start:end],
-            count=len(getattr(user, action_entity)),
+            objects=objects[start:end],
+            count=len(objects),
             page_no=page_no,
             page_size=page_size)
 
@@ -74,7 +108,6 @@ class UserBusiness(GeneralBusiness):
     # @classmethod
     # def get_favor_apps(cls, user_ID, page_no, page_size):
     #     return cls.get(user_ID, page_no, page_size, "favor_apps")
-
 
     # method 2 对比一下 1 和 2
     # @classmethod

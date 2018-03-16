@@ -183,13 +183,13 @@ function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
       <div className={styles.starFavorDiv}>
         <div className={styles.starFavorRightDiv}>
           <Icon className={styles.bottomIcon}
-                type={project.star_users.includes(user_obj_id) ? "star" : "star-o"}
-                onClick={() => onClickStarFavor('star')}/>
-          <p className={styles.bottomNumber}>{project.star_users.length}</p>
-          <Icon className={styles.bottomIcon}
-                type={project.favor_users.includes(user_obj_id) ? "like" : "like-o"}
+                type={project.favor_users.includes(user_obj_id) ? "star" : "star-o"}
                 onClick={() => onClickStarFavor('favor')}/>
           <p className={styles.bottomNumber}>{project.favor_users.length}</p>
+          <Icon className={styles.bottomIcon}
+                type={project.star_users.includes(user_obj_id) ? "like" : "like-o"}
+                onClick={() => onClickStarFavor('star')}/>
+          <p className={styles.bottomNumber}>{project.star_users.length}</p>
         </div>
       </div>
     </div>

@@ -28,7 +28,7 @@ from server3.constants import Error
 from server3.service.user_service import UserService
 from server3.business.user_business import UserBusiness
 from server3.business.statistics_business import StatisticsBusiness
-
+from server3.service import request_answer_service
 
 PREFIX = '/user'
 
@@ -233,11 +233,20 @@ def get_action_entity():
     action_entity = request.args.get("action_entity")
     page_no = int(request.args.get('page_no', 1))
     page_size = int(request.args.get('page_size', 5))
+    type = request.args.get('type', None)
+    search_query = request.args.get('search_query', None)
     apps = UserBusiness.get_action_entity(
-        user_ID=user_ID, action_entity=action_entity,
-        page_no=page_no, page_size=page_size)
-    for app in apps.objects:
-        app.user_ID = app.user.user_ID
+        user_ID=user_ID, action_entity=action_entity, type=type,
+        page_no=page_no, page_size=page_size,search_query=search_query)
+    if action_entity != 'request_star':
+        for app in apps.objects:
+            app.user_ID = app.user.user_ID
+    else:
+        for each_request in apps.objects:
+            each_request.answer_number = \
+                request_answer_service.get_all_answer_of_this_user_request(
+                    each_request.id, get_number=True)
+            each_request.user_ID = each_request.user.user_ID
     return jsonify({
         'response': {
             "objects": json_utility.me_obj_list_to_json_list(apps.objects),

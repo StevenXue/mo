@@ -4,6 +4,7 @@ import './global.less'
 import './index.less'
 import modelling from './models/modelling'
 import projectDetail from './models/projectDetail'
+import worldChannel from './models/worldChannel'
 
 // ES6 Promise polyfill
 require('es6-promise/auto')
@@ -32,6 +33,8 @@ app.model(require('./models/message'))
 app.model(require('./models/profile'))
 app.model(modelling)
 app.model(projectDetail)
+app.model(worldChannel)
+
 
 // 通过dva g model test的，手动将这个models/test.js文件删除掉，会报错。
 // rm -r node_modules/.cache/babel-loader

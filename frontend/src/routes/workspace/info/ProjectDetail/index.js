@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link, Route, Switch, } from 'react-router-dom'
+
 import { connect } from 'dva'
 import { Button, Col, Icon, Modal, Row, Spin, Tabs, Tag, Upload } from 'antd'
 // pages
@@ -7,10 +8,14 @@ import Modelling from '../../modelling/Modelling/index'
 // components
 import ProjectModel from '../../../../components/ProjectModal/index'
 import HelpModal from '../../../../components/HelpModal'
+import ReactMdeEditor from '../../../../components/ReactMdeCom/reactMde'
 import { showTime } from '../../../../utils/index'
 import styles from './index.less'
 import _ from 'lodash'
 import { message } from 'antd/lib/index'
+import ReactMarkdown from 'react-markdown'
+
+
 
 const confirm = Modal.confirm
 const TabPane = Tabs.TabPane
@@ -27,6 +32,7 @@ const myShowTime = (time, format = 'yyyy-MM-dd hh:mm') => {
   let date = new Date(time).Format(format)
   return date.toLocaleString()
 }
+
 
 function ProjectInfo({ market_use, match, history, location, dispatch, projectDetail, login }) {
 
@@ -76,6 +82,18 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
         action: action,
         entity: projectDetail.project.type,
       },
+    })
+  }
+
+  function showOverviewEditState() {
+    dispatch({
+      type:'projectDetail/showOverviewEditState',
+    })
+  }
+
+  function hideOverviewEditState() {
+    dispatch({
+      type:'projectDetail/hideOverviewEditState',
     })
   }
 
@@ -153,20 +171,22 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
                           }}>
                     Notebook ->
                   </Button>
-
                 </span>
               </span>
             </div>
           </div>
-
           {/*content tabs*/}
-          <Tabs defaultActiveKey="2" onChange={callback} className={styles.jobs}>
+          <Tabs defaultActiveKey="1" onChange={callback} className={styles.jobs}>
             <TabPane tab="Overview" key="1">
-              Some Description
-              <br/>
-              Some Description
-              <br/>
-              Some Description
+              <div className={styles.reactMdeEditorDiv}>
+                {!projectDetail.overviewEditState?<ReactMarkdown source={projectDetail.project.overview}/>:null}
+                {projectDetail.overviewEditState?<ReactMdeEditor
+                  projectDetail={projectDetail} dispatch={dispatch}/>:null}
+                {!projectDetail.overviewEditState?<div style={{"textAlign":"center"}}><Button
+                  type='primary' style={{ marginRight: 15 }}
+                  onClick={() => {showOverviewEditState()}}>EDIT DESCRIPTION</Button></div>:null}
+              </div>
+
             </TabPane>
             <TabPane tab="Jobs" key="2">
               <Jobs projectDetail={projectDetail} dispatch={dispatch}/>
