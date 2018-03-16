@@ -3,7 +3,7 @@ import { routerRedux } from 'dva/router'
 import { fetchProject, deleteProject, updateProject, forkProject } from '../services/project'
 import { fetchApp } from '../services/app'
 import { getSessions, getTerminals, deleteSession, deleteTerminal } from '../services/job'
-import { deleteLab } from '../services/notebook'
+import { deleteLab, startLab } from '../services/notebook'
 import { privacyChoices } from '../constants'
 import pathToRegexp from 'path-to-regexp'
 import { get } from 'lodash'
@@ -11,7 +11,6 @@ import { hubPrefix } from '../utils/config'
 import * as dataAnalysisService from '../services/dataAnalysis'
 import { message } from 'antd/lib/index'
 
-import { startLabBack } from './modelling'
 import * as UserStarFavorService from '../services/user'
 
 export default {
@@ -20,23 +19,22 @@ export default {
     terminals: [],
     sessions: [],
     // doneIndices: new Set([]),
-    overviewEditState:false,
+    overviewEditState: false,
   },
   reducers: {
-    showOverviewEditState(state){
+    showOverviewEditState(state) {
       return {
         ...state,
-        overviewEditState:true,
+        overviewEditState: true,
       }
     },
 
-    hideOverviewEditState(state){
+    hideOverviewEditState(state) {
       return {
         ...state,
-        overviewEditState:false,
+        overviewEditState: false,
       }
     },
-
 
     setProject(state, { payload: project }) {
       return {
@@ -81,15 +79,15 @@ export default {
         project: action.payload.project,
       }
     },
-    changeOverview(state, action){
+    changeOverview(state, action) {
       return {
         ...state,
         project: {
           ...state.project,
-          overview:action.payload.overview,
-        }
+          overview: action.payload.overview,
+        },
       }
-    }
+    },
 
   },
   effects: {
@@ -99,7 +97,7 @@ export default {
         app: fetchApp,
         module: fetchProject,
         dataset: fetchProject,
-        project: fetchProject
+        project: fetchProject,
       }
       // fetch and set project
       let { data: project } = yield call(fetchMapper[projectType], { projectId })
@@ -107,48 +105,49 @@ export default {
       // start lab backend
       const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
       const hubToken = project.hub_token
-      if(!notStartLab) {
-        yield call(startLabBack, { payload: { hubUserName, hubToken } }, { call })
-        // fetch and set project
-        ({ data: project } = (yield call(fetchMapper[projectType], { projectId })))
+      if (!notStartLab) {
+        yield call(startLab, { hubUserName, hubToken })
+        // fetch and set project for tb_port restarted by startLab
+        project = (yield call(fetchMapper[projectType], { projectId })).data
         yield put({ type: 'setProject', payload: project })
       }
 
-      const defaultDocs = {'text':"## Overview\n" +
-        "\n" +
-        "_Provide a short overview of your algorithm that explains the value and primary use cases._\n" +
-        "\n" +
-        "## Usage\n" +
-        "\n" +
-        "### Input\n" +
-        "\n" +
-        "_Describe the input fields for your algorithm. For example:_\n" +
-        "\n" +
-        "\n" +
-        "| Parameter | Description |\n" +
-        "| --------- | ----------- |\n" +
-        "| field     | Description of field |\n" +
-        "\n" +
-        "### Output\n" +
-        "\n" +
-        "_Describe the output fields for your algorithm. For example:_\n" +
-        "\n" +
-        "\n" +
-        "| Parameter | Description | \n" +
-        "| --------- | ----------- | \n" +
-        "| field     | Description of field | \n" +
-        "\n" +
-        "## Examples\n" +
-        "\n" +
-        "_Provide and explain examples of input and output for your algorithm._\n" +
-        "\n"}
-
-
-      if(!project.overview) {
-        project['overview']=defaultDocs
+      const defaultDocs = {
+        'text': '## Overview\n' +
+        '\n' +
+        '_Provide a short overview of your algorithm that explains the value and primary use cases._\n' +
+        '\n' +
+        '## Usage\n' +
+        '\n' +
+        '### Input\n' +
+        '\n' +
+        '_Describe the input fields for your algorithm. For example:_\n' +
+        '\n' +
+        '\n' +
+        '| Parameter | Description |\n' +
+        '| --------- | ----------- |\n' +
+        '| field     | Description of field |\n' +
+        '\n' +
+        '### Output\n' +
+        '\n' +
+        '_Describe the output fields for your algorithm. For example:_\n' +
+        '\n' +
+        '\n' +
+        '| Parameter | Description | \n' +
+        '| --------- | ----------- | \n' +
+        '| field     | Description of field | \n' +
+        '\n' +
+        '## Examples\n' +
+        '\n' +
+        '_Provide and explain examples of input and output for your algorithm._\n' +
+        '\n',
       }
-      else{
-        project['overview']={'text':project['overview']}
+
+      if (!project.overview) {
+        project['overview'] = defaultDocs
+      }
+      else {
+        project['overview'] = { 'text': project['overview'] }
       }
 
       yield put({ type: 'setProject', payload: project })
@@ -196,7 +195,7 @@ export default {
         onJson: () => {
           fetchData && this.props.fetchData()
           this.props.dispatch({ type: 'project/hideModal' })
-          this.props.dispatch({ type: 'projectDetail/hideOverviewEditState'})
+          this.props.dispatch({ type: 'projectDetail/hideOverviewEditState' })
         },
       })
       yield put({ type: 'project/hideModal' })
@@ -235,7 +234,7 @@ export default {
       return history.listen(({ pathname }) => {
         const match = pathToRegexp('/workspace/:projectId/:type?').exec(pathname)
         const match2 = pathToRegexp('/market/:projectId/:type?').exec(pathname)
-        let url = new URL(location.href.replace('/#', ''));
+        let url = new URL(location.href.replace('/#', ''))
         const projectType = url.searchParams.get('type')
         if (match) {
           const projectId = match[1]
