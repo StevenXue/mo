@@ -240,6 +240,9 @@ class ProjectBusiness:
         # generate project dir
         project_path = cls.gen_dir(user_ID, name)
 
+        # init git repo
+        cls.init_git_repo(user_ID, name)
+
         # auth jupyterhub with user token
         res = cls.auth_hub_user(user_ID, name, user_token)
 

@@ -100,10 +100,10 @@ export default {
       const hubToken = project.hub_token
       if(!notStartLab) {
         yield call(startLabBack, { payload: { hubUserName, hubToken } }, { call })
+        // fetch and set project
+        ({ data: project } = (yield call(fetchMapper[projectType], { projectId })))
+        yield put({ type: 'setProject', payload: project })
       }
-
-      // fetch and set project
-      ({ data: project } = (yield call(fetchProject, { projectId })))
 
       const defaultDocs = "## Overview\n" +
         "\n" +
@@ -138,8 +138,6 @@ export default {
         project['overview']=defaultDocs
       }
 
-      // fetch and set project
-      ({ data: project } = (yield call(fetchMapper[projectType], { projectId })))
       yield put({ type: 'setProject', payload: project })
 
       // fetch jobs
