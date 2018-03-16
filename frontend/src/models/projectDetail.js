@@ -81,6 +81,15 @@ export default {
         project: action.payload.project,
       }
     },
+    changeOverview(state, action){
+      return {
+        ...state,
+        project: {
+          ...state.project,
+          overview:action.payload.overview,
+        }
+      }
+    }
 
   },
   effects: {
@@ -105,7 +114,7 @@ export default {
         yield put({ type: 'setProject', payload: project })
       }
 
-      const defaultDocs = "## Overview\n" +
+      const defaultDocs = {'text':"## Overview\n" +
         "\n" +
         "_Provide a short overview of your algorithm that explains the value and primary use cases._\n" +
         "\n" +
@@ -132,10 +141,14 @@ export default {
         "## Examples\n" +
         "\n" +
         "_Provide and explain examples of input and output for your algorithm._\n" +
-        "\n"
+        "\n"}
+
 
       if(!project.overview) {
         project['overview']=defaultDocs
+      }
+      else{
+        project['overview']={'text':project['overview']}
       }
 
       yield put({ type: 'setProject', payload: project })

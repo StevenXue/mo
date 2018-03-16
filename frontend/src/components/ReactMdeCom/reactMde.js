@@ -3,35 +3,36 @@ import ReactDOM from 'react-dom'
 import ReactMde, {ReactMdeTypes, ReactMdeCommands} from 'react-mde'
 import 'react-mde/lib/styles/css/react-mde-all.css'
 import {updateProject} from "../../services/project"
-import { Button} from 'antd'
-
+import {Button} from 'antd'
+import {connect} from "dva"
+import { get } from 'lodash'
 
 class ReactMdeEditor extends React.Component {
-
 
   constructor(props) {
     super(props)
     this.state = {
       reactMdeValue: {
-        text: this.props.projectDetail.project.overview
-      }
+        text: get(this.props.projectDetail, 'project.overview.text')
+      },
+      modifyState: false,
     }
   }
-
-
 
   componentDidMount() {
   }
 
   editOverview() {
     const body = {
-      overview: this.state.reactMdeValue.text
+      overview: this.props.projectDetail.project.overview.text
     }
+
     updateProject({
       body,
       projectId: this.props.projectDetail.project._id,
       onJson: () => {
         this.props.dispatch({type: 'projectDetail/hideOverviewEditState'})
+        this.changeEditOverviewState()
         this.props.dispatch({
           type: 'projectDetail/fetch',
           projectId: this.props.projectDetail.project._id,
@@ -41,13 +42,18 @@ class ReactMdeEditor extends React.Component {
     })
   }
 
-  cancelEditOverview(){
-    this.props.dispatch({type: 'projectDetail/hideOverviewEditState'})
+
+  changeEditOverviewState() {
+    this.setState({modifyState: !this.state.modifyState})
   }
 
   handleValueChange = (value: ReactMdeTypes.Value) => {
-    this.setState({reactMdeValue: value})
-    console.log(this.state.reactMdeValue.text)
+    this.props.dispatch({
+      type: 'projectDetail/changeOverview',
+      payload :{
+        overview:value
+      }
+    })
   }
 
   render() {
@@ -58,19 +64,32 @@ class ReactMdeEditor extends React.Component {
             id: "ta1",
             name: "ta1",
           }}
-          value={this.state.reactMdeValue}
+          value={get(this.props.projectDetail, 'project.overview')}
           onChange={this.handleValueChange}
           commands={ReactMdeCommands.getDefaultCommands()}
           showdownOptions={{tables: true, simplifiedAutoLink: true}}
+          visibility={{
+            toolbar: this.state.modifyState,
+            textarea: this.state.modifyState,
+            previewHelp: false
+          }}
         />
-        <Button type='primary' style={{ marginRight: 15 }}
-                onClick={() => {this.editOverview()}}>OK</Button>
-        <Button onClick={() => {this.cancelEditOverview()}}>Cancel</Button>
+        {this.state.modifyState?<div style={{"textAlign":"center","marginTop":"15px"}}>
+        <Button type='primary' style={{marginRight: 15}}
+                onClick={() => {
+                  this.editOverview()
+                }}>OK</Button>
+        <Button onClick={() => {
+          this.changeEditOverviewState()
+        }}>Cancel</Button>
+        </div>:null}
+        {!this.state.modifyState?<div style={{"textAlign":"center"}}><Button
+          type='primary' style={{ marginRight: 15 }}
+          onClick={() => {this.changeEditOverviewState()}}>EDIT DESCRIPTION</Button></div>:null}
       </div>
     )
   }
 }
 
-
-export default ReactMdeEditor
+export default connect(({ projectDetail }) => ({ projectDetail }))(ReactMdeEditor)
 
