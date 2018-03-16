@@ -29,6 +29,10 @@ class GeneralBusiness:
         return cls.repo.read_by_id(object_id=object_id)
 
     @classmethod
+    def read_unique_one(cls, **kwargs):
+        return cls.repo.read_unique_one(kwargs)
+
+    @classmethod
     def get_pagination(cls, query, page_no, page_size):
         start = (page_no - 1) * page_size
         end = page_no * page_size

@@ -58,6 +58,7 @@ class Module(Project):
     module_path = StringField()
     input = DictField()
     output = DictField()
+    repo_path = StringField()
 
 
 RE_TYPE = (

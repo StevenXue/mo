@@ -50,6 +50,13 @@ class AppService(ProjectService):
             input_json=input_json, output_json=output_json)
         return output_json
 
+    @classmethod
+    def insert_envs(cls, user_ID, app_name):
+        user = UserBusiness.get_by_user_ID(user_ID)
+        app = AppBusiness.read_unique_one(name=app_name, user=user)
+        for module in app.used_modules:
+            AppBusiness.insert_module_env(app, module)
+
     # @classmethod
     # def add_used_app(cls, user_ID, app_id):
     #     user = UserBusiness.get_by_user_ID(user_ID=user_ID)

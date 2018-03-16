@@ -1,20 +1,21 @@
 import React from 'react'
-import { Link, Route, Switch, } from 'react-router-dom'
+import {Link, Route, Switch,} from 'react-router-dom'
 
-import { connect } from 'dva'
-import { Button, Col, Icon, Modal, Row, Spin, Tabs, Tag, Upload } from 'antd'
+import {connect} from 'dva'
+import {Button, Col, Icon, Modal, Row, Spin, Tabs, Tag, Upload} from 'antd'
 // pages
 import Modelling from '../../modelling/Modelling/index'
 // components
 import ProjectModel from '../../../../components/ProjectModal/index'
 import HelpModal from '../../../../components/HelpModal'
 import ReactMdeEditor from '../../../../components/ReactMdeCom/reactMde'
-import { showTime } from '../../../../utils/index'
-import styles from './index.less'
-import _ from 'lodash'
-import { message } from 'antd/lib/index'
-import ReactMarkdown from 'react-markdown'
+import ProjectExample from '../../../../components/ProjectExample/projectExample'
 
+import {showTime} from '../../../../utils/index'
+import styles from './index.less'
+import { get } from 'lodash'
+import {message} from 'antd/lib/index'
+import ReactMarkdown from 'react-markdown'
 
 
 const confirm = Modal.confirm
@@ -34,11 +35,13 @@ const myShowTime = (time, format = 'yyyy-MM-dd hh:mm') => {
 }
 
 
-function ProjectInfo({ market_use, match, history, location, dispatch, projectDetail, login }) {
+function ProjectInfo({market_use, match, history, location, dispatch, projectDetail, login}) {
 
   const projectId = match.params.projectId
   const user_ID = localStorage.getItem('user_ID')
-  const userObjId = _.get(login, 'user._id')
+  const userObjId = localStorage.getItem('user_obj_id')
+  const projectOwner = get(projectDetail, 'project.user')
+  const projectOwnerOrNot = (projectOwner === userObjId)
 
   const props1 = {
     name: 'file',
@@ -69,7 +72,7 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
       okType: 'danger',
       cancelText: 'No',
       onOk() {
-        dispatch({ type: 'projectDetail/delete', payload: { projectId } })
+        dispatch({type: 'projectDetail/delete', payload: {projectId}})
       },
     })
   }
@@ -87,13 +90,13 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
 
   function showOverviewEditState() {
     dispatch({
-      type:'projectDetail/showOverviewEditState',
+      type: 'projectDetail/showOverviewEditState',
     })
   }
 
   function hideOverviewEditState() {
     dispatch({
-      type:'projectDetail/hideOverviewEditState',
+      type: 'projectDetail/hideOverviewEditState',
     })
   }
 
@@ -104,7 +107,8 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
   if (location.pathname.split('/').length > 3) {
     // project 4 step pages
     return (
-      <ProjectDetail match={match} history={history} location={location} projectDetail={projectDetail}
+      <ProjectDetail match={match} history={history} location={location}
+                     projectDetail={projectDetail}
                      dispatch={dispatch}/>
     )
   } else {
@@ -116,29 +120,31 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
       return (
         <div className={`main-container ${styles.normal}`}>
           {components.includes('help-modal') &&
-          <HelpModal visible={!projectDetail.project.entered} projectType={projectDetail.project.type}/>}
+          <HelpModal visible={!projectDetail.project.entered}
+                     projectType={projectDetail.project.type}/>}
           <div className={styles.info}>
             {/*info head*/}
             <div className={styles.name}>
               <h1>
-                {market_use && <Icon
+                {!projectOwnerOrNot && <Icon
                   // type="star"
                   type={projectDetail.project.favor_users.includes(userObjId) ? 'star' : 'star-o'}
-                  style={{ fontSize: '22px', color: '#34c0e2' }}
+                  style={{fontSize: '22px', color: '#34c0e2'}}
                   onClick={() => appStarFavor('favor')}/>}
                 {projectDetail.project.name}&nbsp;
-                {!market_use && <Icon type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
-                                      style={{ fontSize: 20 }}/>}
-                {!market_use && <span className={styles.rightButton}>
+                {projectOwnerOrNot && <Icon
+                  type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
+                  style={{fontSize: 20}}/>}
+                {projectOwnerOrNot && <span className={styles.rightButton}>
                   <ProjectModel new={false} projectDetail={projectDetail}
                   >
-                    <Button icon='edit' style={{ marginRight: 15 }}/>
+                    <Button icon='edit' style={{marginRight: 15}}/>
                   </ProjectModel>
                   <Button icon='delete' onClick={() => deleteProject()}/>
                 </span>}
               </h1>
-              <p className={styles.text} style={{ fontSize: 14, marginTop: 6 }}>
-                <Icon type="clock-circle-o" style={{ marginRight: 10 }}/>
+              <p className={styles.text} style={{fontSize: 14, marginTop: 6}}>
+                <Icon type="clock-circle-o" style={{marginRight: 10}}/>
                 Create Time: {showTime(projectDetail.project.create_time)}
               </p>
             </div>
@@ -151,18 +157,18 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
               <div className={styles.tags}>
                 {projectDetail.project.tags.length > 0 ? projectDetail.project.tags.map(e =>
                     <Tag color="#EEEEEE"
-                         style={{ color: '#666666' }}
+                         style={{color: '#666666'}}
                          key={e}>{e}</Tag>)
-                  : <p style={{ color: 'rgba(0,0,0,0.54)' }}>(no tags)</p>}
+                  : <p style={{color: 'rgba(0,0,0,0.54)'}}>(no tags)</p>}
               </div>
               <span>
-                <span className={styles.generalSpan}>
+                {projectOwnerOrNot && <span className={styles.generalSpan}>
                 <Upload {...props1}>
                   <Button>
                     <Icon type="upload"/> Click to Upload
                   </Button>
                 </Upload>
-                </span>
+                </span>}
                 <span className={styles.enterNotebook}>
                   <Button type="primary"
                           onClick={() => {
@@ -176,30 +182,24 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
             </div>
           </div>
           {/*content tabs*/}
-          <Tabs defaultActiveKey="1" onChange={callback} className={styles.jobs}>
+          <Tabs defaultActiveKey="3" onChange={callback}
+                className={styles.jobs}>
             <TabPane tab="Overview" key="1">
               <div className={styles.reactMdeEditorDiv}>
-                {!projectDetail.overviewEditState?<ReactMarkdown source={projectDetail.project.overview}/>:null}
-                {projectDetail.overviewEditState?<ReactMdeEditor
-                  projectDetail={projectDetail} dispatch={dispatch}/>:null}
-                {!projectDetail.overviewEditState?<div style={{"textAlign":"center"}}><Button
-                  type='primary' style={{ marginRight: 15 }}
-                  onClick={() => {showOverviewEditState()}}>EDIT DESCRIPTION</Button></div>:null}
+                {/*{!projectDetail.overviewEditState?<ReactMarkdown source={projectDetail.project.overview}/>:null}*/}
+                {/*{projectDetail.overviewEditState?<ReactMdeEditor*/}
+                {/*projectDetail={projectDetail} dispatch={dispatch}/>:null}*/}
+                <ReactMdeEditor
+                  projectDetail={projectDetail} dispatch={dispatch}/>
               </div>
-
             </TabPane>
-            <TabPane tab="Jobs" key="2">
+            {projectOwnerOrNot && <TabPane tab="Jobs" key="2">
               <Jobs projectDetail={projectDetail} dispatch={dispatch}/>
-            </TabPane>
+            </TabPane>}
             <TabPane tab="Examples" key="3">
-              Some Description
-              <br/>
-              Some Description
-              <br/>
-              Some Description
+              <ProjectExample projectDetail={projectDetail} dispatch={dispatch}/>
             </TabPane>
           </Tabs>
-
         </div>
       )
     }
@@ -207,12 +207,14 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
   }
 }
 
-const Jobs = ({ projectDetail, dispatch }) => {
+const Jobs = ({projectDetail, dispatch}) => {
   return (
     <div>
       <h2>Jobs:
         <span className={styles.rightButton}>
-                     <Button onClick={() => {window.open(`http://localhost:${projectDetail.project.tb_port}`)}}>
+                     <Button onClick={() => {
+                       window.open(`http://localhost:${projectDetail.project.tb_port}`)
+                     }}>
                        Jobs Visualization
                      </Button>
                 </span>
@@ -238,7 +240,10 @@ const Jobs = ({ projectDetail, dispatch }) => {
             <div className={styles.jobContainer}>
               <h4>{job.path}
                 <Icon className={styles.shutDown} type='close'
-                      onClick={() => dispatch({ type: 'projectDetail/closeSession', sessionId: job.id })}/>
+                      onClick={() => dispatch({
+                        type: 'projectDetail/closeSession',
+                        sessionId: job.id
+                      })}/>
               </h4>
               <p className={styles.jobInfo}>
                 <span className={blobDict[job.kernel.execution_state]}/>
@@ -256,7 +261,10 @@ const Jobs = ({ projectDetail, dispatch }) => {
             <div className={styles.jobContainer}>
               <h4>{'Terminal/'}{job.name}
                 <Icon className={styles.shutDown} type='close'
-                      onClick={() => dispatch({ type: 'projectDetail/closeSession', terminalName: job.name })}/>
+                      onClick={() => dispatch({
+                        type: 'projectDetail/closeSession',
+                        terminalName: job.name
+                      })}/>
               </h4>
             </div>
           </div>)}
@@ -270,7 +278,7 @@ ProjectInfo.defaultProps = {
   market_use: false,
 }
 
-function ProjectDetail({ match, history, location, dispatch, projectDetail }) {
+function ProjectDetail({match, history, location, dispatch, projectDetail}) {
 
   return (
     <div className={`main-container ${styles.normal}`}>
@@ -294,4 +302,7 @@ function ProjectDetail({ match, history, location, dispatch, projectDetail }) {
   )
 }
 
-export default connect(({ projectDetail, login }) => ({ projectDetail, login }))(ProjectInfo)
+export default connect(({projectDetail, login}) => ({
+  projectDetail,
+  login
+}))(ProjectInfo)

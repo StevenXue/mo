@@ -14,12 +14,26 @@ from server3.business.app_business import AppBusiness
 from server3.business.module_business import ModuleBusiness
 from server3.business.user_business import UserBusiness
 
-from server3.constants import Error, ErrorMessage
+from server3.constants import Error, ErrorMessage, GIT_SERVER
 from server3.entity.general_entity import UserEntity
 from server3.business.user_request_business import UserRequestBusiness
 from server3.business.data_set_business import DatasetBusiness
 
+
+def add_git_http_user(user_ID, password):
+    """
+    auth jupyterhub with user token
+    :param user_ID:
+    :param password:
+    :param user_token:
+    :return: dict of res json
+    """
+    return requests.post(f'{GIT_SERVER}/git/{user_ID}',
+                         json={'password': password})
+
+
 def add(user_ID, password, kwargs):
+    add_git_http_user(user_ID, password)
     hashed_password = generate_password_hash(password)
     return user_business.add(user_ID, hashed_password, kwargs)
 

@@ -91,13 +91,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         client = docker.from_env()
         # copy module yaml to app yaml
         for module in used_modules:
-            # copy venv
-            # TODO instead, using docker run to add venv
-            # call(['bash', 'add_venv.sh', os.path.abspath(dst)])
-            user_ID = module.user.user_ID
-            container = client.containers.get(f'jupyter-{user_ID}_2B{app.name}')
-            print(container.exec_run(['/bin/bash', '/home/jovyan/add_venv.sh',
-                                      f'{user_ID}/{module.name}']).decode('ascii'))
+            cls.insert_module_env(app, module)
             # copy yaml
             func_args = module.to_mongo()['args'][func]
             output_args = module.to_mongo()['output'].get(func, {})
@@ -120,6 +114,15 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
                 yaml.dump({'input': args, 'output': output}, stream,
                           default_flow_style=False)
         return cls.repo.add_to_set(app_id, used_modules=used_modules)
+
+    @staticmethod
+    def insert_module_env(app, module):
+        client = docker.from_env()
+        # copy venv
+        user_ID = module.user.user_ID
+        container = client.containers.get(f'jupyter-{user_ID}_2B{app.name}')
+        print(container.exec_run(['/bin/bash', '/home/jovyan/add_venv.sh',
+                                  f'{user_ID}/{module.name}']).decode('ascii'))
 
     @classmethod
     def replace_dup_n_update(cls, args, func_args, module_name):

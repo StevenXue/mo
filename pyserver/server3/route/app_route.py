@@ -51,6 +51,14 @@ def add_used_module(app_id):
     return jsonify({"response": json_utility.convert_to_json(app.to_mongo())})
 
 
+@app_app.route("/insert_envs/<project_name>", methods=["PUT"])
+# @jwt_required
+def insert_envs(project_name):
+    [user_ID, app_name] = project_name.split('+')
+    AppService.insert_envs(user_ID, app_name)
+    return jsonify({"response": f'insert_envs success {project_name}'})
+
+
 @app_app.route("/nb_to_script/<app_id>", methods=["POST"])
 @jwt_required
 def nb_to_script(app_id):

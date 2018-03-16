@@ -4,12 +4,15 @@ import shutil
 import subprocess
 from importlib import import_module
 from datetime import datetime
-
+from git import Repo as GRepo
+from distutils.dir_util import copy_tree
 # from server3.entity.module import Module
 from server3.entity import project
 from server3.repository.general_repo import Repo
 from server3.business.project_business import ProjectBusiness
 from server3.constants import MODULE_DIR
+from server3.constants import GIT_SERVER_IP
+
 # module_repo = Repo(Module)
 
 tail_path = 'src/module_spec.yml'
@@ -60,21 +63,45 @@ class ModuleBusiness(ProjectBusiness):
             tags = []
         user_ID = user.user_ID
 
+        # user_path = os.path.join(USER_DIR, user_ID)
+        # project_path = os.path.join(USER_DIR, user_ID, name)
+
         # generate project dir
         project_path = cls.gen_dir(user_ID, name)
+
+        # init git repo
+        cls.init_git_repo(user_ID, name)
+
+        # clone to project dir
+        repo = GRepo.clone_from(
+            f'root@{GIT_SERVER_IP}:/var/www/user_repos/{user_ID}/{name}',
+            project_path)
+
+        # create template
+        # TODO real template and new template method
+        copy_tree(
+            '/Users/zhaofengli/projects/goldersgreen/pyserver/server3/lib/modules/zhaofengli/sesese',
+            project_path)
+        # add all
+        repo.git.add(A=True)
+        # initial commit
+        repo.index.commit('Initial Commit')
+        repo.remote(name='origin').push()
 
         # auth jupyterhub with user token
         res = cls.auth_hub_user(user_ID, name, user_token)
 
         # create a new project object
         create_time = datetime.utcnow()
-        return cls.repo.create_one(name=name, description=description,
-                                   create_time=create_time,
-                                   update_time=create_time,
-                                   type=type, tags=tags,
-                                   hub_token=res.get('token'),
-                                   path=project_path, user=user,
-                                   privacy=privacy, category=category)
+        return cls.repo.create_one(
+            name=name, description=description,
+            create_time=create_time,
+            update_time=create_time,
+            type=type, tags=tags,
+            hub_token=res.get('token'),
+            path=project_path, user=user,
+            privacy=privacy, category=category,
+            repo_path=f'http://{GIT_SERVER_IP}/repos/{user_ID}/{name}')
 
     @classmethod
     def get_by_id(cls, project_id, yml=False):
