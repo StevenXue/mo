@@ -5,7 +5,7 @@ import {Tabs, Input, Icon} from 'antd'
 import {WorldMessages, CloseWorldMessageItem} from './index'
 import styles from './index.less'
 
-class worldChannelC extends React.Component {
+class worldChannelC extends Component {
 
   componentDidMount() {
     // To disabled submit button at the beginning.
@@ -21,10 +21,10 @@ class worldChannelC extends React.Component {
     const {worldMessages, onClickIcon, isRight, dispatch, login} = this.props
     if (!login.user) {
       return (
-        <div />
+        <div/>
       )
     }
-    else{
+    else {
       return <Open worldMessages={worldMessages}
                    onClickIcon={onClickIcon}
                    dispatch={dispatch}
@@ -32,32 +32,17 @@ class worldChannelC extends React.Component {
 
       />
     }
-
-
-
-
-    // return isRight ?
-    //   <Open worldMessages={worldMessages} onClickIcon={onClickIcon}
-    //         dispatch={dispatch}
-    //   /> :
-    //   <Close worldMessages={worldMessages} onClickIcon={onClickIcon}/>
   }
 }
 
 
-class Open extends React.Component {
+class Open extends Component {
   constructor(props) {
     super(props)
     this.state = {}
   }
 
   componentDidMount() {
-    // this.props.dispatch({
-    //   type: "worldChannel/getWorldMessages",
-    //   payload: {
-    //     channel: "request"
-    //   }
-    // })
     this.scrollToBottom()
   }
 
@@ -112,10 +97,6 @@ class Open extends React.Component {
               />
             </div>
         }
-
-
-        {/*<div className={styles.black_line}/>*/}
-
         <WorldMessages
           worldMessages={worldMessages}
           ref1={(el) => {
@@ -129,6 +110,8 @@ class Open extends React.Component {
             <Input
               placeholder="输入"
               onPressEnter={this.handleSendMessage}
+              // ref="myInput"
+              // ref={(el) => this.input = el}
             />
 
             <img
@@ -141,37 +124,16 @@ class Open extends React.Component {
                 alignItem: "center"
               }}
               src={require('../../img/icon/aircraft.png')}
-              // onClick={this.handleSendMessage}
+              onClick={()=>{}}
             />
 
           </div>
         }
-
       </div>
 
     )
   }
 }
-
-// const Close = ({onClickIcon, worldMessages}) => {
-//   return (
-//     <div className={styles.close_container}>
-//       <div className={styles.first_row}>
-//         <Icon type="left" onClick={onClickIcon} style={{fontSize: 20}}/>
-//         {/*<div className={styles.title}>*/}
-//         {/*ALL*/}
-//         {/*</div>*/}
-//       </div>
-//       <div className={styles.messages_container}>
-//
-//         {worldMessages.map((worldMessage) => {
-//
-//           return <CloseWorldMessageItem key={worldMessage._id} worldMessage={worldMessage}/>
-//         })}
-//       </div>
-//     </div>
-//   )
-// }
 
 export default connect(({login, worldChannel}) => ({login, ...worldChannel}))(worldChannelC)
 

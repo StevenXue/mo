@@ -22,6 +22,17 @@ class AppService(ProjectService):
 
     @classmethod
     def run_app(cls, app_id, input_json, user_ID):
+        """
+
+        :param app_id: app id
+        :type app_id: ObjectId
+        :param input_json:
+        :type input_json:
+        :param user_ID:
+        :type user_ID:
+        :return:
+        :rtype:
+        """
         app = AppBusiness.get_by_id(project_id=app_id)
         url = app.user.user_ID+"-"+app.name
         domin = "http://192.168.31.23:8080/function/"
