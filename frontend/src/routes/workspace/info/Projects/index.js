@@ -13,11 +13,12 @@ const Search = Input.Search
 const TabPane = Tabs.TabPane
 
 function Projects({ history, project, dispatch ,location}) {
+  const defaultActiveKeyDic = {"?App":"1","?Module":"2","?Dataset":"3"}
+  const paramList = Object.keys(defaultActiveKeyDic)
 
   function callback(key) {
-    // console.log(key)
+    history.push(`workspace${paramList[parseInt(key)-1]}`)
   }
-  let defaultActiveKeyDic = {"?App":"1","?Module":"2","?Dataset":"3"}
   return (
     <div className={`main-container ${styles.normal}`}>
       <Tabs defaultActiveKey={defaultActiveKeyDic[location.search]}
@@ -89,8 +90,8 @@ class ProjectList extends Component {
     this.fetchData({ payload: { query: value } })
   }
 
-  toProjectDetail(id, history) {
-    history.push(`/workspace/${id}`)
+  toProjectDetail(id, history, type) {
+    history.push(`/workspace/${id}?type=${type}`)
   }
 
   render() {
@@ -118,7 +119,7 @@ class ProjectList extends Component {
             <Card key={e._id} className={styles.card}
                   title={<h3>{e.name}</h3>}
                   extra={e.is_private && <Icon type="lock"/>}
-                  onClick={() => this.toProjectDetail(e._id, history)} style={{ cursor: 'pointer' }}>
+                  onClick={() => this.toProjectDetail(e._id, history, e.type)} style={{ cursor: 'pointer' }}>
               <div>
                 <p className={styles.des}>{e.description}</p>
                 <p className={styles.other}>

@@ -22,6 +22,7 @@ from server3.repository.project_repo import ProjectRepo
 from server3.business import user_business
 from server3.constants import USER_DIR
 from server3.constants import HUB_SERVER
+from server3.constants import GIT_SERVER
 from server3.constants import ADMIN_TOKEN
 from server3.entity.general_entity import Objects
 PAGE_NO = 1
@@ -130,6 +131,16 @@ class ProjectBusiness:
                              json={'username': user_ID + '+' + project_name,
                                    'password': user_token}
                              ).json()
+
+    @staticmethod
+    def init_git_repo(user_ID, repo_name):
+        """
+        auth jupyterhub with user token
+        :param user_ID:
+        :param repo_name:
+        :return: dict of res json
+        """
+        return requests.post(f'{GIT_SERVER}/git/{user_ID}/{repo_name}')
 
     @staticmethod
     def delete_hub_user(user_ID, project_name):
