@@ -95,4 +95,5 @@
   --jp-icon-settings: url('icons/jupyter/settings.svg');
   --jp-about-header-logo: url('icons/jupyter/jupyter.svg');
   --jp-about-header-wordmark: url('images/jupyterlab-wordmark.svg');
+  --jp-commit: url('images/commit.svg');
 }

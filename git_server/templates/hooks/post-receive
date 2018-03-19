@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# An example hook script to prepare a packed repository for use over
+# dumb transports.
+#
+# To enable this hook, rename this file to "post-receive".
+echo 'hook start'
+GIT_SERVER_DIR=/root/git_server/
+cd ${GIT_SERVER_DIR}
+python3.6 messager.py
+echo 'hook end'

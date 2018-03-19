@@ -33,7 +33,7 @@ import '../style/index.css';
 /**
  * The class name added to toolbar deploy button.
  */
-const TOOLBAR_DEPLOY_CLASS = 'jp-LauncherIcon';
+const TOOLBAR_COMMIT_CLASS = 'jp-CommitIcon';
 
 /**
  * Initialization data for the moduledeploy-extension extension.
@@ -77,7 +77,7 @@ export function createDeployButton(): ToolbarButton {
   if (match) {
     let projectId = match[1];
     return new ToolbarButton({
-      className: TOOLBAR_DEPLOY_CLASS,
+      className: TOOLBAR_COMMIT_CLASS,
       onClick: () => {
         return showDialog({
           title: 'Commit ' + document.title.split(' - ')[0],
