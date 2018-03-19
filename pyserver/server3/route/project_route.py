@@ -16,6 +16,8 @@ from kubernetes import client
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server3.service import project_service
+from server3.service import message_service
+from server3.service.project_service import ProjectService
 from server3.service import ownership_service
 from server3.service.app_service import AppService
 from server3.business.project_business import ProjectBusiness
@@ -319,4 +321,15 @@ def commit(project_id):
     data = request.get_json()
     commit_msg = data.get('commit_msg')
     ProjectBusiness.commit(project_id, commit_msg)
+    return jsonify({"response": 1})
+
+
+@project_app.route("/commit_broadcast/<project_id>", methods=["POST"])
+def commit_broadcast(project_id):
+    project = ProjectBusiness.get_by_id(project_id)
+    # ProjectBusiness.commit(project_id, commit_msg)
+    receivers = project.star_users # get app subscriber
+    # commits = ProjectBusiness.get_commits(project.path)
+    message_service.create_message(ObjectId('592f8775df86b2e82f9788cf'),
+                                   'commit', receivers, project.user)
     return jsonify({"response": 1})

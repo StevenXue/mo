@@ -1,8 +1,10 @@
 # -*- coding: UTF-8 -*-
 import eventlet
+eventlet.monkey_patch()
 
-eventlet.monkey_patch(thread=False)
-eventlet.import_patched('mongoengine')
+# looks like the problem was fixed in eventlet 0.22
+# eventlet.monkey_patch(thread=False)
+# eventlet.import_patched('mongoengine')
 
 import os
 import requests

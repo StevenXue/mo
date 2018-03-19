@@ -174,12 +174,14 @@ export default {
     //   yield put({ type: 'setJobs', payload: jobs })
     // },
     * delete({payload}, {call, put, select}) {
-      let project = yield select(state => state.projectDetail['project'])
-      const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
-      const hubToken = project.hub_token
       yield call(deleteProject, payload)
       yield put(routerRedux.push('/workspace'))
-      yield call(deleteLab, {hubUserName, hubToken})
+
+      // hub user will deleted in backend, no need to stop hub user server
+      // let project = yield select(state => state.projectDetail['project'])
+      // const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
+      // const hubToken = project.hub_token
+      // yield call(deleteLab, {hubUserName, hubToken})
 
     },
     * setEntered({projectId}, {call, put}) {

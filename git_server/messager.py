@@ -1,17 +1,11 @@
 # -*- coding: UTF-8 -*-
-from datetime import datetime
+import sys
 import requests
-# from flask_socketio import SocketIO
-# from constants import REDIS_SERVER
 
-# socketio = SocketIO(message_queue=REDIS_SERVER)
-
-
-def emit_on_commit():
-    with open('./temp.log', 'w') as f:
-        f.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    # socketio.emit('world', 'sss', namespace='/log')
-    requests.post('http://10.52.22.14:5005/')
-
-
-emit_on_commit()
+project_id = sys.argv[1]
+requests.post(
+    # 'http://10.52.22.14:5005/project/commit_broadcast/' + project_id)
+    'http://10.52.17.70:5005/project/commit_broadcast/' + project_id)
+with open('./temp.log', 'w') as f:
+    from datetime import datetime
+    f.write(datetime.now().strftime("%b %d %Y %H:%M:%S")+':success')

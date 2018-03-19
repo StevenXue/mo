@@ -32,7 +32,7 @@ def create_message(sender, message_type, receivers, user=None,  **kwargs):
     receivers = [user_business.get_by_user_object_id(r) for r in receivers
                  if isinstance(r, (str, ObjectId))]
     # create a new message object
-    created_message, created_receivers = message_business.add_message\
+    created_message, created_receivers = message_business.add_message \
         (sender, message_type, receivers, user,**kwargs)
     if created_message:
         logger_service.emit_notification(created_message, created_receivers)

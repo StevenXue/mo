@@ -7,5 +7,6 @@
 echo 'hook start'
 GIT_SERVER_DIR=/root/git_server/
 cd ${GIT_SERVER_DIR}
-python3.6 messager.py
+workon lzfenv
+python3.6 messager.py ${GIT_PUSH_OPTION_0}
 echo 'hook end'
