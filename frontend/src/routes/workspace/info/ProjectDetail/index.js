@@ -35,7 +35,7 @@ const myShowTime = (time, format = 'yyyy-MM-dd hh:mm') => {
 }
 
 
-function ProjectInfo({market_use, match, history, location, dispatch, projectDetail, login}) {
+function ProjectInfo({match, history, location, dispatch, projectDetail, login}) {
 
   const projectId = match.params.projectId
   const user_ID = localStorage.getItem('user_ID')
@@ -148,7 +148,6 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                 Create Time: {showTime(projectDetail.project.create_time)}
               </p>
             </div>
-
             {/*info body*/}
             <div className={styles.body}>
               <div className={styles.description}>
@@ -182,7 +181,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
             </div>
           </div>
           {/*content tabs*/}
-          <Tabs defaultActiveKey="2" onChange={callback}
+          <Tabs defaultActiveKey="3" onChange={callback}
                 className={styles.jobs}>
             <TabPane tab="Overview" key="1">
               <div className={styles.reactMdeEditorDiv}>
@@ -274,9 +273,6 @@ const Jobs = ({projectDetail, dispatch}) => {
   )
 }
 
-ProjectInfo.defaultProps = {
-  market_use: false,
-}
 
 function ProjectDetail({match, history, location, dispatch, projectDetail}) {
 

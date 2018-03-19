@@ -5,7 +5,7 @@ import 'react-mde/lib/styles/css/react-mde-all.css'
 import {updateProject} from "../../services/project"
 import {Button} from 'antd'
 import {connect} from "dva"
-import { get } from 'lodash'
+import {get} from 'lodash'
 
 class ReactMdeEditor extends React.Component {
 
@@ -16,6 +16,9 @@ class ReactMdeEditor extends React.Component {
         text: get(this.props.projectDetail, 'project.overview.text')
       },
       modifyState: false,
+      modified: false,
+      oldValue: null
+
     }
   }
 
@@ -42,7 +45,6 @@ class ReactMdeEditor extends React.Component {
     })
   }
 
-
   changeEditOverviewState() {
     this.setState({modifyState: !this.state.modifyState})
   }
@@ -50,8 +52,27 @@ class ReactMdeEditor extends React.Component {
   handleValueChange = (value: ReactMdeTypes.Value) => {
     this.props.dispatch({
       type: 'projectDetail/changeOverview',
-      payload :{
-        overview:value
+      payload: {
+        overview: value
+      }
+    })
+  }
+
+  startEditOverviewState(){
+    this.setState({
+      modifyState: true,
+      oldValue:this.props.projectDetail.project.overview,
+    })
+  }
+
+  cancelEditOverviewState() {
+    this.setState({
+      modifyState: false,
+    })
+    this.props.dispatch({
+      type: 'projectDetail/changeOverview',
+      payload: {
+        overview: this.state.oldValue,
       }
     })
   }
@@ -74,22 +95,27 @@ class ReactMdeEditor extends React.Component {
             previewHelp: false
           }}
         />
-        {this.state.modifyState?<div style={{"textAlign":"center","marginTop":"15px"}}>
-        <Button type='primary' style={{marginRight: 15}}
-                onClick={() => {
-                  this.editOverview()
-                }}>OK</Button>
-        <Button onClick={() => {
-          this.changeEditOverviewState()
-        }}>Cancel</Button>
-        </div>:null}
-        {!this.state.modifyState?<div style={{"textAlign":"center"}}><Button
-          type='primary' style={{ marginRight: 15 }}
-          onClick={() => {this.changeEditOverviewState()}}>EDIT DESCRIPTION</Button></div>:null}
+        {this.state.modifyState ?
+          <div style={{"textAlign": "center", "marginTop": "15px"}}>
+            <Button type='primary' style={{marginRight: 15}}
+                    onClick={() => {
+                      this.editOverview()
+                    }}>OK</Button>
+            <Button onClick={() => {
+              this.cancelEditOverviewState()
+            }}>Cancel</Button>
+          </div> : null}
+        {!this.state.modifyState ?
+          <div style={{"textAlign": "center"}}><Button
+            type='primary' style={{marginRight: 15}}
+            onClick={() => {
+              this.startEditOverviewState()
+            }}>EDIT DESCRIPTION</Button></div> : null}
       </div>
     )
   }
 }
 
-export default connect(({ projectDetail }) => ({ projectDetail }))(ReactMdeEditor)
+
+export default connect(({projectDetail}) => ({projectDetail}))(ReactMdeEditor)
 

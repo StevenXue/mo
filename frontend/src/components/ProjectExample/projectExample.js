@@ -70,7 +70,21 @@ class ProjectExample extends React.Component {
 
 
   changeEditOverviewState() {
-    this.setState({modifyState: !this.state.modifyState})
+    this.setState({
+      modifyState: !this.state.modifyState,
+    })
+  }
+
+  startEditOverviewState(){
+    this.setState({
+      modifyState: true,
+    })
+  }
+
+  cancelEditOverviewState() {
+    this.setState({
+      modifyState: false,
+    })
   }
 
   handleValueChange = (value: ReactMdeTypes.Value) => {
