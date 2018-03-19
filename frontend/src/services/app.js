@@ -11,3 +11,14 @@ export function fetchApp({ projectId, onJson }) {
   return request(`${CORS}/${PREFIX}/${projectId}?yml=true`, undefined, { onJson })
 }
 
+export const runApi = async payload => {
+  return request(`${CORS}/${PREFIX}/run/${payload.app_id}`, {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      app: payload.app,
+    }),
+  })
+}

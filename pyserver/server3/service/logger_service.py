@@ -166,11 +166,13 @@ def emit_result(*args, **kw):
 
 def emit_notification(message, created_receivers):
     for receiver in created_receivers:
-        receiver_user = receiver.obj_id
-        message.user_ID = message.user.user_ID
-        message.user_request_title = message.user_request.title
+        receiver_user = receiver.user
         message.is_read = False
         message.receiver_id = receiver.id
+        if message.user:
+            message.user_ID = message.user.user_ID
+        if message.user_request:
+            message.user_request_title = message.user_request.title
         msg = json_utility.convert_to_json(
             {'receiver_id': receiver.id,
              'message': message.to_mongo(),

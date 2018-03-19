@@ -211,7 +211,6 @@ def run_app(app_id):
     data = request.get_json()
     input_json = data["app"]["input"]
     result = AppService.run_app(app_id, input_json=input_json, user_ID=user_ID)
-
     return jsonify({"response": result})
 
 # if __name__ == "__main__":
