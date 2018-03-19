@@ -39,7 +39,6 @@ def send():
     user_ID = get_jwt_identity()
     channel = data.pop("channel")
     message = data.pop("message")
-    print("user_ID", user_ID)
     result = WorldService.user_send(user_ID, channel, message)
     if result:
         result = json_utility.convert_to_json(result.to_mongo())
@@ -51,14 +50,17 @@ def send():
 @world_app.route('', methods=['GET'])
 def get():
     # data = request.ar()s
-    channel = request.args.get("channel")
+    channel = request.args.get("channel", 'all')
     page_no = int(request.args.get('page_no', 1))
     page_size = int(request.args.get('page_size', 50))
+    if channel == 'all':
+        query = {}
+    else:
+        query = {"channel": channel}
     world_messages = WorldBusiness.get_pagination(
-        query={"channel": channel},
+        query=query,
         page_no=page_no, page_size=page_size)
     for message in world_messages.objects:
-        print("message")
         if hasattr(message, "sender") and message.sender:
             message.sender_user_ID = message.sender.user_ID
         else:
