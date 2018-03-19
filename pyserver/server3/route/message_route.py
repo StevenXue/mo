@@ -29,7 +29,8 @@ def create_message():
     sender = data.get('sender', None)
     title = data.get('title')
     content = data.get('content', None)
-    receivers = data.get('receivers', None)
+    # receivers is a list
+    receivers = data.get('receivers', [])
     message_service.create_message(sender, message_type,
                                    receivers, title=title,
                                    content=content)

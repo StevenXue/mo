@@ -182,7 +182,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
             </div>
           </div>
           {/*content tabs*/}
-          <Tabs defaultActiveKey="1" onChange={callback}
+          <Tabs defaultActiveKey="3" onChange={callback}
                 className={styles.jobs}>
             <TabPane tab="Overview" key="1">
               <div className={styles.reactMdeEditorDiv}>
@@ -197,7 +197,8 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
               <Jobs projectDetail={projectDetail} dispatch={dispatch}/>
             </TabPane>}
             <TabPane tab="Examples" key="3">
-              <ProjectExample projectDetail={projectDetail} dispatch={dispatch}/>
+              {projectDetail.project.args?
+                <ProjectExample projectDetail={projectDetail} dispatch={dispatch}/>:null}
             </TabPane>
           </Tabs>
         </div>

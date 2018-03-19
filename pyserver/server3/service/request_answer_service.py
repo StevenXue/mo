@@ -56,30 +56,24 @@ def create_request_answer(**data):
         # get user object
         user = data['answer_user']
         # create ownership relation
-        if ownership_business.add(user,
-                                  request_answer=
-                                  created_request_answer):
-
-            #  新建通知消息
-            admin_user = user_business.get_by_user_ID('admin')
-            user_request = user_request_business. \
-                get_by_user_request_id(data['user_request'])
-            receivers = list({'obj_id': el} for el in user_request.star_user)
-            if message_service.create_message(
-                    sender=admin_user,
-                    message_type='answer',
-                    receivers=receivers,
-                    title='Notification',
-                    user=user,
-                    user_request=user_request,
-            ):
-                return created_request_answer
-            else:
-                raise RuntimeError(
-                    'Cannot create message of the new request_answer')
+        #  新建通知消息
+        admin_user = user_business.get_by_user_ID('admin')
+        user_request = user_request_business. \
+            get_by_user_request_id(data['user_request'])
+        receivers = [el for el in user_request.star_user]
+        if message_service.create_message(
+                sender=admin_user,
+                message_type='answer',
+                receivers=receivers,
+                user=user,
+                title='Notification',
+                user_request=user_request,
+        ):
+            return created_request_answer
         else:
             raise RuntimeError(
-                'Cannot create ownership of the new request_answer')
+                'Cannot create message of the new request_answer')
+
     else:
         raise RuntimeError('Cannot create the new request_answer')
 

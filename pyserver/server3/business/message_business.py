@@ -37,18 +37,19 @@ def get_by_user_id(user_id):
     return messages
 
 
-def add_message(sender, message_type, receivers, **kwargs):
+def add_message(sender, message_type, receivers, user, **kwargs):
     now = datetime.utcnow()
 
     message_obj = Message(sender=sender,
                           create_time=now,
                           message_type=message_type,
+                          user=user,
                           **kwargs)
     message = message_repo.create(message_obj)
     created_receivers = []
     for el in receivers:
         created_receivers.append(receiver_repo.create(Receiver(
-            obj_id=el.get('obj_id', None), message=message
+            user=el, message=message
         )))
     return message, created_receivers
 
