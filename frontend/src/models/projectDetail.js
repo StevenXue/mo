@@ -10,6 +10,7 @@ import { get } from 'lodash'
 import { hubPrefix } from '../utils/config'
 import * as dataAnalysisService from '../services/dataAnalysis'
 import { message } from 'antd/lib/index'
+import CONSTANT  from  '../constants'
 
 import { startLabBack } from './modelling'
 import * as UserStarFavorService from '../services/user'
@@ -89,12 +90,19 @@ export default {
           overview:action.payload.overview,
         }
       }
+    },
+    clearProject(state,action){
+      return {
+        ...state,
+        project: null,
+      }
     }
 
   },
   effects: {
     // 获取该 project
     *fetch({ projectId, notStartLab, projectType }, { call, put }) {
+      yield put({ type: 'clearProject' })
       const fetchMapper = {
         app: fetchApp,
         module: fetchProject,
@@ -114,35 +122,7 @@ export default {
       // fetch and set project
       ({ data: project } = (yield call(fetchProject, { projectId })))
 
-      const defaultDocs = {'text':"## Overview\n" +
-        "\n" +
-        "_Provide a short overview of your algorithm that explains the value and primary use cases._\n" +
-        "\n" +
-        "## Usage\n" +
-        "\n" +
-        "### Input\n" +
-        "\n" +
-        "_Describe the input fields for your algorithm. For example:_\n" +
-        "\n" +
-        "\n" +
-        "| Parameter | Description |\n" +
-        "| --------- | ----------- |\n" +
-        "| field     | Description of field |\n" +
-        "\n" +
-        "### Output\n" +
-        "\n" +
-        "_Describe the output fields for your algorithm. For example:_\n" +
-        "\n" +
-        "\n" +
-        "| Parameter | Description | \n" +
-        "| --------- | ----------- | \n" +
-        "| field     | Description of field | \n" +
-        "\n" +
-        "## Examples\n" +
-        "\n" +
-        "_Provide and explain examples of input and output for your algorithm._\n" +
-        "\n"}
-
+      const defaultDocs = CONSTANT.defaultOverviewDocs
 
       if(!project.overview) {
         project['overview']=defaultDocs
@@ -152,7 +132,7 @@ export default {
       }
 
       // fetch and set project
-      ({ data: project } = (yield call(fetchMapper[projectType], { projectId })))
+      // ({ data: project } = (yield call(fetchMapper[projectType], { projectId })))
       yield put({ type: 'setProject', payload: project })
 
       // fetch jobs

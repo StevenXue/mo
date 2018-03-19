@@ -47,6 +47,7 @@ class ProjectList extends Component {
       projectsLoading: false,
       privacy: undefined,
       projectType: 'project',
+      user_obj_id: localStorage.getItem('user_obj_id')
     }
   }
 
@@ -92,8 +93,14 @@ class ProjectList extends Component {
     this.fetchData({payload: {query: value}})
   }
 
-  toProjectDetail(id, history) {
-    this.props.dispatch({type: 'project/push', id, route: 'market'})
+  toProjectDetail(id, history, type, projectOwner, loginUser) {
+    // this.props.dispatch({type: 'project/push', id, route: 'market'})
+    if (projectOwner === loginUser) {
+      history.push(`/workspace/${id}?type=${type}`)
+    }
+    else {
+      history.push(`/market/${id}?type=${type}`)
+    }
   }
 
   starFavor(action, id, type) {
@@ -143,14 +150,13 @@ class ProjectList extends Component {
         <div className={styles.projectList}>
           {this.state.projects.map(e =>
             <ProjectCard key={e._id} project={e}
-                         onClickToDetail={() => this.toProjectDetail(e._id, history)}
+                         onClickToDetail={() => this.toProjectDetail(e._id, history, e.type, e.user, this.state.user_obj_id)}
                          onClickStarFavor={(action) => this.starFavor(action, e._id, e.type)}
             />
           )}
         </div>
       </div>
     )
-
   }
 }
 

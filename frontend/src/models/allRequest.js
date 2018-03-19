@@ -252,6 +252,13 @@ export default {
         }
       }
     },
+
+    clearFocusRequest(state,action){
+      return {
+        ...state,
+        focusUserRequest: null,
+      }
+    }
   },
 
   effects: {
@@ -271,9 +278,8 @@ export default {
       }
     },
 
-
-
     * fetchOneRequest(action, {call, put}) {
+      yield put({ type: 'clearFocusRequest' })
       const {data: focusUserRequest} = yield call(userRequestService.fetchOneUserRequest,
         {user_request_ID: action.payload.userrequestId})
       yield put({
