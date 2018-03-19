@@ -6,6 +6,8 @@ Author: Zhaofeng Li
 Date: 2017.05.24
 """
 from bson import ObjectId
+from datetime import datetime
+from datetime import tzinfo
 from flask import Blueprint
 from flask import jsonify
 from flask import make_response
@@ -94,12 +96,15 @@ def list_projects_by_query():
 def get_project(project_id):
     if not project_id:
         return jsonify({'response': 'no project_id arg'}), 400
-    try:
-        project = ProjectBusiness.get_by_id(project_id)
-        project = json_utility.convert_to_json(project.to_mongo())
-    except Exception as e:
-        return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}), 400)
+    project = ProjectBusiness.get_by_id(project_id)
+    if request.args.get('commits') == 'true':
+        commits = ProjectBusiness.get_commits(project.path)
+        project.commits = [{
+            'message': c.message,
+            'time': datetime.fromtimestamp(c.time[0] + c.time[1]),
+        } for c in commits]
+    project = json_utility.convert_to_json(project.to_mongo())
+
     return make_response(jsonify({'response': project}), 200)
 
 
@@ -312,7 +317,6 @@ def get_project_playground(project_id):
 @jwt_required
 def commit(project_id):
     data = request.get_json()
-    print(data)
     commit_msg = data.get('commit_msg')
     ProjectBusiness.commit(project_id, commit_msg)
     return jsonify({"response": 1})

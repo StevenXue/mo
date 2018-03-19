@@ -16,6 +16,7 @@ import styles from './index.less'
 import { get } from 'lodash'
 import {message} from 'antd/lib/index'
 import ReactMarkdown from 'react-markdown'
+import {flaskServer} from '../../../../constants'
 
 
 const confirm = Modal.confirm
@@ -45,7 +46,7 @@ function ProjectInfo({match, history, location, dispatch, projectDetail, login})
 
   const props1 = {
     name: 'file',
-    action: 'http://localhost:5000/file/project_file',
+    action: flaskServer+'/file/project_file',
     headers: {
       authorization: `Bearer ${localStorage.getItem('token')}`,
     },

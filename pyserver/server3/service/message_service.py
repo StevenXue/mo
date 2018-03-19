@@ -10,6 +10,7 @@ from server3.business import message_business
 from server3.business import user_business
 from server3.service import logger_service
 
+
 def get_by_user_id(user_id):
     messages = message_business.get_by_user_id(user_id)
     return messages

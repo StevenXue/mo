@@ -11,7 +11,7 @@ def emit_on_commit():
     with open('./temp.log', 'w') as f:
         f.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     # socketio.emit('world', 'sss', namespace='/log')
-    # requests.post('')
+    requests.post('http://10.52.22.14:5005/')
 
 
 emit_on_commit()

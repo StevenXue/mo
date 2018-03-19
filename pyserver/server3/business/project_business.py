@@ -350,3 +350,10 @@ class ProjectBusiness:
         # initial commit
         repo.index.commit(commit_msg)
         repo.remote(name='origin').push()
+
+    @classmethod
+    def get_commits(cls, project_path):
+        repo = Repo.init(project_path)
+        heads = repo.heads
+        master = heads.master
+        return master.log()
