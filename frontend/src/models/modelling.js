@@ -19,6 +19,7 @@ const categories = 'model'
 const checker = (value, arr) =>
   arr.some(element => value.includes(element))
 
+// ext to close
 const extFilter = {
   app: ['moduledeploy-extension'],
   module: ['appdeploy-extension'],
@@ -63,6 +64,7 @@ const loadnStartJL = (projectType) => {
     require('../packages/jupyterlab_package/packages/datasets-extension'),
     require('../packages/jupyterlab_package/packages/moduledeploy-extension'),
     require('../packages/jupyterlab_package/packages/appdeploy-extension'),
+    require('../packages/jupyterlab_package/packages/commit-extension'),
   ]
 
   const JupyterLab = require('../packages/jupyterlab_package/packages/application').JupyterLab

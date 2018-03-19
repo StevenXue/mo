@@ -16,6 +16,8 @@ from copy import deepcopy
 from datetime import datetime
 from distutils.dir_util import copy_tree
 
+from git import Repo
+
 from server3.entity.project import Project
 # from server3.repository import job_repo
 from server3.repository.project_repo import ProjectRepo
@@ -25,6 +27,8 @@ from server3.constants import HUB_SERVER
 from server3.constants import GIT_SERVER
 from server3.constants import ADMIN_TOKEN
 from server3.entity.general_entity import Objects
+from server3.constants import GIT_SERVER_IP
+
 PAGE_NO = 1
 PAGE_SIZE = 5
 
@@ -218,6 +222,12 @@ class ProjectBusiness:
         #     "page_size": page_size,
         # }
 
+    @staticmethod
+    def clone(user_ID, name, project_path):
+        return Repo.clone_from(
+            f'root@{GIT_SERVER_IP}:/var/www/user_repos/{user_ID}/{name}',
+            project_path)
+
     @classmethod
     def create_project(cls, name, description, user, privacy='private',
                        tags=None, user_token='', type='app'):
@@ -242,6 +252,9 @@ class ProjectBusiness:
 
         # init git repo
         cls.init_git_repo(user_ID, name)
+
+        # clone to project dir
+        repo = cls.clone(user_ID, name, project_path)
 
         # auth jupyterhub with user token
         res = cls.auth_hub_user(user_ID, name, user_token)
@@ -319,4 +332,21 @@ class ProjectBusiness:
         return cls.repo.update_unique_one(dict(name=project_name, user=user),
                                           data)
 
-    # @classmethod
+    @classmethod
+    def commit(cls, project_id, commit_msg):
+        """
+        Update project
+
+        :param name: str
+        :param description: str
+        :param user_ID: ObjectId
+        :param is_private: boolean
+        :return: a new created project object
+        """
+        project = cls.get_by_id(project_id)
+        repo = Repo(project.path)
+        # add all
+        repo.git.add(A=True)
+        # initial commit
+        repo.index.commit(commit_msg)
+        repo.remote(name='origin').push()

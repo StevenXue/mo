@@ -306,3 +306,13 @@ def get_project_playground(project_id):
     except client.rest.ApiException as e:
         return jsonify({'response': e.reason}), 400
     return jsonify({'response': port})
+
+
+@project_app.route("/commit/<project_id>", methods=["PUT"])
+@jwt_required
+def commit(project_id):
+    data = request.get_json()
+    print(data)
+    commit_msg = data.get('commit_msg')
+    ProjectBusiness.commit(project_id, commit_msg)
+    return jsonify({"response": 1})

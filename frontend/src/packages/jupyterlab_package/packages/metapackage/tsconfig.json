@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    //    "declaration": true,
     "noImplicitAny": false,
     "noEmitOnError": true,
     "noUnusedLocals": true,
@@ -38,6 +37,9 @@
       ],
       "@jupyterlab/appeploy-extension": [
         "../appdeploy-extension/src"
+      ],
+      "@jupyterlab/commit-extension": [
+        "../commit-extension/src"
       ]
     },
     "jsx": "react",
