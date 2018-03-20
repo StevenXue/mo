@@ -72,6 +72,7 @@ class ProjectModal extends Component {
                 type: 'projectDetail/fetch',
                 projectId: this.props.projectDetail.project._id,
                 notStartLab: true,
+                projectType: this.props.projectDetail.project.type
               })
             },
           })
