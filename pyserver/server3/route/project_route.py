@@ -330,7 +330,7 @@ def commit(project_id):
 def commit_broadcast(project_id):
     project = ProjectBusiness.get_by_id(project_id)
     # ProjectBusiness.commit(project_id, commit_msg)
-    receivers = project.star_users # get app subscriber
+    receivers = project.favor_users # get app subscriber
     # commits = ProjectBusiness.get_commits(project.path)
     message_service.create_message(ObjectId('592f8775df86b2e82f9788cf'),
                                    'commit', receivers, project.user)

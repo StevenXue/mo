@@ -47,6 +47,7 @@ def add_message(sender, message_type, receivers, user, **kwargs):
                           **kwargs)
     message = message_repo.create(message_obj)
     created_receivers = []
+    print(receivers)
     for el in receivers:
         created_receivers.append(receiver_repo.create(Receiver(
             user=el, message=message

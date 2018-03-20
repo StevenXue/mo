@@ -275,7 +275,7 @@ class ProjectBusiness:
                                    type=type, tags=tags,
                                    hub_token=res.get('token'),
                                    path=project_path, user=user,
-                                   privacy=privacy)
+                                   privacy=privacy, favor_users=[user])
 
     @classmethod
     def get_by_id(cls, object_id):
@@ -349,12 +349,7 @@ class ProjectBusiness:
         # add all
         repo.git.add(A=True)
         repo.index.commit(commit_msg)
-
-        def push():
-            repo.remote(name='origin').push(o=project_id)
-
-        push()
-        # spawn_n(push)
+        repo.remote(name='origin').push(o=project_id)
 
     @classmethod
     def get_commits(cls, project_path):
