@@ -31,18 +31,11 @@ class RequestModal extends Component {
 
   }
 
-  showModelHandler = (e) => {
-    // if (e) e.stopPropagation()
-    // this.setState({
-    //   visible: true,
-    // });
+  showModelHandler = () => {
     this.props.dispatch({type: 'allRequest/showModal'})
   }
 
   hideModelHandler = () => {
-    // this.setState({
-    //   visible: false,
-    // });
     this.props.dispatch({type: 'allRequest/hideModal'})
 
   }
@@ -53,7 +46,7 @@ class RequestModal extends Component {
       const body = {
         ...values,
         type: this.props.type,
-        // tags: this.state.tags,
+        tags: this.state.tags,
       }
       if (!err) {
         if (this.props.new) {
@@ -81,9 +74,9 @@ class RequestModal extends Component {
     })
   }
 
-  handleClose(removedTag) {
-    const tags = this.state.tags.filter(tag => tag !== removedTag).filter(e => e)
-    this.setState({tags})
+  handleClose(tags, removedTag) {
+    tags = tags.filter(tag => tag !== removedTag).filter(e => e)
+    this.setState({tags, inputValue: undefined})
     // dispatch({ type: 'upload/removeTag', payload: tags })
   }
 
@@ -93,22 +86,14 @@ class RequestModal extends Component {
   }
 
   handleInputChange(e) {
-    console.log(this.state.inputValue)
     this.setState({inputValue: e.target.value})
-    // dispatch({ type: 'upload/setInputValue', payload: e.target.value })
   }
 
-  handleInputConfirm() {
-    if (this.state.inputValue && this.state.tags.indexOf(this.state.inputValue) === -1) {
-      // console.log(this.state.tags)
-      const tags = [...this.state.tags, this.state.inputValue]
-      // console.log(tags)
+  handleInputConfirm(tags) {
+    if (this.state.inputValue && tags.indexOf(this.state.inputValue) === -1) {
+      tags = [...tags, this.state.inputValue]
       this.setState({tags, inputValue: undefined, inputVisible: false})
     }
-
-    // if (upload.inputValue && upload.tags.indexOf(upload.inputValue) === -1) {
-    //   dispatch({ type: 'upload/confirmInput' })
-    // }
   }
 
   render() {
@@ -186,7 +171,7 @@ class RequestModal extends Component {
                   const isLongTag = tag.length > 15
                   const tagElem = (
                     <Tag key={tag} closable={true}
-                         afterClose={() => this.handleClose(tag)}>
+                         afterClose={() => this.handleClose(tags, tag)}>
                       {isLongTag ? `${tag.slice(0, 15)}...` : tag}
                     </Tag>
                   )
@@ -200,8 +185,8 @@ class RequestModal extends Component {
                     style={{width: 78}}
                     value={this.state.inputValue}
                     onChange={(e) => this.handleInputChange(e)}
-                    onBlur={() => this.handleInputConfirm()}
-                    onPressEnter={() => this.handleInputConfirm()}
+                    // onBlur={() => this.handleInputConfirm(tags)}
+                    onPressEnter={() => this.handleInputConfirm(tags)}
                   />
                 ) : <Button size="small" type="dashed"
                             onClick={() => this.showInput()}>+ New Tag</Button>}

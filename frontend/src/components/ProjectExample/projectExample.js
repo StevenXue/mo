@@ -166,6 +166,6 @@ class ProjectExample extends React.Component {
   }
 }
 
-const WrappedInputForm = Form.create()(InputForm)
+// const WrappedInputForm = Form.create()(InputForm)
 export default connect(({projectDetail}) => ({projectDetail}))(ProjectExample)
 

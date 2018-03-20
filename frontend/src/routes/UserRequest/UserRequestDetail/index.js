@@ -332,6 +332,16 @@ function UserRequestDetail({allRequest, login, dispatch}) {
     })
   }
 
+  const clickSelectedProject =(e)=>{
+    let user_obj_id = localStorage.getItem('user_obj_id')
+    if(user_obj_id === e.select_project.user){
+      window.open("/#/workspace/" + e.select_project._id+ "?type="+e.select_project.type)
+    }
+    else{
+      window.open("/#/market/" + e.select_project._id+ "?type="+e.select_project.type)
+    }
+  }
+
   // function acceptAnswer(request_answer) {
   //   dispatch({
   //     type: 'allRequest/acceptAnswer',
@@ -463,9 +473,9 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                       fontSize: '26px',
                       cursor: 'pointer'
                     }}>
-                      <Icon type="caret-up"
+                      <Icon type={e['votes_up_user'].includes(user_obj_id) ? "like" : "like-o"}
                             onClick={() => answerVotesUp(e._id)}
-                            style={e['votes_up_user'].includes(user_obj_id) ? {color: '#34c0e2'} : {}}
+                            style={{color: '#34c0e2'}}
                       />
                     </div>
                     <div style={{
@@ -475,14 +485,14 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                     }}>
                       {e['votes_up_user'].length}
                     </div>
-                    <div style={{
-                      width: '100%',
-                      textAlign: 'center',
-                      fontSize: '26px',
-                      cursor: 'pointer'
-                    }}>
-                      <Icon type="caret-down"/>
-                    </div>
+                    {/*<div style={{*/}
+                      {/*width: '100%',*/}
+                      {/*textAlign: 'center',*/}
+                      {/*fontSize: '26px',*/}
+                      {/*cursor: 'pointer'*/}
+                    {/*}}>*/}
+                      {/*<Icon type="caret-down"/>*/}
+                    {/*</div>*/}
                     {user_ID === focusUserRequest.user_ID &&
                     !focusUserRequest.accept_answer &&
                     <div style={{
@@ -512,8 +522,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                     {e.select_project ?
                       <Card title={e.select_project.name}
                             style={{cursor: 'pointer'}}
-                            onClick={() =>
-                              window.open("/#/workspace/" + e.select_project._id)}>
+                            onClick={() =>clickSelectedProject(e)}>
                         <p>{e.select_project.description}</p></Card> : null}
                     <div>
                       <div className={styles.eachAnswer}>

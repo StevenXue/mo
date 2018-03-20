@@ -20,10 +20,10 @@ class Project(DynamicDocument):
     path = StringField(required=True)
     user = ReferenceField("User", required=True)
     privacy = StringField(choices=['private', 'public'], required=True)
-    overview = StringField()
 
     # optional
     description = StringField()
+    overview = StringField()
     tb_port = StringField()
     datasets = ListField(ReferenceField('DataSet', reverse_delete_rule=PULL))
     jobs = ListField(ReferenceField('Job', reverse_delete_rule=PULL))
