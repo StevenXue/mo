@@ -4,7 +4,7 @@ from tornado import gen
 import jupyterhub
 import requests
 
-SERVER = 'http://localhost:5000'
+SERVER = 'http://localhost:5005'
 
 
 def default_format_volume_name(template, spawner):
@@ -37,7 +37,7 @@ class MyDockerSpawner(DockerSpawner):
 
     def update_project_tb_port(self, project_name, tb_port):
         """
-        auth jupyterhub with user token
+        update tb port when docker restarted
         :param tb_port:
         :param project_name:
         :return: dict of res json
@@ -48,7 +48,7 @@ class MyDockerSpawner(DockerSpawner):
 
     def insert_envs(self, project_name):
         """
-        auth jupyterhub with user token
+        add env to jupyterlab
         :param tb_port:
         :param project_name:
         :return: dict of res json

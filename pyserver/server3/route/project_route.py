@@ -6,6 +6,8 @@ Author: Zhaofeng Li
 Date: 2017.05.24
 """
 from bson import ObjectId
+from datetime import datetime
+from datetime import tzinfo
 from flask import Blueprint
 from flask import jsonify
 from flask import make_response
@@ -14,6 +16,8 @@ from kubernetes import client
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server3.service import project_service
+from server3.service import message_service
+from server3.service.project_service import ProjectService
 from server3.service import ownership_service
 from server3.service.app_service import AppService
 from server3.business.project_business import ProjectBusiness
@@ -94,12 +98,15 @@ def list_projects_by_query():
 def get_project(project_id):
     if not project_id:
         return jsonify({'response': 'no project_id arg'}), 400
-    try:
-        project = ProjectBusiness.get_by_id(project_id)
-        project = json_utility.convert_to_json(project.to_mongo())
-    except Exception as e:
-        return make_response(jsonify({'response': '%s: %s' % (str(
-            Exception), e.args)}), 400)
+    project = ProjectBusiness.get_by_id(project_id)
+    if request.args.get('commits') == 'true':
+        commits = ProjectBusiness.get_commits(project.path)
+        project.commits = [{
+            'message': c.message,
+            'time': datetime.fromtimestamp(c.time[0] + c.time[1]),
+        } for c in commits]
+    project = json_utility.convert_to_json(project.to_mongo())
+
     return make_response(jsonify({'response': project}), 200)
 
 
@@ -306,3 +313,23 @@ def get_project_playground(project_id):
     except client.rest.ApiException as e:
         return jsonify({'response': e.reason}), 400
     return jsonify({'response': port})
+
+
+@project_app.route("/commit/<project_id>", methods=["PUT"])
+@jwt_required
+def commit(project_id):
+    data = request.get_json()
+    commit_msg = data.get('commit_msg')
+    ProjectBusiness.commit(project_id, commit_msg)
+    return jsonify({"response": 1})
+
+
+@project_app.route("/commit_broadcast/<project_id>", methods=["POST"])
+def commit_broadcast(project_id):
+    project = ProjectBusiness.get_by_id(project_id)
+    # ProjectBusiness.commit(project_id, commit_msg)
+    receivers = project.star_users # get app subscriber
+    # commits = ProjectBusiness.get_commits(project.path)
+    message_service.create_message(ObjectId('592f8775df86b2e82f9788cf'),
+                                   'commit', receivers, project.user)
+    return jsonify({"response": 1})

@@ -102,7 +102,7 @@ def add():
 
 
 @app_app.route('/<app_id>', methods=['GET'])
-def get_module(app_id):
+def get_app(app_id):
     yml = request.args.get('yml')
     yml = str(yml).lower() == 'true'
     app = AppBusiness.get_by_id(app_id, yml=yml)
@@ -110,7 +110,7 @@ def get_module(app_id):
     # 将app.user 更换为 user_ID 还是name?
     user_ID = app.user.user_ID
     app = json_utility.convert_to_json(app.to_mongo())
-    app["user"] = user_ID
+    app["user_ID"] = user_ID
     return jsonify({
         "response": app
     }), 200
@@ -147,7 +147,7 @@ def get_api_list():
     else:
         objects = api_list.objects
         for object in objects:
-            object.user_user_ID = object.user.user_ID
+            object.user_ID = object.user.user_ID
         objects = json_utility.me_obj_list_to_json_list(objects)
         return jsonify({
             "response": {
@@ -211,7 +211,6 @@ def run_app(app_id):
     data = request.get_json()
     input_json = data["app"]["input"]
     result = AppService.run_app(app_id, input_json=input_json, user_ID=user_ID)
-
     return jsonify({"response": result})
 
 # if __name__ == "__main__":

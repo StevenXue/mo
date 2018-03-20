@@ -16,6 +16,7 @@ import styles from './index.less'
 import { get } from 'lodash'
 import {message} from 'antd/lib/index'
 import ReactMarkdown from 'react-markdown'
+import {flaskServer} from '../../../../constants'
 
 
 const confirm = Modal.confirm
@@ -40,12 +41,12 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
   const projectId = match.params.projectId
   const user_ID = localStorage.getItem('user_ID')
   const userObjId = localStorage.getItem('user_obj_id')
-  const projectOwner = get(projectDetail, 'project.user')
-  const projectOwnerOrNot = (projectOwner === userObjId)
+  // const projectOwner = get(projectDetail, 'project.user')
+  // const projectOwnerOrNot = (projectOwner === userObjId)
 
   const props1 = {
     name: 'file',
-    action: 'http://localhost:5000/file/project_file',
+    action: flaskServer+'/file/project_file',
     headers: {
       authorization: `Bearer ${localStorage.getItem('token')}`,
     },
@@ -126,16 +127,16 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
             {/*info head*/}
             <div className={styles.name}>
               <h1>
-                {!projectOwnerOrNot && <Icon
+                {market_use && <Icon
                   // type="star"
                   type={projectDetail.project.favor_users.includes(userObjId) ? 'star' : 'star-o'}
                   style={{fontSize: '22px', color: '#34c0e2'}}
                   onClick={() => appStarFavor('favor')}/>}
                 {projectDetail.project.name}&nbsp;
-                {projectOwnerOrNot && <Icon
+                {!market_use && <Icon
                   type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
                   style={{fontSize: 20}}/>}
-                {projectOwnerOrNot && <span className={styles.rightButton}>
+                {!market_use && <span className={styles.rightButton}>
                   <ProjectModel new={false} projectDetail={projectDetail}
                   >
                     <Button icon='edit' style={{marginRight: 15}}/>
@@ -162,7 +163,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                   : <p style={{color: 'rgba(0,0,0,0.54)'}}>(no tags)</p>}
               </div>
               <span>
-                {projectOwnerOrNot && <span className={styles.generalSpan}>
+                {!market_use && <span className={styles.generalSpan}>
                 <Upload {...props1}>
                   <Button>
                     <Icon type="upload"/> Click to Upload
@@ -193,11 +194,12 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                   projectDetail={projectDetail} dispatch={dispatch}/>
               </div>
             </TabPane>
-            {projectOwnerOrNot && <TabPane tab="Jobs" key="2">
+            {!market_use && <TabPane tab="Jobs" key="2">
               <Jobs projectDetail={projectDetail} dispatch={dispatch}/>
             </TabPane>}
             <TabPane tab="Examples" key="3">
-              <ProjectExample projectDetail={projectDetail} dispatch={dispatch}/>
+              {projectDetail.project.args?
+                <ProjectExample projectDetail={projectDetail} dispatch={dispatch}/>:null}
             </TabPane>
           </Tabs>
         </div>

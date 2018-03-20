@@ -1,7 +1,7 @@
 import React from 'react'
 import { Form, Button, Select, Input, Tooltip, Icon } from 'antd'
 import styles from './index.less'
-
+import {runApi} from '../../services/app'
 const FormItem = Form.Item
 
 function getArgs(baseSteps, stepIndex, argIndex) {
@@ -118,7 +118,8 @@ const formItems = (arg, i, getFieldDecorator, baseArg) => {
 
   return <FormItem
     key={i}
-    label={arg.display_name}
+    label={arg.display_name?arg.display_name:arg.name}
+    {...formItemLayout}
   >
     <div className={styles.row}>
       {
@@ -142,20 +143,47 @@ const formItems = (arg, i, getFieldDecorator, baseArg) => {
   </FormItem>
 }
 
+const handleSubmit = (e, validateFieldsAndScroll,appId,dispatch) =>{
+  e.preventDefault()
+  validateFieldsAndScroll((err, values) => {
+    if (!err) {
+      console.log('Received values of form: ', values)
+      let payload = {'app':{'input':values}}
+      payload['app_id'] = appId
+      dispatch({type: 'projectDetail/get_example_result',payload:payload})
+    }
+  })
+}
+const formItemLayout = {
+  labelCol: {
+    xs: { span: 24 },
+    sm: { span: 6 },
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    sm: { span: 14 },
+  },
+};
+
 function ParamsMapper({
-                        args, layerIndex, baseArgs,
-                        form: { getFieldDecorator },
+                        args, layerIndex, baseArgs,appId,dispatch,
+                        form: { getFieldDecorator ,validateFieldsAndScroll},
                       }) {
 
   return (
-    <Form layout='inline' className={styles.form}
+    <Form layout='horizontal' className={styles.form}
           key={`params-form-${layerIndex}`}
-    >
+          onSubmit={(value)=>handleSubmit(value,validateFieldsAndScroll,appId,dispatch)}
+          >
       {
         args.map((arg, i) => {
           return formItems(arg, i, getFieldDecorator, baseArgs[i])
         })
       }
+      <FormItem wrapperCol={{ span: 12, offset: 11 }}>
+        <Button
+          type="primary" htmlType="submit">Submit</Button>
+      </FormItem>
     </Form>
   )
 }

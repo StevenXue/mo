@@ -7,7 +7,7 @@ from mongoengine import BooleanField
 from mongoengine import ListField
 
 
-MESSAGE_TYPE = ('answer', 'chat')
+MESSAGE_TYPE = ('answer', 'chat', 'commit')
 
 
 class Message(DynamicDocument):
@@ -23,7 +23,7 @@ class Message(DynamicDocument):
 
 class Receiver(DynamicDocument):
     read_time = DateTimeField()
-    obj_id = ReferenceField("User", required=True)
+    user = ReferenceField("User", required=True)
     is_read = BooleanField(default=False)
     message = ReferenceField("Message", required=True,
                              reverse_delete_rule=CASCADE)

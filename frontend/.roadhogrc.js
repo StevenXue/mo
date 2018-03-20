@@ -37,7 +37,7 @@ export default {
   ],
   'proxy': {
     '/pyapi': {
-      'target': 'http://localhost:5000/',
+      'target': 'http://localhost:5005/',
       'changeOrigin': true,
       'pathRewrite': { '^/pyapi': '' },
     },

@@ -58,7 +58,7 @@ class ProjectModal extends Component {
             onJson: (response) => {
               this.props.fetchData && this.props.fetchData()
               this.props.dispatch({ type: 'project/hideModal' })
-              this.props.dispatch(routerRedux.push('/workspace/' + response._id))
+              this.props.dispatch(routerRedux.push('/workspace/' + response._id+`?type=${this.props.type}`))
             },
           })
         } else {

@@ -10,6 +10,7 @@ import '@jupyterlab/cells';
 import '@jupyterlab/codeeditor';
 import '@jupyterlab/codemirror';
 import '@jupyterlab/codemirror-extension';
+import '@jupyterlab/commit-extension';
 import '@jupyterlab/completer';
 import '@jupyterlab/completer-extension';
 import '@jupyterlab/console';

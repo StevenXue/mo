@@ -16,6 +16,11 @@ from copy import deepcopy
 from datetime import datetime
 from distutils.dir_util import copy_tree
 
+from git import Repo
+from flask_socketio import SocketIO
+
+from eventlet import spawn_n
+
 from server3.entity.project import Project
 # from server3.repository import job_repo
 from server3.repository.project_repo import ProjectRepo
@@ -25,6 +30,12 @@ from server3.constants import HUB_SERVER
 from server3.constants import GIT_SERVER
 from server3.constants import ADMIN_TOKEN
 from server3.entity.general_entity import Objects
+from server3.constants import GIT_SERVER_IP
+
+from server3.constants import REDIS_SERVER
+
+socketio = SocketIO(message_queue=REDIS_SERVER)
+
 PAGE_NO = 1
 PAGE_SIZE = 5
 
@@ -133,16 +144,6 @@ class ProjectBusiness:
                              ).json()
 
     @staticmethod
-    def init_git_repo(user_ID, repo_name):
-        """
-        auth jupyterhub with user token
-        :param user_ID:
-        :param repo_name:
-        :return: dict of res json
-        """
-        return requests.post(f'{GIT_SERVER}/git/{user_ID}/{repo_name}')
-
-    @staticmethod
     def delete_hub_user(user_ID, project_name):
         """
         auth jupyterhub with user token
@@ -159,6 +160,16 @@ class ProjectBusiness:
                                    'Authorization': 'token {}'.format(
                                        ADMIN_TOKEN)
                                })
+
+    @staticmethod
+    def init_git_repo(user_ID, repo_name):
+        """
+        auth jupyterhub with user token
+        :param user_ID:
+        :param repo_name:
+        :return: dict of res json
+        """
+        return requests.post(f'{GIT_SERVER}/git/{user_ID}/{repo_name}')
 
     @staticmethod
     def gen_dir(user_ID, name):
@@ -218,6 +229,12 @@ class ProjectBusiness:
         #     "page_size": page_size,
         # }
 
+    @staticmethod
+    def clone(user_ID, name, project_path):
+        return Repo.clone_from(
+            f'root@{GIT_SERVER_IP}:/var/www/user_repos/{user_ID}/{name}',
+            project_path)
+
     @classmethod
     def create_project(cls, name, description, user, privacy='private',
                        tags=None, user_token='', type='app'):
@@ -239,6 +256,12 @@ class ProjectBusiness:
 
         # generate project dir
         project_path = cls.gen_dir(user_ID, name)
+
+        # init git repo
+        cls.init_git_repo(user_ID, name)
+
+        # clone to project dir
+        repo = cls.clone(user_ID, name, project_path)
 
         # auth jupyterhub with user token
         res = cls.auth_hub_user(user_ID, name, user_token)
@@ -305,10 +328,6 @@ class ProjectBusiness:
         Update project
 
         :param project_name:
-        :param tb_port:
-        :param privacy:
-        :param tags:
-        :param description: str
         :return: a new created project object
         """
         [user_ID, project_name] = project_name.split('+')
@@ -316,4 +335,30 @@ class ProjectBusiness:
         return cls.repo.update_unique_one(dict(name=project_name, user=user),
                                           data)
 
-    # @classmethod
+    @classmethod
+    def commit(cls, project_id, commit_msg):
+        """
+        commit project
+
+        :param commit_msg:
+        :param project_id:
+        :return: a new created project object
+        """
+        project = cls.get_by_id(project_id)
+        repo = Repo(project.path)
+        # add all
+        repo.git.add(A=True)
+        repo.index.commit(commit_msg)
+
+        def push():
+            repo.remote(name='origin').push(o=project_id)
+
+        push()
+        # spawn_n(push)
+
+    @classmethod
+    def get_commits(cls, project_path):
+        repo = Repo.init(project_path)
+        heads = repo.heads
+        master = heads.master
+        return master.log()

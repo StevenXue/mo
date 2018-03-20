@@ -73,9 +73,7 @@ class ModuleBusiness(ProjectBusiness):
         cls.init_git_repo(user_ID, name)
 
         # clone to project dir
-        repo = GRepo.clone_from(
-            f'root@{GIT_SERVER_IP}:/var/www/user_repos/{user_ID}/{name}',
-            project_path)
+        repo = cls.clone(user_ID, name, project_path)
 
         # create template
         # TODO real template and new template method

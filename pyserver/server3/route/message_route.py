@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+from bson import ObjectId
 from flask import Blueprint
 from flask import jsonify
 from flask import make_response
@@ -24,12 +25,12 @@ def create_message():
         return jsonify({'response': 'insufficient arguments'}), 400
     data = request.get_json()
     #  用于确定 message 的类型
-
     message_type = data['message_type']
     sender = data.get('sender', None)
     title = data.get('title')
     content = data.get('content', None)
-    receivers = data.get('receivers', None)
+    # receivers is a list
+    receivers = data.get('receivers', [])
     message_service.create_message(sender, message_type,
                                    receivers, title=title,
                                    content=content)

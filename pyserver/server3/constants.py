@@ -3,7 +3,7 @@ from uuid import getnode as get_mac
 MONGO = 'DEFAULT'
 # if get_mac() == 274973436731254:
 #     MONGO = 'DEFAULT'
-PORT = 5000
+PORT = 5005
 FILL_BLANK = 'BLANK_GRID'
 ALLOWED_EXTENSIONS = {'zip', 'csv', 'png', 'jpg', 'jpeg', 'svg', 'txt', 'py',
                       'pyc',
@@ -14,7 +14,7 @@ MODEL_SCRIPT_PATH = './run_model.py'
 SERVING_PORT = 9000
 REDIS_SERVER = 'redis://10.52.14.182:6379'
 GIT_SERVER = 'http://10.52.14.182:2333'
-GIT_SERVER_IP = 'http://10.52.14.182'
+GIT_SERVER_IP = '10.52.14.182'
 # REDIS_SERVER = 'redis://localhost:6379'
 HUB_SERVER = 'http://localhost:8000'
 ADMIN_TOKEN = '1d4afa72b00c4ffd9db82f26e1628f89'
