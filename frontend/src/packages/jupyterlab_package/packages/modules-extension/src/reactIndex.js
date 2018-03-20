@@ -12,6 +12,10 @@ import {
   NotebookActions,
 } from '@jupyterlab/notebook'
 
+import {
+  defaultOverview,
+} from '@jupyterlab/services'
+
 import ParamsMapper from './ParamsMapper'
 
 import { addModuleToApp, getModule, getProjects } from './services'
@@ -154,35 +158,7 @@ export class ModulePage extends React.Component {
           </div>
         )
       } else {
-
-        const overview = this.state.project.overview || '## Overview\n' +
-          '\n' +
-          '_Provide a short overview of your algorithm that explains the value and primary use cases._\n' +
-          '\n' +
-          '## Usage\n' +
-          '\n' +
-          '### Input\n' +
-          '\n' +
-          '_Describe the input fields for your algorithm. For example:_\n' +
-          '\n' +
-          '\n' +
-          '| Parameter | Description |\n' +
-          '| --------- | ----------- |\n' +
-          '| field     | Description of field |\n' +
-          '\n' +
-          '### Output\n' +
-          '\n' +
-          '_Describe the output fields for your algorithm. For example:_\n' +
-          '\n' +
-          '\n' +
-          '| Parameter | Description | \n' +
-          '| --------- | ----------- | \n' +
-          '| field     | Description of field | \n' +
-          '\n' +
-          '## Examples\n' +
-          '\n' +
-          '_Provide and explain examples of input and output for your algorithm._\n' +
-          '\n'
+        const overview = this.state.project.overview || defaultOverview
         return (
           <div style={{ height: '100%', overflowY: 'auto' }}>
             <header style={{ cursor: 'pointer' }} onClick={() => this.backToList()}>

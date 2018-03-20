@@ -264,10 +264,12 @@ def update_project(project_identity):
         data['tags'] = str_utility.split_without_empty(tags)
 
     if request.args.get('by') == 'name':
-        ProjectBusiness.update_project_by_name(project_identity, **data)
+        project = ProjectBusiness.update_project_by_name(project_identity,
+                                                       **data)
     else:
-        ProjectBusiness.update_project(project_identity, **data)
-    return jsonify({'response': 'create project success'}), 200
+        project = ProjectBusiness.update_project(project_identity, **data)
+    project = json_utility.convert_to_json(project.to_mongo())
+    return jsonify({'response': project}), 200
 
 
 @project_app.route('/projects/<string:project_id>', methods=['DELETE'])

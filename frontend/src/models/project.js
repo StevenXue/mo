@@ -10,12 +10,19 @@ export default {
     projectsLoading: false,
     privacy: undefined,
     projectType: 'project',
+    tags: [],
   },
   reducers: {
     setPrivacy(state, { payload: privacy }) {
       return {
         ...state,
         privacy,
+      }
+    },
+    setTags(state, { payload: tags }) {
+      return {
+        ...state,
+        tags,
       }
     },
     setType(state, { payload: projectType }) {
