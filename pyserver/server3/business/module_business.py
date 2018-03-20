@@ -126,7 +126,9 @@ class ModuleBusiness(ProjectBusiness):
         module = cls.get_by_id(project_id, yml=False)
         module.module_path = os.path.join(MODULE_DIR, module.user.user_ID,
                                           module.name)
+        module.privacy = 'public'
         module.save()
+
         dst = module.module_path
         # if dir exists, remove it and copytree, cause copytree will
         #  create the dir
@@ -135,3 +137,5 @@ class ModuleBusiness(ProjectBusiness):
         shutil.copytree(module.path, dst)
         # WORKON_HOME=./ pipenv install vv
         subprocess.call(['bash', 'install_venv.sh', os.path.abspath(dst)])
+
+        return module

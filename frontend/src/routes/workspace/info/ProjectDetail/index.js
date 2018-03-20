@@ -272,7 +272,6 @@ const Jobs = ({projectDetail, dispatch}) => {
           </div>)}
       </div>
     </div>
-
   )
 }
 

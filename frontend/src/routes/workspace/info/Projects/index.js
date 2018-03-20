@@ -13,7 +13,7 @@ const Search = Input.Search
 const TabPane = Tabs.TabPane
 
 function Projects({ history, project, dispatch ,location}) {
-  const defaultActiveKeyDic = {"?App":"1","?Module":"2","?Dataset":"3"}
+  const defaultActiveKeyDic = {"?tab=App":"1","?tab=Module":"2","?tab=Dataset":"3"}
   const paramList = Object.keys(defaultActiveKeyDic)
 
   function callback(key) {

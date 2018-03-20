@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Card, Button, Row, Col, Input, message } from 'antd'
+import { Card, Button, Row, Col, Input, message, Icon } from 'antd'
 
 import {
   Clipboard
@@ -144,12 +144,13 @@ export class DatasetPage extends React.Component {
     if (this.state.projectId !== undefined) {
       return (
         <div style={{ minHeight: 100, overflowY: 'auto' }}>
-          <h2>{this.state.project.name}</h2>
+          <header style={{ cursor: 'pointer' }} onClick={() => this.backToList()}>
+            <Icon type="left"/>{this.state.project.name}
+          </header>
           <p>{this.state.project.description}</p>
           <p id='copy-p'>{this.state.project.path}</p>
           <Row>
             <Button type='primary' onClick={(e) => this.copyPath()}>Copy Path</Button>
-            <Button onClick={() => this.backToList()}>Cancel</Button>
           </Row>
         </div>
       )

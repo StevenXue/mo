@@ -44,8 +44,6 @@ def count_projects():
             user_ID=user_ID,
             count_only=True)
         counts.append(count)
-    print('count')
-    print(counts)
     return jsonify({
         "response": counts
     }), 200

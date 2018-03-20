@@ -5,36 +5,11 @@ import {Tabs, Switch, Button, Input, Form, Card, Upload, message, Icon} from 'an
 import {get} from 'lodash'
 import {showTime} from '../../utils/index'
 import styles from './index.less'
+import CONSTANT from '../../constants'
 
 const TabPane = Tabs.TabPane
 const {TextArea} = Input
-
-const defaultDocs = "## Overview\n" +
-  "\n" +
-  "_Provide a short overview of your algorithm that explains the value and primary use cases._\n" +
-  "\n" +
-  "## Usage\n" +
-  "\n" +
-  "### Input\n" +
-  "\n" +
-  "_Describe the input fields for your algorithm. For example:_\n" +
-  "aababsa\n" +
-  "| Parameter | Description |\n" +
-  "| --------- | ----------- |\n" +
-  "| field     | Description of field |\n" +
-  "\n" +
-  "### Output\n" +
-  "\n" +
-  "_Describe the output fields for your algorithm. For example:_\n" +
-  "\n" +
-  "| Parameter | Description |\n" +
-  "| --------- | ----------- |\n" +
-  "| field     | Description of field |\n" +
-  "\n" +
-  "## Examples\n" +
-  "\n" +
-  "_Provide and explain examples of input and output for your algorithm._\n" +
-  "\n"
+const defaultDocs = CONSTANT.defaultOverviewDocs
 //({module, dispatch}
 class Docs extends React.Component {
   constructor(props) {

@@ -71,7 +71,7 @@ function Profile({login, profile, dispatch, history}) {
                   <Row type="flex" justify="start">
                     <Col span={2}>
                       <div className={styles.appDiv}
-                           onClick={() => toWorkspace(dispatch, 'App')}>
+                           onClick={() => toWorkspace(dispatch, 'tab=App')}>
                         <p className={styles.appText}>App</p>
                         <p
                           className={styles.appNumber}>{projectNumber ? projectNumber[0] : null}</p>
@@ -84,7 +84,7 @@ function Profile({login, profile, dispatch, history}) {
                     </Col>
                     <Col span={2}>
                       <div className={styles.appDiv}
-                           onClick={() => toWorkspace(dispatch, 'Module')}>
+                           onClick={() => toWorkspace(dispatch, 'tab=Module')}>
                         <p className={styles.appText}>Module</p>
                         <p
                           className={styles.appNumber}>{projectNumber ? projectNumber[1] : null}</p>
@@ -97,7 +97,7 @@ function Profile({login, profile, dispatch, history}) {
                     </Col>
                     <Col span={2}>
                       <div className={styles.appDiv}
-                           onClick={() => toWorkspace(dispatch, 'Dataset')}>
+                           onClick={() => toWorkspace(dispatch, 'tab=Dataset')}>
                         <p className={styles.appText}>Dataset</p>
                         <p
                           className={styles.appNumber}>{projectNumber ? projectNumber[2] : null}</p>
@@ -584,7 +584,7 @@ class MyAnswerList extends Component {
                       <p className={styles.description}>{e.answer}</p>
                       <div className={styles.footer}>
                         <Icon type="clock-circle-o"
-                              className={styles.clockIcon}/>
+                              className={styles.tagsIcon}/>
                         <p>{showTime(e.create_time)}</p>
                       </div>
                     </div>

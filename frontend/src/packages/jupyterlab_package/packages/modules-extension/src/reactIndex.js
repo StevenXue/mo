@@ -1,6 +1,9 @@
 import * as React from 'react'
-import { Card, Button, Row, Col, Input } from 'antd'
+import { Card, Button, Row, Col, Input, Icon } from 'antd'
 import * as pathToRegexp from 'path-to-regexp'
+import ReactMde from 'react-mde'
+// const {ReactMdeTypes, ReactMdeCommands} = ReactMde
+
 import {
   VDomRenderer,
 } from '@jupyterlab/apputils'
@@ -73,7 +76,7 @@ export class ModulePage extends React.Component {
       projectId: response._id,
       project: response,
       func: func,
-      args: Object.values(response.input[func]),
+      args: func ? Object.values(response.input[func]) : undefined,
     })
   }
 
@@ -137,16 +140,72 @@ export class ModulePage extends React.Component {
 
   render() {
     if (this.state.projectId !== undefined) {
-      return (
-        <div style={{ height: '100%', overflowY: 'auto' }}>
-          <h2>{this.state.project.name}</h2>
-          {this.renderParameters()}
-          <Row>
-            <Button type='primary' onClick={() => this.insertCode()}>Insert Code</Button>
-            <Button onClick={() => this.backToList()}>Cancel</Button>
-          </Row>
-        </div>
-      )
+      if (this.state.func) {
+        return (
+          <div style={{ height: '100%', overflowY: 'auto' }}>
+            <header style={{ cursor: 'pointer' }} onClick={() => this.backToList()}>
+              <Icon type="left"/>{this.state.project.name}
+            </header>
+            {this.renderParameters()}
+            <Row>
+              <Button type='primary' onClick={() => this.insertCode()}>Insert Code</Button>
+              {/*<Button onClick={() => this.backToList()}>Back to List</Button>*/}
+            </Row>
+          </div>
+        )
+      } else {
+
+        const overview = this.state.project.overview || '## Overview\n' +
+          '\n' +
+          '_Provide a short overview of your algorithm that explains the value and primary use cases._\n' +
+          '\n' +
+          '## Usage\n' +
+          '\n' +
+          '### Input\n' +
+          '\n' +
+          '_Describe the input fields for your algorithm. For example:_\n' +
+          '\n' +
+          '\n' +
+          '| Parameter | Description |\n' +
+          '| --------- | ----------- |\n' +
+          '| field     | Description of field |\n' +
+          '\n' +
+          '### Output\n' +
+          '\n' +
+          '_Describe the output fields for your algorithm. For example:_\n' +
+          '\n' +
+          '\n' +
+          '| Parameter | Description | \n' +
+          '| --------- | ----------- | \n' +
+          '| field     | Description of field | \n' +
+          '\n' +
+          '## Examples\n' +
+          '\n' +
+          '_Provide and explain examples of input and output for your algorithm._\n' +
+          '\n'
+        return (
+          <div style={{ height: '100%', overflowY: 'auto' }}>
+            <header style={{ cursor: 'pointer' }} onClick={() => this.backToList()}>
+              <Icon type="left"/>{this.state.project.name}
+            </header>
+            <div>
+              <ReactMde
+                textAreaProps={{
+                  id: 'ta1',
+                  name: 'ta1',
+                }}
+                value={{ text: overview }}
+                showdownOptions={{ tables: true, simplifiedAutoLink: true }}
+                visibility={{
+                  toolbar: false,
+                  textarea: false,
+                  previewHelp: false,
+                }}
+              />
+            </div>
+          </div>
+        )
+      }
     } else {
       return (
         <div style={{ height: '100%' }}>
@@ -158,15 +217,16 @@ export class ModulePage extends React.Component {
           <div className='list'>
             {this.state.projects.map((project) =>
               <Card key={project.name} title={project.name}
+                    extra={<Button onClick={() => this.clickProject(project)}>Detail</Button>}
                 // onClick={() => this.clickModule(project)}
                     style={{ margin: '5px 3px', cursor: 'pointer' }}>
                 <Col>
                   {project.description}
-                  {project.category ? <Row>
+                  {project.category === 'model' ? <Row>
                     <Button onClick={() => this.clickProject(project, 'train')}>train</Button>
                     <Button onClick={() => this.clickProject(project, 'predict')}>predict</Button>
                   </Row> : <Row>
-                    <Button onClick={() => this.clickProject(project, 'run')}>train</Button>
+                    <Button onClick={() => this.clickProject(project, 'run')}>run</Button>
                   </Row>}
                 </Col>
               </Card>)}

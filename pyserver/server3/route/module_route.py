@@ -93,5 +93,6 @@ def update_module():
 
 @module_app.route("/publish/<project_id>", methods=["POST"])
 def deploy_in_docker(project_id):
-    ModuleBusiness.publish(project_id)
-    return jsonify({"response": {"code": 11}})
+    project = ModuleBusiness.publish(project_id)
+    project = json_utility.convert_to_json(project.to_mongo())
+    return jsonify({"response": project})
