@@ -57,8 +57,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         # deploy
         call(['faas-cli', 'build', '-f', f'./{service_name}.yml'],
              cwd=cls.base_func_path)
-        call(
-            ['faas-cli', 'deploy', '-f', f'./{service_name}.yml'],
+        call(['faas-cli', 'deploy', '-f', f'./{service_name}.yml'],
             cwd=cls.base_func_path)
 
         user_ID = app.user.user_ID
@@ -66,6 +65,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
 
         app.app_path = dir_path
         app.privacy = 'public'
+        app.status = 'active'
         app.save()
         return app
 
