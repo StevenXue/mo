@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import {Modal, Form, Input, Radio, Select, Tag, Tooltip, Button} from 'antd'
 import {connect} from 'dva'
+import _ from 'lodash'
 import {
   createNewUserRequest,
   updateUserRequest,
@@ -22,7 +23,6 @@ class RequestModal extends Component {
     super(props)
     this.state = {
       visible: false,
-      tags: [],
       inputVisible: false,
     }
   }
@@ -46,7 +46,7 @@ class RequestModal extends Component {
       const body = {
         ...values,
         type: this.props.type,
-        tags: this.state.tags,
+        tags: this.props.allRequest.tags,
       }
       if (!err) {
         if (this.props.new) {
@@ -76,8 +76,8 @@ class RequestModal extends Component {
 
   handleClose(tags, removedTag) {
     tags = tags.filter(tag => tag !== removedTag).filter(e => e)
-    this.setState({tags, inputValue: undefined})
-    // dispatch({ type: 'upload/removeTag', payload: tags })
+    this.setState({inputValue: undefined})
+    this.props.dispatch({ type: 'allRequest/setTags', payload: tags })
   }
 
   showInput() {
@@ -92,23 +92,25 @@ class RequestModal extends Component {
   handleInputConfirm(tags) {
     if (this.state.inputValue && tags.indexOf(this.state.inputValue) === -1) {
       tags = [...tags, this.state.inputValue]
-      this.setState({tags, inputValue: undefined, inputVisible: false})
+      this.setState({ inputValue: undefined, inputVisible: false })
+      this.props.dispatch({ type: 'allRequest/setTags', payload: tags })
     }
   }
 
   render() {
-    const {children, requestDetail} = this.props
+    const {children, requestDetail,allRequest} = this.props
     const {getFieldDecorator} = this.props.form
     // const { name, description, privacy } = this.props.record
     const formItemLayout = {
       labelCol: {span: 6},
       wrapperCol: {span: 14},
     }
-    let title, description,  input, output
-    let tags = this.state.tags
+
+    let tags=[]
+    let title, description, input, output
     if (requestDetail) {
-      ({title, description, input, output } = requestDetail)
-      tags = tags.length > 0 ? [...requestDetail.tags,...tags] : requestDetail.tags
+      tags = allRequest.tags;
+      ({ title, description, input, output }= requestDetail);
     }
     return (
       <span>

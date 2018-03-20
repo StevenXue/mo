@@ -46,6 +46,7 @@ export default {
     pageSize:10,
     totalNumber:0,
     modalVisible: false,
+    tags: [],
   },
   reducers: {
     // 获取所有的request
@@ -181,6 +182,7 @@ export default {
       return {
         ...state,
         focusUserRequest: focusUserRequest,
+        tags: focusUserRequest.tags,
       }
     },
 
@@ -258,6 +260,13 @@ export default {
         ...state,
         focusUserRequest: null,
       }
+    },
+    setTags(state, { payload: tags }) {
+      console.log(tags,'tags')
+      return {
+        ...state,
+        tags:tags,
+      }
     }
   },
 
@@ -278,8 +287,12 @@ export default {
       }
     },
 
-    * fetchOneRequest(action, {call, put}) {
+    * refresh(action, { call, put }){
       yield put({ type: 'clearFocusRequest' })
+      yield put({ type: 'fetchOneRequest', payload:action.payload })
+    },
+
+    * fetchOneRequest(action, {call, put}) {
       const {data: focusUserRequest} = yield call(userRequestService.fetchOneUserRequest,
         {user_request_ID: action.payload.userrequestId})
       yield put({
@@ -399,11 +412,14 @@ export default {
           //   payload: {}
           // })
         } else if (match) {
-          console.log('match')
           dispatch({
-            type: 'fetchOneRequest',
+            type: 'refresh',
             payload: {userrequestId: match[1]}
           })
+          // dispatch({
+          //   type: 'fetchOneRequest',
+          //   payload: {userrequestId: match[1]}
+          // })
         }
       })
     },
