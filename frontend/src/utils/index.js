@@ -128,6 +128,23 @@ var gradientColors = function (start, end, steps, gamma) {
   }
   return output;
 };
+const formatParam = (filter) => {
+  let params = ''
+  for (let key in filter) {
+    if (!filter.hasOwnProperty(key)) {
+      continue
+    }
+    if (filter[key]) {
+      const value = filter[key]
+      if (key === 'projectType') {
+        key = 'type'
+      }
+      params += `&${key}=${value}`
+    }
+  }
+  return params
+}
+
 
 module.exports = {
   config,
@@ -138,5 +155,6 @@ module.exports = {
   arrayToTree,
   showTime,
   org_request,
-  gradientColors
+  gradientColors,
+  formatParam
 }
