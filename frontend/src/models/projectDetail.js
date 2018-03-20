@@ -249,14 +249,16 @@ export default {
       return history.listen(({pathname}) => {
         const match = pathToRegexp('/workspace/:projectId/:type?').exec(pathname)
         const match2 = pathToRegexp('/market/:projectId/:type?').exec(pathname)
-        let url = new URL(location.href.replace('/#', ''))
-        const projectType = url.searchParams.get('type')
+        const url = new URL(location.href.replace('/#', ''))
         if (match) {
           const projectId = match[1]
+          const projectType = url.searchParams.get('type') || match[2]
           dispatch({type: 'fetch', projectId, projectType})
           // dispatch({ type: 'fetchJobs', projectId: projectId })
         } else if (match2) {
           const projectId = match2[1]
+          const projectType = url.searchParams.get('type') || match[2]
+
           dispatch({type: 'fetch', projectId, projectType})
         }
       })
