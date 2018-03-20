@@ -11,6 +11,8 @@
  */
 
 import React, {Component} from 'react'
+import {connect} from 'dva'
+
 // import ChatBot from 'react-simple-chatbot'
 import ChatBot from '../../packages/react-simple-chatbot-master/lib/ChatBot'
 
@@ -128,6 +130,7 @@ export const optionStep = {
 
   ],
 }
+
 /**
  * 保存 webChat id
  * */
@@ -317,18 +320,33 @@ function finalSteps() {
   ]
 }
 
-class WebChat extends Component {
+class WebChat extends React.Component {
   constructor(props) {
     super(props)
+
+    // this.state = {
+    //   opened: true,
+    // }
+  }
+
+  myToggleFloating = ({ opened }) => {
+    this.props.dispatch({
+      type: 'chatbot/updateState',
+      payload: {
+        opened
+      }
+    })
+    // this.setState({  opened });
   }
 
   render() {
+    const {opened} = this.props
     return (
       <ThemeProvider theme={theme}>
         <ChatBot
           floating={true}
           headerTitle="MO平台机器人"
-          // recognitionEnable={true}
+          recognitionEnable={true}
           placeholder="请输入你的问题"
           steps={finalSteps()}
           //steps={uiSteps}
@@ -338,6 +356,9 @@ class WebChat extends Component {
           userDelay={10}
           botBubbleColor="white"
           botFontColor="black"
+
+          opened={opened}
+          toggleFloating={this.myToggleFloating}
           // customStyle={{"background-color": "red"}}
           // userBubbleColor='#ffe695'
           // userFontColor=''
@@ -347,7 +368,7 @@ class WebChat extends Component {
   }
 }
 
-export default WebChat
+export default connect(({chatbot}) => ({...chatbot}))(WebChat)
 
 /**
  * <ChatBot

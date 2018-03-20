@@ -422,6 +422,7 @@ class ChatBot extends Component {
   }
 
   toggleChatBot(opened) {
+    console.log("opened", opened)
     if (this.props.toggleFloating) {
       this.props.toggleFloating({ opened });
     } else {
@@ -445,6 +446,8 @@ class ChatBot extends Component {
           style={customStyle}
           previousStep={previousStep}
           triggerNextStep={this.triggerNextStep}
+
+          // toggleChatBot = {this.toggleChatBot(false)}
         />
       );
     }

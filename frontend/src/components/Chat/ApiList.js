@@ -129,7 +129,6 @@ export class ApiList extends Component {
       <div
         className={styles.container}
       >
-
         {apiList.map(api => {
             const {favor_users} = api
             return <ApiCard
@@ -137,14 +136,16 @@ export class ApiList extends Component {
               key={api._id}
               isFavor={this.isFavor(favor_users)}
 
-              onPress={() =>
-                this.props.dispatch(routerRedux.push(`/workspace/${api._id}`))
-                // this.props.dispatch(
-                //   NavigationActions.navigate({
-                //     routeName: 'AppDetail',
-                //     params: {api},
-                //   })
-                // )
+              onPress={() => {
+                // 关闭窗口
+                this.props.dispatch({
+                  type: 'chatbot/updateState',
+                  payload: {
+                    opened: false
+                  }
+                })
+                this.props.dispatch(routerRedux.push(`/workspace/${api._id}?type=app`))
+              }
               }
             />
           }
@@ -162,7 +163,6 @@ export class ApiList extends Component {
               this.setState({showButton: false})
             }}/>) :
             <NoMoreCard onPress={() => {
-              console.log("this.props", this.props)
               this.props.triggerCustomOption({
                 value: 2,
                 label: '发布需求',

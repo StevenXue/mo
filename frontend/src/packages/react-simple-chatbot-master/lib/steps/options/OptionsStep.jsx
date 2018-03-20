@@ -6,6 +6,9 @@ import OptionElement from './OptionElement';
 import Options from './Options';
 import OptionsStepContainer from './OptionsStepContainer';
 
+import {connect} from 'dva'
+import {routerRedux} from 'dva/router'
+
 class OptionsStep extends Component {
   /* istanbul ignore next */
   constructor(props) {
@@ -15,14 +18,39 @@ class OptionsStep extends Component {
     this.onOptionClick = this.onOptionClick.bind(this);
   }
 
-  onOptionClick({ value }) {
-    this.props.triggerNextStep({ value });
+  onOptionClick({ value, label }) {
+    console.log("value", value)
+
+    if(label === "发布需求"){
+      this.props.dispatch({
+        type: 'chatbot/updateState',
+        payload: {
+          opened: false
+        }
+      })
+      this.props.dispatch(routerRedux.push(`/userrequest`))
+      this.props.dispatch({type: 'allRequest/showModal'})
+    }else if(label === "我发布的需求"){
+      this.props.dispatch({
+        type: 'chatbot/updateState',
+        payload: {
+          opened: false
+        }
+      })
+      let user_ID = localStorage.getItem('user_ID');
+      this.props.dispatch(routerRedux.push(`/profile/${user_ID}`))
+    }
+    else{
+      this.props.triggerNextStep({ value });
+    }
+
+
   }
 
   renderOption(option) {
     const { bubbleStyle } = this.props;
     const { user } = this.props.step;
-    const { value, label } = option;
+    const { value, label, route } = option;
     const border = `1px solid ${option.borderColor}`
     //border:1px solid red
     return (
@@ -34,7 +62,7 @@ class OptionsStep extends Component {
           className="rsc-os-option-element"
           style={bubbleStyle}
           user={user}
-          onClick={() => this.onOptionClick({ value })}
+          onClick={() => this.onOptionClick({ value, label })}
           border={border}
         >
           {label}
@@ -62,4 +90,4 @@ OptionsStep.propTypes = {
   bubbleStyle: PropTypes.object.isRequired,
 };
 
-export default OptionsStep;
+export default connect(({})=>({}))(OptionsStep);

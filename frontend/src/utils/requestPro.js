@@ -76,11 +76,14 @@ export default async function request(url, options) {
 
 /**************************** 分割线 ****************************/
 
-const onSuccessDef = function(response) {}
+const onSuccessDef = function (response) {
+}
 
-const onErrorDef = function(error) {}
+const onErrorDef = function (error) {
+}
 
-const callbackDef = function(response) {}
+const callbackDef = function (response) {
+}
 
 /**
  * Requests a URL, returning a promise.
@@ -94,13 +97,11 @@ const callbackDef = function(response) {}
  *
  *
  */
-export async function customRequest(
-  url,
-  options,
-  callback = callbackDef,
-  onSuccess = onSuccessDef,
-  onError = onErrorDef
-) {
+export async function customRequest(url,
+                                    options,
+                                    callback = callbackDef,
+                                    onSuccess = onSuccessDef,
+                                    onError = onErrorDef) {
   // concat url
   const newUrl = `/pyapi${url}`
 
@@ -110,7 +111,7 @@ export async function customRequest(
   const defaultOptions = {
     credentials: 'include',
   }
-  const newOptions = { ...defaultOptions, ...options }
+  const newOptions = {...defaultOptions, ...options}
   if (newOptions.method === 'POST' || newOptions.method === 'PUT' ||
     newOptions.method === 'post' || newOptions.method === 'put'
 
@@ -132,11 +133,6 @@ export async function customRequest(
     ...newOptions.headers,
   }
 
-  console.log('newUrl, newOptions')
-  console.log(newUrl, newOptions)
-  console.log(JSON.stringify(newUrl))
-  console.log(JSON.stringify(newOptions))
-
 
   return fetch(newUrl, newOptions)
     .then(checkStatus)
@@ -149,7 +145,7 @@ export async function customRequest(
         return response.json()
       }
     })
-    .then(res=> {
+    .then(res => {
       onSuccess(res)
     })
     .then(res => {
