@@ -44,7 +44,9 @@
     "watch:main": "jlpm run watch",
     "watch:packages": "python scripts/watch_packages.py"
   },
-  "dependencies": {},
+  "dependencies": {
+    "react-simple-chatbot": "^0.2.9"
+  },
   "devDependencies": {
     "@jupyterlab/eslint-plugin-jinja": "^0.2.0",
     "eslint": "^4.12.1",

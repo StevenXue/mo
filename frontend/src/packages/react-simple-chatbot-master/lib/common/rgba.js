@@ -1,4 +1,8 @@
 const hexToRgb = (hex) => {
+  console.log("hex", hex)
+  if(!hex){
+    return null
+  }
   // http://stackoverflow.com/a/5624139
   const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
   hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
@@ -21,6 +25,9 @@ const hexToRgb = (hex) => {
  */
 const rgba = (hex, alpha = 1) => {
   const color = hexToRgb(hex);
+  if(!color){
+    return `rgba(0, 0, 0, ${alpha}`
+  }
   return `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`;
 };
 

@@ -329,7 +329,7 @@ class WebChat extends React.Component {
     // }
   }
 
-  myToggleFloating = ({ opened }) => {
+  myToggleFloating = ({opened}) => {
     this.props.dispatch({
       type: 'chatbot/updateState',
       payload: {
@@ -343,25 +343,47 @@ class WebChat extends React.Component {
     const {opened} = this.props
     return (
       <ThemeProvider theme={theme}>
+        {/*<ChatBot*/}
+          {/*floating={true}*/}
+          {/*headerTitle="Speech Recognition"*/}
+          {/*recognitionEnable={true}*/}
+          {/*steps={[*/}
+            {/*{*/}
+              {/*id: '1',*/}
+              {/*message: 'What is your name?',*/}
+              {/*trigger: '2',*/}
+            {/*},*/}
+            {/*{*/}
+              {/*id: '2',*/}
+              {/*user: true,*/}
+              {/*trigger: '3',*/}
+            {/*},*/}
+            {/*{*/}
+              {/*id: '3',*/}
+              {/*message: 'Hi {previousValue}, nice to meet you!',*/}
+              {/*end: true,*/}
+            {/*},*/}
+          {/*]}*/}
+        {/*/>*/}
         <ChatBot
-          floating={true}
-          headerTitle="MO平台机器人"
-          recognitionEnable={true}
-          placeholder="请输入你的问题"
-          steps={finalSteps()}
-          //steps={uiSteps}
-          hideUserAvatar
-          hideBotAvatar
-          botDelay={100}
-          userDelay={10}
-          botBubbleColor="white"
-          botFontColor="black"
+        floating={true}
+        headerTitle="MO平台机器人"
+        recognitionEnable={true}
+        placeholder="请输入你的问题"
+        steps={finalSteps()}
+        //steps={uiSteps}
+        hideUserAvatar
+        hideBotAvatar
+        botDelay={100}
+        userDelay={10}
+        botBubbleColor="white"
+        botFontColor="black"
 
-          opened={opened}
-          toggleFloating={this.myToggleFloating}
-          // customStyle={{"background-color": "red"}}
-          // userBubbleColor='#ffe695'
-          // userFontColor=''
+        opened={opened}
+        toggleFloating={this.myToggleFloating}
+        // customStyle={{"background-color": "red"}}
+        // userBubbleColor='#ffe695'
+        // userFontColor=''
         />
       </ThemeProvider>
     )

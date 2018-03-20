@@ -8,7 +8,6 @@ from server3.business.general_business import GeneralBusiness
 class WorldBusiness(GeneralBusiness):
     repo = Repo(World)
 
-    # TODO 推送到前端
     # 1. 用户发送
     @classmethod
     def user_send(cls, sender, channel, message):
