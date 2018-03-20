@@ -55,18 +55,19 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
             # copy module tree to target path
             cls.copytree(module_path, module_path_target)
         # deploy
-        call(['faas-cli', 'build', '-f', './{name}.yml'.format(
-            name=service_name)],
+        call(['faas-cli', 'build', '-f', f'./{service_name}.yml'],
              cwd=cls.base_func_path)
         call(
-            ['faas-cli', 'deploy', '-f', './{name}.yml'.format(
-                name=service_name)],
+            ['faas-cli', 'deploy', '-f', f'./{service_name}.yml'],
             cwd=cls.base_func_path)
 
         user_ID = app.user.user_ID
         dir_path = os.path.join(APP_DIR, user_ID + '-' + app.name)
-        cls.update_project(app_id, app_path=dir_path)
-        return service_name
+
+        app.app_path = dir_path
+        app.privacy = 'public'
+        app.save()
+        return app
 
     @classmethod
     def get_by_id(cls, project_id, yml=False):
@@ -102,8 +103,8 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
                     args = cls.replace_dup_n_update(obj['input'], func_args,
                                                     module.name)
                     output = cls.update_with_module_name(obj.get('output', {}),
-                                                      output_args,
-                                                      module.name)
+                                                         output_args,
+                                                         module.name)
             else:
                 args = cls.update_with_module_name(args, func_args,
                                                    module.name)
@@ -200,10 +201,12 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         #  比对打分
         for app in all_apps:
             name_score = synonyms.compare(search_query, app.name, seg=True)
-            description_score = synonyms.compare(search_query, app.description, seg=True)
+            description_score = synonyms.compare(search_query, app.description,
+                                                 seg=True)
             app.score = (name_score + description_score) / 2
         # 筛选掉小于 description_score
-        apps = list(filter(lambda app: app.score >= default_max_score, all_apps))
+        apps = list(
+            filter(lambda app: app.score >= default_max_score, all_apps))
 
         count = len(apps)
         apps = sorted(apps, key=lambda item: -item.score)
