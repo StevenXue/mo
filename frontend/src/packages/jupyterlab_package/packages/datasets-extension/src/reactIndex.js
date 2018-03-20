@@ -14,6 +14,8 @@ import {
   defaultOverview,
 } from '@jupyterlab/services'
 
+import CopyInput from './CopyInput'
+
 import ParamsMapper from './ParamsMapper'
 
 import { getProjects } from './services'
@@ -153,11 +155,10 @@ export class DatasetPage extends React.Component {
           <header style={{ cursor: 'pointer' }} onClick={() => this.backToList()}>
             <Icon type="left"/>{this.state.project.name}
           </header>
-          <p>{this.state.project.description}</p>
-          <p id='copy-p'>{this.state.project.path}</p>
-          <Row>
-            <Button type='primary' onClick={(e) => this.copyPath()}>Copy Path</Button>
-          </Row>
+          <p className='des'>{this.state.project.description}</p>
+          <div className='des'>
+            <CopyInput text={this.state.project.path}/>
+          </div>
           <ReactMde
             textAreaProps={{
               id: 'ta1',
