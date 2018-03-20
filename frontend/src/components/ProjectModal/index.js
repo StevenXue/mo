@@ -3,6 +3,7 @@ import { Modal, Form, Input, Radio, Select, Tag, Tooltip, Button } from 'antd'
 import { connect } from 'dva'
 import { createProject, updateProject, getMyProjects, getProjects } from '../../services/project'
 import { routerRedux } from 'dva/router'
+import _ from 'lodash'
 
 const FormItem = Form.Item
 const RadioButton = Radio.Button
@@ -20,7 +21,6 @@ class ProjectModal extends Component {
     this.state = {
       visible: false,
       privacy: 'private',
-      tags: [],
       inputVisible: false,
     }
   }
@@ -48,7 +48,7 @@ class ProjectModal extends Component {
       console.log('confirm', this.state.tags, values)
       const body = {
         ...values,
-        tags: this.state.tags,
+        tags: this.props.projectDetail.tags,
         type: this.props.type,
       }
       if (!err) {
@@ -72,6 +72,7 @@ class ProjectModal extends Component {
                 type: 'projectDetail/fetch',
                 projectId: this.props.projectDetail.project._id,
                 notStartLab: true,
+                projectType: this.props.projectDetail.project.type,
               })
             },
           })
@@ -88,8 +89,8 @@ class ProjectModal extends Component {
 
   handleClose(tags, removedTag) {
     tags = tags.filter(tag => tag !== removedTag).filter(e => e)
-    this.setState({ tags, inputValue: undefined })
-    // dispatch({ type: 'upload/removeTag', payload: tags })
+    this.setState({ inputValue: undefined })
+    this.props.dispatch({ type: 'projectDetail/setTags', payload: tags })
   }
 
   showInput() {
@@ -105,7 +106,8 @@ class ProjectModal extends Component {
   handleInputConfirm(tags) {
     if (this.state.inputValue && tags.indexOf(this.state.inputValue) === -1) {
       tags = [...tags, this.state.inputValue]
-      this.setState({ tags, inputValue: undefined, inputVisible: false })
+      this.setState({ inputValue: undefined, inputVisible: false })
+      this.props.dispatch({ type: 'projectDetail/setTags', payload: tags })
     }
 
     // if (upload.inputValue && upload.tags.indexOf(upload.inputValue) === -1) {
@@ -120,11 +122,10 @@ class ProjectModal extends Component {
       labelCol: { span: 6 },
       wrapperCol: { span: 14 },
     }
-    let name, description, type, privacy
-    let tags = this.state.tags
+    let tags=[]
+    const { name, description, type, privacy } = _.get(projectDetail, 'project', {});
     if (projectDetail) {
-      ({ name, description, type, privacy } = projectDetail.project)
-      tags = tags.length > 0 ? [...projectDetail.project.tags, ...tags] : projectDetail.project.tags
+      tags = projectDetail.tags;
     }
 
     return (

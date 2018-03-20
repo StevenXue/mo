@@ -37,8 +37,9 @@ def run_in_docker():
 @app_app.route("/deploy/<app_id>", methods=["POST"])
 @jwt_required
 def deploy_in_docker(app_id):
-    service_name = AppBusiness.deploy(app_id)
-    return jsonify({"response": service_name})
+    project = AppBusiness.deploy(app_id)
+    project = json_utility.convert_to_json(project.to_mongo())
+    return jsonify({"response": project})
 
 
 @app_app.route("/add_used_module/<app_id>", methods=["PUT"])

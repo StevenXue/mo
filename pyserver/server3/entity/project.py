@@ -61,10 +61,7 @@ class Module(Project):
     repo_path = StringField()
 
 
-RE_TYPE = (
-    (0, 'disabled'),
-    (1, 'active')
-)
+RE_TYPE = ('disabled', 'active')
 
 
 class AppGetType:
@@ -103,7 +100,7 @@ class App(Project):
     # 输出格式
     output = DictField()
     # api status
-    status = IntField(choices=RE_TYPE)
+    status = StringField(choices=RE_TYPE)
     # 模拟的数据
     fake_response = StringField()
     # 调用次数
@@ -114,7 +111,6 @@ class App(Project):
     used_modules = ListField(ReferenceField(Module))
     # app 路径
     app_path = StringField(default=None)
-
 
     # # http_req是get还是post 全部是post
     # http_req = StringField(required=True)
