@@ -18,7 +18,7 @@ const TabPane = Tabs.TabPane
 
 function Projects({history, project, dispatch,location}) {
 
-  const defaultActiveKeyDic = {"?tab=App":"1","?tab=Module":"2","?tab=Dataset":"3"}
+  const defaultActiveKeyDic = {"?tab=app":"1","?tab=module":"2","?tab=dataset":"3"}
   const paramList = Object.keys(defaultActiveKeyDic)
 
   function callback(key) {
@@ -180,7 +180,7 @@ function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
         <div>
           <div className={styles.authorDateDiv}>
             <div className={styles.authorDiv}><p
-              className={styles.authorP}>AUTHOR</p><p>user</p></div>
+              className={styles.authorP}>AUTHOR</p><p>{project.user_ID}</p></div>
             <div className={styles.dateDiv}><p className={styles.dateP}>DATE</p>
               <p>{showTime(project.create_time, "yyyy-MM-dd")}</p></div>
           </div>

@@ -30,7 +30,7 @@ const related_fields = ['All',
 
 
 function AllRequest({history, allRequest, dispatch,location}) {
-  const defaultActiveKeyDic = {"?tab=App":"1","?tab=Module":"2","?tab=Dataset":"3"}
+  const defaultActiveKeyDic = {"?tab=app":"1","?tab=module":"2","?tab=dataset":"3"}
   const paramList = Object.keys(defaultActiveKeyDic)
 
   function callback(key) {
@@ -65,6 +65,7 @@ class RequestList extends Component {
       requestType: 'project',
       pageNo: 1,
       pageSize: 10,
+      search_query:null,
     }
   }
 
@@ -96,6 +97,9 @@ class RequestList extends Component {
   }
 
   handleQueryChange(value) {
+    this.setState({
+      search_query: value,
+    })
     this.fetchData({
       payload: {
         search_query: value,
@@ -119,7 +123,7 @@ class RequestList extends Component {
       pageNo: current,
       pageSize: pageSize
     })
-    this.fetchData({payload: {page_no: current, page_size: pageSize,}})
+    this.fetchData({payload: {search_query: this.state.search_query,page_no: current, page_size: pageSize,}})
   }
 
   render() {
@@ -141,7 +145,7 @@ class RequestList extends Component {
         <div className={styles.requestList}>
           {this.state.requests.map(e =>
             <Card key={e._id} className={styles.card}
-                  bodyStyle={{paddingLeft:0}}>
+                  bodyStyle={{paddingLeft:'5px'}}>
               <div>
                 <Row gutter={5} type="flex" justify="space-around" align="middle">
                   <Col span={3} >
