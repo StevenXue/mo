@@ -192,7 +192,7 @@ class ProjectBusiness:
     @classmethod
     def get_objects(cls, search_query, user=None, page_no=PAGE_NO,
                     page_size=PAGE_SIZE, default_max_score=0.4,
-                    privacy=None,count_only=False):
+                    privacy=None):
         """
         Search for objects
 
@@ -212,16 +212,14 @@ class ProjectBusiness:
                                                      'description': 'icontains',
                                                      'tags': 'in'})
         else:
-            objects = cls.repo.read()  # 分页
+            objects = cls.repo.read()
         if privacy:
             objects = objects(privacy=privacy)
         if user:
             objects = objects(user=user)
         count = objects.count()
-        if count_only:
-            return count
-        return Objects(objects=objects[start: end], count=count, page_no=page_no,
-                       page_size=page_size)
+        return Objects(objects=objects[start: end], count=count,
+                       page_no=page_no, page_size=page_size)
         # return {
         #     "objects": objects.order_by('-create_time')[start:end],
         #     "count": count,
@@ -278,14 +276,14 @@ class ProjectBusiness:
                                    privacy=privacy, favor_users=[user])
 
     @classmethod
-    def get_by_id(cls, object_id):
+    def get_by_id(cls, project_id):
         """
         Get a project object by its ObjectId
 
-        :param object_id: ObjectId
+        :param project_id: ObjectId
         :return: a matched Project object
         """
-        project = cls.repo.read_by_id(object_id)
+        project = cls.repo.read_by_id(project_id)
         cls.project = project
         return project
 

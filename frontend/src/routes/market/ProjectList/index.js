@@ -18,7 +18,7 @@ const TabPane = Tabs.TabPane
 
 function Projects({history, project, dispatch,location}) {
 
-  const defaultActiveKeyDic = {"?tab=App":"1","?tab=Module":"2","?tab=Dataset":"3"}
+  const defaultActiveKeyDic = {"?tab=app":"1","?tab=module":"2","?tab=dataset":"3"}
   const paramList = Object.keys(defaultActiveKeyDic)
 
   function callback(key) {

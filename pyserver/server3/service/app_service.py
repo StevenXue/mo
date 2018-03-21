@@ -57,13 +57,12 @@ class AppService(ProjectService):
         for module in app.used_modules:
             AppBusiness.insert_module_env(app, module)
 
-
-@classmethod
-def get_by_id(cls, project_id, **kwargs):
-    project = super().get_by_id(project_id, **kwargs)
-    if kwargs.get('yml') == 'true' and project.app_path:
-        project.args = cls.business.load_app_params(project)
-    return project
+    @classmethod
+    def get_by_id(cls, project_id, **kwargs):
+        project = super().get_by_id(project_id, **kwargs)
+        if kwargs.get('yml') == 'true' and project.app_path:
+            project.args = cls.business.load_app_params(project)
+        return project
 
 # @classmethod
 # def add_used_app(cls, user_ID, app_id):
@@ -82,6 +81,7 @@ def get_by_id(cls, project_id, **kwargs):
 #         "description": "预测航班延误信息",
 #     }
 #     AppService.create_project(name="预测航班延误", description="description")
+
 
 if __name__ == '__main__':
     pass

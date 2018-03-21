@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
-import { Select, Button, Card, Icon, Input, Avatar, Tabs } from 'antd'
+import { Select, Button, Card, Icon, Input, Pagination, Tabs } from 'antd'
 import ProjectModel from '../../../../components/ProjectModal/index'
 import { showTime } from '../../../../utils/index'
 import { privacyChoices, projectChoices } from '../../../../constants'
@@ -12,13 +12,14 @@ const Option = Select.Option
 const Search = Input.Search
 const TabPane = Tabs.TabPane
 
-function Projects({ history, project, dispatch ,location}) {
-  const defaultActiveKeyDic = {"?tab=app":"1","?tab=module":"2","?tab=dataset":"3"}
+function Projects({ history, project, dispatch, location }) {
+  const defaultActiveKeyDic = { '?tab=app': '1', '?tab=module': '2', '?tab=dataset': '3' }
   const paramList = Object.keys(defaultActiveKeyDic)
 
   function callback(key) {
-    history.push(`workspace${paramList[parseInt(key)-1]}`)
+    history.push(`workspace${paramList[parseInt(key) - 1]}`)
   }
+
   return (
     <div className={`main-container ${styles.normal}`}>
       <Tabs defaultActiveKey={defaultActiveKeyDic[location.search]}
@@ -45,35 +46,38 @@ class ProjectList extends Component {
       projectsLoading: false,
       privacy: undefined,
       projectType: 'project',
+      totalNumber: 0,
+      pageNo: 1,
+      pageSize: 5,
     }
   }
 
-  fetchData({ payload }) {
+  fetchData({ payload = {} }) {
+
     const { type } = this.props
 
+    // default filter
     let filter = { type, group: 'my' };
-    ['query', 'privacy'].forEach((key) => {
-      if (this.state[key]) {
-        filter[key] = this.stats[key]
-      }
+
+    // get state filter
+    ['query', 'privacy', 'page_no', 'page_size'].forEach((key) => {
+      filter[key] = this.state[key.hyphenToHump()]
     })
-    if (payload) {
-      for (let key in payload) {
-        if (!payload.hasOwnProperty(key)) {
-          continue
-        }
-        if (payload[key]) {
-          filter[key] = payload[key]
-          this.setState({
-            key: payload[key],
-          })
-        }
-      }
+
+    // update filter from args
+    for (let key in payload) {
+      filter[key] = payload[key]
+      this.setState({
+        [key.hyphenToHump()]: payload[key],
+      })
     }
+
+    // fetch
     getProjects({
       filter,
-      onJson: (projects) => this.setState({
+      onJson: ({ projects, count }) => this.setState({
         projects,
+        totalNumber: count,
       }),
     })
   }
@@ -92,6 +96,10 @@ class ProjectList extends Component {
 
   toProjectDetail(id, history, type) {
     history.push(`/workspace/${id}?type=${type}`)
+  }
+
+  onShowSizeChange = (pageNo, pageSize) => {
+    this.fetchData({ payload: { page_no: pageNo, page_size: pageSize } })
   }
 
   render() {
@@ -138,6 +146,15 @@ class ProjectList extends Component {
               </div>
             </Card>)}
           {/*{project.projects.public_projects.map(e => e.name)}*/}
+        </div>
+        <div className={styles.pagination}>
+          <Pagination showSizeChanger
+                      onShowSizeChange={this.onShowSizeChange}
+                      onChange={this.onShowSizeChange}
+                      defaultCurrent={1}
+                      defaultPageSize={5}
+                      pageSizeOptions={['5', '10', '15', '20', '25']}
+                      total={this.state.totalNumber}/>
         </div>
       </div>
     )
