@@ -12,6 +12,10 @@ import {
   NotebookActions,
 } from '@jupyterlab/notebook'
 
+import {
+  defaultOverview,
+} from '@jupyterlab/services'
+
 import ParamsMapper from './ParamsMapper'
 
 import { addModuleToApp, getModule, getProjects } from './services'
@@ -76,7 +80,7 @@ export class ModulePage extends React.Component {
       projectId: response._id,
       project: response,
       func: func,
-      args: func ? Object.values(response.input[func]) : undefined,
+      args: func ? Object.values(response.args.input[func]) : undefined,
     })
   }
 
@@ -132,7 +136,7 @@ export class ModulePage extends React.Component {
       <div>
         <ParamsMapper args={this.state.args}
                       setValue={(values) => this.setValue(values)}
-                      baseArgs={Object.values(this.state.project.input[this.state.func])}
+                      baseArgs={Object.values(this.state.project.args.input[this.state.func])}
         />
       </div>
     )
@@ -142,11 +146,13 @@ export class ModulePage extends React.Component {
     if (this.state.projectId !== undefined) {
       if (this.state.func) {
         return (
-          <div style={{ height: '100%', overflowY: 'auto' }}>
+          <div style={{ height: '100%' }}>
             <header style={{ cursor: 'pointer' }} onClick={() => this.backToList()}>
               <Icon type="left"/>{this.state.project.name}
             </header>
-            {this.renderParameters()}
+            <div style={{ height: '100%', overflowY: 'auto' }}>
+              {this.renderParameters()}
+            </div>
             <Row>
               <Button type='primary' onClick={() => this.insertCode()}>Insert Code</Button>
               {/*<Button onClick={() => this.backToList()}>Back to List</Button>*/}
@@ -154,41 +160,13 @@ export class ModulePage extends React.Component {
           </div>
         )
       } else {
-
-        const overview = this.state.project.overview || '## Overview\n' +
-          '\n' +
-          '_Provide a short overview of your algorithm that explains the value and primary use cases._\n' +
-          '\n' +
-          '## Usage\n' +
-          '\n' +
-          '### Input\n' +
-          '\n' +
-          '_Describe the input fields for your algorithm. For example:_\n' +
-          '\n' +
-          '\n' +
-          '| Parameter | Description |\n' +
-          '| --------- | ----------- |\n' +
-          '| field     | Description of field |\n' +
-          '\n' +
-          '### Output\n' +
-          '\n' +
-          '_Describe the output fields for your algorithm. For example:_\n' +
-          '\n' +
-          '\n' +
-          '| Parameter | Description | \n' +
-          '| --------- | ----------- | \n' +
-          '| field     | Description of field | \n' +
-          '\n' +
-          '## Examples\n' +
-          '\n' +
-          '_Provide and explain examples of input and output for your algorithm._\n' +
-          '\n'
+        const overview = this.state.project.overview || defaultOverview
         return (
-          <div style={{ height: '100%', overflowY: 'auto' }}>
+          <div style={{ height: '100%' }}>
             <header style={{ cursor: 'pointer' }} onClick={() => this.backToList()}>
               <Icon type="left"/>{this.state.project.name}
             </header>
-            <div>
+            <div style={{ height: '100%', overflowY: 'auto' }}>
               <ReactMde
                 textAreaProps={{
                   id: 'ta1',

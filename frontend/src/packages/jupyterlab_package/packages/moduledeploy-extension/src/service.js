@@ -51,7 +51,7 @@ export function fetchProject({ projectId, onJson }) {
 }
 
 export function publish({ projectId, onJson }) {
-  return request(path.join('/pyapi', 'module', 'publish', projectId), {
+  return request(path.join('/pyapi', 'modules', 'publish', projectId), {
     method: 'post',
   }, { onJson })
 }

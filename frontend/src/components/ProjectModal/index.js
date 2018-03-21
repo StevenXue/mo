@@ -39,19 +39,19 @@ class ProjectModal extends Component {
     //   visible: false,
     // });
     this.props.dispatch({ type: 'project/hideModal' })
-
+    this.props.dispatch({ type: 'project/setTags', payload: [] })
   }
 
   okHandler = () => {
     const { form } = this.props
     form.validateFields((err, values) => {
-      console.log('confirm', this.state.tags, values)
       const body = {
         ...values,
-        tags: this.props.projectDetail.tags,
+        tags: this.props.project.tags,
         type: this.props.type,
       }
       if (!err) {
+        // TODO move fetch and dispatch to model
         if (this.props.new) {
           createProject({
             body,
@@ -59,6 +59,7 @@ class ProjectModal extends Component {
               this.props.fetchData && this.props.fetchData()
               this.props.dispatch({ type: 'project/hideModal' })
               this.props.dispatch(routerRedux.push('/workspace/' + response._id+`?type=${this.props.type}`))
+              this.props.dispatch({ type: 'project/setTags', payload: [] })
             },
           })
         } else {
@@ -74,6 +75,7 @@ class ProjectModal extends Component {
                 notStartLab: true,
                 projectType: this.props.projectDetail.project.type,
               })
+              this.props.dispatch({ type: 'project/setTags', payload: [] })
             },
           })
         }
@@ -90,7 +92,7 @@ class ProjectModal extends Component {
   handleClose(tags, removedTag) {
     tags = tags.filter(tag => tag !== removedTag).filter(e => e)
     this.setState({ inputValue: undefined })
-    this.props.dispatch({ type: 'projectDetail/setTags', payload: tags })
+    this.props.dispatch({ type: 'project/setTags', payload: tags })
   }
 
   showInput() {
@@ -107,7 +109,7 @@ class ProjectModal extends Component {
     if (this.state.inputValue && tags.indexOf(this.state.inputValue) === -1) {
       tags = [...tags, this.state.inputValue]
       this.setState({ inputValue: undefined, inputVisible: false })
-      this.props.dispatch({ type: 'projectDetail/setTags', payload: tags })
+      this.props.dispatch({ type: 'project/setTags', payload: tags })
     }
 
     // if (upload.inputValue && upload.tags.indexOf(upload.inputValue) === -1) {
@@ -116,17 +118,16 @@ class ProjectModal extends Component {
   }
 
   render() {
-    const { children, projectDetail } = this.props
+    const { children, projectDetail, project } = this.props
     const { getFieldDecorator } = this.props.form
     const formItemLayout = {
       labelCol: { span: 6 },
       wrapperCol: { span: 14 },
     }
-    let tags=[]
-    const { name, description, type, privacy } = _.get(projectDetail, 'project', {});
-    if (projectDetail) {
-      tags = projectDetail.tags;
-    }
+
+    // default values
+    const { name, description, privacy } = _.get(projectDetail, 'project', {});
+    let tags = _.get(project, 'tags', [])
 
     return (
       <span>

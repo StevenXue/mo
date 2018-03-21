@@ -119,3 +119,18 @@
   height: 100%;
   overflow: auto;
 }
+
+#datasets-manager .copy-input {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+  border-right: none;
+}
+
+#datasets-manager .copy-btn {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+}
+
+#datasets-manager .des {
+  margin: 10px;
+}

@@ -29,8 +29,8 @@ def create_message(sender, message_type, receivers, user=None,  **kwargs):
         user = user_business.get_by_user_object_id(user)
     if isinstance(sender, (str, ObjectId)):
         sender = user_business.get_by_user_object_id(sender)
-    receivers = [user_business.get_by_user_object_id(r) for r in receivers
-                 if isinstance(r, (str, ObjectId))]
+    receivers = [user_business.get_by_user_object_id(r)
+                 if isinstance(r, (str, ObjectId)) else r for r in receivers]
     # create a new message object
     created_message, created_receivers = message_business.add_message \
         (sender, message_type, receivers, user,**kwargs)

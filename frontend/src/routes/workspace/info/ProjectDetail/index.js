@@ -6,7 +6,7 @@ import {Button, Col, Icon, Modal, Row, Spin, Tabs, Tag, Upload} from 'antd'
 // pages
 import Modelling from '../../modelling/Modelling/index'
 // components
-import ProjectModel from '../../../../components/ProjectModal/index'
+import ProjectModal from '../../../../components/ProjectModal/index'
 import HelpModal from '../../../../components/HelpModal'
 import ReactMdeEditor from '../../../../components/ReactMdeCom/reactMde'
 import ProjectExample from '../../../../components/ProjectExample/projectExample'
@@ -158,10 +158,10 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                       type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
                       style={{fontSize: 20}}/>}
                     {!market_use && <span className={styles.rightButton}>
-                  <ProjectModel new={false} projectDetail={projectDetail}
+                  <ProjectModal new={false} projectDetail={projectDetail}
                   >
                     <Button icon='edit' style={{marginRight: 15}}/>
-                  </ProjectModel>
+                  </ProjectModal>
                   <Button icon='delete' onClick={() => deleteProject()}/>
                 </span>}
                   </h1>

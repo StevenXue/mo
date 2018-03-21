@@ -35,7 +35,8 @@ class MyDockerSpawner(DockerSpawner):
         port = int(tb_resp[0]['HostPort'])
         return port
 
-    def update_project_tb_port(self, project_name, tb_port):
+    @staticmethod
+    def update_project_tb_port(project_name, tb_port):
         """
         update tb port when docker restarted
         :param tb_port:
@@ -46,14 +47,14 @@ class MyDockerSpawner(DockerSpawner):
         return requests.put(f'{SERVER}/project/projects/{project_name}?by=name'
                             , json={'tb_port': str(tb_port)})
 
-    def insert_envs(self, project_name):
+    @staticmethod
+    def insert_envs(project_name):
         """
         add env to jupyterlab
         :param tb_port:
         :param project_name:
         :return: dict of res json
         """
-        print('update project tb_port: ', project_name)
         return requests.put(f'{SERVER}/apps/insert_envs/{project_name}')
 
     @gen.coroutine
@@ -166,7 +167,8 @@ class MyDockerSpawner(DockerSpawner):
             self.user.server.ip = ip
             self.user.server.port = port
         tb_port = yield self.get_tb_port()
+        # update tb_port and module env to exist app
         self.update_project_tb_port(self.user.name, tb_port)
         self.insert_envs(self.user.name)
         # jupyterhub 0.7 prefers returning ip, port:
-        return (ip, port)
+        return ip, port

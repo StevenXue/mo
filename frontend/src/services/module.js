@@ -1,6 +1,6 @@
 import request from "../utils/requestPro"
 
-const prefix = "/module"
+const prefix = "/modules"
 
 // 新建 module
 export function createModule(payload) {
@@ -19,8 +19,8 @@ export function fetchModuleList(payload) {
 }
 
 
-export function fetchModule(payload) {
-  return request(`${prefix}/${payload.moduleId}`);
+export function fetchModule({projectId}) {
+  return request(`${prefix}/${projectId}`);
 }
 
 export function updateModule(payload) {

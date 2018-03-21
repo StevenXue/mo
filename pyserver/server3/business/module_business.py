@@ -101,29 +101,29 @@ class ModuleBusiness(ProjectBusiness):
             privacy=privacy, category=category,
             repo_path=f'http://{GIT_SERVER_IP}/repos/{user_ID}/{name}')
 
-    @classmethod
-    def get_by_id(cls, project_id, yml=False):
-        module = ProjectBusiness.get_by_id(project_id)
-        # TODO 完全加入这个参数后去掉
-        if module.module_path is None:
-            user_ID = module.user.user_ID
-            dir_path = os.path.join(MODULE_DIR, user_ID, module.name)
-            module.module_path = dir_path
-            module.save()
-        if yml and module.module_path:
-            module.input, module.output = cls.load_module_params(module)
-        return module
+    # @classmethod
+    # def get_by_id(cls, project_id, yml=False):
+    #     module = ProjectBusiness.get_by_id(project_id)
+    #     # TODO 完全加入这个参数后去掉
+    #     if module.module_path is None:
+    #         user_ID = module.user.user_ID
+    #         dir_path = os.path.join(MODULE_DIR, user_ID, module.name)
+    #         module.module_path = dir_path
+    #         module.save()
+    #     if yml and module.module_path:
+    #         module.input, module.output = cls.load_module_params(module)
+    #     return module
 
     @staticmethod
     def load_module_params(module):
         yml_path = os.path.join(module.module_path, tail_path)
         with open(yml_path, 'r') as stream:
             obj = yaml.load(stream)
-            return obj.get('input'), obj.get('output')
+            return {'input': obj.get('input'), 'output': obj.get('output')}
 
     @classmethod
     def publish(cls, project_id):
-        module = cls.get_by_id(project_id, yml=False)
+        module = cls.get_by_id(project_id)
         module.module_path = os.path.join(MODULE_DIR, module.user.user_ID,
                                           module.name)
         module.privacy = 'public'
