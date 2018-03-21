@@ -1,13 +1,20 @@
 import * as React from 'react'
 import { Card, Button, Row, Col, Input, message, Icon } from 'antd'
+import ReactMde from 'react-mde'
 
 import {
-  Clipboard
-} from '@jupyterlab/apputils';
+  Clipboard,
+} from '@jupyterlab/apputils'
 
 import {
   NotebookActions,
 } from '@jupyterlab/notebook'
+
+import {
+  defaultOverview,
+} from '@jupyterlab/services'
+
+import CopyInput from './CopyInput'
 
 import ParamsMapper from './ParamsMapper'
 
@@ -142,21 +149,36 @@ export class DatasetPage extends React.Component {
 
   render() {
     if (this.state.projectId !== undefined) {
+      const overview = this.state.project.overview || defaultOverview
       return (
-        <div style={{ minHeight: 100, overflowY: 'auto' }}>
+        <div style={{ height: '100%' }}>
           <header style={{ cursor: 'pointer' }} onClick={() => this.backToList()}>
             <Icon type="left"/>{this.state.project.name}
           </header>
-          <p>{this.state.project.description}</p>
-          <p id='copy-p'>{this.state.project.path}</p>
-          <Row>
-            <Button type='primary' onClick={(e) => this.copyPath()}>Copy Path</Button>
-          </Row>
+          <div style={{ height: '100%', overflowY: 'auto' }}>
+            <p className='des'>{this.state.project.description}</p>
+            <div className='des'>
+              <CopyInput text={this.state.project.path}/>
+            </div>
+            <ReactMde
+              textAreaProps={{
+                id: 'ta1',
+                name: 'ta1',
+              }}
+              value={{ text: overview }}
+              showdownOptions={{ tables: true, simplifiedAutoLink: true }}
+              visibility={{
+                toolbar: false,
+                textarea: false,
+                previewHelp: false,
+              }}
+            />
+          </div>
         </div>
       )
     } else {
       return (
-        <div style={{ height: '100%' }}>
+        <div style={{ height: '100%', overflowY: 'auto' }}>
           <header>DATASET LIST</header>
           <Search
             placeholder="input search text"

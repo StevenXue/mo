@@ -22,7 +22,7 @@ export function getProjects({ filter, onJson }) {
   return request(path.join('/pyapi', PREFIX) + `?${params}`, undefined, { onJson })
 }
 
-const prefix = 'module'
+const prefix = 'modules'
 
 export function getModules(onSuccess) {
   return request(`pyapi/${prefix}/module_list`, null, { onSuccess })

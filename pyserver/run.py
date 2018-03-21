@@ -64,6 +64,7 @@ from server3.route import api_route
 from server3.route import app_route
 from server3.route import message_route
 from server3.route import world_route
+from server3.route import dataset_route
 
 
 app.register_blueprint(file_route.file_app)
@@ -87,6 +88,8 @@ app.register_blueprint(api_route.api_app)
 app.register_blueprint(app_route.app_app)
 app.register_blueprint(message_route.message_app)
 app.register_blueprint(world_route.world_app)
+app.register_blueprint(dataset_route.dataset_app)
+
 
 # This method will get whatever object is passed into the
 # create_access_token method.

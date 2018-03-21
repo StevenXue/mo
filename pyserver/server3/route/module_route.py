@@ -14,9 +14,10 @@ from flask import request
 
 from server3.business import module_business, user_business
 from server3.business.module_business import ModuleBusiness
+from server3.service.module_service import ModuleService
 from server3.utility import json_utility
 
-PREFIX = '/module'
+PREFIX = '/modules'
 
 module_app = Blueprint("module_app", __name__, url_prefix=PREFIX)
 
@@ -43,23 +44,27 @@ def add():
         raise
 
 
+@module_app.route('/<module_id>', methods=['GET'])
+def get_module(module_id):
+    yml = request.args.get('yml')
+    commits = request.args.get('commits')
+    app = ModuleService.get_by_id(module_id, yml=yml, commits=commits)
+
+    # 将app.user 更换为 user_ID 还是name?
+    user_ID = app.user.user_ID
+    app = json_utility.convert_to_json(app.to_mongo())
+    app["user_ID"] = user_ID
+    return jsonify({
+        "response": app
+    }), 200
+
+
 @module_app.route('/module_list', methods=['GET'])
 def get_module_list():
     module_list = module_business.get_all().order_by('-create_time')
     module_list = json_utility.me_obj_list_to_json_list(module_list)
     return jsonify({
         "response": module_list
-    }), 200
-
-
-@module_app.route('/<module_id>', methods=['GET'])
-def get_module(module_id):
-    yml = request.args.get('yml')
-    yml = str(yml).lower() == 'true'
-    module = ModuleBusiness.get_by_id(module_id, yml=yml)
-    module = json_utility.convert_to_json(module.to_mongo())
-    return jsonify({
-        "response": module
     }), 200
 
 

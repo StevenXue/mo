@@ -3,7 +3,7 @@ import { HashRouter, Route, Switch, Link, withRouter, routerRedux } from 'dva/ro
 import { Breadcrumb } from 'antd'
 import { connect } from 'dva'
 import pathToRegexp from 'path-to-regexp'
-import {get} from 'lodash'
+import { get } from 'lodash'
 
 import Users from './routes/Users.js'
 import Account from './routes/login/Account'
@@ -12,12 +12,12 @@ import Projects from './routes/projects/Projects'
 import ProjectDetail from './routes/workspace/info/ProjectDetail'
 import PublicProject from './routes/projects/PublicProject'
 import MainLayout from './components/MainLayout/MainLayout'
-import PublicServedModels from  './routes/DeployedModels/ModelsList'
-import PublicServedModelsDetail from  './routes/DeployedModels/ModelsDetail'
-import UserRequest from  './routes/UserRequest/UserRequestList'
-import UserRequestDetail from  './routes/UserRequest/UserRequestDetail'
+import PublicServedModels from './routes/DeployedModels/ModelsList'
+import PublicServedModelsDetail from './routes/DeployedModels/ModelsDetail'
+import UserRequest from './routes/UserRequest/UserRequestList'
+import UserRequestDetail from './routes/UserRequest/UserRequestDetail'
 import MyService from './routes/MyService'
-import {ModuleList, Module} from './routes/Module'
+import { ModuleList, Module } from './routes/Module'
 import Profile from './routes/Profile'
 import MarketList from './routes/market/ProjectList'
 // import MarketDetail from './routes/market/ProjectDetail'
@@ -29,11 +29,11 @@ const breadcrumbNameMap = {
   '/workspace': 'My Projects',
   '/projects': 'Projects',
   '/modelmarket': 'Model Market',
-  '/myservice':'My Service',
-  '/userrequest':'User Request',
-  '/modellist':'Module',
-  '/profile': "Profile",
-  '/market':'Market'
+  '/myservice': 'My Service',
+  '/userrequest': 'User Request',
+  '/modellist': 'Module',
+  '/profile': 'Profile',
+  '/market': 'Market',
 }
 
 const RouterConfig = ({ history, location, projectDetail }) => {
@@ -46,7 +46,7 @@ const RouterConfig = ({ history, location, projectDetail }) => {
     const matchPro = pathToRegexp('/workspace/:projectId/:step').exec(url)
     const matchSubStep = pathToRegexp('/workspace/:projectId/:step/:subs').exec(url)
     if (matchDetail) {
-      breadcrumbName = get(projectDetail, 'project.name', 'Project Info');
+      breadcrumbName = get(projectDetail, 'project.name', 'Project Info')
     } else if (matchPro) {
       breadcrumbName = matchPro[2]
     } else if (matchSubStep) {
@@ -54,7 +54,8 @@ const RouterConfig = ({ history, location, projectDetail }) => {
     }
     return (
       <Breadcrumb.Item key={url}>
-        <Link to={url} style={{ textTransform: 'capitalize' }}>
+        <Link to={url + location.search.replace('type', 'tab')}
+              style={{ textTransform: 'capitalize' }}>
           {breadcrumbName || breadcrumbNameMap[url]}
         </Link>
       </Breadcrumb.Item>
@@ -79,7 +80,7 @@ const RouterConfig = ({ history, location, projectDetail }) => {
           <Route path="/projects/:projectId" component={PublicProject}/>
           <Route path="/projects" component={Projects}/>
 
-          <Route path="/market/:projectId" render={(props) => <ProjectDetail {...props} market_use={true} />}/>
+          <Route path="/market/:projectId" render={(props) => <ProjectDetail {...props} market_use={true}/>}/>
           <Route path="/market" component={MarketList}/>
 
           <Route path="/modelmarket/:modelsId" component={PublicServedModelsDetail}/>

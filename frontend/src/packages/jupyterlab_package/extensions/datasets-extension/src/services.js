@@ -1,6 +1,6 @@
 import request, { org_request } from './request'
 
-const prefix = "/module"
+const prefix = "/modules"
 
 export function getModules(onSuccess) {
   return org_request(`pyapi/${prefix}/module_list`, null, onSuccess)

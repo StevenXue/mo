@@ -22,7 +22,7 @@ function Projects({history, project, dispatch,location}) {
   const paramList = Object.keys(defaultActiveKeyDic)
 
   function callback(key) {
-    history.push(`userrequest${paramList[parseInt(key)-1]}`)
+    history.push(`market${paramList[parseInt(key)-1]}`)
   }
 
   return (
@@ -172,7 +172,7 @@ function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
         <div className={styles.pic}>
         </div>
         <div className={styles.name}>
-          <p>{project.name}</p>
+          <p className={styles.namep}>{project.name}</p>
         </div>
         <div className={styles.description}>
           <p className={styles.p}>{project.description}</p>
@@ -192,13 +192,13 @@ function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
       <div className={styles.starFavorDiv}>
         <div className={styles.starFavorRightDiv}>
           <Icon className={styles.bottomIcon}
-                type={project.favor_users.includes(user_obj_id) ? "star" : "star-o"}
-                onClick={() => onClickStarFavor('favor')}/>
-          <p className={styles.bottomNumber}>{project.favor_users.length}</p>
-          <Icon className={styles.bottomIcon}
                 type={project.star_users.includes(user_obj_id) ? "like" : "like-o"}
                 onClick={() => onClickStarFavor('star')}/>
           <p className={styles.bottomNumber}>{project.star_users.length}</p>
+          <Icon className={styles.bottomIcon}
+                type={project.favor_users.includes(user_obj_id) ? "star" : "star-o"}
+                onClick={() => onClickStarFavor('favor')}/>
+          <p className={styles.bottomNumber}>{project.favor_users.length}</p>
         </div>
       </div>
     </div>

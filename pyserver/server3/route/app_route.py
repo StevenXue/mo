@@ -13,6 +13,7 @@ from flask import make_response
 from flask import request
 from flask_jwt_extended import jwt_required
 from bson import ObjectId
+from mongoengine import DoesNotExist
 
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -56,8 +57,12 @@ def add_used_module(app_id):
 # @jwt_required
 def insert_envs(project_name):
     [user_ID, app_name] = project_name.split('+')
-    AppService.insert_envs(user_ID, app_name)
-    return jsonify({"response": f'insert_envs success {project_name}'})
+    try:
+        AppService.insert_envs(user_ID, app_name)
+    except DoesNotExist:
+        return jsonify({"response": f'no app {project_name} or not an app'})
+    else:
+        return jsonify({"response": f'insert_envs success {project_name}'})
 
 
 @app_app.route("/nb_to_script/<app_id>", methods=["POST"])
@@ -105,8 +110,8 @@ def add():
 @app_app.route('/<app_id>', methods=['GET'])
 def get_app(app_id):
     yml = request.args.get('yml')
-    yml = str(yml).lower() == 'true'
-    app = AppBusiness.get_by_id(app_id, yml=yml)
+    commits = request.args.get('commits')
+    app = AppService.get_by_id(app_id, yml=yml, commits=commits)
 
     # 将app.user 更换为 user_ID 还是name?
     user_ID = app.user.user_ID

@@ -33,14 +33,15 @@ class User(Document):
     request_vote_up = ListField(ReferenceField("UserRequest"))
     # 用户star的request列表
     request_star = ListField(ReferenceField("UserRequest"))
+
     # 用户点赞的answer列表
     answer_vote_up = ListField(ReferenceField("RequestAnswer"))
 
-    # 用户收藏的api列表
+    # 用户收藏的app列表
     favor_apps = ListField(ReferenceField("App"))
-    # 用户点赞的api列表
+    # 用户点赞的app列表
     star_apps = ListField(ReferenceField("App"))
-    # 用户使用过的api列表
+    # 用户使用过的app列表
     used_apps = ListField(ReferenceField("App"))
 
     # 用户收藏的module列表

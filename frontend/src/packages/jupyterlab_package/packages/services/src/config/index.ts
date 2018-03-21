@@ -254,3 +254,32 @@ namespace ConfigWithDefaults {
     className?: string;
   }
 }
+
+export const defaultOverview = '## Overview\n' +
+  '\n' +
+  '_Provide a short overview of your algorithm that explains the value and primary use cases._\n' +
+  '\n' +
+  '## Usage\n' +
+  '\n' +
+  '### Input\n' +
+  '\n' +
+  '_Describe the input fields for your algorithm. For example:_\n' +
+  '\n' +
+  '\n' +
+  '| Parameter | Description |\n' +
+  '| --------- | ----------- |\n' +
+  '| field     | Description of field |\n' +
+  '\n' +
+  '### Output\n' +
+  '\n' +
+  '_Describe the output fields for your algorithm. For example:_\n' +
+  '\n' +
+  '\n' +
+  '| Parameter | Description | \n' +
+  '| --------- | ----------- | \n' +
+  '| field     | Description of field | \n' +
+  '\n' +
+  '## Examples\n' +
+  '\n' +
+  '_Provide and explain examples of input and output for your algorithm._\n' +
+  '\n';

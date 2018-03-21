@@ -92,9 +92,9 @@ export function updateProject({ body, projectId, onJson }) {
 }
 
 // 删除 project
-export function deleteProject(payload) {
+export function deleteProject({projectId}) {
   const user_ID = localStorage.getItem('user_ID')
-  return request(`${CORS}${projects}/${payload.projectId}?user_ID=${user_ID}`, {
+  return request(`${CORS}${projects}/${projectId}?user_ID=${user_ID}`, {
     method: 'delete',
   })
 }

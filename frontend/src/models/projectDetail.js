@@ -2,6 +2,8 @@ import { routerRedux } from 'dva/router'
 
 import { fetchProject, deleteProject, updateProject, forkProject } from '../services/project'
 import { fetchApp } from '../services/app'
+import { fetchModule } from '../services/module'
+import { fetchDataset } from '../services/dataset'
 import { getSessions, getTerminals, deleteSession, deleteTerminal } from '../services/job'
 import { deleteLab, startLab } from '../services/notebook'
 import { privacyChoices } from '../constants'
@@ -22,7 +24,6 @@ export default {
     sessions: [],
     // doneIndices: new Set([]),
     overviewEditState: false,
-    tags: [],
   },
   reducers: {
     showOverviewEditState(state) {
@@ -38,17 +39,10 @@ export default {
         overviewEditState: false,
       }
     },
-    setProject(state, { payload: project }) {
+    setProjectReducer(state, { payload: project }) {
       return {
         ...state,
         project,
-        tags: project.tags,
-      }
-    },
-    setTags(state, { payload: tags }) {
-      return {
-        ...state,
-        tags,
       }
     },
     setTerminals(state, { payload: terminals }) {
@@ -82,10 +76,10 @@ export default {
       }
     },
 
-    updateStarFavor(state, action) {
+    updateStarFavor(state, {project}) {
       return {
         ...state,
-        project: action.payload.project,
+        project,
       }
     },
     changeOverview(state, action) {
@@ -130,13 +124,13 @@ export default {
     *fetch({ projectId, notStartLab, projectType }, { call, put }) {
       const fetchMapper = {
         app: fetchApp,
-        module: fetchProject,
-        dataset: fetchProject,
+        module: fetchModule,
+        dataset: fetchDataset,
         project: fetchProject,
       }
       // fetch and set project
       let { data: project } = yield call(fetchMapper[projectType], { projectId })
-      yield put({ type: 'setProject', payload: project })
+
       // start lab backend
       const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
       const hubToken = project.hub_token
@@ -166,6 +160,11 @@ export default {
       yield put({ type: 'setTerminals', payload: terminals })
       yield put({ type: 'setSessions', payload: sessions })
     },
+    // wrapper to set tags when set project
+    *setProject({ payload: project }, { call, put }) {
+      yield put({ type: 'setProjectReducer', payload: project })
+      yield put({ type: 'project/setTags', payload: project.tags })
+    },
     *closeSession({ sessionId, terminalName }, { call, put, select }) {
       const project = yield select(state => get(state, 'projectDetail.project'))
       const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
@@ -186,7 +185,7 @@ export default {
     // },
     *delete({ payload }, { call, put, select }) {
       yield call(deleteProject, payload)
-      yield put(routerRedux.push('/workspace'))
+      yield put(routerRedux.push('/workspace?tab='+payload.type))
 
       // hub user will deleted in backend, no need to stop hub user server
       // let project = yield select(state => state.projectDetail['project'])
@@ -197,14 +196,14 @@ export default {
     },
     *setEntered({ projectId }, { call, put }) {
       console.log(projectId)
-      yield call(updateProject, { projectId, body: { entered: true } })
-      yield put({ type: 'fetch', projectId })
+      const { data: project } = yield call(updateProject, { projectId, body: { entered: true } })
+      yield put({ type: 'setProject', payload: project })
     },
     *update({ body, fetchData }, { call, put, select }) {
       const projectId = yield select(state => state.projectDetail.project._id)
       // const user_ID = 'dev_1'
       // body['user_ID'] = user_ID
-      yield call(updateProject, {
+      const { data: project } = yield call(updateProject, {
         body, projectId,
         onJson: () => {
           fetchData && this.props.fetchData()
@@ -213,7 +212,8 @@ export default {
         },
       })
       yield put({ type: 'project/hideModal' })
-      yield put({ type: 'fetch', projectId })
+      yield put({ type: 'setProject', payload: project })
+      // yield put({ type: 'fetch', projectId })
     },
     *setDoneStep({ payload }, { call, put, select }) {
       yield put({ type: 'setStep', payload })
@@ -237,10 +237,11 @@ export default {
 
     *star_favor(action, { call, put, select }) {
       let payload = action.payload
-      const { data: project } = yield call(UserStarFavorService.set_star_favor, payload)
+      const { data:{entity:project} } = yield call(UserStarFavorService.set_star_favor, payload)
+      console.log(project)
       yield put({
         type: 'updateStarFavor',
-        payload: project,
+        project,
       })
     },
 

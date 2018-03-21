@@ -111,7 +111,7 @@ def get_by_id(project_id):
     return project
 
 
-def create_project(name, description, user_ID, tags=[], user_token='',
+def create_project(name, description, user_ID, tags=None, user_token='',
                    type='project', **kwargs):
     """
     Create a new project
@@ -125,6 +125,8 @@ def create_project(name, description, user_ID, tags=[], user_token='',
     :param user_token: string
     :return: a new created project object
     """
+    if tags is None:
+        tags = []
     user = user_business.get_by_user_ID(user_ID)
     cls = TypeMapper.get(type)
     return cls.create_project(name=name, description=description,
@@ -602,7 +604,7 @@ def start_project_playground(project_id):
         replicas = api.read_namespaced_deployment_status(
             deploy_name, NAMESPACE).status.available_replicas
     # FIXME one second sleep to wait for container ready
-    import time
+    import timemr
     time.sleep(1)
     s_api.create_namespaced_service(body=service_json, namespace=NAMESPACE)
     time.sleep(1)
@@ -621,20 +623,21 @@ class ProjectService:
     channel = CHANNEL.project
 
     @classmethod
-    def create_project(cls, name, description, user_ID, tags=[], user_token='',
-                       type='project', **kwargs):
+    def create_project(cls, name, description, user_ID, tags=None,
+                       user_token='', type='project', **kwargs):
         """
         Create a new project
 
         :param name: str
         :param description: str
         :param user_ID: ObjectId
-        :param is_private: boolean
         :param type: string (app/module/dataset)
         :param tags: list of string
         :param user_token: string
         :return: a new created project object
         """
+        if tags is None:
+            tags = []
         project_type = type
         user = user_business.get_by_user_ID(user_ID)
         # message = "{}创建了app{}".format(user.name, name)
@@ -691,6 +694,17 @@ class ProjectService:
             default_max_score=default_max_score,
             user=user
         )
+
+    @classmethod
+    def get_by_id(cls, project_id, **kwargs):
+        project = cls.business.get_by_id(project_id)
+        if kwargs.get('commits') == 'true':
+            commits = cls.business.get_commits(project.path)
+            project.commits = [{
+                'message': c.message,
+                'time': datetime.fromtimestamp(c.time[0] + c.time[1]),
+            } for c in commits]
+        return project
 
 
 
