@@ -39,11 +39,10 @@ def count_projects():
     # user_ID = get_jwt_identity()
     counts = []
     for type in types:
-        count = project_service.list_projects(
+        projects = project_service.list_projects(
             type=type,
-            user_ID=user_ID,
-            count_only=True)
-        counts.append(count)
+            user_ID=user_ID)
+        counts.append(projects.count)
     return jsonify({
         "response": counts
     }), 200
@@ -84,11 +83,9 @@ def list_projects_by_query():
             "message": e.args[0]["hint_message"]
         }), 404
     else:
-        for p in projects.objects:
-            p.user_ID = p.user.user_ID
-        projects = json_utility.me_obj_list_to_json_list(projects.objects)
+        project_list = json_utility.me_obj_list_to_json_list(projects.objects)
         return jsonify({
-            "response": projects
+            "response": {'projects': project_list, 'count': projects.count}
         }), 200
 
 

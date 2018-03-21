@@ -24,7 +24,7 @@ import en_US from '../../intl/en_US'
 
 function MainLayout({children, location, history, modal, isRight, onClickIcon}) {
   return (
-    <Layout>
+    <Layout style={{height: '100%'}}>
       <Header location={location} history={history} />
       <Content style={{display: "flex"}}>
         <div className={styles.content}>
@@ -116,7 +116,7 @@ class OutMainLayout extends React.Component {
 
   render() {
     return (
-      <div>
+      <div style={{height: '100%'}}>
         {/*<div className="change-locale">*/}
         {/*<span style={{marginRight: 16}}>Change locale of components: </span>*/}
         {/*<Radio.Group defaultValue={enUS} onChange={this.changeLocale}>*/}

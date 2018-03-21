@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Card, Button, Row, Col, Input, message, Icon } from 'antd'
+import { Card, Button, Row, Col, Input, message, Icon, Pagination } from 'antd'
 import ReactMde from 'react-mde'
 
 import {
@@ -35,9 +35,12 @@ export class DatasetPage extends React.Component {
     super()
     this.state = {
       projects: [],
-      projectsLoading: false,
+
+      query: undefined,
       privacy: undefined,
-      projectType: 'project',
+      totalNumber: 0,
+      pageNo: 1,
+      pageSize: 5,
     }
   }
 
@@ -45,37 +48,31 @@ export class DatasetPage extends React.Component {
     this.fetchData({})
   }
 
-  fetchData({ payload }) {
+  fetchData({ payload = {} }) {
+
+    // default filter
     let filter = { type, privacy };
-    ['query', 'privacy'].forEach((key) => {
-      if (this.state[key]) {
-        filter[key] = this.stats[key]
-      }
+
+    // get state filter
+    ['query', 'privacy', 'page_no', 'page_size'].forEach((key) => {
+      filter[key] = this.state[key.hyphenToHump()]
     })
-    if (payload) {
-      for (let key in payload) {
-        if (!payload.hasOwnProperty(key)) {
-          continue
-        }
-        if (payload[key]) {
-          filter[key] = payload[key]
-          this.setState({
-            key: payload[key],
-          })
-        }
-      }
+
+    // update filter from args
+    for (let key in payload) {
+      filter[key] = payload[key]
+      this.setState({
+        [key.hyphenToHump()]: payload[key],
+      })
     }
+
+    // fetch
     getProjects({
       filter,
-      onJson: (projects) => this.setState({
+      onJson: ({ projects, count }) => this.setState({
         projects,
+        totalNumber: count,
       }),
-    })
-  }
-
-  onJson = (response) => {
-    this.setState({
-      projects: response,
     })
   }
 
@@ -147,11 +144,15 @@ export class DatasetPage extends React.Component {
     )
   }
 
+  onShowSizeChange = (pageNo, pageSize) => {
+    this.fetchData({ payload: { page_no: pageNo, page_size: pageSize } })
+  }
+
   render() {
     if (this.state.projectId !== undefined) {
       const overview = this.state.project.overview || defaultOverview
       return (
-        <div style={{ height: '100%' }}>
+        <div className='container'>
           <header style={{ cursor: 'pointer' }} onClick={() => this.backToList()}>
             <Icon type="left"/>{this.state.project.name}
           </header>
@@ -178,7 +179,7 @@ export class DatasetPage extends React.Component {
       )
     } else {
       return (
-        <div style={{ height: '100%', overflowY: 'auto' }}>
+        <div className='container'>
           <header>DATASET LIST</header>
           <Search
             placeholder="input search text"
@@ -193,6 +194,15 @@ export class DatasetPage extends React.Component {
                   {project.description}
                 </Col>
               </Card>)}
+            <div className='pagination'>
+              <Pagination showSizeChanger
+                          onShowSizeChange={this.onShowSizeChange}
+                          onChange={this.onShowSizeChange}
+                          defaultCurrent={1}
+                          defaultPageSize={5}
+                          pageSizeOptions={['5', '10', '15', '20', '25']}
+                          total={this.state.totalNumber}/>
+            </div>
           </div>
         </div>
       )

@@ -116,7 +116,7 @@
 }
 
 #datasets-manager .list {
-  height: 100%;
+    height: 100%;
   overflow: auto;
 }
 
@@ -129,6 +129,13 @@
 #datasets-manager .copy-btn {
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
+}
+
+#datasets-manager .container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 5px;
 }
 
 #datasets-manager .des {
