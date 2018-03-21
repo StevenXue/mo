@@ -141,7 +141,7 @@ class RequestList extends Component {
         <div className={styles.requestList}>
           {this.state.requests.map(e =>
             <Card key={e._id} className={styles.card}
-                  bodyStyle={{paddingLeft:0}}>
+                  bodyStyle={{paddingLeft:'5px'}}>
               <div>
                 <Row gutter={5} type="flex" justify="space-around" align="middle">
                   <Col span={3} >
