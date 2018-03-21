@@ -73,7 +73,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
       okType: 'danger',
       cancelText: 'No',
       onOk() {
-        dispatch({type: 'projectDetail/delete', payload: {projectId}})
+        dispatch({type: 'projectDetail/delete', payload: {projectId, type:projectDetail.project.type}})
       },
     })
   }

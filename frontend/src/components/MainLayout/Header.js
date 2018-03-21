@@ -24,7 +24,7 @@ const menuConfig = [
   // },
   {
     key: '/workspace',
-    Link: '/workspace?tab=App',
+    Link: '/workspace?tab=app',
     Icon: null,
     text: 'Workspace',
     // dropdown: [
@@ -56,13 +56,13 @@ const menuConfig = [
   // },
   {
     key: '/market',
-    Link: '/market?tab=App',
+    Link: '/market?tab=app',
     Icon: null,
     text: 'Market',
   },
   {
     key: '/userrequest',
-    Link: '/userrequest?tab=App',
+    Link: '/userrequest?tab=app',
     Icon: null,
     text: 'Request',
   },
