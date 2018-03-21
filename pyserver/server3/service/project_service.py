@@ -654,7 +654,7 @@ class ProjectService:
         )
         # 记录世界频道消息  # 推送消息
         world = WorldService.system_send(
-            channel=CHANNEL.request,
+            channel=CHANNEL.project,
             message=f"用户{project.user.user_ID}创建了{project_type}: {project.title}")
 
         return project
