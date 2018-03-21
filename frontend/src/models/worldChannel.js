@@ -50,7 +50,6 @@ export default {
   subscriptions: {
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
-
         const userId = localStorage.getItem('user_ID')
         if (userId && !connected) {
           const socket = io.connect(flaskServer + '/log')

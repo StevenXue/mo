@@ -22,7 +22,7 @@ function Projects({history, project, dispatch,location}) {
   const paramList = Object.keys(defaultActiveKeyDic)
 
   function callback(key) {
-    history.push(`userrequest${paramList[parseInt(key)-1]}`)
+    history.push(`market${paramList[parseInt(key)-1]}`)
   }
 
   return (

@@ -140,11 +140,12 @@ class RequestList extends Component {
         </div>
         <div className={styles.requestList}>
           {this.state.requests.map(e =>
-            <Card key={e._id} className={styles.card}>
+            <Card key={e._id} className={styles.card}
+                  bodyStyle={{paddingLeft:0}}>
               <div>
-                <Row>
-                  <Col span={3}>
-                    <div
+                <Row gutter={5} type="flex" justify="space-around" align="middle">
+                  <Col span={3} >
+                    <div className={styles.starAnswerDiv}
                       onClick={() => this.toUserRequestDetail(e._id, history)}>
                       <div className={styles.starDiv}>
                         <p
