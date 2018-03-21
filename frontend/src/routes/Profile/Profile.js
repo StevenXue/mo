@@ -71,7 +71,7 @@ function Profile({login, profile, dispatch, history}) {
                   <Row type="flex" justify="start">
                     <Col span={2}>
                       <div className={styles.appDiv}
-                           onClick={() => toWorkspace(dispatch, 'tab=App')}>
+                           onClick={() => toWorkspace(dispatch, 'tab=app')}>
                         <p className={styles.appText}>App</p>
                         <p
                           className={styles.appNumber}>{projectNumber ? projectNumber[0] : null}</p>
@@ -84,7 +84,7 @@ function Profile({login, profile, dispatch, history}) {
                     </Col>
                     <Col span={2}>
                       <div className={styles.appDiv}
-                           onClick={() => toWorkspace(dispatch, 'tab=Module')}>
+                           onClick={() => toWorkspace(dispatch, 'tab=module')}>
                         <p className={styles.appText}>Module</p>
                         <p
                           className={styles.appNumber}>{projectNumber ? projectNumber[1] : null}</p>
@@ -97,7 +97,7 @@ function Profile({login, profile, dispatch, history}) {
                     </Col>
                     <Col span={2}>
                       <div className={styles.appDiv}
-                           onClick={() => toWorkspace(dispatch, 'tab=Dataset')}>
+                           onClick={() => toWorkspace(dispatch, 'tab=dataset')}>
                         <p className={styles.appText}>Dataset</p>
                         <p
                           className={styles.appNumber}>{projectNumber ? projectNumber[2] : null}</p>
