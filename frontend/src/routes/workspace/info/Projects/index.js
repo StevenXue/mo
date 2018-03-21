@@ -44,8 +44,10 @@ class ProjectList extends Component {
     this.state = {
       projects: [],
       projectsLoading: false,
-      privacy: undefined,
       projectType: 'project',
+
+      query: undefined,
+      privacy: undefined,
       totalNumber: 0,
       pageNo: 1,
       pageSize: 5,
