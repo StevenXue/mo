@@ -19,6 +19,7 @@ from server3.entity.general_entity import UserEntity
 from server3.business.user_request_business import UserRequestBusiness
 from server3.business.data_set_business import DatasetBusiness
 
+from server3.entity.phone_message_id import PhoneMessageId
 
 def add_git_http_user(user_ID, password):
     """
@@ -32,10 +33,17 @@ def add_git_http_user(user_ID, password):
                          json={'password': password})
 
 
-def add(user_ID, password, kwargs):
+def add(user_ID, password, **kwargs):
     add_git_http_user(user_ID, password)
     hashed_password = generate_password_hash(password)
-    return user_business.add(user_ID, hashed_password, kwargs)
+    return user_business.add(user_ID, hashed_password, **kwargs)
+
+
+def register(user_ID, password, phone, code, **kwargs):
+    if verify_code(code=code, phone=phone):
+        return add(user_ID=user_ID, password=password, phone=phone, **kwargs)
+    else:
+        raise Error()
 
 
 def reset_password(phone, message_id, code, new_password):
@@ -214,7 +222,7 @@ def add_used_api(user_ID, api_id):
         }
 
 
-def get_verification_code(phone):
+def send_verification_code(phone):
     """
 
     :param phone:
@@ -235,10 +243,15 @@ def get_verification_code(phone):
     result = response.json()
     if "error" in result:
         raise Error(result["error"])
-    return response.json()["message_id"]
+    message_id = response.json()["message_id"]
+    # 存入数据库
+    phone_message_id = PhoneMessageId(phone=phone, message_id=message_id)
+    result = phone_message_id.save()
+    return result
 
 
-def verify_code(code, message_id):
+def verify_code(code, phone):
+    message_id = PhoneMessageId.objects(phone=phone).message_id
     url = 'https://api.sms.jpush.cn/v1/codes/' + message_id + '/valid'
     payload = json.dumps({
         'code': code
