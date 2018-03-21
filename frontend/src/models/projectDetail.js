@@ -82,10 +82,10 @@ export default {
       }
     },
 
-    updateStarFavor(state, action) {
+    updateStarFavor(state, {project}) {
       return {
         ...state,
-        project: action.payload.project,
+        project,
       }
     },
     changeOverview(state, action) {
@@ -237,10 +237,11 @@ export default {
 
     *star_favor(action, { call, put, select }) {
       let payload = action.payload
-      const { data: project } = yield call(UserStarFavorService.set_star_favor, payload)
+      const { data:{entity:project} } = yield call(UserStarFavorService.set_star_favor, payload)
+      console.log(project)
       yield put({
         type: 'updateStarFavor',
-        payload: project,
+        project,
       })
     },
 
