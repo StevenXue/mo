@@ -185,7 +185,7 @@ export default {
     // },
     *delete({ payload }, { call, put, select }) {
       yield call(deleteProject, payload)
-      yield put(routerRedux.push('/workspace'))
+      yield put(routerRedux.push('/workspace?tab='+payload.type))
 
       // hub user will deleted in backend, no need to stop hub user server
       // let project = yield select(state => state.projectDetail['project'])
