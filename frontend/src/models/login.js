@@ -129,7 +129,7 @@ export default {
         if (from) {
           yield put(routerRedux.push(from))
         } else {
-          yield put(routerRedux.push('/userrequest'))
+          yield put(routerRedux.push('/userrequest?tab=App'))
         }
       } else {
         throw data

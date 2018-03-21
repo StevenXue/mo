@@ -78,7 +78,7 @@ class Open extends Component {
           isRight ?
             <div className={styles.first_row}>
 
-              <Icon type="right" onClick={onClickIcon}
+              <Icon type="arrow-right" onClick={onClickIcon}
                     className={styles.icon_container}
               />
 
@@ -86,13 +86,13 @@ class Open extends Component {
                 ALL
               </div>
 
-              <Icon type="question"
+              <Icon type="caret-down"
                     className={styles.icon_container}
               />
             </div> :
 
             <div className={styles.first_row}>
-              <Icon type="left" onClick={onClickIcon}
+              <Icon type="arrow-left" onClick={onClickIcon}
                     className={styles.icon_container}
               />
             </div>

@@ -5,6 +5,7 @@ import './index.less'
 import modelling from './models/modelling'
 import projectDetail from './models/projectDetail'
 import worldChannel from './models/worldChannel'
+import chatbot from './models/chatbot'
 
 // ES6 Promise polyfill
 require('es6-promise/auto')
@@ -34,6 +35,8 @@ app.model(require('./models/profile'))
 app.model(modelling)
 app.model(projectDetail)
 app.model(worldChannel)
+app.model(chatbot)
+
 
 
 // 通过dva g model test的，手动将这个models/test.js文件删除掉，会报错。

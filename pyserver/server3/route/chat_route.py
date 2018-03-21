@@ -62,6 +62,7 @@ def get_intent():
     return jsonify({
         "response": {
             "type": "intent",
+            **intent_list[0],
             "message": intent_list[0]["label"],
             "trigger": intent_list[0]["trigger"]
         }

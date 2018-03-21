@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import {Modal, Form, Input, Radio, Select, Tag, Tooltip, Button} from 'antd'
 import {connect} from 'dva'
+import _ from 'lodash'
 import {
   createNewUserRequest,
   updateUserRequest,
@@ -22,7 +23,6 @@ class RequestModal extends Component {
     super(props)
     this.state = {
       visible: false,
-      tags: [],
       inputVisible: false,
     }
   }
@@ -31,18 +31,11 @@ class RequestModal extends Component {
 
   }
 
-  showModelHandler = (e) => {
-    // if (e) e.stopPropagation()
-    // this.setState({
-    //   visible: true,
-    // });
+  showModelHandler = () => {
     this.props.dispatch({type: 'allRequest/showModal'})
   }
 
   hideModelHandler = () => {
-    // this.setState({
-    //   visible: false,
-    // });
     this.props.dispatch({type: 'allRequest/hideModal'})
 
   }
@@ -53,7 +46,7 @@ class RequestModal extends Component {
       const body = {
         ...values,
         type: this.props.type,
-        // tags: this.state.tags,
+        tags: this.props.allRequest.tags,
       }
       if (!err) {
         if (this.props.new) {
@@ -81,10 +74,10 @@ class RequestModal extends Component {
     })
   }
 
-  handleClose(removedTag) {
-    const tags = this.state.tags.filter(tag => tag !== removedTag).filter(e => e)
-    this.setState({tags})
-    // dispatch({ type: 'upload/removeTag', payload: tags })
+  handleClose(tags, removedTag) {
+    tags = tags.filter(tag => tag !== removedTag).filter(e => e)
+    this.setState({inputValue: undefined})
+    this.props.dispatch({ type: 'allRequest/setTags', payload: tags })
   }
 
   showInput() {
@@ -93,37 +86,31 @@ class RequestModal extends Component {
   }
 
   handleInputChange(e) {
-    console.log(this.state.inputValue)
     this.setState({inputValue: e.target.value})
-    // dispatch({ type: 'upload/setInputValue', payload: e.target.value })
   }
 
-  handleInputConfirm() {
-    if (this.state.inputValue && this.state.tags.indexOf(this.state.inputValue) === -1) {
-      // console.log(this.state.tags)
-      const tags = [...this.state.tags, this.state.inputValue]
-      // console.log(tags)
-      this.setState({tags, inputValue: undefined, inputVisible: false})
+  handleInputConfirm(tags) {
+    if (this.state.inputValue && tags.indexOf(this.state.inputValue) === -1) {
+      tags = [...tags, this.state.inputValue]
+      this.setState({ inputValue: undefined, inputVisible: false })
+      this.props.dispatch({ type: 'allRequest/setTags', payload: tags })
     }
-
-    // if (upload.inputValue && upload.tags.indexOf(upload.inputValue) === -1) {
-    //   dispatch({ type: 'upload/confirmInput' })
-    // }
   }
 
   render() {
-    const {children, requestDetail} = this.props
+    const {children, requestDetail,allRequest} = this.props
     const {getFieldDecorator} = this.props.form
     // const { name, description, privacy } = this.props.record
     const formItemLayout = {
       labelCol: {span: 6},
       wrapperCol: {span: 14},
     }
-    let title, description,  input, output
-    let tags = this.state.tags
+
+    let tags=[]
+    let title, description, input, output
     if (requestDetail) {
-      ({title, description, input, output } = requestDetail)
-      tags = tags.length > 0 ? [...requestDetail.tags,...tags] : requestDetail.tags
+      tags = allRequest.tags;
+      ({ title, description, input, output }= requestDetail);
     }
     return (
       <span>
@@ -186,7 +173,7 @@ class RequestModal extends Component {
                   const isLongTag = tag.length > 15
                   const tagElem = (
                     <Tag key={tag} closable={true}
-                         afterClose={() => this.handleClose(tag)}>
+                         afterClose={() => this.handleClose(tags, tag)}>
                       {isLongTag ? `${tag.slice(0, 15)}...` : tag}
                     </Tag>
                   )
@@ -200,8 +187,8 @@ class RequestModal extends Component {
                     style={{width: 78}}
                     value={this.state.inputValue}
                     onChange={(e) => this.handleInputChange(e)}
-                    onBlur={() => this.handleInputConfirm()}
-                    onPressEnter={() => this.handleInputConfirm()}
+                    // onBlur={() => this.handleInputConfirm(tags)}
+                    onPressEnter={() => this.handleInputConfirm(tags)}
                   />
                 ) : <Button size="small" type="dashed"
                             onClick={() => this.showInput()}>+ New Tag</Button>}

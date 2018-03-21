@@ -13,7 +13,7 @@ import ProjectExample from '../../../../components/ProjectExample/projectExample
 
 import {showTime} from '../../../../utils/index'
 import styles from './index.less'
-import { get } from 'lodash'
+import {get} from 'lodash'
 import {message} from 'antd/lib/index'
 import ReactMarkdown from 'react-markdown'
 import {flaskServer} from '../../../../constants'
@@ -46,7 +46,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
 
   const props1 = {
     name: 'file',
-    action: flaskServer+'/file/project_file',
+    action: flaskServer + '/file/project_file',
     headers: {
       authorization: `Bearer ${localStorage.getItem('token')}`,
     },
@@ -124,44 +124,64 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
           <HelpModal visible={!projectDetail.project.entered}
                      projectType={projectDetail.project.type}/>}
           <div className={styles.info}>
-            {/*info head*/}
-            <div className={styles.name}>
-              <h1>
-                {market_use && <Icon
-                  // type="star"
-                  type={projectDetail.project.favor_users.includes(userObjId) ? 'star' : 'star-o'}
-                  style={{fontSize: '22px', color: '#34c0e2'}}
-                  onClick={() => appStarFavor('favor')}/>}
-                {projectDetail.project.name}&nbsp;
-                {!market_use && <Icon
-                  type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
-                  style={{fontSize: 20}}/>}
-                {!market_use && <span className={styles.rightButton}>
+            <Row>
+              <Col span={3} style={{padding: '10px 42px'}}>
+                <div className={styles.bigIconNunberDiv}>
+                  <div className={projectDetail.project.star_users.includes(userObjId) ? styles.iconNunberDivActive:styles.iconNunberDiv}
+                       style={market_use?{cursor: 'pointer'}:{cursor:'default'}}
+                       onClick={market_use?() => appStarFavor('star'):null}
+                       >
+                    <p className={styles.icon}>
+                      <Icon
+                            type={projectDetail.project.star_users.includes(userObjId) ? 'like' : 'like-o'}/>
+                    </p>
+                    <p
+                      className={styles.number}>{projectDetail.project.star_users.length}</p>
+                  </div>
+                  <div className={projectDetail.project.favor_users.includes(userObjId) ? styles.iconNunberDivActive:styles.iconNunberDiv}
+                       style={market_use?{cursor: 'pointer'}:{cursor:'default'}}
+                       onClick={market_use?() => appStarFavor('favor'):null}>
+                    <p className={styles.icon}>
+                      <Icon
+                            type={projectDetail.project.favor_users.includes(userObjId) ? 'star' : 'star-o'}/>
+                    </p>
+                    <p
+                      className={styles.number}>{projectDetail.project.favor_users.length}</p>
+                  </div>
+                </div>
+              </Col>
+              <Col span={21} style={{paddingRight: '150px'}}>
+                <div className={styles.name}>
+                  <h1>
+                    {projectDetail.project.name}&nbsp;
+                    {!market_use && <Icon
+                      type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
+                      style={{fontSize: 20}}/>}
+                    {!market_use && <span className={styles.rightButton}>
                   <ProjectModal new={false} projectDetail={projectDetail}
                   >
                     <Button icon='edit' style={{marginRight: 15}}/>
                   </ProjectModal>
                   <Button icon='delete' onClick={() => deleteProject()}/>
                 </span>}
-              </h1>
-              <p className={styles.text} style={{fontSize: 14, marginTop: 6}}>
-                <Icon type="clock-circle-o" style={{marginRight: 10}}/>
-                Create Time: {showTime(projectDetail.project.create_time)}
-              </p>
-            </div>
-
-            {/*info body*/}
-            <div className={styles.body}>
-              <div className={styles.description}>
-                <p>{projectDetail.project.description}</p>
-              </div>
-              <div className={styles.tags}>
-                {projectDetail.project.tags.length > 0 ? projectDetail.project.tags.map(e =>
-                    <Tag color="#EEEEEE"
-                         style={{color: '#666666'}}
-                         key={e}>{e}</Tag>)
-                  : <p style={{color: 'rgba(0,0,0,0.54)'}}>(no tags)</p>}
-              </div>
+                  </h1>
+                  <p className={styles.text}>
+                    <Icon type="clock-circle-o" style={{marginRight: 10}}/>
+                    Create Time: {showTime(projectDetail.project.create_time)}
+                  </p>
+                </div>
+                <div className={styles.descriptionDiv}>
+                  <p
+                    className={styles.descriptionP}>{projectDetail.project.description}</p>
+                </div>
+                <div className={styles.tags}>
+                  {projectDetail.project.tags.length > 0 ? projectDetail.project.tags.map(e =>
+                      <Tag color="#EEEEEE"
+                           style={{color: '#666666',cursor: 'default'}}
+                           key={e}>{e}</Tag>)
+                    : null}
+                </div>
+                <div style={{paddingBottom: '50px'}}>
               <span>
                 {!market_use && <span className={styles.generalSpan}>
                 <Upload {...props1}>
@@ -180,7 +200,12 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                   </Button>
                 </span>
               </span>
-            </div>
+                </div>
+              </Col>
+            </Row>
+
+            {/*info body*/}
+
           </div>
           {/*content tabs*/}
           <Tabs defaultActiveKey="3" onChange={callback}
@@ -198,8 +223,9 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
               <Jobs projectDetail={projectDetail} dispatch={dispatch}/>
             </TabPane>}
             <TabPane tab="Examples" key="3">
-              {projectDetail.project.args?
-                <ProjectExample projectDetail={projectDetail} dispatch={dispatch}/>:null}
+              {projectDetail.project.args ?
+                <ProjectExample projectDetail={projectDetail}
+                                dispatch={dispatch}/> : null}
             </TabPane>
           </Tabs>
         </div>
@@ -272,7 +298,6 @@ const Jobs = ({projectDetail, dispatch}) => {
           </div>)}
       </div>
     </div>
-
   )
 }
 

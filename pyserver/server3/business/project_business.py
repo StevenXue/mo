@@ -353,7 +353,12 @@ class ProjectBusiness:
 
     @classmethod
     def get_commits(cls, project_path):
-        repo = Repo.init(project_path)
-        heads = repo.heads
-        master = heads.master
-        return master.log()
+        # todo 临时使用，更改数据库后删除try
+        try:
+            repo = Repo.init(project_path)
+            heads = repo.heads
+            master = heads.master
+        except:
+            return []
+        else:
+            return master.log()
