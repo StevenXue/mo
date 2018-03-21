@@ -2,6 +2,8 @@ import { routerRedux } from 'dva/router'
 
 import { fetchProject, deleteProject, updateProject, forkProject } from '../services/project'
 import { fetchApp } from '../services/app'
+import { fetchModule } from '../services/module'
+import { fetchDataset } from '../services/dataset'
 import { getSessions, getTerminals, deleteSession, deleteTerminal } from '../services/job'
 import { deleteLab, startLab } from '../services/notebook'
 import { privacyChoices } from '../constants'
@@ -122,8 +124,8 @@ export default {
     *fetch({ projectId, notStartLab, projectType }, { call, put }) {
       const fetchMapper = {
         app: fetchApp,
-        module: fetchProject,
-        dataset: fetchProject,
+        module: fetchModule,
+        dataset: fetchDataset,
         project: fetchProject,
       }
       // fetch and set project

@@ -151,27 +151,29 @@ export class DatasetPage extends React.Component {
     if (this.state.projectId !== undefined) {
       const overview = this.state.project.overview || defaultOverview
       return (
-        <div style={{ height: '100%', overflowY: 'auto' }}>
+        <div style={{ height: '100%' }}>
           <header style={{ cursor: 'pointer' }} onClick={() => this.backToList()}>
             <Icon type="left"/>{this.state.project.name}
           </header>
-          <p className='des'>{this.state.project.description}</p>
-          <div className='des'>
-            <CopyInput text={this.state.project.path}/>
+          <div style={{ height: '100%', overflowY: 'auto' }}>
+            <p className='des'>{this.state.project.description}</p>
+            <div className='des'>
+              <CopyInput text={this.state.project.path}/>
+            </div>
+            <ReactMde
+              textAreaProps={{
+                id: 'ta1',
+                name: 'ta1',
+              }}
+              value={{ text: overview }}
+              showdownOptions={{ tables: true, simplifiedAutoLink: true }}
+              visibility={{
+                toolbar: false,
+                textarea: false,
+                previewHelp: false,
+              }}
+            />
           </div>
-          <ReactMde
-            textAreaProps={{
-              id: 'ta1',
-              name: 'ta1',
-            }}
-            value={{ text: overview }}
-            showdownOptions={{ tables: true, simplifiedAutoLink: true }}
-            visibility={{
-              toolbar: false,
-              textarea: false,
-              previewHelp: false,
-            }}
-          />
         </div>
       )
     } else {

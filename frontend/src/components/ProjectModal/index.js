@@ -39,7 +39,7 @@ class ProjectModal extends Component {
     //   visible: false,
     // });
     this.props.dispatch({ type: 'project/hideModal' })
-
+    this.props.dispatch({ type: 'project/setTags', payload: [] })
   }
 
   okHandler = () => {
@@ -51,6 +51,7 @@ class ProjectModal extends Component {
         type: this.props.type,
       }
       if (!err) {
+        // TODO move fetch and dispatch to model
         if (this.props.new) {
           createProject({
             body,
@@ -58,6 +59,7 @@ class ProjectModal extends Component {
               this.props.fetchData && this.props.fetchData()
               this.props.dispatch({ type: 'project/hideModal' })
               this.props.dispatch(routerRedux.push('/workspace/' + response._id+`?type=${this.props.type}`))
+              this.props.dispatch({ type: 'project/setTags', payload: [] })
             },
           })
         } else {
@@ -73,6 +75,7 @@ class ProjectModal extends Component {
                 notStartLab: true,
                 projectType: this.props.projectDetail.project.type,
               })
+              this.props.dispatch({ type: 'project/setTags', payload: [] })
             },
           })
         }

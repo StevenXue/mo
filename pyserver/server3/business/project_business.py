@@ -323,7 +323,7 @@ class ProjectBusiness:
         return cls.repo.update_one_by_id(project_id, data)
 
     @classmethod
-    def update_project_by_name(cls, project_name, **data):
+    def update_project_by_identity(cls, project_name, **data):
         """
         Update project
 

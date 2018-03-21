@@ -80,7 +80,7 @@ export class ModulePage extends React.Component {
       projectId: response._id,
       project: response,
       func: func,
-      args: func ? Object.values(response.input[func]) : undefined,
+      args: func ? Object.values(response.args.input[func]) : undefined,
     })
   }
 
@@ -136,7 +136,7 @@ export class ModulePage extends React.Component {
       <div>
         <ParamsMapper args={this.state.args}
                       setValue={(values) => this.setValue(values)}
-                      baseArgs={Object.values(this.state.project.input[this.state.func])}
+                      baseArgs={Object.values(this.state.project.args.input[this.state.func])}
         />
       </div>
     )
@@ -146,11 +146,13 @@ export class ModulePage extends React.Component {
     if (this.state.projectId !== undefined) {
       if (this.state.func) {
         return (
-          <div style={{ height: '100%', overflowY: 'auto' }}>
+          <div style={{ height: '100%' }}>
             <header style={{ cursor: 'pointer' }} onClick={() => this.backToList()}>
               <Icon type="left"/>{this.state.project.name}
             </header>
-            {this.renderParameters()}
+            <div style={{ height: '100%', overflowY: 'auto' }}>
+              {this.renderParameters()}
+            </div>
             <Row>
               <Button type='primary' onClick={() => this.insertCode()}>Insert Code</Button>
               {/*<Button onClick={() => this.backToList()}>Back to List</Button>*/}
@@ -160,11 +162,11 @@ export class ModulePage extends React.Component {
       } else {
         const overview = this.state.project.overview || defaultOverview
         return (
-          <div style={{ height: '100%', overflowY: 'auto' }}>
+          <div style={{ height: '100%' }}>
             <header style={{ cursor: 'pointer' }} onClick={() => this.backToList()}>
               <Icon type="left"/>{this.state.project.name}
             </header>
-            <div>
+            <div style={{ height: '100%', overflowY: 'auto' }}>
               <ReactMde
                 textAreaProps={{
                   id: 'ta1',

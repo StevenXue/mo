@@ -69,19 +69,19 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         app.save()
         return app
 
-    @classmethod
-    def get_by_id(cls, project_id, yml=False):
-        app = ProjectBusiness.get_by_id(project_id)
-        if yml and app.app_path:
-            app.args = cls.load_app_params(app)
-        return app
+    # @classmethod
+    # def get_by_id(cls, project_id, yml=False):
+    #     app = ProjectBusiness.get_by_id(project_id)
+    #     if yml and app.app_path:
+    #         app.args = cls.load_app_params(app)
+    #     return app
 
     @staticmethod
     def load_app_params(app):
         yml_path = os.path.join(app.app_path, yaml_tail_path)
         with open(yml_path, 'r') as stream:
             obj = yaml.load(stream)
-            return obj
+            return {'input': obj.get('input'), 'output': obj.get('output')}
 
     @classmethod
     def add_used_module(cls, app_id, used_modules, func):
@@ -89,24 +89,23 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         app_yaml_path = os.path.join(app.path, yaml_tail_path)
         args = {}
         output = {}
-        client = docker.from_env()
         # copy module yaml to app yaml
         for module in used_modules:
             cls.insert_module_env(app, module)
             # copy yaml
-            func_args = module.to_mongo()['args'][func]
-            output_args = module.to_mongo()['output'].get(func, {})
+            input_args = module.to_mongo()['args']['input'].get(func, {})
+            output_args = module.to_mongo()['args']['output'].get(func, {})
             if os.path.isfile(app_yaml_path):
                 with open(app_yaml_path, 'r') as stream:
                     # read args
                     obj = yaml.load(stream)
-                    args = cls.replace_dup_n_update(obj['input'], func_args,
+                    args = cls.replace_dup_n_update(obj['input'], input_args,
                                                     module.name)
                     output = cls.update_with_module_name(obj.get('output', {}),
                                                          output_args,
                                                          module.name)
             else:
-                args = cls.update_with_module_name(args, func_args,
+                args = cls.update_with_module_name(args, input_args,
                                                    module.name)
                 output = cls.update_with_module_name(output, output_args,
                                                      module.name)
