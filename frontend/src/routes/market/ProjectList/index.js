@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {connect} from 'dva'
-import {Select, Button, Card, Icon, Input, Avatar, Tabs} from 'antd'
+import {Select, Icon, Input, Pagination, Tabs} from 'antd'
 import ProjectModel from '../../../components/ProjectModal/index'
 import {showTime} from '../../../utils/index'
 import {privacyChoices, projectChoices} from '../../../constants'
@@ -48,38 +48,36 @@ class ProjectList extends Component {
     this.state = {
       projects: [],
       projectsLoading: false,
-      privacy: undefined,
+      privacy: 'public',
       projectType: 'project',
-      user_obj_id: localStorage.getItem('user_obj_id')
+      query: undefined,
+      user_obj_id: localStorage.getItem('user_obj_id'),
+      totalNumber: 0,
+      pageNo: 1,
+      pageSize: 4,
     }
   }
 
-  fetchData({payload}) {
+  fetchData({payload= {}}) {
     const {type} = this.props
 
     let filter = {type};
-    ['query', 'privacy'].forEach((key) => {
-      if (this.state[key]) {
-        filter[key] = this.stats[key]
-      }
+    ['query', 'privacy', 'page_no', 'page_size'].forEach((key) => {
+      filter[key] = this.state[key.dashToHump()]
     })
-    if (payload) {
-      for (let key in payload) {
-        if (!payload.hasOwnProperty(key)) {
-          continue
-        }
-        if (payload[key]) {
-          filter[key] = payload[key]
-          this.setState({
-            key: payload[key],
-          })
-        }
-      }
+
+    for (let key in payload) {
+        filter[key] = payload[key]
+        this.setState({
+          [key.dashToHump()]: payload[key],
+        })
     }
+
     getProjects({
       filter,
-      onJson: (projects) => this.setState({
+      onJson: ({projects, count}) => this.setState({
         projects,
+        totalNumber: count,
       })
     })
   }
@@ -88,12 +86,14 @@ class ProjectList extends Component {
     this.fetchData({})
   }
 
-  handlePrivacyChange(value) {
-    this.fetchData({payload: {privacy: value === 'all' ? undefined : value}})
-  }
 
   handleQueryChange(value) {
     this.fetchData({payload: {query: value}})
+  }
+
+
+  onShowSizeChange = (pageNo, pageSize) => {
+    this.fetchData({ payload: { page_no: pageNo, page_size: pageSize } })
   }
 
   toProjectDetail(id, history, type, projectOwner, loginUser) {
@@ -114,7 +114,6 @@ class ProjectList extends Component {
     }
 
     let toUpdateIndex = this.state.projects.findIndex(findById)
-    console.log(toUpdateIndex)
     let toUpdate = this.state.projects[toUpdateIndex]
     if (action === 'star') {
       toUpdate.star_users.includes(user_obj_id) ? toUpdate.star_users.pop(user_obj_id) : toUpdate.star_users.push(user_obj_id)
@@ -157,6 +156,15 @@ class ProjectList extends Component {
                          onClickStarFavor={(action) => this.starFavor(action, e._id, e.type)}
             />
           )}
+        </div>
+        <div className={styles.pagination}>
+          <Pagination showSizeChanger
+                      onShowSizeChange={this.onShowSizeChange}
+                      onChange={this.onShowSizeChange}
+                      defaultCurrent={1}
+                      defaultPageSize={4}
+                      pageSizeOptions={['4','8', '16', '32']}
+                      total={this.state.totalNumber}/>
         </div>
       </div>
     )

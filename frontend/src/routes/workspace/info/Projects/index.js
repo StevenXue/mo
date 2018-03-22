@@ -63,12 +63,14 @@ class ProjectList extends Component {
 
     // get state filter
     ['query', 'privacy', 'page_no', 'page_size'].forEach((key) => {
+      console.log('?',key,key.hyphenToHump())
       filter[key] = this.state[key.hyphenToHump()]
     })
 
     // update filter from args
     for (let key in payload) {
       filter[key] = payload[key]
+      console.log('!',key,key.hyphenToHump())
       this.setState({
         [key.hyphenToHump()]: payload[key],
       })
@@ -80,7 +82,7 @@ class ProjectList extends Component {
       onJson: ({ projects, count }) => this.setState({
         projects,
         totalNumber: count,
-      }),
+      })
     })
   }
 
@@ -106,6 +108,7 @@ class ProjectList extends Component {
 
   render() {
     const { history, project, dispatch } = this.props
+
     return (
       <div>
         <div className={styles.header}>
@@ -160,7 +163,6 @@ class ProjectList extends Component {
         </div>
       </div>
     )
-
   }
 }
 
