@@ -38,7 +38,6 @@ def list_request_answer():
         request_answer_info = json_utility. \
             me_obj_list_to_json_list(request_answer)
         # 得到每一个answer下的comments 和 selcet project
-
         for index, answer in enumerate(request_answer_info):
             answer_comment = comments_service.get_comments_of_this_answer(
                 answer['_id'])
@@ -47,15 +46,14 @@ def list_request_answer():
             answer['comment'] = answer_comment_info
             if 'select_project' in answer:
                 # 获取commit
-                print(request_answer[index].select_project.path)
                 commits = ProjectBusiness.get_commits(request_answer[index].select_project.path)
-                request_answer[index].select_project.commits = [{
+                select_project = request_answer[index].select_project
+                select_project.commits = [{
                     'message': c.message,
                     'time': datetime.fromtimestamp(c.time[0] + c.time[1]),
                         } for c in commits]
                 answer['select_project'] = json_utility.convert_to_json(
-                    request_answer[index].select_project.to_mongo())
-
+                    select_project.to_mongo())
         return jsonify({'response': request_answer_info}), 200
     elif user_ID:
         request_answer, total_number = request_answer_service. \
