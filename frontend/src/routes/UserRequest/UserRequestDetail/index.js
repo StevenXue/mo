@@ -4,7 +4,7 @@ import {routerRedux} from 'dva/router'
 import styles from './index.less'
 import {
   Tabs, Switch, Button, Input, Form, Card, Icon,
-  Row, Col, Select, Spin, Modal
+  Row, Col, Select, Spin, Modal, Tag
 } from 'antd'
 import debounce from 'lodash.debounce'
 import {get} from 'lodash'
@@ -138,7 +138,7 @@ class AnswerForm extends React.Component {
     let filter = {'type': type, 'query': value}
     getProjects({
       filter,
-      onJson: (projects) => this.setState({
+      onJson: ({projects}) => this.setState({
         projects, fetching: false
       })
     })
@@ -526,10 +526,15 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                     {e.select_project ?
                       <Card title={e.select_project.name}
                             style={{cursor: 'pointer'}}
-                            onClick={() => clickSelectedProject(e)}>
+                            onClick={() => clickSelectedProject(e)}
+                            extra={<div style={{ fontSize:'14px'}}>
+                              <Tag color="#FFC923" style={{opacity:'0.8'}}>Online</Tag>
+                            </div>}>
                         <p>{e.select_project.description}</p>
-                        {e.select_project.commits ? <div><p>last commit</p>
-                          <p>{e.select_project.commits[-1].message}</p></div> : null}
+                        {e.select_project.commits.length>0 ? <div style={{marginTop:'35px', color: '#848d95'}}>
+                          <p>last commited at {showTime(e.select_project.commits[e.select_project.commits.length-1]['time'])}</p>
+                          <p>{e.select_project.commits[e.select_project.commits.length-1]['message']}</p>
+                        </div> : null}
                       </Card> : null}
                     <div>
                       <div className={styles.eachAnswer}>
