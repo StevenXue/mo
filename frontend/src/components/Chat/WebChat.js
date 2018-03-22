@@ -400,6 +400,7 @@ class WebChat extends React.Component {
 
         opened={opened}
         toggleFloating={this.myToggleFloating}
+        isRight={this.props.isRight}
         // customStyle={{"background-color": "red"}}
         // userBubbleColor='#ffe695'
         // userFontColor=''

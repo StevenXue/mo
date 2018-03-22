@@ -102,7 +102,7 @@ def update_user_request_votes():
 @user_request_app.route('/star', methods=['PUT'])
 def update_user_request_star():
     data = request.get_json()
-    user_request_id = data["user_request"]
+    user_request_id = data["user_request_id"]
     star_user_id = data["star_user_id"]
     result = user_service.update_request_star(user_request_id, star_user_id)
     result = json_utility.convert_to_json(result.to_mongo())

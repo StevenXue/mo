@@ -20,8 +20,6 @@ export default {
     },
 
     updateNewMessage(state, {payload}) {
-      console.log('payload')
-      console.log(payload)
       let receiver_id = payload.msg.receiver_id
       return {
         ...state,

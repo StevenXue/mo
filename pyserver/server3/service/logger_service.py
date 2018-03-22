@@ -165,6 +165,7 @@ def emit_result(*args, **kw):
 
 
 def emit_notification(message, created_receivers):
+    print("emit_notification", emit_notification)
     for receiver in created_receivers:
         receiver_user = receiver.user
         message.is_read = False
