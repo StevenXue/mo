@@ -103,7 +103,6 @@ export const optionStep = {
     {
       value: 6,
       label: '我发布的需求',
-      // trigger: "createUserRequest", // WebChatId.asking.text,
       borderColor: 'yellow',
       route: "Requests"
     },
@@ -176,6 +175,7 @@ function finalSteps() {
       id: WebChatId.message.intent,
       component: <Intent/>,
       waitAction: true,
+      replace: true
     },
 
     {
@@ -281,8 +281,27 @@ function finalSteps() {
   const asking = [
     {
       id: "createUserRequest",
-      component: <div/>,
+      message: '请选择你要创建的需求类型',
+      trigger: 'createUserRequest1',
     },
+    {
+      id: "createUserRequest1",
+      options: [
+        { value: 1, label: 'App',  type: 'goto', url: '/userrequest?tab=App'},
+        { value: 2, label: 'Module',  type: 'goto',  url: '/userrequest?tab=Module' },
+        { value: 3, label: 'DataSet',  type: 'goto',  url: '/userrequest?tab=DataSet' },
+      ],
+    },
+
+    // {
+    //   id: "createUserRequest",
+    //   message: '请选择你要创建的需求类型',
+    //   trigger: 'gotoApp',
+    //   trigger: 'gotoModule',
+    //   trigger: 'gotoDataset',
+    // }
+
+
 
     //
     // {
@@ -381,6 +400,7 @@ class WebChat extends React.Component {
 
         opened={opened}
         toggleFloating={this.myToggleFloating}
+        isRight={this.props.isRight}
         // customStyle={{"background-color": "red"}}
         // userBubbleColor='#ffe695'
         // userFontColor=''

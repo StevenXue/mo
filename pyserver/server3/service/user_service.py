@@ -3,6 +3,7 @@ import json
 import requests
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
+from mongoengine import DoesNotExist
 
 from server3.business import user_business
 from server3.utility import json_utility
@@ -19,6 +20,7 @@ from server3.entity.general_entity import UserEntity
 from server3.business.user_request_business import UserRequestBusiness
 from server3.business.data_set_business import DatasetBusiness
 
+from server3.entity.phone_message_id import PhoneMessageId
 
 def add_git_http_user(user_ID, password):
     """
@@ -32,10 +34,16 @@ def add_git_http_user(user_ID, password):
                          json={'password': password})
 
 
-def add(user_ID, password, kwargs):
+def add(user_ID, password, **kwargs):
     add_git_http_user(user_ID, password)
     hashed_password = generate_password_hash(password)
-    return user_business.add(user_ID, hashed_password, kwargs)
+    return user_business.add(user_ID, hashed_password, **kwargs)
+
+
+def register(user_ID, password, phone, code, **kwargs):
+    # 验证失败会抛出错误
+    verify_code(code=code, phone=phone)
+    return add(user_ID=user_ID, password=password, phone=phone, **kwargs)
 
 
 def reset_password(phone, message_id, code, new_password):
@@ -214,7 +222,7 @@ def add_used_api(user_ID, api_id):
         }
 
 
-def get_verification_code(phone):
+def send_verification_code(phone):
     """
 
     :param phone:
@@ -232,14 +240,47 @@ def get_verification_code(phone):
         'authorization': "Basic MjZlZWFhM2QyNzljMzIyZTg0Zjk1NDQxOmYwMjQ2NzdiOWNjM2QxZWZmNDE0ODQxMA==",
     }
     response = requests.request("POST", url, data=payload, headers=headers)
+    print("response", response)
     result = response.json()
+    print("result", result)
     if "error" in result:
         raise Error(result["error"])
-    return response.json()["message_id"]
+    msg_id = result["msg_id"]
+    # 数据库 更改或者创建 get or create
+    try:
+        obj = PhoneMessageId.objects(phone=phone).get()
+        obj.msg_id = msg_id
+        return obj.save()
+    except DoesNotExist as e:
+        obj = PhoneMessageId(phone=phone, msg_id=msg_id)
+        return obj.save()
+
+    # if obj:
+    #     obj.msg_id = msg_id
+    #     return obj.save()
+    # else:
+    #     obj = PhoneMessageId(phone=phone, msg_id=msg_id)
+    #     return obj.save()
+    # phone_message_id = PhoneMessageId(phone=phone, msg_id=msg_id)
+    # result = phone_message_id.save()
+    # return result
 
 
-def verify_code(code, message_id):
-    url = 'https://api.sms.jpush.cn/v1/codes/' + message_id + '/valid'
+def verify_code(code, phone):
+    """
+
+    :param code:
+    :type code:
+    :param phone:
+    :type phone:
+    :return: 验证成功返回 True, 失败抛出报错信息 {
+        "code": *****,
+        "message": "******"
+    }
+    :rtype:
+    """
+    msg_id = PhoneMessageId.objects(phone=phone).get().msg_id
+    url = 'https://api.sms.jpush.cn/v1/codes/' + msg_id + '/valid'
     payload = json.dumps({
         'code': code
     })
@@ -247,6 +288,7 @@ def verify_code(code, message_id):
         'content-type': "application/json",
         'authorization': "Basic MjZlZWFhM2QyNzljMzIyZTg0Zjk1NDQxOmYwMjQ2NzdiOWNjM2QxZWZmNDE0ODQxMA==",
     }
+
     response = requests.request("POST", url, data=payload, headers=headers)
     result = response.json()
     if "error" in result:

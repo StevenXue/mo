@@ -55,11 +55,31 @@ def create_request_answer(**data):
     if created_request_answer:
         # get user object
         user = data['answer_user']
-        # create ownership relation
-        #  新建通知消息
-        admin_user = user_business.get_by_user_ID('admin')
         user_request = user_request_business. \
             get_by_user_request_id(data['user_request'])
+
+        from server3.service.world_service import WorldService
+        from server3.business.statistics_business import StatisticsBusiness
+        from server3.entity.world import CHANNEL
+
+        # 记录历史记录
+        statistics = StatisticsBusiness.action(
+            user_obj=user,
+            entity_obj=created_request_answer,
+            entity_type="requestAnswer",
+            action="create"
+        )
+
+        # 记录世界频道消息  # 推送消息
+        world = WorldService.system_send(
+            channel=CHANNEL.request,
+            message=f"用户{created_request_answer.answer_user.user_ID}为需求"
+                    f"{user_request.title}创建了回答")
+
+        # create ownership relations
+        #  新建通知消息
+        admin_user = user_business.get_by_user_ID('admin')
+
         receivers = [el for el in user_request.star_user]
         if message_service.create_message(
                 sender=admin_user,

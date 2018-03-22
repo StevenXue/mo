@@ -33,9 +33,9 @@ class Register extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.register.status === 'ok') {
-      this.props.dispatch(routerRedux.push('/user/register-result'));
-    }
+    // if (nextProps.register.status === 'ok') {
+    //   this.props.dispatch(routerRedux.push('/user/register-result'));
+    // }
   }
 
   componentWillUnmount() {
@@ -43,6 +43,15 @@ class Register extends Component {
   }
 
   onGetCaptcha = () => {
+    // 向后端请求验证码
+    let phone = this.props.form.getFieldValue("phone")
+    this.props.dispatch({
+      type: "register/sendVerificationCode",
+      payload: {
+        phone: phone
+      }
+    })
+
     let count = 59;
     this.setState({ count });
     this.interval = setInterval(() => {
@@ -243,32 +252,32 @@ class Register extends Component {
               </FormItem>
             </InputGroup>
           </FormItem>
-          {/*<FormItem>*/}
-            {/*<Row gutter={8}>*/}
-              {/*<Col span={16}>*/}
-                {/*{getFieldDecorator('captcha', {*/}
-                  {/*rules: [{*/}
-                    {/*required: true, message: '请输入验证码！',*/}
-                  {/*}],*/}
-                {/*})(*/}
-                  {/*<Input*/}
-                    {/*size="large"*/}
-                    {/*placeholder="验证码"*/}
-                  {/*/>*/}
-                {/*)}*/}
-              {/*</Col>*/}
-              {/*<Col span={8}>*/}
-                {/*<Button*/}
-                  {/*size="large"*/}
-                  {/*disabled={count}*/}
-                  {/*className={styles.getCaptcha}*/}
-                  {/*onClick={this.onGetCaptcha}*/}
-                {/*>*/}
-                  {/*{count ? `${count} s` : '获取验证码'}*/}
-                {/*</Button>*/}
-              {/*</Col>*/}
-            {/*</Row>*/}
-          {/*</FormItem>*/}
+          <FormItem>
+            <Row gutter={8}>
+              <Col span={16}>
+                {getFieldDecorator('captcha', {
+                  rules: [{
+                    required: true, message: '请输入验证码！',
+                  }],
+                })(
+                  <Input
+                    size="large"
+                    placeholder="验证码"
+                  />
+                )}
+              </Col>
+              <Col span={8}>
+                <Button
+                  size="large"
+                  disabled={count}
+                  className={styles.getCaptcha}
+                  onClick={this.onGetCaptcha}
+                >
+                  {count ? `${count} s` : '获取验证码'}
+                </Button>
+              </Col>
+            </Row>
+          </FormItem>
           <FormItem style={{marginTop: 20}}>
             <Button size="large" loading={register.submitting} className={styles.submit} type="primary" htmlType="submit">
               Sign Up
