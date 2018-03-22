@@ -7,7 +7,14 @@ import lodash from 'lodash'
 
 // 连字符转驼峰
 String.prototype.hyphenToHump = function () {
-  return this.replace(/-(\w)/g, (...args) => {
+  return this.replace(/-(\w)/g, (args) => {
+    return args[1].toUpperCase()
+  })
+}
+
+// 下划线转驼峰
+String.prototype.dashToHump = function () {
+  return this.replace(/-(\w)/g, (args) => {
     return args[1].toUpperCase()
   })
 }

@@ -63,14 +63,14 @@ class ProjectList extends Component {
 
     // get state filter
     ['query', 'privacy', 'page_no', 'page_size'].forEach((key) => {
-      filter[key] = this.state[key.hyphenToHump()]
+      filter[key] = this.state[key.dashToHump()]
     })
 
     // update filter from args
     for (let key in payload) {
       filter[key] = payload[key]
       this.setState({
-        [key.hyphenToHump()]: payload[key],
+        [key.dashToHump()]: payload[key],
       })
     }
 
