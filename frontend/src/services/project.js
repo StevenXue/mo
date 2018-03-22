@@ -15,15 +15,11 @@ const PREFIX = 'project'
 export function getProjects({ filter, onJson }) {
   let params = ''
   for (let key in filter) {
-    if (!filter.hasOwnProperty(key)) {
-      continue
-    }
     if (filter[key]) {
-      const value = filter[key]
       if (key === 'projectType') {
         key = 'type'
       }
-      params += `&${key}=${value}`
+      params += `&${key}=${filter[key]}`
     }
   }
   return request(path.join(CORS, PREFIX) + `?${params}`, undefined, { onJson })

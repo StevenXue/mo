@@ -190,7 +190,7 @@ def list_projects_by_user_ID(user_ID, order=-1, privacy='all'):
 
 def list_projects(search_query=None, page_no=1, page_size=10,
                   default_max_score=0.4, privacy=None, type='project',
-                  user_ID=None,count_only=False):
+                  user_ID=None):
     """
     list projects
     :param user_ID:
@@ -209,7 +209,6 @@ def list_projects(search_query=None, page_no=1, page_size=10,
         page_size=page_size,
         default_max_score=default_max_score,
         user=user,
-        count_only=count_only,
     )
 
 

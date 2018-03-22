@@ -119,3 +119,15 @@
   height: 100%;
   overflow: auto;
 }
+
+#modules-manager .container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 5px;
+}
+
+/*#modules-manager .pagination {*/
+  /*height: 100%;*/
+  /*overflow: auto;*/
+/*}*/
