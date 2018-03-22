@@ -5,12 +5,15 @@ import subprocess
 from importlib import import_module
 from datetime import datetime
 from git import Repo as GRepo
+from cookiecutter.main import cookiecutter
+
 from distutils.dir_util import copy_tree
 # from server3.entity.module import Module
 from server3.entity import project
 from server3.repository.general_repo import Repo
 from server3.business.project_business import ProjectBusiness
 from server3.constants import MODULE_DIR
+from server3.constants import USER_DIR
 from server3.constants import GIT_SERVER_IP
 
 # module_repo = Repo(Module)
@@ -63,7 +66,7 @@ class ModuleBusiness(ProjectBusiness):
             tags = []
         user_ID = user.user_ID
 
-        # user_path = os.path.join(USER_DIR, user_ID)
+        user_path = os.path.join(USER_DIR, user_ID)
         # project_path = os.path.join(USER_DIR, user_ID, name)
 
         # generate project dir
@@ -77,9 +80,20 @@ class ModuleBusiness(ProjectBusiness):
 
         # create template
         # TODO real template and new template method
-        copy_tree(
-            '/Users/zhaofengli/projects/goldersgreen/pyserver/server3/lib/modules/zhaofengli/sesese',
-            project_path)
+        # copy_tree(
+        #     '/Users/zhaofengli/projects/goldersgreen/pyserver/module_template',
+        #     project_path)
+
+        cookiecutter(
+            'https://github.com/Acrobaticat/mo-cookiecutter-python.git',
+            no_input=True, output_dir=user_path,
+            extra_context={
+                "author_name": user_ID,
+                "module_name": name,
+                "module_type": category,
+                "module_description": description,
+                "repository": ""
+            })
         # add all
         repo.git.add(A=True)
         # initial commit
