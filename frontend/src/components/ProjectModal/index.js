@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Modal, Form, Input, Radio, Select, Tag, Tooltip, Button } from 'antd'
+import { Modal, Form, Input, Radio, Select, Tag, Tooltip, Button, message } from 'antd'
 import { connect } from 'dva'
 import { createProject, updateProject, getMyProjects, getProjects } from '../../services/project'
 import { routerRedux } from 'dva/router'
@@ -14,6 +14,7 @@ const fields = ['Business', 'Government', 'Education', 'Environment', 'Health', 
   'Public Services', 'Social', 'Transportation', 'Science', 'Technology']
 const tasks = ['Classification', 'Regression', 'Clustering', 'Reinforcement Learning']
 const TYPE = ['app', 'module', 'dataset']
+const CAT = ['model', 'toolkit']
 
 class ProjectModal extends Component {
   constructor(props) {
@@ -53,13 +54,15 @@ class ProjectModal extends Component {
       if (!err) {
         // TODO move fetch and dispatch to model
         if (this.props.new) {
+          const hide = message.loading('Project Creating...', 0)
           createProject({
             body,
             onJson: (response) => {
               this.props.fetchData && this.props.fetchData()
               this.props.dispatch({ type: 'project/hideModal' })
-              this.props.dispatch(routerRedux.push('/workspace/' + response._id+`?type=${this.props.type}`))
+              this.props.dispatch(routerRedux.push('/workspace/' + response._id + `?type=${this.props.type}`))
               this.props.dispatch({ type: 'project/setTags', payload: [] })
+              hide()
             },
           })
         } else {
@@ -124,9 +127,11 @@ class ProjectModal extends Component {
       labelCol: { span: 6 },
       wrapperCol: { span: 14 },
     }
+    const url = new URL(location.href.replace('/#', ''))
+    const projectType = url.searchParams.get('tab') || url.searchParams.get('type')
 
     // default values
-    const { name, description, privacy } = _.get(projectDetail, 'project', {});
+    const { name, description, category, privacy } = _.get(projectDetail, 'project', {})
     let tags = _.get(project, 'tags', [])
 
     return (
@@ -136,7 +141,8 @@ class ProjectModal extends Component {
         </span>
         <Modal
           title="Project Configuration"
-          visible={this.props.project.modalVisible}
+          visible={this.props.project.modalVisible && projectType === this.props.type}
+          // type in url === type passed by Projects Component
           onOk={this.okHandler}
           onCancel={this.hideModelHandler}
         >
@@ -188,23 +194,25 @@ class ProjectModal extends Component {
               )}
 
             </FormItem>}
-            {/*<FormItem*/}
-            {/*{...formItemLayout}*/}
-            {/*label="Project Type"*/}
-            {/*>*/}
-            {/*{getFieldDecorator('type', {*/}
-            {/*initialValue: type,*/}
-            {/*rules: [*/}
-            {/*{ required: true },*/}
-            {/*],*/}
-            {/*})(*/}
-            {/*<Select disabled={!this.props.new}>*/}
-            {/*{*/}
-            {/*TYPE.map((e) => <Option value={e} key={e}>{e}</Option>)*/}
-            {/*}*/}
-            {/*</Select>,*/}
-            {/*)}*/}
-            {/*</FormItem>*/}
+            {this.props.type === 'module' && <FormItem
+              {...formItemLayout}
+              label="Category"
+              help='Models are modules need to be trained,
+              and vice versa, toolkits are no need for training.'
+            >
+              {getFieldDecorator('category', {
+                initialValue: category,
+                rules: [
+                  { required: true },
+                ],
+              })(
+                <Select disabled={!this.props.new}>
+                  {
+                    CAT.map((e) => <Option value={e} key={e}>{e}</Option>)
+                  }
+                </Select>,
+              )}
+            </FormItem>}
             <FormItem
               {...formItemLayout}
               label="Tags"

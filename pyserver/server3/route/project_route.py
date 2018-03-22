@@ -83,6 +83,8 @@ def list_projects_by_query():
             "message": e.args[0]["hint_message"]
         }), 404
     else:
+        for project in projects.objects:
+            project.user_ID = project.user.user_ID
         project_list = json_utility.me_obj_list_to_json_list(projects.objects)
         return jsonify({
             "response": {'projects': project_list, 'count': projects.count}

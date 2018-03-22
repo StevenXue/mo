@@ -1,4 +1,5 @@
 import os
+import uuid
 import yaml
 import shutil
 import subprocess
@@ -8,6 +9,7 @@ from git import Repo as GRepo
 from cookiecutter.main import cookiecutter
 
 from distutils.dir_util import copy_tree
+from distutils.dir_util import remove_tree
 # from server3.entity.module import Module
 from server3.entity import project
 from server3.repository.general_repo import Repo
@@ -19,7 +21,12 @@ from server3.constants import GIT_SERVER_IP
 # module_repo = Repo(Module)
 
 tail_path = 'src/module_spec.yml'
-
+cat_dict = {
+    'model':
+        'https://github.com/momodel/cookiecutter-python-model.git',
+    'toolkit':
+        'https://github.com/momodel/cookiecutter-python-toolkit.git'
+}
 
 # def add(name, user, **kwargs):
 #     try:
@@ -66,11 +73,12 @@ class ModuleBusiness(ProjectBusiness):
             tags = []
         user_ID = user.user_ID
 
-        user_path = os.path.join(USER_DIR, user_ID)
+        # user_path = os.path.join(USER_DIR, user_ID)
         # project_path = os.path.join(USER_DIR, user_ID, name)
 
         # generate project dir
         project_path = cls.gen_dir(user_ID, name)
+        temp_path = cls.gen_dir(user_ID, uuid.uuid4().hex)
 
         # init git repo
         cls.init_git_repo(user_ID, name)
@@ -78,22 +86,21 @@ class ModuleBusiness(ProjectBusiness):
         # clone to project dir
         repo = cls.clone(user_ID, name, project_path)
 
-        # create template
-        # TODO real template and new template method
-        # copy_tree(
-        #     '/Users/zhaofengli/projects/goldersgreen/pyserver/module_template',
-        #     project_path)
-
+        # create template to temp path
         cookiecutter(
-            'https://github.com/Acrobaticat/mo-cookiecutter-python.git',
-            no_input=True, output_dir=user_path,
+            cat_dict[category],
+            no_input=True, output_dir=temp_path,
             extra_context={
                 "author_name": user_ID,
                 "module_name": name,
                 "module_type": category,
                 "module_description": description,
-                "repository": ""
             })
+
+        # copy temp project to project dir and remove temp dir
+        copy_tree(os.path.join(temp_path, name), project_path)
+        remove_tree(temp_path)
+
         # add all
         repo.git.add(A=True)
         # initial commit

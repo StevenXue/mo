@@ -14,7 +14,7 @@ String.prototype.hyphenToHump = function () {
 
 // 下划线转驼峰
 String.prototype.dashToHump = function () {
-  return this.replace(/-(\w)/g, (args) => {
+  return this.replace(/_(\w)/g, (args) => {
     return args[1].toUpperCase()
   })
 }

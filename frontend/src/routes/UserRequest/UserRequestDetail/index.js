@@ -4,7 +4,7 @@ import {routerRedux} from 'dva/router'
 import styles from './index.less'
 import {
   Tabs, Switch, Button, Input, Form, Card, Icon,
-  Row, Col, Select, Spin, Modal
+  Row, Col, Select, Spin, Modal, Tag
 } from 'antd'
 import debounce from 'lodash.debounce'
 import {get} from 'lodash'
@@ -15,7 +15,6 @@ import {JsonToArray} from "../../../utils/JsonUtils"
 import RequestModal from '../../../components/RequestModal/index'
 import {getProjects} from "../../../services/project"
 import ProjectModal from '../../../components/ProjectModal/index'
-
 
 
 const {TextArea} = Input
@@ -139,7 +138,7 @@ class AnswerForm extends React.Component {
     let filter = {'type': type, 'query': value}
     getProjects({
       filter,
-      onJson: (projects) => this.setState({
+      onJson: ({projects}) => this.setState({
         projects, fetching: false
       })
     })
@@ -250,8 +249,9 @@ class AnswerForm extends React.Component {
           {projects.map(d => <Select.Option
             key={d._id}>{d.name}</Select.Option>)}
         </Select>
-          <ProjectModal new={true}  type={this.props.type}>
-          <Button icon='plus-circle-o' type='primary' style={{'marginLeft':'30px'}}>New {this.props.type}</Button>
+          <ProjectModal new={true} type={this.props.type}>
+            <Button icon='plus-circle-o' type='primary'
+                    style={{'marginLeft': '30px'}}>New {this.props.type}</Button>
           </ProjectModal></div> : null}
         {/*<BraftEditor {...editorProps}/>*/}
         <div style={{margin: '24px 0'}}/>
@@ -332,13 +332,13 @@ function UserRequestDetail({allRequest, login, dispatch}) {
     })
   }
 
-  const clickSelectedProject =(e)=>{
+  const clickSelectedProject = (e) => {
     let user_obj_id = localStorage.getItem('user_obj_id')
-    if(user_obj_id === e.select_project.user){
-      window.open("/#/workspace/" + e.select_project._id+ "?type="+e.select_project.type)
+    if (user_obj_id === e.select_project.user) {
+      window.open("/#/workspace/" + e.select_project._id + "?type=" + e.select_project.type)
     }
-    else{
-      window.open("/#/market/" + e.select_project._id+ "?type="+e.select_project.type)
+    else {
+      window.open("/#/market/" + e.select_project._id + "?type=" + e.select_project.type)
     }
   }
 
@@ -432,8 +432,11 @@ function UserRequestDetail({allRequest, login, dispatch}) {
 
         <p
           className={styles.description}>{get(focusUserRequest, 'description') ? get(focusUserRequest, 'description') : null}</p>
-        {focusUserRequest.input?<div style={{margin: '16px 0'}}><p>Input: {focusUserRequest.input}</p></div>:null}
-        {focusUserRequest.output?<div style={{margin: '16px 0'}}><p>Output: {focusUserRequest.output}</p></div>:null}
+        {focusUserRequest.input ?
+          <div style={{margin: '16px 0'}}><p>Input: {focusUserRequest.input}</p>
+          </div> : null}
+        {focusUserRequest.output ? <div style={{margin: '16px 0'}}>
+          <p>Output: {focusUserRequest.output}</p></div> : null}
         <h2
           className={styles.commentsAnswers}>{focusUserRequest.comments ? focusUserRequest.comments.length : 0} Comments</h2>
         <hr/>
@@ -473,9 +476,10 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                       fontSize: '26px',
                       cursor: 'pointer'
                     }}>
-                      <Icon type={e['votes_up_user'].includes(user_obj_id) ? "like" : "like-o"}
-                            onClick={() => answerVotesUp(e._id)}
-                            style={{color: '#34c0e2'}}
+                      <Icon
+                        type={e['votes_up_user'].includes(user_obj_id) ? "like" : "like-o"}
+                        onClick={() => answerVotesUp(e._id)}
+                        style={{color: '#34c0e2'}}
                       />
                     </div>
                     <div style={{
@@ -486,12 +490,12 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                       {e['votes_up_user'].length}
                     </div>
                     {/*<div style={{*/}
-                      {/*width: '100%',*/}
-                      {/*textAlign: 'center',*/}
-                      {/*fontSize: '26px',*/}
-                      {/*cursor: 'pointer'*/}
+                    {/*width: '100%',*/}
+                    {/*textAlign: 'center',*/}
+                    {/*fontSize: '26px',*/}
+                    {/*cursor: 'pointer'*/}
                     {/*}}>*/}
-                      {/*<Icon type="caret-down"/>*/}
+                    {/*<Icon type="caret-down"/>*/}
                     {/*</div>*/}
                     {user_ID === focusUserRequest.user_ID &&
                     !focusUserRequest.accept_answer &&
@@ -522,8 +526,16 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                     {e.select_project ?
                       <Card title={e.select_project.name}
                             style={{cursor: 'pointer'}}
-                            onClick={() =>clickSelectedProject(e)}>
-                        <p>{e.select_project.description}</p></Card> : null}
+                            onClick={() => clickSelectedProject(e)}
+                            extra={<div style={{ fontSize:'14px'}}>
+                              <Tag color="#FFC923" style={{opacity:'0.8'}}>Online</Tag>
+                            </div>}>
+                        <p>{e.select_project.description}</p>
+                        {e.select_project.commits.length>0 ? <div style={{marginTop:'35px', color: '#848d95'}}>
+                          <p>last commited at {showTime(e.select_project.commits[e.select_project.commits.length-1]['time'])}</p>
+                          <p>{e.select_project.commits[e.select_project.commits.length-1]['message']}</p>
+                        </div> : null}
+                      </Card> : null}
                     <div>
                       <div className={styles.eachAnswer}>
                         <div dangerouslySetInnerHTML={{

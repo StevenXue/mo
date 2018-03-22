@@ -159,6 +159,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                       style={{fontSize: 20}}/>}
                     {!market_use && <span className={styles.rightButton}>
                   <ProjectModal new={false} projectDetail={projectDetail}
+                                type={projectDetail.project.type}
                   >
                     <Button icon='edit' style={{marginRight: 15}}/>
                   </ProjectModal>
