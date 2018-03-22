@@ -347,6 +347,7 @@ class ProjectBusiness:
         # add all
         repo.git.add(A=True)
         repo.index.commit(commit_msg)
+        repo.remote(name='origin').pull()
         repo.remote(name='origin').push(o=project_id)
 
     @classmethod

@@ -255,3 +255,7 @@
 .jp-CommitIcon {
   background-image: var(--jp-commit);
 }
+
+.jp-Git-SyncIcon {
+  background-image: var(--jp-git-sync);
+}
