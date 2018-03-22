@@ -54,7 +54,7 @@ class ProjectList extends Component {
       user_obj_id: localStorage.getItem('user_obj_id'),
       totalNumber: 0,
       pageNo: 1,
-      pageSize: 4,
+      pageSize: 8,
     }
   }
 
@@ -162,7 +162,7 @@ class ProjectList extends Component {
                       onShowSizeChange={this.onShowSizeChange}
                       onChange={this.onShowSizeChange}
                       defaultCurrent={1}
-                      defaultPageSize={4}
+                      defaultPageSize={8}
                       pageSizeOptions={['4','8', '16', '32']}
                       total={this.state.totalNumber}/>
         </div>
