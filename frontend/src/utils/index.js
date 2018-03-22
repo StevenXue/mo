@@ -12,6 +12,17 @@ String.prototype.hyphenToHump = function () {
   })
 }
 
+// 下划线转驼峰
+String.prototype.dashToHump = function () {
+  return this.replace(/_(\w)/g, (...args) => {
+    return args[1].toUpperCase()
+  })
+}
+
+// function dashToCamelCase( myStr ) {
+//   return myStr.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
+// }
+
 // 驼峰转连字符
 String.prototype.humpToHyphen = function () {
   return this.replace(/([A-Z])/g, '-$1').toLowerCase()

@@ -3,6 +3,7 @@ import json
 import requests
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
+from mongoengine import DoesNotExist
 
 from server3.business import user_business
 from server3.utility import json_utility
@@ -40,10 +41,9 @@ def add(user_ID, password, **kwargs):
 
 
 def register(user_ID, password, phone, code, **kwargs):
-    if verify_code(code=code, phone=phone):
-        return add(user_ID=user_ID, password=password, phone=phone, **kwargs)
-    else:
-        raise Error()
+    # 验证失败会抛出错误
+    verify_code(code=code, phone=phone)
+    return add(user_ID=user_ID, password=password, phone=phone, **kwargs)
 
 
 def reset_password(phone, message_id, code, new_password):
@@ -240,19 +240,47 @@ def send_verification_code(phone):
         'authorization': "Basic MjZlZWFhM2QyNzljMzIyZTg0Zjk1NDQxOmYwMjQ2NzdiOWNjM2QxZWZmNDE0ODQxMA==",
     }
     response = requests.request("POST", url, data=payload, headers=headers)
+    print("response", response)
     result = response.json()
+    print("result", result)
     if "error" in result:
         raise Error(result["error"])
-    message_id = response.json()["message_id"]
-    # 存入数据库
-    phone_message_id = PhoneMessageId(phone=phone, message_id=message_id)
-    result = phone_message_id.save()
-    return result
+    msg_id = result["msg_id"]
+    # 数据库 更改或者创建 get or create
+    try:
+        obj = PhoneMessageId.objects(phone=phone).get()
+        obj.msg_id = msg_id
+        return obj.save()
+    except DoesNotExist as e:
+        obj = PhoneMessageId(phone=phone, msg_id=msg_id)
+        return obj.save()
+
+    # if obj:
+    #     obj.msg_id = msg_id
+    #     return obj.save()
+    # else:
+    #     obj = PhoneMessageId(phone=phone, msg_id=msg_id)
+    #     return obj.save()
+    # phone_message_id = PhoneMessageId(phone=phone, msg_id=msg_id)
+    # result = phone_message_id.save()
+    # return result
 
 
 def verify_code(code, phone):
-    message_id = PhoneMessageId.objects(phone=phone).message_id
-    url = 'https://api.sms.jpush.cn/v1/codes/' + message_id + '/valid'
+    """
+
+    :param code:
+    :type code:
+    :param phone:
+    :type phone:
+    :return: 验证成功返回 True, 失败抛出报错信息 {
+        "code": *****,
+        "message": "******"
+    }
+    :rtype:
+    """
+    msg_id = PhoneMessageId.objects(phone=phone).get().msg_id
+    url = 'https://api.sms.jpush.cn/v1/codes/' + msg_id + '/valid'
     payload = json.dumps({
         'code': code
     })
@@ -260,6 +288,7 @@ def verify_code(code, phone):
         'content-type': "application/json",
         'authorization': "Basic MjZlZWFhM2QyNzljMzIyZTg0Zjk1NDQxOmYwMjQ2NzdiOWNjM2QxZWZmNDE0ODQxMA==",
     }
+
     response = requests.request("POST", url, data=payload, headers=headers)
     result = response.json()
     if "error" in result:

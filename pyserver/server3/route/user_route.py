@@ -45,12 +45,15 @@ def send_verification_code(phone):
     try:
         user_service.send_verification_code(phone)
         return jsonify({
-
-        })
-    except Error:
+            "response": "success"
+        }), 200
+    except Error as e:
+        print("e.args[0]", e.args[0])
         return jsonify({
-
-        })
+            "response": {
+                "error": e.args[0]
+            }
+        }), 400
     # if message_id:
     #     return make_response(jsonify({
     #         "response": message_id
@@ -58,21 +61,21 @@ def send_verification_code(phone):
 
 
 # TODO 删掉 验证手机号和验证码是否匹配 (不存在单独验证，需要与相应动作关联）
-@user_app.route('/verify_code', methods=['post'])
-def verify_code():
-    data = request.get_json()
-    try:
-        result = user_service.verify_code(code=data["code"], phone=data["phone"])
-    except Error as e:
-        print("Error", e)
-        print("e.args[0]", e.args[0])
-        return jsonify({
-            "message": e.args[0]
-        }), 300
-    if result:
-        return jsonify({
-            "response": True,
-        }), 200
+# @user_app.route('/verify_code', methods=['post'])
+# def verify_code():
+#     data = request.get_json()
+#     try:
+#         result = user_service.verify_code(code=data["code"], phone=data["phone"])
+#     except Error as e:
+#         print("Error", e)
+#         print("e.args[0]", e.args[0])
+#         return jsonify({
+#             "message": e.args[0]
+#         }), 300
+#     if result:
+#         return jsonify({
+#             "response": True,
+#         }), 200
 
 
 @user_app.route('/reset_password', methods=['post'])
@@ -106,15 +109,26 @@ def register():
     user_ID = data['user_ID']
     password = data['password']
     code = data.pop('code')
+    captcha = data.pop("captcha")
+    phone = data.pop('phone')
     data.pop('user_ID')
     data.pop('password')
     if user_ID is None or password is None or code is None:
         return jsonify({'response': 'invalid user or password'}), 400
-
-    added_user = user_service.add(user_ID, password, **data)
-    added_user = json_utility.convert_to_json(added_user.to_mongo())
-    added_user.pop('password')
-    return jsonify({'response': added_user}), 200
+    try:
+        added_user = user_service.register(user_ID, password, phone, code, **data)
+        added_user = json_utility.convert_to_json(added_user.to_mongo())
+        added_user.pop('password')
+        return jsonify({'response': added_user}), 200
+    except Error as e:
+        print("e.args[0]", e.args[0])
+        return jsonify({
+            "response": {"error": e.args[0]}
+        }), 400
+    # added_user = user_service.add(user_ID, password, **data)
+    # added_user = json_utility.convert_to_json(added_user.to_mongo())
+    # added_user.pop('password')
+    # return jsonify({'response': added_user}), 200
 
 
 # Provide a method to create access tokens. The create_access_token()

@@ -80,10 +80,16 @@ export async function register(params) {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(params),
+    body: JSON.stringify({...params, code: params.captcha}),
   });
 }
 
 export async function queryNotices() {
   return request('/pyapi/notices');
+}
+
+export async function send_verification_code(params) {
+  return request(`/pyapi/user/send_verification_code/${params.phone}`, {
+    method: 'GET',
+  });
 }

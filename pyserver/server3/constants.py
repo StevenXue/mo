@@ -232,6 +232,7 @@ class ErrorMessage(Exception):
         "hint_message": "提示：错误的获取类型\n"
     }
 
-    verify_failed = {
-
-    }
+    # verify_failed = {
+    #     "key": "验证失败",
+    #     'hint_message': '提示：验证失败\n'
+    # }
