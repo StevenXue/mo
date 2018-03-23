@@ -287,9 +287,9 @@ function finalSteps() {
     {
       id: "createUserRequest1",
       options: [
-        { value: 1, label: 'App',  type: 'goto', url: '/userrequest?tab=App'},
-        { value: 2, label: 'Module',  type: 'goto',  url: '/userrequest?tab=Module' },
-        { value: 3, label: 'DataSet',  type: 'goto',  url: '/userrequest?tab=DataSet' },
+        { value: 1, label: 'App',  type: 'goto', url: '/userrequest?tab=app'},
+        { value: 2, label: 'Module',  type: 'goto',  url: '/userrequest?tab=module' },
+        { value: 3, label: 'DataSet',  type: 'goto',  url: '/userrequest?tab=dataSet' },
       ],
     },
 
