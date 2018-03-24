@@ -1,5 +1,5 @@
-import React, {Component} from 'react'
-import {connect} from 'dva'
+import React, { Component } from 'react'
+import { connect } from 'dva'
 import {
   Select,
   Card,
@@ -9,15 +9,15 @@ import {
   Row,
   Col,
   Pagination,
-  Tabs
+  Tabs,
 } from 'antd'
-import {showTime} from '../../../utils/index'
-import {arrayToJson, JsonToArray} from '../../../utils/JsonUtils'
-import {routerRedux} from 'dva/router'
+import { showTime } from '../../../utils/index'
+import { arrayToJson, JsonToArray } from '../../../utils/JsonUtils'
+import { routerRedux } from 'dva/router'
 import RequestModal from '../../../components/RequestModal/index'
 
 import styles from './index.less'
-import {fetchAllUserRequest} from "../../../services/userRequest"
+import { fetchAllUserRequest } from '../../../services/userRequest'
 
 const Option = Select.Option
 const Search = Input.Search
@@ -28,32 +28,30 @@ const related_fields = ['All',
   'Health', 'Housing & Development', 'Public Services',
   'Social', 'Transportation', 'Science', 'Technology']
 
-
-function AllRequest({history, allRequest, dispatch,location}) {
-  const defaultActiveKeyDic = {"?tab=app":"1","?tab=module":"2","?tab=dataset":"3"}
+function AllRequest({ history, allRequest, dispatch, location }) {
+  const defaultActiveKeyDic = { '?tab=app': '1', '?tab=module': '2', '?tab=dataset': '3' }
   const paramList = Object.keys(defaultActiveKeyDic)
 
   function callback(key) {
-    history.push(`userrequest${paramList[parseInt(key)-1]}`)
+    history.push(`userrequest${paramList[parseInt(key) - 1]}`)
   }
 
   return (
     <div className={`main-container ${styles.normal}`}>
       <Tabs defaultActiveKey={defaultActiveKeyDic[location.search]} onChange={callback}>
         <TabPane tab="Apps" key="1">
-          <RequestList {...{history, allRequest, dispatch}} type='app'/>
+          <RequestList {...{ history, allRequest, dispatch }} type='app'/>
         </TabPane>
         <TabPane tab="Modules" key="2">
-          <RequestList {...{history, allRequest, dispatch}} type='module'/>
+          <RequestList {...{ history, allRequest, dispatch }} type='module'/>
         </TabPane>
         <TabPane tab="Datasets" key="3">
-          <RequestList {...{history, allRequest, dispatch}} type='dataset'/>
+          <RequestList {...{ history, allRequest, dispatch }} type='dataset'/>
         </TabPane>
       </Tabs>
     </div>
   )
 }
-
 
 class RequestList extends Component {
   constructor() {
@@ -65,25 +63,25 @@ class RequestList extends Component {
       requestType: 'project',
       pageNo: 1,
       pageSize: 10,
-      search_query:null,
+      search_query: null,
     }
   }
 
-  fetchData({payload}) {
-    const {type} = this.props
+  fetchData({ payload }) {
+    const { type } = this.props
     if (payload) {
       payload['type'] = type
     }
     else {
-      payload = {'type': type}
+      payload = { 'type': type }
     }
     fetchAllUserRequest({
       payload,
-      onJson: ({user_request: requests, total_number: totalNumber}) => {
+      onJson: ({ user_request: requests, total_number: totalNumber }) => {
         this.setState({
-          requests, totalNumber
+          requests, totalNumber,
         })
-      }
+      },
     })
   }
 
@@ -92,7 +90,7 @@ class RequestList extends Component {
       payload: {
         page_no: this.state.current,
         page_size: this.state.pageSize,
-      }
+      },
     })
   }
 
@@ -105,14 +103,14 @@ class RequestList extends Component {
         search_query: value,
         page_no: this.state.current,
         page_size: this.state.pageSize,
-      }
+      },
     })
   }
 
   toUserRequestDetail(id, history) {
-    history.push(`/userrequest/${id}`)
+    const { type } = this.props
+    history.push(`/userrequest/${id}?type=${type}`)
   }
-
 
   toUserProfile(user_ID, history) {
     history.push(`/profile/${user_ID}`)
@@ -121,20 +119,20 @@ class RequestList extends Component {
   onShowSizeChange = (current, pageSize) => {
     this.setState({
       pageNo: current,
-      pageSize: pageSize
+      pageSize: pageSize,
     })
-    this.fetchData({payload: {search_query: this.state.search_query,page_no: current, page_size: pageSize,}})
+    this.fetchData({ payload: { search_query: this.state.search_query, page_no: current, page_size: pageSize, } })
   }
 
   render() {
-    const {history, project, dispatch} = this.props
+    const { history, project, dispatch } = this.props
     return (
       <div>
         <div className={styles.header}>
           <Search
             placeholder="input search text"
             onSearch={(value) => this.handleQueryChange(value)}
-            style={{width: 200}}
+            style={{ width: 200 }}
           />
           <RequestModal new={true} fetchData={() => this.fetchData({})}
                         type={this.props.type}>
@@ -145,12 +143,12 @@ class RequestList extends Component {
         <div className={styles.requestList}>
           {this.state.requests.map(e =>
             <Card key={e._id} className={styles.card}
-                  bodyStyle={{paddingLeft:'5px'}}>
+                  bodyStyle={{ paddingLeft: '5px' }}>
               <div>
                 <Row gutter={5} type="flex" justify="space-around" align="middle">
-                  <Col span={3} >
+                  <Col span={3}>
                     <div className={styles.starAnswerDiv}
-                      onClick={() => this.toUserRequestDetail(e._id, history)}>
+                         onClick={() => this.toUserRequestDetail(e._id, history)}>
                       <div className={styles.starDiv}>
                         <p
                           className={styles.starNumber}>{e['star_user'].length}</p>
@@ -200,4 +198,4 @@ class RequestList extends Component {
   }
 }
 
-export default connect(({allRequest}) => ({allRequest}))(AllRequest)
+export default connect(({ allRequest }) => ({ allRequest }))(AllRequest)

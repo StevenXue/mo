@@ -1,9 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import 'react-mde/lib/styles/css/react-mde-all.css'
-import {getProjects, updateProject} from "../../services/project"
-import JsonToArray from "../../utils/JsonUtils"
+import { getProjects, updateProject } from '../../services/project'
+import JsonToArray from '../../utils/JsonUtils'
 import ParamsMapper from '../../components/ParamsMapper/index'
+import CopyInput from '../../components/CopyInput'
 
 import {
   Row,
@@ -16,15 +17,14 @@ import {
   Select,
   Checkbox,
   Button,
-  AutoComplete
+  AutoComplete,
 } from 'antd'
-import {connect} from "dva"
-import {get, map} from 'lodash'
+import { connect } from 'dva'
+import { get, map } from 'lodash'
 
 const FormItem = Form.Item
 const Option = Select.Option
 const AutoCompleteOption = AutoComplete.Option
-
 
 class InputForm extends React.Component {
   state = {
@@ -42,8 +42,8 @@ class InputForm extends React.Component {
 
   render() {
     console.log(this.props.projectDetail.project.args.input)
-    const {getFieldDecorator} = this.props.form
-    const {autoCompleteResult} = this.state
+    const { getFieldDecorator } = this.props.form
+    const { autoCompleteResult } = this.state
     const args = map(this.props.projectDetail.project.args.input)
     const formItemLayout = {
       labelCol: {
@@ -54,7 +54,7 @@ class InputForm extends React.Component {
         xs: { span: 24 },
         sm: { span: 14 },
       },
-    };
+    }
     return (
       <Form layout='horizontal' onSubmit={this.handleSubmit}>
         {args.map(e =>
@@ -70,27 +70,26 @@ class InputForm extends React.Component {
                 required: e.required, message: e.des,
               }],
             })(
-              <Input/>
+              <Input/>,
             )}
-          </FormItem>
+          </FormItem>,
         )}
-      <FormItem wrapperCol={{ span: 12, offset: 11 }}>
-        <Button
-                type="primary" htmlType="submit"
-                loading={this.state.confirmDirty}>Submit</Button>
-      </FormItem>
+        <FormItem wrapperCol={{ span: 12, offset: 11 }}>
+          <Button
+            type="primary" htmlType="submit"
+            loading={this.state.confirmDirty}>Submit</Button>
+        </FormItem>
       </Form>
     )
   }
 }
-
 
 class ProjectExample extends React.Component {
 
   constructor(props) {
     super(props)
     this.state = {
-      args:Object.values(this.props.projectDetail.project.args.input),
+      args: Object.values(this.props.projectDetail.project.args.input),
     }
   }
 
@@ -113,9 +112,18 @@ class ProjectExample extends React.Component {
   }
 
   render() {
+    const { projectDetail } = this.props
     console.log(this.state.args)
     return (
       <div>
+        {this.props.projectDetail.project.status === 'active' &&
+        <div>
+          API:
+          <CopyInput
+            text={`${projectDetail.project.app_path.replace('.', 'http://192.168.31.23:8080')}`}/>
+        </div>}
+        <br/>
+        <br/>
         <Row gutter={16}>
           <Col span={12}>
             <div>
@@ -125,20 +133,20 @@ class ProjectExample extends React.Component {
                 </p>
               </div>
               {/*<div>*/}
-                {/*<WrappedInputForm dispatch={this.props.dispatch}*/}
-                                  {/*projectDetail={this.props.projectDetail}*/}
-                {/*/>*/}
+              {/*<WrappedInputForm dispatch={this.props.dispatch}*/}
+              {/*projectDetail={this.props.projectDetail}*/}
+              {/*/>*/}
               {/*</div>*/}
               <div>
                 <ParamsMapper args={this.state.args}
                               setValue={(values) => this.setValue(values)}
                               baseArgs={Object.values(this.props.projectDetail.project.args.input)}
-                              appId = {this.props.projectDetail.project._id}
-                              dispatch ={this.props.dispatch}
+                              appId={this.props.projectDetail.project._id}
+                              dispatch={this.props.dispatch}
                 />
                 {/*<div >*/}
-                  {/*<Button*/}
-                    {/*type="primary" htmlType="submit">Submit</Button>*/}
+                {/*<Button*/}
+                {/*type="primary" htmlType="submit">Submit</Button>*/}
                 {/*</div>*/}
               </div>
             </div>
@@ -155,7 +163,7 @@ class ProjectExample extends React.Component {
                   <div key={e.name}>
                     <p>{e.name}</p>
                     <p>{e.value}</p>
-                  </div>
+                  </div>,
                 )}
               </div>
             </div>
@@ -167,5 +175,5 @@ class ProjectExample extends React.Component {
 }
 
 // const WrappedInputForm = Form.create()(InputForm)
-export default connect(({projectDetail}) => ({projectDetail}))(ProjectExample)
+export default connect(({ projectDetail }) => ({ projectDetail }))(ProjectExample)
 

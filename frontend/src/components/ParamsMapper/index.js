@@ -2,7 +2,7 @@ import React from 'react'
 import {Form, Button, Select, Input, Tooltip, Icon, Upload, Modal} from 'antd'
 import styles from './index.less'
 import {runApi} from '../../services/app'
-import reqwest from 'reqwest'
+// import reqwest from 'reqwest'
 
 const FormItem = Form.Item
 
