@@ -15,7 +15,7 @@ class Intent extends Component {
     }
   }
 
-  onOptionClick({ value, label }) {
+  onOptionClick({ value, label, trigger }) {
     if (label === "发布需求") {
       this.props.dispatch({
         type: 'chatbot/updateState',
@@ -36,7 +36,7 @@ class Intent extends Component {
       this.props.dispatch(routerRedux.push(`/profile/${user_ID}`))
     }
     else {
-      this.props.triggerNextStep({value});
+      this.props.triggerNextStep({trigger: trigger});
     }
   }
 
@@ -56,7 +56,7 @@ class Intent extends Component {
         }
         if(type === 'intent'){
           // 跳转对应功能
-          this.onOptionClick({value, label})
+          this.onOptionClick({value, label, trigger})
           // this.props.triggerNextStep({trigger: trigger})
         }
       },

@@ -26,7 +26,6 @@ export const ApiCard = ({ app, onPress, isFavor}) => {
 
     <HearderRightV isFavor={isFavor} starNum={favor_users.length} favorNum={star_users.length}/>
 
-
   </div>
 }
 export const NoMoreCard = ({onPress}) => <IconCard
