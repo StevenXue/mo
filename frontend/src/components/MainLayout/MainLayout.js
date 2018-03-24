@@ -73,7 +73,7 @@ class OutMainLayout extends React.Component {
       worldChannelIsOpen: false,
       visible: true,
 
-      isRight: true
+      isRight: false
     }
   }
 
@@ -148,7 +148,7 @@ class OutMainLayout extends React.Component {
 
         </LocaleProvider>
 
-        <WebChat/>
+        <WebChat isRight={this.state.isRight}/>
       </div>
     )
   }

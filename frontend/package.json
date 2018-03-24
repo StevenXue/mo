@@ -50,6 +50,7 @@
     "react-markdown": "^3.3.0",
     "react-mde": "^4.0.3",
     "react-simple-chatbot": "^0.2.9",
+    "reqwest": "^2.0.5",
     "rxjs": "^5.5.2",
     "showdown": "^1.8.6",
     "socket.io-client": "^2.0.4",

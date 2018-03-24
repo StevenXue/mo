@@ -216,6 +216,7 @@ export default {
         if (!match) {dispatch({ type: 'query' })}
         const userId = localStorage.getItem('user_ID')
         if (userId && !connected) {
+
           const socket = io.connect(flaskServer + '/log/' + userId)
           socket.on('log_epoch_end', (msg) => {
             dispatch({ type: 'handleSocket', payload: { msg, pathname } })

@@ -72,7 +72,7 @@ class Open extends Component {
     const {worldMessages, onClickIcon, isRight} = this.props
     return (
       <div className={styles.container}
-           style={{width: isRight ? 300 : 50}}
+           style={{width: isRight ? 300 : 50, display:"flex", flexDirection: "column"}}
       >
         {
           isRight ?

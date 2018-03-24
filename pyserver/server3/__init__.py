@@ -27,3 +27,10 @@ DataSet.register_delete_rule(File, 'data_set', CASCADE)
 File.register_delete_rule(DataSet, 'file', NULLIFY)
 UserRequest.register_delete_rule(User, 'request_star', PULL)
 User.register_delete_rule(UserRequest, 'star_user', PULL)
+
+# 删除app
+App.register_delete_rule(User, 'favor_apps', PULL)
+App.register_delete_rule(User, 'star_apps', PULL)
+# App.register_delete_rule(User, 'used_apps', PULL)  # TODO 把相关的used_apps删掉
+
+

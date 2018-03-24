@@ -18,31 +18,48 @@ class OptionsStep extends Component {
     this.onOptionClick = this.onOptionClick.bind(this);
   }
 
-  onOptionClick({ value, label }) {
+  onOptionClick({ value, label, type }) {
     console.log("value", value)
 
-    if(label === "发布需求"){
-      this.props.dispatch({
-        type: 'chatbot/updateState',
-        payload: {
-          opened: false
-        }
-      })
-      this.props.dispatch(routerRedux.push(`/userrequest`))
-      this.props.dispatch({type: 'allRequest/showModal'})
-    }else if(label === "我发布的需求"){
-      this.props.dispatch({
-        type: 'chatbot/updateState',
-        payload: {
-          opened: false
-        }
-      })
-      let user_ID = localStorage.getItem('user_ID');
-      this.props.dispatch(routerRedux.push(`/profile/${user_ID}`))
+    if(type === 'goto'){
+        this.props.dispatch({
+          type: 'chatbot/updateState',
+          payload: {
+            opened: false
+          }
+        })
+        this.props.dispatch(routerRedux.push(`/userrequest?tab=${label}`))
+        this.props.dispatch({type: 'allRequest/showModal'})
+    }else{
+
+      if(label === "我发布的需求"){
+        this.props.dispatch({
+          type: 'chatbot/updateState',
+          payload: {
+            opened: false
+          }
+        })
+        let user_ID = localStorage.getItem('user_ID');
+        this.props.dispatch(routerRedux.push(`/profile/${user_ID}`))
+      }
+      else{
+        this.props.triggerNextStep({ value });
+      }
+
     }
-    else{
-      this.props.triggerNextStep({ value });
-    }
+
+    // if(label === "发布需求"){
+    //   this.props.dispatch({
+    //     type: 'chatbot/updateState',
+    //     payload: {
+    //       opened: false
+    //     }
+    //   })
+    //   this.props.dispatch(routerRedux.push(`/userrequest?tab=App`))
+    //   this.props.dispatch({type: 'allRequest/showModal'})
+    // }else
+
+
 
 
   }
@@ -50,7 +67,7 @@ class OptionsStep extends Component {
   renderOption(option) {
     const { bubbleStyle } = this.props;
     const { user } = this.props.step;
-    const { value, label, route } = option;
+    const { value, label, route, type } = option;
     const border = `1px solid ${option.borderColor}`
     //border:1px solid red
     return (
@@ -62,7 +79,7 @@ class OptionsStep extends Component {
           className="rsc-os-option-element"
           style={bubbleStyle}
           user={user}
-          onClick={() => this.onOptionClick({ value, label })}
+          onClick={() => this.onOptionClick({ value, label, type })}
           border={border}
         >
           {label}

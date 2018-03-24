@@ -5,9 +5,9 @@ input:
     name: flight_no
     range: null
     required: false
-    type: input
+    type: upload
     value: null
-    value_type: int
+    value_type: str
   weather_prediction_param_2:
     default: 1
     des: 'flight number'
