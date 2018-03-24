@@ -159,7 +159,7 @@ export class DatasetPage extends React.Component {
           <div style={{ height: '100%', overflowY: 'auto' }}>
             <p className='des'>{this.state.project.description}</p>
             <div className='des'>
-              <CopyInput text={this.state.project.path}/>
+              <CopyInput text={this.state.project.path.replace('./user_directory', '../dataset')}/>
             </div>
             <ReactMde
               textAreaProps={{
