@@ -261,6 +261,12 @@ class ProjectBusiness:
         # clone to project dir
         repo = cls.clone(user_ID, name, project_path)
 
+        # add all
+        repo.git.add(A=True)
+        # initial commit
+        repo.index.commit('Initial Commit')
+        repo.remote(name='origin').push()
+
         # auth jupyterhub with user token
         res = cls.auth_hub_user(user_ID, name, user_token)
 
