@@ -72,7 +72,6 @@ if __name__ == '__main__':
     print("test_resultXXX", test_result.failures[0][1])
 
 
-
 # import unittest
 # from unittest import TextTestRunner
 #
