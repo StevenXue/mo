@@ -82,7 +82,7 @@ const switchComponent = (arg, baseArg) => {
   switch (arg.type) {
     case 'multiple_input':
     case 'input':
-      return <Input  />
+      return <Input/>
 
     case 'choice':
       return (
@@ -120,6 +120,7 @@ const formItems = (arg, i, getFieldDecorator, baseArg) => {
   return <FormItem
     key={arg.name}
     label={arg.name}
+    help={`Need ${arg.value_type}`}
   >
     <div className='parameter-row'>
       {
