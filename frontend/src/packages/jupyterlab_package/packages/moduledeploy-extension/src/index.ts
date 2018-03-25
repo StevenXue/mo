@@ -26,7 +26,7 @@ import {
   Form,
 } from './vdomWrapper';
 
-import { publish } from './service';
+// import { publish } from './service';
 
 import '../style/index.css';
 
@@ -56,15 +56,15 @@ class DeployForm extends Form {
    * Get the input text node.
    */
   get inputNode(): HTMLInputElement {
-    return this.node.getElementsByTagName('input')[0] as HTMLInputElement;
+    return this.node.getElementsByClassName('testing-state')[0] as HTMLInputElement;
   }
 
   /**
    * Get the value of the widget.
    */
   getValue(): string {
-    // return this.inputNode.value;
-    return '11';
+    return this.inputNode.value;
+    // return '11';
   }
 }
 
@@ -75,7 +75,7 @@ export function createDeployButton(): ToolbarButton {
   const hash = window.location.hash;
   const match = pathToRegexp('#/workspace/:projectId/:type').exec(hash);
   if (match) {
-    let projectId = match[1];
+    // let projectId = match[1];
     return new ToolbarButton({
       className: TOOLBAR_DEPLOY_CLASS,
       onClick: () => {
@@ -89,16 +89,15 @@ export function createDeployButton(): ToolbarButton {
         }).then(result => {
           console.log('then');
           if (!result.value) {
-            return null;
+            message.error('Please wait until testing finished!');
           }
           console.log(result.value);
-          publish({
-            projectId,
-            onJson: () => {
-              message.success('Module deploy success!');
-            },
-          });
-          // return deploy(context);
+          // publish({
+          //   projectId,
+          //   onJson: () => {
+          //     message.success('Module deploy success!');
+          //   },
+          // });
         });
       },
       tooltip: 'Deploy Script',

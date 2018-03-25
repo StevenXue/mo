@@ -1,23 +1,23 @@
 # Configuration file for jupyterhub.
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Application(SingletonConfigurable) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 ## This is an application.
 
 ## The date format used by logging formatters for %(asctime)s
-#c.Application.log_datefmt = '%Y-%m-%d %H:%M:%S'
+# c.Application.log_datefmt = '%Y-%m-%d %H:%M:%S'
 
 ## The Logging format template
-#c.Application.log_format = '[%(name)s]%(highlevel)s %(message)s'
+# c.Application.log_format = '[%(name)s]%(highlevel)s %(message)s'
 
 ## Set the log level by value or name.
-#c.Application.log_level = 30
+# c.Application.log_level = 30
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # JupyterHub(Application) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 ## An Application for starting a Multi-User Jupyter Notebook server.
 
@@ -34,7 +34,7 @@
 #  error asking them to try again.
 #  
 #  If set to 0, no limit is enforced.
-#c.JupyterHub.active_server_limit = 0
+# c.JupyterHub.active_server_limit = 0
 
 ## Grant admin users permission to access single-user servers.
 #  
@@ -42,13 +42,13 @@
 c.JupyterHub.admin_access = True
 
 ## DEPRECATED since version 0.7.2, use Authenticator.admin_users instead.
-#c.JupyterHub.admin_users = set()
+# c.JupyterHub.admin_users = set()
 
 ## Allow named single-user servers per user
-#c.JupyterHub.allow_named_servers = False
+# c.JupyterHub.allow_named_servers = False
 
 ## Answer yes to any questions (e.g. confirm overwrite)
-#c.JupyterHub.answer_yes = False
+# c.JupyterHub.answer_yes = False
 
 ## PENDING DEPRECATION: consider using service_tokens
 #  
@@ -78,7 +78,7 @@ c.JupyterHub.authenticator_class = 'authenticator.SuperSecureAuthenticator'
 # c.JupyterHub.authenticator_class = 'jupyterhub.auth.PAMAuthenticator'
 
 ## The base URL of the entire application
-#c.JupyterHub.base_url = '/'
+# c.JupyterHub.base_url = '/'
 
 ## Whether to shutdown the proxy when the Hub shuts down.
 #  
@@ -91,7 +91,7 @@ c.JupyterHub.authenticator_class = 'authenticator.SuperSecureAuthenticator'
 #  only shutdown the Hub, leaving everything else running.
 #  
 #  The Hub should be able to resume from database state.
-#c.JupyterHub.cleanup_proxy = True
+# c.JupyterHub.cleanup_proxy = True
 
 ## Whether to shutdown single-user servers when the Hub shuts down.
 #  
@@ -102,7 +102,7 @@ c.JupyterHub.authenticator_class = 'authenticator.SuperSecureAuthenticator'
 #  shutdown the Hub, leaving everything else running.
 #  
 #  The Hub should be able to resume from database state.
-#c.JupyterHub.cleanup_servers = True
+# c.JupyterHub.cleanup_servers = True
 
 ## Maximum number of concurrent users that can be spawning at a time.
 #  
@@ -119,54 +119,54 @@ c.JupyterHub.authenticator_class = 'authenticator.SuperSecureAuthenticator'
 #  their own.
 #  
 #  If set to 0, no limit is enforced.
-#c.JupyterHub.concurrent_spawn_limit = 100
+# c.JupyterHub.concurrent_spawn_limit = 100
 
 ## The config file to load
-#c.JupyterHub.config_file = 'jupyterhub_config.py'
+# c.JupyterHub.config_file = 'jupyterhub_config.py'
 
 ## DEPRECATED: does nothing
-#c.JupyterHub.confirm_no_ssl = False
+# c.JupyterHub.confirm_no_ssl = False
 
 ## Number of days for a login cookie to be valid. Default is two weeks.
-#c.JupyterHub.cookie_max_age_days = 14
+# c.JupyterHub.cookie_max_age_days = 14
 
 ## The cookie secret to use to encrypt cookies.
 #  
 #  Loaded from the JPY_COOKIE_SECRET env variable by default.
 #  
 #  Should be exactly 256 bits (32 bytes).
-#c.JupyterHub.cookie_secret = b''
+# c.JupyterHub.cookie_secret = b''
 
 ## File in which to store the cookie secret.
-#c.JupyterHub.cookie_secret_file = 'jupyterhub_cookie_secret'
+# c.JupyterHub.cookie_secret_file = 'jupyterhub_cookie_secret'
 
 ## The location of jupyterhub data files (e.g. /usr/local/share/jupyter/hub)
-#c.JupyterHub.data_files_path = '/usr/local/share/jupyter/hub'
+# c.JupyterHub.data_files_path = '/usr/local/share/jupyter/hub'
 
 ## Include any kwargs to pass to the database connection. See
 #  sqlalchemy.create_engine for details.
-#c.JupyterHub.db_kwargs = {}
+# c.JupyterHub.db_kwargs = {}
 
 ## url for the database. e.g. `sqlite:///jupyterhub.sqlite`
-#c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite'
+# c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite'
 
 ## log all database transactions. This has A LOT of output
-#c.JupyterHub.debug_db = False
+# c.JupyterHub.debug_db = False
 
 ## DEPRECATED since version 0.8: Use ConfigurableHTTPProxy.debug
-#c.JupyterHub.debug_proxy = False
+# c.JupyterHub.debug_proxy = False
 
 ## Send JupyterHub's logs to this file.
 #  
 #  This will *only* include the logs of the Hub itself, not the logs of the proxy
 #  or any single-user servers.
-#c.JupyterHub.extra_log_file = ''
+# c.JupyterHub.extra_log_file = ''
 
 ## Extra log handlers to set on JupyterHub logger
-#c.JupyterHub.extra_log_handlers = []
+# c.JupyterHub.extra_log_handlers = []
 
 ## Generate default config file
-#c.JupyterHub.generate_config = False
+# c.JupyterHub.generate_config = False
 
 ## The ip or hostname for proxies and spawners to use for connecting to the Hub.
 #  
@@ -177,14 +177,14 @@ c.JupyterHub.authenticator_class = 'authenticator.SuperSecureAuthenticator'
 #  `hub_ip`.
 #  
 #  .. versionadded:: 0.8
-#c.JupyterHub.hub_connect_ip = ''
+# c.JupyterHub.hub_connect_ip = ''
 
 ## The port for proxies & spawners to connect to the hub on.
 #  
 #  Used alongside `hub_connect_ip`
 #  
 #  .. versionadded:: 0.8
-#c.JupyterHub.hub_connect_port = 0
+# c.JupyterHub.hub_connect_port = 0
 
 from jupyter_client.localinterfaces import public_ips
 
@@ -197,17 +197,17 @@ from jupyter_client.localinterfaces import public_ips
 c.JupyterHub.hub_ip = public_ips()[0]
 
 ## The port for the Hub process
-#c.JupyterHub.hub_port = 8081
+# c.JupyterHub.hub_port = 8081
 
 ## The public facing ip of the whole application (the proxy)
-#c.JupyterHub.ip = ''
+# c.JupyterHub.ip = ''
 c.JupyterHub.ip = '0.0.0.0'
 
 ## Supply extra arguments that will be passed to Jinja environment.
-#c.JupyterHub.jinja_environment_options = {}
+# c.JupyterHub.jinja_environment_options = {}
 
 ## Interval (in seconds) at which to update last-activity timestamps.
-#c.JupyterHub.last_activity_interval = 300
+# c.JupyterHub.last_activity_interval = 300
 
 ## Dict of 'group': ['usernames'] to load at startup.
 #  
@@ -216,48 +216,48 @@ c.JupyterHub.ip = '0.0.0.0'
 #  Loading one set of groups, then starting JupyterHub again with a different set
 #  will not remove users or groups from previous launches. That must be done
 #  through the API.
-#c.JupyterHub.load_groups = {}
+# c.JupyterHub.load_groups = {}
 
 ## Specify path to a logo image to override the Jupyter logo in the banner.
-#c.JupyterHub.logo_file = ''
+# c.JupyterHub.logo_file = ''
 
 ## File to write PID Useful for daemonizing jupyterhub.
-#c.JupyterHub.pid_file = ''
+# c.JupyterHub.pid_file = ''
 
 ## The public facing port of the proxy
-#c.JupyterHub.port = 8000
+# c.JupyterHub.port = 8000
 
 ## DEPRECATED since version 0.8 : Use ConfigurableHTTPProxy.api_url
-#c.JupyterHub.proxy_api_ip = ''
+# c.JupyterHub.proxy_api_ip = ''
 
 ## DEPRECATED since version 0.8 : Use ConfigurableHTTPProxy.api_url
-#c.JupyterHub.proxy_api_port = 0
+# c.JupyterHub.proxy_api_port = 0
 
 ## DEPRECATED since version 0.8: Use ConfigurableHTTPProxy.auth_token
-#c.JupyterHub.proxy_auth_token = ''
+# c.JupyterHub.proxy_auth_token = ''
 
 ## Interval (in seconds) at which to check if the proxy is running.
-#c.JupyterHub.proxy_check_interval = 30
+# c.JupyterHub.proxy_check_interval = 30
 
 ## Select the Proxy API implementation.
 # c.JupyterHub.proxy_class = 'jupyterhub.proxy.ConfigurableHTTPProxy'
 # c.JupyterHub.proxy_class = 'myproxy.MyProxy'
 
 ## DEPRECATED since version 0.8. Use ConfigurableHTTPProxy.command
-#c.JupyterHub.proxy_cmd = []
+# c.JupyterHub.proxy_cmd = []
 
 ## Purge and reset the database.
-#c.JupyterHub.reset_db = False
+# c.JupyterHub.reset_db = False
 
 ## Interval (in seconds) at which to check connectivity of services with web
 #  endpoints.
-#c.JupyterHub.service_check_interval = 60
+# c.JupyterHub.service_check_interval = 60
 
 ## Dict of token:servicename to be loaded into the database.
 #  
 #  Allows ahead-of-time generation of API tokens for use by externally managed
 #  services.
-#c.JupyterHub.service_tokens = {}
+# c.JupyterHub.service_tokens = {}
 
 ## List of service specification dictionaries.
 #  
@@ -277,7 +277,7 @@ c.JupyterHub.ip = '0.0.0.0'
 #              'environment':
 #          }
 #      ]
-#c.JupyterHub.services = []
+# c.JupyterHub.services = []
 
 ## The class to use for spawning single-user servers.
 #  
@@ -288,21 +288,21 @@ c.JupyterHub.spawner_class = 'mydockerspawner.MyDockerSpawner'
 ## Path to SSL certificate file for the public facing interface of the proxy
 #  
 #  When setting this, you should also set ssl_key
-#c.JupyterHub.ssl_cert = ''
+# c.JupyterHub.ssl_cert = ''
 
 ## Path to SSL key file for the public facing interface of the proxy
 #  
 #  When setting this, you should also set ssl_cert
-#c.JupyterHub.ssl_key = ''
+# c.JupyterHub.ssl_key = ''
 
 ## Host to send statsd metrics to
-#c.JupyterHub.statsd_host = ''
+# c.JupyterHub.statsd_host = ''
 
 ## Port on which to send statsd metrics about the hub
-#c.JupyterHub.statsd_port = 8125
+# c.JupyterHub.statsd_port = 8125
 
 ## Prefix to use for all metrics sent by jupyterhub to statsd
-#c.JupyterHub.statsd_prefix = 'jupyterhub'
+# c.JupyterHub.statsd_prefix = 'jupyterhub'
 
 ## Run single-user servers on subdomains of this host.
 #  
@@ -317,13 +317,13 @@ c.JupyterHub.spawner_class = 'mydockerspawner.MyDockerSpawner'
 #  In general, this is most easily achieved with wildcard DNS.
 #  
 #  When using SSL (i.e. always) this also requires a wildcard SSL certificate.
-#c.JupyterHub.subdomain_host = ''
+# c.JupyterHub.subdomain_host = ''
 
 ## Paths to search for jinja templates.
-#c.JupyterHub.template_paths = []
+# c.JupyterHub.template_paths = []
 
 ## Extra settings overrides to pass to the tornado application.
-#c.JupyterHub.tornado_settings = {}
+# c.JupyterHub.tornado_settings = {}
 
 ## Trust user-provided tokens (via JupyterHub.service_tokens) to have good
 #  entropy.
@@ -343,17 +343,17 @@ c.JupyterHub.spawner_class = 'mydockerspawner.MyDockerSpawner'
 #  If your inserted tokens are generated by a good-quality mechanism, e.g.
 #  `openssl rand -hex 32`, then you can set this flag to True to reduce the cost
 #  of checking authentication tokens.
-#c.JupyterHub.trust_user_provided_tokens = False
+# c.JupyterHub.trust_user_provided_tokens = False
 
 ## Upgrade the database automatically on start.
 #  
 #  Only safe if database is regularly backed up. Only SQLite databases will be
 #  backed up to a local file automatically.
-#c.JupyterHub.upgrade_db = False
+# c.JupyterHub.upgrade_db = False
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Spawner(LoggingConfigurable) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 ## Base class for spawning single-user notebook servers.
 #  
@@ -370,7 +370,7 @@ c.JupyterHub.spawner_class = 'mydockerspawner.MyDockerSpawner'
 #  Some spawners allow shell-style expansion here, allowing you to use
 #  environment variables here. Most, including the default, do not. Consult the
 #  documentation for your spawner to verify!
-#c.Spawner.args = []
+# c.Spawner.args = []
 
 ## The command used for starting the single-user server.
 #  
@@ -393,7 +393,7 @@ c.Spawner.cmd = ['bash', '/home/jovyan/run.sh']
 #  set to 2, allows use of up to 2 CPUs.
 #  
 #  Note that this needs to be supported by your spawner for it to work.
-#c.Spawner.cpu_guarantee = None
+# c.Spawner.cpu_guarantee = None
 
 ## Maximum number of cpu-cores a single-user notebook server is allowed to use.
 #  
@@ -405,10 +405,10 @@ c.Spawner.cmd = ['bash', '/home/jovyan/run.sh']
 #  cpu-cores.
 #  
 #  This needs to be supported by your spawner for it to work.
-#c.Spawner.cpu_limit = None
+# c.Spawner.cpu_limit = None
 
 ## Enable debug-logging of the single-user server
-#c.Spawner.debug = False
+# c.Spawner.debug = False
 
 ## The URL the single-user server should start in.
 #  
@@ -430,7 +430,7 @@ c.Spawner.default_url = '/lab'
 #  Note: a user could circumvent this if the user modifies their Python
 #  environment, such as when they have their own conda environments / virtualenvs
 #  / containers.
-#c.Spawner.disable_user_config = False
+# c.Spawner.disable_user_config = False
 
 ## Whitelist of environment variables for the single-user server to inherit from
 #  the JupyterHub process.
@@ -438,7 +438,7 @@ c.Spawner.default_url = '/lab'
 #  This whitelist is used to ensure that sensitive information in the JupyterHub
 #  process's environment (such as `CONFIGPROXY_AUTH_TOKEN`) is not passed to the
 #  single-user server's process.
-#c.Spawner.env_keep = ['PATH', 'PYTHONPATH', 'CONDA_ROOT', 'CONDA_DEFAULT_ENV', 'VIRTUAL_ENV', 'LANG', 'LC_ALL']
+# c.Spawner.env_keep = ['PATH', 'PYTHONPATH', 'CONDA_ROOT', 'CONDA_DEFAULT_ENV', 'VIRTUAL_ENV', 'LANG', 'LC_ALL']
 
 ## Extra environment variables to set for the single-user server's process.
 #  
@@ -457,19 +457,19 @@ c.Spawner.default_url = '/lab'
 #  Note that the spawner class' interface is not guaranteed to be exactly same
 #  across upgrades, so if you are using the callable take care to verify it
 #  continues to work after upgrades!
-#c.Spawner.environment = {}
+# c.Spawner.environment = {}
 
 ## Timeout (in seconds) before giving up on a spawned HTTP server
 #  
 #  Once a server has successfully been spawned, this is the amount of time we
 #  wait before assuming that the server is unable to accept connections.
-#c.Spawner.http_timeout = 30
+# c.Spawner.http_timeout = 30
 
 ## The IP address (or hostname) the single-user server should listen on.
 #  
 #  The JupyterHub proxy implementation should be able to send packets to this
 #  interface.
-#c.Spawner.ip = ''
+# c.Spawner.ip = ''
 
 ## Minimum number of bytes a single-user notebook server is guaranteed to have
 #  available.
@@ -481,7 +481,7 @@ c.Spawner.default_url = '/lab'
 #    - T -> Terabytes
 #  
 #  This needs to be supported by your spawner for it to work.
-#c.Spawner.mem_guarantee = None
+# c.Spawner.mem_guarantee = None
 
 ## Maximum number of bytes a single-user notebook server is allowed to use.
 #  
@@ -496,7 +496,7 @@ c.Spawner.default_url = '/lab'
 #  to allocate this much memory - only that it can not allocate more than this.
 #  
 #  This needs to be supported by your spawner for it to work.
-#c.Spawner.mem_limit = None
+# c.Spawner.mem_limit = None
 
 ## Path to the notebook directory for the single-user server.
 #  
@@ -531,7 +531,7 @@ c.Spawner.default_url = '/lab'
 #  
 #  The data from this form submission will be passed on to your spawner in
 #  `self.user_options`
-#c.Spawner.options_form = ''
+# c.Spawner.options_form = ''
 
 ## Interval (in seconds) on which to poll the spawner for single-user server's
 #  status.
@@ -540,7 +540,7 @@ c.Spawner.default_url = '/lab'
 #  if the single-user server is still running. If it isn't running, then
 #  JupyterHub modifies its own state accordingly and removes appropriate routes
 #  from the configurable proxy.
-#c.Spawner.poll_interval = 30
+# c.Spawner.poll_interval = 30
 
 ## The port for single-user servers to listen on.
 #  
@@ -550,7 +550,7 @@ c.Spawner.default_url = '/lab'
 #  makes sense if each server is on a different address, e.g. in containers.
 #  
 #  New in version 0.7.
-#c.Spawner.port = 0
+# c.Spawner.port = 0
 
 ## An optional hook function that you can implement to do some bootstrapping work
 #  before the spawner starts. For example, create a directory for your user or
@@ -566,7 +566,7 @@ c.Spawner.default_url = '/lab'
 #          check_call(['./examples/bootstrap-script/bootstrap.sh', username])
 #  
 #      c.Spawner.pre_spawn_hook = my_hook
-#c.Spawner.pre_spawn_hook = None
+# c.Spawner.pre_spawn_hook = None
 
 ## Timeout (in seconds) before giving up on starting of single-user server.
 #  
@@ -574,11 +574,11 @@ c.Spawner.default_url = '/lab'
 #  respond. Callers of spawner.start will assume that startup has failed if it
 #  takes longer than this. start should return when the server process is started
 #  and its location is known.
-#c.Spawner.start_timeout = 60
+# c.Spawner.start_timeout = 60
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # LocalProcessSpawner(Spawner) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 ## A Spawner that uses `subprocess.Popen` to start single-user servers as local
 #  processes.
@@ -592,13 +592,13 @@ c.Spawner.default_url = '/lab'
 #  
 #  If the process has not exited cleanly after this many seconds, a SIGTERM is
 #  sent.
-#c.LocalProcessSpawner.interrupt_timeout = 10
+# c.LocalProcessSpawner.interrupt_timeout = 10
 
 ## Seconds to wait for process to halt after SIGKILL before giving up.
 #  
 #  If the process does not exit cleanly after this many seconds of SIGKILL, it
 #  becomes a zombie process. The hub process will log a warning and then give up.
-#c.LocalProcessSpawner.kill_timeout = 5
+# c.LocalProcessSpawner.kill_timeout = 5
 
 ## Extra keyword arguments to pass to Popen
 #  
@@ -607,17 +607,17 @@ c.Spawner.default_url = '/lab'
 #  For example::
 #  
 #      popen_kwargs = dict(shell=True)
-#c.LocalProcessSpawner.popen_kwargs = {}
+# c.LocalProcessSpawner.popen_kwargs = {}
 
 ## Seconds to wait for single-user server process to halt after SIGTERM.
 #  
 #  If the process does not exit cleanly after this many seconds of SIGTERM, a
 #  SIGKILL is sent.
-#c.LocalProcessSpawner.term_timeout = 5
+# c.LocalProcessSpawner.term_timeout = 5
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Authenticator(LoggingConfigurable) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 ## Base class for implementing an authentication provider for JupyterHub
 
@@ -644,7 +644,7 @@ c.Authenticator.admin_users = {'admin'}
 #  `.get_handlers()`.
 #  
 #  .. versionadded:: 0.8
-#c.Authenticator.auto_login = False
+# c.Authenticator.auto_login = False
 
 ## Enable persisting auth_state (if available).
 #  
@@ -661,12 +661,12 @@ c.Authenticator.admin_users = {'admin'}
 #  If encryption is unavailable, auth_state cannot be persisted.
 #  
 #  New in JupyterHub 0.8
-#c.Authenticator.enable_auth_state = False
+# c.Authenticator.enable_auth_state = False
 
 ## Dictionary mapping authenticator usernames to JupyterHub users.
 #  
 #  Primarily used to normalize OAuth user names to local users.
-#c.Authenticator.username_map = {}
+# c.Authenticator.username_map = {}
 
 ## Regular expression pattern that all valid usernames must match.
 #  
@@ -674,7 +674,7 @@ c.Authenticator.admin_users = {'admin'}
 #  not be attempted.
 #  
 #  If not set, allow any username.
-#c.Authenticator.username_pattern = ''
+# c.Authenticator.username_pattern = ''
 
 ## Whitelist of usernames that are allowed to log in.
 #  
@@ -683,11 +683,11 @@ c.Authenticator.admin_users = {'admin'}
 #  restrictions the authenticator has in place.
 #  
 #  If empty, does not perform any additional restriction.
-#c.Authenticator.whitelist = set()
+# c.Authenticator.whitelist = set()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # LocalAuthenticator(Authenticator) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 ## Base class for Authenticators that work with local Linux/UNIX users
 #  
@@ -712,27 +712,27 @@ c.Authenticator.admin_users = {'admin'}
 #      adduser -q --gecos "" --home /customhome/river --disabled-password river
 #  
 #  when the user 'river' is created.
-#c.LocalAuthenticator.add_user_cmd = []
+# c.LocalAuthenticator.add_user_cmd = []
 
 ## If set to True, will attempt to create local system users if they do not exist
 #  already.
 #  
 #  Supports Linux and BSD variants only.
-#c.LocalAuthenticator.create_system_users = False
+# c.LocalAuthenticator.create_system_users = False
 
 ## Whitelist all users from this UNIX group.
 #  
 #  This makes the username whitelist ineffective.
-#c.LocalAuthenticator.group_whitelist = set()
+# c.LocalAuthenticator.group_whitelist = set()
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # PAMAuthenticator(LocalAuthenticator) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 ## Authenticate local UNIX users with PAM
 
 ## The text encoding to use when communicating with PAM
-#c.PAMAuthenticator.encoding = 'utf8'
+# c.PAMAuthenticator.encoding = 'utf8'
 
 ## Whether to open a new PAM session when spawners are started.
 #  
@@ -741,34 +741,35 @@ c.Authenticator.admin_users = {'admin'}
 #  
 #  If any errors are encountered when opening/closing PAM sessions, this is
 #  automatically set to False.
-#c.PAMAuthenticator.open_sessions = True
+# c.PAMAuthenticator.open_sessions = True
 
 ## The name of the PAM service to use for authentication
-#c.PAMAuthenticator.service = 'login'
+# c.PAMAuthenticator.service = 'login'
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # CryptKeeper(SingletonConfigurable) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 ## Encapsulate encryption configuration
 #  
 #  Use via the encryption_config singleton below.
 
 ## 
-#c.CryptKeeper.keys = []
+# c.CryptKeeper.keys = []
 
 ## The number of threads to allocate for encryption
-#c.CryptKeeper.n_threads = 8
+# c.CryptKeeper.n_threads = 8
 
 
 c.DockerSpawner.image = 'singleuser:latest'
 c.DockerSpawner.remove_containers = True
 # c.DockerSpawner.use_internal_ip =
-# TODO mount project folder instead of user folder
 c.DockerSpawner.volumes = \
     {
-    # '/Users/zhaofengli/projects/goldersgreen/pyserver/user_directory/{user_ID}/{project_name}': '/home/jovyan/work',
-    '/Users/Chun/Documents/workspace/goldersgreen/pyserver/user_directory/{user_ID}/{project_name}': '/home/jovyan/work',
-    # '/Users/zhaofengli/projects/goldersgreen/pyserver/server3/lib/modules': '/home/jovyan/modules'
-    '/Users/Chun/Documents/workspace/goldersgreen/pyserver/server3/lib/modules': '/home/jovyan/modules'
+        '/Users/zhaofengli/projects/goldersgreen/pyserver/user_directory/{user_ID}/{project_name}': '/home/jovyan/work',
+        '/Users/zhaofengli/projects/goldersgreen/pyserver/server3/lib/modules': '/home/jovyan/modules',
+        '/Users/zhaofengli/projects/goldersgreen/pyserver/user_directory': '/home/jovyan/dataset'
+        # '/Users/Chun/Documents/workspace/goldersgreen/pyserver/user_directory/{user_ID}/{project_name}': '/home/jovyan/work',
+        # '/Users/Chun/Documents/workspace/goldersgreen/pyserver/server3/lib/modules': '/home/jovyan/modules',
+        # '/Users/Chun/Documents/workspace/goldersgreen/pyserver/user_directory': '/home/jovyan/dataset'
     }
