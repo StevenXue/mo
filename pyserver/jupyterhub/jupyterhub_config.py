@@ -767,8 +767,8 @@ c.DockerSpawner.remove_containers = True
 # TODO mount project folder instead of user folder
 c.DockerSpawner.volumes = \
     {
-    '/Users/zhaofengli/projects/goldersgreen/pyserver/user_directory/{user_ID}/{project_name}': '/home/jovyan/work',
-    '/Users/zhaofengli/projects/goldersgreen/pyserver/server3/lib/modules':
-        '/home/jovyan/modules',
-    '/Users/zhaofengli/projects/goldersgreen/pyserver/user_directory': '/home/jovyan/dataset'
+    # '/Users/zhaofengli/projects/goldersgreen/pyserver/user_directory/{user_ID}/{project_name}': '/home/jovyan/work',
+    '/Users/Chun/Documents/workspace/goldersgreen/pyserver/user_directory/{user_ID}/{project_name}': '/home/jovyan/work',
+    # '/Users/zhaofengli/projects/goldersgreen/pyserver/server3/lib/modules': '/home/jovyan/modules'
+    '/Users/Chun/Documents/workspace/goldersgreen/pyserver/server3/lib/modules': '/home/jovyan/modules'
     }
