@@ -39,6 +39,9 @@ export default {
         overviewEditState: false,
       }
     },
+    tgHelpModal(state) {
+      return { ...state, helpModalVisible: !state.helpModalVisible }
+    },
     setProjectReducer(state, { payload: project }) {
       return {
         ...state,

@@ -110,12 +110,12 @@ export class ModulePage extends React.Component {
   }
 
   insertCode() {
-    const user_ID = localStorage.getItem('user_ID')
+    // const user_ID = localStorage.getItem('user_ID')
     NotebookActions.insertCode(this.props.tracker.currentWidget.notebook,
       [
         `conf = '${genConf(this.state.args)}'\n`,
         `conf = json_parser(conf)\n`,
-        `result = ${this.state.func}('${user_ID}/${this.state.project.name}', conf)`,
+        `result = ${this.state.func}('${this.state.project.user_ID}/${this.state.project.name}', conf)`,
       ],
     )
     addModuleToApp({ appId: this.appId, moduleId: this.state.projectId, func: this.state.func })

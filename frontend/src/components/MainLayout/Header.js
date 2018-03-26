@@ -191,7 +191,9 @@ function Header({location, login, history, dispatch, allRequest,message}) {
           {login.user && JsonToArray(message.messages).map(e =>
             <Menu.Item key={e._id} className={styles.messageMenuItem}>
               <div onClick={() => toMessage(e.user_request,e.receiver_id)}>
-                {e.user_ID}回答了您关注的需求{e.user_request_title}
+                {e.type === 'answer'? <p>{e.user_ID} 回答了您关注的需求  {e.user_request_title}</p>:<p>
+                  {e.user_ID} 更新了您关注的需求  {e.user_request_title} 的答案
+                  </p>}
               </div>
             </Menu.Item>
           )

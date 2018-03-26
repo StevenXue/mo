@@ -1,7 +1,8 @@
 import React from 'react'
-import { Form, Button, Select, Input, Tooltip, Icon } from 'antd'
+import {Form, Button, Select, Input, Tooltip, Icon, Upload, Modal} from 'antd'
 import styles from './index.less'
 import {runApi} from '../../services/app'
+// import reqwest from 'reqwest'
 
 const FormItem = Form.Item
 
@@ -78,7 +79,7 @@ const splitHandler = (e, type, valueType) => {
   }
 }
 
-const switchComponent = (arg, baseArg) => {
+const switchComponent = (arg, baseArg, setFieldsValue ) => {
   switch (arg.type) {
     case 'multiple_input':
     case 'input':
@@ -86,10 +87,11 @@ const switchComponent = (arg, baseArg) => {
 
     case 'choice':
       return (
-        <Select style={{ width: 142 }}>
+        <Select style={{width: 142}}>
           {
             arg.range.map((option) =>
-              <Select.Option value={option} key={option}>{option}</Select.Option>,
+              <Select.Option value={option}
+                             key={option}>{option}</Select.Option>,
             )
           }
         </Select>
@@ -97,21 +99,28 @@ const switchComponent = (arg, baseArg) => {
 
     case 'multiple_choice':
       return (
-        <Select style={{ width: 142 }} mode='multiple'>
+        <Select style={{width: 142}} mode='multiple'>
           {
             arg.range.map((option) =>
-              <Select.Option value={option} key={option}>{option}</Select.Option>,
+              <Select.Option value={option}
+                             key={option}>{option}</Select.Option>,
             )
           }
         </Select>
       )
+
+    case 'upload':
+      return (
+        <Demo setFieldsValue={setFieldsValue} key1={arg.name}/>
+      )
+
     default:
       return <Input/>
   }
 }
 
-const formItems = (arg, i, getFieldDecorator, baseArg) => {
-
+const formItems = (arg, i, getFieldDecorator, baseArg, setFieldsValue ) => {
+  console.log('arg',arg)
   let v
   if (arg.value || (arg.values && arg.values.length > 0)) {
     v = arg.value || arg.values
@@ -119,7 +128,7 @@ const formItems = (arg, i, getFieldDecorator, baseArg) => {
 
   return <FormItem
     key={i}
-    label={arg.display_name?arg.display_name:arg.name}
+    label={arg.display_name ? arg.display_name : arg.name}
     {...formItemLayout}
   >
     <div className={styles.row}>
@@ -129,11 +138,12 @@ const formItems = (arg, i, getFieldDecorator, baseArg) => {
           getValueFromEvent: (value) => splitHandler(value, arg.type, arg.value_type),
           rules: [
             {
-              required: arg.required, message: `need ${arg.value_type || ''} ${arg.type}`,
+              required: arg.required,
+              message: `need ${arg.value_type || ''} ${arg.type}`,
               type: typeParser(arg.type, arg.value_type),
             },
           ],
-        })(switchComponent(arg, baseArg))
+        })(switchComponent(arg, baseArg, setFieldsValue ))
       }
       <div className={styles.help}>
         <Tooltip title={baseArg.des}>
@@ -144,44 +154,136 @@ const formItems = (arg, i, getFieldDecorator, baseArg) => {
   </FormItem>
 }
 
-const handleSubmit = (e, validateFieldsAndScroll,appId,dispatch) =>{
+const handleSubmit = (e, validateFieldsAndScroll, appId, dispatch) => {
+
   e.preventDefault()
   validateFieldsAndScroll((err, values) => {
+    console.log('llllllll',values)
     if (!err) {
       console.log('Received values of form: ', values)
-      let payload = {'app':{'input':values}}
+      let payload = {'app': {'input': values}}
       payload['app_id'] = appId
-      dispatch({type: 'projectDetail/get_example_result',payload:payload})
+      dispatch({type: 'projectDetail/get_example_result', payload: payload})
     }
   })
 }
 const formItemLayout = {
   labelCol: {
-    xs: { span: 24 },
-    sm: { span: 6 },
+    xs: {span: 24},
+    sm: {span: 6},
   },
   wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 14 },
+    xs: {span: 24},
+    sm: {span: 14},
   },
-};
+}
+
+
+function getBase64(img, callback) {
+  const reader = new FileReader()
+  reader.addEventListener('load', () => callback(reader.result))
+  reader.readAsDataURL(img)
+}
+
+class Demo extends React.Component {
+  state = {
+    loading: false,
+    previewVisible: false,
+    fileList: [],
+  }
+
+  handleCancel = () => this.setState({previewVisible: false})
+
+  handlePreview = (file) => {
+    this.setState({
+      previewImage: file.url || file.thumbUrl,
+      previewVisible: true,
+    })
+  }
+
+  handleChange = ({fileList}) => {
+    let thisFile = fileList[0]
+    getBase64(thisFile, imageUrl => {
+      let newList = [{originFileObj: thisFile,thumbUrl: imageUrl,uid:thisFile.uid}]
+      this.setState({
+        fileList:newList,
+        loading: false,
+      })
+      this.props.setFieldsValue({[this.props.key1]:newList[0].thumbUrl})
+    })
+  }
+
+  render() {
+    console.log(this.props)
+    const uploadButton = (
+      <div>
+        <Icon type={this.state.loading ? 'loading' : 'plus'}/>
+        <div className="ant-upload-text">Upload</div>
+      </div>
+    )
+    const props = {
+      onRemove: (file) => {
+        this.setState(({fileList}) => {
+          const index = fileList.indexOf(file)
+          const newFileList = fileList.slice()
+          newFileList.splice(index, 1)
+          return {
+            fileList: newFileList,
+          }
+        })
+      },
+      beforeUpload: (file) => {
+        return false
+      },
+      fileList: this.state.fileList,
+    }
+    return (
+      <div style={styles.ImageContainer}>
+        <div style={styles.image}>
+          <Upload {...props}
+                  className="upload-pic"
+                  action={URL + '/fake_upload'}
+                  listType="picture-card"
+                  fileList={this.state.fileList}
+                  onPreview={this.handlePreview}
+                  onChange={this.handleChange}
+          >
+            {this.state.fileList.length >= 1 ? null : uploadButton}
+          </Upload>
+          <Modal
+            visible={this.state.previewVisible}
+            footer={null}
+            onCancel={this.handleCancel}
+          >
+            <img
+              alt="example"
+              style={{width: '100%'}}
+              src={this.state.previewImage}
+            />
+          </Modal>
+        </div>
+      </div>
+    )
+  }
+}
+
 
 function ParamsMapper({
-                        args, layerIndex, baseArgs,appId,dispatch,
-                        form: { getFieldDecorator ,validateFieldsAndScroll},
+                        args, layerIndex, baseArgs, appId, dispatch,
+                        form: {getFieldDecorator, validateFieldsAndScroll, setFieldsValue },
                       }) {
 
   return (
     <Form layout='horizontal' className={styles.form}
           key={`params-form-${layerIndex}`}
-          onSubmit={(value)=>handleSubmit(value,validateFieldsAndScroll,appId,dispatch)}
-          >
+          onSubmit={(value) => handleSubmit(value, validateFieldsAndScroll, appId, dispatch)}
+    >
       {
         args.map((arg, i) => {
-          return formItems(arg, i, getFieldDecorator, baseArgs[i])
+          return formItems(arg, i, getFieldDecorator, baseArgs[i], setFieldsValue )
         })
       }
-      <FormItem wrapperCol={{ span: 12, offset: 11 }}>
+      <FormItem wrapperCol={{span: 12, offset: 11}}>
         <Button
           type="primary" htmlType="submit">Submit</Button>
       </FormItem>
@@ -189,11 +291,11 @@ function ParamsMapper({
   )
 }
 
-const handleValuesChange = ({ setValue }, values) => {
+const handleValuesChange = ({setValue}, values) => {
   setValue(values)
 }
 
-export default Form.create({ onValuesChange: (props, values) => handleValuesChange(props, values) })(ParamsMapper)
+export default Form.create({onValuesChange: (props, values) => handleValuesChange(props, values)})(ParamsMapper)
 export {
   formItems,
 }

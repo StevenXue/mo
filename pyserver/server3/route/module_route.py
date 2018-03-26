@@ -15,6 +15,7 @@ from flask import request
 from server3.business import module_business, user_business
 from server3.business.module_business import ModuleBusiness
 from server3.service.module_service import ModuleService
+from server3.service.validation.validation import GDValidation
 from server3.utility import json_utility
 
 PREFIX = '/modules'
@@ -97,7 +98,18 @@ def update_module():
 
 
 @module_app.route("/publish/<project_id>", methods=["POST"])
-def deploy_in_docker(project_id):
+def publish_module(project_id):
     project = ModuleBusiness.publish(project_id)
     project = json_utility.convert_to_json(project.to_mongo())
     return jsonify({"response": project})
+
+
+@module_app.route("/test/<project_id>", methods=["GET"])
+def test_module(project_id):
+    # project = ModuleBusiness.publish(project_id)
+    # project = json_utility.convert_to_json(project.to_mongo())
+    result = GDValidation.run_test('./', 'sesese')
+    print(result)
+    import time
+    time.sleep(3)
+    return jsonify({"response": 1})

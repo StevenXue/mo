@@ -5,17 +5,16 @@ import { showTime } from './time'
 import classnames from 'classnames'
 import lodash from 'lodash'
 
-// 下划线转驼峰
-String.prototype.dashToHump = function () {
-  return this.replace(/_(\w)/g, (...args) => {
+// 连字符转驼峰
+String.prototype.hyphenToHump = function () {
+  return this.replace(/-(\w)/g, (args) => {
     return args[1].toUpperCase()
   })
 }
 
-
-// 连字符转驼峰
-String.prototype.hyphenToHump = function () {
-  return this.replace(/-(\w)/g, (...args) => {
+// 下划线转驼峰
+String.prototype.dashToHump = function () {
+  return this.replace(/_(\w)/g, (args) => {
     return args[1].toUpperCase()
   })
 }

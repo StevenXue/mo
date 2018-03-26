@@ -1,8 +1,8 @@
 import React from 'react'
-import {Link, Route, Switch,} from 'react-router-dom'
+import { Link, Route, Switch, } from 'react-router-dom'
 
-import {connect} from 'dva'
-import {Button, Col, Icon, Modal, Row, Spin, Tabs, Tag, Upload} from 'antd'
+import { connect } from 'dva'
+import { Button, Col, Icon, Modal, Row, Spin, Tabs, Tag, Upload } from 'antd'
 // pages
 import Modelling from '../../modelling/Modelling/index'
 // components
@@ -11,13 +11,12 @@ import HelpModal from '../../../../components/HelpModal'
 import ReactMdeEditor from '../../../../components/ReactMdeCom/reactMde'
 import ProjectExample from '../../../../components/ProjectExample/projectExample'
 
-import {showTime} from '../../../../utils/index'
+import { showTime } from '../../../../utils/index'
 import styles from './index.less'
-import {get} from 'lodash'
-import {message} from 'antd/lib/index'
+import { get } from 'lodash'
+import { message } from 'antd/lib/index'
 import ReactMarkdown from 'react-markdown'
-import {flaskServer} from '../../../../constants'
-
+import { flaskServer } from '../../../../constants'
 
 const confirm = Modal.confirm
 const TabPane = Tabs.TabPane
@@ -35,8 +34,7 @@ const myShowTime = (time, format = 'yyyy-MM-dd hh:mm') => {
   return date.toLocaleString()
 }
 
-
-function ProjectInfo({market_use, match, history, location, dispatch, projectDetail, login}) {
+function ProjectInfo({ market_use, match, history, location, dispatch, projectDetail, login }) {
 
   const projectId = match.params.projectId
   const user_ID = localStorage.getItem('user_ID')
@@ -73,8 +71,14 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
       okType: 'danger',
       cancelText: 'No',
       onOk() {
-        dispatch({type: 'projectDetail/delete', payload: {projectId, type:projectDetail.project.type}})
+        dispatch({ type: 'projectDetail/delete', payload: { projectId, type: projectDetail.project.type } })
       },
+    })
+  }
+
+  const helpModal = () => {
+    dispatch({
+      type: 'projectDetail/tgHelpModal'
     })
   }
 
@@ -121,52 +125,56 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
       return (
         <div className={`main-container ${styles.normal}`}>
           {components.includes('help-modal') &&
-          <HelpModal visible={!projectDetail.project.entered}
+          <HelpModal visible={!projectDetail.project.entered || projectDetail.helpModalVisible}
                      projectType={projectDetail.project.type}/>}
           <div className={styles.info}>
             <Row>
-              <Col span={3} style={{padding: '10px 42px'}}>
+              <Col span={3} style={{ padding: '10px 42px' }}>
                 <div className={styles.bigIconNunberDiv}>
-                  <div className={projectDetail.project.star_users.includes(userObjId) ? styles.iconNunberDivActive:styles.iconNunberDiv}
-                       style={market_use?{cursor: 'pointer'}:{cursor:'default'}}
-                       onClick={market_use?() => appStarFavor('star'):null}
-                       >
+                  <div
+                    className={projectDetail.project.star_users.includes(userObjId) ? styles.iconNunberDivActive : styles.iconNunberDiv}
+                    style={market_use ? { cursor: 'pointer' } : { cursor: 'default' }}
+                    onClick={market_use ? () => appStarFavor('star') : null}
+                  >
                     <p className={styles.icon}>
                       <Icon
-                            type={projectDetail.project.star_users.includes(userObjId) ? 'like' : 'like-o'}/>
+                        type={projectDetail.project.star_users.includes(userObjId) ? 'like' : 'like-o'}/>
                     </p>
                     <p
                       className={styles.number}>{projectDetail.project.star_users.length}</p>
                   </div>
-                  <div className={projectDetail.project.favor_users.includes(userObjId) ? styles.iconNunberDivActive:styles.iconNunberDiv}
-                       style={market_use?{cursor: 'pointer'}:{cursor:'default'}}
-                       onClick={market_use?() => appStarFavor('favor'):null}>
+                  <div
+                    className={projectDetail.project.favor_users.includes(userObjId) ? styles.iconNunberDivActive : styles.iconNunberDiv}
+                    style={market_use ? { cursor: 'pointer' } : { cursor: 'default' }}
+                    onClick={market_use ? () => appStarFavor('favor') : null}>
                     <p className={styles.icon}>
                       <Icon
-                            type={projectDetail.project.favor_users.includes(userObjId) ? 'star' : 'star-o'}/>
+                        type={projectDetail.project.favor_users.includes(userObjId) ? 'star' : 'star-o'}/>
                     </p>
                     <p
                       className={styles.number}>{projectDetail.project.favor_users.length}</p>
                   </div>
                 </div>
               </Col>
-              <Col span={21} style={{paddingRight: '150px'}}>
+              <Col span={21} style={{ paddingRight: '150px' }}>
                 <div className={styles.name}>
                   <h1>
                     {projectDetail.project.name}&nbsp;
                     {!market_use && <Icon
                       type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
-                      style={{fontSize: 20}}/>}
+                      style={{ fontSize: 20 }}/>}
                     {!market_use && <span className={styles.rightButton}>
                   <ProjectModal new={false} projectDetail={projectDetail}
+                                type={projectDetail.project.type}
                   >
-                    <Button icon='edit' style={{marginRight: 15}}/>
+                    <Button icon='edit' style={{ marginRight: 15 }}/>
                   </ProjectModal>
-                  <Button icon='delete' onClick={() => deleteProject()}/>
+                  <Button icon='delete' style={{ marginRight: 15 }} onClick={() => deleteProject()}/>
+                      <Button icon='cloud-download-o' onClick={() => helpModal()}/>
                 </span>}
                   </h1>
                   <p className={styles.text}>
-                    <Icon type="clock-circle-o" style={{marginRight: 10}}/>
+                    <Icon type="clock-circle-o" style={{ marginRight: 10 }}/>
                     Create Time: {showTime(projectDetail.project.create_time)}
                   </p>
                 </div>
@@ -177,11 +185,11 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                 <div className={styles.tags}>
                   {projectDetail.project.tags.length > 0 ? projectDetail.project.tags.map(e =>
                       <Tag color="#EEEEEE"
-                           style={{color: '#666666',cursor: 'default'}}
+                           style={{ color: '#666666', cursor: 'default' }}
                            key={e}>{e}</Tag>)
                     : null}
                 </div>
-                <div style={{paddingBottom: '50px'}}>
+                <div style={{ paddingBottom: '50px' }}>
               <span>
                 {!market_use && <span className={styles.generalSpan}>
                 <Upload {...props1}>
@@ -223,9 +231,8 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
               <Jobs projectDetail={projectDetail} dispatch={dispatch}/>
             </TabPane>}
             <TabPane tab="Examples" key="3">
-              {projectDetail.project.args ?
-                <ProjectExample projectDetail={projectDetail}
-                                dispatch={dispatch}/> : null}
+              {projectDetail.project.args ? <ProjectExample projectDetail={projectDetail}
+                                                            dispatch={dispatch}/> : null}
             </TabPane>
           </Tabs>
         </div>
@@ -235,7 +242,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
   }
 }
 
-const Jobs = ({projectDetail, dispatch}) => {
+const Jobs = ({ projectDetail, dispatch }) => {
   return (
     <div>
       <h2>Jobs:
@@ -270,7 +277,7 @@ const Jobs = ({projectDetail, dispatch}) => {
                 <Icon className={styles.shutDown} type='close'
                       onClick={() => dispatch({
                         type: 'projectDetail/closeSession',
-                        sessionId: job.id
+                        sessionId: job.id,
                       })}/>
               </h4>
               <p className={styles.jobInfo}>
@@ -291,7 +298,7 @@ const Jobs = ({projectDetail, dispatch}) => {
                 <Icon className={styles.shutDown} type='close'
                       onClick={() => dispatch({
                         type: 'projectDetail/closeSession',
-                        terminalName: job.name
+                        terminalName: job.name,
                       })}/>
               </h4>
             </div>
@@ -305,7 +312,7 @@ ProjectInfo.defaultProps = {
   market_use: false,
 }
 
-function ProjectDetail({match, history, location, dispatch, projectDetail}) {
+function ProjectDetail({ match, history, location, dispatch, projectDetail }) {
 
   return (
     <div className={`main-container ${styles.normal}`}>
@@ -329,7 +336,7 @@ function ProjectDetail({match, history, location, dispatch, projectDetail}) {
   )
 }
 
-export default connect(({projectDetail, login}) => ({
+export default connect(({ projectDetail, login }) => ({
   projectDetail,
-  login
+  login,
 }))(ProjectInfo)

@@ -33,7 +33,7 @@ import '../style/index.css';
 /**
  * The class name added to toolbar deploy button.
  */
-const TOOLBAR_COMMIT_CLASS = 'jp-CommitIcon';
+const TOOLBAR_COMMIT_CLASS = 'jp-Git-SyncIcon';
 
 /**
  * Initialization data for the moduledeploy-extension extension.
@@ -80,7 +80,7 @@ export function createDeployButton(): ToolbarButton {
       className: TOOLBAR_COMMIT_CLASS,
       onClick: () => {
         return showDialog({
-          title: 'Commit ' + document.title.split(' - ')[0],
+          title: 'Commit and Sync ' + document.title.split(' - ')[0],
           body: new DeployForm(() => {
             console.log('click');
           }),
@@ -96,13 +96,13 @@ export function createDeployButton(): ToolbarButton {
             projectId,
             commitMsg,
             onJson: () => {
-              message.success('Commit and Push: ' + result.value);
+              message.success('Commit and Sync: ' + result.value);
             },
           });
           // return deploy(context);
         });
       },
-      tooltip: 'Deploy Script',
+      tooltip: 'Commit and Sync',
     });
   } else {
     throw Error;

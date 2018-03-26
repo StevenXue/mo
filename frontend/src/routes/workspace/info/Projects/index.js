@@ -63,16 +63,14 @@ class ProjectList extends Component {
 
     // get state filter
     ['query', 'privacy', 'page_no', 'page_size'].forEach((key) => {
-      console.log('?',key,key.hyphenToHump())
-      filter[key] = this.state[key.hyphenToHump()]
+      filter[key] = this.state[key.dashToHump()]
     })
 
     // update filter from args
     for (let key in payload) {
       filter[key] = payload[key]
-      console.log('!',key,key.hyphenToHump())
       this.setState({
-        [key.hyphenToHump()]: payload[key],
+        [key.dashToHump()]: payload[key],
       })
     }
 
@@ -82,7 +80,7 @@ class ProjectList extends Component {
       onJson: ({ projects, count }) => this.setState({
         projects,
         totalNumber: count,
-      })
+      }),
     })
   }
 
@@ -108,7 +106,6 @@ class ProjectList extends Component {
 
   render() {
     const { history, project, dispatch } = this.props
-
     return (
       <div>
         <div className={styles.header}>
@@ -123,7 +120,7 @@ class ProjectList extends Component {
             onSearch={(value) => this.handleQueryChange(value)}
             style={{ width: 200 }}
           />
-          <ProjectModel new={true} fetchData={() => this.fetchData({})} type={this.props.type}>
+          <ProjectModel new={true} fetchData={() => this.fetchData({})} type={this.props.type} >
             <Button icon='plus-circle-o' type='primary' className={styles.rightButton}>New {this.props.type}</Button>
           </ProjectModel>
         </div>
@@ -163,6 +160,7 @@ class ProjectList extends Component {
         </div>
       </div>
     )
+
   }
 }
 
