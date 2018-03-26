@@ -114,3 +114,24 @@
     }
   }
 }
+
+
+.mobileGroup {
+  :global {
+    .ant-form-item {
+      margin-bottom: 0;
+      vertical-align: top;
+
+      &:first-child .ant-select-selection {
+        border-right-width: 0;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+
+      &:last-child .ant-input {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+    }
+  }
+}
