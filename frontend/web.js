@@ -21,11 +21,6 @@ app.use('/hub_api', proxy(hubUrl, {
   }
 }));
 
-app.use('/api', function (req, res) {
-  var url = 'http://122.224.116.44:5005' + req.url;
-  req.pipe(request(url)).pipe(res);
-});
-
 app.get('/*', function (req, res) {
     res.sendFile(path.join(__dirname, './dist', 'index.html'));
 });
