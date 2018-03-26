@@ -3,7 +3,7 @@ const path = require('path');
 const app = express();
 
 app.use(express.static('./dist'));
-// static folder for mediappp
+// static folder for mediaii
 app.use(express.static('./assets'));
 
 app.use('/api', function (req, res) {
