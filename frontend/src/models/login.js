@@ -1,4 +1,4 @@
-import { login, tokenLogin } from '../services/login'
+import { login, tokenLogin, loginWithPhone } from '../services/login'
 import { routerRedux } from 'dva/router'
 import { message } from 'antd'
 import pathToRegexp from 'path-to-regexp'
@@ -135,6 +135,46 @@ export default {
         throw data
       }
     },
+
+    *loginWithPhone({ payload }, { put, call }) {
+      yield put({
+        type: 'changeSubmitting',
+        payload: true,
+      })
+      const response = yield call(loginWithPhone, payload)
+      yield put({
+        type: 'changeSubmitting',
+        payload: false,
+      })
+
+
+      if(response.status === 200){
+        const {data} = response
+        if (data) {
+          localStorage.setItem('token', data.token)
+          localStorage.setItem('user_ID', data.user.user_ID)
+          localStorage.setItem('user_obj_id', data.user._id)
+          const from = queryURL('from')
+          yield put({ type: 'setUser', payload: data.user })
+          if (from) {
+            yield put(routerRedux.push(from))
+          } else {
+            yield put(routerRedux.push('/userrequest?tab=app'))
+          }
+        } else {
+          throw data
+        }
+      }else{
+        let errorMessage = response.data.error.message
+        message.error(errorMessage)
+      }
+
+
+
+    },
+
+
+
     *query({ payload }, { call, put }) {
       try {
         const { data: data } = yield call(tokenLogin)
