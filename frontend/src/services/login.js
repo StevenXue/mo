@@ -19,5 +19,6 @@ export function tokenLogin(params) {
     headers: {
       'Authorization': 'Bearer ' + localStorage.getItem('token'),
     },
+    noErrorMsg: true
   })
 }

@@ -138,19 +138,28 @@ export default {
     *query({ payload }, { call, put }) {
       try {
         const { data: data } = yield call(tokenLogin)
-        yield put({
-          type: 'setUser',
-          payload: data.user,
-        })
-        // FIXME regex can't catch whole url
-        // const from = queryURL('from')
-        // if (from) {
-        //   yield put(routerRedux.push(from))
-        // }
-        console.log(location.hash.substr(1))
-        if (location.hash.substr(1) === '/login') {
-          // user dashboard not build yet, push to project by default
-          yield put(routerRedux.push('/workspace'))
+        if(!data.user) {
+          if (!(location.href.includes('/user/login') || location.href.includes('/user/register'))) {
+            // yield put(routerRedux.push('/user/login'))
+            // FIXME reload is a workaround
+            window.location.replace('/#/user/login')
+            window.location.reload()
+          }
+        } else {
+          yield put({
+            type: 'setUser',
+            payload: data.user,
+          })
+          // FIXME regex can't catch whole url
+          // const from = queryURL('from')
+          // if (from) {
+          //   yield put(routerRedux.push(from))
+          // }
+          console.log(location.hash.substr(1))
+          if (location.hash.substr(1) === '/login') {
+            // user dashboard not build yet, push to project by default
+            yield put(routerRedux.push('/workspace?tab=app'))
+          }
         }
       } catch (err) {
         if (!(location.href.includes('/user/login') || location.href.includes('/user/register'))) {

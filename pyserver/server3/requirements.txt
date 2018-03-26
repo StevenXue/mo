@@ -37,3 +37,7 @@ Pillow
 jupyterhub
 authenticator
 dockerspawner
+gitpython
+cookiecutter
+psutil
+htpasswd
