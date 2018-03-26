@@ -3,7 +3,7 @@ const path = require('path');
 const app = express();
 
 app.use(express.static('./dist'));
-// static folder for mediaaaaa
+// static folder for medialll
 app.use(express.static('./assets'));
 
 app.use('/api', function (req, res) {
