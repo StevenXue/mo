@@ -1,13 +1,13 @@
 from uuid import getnode as get_mac
 
-MONGO = 'DEFAULT'
+MONGO = 'PROD'
 # if get_mac() == 274973436731254:
 #     MONGO = 'DEFAULT'
 PORT = 5005
 FILL_BLANK = 'BLANK_GRID'
 ALLOWED_EXTENSIONS = {'zip', 'csv', 'png', 'jpg', 'jpeg', 'svg', 'txt', 'py',
-                      'pyc',
-                      'md', 'h5', 'npz', 'pkl', 'pdf', 'doc', 'docx', 'yml'}
+                      'pyc', 'md', 'h5', 'npz', 'pkl', 'pdf', 'doc', 'docx',
+                      'yml'}
 PREDICT_FOLDER = 'predict_data/'
 MODEL_EXPORT_BASE = '/tmp'
 MODEL_SCRIPT_PATH = './run_model.py'
