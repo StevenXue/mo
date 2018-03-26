@@ -73,12 +73,11 @@ export default {
     // 登陆后
     setup({dispatch, history}) {
       return history.listen(({pathname}) => {
-        if (pathname === '/') {
+        console.log('messsage')
           dispatch({
             type: 'fetchAllMessage',
             payload: {}
           })
-        }
       })
     },
   },
