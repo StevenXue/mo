@@ -29,8 +29,8 @@ export default {
         })
         yield put(routerRedux.push('/user/login'))
       }else{
-        let message = response.data.error.message
-        message.error(message)
+        let errorMessage = response.data.error.message
+        message.error(errorMessage)
       }
 
     },
@@ -41,8 +41,8 @@ export default {
       if(response.status === 200){
         message.success('验证码发送成功!')
       }else{
-        let message = response.data.error.message
-        message.error(message)
+        let errorMessage = response.data.error.message
+        message.error(errorMessage)
       }
 
     }
