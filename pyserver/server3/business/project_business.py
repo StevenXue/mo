@@ -30,7 +30,7 @@ from server3.constants import HUB_SERVER
 from server3.constants import GIT_SERVER
 from server3.constants import ADMIN_TOKEN
 from server3.entity.general_entity import Objects
-from server3.constants import GIT_SERVER_IP
+from server3.constants import GIT_IP_LOCAL
 
 from server3.constants import REDIS_SERVER
 
@@ -230,7 +230,7 @@ class ProjectBusiness:
     @staticmethod
     def clone(user_ID, name, project_path):
         return Repo.clone_from(
-            f'root@{GIT_SERVER_IP}:/var/www/user_repos/{user_ID}/{name}',
+            f'root@{GIT_IP_LOCAL}:/var/www/user_repos/{user_ID}/{name}',
             project_path)
 
     @classmethod

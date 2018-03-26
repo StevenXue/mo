@@ -7,18 +7,17 @@ module.exports = {
   jupyterServer: 'http://10.52.14.182:8888/api/contents/',  // kube master node ip
   kubeServer: 'http://10.52.14.182:8888/api/contents/',  // kube master node ip
   gitServerIp: '192.168.31.7',
-  // gitServerIp: '10.52.14.182',
   // jupyterServer: 'http://10.52.14.182:8888/api/contents/',
   // jupyterServer: 'http://122.224.116.44:9001/api/contents/',
 
   // server api
-  // flaskServer: 'http://localhost:5005',
+  flaskServer: 'http://localhost:5005',
   // flaskServer: 'http://10.52.14.182:5005',
   // flaskServer: 'http://122.224.116.44:5005',
-  flaskServer: 'http://192.168.31.7:5005',
+  // flaskServer: 'http://192.168.31.7:5005',
 
-  hubServer: 'http://192.168.31.7:8000',
-  // hubServer: 'http://localhost:8000',
+  hubServer: 'http://localhost:8000',
+  // hubServer: 'http://192.168.31.7:8000',
 
   //jupyter
   kubeBaseUrl: 'http://10.52.14.182:8888',  // kube master node ip
