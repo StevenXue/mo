@@ -23,7 +23,7 @@ module.exports = {
   kubeBaseUrl: 'http://10.52.14.182:8888',  // kube master node ip
   // baseUrl: 'http://10.52.14.182:8888',
   // baseUrl: 'http://122.224.116.44:9001',
-
+  //
   // assets
   assetsUrl: 'http://122.224.116.44:8008',
 
