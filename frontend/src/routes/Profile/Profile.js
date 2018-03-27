@@ -252,7 +252,7 @@ class MyFavouriteList extends Component {
         {this.state.pOrR === 'project' &&
         <div className={styles.favorList}>
           {this.state.objects.map(e =>
-            <Card noHovering={true} key={e._id} bordered={false}>
+            <Card noHovering={true} key={e._id} bordered={true}>
               <div>
                 <Row>
                   <div>
@@ -264,12 +264,12 @@ class MyFavouriteList extends Component {
                       <p className={styles.description}>{e.description}</p>
                     </div>
                     <div className={styles.footer}>
-                      <Icon type="user" className={styles.userIcon}/>
+                      <Icon type="user" className={styles.firstIcon}/>
                       <p>{e.user_ID} </p>
-                      <Icon type="tags" className={styles.tagsIcon}/>
+                      <Icon type="tags" className={styles.otherIcon}/>
                       <p>{e.tags}</p>
                       <Icon type="clock-circle-o"
-                            className={styles.tagsIcon}/>
+                            className={styles.otherIcon}/>
                       <p>{showTime(e.create_time)}</p>
                     </div>
                   </div>
@@ -283,7 +283,7 @@ class MyFavouriteList extends Component {
         </div>}
         {this.state.pOrR === 'request' && <div className={styles.requestList}>
           {this.state.objects.map(e =>
-            <Card noHovering={true} key={e._id} bordered={false}>
+            <Card noHovering={true} key={e._id} bordered={true}>
               <div>
                 <Row>
                   <Col span={3}>
@@ -310,9 +310,9 @@ class MyFavouriteList extends Component {
                          onClick={() => this.toUserRequestDetail(e._id, history)}>{e.title}</p>
                       {/*<p className={styles.description}>{e.description}</p>*/}
                       <div className={styles.footer}>
-                        <Icon type="user" className={styles.userIcon}/>
+                        <Icon type="user" className={styles.firstIcon}/>
                         <p>{e.user_ID} </p>
-                        <Icon type="tags" className={styles.tagsIcon}/>
+                        <Icon type="tags" className={styles.otherIcon}/>
                         {e['tags'].length > 0 &&
                         <p key={e}>{e['tags'].join(',')}</p>}
                         <Icon type="clock-circle-o"
@@ -430,7 +430,7 @@ class MyRequestList extends Component {
         </div>
         <div className={styles.requestList}>
           {this.state.requests.map(e =>
-            <Card noHovering={true} key={e._id} bordered={false}>
+            <Card noHovering={true} key={e._id} bordered={true}>
               <div>
                 <Row>
                   <Col span={3}>
@@ -458,11 +458,11 @@ class MyRequestList extends Component {
                          onClick={() => this.toUserRequestDetail(e._id, history)}>{e.title}</p>
                       {/*<p className={styles.description}>{e.description}</p>*/}
                       <div className={styles.footer}>
-                        <Icon type="tags" className={styles.tagsIcon}/>
+                        <Icon type="tags" className={styles.firstIcon}/>
                         {e['tags'].length > 0 &&
                         <p key={e}>{e['tags'].join(',')}</p>}
                         <Icon type="clock-circle-o"
-                              className={styles.clockIcon}/>
+                              className={styles.otherIcon}/>
                         <p>{showTime(e.create_time)}</p>
                       </div>
                     </div>
@@ -574,7 +574,7 @@ class MyAnswerList extends Component {
         </div>
         <div className={styles.requestList}>
           {this.state.requests.map(e =>
-            <Card noHovering={true} key={e._id} bordered={false}>
+            <Card noHovering={true} key={e._id} bordered={true}>
               <div>
                 <Row>
                   <Col span={21}>
@@ -584,7 +584,7 @@ class MyAnswerList extends Component {
                       <p className={styles.description}>{e.answer}</p>
                       <div className={styles.footer}>
                         <Icon type="clock-circle-o"
-                              className={styles.tagsIcon}/>
+                              className={styles.firstIcon}/>
                         <p>{showTime(e.create_time)}</p>
                       </div>
                     </div>
