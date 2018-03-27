@@ -2,11 +2,10 @@
 # <img src="./media/mo.png" width="200" height="150" />
 # MO <small>1.0</small>
 
-> A magical documentation site generator.
+> Open platform for rapid data exploration and modelling
 
-* Simple and lightweight (~12kb gzipped)
-* Multiple themes
-* Not build static html files
+* 全生态
+* 多角色
 
 [GitHub](https://github.com/momodel)
 [Get Started](#goldersgreen)

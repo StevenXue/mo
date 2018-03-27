@@ -1,5 +1,14 @@
+
 # goldersgreen
 Open platform for rapid data exploration and modelling
+
+## 关于平台
+平台中联结了人工智能应用使用者、需求提出者、数据提供者、关键模组开发者以及应用组装者，集合网页端和移动端，满足不同用户的使用场景，实现了需求提出 - 可复用算法模块开发 - 模块组装 - 应用发布使用的生态链。
+
+
+
+<!--
+这些是注释文本，不会显示
 
 # 开始
 	如何寻找可用的module/app/dataset
@@ -17,3 +26,6 @@ Open platform for rapid data exploration and modelling
 		dataset
 # 交流讨论
 	如何回答别人的问题
+
+-->
+
