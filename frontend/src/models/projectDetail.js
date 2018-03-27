@@ -241,7 +241,7 @@ export default {
     *star_favor(action, { call, put, select }) {
       let payload = action.payload
       const { data:{entity:project} } = yield call(UserStarFavorService.set_star_favor, payload)
-      console.log(project)
+      console.log('project',project)
       yield put({
         type: 'updateStarFavor',
         project,

@@ -118,7 +118,7 @@ class ProjectList extends Component {
 
   starFavor(action, id, type) {
     const user_obj_id = localStorage.getItem('user_obj_id')
-
+    console.log('action',action)
     function findById(element) {
       return element._id === id
     }
