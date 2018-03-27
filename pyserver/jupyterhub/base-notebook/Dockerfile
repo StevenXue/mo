@@ -11,6 +11,9 @@ LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
 
 USER root
 
+# Fix apt-get update network error
+RUN echo "nameserver 8.8.8.8" | tee /etc/resolv.conf > /dev/null
+
 # Install all OS dependencies for notebook server that starts but lacks all
 # features (e.g., download as all possible file formats)
 ENV DEBIAN_FRONTEND noninteractive
@@ -100,7 +103,13 @@ RUN fix-permissions $LOCAL_DIR && \
 ENV PATH=$PATH:$HOME/.local/bin
 # path in container
 RUN /bin/bash -c "export PATH=\$PATH:$HOME/.local/bin"
-RUN pipenv --python 3.6
+
+# Change pipenv index url
+COPY --chown=jovyan:users Pipfile $HOME/
+
+RUN pipenv install
+
+#RUN cat Pipfile
 
 #RUN pipenv install && pipenv shell
 # Install Jupyter Notebook and Hub
@@ -181,7 +190,6 @@ USER $NB_UID
 # Remove pyqt and qt pulled in for matplotlib since we're only ever going to
 # use notebook-friendly backends in these images
 RUN pipenv install \
-#    ' ' \
     'ipywidgets==7.1.*' \
     'pandas==0.19.*' \
     'numexpr==2.6.*' \
@@ -199,12 +207,11 @@ RUN pipenv install \
     'numba==0.31.*' \
     'bokeh==0.12.*' \
     'sqlalchemy==1.1.*' \
-#    'hdf5==1.8.17' \
     'h5py==2.6.*' \
     'vincent==0.4.*' \
     'beautifulsoup4==4.5.*' \
     'protobuf==3.*' \
-    'xlrd'
+    'xlrd==1.1.*'
     # Activate ipywidgets extension in the environment that runs the notebook server
 RUN pipenv run jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
     # Also activate ipywidgets extension for JupyterLab
@@ -239,13 +246,13 @@ USER $NB_UID
 # Install Tensorflow
 RUN pipenv install \
     'tensorflow==1.3.*' \
-    'keras==2.0.*' && \
+    'keras==2.0.*' && 
     fix-permissions $LOCAL_DIR && \
     fix-permissions /home/$NB_USER
 
 ### my notebook
 
-RUN pipenv update tensorflow==1.6.* keras==2.1.* notebook==5.4.*
+RUN pipenv install tensorflow==1.6.* keras==2.1.* notebook==5.4.*
 #RUN pipenv install jupyterlab==0.31.0
 #RUN pipenv run jupyter serverextension enable --py jupyterlab --sys-prefix
 

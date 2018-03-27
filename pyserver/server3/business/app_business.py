@@ -42,6 +42,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         # target path = new path
         func_path = os.path.join(cls.base_func_path, service_name)
         module_dir_path = os.path.join(func_path, 'modules')
+
         cls.copytree(app.path, func_path)
         # copy modules
         for module in modules:
@@ -53,7 +54,9 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
             except FileExistsError:
                 print('dir exists, no need to create')
             # copy module tree to target path
+            print(module_path, module_path_target)
             cls.copytree(module_path, module_path_target)
+        print('finish copy')
         # deploy
         call(['faas-cli', 'build', '-f', f'./{service_name}.yml'],
              cwd=cls.base_func_path)
@@ -120,7 +123,10 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         client = docker.from_env()
         # copy venv
         user_ID = module.user.user_ID
-        container = client.containers.get(f'jupyter-{user_ID}_2B{app.name}')
+        user_ID_c = user_ID.replace('_', '_5F')
+        app_name = app.name.replace('_', '_5F')
+        container = client.containers.\
+            get(f'jupyter-{user_ID_c}_2B{app_name}')
         print(container.exec_run(['/bin/bash', '/home/jovyan/add_venv.sh',
                                   f'{user_ID}/{module.name}']).decode('ascii'))
 

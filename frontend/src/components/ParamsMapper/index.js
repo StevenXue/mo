@@ -129,6 +129,7 @@ const formItems = (arg, i, getFieldDecorator, baseArg, setFieldsValue ) => {
   return <FormItem
     key={i}
     label={arg.display_name ? arg.display_name : arg.name}
+    help={`Need ${arg.value_type}`}
     {...formItemLayout}
   >
     <div className={styles.row}>
