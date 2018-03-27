@@ -68,9 +68,6 @@ function Profile({login, profile, dispatch, history}) {
             <Col span={3} style={{padding: '20px 0 0 20px'}}>
               <div className={styles.photoDiv}>
                 <img src={avatarList[picNumber]}  alt="avatar" />
-                {/*<p className={styles.photoP}>*/}
-                  {/*<Icon type="user" style={{fontSize: 100, color: '#08c',}}/>*/}
-                {/*</p>*/}
               </div>
             </Col>
             <Col span={21}>
