@@ -1,5 +1,5 @@
 
-[ref tutorial]('http://blog.xuite.net/zack_pan/blog/65273998-GIT+over+HTTP+%28GIT+HTTP+Transparent%29')
+[ref tutorial](http://blog.xuite.net/zack_pan/blog/65273998-GIT+over+HTTP+%28GIT+HTTP+Transparent%29)
 
 add apache config file `/etc/httpd/conf.d/git.conf`
 

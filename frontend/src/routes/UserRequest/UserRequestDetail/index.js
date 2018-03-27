@@ -30,6 +30,7 @@ class CommentForm extends React.Component {
   componentDidMount() {
     // To disabled submit button at the beginning.
     this.props.form.validateFields()
+    this.input.focus()
   }
 
   make_comment = (values) => {
@@ -90,7 +91,9 @@ class CommentForm extends React.Component {
             rules: [{ required: true, message: '' }],
           })(
             <Input className={styles.inputtext}
-                   placeholder="Any idea to help?"/>,
+                   placeholder="Any idea to help?"
+                   ref={inputRef => (this.input = inputRef)}
+            />,
           )}
         </FormItem>
         {/*<FormItem>*/}

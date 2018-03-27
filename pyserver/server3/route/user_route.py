@@ -54,10 +54,30 @@ def send_verification_code(phone):
                 "error": e.args[0]
             }
         }), 400
-    # if message_id:
-    #     return make_response(jsonify({
-    #         "response": message_id
-    #     }), 200)
+
+
+@user_app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    user_ID = data['user_ID']
+    password = data['password']
+    code = data.pop('code')
+    captcha = data.pop("captcha")
+    phone = data.pop('phone')
+    data.pop('user_ID')
+    data.pop('password')
+    if user_ID is None or password is None or code is None:
+        return jsonify({'response': 'invalid user or password'}), 400
+    try:
+        added_user = user_service.register(user_ID, password, phone, code, **data)
+        added_user = json_utility.convert_to_json(added_user.to_mongo())
+        added_user.pop('password')
+        return jsonify({'response': added_user}), 200
+    except Error as e:
+        print("e.args[0]", e.args[0])
+        return jsonify({
+            "response": {"error": e.args[0]}
+        }), 400
 
 
 # TODO 删掉 验证手机号和验证码是否匹配 (不存在单独验证，需要与相应动作关联）
@@ -103,34 +123,6 @@ def reset_password():
         })
 
 
-@user_app.route('/register', methods=['POST'])
-def register():
-    data = request.get_json()
-    user_ID = data['user_ID']
-    password = data['password']
-    code = data.pop('code')
-    captcha = data.pop("captcha")
-    phone = data.pop('phone')
-    data.pop('user_ID')
-    data.pop('password')
-    if user_ID is None or password is None or code is None:
-        return jsonify({'response': 'invalid user or password'}), 400
-    try:
-        added_user = user_service.register(user_ID, password, phone, code, **data)
-        added_user = json_utility.convert_to_json(added_user.to_mongo())
-        added_user.pop('password')
-        return jsonify({'response': added_user}), 200
-    except Error as e:
-        print("e.args[0]", e.args[0])
-        return jsonify({
-            "response": {"error": e.args[0]}
-        }), 400
-    # added_user = user_service.add(user_ID, password, **data)
-    # added_user = json_utility.convert_to_json(added_user.to_mongo())
-    # added_user.pop('password')
-    # return jsonify({'response': added_user}), 200
-
-
 # Provide a method to create access tokens. The create_access_token()
 # function is used to actually generate the token
 @user_app.route('/login', methods=['POST'])
@@ -161,15 +153,23 @@ def login_with_phone():
     """
     data = request.get_json()
     phone = data.pop("phone")
-    message_id = data.pop("message_id")
+    # message_id = data.pop("message_id")
     code = data.pop("code")
-    result = user_service.verify_code(code=code, message_id=message_id)
-    if result:
-        user = user_business.get_by_phone(phone=phone)
-        response = {'response': {
-            'token': create_access_token(identity=user),
-            'user': json_utility.convert_to_json(user.to_mongo())}}
-        return jsonify(response), 200
+    try:
+        result = user_service.verify_code(code=code, phone=phone)
+        if result:
+            user = user_business.get_by_phone(phone=phone)
+            response = {'response': {
+                'token': create_access_token(identity=user),
+                'user': json_utility.convert_to_json(user.to_mongo())}}
+            return jsonify(response), 200
+    except Error as e:
+        print("e.args[0]", e.args[0])
+        return jsonify({
+            "response": {
+                "error": e.args[0]
+            }
+        }), 400
 
 
 # @user_app.route('/favor_api', methods=['PUT'])
@@ -262,7 +262,7 @@ def get_action_entity():
     search_query = request.args.get('search_query', None)
     apps = UserBusiness.get_action_entity(
         user_ID=user_ID, action_entity=action_entity, type=type,
-        page_no=page_no, page_size=page_size,search_query=search_query)
+        page_no=page_no, page_size=page_size, search_query=search_query)
     if action_entity != 'request_star':
         for app in apps.objects:
             app.user_ID = app.user.user_ID
@@ -327,6 +327,7 @@ def get_statistics():
             "count": statistics.count,
         }
     })
+
 # @user_app.route('/favor_app/<app_id>', methods=['PUT'])
 # @jwt_required
 # def favor_app(app_id):

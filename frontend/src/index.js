@@ -12,10 +12,10 @@ require('es6-promise/auto')
 
 // 1. Initialize
 const app = dva({
-  onError(e) {
-    // e.preventDefault();
-    // console.log(e)
-  }
+  // onError(e) {
+  //   e.preventDefault();
+  //   console.log(e)
+  // }
 })
 
 app.model(require('./models/dataAnalysis'))
