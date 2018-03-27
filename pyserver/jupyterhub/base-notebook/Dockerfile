@@ -105,7 +105,7 @@ ENV PATH=$PATH:$HOME/.local/bin
 RUN /bin/bash -c "export PATH=\$PATH:$HOME/.local/bin"
 RUN pipenv --python 3.6
 
-ADD Pipfile .
+ENV PIP_INDEX_URL=https://mirrors.ustc.edu.cn/pypi/web/simple
 
 #RUN pipenv install && pipenv shell
 # Install Jupyter Notebook and Hub
