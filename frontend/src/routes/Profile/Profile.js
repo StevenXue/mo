@@ -16,6 +16,15 @@ const TabPane = Tabs.TabPane
 const {Meta} = Card
 const Search = Input.Search
 
+import avatar1 from '../../img/avatar/1.png'
+import avatar2 from '../../img/avatar/2.png'
+import avatar3 from '../../img/avatar/3.png'
+import avatar4 from '../../img/avatar/4.png'
+import avatar5 from '../../img/avatar/5.png'
+import avatar6 from '../../img/avatar/6.png'
+
+const avatarList =[avatar1,avatar2,avatar3,avatar4,avatar5,avatar6]
+
 import styles from './index.less'
 import {fetchAllUserRequest} from "../../services/userRequest"
 import {get_star_favor} from "../../services/user"
@@ -51,15 +60,17 @@ function Profile({login, profile, dispatch, history}) {
   if (profile.userInfo) {
     const {age, email, name, phone, user_ID} = profile.userInfo
     const {projectNumber} = profile
+    const picNumber = parseInt(profile.userInfo._id.slice(20))%6
     return (
       <div className={`main-container ${styles.container}`}>
         <div className={styles.headerRow}>
           <Row>
-            <Col span={3} style={{padding: '0 0 0 50px'}}>
+            <Col span={3} style={{padding: '20px 0 0 20px'}}>
               <div className={styles.photoDiv}>
-                <p className={styles.photoP}>
-                  <Icon type="user" style={{fontSize: 100, color: '#08c',}}/>
-                </p>
+                <img src={avatarList[picNumber]}  alt="avatar" />
+                {/*<p className={styles.photoP}>*/}
+                  {/*<Icon type="user" style={{fontSize: 100, color: '#08c',}}/>*/}
+                {/*</p>*/}
               </div>
             </Col>
             <Col span={21}>

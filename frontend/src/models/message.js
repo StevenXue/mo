@@ -56,6 +56,12 @@ export default {
           payload: {messages: arrayToJson(messages, 'receiver_id')}
         })
       }
+      else{
+        yield put({
+          type: 'setMessage',
+          payload: {messages: []}
+        })
+      }
     },
 
     * readMessage(action, {call, put, select}) {

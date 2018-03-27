@@ -42,6 +42,7 @@ def create_message():
 def get_message():
     user_ID = get_jwt_identity()
     # user_id = request.args.get("user_obj_id")
+    print(user_ID)
     messages = message_service.get_by_user_ID(user_ID)
     return jsonify({'response': messages}), 200
 
