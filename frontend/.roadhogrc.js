@@ -4,6 +4,8 @@ const path = require('path')
 const re = /.+\.css$/
 const paths = require('./paths')
 
+import { flaskServer, hubServer } from './src/constants'
+
 const walkSync = (dir) =>
   fs.readdirSync(dir)
     .reduce((files, file) =>
@@ -37,17 +39,12 @@ export default {
   ],
   'proxy': {
     '/pyapi': {
-      'target': 'http://localhost:5005/',
+      'target': flaskServer,
       'changeOrigin': true,
       'pathRewrite': { '^/pyapi': '' },
     },
-    // '/hub_api/**/*.png': {
-    //   'target': 'http://localhost:5000/',
-    //   'changeOrigin': true,
-    //   'pathRewrite': { '^/hub_api': 'hub_png' },
-    // },
     '/hub_api': {
-      'target': 'http://localhost:8000/',
+      'target': hubServer,
       'changeOrigin': true,
       'ws': true,
       'pathRewrite': { '^/hub_api': '' },

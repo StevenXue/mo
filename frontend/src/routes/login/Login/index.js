@@ -70,7 +70,7 @@ class Login extends Component {
   handleSubmit = (e) => {
     e.preventDefault()
     const {type} = this.state
-    this.props.form.validateFields({},
+    this.props.form.validateFields(['user_ID', 'password'], {},
       (err, values) => {
         console.log('values', values)
         console.log('err', err)
@@ -88,7 +88,7 @@ class Login extends Component {
     console.log("handleLoginWithPhone")
     e.preventDefault()
     const {type} = this.state
-    this.props.form.validateFields({force: true},
+    this.props.form.validateFields(['phone', 'captcha'], {force: true},
       (err, values) => {
         console.log('values', values)
         if (!err) {
@@ -177,76 +177,76 @@ class Login extends Component {
 
           <TabPane tab="手机号登陆" key="2">
 
-            {/*<Form onSubmit={this.handleLoginWithPhone}>*/}
+            <Form onSubmit={this.handleLoginWithPhone}>
 
-              {/*{*/}
-                {/*login.status === 'error' &&*/}
-                {/*login.type === 'account' &&*/}
-                {/*login.submitting === false &&*/}
-                {/*this.renderMessage('Invalid phone and code!')*/}
-              {/*}*/}
+              {
+                login.status === 'error' &&
+                login.type === 'account' &&
+                login.submitting === false &&
+                this.renderMessage('Invalid phone and code!')
+              }
 
-              {/*<FormItem>*/}
-                {/*<InputGroup size="large" className={styles.mobileGroup} compact>*/}
-                  {/*<FormItem style={{ width: '20%' }}>*/}
-                    {/*Mobile*/}
-                    {/*{getFieldDecorator('prefix', {*/}
-                      {/*initialValue: '86',*/}
-                    {/*})(*/}
-                      {/*<Select size="large">*/}
-                        {/*<Option value="86">+86</Option>*/}
-                      {/*</Select>*/}
-                    {/*)}*/}
-                  {/*</FormItem>*/}
-                  {/*<FormItem style={{ width: '80%' }}>*/}
-                    {/*&nbsp;*/}
-                    {/*{getFieldDecorator('phone', {*/}
-                      {/*rules: [{*/}
-                        {/*required: true, message: 'Please enter your mobile number!',*/}
-                      {/*}, {*/}
-                        {/*pattern: /^1\d{10}$/, message: 'Mobile number type error!',*/}
-                      {/*}],*/}
-                    {/*})(*/}
-                      {/*<Input placeholder="11 digits mobile number" />*/}
-                    {/*)}*/}
-                  {/*</FormItem>*/}
-                {/*</InputGroup>*/}
-              {/*</FormItem>*/}
-              {/*<FormItem>*/}
-                {/*<Row gutter={8}>*/}
-                  {/*<Col span={16}>*/}
-                    {/*{getFieldDecorator('captcha', {*/}
-                      {/*rules: [{*/}
-                        {/*required: true, message: '请输入验证码！',*/}
-                      {/*}],*/}
-                    {/*})(*/}
-                      {/*<Input*/}
-                        {/*size="large"*/}
-                        {/*placeholder="验证码"*/}
-                      {/*/>*/}
-                    {/*)}*/}
-                  {/*</Col>*/}
-                  {/*<Col span={8}>*/}
-                    {/*<Button*/}
-                      {/*size="large"*/}
-                      {/*disabled={count}*/}
-                      {/*className={styles.getCaptcha}*/}
-                      {/*onClick={this.onGetCaptcha}*/}
-                    {/*>*/}
-                      {/*{count ? `${count} s` : '获取验证码'}*/}
-                    {/*</Button>*/}
-                  {/*</Col>*/}
-                {/*</Row>*/}
-              {/*</FormItem>*/}
+              <FormItem>
+                <InputGroup size="large" className={styles.mobileGroup} compact>
+                  <FormItem style={{ width: '20%' }}>
+                    Mobile
+                    {getFieldDecorator('prefix', {
+                      initialValue: '86',
+                    })(
+                      <Select size="large">
+                        <Option value="86">+86</Option>
+                      </Select>
+                    )}
+                  </FormItem>
+                  <FormItem style={{ width: '80%' }}>
+                    &nbsp;
+                    {getFieldDecorator('phone', {
+                      rules: [{
+                        required: true, message: 'Please enter your mobile number!',
+                      }, {
+                        pattern: /^1\d{10}$/, message: 'Mobile number type error!',
+                      }],
+                    })(
+                      <Input placeholder="11 digits mobile number" />
+                    )}
+                  </FormItem>
+                </InputGroup>
+              </FormItem>
+              <FormItem>
+                <Row gutter={8}>
+                  <Col span={16}>
+                    {getFieldDecorator('captcha', {
+                      rules: [{
+                        required: true, message: '请输入验证码！',
+                      }],
+                    })(
+                      <Input
+                        size="large"
+                        placeholder="验证码"
+                      />
+                    )}
+                  </Col>
+                  <Col span={8}>
+                    <Button
+                      size="large"
+                      disabled={count}
+                      className={styles.getCaptcha}
+                      onClick={this.onGetCaptcha}
+                    >
+                      {count ? `${count} s` : '获取验证码'}
+                    </Button>
+                  </Col>
+                </Row>
+              </FormItem>
 
-              {/*<FormItem className={styles.additional} style={{marginTop: 20}}>*/}
-                {/*<Button size="large" loading={login.submitting} className={styles.submit} type="primary"*/}
-                        {/*htmlType="submit">*/}
-                  {/*Login*/}
-                {/*</Button>*/}
-              {/*</FormItem>*/}
+              <FormItem className={styles.additional} style={{marginTop: 20}}>
+                <Button size="large" loading={login.submitting} className={styles.submit} type="primary"
+                        htmlType="submit">
+                  Login
+                </Button>
+              </FormItem>
 
-            {/*</Form>*/}
+            </Form>
           </TabPane>
 
 

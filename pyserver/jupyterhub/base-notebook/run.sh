@@ -10,6 +10,6 @@ source /usr/local/bin/virtualenvwrapper.sh
 #lsvirtualenv
 #mktmpenv
 #toggleglobalsitepackages
-pipenv run tensorboard --logdir=$WORK/logs &
-pipenv run jupyter labhub --NotebookApp.allow_origin=* --NotebookApp.token=''
+pipenv run tensorboard --logdir=$WORK/logs --host=0.0.0.0 &
+pipenv run jupyter labhub --ip=0.0.0.0 --NotebookApp.allow_origin=* --NotebookApp.token=''
 #python3 -m http.server 8888
