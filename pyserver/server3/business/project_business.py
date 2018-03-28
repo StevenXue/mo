@@ -229,9 +229,16 @@ class ProjectBusiness:
 
     @staticmethod
     def clone(user_ID, name, project_path):
-        return Repo.clone_from(
+        repo = Repo.clone_from(
             f'{GIT_LOCAL}/var/www/user_repos/{user_ID}/{name}',
             project_path)
+        for root, dirs, files in os.walk(project_path):
+            os.chmod(root, 0o777)
+            for d in dirs:
+                os.chmod(os.path.join(root, d), 777)
+            for f in files:
+                os.chmod(os.path.join(root, f), 777)
+        return repo
 
     @classmethod
     def create_project(cls, name, description, user, privacy='private',
