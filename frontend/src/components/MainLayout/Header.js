@@ -183,7 +183,7 @@ function Header({location, login, history, dispatch, allRequest,message}) {
           title={
             <span onClick={toLoginPage}>
                 <Badge count={login.user ? numberOfUnreadMessage() : 0}>
-                <Icon type="message"/>
+                <Icon style={{color:'white'}} type="message"/>
                 </Badge>
               </span>
           }
