@@ -95,20 +95,92 @@ class GDValidation(unittest.TestCase):
                     yaml_input_predict,
                     msg="[input/predict] section missing in module_spec.yml")
 
-            required_predict_items = ["name", "value_type", "range", "type"]
+            required_predict_items = {"value_name": "name",
+                                      "value_type": "value_type",
+                                      "default_value": "default"}
+            predict_feed = {}
             for k, v in yaml_input_predict.items():
-                for item in required_predict_items:
-                    with self.subTest(name="[input:predict:{}]".format(k)):
-                        self.assertIsNotNone(
-                            v.get(item, None),
-                            msg="[{}/{}] missing in module_spec.yml".format(
-                                k, item))
+
+                with self.subTest(name="[input:predict:{}]".format(k)):
+                    name = v.get(required_predict_items["value_name"], None)
+                    self.assertIsNotNone(
+                        name,
+                        msg="[{}/name] missing in module_spec.yml".format(
+                                k, name))
+
+                with self.subTest(name="[input:predict:{}]".format(k)):
+                    value_type = v.get(required_predict_items["value_type"], None)
+                    self.assertIsNotNone(
+                        value_type,
+                        msg="[{}/value_type] missing in module_spec.yml".format(
+                            k, value_type))
+
+                with self.subTest(name="[input:predict:{}]".format(k)):
+                    default_value = v.get(required_predict_items["default_value"], None)
+                    self.assertIsNotNone(
+                        default_value,
+                        msg="[{}/default] missing in module_spec.yml".format(
+                            k, default_value))
+
+                # print("default_value", default_value)
+                with self.subTest(name="[input:predict:{}] - Type Checking".format(k)):
+
+                    self.assertTrue(
+                        self.check_value_type(value_type, default_value),
+                        msg="[{}/default] value is not match "
+                            "with [{}/value_type]".format(k, k))
+
+
+
+
+            # Check predict
+            print("predict_feed", predict_feed)
 
             # Check [output] section
             with self.subTest(name="[output] section"):
                 self.assertIsNotNone(
                     GDValidation.MODULE_YAML_OBJ.get("output"),
                     msg="[output] section missing in module_spec.yml")
+
+        pass
+
+    # @staticmethod
+    def check_int(self, value):
+        return type(value) is int
+
+    def check_float(self, value):
+        return type(value) is float
+
+    def check_str(self, value):
+        return type(value) is str
+
+    def check_datetime(self, value):
+        from datetime import datetime
+        return type(value) is datetime
+
+    def chcek_img(self, value):
+        return True
+
+    def chcek_img(self, value):
+        return True
+
+    def check_value_type(self, value_type, default_value):
+        # available Types: int, str, float, img, datetime, [int], [str], [float]
+        check_fucns = {
+            "int": self.check_int(default_value),
+            "float": self.check_float(default_value),
+            "str": self.check_str(default_value),
+            "datetime": self.check_datetime(default_value),
+            "[int]": self,
+            "[str]": self,
+            "[float]": self
+        }
+
+        try:
+            return check_fucns[value_type]
+        except Exception as e:
+            self.fail(msg="[value_type] is not valid")
+
 
 
     @classmethod
