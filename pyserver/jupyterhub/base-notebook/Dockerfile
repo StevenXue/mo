@@ -252,6 +252,11 @@ RUN pipenv install \
 
 ### my notebook
 
+USER root
+RUN apt-get update && apt-get install -yq python-opencv
+
+USER $NB_UID
+
 RUN pipenv install tensorflow==1.6.* keras==2.1.* notebook==5.4.*
 #RUN pipenv install jupyterlab==0.31.0
 #RUN pipenv run jupyter serverextension enable --py jupyterlab --sys-prefix

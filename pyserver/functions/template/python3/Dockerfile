@@ -11,6 +11,7 @@ RUN apk --no-cache add curl \
 RUN echo "http://dl-8.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories
 #RUN apk --no-cache --update-cache add gcc gfortran build-base wget freetype-dev libpng-dev openblas-dev
 RUN apk update && apk upgrade && apk add --no-cache alpine-sdk gcc gfortran python python-dev py-pip build-base wget freetype-dev libpng-dev openblas-dev
+RUN apk update && apk upgrade && apk add --no-cache jpeg-dev
 #RUN apk add --no-cache --update python-dev gfortran py-pip build-base
 RUN ln -s /usr/include/locale.h /usr/include/xlocale.h
 
@@ -22,7 +23,7 @@ RUN ln -s /usr/include/locale.h /usr/include/xlocale.h
 WORKDIR /root/
 
 COPY requirements.txt   .
-RUN pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/
+RUN pip install --no-cache-dir -r requirements.txt -i https://mirrors.ustc.edu.cn/pypi/web/simple
 COPY index.py           .
 
 
@@ -32,7 +33,7 @@ RUN touch ./function/__init__.py
 
 WORKDIR /root/function/
 COPY function/requirements.txt	.
-RUN pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/
+RUN pip install --no-cache-dir -r requirements.txt -i https://mirrors.ustc.edu.cn/pypi/web/simple
 
 WORKDIR /root/
 

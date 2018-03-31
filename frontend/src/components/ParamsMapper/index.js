@@ -1,7 +1,7 @@
 import React from 'react'
-import {Form, Button, Select, Input, Tooltip, Icon, Upload, Modal} from 'antd'
+import { Form, Button, Select, Input, Tooltip, Icon, Upload, Modal } from 'antd'
 import styles from './index.less'
-import {runApi} from '../../services/app'
+import { runApi } from '../../services/app'
 // import reqwest from 'reqwest'
 
 const FormItem = Form.Item
@@ -32,41 +32,47 @@ const parse = (e, valueType) => {
   }
 }
 
-const typeParser = (type, valueType) => {
-  const typeDict = {
-    int: 'integer',
-    float: 'number',
-    str: 'string',
-    bool: 'boolean',
-  }
+const typeParser = (valueType) => {
 
-  switch (type) {
-    case 'multiple_input':
+  switch (valueType) {
+    case '[int]':
+    case '[str]':
+    case '[float]':
       return 'array'
-    case 'multiple_choice':
-      return 'array'
-    case 'input':
-      return typeDict[valueType]
+    case 'str':
+      return 'string'
+    case 'int':
+      return 'integer'
+    case 'float':
+      return 'float'
     default:
       return 'string'
   }
 }
 
-const splitHandler = (e, type, valueType) => {
-  switch (type) {
-    case 'multiple_input':
+const splitHandler = (e, valueType, valueRange) => {
+  if (Array.isArray(valueRange)) {
+    // choice or multiple_choice
+    return e
+  } // others are input or upload
+  switch (valueType) {
+    case '[int]':
+    case '[str]':
+    case '[float]':
       const splitValue = e.target.value.split(',')
       // FIXME
       if (splitValue.includes('')) {
         return e.target.value
       } else {
         try {
-          return splitValue.map(e => parse(e, valueType))
+          return splitValue.map(e => parse(e, valueType.replace('[', '').replace(']', '')))
         } catch (err) {
           return e.target.value
         }
       }
-    case 'input':
+    case 'str':
+    case 'int':
+    case 'float':
       try {
         return parse(e.target.value, valueType)
       } catch (err) {
@@ -79,39 +85,44 @@ const splitHandler = (e, type, valueType) => {
   }
 }
 
-const switchComponent = (arg, baseArg, setFieldsValue ) => {
-  switch (arg.type) {
-    case 'multiple_input':
-    case 'input':
+const switchComponent = (arg, baseArg, setFieldsValue) => {
+  switch (arg.value_type) {
+    case '[int]':
+    case '[str]':
+    case '[float]':
+      if (Array.isArray(arg.value_range)) {
+        return (
+          <Select style={{ width: 142 }} mode='multiple'>
+            {
+              arg.value_range.map((option) =>
+                <Select.Option value={option}
+                               key={option}>{option}</Select.Option>,
+              )
+            }
+          </Select>
+        )
+      }
+      return <Input/>
+    case 'str':
+    case 'int':
+    case 'float':
+      if (Array.isArray(arg.value_range)) {
+        return (
+          <Select style={{ width: 142 }}>
+            {
+              arg.value_range.map((option) =>
+                <Select.Option value={option}
+                               key={option}>{option}</Select.Option>,
+              )
+            }
+          </Select>
+        )
+      }
       return <Input/>
 
-    case 'choice':
+    case 'img':
       return (
-        <Select style={{width: 142}}>
-          {
-            arg.range.map((option) =>
-              <Select.Option value={option}
-                             key={option}>{option}</Select.Option>,
-            )
-          }
-        </Select>
-      )
-
-    case 'multiple_choice':
-      return (
-        <Select style={{width: 142}} mode='multiple'>
-          {
-            arg.range.map((option) =>
-              <Select.Option value={option}
-                             key={option}>{option}</Select.Option>,
-            )
-          }
-        </Select>
-      )
-
-    case 'upload':
-      return (
-        <Demo setFieldsValue={setFieldsValue} key1={arg.name}/>
+        <Demo setFieldsValue={setFieldsValue} keyName={arg.name}/>
       )
 
     default:
@@ -119,8 +130,57 @@ const switchComponent = (arg, baseArg, setFieldsValue ) => {
   }
 }
 
-const formItems = (arg, i, getFieldDecorator, baseArg, setFieldsValue ) => {
-  console.log('arg',arg)
+const validator = (type, range) => {
+  if (!range || Array.isArray(range)) {
+    return {}
+  }
+  let l, h
+  if (range.includes('-')) {
+    [l, h] = range.split('-').map(e=> parseFloat(e.replace(/\s/g,'')))
+  } else if (range.includes('>=')) {
+    l = range.split('>=').map(e=> parseFloat(e.replace(/\s/g,''))).slice(-1)[0]
+  } else if (range.includes('<=')) {
+    h = range.split('>=').map(e=> parseFloat(e.replace(/\s/g,''))).slice(-1)[0]
+  }
+  switch (type) {
+    case '[int]':
+    case '[str]':
+    case '[float]':
+      return {
+        validator: (rule, value, callback) => {
+          console.log(111, rule, value)
+          if (Array.isArray(value) && value.every(e => (!h || e <= h) && (!l || e >= l))) {
+            callback()
+          } else {
+            callback('range error')
+          }
+        },
+      }
+
+    case 'str':
+    case 'int':
+    case 'float':
+      return {
+        validator: (rule, value, callback) => {
+          console.log(111, rule, value)
+          if ((!h || value <= h) && (!l || value >= l)) {
+            callback()
+          } else {
+            callback('range error')
+          }
+        },
+      }
+
+    case 'img':
+      return {}
+
+    default:
+      return {}
+  }
+}
+
+const formItems = (arg, i, getFieldDecorator, baseArg, setFieldsValue) => {
+  console.log('arg', arg)
   let v
   if (arg.value || (arg.values && arg.values.length > 0)) {
     v = arg.value || arg.values
@@ -129,22 +189,23 @@ const formItems = (arg, i, getFieldDecorator, baseArg, setFieldsValue ) => {
   return <FormItem
     key={i}
     label={arg.display_name ? arg.display_name : arg.name}
-    help={`Need ${arg.value_type}`}
+    help={`need ${arg.value_type || ''}` + (arg.value_range ? ` in range ${arg.value_range}` : '')}
     {...formItemLayout}
   >
     <div className={styles.row}>
       {
         getFieldDecorator(arg.name, {
           initialValue: v || arg.default,
-          getValueFromEvent: (value) => splitHandler(value, arg.type, arg.value_type),
+          getValueFromEvent: (value) => splitHandler(value, arg.value_type, arg.value_range),
           rules: [
             {
-              required: arg.required,
-              message: `need ${arg.value_type || ''} ${arg.type}`,
-              type: typeParser(arg.type, arg.value_type),
+              required: !arg.optional,
+              // message: `need ${arg.value_type || ''}` + (arg.value_range ? ` in range ${arg.value_range}` : ''),
+              type: typeParser(arg.value_type),
+              ...validator(arg.value_type, arg.value_range),
             },
           ],
-        })(switchComponent(arg, baseArg, setFieldsValue ))
+        })(switchComponent(arg, baseArg, setFieldsValue))
       }
       <div className={styles.help}>
         <Tooltip title={baseArg.des}>
@@ -159,26 +220,24 @@ const handleSubmit = (e, validateFieldsAndScroll, appId, dispatch) => {
 
   e.preventDefault()
   validateFieldsAndScroll((err, values) => {
-    console.log('llllllll',values)
     if (!err) {
       console.log('Received values of form: ', values)
-      let payload = {'app': {'input': values}}
+      let payload = { 'app': { 'input': values } }
       payload['app_id'] = appId
-      dispatch({type: 'projectDetail/get_example_result', payload: payload})
+      dispatch({ type: 'projectDetail/get_example_result', payload: payload })
     }
   })
 }
 const formItemLayout = {
   labelCol: {
-    xs: {span: 24},
-    sm: {span: 6},
+    xs: { span: 24 },
+    sm: { span: 6 },
   },
   wrapperCol: {
-    xs: {span: 24},
-    sm: {span: 14},
+    xs: { span: 24 },
+    sm: { span: 14 },
   },
 }
-
 
 function getBase64(img, callback) {
   const reader = new FileReader()
@@ -193,7 +252,7 @@ class Demo extends React.Component {
     fileList: [],
   }
 
-  handleCancel = () => this.setState({previewVisible: false})
+  handleCancel = () => this.setState({ previewVisible: false })
 
   handlePreview = (file) => {
     this.setState({
@@ -202,15 +261,15 @@ class Demo extends React.Component {
     })
   }
 
-  handleChange = ({fileList}) => {
+  handleChange = ({ fileList }) => {
     let thisFile = fileList[0]
     getBase64(thisFile, imageUrl => {
-      let newList = [{originFileObj: thisFile,thumbUrl: imageUrl,uid:thisFile.uid}]
+      let newList = [{ originFileObj: thisFile, thumbUrl: imageUrl, uid: thisFile.uid }]
       this.setState({
-        fileList:newList,
+        fileList: newList,
         loading: false,
       })
-      this.props.setFieldsValue({[this.props.key1]:newList[0].thumbUrl})
+      this.props.setFieldsValue({ [this.props.keyName]: newList[0].thumbUrl })
     })
   }
 
@@ -224,7 +283,7 @@ class Demo extends React.Component {
     )
     const props = {
       onRemove: (file) => {
-        this.setState(({fileList}) => {
+        this.setState(({ fileList }) => {
           const index = fileList.indexOf(file)
           const newFileList = fileList.slice()
           newFileList.splice(index, 1)
@@ -258,7 +317,7 @@ class Demo extends React.Component {
           >
             <img
               alt="example"
-              style={{width: '100%'}}
+              style={{ width: '100%' }}
               src={this.state.previewImage}
             />
           </Modal>
@@ -268,10 +327,9 @@ class Demo extends React.Component {
   }
 }
 
-
 function ParamsMapper({
                         args, layerIndex, baseArgs, appId, dispatch,
-                        form: {getFieldDecorator, validateFieldsAndScroll, setFieldsValue },
+                        form: { getFieldDecorator, validateFieldsAndScroll, setFieldsValue },
                       }) {
 
   return (
@@ -281,10 +339,10 @@ function ParamsMapper({
     >
       {
         args.map((arg, i) => {
-          return formItems(arg, i, getFieldDecorator, baseArgs[i], setFieldsValue )
+          return formItems(arg, i, getFieldDecorator, baseArgs[i], setFieldsValue)
         })
       }
-      <FormItem wrapperCol={{span: 12, offset: 11}}>
+      <FormItem wrapperCol={{ span: 12, offset: 11 }}>
         <Button
           type="primary" htmlType="submit">Submit</Button>
       </FormItem>
@@ -292,11 +350,11 @@ function ParamsMapper({
   )
 }
 
-const handleValuesChange = ({setValue}, values) => {
+const handleValuesChange = ({ setValue }, values) => {
   setValue(values)
 }
 
-export default Form.create({onValuesChange: (props, values) => handleValuesChange(props, values)})(ParamsMapper)
+export default Form.create({ onValuesChange: (props, values) => handleValuesChange(props, values) })(ParamsMapper)
 export {
   formItems,
 }

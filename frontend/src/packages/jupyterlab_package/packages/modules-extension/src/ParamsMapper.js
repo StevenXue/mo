@@ -31,41 +31,46 @@ const parse = (e, valueType) => {
   }
 }
 
-const typeParser = (type, valueType) => {
-  const typeDict = {
-    int: 'integer',
-    float: 'number',
-    str: 'string',
-    bool: 'boolean',
-  }
-
-  switch (type) {
-    case 'multiple_input':
+const typeParser = (valueType) => {
+  switch (valueType) {
+    case '[int]':
+    case '[str]':
+    case '[float]':
       return 'array'
-    case 'multiple_choice':
-      return 'array'
-    case 'input':
-      return typeDict[valueType]
+    case 'str':
+      return 'string'
+    case 'int':
+      return 'integer'
+    case 'float':
+      return 'float'
     default:
       return 'string'
   }
 }
 
-const splitHandler = (e, type, valueType) => {
-  switch (type) {
-    case 'multiple_input':
+const splitHandler = (e, valueType, valueRange) => {
+  if (Array.isArray(valueRange)) {
+    // choice or multiple_choice
+    return e
+  } // others are input or upload
+  switch (valueType) {
+    case '[int]':
+    case '[str]':
+    case '[float]':
       const splitValue = e.target.value.split(',')
       // FIXME
       if (splitValue.includes('')) {
         return e.target.value
       } else {
         try {
-          return splitValue.map(e => parse(e, valueType))
+          return splitValue.map(e => parse(e, valueType.replace('[', '').replace(']', '')))
         } catch (err) {
           return e.target.value
         }
       }
-    case 'input':
+    case 'str':
+    case 'int':
+    case 'float':
       try {
         return parse(e.target.value, valueType)
       } catch (err) {
@@ -79,58 +84,122 @@ const splitHandler = (e, type, valueType) => {
 }
 
 const switchComponent = (arg, baseArg) => {
-  switch (arg.type) {
-    case 'multiple_input':
-    case 'input':
-      return <Input  />
+  switch (arg.value_type) {
+    case '[int]':
+    case '[str]':
+    case '[float]':
+      if (Array.isArray(arg.value_range)) {
+        return (
+          <Select style={{ width: 142 }} mode='multiple'>
+            {
+              arg.value_range.map((option) =>
+                <Select.Option value={option}
+                               key={option}>{option}</Select.Option>,
+              )
+            }
+          </Select>
+        )
+      }
+      return <Input/>
+    case 'str':
+    case 'int':
+    case 'float':
+      if (Array.isArray(arg.value_range)) {
+        return (
+          <Select style={{ width: 142 }}>
+            {
+              arg.value_range.map((option) =>
+                <Select.Option value={option}
+                               key={option}>{option}</Select.Option>,
+              )
+            }
+          </Select>
+        )
+      }
+      return <Input/>
 
-    case 'choice':
+    case 'img':
       return (
-        <Select style={{ width: 142 }}>
-          {
-            arg.range.map((option) =>
-              <Select.Option value={option} key={option}>{option}</Select.Option>,
-            )
-          }
-        </Select>
+        <Demo setFieldsValue={setFieldsValue} keyName={arg.name}/>
       )
 
-    case 'multiple_choice':
-      return (
-        <Select style={{ width: 142 }} mode='multiple'>
-          {
-            arg.range.map((option) =>
-              <Select.Option value={option} key={option}>{option}</Select.Option>,
-            )
-          }
-        </Select>
-      )
     default:
       return <Input/>
   }
 }
 
-const formItems = (arg, i, getFieldDecorator, baseArg) => {
+const validator = (type, range) => {
+  if (!range || Array.isArray(range)) {
+    return {}
+  }
+  let l, h
+  if (range.includes('-')) {
+    [l, h] = range.split('-').map(e => parseFloat(e.replace(/\s/g, '')))
+  } else if (range.includes('>=')) {
+    l = range.split('>=').map(e => parseFloat(e.replace(/\s/g, ''))).slice(-1)[0]
+  } else if (range.includes('<=')) {
+    h = range.split('>=').map(e => parseFloat(e.replace(/\s/g, ''))).slice(-1)[0]
+  }
+  switch (type) {
+    case '[int]':
+    case '[str]':
+    case '[float]':
+      return {
+        validator: (rule, value, callback) => {
+          console.log(111, rule, value)
+          if (Array.isArray(value) && value.every(e => (!h || e <= h) && (!l || e >= l))) {
+            callback()
+          } else {
+            callback('range error')
+          }
+        },
+      }
 
+    case 'str':
+    case 'int':
+    case 'float':
+      return {
+        validator: (rule, value, callback) => {
+          console.log(111, rule, value)
+          if ((!h || value <= h) && (!l || value >= l)) {
+            callback()
+          } else {
+            callback('range error')
+          }
+        },
+      }
+
+    case 'img':
+      return {}
+
+    default:
+      return {}
+  }
+}
+
+const formItems = (arg, i, getFieldDecorator, baseArg, setFieldsValue) => {
+  console.log('arg', arg)
   let v
   if (arg.value || (arg.values && arg.values.length > 0)) {
     v = arg.value || arg.values
   }
 
   return <FormItem
-    key={arg.name}
-    label={arg.name}
-    help={`Need ${arg.value_type}`}
+    key={arg.display_name ? arg.display_name : arg.name}
+    label={arg.display_name ? arg.display_name : arg.name}
+    help={`need ${arg.value_type || ''}` + (arg.value_range ? ` in range ${arg.value_range}` : '')}
   >
     <div className='parameter-row'>
       {
         getFieldDecorator(arg.name, {
           initialValue: v || arg.default,
-          getValueFromEvent: (value) => splitHandler(value, arg.type, arg.value_type),
+          getValueFromEvent: (value) => splitHandler(value, arg.value_type, arg.value_range),
           rules: [
             {
-              required: arg.required, message: `need ${arg.value_type || ''} ${arg.type}`,
-              type: typeParser(arg.type, arg.value_type),
+              required: !arg.optional,
+              // message: `need ${arg.value_type || ''}` + (arg.value_range ? ` in range ${arg.value_range}` : ''),
+              type: typeParser(arg.value_type),
+              ...validator(arg.value_type, arg.value_range),
             },
           ],
         })(switchComponent(arg, baseArg))
