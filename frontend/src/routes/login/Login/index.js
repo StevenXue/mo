@@ -122,7 +122,7 @@ class Login extends Component {
     return (
       <div className={styles.main}>
         <Tabs defaultActiveKey="1">
-          <TabPane tab="账号登录" key="1">
+          <TabPane tab="Account" key="1">
 
             <Form onSubmit={this.handleSubmit}>
 
@@ -175,7 +175,7 @@ class Login extends Component {
             </Form>
           </TabPane>
 
-          <TabPane tab="手机号登陆" key="2">
+          <TabPane tab="Phone" key="2">
 
             <Form onSubmit={this.handleLoginWithPhone}>
 
