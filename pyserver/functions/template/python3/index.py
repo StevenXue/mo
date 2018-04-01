@@ -2,9 +2,8 @@
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 import sys
-import json
 from function import handler
-
+from function.modules import HiddenPrints
 
 def get_stdin():
     buf = ""
@@ -14,14 +13,12 @@ def get_stdin():
         if line=="":
             break
     return buf
-    # for binary read
-    # buf = sys.stdin.buffer.read()
-    # return buf
-
 
 if(__name__ == "__main__"):
     st = get_stdin()
-    st = json.loads(st)
-    handler.handle(st)
+    with HiddenPrints():
+        ret = handler.handle(st)
+    if ret != None:
+        print(ret)
 
 

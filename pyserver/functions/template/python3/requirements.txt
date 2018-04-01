@@ -1,7 +1,12 @@
+tensorflow
+keras
 numpy
 scipy
 scikit-learn
 pandas
 protobuf
 Pillow
-keras
+matplotlib
+sympy
+tqdm
+opencv-python
