@@ -1,10 +1,36 @@
 # 快速开始
+Welcome to Getting Started with the MO
+
+## 主页面
+登录后主页面包含3个版块
 
 
-## 寻找App
-进入market, 浏览app列表并通过category和tags进行筛选， 或者使用顶部搜索框进行筛选。
+<img src="./media/home.png"  width="840px" height="465px" />
 
-## 第一次使用App
+**1. workspace 我的工作台**
+
+包含用户的apps，modules 和 datasets
+
+**2. market 市场**
+
+包含平台上所有的apps，modules 和 datasets
+
+**3. request 需求版**
+
+包含用户发布的需求        
+
+
+## 发布我的第一个需求
+用户进入request模块，选择相应的request类型（apps/module/dataset), 点击 New app request, 填写相应内容。 用户可以在Request版块查找自己发布的需求，也可以在my profile中查看
+- title: 标题
+- description: 描述
+- Tags：标签
+- Input: 对输入的描述
+- Output: 对输出的描述
+
+## 使用我的第一个App
+用户进入 market / app , 点击自己需要的 app， 进入app 详情页面， 查看完app 的简介后，点击example ，在Input 填写自己的参数， 点击submit, 结果将会展示在output 框内. 
+用户也可浏览app列表并通过category和tags进行筛选， 或者使用顶部搜索框进行筛选
 
 We’ll make our first call with the demo algorithm “Hello”. This algorithm takes an input of a string (preferably your name!) and returns a greeting addressed to the input.
 
@@ -42,30 +68,4 @@ he duration is the compute time of the API call into the algorithm. This is the 
 For more information about pricing, check out our Pricing Guide
 
 
-## 发布需求
-<!--
-这些是注释文本，不会显示
-## 如何寻找可用的module/app/dataset
-1. 进入market选择module/app/dataset，输入搜索关键字
 
-## 如何寻找别人提出的app需求
-1. 进入request
-
-## 如何创建第一个app
-
-# APP开发
-	notebook相关功能介绍
-	如何调用别人写好的module、dataset
-	如何将做好的项目deploy
-	如何用写好的app回答需求
-
-
-# 发布需求
-	在哪里可以发布需求
-	发布需求的类型及注意事项
-		module
-		dataset
-# 交流讨论
-	如何回答别人的问题
-
--->

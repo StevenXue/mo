@@ -19,8 +19,9 @@
   <div id="app">加载中</div>
   <script>
     window.$docsify = {
-      name: '',
+      name: 'MO',
       repo: 'https://github.com/QingWei-Li/docsify/',
+      homepage: 'zh-cn/home.md',
 
       loadSidebar: true,
       subMaxLevel: 2,
@@ -30,30 +31,7 @@
       loadNavbar: true,
       coverpage: true,
       maxLevel: 4,
-
-//      auto2top: true,
       search: 'auto', // 默认值
-      // 完整配置参数
-//      search: {
-//        maxAge: 86400000, // 过期时间，单位毫秒，默认一天
-//        paths: [], // or 'auto'
-//        placeholder: 'Type to search',
-//
-////        // 支持本地化
-////        placeholder: {
-////          '/zh-cn/': '搜索',
-////          '/': 'Type to search'
-////        },
-//
-//        noData: 'No Results!',
-//
-////        // 支持本地化
-////        noData: {
-////          '/zh-cn/': '找不到结果',
-////          '/': 'No Results'
-////        },
-//      },
-
       plugins: [
         function (hook) {
           var footer = [
@@ -69,12 +47,6 @@
           })
         }
       ],
-
-
-//      coverpage: {
-//        '/': 'cover.md',
-//        '/zh-cn/': 'cover.md'
-//      }
     }
   </script>
   <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>

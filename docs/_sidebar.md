@@ -1,6 +1,12 @@
-* [首页](/)
-* [快速开始](start)
+* [首页](zh-cn/home.md)
+* [快速开始](zh-cn/quick_start.md)
+* [基本信息](zh-cn/basic_info.md)
+* [进阶使用](zh-cn/advance.md)
+* [开发者指南](zh-cn/developer.md)
 
+
+  
+<!--
 * [APP开发](APP开发)
 
 
@@ -10,7 +16,8 @@
 * 交流讨论
   * [如何回答别人的问题]()
   
-<!--
+  
+
  * [概览](./README.md)
  
  # 开始
