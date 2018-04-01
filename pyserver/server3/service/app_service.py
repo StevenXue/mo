@@ -35,8 +35,8 @@ class AppService(ProjectService):
         """
         app = AppBusiness.get_by_id(project_id=app_id)
         url = app.user.user_ID + "-" + app.name
-        domin = "http://192.168.31.23:8080/function/"
-        url = domin + url
+        domain = "http://192.168.31.23:8080/function/"
+        url = domain + url
         payload = json.dumps(input_json)
         headers = {
             'content-type': "application/json",
