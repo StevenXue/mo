@@ -6,12 +6,20 @@ from unittest import TextTestRunner
 import yaml
 
 class GDValidation(unittest.TestCase):
+    '''
+        VALIDATE USER'S MODULE
+    '''
 
+    MODULE_AUTHOR = ""
     MODULE_PATH = "./"
     MODULE_NAME = ""
-    MODULE_YAML_OBJ = None
+    MODULE_USER_DIRECTORY = "user_directory"
+    # user_directory.zhaofengli.sesese.src.main
+    # MODULE_INPUT = {}
+    # MODULE_YAML_OBJ = None
 
-    # Validation Step 1: File / Directory Exist
+
+    # Step 1: File / Directory Exist
     def test_src_directory(self):
         '''
             To check the [/src/] direcotary
@@ -67,7 +75,7 @@ class GDValidation(unittest.TestCase):
             "{}/requirements.txt".format(self.MODULE_PATH)),
             msg="[requirements.txt] does not exist")
 
-    # Validation Step 2: YAML
+    # Step 2: YAML
     def test_yaml(self):
         '''
             To check the content of [module_spec.yaml] file
@@ -75,32 +83,34 @@ class GDValidation(unittest.TestCase):
         '''
 
 
-        # Check yml file can be loaded
+        # Check yml file can be loaded correctly
         with open("{}/src/module_spec.yml".format(self.MODULE_PATH)) as stream:
             try:
-                GDValidation.MODULE_YAML_OBJ = yaml.load(stream)
+                yaml_obj = yaml.load(stream)
             except Exception as e:
                 self.fail(msg="yaml cannot be loaded")
 
             # Check [input] section
             with self.subTest(name="[input] section"):
                 self.assertIsNotNone(
-                    GDValidation.MODULE_YAML_OBJ.get("input"),
+                    yaml_obj.get("input"),
                     msg="[input] section missing in module_spec.yml")
 
+            # Check [input:predict] section
             with self.subTest(name="[input:predict] section"):
-                yaml_input_predict = GDValidation.MODULE_YAML_OBJ.get(
+                yaml_input_predict = yaml_obj.get(
                     "input", {}).get("predict", None)
                 self.assertIsNotNone(
                     yaml_input_predict,
                     msg="[input/predict] section missing in module_spec.yml")
 
+            # Check value_name / value_type / default_value of each parameter
             required_predict_items = {"value_name": "name",
                                       "value_type": "value_type",
                                       "default_value": "default"}
-            predict_feed = {}
+            input_feed = {}
             for k, v in yaml_input_predict.items():
-
+                # Check value_name
                 with self.subTest(name="[input:predict:{}]".format(k)):
                     name = v.get(required_predict_items["value_name"], None)
                     self.assertIsNotNone(
@@ -108,76 +118,132 @@ class GDValidation(unittest.TestCase):
                         msg="[{}/name] missing in module_spec.yml".format(
                                 k, name))
 
+                # Check value_type
                 with self.subTest(name="[input:predict:{}]".format(k)):
-                    value_type = v.get(required_predict_items["value_type"], None)
+                    value_type = v.get(required_predict_items["value_type"],
+                                       None)
                     self.assertIsNotNone(
                         value_type,
                         msg="[{}/value_type] missing in module_spec.yml".format(
                             k, value_type))
 
+                # Check default_value
                 with self.subTest(name="[input:predict:{}]".format(k)):
-                    default_value = v.get(required_predict_items["default_value"], None)
+                    default_value = v.get(
+                        required_predict_items["default_value"], None)
                     self.assertIsNotNone(
                         default_value,
                         msg="[{}/default] missing in module_spec.yml".format(
                             k, default_value))
 
-                # print("default_value", default_value)
-                with self.subTest(name="[input:predict:{}] - Type Checking".format(k)):
+                # Check if type of default_value is matched with value_type
+                with self.subTest(name=
+                                  "[input:predict:{}] - "
+                                  "Type Checking".format(k)):
 
                     self.assertTrue(
                         self.check_value_type(value_type, default_value),
                         msg="[{}/default] value is not match "
                             "with [{}/value_type]".format(k, k))
 
+                input_feed[name] = default_value
 
+                if input_feed:
+                    # Check predict() with default_value of each parameter
+                    with self.subTest(name="predict() test"):
+                        try:
+                            # print("self.MODULE_INPPRT_PATH", self.MODULE_IMPORT_PATH)
+                            module_import_path = \
+                                "{}.{}.{}.src.main".format(
+                                    self.MODULE_USER_DIRECTORY,
+                                    self.MODULE_AUTHOR,
+                                    self.MODULE_NAME)
+                            print("module_import_path", module_import_path)
+                            import importlib
+                            my_module = importlib. \
+                                import_module(module_import_path)
+                            m = getattr(my_module, self.MODULE_NAME)()
+                            m.predict(input=input_feed)
 
+                        except Exception as e:
+                            self.fail(
+                                msg=
+                                "predict() cannot be executed correctly - {}".
+                                    format(str(e)))
+                else:
+                    self.fail(msg="MODULE_INPUT cannot be generated")
 
-            # Check predict
-            print("predict_feed", predict_feed)
+    # # Step 3: main.py and predict()
+    # def test_predict(self):
+    #
+    #
+    #     if self.MODULE_INPUT:
+    #         # Check predict() with default_value of each parameter
+    #         with self.subTest(name="predict() test"):
+    #             try:
+    #                 import importlib
+    #                 my_module = importlib. \
+    #                     import_module(
+    #                     self.MODULE_IMPORT_PATH)
+    #                 m = getattr(my_module, self.MODULE_NAME)()
+    #                 m.predict(input=self.MODULE_INPUT)
+    #
+    #             except Exception as e:
+    #                 self.fail(msg=
+    #                           "predict() cannot be executed correctly - {}".
+    #                           format(str(e)))
+    #     else:
+    #         self.fail(msg="MODULE_INPUT cannot be generated")
 
-            # Check [output] section
-            with self.subTest(name="[output] section"):
-                self.assertIsNotNone(
-                    GDValidation.MODULE_YAML_OBJ.get("output"),
-                    msg="[output] section missing in module_spec.yml")
-
-        pass
-
-    # @staticmethod
-    def check_int(self, value):
+    @staticmethod
+    def check_int(value):
         return type(value) is int
 
-    def check_float(self, value):
+    @staticmethod
+    def check_float(value):
         return type(value) is float
 
-    def check_str(self, value):
+    @staticmethod
+    def check_str(value):
         return type(value) is str
 
-    def check_datetime(self, value):
+    @staticmethod
+    def check_datetime(value):
         from datetime import datetime
         return type(value) is datetime
 
-    def chcek_img(self, value):
-        return True
+    @staticmethod
+    def check_array_int(value):
+        if type(value) is list:
+            print("in check_array_int()")
+            return all(isinstance(item, int) for item in value)
+        else:
+            return False
 
-    def chcek_img(self, value):
-        return True
+    # @staticmethod
+    # def check_array_str(value):
+    #     return all(isinstance(item, str) for item in value)
+    #
+    # @staticmethod
+    # def check_array_float(value):
+    #     return all(isinstance(item, float) for item in value)
 
     def check_value_type(self, value_type, default_value):
         # available Types: int, str, float, img, datetime, [int], [str], [float]
+
+
         check_fucns = {
             "int": self.check_int(default_value),
             "float": self.check_float(default_value),
             "str": self.check_str(default_value),
             "datetime": self.check_datetime(default_value),
-            "[int]": self,
-            "[str]": self,
-            "[float]": self
+            "['int']": self.check_array_int(default_value),
+            "[int]": self.check_array_int(default_value),
         }
 
+        print('value_type', value_type)
         try:
-            return check_fucns[value_type]
+            return check_fucns[str(value_type)]
         except Exception as e:
             self.fail(msg="[value_type] is not valid")
 
@@ -202,9 +268,11 @@ if __name__ == '__main__':
     #     GDValidation.MODULE_PATH = sys.argv.pop()
     # print(GDValidation.MODULE_NAME)
     # print(GDValidation.MODULE_PATH)
-
+    import sys
+    sys.path.append('../../../')
     GDValidation.MODULE_PATH = "/Users/Chun/Documents/workspace/goldersgreen/pyserver/user_directory/zhaofengli/sesese"
     GDValidation.MODULE_NAME = "sesese"
+    GDValidation.MODULE_AUTHOR = "zhaofengli"
     # /Users/Chun/Documents/workspace/goldersgreen/pyserver/user_directory/zhaofengli/sesese
     # unittest.main()
 
