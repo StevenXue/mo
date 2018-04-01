@@ -1,9 +1,16 @@
 
 
 import os
+
+from io import BytesIO
+from PIL import Image
+import base64
+import re
+
 import unittest
 from unittest import TextTestRunner
 import yaml
+
 
 class GDValidation(unittest.TestCase):
     '''
@@ -85,6 +92,7 @@ class GDValidation(unittest.TestCase):
 
         # Check yml file can be loaded correctly
         with open("{}/src/module_spec.yml".format(self.MODULE_PATH)) as stream:
+            # Load yaml file
             try:
                 yaml_obj = yaml.load(stream)
             except Exception as e:
@@ -148,52 +156,57 @@ class GDValidation(unittest.TestCase):
 
                 input_feed[name] = default_value
 
-                if input_feed:
-                    # Check predict() with default_value of each parameter
-                    with self.subTest(name="predict() test"):
-                        try:
-                            # print("self.MODULE_INPPRT_PATH", self.MODULE_IMPORT_PATH)
-                            module_import_path = \
-                                "{}.{}.{}.src.main".format(
-                                    self.MODULE_USER_DIRECTORY,
-                                    self.MODULE_AUTHOR,
-                                    self.MODULE_NAME)
-                            print("module_import_path", module_import_path)
-                            import importlib
-                            my_module = importlib. \
-                                import_module(module_import_path)
-                            m = getattr(my_module, self.MODULE_NAME)()
-                            m.predict(input=input_feed)
+            print("input_feed", input_feed)
 
-                        except Exception as e:
-                            self.fail(
-                                msg=
-                                "predict() cannot be executed correctly - {}".
-                                    format(str(e)))
-                else:
-                    self.fail(msg="MODULE_INPUT cannot be generated")
+            if input_feed:
+                # Check predict() with default_value of each parameter
+                with self.subTest(name="predict()"):
+                    try:
 
-    # # Step 3: main.py and predict()
-    # def test_predict(self):
-    #
-    #
-    #     if self.MODULE_INPUT:
-    #         # Check predict() with default_value of each parameter
-    #         with self.subTest(name="predict() test"):
-    #             try:
-    #                 import importlib
-    #                 my_module = importlib. \
-    #                     import_module(
-    #                     self.MODULE_IMPORT_PATH)
-    #                 m = getattr(my_module, self.MODULE_NAME)()
-    #                 m.predict(input=self.MODULE_INPUT)
-    #
-    #             except Exception as e:
-    #                 self.fail(msg=
-    #                           "predict() cannot be executed correctly - {}".
-    #                           format(str(e)))
-    #     else:
-    #         self.fail(msg="MODULE_INPUT cannot be generated")
+                        module_import_path = \
+                            "{}.{}.{}.src.main".format(
+                                self.MODULE_USER_DIRECTORY,
+                                self.MODULE_AUTHOR,
+                                self.MODULE_NAME)
+                        print("module_import_path", module_import_path)
+                        import importlib
+                        my_module = importlib. \
+                            import_module(module_import_path)
+                        m = getattr(my_module, self.MODULE_NAME)()
+                        result = m.predict(input=input_feed)
+                        # print("result", result)
+                        # Check result type
+
+                    except Exception as e:
+                        self.fail(
+                            msg=
+                            "predict() cannot be executed correctly - {}".
+                                format(str(e)))
+            else:
+                self.fail(msg="MODULE_INPUT cannot be generated")
+
+
+
+    def check_value_type(self, value_type, default_value):
+        # available Types: int, str, float, img, datetime, [int], [str], [float]
+
+
+        check_fucns = {
+            "int": self.check_int(default_value),
+            "float": self.check_float(default_value),
+            "str": self.check_str(default_value),
+            "datetime": self.check_datetime(default_value),
+            "img": self.check_img(default_value),
+            "['int']": self.check_array_int(default_value),
+            "[int]": self.check_array_int(default_value)
+
+        }
+
+        # print('value_type', value_type)
+        try:
+            return check_fucns[str(value_type)]
+        except Exception as e:
+            self.fail(msg="[value_type] is not valid")
 
     @staticmethod
     def check_int(value):
@@ -208,6 +221,20 @@ class GDValidation(unittest.TestCase):
         return type(value) is str
 
     @staticmethod
+    def check_img(value):
+        try:
+            base64_data = re.sub('^data:image/.+;base64,', '', value)
+            byte_data = base64.b64decode(base64_data)
+            image_data = BytesIO(byte_data)
+            # img = Image.open(image_data)
+            Image.open(image_data)
+            return True
+        except Exception as e:
+            print(str(e))
+            return False
+
+
+    @staticmethod
     def check_datetime(value):
         from datetime import datetime
         return type(value) is datetime
@@ -215,7 +242,7 @@ class GDValidation(unittest.TestCase):
     @staticmethod
     def check_array_int(value):
         if type(value) is list:
-            print("in check_array_int()")
+            # print("in check_array_int()")
             return all(isinstance(item, int) for item in value)
         else:
             return False
@@ -227,27 +254,6 @@ class GDValidation(unittest.TestCase):
     # @staticmethod
     # def check_array_float(value):
     #     return all(isinstance(item, float) for item in value)
-
-    def check_value_type(self, value_type, default_value):
-        # available Types: int, str, float, img, datetime, [int], [str], [float]
-
-
-        check_fucns = {
-            "int": self.check_int(default_value),
-            "float": self.check_float(default_value),
-            "str": self.check_str(default_value),
-            "datetime": self.check_datetime(default_value),
-            "['int']": self.check_array_int(default_value),
-            "[int]": self.check_array_int(default_value),
-        }
-
-        print('value_type', value_type)
-        try:
-            return check_fucns[str(value_type)]
-        except Exception as e:
-            self.fail(msg="[value_type] is not valid")
-
-
 
     @classmethod
     def run_test(cls, MODULE_PATH, MODULE_NAME):
@@ -270,8 +276,8 @@ if __name__ == '__main__':
     # print(GDValidation.MODULE_PATH)
     import sys
     sys.path.append('../../../')
-    GDValidation.MODULE_PATH = "/Users/Chun/Documents/workspace/goldersgreen/pyserver/user_directory/zhaofengli/sesese"
-    GDValidation.MODULE_NAME = "sesese"
+    GDValidation.MODULE_PATH = "/Users/Chun/Documents/workspace/goldersgreen/pyserver/user_directory/zhaofengli/weather_prediction"
+    GDValidation.MODULE_NAME = "weather_prediction"
     GDValidation.MODULE_AUTHOR = "zhaofengli"
     # /Users/Chun/Documents/workspace/goldersgreen/pyserver/user_directory/zhaofengli/sesese
     # unittest.main()
