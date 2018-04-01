@@ -120,7 +120,7 @@ class ProjectExample extends React.Component {
         <div>
           API:
           <CopyInput
-            text={`${projectDetail.project.app_path.replace('.', 'http://192.168.31.23:8080')}`}/>
+            text={`${projectDetail.project.app_path.replace('.', 'http://192.168.31.7:8080')}`}/>
         </div>}
         <br/>
         <br/>
