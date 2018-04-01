@@ -8,6 +8,7 @@ from server3.business.module_business import ModuleBusiness
 from server3.business.app_business import AppBusiness
 from server3.business.user_business import UserBusiness
 from server3.business.statistics_business import StatisticsBusiness
+from server3.constants import DOCKER_IP
 
 
 class AppService(ProjectService):
@@ -36,7 +37,7 @@ class AppService(ProjectService):
         """
         app = AppBusiness.get_by_id(project_id=app_id)
         url = app.user.user_ID + "-" + app.name
-        domin = "http://127.0.0.1:8080/function/"
+        domin = f"http://{DOCKER_IP}:8080/function/"
         url = domin + url
         payload = json.dumps(input_json)
         headers = {

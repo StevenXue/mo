@@ -107,11 +107,8 @@ RUN /bin/bash -c "export PATH=\$PATH:$HOME/.local/bin"
 # ENV PIP_INDEX_URL=https://mirrors.ustc.edu.cn/pypi/web/simple
 # RUN mkdir $HOME/.pip/
 COPY --chown=jovyan:users Pipfile $HOME/
-RUN ls -la
 
 RUN pipenv install
-
-RUN cat Pipfile
 
 #RUN pipenv install && pipenv shell
 # Install Jupyter Notebook and Hub
@@ -188,8 +185,6 @@ RUN apt-get update && \
 
 USER $NB_UID
 
-RUN  cat Pipfile
-
 # Install Python 3 packages
 # Remove pyqt and qt pulled in for matplotlib since we're only ever going to
 # use notebook-friendly backends in these images
@@ -255,8 +250,6 @@ RUN pipenv install \
     fix-permissions /home/$NB_USER
 
 ### my notebook
-USER root
-RUN apt-get update && apt-get install -yq python-opencv
 
 USER $NB_UID
 

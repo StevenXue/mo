@@ -7,10 +7,7 @@ def module_general(module_id, action, *args, **kwargs):
         'modules.{user_ID}.{module_name}.src.main'.format(
             user_ID=user_ID, module_name=module_name))
     cls = getattr(main, module_name)()
-    try:
-        getattr(cls, action)(*args, **kwargs)
-    except AttributeError:
-        raise AttributeError("Module doesn't have method '{}'.".format(action))
+    getattr(cls, action)(*args, **kwargs)
 
 
 class Client:

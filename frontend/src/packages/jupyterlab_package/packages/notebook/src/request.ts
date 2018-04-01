@@ -1,4 +1,4 @@
-import * as fetch from 'dva/fetch';
+// import * as fetch from 'dva/fetch';
 import { message } from 'antd';
 import * as _ from 'lodash';
 

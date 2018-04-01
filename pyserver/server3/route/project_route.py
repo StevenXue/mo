@@ -5,9 +5,9 @@ Blueprint for project
 Author: Zhaofeng Li
 Date: 2017.05.24
 """
-from bson import ObjectId
 from datetime import datetime
 from datetime import tzinfo
+from bson import ObjectId
 from flask import Blueprint
 from flask import jsonify
 from flask import make_response
@@ -333,4 +333,14 @@ def commit_broadcast(project_id):
     # commits = ProjectBusiness.get_commits(project.path)
     message_service.create_message(ObjectId('592f8775df86b2e82f9788cf'),
                                    'commit', receivers, project.user)
+    return jsonify({"response": 1})
+
+
+@project_app.route("/nb_to_script/<project_id>", methods=["POST"])
+@jwt_required
+def nb_to_script(project_id):
+    data = request.get_json()
+    optimise = data.get('optimise')
+    nb_path = data.get('nb_path')
+    ProjectBusiness.nb_to_script(project_id, nb_path, optimise)
     return jsonify({"response": 1})
