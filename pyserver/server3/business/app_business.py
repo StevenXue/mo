@@ -16,6 +16,7 @@ from server3.utility.json_utility import args_converter
 from server3.constants import APP_DIR
 from server3.constants import MODULE_DIR
 from server3.constants import INIT_RES
+from server3.constants import DOCKER_IP
 from server3.constants import Error, Warning, ErrorMessage
 from server3.entity.general_entity import Objects
 
@@ -32,12 +33,12 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         app = cls.get_by_id(app_id)
         modules = [m.user.user_ID + '/' + m.name for m in app.used_modules]
         if modules is None:
-            modules = ['zhaofengli/flight_delay_prediction',
-                       'zhaofengli/weather_prediction']
+            modules = []
 
         service_name = app.user.user_ID + '-' + app.name
         # faas new in functions dir
-        call(['faas-cli', 'new', service_name, '--lang=python3'],
+        call(['faas-cli', 'new', service_name, '--lang=python3',
+             f'--gateway=http://{DOCKER_IP}:8080'],
              cwd=cls.base_func_path)
         # target path = new path
         func_path = os.path.join(cls.base_func_path, service_name)
@@ -120,9 +121,12 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         client = docker.from_env()
         # copy venv
         user_ID = module.user.user_ID
-        container = client.containers.get(f'jupyter-{user_ID}_2B{app.name}')
-        print(container.exec_run(['/bin/bash', '/home/jovyan/add_venv.sh',
-                                  f'{user_ID}/{module.name}']).decode('ascii'))
+        user_ID_c = user_ID.replace('_', '_5F')
+        app_name = app.name.replace('_', '_5F')
+        container = client.containers. \
+            get(f'jupyter-{user_ID_c}_2B{app_name}')
+        container.exec_run(['/bin/bash', '/home/jovyan/add_venv.sh',
+                            f'{user_ID}/{module.name}'])
 
     @classmethod
     def replace_dup_n_update(cls, args, func_args, module_name):

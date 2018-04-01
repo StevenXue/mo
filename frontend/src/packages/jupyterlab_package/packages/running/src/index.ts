@@ -335,7 +335,7 @@ export class RunningSessions extends Widget {
         request(`pyapi/project/projects/${match[1]}`,
           undefined,
           {
-            onJson: (project: any) => window.open(`http://localhost:${project.tb_port}`),
+            onJson: (project: any) => window.open(`http://192.168.31.7:${project.tb_port}`),
           });
       }
     }

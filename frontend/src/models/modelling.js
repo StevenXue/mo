@@ -63,6 +63,7 @@ const loadnStartJL = (projectType) => {
     require('../packages/jupyterlab_package/packages/datasets-extension'),
     require('../packages/jupyterlab_package/packages/moduledeploy-extension'),
     require('../packages/jupyterlab_package/packages/appdeploy-extension'),
+    require('../packages/jupyterlab_package/packages/commit-extension'),
   ]
 
   const JupyterLab = require('../packages/jupyterlab_package/packages/application').JupyterLab

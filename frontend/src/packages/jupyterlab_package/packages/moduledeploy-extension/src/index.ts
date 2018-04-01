@@ -26,7 +26,7 @@ import {
   Form,
 } from './vdomWrapper';
 
-// import { publish } from './service';
+import { publish } from './service';
 
 import '../style/index.css';
 
@@ -75,7 +75,7 @@ export function createDeployButton(): ToolbarButton {
   const hash = window.location.hash;
   const match = pathToRegexp('#/workspace/:projectId/:type').exec(hash);
   if (match) {
-    // let projectId = match[1];
+    let projectId = match[1];
     return new ToolbarButton({
       className: TOOLBAR_DEPLOY_CLASS,
       onClick: () => {
@@ -92,12 +92,12 @@ export function createDeployButton(): ToolbarButton {
             message.error('Please wait until testing finished!');
           }
           console.log(result.value);
-          // publish({
-          //   projectId,
-          //   onJson: () => {
-          //     message.success('Module deploy success!');
-          //   },
-          // });
+          publish({
+            projectId,
+            onJson: () => {
+              message.success('Module deploy success!');
+            },
+          });
         });
       },
       tooltip: 'Deploy Script',

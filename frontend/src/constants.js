@@ -2,6 +2,7 @@ const mainColor = '#108ee9';
 
 module.exports = {
   apiPrefix: '/pyapi',
+//apiPrefix: 'http://192.168.31.7:5005'
   // apiPrefix: 'http://122.224.116.44:5005',
 
   jupyterServer: 'http://10.52.14.182:8888/api/contents/',  // kube master node ip
@@ -11,12 +12,12 @@ module.exports = {
   // jupyterServer: 'http://122.224.116.44:9001/api/contents/',
 
   // server api
-  // flaskServer: 'http://localhost:5005', // dev
+  //flaskServer: 'http://localhost:5005', // dev
   // flaskServer: 'http://10.52.14.182:5005',
   // flaskServer: 'http://122.224.116.44:5005',
   flaskServer: 'http://192.168.31.7:5005', // prod
 
-  // hubServer: 'http://localhost:8000', // dev
+  //hubServer: 'http://localhost:8000', // dev
   hubServer: 'http://192.168.31.7:8000', // prod
 
   //jupyter

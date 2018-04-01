@@ -15,6 +15,7 @@ SERVING_PORT = 9000
 REDIS_SERVER = 'redis://localhost:6379'
 GIT_SERVER = 'http://localhost:2333'
 GIT_SERVER_IP = '192.168.31.7'
+DOCKER_IP = '127.0.0.1'
 GIT_LOCAL = ''
 # REDIS_SERVER = 'redis://localhost:6379'
 HUB_SERVER = 'http://localhost:8000'

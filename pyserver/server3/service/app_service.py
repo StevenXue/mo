@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import requests
 import json
+import re
 
 from server3.service.project_service import ProjectService
 from server3.business.module_business import ModuleBusiness
@@ -35,13 +36,18 @@ class AppService(ProjectService):
         """
         app = AppBusiness.get_by_id(project_id=app_id)
         url = app.user.user_ID + "-" + app.name
-        domin = "http://192.168.31.23:8080/function/"
+        domin = "http://127.0.0.1:8080/function/"
         url = domin + url
         payload = json.dumps(input_json)
         headers = {
             'content-type': "application/json",
         }
         response = requests.request("POST", url, data=payload, headers=headers)
+        #print(response.text)
+        #pattern = re.compile(r'JSONSTARTHERE(.+?)JSONENDHERE', flags=re.DOTALL)
+        #results = pattern.findall(response.text)
+        #output_json = json.loads(results[0])
+        #print(output_json)
         output_json = response.json()
         # 成功调用后 在新的collection存一笔
         user_obj = UserBusiness.get_by_user_ID(user_ID=user_ID)

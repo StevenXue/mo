@@ -103,9 +103,15 @@ RUN fix-permissions $LOCAL_DIR && \
 ENV PATH=$PATH:$HOME/.local/bin
 # path in container
 RUN /bin/bash -c "export PATH=\$PATH:$HOME/.local/bin"
-RUN pipenv --python 3.6
 
-ENV PIP_INDEX_URL=https://mirrors.ustc.edu.cn/pypi/web/simple
+# ENV PIP_INDEX_URL=https://mirrors.ustc.edu.cn/pypi/web/simple
+# RUN mkdir $HOME/.pip/
+COPY --chown=jovyan:users Pipfile $HOME/
+RUN ls -la
+
+RUN pipenv install
+
+RUN cat Pipfile
 
 #RUN pipenv install && pipenv shell
 # Install Jupyter Notebook and Hub
@@ -182,6 +188,8 @@ RUN apt-get update && \
 
 USER $NB_UID
 
+RUN  cat Pipfile
+
 # Install Python 3 packages
 # Remove pyqt and qt pulled in for matplotlib since we're only ever going to
 # use notebook-friendly backends in these images
@@ -247,8 +255,14 @@ RUN pipenv install \
     fix-permissions /home/$NB_USER
 
 ### my notebook
+USER root
+RUN apt-get update && apt-get install -yq python-opencv
 
-RUN pipenv update tensorflow==1.6.* keras==2.1.* notebook==5.4.*
+USER $NB_UID
+
+RUN cat Pipfile
+RUN pipenv install tensorflow==1.6.* keras==2.1.* notebook==5.4.*
+RUN pipenv install opencv-python
 #RUN pipenv install jupyterlab==0.31.0
 #RUN pipenv run jupyter serverextension enable --py jupyterlab --sys-prefix
 
