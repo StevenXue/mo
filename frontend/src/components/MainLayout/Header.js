@@ -65,7 +65,7 @@ const menuConfig = [
     Link: '/userrequest?tab=app',
     Icon: null,
     text: 'Request',
-  },
+  }
 ]
 
 
@@ -153,6 +153,13 @@ function Header({location, login, history, dispatch, allRequest,message}) {
             }
           }
         )}
+        {
+          <Menu.Item key={"docs"}>
+            <div onClick={()=> {window.location.replace("http://localhost:3000"); } }>
+              <FormattedMessage id={"docs"} defaultMessage={"Docs"}/>
+            </div>
+          </Menu.Item>
+        }
         <SubMenu
           className={styles.rightButton}
           title={

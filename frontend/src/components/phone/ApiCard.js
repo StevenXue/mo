@@ -10,8 +10,12 @@ export const ApiCard = ({ app, onPress, isFavor}) => {
   const {favor_users=[], star_users=[], name: title, description, score} = app
 
   return <div style={styles.cardContainer} onClick={onPress}>
-    <div style={styles.title}>
-      <div style={{fontSize: 18}}>{title}</div>
+    <div style={styles.title_1} >
+      <div
+        style={{fontSize: 18, justifyContent: 'center',}}
+        className={style.number_of_2_lines_title}
+        >
+        {title}</div>
     </div>
 
     <div style={styles.desc}>
@@ -79,10 +83,16 @@ const styles = {
     minWidth: 150,
     width: 150,
     height: 200,
+    minHeight: 200,
     boxShadow: 'rgba(0,0,0,0.15) 0px 1px 2px 0px',
   },
-  title: {
+  title_1: {
+    display: "flex",
+    height: "15%",
+    width: "90%",
+
     alignItems: 'center',
+    justifyContent: "center",
     margin: 10,
   },
 

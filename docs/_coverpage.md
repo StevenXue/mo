@@ -4,8 +4,8 @@
 
 > Open platform for rapid data exploration and modelling
 
-* 全生态
-* 多角色
+* start your AI journey easily
+* 
 
 [GitHub](https://github.com/momodel)
 [Get Started](#goldersgreen)

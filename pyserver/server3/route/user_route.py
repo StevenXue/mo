@@ -328,53 +328,20 @@ def get_statistics():
         }
     })
 
-# @user_app.route('/favor_app/<app_id>', methods=['PUT'])
-# @jwt_required
-# def favor_app(app_id):
-#     """
-#     在用户和api下都存一份
-#     用户存api_id
-#     api存 user_ID
-#     :return:
-#     :rtype:
-#     """
-#     user_ID = get_jwt_identity()
-#     result = UserService.favor_app(user_ID=user_ID, app_id=app_id)
-#     if result:
-#         return jsonify({
-#             'message': "success",
-#             'response': {
-#                 "app": json_utility.convert_to_json(result.app.to_mongo()),
-#                 "user": json_utility.convert_to_json(result.user.to_mongo())
-#             }
-#         }), 200
-#     else:
-#         return jsonify({'response': "failed"}), 400
-#
-#
-# @user_app.route('/favor_apps', methods=['GET'])
-# @jwt_required
-# def get_favor_apps():
-#     user_ID = get_jwt_identity()
-#     page_no = int(request.args.get('page_no', 1))
-#     page_size = int(request.args.get('page_size', 5))
-#
-#     apps = UserBusiness.get_favor_apps(user_ID=user_ID, page_no=page_no, page_size=page_size)
-#     return jsonify({
-#         'response': {
-#             "objects": json_utility.me_obj_list_to_json_list(apps.objects),
-#             "count": apps.count,
-#             "page_no": apps.page_no,
-#             "page_size": apps.page_size
-#         }
-#     })
-#
-#
-# @user_app.route('/star_apps', methods=['GET'])
-# @jwt_required
-# def get_star_apps():
-#     user_ID = get_jwt_identity()
-#     apps = UserBusiness.get_star_apps(user_ID=user_ID)
-#     return jsonify({
-#         'response': json_utility.me_obj_list_to_json_list(apps)
-#     })
+
+# 用户更改基本信息 邮箱，手机号, 性别
+@user_app.route('', methods=['PUT'])
+@jwt_required
+def update_user():
+    user_ID = get_jwt_identity()
+    data = request.get_json()
+    # 检查data是否在 ["email", "phone", "gender"]
+    lists = ["email", "phone", "gender"]
+    for key, value in data.items():
+        if key not in lists:
+            return jsonify({'response': 'error arguments'}), 400
+    user = UserBusiness.update_by_user_ID(user_ID=user_ID, update=data)
+    print("user", user)
+    return jsonify({'response': {
+        "user": json_utility.convert_to_json(user.to_mongo())
+    }}), 200

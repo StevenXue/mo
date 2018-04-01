@@ -15,6 +15,7 @@ function checkStatus(response, noErrorMsg) {
   }
   if(!noErrorMsg) {
     message.error('This is a message of error: ' + response.statusText)
+    console.log("response", response)
   }
   return response
   // return error;
