@@ -169,7 +169,7 @@ function Header({location, login, history, dispatch, allRequest,message}) {
           }
         >
           {login.user &&
-          <Menu.Item key={'/profile'}>
+          <Menu.Item key={'/profile'} style={{color:'black'}}>
             <div onClick={() => history.push('/profile/'+login.user.user_ID)}>
               Profile
             </div>
@@ -177,7 +177,7 @@ function Header({location, login, history, dispatch, allRequest,message}) {
           }
 
           {login.user &&
-          <Menu.Item key={'/logout'}>
+          <Menu.Item key={'/logout'} style={{color:'black'}}>
             <div onClick={logout}>
               Logout
             </div>
@@ -190,14 +190,14 @@ function Header({location, login, history, dispatch, allRequest,message}) {
           title={
             <span onClick={toLoginPage}>
                 <Badge count={login.user ? numberOfUnreadMessage() : 0}>
-                <Icon type="message"/>
+                <Icon style={{color:'white'}} type="message"/>
                 </Badge>
               </span>
           }
         >
           {login.user && JsonToArray(message.messages).map(e =>
             <Menu.Item key={e._id} className={styles.messageMenuItem}
-                       style={e.is_read === false?{backgroundColor: '#464e78'}:null}>
+                       style={e.is_read === false?{backgroundColor: '#f0f2f5',color:'black'}:{color:'black'}}>
               <div onClick={() => toMessage(e.user_request,e.receiver_id)}>
                 {e.message_type === 'answer'? <p>{e.user_ID} 回答了您关注的需求  {e.user_request_title}</p>:<p>
                   {e.user_ID} 更新了您关注的需求  {e.user_request_title} 的答案
