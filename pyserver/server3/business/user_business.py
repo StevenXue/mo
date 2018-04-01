@@ -86,6 +86,14 @@ class UserBusiness(GeneralBusiness):
             page_no=page_no,
             page_size=page_size)
 
+
+    @classmethod
+    def update_by_user_ID(cls, user_ID, update):
+        user = get_by_user_ID(user_ID=user_ID)
+        return cls.repo.update_one_by_id(obj_id=user.id, update=update)
+
+
+
     # @classmethod
     # def prepare(cls, user_ID, page_no, page_size):
     #     user = cls.get_by_user_ID(user_ID=user_ID)

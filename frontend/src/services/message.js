@@ -1,7 +1,6 @@
-import {request, config} from '../utils';
+import {request, config} from '../utils'
 
 const {CORS, api} = config
-
 
 
 // 新建 新的message
@@ -15,18 +14,22 @@ export function createNewMessage(payload) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      message_type :payload.message_type,
-      sender :payload.sender,
-      title :payload.title,
-      content :payload.content,
-      receivers :payload.receivers,
+      message_type: payload.message_type,
+      sender: payload.sender,
+      title: payload.title,
+      content: payload.content,
+      receivers: payload.receivers,
     }),
-  });
+  })
 }
 
 // 获取所有的 request
 export function fetchMessage() {
-  return request(`${CORS}/message`);
+  return request(`${CORS}/message`,
+    {
+      noErrorMsg: true
+    }
+  )
 }
 
 // 更改message的状态为已读

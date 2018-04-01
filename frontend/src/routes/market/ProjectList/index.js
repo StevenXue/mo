@@ -4,6 +4,15 @@ import {Select, Icon, Input, Pagination, Tabs} from 'antd'
 import ProjectModel from '../../../components/ProjectModal/index'
 import {showTime} from '../../../utils/index'
 import {privacyChoices, projectChoices} from '../../../constants'
+import avatar1 from '../../../img/avatar/1.png'
+import avatar2 from '../../../img/avatar/2.png'
+import avatar3 from '../../../img/avatar/3.png'
+import avatar4 from '../../../img/avatar/4.png'
+import avatar5 from '../../../img/avatar/5.png'
+import avatar6 from '../../../img/avatar/6.png'
+
+const avatarList =[avatar1,avatar2,avatar3,avatar4,avatar5,avatar6]
+
 import {
   createProject,
   getProjects,
@@ -109,7 +118,7 @@ class ProjectList extends Component {
 
   starFavor(action, id, type) {
     const user_obj_id = localStorage.getItem('user_obj_id')
-
+    console.log('action',action)
     function findById(element) {
       return element._id === id
     }
@@ -174,11 +183,12 @@ class ProjectList extends Component {
 
 function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
   const user_obj_id = localStorage.getItem('user_obj_id')
-  console.log(project)
+  const picNumber = parseInt(project.user.slice(20))%6
   return (
     <div className={styles.projectCard}>
       <div className={styles.toDetail} onClick={() => onClickToDetail()}>
         <div className={styles.pic}>
+          <img src={avatarList[picNumber]}  alt="avatar" />
         </div>
         <div className={styles.name}>
           <p className={styles.namep}>{project.name}</p>
