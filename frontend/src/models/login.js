@@ -168,13 +168,7 @@ export default {
         let errorMessage = response.data.error.message
         message.error(errorMessage)
       }
-
-
-
     },
-
-
-
     *query({ payload }, { call, put }) {
       try {
         const { data: data } = yield call(tokenLogin)
