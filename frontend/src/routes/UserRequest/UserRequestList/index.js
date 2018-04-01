@@ -10,6 +10,7 @@ import {
   Col,
   Pagination,
   Tabs,
+  Tag,
 } from 'antd'
 import { showTime } from '../../../utils/index'
 import { arrayToJson, JsonToArray } from '../../../utils/JsonUtils'
@@ -167,8 +168,8 @@ class RequestList extends Component {
                          onClick={() => this.toUserRequestDetail(e._id, history)}>{e.title}</p>
                       {/*<p className={styles.description}>{e.description}</p>*/}
                       <div>
-                        {e['tags'].length > 0 && e['tags'].map(e => <p key={e}
-                                                                       className={styles.tags}>{e}</p>)}
+                        {e['tags'].length > 0 && e['tags'].map(e => <Tag
+                                                                       className={styles.tags}>{e}</Tag>)}
                         <div className={styles.timeAndUserDiv}>
                           <p
                             className={styles.showTime}>{showTime(e.create_time)}</p>

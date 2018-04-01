@@ -21,7 +21,7 @@ p{
   .bottomRow {
     color: black;
     .radioGroupDiv{
-      margin: 0 0 0 50px;
+      margin: 0 0 20px 50px;
       .radio{
         margin: 0 10px 0 10px;
         font-size: 14px;
@@ -36,7 +36,11 @@ p{
     //align-items: center;
   }
   .photoDiv {
-    display:inline-block;
+    //display:inline-block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     .photoP{
       text-align: right;
       margin: 15px 0 0 0;
@@ -94,6 +98,8 @@ p{
     margin: 0 0;
     width: 100%;
 
+
+
     .card {
       margin: 0 0;
       width: 100%;
@@ -104,7 +110,7 @@ p{
     .title {
       color: black;
       font-size: 22px;
-      margin: -15px 0 20px 0;
+      //margin: -15px 0 20px 0;
       overflow: hidden;
       text-overflow: ellipsis;
       display: -webkit-box;
@@ -139,6 +145,7 @@ p{
     .starText{
       font-size: 14px;
       text-align: center;
+      margin-top: 5px;
     }
     .tags{
       font-size: 16px;
@@ -159,14 +166,10 @@ p{
       align-items: center;
       color: #828A92;
       margin: 5px 0 0 3px;
-      .userIcon{
+      .firstIcon{
         margin-right: 4px;
       }
-      .tagsIcon{
-        margin-left: 0px;
-        margin-right: 4px;
-      }
-      .clockIcon{
+      .otherIcon{
         margin-left: 21px;
         margin-right: 4px;
       }
@@ -237,14 +240,15 @@ p{
       cursor: default;
     }
     .footer {
-      display: flex;
+      display: -webkit-box;
+      //display: flex;
       align-items: center;
       color: #828A92;
       margin: 5px 0 0 3px;
-      .userIcon{
+      .firstIcon{
         margin-right: 4px;
       }
-      .tagsIcon{
+      .otherIcon{
         margin-left: 21px;
         margin-right: 4px;
       }

@@ -29,6 +29,7 @@
 
       .messageSubmenu {
         float: right;
+
       }
 
       .messageMenuItem {
@@ -41,4 +42,20 @@
 
   }
 
+}
+
+
+:global {
+  .ant-menu {
+    max-height: 200px;
+    overflow-y: auto;
+    ::-webkit-scrollbar {display:none}
+    background: white;
+  }
+  .ant-menu-item {
+    color:black;
+  }
+  .ant-menu-dark, .ant-menu-dark .ant-menu-sub {
+    background: white;
+  }
 }
