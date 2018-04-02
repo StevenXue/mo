@@ -162,6 +162,7 @@ class ProjectExample extends React.Component {
                 {map(this.props.projectDetail.project.args.output).map(e =>
                   <div key={e.name}>
                     <p>{e.name}</p>
+                    {e.value_type === 'img'?<img src={'data:image/jpeg;base64,'+e.value}  alt="img" />:<p>{e.value}</p>}
                   </div>
                 )}
               </div>

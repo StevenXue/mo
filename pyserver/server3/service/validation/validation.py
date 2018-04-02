@@ -247,8 +247,6 @@ class GDValidation(unittest.TestCase):
         except Exception as e:
             self.fail(msg="[value_type] is not valid")
 
-
-
     @classmethod
     def run_test(cls, MODULE_PATH, MODULE_NAME):
         GDValidation.MODULE_PATH = MODULE_PATH
