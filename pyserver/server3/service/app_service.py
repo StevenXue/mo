@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import requests
 import json
+import re
 
 from server3.service.project_service import ProjectService
 from server3.business.module_business import ModuleBusiness
@@ -43,16 +44,21 @@ class AppService(ProjectService):
             'content-type': "application/json",
         }
         response = requests.request("POST", url, data=payload, headers=headers)
-        output_json = response.json()
+        print(response.text)
+        pattern = re.compile(r'STRHEAD(.+?)STREND', flags=re.DOTALL)
+        results = pattern.findall(response.text)
+        output_json = json.loads(results[0])
+        print(output_json)
+        # output_json = response.json()
         # 成功调用后 在新的collection存一笔
         user_obj = UserBusiness.get_by_user_ID(user_ID=user_ID)
         # 筛选 input_json
 
         StatisticsBusiness.use_app(
             user_obj=user_obj, app_obj=app,
+            output_json=output_json
             # input_json=input_json,
-            output_json=output_json)
-        return output_json
+        )
 
     @classmethod
     def insert_envs(cls, user_ID, app_name):
