@@ -48,19 +48,13 @@ class App extends Component {
       <div className={styles.App}><img src={banner} alt="" width='100%'/>
         <img src={logo} alt="" style={{position:'absolute',left:'10%',top:16}}/>
         <div className={styles.login}>
-          <Link to='/user/login'>
-            <span>登录</span>
-          </Link>
-
-
+          <span>登录</span>
           <i></i>
-          <Link to='/user/register'>
-            <span>注册</span>
-          </Link>
+          <span>注册</span>
         </div>
-        <Row  className={styles.Row_R}>
+        <Row className={styles.Row_R}>
           <Col span={2}></Col>
-          <Col span={8} className={styles.Col_C}>l
+          <Col span={8} className={styles.Col_C} style={{paddingTop:138,paddingBottom:128}}> {/* check */}
             <div style={{marginBottom:20}}>
               <img src={right1b} alt="" style={{marginBottom:28,marginRight:10}}/>
               <span>全生态AI应用开发平台</span>
@@ -71,8 +65,8 @@ class App extends Component {
             </div>
           </Col>
           <Col span={2}></Col>
-          <Col span={10}><img src={system} alt="" width="100%"/></Col>
-          <Col span={2}></Col>
+          <Col span={10} style={{backgroundColor:'#f9f9f9',paddingTop:138,paddingBottom:128}}><img src={system} alt="" width="100%"/></Col>  {/* check */}
+          <Col span={2} style={{backgroundColor:'#f9f9f9',paddingTop:138,paddingBottom:128}}></Col> {/* check */}
         </Row>
         <div className={styles.Div_1}>
           <img src={bg1} alt="" width="100%"/>
@@ -110,34 +104,34 @@ class App extends Component {
           </Row>
         </div>
         <Row style={{padding: '120px 0',backgroundColor:'#373737', display: 'flex', justifyContent: 'center' }}>
-          <div style={{height: 562.5, width: 1000, zIndex: 9, background: 'rgba(52,191,226,0.7)', position: 'absolute',
-            display: this.state.playDisplay, justifyContent:'center', alignItems: 'center', borderRadius: 30}}>
+          <div className={styles.video} style={{display: this.state.playDisplay}}>
             <Icon type="play-circle" style={{fontSize: 100, color: 'white', cursor: 'pointer'}}
                   onClick={() => this.startVideo()}/>
           </div>
-          <video id='intro-video' width="1000" height="562.5" src="http://localhost:5005/static/videos/intro.mp4"
+          <video id='intro-video' width="1000" height="562.5" src="/pyapi/static/videos/intro.mp4"
                  style={{borderRadius: 30, boxShadow: '0 8px 25px rgba(0,0,0,0.7)'}} />
         </Row>
         <div className={styles.Div_3}>
-          <Row className={`${styles.Row_2} ${styles.bg11}`}>
-            <Col span={3}></Col>
-            <Col span={7} className={styles.Col_2}>
-              <div className={styles.Div_3}>
-                <img src={right1b} alt="" style={{marginBottom:28}}/>
-                <span>网页端</span>
-                <img src={right2b} alt="" style={{marginBottom:-16}}/>
-              </div>
-              <div className={styles.Div_4}>开发工具与交流平台</div>
-              <div className={styles.Div_5}>
-                <p>蓦的网页端不仅仅是一个实用的开发工具，除了预测模型和模型组件的训练、监控与部署，更是开发者们交流讨论的平台。</p>
-                <p>在需求版块您也可以分享自己的研究成果或者解决不了的技术难题。我们还提供世界频道的小功能，可以和网站的在线用户进行实时交流。</p>
-              </div>
-              <Button type="primary">查看更多</Button>
-            </Col>
-          </Row>
-
-
-          <Row className={styles.Row_3} style={{paddingTop:170}}>
+          <div style={{backgroundColor:'#f9f9f9',position:'relative'}}> {/* check */}
+            <i style={{width:'100%',height:'24%',backgroundColor:'#ffffff',position:'absolute',bottom:0,left:0}}></i>
+            <Row className={`${styles.Row_2} ${styles.bg11}`}>
+              <Col span={3}></Col>
+              <Col span={7} className={styles.Col_2}>
+                <div className={styles.Div_3}>
+                  <img src={right1b} alt="" style={{marginBottom:28}}/>
+                  <span>网页端</span>
+                  <img src={right2b} alt="" style={{marginBottom:-16}}/>
+                </div>
+                <div className={styles.Div_4}>开发工具与交流平台</div>
+                <div className={styles.Div_5}>
+                  <p>蓦的网页端不仅仅是一个实用的开发工具，除了预测模型和模型组件的训练、监控与部署，更是开发者们交流讨论的平台。</p>
+                  <p>在需求版块您也可以分享自己的研究成果或者解决不了的技术难题。我们还提供世界频道的小功能，可以和网站的在线用户进行实时交流。</p>
+                </div>
+                <Button type="primary" style={{width:200,height:48}}>查看更多</Button>   {/* check */}
+              </Col>
+            </Row>
+          </div>
+          <Row className={styles.Row_3}>  {/* check */}
             <Col span={3}></Col>
             <Col span={7} className={styles.Col_2}>
               <div>
@@ -148,21 +142,28 @@ class App extends Component {
               </div>
             </Col>
             <Col span={2}></Col>
-
-            <Col span={12} className={styles.Col_3}>
-              <img src={computer1} width="518px" height="286px" alt=""/>
-            </Col>
-            <img src={computer} style={{position:'absolute',left:401,top:-323,width:766,height:451}} alt=""/>          </Row>
-
-
+            <Col span={12} className={styles.Col_3}><img src={computer1} width="518px" height="286px" alt=""/></Col>
+            <img src={computer} style={{position:'absolute',left:482,top:-323,width:766,height:451}} alt=""/> {/* check */}
+          </Row>
           <Row style={{paddingTop:100}}>
             <Col span={3}></Col>
-            <Col span={10} className={styles.Col_5}><img src={computer2} width="518px" height="286px" alt=""/></Col>
-            <Col span={1}></Col>
-            <Col span={9} className={styles.Col_6}>轻松的经验交流区</Col>
+            <Col span={9} className={styles.Col_5}><img src={computer2} width="518px" height="286px" alt=""/></Col>  {/* check */}
+            {/* <Col span={1}></Col> */}  {/* check */}
+            <Col span={7} className={styles.Col_2}>
+              <div style={{paddingTop:50,textAlign:'left'}}>
+                <p style={{textAlign:'left',
+                  fontFamily: 'SFProDisplay-Regular',
+                  fontSize: '32px',
+                  color: '#4B4F56',
+                  lineHeight: '38px'}}>灵活的模块化算法模型</p>
+                <span style={{fontFamily: 'PingFangSC-Regular',
+                  fontSize: '16px',
+                  color: '#666666',
+                  lineHeight: '38px'}}>用户可以将算法进行封装，构建成模块提供给他人使用，可以根据配置自动生成参数的输入界面。</span>
+              </div>
+            </Col>  {/* check */}
+
           </Row>
-
-
           <Row className={styles.Row_3}>
             <Col span={3}></Col>
             <Col span={7} className={styles.Col_2}>
@@ -173,40 +174,38 @@ class App extends Component {
             </Col>
             <Col span={2}></Col>
             <Col span={12} className={styles.Col_3}>
-              <img src={computer3} width="518px" height="286px" alt=""/>
-            </Col>
+              <img src={computer3} width="518px" height="286px" alt=""/></Col>
           </Row>
-
-
           <Row className={styles.Row_3} style={{marginBottom:100}}>
             <Col span={2}></Col>
-            <Col span={10} className={styles.Col_3}>
-              <img src={computer4} width="518px" height="286px" alt=""/>
-            </Col>
-            <Col span={1}></Col>
-            <Col span={7} className={styles.Col_2}>
-              <div style={{paddingTop:50,textAlign:'left'}}>
-                <p style={{textAlign:'left'}}>灵活的模块化算法模型</p>
-                <span>用户可以将算法进行封装，构建成模块提供给他人使用，可以根据配置自动生成参数的输入界面。</span>
+            <Col span={10} className={styles.Col_3}><img src={computer4} width="518px" height="286px" alt=""/></Col>  {/* check */}
+            {/* <Col span={1}></Col> */} {/* check */}
+            <Col span={8} className={styles.Col_2}>
+              <div style={{textAlign:'left'}}>
+                <p style={{textAlign:'left'}}>轻松的经验交流区</p>
+                <span>在这里展示你的技术与成果，和其他用户交流经验，当然，如果你有任何需求，在这里提出也会找到合适的帮手来为你解决。</span>
               </div>
-            </Col>
+            </Col>    {/* check */}
           </Row>
-          <Row className={`${styles.Row_2} ${styles.bg22}`}>
-            <Col span={3}></Col>
-            <Col span={7} className={styles.Col_2}>
-              <div className={styles.Div_3}>
-                <img src={right1b} alt="" style={{marginBottom:28}}/>
-                <span>移动端</span>
-                <img src={right2b} alt="" style={{marginBottom:-16}}/>
-              </div>
-              <div className={styles.Div_4}>便捷智能的手机管家</div>
-              <div className={styles.Div_5}>
-                <p>蓦的移动端更像是您的便携智能手机管家，购物推荐亦或者明天的交通路线，您有什么想要知道的都可以来询问小莫语音助手，我们会根据您的需求和偏好为您推荐最合适的预测模型。</p>
-                <p>如果在平台中暂时没有满足您需要的预测模型，您也可以把您的需求告诉小莫，小莫会在平台中帮您找到潜在的开发者帮您实现。</p>
-              </div>
-              <Button type="primary">客户端下载</Button>
-            </Col>
-          </Row>
+          <div style={{backgroundColor:'#f9f9f9',position:'relative'}}> {/* check */}
+            <i style={{width:'100%',height:'24%',backgroundColor:'#ffffff',position:'absolute',bottom:0,left:0}}></i>
+            <Row className={`${styles.Row_2} ${styles.bg22}`}>
+              <Col span={3}></Col>
+              <Col span={7} className={styles.Col_2}>
+                <div className={styles.Div_3}>
+                  <img src={right1b} alt="" style={{marginBottom:28}}/>
+                  <span>移动端</span>
+                  <img src={right2b} alt="" style={{marginBottom:-16}}/>
+                </div>
+                <div className={styles.Div_4}>便捷智能的手机管家</div>
+                <div className={styles.Div_5}>
+                  <p>蓦的移动端更像是您的便携智能手机管家，购物推荐亦或者明天的交通路线，您有什么想要知道的都可以来询问小莫语音助手，我们会根据您的需求和偏好为您推荐最合适的预测模型。</p>
+                  <p>如果在平台中暂时没有满足您需要的预测模型，您也可以把您的需求告诉小莫，小莫会在平台中帮您找到潜在的开发者帮您实现。</p>
+                </div>
+                <Button type="primary" style={{width:200,height:48}}>客户端下载</Button>  {/* check */}
+              </Col>
+            </Row>
+          </div>
         </div>
         <ul className={styles.Ul_1}>
           <li>
@@ -236,7 +235,7 @@ class App extends Component {
               <Col span={4}></Col>
               <Col span={8} style={{textAlign:'center'}}>
                 <img src={search} alt="" style={{marginBottom:20}}/>
-                <Button type="primary" onClick={()=> window.location.replace('/#/user/register')}>立即注册</Button>
+                <Button type="primary">立即注册</Button>
               </Col>
               <Col span={2}></Col>
               <Col span={10}>

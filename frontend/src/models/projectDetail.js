@@ -24,7 +24,7 @@ export default {
     sessions: [],
     // doneIndices: new Set([]),
     overviewEditState: false,
-    helpModalVisible: true,
+    helpModalVisible: false,
   },
   reducers: {
     showOverviewEditState(state) {
