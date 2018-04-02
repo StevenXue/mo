@@ -36,6 +36,7 @@ class AppService(ProjectService):
         app = AppBusiness.get_by_id(project_id=app_id)
         url = app.user.user_ID + "-" + app.name
         domin = "http://192.168.31.23:8080/function/"
+        # domin = 'http://192.168.31.7:8080/function/"
         url = domin + url
         payload = json.dumps(input_json)
         headers = {
@@ -50,7 +51,8 @@ class AppService(ProjectService):
         StatisticsBusiness.use_app(
             user_obj=user_obj, app_obj=app,
             # input_json=input_json,
-            output_json=output_json)
+            # output_json=output_json
+        )
         return output_json
 
     @classmethod
