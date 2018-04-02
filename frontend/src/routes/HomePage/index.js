@@ -116,7 +116,7 @@ class App extends Component {
                   onClick={() => this.startVideo()}/>
           </div>
           <video id='intro-video' width="1000" height="562.5" src="http://localhost:5005/static/videos/intro.mp4"
-                 style={{borderRadius: 30, boxShadow: '0 8px 10px #000000'}} />
+                 style={{borderRadius: 30, boxShadow: '0 8px 25px rgba(0,0,0,0.7)'}} />
         </Row>
         <div className={styles.Div_3}>
           <Row className={`${styles.Row_2} ${styles.bg11}`}>
