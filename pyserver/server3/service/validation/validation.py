@@ -92,6 +92,15 @@ class GDValidation(unittest.TestCase):
         with open("{}/src/main.py".format(self.MODULE_PATH), 'r') as f:
             read_data = f.read()
 
+            # Check class name
+            with self.subTest(name='class name in main.py'):
+                self.assertIsNotNone(
+                    re.search(r'class\s+{}'.format(self.MODULE_NAME),
+                              read_data),
+                    msg="class name is not eqaul to {}".format(
+                        self.MODULE_NAME))
+
+
             if self.MODULE_TYPE == 'model':
                 # Check [def __init__()] section
                 with self.subTest(name="[def __init__()] in main.py"):
