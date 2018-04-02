@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Button,} from 'antd';
+import { Row, Col, Button, Icon} from 'antd';
 import { Link, Route, Switch } from 'dva/router'
 
 
@@ -31,7 +31,16 @@ import computer4 from './image/computer4.png';
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {}
+    this.state = {
+      playDisplay: 'flex'
+    }
+  }
+
+  startVideo() {
+    this.setState({
+      playDisplay: 'none'
+    })
+    document.getElementById('intro-video').play()
   }
 
   render() {
@@ -40,13 +49,13 @@ class App extends Component {
         <img src={logo} alt="" style={{position:'absolute',left:'10%',top:16}}/>
         <div className={styles.login}>
           <Link to='/user/login'>
-          <span>登录</span>
+            <span>登录</span>
           </Link>
 
 
           <i></i>
           <Link to='/user/register'>
-          <span>注册</span>
+            <span>注册</span>
           </Link>
         </div>
         <Row  className={styles.Row_R}>
@@ -68,9 +77,9 @@ class App extends Component {
         <div className={styles.Div_1}>
           <img src={bg1} alt="" width="100%"/>
           <div className={styles.Div_2}>
-              <img src={right1} alt=""/>
-              <span>网站+移动端双平台</span>
-              <img src={right2} alt=""/>
+            <img src={right1} alt=""/>
+            <span>网站+移动端双平台</span>
+            <img src={right2} alt=""/>
           </div>
           <span className={styles.Span_1}>平台集合网页端和移动端，满足不同用户在不同使用场景下的需求。</span>
           <Row className={styles.Row_1}>
@@ -100,9 +109,14 @@ class App extends Component {
             <Col span={1}></Col>
           </Row>
         </div>
-        <Row style={{paddingTop:154,backgroundColor:'#000000'}}>
-          <Col span={2}></Col>
-          <video width="1000" height="562.5" src="blob:http://v.youku.com/1a55807c-ffa7-477f-b687-fdb3d309d3e7" controls="controls"></video>
+        <Row style={{padding: '120px 0',backgroundColor:'#373737', display: 'flex', justifyContent: 'center' }}>
+          <div style={{height: 562.5, width: 1000, zIndex: 9, background: 'rgba(52,191,226,0.7)', position: 'absolute',
+            display: this.state.playDisplay, justifyContent:'center', alignItems: 'center', borderRadius: 30}}>
+            <Icon type="play-circle" style={{fontSize: 100, color: 'white', cursor: 'pointer'}}
+                  onClick={() => this.startVideo()}/>
+          </div>
+          <video id='intro-video' width="1000" height="562.5" src="http://localhost:5005/static/videos/intro.mp4"
+                 style={{borderRadius: 30, boxShadow: '0 8px 10px #000000'}} />
         </Row>
         <div className={styles.Div_3}>
           <Row className={`${styles.Row_2} ${styles.bg11}`}>
