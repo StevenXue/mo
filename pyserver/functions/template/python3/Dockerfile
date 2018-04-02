@@ -26,6 +26,8 @@ WORKDIR /root/
 
 COPY requirements.txt   .
 RUN while read requirement; do conda install --yes $requirement || pip install $requirement -i https://mirrors.ustc.edu.cn/pypi/web/simple; done < requirements.txt
+RUN pip install opencv-python -i https://mirrors.ustc.edu.cn/pypi/web/simple
+
 COPY index.py           .
 
 ENV fprocess="python3 index.py"

@@ -120,7 +120,7 @@ class ProjectExample extends React.Component {
         <div>
           API:
           <CopyInput
-            text={`${projectDetail.project.app_path.replace('.', 'http://192.168.31.23:8080')}`}/>
+            text={`${projectDetail.project.app_path.replace('.', 'http://192.168.31.7:8080')}`}/>
         </div>}
         <br/>
         <br/>
@@ -162,7 +162,7 @@ class ProjectExample extends React.Component {
                 {map(this.props.projectDetail.project.args.output).map(e =>
                   <div key={e.name}>
                     <p>{e.name}</p>
-                    <p>{e.value}</p>
+                    {e.value_type === 'img'?<img src={'data:image/jpeg;base64,'+e.value}  alt="img" />:<p>{e.value}</p>}
                   </div>,
                 )}
               </div>
