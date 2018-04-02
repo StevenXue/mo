@@ -49,7 +49,7 @@ class AppService(ProjectService):
         results = pattern.findall(response.text)
         output_json = json.loads(results[0])
         print(output_json)
-        #output_json = response.json()
+        # output_json = response.json()
         # 成功调用后 在新的collection存一笔
         user_obj = UserBusiness.get_by_user_ID(user_ID=user_ID)
         # 筛选 input_json
@@ -57,9 +57,8 @@ class AppService(ProjectService):
         StatisticsBusiness.use_app(
             user_obj=user_obj, app_obj=app,
             output_json=output_json
-        # input_json=input_json,
+            # input_json=input_json,
         )
-        return output_json
 
     @classmethod
     def insert_envs(cls, user_ID, app_name):

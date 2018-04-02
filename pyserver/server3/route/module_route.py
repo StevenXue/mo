@@ -15,7 +15,6 @@ from flask import request
 from server3.business import module_business, user_business
 from server3.business.module_business import ModuleBusiness
 from server3.service.module_service import ModuleService
-from server3.service.validation.validation import GDValidation
 from server3.utility import json_utility
 
 PREFIX = '/modules'
@@ -106,10 +105,7 @@ def publish_module(project_id):
 
 @module_app.route("/test/<project_id>", methods=["GET"])
 def test_module(project_id):
-    # project = ModuleBusiness.publish(project_id)
-    # project = json_utility.convert_to_json(project.to_mongo())
-    result = GDValidation.run_test('./', 'sesese')
-    print(result)
+    failures = ModuleBusiness.run_test(project_id)
     import time
-    time.sleep(3)
-    return jsonify({"response": 1})
+    time.sleep(1)
+    return jsonify({"response": failures})
