@@ -964,7 +964,7 @@ c.Authenticator.admin_users = {'admin'}
 
 c.DockerSpawner.image = 'singleuser:latest'
 c.DockerSpawner.remove_containers = True
-# c.DockerSpawner.use_internal_ip =
+c.DockerSpawner.container_ip = '0.0.0.0'
 c.DockerSpawner.volumes = \
     {
         '/Users/zhaofengli/projects/goldersgreen/pyserver/user_directory/{user_ID}/{project_name}': '/home/jovyan/work',
@@ -973,4 +973,7 @@ c.DockerSpawner.volumes = \
         # '/Users/Chun/Documents/workspace/goldersgreen/pyserver/user_directory/{user_ID}/{project_name}': '/home/jovyan/work',
         # '/Users/Chun/Documents/workspace/goldersgreen/pyserver/server3/lib/modules': '/home/jovyan/modules',
         # '/Users/Chun/Documents/workspace/goldersgreen/pyserver/user_directory': '/home/jovyan/dataset'
+        # '/home/git/www/mo_prod/pyserver/user_directory/{user_ID}/{project_name}': '/home/jovyan/work',
+        # '/home/git/www/mo_prod/pyserver/server3/lib/modules': '/home/jovyan/modules',
+        # '/home/git/www/mo_prod/pyserver/user_directory': '/home/jovyan/dataset'
     }

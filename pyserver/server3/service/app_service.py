@@ -7,6 +7,7 @@ from server3.business.module_business import ModuleBusiness
 from server3.business.app_business import AppBusiness
 from server3.business.user_business import UserBusiness
 from server3.business.statistics_business import StatisticsBusiness
+from server3.constants import DOCKER_IP
 
 
 class AppService(ProjectService):
@@ -35,7 +36,7 @@ class AppService(ProjectService):
         """
         app = AppBusiness.get_by_id(project_id=app_id)
         url = app.user.user_ID + "-" + app.name
-        domin = "http://192.168.31.23:8080/function/"
+        domin = f"http://{DOCKER_IP}:8080/function/"
         url = domin + url
         payload = json.dumps(input_json)
         headers = {
@@ -45,9 +46,12 @@ class AppService(ProjectService):
         output_json = response.json()
         # 成功调用后 在新的collection存一笔
         user_obj = UserBusiness.get_by_user_ID(user_ID=user_ID)
+        # 筛选 input_json
+
         StatisticsBusiness.use_app(
             user_obj=user_obj, app_obj=app,
-            input_json=input_json, output_json=output_json)
+            # input_json=input_json,
+            output_json=output_json)
         return output_json
 
     @classmethod

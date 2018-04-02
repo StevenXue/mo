@@ -168,18 +168,12 @@ export default {
         let errorMessage = response.data.error.message
         message.error(errorMessage)
       }
-
-
-
     },
-
-
-
     *query({ payload }, { call, put }) {
       try {
         const { data: data } = yield call(tokenLogin)
         if(!data.user) {
-          if (!(location.href.includes('/user/login') || location.href.includes('/user/register'))) {
+          if (!(location.href.includes('/user/login') || location.href.includes('/user/register') || location.href.slice(-3)==='/#/')) {
             // yield put(routerRedux.push('/user/login'))
             // FIXME reload is a workaround
             window.location.replace('/#/user/login')
@@ -261,8 +255,11 @@ export default {
   subscriptions: {
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
+        console.log("pathname", pathname)
         const match = pathToRegexp('/user/login').exec(pathname)
+
         if (!match) {dispatch({ type: 'query' })}
+
         const userId = localStorage.getItem('user_ID')
         if (userId && !connected) {
 

@@ -1,9 +1,9 @@
 import React from 'react'
-import { HashRouter, Route, Switch, Link, withRouter, routerRedux } from 'dva/router'
-import { Breadcrumb } from 'antd'
-import { connect } from 'dva'
+import {HashRouter, Route, Switch, Link, withRouter, routerRedux} from 'dva/router'
+import {Breadcrumb} from 'antd'
+import {connect} from 'dva'
 import pathToRegexp from 'path-to-regexp'
-import { get } from 'lodash'
+import {get} from 'lodash'
 
 import Users from './routes/Users.js'
 import Account from './routes/login/Account'
@@ -17,9 +17,10 @@ import PublicServedModelsDetail from './routes/DeployedModels/ModelsDetail'
 import UserRequest from './routes/UserRequest/UserRequestList'
 import UserRequestDetail from './routes/UserRequest/UserRequestDetail'
 import MyService from './routes/MyService'
-import { ModuleList, Module } from './routes/Module'
+import {ModuleList, Module} from './routes/Module'
 import Profile from './routes/Profile'
 import MarketList from './routes/market/ProjectList'
+import HomePage from './routes/HomePage'
 // import MarketDetail from './routes/market/ProjectDetail'
 // import ApiList from './components/Chat/ApiList'
 const breadcrumbNameMap = {
@@ -36,7 +37,7 @@ const breadcrumbNameMap = {
   '/market': 'Market',
 }
 
-const RouterConfig = ({ history, location, projectDetail }) => {
+const RouterConfig = ({history, location, projectDetail}) => {
   const pathSnippets = location.pathname.split('/').filter(i => i)
 
   const extraBreadcrumbItems = pathSnippets.map((_, index) => {
@@ -55,7 +56,7 @@ const RouterConfig = ({ history, location, projectDetail }) => {
     return (
       <Breadcrumb.Item key={url}>
         <Link to={url + location.search.replace('type', 'tab')}
-              style={{ textTransform: 'capitalize' }}>
+              style={{textTransform: 'capitalize'}}>
           {breadcrumbName || breadcrumbNameMap[url]}
         </Link>
       </Breadcrumb.Item>
@@ -68,37 +69,49 @@ const RouterConfig = ({ history, location, projectDetail }) => {
   )].concat(extraBreadcrumbItems)
 
   return (
-    <MainLayout location={location} history={history}>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <Breadcrumb>
-          {extraBreadcrumbItems}
-        </Breadcrumb>
-        <Switch>
-          <Route path="/user" component={Account}/>
-          <Route path="/workspace/:projectId" component={ProjectDetail}/>
-          <Route path="/workspace" component={MyProjects}/>
-          <Route path="/projects/:projectId" component={PublicProject}/>
-          <Route path="/projects" component={Projects}/>
+    <Switch>
+      <Route path="/user" component={Account}/>
 
-          <Route path="/market/:projectId" render={(props) => <ProjectDetail {...props} market_use={true}/>}/>
-          <Route path="/market" component={MarketList}/>
+      <Route path="/:anything" component={() =>
+        <MainLayout location={location} history={history}>
+          <div style={{display: 'flex', flexDirection: 'column'}}>
+            <Breadcrumb>
+              {extraBreadcrumbItems}
+            </Breadcrumb>
+            <Switch>
 
-          <Route path="/modelmarket/:modelsId" component={PublicServedModelsDetail}/>
-          <Route path="/modelmarket" component={PublicServedModels}/>
-          <Route path="/myservice" component={MyService}/>
-          <Route path="/userrequest/:userrequestId" component={UserRequestDetail}/>
-          <Route path="/userrequest" component={UserRequest}/>
+              <Route path="/workspace/:projectId" component={ProjectDetail}/>
+              <Route path="/workspace" component={MyProjects}/>
+              <Route path="/projects/:projectId" component={PublicProject}/>
+              <Route path="/projects" component={Projects}/>
 
-          <Route path="/modulelist/:moduleId" component={Module}/>
-          <Route path="/modulelist" component={ModuleList}/>
-          <Route path="/profile/:userId" component={Profile}/>
-        </Switch>
-      </div>
-    </MainLayout>
+              <Route path="/market/:projectId" render={(props) => <ProjectDetail {...props} market_use={true}/>}/>
+              <Route path="/market" component={MarketList}/>
+
+              <Route path="/modelmarket/:modelsId" component={PublicServedModelsDetail}/>
+              <Route path="/modelmarket" component={PublicServedModels}/>
+              <Route path="/myservice" component={MyService}/>
+              <Route path="/userrequest/:userrequestId" component={UserRequestDetail}/>
+              <Route path="/userrequest" component={UserRequest}/>
+
+              <Route path="/modulelist/:moduleId" component={Module}/>
+              <Route path="/modulelist" component={ModuleList}/>
+              <Route path="/profile/:userId" component={Profile}/>
+            </Switch>
+          </div>
+        </MainLayout>}
+      />
+
+
+      <Route path="/" component={HomePage}/>
+
+
+
+    </Switch>
   )
 }
 
-const Main = withRouter(connect(({ projectDetail }) => ({ projectDetail }))(RouterConfig))
+const Main = withRouter(connect(({projectDetail}) => ({projectDetail}))(RouterConfig))
 
 const App = ((props) =>
     <HashRouter>

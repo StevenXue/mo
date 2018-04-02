@@ -15,7 +15,7 @@ class StatisticsBusiness(GeneralBusiness):
             app=app_obj,
             action="use",
             datetime=datetime.utcnow(),
-            input_json=input_json,
+            # input_json=input_json,
             output_json=output_json
         )
 

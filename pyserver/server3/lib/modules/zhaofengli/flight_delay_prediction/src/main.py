@@ -66,7 +66,7 @@ class flight_delay_prediction(object):
         allfeatures = list(predict_data.columns.values)
         cat_attribs = ["OriginAirportID", "DestAirportID"]
         num_attribs = [i for i in allfeatures if i not in cat_attribs]
-
+        print(predict_data[num_attribs].values)
         data_num_prepared = self.num_pipeline.transform(predict_data[num_attribs].values)
         data_cat_prepared = self.cat_pipeline.transform(predict_data[cat_attribs].values)
         data_prepared = np.concatenate(
