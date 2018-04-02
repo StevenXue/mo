@@ -165,7 +165,6 @@ class ModuleBusiness(ProjectBusiness):
     @classmethod
     def run_test(cls, project_id):
         project = cls.get_by_id(project_id)
-        print(project.path, project.name)
         result = GDValidation.run_test(project.path, project.name)
         failures = [f[1] for f in result.failures]
         return failures

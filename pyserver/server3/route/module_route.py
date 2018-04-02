@@ -106,4 +106,6 @@ def publish_module(project_id):
 @module_app.route("/test/<project_id>", methods=["GET"])
 def test_module(project_id):
     failures = ModuleBusiness.run_test(project_id)
+    import time
+    time.sleep(1)
     return jsonify({"response": failures})
