@@ -162,8 +162,7 @@ class ProjectExample extends React.Component {
                 {map(this.props.projectDetail.project.args.output).map(e =>
                   <div key={e.name}>
                     <p>{e.name}</p>
-                    <p>{e.value}</p>
-                  </div>,
+                  </div>
                 )}
               </div>
             </div>
