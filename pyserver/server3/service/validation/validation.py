@@ -329,9 +329,10 @@ class GDValidation(unittest.TestCase):
             return False, None
 
     @classmethod
-    def run_test(cls, MODULE_PATH, MODULE_NAME):
-        GDValidation.MODULE_PATH = MODULE_PATH
-        GDValidation.MODULE_NAME = MODULE_NAME
+    def run_test(cls, module_path, module_name, module_user_ID):
+        GDValidation.MODULE_PATH = module_path
+        GDValidation.MODULE_NAME = module_name
+        GDValidation.MODULE_AUTHOR = module_user_ID
 
         test_suite = unittest.TestLoader().loadTestsFromTestCase(cls)
         return TextTestRunner().run(test_suite)
