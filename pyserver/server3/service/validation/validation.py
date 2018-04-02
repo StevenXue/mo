@@ -6,10 +6,12 @@ from io import BytesIO
 from PIL import Image
 import base64
 import re
-
-import unittest
-from unittest import TextTestRunner
+import importlib
 import yaml
+import unittest
+from datetime import datetime
+from unittest import TextTestRunner
+
 
 
 class GDValidation(unittest.TestCase):
@@ -21,6 +23,9 @@ class GDValidation(unittest.TestCase):
     MODULE_PATH = "./"
     MODULE_NAME = ""
     MODULE_USER_DIRECTORY = "user_directory"
+    # model / toolkit
+    MODULE_TYPE = "model"
+
     # user_directory.zhaofengli.sesese.src.main
     # MODULE_INPUT = {}
     # MODULE_YAML_OBJ = None
@@ -82,7 +87,51 @@ class GDValidation(unittest.TestCase):
             "{}/requirements.txt".format(self.MODULE_PATH)),
             msg="[requirements.txt] does not exist")
 
-    # Step 2: YAML
+    # Step 2: main.py
+    def test_signature(self):
+        with open("{}/src/main.py".format(self.MODULE_PATH), 'r') as f:
+            read_data = f.read()
+
+            if self.MODULE_TYPE == 'model':
+                # Check [def __init__()] section
+                with self.subTest(name="[def __init__()] in main.py"):
+                    self.assertIsNotNone(
+                        re.search(r'def\s+__init__\(self', read_data),
+                        msg="[def __init__()] signature is missing")
+
+                # Check [def train()] section
+                with self.subTest(name="[def train()] in main.py"):
+                    self.assertIsNotNone(
+                        re.search(r'def\s+train\(self,\s+input={}', read_data),
+                        msg="[def train()] signature is missing")
+
+                # Check [def predict()] section
+                with self.subTest(name="[def predict()] in main.py"):
+                    self.assertIsNotNone(
+                        re.search(r'def\s+predict\(self,\s+input={}', read_data),
+                        msg="[def predict()] signature is missing")
+
+                # Check [def load_model()] section
+                with self.subTest(name="[def load_model()] in main.py"):
+                    self.assertIsNotNone(
+                        re.search(r'def\s+load_model\(self', read_data),
+                        msg="[def load_model()] signature is missing")
+
+            elif self.MODULE_TYPE == 'toolkit':
+                # Check [def __init__()] section
+                with self.subTest(name="[def __init__()] in main.py"):
+                    self.assertIsNotNone(
+                        re.search(r'def\s+__init__\(self', read_data),
+                        msg="[def __init__()] signature is missing")
+
+                # Check [def run()] section
+                with self.subTest(name="[def train()] in main.py"):
+                    self.assertIsNotNone(
+                        re.search(r'def\s+run\(self,\s+input={}', read_data),
+                        msg="[def run()] signature is missing")
+
+
+    # Step 3: YAML
     def test_yaml(self):
         '''
             To check the content of [module_spec.yaml] file
@@ -104,22 +153,29 @@ class GDValidation(unittest.TestCase):
                     yaml_obj.get("input"),
                     msg="[input] section missing in module_spec.yml")
 
-            # Check [input:predict] section
-            with self.subTest(name="[input:predict] section"):
-                yaml_input_predict = yaml_obj.get(
-                    "input", {}).get("predict", None)
-                self.assertIsNotNone(
-                    yaml_input_predict,
-                    msg="[input/predict] section missing in module_spec.yml")
-
             # Check value_name / value_type / default_value of each parameter
             required_predict_items = {"value_name": "name",
                                       "value_type": "value_type",
                                       "default_value": "default"}
+            prefix = ''
+            if self.MODULE_TYPE == 'model':
+                prefix = 'predict'
+            elif self.MODULE_TYPE == 'toolkit':
+                prefix = 'run'
+
+
+            # Check [input:predict or input:run] section
+            with self.subTest(name="[input:{}] section".format(prefix)):
+                yaml_input = yaml_obj.get("input", {}).get(prefix, None)
+                self.assertIsNotNone(
+                    yaml_input,
+                    msg="[input/{}] section missing in module_spec.yml".
+                        format(prefix))
+
             input_feed = {}
-            for k, v in yaml_input_predict.items():
+            for k, v in yaml_input.items():
                 # Check value_name
-                with self.subTest(name="[input:predict:{}]".format(k)):
+                with self.subTest(name="[input:{}:{}]".format(prefix, k)):
                     name = v.get(required_predict_items["value_name"], None)
                     self.assertIsNotNone(
                         name,
@@ -127,7 +183,7 @@ class GDValidation(unittest.TestCase):
                                 k, name))
 
                 # Check value_type
-                with self.subTest(name="[input:predict:{}]".format(k)):
+                with self.subTest(name="[input:{}:{}]".format(prefix, k)):
                     value_type = v.get(required_predict_items["value_type"],
                                        None)
                     self.assertIsNotNone(
@@ -136,7 +192,7 @@ class GDValidation(unittest.TestCase):
                             k, value_type))
 
                 # Check default_value
-                with self.subTest(name="[input:predict:{}]".format(k)):
+                with self.subTest(name="[input:{}:{}]".format(prefix, k)):
                     default_value = v.get(
                         required_predict_items["default_value"], None)
                     self.assertIsNotNone(
@@ -146,51 +202,52 @@ class GDValidation(unittest.TestCase):
 
                 # Check if type of default_value is matched with value_type
                 with self.subTest(name=
-                                  "[input:predict:{}] - "
-                                  "Type Checking".format(k)):
-
+                                  "[input:{}:{}] - "
+                                  "Type Checking".format(prefix, k)):
+                    assert_result, value = \
+                        self.check_value_type(value_type, default_value)
                     self.assertTrue(
-                        self.check_value_type(value_type, default_value),
+                        assert_result,
                         msg="[{}/default] value is not match "
                             "with [{}/value_type]".format(k, k))
 
-                input_feed[name] = default_value
+                input_feed[name] = value
 
-            print("input_feed", input_feed)
+            # print("input_feed", input_feed)
 
             if input_feed:
                 # Check predict() with default_value of each parameter
-                with self.subTest(name="predict()"):
+                with self.subTest(name="{}()".format(prefix)):
                     try:
-
                         module_import_path = \
                             "{}.{}.{}.src.main".format(
                                 self.MODULE_USER_DIRECTORY,
                                 self.MODULE_AUTHOR,
                                 self.MODULE_NAME)
                         print("module_import_path", module_import_path)
-                        import importlib
+
                         my_module = importlib. \
                             import_module(module_import_path)
                         m = getattr(my_module, self.MODULE_NAME)()
-                        result = m.predict(input=input_feed)
+
+                        if self.MODULE_TYPE == 'model':
+                            result = m.predict(input=input_feed)
+                        elif self.MODULE_TYPE == 'toolkit':
+                            result = m.run(input=input_feed)
+
                         # print("result", result)
                         # Check result type
 
                     except Exception as e:
                         self.fail(
                             msg=
-                            "predict() cannot be executed correctly - {}".
-                                format(str(e)))
+                            "{}() cannot be executed correctly - {}".
+                                format(prefix, str(e)))
             else:
                 self.fail(msg="MODULE_INPUT cannot be generated")
 
-
-
     def check_value_type(self, value_type, default_value):
         # available Types: int, str, float, img, datetime, [int], [str], [float]
-
-
         check_fucns = {
             "int": self.check_int(default_value),
             "float": self.check_float(default_value),
@@ -198,8 +255,11 @@ class GDValidation(unittest.TestCase):
             "datetime": self.check_datetime(default_value),
             "img": self.check_img(default_value),
             "['int']": self.check_array_int(default_value),
-            "[int]": self.check_array_int(default_value)
-
+            "[int]": self.check_array_int(default_value),
+            "[str]": self.check_array_str(default_value),
+            "['str']": self.check_array_str(default_value),
+            "[float]": self.check_array_float(default_value),
+            "['float']": self.check_array_float(default_value)
         }
 
         # print('value_type', value_type)
@@ -210,15 +270,15 @@ class GDValidation(unittest.TestCase):
 
     @staticmethod
     def check_int(value):
-        return type(value) is int
+        return type(value) is int, value
 
     @staticmethod
     def check_float(value):
-        return type(value) is float
+        return type(value) is float, value
 
     @staticmethod
     def check_str(value):
-        return type(value) is str
+        return type(value) is str, value
 
     @staticmethod
     def check_img(value):
@@ -226,34 +286,38 @@ class GDValidation(unittest.TestCase):
             base64_data = re.sub('^data:image/.+;base64,', '', value)
             byte_data = base64.b64decode(base64_data)
             image_data = BytesIO(byte_data)
-            # img = Image.open(image_data)
             Image.open(image_data)
-            return True
+            return True, value
         except Exception as e:
             print(str(e))
-            return False
+            return False, None
 
 
     @staticmethod
     def check_datetime(value):
-        from datetime import datetime
-        return type(value) is datetime
+        return type(value) is datetime, value
 
     @staticmethod
     def check_array_int(value):
         if type(value) is list:
             # print("in check_array_int()")
-            return all(isinstance(item, int) for item in value)
+            return all(isinstance(item, int) for item in value), value
         else:
-            return False
+            return False, None
 
-    # @staticmethod
-    # def check_array_str(value):
-    #     return all(isinstance(item, str) for item in value)
-    #
-    # @staticmethod
-    # def check_array_float(value):
-    #     return all(isinstance(item, float) for item in value)
+    @staticmethod
+    def check_array_str(value):
+        if type(value) is list:
+            return all(isinstance(item, str) for item in value), value
+        else:
+            return False, None
+
+    @staticmethod
+    def check_array_float(value):
+        if type(value) is list:
+            return all(isinstance(item, float) for item in value)
+        else:
+            return False, None
 
     @classmethod
     def run_test(cls, MODULE_PATH, MODULE_NAME):
