@@ -14,6 +14,7 @@ from distutils.dir_util import remove_tree
 from server3.entity import project
 from server3.repository.general_repo import Repo
 from server3.business.project_business import ProjectBusiness
+from server3.service.validation.validation import GDValidation
 from server3.constants import MODULE_DIR
 from server3.constants import USER_DIR
 from server3.constants import GIT_SERVER_IP
@@ -160,3 +161,12 @@ class ModuleBusiness(ProjectBusiness):
         subprocess.call(['bash', 'install_venv.sh', os.path.abspath(dst)])
 
         return module
+
+    @classmethod
+    def run_test(cls, project_id):
+        project = cls.get_by_id(project_id)
+        print(project.path, project.name)
+        result = GDValidation.run_test(project.path, project.name)
+        failures = [f[1] for f in result.failures]
+        return failures
+

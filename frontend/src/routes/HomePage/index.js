@@ -138,8 +138,7 @@ class App extends Component {
             <Col span={12} className={styles.Col_3}>
               <img src={computer1} width="518px" height="286px" alt=""/>
             </Col>
-            <img src={computer} style={{position:'absolute',left:442,top:-103,width:383,height:225}} alt=""/>
-          </Row>
+            <img src={computer} style={{position:'absolute',left:401,top:-323,width:766,height:451}} alt=""/>          </Row>
 
 
           <Row style={{paddingTop:100}}>
