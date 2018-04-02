@@ -21,6 +21,7 @@ if(__name__ == "__main__"):
     with HiddenPrints():
         ret = handler.handle(st)
     if ret != None:
+        print('STRHEAD')
         print(ret)
-
+        print('STREND')
 
