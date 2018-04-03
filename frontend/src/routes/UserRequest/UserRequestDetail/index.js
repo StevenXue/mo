@@ -388,6 +388,18 @@ function UserRequestDetail({ allRequest, login, dispatch }) {
       },
     })
   }
+  function appStatus(project) {
+    if (!project.status) {
+      return <div/>
+    }
+    if (project.status === 'deploying') {
+      return <Tag color='gold' style={{cursor: 'default'}}>Deploying <Icon type="loading"/></Tag>
+    } else if (project.status === 'active') {
+      return <Tag color='green' style={{cursor: 'default'}}>Online</Tag>
+    } else {
+      return <Tag color='grey' style={{cursor: 'default'}}>Offline</Tag>
+    }
+  }
 
   if (login.user && focusUserRequest !== null) {
     const {
@@ -525,9 +537,7 @@ function UserRequestDetail({ allRequest, login, dispatch }) {
                     {e.select_project ? <Card title={e.select_project.name}
                                               style={{ cursor: 'pointer' }}
                                               onClick={() => clickSelectedProject(e)}
-                                              extra={<div style={{ fontSize: '14px' }}>
-                                                <Tag color={e.select_project.status==='active'?"geekblue":'#C1C1C1'} style={{ opacity: '0.8' }}>{e.select_project.status==='active'?'Online':'Offline'}</Tag>
-                                              </div>}>
+                                              extra={<div style={{ fontSize: '14px' }}> {appStatus(e.select_project)}</div>}>
                       <p>{e.select_project.description}</p>
                       {e.select_project.commits.length > 0 ? <div style={{ marginTop: '35px', color: '#848d95' }}>
                         <p>last commited
