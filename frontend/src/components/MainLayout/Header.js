@@ -103,13 +103,16 @@ function Header({location, login, history, dispatch, allRequest,message}) {
   const toMessage= (e) => {
     switch(e.message_type) {
       case 'answer':
-        history.push('/userrequest/'+ e.user_request)
+        history.push(`/userrequest/${e.user_request}?type=${e.user_request_type}`)
         break
       case 'commit':
-        history.push('/userrequest/'+ e.user_request)
+        history.push(`/workspace/${e.project_id}?type=${e.project_type}`)
         break
       case 'deploy':
         history.push(`/workspace/${e.app_id}?type=app`)
+        break
+      case 'publish':
+        history.push(`/workspace/${e.module_id}?type=module`)
         break
     }
     dispatch({
@@ -126,6 +129,8 @@ function Header({location, login, history, dispatch, allRequest,message}) {
         return <p>{e.user_ID} 更新了您关注的需求  {e.user_request_title} 的答案</p>
       case 'deploy':
         return <p>{e.user_ID} 上线了您关注的应用  {e.app_name}</p>
+      case 'publish':
+        return <p>{e.user_ID} 发布了您关注的模块  {e.module_name}</p>
     }
 
   }

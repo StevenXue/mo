@@ -101,6 +101,8 @@ export function createPublishButton(): ToolbarButton {
                                     message.success('Module publish success!');
                                 },
                             });
+                            window.location.replace(`/#/workspace/${projectId}?type=module`);
+                            window.location.reload();
                         }
                     } else {
                         message.error('Please wait until testing finished!');

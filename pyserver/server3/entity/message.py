@@ -7,7 +7,7 @@ from mongoengine import BooleanField
 from mongoengine import ListField
 
 
-MESSAGE_TYPE = ('answer', 'chat', 'commit', 'deploy')
+MESSAGE_TYPE = ('answer', 'chat', 'commit', 'deploy', 'publish')
 
 
 class Message(DynamicDocument):

@@ -98,7 +98,7 @@ def update_module():
 
 @module_app.route("/publish/<project_id>", methods=["POST"])
 def publish_module(project_id):
-    project = ModuleBusiness.publish(project_id)
+    project = ModuleService.publish(project_id)
     project = json_utility.convert_to_json(project.to_mongo())
     return jsonify({"response": project})
 

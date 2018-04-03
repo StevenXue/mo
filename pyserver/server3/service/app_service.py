@@ -8,6 +8,7 @@ from server3.service.project_service import ProjectService
 from server3.business.module_business import ModuleBusiness
 from server3.business.app_business import AppBusiness
 from server3.business.user_business import UserBusiness
+from server3.business import user_business
 from server3.business.statistics_business import StatisticsBusiness
 from server3.service import message_service
 from server3.constants import DOCKER_IP
@@ -81,9 +82,10 @@ class AppService(ProjectService):
     def deploy(cls, app_id):
         app = cls.business.deploy(app_id)
         receivers = app.favor_users  # get app subscriber
-        message_service.create_message(ObjectId('592f8775df86b2e82f9788cf'),
-                                       'deploy', receivers, app.user,
-                                       app_name=app.name, app_id=app.id)
+        admin_user = user_business.get_by_user_ID('admin')
+        message_service.create_message(admin_user, 'deploy', receivers,
+                                       app.user, app_name=app.name,
+                                       app_id=app.id)
         return app
 
 # @classmethod
