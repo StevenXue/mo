@@ -276,8 +276,7 @@ class MyFavouriteList extends Component {
                       <p>{e.user_ID} </p>
                       <Icon type="tags" className={styles.otherIcon}/>
                       <p>{e.tags}</p>
-                      <Icon type="clock-circle-o"
-                            className={styles.otherIcon}/>
+                      <Icon type="clock-circle-o" className={styles.otherIcon}/>
                       <p>{showTime(e.create_time)}</p>
                     </div>
                   </div>
@@ -324,7 +323,7 @@ class MyFavouriteList extends Component {
                         {e['tags'].length > 0 &&
                         <p key={e}>{e['tags'].join(',')}</p>}
                         <Icon type="clock-circle-o"
-                              className={styles.clockIcon}/>
+                              className={styles.otherIcon}/>
                         <p>{showTime(e.create_time)}</p>
                       </div>
                     </div>

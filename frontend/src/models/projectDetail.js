@@ -23,23 +23,9 @@ export default {
     terminals: [],
     sessions: [],
     // doneIndices: new Set([]),
-    overviewEditState: false,
     helpModalVisible: false,
   },
   reducers: {
-    showOverviewEditState(state) {
-      return {
-        ...state,
-        overviewEditState: true,
-      }
-    },
-
-    hideOverviewEditState(state) {
-      return {
-        ...state,
-        overviewEditState: false,
-      }
-    },
     showHelpModal(state) {
       return { ...state, helpModalVisible: true }
     },
