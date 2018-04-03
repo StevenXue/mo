@@ -107,7 +107,7 @@ export function createDeployButton(): ToolbarButton {
                     }
                 });
             },
-            tooltip: 'Deploy Script',
+            tooltip: 'Publish Module',
         });
     } else {
         throw Error;
