@@ -216,14 +216,14 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
 
           </div>
           {/*content tabs*/}
-          <Tabs defaultActiveKey="3" onChange={callback}
+          <Tabs defaultActiveKey="1" onChange={callback}
                 className={styles.jobs}>
             <TabPane tab="Overview" key="1">
               <div className={styles.reactMdeEditorDiv}>
                 {/*{!projectDetail.overviewEditState?<ReactMarkdown source={projectDetail.project.overview}/>:null}*/}
                 {/*{projectDetail.overviewEditState?<ReactMdeEditor*/}
                 {/*projectDetail={projectDetail} dispatch={dispatch}/>:null}*/}
-                <ReactMdeEditor
+                <ReactMdeEditor key="1"
                   projectDetail={projectDetail} dispatch={dispatch}/>
               </div>
             </TabPane>

@@ -23,23 +23,9 @@ export default {
     terminals: [],
     sessions: [],
     // doneIndices: new Set([]),
-    overviewEditState: false,
     helpModalVisible: true,
   },
   reducers: {
-    showOverviewEditState(state) {
-      return {
-        ...state,
-        overviewEditState: true,
-      }
-    },
-
-    hideOverviewEditState(state) {
-      return {
-        ...state,
-        overviewEditState: false,
-      }
-    },
     tgHelpModal(state) {
       return { ...state, helpModalVisible: !state.helpModalVisible }
     },
@@ -126,6 +112,7 @@ export default {
     },
     // 获取该 project
     *fetch({ projectId, notStartLab, projectType }, { call, put }) {
+      console.log('123')
       const fetchMapper = {
         app: fetchApp,
         module: fetchModule,
@@ -153,6 +140,7 @@ export default {
       else {
         project['overview'] = { 'text': project['overview'] }
       }
+      console.log(project['overview'])
       yield put({ type: 'setProject', payload: project })
 
       // fetch jobs

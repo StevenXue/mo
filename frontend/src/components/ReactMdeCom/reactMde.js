@@ -16,9 +16,6 @@ class ReactMdeEditor extends React.Component {
         text: get(this.props.projectDetail, 'project.overview.text')
       },
       modifyState: false,
-      modified: false,
-      oldValue: null
-
     }
   }
 
@@ -27,20 +24,20 @@ class ReactMdeEditor extends React.Component {
 
   editOverview() {
     const body = {
-      overview: this.props.projectDetail.project.overview.text
+      overview: this.state.reactMdeValue.text
     }
 
     updateProject({
       body,
       projectId: this.props.projectDetail.project._id,
       onJson: () => {
-        this.props.dispatch({type: 'projectDetail/hideOverviewEditState'})
-        this.changeEditOverviewState()
         this.props.dispatch({
           type: 'projectDetail/fetch',
           projectId: this.props.projectDetail.project._id,
+          projectType:this.props.projectDetail.project.type,
           notStartLab: true,
         })
+        this.changeEditOverviewState()
       },
     })
   }
@@ -50,30 +47,21 @@ class ReactMdeEditor extends React.Component {
   }
 
   handleValueChange = (value: ReactMdeTypes.Value) => {
-    this.props.dispatch({
-      type: 'projectDetail/changeOverview',
-      payload: {
-        overview: value
-      }
+    this.setState({
+      reactMdeValue:value,
     })
   }
 
   startEditOverviewState(){
     this.setState({
       modifyState: true,
-      oldValue:this.props.projectDetail.project.overview,
     })
   }
 
   cancelEditOverviewState() {
     this.setState({
       modifyState: false,
-    })
-    this.props.dispatch({
-      type: 'projectDetail/changeOverview',
-      payload: {
-        overview: this.state.oldValue,
-      }
+      reactMdeValue:this.props.projectDetail.project.overview
     })
   }
 
@@ -85,7 +73,7 @@ class ReactMdeEditor extends React.Component {
             id: "ta1",
             name: "ta1",
           }}
-          value={get(this.props.projectDetail, 'project.overview')}
+          value={this.state.reactMdeValue}
           onChange={this.handleValueChange}
           commands={ReactMdeCommands.getDefaultCommands()}
           showdownOptions={{tables: true, simplifiedAutoLink: true}}
