@@ -111,29 +111,6 @@ def get_by_id(project_id):
     return project
 
 
-def create_project(name, description, user_ID, tags=None, user_token='',
-                   type='project', **kwargs):
-    """
-    Create a new project
-
-    :param name: str
-    :param description: str
-    :param user_ID: ObjectId
-    :param is_private: boolean
-    :param type: string (app/module/dataset)
-    :param tags: list of string
-    :param user_token: string
-    :return: a new created project object
-    """
-    if tags is None:
-        tags = []
-    user = user_business.get_by_user_ID(user_ID)
-    cls = TypeMapper.get(type)
-    return cls.create_project(name=name, description=description,
-                              type=type, tags=tags, user=user,
-                              user_token=user_token, **kwargs)
-
-
 def update_project(project_id, name, description, is_private=True,
                    related_fields=[], tags=[], related_tasks=[],
                    done_indices=[]):
@@ -339,7 +316,7 @@ def get_all_jobs_of_project(project_id, categories, status=None):
                         job_info['staging_data_set_id'])
                     one_input_data_demo = []
                     for each_feture in \
-                        job_info['params']['fit']['data_fields'][0]:
+                            job_info['params']['fit']['data_fields'][0]:
                         one_input_data_demo.append(
                             staging_data_demo[each_feture])
                     input_data_demo_string = '[' + ",".join(
@@ -641,9 +618,15 @@ class ProjectService:
         user = user_business.get_by_user_ID(user_ID)
         # message = "{}创建了app{}".format(user.name, name)
         # world_business.system_send(channel=cls.channel, message=message)
-        project = cls.business.create_project(name=name, description=description,
+        project = cls.business.create_project(name=name,
+                                              description=description,
                                               type=type, tags=tags, user=user,
                                               user_token=user_token, **kwargs)
+
+        from server3.service.user_service import UserService
+        UserService.action_entity(user_ID=project.user.user_ID,
+                                  entity_id=project.id,
+                                  action='favor', entity=project.type)
 
         from server3.service.world_service import WorldService
         from server3.business.statistics_business import StatisticsBusiness
@@ -704,6 +687,3 @@ class ProjectService:
                 'time': datetime.fromtimestamp(c.time[0] + c.time[1]),
             } for c in commits]
         return project
-
-
-

@@ -120,7 +120,7 @@ class ModuleBusiness(ProjectBusiness):
             type=type, tags=tags,
             hub_token=res.get('token'),
             path=project_path, user=user,
-            privacy=privacy, category=category,
+            privacy=privacy, category=category, favor_users=[user],
             repo_path=f'http://{GIT_SERVER_IP}/repos/{user_ID}/{name}')
 
     # @classmethod
@@ -165,7 +165,8 @@ class ModuleBusiness(ProjectBusiness):
     @classmethod
     def run_test(cls, project_id):
         project = cls.get_by_id(project_id)
-        result = GDValidation.run_test(project.path, project.name)
+        result = GDValidation.run_test(project.path, project.name,
+                                       project.user.user_ID, project.category)
         failures = [f[1] for f in result.failures]
         return failures
 
