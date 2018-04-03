@@ -36,12 +36,24 @@ const WorldMessageItem = ({worldMessage, isRight}) => {
         >
           {
             message_type === 'admin' ?
-              <img
+
+              <div
                 style={{
                   height: 30, width: 30,
+                  color: "#34BFE2"
                 }}
-                src={require('../../img/icon/system.png')}
-              /> :
+                className={styles.system_image}
+              />
+
+              // <img
+              //   style={{
+              //     height: 30, width: 30,
+              //     color: "#34BFE2"
+              //   }}
+              //   src={require('../../img/icon/system.png')}
+              // />
+
+              :
               <img
                 style={{
                   height: 30, width: 30,

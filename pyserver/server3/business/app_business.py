@@ -192,11 +192,14 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
 
     @classmethod
     def list_projects_chat(cls, search_query, page_no=None, page_size=None,
-                           default_max_score=0.4, ):
+                           default_max_score=0.4, privacy="public"):
         start = (page_no - 1) * page_size
         end = page_no * page_size
 
-        all_apps = cls.get_all()
+        # all_apps = cls.get_all()
+        all_apps = cls.repo.read(query={"privacy": privacy})
+        # all_apps = cls.read(query={"privacy": privacy})
+
         #  比对打分
         for app in all_apps:
             name_score = synonyms.compare(search_query, app.name, seg=True)

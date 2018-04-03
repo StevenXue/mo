@@ -68,6 +68,18 @@ class Open extends Component {
     e.target.value = ""
   }
 
+  subHadleSendMessage = (e) => {
+    const inputMessage = e.input.value
+    this.props.dispatch({
+      type: "worldChannel/sendMessage",
+      payload: {
+        channel: "all",
+        message: inputMessage
+      }
+    })
+    e.input.value = ""
+  }
+
   render() {
     const {worldMessages, onClickIcon, isRight} = this.props
     return (
@@ -110,7 +122,8 @@ class Open extends Component {
             <Input
               placeholder="输入"
               onPressEnter={this.handleSendMessage}
-              // ref="myInput"
+              id="myInput"
+              ref="myInput"
               // ref={(el) => this.input = el}
             />
 
@@ -124,7 +137,15 @@ class Open extends Component {
                 alignItem: "center"
               }}
               src={require('../../img/icon/aircraft.png')}
-              onClick={()=>{}}
+              onClick={()=>{
+                let object = this.refs.myInput;
+                // console.log("object", object.textAreaRef.value);
+                this.subHadleSendMessage(object)
+                // console.log("object", object.input.value);
+                // this.subHadleSendMessage(object.input.value)
+                // object.props.onPressEnter()
+
+              }}
             />
 
           </div>

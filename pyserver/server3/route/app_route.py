@@ -180,13 +180,14 @@ def get_chat_api_list():
     page_size = int(request.args.get('page_size', 5))
     search_query = request.args.get('search_query', None)
     default_max_score = float(request.args.get('max_score', 0.1))
+    privacy = request.args.get('privacy')
 
     if not search_query:
         return jsonify({'response': 'no search_query arg'}), 400
     try:
         api_list = AppBusiness.list_projects_chat(
             search_query, page_no=page_no, page_size=page_size,
-            default_max_score=default_max_score
+            default_max_score=default_max_score, privacy=privacy
         )
     except Warning as e:
         return jsonify({
