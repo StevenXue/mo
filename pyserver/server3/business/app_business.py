@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import os
 import yaml
+import shutil
 from copy import deepcopy
 from subprocess import call
 import synonyms
@@ -33,11 +34,10 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
                                               **kwargs)
 
     @classmethod
-    def deploy(cls, app_id):
+    def deploy(cls, app_id, handler_file_path):
         app = cls.get_by_id(app_id)
         app.status = 'deploying'
         app.save()
-
         modules = [m.user.user_ID + '/' + m.name for m in app.used_modules]
         if modules is None:
             modules = []
@@ -52,6 +52,13 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         module_dir_path = os.path.join(func_path, 'modules')
 
         cls.copytree(app.path, func_path)
+
+        # rename py to handler.py
+        handler_file_path = handler_file_path.replace('work', func_path)
+        handler_file_name = handler_file_path.split('/')[-1]
+        shutil.move(handler_file_path, handler_file_path.replace(
+            handler_file_name, 'handler.py'))
+
         # copy modules
         for module in modules:
             owner_ID = module.split('/')[0]

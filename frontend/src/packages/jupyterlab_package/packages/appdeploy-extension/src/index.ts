@@ -91,16 +91,15 @@ class DeployForm extends Form {
     /**
      * Get the input text node.
      */
-    get inputNode(): HTMLInputElement {
-        return this.node.getElementsByTagName('input')[0] as HTMLInputElement;
+    get selectNode(): HTMLSelectElement {
+        return this.node.getElementsByTagName('select')[0] as HTMLSelectElement;
     }
 
     /**
      * Get the value of the widget.
      */
     getValue(): string {
-        // return this.inputNode.value;
-        return '11';
+        return this.selectNode.value;
     }
 }
 
@@ -120,7 +119,7 @@ export function createDeployButton(): ToolbarButton {
                     body: new DeployForm(() => {
                         console.log('click');
                     }),
-                    focusNodeSelector: 'input',
+                    focusNodeSelector: 'select',
                     buttons: [Dialog.cancelButton(), Dialog.okButton({label: 'DEPLOY'})],
                 }).then(result => {
                     console.log('then');
@@ -130,7 +129,7 @@ export function createDeployButton(): ToolbarButton {
                     console.log(result.value);
                     // const hide = message.loading('App deploying...', 0);
                     deploy({
-                        projectId, onJson: () => {
+                        projectId, filePath: result.value, onJson: () => {
                             message.success('App deploy success!');
                             // hide();
                         },

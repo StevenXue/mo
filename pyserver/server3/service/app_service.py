@@ -79,8 +79,8 @@ class AppService(ProjectService):
         return project
 
     @classmethod
-    def deploy(cls, app_id):
-        app = cls.business.deploy(app_id)
+    def deploy(cls, app_id, handler_file_path):
+        app = cls.business.deploy(app_id, handler_file_path)
         receivers = app.favor_users  # get app subscriber
         admin_user = user_business.get_by_user_ID('admin')
         message_service.create_message(admin_user, 'deploy', receivers,
