@@ -107,5 +107,5 @@ def publish_module(project_id):
 def test_module(project_id):
     failures = ModuleBusiness.run_test(project_id)
     import time
-    time.sleep(1)
+    time.sleep(0.5)
     return jsonify({"response": failures})
