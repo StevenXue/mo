@@ -95,7 +95,7 @@ class ReactMdeEditor extends React.Component {
           </div> : null}
         {!this.state.modifyState ?
           <div style={{"textAlign": "center"}}><Button
-            type='primary' style={{marginRight: 15}}
+            type='primary' style={{marginTop: 15}}
             onClick={() => {
               this.startEditOverviewState()
             }}>EDIT DESCRIPTION</Button></div> : null}
