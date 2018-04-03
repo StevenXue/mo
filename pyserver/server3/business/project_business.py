@@ -44,6 +44,7 @@ PAGE_SIZE = 5
 
 project_repo = ProjectRepo(Project)
 
+
 # Objects = collections.namedtuple('Objects', ('objects', 'count', 'page_no', 'page_size'))
 
 
@@ -238,7 +239,7 @@ class ProjectBusiness:
 
     @classmethod
     def create_project(cls, name, description, user, privacy='private',
-                       tags=None, user_token='', type='app'):
+                       tags=None, user_token='', type='app', **kwargs):
         """
         Create a new project
 
@@ -282,7 +283,7 @@ class ProjectBusiness:
                                    type=type, tags=tags,
                                    hub_token=res.get('token'),
                                    path=project_path, user=user,
-                                   privacy=privacy, favor_users=[user])
+                                   privacy=privacy, **kwargs)
 
     @classmethod
     def get_by_id(cls, project_id):

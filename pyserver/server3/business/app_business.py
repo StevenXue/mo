@@ -27,6 +27,12 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
     base_func_path = './functions'
 
     @classmethod
+    def create_project(cls, *args, **kwargs):
+        ProjectBusiness.repo = Repo(project.App)
+        return ProjectBusiness.create_project(*args, status='inactive',
+                                              **kwargs)
+
+    @classmethod
     def deploy(cls, app_id):
         app = cls.get_by_id(app_id)
         app.status = 'deploying'
