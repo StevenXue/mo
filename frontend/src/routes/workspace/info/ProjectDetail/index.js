@@ -1,10 +1,10 @@
 import React from 'react'
-import { Link, Route, Switch, } from 'react-router-dom'
+import { Link, Route, Switch } from 'react-router-dom'
 
 import { connect } from 'dva'
 import { Button, Col, Icon, Modal, Row, Spin, Tabs, Tag, Upload } from 'antd'
 // pages
-import Modelling from '../../modelling/Modelling/index'
+import JupyterLab from '../../modelling/Modelling/index'
 // components
 import ProjectModal from '../../../../components/ProjectModal/index'
 import HelpModal from '../../../../components/HelpModal'
@@ -76,12 +76,6 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
     })
   }
 
-  const helpModal = () => {
-    dispatch({
-      type: 'projectDetail/tgHelpModal'
-    })
-  }
-
   function appStarFavor(action) {
     dispatch({
       type: 'projectDetail/star_favor',
@@ -119,6 +113,19 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
   } else {
     // project info page
     if (projectDetail.project) {
+
+      function appStatus() {
+        if (!projectDetail.project.status) {
+          return <div/>
+        }
+        if (projectDetail.project.status === 'deploying') {
+          return <Tag color='gold'>Deploying <Icon type="loading"/></Tag>
+        } else if (projectDetail.project.status === 'active') {
+          return <Tag color='green'>Online</Tag>
+        } else {
+          return <Tag color='grey'>Offline</Tag>
+        }
+      }
 
       // optional component list by project type
       const components = projectTypeDict[projectDetail.project.type]
@@ -171,7 +178,7 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
                   </ProjectModal>
                   <Button icon='delete' style={{ marginRight: 15 }} onClick={() => deleteProject()}/>
                       <Button icon='cloud-download-o' onClick={() => dispatch({
-                        type: 'projectDetail/showHelpModal'
+                        type: 'projectDetail/showHelpModal',
                       })}/>
                 </span>}
                   </h1>
@@ -219,6 +226,7 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
           </div>
           {/*content tabs*/}
           <Tabs defaultActiveKey="3" onChange={callback}
+                tabBarExtraContent={appStatus()}
                 className={styles.jobs}>
             <TabPane tab="Overview" key="1">
               <div className={styles.reactMdeEditorDiv}>
@@ -318,21 +326,8 @@ function ProjectDetail({ match, history, location, dispatch, projectDetail }) {
 
   return (
     <div className={`main-container ${styles.normal}`}>
-      {/*<div className={styles.step}>*/}
-      {/*<Steps match={match} history={history} location={location}*/}
-      {/*dispatch={dispatch} projectDetail={projectDetail}*/}
-      {/*/>*/}
-      {/*</div>*/}
       <Switch>
-        <Route path="/workspace/:projectID/:type" component={Modelling}/>
-        {/*<Route path="/workspace/:projectID/import/choice" component={DataImport}/>*/}
-        {/*<Route path="/workspace/:projectID/import/preview" component={DataPreview}/>*/}
-        {/*<Route path="/workspace/:projectID/import/select" component={DataSelection}/>*/}
-        {/*<Route path="/workspace/:projectID/import/upload" component={UploadData}/>*/}
-        {/*<Route path="/workspace/:projectID/import" component={StagedList}/>*/}
-        {/*<Route path="/workspace/:projectID/analysis" component={DataAnalysis}/>*/}
-        {/*<Route path="/workspace/:projectID/modelling" component={Modelling}/>*/}
-        {/*<Route path="/workspace/:projectID/deploy" component={Deployment}/>*/}
+        <Route path="/workspace/:projectID/:type" component={JupyterLab}/>
       </Switch>
     </div>
   )

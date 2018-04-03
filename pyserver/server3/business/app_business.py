@@ -29,6 +29,9 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
     @classmethod
     def deploy(cls, app_id):
         app = cls.get_by_id(app_id)
+        app.status = 'deploying'
+        app.save()
+
         modules = [m.user.user_ID + '/' + m.name for m in app.used_modules]
         if modules is None:
             modules = []

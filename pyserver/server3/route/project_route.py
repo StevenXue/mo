@@ -20,6 +20,8 @@ from server3.service import message_service
 from server3.service.project_service import ProjectService
 from server3.service import ownership_service
 from server3.service.app_service import AppService
+from server3.service.module_service import ModuleService
+from server3.service.dataset_service import DatasetService
 from server3.business.project_business import ProjectBusiness
 from server3.utility import json_utility
 from server3.utility import str_utility
@@ -226,14 +228,14 @@ def create_project():
     #                      tags=tags,
     #                      type=type, user_token=user_token,
     #                      **data)
-    if type == 'app':
-        project = AppService.create_project(
-            name, description, user_ID, tags=tags,
-            type=type, user_token=user_token, **data)
-    else:
-        project = project_service.create_project(
-            name, description, user_ID, tags=tags,
-            type=type, user_token=user_token, **data)
+    TypeMapper = {
+        "app": AppService,
+        "module": ModuleService,
+        "dataset": DatasetService,
+    }
+    project = TypeMapper[type].create_project(
+        name, description, user_ID, tags=tags,
+        type=type, user_token=user_token, **data)
     project = json_utility.convert_to_json(project.to_mongo())
     return jsonify({'response': project}), 200
 

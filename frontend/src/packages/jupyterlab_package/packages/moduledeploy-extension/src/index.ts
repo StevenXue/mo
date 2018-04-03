@@ -43,14 +43,14 @@ const extension: JupyterLabPlugin<void> = {
     autoStart: true,
     requires: [IFileBrowserFactory],
     activate: (app: JupyterLab, fb: IFileBrowserFactory) => {
-        fb.defaultBrowser.toolbar.addItem('publishModule', createDeployButton());
+        fb.defaultBrowser.toolbar.addItem('publishModule', createPublishButton());
     },
 };
 
 /**
  * A widget used to rename a file.
  */
-class DeployForm extends Form {
+class PublishForm extends Form {
 
     /**
      * Get the input text node.
@@ -69,9 +69,9 @@ class DeployForm extends Form {
 }
 
 /**
- * Create a deploy toolbar item.
+ * Create a publish toolbar item.
  */
-export function createDeployButton(): ToolbarButton {
+export function createPublishButton(): ToolbarButton {
     const hash = window.location.hash;
     const match = pathToRegexp('#/workspace/:projectId/:type').exec(hash);
     if (match) {
@@ -81,7 +81,7 @@ export function createDeployButton(): ToolbarButton {
             onClick: () => {
                 return showDialog({
                     title: 'Publish ' + document.title.split(' - ')[0],
-                    body: new DeployForm(() => {
+                    body: new PublishForm(() => {
                         console.log('click');
                     }),
                     focusNodeSelector: 'input',
@@ -98,7 +98,7 @@ export function createDeployButton(): ToolbarButton {
                             publish({
                                 projectId,
                                 onJson: () => {
-                                    message.success('Module deploy success!');
+                                    message.success('Module publish success!');
                                 },
                             });
                         }

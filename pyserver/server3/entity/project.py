@@ -61,7 +61,7 @@ class Module(Project):
     repo_path = StringField()
 
 
-RE_TYPE = ('disabled', 'active')
+RE_TYPE = ('inactive', 'active', 'deploying')
 
 
 class AppGetType:

@@ -120,7 +120,7 @@ class ModuleBusiness(ProjectBusiness):
             type=type, tags=tags,
             hub_token=res.get('token'),
             path=project_path, user=user,
-            privacy=privacy, category=category,
+            privacy=privacy, category=category, favor_user=[user],
             repo_path=f'http://{GIT_SERVER_IP}/repos/{user_ID}/{name}')
 
     # @classmethod
