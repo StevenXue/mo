@@ -526,7 +526,7 @@ function UserRequestDetail({ allRequest, login, dispatch }) {
                                               style={{ cursor: 'pointer' }}
                                               onClick={() => clickSelectedProject(e)}
                                               extra={<div style={{ fontSize: '14px' }}>
-                                                <Tag color="#FFC923" style={{ opacity: '0.8' }}>Online</Tag>
+                                                <Tag color="geekblue" style={{ opacity: '0.8' }}>{e.select_project.status}</Tag>
                                               </div>}>
                       <p>{e.select_project.description}</p>
                       {e.select_project.commits.length > 0 ? <div style={{ marginTop: '35px', color: '#848d95' }}>
