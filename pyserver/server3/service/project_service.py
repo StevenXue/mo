@@ -622,7 +622,6 @@ class ProjectService:
                                               description=description,
                                               type=type, tags=tags, user=user,
                                               user_token=user_token, **kwargs)
-
         from server3.service.user_service import UserService
         UserService.action_entity(user_ID=project.user.user_ID,
                                   entity_id=project.id,

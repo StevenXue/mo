@@ -12,6 +12,7 @@ from server3.business import model_business
 from server3.business import user_request_business
 from server3.business import request_answer_business
 from server3.business.app_business import AppBusiness
+from server3.business.project_business import ProjectBusiness
 from server3.business.module_business import ModuleBusiness
 from server3.business.user_business import UserBusiness
 
@@ -313,6 +314,7 @@ class UserService:
             "dataset": DatasetBusiness,
         }
         business = business_maper[entity]
+        print("entity_id", entity_id)
         object = business.get_by_id(entity_id)
 
         if entity == "request":

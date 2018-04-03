@@ -119,11 +119,11 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
           return <div/>
         }
         if (projectDetail.project.status === 'deploying') {
-          return <Tag color='gold'>Deploying <Icon type="loading"/></Tag>
+          return <Tag color='gold' style={{cursor: 'default'}}>Deploying <Icon type="loading"/></Tag>
         } else if (projectDetail.project.status === 'active') {
-          return <Tag color='green'>Online</Tag>
+          return <Tag color='green' style={{cursor: 'default'}}>Online</Tag>
         } else {
-          return <Tag color='grey'>Offline</Tag>
+          return <Tag color='grey' style={{cursor: 'default'}}>Offline</Tag>
         }
       }
 
@@ -225,7 +225,7 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
 
           </div>
           {/*content tabs*/}
-          <Tabs defaultActiveKey="3" onChange={callback}
+          <Tabs defaultActiveKey="1" onChange={callback}
                 tabBarExtraContent={appStatus()}
                 className={styles.jobs}>
             <TabPane tab="Overview" key="1">
