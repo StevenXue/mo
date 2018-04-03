@@ -25,7 +25,8 @@ class GDValidation(unittest.TestCase):
     MODULE_USER_DIRECTORY = "user_directory"
     # model / toolkit
     MODULE_TYPE = "model"
-
+    # basic / advance
+    MODULE_VALIDATION_MODE = 'basic'
     # user_directory.zhaofengli.sesese.src.main
     # MODULE_INPUT = {}
     # MODULE_YAML_OBJ = None
@@ -100,7 +101,6 @@ class GDValidation(unittest.TestCase):
                     msg="class name is not eqaul to {}".format(
                         self.MODULE_NAME))
 
-
             if self.MODULE_TYPE == 'model':
                 # Check [def __init__()] section
                 with self.subTest(name="[def __init__()] in main.py"):
@@ -166,6 +166,7 @@ class GDValidation(unittest.TestCase):
             required_predict_items = {"value_name": "name",
                                       "value_type": "value_type",
                                       "default_value": "default"}
+
             prefix = ''
             if self.MODULE_TYPE == 'model':
                 prefix = 'predict'
@@ -201,26 +202,27 @@ class GDValidation(unittest.TestCase):
                             k, value_type))
 
                 # Check default_value
-                with self.subTest(name="[input:{}:{}]".format(prefix, k)):
-                    default_value = v.get(
-                        required_predict_items["default_value"], None)
-                    self.assertIsNotNone(
-                        default_value,
-                        msg="[{}/default] missing in module_spec.yml".format(
-                            k, default_value))
+                if self.MODULE_VALIDATION_MODE == 'advance':
+                    with self.subTest(name="[input:{}:{}]".format(prefix, k)):
+                        default_value = v.get(
+                            required_predict_items["default_value"], None)
+                        self.assertIsNotNone(
+                            default_value,
+                            msg="[{}/default] missing in module_spec.yml".format(
+                                k, default_value))
 
-                # Check if type of default_value is matched with value_type
-                with self.subTest(name=
-                                  "[input:{}:{}] - "
-                                  "Type Checking".format(prefix, k)):
-                    assert_result, value = \
-                        self.check_value_type(value_type, default_value)
-                    self.assertTrue(
-                        assert_result,
-                        msg="[{}/default] value is not match "
-                            "with [{}/value_type]".format(k, k))
+                    # Check if type of default_value is matched with value_type
+                    with self.subTest(name=
+                                      "[input:{}:{}] - "
+                                      "Type Checking".format(prefix, k)):
+                        assert_result, value = \
+                            self.check_value_type(value_type, default_value)
+                        self.assertTrue(
+                            assert_result,
+                            msg="[{}/default] value is not match "
+                                "with [{}/value_type]".format(k, k))
 
-                input_feed[name] = value
+                    input_feed[name] = value
 
             # print("input_feed", input_feed)
 
@@ -250,10 +252,11 @@ class GDValidation(unittest.TestCase):
                     except Exception as e:
                         self.fail(
                             msg=
-                            "{}() cannot be executed correctly - {}".
-                                format(prefix, str(e)))
+                            "{}() cannot be executed correctly - {}".format(
+                                prefix, str(e)))
             else:
-                self.fail(msg="MODULE_INPUT cannot be generated")
+                if self.MODULE_VALIDATION_MODE == 'advance':
+                    self.fail(msg="MODULE_INPUT cannot be generated")
 
     def check_value_type(self, value_type, default_value):
         # available Types: int, str, float, img, datetime, [int], [str], [float]
@@ -349,9 +352,11 @@ if __name__ == '__main__':
     # print(GDValidation.MODULE_PATH)
     import sys
     sys.path.append('../../../')
-    GDValidation.MODULE_PATH = "/Users/Chun/Documents/workspace/goldersgreen/pyserver/user_directory/zhaofengli/weather_prediction"
+    GDValidation.MODULE_PATH = "/Users/Chun/Documents/workspace/momodel/goldersgreen/pyserver/user_directory/zhaofengli/weather_prediction"
     GDValidation.MODULE_NAME = "weather_prediction"
     GDValidation.MODULE_AUTHOR = "zhaofengli"
+    GDValidation.MODULE_TYPE = 'model'
+    GDValidation.MODULE_VALIDATION_MODE = 'basic'
     # /Users/Chun/Documents/workspace/goldersgreen/pyserver/user_directory/zhaofengli/sesese
     # unittest.main()
 
@@ -363,20 +368,3 @@ if __name__ == '__main__':
 
     # print("test_result.__dict__", test_result.__dict__)
     # print("test_resultXXX", test_result.failures[0][1])
-
-
-# import unittest
-# from unittest import TextTestRunner
-#
-# class TestExample(unittest.TestCase):
-#
-#     def test_pass(self):
-#         self.assertEqual(1, 1, 'Expected 1 to equal 1')
-#
-#     def test_fail(self):
-#         self.assertEqual(1, 2, 'uh-oh')
-#
-# if __name__ == '__main__':
-#     test_suite = unittest.TestLoader().loadTestsFromTestCase(TestExample)
-#     test_result = TextTestRunner().run(test_suite)
-#     print("test_result", test_result.failures[0][1])
