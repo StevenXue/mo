@@ -170,7 +170,9 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
                     <Button icon='edit' style={{ marginRight: 15 }}/>
                   </ProjectModal>
                   <Button icon='delete' style={{ marginRight: 15 }} onClick={() => deleteProject()}/>
-                      <Button icon='cloud-download-o' onClick={() => helpModal()}/>
+                      <Button icon='cloud-download-o' onClick={() => dispatch({
+                        type: 'projectDetail/showHelpModal'
+                      })}/>
                 </span>}
                   </h1>
                   <p className={styles.text}>

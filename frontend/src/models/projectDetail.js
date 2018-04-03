@@ -40,8 +40,11 @@ export default {
         overviewEditState: false,
       }
     },
-    tgHelpModal(state) {
-      return { ...state, helpModalVisible: !state.helpModalVisible }
+    showHelpModal(state) {
+      return { ...state, helpModalVisible: true }
+    },
+    hideHelpModal(state) {
+      return { ...state, helpModalVisible: false }
     },
     setProjectReducer(state, { payload: project }) {
       return {

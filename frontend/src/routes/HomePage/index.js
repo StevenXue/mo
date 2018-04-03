@@ -7,6 +7,8 @@ import styles from './css/App.less';
 import banner from './image/banner.png';
 import bg1 from './image/bg1.png';
 import bg2 from './image/bg2.png';
+import bg3 from './image/bg3.png';
+import bg_v from './image/bg_v.png';
 import bottom from './image/bottom.png';
 import logo from './image/logo.png';
 import phone1 from './image/phone1.png';
@@ -52,27 +54,28 @@ class App extends Component {
           <i></i>
           <span>注册</span>
         </div>
-        <Row className={styles.Row_R}>
+        <Row className={styles.Row_R} type="flex" >
           <Col span={2}></Col>
           <Col span={8} className={styles.Col_C} style={{paddingTop:138,paddingBottom:128}}> {/* check */}
             <div style={{marginBottom:20}}>
               <img src={right1b} alt="" style={{marginBottom:28,marginRight:10}}/>
-              <span>全生态AI应用开发平台</span>
+              <span>全生态 AI 应用开发平台</span>
               <img src={right2b} alt="" style={{marginBottom:-16,marginLeft:10}}/>
             </div>
             <div>
               <p>蓦联结了人工智能应用使用者、需求提出者、数据提供者、关键模组开发者以及应用组装者，实现了需求提出 - 可复用算法模块开发 - 模块组装 - 应用发布使用的生态链。</p>
             </div>
           </Col>
-          <Col span={2}></Col>
+          <Col span={2} />
+          <Col span={1} style={{backgroundColor:'#f9f9f9',paddingTop:138,paddingBottom:128, alignSelf: 'stretch'}} /> {/* check */}
           <Col span={10} style={{backgroundColor:'#f9f9f9',paddingTop:138,paddingBottom:128}}><img src={system} alt="" width="100%"/></Col>  {/* check */}
-          <Col span={2} style={{backgroundColor:'#f9f9f9',paddingTop:138,paddingBottom:128}}></Col> {/* check */}
+          <Col span={1} style={{backgroundColor:'#f9f9f9',paddingTop:138,paddingBottom:128, alignSelf: 'stretch'}} /> {/* check */}
         </Row>
         <div className={styles.Div_1}>
           <img src={bg1} alt="" width="100%"/>
           <div className={styles.Div_2}>
             <img src={right1} alt=""/>
-            <span>网站+移动端双平台</span>
+            <span>网站 + 移动端双平台</span>
             <img src={right2} alt=""/>
           </div>
           <span className={styles.Span_1}>平台集合网页端和移动端，满足不同用户在不同使用场景下的需求。</span>
@@ -103,7 +106,7 @@ class App extends Component {
             <Col span={1}></Col>
           </Row>
         </div>
-        <Row style={{padding: '120px 0',backgroundColor:'#373737', display: 'flex', justifyContent: 'center' }}>
+        <Row style={{padding: '120px 0', background: `url(${bg_v})`, backgroundSize: '100% 100%', display: 'flex', justifyContent: 'center' }}>
           <div className={styles.video} style={{display: this.state.playDisplay}}>
             <Icon type="play-circle" style={{fontSize: 100, color: 'white', cursor: 'pointer'}}
                   onClick={() => this.startVideo()}/>
@@ -112,50 +115,49 @@ class App extends Component {
                  style={{borderRadius: 30, boxShadow: '0 8px 25px rgba(0,0,0,0.7)'}} />
         </Row>
         <div className={styles.Div_3}>
-          <div style={{backgroundColor:'#f9f9f9',position:'relative'}}> {/* check */}
-            <i style={{width:'100%',height:'24%',backgroundColor:'#ffffff',position:'absolute',bottom:0,left:0}}></i>
-            <Row className={`${styles.Row_2} ${styles.bg11}`}>
-              <Col span={3}></Col>
-              <Col span={7} className={styles.Col_2}>
-                <div className={styles.Div_3}>
-                  <img src={right1b} alt="" style={{marginBottom:28}}/>
-                  <span>网页端</span>
-                  <img src={right2b} alt="" style={{marginBottom:-16}}/>
-                </div>
-                <div className={styles.Div_4}>开发工具与交流平台</div>
-                <div className={styles.Div_5}>
-                  <p>蓦的网页端不仅仅是一个实用的开发工具，除了预测模型和模型组件的训练、监控与部署，更是开发者们交流讨论的平台。</p>
-                  <p>在需求版块您也可以分享自己的研究成果或者解决不了的技术难题。我们还提供世界频道的小功能，可以和网站的在线用户进行实时交流。</p>
-                </div>
-                <Button type="primary" style={{width:200,height:48}}>查看更多</Button>   {/* check */}
-              </Col>
-            </Row>
-          </div>
-          <Row className={styles.Row_3}>  {/* check */}
+          <Row style={{position:'relative'}}>    {/* 修改 */}
+            <Col><img alt="" src={bg2} width="100%"/></Col>
+            <Col span={7} className={styles.bg3} style={{position:'absolute',left:'10%',top:'5%'}}>
+              <div className={styles.Div_3}>
+                <img src={right1b} alt="" style={{marginBottom:28}}/>
+                <span>网页端</span>
+                <img src={right2b} alt="" style={{marginBottom:-16}}/>
+              </div>
+              <div className={styles.Div_4}>开发工具与交流平台</div>
+              <div className={styles.Div_5}>
+                <p>蓦的网页端不仅仅是一个实用的开发工具，除了预测模型和模型组件的训练、监控与部署，更是开发者们交流讨论的平台。</p>
+                <p>在需求版块您也可以分享自己的研究成果或者解决不了的技术难题。我们还提供世界频道的小功能，可以和网站的在线用户进行实时交流。</p>
+              </div>
+              <Button type="primary" style={{width:200,height:48}}>客户端下载</Button>
+            </Col>
+          </Row>
+          <Row className={styles.Row_3} >  {/* check */}
             <Col span={3}></Col>
             <Col span={7} className={styles.Col_2}>
               <div>
-                <p>强大的模型编辑工具</p>
+                <p>简便的模型编辑工具</p>
                 <span>平台内嵌 JupyterLab，是基于 Web 端 iPython 编辑的类 IDE
                       环境，除 JupyterLab 的定制、改写与模块的编写之外，还增加了
                       文件转换，模型部署，模块与数据集的展示与插入等功能</span>
               </div>
             </Col>
             <Col span={2}></Col>
-            <Col span={12} className={styles.Col_3}><img src={computer1} width="518px" height="286px" alt=""/></Col>
-            <img src={computer} style={{position:'absolute',left:482,top:-323,width:766,height:451}} alt=""/> {/* check */}
+            <Col span={12} className={styles.Col_3}><img src={computer1} width="600px" height="332px" alt=""/></Col>
+            {/*<img src={computer} style={{position:'absolute',left:'26%',top:'-26%',width:766,height:451}} alt=""/> /!* check *!/*/}
           </Row>
           <Row style={{paddingTop:100}}>
-            <Col span={3}></Col>
-            <Col span={9} className={styles.Col_5}><img src={computer2} width="518px" height="286px" alt=""/></Col>  {/* check */}
+            <Col span={2}></Col>
+            <Col span={8} className={styles.Col_5}><img src={computer2} width="572px" height="506px" alt=""/></Col>  {/* check */}
             {/* <Col span={1}></Col> */}  {/* check */}
+            <Col span={2}></Col>
             <Col span={7} className={styles.Col_2}>
-              <div style={{paddingTop:50,textAlign:'left'}}>
+              <div style={{paddingTop:'23%',textAlign:'left'}}>
                 <p style={{textAlign:'left',
-                  fontFamily: 'SFProDisplay-Regular',
+                  // fontFamily: 'SFProDisplay-Regular',
                   fontSize: '32px',
                   color: '#4B4F56',
-                  lineHeight: '38px'}}>灵活的模块化算法模型</p>
+                  lineHeight: '38px',
+                marginBottom:'30px'}}>灵活的模块化算法模型</p>
                 <span style={{fontFamily: 'PingFangSC-Regular',
                   fontSize: '16px',
                   color: '#666666',
@@ -169,17 +171,18 @@ class App extends Component {
             <Col span={7} className={styles.Col_2}>
               <div style={{paddingTop:50}}>
                 <p>快捷的模型部署工具</p>
-                <span>可扩展的自动化微服务 AI / ML 的 DevOps部署过后其他可以作为独立的应用提供给他人使用</span>
+                <span>可扩展的自动化微服务 AI / ML 的 DevOps 部署过后其他可以作为独立的应用提供给他人使用</span>
               </div>
             </Col>
             <Col span={2}></Col>
-            <Col span={12} className={styles.Col_3}>
-              <img src={computer3} width="518px" height="286px" alt=""/></Col>
+            <Col span={12} className={styles.Col_3_2}>
+              <img src={computer3} width="600px" height="360px" alt=""/></Col>
           </Row>
           <Row className={styles.Row_3} style={{marginBottom:100}}>
             <Col span={2}></Col>
-            <Col span={10} className={styles.Col_3}><img src={computer4} width="518px" height="286px" alt=""/></Col>  {/* check */}
+            <Col span={8} className={styles.Col_3}><img src={computer4} width="720px" height="398.4px" alt=""/></Col>  {/* check */}
             {/* <Col span={1}></Col> */} {/* check */}
+            <Col span={2}></Col>
             <Col span={8} className={styles.Col_2}>
               <div style={{textAlign:'left'}}>
                 <p style={{textAlign:'left'}}>轻松的经验交流区</p>
@@ -187,63 +190,87 @@ class App extends Component {
               </div>
             </Col>    {/* check */}
           </Row>
-          <div style={{backgroundColor:'#f9f9f9',position:'relative'}}> {/* check */}
-            <i style={{width:'100%',height:'24%',backgroundColor:'#ffffff',position:'absolute',bottom:0,left:0}}></i>
-            <Row className={`${styles.Row_2} ${styles.bg22}`}>
-              <Col span={3}></Col>
-              <Col span={7} className={styles.Col_2}>
-                <div className={styles.Div_3}>
-                  <img src={right1b} alt="" style={{marginBottom:28}}/>
-                  <span>移动端</span>
-                  <img src={right2b} alt="" style={{marginBottom:-16}}/>
-                </div>
-                <div className={styles.Div_4}>便捷智能的手机管家</div>
-                <div className={styles.Div_5}>
-                  <p>蓦的移动端更像是您的便携智能手机管家，购物推荐亦或者明天的交通路线，您有什么想要知道的都可以来询问小莫语音助手，我们会根据您的需求和偏好为您推荐最合适的预测模型。</p>
-                  <p>如果在平台中暂时没有满足您需要的预测模型，您也可以把您的需求告诉小莫，小莫会在平台中帮您找到潜在的开发者帮您实现。</p>
-                </div>
-                <Button type="primary" style={{width:200,height:48}}>客户端下载</Button>  {/* check */}
-              </Col>
-            </Row>
-          </div>
+          <Row style={{position:'relative'}}>    {/* 修改 */}
+            <Col><img alt="" src={bg3} width="100%"/></Col>
+            <Col span={7} className={styles.bg3} style={{position:'absolute',left:'10%',top:'5%'}}>
+              <div className={styles.Div_3}>
+                <img src={right1b} alt="" style={{marginBottom:28}}/>
+                <span>移动端</span>
+                <img src={right2b} alt="" style={{marginBottom:-16}}/>
+              </div>
+              <div className={styles.Div_4}>便捷智能的手机管家</div>
+              <div className={styles.Div_5}>
+                <p>蓦的移动端更像是您的便携智能手机管家，购物推荐亦或者明天的交通路线，您有什么想要知道的都可以来询问小莫语音助手，我们会根据您的需求和偏好为您推荐最合适的预测模型。</p>
+                <p>如果在平台中暂时没有满足您需要的预测模型，您也可以把您的需求告诉小莫，小莫会在平台中帮您找到潜在的开发者帮您实现。</p>
+              </div>
+              <Button type="primary" style={{width:200,height:48}}>客户端下载</Button>
+            </Col>
+          </Row>
         </div>
-        <ul className={styles.Ul_1}>
+        <ul className={styles.Ul_1} style={{paddingTop:134,paddingBottom:'4%'}}>
           <li>
             <span></span>
             <p>友好的对话式交互</p>
-            <img src={phone1} alt=""/>
+            <img src={phone1} alt="" width="70%"/>
           </li>
           <li>
             <span></span>
             <p>丰富的预测模型</p>
-            <img src={phone2} alt=""/>
+            <img src={phone2} alt="" width="70%"/>
           </li>
           <li>
             <span></span>
             <p>便捷的需求对接社区</p>
-            <img src={phone3} alt=""/>
+            <img src={phone3} alt="" width="70%"/>
           </li>
         </ul>
+        {/*<div style={{position:'relative'}}>*/}
+          {/*<img src={bottom} alt="" />*/}
+          {/*<div className={styles.footDiv} >*/}
+            {/*<p>我们的地址</p>*/}
+            {/*<span>杭州市江干区凯旋路180号</span>*/}
+            {/*<p>联系邮箱</p>*/}
+            {/*<span>123456@163.com</span>*/}
+            {/*<Row>*/}
+              {/*<Col span={4}></Col>*/}
+              {/*<Col span={8} style={{textAlign:'center'}}>*/}
+                {/*<img src={search} alt="" style={{marginBottom:20}}/>*/}
+                {/*<Button type="primary">立即注册</Button>*/}
+              {/*</Col>*/}
+              {/*<Col span={2}></Col>*/}
+              {/*<Col span={10}>*/}
+                {/*<img src={two} alt="" width="50%"/>*/}
+              {/*</Col>*/}
+            {/*</Row>*/}
+          {/*</div>*/}
+        {/*</div>*/}
         <div style={{position:'relative'}}>
           <img src={bottom} alt="" />
-          <div className={styles.footDiv}>
-            <p>我们的地址</p>
-            <span>杭州市江干区凯旋路180号</span>
-            <p>联系邮箱</p>
-            <span>123456@163.com</span>
+          <div className={styles.footDiv} >
             <Row>
-              <Col span={4}></Col>
-              <Col span={8} style={{textAlign:'center'}}>
-                <img src={search} alt="" style={{marginBottom:20}}/>
-                <Button type="primary">立即注册</Button>
+              <Col span={5}/>
+              <Col span={4}>
+                <p>我们的地址</p>
+                <span>杭州市江干区凯旋路170号</span>
+                <p>联系邮箱</p>
+                <span>123456@163.com</span>
               </Col>
-              <Col span={2}></Col>
-              <Col span={10}>
+              <Col span={1}/>
+              <Col span={4}>
+                <div>
+                  <img src={search} alt="" style={{marginBottom:20}}/>
+                </div>
+                <Button type="primary" style={{marginLeft:'31%'}} className={styles.btt}>立即注册</Button>
+              </Col>
+              <Col span={1}/>
+              <Col span={4}>
+                <p style={{textAlign:'left',fontSize:'16px'}}>IOS客户端下载</p>
+
                 <img src={two} alt="" width="50%"/>
               </Col>
+              <Col span={5}/>
             </Row>
           </div>
-
         </div>
       </div>
     );

@@ -59,6 +59,7 @@ class AppService(ProjectService):
             output_json=output_json
             # input_json=input_json,
         )
+        return output_json
 
     @classmethod
     def insert_envs(cls, user_ID, app_name):

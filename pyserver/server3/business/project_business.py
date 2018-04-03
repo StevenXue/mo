@@ -282,7 +282,7 @@ class ProjectBusiness:
                                    type=type, tags=tags,
                                    hub_token=res.get('token'),
                                    path=project_path, user=user,
-                                   privacy=privacy, favor_users=[user])
+                                   privacy=privacy)
 
     @classmethod
     def get_by_id(cls, project_id):
