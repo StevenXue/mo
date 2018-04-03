@@ -29,6 +29,7 @@ def get_by_user_id(user_id):
         message_info['user_ID'] = message.user.user_ID
         if message.user_request:
             message_info['user_request_title'] = message.user_request.title
+            message_info['user_request_type'] = message.user_request.type
         message_info['is_read'] = receiver['is_read']
         message_info['receiver_id'] = receiver['_id']
         messages.append(message_info)
