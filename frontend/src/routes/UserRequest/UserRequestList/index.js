@@ -168,7 +168,7 @@ class RequestList extends Component {
                          onClick={() => this.toUserRequestDetail(e._id, history)}>{e.title}</p>
                       {/*<p className={styles.description}>{e.description}</p>*/}
                       <div>
-                        {e['tags'].length > 0 && e['tags'].map(e => <Tag
+                        {e['tags'].length > 0 && e['tags'].map(e => <Tag key={e}
                                                                        className={styles.tags}>{e}</Tag>)}
                         <div className={styles.timeAndUserDiv}>
                           <p

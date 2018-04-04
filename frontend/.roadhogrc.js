@@ -4,7 +4,7 @@ const path = require('path')
 const re = /.+\.css$/
 const paths = require('./paths')
 
-import { flaskServer, hubServer } from './src/constants'
+import { flaskServer, hubServer } from './config.js'
 
 const walkSync = (dir) =>
   fs.readdirSync(dir)
