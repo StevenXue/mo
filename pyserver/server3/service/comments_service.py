@@ -11,10 +11,16 @@ def get_comments_of_this_user_request(user_request_id):
     return user_request_comments
 
 
+def count_comments_of_this_user_request(user_request_id):
+    count = comments_business.count_comments_of_this_user_request(user_request_id)
+    return count
+
+
 def get_comments_of_this_answer(request_answer_id):
     user_request_comments = comments_business. \
         get_comments_of_this_answer(request_answer_id)
     return user_request_comments
+
 
 
 def get_by_id(user_request_comments_id):
