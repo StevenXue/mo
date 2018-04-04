@@ -1,10 +1,12 @@
-const mainColor = '#108ee9';
+const mainColor = '#108ee9'
 import avatar1 from './img/avatar/1.png'
 import avatar2 from './img/avatar/2.png'
 import avatar3 from './img/avatar/3.png'
 import avatar4 from './img/avatar/4.png'
 import avatar5 from './img/avatar/5.png'
 import avatar6 from './img/avatar/6.png'
+
+import { flaskServer, hubServer } from '../config.js'
 
 module.exports = {
   apiPrefix: '/pyapi',
@@ -18,12 +20,12 @@ module.exports = {
   // jupyterServer: 'http://122.224.116.44:9001/api/contents/',
 
   // server api
-  flaskServer: 'http://localhost:5005',
+  flaskServer,
   // flaskServer: 'http://10.52.14.182:5005',
   // flaskServer: 'http://122.224.116.44:5005',
   // flaskServer: 'http://192.168.31.7:5005',
 
-  hubServer: 'http://localhost:8000',
+  hubServer,
   // hubServer: 'http://192.168.31.7:8000',
 
   //jupyter
@@ -51,24 +53,23 @@ module.exports = {
   },
 
   privacyChoices: [
-    {value: 'all', text: 'Privacy'},
-    {value: 'private', text: 'Private'},
-    {value: 'public', text: 'Public'}
+    { value: 'all', text: 'Privacy' },
+    { value: 'private', text: 'Private' },
+    { value: 'public', text: 'Public' },
   ],
 
   projectChoices: [
-    {value: 'project', text: 'Project Type'},
-    {value: 'app', text: 'App'},
-    {value: 'module', text: 'Module'},
-    {value: 'dataset', text: 'Dataset'},
+    { value: 'project', text: 'Project Type' },
+    { value: 'app', text: 'App' },
+    { value: 'module', text: 'Module' },
+    { value: 'dataset', text: 'Dataset' },
   ],
 
   dataCategory: [
     'Business', 'Government', 'Education', 'Environment',
     'Health', 'Housing & Development', 'Public Services',
-    'Social', 'Transportation', 'Science', 'Technology'
+    'Social', 'Transportation', 'Science', 'Technology',
   ],
-
 
   translateDict: {
     'dataAnalysis': 'toolkit',
@@ -84,41 +85,41 @@ module.exports = {
     0: 'ready',
     100: 'running',
     200: 'done',
-    300: 'error'
+    300: 'error',
   },
 
-  defaultOverviewDocs:{'text':"## Overview\n" +
-    "\n" +
-    "_Provide a short overview of your algorithm that explains the value and primary use cases._\n" +
-    "\n" +
-    "## Usage\n" +
-    "\n" +
-    "### Input\n" +
-    "\n" +
-    "_Describe the input fields for your algorithm. For example:_\n" +
-    "\n" +
-    "\n" +
-    "| Parameter | Description |\n" +
-    "| --------- | ----------- |\n" +
-    "| field     | Description of field |\n" +
-    "\n" +
-    "### Output\n" +
-    "\n" +
-    "_Describe the output fields for your algorithm. For example:_\n" +
-    "\n" +
-    "\n" +
-    "| Parameter | Description | \n" +
-    "| --------- | ----------- | \n" +
-    "| field     | Description of field | \n" +
-    "\n" +
-    "## Examples\n" +
-    "\n" +
-    "_Provide and explain examples of input and output for your algorithm._\n" +
-    "\n"},
+  defaultOverviewDocs: {
+    'text': '## Overview\n' +
+    '\n' +
+    '_Provide a short overview of your algorithm that explains the value and primary use cases._\n' +
+    '\n' +
+    '## Usage\n' +
+    '\n' +
+    '### Input\n' +
+    '\n' +
+    '_Describe the input fields for your algorithm. For example:_\n' +
+    '\n' +
+    '\n' +
+    '| Parameter | Description |\n' +
+    '| --------- | ----------- |\n' +
+    '| field     | Description of field |\n' +
+    '\n' +
+    '### Output\n' +
+    '\n' +
+    '_Describe the output fields for your algorithm. For example:_\n' +
+    '\n' +
+    '\n' +
+    '| Parameter | Description | \n' +
+    '| --------- | ----------- | \n' +
+    '| field     | Description of field | \n' +
+    '\n' +
+    '## Examples\n' +
+    '\n' +
+    '_Provide and explain examples of input and output for your algorithm._\n' +
+    '\n',
+  },
 
+  avatarList: [avatar1, avatar2, avatar3, avatar4, avatar5, avatar6],
 
-  avatarList: [avatar1,avatar2,avatar3,avatar4,avatar5,avatar6]
-
-
-};
+}
 
