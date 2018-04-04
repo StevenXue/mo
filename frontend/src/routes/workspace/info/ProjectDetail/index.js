@@ -98,9 +98,11 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
       type: 'projectDetail/hideOverviewEditState',
     })
   }
-
-  function callback(key) {
-    // console.log(key);
+  const callback = (activeKey) => {
+    dispatch({
+      type: 'projectDetail/changeActiveTab',
+      activeTab: activeKey
+    })
   }
 
   if (location.pathname.split('/').length > 3) {
@@ -226,6 +228,7 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
           </div>
           {/*content tabs*/}
           <Tabs defaultActiveKey="1" onChange={callback}
+                activeKey = {projectDetail.activeTab}
                 tabBarExtraContent={appStatus()}
                 className={styles.jobs}>
             <TabPane tab="Overview" key="1">
@@ -234,7 +237,7 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
                 {/*{projectDetail.overviewEditState?<ReactMdeEditor*/}
                 {/*projectDetail={projectDetail} dispatch={dispatch}/>:null}*/}
                 <ReactMdeEditor
-                  projectDetail={projectDetail} dispatch={dispatch}/>
+                  projectDetail={projectDetail} dispatch={dispatch} market_use={market_use}/>
               </div>
             </TabPane>
             {!market_use && <TabPane tab="Jobs" key="2">
