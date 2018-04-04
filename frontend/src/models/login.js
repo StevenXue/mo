@@ -8,10 +8,9 @@ import { invert } from 'lodash'
 import { queryURL } from '../utils'
 import * as projectService from '../services/project'
 import { flaskServer, translateDict } from '../constants'
-import * as userRequestService from "../services/userRequest"
+import * as userRequestService from '../services/userRequest'
 
 let connected = false
-
 
 export default {
   namespace: 'login',
@@ -56,21 +55,18 @@ export default {
         user: undefined,
       }
     },
-    updateProjectNumber(state, action){
-      console.log('action',action)
-      return{
+    updateProjectNumber(state, action) {
+      console.log('action', action)
+      return {
         ...state,
-        user:{
+        user: {
           ...state.user,
-          projectNumber:action.payload.projectNumber,
-        }
+          projectNumber: action.payload.projectNumber,
+        },
       }
-    }
+    },
   },
   effects: {
-
-
-
     *accountSubmit({ payload }, { call, put }) {
       yield put({
         type: 'changeSubmitting',
@@ -147,9 +143,8 @@ export default {
         payload: false,
       })
 
-
-      if(response.status === 200){
-        const {data} = response
+      if (response.status === 200) {
+        const { data } = response
         if (data) {
           localStorage.setItem('token', data.token)
           localStorage.setItem('user_ID', data.user.user_ID)
@@ -164,22 +159,16 @@ export default {
         } else {
           throw data
         }
-      }else{
+      } else {
         let errorMessage = response.data.error.message
         message.error(errorMessage)
       }
-
-
-
     },
-
-
-
     *query({ payload }, { call, put }) {
       try {
         const { data: data } = yield call(tokenLogin)
-        if(!data.user) {
-          if (!(location.href.includes('/user/login') || location.href.includes('/user/register') || location.href.slice(-3)==='/#/')) {
+        if (!data.user) {
+          if (!(location.href.includes('/user/login') || location.href.includes('/user/register') || location.href.slice(-3) === '/#/')) {
             // yield put(routerRedux.push('/user/login'))
             // FIXME reload is a workaround
             window.location.replace('/#/user/login')
@@ -261,7 +250,7 @@ export default {
   subscriptions: {
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
-        console.log("pathname", pathname)
+        console.log('pathname', pathname)
         const match = pathToRegexp('/user/login').exec(pathname)
 
         if (!match) {dispatch({ type: 'query' })}
@@ -282,6 +271,16 @@ export default {
 
           socket.on('notification', (msg) => {
             dispatch({ type: 'message/updateNewMessage', payload: { msg } })
+            console.log('msg', msg)
+            if (msg.message.message_type === 'deploy') {
+              const match = pathToRegexp('/workspace/:projectId/:type?').exec(pathname)
+              if (match) {
+                const projectId = match[1]
+                const url = new URL(location.href.replace('/#', ''))
+                const projectType = url.searchParams.get('type') || match[2]
+                dispatch({ type: 'projectDetail/refresh', projectId,  projectType})
+              }
+            }
           })
           connected = true
         }

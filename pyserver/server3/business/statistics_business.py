@@ -8,7 +8,7 @@ class StatisticsBusiness(GeneralBusiness):
     repo = Repo(Statistics)
 
     @classmethod
-    def use_app(cls, user_obj, app_obj, input_json, output_json):
+    def use_app(cls, user_obj, app_obj, output_json, input_json=None):
         return cls.repo.create_one(
             caller=user_obj,
             entity_type="app",

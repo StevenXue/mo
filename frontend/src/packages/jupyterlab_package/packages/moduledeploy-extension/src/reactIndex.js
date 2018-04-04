@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Card, Button, Row, Col, Input, Spin } from 'antd'
-import * as pathToRegexp from 'path-to-regexp';
+import * as pathToRegexp from 'path-to-regexp'
 
 import {
   VDomRenderer,
@@ -26,6 +26,7 @@ export class ModulePage extends React.Component {
   constructor() {
     super()
     this.state = {
+      testResult: [],
     }
   }
 
@@ -42,17 +43,24 @@ export class ModulePage extends React.Component {
         onJson: (project) => {
           this.setState({
             project,
-            testing: true
+            testing: true,
           })
 
           testModule({
             projectId,
-            onJson: (project) => {
-              console.log(project)
-              document.getElementsByClassName('testing-state')[0].value = 'anything'
+            onJson: (failures) => {
+              console.log(failures)
+              let testResult = []
+              if (failures.length > 0) {
+                testResult = failures
+                document.getElementsByClassName('testing-state')[0].value = 'failed'
+              } else {
+                testResult = ['All test passed']
+                document.getElementsByClassName('testing-state')[0].value = 'passed'
+              }
               this.setState({
-                // project,
-                testing: false
+                testResult,
+                testing: false,
               })
             },
           })
@@ -65,10 +73,14 @@ export class ModulePage extends React.Component {
     if (this.state.project !== undefined) {
       return (
         <div style={{ minHeight: 100, overflowY: 'auto' }}>
-          <input style={{display: 'none'}} className='testing-state' />
+          <input style={{ display: 'none' }} className='testing-state'/>
           <h3>{this.state.project.name}</h3>
           <p>{this.state.project.description}</p>
-          <Spin spinning={this.state.testing} tip="Running test cases..."/>
+          {this.state.testResult.length === 0 ? <Spin spinning={this.state.testing} tip="Running test cases..."/> :
+            <div>
+              <h3>Testing Result:</h3>
+              {this.state.testResult.map(e => <div>{e}<br/><br/></div>)}
+            </div>}
         </div>
       )
     } else {

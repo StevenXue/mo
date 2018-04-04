@@ -23,24 +23,14 @@ export default {
     terminals: [],
     sessions: [],
     // doneIndices: new Set([]),
-    overviewEditState: false,
+    helpModalVisible: false,
   },
   reducers: {
-    showOverviewEditState(state) {
-      return {
-        ...state,
-        overviewEditState: true,
-      }
+    showHelpModal(state) {
+      return { ...state, helpModalVisible: true }
     },
-
-    hideOverviewEditState(state) {
-      return {
-        ...state,
-        overviewEditState: false,
-      }
-    },
-    tgHelpModal(state) {
-      return { ...state, helpModalVisible: !state.helpModalVisible }
+    hideHelpModal(state) {
+      return { ...state, helpModalVisible: false }
     },
     setProjectReducer(state, { payload: project }) {
       return {
@@ -79,7 +69,7 @@ export default {
       }
     },
 
-    updateStarFavor(state, {project}) {
+    updateStarFavor(state, { project }) {
       return {
         ...state,
         project,
@@ -155,13 +145,14 @@ export default {
       yield put({ type: 'setProject', payload: project })
 
       // fetch jobs
-      const { data: terminals } = yield call(getTerminals, {
-        hubUserName,
-        hubToken,
-      })
-      const { data: sessions } = yield call(getSessions, { hubUserName, hubToken })
-      yield put({ type: 'setTerminals', payload: terminals })
-      yield put({ type: 'setSessions', payload: sessions })
+      try {
+        const { data: terminals } = yield call(getTerminals, { hubUserName, hubToken })
+        const { data: sessions } = yield call(getSessions, { hubUserName, hubToken })
+        yield put({ type: 'setTerminals', payload: terminals })
+        yield put({ type: 'setSessions', payload: sessions })
+      } catch (e) {
+        console.log('get jobs', e)
+      }
     },
     // wrapper to set tags when set project
     *setProject({ payload: project }, { call, put }) {
@@ -188,7 +179,7 @@ export default {
     // },
     *delete({ payload }, { call, put, select }) {
       yield call(deleteProject, payload)
-      yield put(routerRedux.push('/workspace?tab='+payload.type))
+      yield put(routerRedux.push('/workspace?tab=' + payload.type))
 
       // hub user will deleted in backend, no need to stop hub user server
       // let project = yield select(state => state.projectDetail['project'])
@@ -240,8 +231,8 @@ export default {
 
     *star_favor(action, { call, put, select }) {
       let payload = action.payload
-      const { data:{entity:project} } = yield call(UserStarFavorService.set_star_favor, payload)
-      console.log('project',project)
+      const { data: { entity: project } } = yield call(UserStarFavorService.set_star_favor, payload)
+      console.log(project)
       yield put({
         type: 'updateStarFavor',
         project,

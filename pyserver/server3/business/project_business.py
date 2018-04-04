@@ -11,10 +11,13 @@
 # -*- coding: UTF-8 -*-
 import os
 import shutil
+import re
+import fileinput
 import requests
 from copy import deepcopy
 from datetime import datetime
 from distutils.dir_util import copy_tree
+from subprocess import call
 
 from git import Repo
 from flask_socketio import SocketIO
@@ -31,7 +34,7 @@ from server3.constants import GIT_SERVER
 from server3.constants import ADMIN_TOKEN
 from server3.entity.general_entity import Objects
 from server3.constants import GIT_LOCAL
-
+from server3.constants import INIT_RES
 from server3.constants import REDIS_SERVER
 
 socketio = SocketIO(message_queue=REDIS_SERVER)
@@ -40,6 +43,7 @@ PAGE_NO = 1
 PAGE_SIZE = 5
 
 project_repo = ProjectRepo(Project)
+
 
 # Objects = collections.namedtuple('Objects', ('objects', 'count', 'page_no', 'page_size'))
 
@@ -235,7 +239,7 @@ class ProjectBusiness:
 
     @classmethod
     def create_project(cls, name, description, user, privacy='private',
-                       tags=None, user_token='', type='app'):
+                       tags=None, user_token='', type='app', **kwargs):
         """
         Create a new project
 
@@ -279,7 +283,7 @@ class ProjectBusiness:
                                    type=type, tags=tags,
                                    hub_token=res.get('token'),
                                    path=project_path, user=user,
-                                   privacy=privacy, favor_users=[user])
+                                   privacy=privacy, **kwargs)
 
     @classmethod
     def get_by_id(cls, project_id):
@@ -367,3 +371,39 @@ class ProjectBusiness:
             return []
         else:
             return master.log()
+
+    @classmethod
+    def nb_to_script(cls, project_id, nb_path, optimise=True):
+        app = cls.get_by_id(project_id)
+        call(['jupyter', 'nbconvert', '--to', 'script', nb_path],
+             cwd=app.path)
+        full_path = os.path.join(app.path, nb_path)
+        script_path = full_path.replace('ipynb', 'py')
+        for line in fileinput.input(files=script_path, inplace=1):
+            # remove input tag comments
+            line = re.sub(r"# In\[(\d+)\]:", r"", line.rstrip())
+
+            if optimise:
+                if any(re.search(reg, line.rstrip()) for reg in INIT_RES):
+                    line = re.sub(
+                        r"# Please use current \(work\) folder to store your data "
+                        r"and models",
+                        r'', line.rstrip())
+                    line = re.sub(r"sys.path.append\('\.\./'\)", r'',
+                                  line.rstrip())
+                    line = re.sub(r"""client = Client\('(.+)'\)""",
+                                  r"""client = Client('\1', silent=True)""",
+                                  line.rstrip())
+                    line = re.sub(r"""from modules import (.+)""",
+                                  r"""from function.modules import \1""",
+                                  line.rstrip())
+                    # add handle function
+                    line = re.sub(
+                        r"predict = client\.predict",
+                        r"predict = client.predict\n\n"
+                        r"def handle(conf):\n"
+                        r"\t# paste your code here",
+                        line.rstrip())
+                else:
+                    line = '\t' + line
+            print(line)

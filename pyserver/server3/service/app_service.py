@@ -1,12 +1,17 @@
 # -*- coding: UTF-8 -*-
 import requests
 import json
+import re
+from bson import ObjectId
 
 from server3.service.project_service import ProjectService
 from server3.business.module_business import ModuleBusiness
 from server3.business.app_business import AppBusiness
 from server3.business.user_business import UserBusiness
+from server3.business import user_business
 from server3.business.statistics_business import StatisticsBusiness
+from server3.service import message_service
+from server3.constants import DOCKER_IP
 
 
 class AppService(ProjectService):
@@ -35,21 +40,26 @@ class AppService(ProjectService):
         """
         app = AppBusiness.get_by_id(project_id=app_id)
         url = app.user.user_ID + "-" + app.name
-        domin = "http://192.168.31.23:8080/function/"
-        # domin = 'http://192.168.31.7:8080/function/"
+        domin = f"http://{DOCKER_IP}:8080/function/"
         url = domin + url
         payload = json.dumps(input_json)
         headers = {
             'content-type': "application/json",
         }
         response = requests.request("POST", url, data=payload, headers=headers)
-        output_json = response.json()
+        print(response.text)
+        pattern = re.compile(r'STRHEAD(.+?)STREND', flags=re.DOTALL)
+        results = pattern.findall(response.text)
+        output_json = json.loads(results[0])
+        print(output_json)
+        # output_json = response.json()
         # 成功调用后 在新的collection存一笔
         user_obj = UserBusiness.get_by_user_ID(user_ID=user_ID)
         # 筛选 input_json
 
         StatisticsBusiness.use_app(
             user_obj=user_obj, app_obj=app,
+            output_json=output_json
             # input_json=input_json,
             # output_json=output_json
         )
@@ -68,6 +78,16 @@ class AppService(ProjectService):
         if kwargs.get('yml') == 'true' and project.app_path:
             project.args = cls.business.load_app_params(project)
         return project
+
+    @classmethod
+    def deploy(cls, app_id, handler_file_path):
+        app = cls.business.deploy(app_id, handler_file_path)
+        receivers = app.favor_users  # get app subscriber
+        admin_user = user_business.get_by_user_ID('admin')
+        message_service.create_message(admin_user, 'deploy', receivers,
+                                       app.user, app_name=app.name,
+                                       app_id=app.id)
+        return app
 
 # @classmethod
 # def add_used_app(cls, user_ID, app_id):

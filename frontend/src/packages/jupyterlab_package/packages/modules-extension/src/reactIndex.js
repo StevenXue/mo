@@ -110,11 +110,19 @@ export class ModulePage extends React.Component {
   }
 
   insertCode() {
-    // const user_ID = localStorage.getItem('user_ID')
+    let dict = {}
+    this.state.args.forEach(arg => {
+      dict[arg.name] = arg.value || arg.default_value
+    })
     NotebookActions.insertCode(this.props.tracker.currentWidget.notebook,
       [
-        `conf = '${genConf(this.state.args)}'\n`,
+        `conf = '${JSON.stringify(dict)}'\n`,
         `conf = json_parser(conf)\n`,
+        `print(conf)`
+      ],
+    )
+    NotebookActions.insertCode(this.props.tracker.currentWidget.notebook,
+      [
         `result = ${this.state.func}('${this.state.project.user_ID}/${this.state.project.name}', conf)`,
       ],
     )
@@ -159,7 +167,7 @@ export class ModulePage extends React.Component {
             <header style={{ cursor: 'pointer' }} onClick={() => this.backToList()}>
               <Icon type="left"/>{this.state.project.name}
             </header>
-            <div style={{ height: '100%', overflowY: 'auto' }}>
+            <div style={{ height: 'auto', overflowY: 'auto' }}>
               {this.renderParameters()}
             </div>
             <Row>
@@ -175,7 +183,7 @@ export class ModulePage extends React.Component {
             <header style={{ cursor: 'pointer' }} onClick={() => this.backToList()}>
               <Icon type="left"/>{this.state.project.name}
             </header>
-            <div style={{ height: '100%', overflowY: 'auto' }}>
+            <div style={{ height: 'auto', overflowY: 'auto' }}>
               <ReactMde
                 textAreaProps={{
                   id: 'ta1',

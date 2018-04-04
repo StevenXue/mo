@@ -30,7 +30,7 @@ from server3.constants import ADMIN_TOKEN
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
 app = Flask(__name__, static_url_path='/static',
-            static_folder='user_directory/model')
+            static_folder='../static')
 app.secret_key = 'super-super-secret'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
