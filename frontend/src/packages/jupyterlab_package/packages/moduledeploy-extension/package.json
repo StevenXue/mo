@@ -1,7 +1,7 @@
 {
   "name": "@jupyterlab/moduledeploy-extension",
   "version": "0.1.0",
-  "description": "add deploy button for module",
+  "description": "add publish button for module",
   "keywords": [
     "jupyter",
     "jupyterlab",

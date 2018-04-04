@@ -8,7 +8,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server3.service import user_request_service
 from server3.service import request_answer_service
-
+from server3.service import comments_service
 from server3.service import user_service
 from server3.utility import json_utility
 
@@ -57,6 +57,11 @@ def list_user_request():
         each_request_info['answer_number'] = \
             request_answer_service.get_all_answer_of_this_user_request(
                 each_request_info['_id'], get_number=True)
+
+        each_request_info['comment_number'] = \
+            comments_service.count_comments_of_this_user_request(
+                each_request_info['_id'])
+
         each_request_info['user_ID'] = each_request.user.user_ID
         user_requests_info.append(each_request_info)
     return jsonify({'response': {'user_request': user_requests_info,

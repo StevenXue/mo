@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import os
 import yaml
+import shutil
 from copy import deepcopy
 from subprocess import call
 import synonyms
@@ -27,8 +28,16 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
     base_func_path = './functions'
 
     @classmethod
-    def deploy(cls, app_id):
+    def create_project(cls, *args, **kwargs):
+        ProjectBusiness.repo = Repo(project.App)
+        return ProjectBusiness.create_project(*args, status='inactive',
+                                              **kwargs)
+
+    @classmethod
+    def deploy(cls, app_id, handler_file_path):
         app = cls.get_by_id(app_id)
+        app.status = 'deploying'
+        app.save()
         modules = [m.user.user_ID + '/' + m.name for m in app.used_modules]
         if modules is None:
             modules = []
@@ -43,6 +52,13 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         module_dir_path = os.path.join(func_path, 'modules')
 
         cls.copytree(app.path, func_path)
+
+        # rename py to handler.py
+        handler_file_path = handler_file_path.replace('work', func_path)
+        handler_file_name = handler_file_path.split('/')[-1]
+        shutil.move(handler_file_path, handler_file_path.replace(
+            handler_file_name, 'handler.py'))
+
         # copy modules
         for module in modules:
             owner_ID = module.split('/')[0]
@@ -159,11 +175,14 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
 
     @classmethod
     def list_projects_chat(cls, search_query, page_no=None, page_size=None,
-                           default_max_score=0.4, ):
+                           default_max_score=0.4, privacy="public"):
         start = (page_no - 1) * page_size
         end = page_no * page_size
 
-        all_apps = cls.get_all()
+        # all_apps = cls.get_all()
+        all_apps = cls.repo.read(query={"privacy": privacy})
+        # all_apps = cls.read(query={"privacy": privacy})
+
         #  比对打分
         for app in all_apps:
             name_score = synonyms.compare(search_query, app.name, seg=True)

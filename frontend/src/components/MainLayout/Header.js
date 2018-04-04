@@ -100,12 +100,39 @@ function Header({location, login, history, dispatch, allRequest,message}) {
     return unread
   }
   // 点击未读信息，进入详情
-  const toMessage= (user_request,receiver_id) => {
-    history.push('/userrequest/'+ user_request)
+  const toMessage= (e) => {
+    switch(e.message_type) {
+      case 'answer':
+        history.push(`/userrequest/${e.user_request}?type=${e.user_request_type}`)
+        break
+      case 'commit':
+        history.push(`/workspace/${e.project_id}?type=${e.project_type}`)
+        break
+      case 'deploy':
+        history.push(`/workspace/${e.app_id}?type=app`)
+        break
+      case 'publish':
+        history.push(`/workspace/${e.module_id}?type=module`)
+        break
+    }
     dispatch({
       type: 'message/readMessage',
-      payload: {receiver_id: receiver_id},
+      payload: {receiver_id: e.receiver_id},
     })
+  }
+
+  const switchMessage = (e) => {
+    switch(e.message_type) {
+      case 'answer':
+        return <p>{e.user_ID} 回答了您关注的需求  {e.user_request_title}</p>
+      case 'commit':
+        return <p>{e.user_ID} 更新了您关注的需求  {e.user_request_title} 的答案</p>
+      case 'deploy':
+        return <p>{e.user_ID} 上线了您关注的应用  {e.app_name}</p>
+      case 'publish':
+        return <p>{e.user_ID} 发布了您关注的模块  {e.module_name}</p>
+    }
+
   }
 
   return <div className={styles.container}>
@@ -198,10 +225,8 @@ function Header({location, login, history, dispatch, allRequest,message}) {
           {login.user && JsonToArray(message.messages).map(e =>
             <Menu.Item key={e._id} className={styles.messageMenuItem}
                        style={e.is_read === false?{backgroundColor: '#f0f2f5',color:'black'}:{color:'black'}}>
-              <div onClick={() => toMessage(e.user_request,e.receiver_id)}>
-                {e.message_type === 'answer'? <p>{e.user_ID} 回答了您关注的需求  {e.user_request_title}</p>:<p>
-                  {e.user_ID} 更新了您关注的需求  {e.user_request_title} 的答案
-                  </p>}
+              <div onClick={() => toMessage(e)}>
+                {switchMessage(e)}
               </div>
             </Menu.Item>
           )

@@ -45,7 +45,9 @@ export default async function request(url, options = {}, funcs = {}) {
 
     const data = await newRes.json()
 
-    onJson && await onJson(data.response)
+    const res = data.response || data
+
+    onJson && await onJson(res)
 
     const ret = {
       data: data.response,
