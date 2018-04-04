@@ -22,67 +22,6 @@ import {
 import { connect } from 'dva'
 import { get, map } from 'lodash'
 
-const FormItem = Form.Item
-const Option = Select.Option
-const AutoCompleteOption = AutoComplete.Option
-
-class InputForm extends React.Component {
-  state = {
-    confirmDirty: false,
-    autoCompleteResult: [],
-  }
-  handleSubmit = (e) => {
-    e.preventDefault()
-    this.props.form.validateFieldsAndScroll((err, values) => {
-      if (!err) {
-        console.log('Received values of form: ', values)
-      }
-    })
-  }
-
-  render() {
-    console.log(this.props.projectDetail.project.args.input)
-    const { getFieldDecorator } = this.props.form
-    const { autoCompleteResult } = this.state
-    const args = map(this.props.projectDetail.project.args.input)
-    const formItemLayout = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 6 },
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 14 },
-      },
-    }
-    return (
-      <Form layout='horizontal' onSubmit={this.handleSubmit}>
-        {args.map(e =>
-          <FormItem
-            {...formItemLayout}
-            label={e.name}
-            key={e.name}
-          >
-            {getFieldDecorator(e.name, {
-              rules: [{
-                message: e.des,
-              }, {
-                required: e.required, message: e.des,
-              }],
-            })(
-              <Input/>,
-            )}
-          </FormItem>,
-        )}
-        <FormItem wrapperCol={{ span: 12, offset: 11 }}>
-          <Button
-            type="primary" htmlType="submit"
-            loading={this.state.confirmDirty}>Submit</Button>
-        </FormItem>
-      </Form>
-    )
-  }
-}
 
 class ProjectExample extends React.Component {
 
@@ -90,11 +29,13 @@ class ProjectExample extends React.Component {
     super(props)
     this.state = {
       args: Object.values(this.props.projectDetail.project.args.input),
+      output: this.props.projectDetail.project.args.output,
     }
   }
 
   componentDidMount() {
   }
+
 
   setValue(values) {
     let args = this.state.args
@@ -162,7 +103,7 @@ class ProjectExample extends React.Component {
                 {map(this.props.projectDetail.project.args.output).map(e =>
                   <div key={e.name}>
                     <p>{e.name}</p>
-                    {e.value_type === 'img'?<img src={'data:image/jpeg;base64,'+e.value}  alt="img" />:<p>{e.value}</p>}
+                    {e.value_type === 'img' && e.value ?<img src={'data:image/jpeg;base64,'+e.value}  alt="img" />:<p>{e.value}</p>}
                   </div>
                 )}
               </div>
