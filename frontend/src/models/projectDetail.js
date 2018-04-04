@@ -24,8 +24,13 @@ export default {
     sessions: [],
     // doneIndices: new Set([]),
     helpModalVisible: false,
+    activeTab:'1'
   },
   reducers: {
+    changeActiveTab(state, {activeTab}){
+      return {...state,activeTab}
+    },
+
     showHelpModal(state) {
       return { ...state, helpModalVisible: true }
     },
@@ -242,7 +247,6 @@ export default {
     *get_example_result(action, { call, put, select }) {
       let payload = action.payload
       const { data: result } = yield call(AppService.runApi, payload)
-      console.log(result, 'resssss')
       yield put({
         type: 'setExampleResult',
         payload: result,
