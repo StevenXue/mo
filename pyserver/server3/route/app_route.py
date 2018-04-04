@@ -38,7 +38,9 @@ def run_in_docker():
 @app_app.route("/deploy/<app_id>", methods=["POST"])
 @jwt_required
 def deploy_in_docker(app_id):
-    project = AppBusiness.deploy(app_id)
+    data = request.get_json()
+    handler_file_path = data.get('file_path')
+    project = AppService.deploy(app_id, handler_file_path)
     project = json_utility.convert_to_json(project.to_mongo())
     return jsonify({"response": project})
 
@@ -180,13 +182,14 @@ def get_chat_api_list():
     page_size = int(request.args.get('page_size', 5))
     search_query = request.args.get('search_query', None)
     default_max_score = float(request.args.get('max_score', 0.1))
+    privacy = request.args.get('privacy')
 
     if not search_query:
         return jsonify({'response': 'no search_query arg'}), 400
     try:
         api_list = AppBusiness.list_projects_chat(
             search_query, page_no=page_no, page_size=page_size,
-            default_max_score=default_max_score
+            default_max_score=default_max_score, privacy=privacy
         )
     except Warning as e:
         return jsonify({

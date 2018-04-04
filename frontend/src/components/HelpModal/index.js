@@ -12,7 +12,7 @@ const HelpModal = ({ visible, projectDetail, dispatch }) => {
 
   const hideModelHandler = () => {
     dispatch({ type: 'projectDetail/setEntered', projectId: projectDetail.project._id })
-    dispatch({ type: 'projectDetail/tgHelpModal' })
+    dispatch({ type: 'projectDetail/hideHelpModal' })
   }
 
   const { name, repo_path } = projectDetail.project

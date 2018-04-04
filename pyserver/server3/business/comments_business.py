@@ -17,6 +17,12 @@ def get_comments_of_this_user_request(user_request_id):
     return user_request_comments_repo.read(query)
 
 
+def count_comments_of_this_user_request(user_request_id):
+    query = {'user_request': ObjectId(user_request_id),
+             'comments_type': 'request'}
+    return user_request_comments_repo.read(query).count()
+
+
 def get_comments_of_this_answer(request_answer_id):
     query = {'request_answer': ObjectId(request_answer_id)}
     return user_request_comments_repo.read(query)

@@ -16,14 +16,15 @@ const TabPane = Tabs.TabPane
 const {Meta} = Card
 const Search = Input.Search
 
-import avatar1 from '../../img/avatar/1.png'
-import avatar2 from '../../img/avatar/2.png'
-import avatar3 from '../../img/avatar/3.png'
-import avatar4 from '../../img/avatar/4.png'
-import avatar5 from '../../img/avatar/5.png'
-import avatar6 from '../../img/avatar/6.png'
-
-const avatarList =[avatar1,avatar2,avatar3,avatar4,avatar5,avatar6]
+import  {avatarList} from  '../../constants'
+// import avatar1 from '../../img/avatar/1.png'
+// import avatar2 from '../../img/avatar/2.png'
+// import avatar3 from '../../img/avatar/3.png'
+// import avatar4 from '../../img/avatar/4.png'
+// import avatar5 from '../../img/avatar/5.png'
+// import avatar6 from '../../img/avatar/6.png'
+//
+// const avatarList =[avatar1,avatar2,avatar3,avatar4,avatar5,avatar6]
 
 import styles from './index.less'
 import {fetchAllUserRequest} from "../../services/userRequest"
@@ -276,8 +277,7 @@ class MyFavouriteList extends Component {
                       <p>{e.user_ID} </p>
                       <Icon type="tags" className={styles.otherIcon}/>
                       <p>{e.tags}</p>
-                      <Icon type="clock-circle-o"
-                            className={styles.otherIcon}/>
+                      <Icon type="clock-circle-o" className={styles.otherIcon}/>
                       <p>{showTime(e.create_time)}</p>
                     </div>
                   </div>
@@ -324,7 +324,7 @@ class MyFavouriteList extends Component {
                         {e['tags'].length > 0 &&
                         <p key={e}>{e['tags'].join(',')}</p>}
                         <Icon type="clock-circle-o"
-                              className={styles.clockIcon}/>
+                              className={styles.otherIcon}/>
                         <p>{showTime(e.create_time)}</p>
                       </div>
                     </div>

@@ -23,25 +23,14 @@ export default {
     terminals: [],
     sessions: [],
     // doneIndices: new Set([]),
-    overviewEditState: false,
-    helpModalVisible: true,
+    helpModalVisible: false,
   },
   reducers: {
-    showOverviewEditState(state) {
-      return {
-        ...state,
-        overviewEditState: true,
-      }
+    showHelpModal(state) {
+      return { ...state, helpModalVisible: true }
     },
-
-    hideOverviewEditState(state) {
-      return {
-        ...state,
-        overviewEditState: false,
-      }
-    },
-    tgHelpModal(state) {
-      return { ...state, helpModalVisible: !state.helpModalVisible }
+    hideHelpModal(state) {
+      return { ...state, helpModalVisible: false }
     },
     setProjectReducer(state, { payload: project }) {
       return {

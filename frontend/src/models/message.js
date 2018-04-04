@@ -24,9 +24,8 @@ export default {
       return {
         ...state,
         messages: {
+          [receiver_id]: payload.msg.message,
           ...state.messages,
-          [receiver_id]:
-            payload.msg.message,
         }
       }
     },

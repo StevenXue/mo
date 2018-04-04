@@ -2,12 +2,15 @@
 import requests
 import json
 import re
+from bson import ObjectId
 
 from server3.service.project_service import ProjectService
 from server3.business.module_business import ModuleBusiness
 from server3.business.app_business import AppBusiness
 from server3.business.user_business import UserBusiness
+from server3.business import user_business
 from server3.business.statistics_business import StatisticsBusiness
+from server3.service import message_service
 from server3.constants import DOCKER_IP
 
 
@@ -58,7 +61,9 @@ class AppService(ProjectService):
             user_obj=user_obj, app_obj=app,
             output_json=output_json
             # input_json=input_json,
+            # output_json=output_json
         )
+        return output_json
 
     @classmethod
     def insert_envs(cls, user_ID, app_name):
@@ -73,6 +78,16 @@ class AppService(ProjectService):
         if kwargs.get('yml') == 'true' and project.app_path:
             project.args = cls.business.load_app_params(project)
         return project
+
+    @classmethod
+    def deploy(cls, app_id, handler_file_path):
+        app = cls.business.deploy(app_id, handler_file_path)
+        receivers = app.favor_users  # get app subscriber
+        admin_user = user_business.get_by_user_ID('admin')
+        message_service.create_message(admin_user, 'deploy', receivers,
+                                       app.user, app_name=app.name,
+                                       app_id=app.id)
+        return app
 
 # @classmethod
 # def add_used_app(cls, user_ID, app_id):

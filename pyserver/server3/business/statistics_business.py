@@ -16,7 +16,7 @@ class StatisticsBusiness(GeneralBusiness):
             action="use",
             datetime=datetime.utcnow(),
             # input_json=input_json,
-            output_json=output_json
+            # output_json=output_json
         )
 
     @classmethod

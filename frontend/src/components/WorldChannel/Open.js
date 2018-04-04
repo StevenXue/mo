@@ -68,11 +68,23 @@ class Open extends Component {
     e.target.value = ""
   }
 
+  subHadleSendMessage = (e) => {
+    const inputMessage = e.input.value
+    this.props.dispatch({
+      type: "worldChannel/sendMessage",
+      payload: {
+        channel: "all",
+        message: inputMessage
+      }
+    })
+    e.input.value = ""
+  }
+
   render() {
     const {worldMessages, onClickIcon, isRight} = this.props
     return (
       <div className={styles.container}
-           style={{width: isRight ? 300 : 50, display:"flex", flexDirection: "column"}}
+           style={{width: isRight ? 300 : 50, display: "flex", flexDirection: "column"}}
       >
         {
           isRight ?
@@ -110,22 +122,31 @@ class Open extends Component {
             <Input
               placeholder="输入"
               onPressEnter={this.handleSendMessage}
-              // ref="myInput"
+              id="myInput"
+              ref="myInput"
               // ref={(el) => this.input = el}
             />
 
-            <img
+            <div
               style={{
-                height: 20, width: 20,
+                height: 30, width: 30,
                 marginLeft: 10,
                 marginRight: 10,
-                display: "flex",
-                justifyContent: "center",
-                alignItem: "center"
+                // display: "flex",
+                // justifyContent: "center",
+                // alignItem: "center",
+                // flex: 1
               }}
-              src={require('../../img/icon/aircraft.png')}
-              onClick={()=>{}}
-            />
+            >
+              <img
+                style={{height: 25, width: 25}}
+                src={require('../../img/icon/aircraft.png')}
+                onClick={() => {
+                  let object = this.refs.myInput
+                  this.subHadleSendMessage(object)
+                }}
+              />
+            </div>
 
           </div>
         }

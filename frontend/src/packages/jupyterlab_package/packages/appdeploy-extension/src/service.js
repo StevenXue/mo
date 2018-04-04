@@ -50,8 +50,21 @@ export function fetchProject({ projectId, onJson }) {
   return request(path.join('/pyapi', PREFIX, 'projects', projectId), undefined, { onJson })
 }
 
-export function deploy({ projectId, onJson }) {
+export function deploy({ projectId, filePath, onJson }) {
   return request(path.join('/pyapi', 'apps', 'deploy', projectId), {
     method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({file_path: filePath}),
+  }, { onJson })
+}
+
+export function getContents({ hubUserName, hubToken, onJson }) {
+  return request(`/hub_api/user/${hubUserName}/api/contents/work?content=1&${(new Date()).getTime()}`, {
+    method: 'get',
+    headers: {
+      'Authorization': `token ${hubToken}`,
+    },
   }, { onJson })
 }

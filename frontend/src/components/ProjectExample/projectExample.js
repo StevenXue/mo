@@ -163,7 +163,7 @@ class ProjectExample extends React.Component {
                   <div key={e.name}>
                     <p>{e.name}</p>
                     {e.value_type === 'img'?<img src={'data:image/jpeg;base64,'+e.value}  alt="img" />:<p>{e.value}</p>}
-                  </div>,
+                  </div>
                 )}
               </div>
             </div>

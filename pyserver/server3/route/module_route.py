@@ -98,7 +98,7 @@ def update_module():
 
 @module_app.route("/publish/<project_id>", methods=["POST"])
 def publish_module(project_id):
-    project = ModuleBusiness.publish(project_id)
+    project = ModuleService.publish(project_id)
     project = json_utility.convert_to_json(project.to_mongo())
     return jsonify({"response": project})
 
@@ -107,5 +107,5 @@ def publish_module(project_id):
 def test_module(project_id):
     failures = ModuleBusiness.run_test(project_id)
     import time
-    time.sleep(1)
+    time.sleep(0.5)
     return jsonify({"response": failures})

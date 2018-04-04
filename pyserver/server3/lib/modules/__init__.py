@@ -23,11 +23,11 @@ def module_general(module_id, action, *args, **kwargs):
 
 
 def json_parser(json_obj):
-    args = json.loads(json_obj)
-    return {arg.get('name'): arg.get('value')
-                             or arg.get('values')
-                             or arg.get('default')
-            for arg in args}
+    return json.loads(json_obj)
+    # return {arg.get('name'): arg.get('value')
+    #                          or arg.get('values')
+    #                          or arg.get('default')
+    #         for arg in args}
 
 
 class Client:

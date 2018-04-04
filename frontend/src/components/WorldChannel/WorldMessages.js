@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import {Popover} from 'antd'
 import styles from './index.less'
 import {showTime} from "../../utils/index"
+import {avatarList} from "../../constants"
 
 
 export const WorldMessages = ({worldMessages = [], ref1, isRight}) => {
@@ -21,7 +22,14 @@ export const WorldMessages = ({worldMessages = [], ref1, isRight}) => {
 
 
 const WorldMessageItem = ({worldMessage, isRight}) => {
-  const {message, _id, create_time, sender_user_ID, message_type} = worldMessage
+
+  const {message, _id, create_time, sender_user_ID, message_type, sender} = worldMessage
+  let picNumber = ""
+
+  if(sender) {
+    picNumber = parseInt(sender.slice(20))%6
+  }
+
 
   const renderItem = () => {
     return (
@@ -36,18 +44,35 @@ const WorldMessageItem = ({worldMessage, isRight}) => {
         >
           {
             message_type === 'admin' ?
-              <img
+
+              <div
                 style={{
                   height: 30, width: 30,
+                  color: "#34BFE2"
                 }}
-                src={require('../../img/icon/system.png')}
-              /> :
-              <img
-                style={{
-                  height: 30, width: 30,
-                }}
-                src={require('../../img/icon/mo.png')}
+                className={styles.system_image}
               />
+
+              // <img
+              //   style={{
+              //     height: 30, width: 30,
+              //     color: "#34BFE2"
+              //   }}
+              //   src={require('../../img/icon/system.png')}
+              // />
+
+              :
+
+              <img style={{
+                height: 30, width: 30,
+              }} src={avatarList[picNumber]}  alt="avatar" />
+
+              // <img
+              //   style={{
+              //     height: 30, width: 30,
+              //   }}
+              //   src={require('../../img/icon/mo.png')}
+              // />
           }
         </div>
 
