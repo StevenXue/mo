@@ -63,77 +63,6 @@ class TypeMapper:
         return getattr(cls, attr)
 
 
-def tb_proxy(project_id):
-    port = ProjectBusiness.get_by_id(project_id).tb_port
-    resp = requests.post('{localhost}:{port}'.
-                         format(localhost='http://localhost', port=port)
-                         )
-    print(resp.content)
-    return resp.content
-
-
-def auth_hub_user(user_ID, project_name, user_token):
-    """
-    auth jupyterhub with user token
-    :param user_ID:
-    :param project_name:
-    :param user_token:
-    :return: dict of res json
-    """
-    return requests.post('{hub_server}/hub/api/authorizations/token'.
-                         format(hub_server=HUB_SERVER),
-                         json={'username': user_ID + '+' + project_name,
-                               'password': user_token}
-                         ).json()
-
-
-def delete_hub_user(user_ID, project_name):
-    """
-    auth jupyterhub with user token
-    :param user_ID:
-    :param project_name:
-    :param token:
-    :return: dict of res json
-    """
-    url = '{hub_server}/hub/api/users/{user_ID}+{project_name}'.format(
-        hub_server=HUB_SERVER, user_ID=user_ID,
-        project_name=project_name)
-    return requests.delete(url,
-                           headers={
-                               'Authorization': 'token {}'.format(ADMIN_TOKEN)
-                           })
-
-
-def get_by_id(project_id):
-    project = project_business.get_by_id(project_id)
-    ow = ownership_business.get_ownership_by_owned_item(project, 'project')
-    project.is_private = ow.private
-    return project
-
-
-def update_project(project_id, name, description, is_private=True,
-                   related_fields=[], tags=[], related_tasks=[],
-                   done_indices=[]):
-    """
-    Create a new project
-
-    :param name: str
-    :param description: str
-    :param user_ID: ObjectId
-    :param is_private: boolean
-    :return: a new created project object
-    """
-    project = project_business.get_by_id(project_id)
-    ow = ownership_business.get_ownership_by_owned_item(project, 'project')
-    ownership_business.update_by_id(ow['id'], private=is_private)
-    project_business.update_by_id(project_id, name=name,
-                                  description=description,
-                                  update_time=datetime.utcnow(),
-                                  related_fields=related_fields,
-                                  tags=tags, related_tasks=related_tasks,
-                                  done_indices=done_indices)
-
-
 def list_projects_by_user_ID(user_ID, order=-1, privacy='all'):
     """
     list all projects
@@ -187,28 +116,6 @@ def list_projects(search_query=None, page_no=1, page_size=10,
         default_max_score=default_max_score,
         user=user,
     )
-
-
-def remove_project_by_id(project_id, user_ID):
-    """
-    remove project by its object_id
-    :param project_id: object_id of project to remove
-    :return:
-    """
-    project = project_business.get_by_id(project_id)
-    # check ownership
-    ownership = ownership_business.get_ownership_by_owned_item(project,
-                                                               'project')
-    if user_ID != ownership.user.user_ID:
-        raise ValueError('project not belong to this user, cannot delete')
-    # delete tmp jupyterhub user
-    delete_hub_user(user_ID, project.name)
-    # delete project directory
-    project_directory = UPLOAD_FOLDER + user_ID + '/' + project.name
-    if os.path.isdir(project_directory):
-        shutil.rmtree(project_directory)
-    # delete project object
-    return project_business.remove_by_id(project_id)
 
 
 # 增加result_obj和job_obj到project
