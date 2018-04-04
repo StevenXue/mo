@@ -1,4 +1,10 @@
 const mainColor = '#108ee9';
+import avatar1 from './img/avatar/1.png'
+import avatar2 from './img/avatar/2.png'
+import avatar3 from './img/avatar/3.png'
+import avatar4 from './img/avatar/4.png'
+import avatar5 from './img/avatar/5.png'
+import avatar6 from './img/avatar/6.png'
 
 module.exports = {
   apiPrefix: '/pyapi',
@@ -108,7 +114,11 @@ module.exports = {
     "## Examples\n" +
     "\n" +
     "_Provide and explain examples of input and output for your algorithm._\n" +
-    "\n"}
+    "\n"},
+
+
+  avatarList: [avatar1,avatar2,avatar3,avatar4,avatar5,avatar6]
+
 
 };
 
