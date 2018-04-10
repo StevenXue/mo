@@ -35,7 +35,7 @@ class NewPassword extends Component {
     }
     send = ()=>{
         if(this.state.password==this.state.password_two){
-            fetch(`http://localhost:5005/user/newpassword?password=${this.state.password}&&email=${{this.props.location.query.email}}`, {method: 'GET'})
+            fetch(`http://localhost:5005/user/newpassword?password=${this.state.password}&&email=${this.props.location.query.email}`, {method: 'GET'})
             .then(({status})=>{
                 if(status==200){
                     this.vic();
