@@ -386,7 +386,7 @@ function UserRequestDetail({ allRequest, login, dispatch }) {
             user_request_id: focusUserRequest['_id'],
           },
         })
-        dispatch(routerRedux.push('/userrequest'))
+        dispatch(routerRedux.push('/userrequest?tab=app'))
       },
     })
   }
@@ -536,7 +536,7 @@ function UserRequestDetail({ allRequest, login, dispatch }) {
 
                   </Col>
                   <Col span={22}>
-                    {e.select_project ? <Card title={e.select_project.name}
+                    {e.select_project && e.select_project["deleted"] === undefined? <Card title={e.select_project.name}
                                               style={{ cursor: 'pointer' }}
                                               onClick={() => clickSelectedProject(e)}
                                               extra={<div style={{ fontSize: '14px' }}> {appStatus(e.select_project)}</div>}>
@@ -546,7 +546,7 @@ function UserRequestDetail({ allRequest, login, dispatch }) {
                           at {showTime(e.select_project.commits[e.select_project.commits.length - 1]['time'])}</p>
                         <p>{e.select_project.commits[e.select_project.commits.length - 1]['message']}</p>
                       </div> : null}
-                    </Card> : null}
+                    </Card> : <Card title={`this ${e.type} has been deleted`}/>}
                     <div>
                       <div className={styles.eachAnswer}>
                         <div dangerouslySetInnerHTML={{
