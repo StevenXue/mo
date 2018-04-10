@@ -243,7 +243,7 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
             {!market_use && <TabPane tab="Jobs" key="2">
               <Jobs projectDetail={projectDetail} dispatch={dispatch}/>
             </TabPane>}
-            {projectDetail.project.type==='app' ?  <TabPane tab="Examples" key="3">
+            {projectDetail.project.type==='app' && projectDetail.project.status==='active'?  <TabPane tab="Examples" key="3">
               {projectDetail.project.args ? <ProjectExample projectDetail={projectDetail}
                                                             dispatch={dispatch}/> : null}
             </TabPane>:null}
