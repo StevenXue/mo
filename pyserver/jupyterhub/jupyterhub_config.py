@@ -38,6 +38,8 @@ def default_format_volume_name(template, spawner):
 
 class MyDockerSpawner(DockerSpawner):
     tb_port = '6006'
+    tb_host = None
+    tb_proxy_spec = None
 
     @property
     def extra_create_kwargs(self):
@@ -190,6 +192,9 @@ class MyDockerSpawner(DockerSpawner):
             self.user.server.ip = ip
             self.user.server.port = port
         tb_port = yield self.get_tb_port()
+        self.tb_host = self.server.host.replace(str(self.user.server.port),
+                                                str(tb_port))
+        self.tb_proxy_spec = self.proxy_spec.replace('/user/', '/tb/')
         # update tb_port and module env to exist app
         self.update_project_tb_port(self.user.name, tb_port)
         self.insert_envs(self.user.name)
@@ -197,11 +202,263 @@ class MyDockerSpawner(DockerSpawner):
         return ip, port
 
 
+import os
+import json
+from subprocess import Popen
+from jupyterhub.proxy import ConfigurableHTTPProxy
+from tornado.ioloop import PeriodicCallback
+from tornado.httpclient import AsyncHTTPClient, HTTPRequest
+
+from jupyterhub.objects import Server
+from jupyterhub.utils import url_path_join
 
 
+class MyProxy(ConfigurableHTTPProxy):
+    tb_public_url = 'http://127.0.0.1:8111'
+    tb_api_url = 'http://127.0.0.1:8222'
+
+    # @property
+    # def tb_public_url(self):
+    #     """I'm the 'x' property."""
+    #     return 'http{s}://{ip}:{port}{base_url}'.format(
+    #         s='s' if self.ssl_cert else '',
+    #         ip=self.ip,
+    #         port=self.tb_public_port,
+    #         base_url=self.base_url,
+    #     )
+
+    @gen.coroutine
+    def start(self):
+        # start tensorboard
+        yield self.start_tb_proxy()
+
+        public_server = Server.from_url(self.public_url)
+        api_server = Server.from_url(self.api_url)
+        env = os.environ.copy()
+        env['CONFIGPROXY_AUTH_TOKEN'] = self.auth_token
+        cmd = self.command + [
+            '--ip', public_server.ip,
+            '--port', str(public_server.port),
+            '--api-ip', api_server.ip,
+            '--api-port', str(api_server.port),
+            '--error-target', url_path_join(self.hub.url, 'error'),
+        ]
+        if self.app.subdomain_host:
+            cmd.append('--host-routing')
+        if self.debug:
+            cmd.extend(['--log-level', 'debug'])
+        if self.ssl_key:
+            cmd.extend(['--ssl-key', self.ssl_key])
+        if self.ssl_cert:
+            cmd.extend(['--ssl-cert', self.ssl_cert])
+        if self.app.statsd_host:
+            cmd.extend([
+                '--statsd-host', self.app.statsd_host,
+                '--statsd-port', str(self.app.statsd_port),
+                '--statsd-prefix', self.app.statsd_prefix + '.chp'
+            ])
+        # Warn if SSL is not used
+        if ' --ssl' not in ' '.join(cmd):
+            self.log.warning("Running JupyterHub without SSL."
+                             "  I hope there is SSL termination happening somewhere else...")
+        self.log.info("Starting proxy @ %s", public_server.bind_url)
+        self.log.debug("Proxy cmd: %s", cmd)
+        shell = os.name == 'nt'
+        try:
+            self.proxy_process = Popen(cmd, env=env, start_new_session=True,
+                                       shell=shell)
+        except FileNotFoundError as e:
+            self.log.error(
+                "Failed to find proxy %r\n"
+                "The proxy can be installed with `npm install -g configurable-http-proxy`"
+                % self.command
+            )
+            raise
+
+        def _check_process():
+            status = self.proxy_process.poll()
+            if status is not None:
+                e = RuntimeError(
+                    "Proxy failed to start with exit code %i" % status)
+                # py2-compatible `raise e from None`
+                e.__cause__ = None
+                raise e
+
+        for server in (public_server, api_server):
+            for i in range(10):
+                _check_process()
+                try:
+                    yield server.wait_up(1)
+                except TimeoutError:
+                    continue
+                else:
+                    break
+            yield server.wait_up(1)
+        _check_process()
+        self.log.debug("Proxy started and appears to be up")
+        pc = PeriodicCallback(self.check_running,
+                              1e3 * self.check_running_interval)
+        pc.start()
+
+    @gen.coroutine
+    def start_tb_proxy(self):
+        public_server = Server.from_url(self.tb_public_url)
+        api_server = Server.from_url(self.tb_api_url)
+        env = os.environ.copy()
+        env['CONFIGPROXY_AUTH_TOKEN'] = self.auth_token
+        cmd = self.command + [
+            '--ip', public_server.ip,
+            '--port', str(public_server.port),
+            '--api-ip', api_server.ip,
+            '--api-port', str(api_server.port),
+            '--error-target', url_path_join(self.hub.url, 'error'),
+            '--no-include-prefix',
+        ]
+        print('cmdcmdcmdcmd', cmd, self.auth_token)
+        if self.app.subdomain_host:
+            cmd.append('--host-routing')
+        if self.debug:
+            cmd.extend(['--log-level', 'debug'])
+        if self.ssl_key:
+            cmd.extend(['--ssl-key', self.ssl_key])
+        if self.ssl_cert:
+            cmd.extend(['--ssl-cert', self.ssl_cert])
+        if self.app.statsd_host:
+            cmd.extend([
+                '--statsd-host', self.app.statsd_host,
+                '--statsd-port', str(self.app.statsd_port),
+                '--statsd-prefix', self.app.statsd_prefix + '.chp'
+            ])
+        # Warn if SSL is not used
+        if ' --ssl' not in ' '.join(cmd):
+            self.log.warning("Running JupyterHub without SSL."
+                             "  I hope there is SSL termination happening somewhere else...")
+        self.log.info("Starting proxy @ %s", public_server.bind_url)
+        self.log.debug("Proxy cmd: %s", cmd)
+        shell = os.name == 'nt'
+        try:
+            self.proxy_process = Popen(cmd, env=env, start_new_session=True,
+                                       shell=shell)
+        except FileNotFoundError as e:
+            self.log.error(
+                "Failed to find proxy %r\n"
+                "The proxy can be installed with `npm install -g configurable-http-proxy`"
+                % self.command
+            )
+            raise
+
+        def _check_process():
+            status = self.proxy_process.poll()
+            if status is not None:
+                e = RuntimeError(
+                    "Proxy failed to start with exit code %i" % status)
+                # py2-compatible `raise e from None`
+                e.__cause__ = None
+                raise e
+
+        for server in (public_server, api_server):
+            for i in range(10):
+                _check_process()
+                try:
+                    yield server.wait_up(1)
+                except TimeoutError:
+                    continue
+                else:
+                    break
+            yield server.wait_up(1)
+        _check_process()
+        self.log.debug("Proxy started and appears to be up")
+        pc = PeriodicCallback(self.check_running,
+                              1e3 * self.check_running_interval)
+        pc.start()
+
+    @gen.coroutine
+    def add_tb(self, user, server_name='', client=None):
+        """Add a user's server to the proxy table."""
+        spawner = user.spawners[server_name]
+        self.log.info("Adding user %s's tensorboard to proxy %s => %s",
+                      user.name, spawner.tb_proxy_spec, spawner.tb_host,
+                      )
+
+        if spawner.pending and spawner.pending != 'spawn':
+            raise RuntimeError(
+                "%s is pending %s, shouldn't be added to the proxy yet!" % (
+                    spawner._log_name, spawner.pending)
+            )
+
+        yield self.add_route(
+            spawner.tb_proxy_spec,
+            spawner.tb_host,
+            {
+                'user': user.name,
+                # 'includePrefix': False,
+                # 'prependPath': False
+            },
+            tb=True
+        )
+
+    def add_route(self, routespec, target, data, **kwargs):
+        body = data or {}
+        body['target'] = target
+        body['jupyterhub'] = True
+        path = self._routespec_to_chp_path(routespec)
+        if kwargs.get('tb'):
+            return self.tb_api_request(path,
+                                       method='POST',
+                                       body=body,
+                                       )
+        else:
+            return self.api_request(path,
+                                    method='POST',
+                                    body=body,
+                                    )
+
+    def tb_api_request(self, path, method='GET', body=None, client=None):
+        """Make an authenticated API request of the proxy."""
+        client = client or AsyncHTTPClient()
+        url = url_path_join(self.tb_api_url, 'api/routes', path)
+
+        if isinstance(body, dict):
+            body = json.dumps(body)
+        self.log.debug("Proxy: Fetching %s %s", method, url)
+        req = HTTPRequest(url,
+                          method=method,
+                          headers={'Authorization': 'token {}'.format(
+                              self.auth_token)},
+                          body=body,
+                          )
+
+        return client.fetch(req)
+
+    @gen.coroutine
+    def add_user(self, user, server_name='', client=None):
+        """Add a user's server to the proxy table."""
+        spawner = user.spawners[server_name]
+        self.log.info("Adding user %s to proxy %s => %s",
+                      user.name, spawner.proxy_spec, spawner.server.host,
+                      )
+
+        if spawner.pending and spawner.pending != 'spawn':
+            raise RuntimeError(
+                "%s is pending %s, shouldn't be added to the proxy yet!" % (
+                    spawner._log_name, spawner.pending)
+            )
+
+        yield self.add_tb(user)
+
+        yield self.add_route(
+            spawner.proxy_spec,
+            spawner.server.host,
+            {
+                'user': user.name,
+                'server_name': server_name,
+            }
+        )
 
 
+from jupyterhub.handlers.base import PrefixRedirectHandler
 
+# c.JupyterHub.init_handlers =
 # ------------------------------------------------------------------------------
 # Application(SingletonConfigurable) configuration
 # ------------------------------------------------------------------------------
@@ -358,7 +615,7 @@ c.JupyterHub.authenticator_class = SuperSecureAuthenticator
 # c.JupyterHub.debug_db = False
 
 ## DEPRECATED since version 0.8: Use ConfigurableHTTPProxy.debug
-# c.JupyterHub.debug_proxy = False
+c.JupyterHub.debug_proxy = True
 
 ## Send JupyterHub's logs to this file.
 #  
@@ -445,7 +702,7 @@ c.JupyterHub.ip = '0.0.0.0'
 
 ## Select the Proxy API implementation.
 # c.JupyterHub.proxy_class = 'jupyterhub.proxy.ConfigurableHTTPProxy'
-# c.JupyterHub.proxy_class = 'myproxy.MyProxy'
+c.JupyterHub.proxy_class = MyProxy
 
 ## DEPRECATED since version 0.8. Use ConfigurableHTTPProxy.command
 # c.JupyterHub.proxy_cmd = []
