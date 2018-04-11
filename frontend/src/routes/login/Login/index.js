@@ -165,11 +165,12 @@ class Login extends Component {
               </FormItem>
 
               <FormItem className={styles.additional} style={{marginTop: 20}}>
-                <Button size="large" loading={login.submitting} className={styles.submit} type="primary"
+                 <Button size="large" loading={login.submitting} className={styles.submit} type="primary"
                         htmlType="submit">
                   Login
                 </Button>
-                <a className={styles.forgot} href="">Forgot password?</a>
+                {/* <a className={styles.forgot} href="">Forgot password?</a> */}
+                <Link to='/user/forgot' className={styles.forgot}>Forgot password?</Link>
               </FormItem>
 
             </Form>

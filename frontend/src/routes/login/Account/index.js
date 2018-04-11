@@ -7,6 +7,8 @@ import { Icon, Tabs } from 'antd'
 import { config } from '../../../utils'
 import Login from '../Login'
 import Register from '../Register'
+import Forgot from '../Forgot'
+import NewPassword from '../NewPassword'
 import styles from './index.less'
 // import { getRouteData } from '../utils/utils';
 
@@ -44,16 +46,21 @@ class UserLayout extends React.PureComponent {
               {/*<span className={styles.title}>{config.name}</span>*/}
             </Link>
           </div>
-          <div className={styles.switcher}>
+          {
+            lastPathName!="forgot"&&lastPathName!="newpassword"?<div className={styles.switcher}>
             <Link to='/user/login' className={lastPathName === 'login' ? styles.selected:styles.unSelected} >Log In</Link>
             <Link to='/user/register' className={lastPathName === 'register' ? styles.selected:styles.unSelected}>Sign Up</Link>
-          </div>
+          </div>:null
+          }
+          
         </div>
         <div className={styles.container}>
 
           <Switch>
+            <Route path="/user/newpassword" component={NewPassword}/>
             <Route path="/user/login" component={Login}/>
             <Route path="/user/register" component={Register}/>
+            <Route path="/user/forgot" component={Forgot}/>
           </Switch>
         </div>
       </div>

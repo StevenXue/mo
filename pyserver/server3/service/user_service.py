@@ -22,7 +22,24 @@ from server3.business.user_request_business import UserRequestBusiness
 from server3.business.data_set_business import DatasetBusiness
 
 from server3.entity.phone_message_id import PhoneMessageId
-
+import smtplib    
+from email.mime.multipart import MIMEMultipart    
+from email.mime.text import MIMEText    
+from email.mime.image import MIMEImage 
+from email.header import Header   
+smtpserver = 'smtp.163.com'
+username = '15669929857@163.com'
+password='wurao122'
+sender='15669929857@163.com'
+# receiver='374758875@qq.com'
+subject = 'Python email test'
+msg = MIMEMultipart('mixed') 
+msg['Subject'] = subject
+msg['From'] = '15669929857@163.com <15669929857@163.com>'
+# msg['To'] = '374758875@qq.com'
+# text = "Hi!\nHow are you?\nHere is the link you wanted:\nhttp://localhost:8989/#/user/login"    
+# text_plain = MIMEText(text,'plain', 'utf-8')    
+# msg.attach(text_plain)   
 def add_git_http_user(user_ID, password):
     """
     auth jupyterhub with user token
@@ -63,7 +80,33 @@ def authenticate(user_ID, password):
     if user and check_password_hash(user.password, password):
         user.id = str(user.id)
         return user
-    return False
+    return False 
+
+def forgot_send(email):
+    user = user_business.get_by_email(email)
+    if user:
+        receiver= email
+        msg['To'] = email
+        # ssstr = 'Hi!\nHow are you?\nHere is the link you wanted:\nhttp://localhost:8989/#/user/login?email='+email
+        text = 'Hi!\nHow are you?\nHere is the link you wanted:\nhttp://localhost:8989/#/user/login?email='+email
+        text_plain = MIMEText(text,'plain', 'utf-8')    
+        msg.attach(text_plain)   
+        smtp = smtplib.SMTP()    
+        smtp.connect('smtp.163.com')
+        smtp.login(username, password)    
+        smtp.sendmail(sender, receiver, msg.as_string())    
+        smtp.quit()
+        return user
+    return False 
+
+
+def newpassword_send(password,email):
+    user = user_business.get_by_email(email)
+    if user:
+        user['password'] = generate_password_hash(password)
+        user.save()
+        return user
+    return False 
 
 
 def update_request_vote(user_request_id, user_ID):
