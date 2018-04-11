@@ -138,6 +138,9 @@ def objs_to_json_with_args(objects, args):
             new_object[f'{arg}_obj'] = convert_to_json(object[arg].to_mongo())
         return_objects.append(new_object)
     return return_objects
+
+
+
     # return [
     #     {
     #     **convert_to_json(me_obj.to_mongo()),

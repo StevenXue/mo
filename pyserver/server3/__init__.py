@@ -19,6 +19,8 @@ from server3.entity.user_request import UserRequest
 from server3.entity.user_request_comments import UserRequestComments
 from server3.entity.request_answer import RequestAnswer
 from server3.entity.api import Api
+from server3.entity.statistics import Statistics
+
 
 # ——————————————————————————————————————————————————————— external delete rules
 #                                            Defined here to avoid import loops
@@ -31,6 +33,8 @@ User.register_delete_rule(UserRequest, 'star_user', PULL)
 # 删除app
 App.register_delete_rule(User, 'favor_apps', PULL)
 App.register_delete_rule(User, 'star_apps', PULL)
+App.register_delete_rule(Statistics, 'app', CASCADE)
+
 # App.register_delete_rule(User, 'used_apps', PULL)  # TODO 把相关的used_apps删掉
 
 
