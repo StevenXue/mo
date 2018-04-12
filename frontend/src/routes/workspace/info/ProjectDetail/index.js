@@ -261,7 +261,7 @@ const Jobs = ({ projectDetail, dispatch }) => {
       <h2>Jobs:
         <span className={styles.rightButton}>
                      <Button onClick={() => {
-                       window.open(`${tbServer}/tb/${localStorage.getItem('user_ID')}+${projectDetail.project.name}/`)
+                       window.open(`/tb/${localStorage.getItem('user_ID')}+${projectDetail.project.name}/`)
                      }}>
                        Jobs Visualization
                      </Button>

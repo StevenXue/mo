@@ -4,7 +4,7 @@ const path = require('path');
 const re = /.+\.css$/;
 const paths = require('./paths');
 
-import {flaskServer, hubServer} from './config.js'
+import {flaskServer, hubServer, tbServer} from './config.js'
 
 const walkSync = (dir) =>
   fs.readdirSync(dir)
@@ -42,6 +42,11 @@ export default {
       'target': flaskServer,
       'changeOrigin': true,
       'pathRewrite': {'^/pyapi': ''},
+    },
+    '/tb': {
+      'target': tbServer,
+      'changeOrigin': true,
+      // 'pathRewrite': {'^/tb': ''},
     },
     '/hub_api': {
       'target': hubServer,
