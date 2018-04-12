@@ -16,7 +16,7 @@ import styles from './index.less'
 import { get } from 'lodash'
 import { message } from 'antd/lib/index'
 import ReactMarkdown from 'react-markdown'
-import { flaskServer, hubServer } from '../../../../constants'
+import { flaskServer, hubServer, tbServer } from '../../../../constants'
 
 const confirm = Modal.confirm
 const TabPane = Tabs.TabPane
@@ -261,11 +261,11 @@ const Jobs = ({ projectDetail, dispatch }) => {
       <h2>Jobs:
         <span className={styles.rightButton}>
                      <Button onClick={() => {
-                       window.open(hubServer.replace('8000', projectDetail.project.tb_port))
+                       window.open(`/tb/${localStorage.getItem('user_ID')}+${projectDetail.project.name}/`)
                      }}>
                        Jobs Visualization
                      </Button>
-                </span>
+        </span>
       </h2>
       <p className={styles.overall}>
         <span className={styles.done}>

@@ -127,13 +127,14 @@ class Repo:
     #     return modified_obj.reload()
 
     def update_one_by_id(self, obj_id, update):
-        modified_obj = self.__instance.objects(id=obj_id).modify(**update)
+        modified_obj = self.__instance.objects.get(id=obj_id)
+        modified_obj.modify(**update)
         return modified_obj.reload()
 
     def update_unique_one(self, query, update):
         modified_obj = self.__instance.objects.get(**query)
         modified_obj.modify(**update)
-        return modified_obj
+        return modified_obj.reload()
 
     # delete fields
     def update_unset_fields_by_non_unique_field(self, field_name, field_value,

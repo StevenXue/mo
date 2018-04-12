@@ -27,7 +27,7 @@ import {
 } from '@jupyterlab/coreutils';
 
 import {
-  ServiceManager, Session, TerminalSession, request,
+  ServiceManager, Session, TerminalSession, request
 } from '@jupyterlab/services';
 
 import '../style/index.css';
@@ -335,7 +335,7 @@ export class RunningSessions extends Widget {
         request(`pyapi/project/projects/${match[1]}`,
           undefined,
           {
-            onJson: (project: any) => window.open(`http://localhost:${project.tb_port}`),
+            onJson: (project: any) => window.open(`/tb/${localStorage.getItem('user_ID')}+${project.name}/`)
           });
       }
     }
