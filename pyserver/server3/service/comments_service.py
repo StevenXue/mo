@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 from server3.business import comments_business
-from server3.business import user_business
+from server3.business.user_business import UserBusiness
 from server3.business import ownership_business
 from server3.service import ownership_service
 
@@ -40,7 +40,7 @@ def create_user_request_comments(user_request_id, user_ID, comments,
                                   request_answer_id=request_answer_id)
     if created_user_request_comments:
         # get user object
-        user = user_business.get_by_user_ID(user_ID=user_ID)
+        user = UserBusiness.get_by_user_ID(user_ID=user_ID)
         # create ownership relation
         if ownership_business.add(user,
                                   user_request_comments=
@@ -70,7 +70,7 @@ def update_user_request_comments(user_request_comments_id, user_ID, comments):
 
 
 def list_user_request_comments_by_user_id(user_ID, order=-1):
-    user = user_business.get_by_user_ID(user_ID)
+    user = UserBusiness.get_by_user_ID(user_ID)
     user_request_comments = ownership_business. \
             get_ownership_objects_by_user(user, 'user_request_comments')
     if order == -1:

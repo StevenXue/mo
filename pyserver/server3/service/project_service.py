@@ -19,10 +19,8 @@ from server3.business.app_business import AppBusiness
 from server3.business.module_business import ModuleBusiness
 from server3.business.data_set_business import DatasetBusiness
 from server3.business import job_business
-from server3.business import user_business
+from server3.business.user_business import UserBusiness
 from server3.business import ownership_business
-from server3.business import result_business
-from server3.business import data_set_business
 from server3.service import ownership_service
 from server3.service import staging_data_service
 from server3.service import kube_service
@@ -146,7 +144,7 @@ def list_projects_by_user_ID(user_ID, order=-1, privacy='all'):
         projects = ownership_service.get_all_public_objects('project')
     else:
         if privacy == 'all':
-            user = user_business.get_by_user_ID(user_ID)
+            user = UserBusiness.get_by_user_ID(user_ID)
             projects = ownership_service. \
                 get_ownership_objects_by_user_ID(user, 'project')
         elif privacy == 'private':
@@ -177,7 +175,7 @@ def list_projects(search_query=None, page_no=1, page_size=10,
     """
     user = None
     if user_ID:
-        user = user_business.get_by_user_ID(user_ID)
+        user = UserBusiness.get_by_user_ID(user_ID)
     cls = TypeMapper.get(type)
     return cls.get_objects(
         search_query=search_query,
@@ -436,7 +434,7 @@ def fork(project_id, new_user_ID):
     if ownership.user.user_ID == new_user_ID:
         raise NameError('you are forking your self project')
     # get user object
-    user = user_business.get_by_user_ID(new_user_ID)
+    user = UserBusiness.get_by_user_ID(new_user_ID)
     # copy and save project
     project_cp = project_business.copy(project)
     # create ownership relation
@@ -615,7 +613,7 @@ class ProjectService:
         if tags is None:
             tags = []
         project_type = type
-        user = user_business.get_by_user_ID(user_ID)
+        user = UserBusiness.get_by_user_ID(user_ID)
         # message = "{}创建了app{}".format(user.name, name)
         # world_business.system_send(channel=cls.channel, message=message)
         project = cls.business.create_project(name=name,
@@ -666,7 +664,7 @@ class ProjectService:
 
         user = None
         if user_ID:
-            user = user_business.get_by_user_ID(user_ID)
+            user = UserBusiness.get_by_user_ID(user_ID)
         return cls.business.get_objects(
             search_query=search_query,
             privacy=privacy,

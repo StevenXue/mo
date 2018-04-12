@@ -13,6 +13,8 @@ from server3.service import user_service
 from server3.business.user_business import UserBusiness
 from server3.business.project_business import ProjectBusiness
 from server3.utility import json_utility
+from server3.service.request_answer_service import RequestAnswerService
+from server3.business.request_answer_business import RequestAnswerBusiness
 
 PREFIX = '/request_answer'
 
@@ -29,8 +31,8 @@ def list_request_answer():
     type = request.args.get("type")
     search_query = request.args.get("search_query")
     if user_request_id:
-        request_answer = request_answer_service. \
-            get_all_answer_of_this_user_request(user_request_id)
+        request_answer = RequestAnswerBusiness. \
+            get_by_id(user_request_id)
         for each_one in request_answer:
             # todo 删除历史数据后，可删除此判断
             if each_one.answer_user:
@@ -47,12 +49,13 @@ def list_request_answer():
             if 'select_project' in answer:
                 # 获取commit
                 try:
-                    commits = ProjectBusiness.get_commits(request_answer[index].select_project.path)
+                    commits = ProjectBusiness.get_commits(
+                        request_answer[index].select_project.path)
                     select_project = request_answer[index].select_project
                     select_project.commits = [{
                         'message': c.message,
                         'time': datetime.fromtimestamp(c.time[0] + c.time[1]),
-                            } for c in commits]
+                    } for c in commits]
                     answer['select_project'] = json_utility.convert_to_json(
                         select_project.to_mongo())
                 except:
@@ -60,7 +63,7 @@ def list_request_answer():
                     answer['select_project'] = {'deleted': True}
         return jsonify({'response': request_answer_info}), 200
     elif user_ID:
-        request_answer, total_number = request_answer_service. \
+        request_answer, total_number = RequestAnswerService. \
             get_all_answer_by_user_ID(user_ID, page_no, page_size,
                                       type, search_query)
         request_answer_info = json_utility. \
@@ -88,11 +91,12 @@ def create_request_answer():
     user_request_id = data.pop('user_request_id')
     data['user_request'] = ObjectId(user_request_id)
 
-    request_answer_service.create_request_answer(**data)
+    RequestAnswerService.create_request_answer(**data)
     return jsonify({'response': 'create request_answer success'}), 200
 
 
 @request_answer_app.route('', methods=['PUT'])
+@jwt_required
 def update_request_answer():
     request_answer_id = request.args.get("request_answer_id")
     if not request.json \
@@ -101,33 +105,28 @@ def update_request_answer():
         return jsonify({'response': 'insufficient arguments'}), 400
     data = request.get_json()
     answer = data['answer']
-    user_id = data['user_id']
-    request_answer_service.update_request_answer(
-        request_answer_id, user_id, answer)
+    RequestAnswerService.update_request_answer(request_answer_id, answer)
     return jsonify({'response': 'update request_answer success'}), 200
 
 
 @request_answer_app.route('', methods=['DELETE'])
+@jwt_required
 def remove_request_answer():
-    user_id = request.args.get('user_ID')
+    user_ID = get_jwt_identity()
     request_answer_id = request.args.get('request_answer_id')
-    if not request_answer_id:
-        return jsonify({'response': 'no request_answer arg'}), 400
-    if not user_id:
-        return jsonify({'response': 'no user_ID arg'}), 400
-    result = request_answer_service.remove_request_answer_by_id(
-        ObjectId(request_answer_id), user_id)
+    result = RequestAnswerService.remove_request_answer_by_id(
+        request_answer_id, user_ID)
     return jsonify({'response': result}), 200
 
 
 @request_answer_app.route('/votes', methods=['PUT'])
+@jwt_required
 def update_request_answer_votes():
     data = request.get_json()
     request_answer_id = data["request_answer_id"]
     votes_user_id = data["votes_user_id"]
     result = user_service.update_answer_vote(request_answer_id, votes_user_id)
     result = json_utility.convert_to_json(result)
-    print('update_request_answer_votes')
     return jsonify({'response': result}), 200
 
 
@@ -138,6 +137,6 @@ def accept_request_answer():
     user_request_id = data['user_request_id']
     user_ID = get_jwt_identity()
     request_answer_id = data["request_answer_id"]
-    request_answer_service.accept_request_answer(user_request_id, user_ID,
-                                                 request_answer_id)
+    RequestAnswerService.accept_request_answer(user_request_id, user_ID,
+                                               request_answer_id)
     return jsonify({'response': 'accept success'}), 200

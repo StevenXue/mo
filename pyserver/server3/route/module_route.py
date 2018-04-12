@@ -12,7 +12,8 @@ from flask import Blueprint
 from flask import jsonify
 from flask import request
 
-from server3.business import module_business, user_business
+from server3.business import module_business
+from server3.business.user_business import UserBusiness
 from server3.business.module_business import ModuleBusiness
 from server3.service.module_service import ModuleService
 from server3.utility import json_utility
@@ -28,7 +29,7 @@ def add():
     try:
         name = data.pop("name")
         user_ID = data.pop("user_ID")
-        user = user_business.get_by_user_ID(user_ID)
+        user = UserBusiness.get_by_user_ID(user_ID)
         result = module_business.add(name=name, user=user, **data)
         print("result", result)
         result = json_utility.convert_to_json(result.to_mongo())

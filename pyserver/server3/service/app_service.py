@@ -8,7 +8,6 @@ from server3.service.project_service import ProjectService
 from server3.business.module_business import ModuleBusiness
 from server3.business.app_business import AppBusiness
 from server3.business.user_business import UserBusiness
-from server3.business import user_business
 from server3.business.statistics_business import StatisticsBusiness
 from server3.service import message_service
 from server3.constants import DOCKER_IP
@@ -85,7 +84,7 @@ class AppService(ProjectService):
     def deploy(cls, app_id, handler_file_path):
         app = cls.business.deploy(app_id, handler_file_path)
         receivers = app.favor_users  # get app subscriber
-        admin_user = user_business.get_by_user_ID('admin')
+        admin_user = UserBusiness.get_by_user_ID('admin')
         # 获取所有包含此app的答案
         answers_has_app = cls.requestAnswerBusiness.get_by_anwser_project_id(app.id)
         # 根据答案获取对应的 request 的 owner

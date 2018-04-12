@@ -3,7 +3,7 @@ import os
 
 from server3.service.project_service import ProjectService
 from server3.business.module_business import ModuleBusiness
-from server3.business import user_business
+from server3.business.user_business import UserBusiness
 from server3.service import message_service
 from server3.constants import MODULE_DIR
 from server3.business.request_answer_business import RequestAnswerBusiness
@@ -25,7 +25,7 @@ class ModuleService(ProjectService):
     def publish(cls, project_id):
         module = cls.business.publish(project_id)
         receivers = module.favor_users  # get app subscriber
-        admin_user = user_business.get_by_user_ID('admin')
+        admin_user = UserBusiness.get_by_user_ID('admin')
 
         # 获取所有包含此module的答案
         answers_has_module = cls.requestAnswerBusiness.\

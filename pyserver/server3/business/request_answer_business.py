@@ -19,6 +19,19 @@ class RequestAnswerBusiness(EntityBusiness):
     repo = RequestAnswerRepo(RequestAnswer)
 
     @classmethod
+    def update_request_answer_by_id(cls, request_answer_id, **kwargs):
+        return repo.update_one_by_id(
+            request_answer_id, kwargs)
+
+    @classmethod
+    def add_request_answer(cls, **data):
+        now = datetime.utcnow()
+        request_answer_obj = RequestAnswer(
+            create_time=now, **data
+        )
+        return request_answer_repo.create(request_answer_obj)
+
+    @classmethod
     def get_by_anwser_project_id(cls, project_id):
         objects = cls.repo.read()
         objects = objects(select_project=project_id)
@@ -33,6 +46,12 @@ class RequestAnswerBusiness(EntityBusiness):
         else:
             # 返回answer
             return cls.repo.read(query)
+
+    @classmethod
+    def answer_number_of_user_request(cls, user_request_id):
+        # 返回request的answer的数目
+        query = {'user_request': user_request_id}
+        return cls.repo.read(query).count()
 
     @classmethod
     def get_by_answer_user(cls,
@@ -61,6 +80,7 @@ class RequestAnswerBusiness(EntityBusiness):
             return objects.order_by('-create_time')[start:end], number_of_objects
         else:
             return objects.order_by('-create_time')[start:end]
+
 
 
 # 获取当前user_request下的所有

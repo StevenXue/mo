@@ -118,6 +118,6 @@ class UserRequestBusiness(EntityBusiness):
 
     @classmethod
     def update_by_id(cls, user_request_id, **kwargs):
-        kwargs['create_time'] = datetime.utcnow()
+        kwargs['update_time'] = datetime.utcnow()
         return cls.repo.update_one_by_id(
             user_request_id, kwargs)

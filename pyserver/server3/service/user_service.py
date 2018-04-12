@@ -349,7 +349,7 @@ def verify_code(code, phone):
 class UserService:
     @classmethod
     def action_entity(cls, user_ID, entity_id, action, entity):
-        user = user_business.get_by_user_ID(user_ID=user_ID)
+        user = UserBusiness.get_by_user_ID(user_ID=user_ID)
         business_maper = {
             "app": AppBusiness,
             "module": ModuleBusiness,

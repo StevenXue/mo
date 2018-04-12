@@ -18,7 +18,8 @@ from bson import ObjectId
 # from lib import model_orig
 from server3.entity.model import Model
 from server3.repository.model_repo import ModelRepo
-from server3.business import user_business, ownership_business
+from server3.business.user_business import UserBusiness
+from server3.business import ownership_business
 from server3.lib import models
 
 model_repo = ModelRepo(Model)
@@ -36,7 +37,7 @@ def add(name, description, category,
                   to_code_function=to_code_function, model_type=model_type,
                   parameter_spec=parameter_spec,
                   input=input, steps=steps)
-    # user = user_business.get_by_user_ID('system')
+    # user = UserBusiness.get_by_user_ID('system')
     # ownership_business.add(user, False, model=model)
     return model_repo.create(model)
 
@@ -49,7 +50,7 @@ def update_one_public_model():
     """
         数据库建一个model的collection, 记载public的数据分析工具包简介
     """
-    user = user_business.get_by_user_ID('system')
+    user = UserBusiness.get_by_user_ID('system')
 
     MNIST = Model(name='MNIST手写识别',
                   description='MNIST手写识别',

@@ -22,7 +22,8 @@ from mongoengine import DoesNotExist
 
 from server3.business import file_business
 from server3.business import job_business
-from server3.business import model_business, ownership_business, user_business
+from server3.business import model_business, ownership_business
+from server3.business.user_business import UserBusiness
 from server3.business import project_business
 from server3.business import staging_data_business
 from server3.business import staging_data_set_business
@@ -106,7 +107,7 @@ def add_model_with_ownership(user_ID, is_private, name, description, category,
     model = model_business.add(name, description, category,
                                target_py_code, entry_function, model_type,
                                to_code_function, parameter_spec, input, steps)
-    user = user_business.get_by_user_ID(user_ID)
+    user = UserBusiness.get_by_user_ID(user_ID)
     ownership_business.add(user, is_private, model=model)
     return model
 
@@ -1072,7 +1073,7 @@ def _update_model():
         }
     }
 
-    user = user_business.get_by_user_ID('system')
+    user = UserBusiness.get_by_user_ID('system')
 
     MODEL_DICT = [
         {

@@ -3,7 +3,7 @@ import re
 import synonyms
 from mongoengine import Q
 
-from server3.business import user_business
+from server3.business.user_business import UserBusiness
 from server3.business import api_business
 from server3.entity.api import ApiGetType
 from server3.entity.api import Api
@@ -16,14 +16,14 @@ fields = ["name", "keyword", "description"]
 
 
 def get_favor_apis(user_ID, page_no=default_page_no, page_size=default_page_size):
-    user = user_business.get_by_user_ID(user_ID=user_ID)
+    user = UserBusiness.get_by_user_ID(user_ID=user_ID)
     start = (page_no - 1) * page_size
     end = page_no * page_size
     return user.favor_apis[start:end]
 
 
 def get_used_apis(user_ID, page_no=default_page_no, page_size=default_page_size):
-    user = user_business.get_by_user_ID(user_ID=user_ID)
+    user = UserBusiness.get_by_user_ID(user_ID=user_ID)
     start = (page_no - 1) * page_size
     end = page_no * page_size
     return user.used_apis[start:end]
@@ -65,7 +65,7 @@ def get_api_list(get_type, search_query, user_ID, page_no=default_page_no,
 
     elif get_type == ApiGetType.favor or get_type == ApiGetType.used or get_type == ApiGetType.star:
         # 获取特定
-        user = user_business.get_by_user_ID(user_ID=user_ID)
+        user = UserBusiness.get_by_user_ID(user_ID=user_ID)
         apis = user[get_type + "_apis"]
         if search_query:
             # 先search, 后用apis filter
