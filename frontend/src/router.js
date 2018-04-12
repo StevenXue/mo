@@ -6,6 +6,7 @@ import pathToRegexp from 'path-to-regexp'
 import {get} from 'lodash'
 
 import Users from './routes/Users.js'
+import NewPassword from './routes/login/NewPassword'
 import Account from './routes/login/Account'
 import MyProjects from './routes/workspace/info/Projects'
 import Projects from './routes/projects/Projects'
@@ -27,6 +28,8 @@ const breadcrumbNameMap = {
   '/user': 'User',
   '/user/login': 'Login',
   '/user/register': 'Register',
+  '/user/forgot': 'Forgot',
+  // '/user/newpassword': 'NewPassword',
   '/workspace': 'My Projects',
   '/projects': 'Projects',
   '/modelmarket': 'Model Market',
@@ -71,7 +74,7 @@ const RouterConfig = ({history, location, projectDetail}) => {
   return (
     <Switch>
       <Route path="/user" component={Account}/>
-
+      <Route path="/newpassword" component={NewPassword}/>
       <Route path="/:anything" component={() =>
         <MainLayout location={location} history={history}>
           <div style={{display: 'flex', flexDirection: 'column'}}>

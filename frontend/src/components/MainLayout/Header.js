@@ -121,6 +121,27 @@ function Header({location, login, history, dispatch, allRequest,message}) {
     })
   }
 
+  const toUserProfile = (e) => {
+    history.push(`/profile/${e.user_ID}`)
+  }
+
+  const toUserRequest = (e) => {
+    history.push(`/userrequest/${e.user_request}?type=${e.user_request_type}`)
+  }
+
+  const toApp = (e) => {
+    history.push(`/workspace/${e.app_id}?type=app`)
+  }
+
+  const toModule = (e) => {
+    history.push(`/workspace/${e.module_id}?type=module`)
+  }
+
+  const toDataset = (e) => {
+    history.push(`/workspace/${e.dataset_id}?type=dataset`)
+  }
+
+
   const switchMessage = (e) => {
     switch(e.message_type) {
       case 'answer':
@@ -131,9 +152,14 @@ function Header({location, login, history, dispatch, allRequest,message}) {
         return <p>{e.user_ID} 上线了您关注的应用  {e.app_name}</p>
       case 'publish':
         return <p>{e.user_ID} 发布了您关注的模块  {e.module_name}</p>
+      case 'deploy_request':
+        return <p>{e.user_ID} 为您的答案{e.user_request_title}上线了应用  {e.app_name}</p>
+      case 'publish_request':
+        return <p>{e.user_ID} 为您的答案{e.user_request_title}发布了模块  {e.module_name}</p>
     }
-
   }
+
+
 
   return <div className={styles.container}>
     <div className={styles.box}>

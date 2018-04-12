@@ -18,19 +18,23 @@ moment.locale('en')
 
 import styles from './MainLayout.less'
 import Header from './Header'
+import TourTip from './TourTip'
+
 
 import zh_CN from '../../intl/zh_CN'
 import en_US from '../../intl/en_US'
-
 function MainLayout({children, location, history, modal, isRight, onClickIcon}) {
   return (
     <Layout style={{height: '100%'}}>
       <Header location={location} history={history} />
-      <Content style={{display: "flex"}}>
-        <div className={styles.content}>
+      <Content >
+        {/* <TourTip/> */}
+        <div style={{display: "flex"}}>
+          <div className={styles.content}>
           {children}
         </div>
         <Open onClickIcon={onClickIcon} isRight={isRight}/>
+        </div>
       </Content>
     </Layout>
   )

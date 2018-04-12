@@ -29,7 +29,7 @@ from server3.service.user_service import UserService
 from server3.business.user_business import UserBusiness
 from server3.business.statistics_business import StatisticsBusiness
 from server3.service import request_answer_service
-
+ 
 PREFIX = '/user'
 
 user_app = Blueprint("user_app", __name__, url_prefix=PREFIX)
@@ -143,6 +143,36 @@ def login():
                              'user': user_obj}}
     return jsonify(response), 200
 
+@user_app.route('/forgot', methods=['GET'])
+def forgot():
+    email = request.args.get('email', None)
+    try:
+        user = user_service.forgot_send(email)
+        # user_obj.pop('password')
+    except DoesNotExist as e:
+        return jsonify({'response': '%s: %s' % (str(
+            DoesNotExist), e.args)}), 400
+    if not user:
+        return jsonify({'response': 'Bad email'}), 400
+    # Identity can be any data that is json serializable
+    response = {'response': {'token': create_access_token(identity=user)}}
+    return jsonify(response), 200
+
+@user_app.route('/newpassword', methods=['GET'])
+def newpassword():
+    password = request.args.get('password', None)
+    email = request.args.get('email', None)
+    try:
+        user = user_service.newpassword_send(password,email)
+        # user_obj.pop('password')
+    except DoesNotExist as e:
+        return jsonify({'response': '%s: %s' % (str(
+            DoesNotExist), e.args)}), 400
+    if not user:
+        return jsonify({'response': 'Bad email'}), 400
+    # Identity can be any data that is json serializable
+    response = {'response': {'token': create_access_token(identity=user)}}
+    return jsonify(response), 200
 
 @user_app.route('/login_with_phone', methods=['POST'])
 def login_with_phone():
