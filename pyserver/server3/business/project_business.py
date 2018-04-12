@@ -36,6 +36,8 @@ from server3.entity.general_entity import Objects
 from server3.constants import GIT_LOCAL
 from server3.constants import INIT_RES
 from server3.constants import REDIS_SERVER
+from server3.business.request_answer_business import RequestAnswerBusiness
+
 
 socketio = SocketIO(message_queue=REDIS_SERVER)
 
@@ -127,6 +129,7 @@ def copy(project):
 class ProjectBusiness:
     project = None
     repo = ProjectRepo(Project)
+    requestAnswerBusiness = RequestAnswerBusiness
 
     @staticmethod
     def copytree(o, dst):
@@ -359,6 +362,21 @@ class ProjectBusiness:
         repo.index.commit(commit_msg)
         repo.remote(name='origin').pull()
         repo.remote(name='origin').push(o=project_id)
+
+        # 增加message
+        answers_has_project = cls.requestAnswerBusiness.get_by_anwser_project_id(project_id)
+        # 根据答案获取对应的 request 的 owner
+        for each_anser in answers_has_project:
+            user_request = each_anser.user_request
+            request_owener = user_request.user
+            message_service.create_message(admin_user, 'commit',
+                                           [request_owener],
+                                           project.user,
+                                           project_name=project.name,
+                                           project_id=project.id,
+                                           project_type=project.type,
+                                           user_request_title=user_request.title,
+                                           user_request_id=user_request.id)
 
     @classmethod
     def get_commits(cls, project_path):
