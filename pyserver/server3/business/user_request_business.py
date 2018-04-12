@@ -110,4 +110,14 @@ class UserRequestBusiness(EntityBusiness):
         objects = objects(user=user)
         objects.delete()
 
+    @classmethod
+    def add_user_request(cls, title, **kwargs):
+        now = datetime.utcnow()
+        user_request = UserRequest(title=title, create_time=now, **kwargs)
+        return user_request.save()
 
+    @classmethod
+    def update_by_id(cls, user_request_id, **kwargs):
+        kwargs['create_time'] = datetime.utcnow()
+        return cls.repo.update_one_by_id(
+            user_request_id, kwargs)
