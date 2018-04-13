@@ -73,9 +73,6 @@ class UserRequestService:
                     f"发布了需求{created_user_request.title}")
 
         if created_user_request:
-            # 默认发布者star
-            # created_user_request = user_service.update_request_star(
-            #     created_user_request.id, user_ID)
             user_entity = UserService. \
                 action_entity(user_ID=user_ID,
                               entity_id=created_user_request.id,

@@ -56,16 +56,16 @@ def create_user_request_comments():
 @user_request_comments_app.route('', methods=['PUT'])
 @jwt_required
 def update_user_request_comments():
-    user_request_comments_id = request.args.get("user_request_comments_id")
+    comments_id = request.args.get("comments_id")
     if not request.json \
             or 'comments' not in request.json \
-            or 'user_request_comments_id' not in request.json:
+            or 'comments_id' not in request.json:
         return jsonify({'response': 'insufficient arguments'}), 400
     data = request.get_json()
     comments = data['comments']
     user_ID = get_jwt_identity()
     CommentsService.update_user_request_comments(
-        user_request_comments_id, user_ID, comments)
+        comments_id, user_ID, comments)
     return jsonify({'response': 'update user_request_comments success'}), 200
 
 

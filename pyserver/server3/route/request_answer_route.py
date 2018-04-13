@@ -7,16 +7,13 @@ from flask import jsonify
 from flask import request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from server3.service import comments_service
 from server3.service.user_service import UserService
-from server3.service import request_answer_service
-from server3.service import user_service
+from server3.service.request_answer_service import RequestAnswerService
+from server3.service.comments_service import CommentsService
+from server3.business.request_answer_business import RequestAnswerBusiness
 from server3.business.user_business import UserBusiness
 from server3.business.project_business import ProjectBusiness
 from server3.utility import json_utility
-from server3.service.request_answer_service import RequestAnswerService
-from server3.business.request_answer_business import RequestAnswerBusiness
-from server3.service.comments_service import CommentsService
 
 PREFIX = '/request_answer'
 
@@ -114,7 +111,7 @@ def update_request_answer():
 def remove_request_answer():
     user_ID = get_jwt_identity()
     request_answer_id = request.args.get('request_answer_id')
-    result = RequestAnswerService.remove_request_answer_by_id(
+    result = RequestAnswerService.remove_answer_by_id(
         request_answer_id, user_ID)
     return jsonify({'response': result}), 200
 
@@ -141,6 +138,6 @@ def accept_request_answer():
     user_request_id = data['user_request_id']
     user_ID = get_jwt_identity()
     request_answer_id = data["request_answer_id"]
-    RequestAnswerService.accept_request_answer(user_request_id, user_ID,
-                                               request_answer_id)
+    RequestAnswerService.accept_answer(user_request_id, user_ID,
+                                       request_answer_id)
     return jsonify({'response': 'accept success'}), 200

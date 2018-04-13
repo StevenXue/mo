@@ -35,14 +35,9 @@ class RequestAnswerBusiness(GeneralBusiness):
         return objects
 
     @classmethod
-    def get_by_user_request_id(cls, user_request_id, get_number=False):
+    def get_by_user_request_id(cls, user_request_id):
         query = {'user_request': ObjectId(user_request_id)}
-        if get_number:
-            # 返回request的answer的数目
-            return cls.repo.read(query).count()
-        else:
-            # 返回answer
-            return cls.repo.read(query)
+        return cls.repo.read(query)
 
     @classmethod
     def answer_number_of_user_request(cls, user_request_id):
@@ -54,8 +49,7 @@ class RequestAnswerBusiness(GeneralBusiness):
     def get_by_answer_user(cls,
                            user, type, search_query,
                            page_no,
-                           page_size,
-                           get_total_number=False):
+                           page_size):
 
         start = (page_no - 1) * page_size
         end = page_no * page_size
@@ -72,11 +66,9 @@ class RequestAnswerBusiness(GeneralBusiness):
             objects = RequestAnswer.objects(
                 user_request__in=UserRequest.objects(type=type))
         objects = objects(answer_user=user)
-        if get_total_number:
-            number_of_objects = objects.count()
-            return objects.order_by('-create_time')[start:end], number_of_objects
-        else:
-            return objects.order_by('-create_time')[start:end]
+        number_of_objects = objects.count()
+        return objects.order_by('-create_time')[start:end], number_of_objects
+
 
 
 

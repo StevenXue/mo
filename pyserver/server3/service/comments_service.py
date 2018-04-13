@@ -1,7 +1,5 @@
 # -*- coding: UTF-8 -*-
-from server3.business import comments_business
 from server3.business.user_business import UserBusiness
-from server3.business import ownership_business
 from server3.business.comments_business import CommentsBusiness
 
 
@@ -46,28 +44,14 @@ class CommentsService:
     @classmethod
     def update_user_request_comments(cls, user_request_comments_id, user_ID,
                                      comments):
-        user_request_comments = CommentsBusiness. \
-            get_by_user_request_comments_id(user_request_comments_id)
-        ownership = ownership_business.get_ownership_by_owned_item(
-            user_request_comments, 'user_request_comments'
-        )
-        if ownership.user.user_ID != user_ID:
-            raise RuntimeError(
-                'this request not belong to this user, cannot update')
-        else:
-            comments_business.update_user_request_comments_by_id(
+        CommentsBusiness.update_user_request_comments_by_id(
                 user_request_comments_id=user_request_comments_id,
                 comments=comments
             )
 
     @classmethod
-    def list_user_request_comments_by_user_id(cls, user_ID, order=-1):
-        user = UserBusiness.get_by_user_ID(user_ID)
-        user_request_comments = ownership_business. \
-            get_ownership_objects_by_user(user, 'user_request_comments')
-        if order == -1:
-            user_request_comments.reverse()
-        return user_request_comments
+    def list_user_request_comments_by_user_id(cls, user_ID):
+        pass
 
     @classmethod
     def remove_user_request_comments_by_id(cls, user_request_comments_id,
