@@ -38,23 +38,7 @@ export default {
     ...jupyterPackageCSS,
   ],
   'proxy': {
-    '/pyapi': {
-      'target': flaskServer,
-      'changeOrigin': true,
-      'pathRewrite': { '^/pyapi': '' },
-    },
-    '/hub_api': {
-      'target': hubServer,
-      'changeOrigin': true,
-      'ws': true,
-      'pathRewrite': { '^/hub_api': '' },
-      'onProxyReq': function onProxyReq(proxyReq, req, res) {
-        if (req.headers.accept.indexOf('image') !== -1) {
-          // add custom header to request
-          proxyReq.setHeader('Authorization', 'token 1d4afa72b00c4ffd9db82f26e1628f89')
-        }
-      },
-    },
+
   },
   'theme': {
     'primary-color': '#34C0E2',
