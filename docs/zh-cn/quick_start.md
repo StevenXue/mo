@@ -10,20 +10,27 @@
 数据集：有一组数据组成的集合。平台支持 jpg 、csv 等格式，多个文件可以以 zip 压缩包的形式
 上传到平台。
 
+功能介绍:
 
-## 如何寻找可用的app、module以及dataset
-<img src="./media/nav1.png"  />
+**1. workspace 工作台**
 
-点击首页导航中的Market栏目,在这里你可以找到公开、可调用的app、module以及dataset。
+无论完整的 AI 应用或是封装好的算法模块，都可以跳过繁琐的开发环境搭建，使用我们内嵌的 JupyterLab 直接上手。点击“新建应用”或“新建模块”即可快速开始。
 
-<img src="./media/app_eg.png"  />
+**2. market 发现**
 
-展示卡片会显示app、module或dataset的名称、描述作者、创建时间以及分类，点击卡片可以进入详情。
+探索学习公开的应用以及模块算法，还有开放的数据集，发现喜欢的项目可以点赞收藏，如果你有优质的资源我们也欢迎你与其他数据爱好者共享。
 
-## 如何寻找可用的app、module以及dataset
+**3. request 需求**
+
+其他用户提出的需求会在这里分类展示，你可以寻找自己擅长的领域进行回答。如果你有任何需求，点击“发布需求”也会找到合适的帮手来为你解决。        
+
+
+
+
+## 如何寻找别人提出的需求
 <img src="./media/nav2.png"  />
 
-点击首页导航中的Requst栏目,分为app、module、dataset三类需求，你可以寻找你感兴趣的进行开发。如果你有想要发布的需求也可以在这里提出。
+点击首页导航中的Requst栏目。
 
 <img src="./media/requst_eg.png"  />
 
@@ -31,23 +38,7 @@
 
 
 
-## 主页面
-登录后主页面包含3个版块
 
-
-<img src="./media/home.png"  width="840px" height="465px" />
-
-**1. workspace 我的工作台**
-
-包含用户的apps，modules 和 datasets
-
-**2. market 市场**
-
-包含平台上所有的apps，modules 和 datasets
-
-**3. request 需求版**
-
-包含用户发布的需求        
 
 
 ## 发布我的第一个需求
@@ -58,7 +49,7 @@
 - Input: 对输入的描述
 - Output: 对输出的描述
 
-## 使用我的第一个App
+### 使用我的第一个App
 用户进入 market / app , 点击自己需要的 app， 进入app 详情页面， 查看完app 的简介后，点击example ，在Input 填写自己的参数， 点击submit, 结果将会展示在output 框内. 
 用户也可浏览app列表并通过category和tags进行筛选， 或者使用顶部搜索框进行筛选
 
@@ -81,7 +72,7 @@ algo = client.algo('demo/Hello/')
 print algo.pipe(input)
 ```
 
-## 返回的结果
+### 返回的结果
 Each algorithm returns a response in JSON. It will include the "result" as well as metadata about the API call you made. The metadata will include the content_type as well as a duration.
 ```$xslt
 curl -X POST -d '"YOUR_USERNAME"' -H 'Content-Type: application/json' -H 'Authorization: Simple API_KEY' https://api.algorithmia.com/v1/algo/demo/Hello/
