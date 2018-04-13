@@ -16,13 +16,13 @@ from server3.service.user_service import UserService
 from server3.business.statistics_business import StatisticsBusiness
 
 
-class EntityMapper:
-    userRequest = UserRequestBusiness
-    requestAnswer = RequestAnswerBusiness
-
-    @classmethod
-    def get(cls, attr='userRequest'):
-        return getattr(cls, attr)
+# class EntityMapper:
+#     userRequest = UserRequestBusiness
+#     requestAnswer = RequestAnswerBusiness
+#
+#     @classmethod
+#     def get(cls, attr='userRequest'):
+#         return getattr(cls, attr)
 
 
 class UserRequestService:

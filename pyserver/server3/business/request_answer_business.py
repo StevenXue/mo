@@ -17,7 +17,7 @@ class RequestAnswerBusiness(GeneralBusiness):
 
     @classmethod
     def update_request_answer_by_id(cls, request_answer_id, **kwargs):
-        return repo.update_one_by_id(
+        return cls.repo.update_one_by_id(
             request_answer_id, kwargs)
 
     @classmethod
@@ -26,7 +26,7 @@ class RequestAnswerBusiness(GeneralBusiness):
         request_answer_obj = RequestAnswer(
             create_time=now, **data
         )
-        return request_answer_repo.create(request_answer_obj)
+        return cls.repo.create(request_answer_obj)
 
     @classmethod
     def get_by_anwser_project_id(cls, project_id):
