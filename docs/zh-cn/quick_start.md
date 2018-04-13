@@ -12,20 +12,20 @@
 
 
 ## 如何寻找可用的app、module以及dataset
-<img src="./media/nav1.png"  width="840px" height="465px" />
+<img src="./media/nav1.png"  />
 
 点击首页导航中的Market栏目,在这里你可以找到公开、可调用的app、module以及dataset。
 
-<img src="./media/app_eg.png"  width="840px" height="465px" />
+<img src="./media/app_eg.png"  />
 
 展示卡片会显示app、module或dataset的名称、描述作者、创建时间以及分类，点击卡片可以进入详情。
 
 ## 如何寻找可用的app、module以及dataset
-<img src="./media/nav2.png"  width="840px" height="465px" />
+<img src="./media/nav2.png"  />
 
 点击首页导航中的Requst栏目,分为app、module、dataset三类需求，你可以寻找你感兴趣的进行开发。如果你有想要发布的需求也可以在这里提出。
 
-<img src="./media/requst_eg.png"  width="840px" height="465px" />
+<img src="./media/requst_eg.png"  />
 
 点击需求列表中的栏目可以进入详情，如果回答显示对号则表明此条需求已经采纳了某条回答。
 
