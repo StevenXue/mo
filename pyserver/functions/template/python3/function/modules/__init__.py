@@ -14,10 +14,9 @@ class HiddenPrints:
 
 
 def module_general(module_id, action, *args, **kwargs):
-    [user_ID, module_name] = module_id.split('/')
+    [user_ID, module_name, version] = module_id.split('/')
     main_module = import_module(
-        'function.modules.{user_ID}.{module_name}.src.main'.format(
-            user_ID=user_ID, module_name=module_name))
+        f'modules.{user_ID}.{module_name}.{version}.src.main')
     cls = getattr(main_module, module_name)()
     return getattr(cls, action)(*args, **kwargs)
 
@@ -34,7 +33,6 @@ class Client:
 
     def __init__(self, api_key, silent=False):
         self.silent = silent
-        pass
 
     def run(self, module_id, *args, **kwargs):
         if self.silent:

@@ -26,7 +26,7 @@ import {
     Form,
 } from './vdomWrapper';
 
-import {publish} from './service';
+import {deploy, publish} from './service';
 
 import '../style/index.css';
 
@@ -56,15 +56,15 @@ class DeployForm extends Form {
      * Get the input text node.
      */
     get inputNode(): HTMLInputElement {
-        return this.node.getElementsByClassName('testing-state')[0] as HTMLInputElement;
+        return this.node.getElementsByClassName('testingState')[0] as HTMLInputElement;
     }
 
     /**
      * Get the value of the widget.
      */
-    getValue(): string {
-        return this.inputNode.value;
-        // return '11';
+    getValue(): {testingState: string, versionNumber: string} {
+        const versionElement = this.node.getElementsByClassName('versionNumber')[0] as HTMLInputElement;
+        return {testingState: this.inputNode.value, versionNumber: versionElement.value};
     }
 }
 
@@ -92,15 +92,25 @@ export function createDeployButton(): ToolbarButton {
                         return;
                     }
                     if (result.value) {
-                        if (result.value === 'failed') {
+                        if (result.value.testingState === 'failed') {
                             message.error('Test not passed, please fix warnings!');
                         } else {
-                            publish({
-                                projectId,
-                                onJson: () => {
-                                    message.success('Module deploy success!');
-                                },
-                            });
+                            if (result.value.versionNumber) {
+                                publish({
+                                    projectId,
+                                    version: result.value.versionNumber,
+                                    onJson: () => {
+                                        message.success('Module deploy success!');
+                                    },
+                                });
+                            } else {
+                                deploy({
+                                    projectId,
+                                    onJson: () => {
+                                        message.success('Module deploy success!');
+                                    },
+                                });
+                            }
                             window.location.replace(`/#/workspace/${projectId}?type=module`);
                             window.location.reload();
                         }

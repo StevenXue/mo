@@ -54,8 +54,14 @@ export function testModule({ projectId, onJson }) {
   return request(path.join('/pyapi', 'modules', 'test', projectId), undefined, { onJson })
 }
 
-export function publish({ projectId, onJson }) {
-  return request(path.join('/pyapi', 'modules', 'publish', projectId), {
+export function deploy({ projectId, onJson }) {
+  return request(path.join('/pyapi', 'modules', 'deploy', projectId), {
     method: 'post',
-  }, { onJson })
+  }, { onJson });
+}
+
+export function publish({ projectId, version, onJson }) {
+    return request(path.join('/pyapi', 'modules', 'deploy', projectId, version), {
+        method: 'post',
+    }, { onJson });
 }
