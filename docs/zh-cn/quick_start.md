@@ -1,7 +1,7 @@
 # 快速开始
 平台中联结了人工智能应用使用者、需求提出者、数据提供者、关键模组开发者以及应用组装者，集合网页端和移动端，满足不同用户的使用场景，实现了需求提出 - 可复用算法模块开发 - 模块组装 - 应用发布使用的生态链。
 
-##平台中涉及的概念
+## 平台中涉及的概念
 
 应用：人工智能预测模型。满足普通用户的直接使用需求，例如航班延误预测模型。
 
@@ -10,7 +10,7 @@
 数据集：有一组数据组成的集合。平台支持 jpg 、csv 等格式，多个文件可以以 zip 压缩包的形式
 上传到平台。
 
-##版块介绍
+## 版块介绍
 
 workspace 工作台
 
@@ -78,7 +78,7 @@ he duration is the compute time of the API call into the algorithm. This is the 
 For more information about pricing, check out our Pricing Guide
 
 
-##发布我的第一个需求
+## 发布我的第一个需求
 用户进入request模块，选择相应的request类型（apps/module/dataset), 点击 New app request, 填写相应内容。 用户可以在Request版块查找自己发布的需求，也可以在my profile中查看.
 - title: 标题
 - description: 描述
