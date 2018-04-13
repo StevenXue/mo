@@ -409,7 +409,8 @@ function UserRequestDetail({allRequest, login, dispatch}) {
       return null
     }
     else if (e.select_project.deleted) {
-      return <Card bodyStyle={{color: 'red'}}>Ooops, this {type} has been deleted</Card>
+      return <Card bodyStyle={{color: 'red'}}>Ooops, this {type} has been
+        deleted</Card>
     }
     else {
       return <Card title={e.select_project.name}
@@ -563,7 +564,8 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                   </Col>
                   <Col span={22}>
                     <div
-                      style={{fontSize: '14px'}}>{projectCard(e, focusUserRequest.type)}</div>
+                      style={{fontSize: '14px'}}>{projectCard(e, focusUserRequest.type)}
+                    </div>
                     <div>
                       <div className={styles.eachAnswer}>
                         <div dangerouslySetInnerHTML={{

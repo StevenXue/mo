@@ -60,7 +60,6 @@ def list_request_answer():
                     answer['select_project'] = json_utility.convert_to_json(
                         select_project.to_mongo())
                 except:
-                    print('selected app has been deleted')
                     answer['select_project'] = {'deleted': True}
         return jsonify({'response': request_answer_info}), 200
     elif user_ID:

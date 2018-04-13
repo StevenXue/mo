@@ -130,15 +130,15 @@ function Header({location, login, history, dispatch, allRequest,message}) {
   }
 
   const toApp = (e) => {
-    history.push(`/workspace/${e.app_id}?type=app`)
+    history.push(`/market/${e.app_id}?type=app`)
   }
 
   const toModule = (e) => {
-    history.push(`/workspace/${e.module_id}?type=module`)
+    history.push(`/market/${e.module_id}?type=module`)
   }
 
   const toDataset = (e) => {
-    history.push(`/workspace/${e.dataset_id}?type=dataset`)
+    history.push(`/market/${e.dataset_id}?type=dataset`)
   }
 
 
