@@ -39,18 +39,18 @@ const TOOLBAR_DEPLOY_CLASS = 'jp-LauncherIcon';
  * Initialization data for the moduledeploy-extension extension.
  */
 const extension: JupyterLabPlugin<void> = {
-    id: '@jupyterlab/moduledeploy-extension:plugin',
+    id: '@jupyterlab/modulepublish-extension:plugin',
     autoStart: true,
     requires: [IFileBrowserFactory],
     activate: (app: JupyterLab, fb: IFileBrowserFactory) => {
-        fb.defaultBrowser.toolbar.addItem('deployModule', createDeployButton());
+        fb.defaultBrowser.toolbar.addItem('publishModule', createPublishButton());
     },
 };
 
 /**
  * A widget used to rename a file.
  */
-class DeployForm extends Form {
+class PublishForm extends Form {
 
     /**
      * Get the input text node.
@@ -69,9 +69,9 @@ class DeployForm extends Form {
 }
 
 /**
- * Create a deploy toolbar item.
+ * Create a publish toolbar item.
  */
-export function createDeployButton(): ToolbarButton {
+export function createPublishButton(): ToolbarButton {
     const hash = window.location.hash;
     const match = pathToRegexp('#/workspace/:projectId/:type').exec(hash);
     if (match) {
@@ -80,12 +80,12 @@ export function createDeployButton(): ToolbarButton {
             className: TOOLBAR_DEPLOY_CLASS,
             onClick: () => {
                 return showDialog({
-                    title: 'Deploy ' + document.title.split(' - ')[0],
-                    body: new DeployForm(() => {
+                    title: 'Publish ' + document.title.split(' - ')[0],
+                    body: new PublishForm(() => {
                         console.log('click');
                     }),
                     focusNodeSelector: 'input',
-                    buttons: [Dialog.cancelButton(), Dialog.okButton({label: 'DEPLOY'})],
+                    buttons: [Dialog.cancelButton(), Dialog.okButton({label: 'PUBLISH'})],
                 }).then(result => {
                     console.log(result);
                     if (result.button.label === 'CANCEL') {
@@ -98,7 +98,7 @@ export function createDeployButton(): ToolbarButton {
                             publish({
                                 projectId,
                                 onJson: () => {
-                                    message.success('Module deploy success!');
+                                    message.success('Module publish success!');
                                 },
                             });
                             window.location.replace(`/#/workspace/${projectId}?type=module`);
@@ -109,7 +109,7 @@ export function createDeployButton(): ToolbarButton {
                     }
                 });
             },
-            tooltip: 'Deploy Module',
+            tooltip: 'Publish Module',
         });
     } else {
         throw Error;
