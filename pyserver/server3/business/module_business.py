@@ -16,6 +16,7 @@ from server3.repository.general_repo import Repo
 from server3.business.project_business import ProjectBusiness
 from server3.service.validation.validation import GDValidation
 from server3.constants import MODULE_DIR
+from server3.constants import DEV_DIR_NAME
 from server3.constants import USER_DIR
 from server3.constants import GIT_SERVER_IP
 
@@ -144,12 +145,10 @@ class ModuleBusiness(ProjectBusiness):
             return {'input': obj.get('input'), 'output': obj.get('output')}
 
     @classmethod
-    def publish(cls, project_id):
+    def deploy_or_publish(cls, project_id, version='dev'):
         module = cls.get_by_id(project_id)
         module.module_path = os.path.join(MODULE_DIR, module.user.user_ID,
-                                          module.name)
-        module.privacy = 'public'
-        module.save()
+                                          module.name, version)
 
         dst = module.module_path
         # if dir exists, remove it and copytree, cause copytree will
@@ -159,6 +158,11 @@ class ModuleBusiness(ProjectBusiness):
         shutil.copytree(module.path, dst)
         # WORKON_HOME=./ pipenv install vv
         subprocess.call(['bash', 'install_venv.sh', os.path.abspath(dst)])
+
+        if version != 'dev':
+            module.privacy = 'public'
+            module.versions.append(version)
+            module.save()
 
         return module
 

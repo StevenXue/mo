@@ -96,9 +96,16 @@ def update_module():
         #     data = request.get_json()
 
 
-@module_app.route("/publish/<project_id>", methods=["POST"])
-def publish_module(project_id):
-    project = ModuleService.publish(project_id)
+@module_app.route("/publish/<project_id>/<version>", methods=["POST"])
+def publish_module(project_id, version):
+    project = ModuleService.publish(project_id, version)
+    project = json_utility.convert_to_json(project.to_mongo())
+    return jsonify({"response": project})
+
+
+@module_app.route("/deploy/<project_id>", methods=["POST"])
+def deploy_module(project_id):
+    project = ModuleService.deploy(project_id)
     project = json_utility.convert_to_json(project.to_mongo())
     return jsonify({"response": project})
 
