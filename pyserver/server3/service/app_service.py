@@ -12,10 +12,12 @@ from server3.business import user_business
 from server3.business.statistics_business import StatisticsBusiness
 from server3.service import message_service
 from server3.constants import DOCKER_IP
+from server3.business.request_answer_business import RequestAnswerBusiness
 
 
 class AppService(ProjectService):
     business = AppBusiness
+    requestAnswerBusiness = RequestAnswerBusiness
 
     @classmethod
     def add_used_module(cls, app_id, used_modules, func):
@@ -84,9 +86,23 @@ class AppService(ProjectService):
         app = cls.business.deploy(app_id, handler_file_path)
         receivers = app.favor_users  # get app subscriber
         admin_user = user_business.get_by_user_ID('admin')
+        # 获取所有包含此app的答案
+        answers_has_app = cls.requestAnswerBusiness.get_by_anwser_project_id(app.id)
+        # 根据答案获取对应的 request 的 owner
+        for each_anser in answers_has_app:
+            user_request = each_anser.user_request
+            request_owener = user_request.user
+            message_service.create_message(admin_user, 'deploy_request',
+                                           [request_owener],
+                                           app.user, app_name=app.name,
+                                           app_id=app.id,
+                                           user_request_title=user_request.title,
+                                           user_request_id=user_request.id)
         message_service.create_message(admin_user, 'deploy', receivers,
                                        app.user, app_name=app.name,
                                        app_id=app.id)
+
+
         return app
 
 # @classmethod

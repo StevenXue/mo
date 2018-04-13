@@ -19,6 +19,12 @@ class RequestAnswerBusiness(EntityBusiness):
     repo = RequestAnswerRepo(RequestAnswer)
 
     @classmethod
+    def get_by_anwser_project_id(cls, project_id):
+        objects = cls.repo.read()
+        objects = objects(select_project=project_id)
+        return objects
+
+    @classmethod
     def get_by_user_request_id(cls, user_request_id, get_number=False):
         query = {'user_request': ObjectId(user_request_id)}
         if get_number:

@@ -200,7 +200,6 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
           this.state = {}
         }
         componentWillUnmount(){
-          console.log('cnnnnnnnnn')
           fetch(`http://localhost:5005/user/notourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
         }
         componentDidMount() {
@@ -545,11 +544,11 @@ const Jobs = ({ projectDetail, dispatch }) => {
       <h2>Jobs:
         <span className={styles.rightButton}>
                      <Button onClick={() => {
-                       window.open(hubServer.replace('8000', projectDetail.project.tb_port))
+                       window.open(`/tb/${localStorage.getItem('user_ID')}+${projectDetail.project.name}/`)
                      }}>
                        Jobs Visualization
                      </Button>
-                </span>
+        </span>
       </h2>
       <p className={styles.overall}>
         <span className={styles.done}>

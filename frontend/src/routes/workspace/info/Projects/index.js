@@ -140,6 +140,7 @@ class ProjectList extends Component {
 
   render() {
     const { history, project, dispatch } = this.props
+    // console.log(document.getElementById("LaunchPage_Contain").scrollTop)
     return (
       <div>
         <Joyride

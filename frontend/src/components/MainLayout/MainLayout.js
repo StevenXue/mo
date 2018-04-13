@@ -26,13 +26,13 @@ function MainLayout({children, location, history, modal, isRight, onClickIcon}) 
   return (
     <Layout style={{height: '100%',position:"relative"}}>
       <Header location={location} history={history} />
-      <Content >
+      <Content style={{height:'100%',overflowY:'auto'}} id="LaunchPage_Contain">
         <LaunchPage location={location}/>
-        <div style={{display: "flex"}}>
+        <div style={{display: "flex",height:'100%'}}>
           <div className={styles.content}>
-          {children}
-        </div>
-        <Open onClickIcon={onClickIcon} isRight={isRight}/>
+            {children}
+          </div>
+          <Open onClickIcon={onClickIcon} isRight={isRight}/>
         </div>
       </Content>
     </Layout>

@@ -388,6 +388,25 @@ def get_user_info(user_ID):
     return jsonify({'response': result}), 200
 
 
+# 获取用户的统计信息， 收藏了多少app， 发布了多少需求
+@user_app.route('/user_statistics', methods=['GET'])
+@jwt_required
+def get_user_statistics():
+    from server3.business.user_request_business import UserRequestBusiness
+    user_ID = request.args.get("user_ID", get_jwt_identity())
+
+    apps = UserBusiness.get_action_entity(
+        user_ID=user_ID, action_entity="favor_apps",
+        page_no=1, page_size=1)
+    favor_apps_count = apps.count
+
+    total_number = UserRequestBusiness.count()
+    return jsonify({'response': {
+        "favor_apps_count": favor_apps_count,
+        "requests_count": total_number
+    }}), 200
+
+
 @user_app.route('/statistics', methods=['GET'])
 @jwt_required
 def get_statistics():
@@ -406,20 +425,15 @@ def get_statistics():
             "caller": user_obj
         },
         page_no=page_no, page_size=page_size)
-
-    # for object in statistics.objects:
-    #     # print("tom", json_utility.convert_to_json(object.app.to_mongo()))
-    #     # object.app_obj = "111"
-    #     app = json.dumps(object.app.to_mongo())#json_utility.convert_to_json(object.app.to_mongo())
-    #     object.app_obj = app
-    #
-    #     # object = json_utility.convert_to_json(object.to_mongo())
-    #     # object["app_obj"] = app
-    print("statistics.objects", statistics.objects)
+    for object in statistics.objects:
+        object.app_obj_user_ID = object.app.user.user_ID
 
     return jsonify({
         'response': {
             "objects": json_utility.objs_to_json_with_args(statistics.objects, ["app", "caller"]),
+            # "objects": json_utility.me_obj_list_to_json_list(statistics.objects),
+            # "objects": json.loads(statistics.objects.to_json()),
+
             "page_size": statistics.page_size,
             "page_no": statistics.page_no,
             "count": statistics.count,
@@ -439,7 +453,6 @@ def update_user():
         if key not in lists:
             return jsonify({'response': 'error arguments'}), 400
     user = UserBusiness.update_by_user_ID(user_ID=user_ID, update=data)
-    print("user", user)
     return jsonify({'response': {
         "user": json_utility.convert_to_json(user.to_mongo())
     }}), 200

@@ -42,7 +42,7 @@ class LaunchPage extends React.Component {
                 this.setState({
                     flag:1
                 })
-                document.getElementById("root").scrollTo(0,0)
+                document.getElementById("LaunchPage_Contain").scrollTo(0,0)
                 fetch(`http://localhost:5005/user/nolearning?user_ID=${localStorage.user_ID}`, {method: 'GET'})
             } 
         }
@@ -54,12 +54,12 @@ class LaunchPage extends React.Component {
         })
     }
     ssscrollTo = ()=>{
-        document.getElementById("root").scrollTo(0,100)
+        document.getElementById("LaunchPage_Contain").scrollTo(0,900)
     }
       
     newRequest = ()=>{
         this.props.dispatch(routerRedux.push('/userrequest?tab=app'))
-        this.ssscrollTo()
+        // this.ssscrollTo()
         this.timer = setTimeout(()=>{
         //     this.props.dispatch({type:'joyride/updateState',payload:{steps:[
         //         {
@@ -85,12 +85,13 @@ class LaunchPage extends React.Component {
         //             }
         //         }
         //     ]}})
+        this.ssscrollTo()
         document.getElementById('mei_rightButton').click()
-        },2000)
+        },1000)
     }
     newApp = ()=>{
         this.props.dispatch(routerRedux.push('/workspace?tab=app'))
-        this.ssscrollTo()
+        // this.ssscrollTo()
         
         this.timer = setTimeout(()=>{
             // this.props.dispatch({type:'joyride/updateState',payload:{steps:[
@@ -117,12 +118,14 @@ class LaunchPage extends React.Component {
             //         }
             //     }
             // ]}})
+            // debugger
+            this.ssscrollTo()
             document.getElementById('Newapp').click()
-        },2000)
+        },1000)
     }
     newModule = ()=>{
         this.props.dispatch(routerRedux.push('/workspace?tab=module'))
-        this.ssscrollTo()
+        // this.ssscrollTo()
         this.timer = setTimeout(()=>{
             // this.props.dispatch({type:'joyride/updateState',payload:{steps:[
             //     {
@@ -148,8 +151,9 @@ class LaunchPage extends React.Component {
             //         }
             //     }
             // ]}})
+            this.ssscrollTo()
             document.getElementById('Newmodule').click()
-        },2000)
+        },1000)
     }
     helpDocument = ()=>{
         // this.props.dispatch(routerRedux.push('/workspace?tab=module'))
@@ -162,9 +166,6 @@ class LaunchPage extends React.Component {
         return <div className={styles.LaunchPage} 
                     style={{display:this.state.flag==0?"block":"none"}}
                     >
-                    {/* {
-                        this.checkWelcome()
-                    } */}
             <div className={styles.LaunchPage_Content}>
                 <section className={styles.title}>
                     <p>欢迎来到蓦</p>

@@ -6,7 +6,7 @@ import avatar4 from './img/avatar/4.png'
 import avatar5 from './img/avatar/5.png'
 import avatar6 from './img/avatar/6.png'
 
-import { flaskServer, hubServer } from '../config.js'
+import { flaskServer, hubServer, tbServer } from '../config.js'
 
 module.exports = {
   apiPrefix: '/pyapi',
@@ -27,6 +27,8 @@ module.exports = {
 
   hubServer,
   // hubServer: 'http://192.168.31.7:8000',
+
+  tbServer,
 
   //jupyter
   kubeBaseUrl: 'http://10.52.14.182:8888',  // kube master node ip

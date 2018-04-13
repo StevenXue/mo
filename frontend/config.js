@@ -8,5 +8,8 @@ module.exports = {
   hubServer: 'http://localhost:8000',
   // hubServer: 'http://192.168.31.7:8000',
 
+  docsServer: 'http://localhost:3000',
+
+  tbServer: 'http://localhost:8111',
 }
 
