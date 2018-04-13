@@ -18,7 +18,10 @@ class ModuleService(ProjectService):
         project = super().get_by_id(project_id, **kwargs)
         if kwargs.get('yml') == 'true' and project.module_path:
             project.args = cls.business.load_module_params(
-                project)
+                project, kwargs.get('version'))
+        project.versions = \
+            ['.'.join(version.split('_')) for version in
+             project.versions]
         return project
 
     @classmethod

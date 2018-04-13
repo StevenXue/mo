@@ -48,7 +48,9 @@ def add():
 def get_module(module_id):
     yml = request.args.get('yml')
     commits = request.args.get('commits')
-    app = ModuleService.get_by_id(module_id, yml=yml, commits=commits)
+    version = request.args.get('version')
+    app = ModuleService.get_by_id(module_id, yml=yml, commits=commits,
+                                  version=version)
 
     # 将app.user 更换为 user_ID 还是name?
     user_ID = app.user.user_ID

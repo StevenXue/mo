@@ -20,11 +20,11 @@ class AppService(ProjectService):
     requestAnswerBusiness = RequestAnswerBusiness
 
     @classmethod
-    def add_used_module(cls, app_id, used_modules, func):
+    def add_used_module(cls, app_id, used_modules, func, version):
         used_modules = [ModuleBusiness.get_by_id(mid) for mid in used_modules]
         for module in used_modules:
             module.args = ModuleBusiness.load_module_params(
-                module)
+                module, version)
         return AppBusiness.add_used_module(app_id, used_modules, func)
 
     @classmethod
