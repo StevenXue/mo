@@ -256,9 +256,6 @@ c.JupyterHub.admin_access = True
 #  
 #  Consider using service_tokens for general services that talk to the JupyterHub
 #  API.
-# c.JupyterHub.service_tokens = {
-#     '1d4afa72b00c4ffd9db82f26e1628f89': 'admin',
-# }
 c.JupyterHub.api_tokens = {
     '1d4afa72b00c4ffd9db82f26e1628f89': 'admin',
 }
@@ -963,6 +960,7 @@ c.Authenticator.admin_users = {'admin'}
 c.DockerSpawner.image = 'singleuser:latest'
 c.DockerSpawner.remove_containers = True
 c.DockerSpawner.container_ip = '0.0.0.0'
+c.DockerSpawner.host_ip = '0.0.0.0'
 c.DockerSpawner.volumes = \
     {
         # '/Users/zhaofengli/projects/goldersgreen/pyserver/user_directory/{user_ID}/{project_name}': '/home/jovyan/work',

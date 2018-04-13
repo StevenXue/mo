@@ -71,7 +71,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
             # copy module tree to target path
             cls.copytree(module_path, module_path_target)
         # deploy
-        call(['faas-cli', 'build', '-f', f'./{service_name}.yml'],
+        call(['faas-cli', 'build', '--parallel=8', '-f', f'./{service_name}.yml'],
              cwd=cls.base_func_path)
         call(['faas-cli', 'deploy', '-f', f'./{service_name}.yml'],
              cwd=cls.base_func_path)
@@ -135,13 +135,13 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
     def insert_module_env(app, module):
         client = docker.from_env()
         # copy venv
-        user_ID = module.user.user_ID
-        user_ID_c = user_ID.replace('_', '_5F')
+        module_user_ID = module.user.user_ID
+        app_user_ID = app.user.user_ID.replace('_', '_5F')
         app_name = app.name.replace('_', '_5F')
         container = client.containers. \
-            get(f'jupyter-{user_ID_c}_2B{app_name}')
+            get(f'jupyter-{app_user_ID}_2B{app_name}')
         container.exec_run(['/bin/bash', '/home/jovyan/add_venv.sh',
-                            f'{user_ID}/{module.name}'])
+                            f'{module_user_ID}/{module.name}'])
 
     @classmethod
     def replace_dup_n_update(cls, args, func_args, module_name):

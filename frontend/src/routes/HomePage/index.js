@@ -61,9 +61,7 @@ class App extends Component {
           <Col span={2}></Col>
           <Col span={8} className={styles.Col_C} style={{ paddingTop: 138, paddingBottom: 128 }}> {/* check */}
             <div style={{ marginBottom: 20 }}>
-              <img src={right1b} alt="" style={{ marginBottom: 28, marginRight: 10 }}/>
-              <span>全生态 AI 应用开发平台</span>
-              <img src={right2b} alt="" style={{ marginBottom: -16, marginLeft: 10 }}/>
+              <span>「 全生态 AI 应用开发平台 」</span>
             </div>
             <div>
               <p>蓦联结了人工智能应用使用者、需求提出者、数据提供者、关键模组开发者以及应用组装者，实现了需求提出 - 可复用算法模块开发 - 模块组装 - 应用发布使用的生态链。</p>

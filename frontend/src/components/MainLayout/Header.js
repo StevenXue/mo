@@ -182,7 +182,7 @@ function Header({location, login, history, dispatch, allRequest,message}) {
         )}
         {
           <Menu.Item key={"docs"}>
-            <div onClick={()=> {window.location.replace("http://192.168.31.7:5005/docs"); } }>
+            <div onClick={()=> {window.location.replace("http://192.168.31.7:3000"); } }>
               <FormattedMessage id={"docs"} defaultMessage={"Docs"}/>
             </div>
           </Menu.Item>
