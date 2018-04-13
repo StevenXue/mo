@@ -20,12 +20,12 @@ import inspect
 from server3.lib import toolkit_orig, preprocess_orig
 from server3.entity.toolkit import Toolkit
 from server3.repository.toolkit_repo import ToolkitRepo
-from server3.business import UserBusiness, ownership_business
+from server3.business import ownership_business
+from server3.business.user_business import UserBusiness
 
 from server3.constants import SPEC
 
 toolkit_repo = ToolkitRepo(Toolkit)
-
 
 def get_by_toolkit_name(toolkit_name):
     return toolkit_repo.read_by_unique_field('name', toolkit_name)

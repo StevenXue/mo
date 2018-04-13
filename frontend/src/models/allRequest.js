@@ -78,7 +78,7 @@ export default {
       }
     },
 
-    // 点击votesup后 改变 requset 的状态
+    // 点击voteup后 改变 requset 的状态
     updateRequestVotesUp(state, action) {
       let requestAfterVotesUp = action.payload.requestAfterVotesUp
       let request_id = requestAfterVotesUp._id
@@ -93,7 +93,7 @@ export default {
           focusUserRequest:
             {
               ...state.focusUserRequest,
-              votes_up_user: requestAfterVotesUp.votes_up_user
+              vote_up_user: requestAfterVotesUp.vote_up_user
             }
         }
       }
@@ -155,7 +155,7 @@ export default {
                 ...state.focusUserRequest.answer,
                 [answer_id]: {
                   ...state.focusUserRequest.answer[answer_id],
-                  votes_up_user: answerAfterVotesUp.votes_up_user
+                  vote_up_user: answerAfterVotesUp.vote_up_user
                 }
               }
           }
@@ -380,6 +380,7 @@ export default {
       let payload = action.payload
       payload['votes_user_id'] = yield select(state => state.login.user.user_ID)
       const {data: answerAfterVotesUp} = yield call(requestAnswerService.votesUpAnswer, payload)
+      console.log('??????',answerAfterVotesUp)
       yield put({
         type: 'updateAnswerVotesUp',
         payload: {answerAfterVotesUp: answerAfterVotesUp}
@@ -397,6 +398,7 @@ export default {
 
     * deleteUserRequest(action, {call, put, select}){
       let payload = action.payload
+      console.log('??????????????????????')
       yield call(userRequestService.removeRequest, payload)
     }
   },

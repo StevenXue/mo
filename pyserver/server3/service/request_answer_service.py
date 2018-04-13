@@ -161,7 +161,6 @@ def remove_request_answer_by_id(request_answer_id, user_ID):
 
 
 class RequestAnswerService:
-
     @classmethod
     def get_all_answer_by_user_ID(cls, user_ID, page_no, page_size,
                                   type, search_query,
@@ -245,7 +244,18 @@ class RequestAnswerService:
 
     @classmethod
     def accept_request_answer(cls, user_request_id, user_ID, request_answer_id):
-        user_request_business.update_user_request_by_id(
+        UserRequestBusiness.update_by_id(
             user_request_id=user_request_id,
             accept_answer=ObjectId(request_answer_id)
         )
+
+    @classmethod
+    def get_all_answer_of_this_user_request(cls, user_request_id,
+                                            get_number=False):
+        # request_answer = request_answer_business. \
+        #     get_all_answer_of_this_user_request(user_request)
+
+        request_answer = RequestAnswerBusiness.get_by_user_request_id(
+            user_request_id, get_number)
+        return request_answer
+
