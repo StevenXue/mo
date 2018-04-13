@@ -10,7 +10,7 @@ import {
     NotebookActions,
 } from '@jupyterlab/notebook'
 
-import {fetchProject, testModule} from './service'
+import {getModule, testModule} from './service'
 
 function genConf(args) {
     return JSON.stringify(args).replace(/'/g, '`')
@@ -42,14 +42,16 @@ export class ModulePage extends React.Component {
             console.log('match')
             let projectId = match[1]
             // let type = match[2];
-            fetchProject({
-                projectId,
+            getModule({
+                moduleId: projectId,
                 onJson: (project) => {
                     this.setState({
                         project,
                         testing: true,
                     })
-
+                    if (project.privacy === 'public') {
+                        this.setInitVersionNumber(project)
+                    }
                     testModule({
                         projectId,
                         onJson: (failures) => {
@@ -74,9 +76,23 @@ export class ModulePage extends React.Component {
     }
 
     onCheck(e) {
+        if (e.target.checked === true) {
+            this.setInitVersionNumber(this.state.project)
+        }
         this.setState({
             publish: e.target.checked
         });
+    }
+
+    setInitVersionNumber(project) {
+        const [v1, v2, v3] = this.getInitVersionNumber(project);
+        document.getElementsByClassName('versionNumber')[0].value = `${v1}.${v2}.${v3 + 1}`
+    }
+
+    getInitVersionNumber(project) {
+        const {versions} = project;
+        const versionNow = versions.slice(-1)[0] || '0.0.0';
+        return versionNow.split('.').map(e => parseInt(e));
     }
 
     onVersionChange = (e) => {
@@ -100,9 +116,7 @@ export class ModulePage extends React.Component {
             color = 'red'
         }
         if (this.state.project !== undefined) {
-            const {versions} = this.state.project;
-            const vserionNow = versions.slice(-1)[0] || '0.0.0';
-            const [v1, v2, v3] = vserionNow.split('.').map(e => parseInt(e));
+            const [v1, v2, v3] = this.getInitVersionNumber(this.state.project);
             return (
                 <div style={{minHeight: 100, overflowY: 'auto'}}>
                     <input style={{display: 'none'}} className='testingState'/>
@@ -110,8 +124,9 @@ export class ModulePage extends React.Component {
                     <h3>{this.state.project.name}</h3>
                     <p>{this.state.project.description}</p>
                     {
-                        this.state.project.privacy === 'private' && <Tooltip placement="top"
-                                                                             title='Publishing a module means the module will be accessed by others, otherwise, the module can only be accessed and tested by owner (you)'>
+                        this.state.project.privacy === 'private' &&
+                        <Tooltip placement="top"
+                                 title='Publishing a module means the module will be accessed by others, otherwise, the module can only be accessed and tested by owner (you)'>
                             <Checkbox onChange={(e) => this.onCheck(e)} style={{margin: '10px 0'}}>Publish this
                                 module?</Checkbox>
                         </Tooltip>
@@ -140,7 +155,7 @@ export class ModulePage extends React.Component {
                             <div>
                                 <h3>Testing Result:</h3>
                                 <div className='test-result' style={{color}}>
-                                    {this.state.testResult.map(e => <div className='result-line'>{e}</div>)}
+                                    {this.state.testResult.map(e => <div key={e} className='result-line'>{e}</div>)}
                                 </div>
                             </div>
                     }

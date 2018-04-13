@@ -50,6 +50,15 @@ export function fetchProject({ projectId, onJson }) {
   return request(path.join('/pyapi', PREFIX, 'projects', projectId), undefined, { onJson })
 }
 
+export function getModule({moduleId, version, onJson}) {
+    if (version) {
+        version = version.split('.').join('_');
+        return request(`pyapi/modules/${moduleId}?version=${version}&yml=true`, undefined, {onJson})
+    } else {
+        return request(`pyapi/modules/${moduleId}?yml=true`, undefined, {onJson})
+    }
+}
+
 export function testModule({ projectId, onJson }) {
   return request(path.join('/pyapi', 'modules', 'test', projectId), undefined, { onJson })
 }
@@ -61,7 +70,8 @@ export function deploy({ projectId, onJson }) {
 }
 
 export function publish({ projectId, version, onJson }) {
-    return request(path.join('/pyapi', 'modules', 'deploy', projectId, version), {
+    version = version.split('.').join('_');
+    return request(path.join('/pyapi', 'modules', 'publish', projectId, version), {
         method: 'post',
     }, { onJson });
 }
