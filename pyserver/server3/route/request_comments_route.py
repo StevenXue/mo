@@ -6,7 +6,7 @@ from flask import make_response
 from flask import request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from server3.service import comments_service
+from server3.service.comments_service import CommentsService
 from server3.utility import json_utility
 
 PREFIX = '/user_request_comments'
@@ -19,15 +19,14 @@ user_request_comments_app = Blueprint("user_request_comments_app", __name__,
 def list_user_request_comments():
     user_request_id = request.args.get("user_request_id")
     user_ID = request.args.get("user_ID")
-
     if user_request_id:
-        user_request_comments = comments_service. \
+        user_request_comments = CommentsService. \
             get_comments_of_this_user_request(user_request_id)
         user_request_comments = json_utility. \
             me_obj_list_to_json_list(user_request_comments)
         return jsonify({'response': user_request_comments}), 200
     elif user_ID:
-        user_request_comments = comments_service.\
+        user_request_comments = CommentsService.\
             list_user_request_comments_by_user_id(user_ID)
         user_request_comments = json_utility. \
             me_obj_list_to_json_list(user_request_comments)
@@ -49,7 +48,7 @@ def create_user_request_comments():
     user_request_id = data['user_request_id']
     comments_type = data['comments_type']
     request_answer_id = data.get('request_answer_id', None)
-    comments_service.create_user_request_comments(
+    CommentsService.create_user_request_comments(
         user_request_id, user_ID, comments, comments_type, request_answer_id)
     return jsonify({'response': 'create user_request_comments success'}), 200
 
@@ -65,7 +64,7 @@ def update_user_request_comments():
     data = request.get_json()
     comments = data['comments']
     user_ID = get_jwt_identity()
-    comments_service.update_user_request_comments(
+    CommentsService.update_user_request_comments(
         user_request_comments_id, user_ID, comments)
     return jsonify({'response': 'update user_request_comments success'}), 200
 
@@ -77,7 +76,6 @@ def remove_user_request_comments():
     user_request_comments_id = request.args.get('user_request_comments_id')
     if not user_request_comments_id:
         return jsonify({'response': 'no user_request_comments_id arg'}), 400
-
-    result = comments_service.remove_user_request_comments_by_id(
+    result = CommentsService.remove_user_request_comments_by_id(
         ObjectId(user_request_comments_id), user_ID)
     return jsonify({'response': result}), 200

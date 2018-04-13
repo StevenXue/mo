@@ -7,15 +7,12 @@ from server3.entity.request_answer import RequestAnswer
 from server3.entity.user_request import UserRequest
 from server3.repository.request_answer_repo import \
     RequestAnswerRepo
-from server3.business.user_request_business import EntityBusiness
+from server3.business.general_business import GeneralBusiness
 
-request_answer_repo = RequestAnswerRepo(RequestAnswer)
+# request_answer_repo = RequestAnswerRepo(RequestAnswer)
 
 
-class RequestAnswerBusiness(EntityBusiness):
-    DEFAULT_PAGE_NO = 1
-    DEFAULT_PAGE_SIZE = 5
-    entity = RequestAnswer
+class RequestAnswerBusiness(GeneralBusiness):
     repo = RequestAnswerRepo(RequestAnswer)
 
     @classmethod
@@ -55,9 +52,9 @@ class RequestAnswerBusiness(EntityBusiness):
 
     @classmethod
     def get_by_answer_user(cls,
-                           user, type, search_query=None,
-                           page_no=DEFAULT_PAGE_NO,
-                           page_size=DEFAULT_PAGE_SIZE,
+                           user, type, search_query,
+                           page_no,
+                           page_size,
                            get_total_number=False):
 
         start = (page_no - 1) * page_size
@@ -83,36 +80,36 @@ class RequestAnswerBusiness(EntityBusiness):
 
 
 
-# 获取当前user_request下的所有
-def get_all_answer_of_this_user_request(user_request_id):
-    query = {'user_request': ObjectId(user_request_id)}
-    return request_answer_repo.read(query)
-
-
-def get_answer_number_of_this_user_request(user_request_id):
-    query = {'user_request': ObjectId(user_request_id)}
-    return request_answer_repo.read(query).count()
-
-
-def get_by_request_answer_id(request_answer_id):
-    return request_answer_repo.read_by_unique_field(
-        'id',
-        request_answer_id
-    )
-
-
-def add_request_answer(**data):
-    now = datetime.utcnow()
-    request_answer_obj = RequestAnswer(
-        create_time=now, **data
-    )
-    return request_answer_repo.create(request_answer_obj)
-
-
-def update_request_answer_by_id(request_answer_id, **kwargs):
-    return request_answer_repo.update_one_by_id(
-        request_answer_id, kwargs)
-
-
-def remove_by_id(request_answer_id):
-    return request_answer_repo.delete_by_id(request_answer_id)
+# # 获取当前user_request下的所有
+# def get_all_answer_of_this_user_request(user_request_id):
+#     query = {'user_request': ObjectId(user_request_id)}
+#     return request_answer_repo.read(query)
+#
+#
+# def get_answer_number_of_this_user_request(user_request_id):
+#     query = {'user_request': ObjectId(user_request_id)}
+#     return request_answer_repo.read(query).count()
+#
+#
+# def get_by_request_answer_id(request_answer_id):
+#     return request_answer_repo.read_by_unique_field(
+#         'id',
+#         request_answer_id
+#     )
+#
+#
+# def add_request_answer(**data):
+#     now = datetime.utcnow()
+#     request_answer_obj = RequestAnswer(
+#         create_time=now, **data
+#     )
+#     return request_answer_repo.create(request_answer_obj)
+#
+#
+# def update_request_answer_by_id(request_answer_id, **kwargs):
+#     return request_answer_repo.update_one_by_id(
+#         request_answer_id, kwargs)
+#
+#
+# def remove_by_id(request_answer_id):
+#     return request_answer_repo.delete_by_id(request_answer_id)

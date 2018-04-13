@@ -31,8 +31,7 @@ class UserRequestService:
     def get_list(cls, type, search_query, user_ID, page_no, page_size):
         user = UserBusiness.get_by_user_ID(user_ID) if user_ID else None
         user_request, total_number = UserRequestBusiness. \
-            get_list(type, search_query, user, False, page_no, page_size,
-                     get_total_number=True)
+            get_list(type, search_query, user, False, page_no, page_size)
         return user_request, total_number
 
     @classmethod
@@ -77,12 +76,11 @@ class UserRequestService:
             # 默认发布者star
             # created_user_request = user_service.update_request_star(
             #     created_user_request.id, user_ID)
-
-            created_user_request = UserService. \
+            user_entity = UserService. \
                 action_entity(user_ID=user_ID,
                               entity_id=created_user_request.id,
                               action='star', entity='request')
-            return created_user_request
+            return user_entity.entity
         else:
             raise RuntimeError('Cannot create the new user_request')
 

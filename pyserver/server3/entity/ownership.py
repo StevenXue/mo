@@ -12,7 +12,7 @@ from mongoengine import CASCADE
 # from server3.entity import Model
 # from server3.entity import User
 from server3.entity.user_request import UserRequest
-from server3.entity.user_request_comments import UserRequestComments
+from server3.entity.comments import Comments
 from server3.entity.request_answer import RequestAnswer
 from server3.entity.message import Message
 
@@ -29,7 +29,7 @@ class Ownership(DynamicDocument):
     file = ReferenceField('File', reverse_delete_rule=CASCADE)
     served_model = ReferenceField('ServedModel', reverse_delete_rule=CASCADE)
     user_request = ReferenceField('UserRequest', reverse_delete_rule=CASCADE)
-    user_request_comments = ReferenceField('UserRequestComments',
+    user_request_comments = ReferenceField('Comments',
                                            reverse_delete_rule=CASCADE)
     request_answer = ReferenceField('RequestAnswer',
                                     reverse_delete_rule=CASCADE)

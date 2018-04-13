@@ -2,6 +2,18 @@ from server3.repository.general_repo import Repo
 from server3.entity.general_entity import Objects
 
 
+def check_auth(cls):
+    def _deco(func):
+        def __deco(object_id, user_ID, *args, **kwargs):
+            entity = cls.get_by_id(object_id)
+            if entity.user.user_ID == user_ID:
+                return func(object_id, user_ID, *args, **kwargs)
+            else:
+                raise RuntimeError('no right to delete')
+        return __deco
+    return _deco
+
+
 class GeneralBusiness:
     # 实例化后的 instance 走general repo
     repo = Repo(None)
@@ -49,4 +61,18 @@ class GeneralBusiness:
     def create_one(cls, **kwargs):
         cls.repo.create_one(**kwargs)
 
+    # @classmethod
+    # def remove_by_id(cls, object_id, user_ID):
+    #     entity = cls.repo.read_by_id(object_id)
+    #     if user_ID != entity.user.user_ID:
+    #         raise ValueError('project not belong to this user, cannot delete')
+    #     return cls.repo.delete_by_id(object_id)
+
+    @classmethod
+    @check_auth
+    def remove_by_id(cls, object_id, user_ID):
+        # entity = cls.repo.read_by_id(object_id)
+        # if user_ID != entity.user.user_ID:
+        #     raise ValueError('project not belong to this user, cannot delete')
+        return cls.repo.delete_by_id(object_id)
 

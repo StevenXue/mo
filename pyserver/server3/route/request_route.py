@@ -15,6 +15,7 @@ from server3.business.request_answer_business import RequestAnswerBusiness
 from server3.service import comments_service
 from server3.service import user_service
 from server3.utility import json_utility
+from server3.service.comments_service import CommentsService
 
 PREFIX = '/user_requests'
 
@@ -63,7 +64,7 @@ def list_user_request():
                 each_request_info['_id'])
 
         each_request_info['comment_number'] = \
-            comments_service.count_comments_of_this_user_request(
+            CommentsService.count_comments_of_this_user_request(
                 each_request_info['_id'])
 
         each_request_info['user_ID'] = each_request.user.user_ID

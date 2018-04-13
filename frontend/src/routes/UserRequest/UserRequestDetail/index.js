@@ -19,6 +19,7 @@ import ProjectModal from '../../../components/ProjectModal/index'
 
 const {TextArea} = Input
 const confirm = Modal.confirm
+const FormItem = Form.Item;
 
 function hasErrors(fieldsError) {
   return Object.keys(fieldsError).some(field => fieldsError[field])
@@ -59,7 +60,7 @@ class CommentForm extends React.Component {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        console.log('Received values of form: ', values)
+        // console.log('Received values of form: ', values)
         this.make_comment(values)
       }
 
@@ -95,15 +96,6 @@ class CommentForm extends React.Component {
             />,
           )}
         </FormItem>
-        {/*<FormItem>*/}
-        {/*<Button*/}
-        {/*type="primary"*/}
-        {/*htmlType="submit"*/}
-        {/*disabled={hasErrors(getFieldsError())}*/}
-        {/*>*/}
-        {/*Comment*/}
-        {/*</Button>*/}
-        {/*</FormItem>*/}
       </Form>
     )
   }
@@ -230,7 +222,6 @@ class AnswerForm extends React.Component {
       },
     }
     const {fetching, data, value, projects, inputValue} = this.state
-    // console.log('lll')
     // console.log(this.state)
     return (
       <div className="demo">
@@ -342,16 +333,6 @@ function UserRequestDetail({allRequest, login, dispatch}) {
       window.open('/#/market/' + e.select_project._id + '?type=' + e.select_project.type)
     }
   }
-
-  // function acceptAnswer(request_answer) {
-  //   dispatch({
-  //     type: 'allRequest/acceptAnswer',
-  //     payload: {
-  //       user_request: focusUserRequest['_id'],
-  //       request_answer: request_answer,
-  //     }
-  //   })
-  // }
 
   const acceptAnswer = (request_answer_id) => {
     confirm({

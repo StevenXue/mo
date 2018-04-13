@@ -16,6 +16,7 @@ from server3.business.project_business import ProjectBusiness
 from server3.utility import json_utility
 from server3.service.request_answer_service import RequestAnswerService
 from server3.business.request_answer_business import RequestAnswerBusiness
+from server3.service.comments_service import CommentsService
 
 PREFIX = '/request_answer'
 
@@ -42,7 +43,7 @@ def list_request_answer():
             me_obj_list_to_json_list(request_answer)
         # 得到每一个answer下的comments 和 selcet project
         for index, answer in enumerate(request_answer_info):
-            answer_comment = comments_service.get_comments_of_this_answer(
+            answer_comment = CommentsService.get_comments_of_this_answer(
                 answer['_id'])
             answer_comment_info = json_utility. \
                 me_obj_list_to_json_list(answer_comment)
