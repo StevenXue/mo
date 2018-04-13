@@ -109,6 +109,35 @@ def newpassword_send(password,email):
     return False 
 
 
+def check_tourtip(user_ID):
+    user = user_business.get_by_user_ID(user_ID)
+    if user:
+        return user
+    return False 
+
+
+def no_tourtip(user_ID):
+    user = user_business.get_by_user_ID(user_ID)
+    if user:
+        user['tourtip'] = "1"
+        user.save()
+        return user
+    return False 
+
+def check_learning(user_ID):
+    user = user_business.get_by_user_ID(user_ID)
+    if user:
+        return user
+    return False 
+
+def no_learning(user_ID):
+    user = user_business.get_by_user_ID(user_ID)
+    if user:
+        user['welcome'] = "1"
+        user.save()
+        return user
+    return False 
+
 def update_request_vote(user_request_id, user_ID):
     user = user_business.get_by_user_ID(user_ID)
     user_request = user_request_business. \

@@ -137,7 +137,7 @@ class RequestList extends Component {
           />
           <RequestModal new={true} fetchData={() => this.fetchData({})}
                         type={this.props.type}>
-            <Button icon='plus-circle-o' type='primary'
+            <Button icon='plus-circle-o' type='primary' id="mei_rightButton"
                     className={styles.rightButton}>New {this.props.type} Request</Button>
           </RequestModal>
         </div>
@@ -169,7 +169,8 @@ class RequestList extends Component {
                       {/*<p className={styles.description}>{e.description}</p>*/}
                       <div>
                         {e['tags'].length > 0 && e['tags'].map(e => <Tag
-                                                                       className={styles.tags}>{e}</Tag>)}
+                                                                       className={styles.tags}
+                                                                       key={e}>{e}</Tag>)}
                         <div className={styles.timeAndUserDiv}>
                           <p
                             className={styles.showTime}>{showTime(e.create_time)}</p>

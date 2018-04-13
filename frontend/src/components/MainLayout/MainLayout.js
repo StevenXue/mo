@@ -18,17 +18,16 @@ moment.locale('en')
 
 import styles from './MainLayout.less'
 import Header from './Header'
-import TourTip from './TourTip'
-
+import LaunchPage from './LaunchPage'
 
 import zh_CN from '../../intl/zh_CN'
 import en_US from '../../intl/en_US'
 function MainLayout({children, location, history, modal, isRight, onClickIcon}) {
   return (
-    <Layout style={{height: '100%'}}>
+    <Layout style={{height: '100%',position:"relative"}}>
       <Header location={location} history={history} />
       <Content >
-        {/* <TourTip/> */}
+        <LaunchPage location={location}/>
         <div style={{display: "flex"}}>
           <div className={styles.content}>
           {children}
@@ -39,31 +38,31 @@ function MainLayout({children, location, history, modal, isRight, onClickIcon}) 
     </Layout>
   )
 
-  return (
-    <div className={styles.container}>
-      <div>
-        <Header location={location} history={history}/>
-      </div>
-      {/*<div style={{display: "flex", flex:1,  width: "100%"}}>*/}
-        <div className={styles.content}>
-          {children}
-        </div>
-        {/*<Open onClickIcon={onClickIcon} isRight={isRight}/>*/}
-      {/*</div>*/}
-      {/*<Button type="primary" onClick={modal.showModal}>Open</Button>*/}
+  // return (
+  //   <div className={styles.container}>
+  //     <div>
+  //       <Header location={location} history={history}/>
+  //     </div>
+  //     {/*<div style={{display: "flex", flex:1,  width: "100%"}}>*/}
+  //       <div className={styles.content}>
+  //         {children}
+  //       </div>
+  //       {/*<Open onClickIcon={onClickIcon} isRight={isRight}/>*/}
+  //     {/*</div>*/}
+  //     {/*<Button type="primary" onClick={modal.showModal}>Open</Button>*/}
 
-      {/*<Modal*/}
-      {/*title="Basic Modal"*/}
-      {/*visible={modal.visible}*/}
-      {/*onOk={modal.handleOk}*/}
-      {/*onCancel={modal.handleCancel}*/}
-      {/*>*/}
-      {/*<WorldChannel/>*/}
-      {/*</Modal>*/}
+  //     {/*<Modal*/}
+  //     {/*title="Basic Modal"*/}
+  //     {/*visible={modal.visible}*/}
+  //     {/*onOk={modal.handleOk}*/}
+  //     {/*onCancel={modal.handleCancel}*/}
+  //     {/*>*/}
+  //     {/*<WorldChannel/>*/}
+  //     {/*</Modal>*/}
 
 
-    </div>
-  )
+  //   </div>
+  // )
 }
 
 
