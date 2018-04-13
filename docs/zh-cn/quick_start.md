@@ -21,7 +21,7 @@ Welcome to Getting Started with the MO
 
 
 ## 发布我的第一个需求
-用户进入request模块，选择相应的request类型（apps/module/dataset), 点击 New app request, 填写相应内容。 用户可以在Request版块查找自己发布的需求，也可以在my profile中查看
+用户进入request模块，选择相应的request类型（apps/module/dataset), 点击 New app request, 填写相应内容。 用户可以在Request版块查找自己发布的需求，也可以在my profile中查看.
 - title: 标题
 - description: 描述
 - Tags：标签
