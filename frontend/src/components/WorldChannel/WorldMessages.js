@@ -37,9 +37,10 @@ const WorldMessageItem = ({worldMessage, isRight}) => {
         <div
           style={{
             display: "flex",
-            height: 50, width: 50,
+            minHeight: 50, width: 40,
             justifyContent: "center",
             alignItems: "center",
+            minWidth: 40,
           }}
         >
           {
@@ -78,7 +79,6 @@ const WorldMessageItem = ({worldMessage, isRight}) => {
 
         {
           isRight && renderText()
-
         }
       </div>
     )
@@ -106,8 +106,9 @@ const WorldMessageItem = ({worldMessage, isRight}) => {
 
         <div style={{
           // padding: 2,
-          color: message_type === 'admin' ? '#34BFE2' : "black"
-
+          color: message_type === 'admin' ? '#34BFE2' : "black",
+          wordWrap: "break-word",
+          width: 250,
         }}>
           {message}
         </div>

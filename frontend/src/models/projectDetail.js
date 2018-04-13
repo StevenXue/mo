@@ -92,7 +92,7 @@ export default {
     clearProject(state, action) {
       return {
         ...state,
-        project: null,
+        project: undefined,
       }
     },
     setExampleResult(state, action) {
@@ -139,14 +139,6 @@ export default {
         // yield put({ type: 'setProject', payload: project })
       }
 
-      const defaultDocs = CONSTANT.defaultOverviewDocs
-
-      if (!project.overview) {
-        project['overview'] = defaultDocs
-      }
-      else {
-        project['overview'] = { 'text': project['overview'] }
-      }
       yield put({ type: 'setProject', payload: project })
 
       // fetch jobs
@@ -161,6 +153,14 @@ export default {
     },
     // wrapper to set tags when set project
     *setProject({ payload: project }, { call, put }) {
+      const defaultDocs = CONSTANT.defaultOverviewDocs
+
+      if (!project.overview) {
+        project['overview'] = defaultDocs
+      }
+      else {
+        project['overview'] = { 'text': project['overview'] }
+      }
       yield put({ type: 'setProjectReducer', payload: project })
       yield put({ type: 'project/setTags', payload: project.tags })
     },

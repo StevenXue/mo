@@ -27,13 +27,13 @@ function MainLayout({children, location, history, modal, isRight, onClickIcon}) 
   return (
     <Layout style={{height: '100%'}}>
       <Header location={location} history={history} />
-      <Content >
+      <Content style={{height: '100%', overflowY: "auto"}}>
         {/* <TourTip/> */}
-        <div style={{display: "flex"}}>
+        <div style={{display: "flex", height: "100%"}}>
           <div className={styles.content}>
-          {children}
-        </div>
-        <Open onClickIcon={onClickIcon} isRight={isRight}/>
+            {children}
+          </div>
+          <Open onClickIcon={onClickIcon} isRight={isRight}/>
         </div>
       </Content>
     </Layout>
@@ -45,10 +45,10 @@ function MainLayout({children, location, history, modal, isRight, onClickIcon}) 
         <Header location={location} history={history}/>
       </div>
       {/*<div style={{display: "flex", flex:1,  width: "100%"}}>*/}
-        <div className={styles.content}>
-          {children}
-        </div>
-        {/*<Open onClickIcon={onClickIcon} isRight={isRight}/>*/}
+      <div className={styles.content}>
+        {children}
+      </div>
+      {/*<Open onClickIcon={onClickIcon} isRight={isRight}/>*/}
       {/*</div>*/}
       {/*<Button type="primary" onClick={modal.showModal}>Open</Button>*/}
 

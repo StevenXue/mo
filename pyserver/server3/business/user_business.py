@@ -50,7 +50,7 @@ class UserBusiness(GeneralBusiness):
 
     @classmethod
     def get_action_entity(cls, user_ID, page_no, page_size, action_entity,
-                          type, search_query):
+                          type=None, search_query=None):
         user = cls.get_by_user_ID(user_ID=user_ID)
         start = (page_no - 1) * page_size
         end = page_no * page_size
@@ -94,6 +94,12 @@ class UserBusiness(GeneralBusiness):
     def update_by_user_ID(cls, user_ID, update):
         user = get_by_user_ID(user_ID=user_ID)
         return cls.repo.update_one_by_id(obj_id=user.id, update=update)
+
+
+    # @classmethod
+    # def count_action_entity(cls, user_ID, page_no, page_size, action_entity,
+    #                                  type, search_query):
+
 
 
 

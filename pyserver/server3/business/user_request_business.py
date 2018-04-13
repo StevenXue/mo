@@ -87,6 +87,12 @@ class EntityBusiness:
 
 
     @classmethod
+    def count(cls):
+        objects = cls.repo.read()  # 分页
+        number_of_objects = objects.count()
+        return number_of_objects
+
+    @classmethod
     def remove_by_id(cls, object_id, user_ID):
         """
         Get a project object by its ObjectId
