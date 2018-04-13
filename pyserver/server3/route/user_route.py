@@ -174,6 +174,74 @@ def newpassword():
     response = {'response': {'token': create_access_token(identity=user)}}
     return jsonify(response), 200
 
+@user_app.route('/tourtip', methods=['GET'])
+def tourtip():
+    user_ID = request.args.get('user_ID', None)
+    try:
+        user = user_service.check_tourtip(user_ID)
+        user_obj = json_utility.convert_to_json(user.to_mongo())
+        user_obj.pop('password')
+    except DoesNotExist as e:
+        return jsonify({'response': '%s: %s' % (str(
+            DoesNotExist), e.args)}), 400
+    if not user:
+        return jsonify({'response': 'Bad email'}), 400
+    # Identity can be any data that is json serializable
+    response = {'response': {'user': user_obj}}
+    return jsonify(response), 200
+
+
+@user_app.route('/notourtip', methods=['GET'])
+def notourtip():
+    user_ID = request.args.get('user_ID', None)
+    try:
+        user = user_service.no_tourtip(user_ID)
+        user_obj = json_utility.convert_to_json(user.to_mongo())
+        user_obj.pop('password')
+    except DoesNotExist as e:
+        return jsonify({'response': '%s: %s' % (str(
+            DoesNotExist), e.args)}), 400
+    if not user:
+        return jsonify({'response': 'Bad email'}), 400
+    # Identity can be any data that is json serializable
+    response = {'response': {'user': user_obj}}
+    return jsonify(response), 200
+
+
+@user_app.route('/learning', methods=['GET'])
+def learning():
+    user_ID = request.args.get('user_ID', None)
+    try:
+        user = user_service.check_learning(user_ID)
+        user_obj = json_utility.convert_to_json(user.to_mongo())
+        user_obj.pop('password')
+    except DoesNotExist as e:
+        return jsonify({'response': '%s: %s' % (str(
+            DoesNotExist), e.args)}), 400
+    if not user:
+        return jsonify({'response': 'Bad email'}), 400
+    # Identity can be any data that is json serializable
+    response = {'response': {'user': user_obj}}
+    return jsonify(response), 200
+
+
+@user_app.route('/nolearning', methods=['GET'])
+def nolearning():
+    user_ID = request.args.get('user_ID', None)
+    try:
+        user = user_service.no_learning(user_ID)
+        user_obj = json_utility.convert_to_json(user.to_mongo())
+        user_obj.pop('password')
+    except DoesNotExist as e:
+        return jsonify({'response': '%s: %s' % (str(
+            DoesNotExist), e.args)}), 400
+    if not user:
+        return jsonify({'response': 'Bad email'}), 400
+    # Identity can be any data that is json serializable
+    response = {'response': {'user': user_obj}}
+    return jsonify(response), 200
+
+
 @user_app.route('/login_with_phone', methods=['POST'])
 def login_with_phone():
     """
