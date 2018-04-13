@@ -12,39 +12,28 @@
 
 功能介绍:
 
-**1. workspace 工作台**
+##1. workspace 工作台
 
 无论完整的 AI 应用或是封装好的算法模块，都可以跳过繁琐的开发环境搭建，使用我们内嵌的 JupyterLab 直接上手。点击“新建应用”或“新建模块”即可快速开始。
 
 
 
 
-**2. market 发现**
+##2. market 发现
 
 探索学习公开的应用以及模块算法，还有开放的数据集，发现喜欢的项目可以点赞收藏，如果你有优质的资源我们也欢迎你与其他数据爱好者共享。
 
-**3. request 需求**
+#### 寻找可用的app、module以及dataset
+<img src="./media/nav1.png"  />
 
-其他用户提出的需求会在这里分类展示，你可以寻找自己擅长的领域进行回答。如果你有任何需求，点击“发布需求”也会找到合适的帮手来为你解决。        
+点击首页导航中的Market栏目。
 
-### 如何寻找别人提出的需求
-<img src="./media/nav2.png"  />
+<img src="./media/app_eg.png"  />
 
-点击首页导航中的Requst栏目。
+展示卡片会显示项目名称、描述、作者、创建时间以及项目分类，点击卡片可以进入详情。
 
-<img src="./media/requst_eg.png"  />
 
-点击需求列表中的栏目可以进入详情，如果回答显示对号则表明此条需求已经采纳了某条回答。
-
-### 发布我的第一个需求
-用户进入request模块，选择相应的request类型（apps/module/dataset), 点击 New app request, 填写相应内容。 用户可以在Request版块查找自己发布的需求，也可以在my profile中查看.
-- title: 标题
-- description: 描述
-- Tags：标签
-- Input: 对输入的描述
-- Output: 对输出的描述
-
-### 使用我的第一个App
+#### 使用我的第一个App
 用户进入 market / app , 点击自己需要的 app， 进入app 详情页面， 查看完app 的简介后，点击example ，在Input 填写自己的参数， 点击submit, 结果将会展示在output 框内. 
 用户也可浏览app列表并通过category和tags进行筛选， 或者使用顶部搜索框进行筛选
 
@@ -67,7 +56,7 @@ algo = client.algo('demo/Hello/')
 print algo.pipe(input)
 ```
 
-### 返回的结果
+#### 返回的结果
 Each algorithm returns a response in JSON. It will include the "result" as well as metadata about the API call you made. The metadata will include the content_type as well as a duration.
 ```$xslt
 curl -X POST -d '"YOUR_USERNAME"' -H 'Content-Type: application/json' -H 'Authorization: Simple API_KEY' https://api.algorithmia.com/v1/algo/demo/Hello/
@@ -82,6 +71,30 @@ curl -X POST -d '"YOUR_USERNAME"' -H 'Content-Type: application/json' -H 'Author
 he duration is the compute time of the API call into the algorithm. This is the time in seconds between the start of the execution of the algorithm and when it produces a response. Because you are charged on the compute time of the API call, this information will help you optimize your use of the API.
 
 For more information about pricing, check out our Pricing Guide
+
+
+##3. request 需求
+
+其他用户提出的需求会在这里分类展示，你可以寻找自己擅长的领域进行回答。如果你有任何需求，点击“发布需求”也会找到合适的帮手来为你解决。   
+
+
+#### 寻找别人提出的需求
+<img src="./media/nav2.png"  />
+
+点击首页导航中的Requst栏目。
+
+<img src="./media/requst_eg.png"  />
+
+点击需求列表中的栏目可以进入详情，如果回答显示对号则表明此条需求已经采纳了某条回答。
+
+#### 发布我的第一个需求
+用户进入request模块，选择相应的request类型（apps/module/dataset), 点击 New app request, 填写相应内容。 用户可以在Request版块查找自己发布的需求，也可以在my profile中查看.
+- title: 标题
+- description: 描述
+- Tags：标签
+- Input: 对输入的描述
+- Output: 对输出的描述
+
 
 
 
