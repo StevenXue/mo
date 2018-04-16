@@ -7,10 +7,15 @@ from flask import request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server3.service import user_request_service
+from server3.service.user_request_service import UserRequestService
+from server3.service.user_service import UserService
 from server3.service import request_answer_service
+from server3.service.request_answer_service import RequestAnswerService
+from server3.business.request_answer_business import RequestAnswerBusiness
 from server3.service import comments_service
 from server3.service import user_service
 from server3.utility import json_utility
+from server3.service.comments_service import CommentsService
 
 PREFIX = '/user_requests'
 
@@ -20,7 +25,7 @@ user_request_app = Blueprint("user_request_app", __name__, url_prefix=PREFIX)
 @user_request_app.route('/<user_request_id>', methods=['GET'])
 def get_user_request(user_request_id):
     try:
-        user_request = user_request_service.get_by_id(user_request_id)
+        user_request = UserRequestService.get_by_id(user_request_id)
         user_request_info = json_utility.convert_to_json(user_request.to_mongo())
         user_request_info['user_ID'] = user_request.user.user_ID
     except Exception as e:
@@ -41,7 +46,7 @@ def list_user_request():
     if type == 'all':
         type = None
 
-    user_requests, total_number = user_request_service.get_list(
+    user_requests, total_number = UserRequestService.get_list(
         type=type,
         search_query=search_query,
         page_no=page_no,
@@ -55,11 +60,11 @@ def list_user_request():
         each_request_info = json_utility.convert_to_json(
             each_request.to_mongo())
         each_request_info['answer_number'] = \
-            request_answer_service.get_all_answer_of_this_user_request(
-                each_request_info['_id'], get_number=True)
+            RequestAnswerBusiness.answer_number_of_user_request(
+                each_request_info['_id'])
 
         each_request_info['comment_number'] = \
-            comments_service.count_comments_of_this_user_request(
+            CommentsService.count_comments_of_this_user_request(
                 each_request_info['_id'])
 
         each_request_info['user_ID'] = each_request.user.user_ID
@@ -78,7 +83,7 @@ def create_user_request():
     title = data.pop('title')
     user_ID = get_jwt_identity()
     # data['tags'] = data['tags'].split(",") if data['tags'] else None
-    user_request = user_request_service.create_user_request(title, user_ID,
+    user_request = UserRequestService.create_user_request(title, user_ID,
                                              **data)
     user_request = json_utility.convert_to_json(user_request.to_mongo())
     return jsonify({'response': user_request}), 200
@@ -88,30 +93,40 @@ def create_user_request():
 @jwt_required
 def update_user_request(user_request_id):
     data = request.get_json()
-    result = user_request_service.update_user_request(user_request_id, **data)
+    result = UserRequestService.update_user_request(user_request_id, **data)
     result = json_utility.convert_to_json(result.to_mongo())
     return jsonify({'response': result}), 200
 
 
 @user_request_app.route('/votes', methods=['PUT'])
+@jwt_required
 def update_user_request_votes():
     data = request.get_json()
     user_request_id = data["user_request"]
-    votes_user_id = data["votes_user_id"]
-    result = user_service.update_request_vote(user_request_id, votes_user_id)
-    result = json_utility.convert_to_json(result)
-    print('update_user_request_votes')
+    # votes_user_id = data["votes_user_id"]
+    # result = user_service.update_request_vote(user_request_id, votes_user_id)
+    user_ID = get_jwt_identity()
+    result = UserService.action_entity(user_ID=user_ID,
+                                       entity_id=user_request_id,
+                                       action='vote_up', entity='request')
+
+    result = json_utility.convert_to_json(result.entity.to_mongo())
     return jsonify({'response': result}), 200
 
 
 @user_request_app.route('/star', methods=['PUT'])
+@jwt_required
 def update_user_request_star():
     data = request.get_json()
     user_request_id = data["user_request_id"]
-    star_user_id = data["star_user_id"]
-    result = user_service.update_request_star(user_request_id, star_user_id)
-    result = json_utility.convert_to_json(result.to_mongo())
-    print('update_user_request_star')
+    # star_user_id = data["star_user_id"]
+    user_ID = get_jwt_identity()
+    # result = user_service.update_request_star(user_request_id, star_user_id)
+    result = UserService.action_entity(user_ID=user_ID,
+                                       entity_id=user_request_id,
+                                       action='star', entity='request')
+
+    result = json_utility.convert_to_json(result.entity.to_mongo())
     return jsonify({'response': result}), 200
 
 
@@ -119,7 +134,7 @@ def update_user_request_star():
 @jwt_required
 def remove_user_request_by_id(user_request_id):
     user_ID = get_jwt_identity()
-    result = user_request_service.remove_by_id(ObjectId(
+    result = UserRequestService.remove_by_id(ObjectId(
         user_request_id), user_ID)
     return jsonify({'response': result}), 200
 
@@ -130,5 +145,5 @@ def remove_user_request():
     # data = request.get_json()
     # user_ID = data['user_ID']
     user_ID = get_jwt_identity()
-    result = user_request_service.remove_by_user_ID(user_ID)
+    result = UserRequestService.remove_by_user_ID(user_ID)
     return jsonify({'response': result}), 200

@@ -1,30 +1,4 @@
 # 快速开始
-平台中联结了人工智能应用使用者、需求提出者、数据提供者、关键模组开发者以及应用组装者，集合网页端和移动端，满足不同用户的使用场景，实现了需求提出 - 可复用算法模块开发 - 模块组装 - 应用发布使用的生态链。
-
-## 平台中涉及的概念
-
-应用：人工智能预测模型。满足普通用户的直接使用需求，例如航班延误预测模型。
-
-模块：可复用的算法组件。分为 toolkit 以及 modle 两种，toolkit 为特定的不可训练的函数， modle则是可以训练优化，例如特征提取模块。
-
-数据集：有一组数据组成的集合。平台支持 jpg 、csv 等格式，多个文件可以以 zip 压缩包的形式
-上传到平台。
-
-## 版块介绍
-
-workspace 工作台
-
-无论完整的 AI 应用或是封装好的算法模块，都可以跳过繁琐的开发环境搭建，使用我们内嵌的 JupyterLab 直接上手。点击“新建应用”或“新建模块”即可快速开始。
-
-
-market 发现
-
-探索学习公开的应用以及模块算法，还有开放的数据集，发现喜欢的项目可以点赞收藏，如果你有优质的资源我们也欢迎你与其他数据爱好者共享。
-
-request 需求
-
-其他用户提出的需求会在这里分类展示，你可以寻找自己擅长的领域进行回答。如果你有任何需求，点击“发布需求”也会找到合适的帮手来为你解决。   
-
 
 ## 寻找并使用我的第一个应用
 <img src="./media/nav1.png"  />
@@ -33,14 +7,13 @@ request 需求
 
 <img src="./media/app_eg.png"  />
 
-展示卡片会显示项目名称、描述、作者、创建时间以及项目分类，点击卡片可以进入详情。
+展示卡片会显示项目名称、描述、作者、创建时间以及项目分类，点击卡片可以进入应用详情。应用的使用方式有两种：
 
+**1. 直接使用**
 
-#### 直接使用
+进入应用详情页面， 查看完app 的简介后，点击example ，根据应用要求输入 自己的参数并点击提交，结果将自动反馈在输出区域内。
 
-#### 调用API
-用户进入 market / app , 点击自己需要的 app， 进入app 详情页面， 查看完app 的简介后，点击example ，在Input 填写自己的参数， 点击submit, 结果将会展示在output 框内. 
-用户也可浏览app列表并通过category和tags进行筛选， 或者使用顶部搜索框进行筛选
+**2. 调用API**
 
 We’ll make our first call with the demo algorithm “Hello”. This algorithm takes an input of a string (preferably your name!) and returns a greeting addressed to the input.
 
@@ -60,8 +33,7 @@ client = Algorithmia.client('YOUR_API_KEY')
 algo = client.algo('demo/Hello/')
 print algo.pipe(input)
 ```
-
-###### 返回的结果
+**返回的结果**
 Each algorithm returns a response in JSON. It will include the "result" as well as metadata about the API call you made. The metadata will include the content_type as well as a duration.
 ```$xslt
 curl -X POST -d '"YOUR_USERNAME"' -H 'Content-Type: application/json' -H 'Authorization: Simple API_KEY' https://api.algorithmia.com/v1/algo/demo/Hello/
@@ -77,7 +49,6 @@ he duration is the compute time of the API call into the algorithm. This is the 
 
 For more information about pricing, check out our Pricing Guide
 
-
 ## 发布我的第一个需求
 用户进入request模块，选择相应的request类型（apps/module/dataset), 点击 New app request, 填写相应内容。 用户可以在Request版块查找自己发布的需求，也可以在my profile中查看.
 - title: 标题
@@ -86,6 +57,6 @@ For more information about pricing, check out our Pricing Guide
 - Input: 对输入的描述
 - Output: 对输出的描述
 
-
-
+## 创建我的第一个项目
+点击首页导航中的workspace栏目，先选择文件类型，项目分为应用、模块、数据集三种，在对应页面点击“新建按钮”，填写名称、描述等信息完成创建。创建完成或会自动计入项目详情页面，点击“notebook”按钮，即可进入工作编辑区进行开发训练。
 

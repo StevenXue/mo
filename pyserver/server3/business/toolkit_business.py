@@ -20,12 +20,12 @@ import inspect
 from server3.lib import toolkit_orig, preprocess_orig
 from server3.entity.toolkit import Toolkit
 from server3.repository.toolkit_repo import ToolkitRepo
-from server3.business import user_business, ownership_business
+from server3.business import ownership_business
+from server3.business.user_business import UserBusiness
 
 from server3.constants import SPEC
 
 toolkit_repo = ToolkitRepo(Toolkit)
-
 
 def get_by_toolkit_name(toolkit_name):
     return toolkit_repo.read_by_unique_field('name', toolkit_name)
@@ -40,7 +40,7 @@ def add(name, description, target_py_code, entry_function, parameter_spec):
                       target_py_code=target_py_code,
                       entry_function=entry_function,
                       parameter_spec=parameter_spec)
-    user = user_business.get_by_user_ID('system')
+    user = UserBusiness.get_by_user_ID('system')
     ownership_business.add(user, False, toolkit=toolkit)
     return toolkit_repo.create(toolkit)
 
@@ -53,7 +53,7 @@ def create_public_toolkit():
     """
     数据库建一个toolkit的collection, 记载public的数据分析工具包简介
     """
-    user = user_business.get_by_user_ID('system')
+    user = UserBusiness.get_by_user_ID('system')
 
     AVG = Toolkit(name='平均值',
                   description='计算所选数据集合的平均值',
@@ -817,7 +817,7 @@ def create_public_data_process():
     """
     数据库建一个toolkit的collection, 记载public的数据分析工具包简介
     """
-    user = user_business.get_by_user_ID('system')
+    user = UserBusiness.get_by_user_ID('system')
 
     standard_scaler = Toolkit(name='无量纲化-正态分布',
                               description='标准化，基于特征矩阵的列，将特征值转换至服从标准正态分布',
@@ -1715,7 +1715,7 @@ def update_one_public_toolkit():
     """
         数据库建一个toolkit的collection, 记载public的数据分析工具包简介
     """
-    user = user_business.get_by_user_ID('system')
+    user = UserBusiness.get_by_user_ID('system')
 
     TMP = Toolkit(name='字符串转数字类别',
                   description='将一组类别属性的数据，转化为数字的类别',
@@ -1754,7 +1754,7 @@ def update_one_public_toolkit():
 
 
 def remove_one_public_toolkit():
-    # user = user_business.get_by_user_ID('system')
+    # user = UserBusiness.get_by_user_ID('system')
     toolkit = get_by_toolkit_name('最大互信息数')
     remove(toolkit)
     # 已舍去
@@ -3067,7 +3067,7 @@ def remove_one_public_toolkit():
 #         }
 #     ]
 #
-#     user = user_business.get_by_user_ID("system")
+#     user = UserBusiness.get_by_user_ID("system")
 #
 #     for toolkit in TOOLKIT_DICT:
 #         if not toolkit["_id"]:

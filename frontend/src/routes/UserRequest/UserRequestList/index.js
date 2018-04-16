@@ -153,7 +153,7 @@ class RequestList extends Component {
                       <div className={styles.starDiv}>
                         <p
                           className={styles.starNumber}>{e['star_user'].length}</p>
-                        <p className={styles.starText}>Star</p>
+                        <p className={styles.starText}>Favourite</p>
                       </div>
                       <div className={styles.starDiv}>
                         <p

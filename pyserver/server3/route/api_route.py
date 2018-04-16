@@ -25,6 +25,7 @@ from server3.business import api_business, user_business
 from server3.entity.api import ApiGetType
 from server3.utility import json_utility
 from server3.constants import Error, Warning
+from server3.business.user_business import UserBusiness
 
 PREFIX = '/apis'
 
@@ -41,7 +42,7 @@ def add():
     try:
         user_ID = data.pop("user_ID")
         name = data.pop("name")
-        user = user_business.get_by_user_ID(user_ID)
+        user = UserBusiness.get_by_user_ID(user_ID)
         result = api_business.add(name=name, user=user, **data)
         result = json_utility.convert_to_json(result.to_mongo())
         return jsonify({

@@ -19,6 +19,7 @@ from server3.business.user_business import UserBusiness
 from server3.constants import Error, ErrorMessage, GIT_SERVER
 from server3.entity.general_entity import UserEntity
 from server3.business.user_request_business import UserRequestBusiness
+from server3.business.request_answer_business import RequestAnswerBusiness
 from server3.business.data_set_business import DatasetBusiness
 
 from server3.entity.phone_message_id import PhoneMessageId
@@ -378,19 +379,20 @@ def verify_code(code, phone):
 class UserService:
     @classmethod
     def action_entity(cls, user_ID, entity_id, action, entity):
-        user = user_business.get_by_user_ID(user_ID=user_ID)
+        user = UserBusiness.get_by_user_ID(user_ID=user_ID)
         business_maper = {
             "app": AppBusiness,
             "module": ModuleBusiness,
             "request": UserRequestBusiness,
             "dataset": DatasetBusiness,
+            "answer": RequestAnswerBusiness
         }
         business = business_maper[entity]
-        print("entity_id", entity_id)
+        # print("entity_id", entity_id)
         object = business.get_by_id(entity_id)
 
-        if entity == "request":
-            user_keyword = '{action}_{entity}'.format(action=action, entity=entity)
+        if entity == "request" or entity =='answer':
+            user_keyword = '{entity}_{action}'.format(action=action, entity=entity)
             object_keyword = '{action}_user'.format(action=action)
         else:
             user_keyword = '{action}_{entity}s'.format(action=action, entity=entity)
@@ -451,59 +453,59 @@ class UserService:
         return user
 
 # 尝试合并代码
-class Action:
-    business = None  # app / module
-    action_type = None  # favor / star /
-    # favor_apps
-    user_keyword = None
-    # user_keyword = '{business}_{action_type}s'.format(business=business, action_type=action_type)
-    # favor_users
-    # object_keyword = '{action_type}_users'.format(action_type=action_type)
-    object_keyword = None
-
-    @classmethod
-    def action(cls, user_ID, object_id):
-        user = user_business.get_by_user_ID(user_ID=user_ID)
-        app = cls.business.get_by_id(project_id=object_id)
-
-        if app not in user[cls.user_keyword]:
-            user[cls.user_keyword].append(app)
-            user_result = user.save()
-        else:
-            user[cls.user_keyword].remove(app)
-            user_result = user.save()
-        # 2. 在app下存favor_users
-        if user not in app[cls.object_keyword]:
-            app[cls.object_keyword].append(user)
-            app_result = app.save()
-        else:
-            app[cls.object_keyword].remove(user)
-            app_result = app.save()
-        if user_result and app_result:
-            return UserEntity(user=user_result, entity=app_result)
-
-
-class FavorApp(Action):
-    business = AppBusiness
-    action_type = 'favor'
-    user_keyword = 'favor_apps'
-    object_keyword = 'favor_users'
-
-
-class StarApp(Action):
-    business = AppBusiness
-    action_type = 'star'
-    user_keyword = 'star_apps'
-    object_keyword = 'favor_users'
-
-
-class StarRequest(Action):
-    business = UserRequestBusiness
-    action_type = 'star'
-    user_keyword = 'star_apps'
-    object_keyword = 'favor_users'
-
-
-class FavorModule(Action):
-    # business = ModuleBusiness
-    pass
+# class Action:
+#     business = None  # app / module
+#     action_type = None  # favor / star /
+#     # favor_apps
+#     user_keyword = None
+#     # user_keyword = '{business}_{action_type}s'.format(business=business, action_type=action_type)
+#     # favor_users
+#     # object_keyword = '{action_type}_users'.format(action_type=action_type)
+#     object_keyword = None
+#
+#     @classmethod
+#     def action(cls, user_ID, object_id):
+#         user = user_business.get_by_user_ID(user_ID=user_ID)
+#         app = cls.business.get_by_id(project_id=object_id)
+#
+#         if app not in user[cls.user_keyword]:
+#             user[cls.user_keyword].append(app)
+#             user_result = user.save()
+#         else:
+#             user[cls.user_keyword].remove(app)
+#             user_result = user.save()
+#         # 2. 在app下存favor_users
+#         if user not in app[cls.object_keyword]:
+#             app[cls.object_keyword].append(user)
+#             app_result = app.save()
+#         else:
+#             app[cls.object_keyword].remove(user)
+#             app_result = app.save()
+#         if user_result and app_result:
+#             return UserEntity(user=user_result, entity=app_result)
+#
+#
+# class FavorApp(Action):
+#     business = AppBusiness
+#     action_type = 'favor'
+#     user_keyword = 'favor_apps'
+#     object_keyword = 'favor_users'
+#
+#
+# class StarApp(Action):
+#     business = AppBusiness
+#     action_type = 'star'
+#     user_keyword = 'star_apps'
+#     object_keyword = 'favor_users'
+#
+#
+# class StarRequest(Action):
+#     business = UserRequestBusiness
+#     action_type = 'star'
+#     user_keyword = 'star_apps'
+#     object_keyword = 'favor_users'
+#
+#
+# class FavorModule(Action):
+#     # business = ModuleBusiness
+#     pass

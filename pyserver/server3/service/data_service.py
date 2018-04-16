@@ -7,7 +7,6 @@ from bson import ObjectId
 from server3.business import data_business
 from server3.business import data_set_business
 from server3.business import ownership_business
-from server3.business import user_business
 from server3.business import file_business
 from server3.service import file_service
 from server3.service import ownership_service
@@ -15,6 +14,7 @@ from server3.utility import json_utility
 from server3.utility import data_utility
 from server3.repository import config
 from server3 import constants
+from server3.business.user_business import UserBusiness
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
@@ -54,7 +54,7 @@ def field_mapper_reducer():
 def add_data_set(user_ID, is_private, name, description):
     path = os.path.join(UPLOAD_FOLDER, user_ID, name)
     ds = data_set_business.add(name=name, description=description, path=path)
-    user = user_business.get_by_user_ID(user_ID)
+    user = UserBusiness.get_by_user_ID(user_ID)
     ownership_business.add(user, is_private, data_set=ds)
     return ds
 

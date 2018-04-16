@@ -27,7 +27,7 @@ from eventlet import spawn_n
 from server3.entity.project import Project
 # from server3.repository import job_repo
 from server3.repository.project_repo import ProjectRepo
-from server3.business import user_business
+from server3.business.user_business import UserBusiness
 from server3.constants import USER_DIR
 from server3.constants import HUB_SERVER
 from server3.constants import GIT_SERVER
@@ -342,7 +342,7 @@ class ProjectBusiness:
         :return: a new created project object
         """
         [user_ID, project_name] = project_name.split('+')
-        user = user_business.get_by_user_ID(user_ID)
+        user = UserBusiness.get_by_user_ID(user_ID)
         return cls.repo.update_unique_one(dict(name=project_name, user=user),
                                           data)
 

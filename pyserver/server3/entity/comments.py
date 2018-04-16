@@ -9,7 +9,7 @@ from server3.entity.request_answer import RequestAnswer
 COMMENT_TYPE = ('request', 'answer')
 
 
-class UserRequestComments(DynamicDocument):
+class Comments(DynamicDocument):
     user_request = ReferenceField('UserRequest', reverse_delete_rule=CASCADE)
     request_answer = ReferenceField('RequestAnswer', reverse_delete_rule=CASCADE)
     create_time = DateTimeField(required=True)

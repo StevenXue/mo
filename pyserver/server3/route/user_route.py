@@ -29,7 +29,9 @@ from server3.service.user_service import UserService
 from server3.business.user_business import UserBusiness
 from server3.business.statistics_business import StatisticsBusiness
 from server3.service import request_answer_service
- 
+from server3.service.request_answer_service import RequestAnswerService
+from server3.business.request_answer_business import RequestAnswerBusiness
+
 PREFIX = '/user'
 
 user_app = Blueprint("user_app", __name__, url_prefix=PREFIX)
@@ -69,7 +71,8 @@ def register():
     if user_ID is None or password is None or code is None:
         return jsonify({'response': 'invalid user or password'}), 400
     try:
-        added_user = user_service.register(user_ID, password, phone, code, **data)
+        added_user = user_service.register(user_ID, password, phone, code,
+                                           **data)
         added_user = json_utility.convert_to_json(added_user.to_mongo())
         added_user.pop('password')
         return jsonify({'response': added_user}), 200
@@ -111,7 +114,8 @@ def reset_password():
     code = data.pop("code")
     new_password = data.pop("new_password")
     try:
-        user = user_service.reset_password(phone, message_id, code, new_password)
+        user = user_service.reset_password(phone, message_id, code,
+                                           new_password)
     except Error as e:
         return jsonify({
             "message": e.args[0]
@@ -143,6 +147,7 @@ def login():
                              'user': user_obj}}
     return jsonify(response), 200
 
+
 @user_app.route('/forgot', methods=['GET'])
 def forgot():
     email = request.args.get('email', None)
@@ -158,12 +163,13 @@ def forgot():
     response = {'response': {'token': create_access_token(identity=user)}}
     return jsonify(response), 200
 
+
 @user_app.route('/newpassword', methods=['GET'])
 def newpassword():
     password = request.args.get('password', None)
     email = request.args.get('email', None)
     try:
-        user = user_service.newpassword_send(password,email)
+        user = user_service.newpassword_send(password, email)
         # user_obj.pop('password')
     except DoesNotExist as e:
         return jsonify({'response': '%s: %s' % (str(
@@ -173,6 +179,7 @@ def newpassword():
     # Identity can be any data that is json serializable
     response = {'response': {'token': create_access_token(identity=user)}}
     return jsonify(response), 200
+
 
 @user_app.route('/tourtip', methods=['GET'])
 def tourtip():
@@ -329,8 +336,6 @@ def set_action_entity(entity_id):
     """
     user_ID = get_jwt_identity()
     data = request.get_json()
-    print('data')
-    print(data)
     action = data.pop("action")
     entity = data.pop("entity")
 
@@ -341,7 +346,8 @@ def set_action_entity(entity_id):
         return jsonify({
             'message': "success",
             'response': {
-                "entity": json_utility.convert_to_json(result.entity.to_mongo()),
+                "entity": json_utility.convert_to_json(
+                    result.entity.to_mongo()),
                 "user": json_utility.convert_to_json(result.user.to_mongo())
             }
         }), 200
@@ -366,9 +372,8 @@ def get_action_entity():
             app.user_ID = app.user.user_ID
     else:
         for each_request in apps.objects:
-            each_request.answer_number = \
-                request_answer_service.get_all_answer_of_this_user_request(
-                    each_request.id, get_number=True)
+            each_request.answer_number = RequestAnswerBusiness. \
+                answer_number_of_user_request(each_request.id)
             each_request.user_ID = each_request.user.user_ID
     return jsonify({
         'response': {
@@ -399,11 +404,11 @@ def get_user_statistics():
         user_ID=user_ID, action_entity="favor_apps",
         page_no=1, page_size=1)
     favor_apps_count = apps.count
-
-    total_number = UserRequestBusiness.count()
+    user = UserBusiness.get_by_user_ID(user_ID)
+    requests_count = UserRequestBusiness.request_number_of_this_user(user)
     return jsonify({'response': {
         "favor_apps_count": favor_apps_count,
-        "requests_count": total_number
+        "requests_count": requests_count
     }}), 200
 
 
@@ -430,7 +435,8 @@ def get_statistics():
 
     return jsonify({
         'response': {
-            "objects": json_utility.objs_to_json_with_args(statistics.objects, ["app", "caller"]),
+            "objects": json_utility.objs_to_json_with_args(statistics.objects,
+                                                           ["app", "caller"]),
             # "objects": json_utility.me_obj_list_to_json_list(statistics.objects),
             # "objects": json.loads(statistics.objects.to_json()),
 

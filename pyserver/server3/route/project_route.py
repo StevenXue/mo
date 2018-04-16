@@ -23,7 +23,7 @@ from server3.service.app_service import AppService
 from server3.service.module_service import ModuleService
 from server3.service.dataset_service import DatasetService
 from server3.business.project_business import ProjectBusiness
-from server3.business import user_business
+from server3.business.user_business import UserBusiness
 from server3.utility import json_utility
 from server3.utility import str_utility
 from server3.constants import Error, Warning
@@ -334,7 +334,7 @@ def commit_broadcast(project_id):
     # ProjectBusiness.commit(project_id, commit_msg)
     receivers = project.favor_users  # get app subscriber
     # commits = ProjectBusiness.get_commits(project.path)
-    admin_user = user_business.get_by_user_ID('admin')
+    admin_user = UserBusiness.get_by_user_ID('admin')
     message_service.create_message(admin_user, 'commit', receivers,
                                    project.user, project_type=project.type,
                                    project_id=project_id)
