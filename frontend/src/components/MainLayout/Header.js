@@ -108,11 +108,11 @@ function Header({location, login, history, dispatch, allRequest,message}) {
       case 'commit':
         history.push(`/workspace/${e.project_id}?type=${e.project_type}`)
         break
-      case 'deploy':
-        history.push(`/workspace/${e.app_id}?type=app`)
-        break
+      // case 'deploy':
+      //   history.push(`/workspace/${e.app_id}?type=app`)
+      //   break
       case 'publish':
-        history.push(`/workspace/${e.module_id}?type=module`)
+        toProject(e)
         break
     }
     dispatch({
@@ -129,33 +129,30 @@ function Header({location, login, history, dispatch, allRequest,message}) {
     history.push(`/userrequest/${e.user_request}?type=${e.user_request_type}`)
   }
 
-  const toApp = (e) => {
-    history.push(`/market/${e.app_id}?type=app`)
+  const toProject = (e) => {
+    history.push(`/workspace/${e.project_id}?type=${e.project_type}`)
   }
 
-  const toModule = (e) => {
-    history.push(`/market/${e.module_id}?type=module`)
+  const translatorTemp = {
+    app: '应用',
+    module: '模块',
+    dataset: '数据集'
   }
-
-  const toDataset = (e) => {
-    history.push(`/market/${e.dataset_id}?type=dataset`)
-  }
-
 
   const switchMessage = (e) => {
     switch(e.message_type) {
       case 'answer':
-        return <p className={styles.messageP} >{`${e.user_ID}回答了您关注的需求${e.user_request_title}`}</p>
+        return <p className={styles.messageP}>{`${e.user_ID}回答了您关注的需求${e.user_request_title}`}</p>
       case 'commit':
-        return <p className={styles.messageP} >{e.user_ID} 更新了您关注的需求  {e.user_request_title} 的答案</p>
+        return <p className={styles.messageP}>{e.user_ID} 更新了您关注的需求  {e.user_request_title} 的答案</p>
       case 'deploy':
-        return <p className={styles.messageP} >{e.user_ID} 上线了您关注的应用  {e.app_name}</p>
+        return <p className={styles.messageP}>{e.user_ID} 上线了您关注的{translatorTemp[e.project_type]}  {e.project_name}</p>
       case 'publish':
-        return <p className={styles.messageP} >{e.user_ID} 发布了您关注的模块  {e.module_name}</p>
+        return <p className={styles.messageP}>{e.user_ID} 发布了您关注的{translatorTemp[e.project_type]}  {e.project_name}</p>
       case 'deploy_request':
-        return <p className={styles.messageP} >{e.user_ID} 为您的答案{e.user_request_title}上线了应用  {e.app_name}</p>
+        return <p className={styles.messageP}>{e.user_ID} 为您的答案{e.user_request_title} 上线了{translatorTemp[e.project_type]}  {e.project_name}</p>
       case 'publish_request':
-        return <p className={styles.messageP} >{e.user_ID} 为您的答案{e.user_request_title}发布了模块  {e.module_name}</p>
+        return <p className={styles.messageP}>{e.user_ID} 为您的答案{e.user_request_title} 发布了{translatorTemp[e.project_type]}  {e.project_name}</p>
     }
   }
 

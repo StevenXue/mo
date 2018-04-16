@@ -63,6 +63,8 @@ export class Form extends VDomRenderer<null> {
     protected render(): React.ReactElement<any> {
         return (
             <div>
+                <input style={{display: 'none'}} className='testingState'/>
+                <input style={{display: 'none'}} className='versionNumber'/>
                 <ModulePage/>
             </div>
         );

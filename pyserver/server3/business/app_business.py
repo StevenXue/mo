@@ -34,7 +34,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
                                               **kwargs)
 
     @classmethod
-    def deploy(cls, app_id, handler_file_path):
+    def deploy_or_publish(cls, app_id, handler_file_path, version='dev'):
         app = cls.get_by_id(app_id)
         app.status = 'deploying'
         app.save()
@@ -42,7 +42,8 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         if modules is None:
             modules = []
 
-        service_name = app.user.user_ID + '-' + app.name
+        service_name = '-'.join([app.user.user_ID, app.name, version])
+        service_name_no_v = '-'.join([app.user.user_ID, app.name])
         # faas new in functions dir
         call(['faas-cli', 'new', service_name, '--lang=python3',
               f'--gateway=http://{DOCKER_IP}:8080'],
@@ -78,11 +79,11 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         call(['faas-cli', 'deploy', '-f', f'./{service_name}.yml'],
              cwd=cls.base_func_path)
 
-        user_ID = app.user.user_ID
-        dir_path = os.path.join(APP_DIR, user_ID + '-' + app.name)
+        if version != 'dev':
+            app.app_path = os.path.join(cls.base_func_path, service_name_no_v)
+            app.privacy = 'public'
+            app.versions.append(version)
 
-        app.app_path = dir_path
-        app.privacy = 'public'
         app.status = 'active'
         app.save()
         return app
@@ -95,8 +96,16 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
     #     return app
 
     @staticmethod
-    def load_app_params(app):
-        yml_path = os.path.join(app.app_path, yaml_tail_path)
+    def load_app_params(app, version=''):
+        # TODO remove 'try except' after modules all have versions
+        try:
+            # if no version provided, get the latest
+            if not version:
+                version = app.versions[-1]
+        except:
+            version = ''
+        yml_path = os.path.join('-'.join([app.app_path, version]),
+                                yaml_tail_path)
         with open(yml_path, 'r') as stream:
             obj = yaml.load(stream)
             return {'input': obj.get('input'), 'output': obj.get('output')}

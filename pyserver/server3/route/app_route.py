@@ -45,6 +45,16 @@ def deploy_in_docker(app_id):
     return jsonify({"response": project})
 
 
+@app_app.route("/publish/<app_id>/<version>", methods=["POST"])
+@jwt_required
+def publish_in_docker(app_id, version):
+    data = request.get_json()
+    handler_file_path = data.get('file_path')
+    project = AppService.publish(app_id, handler_file_path, version)
+    project = json_utility.convert_to_json(project.to_mongo())
+    return jsonify({"response": project})
+
+
 @app_app.route("/add_used_module/<app_id>", methods=["PUT"])
 @jwt_required
 def add_used_module(app_id):
@@ -115,7 +125,9 @@ def add():
 def get_app(app_id):
     yml = request.args.get('yml')
     commits = request.args.get('commits')
-    app = AppService.get_by_id(app_id, yml=yml, commits=commits)
+    version = request.args.get('version')
+    app = AppService.get_by_id(app_id, yml=yml, commits=commits,
+                               version=version)
 
     # 将app.user 更换为 user_ID 还是name?
     user_ID = app.user.user_ID
@@ -221,8 +233,10 @@ def run_app(app_id):
     user_ID = get_jwt_identity()
     data = request.get_json()
     input_json = data["app"]["input"]
+    version = data["version"]
     print("input_json", input_json)
-    result = AppService.run_app(app_id, input_json=input_json, user_ID=user_ID)
+    result = AppService.run_app(app_id, input_json=input_json,
+                                user_ID=user_ID, version=version)
     return jsonify({"response": result})
 
 # if __name__ == "__main__":

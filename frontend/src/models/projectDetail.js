@@ -95,6 +95,12 @@ export default {
         },
       }
     },
+    setVersion(state, {version}) {
+      return {
+        ...state,
+        version,
+      }
+    },
     clearProject(state, action) {
       return {
         ...state,
@@ -120,12 +126,13 @@ export default {
 
   },
   effects: {
-    *refresh({ projectId, notStartLab, projectType }, { call, put }) {
+    *refresh({ projectId, notStartLab, projectType, version }, { call, put }) {
       yield put({ type: 'clearProject' })
-      yield put({ type: 'fetch', projectId, projectType })
+      yield put({ type: 'fetch', projectId, projectType, version })
     },
     // 获取该 project
-    *fetch({ projectId, notStartLab, projectType }, { call, put }) {
+    *fetch({ projectId, notStartLab, projectType, version }, { call, put }) {
+
       const fetchMapper = {
         app: fetchApp,
         module: fetchModule,
@@ -133,7 +140,7 @@ export default {
         project: fetchProject,
       }
       // fetch and set project
-      let { data: project } = yield call(fetchMapper[projectType], { projectId })
+      let { data: project } = yield call(fetchMapper[projectType], { projectId, version })
 
       // start lab backend
       const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
@@ -141,7 +148,7 @@ export default {
       if (!notStartLab) {
         yield call(startLab, { hubUserName, hubToken })
         // fetch and set project for tb_port restarted by startLab
-        project = (yield call(fetchMapper[projectType], { projectId })).data
+        project = (yield call(fetchMapper[projectType], { projectId, version })).data
         // yield put({ type: 'setProject', payload: project })
       }
 

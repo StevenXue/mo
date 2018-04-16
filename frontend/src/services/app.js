@@ -7,8 +7,13 @@ const { projects, fork } = api
 const PREFIX = 'apps'
 
 // 获取单个 project
-export function fetchApp({ projectId, onJson }) {
-  return request(`${CORS}/${PREFIX}/${projectId}?yml=true`, undefined, { onJson })
+export function fetchApp({ projectId, version, onJson }) {
+  if (version) {
+    version = version.split('.').join('_');
+    return request(`pyapi/apps/${projectId}?version=${version}&yml=true`, undefined, {onJson})
+  } else {
+    return request(`pyapi/apps/${projectId}?yml=true`, undefined, {onJson})
+  }
 }
 
 export const runApi = async payload => {
@@ -19,6 +24,7 @@ export const runApi = async payload => {
     },
     body: JSON.stringify({
       app: payload.app,
+      version: payload.version.split('.').join('_')
     }),
   })
 }
