@@ -82,10 +82,10 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         if version != 'dev':
             app.app_path = os.path.join(cls.base_func_path, service_name_no_v)
             app.privacy = 'public'
-            app.status = 'active'
             app.versions.append(version)
-            app.save()
 
+        app.status = 'active'
+        app.save()
         return app
 
     # @classmethod

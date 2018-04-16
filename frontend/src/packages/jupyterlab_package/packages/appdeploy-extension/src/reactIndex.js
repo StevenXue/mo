@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Checkbox, Tooltip, Radio, Input, Select} from 'antd'
+import {Checkbox, Tooltip, Radio, Input, Select, Alert} from 'antd'
 import * as pathToRegexp from 'path-to-regexp'
 import * as _ from 'lodash'
 
@@ -51,9 +51,7 @@ export class AppPage extends React.Component {
                         hubUserName,
                         hubToken,
                         onJson: (contents) => {
-                            console.log('fileSelectabaabab')
                             const pyList = contents.content.filter(file => file.path.includes('.py'));
-                            console.log('fileSelect0', document.getElementsByClassName('fileSelect')[0])
                             this.selectPath(_.get(pyList, '[0].path', ''));
                             this.setState({
                                 content: contents.content,
@@ -74,6 +72,8 @@ export class AppPage extends React.Component {
     onCheck(e) {
         if (e.target.checked === true) {
             this.setInitVersionNumber(this.state.project)
+        } else {
+            this.unsetInitVersionNumber()
         }
         this.setState({
             publish: e.target.checked
@@ -83,6 +83,10 @@ export class AppPage extends React.Component {
     setInitVersionNumber(project) {
         const [v1, v2, v3] = this.getInitVersionNumber(project);
         document.getElementsByClassName('versionNumber')[0].value = `${v1}.${v2}.${v3 + 1}`
+    }
+
+    unsetInitVersionNumber() {
+        document.getElementsByClassName('versionNumber')[0].value = '';
     }
 
     getInitVersionNumber(project) {
@@ -131,15 +135,17 @@ export class AppPage extends React.Component {
                         this.state.project.privacy === 'private' &&
                         <Tooltip placement="top"
                                  overlayStyle={{zIndex: 99999}}
-                                 title='Publishing a module means the module will be accessed by others, otherwise, the module can only be accessed and tested by owner (you)'>
+                                 title='Publishing a app means the app will be accessed by others, otherwise, the app can only be accessed and tested by owner (you).'>
                             <Checkbox onChange={(e) => this.onCheck(e)} style={{margin: '10px 0'}}>Publish this
                                 app?</Checkbox>
+                            {this.state.publish && <Alert showIcon message="Once you publish a version of your project, you can never undo it!" type="info" />}
                         </Tooltip>
                     }
                     {
                         (this.state.project.privacy === 'public' || this.state.publish) &&
                         <div style={{margin: '0 0 10px 0'}}>
                             <h3>What version should this be published as?</h3>
+                            {this.state.project.privacy === 'public' && <h4>Current Version: {`${v1}.${v2}.${v3}`}</h4>}
                             <RadioGroup onChange={(e) => this.onVersionChange(e)}
                                         value={this.state.version || `${v1}.${v2}.${v3 + 1}`}>
                                 <Radio key='r1' style={radioStyle}

@@ -29,6 +29,8 @@ from server3.service import kube_service
 from server3.business import staging_data_set_business
 from server3.business import staging_data_business
 from server3.business import served_model_business
+from server3.business.request_answer_business import RequestAnswerBusiness
+from server3.service import message_service
 from server3.business import world_business
 from server3.entity.world import CHANNEL
 
@@ -593,3 +595,29 @@ class ProjectService:
                 'time': datetime.fromtimestamp(c.time[0] + c.time[1]),
             } for c in commits]
         return project
+
+    @classmethod
+    def send_message(cls, project, m_type='publish'):
+        receivers = project.favor_users  # get app subscriber
+        admin_user = user_business.get_by_user_ID('admin')
+
+        # 获取所有包含此module的答案
+        answers_has_module = RequestAnswerBusiness. \
+            get_by_anwser_project_id(project.id)
+        # 根据答案获取对应的 request 的 owner
+        for each_anser in answers_has_module:
+            user_request = each_anser.user_request
+            request_owener = user_request.user
+            message_service.create_message(admin_user, 'publish_request',
+                                           [request_owener],
+                                           project.user,
+                                           project_name=project.name,
+                                           project_id=project.id,
+                                           user_request_title=user_request.title,
+                                           user_request_id=user_request.id,
+                                           project_type=project.type)
+
+        message_service.create_message(admin_user, m_type, receivers,
+                                       project.user, project_name=project.name,
+                                       project_id=project.id,
+                                       project_type=project.type)
