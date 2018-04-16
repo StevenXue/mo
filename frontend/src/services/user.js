@@ -5,6 +5,7 @@ const { CORS } = config
 const prefix = '/user'
 
 export function set_star_favor(payload) {
+  console.log('pay',payload)
   return request(`${CORS}/user/action_entity/${payload.entity_id}`, {
     method: 'put',
     headers: {
@@ -14,7 +15,7 @@ export function set_star_favor(payload) {
       action : payload.action,
       entity : payload.entity
     }),
-  });
+  },);
 }
 
 export function get_star_favor({payload, onJson}) {
