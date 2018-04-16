@@ -49,7 +49,9 @@ def add():
 def get_module(module_id):
     yml = request.args.get('yml')
     commits = request.args.get('commits')
-    app = ModuleService.get_by_id(module_id, yml=yml, commits=commits)
+    version = request.args.get('version')
+    app = ModuleService.get_by_id(module_id, yml=yml, commits=commits,
+                                  version=version)
 
     # 将app.user 更换为 user_ID 还是name?
     user_ID = app.user.user_ID
@@ -97,9 +99,16 @@ def update_module():
         #     data = request.get_json()
 
 
-@module_app.route("/publish/<project_id>", methods=["POST"])
-def publish_module(project_id):
-    project = ModuleService.publish(project_id)
+@module_app.route("/publish/<project_id>/<version>", methods=["POST"])
+def publish_module(project_id, version):
+    project = ModuleService.publish(project_id, version)
+    project = json_utility.convert_to_json(project.to_mongo())
+    return jsonify({"response": project})
+
+
+@module_app.route("/deploy/<project_id>", methods=["POST"])
+def deploy_module(project_id):
+    project = ModuleService.deploy(project_id)
     project = json_utility.convert_to_json(project.to_mongo())
     return jsonify({"response": project})
 

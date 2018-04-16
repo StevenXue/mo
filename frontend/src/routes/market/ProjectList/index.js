@@ -81,7 +81,7 @@ class ProjectList extends Component {
           [key.dashToHump()]: payload[key],
         })
     }
-    console.log('filter', filter)
+    // console.log('filter', filter)
 
     getProjects({
       filter,
@@ -143,7 +143,6 @@ class ProjectList extends Component {
 
   render() {
     const {history, project, dispatch} = this.props
-    console.log(this.state.projects)
     return (
       <div>
         <div className={styles.header}>

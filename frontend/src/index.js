@@ -15,7 +15,6 @@ const app = dva({
   onError(e) {
     console.log("error", e)
     e.preventDefault()
-    // console.log("e222",e）
   }
 })
 

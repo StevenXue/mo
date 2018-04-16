@@ -51,7 +51,9 @@ def add_used_module(app_id):
     data = request.get_json()
     used_modules = data.get('used_modules', [])
     func = data.get('func')
-    app = AppService.add_used_module(app_id, used_modules, func)
+    version = data.get('version')
+    print(app_id)
+    app = AppService.add_used_module(app_id, used_modules, func, version)
     return jsonify({"response": json_utility.convert_to_json(app.to_mongo())})
 
 

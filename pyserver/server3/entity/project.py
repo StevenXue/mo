@@ -59,6 +59,7 @@ class Module(Project):
     input = DictField()
     output = DictField()
     repo_path = StringField()
+    versions = ListField(StringField())
 
 
 RE_TYPE = ('inactive', 'active', 'deploying')

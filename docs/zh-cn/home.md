@@ -1,27 +1,29 @@
-## 关于MO平台
-平台中联结了人工智能应用使用者、需求提出者、数据提供者、关键模组开发者以及应用组装者，集合网页端和移动端，满足不同用户的使用场景，实现了需求提出 - 可复用算法模块开发 - 模块组装 - 应用发布使用的生态链。
-
-Welcome to the MO Developer Center. 
-Here you can find guides showing how to use the MO Clients in the language of python,
-find tutorials for Working with Data, learn how to Write your own App
- or Host your Data Model using frameworks such as Scikit-learn or Tensorflow.
-
 # 平台概览
 
-## 介绍
-1. 各个领域的从业者（非数据科学家或机器学习专家）可以在平台搜索寻找已经公开的app，直接使用或在自己的应用中调用。
-用户还可自己提出需求，请求平台上的机器学习专家去解决这些问题。
-2. 数据科学家伙机器学习专家可以在我们的平台上构建app， 我们提供了自定义jupyter lab 工作环境，
-用户可以直接在环境中调用现成的module进行预测和训练。
-3. 用户良好代码能力的工程师可以在我们的平台构建module, 为数据科学家提供可以预测和训练的模块。我们支持
+平台中联结了人工智能应用使用者、需求提出者、数据提供者、关键模组开发者以及应用组装者，集合网页端和移动端，满足不同用户的使用场景，实现了需求提出 - 可复用算法模块开发 - 模块组装 - 应用发布使用的生态链。
 
-### App
-App是什么，有什么功能
+## 平台中涉及的概念
 
-### Module
-Module是什么，有什么功能
+<font color=#34BFE2>**应用：**</font>人工智能预测模型。满足普通用户的直接使用需求，例如航班延误预测模型。
 
-## 平台特点与优势
+<font color=#34BFE2>**模块：**</font>可复用的算法组件。分为 toolkit 以及 modle 两种，toolkit 为特定的不可训练的函数， modle则是可以训练优化，例如特征提取模块。
+
+<font color=#34BFE2>**数据集：**</font>有一组数据组成的集合。平台支持 jpg 、csv 等格式，多个文件可以以 zip 压缩包的形式
+上传到平台。
+
+## 版块介绍
+
+<font color=#34BFE2>**workspace 工作台**</font>
+
+无论完整的 AI 应用或是封装好的算法模块，都可以跳过繁琐的开发环境搭建，使用我们内嵌的 JupyterLab 直接上手。点击“新建应用”或“新建模块”即可快速开始。
+
+<font color=#34BFE2>**market 发现**</font>
+
+探索学习公开的应用以及模块算法，还有开放的数据集，发现喜欢的项目可以点赞收藏，如果你有优质的资源我们也欢迎你与其他数据爱好者共享。
+
+<font color=#34BFE2>**request 需求**</font>
+
+其他用户提出的需求会在这里分类展示，你可以寻找自己擅长的领域进行回答。如果你有任何需求，点击“发布需求”也会找到合适的帮手来为你解决。
 
 
 # 文档概览

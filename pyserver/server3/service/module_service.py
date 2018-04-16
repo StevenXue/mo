@@ -18,17 +18,31 @@ class ModuleService(ProjectService):
         project = super().get_by_id(project_id, **kwargs)
         if kwargs.get('yml') == 'true' and project.module_path:
             project.args = cls.business.load_module_params(
-                project)
+                project, kwargs.get('version'))
+        project.versions = \
+            ['.'.join(version.split('_')) for version in
+             project.versions]
         return project
 
     @classmethod
-    def publish(cls, project_id):
-        module = cls.business.publish(project_id)
+    def publish(cls, project_id, version):
+        module = cls.business.deploy_or_publish(project_id, version)
+        cls.send_message(module)
+        return module
+
+    @classmethod
+    def deploy(cls, project_id):
+        module = cls.business.deploy_or_publish(project_id)
+        cls.send_message(module)
+        return module
+
+    @classmethod
+    def send_message(cls, module):
         receivers = module.favor_users  # get app subscriber
         admin_user = UserBusiness.get_by_user_ID('admin')
 
         # 获取所有包含此module的答案
-        answers_has_module = cls.requestAnswerBusiness.\
+        answers_has_module = cls.requestAnswerBusiness. \
             get_by_anwser_project_id(module.id)
         # 根据答案获取对应的 request 的 owner
         for each_anser in answers_has_module:
@@ -36,7 +50,8 @@ class ModuleService(ProjectService):
             request_owener = user_request.user
             message_service.create_message(admin_user, 'publish_request',
                                            [request_owener],
-                                           app.user, module_name=module.name,
+                                           module.user,
+                                           module_name=module.name,
                                            module_id=module.id,
                                            user_request_title=user_request.title,
                                            user_request_id=user_request.id)
@@ -44,7 +59,6 @@ class ModuleService(ProjectService):
         message_service.create_message(admin_user, 'publish', receivers,
                                        module.user, module_name=module.name,
                                        module_id=module.id)
-        return module
 
 
 if __name__ == '__main__':

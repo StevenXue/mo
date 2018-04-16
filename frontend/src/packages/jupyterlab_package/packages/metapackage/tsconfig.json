@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "declaration": true,
     "noImplicitAny": false,
     "noEmitOnError": true,
     "noUnusedLocals": true,
@@ -7,7 +8,6 @@
     "moduleResolution": "node",
     "target": "ES5",
     "outDir": "./lib",
-    "allowJs": true,
     "lib": [
       "ES5",
       "ES2015.Core",
@@ -40,6 +40,9 @@
       ],
       "@jupyterlab/commit-extension": [
         "../commit-extension/src"
+      ],
+      "@jupyterlab/modulepublish-extension": [
+        "../modulepublish-extension/src"
       ]
     },
     "jsx": "react",

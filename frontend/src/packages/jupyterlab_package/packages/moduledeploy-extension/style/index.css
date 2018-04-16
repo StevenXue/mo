@@ -1,0 +1,8 @@
+.test-result {
+    border: 1px dashed darkgrey;
+    border-radius: 3px;
+}
+
+.result-line {
+    padding: 5px 8px;
+}
