@@ -537,7 +537,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                       textAlign: 'center',
                       fontSize: '26px',
                       cursor: 'pointer',
-                      color: 'red',
+                      color: 'green',
                     }}>
                       <Icon type="check-circle-o"/>
                     </div>}

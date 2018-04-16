@@ -229,20 +229,20 @@ class RequestAnswerService:
         else:
             raise RuntimeError('Cannot create the new request_answer')
 
-    @classmethod
-    def update_request_answer(cls, request_answer_id, answer):
-        RequestAnswerBusiness.update_request_answer_by_id(
-            request_answer_id=request_answer_id,
-            answer=answer
-        )
+    # @classmethod
+    # def update_request_answer(cls, request_answer_id, answer):
+    #     RequestAnswerBusiness.update_request_answer_by_id(
+    #         request_answer_id=request_answer_id,
+    #         answer=answer
+    #     )
 
-    @classmethod
-    def remove_answer_by_id(cls, request_answer_id, user_ID):
-        return RequestAnswerBusiness.remove_by_id(request_answer_id, user_ID)
+    # @classmethod
+    # def remove_answer_by_id(cls, request_answer_id, user_ID):
+    #     return RequestAnswerBusiness.remove_by_id(request_answer_id, user_ID)
 
-    @classmethod
-    def get_all_answer_of_this_user_request(cls, user_request_id):
-        request_answer = RequestAnswerBusiness.get_by_user_request_id(
-            user_request_id)
-        return request_answer
+    # @classmethod
+    # def get_all_answer_of_this_user_request(cls, user_request_id):
+    #     request_answer = RequestAnswerBusiness.get_by_user_request_id(
+    #         user_request_id)
+    #     return request_answer
 

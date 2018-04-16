@@ -29,7 +29,9 @@ from server3.service.user_service import UserService
 from server3.business.user_business import UserBusiness
 from server3.business.statistics_business import StatisticsBusiness
 from server3.service import request_answer_service
- 
+from server3.service.request_answer_service import RequestAnswerService
+from server3.business.request_answer_business import RequestAnswerBusiness
+
 PREFIX = '/user'
 
 user_app = Blueprint("user_app", __name__, url_prefix=PREFIX)
@@ -298,9 +300,8 @@ def get_action_entity():
             app.user_ID = app.user.user_ID
     else:
         for each_request in apps.objects:
-            each_request.answer_number = \
-                request_answer_service.get_all_answer_of_this_user_request(
-                    each_request.id, get_number=True)
+            each_request.answer_number = RequestAnswerBusiness.\
+                answer_number_of_user_request(each_request.id)
             each_request.user_ID = each_request.user.user_ID
     return jsonify({
         'response': {
@@ -331,11 +332,11 @@ def get_user_statistics():
         user_ID=user_ID, action_entity="favor_apps",
         page_no=1, page_size=1)
     favor_apps_count = apps.count
-
-    total_number = UserRequestBusiness.count()
+    user = UserBusiness.get_by_user_ID(user_ID)
+    requests_count = UserRequestBusiness.request_number_of_this_user(user)
     return jsonify({'response': {
         "favor_apps_count": favor_apps_count,
-        "requests_count": total_number
+        "requests_count": requests_count
     }}), 200
 
 

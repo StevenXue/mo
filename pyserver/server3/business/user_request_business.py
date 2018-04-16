@@ -125,3 +125,9 @@ class UserRequestBusiness(GeneralBusiness):
         return objects.order_by('-create_time')[
                start:end], number_of_objects
 
+    @classmethod
+    def request_number_of_this_user(cls,user):
+        objects = cls.repo.read()
+        objects = objects(user=user)
+        number_of_objects = objects.count()
+        return number_of_objects

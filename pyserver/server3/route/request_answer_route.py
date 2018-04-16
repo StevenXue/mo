@@ -102,7 +102,8 @@ def update_request_answer():
         return jsonify({'response': 'insufficient arguments'}), 400
     data = request.get_json()
     answer = data['answer']
-    RequestAnswerService.update_request_answer(request_answer_id, answer)
+    RequestAnswerBusiness.update_request_answer_by_id(request_answer_id,
+                                                      answer=answer)
     return jsonify({'response': 'update request_answer success'}), 200
 
 
@@ -111,7 +112,7 @@ def update_request_answer():
 def remove_request_answer():
     user_ID = get_jwt_identity()
     request_answer_id = request.args.get('request_answer_id')
-    result = RequestAnswerService.remove_answer_by_id(
+    result = RequestAnswerBusiness.remove_by_id(
         request_answer_id, user_ID)
     return jsonify({'response': result}), 200
 
