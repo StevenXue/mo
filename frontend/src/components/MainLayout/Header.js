@@ -145,17 +145,17 @@ function Header({location, login, history, dispatch, allRequest,message}) {
   const switchMessage = (e) => {
     switch(e.message_type) {
       case 'answer':
-        return <p>{e.user_ID} 回答了您关注的需求  {e.user_request_title}</p>
+        return <p className={styles.messageP} >{`${e.user_ID}回答了您关注的需求${e.user_request_title}`}</p>
       case 'commit':
-        return <p>{e.user_ID} 更新了您关注的需求  {e.user_request_title} 的答案</p>
+        return <p className={styles.messageP} >{e.user_ID} 更新了您关注的需求  {e.user_request_title} 的答案</p>
       case 'deploy':
-        return <p>{e.user_ID} 上线了您关注的应用  {e.app_name}</p>
+        return <p className={styles.messageP} >{e.user_ID} 上线了您关注的应用  {e.app_name}</p>
       case 'publish':
-        return <p>{e.user_ID} 发布了您关注的模块  {e.module_name}</p>
+        return <p className={styles.messageP} >{e.user_ID} 发布了您关注的模块  {e.module_name}</p>
       case 'deploy_request':
-        return <p>{e.user_ID} 为您的答案{e.user_request_title}上线了应用  {e.app_name}</p>
+        return <p className={styles.messageP} >{e.user_ID} 为您的答案{e.user_request_title}上线了应用  {e.app_name}</p>
       case 'publish_request':
-        return <p>{e.user_ID} 为您的答案{e.user_request_title}发布了模块  {e.module_name}</p>
+        return <p className={styles.messageP} >{e.user_ID} 为您的答案{e.user_request_title}发布了模块  {e.module_name}</p>
     }
   }
 
@@ -248,15 +248,24 @@ function Header({location, login, history, dispatch, allRequest,message}) {
               </span>
           }
         >
-          {login.user && JsonToArray(message.messages).map(e =>
-            <Menu.Item key={e._id} className={styles.messageMenuItem}
-                       style={e.is_read === false?{backgroundColor: '#f0f2f5',color:'black'}:{color:'black'}}>
-              <div onClick={() => toMessage(e)}>
-                {switchMessage(e)}
-              </div>
-            </Menu.Item>
-          )
-          }
+          <Menu.Item style={{color:'black',height:'250px',overflowY: 'auto'}}>
+            {login.user && JsonToArray(message.messages).map(e =>
+              <div onClick={() => toMessage(e) }
+                style={e.is_read === false?{margin:'0 -20px',backgroundColor: '#f0f2f5',color:'black'}:{margin:'0 -20px',color:'black'}}>
+              {switchMessage(e)}</div>)}
+          </Menu.Item>
+          <Menu.Item style={{color:'black'}}>
+            <div><div><Icon type="setting" />设置</div><div>查看全部提醒</div></div>
+          </Menu.Item>
+          {/*{login.user && JsonToArray(message.messages).map(e =>*/}
+            {/*<Menu.Item key={e._id} className={styles.messageMenuItem}*/}
+                       {/*style={e.is_read === false?{backgroundColor: '#f0f2f5',color:'black'}:{color:'black'}}>*/}
+              {/*<div onClick={() => toMessage(e)}>*/}
+                {/*{switchMessage(e)}*/}
+              {/*</div>*/}
+            {/*</Menu.Item>*/}
+          {/*)*/}
+          {/*}*/}
         </SubMenu>
       </Menu>
     </div>
