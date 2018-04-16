@@ -45,7 +45,7 @@ user_app = Blueprint("user_app", __name__, url_prefix=PREFIX)
 @user_app.route('/send_verification_code/<phone>', methods=['get'])
 def send_verification_code(phone):
     try:
-        user_service.send_verification_code(phone)
+        user_service.send_vewrification_code(phone)
         return jsonify({
             "response": "success"
         }), 200
