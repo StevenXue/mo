@@ -307,7 +307,7 @@ def send_verification_code(phone):
     url = "https://api.sms.jpush.cn/v1/codes"
     payload = json.dumps({
         'mobile': phone,
-        'temp_id': 1,
+        'temp_id': 149269,
     })
     headers = {
         'content-type': "application/json",
