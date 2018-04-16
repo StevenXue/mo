@@ -1,0 +1,9 @@
+provider:
+  name: faas
+  gateway: http://127.0.0.1:8080
+
+functions:
+  zhaofengli-devtest2-dev:
+    lang: python3
+    handler: ./zhaofengli-devtest2-dev
+    image: zhaofengli-devtest2-dev

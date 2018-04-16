@@ -1,0 +1,9 @@
+provider:
+  name: faas
+  gateway: http://127.0.0.1:8080
+
+functions:
+  zhaofengli-new_app:
+    lang: python3
+    handler: ./zhaofengli-new_app
+    image: zhaofengli-new_app
