@@ -38,6 +38,7 @@ class Project(DynamicDocument):
     related_fields = ListField(StringField(max_length=100))
     user_name = StringField(max_length=50)
     results = ListField(ReferenceField('Result', reverse_delete_rule=PULL))
+    versions = ListField(StringField())
 
     meta = {
         'allow_inheritance': True,
@@ -59,7 +60,6 @@ class Module(Project):
     input = DictField()
     output = DictField()
     repo_path = StringField()
-    versions = ListField(StringField())
 
 
 RE_TYPE = ('inactive', 'active', 'deploying')

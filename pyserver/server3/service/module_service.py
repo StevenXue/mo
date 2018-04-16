@@ -27,17 +27,17 @@ class ModuleService(ProjectService):
     @classmethod
     def publish(cls, project_id, version):
         module = cls.business.deploy_or_publish(project_id, version)
-        cls.send_message(module)
+        cls.send_message(module, m_type='publish')
         return module
 
     @classmethod
     def deploy(cls, project_id):
         module = cls.business.deploy_or_publish(project_id)
-        cls.send_message(module)
+        cls.send_message(module, m_type='deploy')
         return module
 
     @classmethod
-    def send_message(cls, module):
+    def send_message(cls, module, m_type='deploy'):
         receivers = module.favor_users  # get app subscriber
         admin_user = user_business.get_by_user_ID('admin')
 
@@ -56,7 +56,7 @@ class ModuleService(ProjectService):
                                            user_request_title=user_request.title,
                                            user_request_id=user_request.id)
 
-        message_service.create_message(admin_user, 'publish', receivers,
+        message_service.create_message(admin_user, m_type, receivers,
                                        module.user, module_name=module.name,
                                        module_id=module.id)
 

@@ -98,7 +98,7 @@ export class ModulePage extends React.Component {
     onVersionChange = (e) => {
         console.log('radio checked', e.target.value);
         this.setState({
-            value: e.target.value,
+            version: e.target.value,
         });
         document.getElementsByClassName('versionNumber')[0].value = e.target.value
     }
@@ -119,13 +119,12 @@ export class ModulePage extends React.Component {
             const [v1, v2, v3] = this.getInitVersionNumber(this.state.project);
             return (
                 <div style={{minHeight: 100, overflowY: 'auto'}}>
-                    <input style={{display: 'none'}} className='testingState'/>
-                    <input style={{display: 'none'}} className='versionNumber'/>
                     <h3>{this.state.project.name}</h3>
                     <p>{this.state.project.description}</p>
                     {
                         this.state.project.privacy === 'private' &&
                         <Tooltip placement="top"
+                                 overlayStyle={{zIndex: 99999}}
                                  title='Publishing a module means the module will be accessed by others, otherwise, the module can only be accessed and tested by owner (you)'>
                             <Checkbox onChange={(e) => this.onCheck(e)} style={{margin: '10px 0'}}>Publish this
                                 module?</Checkbox>

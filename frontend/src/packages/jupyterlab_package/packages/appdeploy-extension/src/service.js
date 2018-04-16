@@ -46,8 +46,17 @@ export function getMyProjects({ filter }) {
 }
 
 // 获取单个 project
-export function fetchProject({ projectId, onJson }) {
-  return request(path.join('/pyapi', PREFIX, 'projects', projectId), undefined, { onJson })
+// export function fetchProject({ projectId, onJson }) {
+//   return request(path.join('/pyapi', PREFIX, 'projects', projectId), undefined, { onJson })
+// }
+
+export function getApp({projectId, version, onJson}) {
+    if (version) {
+        version = version.split('.').join('_');
+        return request(`pyapi/apps/${projectId}?version=${version}&yml=true`, undefined, {onJson})
+    } else {
+        return request(`pyapi/apps/${projectId}?yml=true`, undefined, {onJson})
+    }
 }
 
 export function deploy({ projectId, filePath, onJson }) {
@@ -58,6 +67,17 @@ export function deploy({ projectId, filePath, onJson }) {
     },
     body: JSON.stringify({file_path: filePath}),
   }, { onJson })
+}
+
+export function publish({ projectId, filePath, version, onJson }) {
+    version = version.split('.').join('_');
+    return request(path.join('/pyapi', 'apps', 'publish', projectId, version), {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({file_path: filePath}),
+    }, { onJson })
 }
 
 export function getContents({ hubUserName, hubToken, onJson }) {

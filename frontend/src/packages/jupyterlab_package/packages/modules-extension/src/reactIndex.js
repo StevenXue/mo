@@ -191,11 +191,11 @@ export class ModulePage extends React.Component {
                         </header>
                         <div>
                             Version:&nbsp;&nbsp;
-                        <Select defaultValue={this.state.version} style={{width: 120}}
-                                onChange={(value) => this.handleVersionChange(value)}>
-                            {this.state.project.versions.map(version =>
-                                <Option key={version} value={version}>{version}</Option>)}
-                        </Select>
+                            <Select defaultValue={this.state.version} style={{width: 120}}
+                                    onChange={(value) => this.handleVersionChange(value)}>
+                                {this.state.project.versions.map(version =>
+                                    <Option key={version} value={version}>{version}</Option>)}
+                            </Select>
                         </div>
                         <div style={{height: 'auto', overflowY: 'auto'}}>
                             {this.renderParameters()}

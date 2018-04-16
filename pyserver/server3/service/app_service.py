@@ -28,7 +28,7 @@ class AppService(ProjectService):
         return AppBusiness.add_used_module(app_id, used_modules, func)
 
     @classmethod
-    def run_app(cls, app_id, input_json, user_ID):
+    def run_app(cls, app_id, input_json, user_ID, version):
         """
 
         :param app_id: app id
@@ -41,7 +41,7 @@ class AppService(ProjectService):
         :rtype:
         """
         app = AppBusiness.get_by_id(project_id=app_id)
-        url = app.user.user_ID + "-" + app.name
+        url = '-'.join([app.user.user_ID, app.name, version])
         domin = f"http://{DOCKER_IP}:8080/function/"
         url = domin + url
         payload = json.dumps(input_json)
@@ -78,16 +78,34 @@ class AppService(ProjectService):
     def get_by_id(cls, project_id, **kwargs):
         project = super().get_by_id(project_id, **kwargs)
         if kwargs.get('yml') == 'true' and project.app_path:
-            project.args = cls.business.load_app_params(project)
+            project.args = cls.business.load_app_params(project,
+                                                        kwargs.get('version'))
+        project.versions = \
+            ['.'.join(version.split('_')) for version in
+             project.versions]
         return project
 
     @classmethod
-    def deploy(cls, app_id, handler_file_path):
-        app = cls.business.deploy(app_id, handler_file_path)
+    def publish(cls, project_id, handler_file_path, version):
+        module = cls.business.deploy_or_publish(project_id,
+                                                handler_file_path, version)
+        cls.send_message(module, m_type='publish')
+        return module
+
+    @classmethod
+    def deploy(cls, project_id, handler_file_path):
+        module = cls.business.deploy_or_publish(project_id,
+                                                handler_file_path)
+        cls.send_message(module, m_type='deploy')
+        return module
+
+    @classmethod
+    def send_message(cls, app, m_type='deploy'):
         receivers = app.favor_users  # get app subscriber
         admin_user = user_business.get_by_user_ID('admin')
         # 获取所有包含此app的答案
-        answers_has_app = cls.requestAnswerBusiness.get_by_anwser_project_id(app.id)
+        answers_has_app = cls.requestAnswerBusiness.get_by_anwser_project_id(
+            app.id)
         # 根据答案获取对应的 request 的 owner
         for each_anser in answers_has_app:
             user_request = each_anser.user_request
@@ -98,12 +116,10 @@ class AppService(ProjectService):
                                            app_id=app.id,
                                            user_request_title=user_request.title,
                                            user_request_id=user_request.id)
-        message_service.create_message(admin_user, 'deploy', receivers,
+        message_service.create_message(admin_user, m_type, receivers,
                                        app.user, app_name=app.name,
                                        app_id=app.id)
 
-
-        return app
 
 # @classmethod
 # def add_used_app(cls, user_ID, app_id):

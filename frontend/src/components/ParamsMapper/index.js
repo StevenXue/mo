@@ -216,7 +216,7 @@ const formItems = (arg, i, getFieldDecorator, baseArg, setFieldsValue) => {
   </FormItem>
 }
 
-const handleSubmit = (e, validateFieldsAndScroll, appId, dispatch) => {
+const handleSubmit = (e, validateFieldsAndScroll, appId, dispatch, version) => {
 
   e.preventDefault()
   validateFieldsAndScroll((err, values) => {
@@ -224,6 +224,7 @@ const handleSubmit = (e, validateFieldsAndScroll, appId, dispatch) => {
       console.log('Received values of form: ', values)
       let payload = { 'app': { 'input': values } }
       payload['app_id'] = appId
+      payload.version = version
       dispatch({ type: 'projectDetail/get_example_result', payload: payload })
     }
   })
@@ -328,14 +329,14 @@ class Demo extends React.Component {
 }
 
 function ParamsMapper({
-                        args, layerIndex, baseArgs, appId, dispatch,
+                        args, layerIndex, baseArgs, appId, dispatch, version,
                         form: { getFieldDecorator, validateFieldsAndScroll, setFieldsValue },
                       }) {
 
   return (
     <Form layout='horizontal' className={styles.form}
           key={`params-form-${layerIndex}`}
-          onSubmit={(value) => handleSubmit(value, validateFieldsAndScroll, appId, dispatch)}
+          onSubmit={(value) => handleSubmit(value, validateFieldsAndScroll, appId, dispatch, version)}
     >
       {
         args.map((arg, i) => {
