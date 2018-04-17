@@ -1,9 +1,0 @@
-provider:
-  name: faas
-  gateway: http://127.0.0.1:8080
-
-functions:
-  zhaofengli-saxe-0_0_2:
-    lang: python3
-    handler: ./zhaofengli-saxe-0_0_2
-    image: zhaofengli-saxe-0_0_2
