@@ -92,7 +92,7 @@ class AppService(ProjectService):
     def deploy(cls, project_id, handler_file_path):
         module = cls.business.deploy_or_publish(project_id,
                                                 handler_file_path)
-        # cls.send_message(module, m_type='deploy')
+        cls.send_message(module, m_type='deploy')
         return module
 
 

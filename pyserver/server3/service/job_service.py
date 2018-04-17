@@ -763,37 +763,6 @@ def save_result_sub(result, sds_id, toolkit_obj):
                 print("ERRORS in data saved to database")
 
 
-def deploy_in_faas(app_id):
-    name = 'flight_predict_service2'
-    base_func_path = './functions'
-    modules = ['zhaofengli/flight_delay_prediction', 'zhaofengli/weather_prediction']
-    handler_path = os.path.join(user_directory, user_ID, path.replace('work/',
-                                                                      ''))
-    # faas new in functions dir
-    call(['faas-cli', 'new', name, '--lang=python3'], cwd=base_func_path)
-    # target path = new path
-    func_path = os.path.join(base_func_path, name)
-    module_dir_path = os.path.join(func_path, 'modules')
-    # copy handler.py
-    shutil.copy(handler_path, func_path)
-    # copy modules
-    for module in modules:
-        [owner_ID, module_name] = module.split('/')
-        module_path = os.path.join(MODULE_DIR, module)
-        module_path_target = os.path.join(module_dir_path, module)
-        try:
-            os.makedirs(os.path.join(module_dir_path, owner_ID))
-        except FileExistsError:
-            print('dir exists, no need to create')
-        # copy module tree to target path
-        shutil.copytree(module_path, module_path_target)
-    # deploy
-    call(['faas-cli', 'build', '-f', './{name}.yml'.format(name=name)],
-          cwd=base_func_path)
-    call(['faas-cli', 'deploy', '-f', './{name}.yml'.format(name=name)],
-          cwd=base_func_path)
-
-
 
 # def get_index_nan(fields, staging_data_set_id):
 #     """

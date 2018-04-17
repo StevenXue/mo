@@ -31,7 +31,7 @@ class ModuleService(ProjectService):
     @classmethod
     def deploy(cls, project_id):
         module = cls.business.deploy_or_publish(project_id)
-        # cls.send_message(module, m_type='deploy')
+        cls.send_message(module, m_type='deploy')
         return module
 
 

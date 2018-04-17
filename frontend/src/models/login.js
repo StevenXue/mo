@@ -270,9 +270,11 @@ export default {
           })
 
           socket.on('notification', (msg) => {
-            dispatch({ type: 'message/updateNewMessage', payload: { msg } })
+            if (msg.message.message_type !== 'deploy') {
+              dispatch({ type: 'message/updateNewMessage', payload: { msg } })
+            }
             console.log('msg', msg)
-            if (msg.message.message_type === 'deploy') {
+            if (msg.message.message_type === 'deploy' || 'publish') {
               const match = pathToRegexp('/workspace/:projectId/:type?').exec(pathname)
               if (match) {
                 const projectId = match[1]

@@ -39,6 +39,8 @@ INIT_RES = [
     r"client = Client\('(.+)'\)",
     r"from modules import (.+)",
     r"(\S+) = client\.(\S+)",
+    r"# append work_path to head when you want to reference a path inside the working directory",
+    r"work_path = ''",
 ]
 PARAMETER_SPEC = [
     {

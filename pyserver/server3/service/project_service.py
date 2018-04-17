@@ -22,6 +22,7 @@ from server3.business import job_business
 from server3.business.user_business import UserBusiness
 from server3.business import ownership_business
 from server3.service import ownership_service
+from server3.service import logger_service
 from server3.service import staging_data_service
 from server3.service import kube_service
 from server3.business import staging_data_set_business
@@ -495,6 +496,12 @@ class ProjectService:
     def send_message(cls, project, m_type='publish'):
         receivers = project.favor_users  # get app subscriber
         admin_user = UserBusiness.get_by_user_ID('admin')
+
+        if m_type == 'deploy':
+            logger_service.emit_anything_notification(
+                {'message': {'message_type': m_type}},
+                project.user)
+            return
 
         # 获取所有包含此module的答案
         answers_has_module = RequestAnswerBusiness. \
