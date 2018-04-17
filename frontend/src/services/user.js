@@ -14,7 +14,7 @@ export function set_star_favor(payload) {
       action : payload.action,
       entity : payload.entity
     }),
-  });
+  },);
 }
 
 export function get_star_favor({payload, onJson}) {
