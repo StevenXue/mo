@@ -96,6 +96,9 @@ class CommentForm extends React.Component {
             />,
           )}
         </FormItem>
+        <FormItem>
+          <Button type="primary">确定</Button>
+        </FormItem>
       </Form>
     )
   }
