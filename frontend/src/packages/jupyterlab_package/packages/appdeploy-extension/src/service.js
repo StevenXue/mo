@@ -81,7 +81,7 @@ export function publish({ projectId, filePath, version, onJson }) {
 }
 
 export function getContents({ hubUserName, hubToken, onJson }) {
-  return request(`/hub_api/user/${hubUserName}/api/contents/work?content=1&${(new Date()).getTime()}`, {
+  return request(`/hub_api/user/${hubUserName}/api/contents/?content=1&${(new Date()).getTime()}`, {
     method: 'get',
     headers: {
       'Authorization': `token ${hubToken}`,

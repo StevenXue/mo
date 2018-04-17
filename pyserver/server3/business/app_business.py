@@ -1,7 +1,9 @@
 # -*- coding: UTF-8 -*-
 import os
+import re
 import yaml
 import shutil
+import fileinput
 from copy import deepcopy
 from subprocess import call
 import synonyms
@@ -56,9 +58,13 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
 
         # rename py to handler.py
         handler_file_path = handler_file_path.replace('work', func_path)
+        handler_file_path = os.path.join(func_path, handler_file_path)
         handler_file_name = handler_file_path.split('/')[-1]
-        shutil.move(handler_file_path, handler_file_path.replace(
-            handler_file_name, 'handler.py'))
+        handler_dst_path = handler_file_path.replace(handler_file_name, 'handler.py')
+        shutil.copy(handler_file_path, handler_dst_path)
+
+        # change some configurable variable to deploy required
+        cls.modify_handler_py(handler_dst_path)
 
         # copy modules
         for module in modules:
@@ -72,13 +78,14 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
             # copy module tree to target path
             print(module_path, module_path_target)
             cls.copytree(module_path, module_path_target)
-        print('finish copy')
+
         # deploy
         call(['faas-cli', 'build', '-f', f'./{service_name}.yml'],
              cwd=cls.base_func_path)
         call(['faas-cli', 'deploy', '-f', f'./{service_name}.yml'],
              cwd=cls.base_func_path)
 
+        # when not dev(publish), change the privacy etc
         if version != 'dev':
             app.app_path = os.path.join(cls.base_func_path, service_name_no_v)
             app.privacy = 'public'
@@ -88,12 +95,13 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         app.save()
         return app
 
-    # @classmethod
-    # def get_by_id(cls, project_id, yml=False):
-    #     app = ProjectBusiness.get_by_id(project_id)
-    #     if yml and app.app_path:
-    #         app.args = cls.load_app_params(app)
-    #     return app
+    @staticmethod
+    def modify_handler_py(py_path):
+        for line in fileinput.input(files=py_path, inplace=1):
+            line = re.sub(r"""work_path = ''""",
+                          r"""work_path = 'function/'""",
+                          line.rstrip())
+            print(line)
 
     @staticmethod
     def load_app_params(app, version=''):

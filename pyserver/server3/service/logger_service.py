@@ -181,6 +181,13 @@ def emit_notification(message, created_receivers):
              })
         socketio.emit('notification', msg,
                       namespace='/log/%s' % receiver_user.user_ID)
+
+
+def emit_anything_notification(message, user):
+    socketio.emit('notification', message,
+                  namespace='/log/%s' % user.user_ID)
+
+
 # if __name__ == '__main__':
 #     emit_log(1, {'loss': 0.3}, {'id': '11'})
 

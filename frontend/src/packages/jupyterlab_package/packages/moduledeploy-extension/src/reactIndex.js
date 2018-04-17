@@ -115,7 +115,7 @@ export class ModulePage extends React.Component {
             height: '30px',
             lineHeight: '30px',
         };
-        let color, alertType;
+        let alertType;
         if (this.state.testResult[0] === 'All test passed') {
             alertType = 'success'
         } else {
@@ -134,7 +134,9 @@ export class ModulePage extends React.Component {
                                  title='Publishing a module means the module will be accessed by others, otherwise, the module can only be accessed and tested by owner (you)'>
                             <Checkbox onChange={(e) => this.onCheck(e)} style={{margin: '10px 0'}}>Publish this
                                 module?</Checkbox>
-                            {this.state.publish && <Alert showIcon message="Once you publish a version of your project, you can never undo it!" type="info" />}
+                            {this.state.publish &&
+                            <Alert showIcon message="Once you publish a version of your project, you can never undo it!"
+                                   type="info"/>}
                         </Tooltip>
                     }
                     {
@@ -157,14 +159,14 @@ export class ModulePage extends React.Component {
                     }
                     {
                         this.state.testResult.length === 0 ?
-                            <Spin spinning={true} tip="Running test cases..." style={{width: '100%'}}/> :
-                            <div>
+                            <Spin spinning={true} tip="Running test cases..." style={{width: '100%'}}/>
+                            : <div>
                                 <h3>Testing Result:</h3>
                                 <div className='test-result'>
                                     {this.state.testResult.map(e =>
                                         <Alert key={e} message={<div style={{whiteSpace: 'pre-line'}}>{e}</div>}
                                                type={alertType} showIcon
-                                        style={{margin: 5}}/>
+                                               style={{margin: 5}}/>
                                     )}
                                 </div>
                             </div>

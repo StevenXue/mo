@@ -413,10 +413,11 @@ class ProjectBusiness:
                     line = re.sub(r"""from modules import (.+)""",
                                   r"""from function.modules import \1""",
                                   line.rstrip())
+
                     # add handle function
                     line = re.sub(
-                        r"predict = client\.predict",
-                        r"predict = client.predict\n\n"
+                        r"work_path = ''",
+                        r"work_path = ''\n\n"
                         r"def handle(conf):\n"
                         r"\t# paste your code here",
                         line.rstrip())
