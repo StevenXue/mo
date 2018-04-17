@@ -324,7 +324,7 @@ def get_project_playground(project_id):
 def commit(project_id):
     data = request.get_json()
     commit_msg = data.get('commit_msg')
-    ProjectBusiness.commit(project_id, commit_msg)
+    ProjectService.commit(project_id, commit_msg)
     return jsonify({"response": 1})
 
 

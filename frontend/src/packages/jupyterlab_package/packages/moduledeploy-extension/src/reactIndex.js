@@ -117,10 +117,8 @@ export class ModulePage extends React.Component {
         };
         let color, alertType;
         if (this.state.testResult[0] === 'All test passed') {
-            color = 'green'
             alertType = 'success'
         } else {
-            color = 'red'
             alertType = 'error'
         }
         if (this.state.project !== undefined) {
