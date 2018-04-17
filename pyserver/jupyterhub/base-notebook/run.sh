@@ -11,5 +11,5 @@ source /usr/local/bin/virtualenvwrapper.sh
 #mktmpenv
 #toggleglobalsitepackages
 pipenv run tensorboard --logdir=$WORK/logs --host=0.0.0.0 &
-pipenv run jupyter labhub --ip=0.0.0.0 --NotebookApp.allow_origin=* --NotebookApp.token=''
+pipenv run jupyter labhub --ip=0.0.0.0 --NotebookApp.allow_origin=* --NotebookApp.token='' --NotebookApp.notebook_dir='/home/jovyan/work'
 #python3 -m http.server 8888

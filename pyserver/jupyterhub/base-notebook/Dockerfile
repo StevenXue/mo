@@ -246,18 +246,17 @@ USER $NB_UID
 # Install Tensorflow
 RUN pipenv install \
     'tensorflow==1.3.*' \
-    'keras==2.0.*' && 
+    'keras==2.0.*' && \
     fix-permissions $LOCAL_DIR && \
     fix-permissions /home/$NB_USER
 
 ### my notebook
 
-USER root
-RUN apt-get update && apt-get install -yq python-opencv
-
 USER $NB_UID
 
+RUN cat Pipfile
 RUN pipenv install tensorflow==1.6.* keras==2.1.* notebook==5.4.*
+RUN pipenv install opencv-python
 #RUN pipenv install jupyterlab==0.31.0
 #RUN pipenv run jupyter serverextension enable --py jupyterlab --sys-prefix
 
