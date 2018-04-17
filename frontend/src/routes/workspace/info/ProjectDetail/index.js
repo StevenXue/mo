@@ -402,6 +402,9 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
                   {projectDetail.project.args ? <ProjectExample projectDetail={projectDetail}
                                                                 dispatch={dispatch}/> : null}
                 </TabPane> : null}
+                <TabPane tab="Comments" key="4">
+                  
+                </TabPane>
               </Tabs>
             </div>
           )

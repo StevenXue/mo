@@ -86,7 +86,7 @@ class EditForm extends React.Component {
   onClick = () => {
     this.setState({status: 'edit'})
     this.state.input.focus()
-}
+  }
 
   render() {
     const {getFieldDecorator, getFieldsError, getFieldError, isFieldTouched} = this.props.form
