@@ -55,13 +55,15 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         func_path = os.path.join(cls.base_func_path, service_name)
         module_dir_path = os.path.join(func_path, 'modules')
 
-        cls.copytree(app.path, func_path)
+        cls.copytree_wrapper(app.path, func_path,
+                             ignore=shutil.ignore_patterns('.git'))
 
         # rename py to handler.py
         handler_file_path = handler_file_path.replace('work', func_path)
         handler_file_path = os.path.join(func_path, handler_file_path)
         handler_file_name = handler_file_path.split('/')[-1]
-        handler_dst_path = handler_file_path.replace(handler_file_name, 'handler.py')
+        handler_dst_path = handler_file_path.replace(handler_file_name,
+                                                     'handler.py')
         shutil.copy(handler_file_path, handler_dst_path)
 
         # change some configurable variable to deploy required
@@ -78,7 +80,8 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
                 print('dir exists, no need to create')
             # copy module tree to target path
             print(module_path, module_path_target)
-            cls.copytree(module_path, module_path_target)
+            cls.copytree_wrapper(module_path, module_path_target,
+                                 ignore=shutil.ignore_patterns('.git'))
 
         # deploy
         call(['faas-cli', 'build', '-f', f'./{service_name}.yml'],

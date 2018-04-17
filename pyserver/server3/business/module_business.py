@@ -30,6 +30,7 @@ cat_dict = {
         'https://github.com/momodel/cookiecutter-python-toolkit.git'
 }
 
+
 # def add(name, user, **kwargs):
 #     try:
 #         module_path = kwargs.pop("module_path")
@@ -100,6 +101,7 @@ class ModuleBusiness(ProjectBusiness):
             })
 
         # copy temp project to project dir and remove temp dir
+        # need to keep .git, cannot use cls.copytree_wrapper
         copy_tree(os.path.join(temp_path, name), project_path)
         remove_tree(temp_path)
 
@@ -156,11 +158,8 @@ class ModuleBusiness(ProjectBusiness):
         module.module_path = os.path.join(MODULE_DIR, module.user.user_ID,
                                           module.name)
         dst = os.path.join(module.module_path, version)
-        # if dir exists, remove it and copytree, cause copytree will
-        #  create the dir
-        if os.path.exists(dst):
-            shutil.rmtree(dst)
-        shutil.copytree(module.path, dst)
+        cls.copytree_wrapper(module.path, dst,
+                             ignore=shutil.ignore_patterns('.git'))
         # WORKON_HOME=./ pipenv install vv
         subprocess.call(['bash', 'install_venv.sh', os.path.abspath(dst)])
 
@@ -180,4 +179,3 @@ class ModuleBusiness(ProjectBusiness):
                                        project.user.user_ID, project.category)
         failures = [f[1] for f in result.failures]
         return failures
-
