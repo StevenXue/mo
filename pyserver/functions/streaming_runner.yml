@@ -1,0 +1,9 @@
+provider:
+  name: faas
+  gateway: http://localhost:8080
+
+functions:
+  streaming_runner:
+    lang: go
+    handler: ./streaming_runner
+    image: streaming_runner

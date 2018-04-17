@@ -1,0 +1,9 @@
+provider:
+  name: faas
+  gateway: http://localhost:8080
+
+functions:
+  flight_predict_service:
+    lang: python3
+    handler: ./flight_predict_service
+    image: flight_predict_service

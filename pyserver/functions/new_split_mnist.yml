@@ -1,0 +1,9 @@
+provider:
+  name: faas
+  gateway: http://localhost:8080
+
+functions:
+  new_split_mnist:
+    lang: python3
+    handler: ./new_split_mnist
+    image: new_split_mnist
