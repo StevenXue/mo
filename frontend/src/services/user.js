@@ -4,7 +4,7 @@ import {formatParam} from '../utils'
 const { CORS } = config
 const prefix = '/user'
 
-export function set_star_favor(payload) {
+export function setStarFavor(payload) {
   return request(`${CORS}/user/action_entity/${payload.entity_id}`, {
     method: 'put',
     headers: {
@@ -17,7 +17,7 @@ export function set_star_favor(payload) {
   },);
 }
 
-export function get_star_favor({payload, onJson}) {
+export function getStarFavor({payload, onJson}) {
   let params = ''
   for (let key in payload) {
     if (!payload.hasOwnProperty(key)) {

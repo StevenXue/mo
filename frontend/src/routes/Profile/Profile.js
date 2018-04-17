@@ -28,7 +28,7 @@ import  {avatarList} from  '../../constants'
 
 import styles from './index.less'
 import {fetchAllUserRequest} from "../../services/userRequest"
-import {get_star_favor} from "../../services/user"
+import {getStarFavor} from "../../services/user"
 import {fetchUserRequestAnswerByUserID} from "../../services/userRequestAnwser"
 import {showTime} from "../../utils"
 import {routerRedux} from "dva/router"
@@ -182,7 +182,7 @@ class MyFavouriteList extends Component {
       payload['action_entity'] = 'favor_'.concat(this.state.type).concat('s')
     }
 
-    get_star_favor({
+    getStarFavor({
       payload,
       onJson: ({objects: objects, count: totalNumber}) => {
         this.setState({

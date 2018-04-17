@@ -247,9 +247,9 @@ export default {
       yield put(routerRedux.replace(url0))
     },
 
-    *star_favor(action, { call, put, select }) {
+    *starFavor(action, { call, put, select }) {
       let payload = action.payload
-      const { data: { entity: project } } = yield call(UserStarFavorService.set_star_favor, payload)
+      const { data: { entity: project } } = yield call(UserStarFavorService.setStarFavor, payload)
       // console.log('ppp',project)
       yield put({
         type: 'updateStarFavor',

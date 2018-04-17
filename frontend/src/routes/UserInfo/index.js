@@ -29,7 +29,7 @@ import {avatarList} from '../../constants'
 
 import styles from './index.less'
 import {fetchAllUserRequest} from "../../services/userRequest"
-import {get_star_favor} from "../../services/user"
+import {getStarFavor} from "../../services/user"
 import {fetchUserRequestAnswerByUserID} from "../../services/userRequestAnwser"
 import {showTime} from "../../utils"
 import {routerRedux} from "dva/router"
