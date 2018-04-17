@@ -14,6 +14,7 @@ import shutil
 import re
 import fileinput
 import requests
+import collections
 from copy import deepcopy
 from datetime import datetime
 from distutils.dir_util import copy_tree
@@ -25,6 +26,7 @@ from flask_socketio import SocketIO
 from eventlet import spawn_n
 
 from server3.entity.project import Project
+from server3.entity.project import Commit
 # from server3.repository import job_repo
 from server3.repository.project_repo import ProjectRepo
 from server3.business.user_business import UserBusiness
@@ -37,7 +39,7 @@ from server3.constants import GIT_LOCAL
 from server3.constants import INIT_RES
 from server3.constants import REDIS_SERVER
 from server3.business.request_answer_business import RequestAnswerBusiness
-
+from server3.constants import GIT_SERVER_IP
 
 socketio = SocketIO(message_queue=REDIS_SERVER)
 
@@ -46,8 +48,8 @@ PAGE_SIZE = 5
 
 project_repo = ProjectRepo(Project)
 
-
 # Objects = collections.namedtuple('Objects', ('objects', 'count', 'page_no', 'page_size'))
+CommitObj = collections.namedtuple('CommitObj', ('project', 'commit_num'))
 
 
 def add(name, description, tags, type, hub_token, project_path):
@@ -278,11 +280,17 @@ class ProjectBusiness:
         # clone to project dir
         repo = cls.clone(user_ID, name, project_path)
 
+        # config repo user
+        with repo.config_writer(config_level="repository") as c:
+            c.set_value('user', 'name', user.user_ID)
+            c.set_value('user', 'email', user.email)
+
         # add all
         repo.git.add(A=True)
         # initial commit
         repo.index.commit('Initial Commit')
         repo.remote(name='origin').push()
+        commit = cls.update_project_commits(repo)
 
         # auth jupyterhub with user token
         res = cls.auth_hub_user(user_ID, name, user_token)
@@ -290,13 +298,16 @@ class ProjectBusiness:
         # create a new project object
         create_time = datetime.utcnow()
 
-        return cls.repo.create_one(name=name, description=description,
-                                   create_time=create_time,
-                                   update_time=create_time,
-                                   type=type, tags=tags,
-                                   hub_token=res.get('token'),
-                                   path=project_path, user=user,
-                                   privacy=privacy, **kwargs)
+        return cls.repo.create_one(
+            name=name, description=description,
+            create_time=create_time,
+            update_time=create_time,
+            type=type, tags=tags,
+            hub_token=res.get('token'),
+            path=project_path, user=user,
+            privacy=privacy, commits=[commit],
+            repo_path=f'http://{GIT_SERVER_IP}/repos/{user_ID}/{name}',
+            **kwargs)
 
     @classmethod
     def get_by_id(cls, project_id):
@@ -359,12 +370,13 @@ class ProjectBusiness:
                                           data)
 
     @classmethod
-    def commit(cls, project_id, commit_msg):
+    def commit(cls, project_id, commit_msg, version=None):
         """
         commit project
 
         :param commit_msg:
         :param project_id:
+        :param version:
         :return: a new created project object
         """
         project = cls.get_by_id(project_id)
@@ -374,7 +386,27 @@ class ProjectBusiness:
         repo.index.commit(commit_msg)
         repo.remote(name='origin').pull()
         repo.remote(name='origin').push(o=project_id)
+        cls.update_project_commits(repo, project, version)
         return project
+
+    @staticmethod
+    def update_project_commits(repo, project=None, version=None):
+        heads = repo.heads
+        master = heads.master
+        commit = master.log()[-1]
+        commit = Commit(oldhexsha=commit.oldhexsha,
+                        newhexsha=commit.newhexsha,
+                        actor_name=commit.actor.name,
+                        actor_email=commit.actor.email,
+                        timestamp=datetime.fromtimestamp(
+                            commit.time[0] + commit.time[1]),
+                        message=commit.message,
+                        version=version
+                        )
+        if project:
+            project.commits.append(commit)
+            project.save()
+        return commit
 
     @classmethod
     def get_commits(cls, project_path):

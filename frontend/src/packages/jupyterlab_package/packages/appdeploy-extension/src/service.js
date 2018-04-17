@@ -9,40 +9,40 @@ import request from './request'
 const PREFIX = 'project'
 
 // 获取用户所有 projects
-export function getProjects({ filter, onJson }) {
-  let params = ''
-  for (let key in filter) {
-    if (!filter.hasOwnProperty(key)) {
-      continue
+export function getProjects({filter, onJson}) {
+    let params = ''
+    for (let key in filter) {
+        if (!filter.hasOwnProperty(key)) {
+            continue
+        }
+        if (filter[key]) {
+            const value = filter[key]
+            if (key === 'projectType') {
+                key = 'type'
+            }
+            params += `&${key}=${value}`
+        }
     }
-    if (filter[key]) {
-      const value = filter[key]
-      if (key === 'projectType') {
-        key = 'type'
-      }
-      params += `&${key}=${value}`
-    }
-  }
-  return request(path.join('pyapi', PREFIX) + `?${params}`, undefined, { onJson })
+    return request(path.join('pyapi', PREFIX) + `?${params}`, undefined, {onJson})
 }
 
 // 获取用户所有 projects
-export function getMyProjects({ filter }) {
-  let params = ''
-  for (let key in filter) {
-    if (!filter.hasOwnProperty(key)) {
-      continue
+export function getMyProjects({filter}) {
+    let params = ''
+    for (let key in filter) {
+        if (!filter.hasOwnProperty(key)) {
+            continue
+        }
+        if (filter[key]) {
+            const value = filter[key]
+            if (key === 'projectType') {
+                key = 'type'
+            }
+            params += `&${key}=${value}`
+        }
     }
-    if (filter[key]) {
-      const value = filter[key]
-      if (key === 'projectType') {
-        key = 'type'
-      }
-      params += `&${key}=${value}`
-    }
-  }
-  params += `&group=my`
-  return request(path.join('/pyapi', PREFIX) + `?${params}`)
+    params += `&group=my`
+    return request(path.join('/pyapi', PREFIX) + `?${params}`)
 }
 
 // 获取单个 project
@@ -59,32 +59,38 @@ export function getApp({projectId, version, onJson}) {
     }
 }
 
-export function deploy({ projectId, filePath, onJson }) {
-  return request(path.join('/pyapi', 'apps', 'deploy', projectId), {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({file_path: filePath}),
-  }, { onJson })
+export function deploy({projectId, filePath, commitMsg, onJson}) {
+    return request(path.join('/pyapi', 'apps', 'deploy', projectId), {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            file_path: filePath,
+            commit_msg: commitMsg
+        }),
+    }, {onJson})
 }
 
-export function publish({ projectId, filePath, version, onJson }) {
+export function publish({projectId, filePath, version, commitMsg, onJson}) {
     version = version.split('.').join('_');
     return request(path.join('/pyapi', 'apps', 'publish', projectId, version), {
         method: 'post',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({file_path: filePath}),
-    }, { onJson })
+        body: JSON.stringify({
+            file_path: filePath,
+            commit_msg: commitMsg
+        }),
+    }, {onJson})
 }
 
-export function getContents({ hubUserName, hubToken, onJson }) {
-  return request(`/hub_api/user/${hubUserName}/api/contents/?content=1&${(new Date()).getTime()}`, {
-    method: 'get',
-    headers: {
-      'Authorization': `token ${hubToken}`,
-    },
-  }, { onJson })
+export function getContents({hubUserName, hubToken, onJson}) {
+    return request(`/hub_api/user/${hubUserName}/api/contents/?content=1&${(new Date()).getTime()}`, {
+        method: 'get',
+        headers: {
+            'Authorization': `token ${hubToken}`,
+        },
+    }, {onJson})
 }

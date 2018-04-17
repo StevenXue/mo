@@ -23,14 +23,15 @@ class ModuleService(ProjectService):
         return project
 
     @classmethod
-    def publish(cls, project_id, version):
-        module = cls.business.deploy_or_publish(project_id, version)
+    def publish(cls, project_id, commit_msg, version):
+        module = cls.business.deploy_or_publish(project_id, commit_msg,
+                                                version=version)
         cls.send_message(module, m_type='publish')
         return module
 
     @classmethod
-    def deploy(cls, project_id):
-        module = cls.business.deploy_or_publish(project_id)
+    def deploy(cls, project_id, commit_msg):
+        module = cls.business.deploy_or_publish(project_id, commit_msg)
         cls.send_message(module, m_type='deploy')
         return module
 

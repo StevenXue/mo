@@ -36,7 +36,8 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
                                               **kwargs)
 
     @classmethod
-    def deploy_or_publish(cls, app_id, handler_file_path, version='dev'):
+    def deploy_or_publish(cls, app_id, commit_msg, handler_file_path,
+                          version='dev'):
         app = cls.get_by_id(app_id)
         app.status = 'deploying'
         app.save()
@@ -84,6 +85,8 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
              cwd=cls.base_func_path)
         call(['faas-cli', 'deploy', '-f', f'./{service_name}.yml'],
              cwd=cls.base_func_path)
+
+        cls.commit(app_id, commit_msg, version)
 
         # when not dev(publish), change the privacy etc
         if version != 'dev':
