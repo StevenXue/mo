@@ -205,7 +205,7 @@ function Header({location, login, history, dispatch, allRequest,message}) {
         )}
         {
           <Menu.Item key={"docs"}>
-            <div onClick={()=> {window.location.replace("http://localhost:3000"); } }>
+            <div onClick={()=> window.location = "https://momodel.github.io/mo/#/zh-cn/quick_start" }>
               <FormattedMessage id={"docs"} defaultMessage={"Docs"}/>
             </div>
           </Menu.Item>

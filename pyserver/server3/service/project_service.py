@@ -392,115 +392,6 @@ def fork(project_id, new_user_ID):
     return project_cp
 
 
-def start_project_playground(project_id):
-    # generate the project volume path
-    project = project_business.get_by_id(project_id)
-    user_ID = ownership_business.get_owner(project, 'project').user_ID
-    volume_dir = os.path.join(USER_DIR, user_ID, project.name, 'volume/')
-    if not os.path.exists(volume_dir):
-        os.makedirs(volume_dir)
-    abs_volume_dir = os.path.abspath(volume_dir)
-
-    deploy_name = project_id + '-jupyter'
-    port = port_for.select_random(ports=set(range(30000, 32767)))
-    # port = network_utility.get_free_port_with_range(30000, 32767)
-    kube_json = {
-        "apiVersion": "apps/v1beta1",
-        "kind": "Deployment",
-        "metadata": {
-            "name": deploy_name
-        },
-        "spec": {
-            "template": {
-                "metadata": {
-                    "labels": {
-                        "app": project_id
-                    }
-                },
-                "spec": {
-                    # "securityContext": {
-                    #     "runAsUser": 1001,
-                    # },
-                    "containers": [
-                        {
-                            "name": project_id,
-                            "image": "10.52.14.192/gzyw/jupyter_app",
-                            "imagePullPolicy": "IfNotPresent",
-                            "ports": [{
-                                "containerPort": 8888,
-                                # "hostPort": port
-                            }],
-                            "stdin": True,
-                            "command": ['python'],
-                            "args": ["-m", "notebook", "--no-browser",
-                                     "--allow-root",
-                                     "--ip=0.0.0.0",
-                                     "--NotebookApp.allow_origin=*",
-                                     "--NotebookApp.disable_check_xsrf=True",
-                                     "--NotebookApp.token=''",
-                                     "--NotebookApp.iopub_data_rate_limit=10000000000"],
-                            "volumeMounts": [{
-                                "mountPath": "/home/root/work/volume",
-                                "name": project_id + "-volume"
-                            }]
-                        }
-                    ],
-                    "volumes": [{
-                        "name": project_id + "-volume",
-                        "hostPath": {"path": abs_volume_dir},
-                    }]
-                },
-            },
-        }
-    }
-    service_json = {
-        "kind": "Service",
-        "apiVersion": "v1",
-        "metadata": {
-            "name": "my-" + project_id + "-service"
-        },
-        "spec": {
-            "type": "NodePort",
-            "ports": [
-                {
-                    "port": 8888,
-                    "nodePort": port
-                }
-            ],
-            "selector": {
-                "app": project_id
-            }
-        }
-    }
-    # import json
-    # from server3.utility import file_utils
-    # file_utils.write_to_filepath(json.dumps(kube_json), './jupyter_app.json')
-    # return
-    api = kube_service.deployment_api
-    s_api = kube_service.service_api
-    api.create_namespaced_deployment(body=kube_json,
-                                     namespace=NAMESPACE)
-    replicas = api.read_namespaced_deployment_status(
-        deploy_name, NAMESPACE).status.available_replicas
-    # wait until deployment is available
-    while replicas is None or replicas < 1:
-        replicas = api.read_namespaced_deployment_status(
-            deploy_name, NAMESPACE).status.available_replicas
-    # FIXME one second sleep to wait for container ready
-    import timemr
-    time.sleep(1)
-    s_api.create_namespaced_service(body=service_json, namespace=NAMESPACE)
-    time.sleep(1)
-    return port
-
-
-def get_playground(project_id):
-    service_name = "my-" + project_id + "-service"
-    api = kube_service.service_api
-    dep = api.read_namespaced_service(service_name, NAMESPACE)
-    return dep.spec.ports[0].node_port
-
-
 class ProjectService:
     business = ProjectBusiness
     channel = CHANNEL.project
@@ -595,9 +486,15 @@ class ProjectService:
         return project
 
     @classmethod
+    def commit(cls, project_id, commit_msg):
+        project = cls.business.commit(project_id, commit_msg)
+        cls.send_message(project, m_type='commit')
+        return project
+
+    @classmethod
     def send_message(cls, project, m_type='publish'):
         receivers = project.favor_users  # get app subscriber
-        admin_user = user_business.get_by_user_ID('admin')
+        admin_user = UserBusiness.get_by_user_ID('admin')
 
         # 获取所有包含此module的答案
         answers_has_module = RequestAnswerBusiness. \

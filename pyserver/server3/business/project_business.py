@@ -179,6 +179,16 @@ class ProjectBusiness:
         return requests.post(f'{GIT_SERVER}/git/{user_ID}/{repo_name}')
 
     @staticmethod
+    def remove_git_repo(user_ID, repo_name):
+        """
+        auth jupyterhub with user token
+        :param user_ID:
+        :param repo_name:
+        :return: dict of res json
+        """
+        return requests.delete(f'{GIT_SERVER}/git/{user_ID}/{repo_name}')
+
+    @staticmethod
     def gen_dir(user_ID, name):
         """
         auth jupyterhub with user token
@@ -317,6 +327,8 @@ class ProjectBusiness:
         # delete project directory
         if os.path.isdir(project.path):
             shutil.rmtree(project.path)
+        # remove git repo
+        cls.remove_git_repo(user_ID, project.name)
         # delete project object
         return cls.repo.delete_by_id(project_id)
 
@@ -362,21 +374,7 @@ class ProjectBusiness:
         repo.index.commit(commit_msg)
         repo.remote(name='origin').pull()
         repo.remote(name='origin').push(o=project_id)
-
-        # 增加message
-        answers_has_project = cls.requestAnswerBusiness.get_by_anwser_project_id(project_id)
-        # 根据答案获取对应的 request 的 owner
-        for each_anser in answers_has_project:
-            user_request = each_anser.user_request
-            request_owener = user_request.user
-            message_service.create_message(admin_user, 'commit',
-                                           [request_owener],
-                                           project.user,
-                                           project_name=project.name,
-                                           project_id=project.id,
-                                           project_type=project.type,
-                                           user_request_title=user_request.title,
-                                           user_request_id=user_request.id)
+        return project
 
     @classmethod
     def get_commits(cls, project_path):
