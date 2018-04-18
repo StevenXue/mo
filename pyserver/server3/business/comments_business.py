@@ -17,11 +17,11 @@ class CommentsBusiness(GeneralBusiness):
     def get_comments(cls, _id, comments_type):
         # _id 是 request 或 answer 或 project 的 id
         if comments_type == 'request':
-            query = {'user_request': ObjectId(_id)}
+            query = {'request': ObjectId(_id)}
         elif comments_type == 'answer':
-            query = {'user_request': ObjectId(_id)}
+            query = {'answer': ObjectId(_id)}
         elif comments_type == 'project':
-            query = {'user_request': ObjectId(_id)}
+            query = {'project': ObjectId(_id)}
         else:
             return jsonify({'response': 'error comments type'}), 400
         return cls.repo.read(query)
@@ -30,11 +30,11 @@ class CommentsBusiness(GeneralBusiness):
     def count_comments(cls, _id, comments_type):
         # _id 是 request 或 answer 或 project 的 id
         if comments_type == 'request':
-            query = {'user_request': ObjectId(_id)}
+            query = {'request': ObjectId(_id)}
         elif comments_type == 'answer':
-            query = {'user_request': ObjectId(_id)}
+            query = {'answer': ObjectId(_id)}
         elif comments_type == 'project':
-            query = {'user_request': ObjectId(_id)}
+            query = {'project': ObjectId(_id)}
         else:
             return jsonify({'response': 'error comments type'}), 400
         return cls.repo.read(query).count()

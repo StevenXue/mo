@@ -17,9 +17,8 @@ comments_app = Blueprint("comments_app", __name__,
 
 @comments_app.route('', methods=['GET'])
 def list_comments():
-    data = request.get_json()
-    _id = data.get("_id")
-    comments_type = data.get("comments_type")
+    _id = request.args.get('_id')
+    comments_type = request.args.get('comments_type')
     comments = CommentsBusiness. \
         get_comments(_id,
                      comments_type=comments_type)

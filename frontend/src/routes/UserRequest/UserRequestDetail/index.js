@@ -34,6 +34,7 @@ class CommentForm extends React.Component {
   }
 
   makeComment = (values) => {
+    console.log('mmmmmm', values)
     this.props.dispatch({
       type: 'allRequest/makeComment',
       payload: {
@@ -56,21 +57,25 @@ class CommentForm extends React.Component {
   }
 
   onBlur = () => {
+    console.log('blur')
     if (this.props.comments_type === 'request') {
       showRequestCommentInput(this.props.dispatch)
     }
     if (this.props.comments_type === 'answer') {
-      showAnswerCommentInput(this.props.dispatch, this.props.request_answer_id,)
+      showAnswerCommentInput(this.props.dispatch, this.props._id)
     }
   }
+
 
   render() {
     const {getFieldDecorator, getFieldsError, getFieldError, isFieldTouched} = this.props.form
     // Only show error after a field is touched.
     const emptyCommentError = isFieldTouched('comment') && getFieldError('comment')
     return (
-      <Form layout="inline" onSubmit={this.handleSubmit}
-            onBlur={() => this.onBlur()}>
+      <Form layout="inline"
+            onBlur={() => this.onBlur()}
+            onSubmit={this.handleSubmit}
+      >
         <FormItem
           validateStatus={emptyCommentError ? 'error' : ''}
           help={emptyCommentError || ''}
@@ -81,11 +86,15 @@ class CommentForm extends React.Component {
             <Input className={styles.inputtext}
                    placeholder="Any idea to help?"
                    ref={inputRef => (this.input = inputRef)}
-            />,
+            />
           )}
         </FormItem>
         <FormItem>
-          <Button type="primary">确定</Button>
+          <Button type="primary"
+                  htmlType="submit"
+                  disabled={hasErrors(getFieldsError())}>
+            确定
+          </Button>
         </FormItem>
       </Form>
     )
@@ -108,7 +117,7 @@ class AnswerForm extends React.Component {
     fetching: false,
     projects: [],
     selected: [],
-    inputValue: null,
+    inputValue: '',
   }
 
   fetchData = (value) => {
@@ -168,7 +177,7 @@ class AnswerForm extends React.Component {
       },
     })
     this.clearSelect()
-    this.setState({inputValue: null})
+    this.setState({inputValue: ''})
   }
 
   handleChange = (content) => {
@@ -253,7 +262,7 @@ class AnswerForm extends React.Component {
           type="primary"
           htmlType="submit"
           // disabled={this.state.html === null}
-          disabled={this.state.inputValue === null}
+          disabled={this.state.inputValue === ''}
           onClick={this.handleSubmit}
         >
           Post Your Answer
@@ -268,6 +277,7 @@ function callback(key) {
 }
 
 function showAnswerCommentInput(dispatch, request_answer_id) {
+  console.log('2', request_answer_id)
   dispatch({
     type: 'allRequest/showAnswerCommentInput',
     payload: {

@@ -42,7 +42,7 @@ def list_request_answer():
         # 得到每一个answer下的comments 和 selcet project
         for index, answer in enumerate(request_answer_info):
             answer_comment = CommentsBusiness.get_comments(
-                answer['_id'],comments_type='answer')
+                answer['_id'], comments_type='answer')
             answer_comment_info = json_utility. \
                 me_obj_list_to_json_list(answer_comment)
             answer['comment'] = answer_comment_info

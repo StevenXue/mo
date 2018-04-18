@@ -1,6 +1,6 @@
 import * as userRequestService from '../services/userRequest'
 import * as stagingDataService from '../services/stagingData'
-import * as userRequestCommentsService from '../services/userRequestComments'
+import * as commentsService from '../services/comments'
 import * as requestAnswerService from '../services/userRequestAnwser'
 import * as messageService from '../services/message'
 import {arrayToJson, JsonToArray} from '../utils/JsonUtils'
@@ -9,7 +9,11 @@ import pathToRegexp from 'path-to-regexp'
 
 // get 此request下所有的的 comment
 function* fetchAllCommentsOfThisRequest(action, {call, put}) {
-  const {data: allCommentsOfThisRequest} = yield call(userRequestCommentsService.fetchAllCommentsOfThisUserRequest, {user_request_ID: action.payload.userrequestId})
+  const {data: allCommentsOfThisRequest} = yield call(
+    commentsService.fetchComments, {
+      _id: action.payload._id,
+      comments_type: 'request'
+    })
   if (allCommentsOfThisRequest.length > 0) {
     yield put({
       type: 'setAllCommentsOfThisRequest',
@@ -22,11 +26,14 @@ function* fetchAllCommentsOfThisRequest(action, {call, put}) {
 
 // get 此request下所有的的 answer 和 comment
 function* fetchAllAnswerOfThisRequest(action, {call, put}) {
-  const {data: allAnswerOfThisRequest} = yield call(requestAnswerService.fetchAllAnswerOfThisUserRequest, {user_request_ID: action.payload.userrequestId})
+  const {data: allAnswerOfThisRequest} = yield call(
+    requestAnswerService.fetchAllAnswerOfThisUserRequest, {
+      user_request_ID: action.payload.userrequestId
+    })
   if (allAnswerOfThisRequest.length > 0) {
-    allAnswerOfThisRequest.forEach(function(element) {
+    allAnswerOfThisRequest.forEach(function (element) {
       element['commentState'] = false
-    });
+    })
     yield put({
       type: 'setAllAnswerOfThisRequest', payload: {
         allAnswerOfThisRequest: arrayToJson(allAnswerOfThisRequest, '_id')
@@ -42,9 +49,9 @@ export default {
     userRequestDic: {},
     focusUserRequest: null,
     loadingState: false,
-    pageNo:1,
-    pageSize:10,
-    totalNumber:0,
+    pageNo: 1,
+    pageSize: 10,
+    totalNumber: 0,
     modalVisible: false,
     tags: [],
   },
@@ -62,19 +69,19 @@ export default {
     },
 
     showModal(state) {
-      return { ...state, modalVisible: true }
+      return {...state, modalVisible: true}
     },
 
     hideModal(state) {
-      return { ...state, modalVisible: false }
+      return {...state, modalVisible: false}
     },
 
 
-    changePageNoSize(state, action){
+    changePageNoSize(state, action) {
       return {
         ...state,
         pageNo: action.payload.pageNo,
-        pageSize:action.payload.pageSize,
+        pageSize: action.payload.pageSize,
       }
     },
 
@@ -170,7 +177,7 @@ export default {
         focusUserRequest:
           {
             ...state.focusUserRequest,
-            accept_answer:request_answer_id
+            accept_answer: request_answer_id
           }
       }
     },
@@ -223,7 +230,7 @@ export default {
       }
     },
 
-    showAnswerCommentInput(state,action){
+    showAnswerCommentInput(state, action) {
       let answer_id = action.payload.request_answer_id
       let commentState = state.focusUserRequest.answer[answer_id].commentState
       return {
@@ -255,17 +262,17 @@ export default {
       }
     },
 
-    clearFocusRequest(state,action){
+    clearFocusRequest(state, action) {
       return {
         ...state,
         focusUserRequest: null,
       }
     },
-    setTags(state, { payload: tags }) {
-      console.log(tags,'tags')
+    setTags(state, {payload: tags}) {
+      console.log(tags, 'tags')
       return {
         ...state,
-        tags:tags,
+        tags: tags,
       }
     }
   },
@@ -273,23 +280,25 @@ export default {
   effects: {
     // 获取所有request
     * fetchAllRequest(action, {call, put, select}) {
-      let payload =  action.payload
+      let payload = action.payload
       payload.page_no = yield select(state => state.allRequest.pageNo)
       payload.page_size = yield select(state => state.allRequest.pageSize)
-      const {data: {user_request:userRequest,total_number:totalNumber}} = yield call(
+      const {data: {user_request: userRequest, total_number: totalNumber}} = yield call(
         userRequestService.fetchAllUserRequest, payload)
       if (userRequest.length > 0) {
         yield put({
           type: 'setAllRequest',
-          payload: {userRequestDic: arrayToJson(userRequest, '_id'),
-                    totalNumber:totalNumber}
+          payload: {
+            userRequestDic: arrayToJson(userRequest, '_id'),
+            totalNumber: totalNumber
+          }
         })
       }
     },
 
-    * refresh(action, { call, put }){
-      yield put({ type: 'clearFocusRequest' })
-      yield put({ type: 'fetchOneRequest', payload:action.payload })
+    * refresh(action, {call, put}) {
+      yield put({type: 'clearFocusRequest'})
+      yield put({type: 'fetchOneRequest', payload: action.payload})
     },
 
     * fetchOneRequest(action, {call, put}) {
@@ -299,11 +308,18 @@ export default {
         type: 'setFocusUserRequest',
         payload: {focusUserRequest: focusUserRequest}
       })
-      yield call(fetchAllCommentsOfThisRequest, {payload: {userrequestId: action.payload.userrequestId}}, {
+      yield call(fetchAllCommentsOfThisRequest, {
+        payload: {
+          _id: action.payload.userrequestId,
+          comments_type: 'request',
+        }
+      }, {
         call, put,
       })
 
-      yield call(fetchAllAnswerOfThisRequest, {payload: {userrequestId: action.payload.userrequestId}}, {
+      yield call(fetchAllAnswerOfThisRequest, {
+        payload: {
+          userrequestId: action.payload.userrequestId}}, {
         call, put,
       })
     },
@@ -325,13 +341,19 @@ export default {
     // 发布新 comment
     * makeComment(action, {call, put, select}) {
       let payload = action.payload
-      const {data: result} = yield call(userRequestCommentsService.createComments, payload)
-
+      const {data: result} = yield call(commentsService.createComments, payload)
+      console.log('payload',payload)
+      // 获得当前 request 的 id
+      const _id = yield select(state => state.allRequest.focusUserRequest._id)
       if (result) {
-        yield call(fetchAllCommentsOfThisRequest, {payload: {userrequestId: payload.user_request_id}}, {
+        yield call(fetchAllCommentsOfThisRequest, {
+          payload: {
+            _id: _id}}, {
           call, put
         })
-        yield call(fetchAllAnswerOfThisRequest, {payload: {userrequestId: payload.user_request_id}}, {
+        yield call(fetchAllAnswerOfThisRequest, {
+          payload: {
+            userrequestId: _id}}, {
           call, put
         })
       }
@@ -374,7 +396,7 @@ export default {
       let payload = action.payload
       payload['votes_user_id'] = yield select(state => state.login.user.user_ID)
       const {data: answerAfterVotesUp} = yield call(requestAnswerService.votesUpAnswer, payload)
-      console.log('??????',answerAfterVotesUp)
+      console.log('??????', answerAfterVotesUp)
       yield put({
         type: 'updateAnswerVotesUp',
         payload: {answerAfterVotesUp: answerAfterVotesUp}
@@ -386,13 +408,12 @@ export default {
       yield call(requestAnswerService.acceptAnswer, payload)
       yield put({
         type: 'updateAcceptAnswer',
-        payload: {request_answer_id:payload.request_answer_id}
+        payload: {request_answer_id: payload.request_answer_id}
       })
     },
 
-    * deleteUserRequest(action, {call, put, select}){
+    * deleteUserRequest(action, {call, put, select}) {
       let payload = action.payload
-      console.log('??????????????????????')
       yield call(userRequestService.removeRequest, payload)
     }
   },
