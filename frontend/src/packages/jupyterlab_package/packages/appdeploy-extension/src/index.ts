@@ -99,9 +99,10 @@ class DeployForm extends Form {
     /**
      * Get the value of the widget.
      */
-    getValue(): {selectFile: string, versionNumber: string} {
+    getValue(): { selectFile: string, versionNumber: string, commitMsg: string } {
         const versionElement = this.node.getElementsByClassName('versionNumber')[0] as HTMLInputElement;
-        return {selectFile: this.inputNode.value, versionNumber: versionElement.value};
+        const commitMsg = this.node.getElementsByClassName('commitMsg')[0] as HTMLInputElement;
+        return {selectFile: this.inputNode.value, versionNumber: versionElement.value, commitMsg: commitMsg.value};
     }
 }
 
@@ -134,6 +135,7 @@ export function createDeployButton(): ToolbarButton {
                             projectId,
                             version: result.value.versionNumber,
                             filePath: result.value.selectFile,
+                            commitMsg: result.value.commitMsg,
                             onJson: () => {
                                 message.success('Module deploy success!');
                             },
@@ -142,6 +144,7 @@ export function createDeployButton(): ToolbarButton {
                         deploy({
                             projectId,
                             filePath: result.value.selectFile,
+                            commitMsg: result.value.commitMsg,
                             onJson: () => {
                                 message.success('App deploy success!');
                                 // hide();

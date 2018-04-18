@@ -14,9 +14,10 @@ import shutil
 import re
 import fileinput
 import requests
+import collections
 from copy import deepcopy
 from datetime import datetime
-from distutils.dir_util import copy_tree
+# from distutils.dir_util import copy_tree
 from subprocess import call
 
 from git import Repo
@@ -25,6 +26,7 @@ from flask_socketio import SocketIO
 from eventlet import spawn_n
 
 from server3.entity.project import Project
+from server3.entity.project import Commit
 # from server3.repository import job_repo
 from server3.repository.project_repo import ProjectRepo
 from server3.business.user_business import UserBusiness
@@ -37,7 +39,7 @@ from server3.constants import GIT_LOCAL
 from server3.constants import INIT_RES
 from server3.constants import REDIS_SERVER
 from server3.business.request_answer_business import RequestAnswerBusiness
-
+from server3.constants import GIT_SERVER_IP
 
 socketio = SocketIO(message_queue=REDIS_SERVER)
 
@@ -46,8 +48,8 @@ PAGE_SIZE = 5
 
 project_repo = ProjectRepo(Project)
 
-
 # Objects = collections.namedtuple('Objects', ('objects', 'count', 'page_no', 'page_size'))
+CommitObj = collections.namedtuple('CommitObj', ('project', 'commit_num'))
 
 
 def add(name, description, tags, type, hub_token, project_path):
@@ -126,14 +128,113 @@ def copy(project):
     return project_cp
 
 
+def copytree(src, dst, symlinks=False, ignore=None, copy_function=shutil.copy2,
+             ignore_dangling_symlinks=False):
+    """Recursively copy a directory tree.
+
+    The destination directory must not already exist.
+    If exception(s) occur, an Error is raised with a list of reasons.
+
+    If the optional symlinks flag is true, symbolic links in the
+    source tree result in symbolic links in the destination tree; if
+    it is false, the contents of the files pointed to by symbolic
+    links are copied. If the file pointed by the symlink doesn't
+    exist, an exception will be added in the list of errors raised in
+    an Error exception at the end of the copy process.
+
+    You can set the optional ignore_dangling_symlinks flag to true if you
+    want to silence this exception. Notice that this has no effect on
+    platforms that don't support os.symlink.
+
+    The optional ignore argument is a callable. If given, it
+    is called with the `src` parameter, which is the directory
+    being visited by copytree(), and `names` which is the list of
+    `src` contents, as returned by os.listdir():
+
+        callable(src, names) -> ignored_names
+
+    Since copytree() is called recursively, the callable will be
+    called once for each directory that is copied. It returns a
+    list of names relative to the `src` directory that should
+    not be copied.
+
+    The optional copy_function argument is a callable that will be used
+    to copy each file. It will be called with the source path and the
+    destination path as arguments. By default, copy2() is used, but any
+    function that supports the same signature (like copy()) can be used.
+
+    """
+    names = os.listdir(src)
+    if ignore is not None:
+        ignored_names = ignore(src, names)
+    else:
+        ignored_names = set()
+
+    os.makedirs(dst, exist_ok=True)
+    errors = []
+    for name in names:
+        if name in ignored_names:
+            continue
+        srcname = os.path.join(src, name)
+        dstname = os.path.join(dst, name)
+        try:
+            if os.path.islink(srcname):
+                linkto = os.readlink(srcname)
+                if symlinks:
+                    # We can't just leave it to `copy_function` because legacy
+                    # code with a custom `copy_function` may rely on copytree
+                    # doing the right thing.
+                    os.symlink(linkto, dstname)
+                    shutil.copystat(srcname, dstname, follow_symlinks=not
+                    symlinks)
+                else:
+                    # ignore dangling symlink if the flag is on
+                    if not os.path.exists(linkto) and ignore_dangling_symlinks:
+                        continue
+                    # otherwise let the copy occurs. copy2 will raise an error
+                    if os.path.isdir(srcname):
+                        copytree(srcname, dstname, symlinks, ignore,
+                                 copy_function)
+                    else:
+                        copy_function(srcname, dstname)
+            elif os.path.isdir(srcname):
+                copytree(srcname, dstname, symlinks, ignore, copy_function)
+            else:
+                # Will raise a SpecialFileError for unsupported file types
+                copy_function(srcname, dstname)
+        # catch the Error from the recursive copytree so that we can
+        # continue with other files
+        except shutil.Error as err:
+            errors.extend(err.args[0])
+        except OSError as why:
+            errors.append((srcname, dstname, str(why)))
+    try:
+        shutil.copystat(src, dst)
+    except OSError as why:
+        # Copying file access times may fail on Windows
+        if getattr(why, 'winerror', None) is None:
+            errors.append((src, dst, str(why)))
+    if errors:
+        raise shutil.Error(errors)
+    return dst
+
+
 class ProjectBusiness:
     project = None
     repo = ProjectRepo(Project)
     requestAnswerBusiness = RequestAnswerBusiness
 
     @staticmethod
-    def copytree(o, dst):
-        copy_tree(o, dst)
+    def copytree(o, dst, **kwargs):
+        copytree(o, dst, **kwargs)
+
+    @staticmethod
+    def copytree_wrapper(o, dst, **kwargs):
+        # if dir exists, remove it and copytree, cause copytree will
+        # create the dir
+        if os.path.exists(dst):
+            shutil.rmtree(dst)
+        shutil.copytree(o, dst, **kwargs)
 
     @staticmethod
     def auth_hub_user(user_ID, project_name, user_token):
@@ -177,6 +278,16 @@ class ProjectBusiness:
         :return: dict of res json
         """
         return requests.post(f'{GIT_SERVER}/git/{user_ID}/{repo_name}')
+
+    @staticmethod
+    def remove_git_repo(user_ID, repo_name):
+        """
+        auth jupyterhub with user token
+        :param user_ID:
+        :param repo_name:
+        :return: dict of res json
+        """
+        return requests.delete(f'{GIT_SERVER}/git/{user_ID}/{repo_name}')
 
     @staticmethod
     def gen_dir(user_ID, name):
@@ -268,11 +379,17 @@ class ProjectBusiness:
         # clone to project dir
         repo = cls.clone(user_ID, name, project_path)
 
+        # config repo user
+        with repo.config_writer(config_level="repository") as c:
+            c.set_value('user', 'name', user.user_ID)
+            c.set_value('user', 'email', user.email)
+
         # add all
         repo.git.add(A=True)
         # initial commit
         repo.index.commit('Initial Commit')
         repo.remote(name='origin').push()
+        commit = cls.update_project_commits(repo)
 
         # auth jupyterhub with user token
         res = cls.auth_hub_user(user_ID, name, user_token)
@@ -280,13 +397,16 @@ class ProjectBusiness:
         # create a new project object
         create_time = datetime.utcnow()
 
-        return cls.repo.create_one(name=name, description=description,
-                                   create_time=create_time,
-                                   update_time=create_time,
-                                   type=type, tags=tags,
-                                   hub_token=res.get('token'),
-                                   path=project_path, user=user,
-                                   privacy=privacy, **kwargs)
+        return cls.repo.create_one(
+            name=name, description=description,
+            create_time=create_time,
+            update_time=create_time,
+            type=type, tags=tags,
+            hub_token=res.get('token'),
+            path=project_path, user=user,
+            privacy=privacy, commits=[commit],
+            repo_path=f'http://{GIT_SERVER_IP}/repos/{user_ID}/{name}',
+            **kwargs)
 
     @classmethod
     def get_by_id(cls, project_id):
@@ -317,6 +437,8 @@ class ProjectBusiness:
         # delete project directory
         if os.path.isdir(project.path):
             shutil.rmtree(project.path)
+        # remove git repo
+        cls.remove_git_repo(user_ID, project.name)
         # delete project object
         return cls.repo.delete_by_id(project_id)
 
@@ -347,12 +469,13 @@ class ProjectBusiness:
                                           data)
 
     @classmethod
-    def commit(cls, project_id, commit_msg):
+    def commit(cls, project_id, commit_msg, version=None):
         """
         commit project
 
         :param commit_msg:
         :param project_id:
+        :param version:
         :return: a new created project object
         """
         project = cls.get_by_id(project_id)
@@ -362,21 +485,27 @@ class ProjectBusiness:
         repo.index.commit(commit_msg)
         repo.remote(name='origin').pull()
         repo.remote(name='origin').push(o=project_id)
+        cls.update_project_commits(repo, project, version)
+        return project
 
-        # 增加message
-        answers_has_project = cls.requestAnswerBusiness.get_by_anwser_project_id(project_id)
-        # 根据答案获取对应的 request 的 owner
-        for each_anser in answers_has_project:
-            user_request = each_anser.user_request
-            request_owener = user_request.user
-            message_service.create_message(admin_user, 'commit',
-                                           [request_owener],
-                                           project.user,
-                                           project_name=project.name,
-                                           project_id=project.id,
-                                           project_type=project.type,
-                                           user_request_title=user_request.title,
-                                           user_request_id=user_request.id)
+    @staticmethod
+    def update_project_commits(repo, project=None, version=None):
+        heads = repo.heads
+        master = heads.master
+        commit = master.log()[-1]
+        commit = Commit(oldhexsha=commit.oldhexsha,
+                        newhexsha=commit.newhexsha,
+                        actor_name=commit.actor.name,
+                        actor_email=commit.actor.email,
+                        timestamp=datetime.fromtimestamp(
+                            commit.time[0] + commit.time[1]),
+                        message=commit.message,
+                        version=version
+                        )
+        if project:
+            project.commits.append(commit)
+            project.save()
+        return commit
 
     @classmethod
     def get_commits(cls, project_path):
@@ -415,10 +544,11 @@ class ProjectBusiness:
                     line = re.sub(r"""from modules import (.+)""",
                                   r"""from function.modules import \1""",
                                   line.rstrip())
+
                     # add handle function
                     line = re.sub(
-                        r"predict = client\.predict",
-                        r"predict = client.predict\n\n"
+                        r"work_path = ''",
+                        r"work_path = ''\n\n"
                         r"def handle(conf):\n"
                         r"\t# paste your code here",
                         line.rstrip())

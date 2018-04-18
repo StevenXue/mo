@@ -225,7 +225,7 @@ const handleSubmit = (e, validateFieldsAndScroll, appId, dispatch, version) => {
       let payload = { 'app': { 'input': values } }
       payload['app_id'] = appId
       payload.version = version
-      dispatch({ type: 'projectDetail/get_example_result', payload: payload })
+      dispatch({ type: 'projectDetail/getExampleResult', payload: payload })
     }
   })
 }

@@ -123,6 +123,7 @@ export class AppPage extends React.Component {
                 <div style={{minHeight: 100, overflowY: 'auto'}}>
                     <h3>{this.state.project.name}</h3>
                     <p>{this.state.project.description}</p>
+                    <Input placeholder='Commit Message' className='commitMsg' style={{margin: '5px 0'}}/>
                     <h4>Please select the main file:</h4>
                     <Select style={{width: '80%'}}
                             onChange={(value) => this.selectPath(value)}

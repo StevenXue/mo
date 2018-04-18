@@ -62,9 +62,10 @@ class DeployForm extends Form {
     /**
      * Get the value of the widget.
      */
-    getValue(): {testingState: string, versionNumber: string} {
+    getValue(): { testingState: string, versionNumber: string, commitMsg: string } {
         const versionElement = this.node.getElementsByClassName('versionNumber')[0] as HTMLInputElement;
-        return {testingState: this.inputNode.value, versionNumber: versionElement.value};
+        const commitMsg = this.node.getElementsByClassName('commitMsg')[0] as HTMLInputElement;
+        return {testingState: this.inputNode.value, versionNumber: versionElement.value, commitMsg: commitMsg.value};
     }
 }
 
@@ -99,6 +100,7 @@ export function createDeployButton(): ToolbarButton {
                                 publish({
                                     projectId,
                                     version: result.value.versionNumber,
+                                    commitMsg: result.value.commitMsg,
                                     onJson: () => {
                                         message.success('Module deploy success!');
                                     },
@@ -106,6 +108,7 @@ export function createDeployButton(): ToolbarButton {
                             } else {
                                 deploy({
                                     projectId,
+                                    commitMsg: result.value.commitMsg,
                                     onJson: () => {
                                         message.success('Module deploy success!');
                                     },

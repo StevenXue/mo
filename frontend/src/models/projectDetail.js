@@ -257,7 +257,7 @@ export default {
       })
     },
 
-    *get_example_result(action, { call, put, select }) {
+    *getExampleResult(action, { call, put, select }) {
       let payload = action.payload
       const { data: result } = yield call(AppService.runApi, payload)
       yield put({

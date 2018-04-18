@@ -88,7 +88,10 @@ function activate(app: JupyterLab, palette: ICommandPalette): ILauncher {
               `client = Client('fackAPI')\n`,
               `run = client.run\n`,
               `train = client.train\n`,
-              `predict = client.predict`,
+              `predict = client.predict\n`,
+              `\n`,
+              `# append work_path to head when you want to reference a path inside the working directory\n`,
+              `work_path = ''`,
             ], (item as any).session);
         }
       };

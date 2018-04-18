@@ -82,17 +82,17 @@ class AppService(ProjectService):
         return project
 
     @classmethod
-    def publish(cls, project_id, handler_file_path, version):
-        module = cls.business.deploy_or_publish(project_id,
+    def publish(cls, project_id, commit_msg, handler_file_path, version):
+        module = cls.business.deploy_or_publish(project_id, commit_msg,
                                                 handler_file_path, version)
         cls.send_message(module, m_type='publish')
         return module
 
     @classmethod
-    def deploy(cls, project_id, handler_file_path):
-        module = cls.business.deploy_or_publish(project_id,
+    def deploy(cls, project_id, commit_msg, handler_file_path):
+        module = cls.business.deploy_or_publish(project_id, commit_msg,
                                                 handler_file_path)
-        # cls.send_message(module, m_type='deploy')
+        cls.send_message(module, m_type='deploy')
         return module
 
 

@@ -1,7 +1,7 @@
 input:
   weather_prediction_param_1:
     default: null
-    des: ''
+    des: 'flight_no'
     name: flight_no
     range: null
     required: false
@@ -10,13 +10,14 @@ input:
     value_type: int
   weather_prediction_param_2:
     default: null
-    des: ''
+    des: 'flight_date'
     name: flight_date
     range: null
     required: false
     type: input
     value: null
     value_type: int
+    # dd
 output:
   weather_prediction_out1:
     type: int

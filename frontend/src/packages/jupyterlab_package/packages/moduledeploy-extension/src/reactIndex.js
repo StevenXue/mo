@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Checkbox, Tooltip, Radio, Input, Spin, Alert} from 'antd'
+import {Checkbox, Tooltip, Radio, Input, Spin, Alert, Input} from 'antd'
 import * as pathToRegexp from 'path-to-regexp'
 
 import {
@@ -115,12 +115,10 @@ export class ModulePage extends React.Component {
             height: '30px',
             lineHeight: '30px',
         };
-        let color, alertType;
+        let alertType;
         if (this.state.testResult[0] === 'All test passed') {
-            color = 'green'
             alertType = 'success'
         } else {
-            color = 'red'
             alertType = 'error'
         }
         if (this.state.project !== undefined) {
@@ -129,6 +127,7 @@ export class ModulePage extends React.Component {
                 <div style={{minHeight: 100, overflowY: 'auto'}}>
                     <h3>{this.state.project.name}</h3>
                     <p>{this.state.project.description}</p>
+                    <Input placeholder='Commit Message' className='commitMsg'/>
                     {
                         this.state.project.privacy === 'private' &&
                         <Tooltip placement="top"
@@ -136,7 +135,9 @@ export class ModulePage extends React.Component {
                                  title='Publishing a module means the module will be accessed by others, otherwise, the module can only be accessed and tested by owner (you)'>
                             <Checkbox onChange={(e) => this.onCheck(e)} style={{margin: '10px 0'}}>Publish this
                                 module?</Checkbox>
-                            {this.state.publish && <Alert showIcon message="Once you publish a version of your project, you can never undo it!" type="info" />}
+                            {this.state.publish &&
+                            <Alert showIcon message="Once you publish a version of your project, you can never undo it!"
+                                   type="info"/>}
                         </Tooltip>
                     }
                     {
@@ -159,14 +160,14 @@ export class ModulePage extends React.Component {
                     }
                     {
                         this.state.testResult.length === 0 ?
-                            <Spin spinning={true} tip="Running test cases..." style={{width: '100%'}}/> :
-                            <div>
+                            <Spin spinning={true} tip="Running test cases..." style={{width: '100%'}}/>
+                            : <div>
                                 <h3>Testing Result:</h3>
                                 <div className='test-result'>
                                     {this.state.testResult.map(e =>
                                         <Alert key={e} message={<div style={{whiteSpace: 'pre-line'}}>{e}</div>}
                                                type={alertType} showIcon
-                                        style={{margin: 5}}/>
+                                               style={{margin: 5}}/>
                                     )}
                                 </div>
                             </div>

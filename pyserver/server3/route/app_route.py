@@ -40,7 +40,8 @@ def run_in_docker():
 def deploy_in_docker(app_id):
     data = request.get_json()
     handler_file_path = data.get('file_path')
-    project = AppService.deploy(app_id, handler_file_path)
+    commit_msg = data.get('commit_msg')
+    project = AppService.deploy(app_id, commit_msg, handler_file_path)
     project = json_utility.convert_to_json(project.to_mongo())
     return jsonify({"response": project})
 
@@ -50,7 +51,9 @@ def deploy_in_docker(app_id):
 def publish_in_docker(app_id, version):
     data = request.get_json()
     handler_file_path = data.get('file_path')
-    project = AppService.publish(app_id, handler_file_path, version)
+    commit_msg = data.get('commit_msg')
+    project = AppService.publish(app_id, commit_msg, handler_file_path,
+                                 version)
     project = json_utility.convert_to_json(project.to_mongo())
     return jsonify({"response": project})
 
