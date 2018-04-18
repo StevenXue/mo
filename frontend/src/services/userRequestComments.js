@@ -6,7 +6,7 @@ const {CORS, api} = config
 
 // 新建 request comments
 export function createNewUserRequestComments(payload) {
-  return request(`${CORS}/user_request_comments`, {
+  return request(`${CORS}/comments`, {
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
@@ -25,12 +25,32 @@ export function createNewUserRequestComments(payload) {
 // 获取某一个用户的所有评论
 export function fetchUserRequestCommentsByUserID(payload) {
   let category = encodeURIComponent(payload.category)
-  return request(`${CORS}/user_request_comments?user_ID=${payload.user_ID}`);
+  return request(`${CORS}/comments?user_ID=${payload.user_ID}`);
 }
 
 
 // 获取一个request下的所有评论
 export function fetchAllCommentsOfThisUserRequest(payload) {
-  return request(`${CORS}/user_request_comments?user_request_id=${payload.user_request_ID}`);
+  return request(`${CORS}/comments?user_request_id=${payload.user_request_ID}`);
 }
 
+
+// 新建 comments
+export function createComments(payload) {
+  return request(`${CORS}/comments`, {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      _id:payload._id,
+      comments:payload.comments,
+      comments_type:payload.comments_type
+    }),
+  });
+}
+
+// 获取一个request/answer/project下的所有评论
+export function fetchComments(payload) {
+  return request(`${CORS}/comments?_id=${payload._id}&comments_type=${payload.comments_type}`);
+}

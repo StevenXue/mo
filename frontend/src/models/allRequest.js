@@ -323,15 +323,9 @@ export default {
       }
     },
     // 发布新 comment
-    * makeNewRequestComment(action, {call, put, select}) {
-      const user_ID = yield select(state => state.login.user.user_ID)
-      const user_request_id = yield select(state => state.allRequest.focusUserRequest._id)
+    * makeComment(action, {call, put, select}) {
       let payload = action.payload
-      payload.user_id = user_ID
-      payload.user_request_id = user_request_id
-      // console.log('payload')
-      // console.log(payload)
-      const {data: result} = yield call(userRequestCommentsService.createNewUserRequestComments, payload)
+      const {data: result} = yield call(userRequestCommentsService.createComments, payload)
 
       if (result) {
         yield call(fetchAllCommentsOfThisRequest, {payload: {userrequestId: payload.user_request_id}}, {
