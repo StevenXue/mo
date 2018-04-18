@@ -478,12 +478,12 @@ class ProjectService:
     @classmethod
     def get_by_id(cls, project_id, **kwargs):
         project = cls.business.get_by_id(project_id)
-        if kwargs.get('commits') == 'true':
-            commits = cls.business.get_commits(project.path)
-            project.commits = [{
-                'message': c.message,
-                'time': datetime.fromtimestamp(c.time[0] + c.time[1]),
-            } for c in commits]
+        # if kwargs.get('commits') == 'true':
+        #     commits = cls.business.get_commits(project.path)
+        #     project.commits = [{
+        #         'message': c.message,
+        #         'time': datetime.fromtimestamp(c.time[0] + c.time[1]),
+        #     } for c in commits]
         return project
 
     @classmethod

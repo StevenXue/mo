@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Checkbox, Tooltip, Radio, Input, Spin, Alert} from 'antd'
+import {Checkbox, Tooltip, Radio, Input, Spin, Alert, Input} from 'antd'
 import * as pathToRegexp from 'path-to-regexp'
 
 import {
@@ -127,6 +127,7 @@ export class ModulePage extends React.Component {
                 <div style={{minHeight: 100, overflowY: 'auto'}}>
                     <h3>{this.state.project.name}</h3>
                     <p>{this.state.project.description}</p>
+                    <Input placeholder='Commit Message' className='commitMsg'/>
                     {
                         this.state.project.privacy === 'private' &&
                         <Tooltip placement="top"

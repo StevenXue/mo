@@ -30,6 +30,7 @@ cat_dict = {
         'https://github.com/momodel/cookiecutter-python-toolkit.git'
 }
 
+
 # def add(name, user, **kwargs):
 #     try:
 #         module_path = kwargs.pop("module_path")
@@ -100,6 +101,7 @@ class ModuleBusiness(ProjectBusiness):
             })
 
         # copy temp project to project dir and remove temp dir
+        # need to keep .git, cannot use cls.copytree_wrapper
         copy_tree(os.path.join(temp_path, name), project_path)
         remove_tree(temp_path)
 
@@ -108,7 +110,7 @@ class ModuleBusiness(ProjectBusiness):
         # initial commit
         repo.index.commit('Initial Commit')
         repo.remote(name='origin').push()
-
+        commit = cls.update_project_commits(repo)
         # auth jupyterhub with user token
         res = cls.auth_hub_user(user_ID, name, user_token)
 
@@ -121,7 +123,7 @@ class ModuleBusiness(ProjectBusiness):
             type=type, tags=tags,
             hub_token=res.get('token'),
             path=project_path, user=user,
-            privacy=privacy, category=category,
+            privacy=privacy, category=category, commits=[commit],
             repo_path=f'http://{GIT_SERVER_IP}/repos/{user_ID}/{name}')
 
     # @classmethod
@@ -151,19 +153,18 @@ class ModuleBusiness(ProjectBusiness):
             return {'input': obj.get('input'), 'output': obj.get('output')}
 
     @classmethod
-    def deploy_or_publish(cls, project_id, version='dev'):
+    def deploy_or_publish(cls, project_id, commit_msg, version='dev'):
         module = cls.get_by_id(project_id)
         module.module_path = os.path.join(MODULE_DIR, module.user.user_ID,
                                           module.name)
-
         dst = os.path.join(module.module_path, version)
-        # if dir exists, remove it and copytree, cause copytree will
-        #  create the dir
-        if os.path.exists(dst):
-            shutil.rmtree(dst)
-        shutil.copytree(module.path, dst)
+        cls.copytree_wrapper(module.path, dst,
+                             ignore=shutil.ignore_patterns('.git'))
         # WORKON_HOME=./ pipenv install vv
         subprocess.call(['bash', 'install_venv.sh', os.path.abspath(dst)])
+
+        cls.commit(project_id, commit_msg, version)
+
         if version != 'dev':
             module.privacy = 'public'
             module.versions.append(version)
@@ -178,4 +179,3 @@ class ModuleBusiness(ProjectBusiness):
                                        project.user.user_ID, project.category)
         failures = [f[1] for f in result.failures]
         return failures
-

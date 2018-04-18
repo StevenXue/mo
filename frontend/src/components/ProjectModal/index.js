@@ -60,7 +60,7 @@ class ProjectModal extends Component {
             onJson: (response) => {
               this.props.fetchData && this.props.fetchData()
               this.props.dispatch({ type: 'project/hideModal' })
-              if(this.props.newAnswer) {
+              if (this.props.newAnswer) {
                 this.props.handleCreate([response])
               } else {
                 this.props.dispatch(routerRedux.push('/workspace/' + response._id + `?type=${this.props.type}`))
@@ -181,7 +181,7 @@ class ProjectModal extends Component {
                 })(<Input/>)
               }
             </FormItem>
-            {!this.props.new && <FormItem
+            {!this.props.new && privacy === 'private' && <FormItem
               {...formItemLayout}
               label="Privacy"
             >

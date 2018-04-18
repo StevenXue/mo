@@ -7,7 +7,19 @@ from mongoengine import ReferenceField
 from mongoengine import ListField
 from mongoengine import DictField
 from mongoengine import IntField
+from mongoengine import EmbeddedDocumentListField
+from mongoengine import EmbeddedDocument
 from mongoengine import PULL
+
+
+class Commit(EmbeddedDocument):
+    oldhexsha = StringField()
+    newhexsha = StringField()
+    actor_name = StringField()
+    actor_email = StringField()
+    timestamp = DateTimeField()
+    message = StringField()
+    version = StringField()
 
 
 class Project(DynamicDocument):
@@ -39,6 +51,7 @@ class Project(DynamicDocument):
     user_name = StringField(max_length=50)
     results = ListField(ReferenceField('Result', reverse_delete_rule=PULL))
     versions = ListField(StringField())
+    commits = EmbeddedDocumentListField(Commit)
 
     meta = {
         'allow_inheritance': True,

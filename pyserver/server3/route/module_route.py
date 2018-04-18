@@ -101,14 +101,19 @@ def update_module():
 
 @module_app.route("/publish/<project_id>/<version>", methods=["POST"])
 def publish_module(project_id, version):
-    project = ModuleService.publish(project_id, version)
+    data = request.get_json()
+    commit_msg = data.get('commit_msg')
+    project = ModuleService.publish(project_id=project_id, commit_msg=commit_msg,
+                                    version=version)
     project = json_utility.convert_to_json(project.to_mongo())
     return jsonify({"response": project})
 
 
 @module_app.route("/deploy/<project_id>", methods=["POST"])
 def deploy_module(project_id):
-    project = ModuleService.deploy(project_id)
+    data = request.get_json()
+    commit_msg = data.get('commit_msg')
+    project = ModuleService.deploy(project_id=project_id, commit_msg=commit_msg)
     project = json_utility.convert_to_json(project.to_mongo())
     return jsonify({"response": project})
 
