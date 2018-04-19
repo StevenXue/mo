@@ -1,7 +1,7 @@
 # 快速开始
 
 ## 寻找并使用我的第一个应用
-<img src="./media/nav1.png"  />
+<img src="./media/nav1.png" width="50%" height="50%" />
 
 点击首页导航中的Market栏目。
 
