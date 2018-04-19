@@ -54,7 +54,17 @@ For more information about pricing, check out our Pricing Guide
 **1. 发布需求**
 用户进入request模块，选择相应的request类型（apps/module/dataset), 点击新建需求, 填写相应内容。 用户可以在Request版块查找自己发布的需求，也可以在my profile中查看.
 
-**3. 创建项目**
+**2. 发现需求**
+<img src="./media/nav1.png" width="50%" height="50%" />
+点击首页导航中的Requst栏目。
+点击需求列表中的栏目可以进入详情，如果回答显示对号则表明此条需求已经采纳了某条回答。
+
+**3. 回答需求**
+点击 Add My Answer 按钮
+如果你已经完成了符合需求的项目，可以在菜单中进行选择并提交回答。
+如果你暂时还没有合适的项目，也可以直接旁边的新建按钮创建项目。
+
+**4. 创建项目**
 点击首页导航中的workspace栏目，先选择文件类型，项目分为应用、模块、数据集三种，在对应页面点击“新建按钮”，填写名称、描述等信息完成创建。创建完成或会自动计入项目详情页面，点击“notebook”按钮，即可进入工作编辑区进行开发训练。
 
 notebook分为三个区域如下图所示：
