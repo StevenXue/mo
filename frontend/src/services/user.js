@@ -32,12 +32,12 @@ export function getStarFavor({payload, onJson}) {
 }
 
 
-export function get_user_info({user_ID}) {
+export function getUserInfo({user_ID}) {
   return request(`${CORS}/user/profile/${user_ID}`)
 }
 
 
-export const getfavorApps = async (payload, callback, onSuccess, onError) => {
+export const getFavorApps = async (payload, callback, onSuccess, onError) => {
   // return request(`${prefix}/favor_apps`, {
   //   method: 'get',
   // })
@@ -49,4 +49,15 @@ export const getfavorApps = async (payload, callback, onSuccess, onError) => {
     onSuccess,
     onError
   )
+}
+
+
+export function updateUserInfo({ body, onJson }) {
+  return request(`${CORS}/user`, {
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  }, { onJson });
 }

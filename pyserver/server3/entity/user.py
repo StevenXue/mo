@@ -9,7 +9,8 @@ from mongoengine import ReferenceField
 from server3.entity.project import Module
 GENDER = (
     (0, 'female'),
-    (1, 'male')
+    (1, 'male'),
+    (2, 'unknown')
 )
 
 
@@ -19,7 +20,7 @@ class User(DynamicDocument):
     name = StringField(max_length=50)
     email = EmailField(unique=True, sparse=True)
     phone = StringField(unique=True, sparse=True)
-    gender = IntField(choices=GENDER)
+    gender = IntField(choices=GENDER, default=2)
     age = IntField()
 
     # 用户收藏的api列表
