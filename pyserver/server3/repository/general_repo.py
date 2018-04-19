@@ -61,6 +61,15 @@ class Repo:
         """
         return Repo.read_unique_one(self, {field_name: field_value})
 
+    def read_by_two_field(self, field_name, field_value, field_name_2, field_value_2):
+        """
+        general function to query the db by unique field
+        :param field_name:
+        :param field_value:
+        :return: return the unique object corresponding to the query
+        """
+        return Repo.read_unique_one(self, {field_name: field_value, field_name_2: field_value_2})
+
     def read_by_non_unique_field(self, field_name, field_value):
         """
         general function to query the db by non unique field, thus return a list

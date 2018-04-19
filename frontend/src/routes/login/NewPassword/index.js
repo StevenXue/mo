@@ -16,7 +16,8 @@ class NewPassword extends Component {
         let url = new URL(window.location.href.replace('/#', ''))
         this.setState({
             email:url.searchParams.get('email'),
-            user:url.searchParams.get('user')
+            user:url.searchParams.get('user'),
+            hashEmail:url.searchParams.get('hashEmail'),
         })
     }
 
@@ -44,8 +45,9 @@ class NewPassword extends Component {
         message.warning('修改失败');
     }
     send = ()=>{
-        if(this.state.password==this.state.password_two){
-            fetch(`http://localhost:5005/user/newpassword?password=${this.state.password}&&email=${this.state.email}`, {method: 'GET'})
+        const {password, email, hashEmail, password_two} = this.state
+        if(password==password_two){
+            fetch(`http://localhost:5005/user/newpassword?password=${password}&&email=${email}&&hashEmail=${hashEmail}`, {method: 'GET'})
             .then(({status})=>{
                 if(status==200){
                     this.vic();

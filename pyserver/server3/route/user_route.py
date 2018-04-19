@@ -168,8 +168,9 @@ def forgot():
 def newpassword():
     password = request.args.get('password', None)
     email = request.args.get('email', None)
+    hashEmail = request.args.get('hashEmail', None)
     try:
-        user = user_service.newpassword_send(password, email)
+        user = user_service.newpassword_send(password, email, hashEmail)
         # user_obj.pop('password')
     except DoesNotExist as e:
         return jsonify({'response': '%s: %s' % (str(
