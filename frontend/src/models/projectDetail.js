@@ -36,7 +36,9 @@ export default {
     sessions: [],
     // doneIndices: new Set([]),
     helpModalVisible: false,
-    activeTab: '1'
+    activeTab: '1',
+    pageNo: 1,
+    pageSize: 10,
   },
   reducers: {
     changeActiveTab(state, {activeTab}) {
@@ -122,16 +124,20 @@ export default {
         project: undefined,
       }
     },
-    setProjectComments(state, {comments, totalNumber}) {
-      console.log('comments',comments)
-      console.log('totalNumber',totalNumber)
+
+    setCommentsPageNoSize(state, {pageNo ,pageSize}){
       return {
         ...state,
-        project: {
-          ...state.project,
-          comments,
-          totalNumber,
-        }
+        pageNo ,
+        pageSize,
+      }
+    },
+
+    setProjectComments(state, {comments, totalNumber}) {
+      return {
+        ...state,
+        comments,
+        totalNumber,
       }
     },
     setExampleResult(state, action) {
@@ -160,9 +166,9 @@ export default {
 
     // 获取 project 下的 comments
     * fetchComments({projectId}, {call, put, select}) {
-      console.log('projectId',projectId)
-      const pageNo = yield select(state => get(state, 'projectDetail.project.pageNo'))
-      const pageSize = yield select(state => get(state, 'projectDetail.project.pageNo'))
+      const pageNo = yield select(state => get(state, 'projectDetail.pageNo'))
+      const pageSize = yield select(state => get(state, 'projectDetail.pageSize'))
+
       let payload = {
         'page_no': pageNo,
         'page_size': pageSize,
@@ -174,8 +180,6 @@ export default {
         payload})
       const comments = data.comments
       const totalNumber = data.total_number
-      console.log('comments',comments)
-      console.log('totalNumber',totalNumber)
       yield put({type: 'setProjectComments', comments, totalNumber})
     },
 

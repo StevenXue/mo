@@ -58,48 +58,25 @@ class CommentsList extends React.Component {
     }
   }
 
-  fetchData() {
-    const payload = {
-      'page_no': this.state.pageNo,
-      'page_size': this.state.pageSize,
-      'comments_type': 'project',
-      '_id': this.props.projectId
-    }
-    this.props.dispatch({
-      type: 'projectDetail/fetchComments',
-      payload
-    })
-    // this.props.dispatch({
-    //   type: 'projectDetail/fetchComments',
-    //   payload,
-    //   onJson: ({comments: comments, total_number: totalNumber}) => {
-    //     this.setState({
-    //       comments, totalNumber
-    //     })
-    //   }})
-  }
-
-  // fetchComments({
-  //   payload,
-  //   onJson: ({comments: comments, total_number: totalNumber}) => {
-  //     this.setState({
-  //       comments, totalNumber
-  //     })
-  //   }
-  // })
-
-
-  componentDidMount() {
-    // this.fetchData()
-  }
+  componentDidMount() {}
 
   onShowSizeChange = (current, pageSize) => {
-    this.setState({
-      pageNo: current,
-      pageSize: pageSize
-    }, () => this.fetchData())
-  }
 
+    // const payload = {
+    //   'pageNo': current,
+    //   'pageSize': pageSize,
+    //   'projectId': this.props.projectId
+    // }
+    this.props.dispatch({
+      type: 'projectDetail/setCommentsPageNoSize',
+      'pageNo': current,
+      'pageSize': pageSize,
+    })
+    this.props.dispatch({
+      type: 'projectDetail/fetchComments',
+      'projectId': this.props.projectId
+    })
+  }
 
   render() {
     const {dispatch, projectId} = this.props
@@ -129,8 +106,8 @@ class CommentsList extends React.Component {
             <Pagination showSizeChanger
                         onShowSizeChange={this.onShowSizeChange.bind(this)}
                         onChange={this.onShowSizeChange}
-                        defaultCurrent={1}
-                        defaultPageSize={this.state.pageSize}
+                        defaultCurrent={this.props.pageNo}
+                        defaultPageSize={this.props.pageSize}
                         pageSizeOptions={['5', '10', '15', '20', '25']}
                         total={this.props.totalNumber}/>
           </div>
@@ -568,7 +545,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
 
               </div>
               {/*content tabs*/}
-              <Tabs defaultActiveKey="1" onChange={callback}
+              <Tabs defaultActiveKey={projectDetail.activeTab} onChange={callback}
                     activeKey={projectDetail.activeTab}
                     tabBarExtraContent={appStatus()}
                     className={styles.jobs}>
@@ -595,8 +572,11 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                 <TabPane tab="Comments" key="4" onClick={()=>getComments()}>
                   <CommentForm dispatch={dispatch} projectId={projectId}/>
                   <CommentsList dispatch={dispatch} projectId={projectId}
-                                comments={projectDetail.project.comments}
-                                totalNumber={projectDetail.project.totalNumber}
+                                comments={projectDetail.comments}
+                                totalNumber={projectDetail.totalNumber}
+                                pageSize={projectDetail.pageSize}
+                                pageNo={projectDetail.pageNo}
+
                   />
                 </TabPane>
               </Tabs>

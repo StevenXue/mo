@@ -34,7 +34,6 @@ class CommentForm extends React.Component {
   }
 
   makeComment = (values) => {
-    console.log('mmmmmm', values)
     this.props.dispatch({
       type: 'allRequest/makeComment',
       payload: {
@@ -89,14 +88,14 @@ class CommentForm extends React.Component {
             />
           )}
         </FormItem>
-        <FormItem>
-          <Button type="primary"
-                  htmlType="submit"
-                  disabled={hasErrors(getFieldsError())}
-                  onClick={this.handleSubmit}>
-            确定
-          </Button>
-        </FormItem>
+        {/*<FormItem>*/}
+          {/*<Button type="primary"*/}
+                  {/*htmlType="submit"*/}
+                  {/*disabled={hasErrors(getFieldsError())}*/}
+                  {/*onClick={this.handleSubmit}>*/}
+            {/*确定*/}
+          {/*</Button>*/}
+        {/*</FormItem>*/}
       </Form>
     )
   }

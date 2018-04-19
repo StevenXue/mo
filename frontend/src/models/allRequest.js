@@ -9,11 +9,16 @@ import pathToRegexp from 'path-to-regexp'
 
 // get 此request下所有的的 comment
 function* fetchAllCommentsOfThisRequest(action, {call, put}) {
-  const {data: allCommentsOfThisRequest} = yield call(
+  const {data} = yield call(
     commentsService.fetchComments, {
-      _id: action.payload._id,
-      comments_type: 'request'
+      payload: {
+        _id: action.payload._id,
+        comments_type: 'request',
+        page_no: 1,
+        page_size: 100
+      }
     })
+  let allCommentsOfThisRequest = data.comments
   if (allCommentsOfThisRequest.length > 0) {
     yield put({
       type: 'setAllCommentsOfThisRequest',
@@ -319,7 +324,9 @@ export default {
 
       yield call(fetchAllAnswerOfThisRequest, {
         payload: {
-          userrequestId: action.payload.userrequestId}}, {
+          userrequestId: action.payload.userrequestId
+        }
+      }, {
         call, put,
       })
     },
@@ -342,18 +349,22 @@ export default {
     * makeComment(action, {call, put, select}) {
       let payload = action.payload
       const {data: result} = yield call(commentsService.createComments, payload)
-      console.log('payload',payload)
+      console.log('payload', payload)
       // 获得当前 request 的 id
       const _id = yield select(state => state.allRequest.focusUserRequest._id)
       if (result) {
         yield call(fetchAllCommentsOfThisRequest, {
           payload: {
-            _id: _id}}, {
+            _id: _id
+          }
+        }, {
           call, put
         })
         yield call(fetchAllAnswerOfThisRequest, {
           payload: {
-            userrequestId: _id}}, {
+            userrequestId: _id
+          }
+        }, {
           call, put
         })
       }
