@@ -49,7 +49,6 @@ def send():
 
 @world_app.route('', methods=['GET'])
 def get():
-    # data = request.ar()s
     channel = request.args.get("channel", 'all')
     page_no = int(request.args.get('page_no', 1))
     page_size = int(request.args.get('page_size', 50))
@@ -65,11 +64,6 @@ def get():
             message.sender_user_ID = message.sender.user_ID
         else:
             message.sender_user_ID = "system"
-
-        # if message.message_type == 'admin':
-        #     message.sender_user_ID = "system"
-        # else:
-        #     message.sender_user_ID =
     if world_messages:
         return jsonify({
             "response": {

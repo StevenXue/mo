@@ -25,18 +25,18 @@ from server3.business.request_answer_business import RequestAnswerBusiness
 from server3.business.data_set_business import DatasetBusiness
 
 from server3.entity.phone_message_id import PhoneMessageId
-import smtplib    
-from email.mime.multipart import MIMEMultipart    
-from email.mime.text import MIMEText    
-from email.mime.image import MIMEImage 
-from email.header import Header   
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from email.header import Header
 smtpserver = 'smtp.163.com'
 username = '15669929857@163.com'
 password='wurao122'
 sender='15669929857@163.com'
 # receiver='374758875@qq.com'
 subject = 'Python email test'
-msg = MIMEMultipart('mixed') 
+msg = MIMEMultipart('mixed')
 msg['Subject'] = subject
 msg['From'] = '15669929857@163.com <15669929857@163.com>'
 # msg['To'] = '374758875@qq.com'
@@ -83,7 +83,7 @@ def authenticate(user_ID, password):
     if user and check_password_hash(user.password, password):
         user.id = str(user.id)
         return user
-    return False 
+    return False
 
 def forgot_send(email):
     user = user_business.get_by_email(email)
@@ -101,11 +101,11 @@ def forgot_send(email):
         msg.attach(text_plain)   
         smtp = smtplib.SMTP()    
         smtp.connect('smtp.163.com')
-        smtp.login(username, password)    
-        smtp.sendmail(sender, receiver, msg.as_string())    
+        smtp.login(username, password)
+        smtp.sendmail(sender, receiver, msg.as_string())
         smtp.quit()
         return user
-    return False 
+    return False
 
 
 def newpassword_send(password,email,hashEmail):
@@ -115,14 +115,14 @@ def newpassword_send(password,email,hashEmail):
         del user.hashEmail
         user.save()
         return user
-    return False 
+    return False
 
 
 def check_tourtip(user_ID):
     user = user_business.get_by_user_ID(user_ID)
     if user:
         return user
-    return False 
+    return False
 
 
 def no_tourtip(user_ID):
@@ -131,13 +131,13 @@ def no_tourtip(user_ID):
         user['tourtip'] = "1"
         user.save()
         return user
-    return False 
+    return False
 
 def check_learning(user_ID):
     user = user_business.get_by_user_ID(user_ID)
     if user:
         return user
-    return False 
+    return False
 
 def no_learning(user_ID):
     user = user_business.get_by_user_ID(user_ID)
@@ -145,7 +145,7 @@ def no_learning(user_ID):
         user['welcome'] = "1"
         user.save()
         return user
-    return False 
+    return False
 
 def update_request_vote(user_request_id, user_ID):
     user = user_business.get_by_user_ID(user_ID)
@@ -315,7 +315,7 @@ def send_verification_code(phone):
     url = "https://api.sms.jpush.cn/v1/codes"
     payload = json.dumps({
         'mobile': phone,
-        'temp_id': 1,
+        'temp_id': 149269,
     })
     headers = {
         'content-type': "application/json",
@@ -422,98 +422,40 @@ class UserService:
             object_result = object.save()
         if user_result and object_result:
             return UserEntity(user=user_result, entity=object_result)
-    
-    @classmethod
-    def favor_app(cls, user_ID, app_id):
-        return FavorApp.action(user_ID, app_id)
-        # user = user_business.get_by_user_ID(user_ID=user_ID)
-        # app = AppBusiness.get_by_id(project_id=app_id)
-        # # 1. 在user下存favor_apps
-        # if app not in user.favor_apps:
-        #     user.favor_apps.append(app)
-        #     user_result = user.save()
-        # else:
-        #     user.favor_apps.remove(app)
-        #     user_result = user.save()
-        # # 2. 在app下存favor_users
-        # if user not in app.favor_users:
-        #     app.favor_users.append(user)
-        #     app_result = app.save()
-        # else:
-        #     app.favor_users.remove(user)
-        #     app_result = app.save()
-        #
-        # if user_result and app_result:
-        #     return FavorAppReturn(user=user_result, app=app_result)
 
     @classmethod
-    def star_app(cls, user_ID, app_id):
-        return StarApp.action(user_ID, app_id)
+    def get_statistics(cls, user_ID, page_no, page_size, action, entity_type):
+        """
+        获取用户统计信息
 
-    @classmethod
-    def star_request(cls, user_ID, app_id):
-        return StarApp.action(user_ID, app_id)
+        这里需要将 app, caller 从objectID转换成json吗？
+        1. service可能被其他service调用，应该在route层转换
+        2. 在其他service调用时也都需要转换，保证route调用结果一致
+        :param user_ID:
+        :type user_ID:
+        :param page_no:
+        :type page_no:
+        :param page_size:
+        :type page_size:
+        :param action:
+        :type action:
+        :param entity_type:
+        :type entity_type:
+        :return:
+        :rtype:
+        """
+        from server3.business.statistics_business import StatisticsBusiness
+        user_obj = UserBusiness.get_by_user_ID(user_ID=user_ID)
+        statistics = StatisticsBusiness.get_pagination(
+            query={
+                "action": action,
+                "entity_type": entity_type,
+                "caller": user_obj
+            },
+            page_no=page_no, page_size=page_size)
+        for _object in statistics.objects:
+            _object.app_obj_user_ID = _object.app.user.user_ID
+        statistics.objects = json_utility.objs_to_json_with_args(
+            statistics.objects, ["app", "caller"])
+        return statistics
 
-    @classmethod
-    def get_user_info(cls, user_ID):
-        user = UserBusiness.get_by_user_ID(user_ID)
-        user = json_utility.convert_to_json(user.to_mongo())
-        return user
-
-# 尝试合并代码
-# class Action:
-#     business = None  # app / module
-#     action_type = None  # favor / star /
-#     # favor_apps
-#     user_keyword = None
-#     # user_keyword = '{business}_{action_type}s'.format(business=business, action_type=action_type)
-#     # favor_users
-#     # object_keyword = '{action_type}_users'.format(action_type=action_type)
-#     object_keyword = None
-#
-#     @classmethod
-#     def action(cls, user_ID, object_id):
-#         user = user_business.get_by_user_ID(user_ID=user_ID)
-#         app = cls.business.get_by_id(project_id=object_id)
-#
-#         if app not in user[cls.user_keyword]:
-#             user[cls.user_keyword].append(app)
-#             user_result = user.save()
-#         else:
-#             user[cls.user_keyword].remove(app)
-#             user_result = user.save()
-#         # 2. 在app下存favor_users
-#         if user not in app[cls.object_keyword]:
-#             app[cls.object_keyword].append(user)
-#             app_result = app.save()
-#         else:
-#             app[cls.object_keyword].remove(user)
-#             app_result = app.save()
-#         if user_result and app_result:
-#             return UserEntity(user=user_result, entity=app_result)
-#
-#
-# class FavorApp(Action):
-#     business = AppBusiness
-#     action_type = 'favor'
-#     user_keyword = 'favor_apps'
-#     object_keyword = 'favor_users'
-#
-#
-# class StarApp(Action):
-#     business = AppBusiness
-#     action_type = 'star'
-#     user_keyword = 'star_apps'
-#     object_keyword = 'favor_users'
-#
-#
-# class StarRequest(Action):
-#     business = UserRequestBusiness
-#     action_type = 'star'
-#     user_keyword = 'star_apps'
-#     object_keyword = 'favor_users'
-#
-#
-# class FavorModule(Action):
-#     # business = ModuleBusiness
-#     pass

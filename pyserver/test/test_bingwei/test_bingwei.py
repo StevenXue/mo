@@ -10,7 +10,7 @@ def test():
     url = "https://api.sms.jpush.cn/v1/codes"
     payload = json.dumps({
         'mobile': "15988731660",
-        'temp_id': 1,
+        'temp_id': 149269,
     })
 
     # payload = "{\"mobile\":\"15988731660\",\"temp_id\":1}"

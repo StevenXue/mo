@@ -58,7 +58,7 @@ from server3.route import job_route
 from server3.route import request_route
 from server3.route import chat_route
 from server3.route import module_route
-from server3.route import request_comments_route
+from server3.route import comments_route
 from server3.route import request_answer_route
 from server3.route import api_route
 from server3.route import app_route
@@ -82,7 +82,7 @@ app.register_blueprint(job_route.job_app)
 app.register_blueprint(request_route.user_request_app)
 app.register_blueprint(chat_route.chat_app)
 app.register_blueprint(module_route.module_app)
-app.register_blueprint(request_comments_route.user_request_comments_app)
+app.register_blueprint(comments_route.comments_app)
 app.register_blueprint(request_answer_route.request_answer_app)
 app.register_blueprint(api_route.api_app)
 app.register_blueprint(app_route.app_app)

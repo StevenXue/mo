@@ -7,6 +7,28 @@ from server3.business.general_business import GeneralBusiness
 class StatisticsBusiness(GeneralBusiness):
     repo = Repo(Statistics)
 
+    entity = Statistics
+
+    # def create(self, **kwargs):
+    #     return Statistics(**kwargs).save()
+    #
+    # @classmethod
+    # def use_app(cls, user_obj, app_obj, output_json, input_json=None):
+    #     cls.create( caller=user_obj,
+    #             entity_type="app",
+    #             app=app_obj,
+    #             action="use",
+    #             datetime=datetime.utcnow())
+    #     # StatisticsBusiness.create()
+    #     statistics = Statistics(
+    #         caller=user_obj,
+    #         entity_type="app",
+    #         app=app_obj,
+    #         action="use",
+    #         datetime=datetime.utcnow(),
+    #     )
+    #     return statistics.save()
+
     @classmethod
     def use_app(cls, user_obj, app_obj, output_json, input_json=None):
         return cls.repo.create_one(

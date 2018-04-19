@@ -9,8 +9,8 @@ import {
 import debounce from 'lodash.debounce'
 import {get} from 'lodash'
 import {showTime} from '../../../utils/index'
-import BraftEditor from 'braft-editor'
-import 'braft-editor/dist/braft.css'
+// import BraftEditor from 'braft-editor'
+// import 'braft-editor/dist/braft.css'
 import {JsonToArray} from '../../../utils/JsonUtils'
 import RequestModal from '../../../components/RequestModal/index'
 import {getProjects} from '../../../services/project'
@@ -19,7 +19,7 @@ import ProjectModal from '../../../components/ProjectModal/index'
 
 const {TextArea} = Input
 const confirm = Modal.confirm
-const FormItem = Form.Item;
+const FormItem = Form.Item
 
 function hasErrors(fieldsError) {
   return Object.keys(fieldsError).some(field => fieldsError[field])
@@ -33,27 +33,15 @@ class CommentForm extends React.Component {
     this.input.focus()
   }
 
-  make_comment = (values) => {
-    // console.log('this.props: ', this.props)
-    if (this.props.comments_type === 'request') {
-      this.props.dispatch({
-        type: 'allRequest/makeNewRequestComment',
-        payload: {
-          comments: values['comment'],
-          comments_type: this.props.comments_type,
-        },
-      })
-    }
-    else {
-      this.props.dispatch({
-        type: 'allRequest/makeNewRequestComment',
-        payload: {
-          comments: values['comment'],
-          comments_type: this.props.comments_type,
-          request_answer_id: this.props.request_answer_id,
-        },
-      })
-    }
+  makeComment = (values) => {
+    this.props.dispatch({
+      type: 'allRequest/makeComment',
+      payload: {
+        comments: values['comment'],
+        comments_type: this.props.comments_type,
+        _id: this.props._id,
+      }
+    })
   }
 
   handleSubmit = (e) => {
@@ -61,28 +49,32 @@ class CommentForm extends React.Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         // console.log('Received values of form: ', values)
-        this.make_comment(values)
+        this.makeComment(values)
       }
 
     })
   }
 
   onBlur = () => {
+    console.log('blur')
     if (this.props.comments_type === 'request') {
       showRequestCommentInput(this.props.dispatch)
     }
     if (this.props.comments_type === 'answer') {
-      showAnswerCommentInput(this.props.dispatch, this.props.request_answer_id,)
+      showAnswerCommentInput(this.props.dispatch, this.props._id)
     }
   }
+
 
   render() {
     const {getFieldDecorator, getFieldsError, getFieldError, isFieldTouched} = this.props.form
     // Only show error after a field is touched.
     const emptyCommentError = isFieldTouched('comment') && getFieldError('comment')
     return (
-      <Form layout="inline" onSubmit={this.handleSubmit}
-            onBlur={() => this.onBlur()}>
+      <Form layout="inline"
+            onBlur={() => this.onBlur()}
+            onSubmit={this.handleSubmit}
+      >
         <FormItem
           validateStatus={emptyCommentError ? 'error' : ''}
           help={emptyCommentError || ''}
@@ -93,9 +85,17 @@ class CommentForm extends React.Component {
             <Input className={styles.inputtext}
                    placeholder="Any idea to help?"
                    ref={inputRef => (this.input = inputRef)}
-            />,
+            />
           )}
         </FormItem>
+        {/*<FormItem>*/}
+          {/*<Button type="primary"*/}
+                  {/*htmlType="submit"*/}
+                  {/*disabled={hasErrors(getFieldsError())}*/}
+                  {/*onClick={this.handleSubmit}>*/}
+            {/*确定*/}
+          {/*</Button>*/}
+        {/*</FormItem>*/}
       </Form>
     )
   }
@@ -117,7 +117,7 @@ class AnswerForm extends React.Component {
     fetching: false,
     projects: [],
     selected: [],
-    inputValue: null,
+    inputValue: '',
   }
 
   fetchData = (value) => {
@@ -177,7 +177,7 @@ class AnswerForm extends React.Component {
       },
     })
     this.clearSelect()
-    this.setState({inputValue: null})
+    this.setState({inputValue: ''})
   }
 
   handleChange = (content) => {
@@ -262,7 +262,7 @@ class AnswerForm extends React.Component {
           type="primary"
           htmlType="submit"
           // disabled={this.state.html === null}
-          disabled={this.state.inputValue === null}
+          disabled={this.state.inputValue === ''}
           onClick={this.handleSubmit}
         >
           Post Your Answer
@@ -277,6 +277,7 @@ function callback(key) {
 }
 
 function showAnswerCommentInput(dispatch, request_answer_id) {
+  console.log('2', request_answer_id)
   dispatch({
     type: 'allRequest/showAnswerCommentInput',
     payload: {
@@ -473,6 +474,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
           {focusUserRequest.commentState &&
           <WrappedCommentForm dispatch={dispatch}
                               comments_type={'request'}
+                              _id={focusUserRequest._id}
           />}
           {!(focusUserRequest.commentState) &&
           <p onClick={() => showRequestCommentInput(dispatch)}
@@ -570,7 +572,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                     {e.commentState &&
                     <WrappedCommentForm dispatch={dispatch}
                                         comments_type={'answer'}
-                                        request_answer_id={e._id}/>}
+                                        _id={e._id}/>}
                     {!(e.commentState) &&
                     <p onClick={() => showAnswerCommentInput(dispatch, e._id)}
                        style={{color: '#848d95', cursor: 'pointer'}}>add a

@@ -20,7 +20,7 @@ import {
 } from '../../../services/project'
 
 import {
-  set_star_favor
+  setStarFavor
 } from '../../../services/user'
 
 import styles from './index.less'
@@ -137,7 +137,7 @@ class ProjectList extends Component {
     }
     // 刷新state
     this.setState({})
-    set_star_favor({
+    setStarFavor({
         entity_id: id,
         action: action,
         entity: type
@@ -145,7 +145,7 @@ class ProjectList extends Component {
 
 
     // this.props.dispatch({
-    //   type: 'projectDetail/star_favor',
+    //   type: 'projectDetail/starFavor',
     //   payload: {
     //     entity_id: id,
     //     action: action,

@@ -45,7 +45,7 @@ user_app = Blueprint("user_app", __name__, url_prefix=PREFIX)
 @user_app.route('/send_verification_code/<phone>', methods=['get'])
 def send_verification_code(phone):
     try:
-        user_service.send_verification_code(phone)
+        user_service.send_vewrification_code(phone)
         return jsonify({
             "response": "success"
         }), 200
@@ -419,28 +419,14 @@ def get_statistics():
     user_ID = get_jwt_identity()
     page_no = int(request.args.get('page_no', 1))
     page_size = int(request.args.get('page_size', 5))
-
     action = request.args.get("action")
     entity_type = request.args.get("entity_type")
-
-    user_obj = UserBusiness.get_by_user_ID(user_ID=user_ID)
-    statistics = StatisticsBusiness.get_pagination(
-        query={
-            "action": action,
-            "entity_type": entity_type,
-            "caller": user_obj
-        },
-        page_no=page_no, page_size=page_size)
-    for object in statistics.objects:
-        object.app_obj_user_ID = object.app.user.user_ID
-
+    statistics = UserService.get_statistics(user_ID, page_no, page_size, action, entity_type)
     return jsonify({
         'response': {
-            "objects": json_utility.objs_to_json_with_args(statistics.objects,
-                                                           ["app", "caller"]),
-            # "objects": json_utility.me_obj_list_to_json_list(statistics.objects),
-            # "objects": json.loads(statistics.objects.to_json()),
-
+            "objects": statistics.objects,
+            # "objects": json_utility.objs_to_json_with_args(statistics.objects,
+            #                                                ["app", "caller"]),
             "page_size": statistics.page_size,
             "page_no": statistics.page_no,
             "count": statistics.count,
