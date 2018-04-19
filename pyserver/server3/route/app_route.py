@@ -62,11 +62,19 @@ def publish_in_docker(app_id, version):
 @jwt_required
 def add_used_module(app_id):
     data = request.get_json()
-    used_modules = data.get('used_modules', [])
+    used_module = data.get('used_module')
     func = data.get('func')
     version = data.get('version')
-    print(app_id)
-    app = AppService.add_used_module(app_id, used_modules, func, version)
+    app = AppService.add_used_module(app_id, used_module, func, version)
+    return jsonify({"response": json_utility.convert_to_json(app.to_mongo())})
+
+
+@app_app.route("/add_used_dataset/<app_id>", methods=["PUT"])
+@jwt_required
+def add_used_dataset(app_id):
+    data = request.get_json()
+    used_dataset = data.get('used_dataset')
+    app = AppService.add_used_dataset(app_id, used_dataset)
     return jsonify({"response": json_utility.convert_to_json(app.to_mongo())})
 
 

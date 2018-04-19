@@ -6,6 +6,7 @@ from bson import ObjectId
 
 from server3.service.project_service import ProjectService
 from server3.business.module_business import ModuleBusiness
+from server3.business.data_set_business import DatasetBusiness
 from server3.business.app_business import AppBusiness
 from server3.business.user_business import UserBusiness
 from server3.business import user_business
@@ -18,23 +19,28 @@ class AppService(ProjectService):
     business = AppBusiness
 
     @classmethod
-    def add_used_module(cls, app_id, used_modules, func, version):
-        used_modules = [ModuleBusiness.get_by_id(mid) for mid in used_modules]
-        for module in used_modules:
-            module.args = ModuleBusiness.load_module_params(
-                module, version)
-        return AppBusiness.add_used_module(app_id, used_modules, func)
+    def add_used_module(cls, app_id, used_module, func, version):
+        used_module = ModuleBusiness.get_by_id(used_module)
+
+        used_module.args = ModuleBusiness.load_module_params(
+            used_module, version)
+        return cls.business.add_used_module(app_id, used_module, func,
+                                            version)
+
+    @classmethod
+    def add_used_dataset(cls, app_id, used_dataset):
+        used_dataset = DatasetBusiness.get_by_id(used_dataset)
+        app = cls.business.get_by_id(app_id)
+        return cls.business.insert_dataset(app, used_dataset)
 
     @classmethod
     def run_app(cls, app_id, input_json, user_ID, version):
         """
 
         :param app_id: app id
-        :type app_id: ObjectId
         :param input_json:
-        :type input_json:
         :param user_ID:
-        :type user_ID:
+        :param version:
         :return:
         :rtype:
         """
@@ -67,8 +73,9 @@ class AppService(ProjectService):
     def insert_envs(cls, user_ID, app_name):
         user = UserBusiness.get_by_user_ID(user_ID)
         app = AppBusiness.read_unique_one(name=app_name, user=user)
-        for module in app.used_modules:
-            AppBusiness.insert_module_env(app, module)
+        for used_module in app.used_modules:
+            AppBusiness.insert_module_env(app, used_module.module,
+                                          used_module.version)
 
     @classmethod
     def get_by_id(cls, project_id, **kwargs):
@@ -94,8 +101,6 @@ class AppService(ProjectService):
                                                 handler_file_path)
         cls.send_message(module, m_type='deploy')
         return module
-
-
 
 
 # @classmethod

@@ -86,6 +86,15 @@ class AppGetType:
     chat = 'chat'
 
 
+class UsedModule(EmbeddedDocument):
+    module = ReferenceField(Module)
+    version = StringField()
+
+
+class UsedDataset(EmbeddedDocument):
+    dataset = ReferenceField(Module)
+
+
 class App(Project):
     # 继承Project
     # # 名称
@@ -122,7 +131,8 @@ class App(Project):
     # 文档字符串
     doc = StringField()
     # 使用过的modules
-    used_modules = ListField(ReferenceField(Module))
+    used_modules = EmbeddedDocumentListField(UsedModule)
+    used_datasets = EmbeddedDocumentListField(UsedDataset)
     # app 路径
     app_path = StringField(default=None)
 
