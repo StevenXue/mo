@@ -51,6 +51,21 @@ export function createComments(payload) {
 }
 
 // 获取一个request/answer/project下的所有评论
-export function fetchComments(payload) {
-  return request(`${CORS}/comments?_id=${payload._id}&comments_type=${payload.comments_type}`);
+export function fetchComments({payload, onJson}) {
+
+  let params = ''
+  for (let key in payload) {
+    if (!payload.hasOwnProperty(key)) {
+      continue
+    }
+    if (payload[key]) {
+      const value = payload[key]
+      params += `&${key}=${value}`
+    }
+  }
+  // console.log('payload1111',payload)
+  // console.log('params',params)
+  // return request(`${CORS}/comments?_id=${payload._id}&comments_type=${payload.comments_type}`);
+  return request(`${CORS}/comments?${params}`, undefined, { onJson });
+
 }

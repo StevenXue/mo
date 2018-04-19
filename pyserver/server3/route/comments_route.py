@@ -11,7 +11,7 @@ from server3.utility import json_utility
 
 PREFIX = '/comments'
 
-comments_app = Blueprint("comments_app", __name__,
+comments_app = Blueprint('comments_app', __name__,
                          url_prefix=PREFIX)
 
 
@@ -19,12 +19,21 @@ comments_app = Blueprint("comments_app", __name__,
 def list_comments():
     _id = request.args.get('_id')
     comments_type = request.args.get('comments_type')
-    comments = CommentsBusiness. \
+    page_no = int(request.args.get('page_no', 1))
+    page_size = int(request.args.get('page_size', 5))
+    comments, total_number = CommentsBusiness. \
         get_comments(_id,
-                     comments_type=comments_type)
+                     comments_type,
+                     page_no,
+                     page_size)
+    for comment in comments:
+        comment.user_ID = comment.comments_user.user_ID
+        if hasattr(comment.comments_user, 'avatar'):
+            comment.avatar = comment.comments_user.get('avatar')
     comments = json_utility. \
         me_obj_list_to_json_list(comments)
-    return jsonify({'response': comments}), 200
+    return jsonify(
+        {'response': {'comments': comments, 'total_number': total_number}}), 200
 
 
 @comments_app.route('', methods=['POST'])

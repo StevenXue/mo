@@ -13,7 +13,9 @@ import {
   Tag,
   Upload,
   Input,
-  Form
+  Form,
+  Pagination,
+  Card
 } from 'antd'
 // pages
 import JupyterLab from '../../modelling/Modelling/index'
@@ -29,7 +31,7 @@ import {get} from 'lodash'
 import {message} from 'antd/lib/index'
 import ReactMarkdown from 'react-markdown'
 import {avatarList, flaskServer, hubServer} from '../../../../constants'
-import {getProjects} from "../../../../services/project"
+// import {fetchComments} from "../../../../services/comments"
 
 const confirm = Modal.confirm
 const TabPane = Tabs.TabPane
@@ -45,9 +47,101 @@ const projectTypeDict = {
 }
 
 
+class CommentsList extends React.Component {
+  constructor() {
+    super()
+    this.state = {
+      comments: [],
+      totalNumber: 0,
+      pageNo: 1,
+      pageSize: 10,
+    }
+  }
+
+  fetchData() {
+    const payload = {
+      'page_no': this.state.pageNo,
+      'page_size': this.state.pageSize,
+      'comments_type': 'project',
+      '_id': this.props.projectId
+    }
+    this.props.dispatch({
+      type: 'projectDetail/fetchComments',
+      payload
+    })
+    // this.props.dispatch({
+    //   type: 'projectDetail/fetchComments',
+    //   payload,
+    //   onJson: ({comments: comments, total_number: totalNumber}) => {
+    //     this.setState({
+    //       comments, totalNumber
+    //     })
+    //   }})
+  }
+
+  // fetchComments({
+  //   payload,
+  //   onJson: ({comments: comments, total_number: totalNumber}) => {
+  //     this.setState({
+  //       comments, totalNumber
+  //     })
+  //   }
+  // })
+
+
+  componentDidMount() {
+    // this.fetchData()
+  }
+
+  onShowSizeChange = (current, pageSize) => {
+    this.setState({
+      pageNo: current,
+      pageSize: pageSize
+    }, () => this.fetchData())
+  }
+
+
+  render() {
+    const {dispatch, projectId} = this.props
+    console.log('coment', this.state.comments)
+    return (
+      <div>
+        <div>
+          {this.props.comments && this.props.comments.map(e =>
+            <div className={styles.commentDiv}>
+              <Row>
+                <Col span={2}>
+                  <div className={styles.photoDiv}>
+                    <img src={e.avatar} alt="avatar"/>
+                  </div>
+                </Col>
+                <Col span={20} className={styles.commentCol}>
+                  <div>
+                    <div className={styles.commentUserID}>{e.user_ID}</div>
+                    <div className={styles.commentContent}>{e.comments}</div>
+                    <div
+                      className={styles.commentCreateTime}>{showTime(e.create_time)}</div>
+                  </div>
+                </Col>
+              </Row>
+            </div>)}
+          <div className={styles.pagination}>
+            <Pagination showSizeChanger
+                        onShowSizeChange={this.onShowSizeChange.bind(this)}
+                        onChange={this.onShowSizeChange}
+                        defaultCurrent={1}
+                        defaultPageSize={this.state.pageSize}
+                        pageSizeOptions={['5', '10', '15', '20', '25']}
+                        total={this.props.totalNumber}/>
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
+
+
 class CommentForm extends React.Component {
-
-
 
   constructor() {
     super()
@@ -57,20 +151,14 @@ class CommentForm extends React.Component {
   }
 
   handleSubmit = () => {
-    console.log(this.state)
-    let selectProjectID = null
-    if (this.state.selected.length > 0) {
-      selectProjectID = this.state.selected[0]['_id']
-    }
     this.props.dispatch({
-      type: 'allRequest/makeNewRequestAnswer',
+      type: 'projectDetail/makeComment',
       payload: {
-        // answer: this.state.html,
-        answer: this.state.inputValue,
-        selectProject: selectProjectID,
-      },
+        comments: this.state.inputValue,
+        comments_type: 'project',
+        _id: this.props.projectId,
+      }
     })
-    this.clearSelect()
     this.setState({inputValue: null})
   }
 
@@ -90,20 +178,20 @@ class CommentForm extends React.Component {
               <img src={avatarList[picNumber]} alt="avatar"/>
             </div>
           </Col>
-          <Col span={20}>
+          <Col span={20} style={{margin: '20px 0'}}>
             <TextArea value={inputValue}
                       placeholder="enter your comments.."
                       autosize={{minRows: 5, maxRows: 50}}
                       onChange={(e) => this.handleInputChange(e)}
             />
-            <div style={{margin: '24px 0'}}/>
+            <div style={{margin: '20px 0'}}/>
             <Button
               type="primary"
               htmlType="submit"
               disabled={this.state.inputValue === ''}
               onClick={this.handleSubmit}
             >
-              Post Your Answer
+              Post Comment
             </Button>
           </Col>
         </Row>
@@ -124,7 +212,6 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
   const userObjId = localStorage.getItem('user_obj_id')
   // const projectOwner = get(projectDetail, 'project.user')
   // const projectOwnerOrNot = (projectOwner === userObjId)
-
   const props1 = {
     name: 'file',
     action: flaskServer + '/file/project_file',
@@ -161,6 +248,14 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
       },
     })
   }
+
+  function getComments() {
+    console.log('???????????')
+    dispatch({
+      type:'projectDetail/fetchComments',
+    })
+  }
+
 
   function appStarFavor(action) {
     dispatch({
@@ -201,7 +296,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
     )
   } else {
     // project info page
-    if (projectDetail.project) {
+    if (projectDetail.project && projectDetail.project.type) {
 
       function appStatus() {
         if (!projectDetail.project.status) {
@@ -497,8 +592,12 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                       <ProjectExample projectDetail={projectDetail}
                                       dispatch={dispatch}/> : null}
                   </TabPane> : null}
-                <TabPane tab="Comments" key="4">
-                  <CommentForm dispatch={dispatch}/>
+                <TabPane tab="Comments" key="4" onClick={()=>getComments()}>
+                  <CommentForm dispatch={dispatch} projectId={projectId}/>
+                  <CommentsList dispatch={dispatch} projectId={projectId}
+                                comments={projectDetail.project.comments}
+                                totalNumber={projectDetail.project.totalNumber}
+                  />
                 </TabPane>
               </Tabs>
             </div>

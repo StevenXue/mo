@@ -92,7 +92,8 @@ class CommentForm extends React.Component {
         <FormItem>
           <Button type="primary"
                   htmlType="submit"
-                  disabled={hasErrors(getFieldsError())}>
+                  disabled={hasErrors(getFieldsError())}
+                  onClick={this.handleSubmit}>
             确定
           </Button>
         </FormItem>
