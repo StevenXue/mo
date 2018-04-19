@@ -37,6 +37,8 @@ const confirm = Modal.confirm
 const TabPane = Tabs.TabPane
 const {TextArea} = Input
 const FormItem = Form.Item
+const commitSvg = require('../../../../img/icon/git-commit.svg')
+
 
 const pages = ['import', 'analysis', 'modelling', 'deploy']
 
@@ -46,6 +48,34 @@ const projectTypeDict = {
   dataset: [],
 }
 
+
+class CommitsList extends React.Component {
+  render() {
+    return (
+      <div>
+        {this.props.commits.map(e =>
+          <div className={styles.commentDiv} key={e.newhexsha}>
+            <Row type="flex" justify="space-around" align="middle">
+              <Col span={2} >
+                <div>
+                  {e.version && <div className={styles.commitVersion}><Icon type="tag-o" /> {e.version}</div>
+                  }
+                  <div className={styles.commitHexsha}><img src={commitSvg} alt="commit"/> {e.newhexsha.slice(0,7)}</div>
+                </div>
+              </Col>
+              <Col span={22} className={styles.commentCol}>
+                <div>
+                  <div className={styles.commentContent}>{e.message}</div>
+                  <div
+                    className={styles.commentCreateTime}>{showTime(e.timestamp)}</div>
+                </div>
+              </Col>
+
+            </Row>
+          </div>)}
+      </div>)
+  }
+}
 
 class CommentsList extends React.Component {
   constructor() {
@@ -58,7 +88,8 @@ class CommentsList extends React.Component {
     }
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+  }
 
   onShowSizeChange = (current, pageSize) => {
 
@@ -226,13 +257,6 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
     })
   }
 
-  function getComments() {
-    console.log('???????????')
-    dispatch({
-      type:'projectDetail/fetchComments',
-    })
-  }
-
 
   function appStarFavor(action) {
     dispatch({
@@ -306,7 +330,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
         componentDidMount() {
           fetch(`http://localhost:5005/user/tourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
             .then((response) => response.json())
-            .then(({ response }) => {
+            .then(({response}) => {
               // if (response.user.tourtip !== 0) {
               //   this.setState({
               //     tourtip: 1,
@@ -550,7 +574,8 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
 
               </div>
               {/*content tabs*/}
-              <Tabs defaultActiveKey={projectDetail.activeTab} onChange={callback}
+              <Tabs defaultActiveKey={projectDetail.activeTab}
+                    onChange={callback}
                     activeKey={projectDetail.activeTab}
                     tabBarExtraContent={appStatus()}
                     className={styles.jobs}>
@@ -574,13 +599,22 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                       <ProjectExample projectDetail={projectDetail}
                                       dispatch={dispatch}/> : null}
                   </TabPane> : null}
-                <TabPane tab="Comments" key="4" onClick={()=>getComments()}>
+                <TabPane tab="Comments" key="4">
                   <CommentForm dispatch={dispatch} projectId={projectId}/>
                   <CommentsList dispatch={dispatch} projectId={projectId}
                                 comments={projectDetail.comments}
                                 totalNumber={projectDetail.totalNumber}
                                 pageSize={projectDetail.pageSize}
                                 pageNo={projectDetail.pageNo}
+
+                  />
+                </TabPane>
+                <TabPane tab="Commits" key="5">
+                  <CommitsList dispatch={dispatch} projectId={projectId}
+                               commits={projectDetail.project.commits}
+                               totalNumber={projectDetail.totalNumber}
+                               pageSize={projectDetail.pageSize}
+                               pageNo={projectDetail.pageNo}
 
                   />
                 </TabPane>
