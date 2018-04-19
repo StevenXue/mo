@@ -1,9 +1,22 @@
 import React from 'react'
-import { Link, Route, Switch } from 'react-router-dom'
+import {Link, Route, Switch} from 'react-router-dom'
 import Joyride from 'react-joyride'
-
-import { connect } from 'dva'
-import { Button, Col, Icon, Modal, Row, Spin, Tabs, Tag, Upload } from 'antd'
+import {connect} from 'dva'
+import {
+  Button,
+  Col,
+  Icon,
+  Modal,
+  Row,
+  Spin,
+  Tabs,
+  Tag,
+  Upload,
+  Input,
+  Form,
+  Pagination,
+  Card
+} from 'antd'
 // pages
 import JupyterLab from '../../modelling/Modelling/index'
 // components
@@ -12,15 +25,18 @@ import HelpModal from '../../../../components/HelpModal'
 import ReactMdeEditor from '../../../../components/ReactMdeCom/reactMde'
 import ProjectExample from '../../../../components/ProjectExample/projectExample'
 
-import { showTime } from '../../../../utils/index'
+import {showTime} from '../../../../utils/index'
 import styles from './index.less'
-import { get } from 'lodash'
-import { message } from 'antd/lib/index'
+import {get} from 'lodash'
+import {message} from 'antd/lib/index'
 import ReactMarkdown from 'react-markdown'
-import { flaskServer, hubServer } from '../../../../constants'
+import {avatarList, flaskServer, hubServer} from '../../../../constants'
+// import {fetchComments} from "../../../../services/comments"
 
 const confirm = Modal.confirm
 const TabPane = Tabs.TabPane
+const {TextArea} = Input
+const FormItem = Form.Item
 
 const pages = ['import', 'analysis', 'modelling', 'deploy']
 
@@ -30,18 +46,149 @@ const projectTypeDict = {
   dataset: [],
 }
 
+
+class CommentsList extends React.Component {
+  constructor() {
+    super()
+    this.state = {
+      comments: [],
+      totalNumber: 0,
+      pageNo: 1,
+      pageSize: 10,
+    }
+  }
+
+  componentDidMount() {}
+
+  onShowSizeChange = (current, pageSize) => {
+
+    // const payload = {
+    //   'pageNo': current,
+    //   'pageSize': pageSize,
+    //   'projectId': this.props.projectId
+    // }
+    this.props.dispatch({
+      type: 'projectDetail/setCommentsPageNoSize',
+      'pageNo': current,
+      'pageSize': pageSize,
+    })
+    this.props.dispatch({
+      type: 'projectDetail/fetchComments',
+      'projectId': this.props.projectId
+    })
+  }
+
+  render() {
+    const {dispatch, projectId} = this.props
+    console.log('coment', this.state.comments)
+    return (
+      <div>
+        <div>
+          {this.props.comments && this.props.comments.map(e =>
+            <div className={styles.commentDiv}>
+              <Row>
+                <Col span={2}>
+                  <div className={styles.photoDiv}>
+                    <img src={e.avatar} alt="avatar"/>
+                  </div>
+                </Col>
+                <Col span={20} className={styles.commentCol}>
+                  <div>
+                    <div className={styles.commentUserID}>{e.user_ID}</div>
+                    <div className={styles.commentContent}>{e.comments}</div>
+                    <div
+                      className={styles.commentCreateTime}>{showTime(e.create_time)}</div>
+                  </div>
+                </Col>
+              </Row>
+            </div>)}
+          <div className={styles.pagination}>
+            <Pagination showSizeChanger
+                        onShowSizeChange={this.onShowSizeChange.bind(this)}
+                        onChange={this.onShowSizeChange}
+                        defaultCurrent={this.props.pageNo}
+                        defaultPageSize={this.props.pageSize}
+                        pageSizeOptions={['5', '10', '15', '20', '25']}
+                        total={this.props.totalNumber}/>
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
+
+
+class CommentForm extends React.Component {
+
+  constructor() {
+    super()
+    this.state = {
+      inputValue: '',
+    }
+  }
+
+  handleSubmit = () => {
+    this.props.dispatch({
+      type: 'projectDetail/makeComment',
+      payload: {
+        comments: this.state.inputValue,
+        comments_type: 'project',
+        _id: this.props.projectId,
+      }
+    })
+    this.setState({inputValue: null})
+  }
+
+  handleInputChange(e) {
+    this.setState({inputValue: e.target.value})
+  }
+
+  render() {
+    const {fetching, data, value, projects, inputValue} = this.state
+    const userObjId = localStorage.getItem('user_obj_id')
+    const picNumber = parseInt(userObjId.slice(20)) % 6
+    return (
+      <div className="demo">
+        <Row type="flex" justify="flex" align="top">
+          <Col span={2}>
+            <div className={styles.photoDiv}>
+              <img src={avatarList[picNumber]} alt="avatar"/>
+            </div>
+          </Col>
+          <Col span={20} style={{margin: '20px 0'}}>
+            <TextArea value={inputValue}
+                      placeholder="enter your comments.."
+                      autosize={{minRows: 5, maxRows: 50}}
+                      onChange={(e) => this.handleInputChange(e)}
+            />
+            <div style={{margin: '20px 0'}}/>
+            <Button
+              type="primary"
+              htmlType="submit"
+              disabled={this.state.inputValue === ''}
+              onClick={this.handleSubmit}
+            >
+              Post Comment
+            </Button>
+          </Col>
+        </Row>
+      </div>
+    )
+  }
+}
+
+
 const myShowTime = (time, format = 'yyyy-MM-dd hh:mm') => {
   let date = new Date(time).Format(format)
   return date.toLocaleString()
 }
 
-function ProjectInfo({ market_use, match, history, location, dispatch, projectDetail, login }) {
+function ProjectInfo({market_use, match, history, location, dispatch, projectDetail, login}) {
   const projectId = match.params.projectId
   const user_ID = localStorage.getItem('user_ID')
   const userObjId = localStorage.getItem('user_obj_id')
   // const projectOwner = get(projectDetail, 'project.user')
   // const projectOwnerOrNot = (projectOwner === userObjId)
-
   const props1 = {
     name: 'file',
     action: flaskServer + '/file/project_file',
@@ -71,14 +218,25 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
       okType: 'danger',
       cancelText: 'No',
       onOk() {
-        dispatch({ type: 'projectDetail/delete', payload: { projectId, type: projectDetail.project.type } })
+        dispatch({
+          type: 'projectDetail/delete',
+          payload: {projectId, type: projectDetail.project.type}
+        })
       },
     })
   }
 
+  function getComments() {
+    console.log('???????????')
+    dispatch({
+      type:'projectDetail/fetchComments',
+    })
+  }
+
+
   function appStarFavor(action) {
     dispatch({
-      type: 'projectDetail/star_favor',
+      type: 'projectDetail/starFavor',
       payload: {
         entity_id: projectDetail.project['_id'],
         action: action,
@@ -114,19 +272,21 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
                      dispatch={dispatch}/>
     )
   } else {
+    console.log('detail path')
     // project info page
-    if (projectDetail.project) {
+    if (projectDetail.project && projectDetail.project.type) {
 
       function appStatus() {
         if (!projectDetail.project.status) {
           return <div/>
         }
         if (projectDetail.project.status === 'deploying') {
-          return <Tag color='gold' style={{ cursor: 'default' }}>Deploying <Icon type="loading"/></Tag>
+          return <Tag color='gold' style={{cursor: 'default'}}>Deploying <Icon
+            type="loading"/></Tag>
         } else if (projectDetail.project.status === 'active') {
-          return <Tag color='green' style={{ cursor: 'default' }}>Online</Tag>
+          return <Tag color='green' style={{cursor: 'default'}}>Online</Tag>
         } else {
-          return <Tag color='grey' style={{ cursor: 'default' }}>Offline</Tag>
+          return <Tag color='grey' style={{cursor: 'default'}}>Offline</Tag>
         }
       }
 
@@ -138,19 +298,23 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
           super()
           this.state = {
             steps: [],
-            tourtip: 0,
+            // tourtip: 0,
+            tourtip: 1, // 0: display tourtip, 0: not display tourtip
           }
         }
 
         componentDidMount() {
-          fetch(`http://localhost:5005/user/tourtip?user_ID=${localStorage.user_ID}`, { method: 'GET' })
+          fetch(`http://localhost:5005/user/tourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
             .then((response) => response.json())
             .then(({ response }) => {
-              if (response.user.tourtip != 0) {
-                this.setState({
-                  tourtip: 1,
-                })
-              }
+              // if (response.user.tourtip !== 0) {
+              //   this.setState({
+              //     tourtip: 1,
+              //   })
+              // }
+              this.setState({
+                tourtip: response.user.tourtip,
+              })
             })
         }
 
@@ -173,17 +337,17 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
           return (
             <div>
               {
-                this.state.tourtip == 0 ? <Joyride
+                this.state.tourtip === 0 && <Joyride
                   ref={c => (this.joyride = c)}
                   // callback={this.callback}
                   debug={false}
                   // disableOverlay={selector === '.card-tickets'}
                   locale={{
-                    back: (<span style={{ color: '#34BFE2' }}>Back</span>),
-                    close: (<span style={{ color: '#34BFE2' }}>Close</span>),
-                    last: (<span style={{ color: '#34BFE2' }}>Last</span>),
-                    next: (<span style={{ color: '#34BFE2' }}>Next</span>),
-                    skip: (<span style={{ color: '#666666' }}>Skip</span>),
+                    back: (<span style={{color: '#34BFE2'}}>Back</span>),
+                    close: (<span style={{color: '#34BFE2'}}>Close</span>),
+                    last: (<span style={{color: '#34BFE2'}}>Last</span>),
+                    next: (<span style={{color: '#34BFE2'}}>Next</span>),
+                    skip: (<span style={{color: '#666666'}}>Skip</span>),
                   }}
                   // scrollToSteps  = {true}
                   run={true}
@@ -193,7 +357,7 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
                   // stepIndex={stepIndex}
                   steps={this.state.steps}
                   type='continuous'
-                /> : null
+                />
               }
               <Cloud_2 addSteps={this.addSteps}/>
             </div>
@@ -208,7 +372,7 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
         }
 
         componentWillUnmount() {
-          fetch(`http://localhost:5005/user/notourtip?user_ID=${localStorage.user_ID}`, { method: 'GET' })
+          fetch(`http://localhost:5005/user/notourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
         }
 
         componentDidMount() {
@@ -284,15 +448,16 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
           return (
             <div className={`main-container ${styles.normal}`}>
               {components.includes('help-modal') &&
-              <HelpModal visible={!projectDetail.project.entered || projectDetail.helpModalVisible}
-                         projectType={projectDetail.project.type}/>}
+              <HelpModal
+                visible={!projectDetail.project.entered || projectDetail.helpModalVisible}
+                projectType={projectDetail.project.type}/>}
               <div className={styles.info}>
                 <Row>
-                  <Col span={3} style={{ padding: '10px 42px' }}>
+                  <Col span={3} style={{padding: '10px 42px'}}>
                     <div className={styles.bigIconNunberDiv}>
                       <div
                         className={projectDetail.project.star_users.includes(userObjId) ? styles.iconNunberDivActive : styles.iconNunberDiv}
-                        style={market_use ? { cursor: 'pointer' } : { cursor: 'default' }}
+                        style={market_use ? {cursor: 'pointer'} : {cursor: 'default'}}
                         onClick={market_use ? () => appStarFavor('star') : null}
                       >
                         <p className={styles.icon}>
@@ -304,7 +469,7 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
                       </div>
                       <div
                         className={projectDetail.project.favor_users.includes(userObjId) ? styles.iconNunberDivActive : styles.iconNunberDiv}
-                        style={market_use ? { cursor: 'pointer' } : { cursor: 'default' }}
+                        style={market_use ? {cursor: 'pointer'} : {cursor: 'default'}}
                         onClick={market_use ? () => appStarFavor('favor') : null}>
                         <p className={styles.icon}>
                           <Icon
@@ -315,31 +480,35 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
                       </div>
                     </div>
                   </Col>
-                  <Col span={21} style={{ paddingRight: '50px' }}>
+                  <Col span={21} style={{paddingRight: '50px'}}>
                     <div className={styles.name}>
                       {/* project header area */}
                       <h1>
                         {projectDetail.project.name}&nbsp;
                         {!market_use && <Icon
                           type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
-                          style={{ fontSize: 20 }}/>}
+                          style={{fontSize: 20}}/>}
                         {!market_use && <span className={styles.rightButton}>
-                          <ProjectModal new={false} projectDetail={projectDetail}
+                          <ProjectModal new={false}
+                                        projectDetail={projectDetail}
                                         type={projectDetail.project.type}
                           >
-                          <Button icon='edit' style={{ marginRight: 15 }}/>
+                          <Button icon='edit' style={{marginRight: 15}}/>
                         </ProjectModal>
                           {/* only private project can be deleted */}
                           {projectDetail.project.privacy === 'private' &&
-                          <Button icon='delete' style={{ marginRight: 15 }} onClick={() => deleteProject()}/>}
-                          <Button icon='cloud-download-o' className="mei" onClick={() => dispatch({
-                            type: 'projectDetail/showHelpModal',
-                          })}/>
+                          <Button icon='delete' style={{marginRight: 15}}
+                                  onClick={() => deleteProject()}/>}
+                          <Button icon='cloud-download-o' className="mei"
+                                  onClick={() => dispatch({
+                                    type: 'projectDetail/showHelpModal',
+                                  })}/>
                       </span>}
                       </h1>
                       <p className={styles.text}>
-                        <Icon type="clock-circle-o" style={{ marginRight: 10 }}/>
-                        Create Time: {showTime(projectDetail.project.create_time)}
+                        <Icon type="clock-circle-o" style={{marginRight: 10}}/>
+                        Create
+                        Time: {showTime(projectDetail.project.create_time)}
                       </p>
                     </div>
                     <div className={styles.descriptionDiv}>
@@ -349,11 +518,11 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
                     <div className={styles.tags}>
                       {projectDetail.project.tags.length > 0 ? projectDetail.project.tags.map(e =>
                           <Tag color="#EEEEEE"
-                               style={{ color: '#666666', cursor: 'default' }}
+                               style={{color: '#666666', cursor: 'default'}}
                                key={e}>{e}</Tag>)
                         : null}
                     </div>
-                    <div style={{ paddingBottom: '50px' }}>
+                    <div style={{paddingBottom: '50px'}}>
                     <span>
                       {!market_use && <span className={styles.generalSpan}>
                       <Upload {...props1}>
@@ -381,7 +550,7 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
 
               </div>
               {/*content tabs*/}
-              <Tabs defaultActiveKey="1" onChange={callback}
+              <Tabs defaultActiveKey={projectDetail.activeTab} onChange={callback}
                     activeKey={projectDetail.activeTab}
                     tabBarExtraContent={appStatus()}
                     className={styles.jobs}>
@@ -391,17 +560,30 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
                     {/*{projectDetail.overviewEditState?<ReactMdeEditor*/}
                     {/*projectDetail={projectDetail} dispatch={dispatch}/>:null}*/}
                     <ReactMdeEditor
-                      projectDetail={projectDetail} dispatch={dispatch} market_use={market_use}/>
+                      projectDetail={projectDetail} dispatch={dispatch}
+                      market_use={market_use}/>
                   </div>
                 </TabPane>
                 {!market_use && <TabPane tab="Jobs" key="2">
                   <Jobs projectDetail={projectDetail} dispatch={dispatch}/>
                 </TabPane>}
-                {projectDetail.project.type === 'app' && projectDetail.project.status === 'active' ? <TabPane
-                  tab="Examples" key="3">
-                  {projectDetail.project.args ? <ProjectExample projectDetail={projectDetail}
-                                                                dispatch={dispatch}/> : null}
-                </TabPane> : null}
+                {projectDetail.project.type === 'app' && projectDetail.project.status === 'active' ?
+                  <TabPane
+                    tab="Examples" key="3">
+                    {projectDetail.project.args ?
+                      <ProjectExample projectDetail={projectDetail}
+                                      dispatch={dispatch}/> : null}
+                  </TabPane> : null}
+                <TabPane tab="Comments" key="4" onClick={()=>getComments()}>
+                  <CommentForm dispatch={dispatch} projectId={projectId}/>
+                  <CommentsList dispatch={dispatch} projectId={projectId}
+                                comments={projectDetail.comments}
+                                totalNumber={projectDetail.totalNumber}
+                                pageSize={projectDetail.pageSize}
+                                pageNo={projectDetail.pageNo}
+
+                  />
+                </TabPane>
               </Tabs>
             </div>
           )
@@ -548,12 +730,13 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
         //   </Tabs>
         // </div>
       )
+    } else {
+      return <Spin spinning={true}>Loading...</Spin>
     }
-    return <Spin spinning={true}>Loading...</Spin>
   }
 }
 
-const Jobs = ({ projectDetail, dispatch }) => {
+const Jobs = ({projectDetail, dispatch}) => {
   return (
     <div>
       <h2>Jobs:
@@ -623,7 +806,7 @@ ProjectInfo.defaultProps = {
   market_use: false,
 }
 
-function ProjectDetail({ match, history, location, dispatch, projectDetail }) {
+function ProjectDetail({match, history, location, dispatch, projectDetail}) {
 
   return (
     <div className={`main-container ${styles.normal}`}>
@@ -634,7 +817,7 @@ function ProjectDetail({ match, history, location, dispatch, projectDetail }) {
   )
 }
 
-export default connect(({ projectDetail, login }) => ({
+export default connect(({projectDetail, login}) => ({
   projectDetail,
   login,
 }))(ProjectInfo)

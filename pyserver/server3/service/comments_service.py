@@ -1,62 +1,62 @@
 # -*- coding: UTF-8 -*-
-from server3.business.user_business import UserBusiness
-from server3.business.comments_business import CommentsBusiness
-
-
-class CommentsService:
-
-    @classmethod
-    def get_comments_of_this_user_request(cls, user_request_id):
-        user_request_comments = CommentsBusiness. \
-            get_comments_of_this_user_request(user_request_id)
-        return user_request_comments
-
-    @classmethod
-    def count_comments_of_this_user_request(cls, user_request_id):
-        count = CommentsBusiness.count_comments_of_this_user_request(
-            user_request_id)
-        return count
-
-    @classmethod
-    def get_comments_of_this_answer(cls, request_answer_id):
-        user_request_comments = CommentsBusiness. \
-            get_comments_of_this_answer(request_answer_id)
-        return user_request_comments
-
-    @classmethod
-    def get_by_id(cls, user_request_comments_id):
-        user_request_comments = CommentsBusiness. \
-            get_by_user_request_comments_id(user_request_comments_id)
-        return user_request_comments
-
-    @classmethod
-    def create_user_request_comments(cls, user_request_id, user_ID, comments,
-                                     comments_type, request_answer_id):
-        # create a new user_request_comments object
-        created_user_request_comments = CommentsBusiness. \
-            add_user_request_comments(user_request_id=user_request_id,
-                                      comments_user_ID=user_ID,
-                                      comments=comments,
-                                      comments_type=comments_type,
-                                      request_answer_id=request_answer_id)
-        return created_user_request_comments
-
-    @classmethod
-    def update_user_request_comments(cls, user_request_comments_id, user_ID,
-                                     comments):
-        CommentsBusiness.update_user_request_comments_by_id(
-                user_request_comments_id=user_request_comments_id,
-                comments=comments
-            )
-
-    @classmethod
-    def list_user_request_comments_by_user_id(cls, user_ID):
-        pass
-
-    @classmethod
-    def remove_user_request_comments_by_id(cls, user_request_comments_id,
-                                           user_ID):
-        return CommentsBusiness.remove_by_id(user_request_comments_id, user_ID)
+# from server3.business.user_business import UserBusiness
+# from server3.business.comments_business import CommentsBusiness
+#
+#
+# class CommentsService:
+#
+#     # @classmethod
+#     # def get_comments_of_this_user_request(cls, user_request_id):
+#     #     user_request_comments = CommentsBusiness. \
+#     #         get_comments_of_this_user_request(user_request_id)
+#     #     return user_request_comments
+#
+#     @classmethod
+#     def count_comments_of_this_user_request(cls, user_request_id):
+#         count = CommentsBusiness.count_comments_of_this_user_request(
+#             user_request_id)
+#         return count
+#
+#     @classmethod
+#     def get_comments_of_this_answer(cls, request_answer_id):
+#         user_request_comments = CommentsBusiness. \
+#             get_comments_of_this_answer(request_answer_id)
+#         return user_request_comments
+#
+#     # @classmethod
+#     # def get_by_id(cls, user_request_comments_id):
+#     #     user_request_comments = CommentsBusiness. \
+#     #         get_by_user_request_comments_id(user_request_comments_id)
+#     #     return user_request_comments
+#
+#     @classmethod
+#     def create_user_request_comments(cls, user_request_id, user_ID, comments,
+#                                      comments_type, request_answer_id):
+#         # create a new user_request_comments object
+#         created_user_request_comments = CommentsBusiness. \
+#             add_user_request_comments(user_request_id=user_request_id,
+#                                       comments_user_ID=user_ID,
+#                                       comments=comments,
+#                                       comments_type=comments_type,
+#                                       request_answer_id=request_answer_id)
+#         return created_user_request_comments
+#
+#     @classmethod
+#     def update_user_request_comments(cls, user_request_comments_id, user_ID,
+#                                      comments):
+#         CommentsBusiness.update_user_request_comments_by_id(
+#                 user_request_comments_id=user_request_comments_id,
+#                 comments=comments
+#             )
+#
+#     @classmethod
+#     def list_user_request_comments_by_user_id(cls, user_ID):
+#         pass
+#
+#     @classmethod
+#     def remove_user_request_comments_by_id(cls, user_request_comments_id,
+#                                            user_ID):
+#         return CommentsBusiness.remove_by_id(user_request_comments_id, user_ID)
 
 #
 # def get_comments_of_this_user_request(user_request_id):

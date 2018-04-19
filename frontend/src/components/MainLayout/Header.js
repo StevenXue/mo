@@ -247,7 +247,7 @@ function Header({location, login, history, dispatch, allRequest,message}) {
         >
           <Menu.Item style={{color:'black',height:'250px',overflowY: 'auto'}}>
             {login.user && JsonToArray(message.messages).map(e =>
-              <div onClick={() => toMessage(e) }
+              <div onClick={() => toMessage(e) } key={e.receiver_id}
                 style={e.is_read === false?{margin:'0 -20px',backgroundColor: '#f0f2f5',color:'black'}:{margin:'0 -20px',color:'black'}}>
               {switchMessage(e)}</div>)}
           </Menu.Item>
