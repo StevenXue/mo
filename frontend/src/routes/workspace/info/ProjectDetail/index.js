@@ -272,6 +272,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                      dispatch={dispatch}/>
     )
   } else {
+    console.log('detail path')
     // project info page
     if (projectDetail.project && projectDetail.project.type) {
 
@@ -297,19 +298,23 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
           super()
           this.state = {
             steps: [],
-            tourtip: 0,
+            // tourtip: 0,
+            tourtip: 1, // 0: display tourtip, 0: not display tourtip
           }
         }
 
         componentDidMount() {
           fetch(`http://localhost:5005/user/tourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
             .then((response) => response.json())
-            .then(({response}) => {
-              if (response.user.tourtip != 0) {
-                this.setState({
-                  tourtip: 1,
-                })
-              }
+            .then(({ response }) => {
+              // if (response.user.tourtip !== 0) {
+              //   this.setState({
+              //     tourtip: 1,
+              //   })
+              // }
+              this.setState({
+                tourtip: response.user.tourtip,
+              })
             })
         }
 
@@ -332,7 +337,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
           return (
             <div>
               {
-                this.state.tourtip == 0 ? <Joyride
+                this.state.tourtip === 0 && <Joyride
                   ref={c => (this.joyride = c)}
                   // callback={this.callback}
                   debug={false}
@@ -352,7 +357,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                   // stepIndex={stepIndex}
                   steps={this.state.steps}
                   type='continuous'
-                /> : null
+                />
               }
               <Cloud_2 addSteps={this.addSteps}/>
             </div>
@@ -725,8 +730,9 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
         //   </Tabs>
         // </div>
       )
+    } else {
+      return <Spin spinning={true}>Loading...</Spin>
     }
-    return <Spin spinning={true}>Loading...</Spin>
   }
 }
 
