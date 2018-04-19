@@ -234,7 +234,7 @@ class ProjectBusiness:
         # create the dir
         if os.path.exists(dst):
             shutil.rmtree(dst)
-        shutil.copytree(o, dst, **kwargs)
+        return shutil.copytree(o, dst, **kwargs)
 
     @staticmethod
     def auth_hub_user(user_ID, project_name, user_token):

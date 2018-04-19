@@ -314,7 +314,6 @@ class MyProxy(ConfigurableHTTPProxy):
             '--error-target', url_path_join(self.hub.url, 'error'),
             '--no-include-prefix',
         ]
-        print('cmdcmdcmdcmd', cmd, self.auth_token)
         if self.app.subdomain_host:
             cmd.append('--host-routing')
         if self.debug:
