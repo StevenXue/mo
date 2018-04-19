@@ -33,7 +33,8 @@ client = Algorithmia.client('YOUR_API_KEY')
 algo = client.algo('demo/Hello/')
 print algo.pipe(input)
 ```
-**返回的结果**
+
+###### 返回的结果
 Each algorithm returns a response in JSON. It will include the "result" as well as metadata about the API call you made. The metadata will include the content_type as well as a duration.
 ```$xslt
 curl -X POST -d '"YOUR_USERNAME"' -H 'Content-Type: application/json' -H 'Authorization: Simple API_KEY' https://api.algorithmia.com/v1/algo/demo/Hello/
@@ -50,12 +51,7 @@ he duration is the compute time of the API call into the algorithm. This is the 
 For more information about pricing, check out our Pricing Guide
 
 ## 发布我的第一个需求
-用户进入request模块，选择相应的request类型（apps/module/dataset), 点击 New app request, 填写相应内容。 用户可以在Request版块查找自己发布的需求，也可以在my profile中查看.
-- title: 标题
-- description: 描述
-- Tags：标签
-- Input: 对输入的描述
-- Output: 对输出的描述
+用户进入request模块，选择相应的request类型（apps/module/dataset), 点击新建需求, 填写相应内容。 用户可以在Request版块查找自己发布的需求，也可以在my profile中查看.
 
 ## 创建我的第一个项目
 点击首页导航中的workspace栏目，先选择文件类型，项目分为应用、模块、数据集三种，在对应页面点击“新建按钮”，填写名称、描述等信息完成创建。创建完成或会自动计入项目详情页面，点击“notebook”按钮，即可进入工作编辑区进行开发训练。
@@ -69,4 +65,3 @@ B区域是主要编程区，你可以在这里用 Python 语言进行开发测�
 C区域是资源区，包含平台中所有的模块与数据集列表，查找到需要的模块后可以查看使用说明并直接插入到B区域编程区。
 
 更多功能介绍参考 Notebook 功能介绍。
-
