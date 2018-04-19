@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import json
 import requests
+import hashlib
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from mongoengine import DoesNotExist
@@ -88,9 +89,14 @@ def forgot_send(email):
     if user:
         receiver= email
         msg['To'] = email
-        # ssstr = 'Hi!\nHow are you?\nHere is the link you wanted:\nhttp://localhost:8989/#/user/login?email='+email
-        text = 'Hi!\nHow are you?\nHere is the link you wanted:\nhttp://localhost:8989/#/user/login?email='+email
-        text_plain = MIMEText(text,'plain', 'utf-8')    
+
+        h = hashlib.md5(bytes('898oaFs09f',encoding="utf-8"))
+        h.update(email.encode("utf-8"))
+        user.hashEmail = h.hexdigest()
+        user.save()
+
+        text = user.user_ID+'，您好！\n请点击下方链接重置密码。 如非您本人操作，请忽略此邮件。\n http://localhost:8989/#/newpassword?email='+h.hexdigest()+'&user='+user.user_ID
+        text_plain = MIMEText(text,'plain', 'utf-8')   
         msg.attach(text_plain)   
         smtp = smtplib.SMTP()    
         smtp.connect('smtp.163.com')
@@ -102,7 +108,7 @@ def forgot_send(email):
 
 
 def newpassword_send(password,email):
-    user = user_business.get_by_email(email)
+    user = user_business.get_by_hashEmail(email)
     if user:
         user['password'] = generate_password_hash(password)
         user.save()
