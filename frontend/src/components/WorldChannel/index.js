@@ -1,10 +1,10 @@
-import WorldChannel from './WorldChannel'
+// import WorldChannel from './WorldChannel'
 import {WorldMessages} from './WorldMessages'
-import Open from './Open'
+import WorldChannel from './WorldChannel'
 
 export {
-  WorldChannel,
+  // WorldChannel,
   WorldMessages,
-  Open,
+  WorldChannel,
 }
 
