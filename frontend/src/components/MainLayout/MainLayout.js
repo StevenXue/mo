@@ -8,7 +8,7 @@ const { Footer, Sider, Content } = Layout;
 import {IntlProvider} from 'react-intl'
 import enUS from 'antd/lib/locale-provider/en_US'
 import {WebChat} from "../Chat"
-import {WorldChannel, Open} from '../WorldChannel'
+import {WorldChannel} from '../WorldChannel'
 
 // ant design 组件国际化包
 import moment from 'moment'
@@ -32,7 +32,7 @@ function MainLayout({children, location, history, modal, isRight, onClickIcon}) 
           <div className={styles.content}>
             {children}
           </div>
-          <Open onClickIcon={onClickIcon} isRight={isRight}/>
+          <WorldChannel onClickIcon={onClickIcon} isRight={isRight}/>
         </div>
       </Content>
     </Layout>

@@ -227,6 +227,14 @@ function Header({location, login, history, dispatch, allRequest,message}) {
           }
 
           {login.user &&
+          <Menu.Item key={'/setting'} style={{color:'black'}}>
+            <div onClick={() => history.push('/setting/profile/'+login.user.user_ID)}>
+              Setting
+            </div>
+          </Menu.Item>
+          }
+
+          {login.user &&
           <Menu.Item key={'/logout'} style={{color:'black'}}>
             <div onClick={logout}>
               Logout

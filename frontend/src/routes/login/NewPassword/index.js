@@ -8,6 +8,17 @@ class NewPassword extends Component {
     state = {
         password:"",
         password_two:"",
+        email:'',
+        user:'',
+    }
+
+    componentDidMount(){
+        let url = new URL(window.location.href.replace('/#', ''))
+        this.setState({
+            email:url.searchParams.get('email'),
+            user:url.searchParams.get('user'),
+            hashEmail:url.searchParams.get('hashEmail'),
+        })
     }
 
     password = (e)=>{
@@ -34,8 +45,9 @@ class NewPassword extends Component {
         message.warning('修改失败');
     }
     send = ()=>{
-        if(this.state.password==this.state.password_two){
-            fetch(`http://localhost:5005/user/newpassword?password=${this.state.password}&&email=${this.props.location.query.email}`, {method: 'GET'})
+        const {password, email, hashEmail, password_two} = this.state
+        if(password==password_two){
+            fetch(`http://localhost:5005/user/newpassword?password=${password}&&email=${email}&&hashEmail=${hashEmail}`, {method: 'GET'})
             .then(({status})=>{
                 if(status==200){
                     this.vic();
@@ -50,10 +62,10 @@ class NewPassword extends Component {
     }
 
     render(){
-        // {this.props.location.query.email}
+
         return <div className={styles.NewPassword}>
             <b>Change Password</b>
-            <p>Enter a new password for {this.props.location.query.email}</p>
+            <p>Enter a new password for {this.state.user}</p>
             {/* <Input placeholder="yours@example.com" onBlur={this.password}/> */}
             <Input
                 placeholder="yours new password"  

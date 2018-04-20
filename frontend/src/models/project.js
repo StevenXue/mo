@@ -2,6 +2,7 @@ import { routerRedux } from 'dva/router'
 import { tokenLogin } from '../services/login'
 import { fetchProjects, createProject, deleteProject, updateProject, getProjects } from '../services/project'
 import { privacyChoices } from '../constants'
+import * as commentsService from "../services/comments"
 
 export default {
   namespace: 'project',

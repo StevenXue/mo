@@ -20,6 +20,7 @@ import UserRequestDetail from './routes/UserRequest/UserRequestDetail'
 import MyService from './routes/MyService'
 import {ModuleList, Module} from './routes/Module'
 import Profile from './routes/Profile'
+import UserInfo from './routes/UserInfo'
 import MarketList from './routes/market/ProjectList'
 import HomePage from './routes/HomePage'
 // import MarketDetail from './routes/market/ProjectDetail'
@@ -100,6 +101,7 @@ const RouterConfig = ({history, location, projectDetail}) => {
               <Route path="/modulelist/:moduleId" component={Module}/>
               <Route path="/modulelist" component={ModuleList}/>
               <Route path="/profile/:userId" component={Profile}/>
+              <Route path="/setting/profile/:userId" component={UserInfo}/>
             </Switch>
           </div>
         </MainLayout>}

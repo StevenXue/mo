@@ -222,7 +222,6 @@ def copytree(src, dst, symlinks=False, ignore=None, copy_function=shutil.copy2,
 class ProjectBusiness:
     project = None
     repo = ProjectRepo(Project)
-    requestAnswerBusiness = RequestAnswerBusiness
 
     @staticmethod
     def copytree(o, dst, **kwargs):

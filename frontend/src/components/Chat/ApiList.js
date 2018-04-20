@@ -16,7 +16,7 @@ import {WebChatId} from './WebChat'
 import {getApiList} from '../../services/phone/api'
 import {routerRedux} from 'dva/router'
 
-import {getfavorApps} from '../../services/user'
+import {getFavorApps} from '../../services/user'
 // import {NavigationActions} from '../../utils'
 import styles from './index.less'
 
@@ -74,7 +74,7 @@ export class ApiList extends Component {
     if (this.props.get_type === "chat") {
       apiFunc = getApiList
     } else {
-      apiFunc = getfavorApps
+      apiFunc = getFavorApps
     }
     const result = apiFunc(
       {keyword: this.keyWord, pageNo: this.pageNo},

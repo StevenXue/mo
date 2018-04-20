@@ -45,7 +45,6 @@ const WorldMessageItem = ({worldMessage, isRight}) => {
         >
           {
             message_type === 'admin' ?
-
               <div
                 style={{
                   height: 30, width: 30,
@@ -53,27 +52,11 @@ const WorldMessageItem = ({worldMessage, isRight}) => {
                 }}
                 className={styles.system_image}
               />
-
-              // <img
-              //   style={{
-              //     height: 30, width: 30,
-              //     color: "#34BFE2"
-              //   }}
-              //   src={require('../../img/icon/system.png')}
-              // />
-
               :
-
               <img style={{
                 height: 30, width: 30,
               }} src={avatarList[picNumber]}  alt="avatar" />
 
-              // <img
-              //   style={{
-              //     height: 30, width: 30,
-              //   }}
-              //   src={require('../../img/icon/mo.png')}
-              // />
           }
         </div>
 
@@ -93,6 +76,7 @@ const WorldMessageItem = ({worldMessage, isRight}) => {
       }}>
         <div style={{
           // padding: 2,
+          // justifyContent: "space-around",
           display: "flex", color: "grey"
         }}>
           <div>

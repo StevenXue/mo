@@ -25,23 +25,21 @@ export default {
         projectNumber:action.payload.projectNumber,
       }
     },
-    setUserInfo(state, action){
+    setUserInfo(state, {userInfo}){
       return{
         ...state,
-        userInfo:action.payload.userInfo,
+        userInfo
       }
     }
   },
   effects: {
-
     * fetchUserInfo(action, {call, put, select}){
-      const {data: userInfo} = yield call(userService.get_user_info, {user_ID:action.payload.user_ID})
+      const {data: userInfo} = yield call(userService.getUserInfo, {user_ID:action.payload.user_ID})
       yield put({
         type: 'setUserInfo',
-        payload: {userInfo: userInfo}
+        userInfo
       })
     },
-
     * fetchProjectNumber(action, {call, put, select}){
       const {data: projectNumber} = yield call(projectService.countProjects, {user_ID:action.payload.user_ID})
       yield put({
@@ -54,9 +52,14 @@ export default {
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
         const match = pathToRegexp('/profile/:userId').exec(pathname)
-        console.log('match？')
+        const match2 = pathToRegexp('/setting/profile/:userId').exec(pathname)
+        if (match2) {
+          console.log(match2)
+          dispatch({
+            type: 'fetchUserInfo',
+            payload: {user_ID: match2[1]}
+          })}
         if (match) {
-          console.log('match')
           dispatch({
             type: 'fetchUserInfo',
             payload: {user_ID: match[1]}
