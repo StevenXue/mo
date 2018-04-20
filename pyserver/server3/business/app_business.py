@@ -158,7 +158,15 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
             module=module, version=version))
 
     @staticmethod
-    def insert_module_env(app, module, version):
+    def copy_to_container(container, path_w_version, path_in_ctnr):
+        container.exec_run(['mkdir', '-p', f'{path_in_ctnr}'])
+        with docker.utils.tar(path_w_version) as module_tar:
+            container.put_archive(path_in_ctnr, module_tar)
+        container.exec_run(['chown', '-R', 'jovyan:users', f'{path_in_ctnr}'],
+                           user='root', privileged=True)
+
+    @classmethod
+    def insert_module_env(cls, app, module, version):
         client = docker.from_env()
         module_user_ID = module.user.user_ID
         app_user_ID = app.user.user_ID.replace('_', '_5F')
@@ -172,11 +180,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
 
         # do the copy, dir need be created first, and put_archive need
         # ownership fix
-        container.exec_run(['mkdir', '-p', f'{path_in_ctnr}'])
-        with docker.utils.tar(path_w_version) as module_tar:
-            container.put_archive(path_in_ctnr, module_tar)
-        container.exec_run(['chown', '-R', 'jovyan:users', f'{path_in_ctnr}'],
-                           user='root', privileged=True)
+        cls.copy_to_container(container, path_w_version, path_in_ctnr)
 
         # copy python env
         container.exec_run(['/bin/bash', '/home/jovyan/add_venv.sh',
@@ -212,6 +216,30 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
                             f'{module_user_ID}/{module.name}/{version}'])
 
     @classmethod
+    def remove_used_dataset(cls, app_id, dataset):
+        app = cls.get_by_id(app_id)
+        cls.remove_dataset_dir(app, dataset)
+        return cls.repo.pull_from_set(app_id, used_datasets=UsedDataset(
+            dataset=dataset))
+
+    @staticmethod
+    def remove_dataset_dir(app, dataset):
+        client = docker.from_env()
+        app_user_ID = app.user.user_ID.replace('_', '_5F')
+        app_name = app.name.replace('_', '_5F')
+        container_id = f'jupyter-{app_user_ID}_2B{app_name}'
+        container = client.containers.get(container_id)
+
+        # copy dataset folder to container
+        path_in_ctnr = dataset.path.replace('./user_directory',
+                                            '/home/jovyan/dataset')
+        print(path_in_ctnr)
+        if len(path_in_ctnr.split('/')) == 6:
+            container.exec_run(['rm', '-rf', f'{path_in_ctnr}'])
+        else:
+            raise Exception('dataset path error')
+
+    @classmethod
     def insert_dataset(cls, app, dataset):
         client = docker.from_env()
         app_user_ID = app.user.user_ID.replace('_', '_5F')
@@ -222,9 +250,9 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         # copy dataset folder to container
         path_in_ctnr = dataset.path.replace('./user_directory',
                                             '/home/jovyan/dataset')
-        container.exec_run(['mkdir', '-p', f'{path_in_ctnr}'])
-        with docker.utils.tar(dataset.path) as dataset_tar:
-            container.put_archive(path_in_ctnr, dataset_tar)
+        # do the copy, dir need be created first, and put_archive need
+        # ownership fix
+        cls.copy_to_container(container, dataset.path, path_in_ctnr)
         return cls.repo.add_to_set(app.id, used_datasets=UsedDataset(
             dataset=dataset))
 

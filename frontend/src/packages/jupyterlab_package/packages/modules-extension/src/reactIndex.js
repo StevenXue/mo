@@ -274,8 +274,14 @@ export class ModulePage extends React.Component {
         return (
             // list
             <div className='container'>
-                <header style={{cursor: 'pointer'}} onClick={() => this.backToList()}>
-                    <Icon type="left"/>
+                <header
+                    style={{
+                        cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+                    }}
+                    onClick={() => this.backToList()}>
+                    <Icon type="left"/><span style={{textAlign: 'center'}}>IMPORTED MODULES</span>
+                    <div/>
                 </header>
                 <div className='list'>
                     <List

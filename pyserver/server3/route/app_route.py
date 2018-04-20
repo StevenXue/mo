@@ -85,7 +85,16 @@ def add_used_dataset(app_id):
     data = request.get_json()
     used_dataset = data.get('used_dataset')
     app = AppService.add_used_dataset(app_id, used_dataset)
-    return jsonify({"response": json_utility.convert_to_json(app.to_mongo())})
+    return jsonify({"response": convert_used_datasets(app)})
+
+
+@app_app.route("/remove_used_dataset/<app_id>", methods=["PUT"])
+@jwt_required
+def remove_used_dataset(app_id):
+    data = request.get_json()
+    used_dataset = data.get('used_dataset')
+    app = AppService.remove_used_dataset(app_id, used_dataset)
+    return jsonify({"response": convert_used_datasets(app)})
 
 
 @app_app.route("/insert_envs/<project_name>", methods=["PUT"])
@@ -148,6 +157,7 @@ def get_app(app_id):
     commits = request.args.get('commits')
     version = request.args.get('version')
     used_modules = request.args.get('used_modules')
+    used_datasets = request.args.get('used_datasets')
     app = AppService.get_by_id(app_id, yml=yml, commits=commits,
                                version=version, used_modules=used_modules)
 
@@ -155,7 +165,9 @@ def get_app(app_id):
     user_ID = app.user.user_ID
     if used_modules == 'true':
         app = convert_used_modules(app)
-    else:
+    if used_datasets == 'true':
+        app = convert_used_datasets(app)
+    if used_modules != 'true' and used_datasets != 'true':
         app = json_utility.convert_to_json(app.to_mongo())
     app["user_ID"] = user_ID
     return jsonify({
@@ -170,6 +182,15 @@ def convert_used_modules(app):
     del app.used_modules
     app = json_utility.convert_to_json(app.to_mongo())
     app['used_modules'] = ums
+    return app
+
+
+def convert_used_datasets(app):
+    ums = [{'dataset': json_utility.convert_to_json(d.dataset.to_mongo())}
+           for d in app.used_datasets]
+    del app.used_datasets
+    app = json_utility.convert_to_json(app.to_mongo())
+    app['used_datasets'] = ums
     return app
 
 

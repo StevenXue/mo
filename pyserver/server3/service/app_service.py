@@ -21,7 +21,6 @@ class AppService(ProjectService):
     @classmethod
     def add_used_module(cls, app_id, used_module, func, version):
         used_module = ModuleBusiness.get_by_id(used_module)
-
         used_module.args = ModuleBusiness.load_module_params(
             used_module, version)
         return cls.business.add_used_module(app_id, used_module, func,
@@ -38,6 +37,12 @@ class AppService(ProjectService):
         used_dataset = DatasetBusiness.get_by_id(used_dataset)
         app = cls.business.get_by_id(app_id)
         return cls.business.insert_dataset(app, used_dataset)
+
+    @classmethod
+    def remove_used_dataset(cls, app_id, used_dataset):
+        print(used_dataset)
+        used_dataset = DatasetBusiness.get_by_id(used_dataset)
+        return cls.business.remove_used_dataset(app_id, used_dataset)
 
     @classmethod
     def run_app(cls, app_id, input_json, user_ID, version):

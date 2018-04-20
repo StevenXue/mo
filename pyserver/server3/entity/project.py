@@ -92,7 +92,7 @@ class UsedModule(EmbeddedDocument):
 
 
 class UsedDataset(EmbeddedDocument):
-    dataset = ReferenceField(Module)
+    dataset = ReferenceField(Dataset)
 
 
 class App(Project):
