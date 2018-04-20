@@ -132,9 +132,8 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         app_yaml_path = os.path.join(app.path, yaml_tail_path)
         args = {}
         output = {}
-        # copy module yaml to app yaml
         cls.insert_module_env(app, module, version)
-        # copy yaml
+        # copy module yaml to app yaml
         input_args = module.to_mongo()['args']['input'].get(func, {})
         output_args = module.to_mongo()['args']['output'].get(func, {})
         if os.path.isfile(app_yaml_path):
@@ -164,19 +163,52 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         module_user_ID = module.user.user_ID
         app_user_ID = app.user.user_ID.replace('_', '_5F')
         app_name = app.name.replace('_', '_5F')
-        container_id = f'jupyter-{app_user_ID}_2B{app_name}'
-        container = client.containers.get(container_id)
+        container_name = f'jupyter-{app_user_ID}_2B{app_name}'
+        container = client.containers.get(container_name)
+        # copy module folder to container
+        path_w_version = os.path.join(module.module_path, version)
+        path_in_ctnr = path_w_version.replace('./server3/lib/modules',
+                                              '/home/jovyan/modules')
+
+        # do the copy, dir need be created first, and put_archive need
+        # ownership fix
+        container.exec_run(['mkdir', '-p', f'{path_in_ctnr}'])
+        with docker.utils.tar(path_w_version) as module_tar:
+            container.put_archive(path_in_ctnr, module_tar)
+        container.exec_run(['chown', '-R', 'jovyan:users', f'{path_in_ctnr}'],
+                           user='root', privileged=True)
+
+        # copy python env
+        container.exec_run(['/bin/bash', '/home/jovyan/add_venv.sh',
+                            f'{module_user_ID}/{module.name}/{version}'])
+
+    @classmethod
+    def remove_used_module(cls, app_id, module, version):
+        app = cls.get_by_id(app_id)
+        cls.remove_module_env(app, module, version)
+        return cls.repo.pull_from_set(app_id, used_modules=UsedModule(
+            module=module, version=version))
+
+    @staticmethod
+    def remove_module_env(app, module, version):
+        client = docker.from_env()
+        module_user_ID = module.user.user_ID
+        app_user_ID = app.user.user_ID.replace('_', '_5F')
+        app_name = app.name.replace('_', '_5F')
+        container_name = f'jupyter-{app_user_ID}_2B{app_name}'
+        container = client.containers.get(container_name)
 
         # copy module folder to container
         path_w_version = os.path.join(module.module_path, version)
         path_in_ctnr = path_w_version.replace('./server3/lib/modules',
                                               '/home/jovyan/modules')
-        container.exec_run(['mkdir', '-p', f'{path_in_ctnr}'])
-        with docker.utils.tar(path_w_version) as module_tar:
-            container.put_archive(path_in_ctnr, module_tar)
+        if len(path_in_ctnr.split('/')) == 7:
+            container.exec_run(['rm', '-rf', f'{path_in_ctnr}'])
+        else:
+            raise Exception('module path error')
 
-        # copy python env
-        container.exec_run(['/bin/bash', '/home/jovyan/add_venv.sh',
+        # remove python env
+        container.exec_run(['/bin/bash', '/home/jovyan/remove_venv.sh',
                             f'{module_user_ID}/{module.name}/{version}'])
 
     @classmethod

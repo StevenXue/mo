@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Card, Button, Row, Col, Input, message, Icon, Pagination } from 'antd'
 import ReactMde from 'react-mde'
+import * as pathToRegexp from 'path-to-regexp'
 
 import {
   Clipboard,
@@ -42,6 +43,11 @@ export class DatasetPage extends React.Component {
       pageNo: 1,
       pageSize: 5,
     }
+      const hash = window.location.hash
+      const match = pathToRegexp('#/workspace/:appId/:type').exec(hash)
+      if (match) {
+          this.appId = match[1]
+      }
   }
 
   componentDidMount() {
@@ -159,7 +165,10 @@ export class DatasetPage extends React.Component {
           <div style={{ height: '100%', overflowY: 'auto' }}>
             <p className='des'>{this.state.project.description}</p>
             <div className='des'>
-              <CopyInput text={this.state.project.path.replace('./user_directory', '../dataset')}/>
+              <CopyInput text={this.state.project.path.replace('./user_directory', '../dataset')}
+                         datasetId={this.state.projectId}
+                         appId={this.appId}
+              />
             </div>
             <ReactMde
               textAreaProps={{

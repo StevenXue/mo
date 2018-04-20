@@ -275,6 +275,7 @@ USER $NB_UID
 
 ADD --chown=jovyan:users run.sh /home/jovyan
 ADD --chown=jovyan:users add_venv.sh /home/jovyan
+ADD --chown=jovyan:users remove_venv.sh /home/jovyan
 ADD --chown=jovyan:users modules /home/jovyan/modules
 ADD --chown=jovyan:users dataset /home/jovyan/dataset
 CMD ['bash', '/home/jovyan/run.sh']

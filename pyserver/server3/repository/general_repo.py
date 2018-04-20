@@ -146,6 +146,17 @@ class Repo:
         modified_obj = self.__instance.objects(id=obj_id).modify(**update)
         return modified_obj.reload()
 
+    def pull_from_set(self, obj_id, **update):
+        """
+        remove item from list fields of document with given object id
+        :param obj_id:
+        :param update:
+        :return:
+        """
+        update = {'pull__' + k: v for k, v in list(update.items())}
+        modified_obj = self.__instance.objects(id=obj_id).modify(**update)
+        return modified_obj.reload()
+
     def delete(self, obj):
         return obj.delete()
 

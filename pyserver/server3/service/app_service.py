@@ -28,6 +28,12 @@ class AppService(ProjectService):
                                             version)
 
     @classmethod
+    def remove_used_module(cls, app_id, used_module, version):
+        used_module = ModuleBusiness.get_by_id(used_module)
+        return cls.business.remove_used_module(app_id, used_module,
+                                               version)
+
+    @classmethod
     def add_used_dataset(cls, app_id, used_dataset):
         used_dataset = DatasetBusiness.get_by_id(used_dataset)
         app = cls.business.get_by_id(app_id)
@@ -83,6 +89,11 @@ class AppService(ProjectService):
         if kwargs.get('yml') == 'true' and project.app_path:
             project.args = cls.business.load_app_params(project,
                                                         kwargs.get('version'))
+        # if kwargs.get('used_modules') == 'true':
+        #     project.used_modules = [{'module': m.module.to_mongo(),
+        #                              'version': m.version}
+        #                             for m in project.used_modules]
+
         project.versions = \
             ['.'.join(version.split('_')) for version in
              project.versions]

@@ -32,3 +32,15 @@ export function getDatasets(onSuccess) {
     },
   }, { onSuccess })
 }
+
+export function addDatasetToApp({appId, datasetId, onJson}) {
+    return request(`pyapi/apps/add_used_dataset/${appId}`, {
+        method: 'put',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            used_dataset: datasetId,
+        }),
+    }, { onJson })
+}
