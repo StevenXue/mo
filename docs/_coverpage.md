@@ -8,4 +8,4 @@
 * 
 
 [GitHub](https://github.com/momodel)
-[Get Started](#关于MO平台)
+[Get Started](#平台介绍)
