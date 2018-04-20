@@ -11,7 +11,8 @@ import {
   Button,
   Form,
   Select,
-  Modal
+  Modal,
+  Upload
 } from 'antd'
 
 
@@ -20,6 +21,7 @@ import styles from './index.less'
 import {showTime} from "../../utils"
 import {updateUserInfo} from "../../services/user"
 import {routerRedux} from "dva/router"
+import AvatarEditor from 'react-avatar-editor'
 
 const TabPane = Tabs.TabPane
 const {Meta} = Card
@@ -284,9 +286,135 @@ class GenderEditForm extends React.Component {
   }
 }
 
+
+class AvatarEdit extends React.Component {
+  constructor() {
+    super()
+    this.state = {
+      previewImage: null,
+      previewVisible: false,
+      fileList:[]
+    }
+  }
+
+  componentDidMount() {
+  }
+
+  handlePreview = (file) => {
+    this.setState({
+      previewImage: file.url || file.thumbUrl,
+      previewVisible: true,
+    })
+  }
+
+  getBase64 = (img , callback) => {
+    const reader = new FileReader()
+    reader.addEventListener('load', () => callback(reader.result))
+    reader.readAsDataURL(img)
+  }
+
+  handleChange = ({fileList}) => {
+    let thisFile = fileList[0]
+    this.getBase64(thisFile, imageUrl => {
+      let newList = [{
+        originFileObj: thisFile,
+        thumbUrl: imageUrl,
+        uid: thisFile.uid
+      }]
+      console.log(imageUrl)
+      this.setState({
+        fileList: newList,
+        loading: false,
+      })
+      this.setState({
+        previewImage: imageUrl,
+        previewVisible: true,
+      })
+      // this.props.setFieldsValue({[this.props.keyName]: newList[0].thumbUrl})
+    })
+  }
+  handleCancel = () => {
+    this.setState({
+      previewImage: null,
+      previewVisible: false,
+      fileList:[]
+    })
+  }
+
+  confirmEdit = () => {
+    console.log('editor',this.editor.getImage().toDataURL())
+    updateUserInfo({
+      body: {
+        'avatar': this.editor.getImage().toDataURL()
+      },
+      onJson: ({user}) => {
+        this.props.dispatch({
+          type: 'profile/setUserInfo',
+          'userInfo': user
+        })
+        this.handleCancel()
+      }
+    })
+  }
+
+  setEditorRef = (editor) => this.editor = editor
+
+  render() {
+    const props = {
+      onRemove: (file) => {
+        this.setState(({ fileList }) => {
+          const index = fileList.indexOf(file)
+          const newFileList = fileList.slice()
+          newFileList.splice(index, 1)
+          return {
+            fileList: newFileList,
+          }
+        })
+      },
+      beforeUpload: (file) => {
+        return false
+      },
+      fileList: this.state.fileList,
+    }
+    return (
+      <div className={styles.photoDiv}>
+        <Upload
+          {...props}
+          className={styles.photoUpload}
+          action={URL + '/fake_upload'}
+          listType="picture-card"
+          fileList={this.state.fileList}
+          onPreview={this.handlePreview}
+          onChange={this.handleChange}
+        >
+          {this.state.fileList.length >= 1 ? null :
+            <div>
+            <img src={this.props.avatar?this.props.avatar:avatarList[this.props.picNumber]} alt="avatar"/>
+            <div className={styles.picDoc}>修改我的头像</div></div>}
+        </Upload>
+        <Modal
+          visible={this.state.previewVisible}
+          onCancel={this.handleCancel}
+          onOk={this.confirmEdit}
+        >
+          <AvatarEditor
+            ref={this.setEditorRef}
+            image={this.state.previewImage}
+            width={250}
+            height={250}
+            border={50}
+            color={[255, 255, 255, 0.6]} // RGBA
+            scale={1.2}
+            rotate={0}
+          />
+        </Modal>
+      </div>)
+  }
+}
+
 function SettingProfile({login, profile, dispatch, history}) {
   if (profile.userInfo) {
-    const {gender, age, email, name, phone, user_ID} = profile.userInfo
+    const {gender, age, email, name, phone, user_ID, avatar} = profile.userInfo
     const {projectNumber} = profile
     const picNumber = parseInt(profile.userInfo._id.slice(20)) % 6
     return (
@@ -298,9 +426,8 @@ function SettingProfile({login, profile, dispatch, history}) {
           <div className={styles.headerRow}>
             <Row type="flex" justify="space-around" align="middle">
               <Col span={3} style={{padding: '25px'}}>
-                <div className={styles.photoDiv}>
-                  <img src={avatarList[picNumber]} alt="avatar"/>
-                </div>
+
+                <AvatarEdit picNumber={picNumber}  avatar={avatar} dispatch={dispatch}/>
               </Col>
               <Col span={21}>
                 <div>

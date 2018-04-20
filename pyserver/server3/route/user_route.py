@@ -388,10 +388,9 @@ def get_action_entity():
 
 @user_app.route('/profile/<user_ID>', methods=['GET'])
 def get_user_info(user_ID):
-    result = UserService.get_user_info(user_ID=user_ID)
-    print('result')
-    print(result)
-    return jsonify({'response': result}), 200
+    user = UserBusiness.get_by_user_ID(user_ID=user_ID)
+    user_info = json_utility.convert_to_json(user.to_mongo())
+    return jsonify({'response': user_info}), 200
 
 
 # 获取用户的统计信息， 收藏了多少app， 发布了多少需求
@@ -441,7 +440,7 @@ def update_user():
     user_ID = get_jwt_identity()
     data = request.get_json()
     # 检查data是否在 ["email", "phone", "gender"]
-    lists = ["email", "phone", "gender"]
+    lists = ["email", "phone", "gender", "avatar"]
     for key, value in data.items():
         if key not in lists:
             return jsonify({'response': 'error arguments'}), 400
