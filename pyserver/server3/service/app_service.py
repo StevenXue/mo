@@ -23,14 +23,12 @@ class AppService(ProjectService):
         used_module = ModuleBusiness.get_by_id(used_module)
         used_module.args = ModuleBusiness.load_module_params(
             used_module, version)
-        return cls.business.add_used_module(app_id, used_module, func,
-                                            version)
+        return cls.business.add_used_module(app_id, used_module, func, version)
 
     @classmethod
     def remove_used_module(cls, app_id, used_module, version):
         used_module = ModuleBusiness.get_by_id(used_module)
-        return cls.business.remove_used_module(app_id, used_module,
-                                               version)
+        return cls.business.remove_used_module(app_id, used_module, version)
 
     @classmethod
     def add_used_dataset(cls, app_id, used_dataset):
