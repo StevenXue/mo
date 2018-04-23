@@ -218,7 +218,7 @@ export class ModulePage extends React.Component {
                     {this.renderParameters()}
                 </div>
                 <Row>
-                    <Button type='primary' onClick={() => this.insertCode()}>Insert Code</Button>
+                    <Button type='primary' onClick={() => this.insertCode()}>Import Module</Button>
                 </Row>
             </div>
         )

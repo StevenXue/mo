@@ -4,8 +4,11 @@ import re
 import yaml
 import shutil
 import fileinput
+import tempfile
+import tarfile
 from copy import deepcopy
 from subprocess import call
+
 import synonyms
 import docker
 
@@ -43,9 +46,12 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         app = cls.get_by_id(app_id)
         app.status = 'deploying'
         app.save()
-        modules = [m.user.user_ID + '/' + m.name for m in app.used_modules]
-        if modules is None:
-            modules = []
+
+        container = cls.get_container(app)
+        # freeze working env
+        # FIXME too slow to install env
+        container.exec_run(['/bin/bash', '/home/jovyan/freeze_venv.sh'])
+        cls.commit(app_id, commit_msg, version)
 
         service_name = '-'.join([app.user.user_ID, app.name, version])
         service_name_no_v = '-'.join([app.user.user_ID, app.name])
@@ -71,27 +77,31 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         # change some configurable variable to deploy required
         cls.modify_handler_py(handler_dst_path)
 
-        # copy modules
-        for module in modules:
-            owner_ID = module.split('/')[0]
-            module_path = os.path.join(MODULE_DIR, module)
-            module_path_target = os.path.join(module_dir_path, module)
-            try:
-                os.makedirs(os.path.join(module_dir_path, owner_ID))
-            except FileExistsError:
-                print('dir exists, no need to create')
-            # copy module tree to target path
-            print(module_path, module_path_target)
-            cls.copytree_wrapper(module_path, module_path_target,
-                                 ignore=shutil.ignore_patterns('.git'))
+        # 1. copy modules from docker
+        cls.copy_from_container(container, '/home/jovyan/modules', func_path)
+        # 2. copy datasets from docker
+        cls.copy_from_container(container, '/home/jovyan/dataset', func_path)
+
+        # used_modules = [m.user.user_ID + '/' + m.name for m in
+        #                 app.used_modules]
+        # for module in used_modules:
+        #     owner_ID = module.split('/')[0]
+        #     module_path = os.path.join(MODULE_DIR, module)
+        #     module_path_target = os.path.join(module_dir_path, module)
+        #     try:
+        #         os.makedirs(os.path.join(module_dir_path, owner_ID))
+        #     except FileExistsError:
+        #         print('dir exists, no need to create')
+        #     # copy module tree to target path
+        #     print(module_path, module_path_target)
+        #     cls.copytree_wrapper(module_path, module_path_target,
+        #                          ignore=shutil.ignore_patterns('.git'))
 
         # deploy
         call(['faas-cli', 'build', '-f', f'./{service_name}.yml'],
              cwd=cls.base_func_path)
         call(['faas-cli', 'deploy', '-f', f'./{service_name}.yml'],
              cwd=cls.base_func_path)
-
-        cls.commit(app_id, commit_msg, version)
 
         # when not dev(publish), change the privacy etc
         if version != 'dev':
@@ -102,6 +112,16 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         app.status = 'active'
         app.save()
         return app
+
+    @staticmethod
+    def copy_from_container(container, path_from, path_to):
+        with tempfile.NamedTemporaryFile() as destination:
+            strm, stat = container.get_archive(path_from)
+            for d in strm:
+                destination.write(d)
+            destination.seek(0)
+            with tarfile.open(mode='r', fileobj=destination) as t:
+                t.extractall(path_to)
 
     @staticmethod
     def modify_handler_py(py_path):
@@ -158,21 +178,26 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
             module=module, version=version))
 
     @staticmethod
-    def copy_to_container(container, path_w_version, path_in_ctnr):
-        container.exec_run(['mkdir', '-p', f'{path_in_ctnr}'])
-        with docker.utils.tar(path_w_version) as module_tar:
-            container.put_archive(path_in_ctnr, module_tar)
-        container.exec_run(['chown', '-R', 'jovyan:users', f'{path_in_ctnr}'],
+    def copy_to_container(container, path_from, path_to):
+        container.exec_run(['mkdir', '-p', f'{path_to}'])
+        with docker.utils.tar(path_from) as module_tar:
+            container.put_archive(path_to, module_tar)
+        container.exec_run(['chown', '-R', 'jovyan:users', f'{path_to}'],
                            user='root', privileged=True)
 
     @classmethod
-    def insert_module_env(cls, app, module, version):
+    def get_container(cls, app):
         client = docker.from_env()
-        module_user_ID = module.user.user_ID
         app_user_ID = app.user.user_ID.replace('_', '_5F')
         app_name = app.name.replace('_', '_5F')
         container_name = f'jupyter-{app_user_ID}_2B{app_name}'
         container = client.containers.get(container_name)
+        return container
+
+    @classmethod
+    def insert_module_env(cls, app, module, version):
+        module_user_ID = module.user.user_ID
+        container = cls.get_container(app)
         # copy module folder to container
         path_w_version = os.path.join(module.module_path, version)
         path_in_ctnr = path_w_version.replace('./server3/lib/modules',
@@ -193,15 +218,10 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         return cls.repo.pull_from_set(app_id, used_modules=UsedModule(
             module=module, version=version))
 
-    @staticmethod
-    def remove_module_env(app, module, version):
-        client = docker.from_env()
+    @classmethod
+    def remove_module_env(cls, app, module, version):
         module_user_ID = module.user.user_ID
-        app_user_ID = app.user.user_ID.replace('_', '_5F')
-        app_name = app.name.replace('_', '_5F')
-        container_name = f'jupyter-{app_user_ID}_2B{app_name}'
-        container = client.containers.get(container_name)
-
+        container = cls.get_container(app)
         # copy module folder to container
         path_w_version = os.path.join(module.module_path, version)
         path_in_ctnr = path_w_version.replace('./server3/lib/modules',
@@ -216,36 +236,8 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
                             f'{module_user_ID}/{module.name}/{version}'])
 
     @classmethod
-    def remove_used_dataset(cls, app_id, dataset):
-        app = cls.get_by_id(app_id)
-        cls.remove_dataset_dir(app, dataset)
-        return cls.repo.pull_from_set(app_id, used_datasets=UsedDataset(
-            dataset=dataset))
-
-    @staticmethod
-    def remove_dataset_dir(app, dataset):
-        client = docker.from_env()
-        app_user_ID = app.user.user_ID.replace('_', '_5F')
-        app_name = app.name.replace('_', '_5F')
-        container_id = f'jupyter-{app_user_ID}_2B{app_name}'
-        container = client.containers.get(container_id)
-
-        # copy dataset folder to container
-        path_in_ctnr = dataset.path.replace('./user_directory',
-                                            '/home/jovyan/dataset')
-        print(path_in_ctnr)
-        if len(path_in_ctnr.split('/')) == 6:
-            container.exec_run(['rm', '-rf', f'{path_in_ctnr}'])
-        else:
-            raise Exception('dataset path error')
-
-    @classmethod
     def insert_dataset(cls, app, dataset):
-        client = docker.from_env()
-        app_user_ID = app.user.user_ID.replace('_', '_5F')
-        app_name = app.name.replace('_', '_5F')
-        container_id = f'jupyter-{app_user_ID}_2B{app_name}'
-        container = client.containers.get(container_id)
+        container = cls.get_container(app)
 
         # copy dataset folder to container
         path_in_ctnr = dataset.path.replace('./user_directory',
@@ -255,6 +247,26 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         cls.copy_to_container(container, dataset.path, path_in_ctnr)
         return cls.repo.add_to_set(app.id, used_datasets=UsedDataset(
             dataset=dataset))
+
+    @classmethod
+    def remove_used_dataset(cls, app_id, dataset):
+        app = cls.get_by_id(app_id)
+        cls.remove_dataset_dir(app, dataset)
+        return cls.repo.pull_from_set(app_id, used_datasets=UsedDataset(
+            dataset=dataset))
+
+    @classmethod
+    def remove_dataset_dir(cls, app, dataset):
+        container = cls.get_container(app)
+
+        # copy dataset folder to container
+        path_in_ctnr = dataset.path.replace('./user_directory',
+                                            '/home/jovyan/dataset')
+        print(path_in_ctnr)
+        if len(path_in_ctnr.split('/')) == 6:
+            container.exec_run(['rm', '-rf', f'{path_in_ctnr}'])
+        else:
+            raise Exception('dataset path error')
 
     @classmethod
     def replace_dup_n_update(cls, args, func_args, module_name):

@@ -24,30 +24,58 @@ def module_general(module_id, action, *args, **kwargs):
 
 def json_parser(json_obj):
     return json.loads(json_obj)
-    # return {arg.get('name'): arg.get('value')
-    #                          or arg.get('values')
-    #                          or arg.get('default')
-    #         for arg in args}
+
+
+key = 'sss'
+
+
+def check_client():
+    def decorator(func):
+        def wrapper(*args, **kw):
+            if kw.pop('key'):
+                return func(*args, **kw)
+            else:
+                raise Exception('Please call the modules using client provided!')
+        return wrapper
+    return decorator
+
+
+def check_api_key():
+    def decorator(func):
+        def wrapper(self, *args, **kw):
+            if self.api_key == 'fakePAI':
+                return func(self, *args, **kw)
+            else:
+                raise Exception('API key permission error!')
+        return wrapper
+    return decorator
 
 
 class Client:
 
     def __init__(self, api_key, silent=False):
         self.silent = silent
+        self.api_key = api_key
 
+    @check_api_key
     def run(self, module_id, *args, **kwargs):
+        kwargs['key'] = key
         if self.silent:
             with HiddenPrints():
                 return module_general(module_id, 'run', *args, **kwargs)
         return module_general(module_id, 'run', *args, **kwargs)
 
+    @check_api_key
     def train(self, module_id, *args, **kwargs):
+        kwargs['key'] = key
         if self.silent:
             with HiddenPrints():
                 return module_general(module_id, 'train', *args, **kwargs)
         return module_general(module_id, 'train', *args, **kwargs)
 
+    @check_api_key
     def predict(self, module_id, *args, **kwargs):
+        kwargs['key'] = key
         if self.silent:
             with HiddenPrints():
                 return module_general(module_id, 'predict', *args, **kwargs)
