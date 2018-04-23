@@ -33,6 +33,7 @@ cat_dict = {
     'toolkit':
         'https://github.com/momodel/cookiecutter-python-toolkit.git'
 }
+TOOL_REPO = 'https://github.com/momodel/dev_cmd_tools.git'
 
 
 # def add(name, user, **kwargs):
@@ -86,6 +87,7 @@ class ModuleBusiness(ProjectBusiness):
         # generate project dir
         project_path = cls.gen_dir(user_ID, name)
         temp_path = cls.gen_dir(user_ID, uuid.uuid4().hex)
+        # temp_tool_path = cls.gen_dir(user_ID+'_tool', uuid.uuid4().hex)
 
         # init git repo
         cls.init_git_repo(user_ID, name)
@@ -108,6 +110,20 @@ class ModuleBusiness(ProjectBusiness):
         # need to keep .git, cannot use cls.copytree_wrapper
         copy_tree(os.path.join(temp_path, name), project_path)
         remove_tree(temp_path)
+
+        # tools_path = os.path.join(project_path, 'dev_cmd_tools')
+        # os.makedirs(tools_path)
+        # copy_tree(temp_tool_path, tools_path)
+
+        # cookiecutter(
+        #     TOOL_REPO,
+        #     no_input=True, output_dir=project_path,
+        #     extra_context={
+        #         "author_name": user_ID,
+        #         "module_name": name,
+        #         "module_type": category,
+        #         "module_description": description,
+        #     })
 
         # add all
         repo.git.add(A=True)
