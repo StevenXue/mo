@@ -26,6 +26,7 @@ from server3.constants import REDIS_SERVER
 from server3.constants import USER_DIR
 from server3.constants import HUB_SERVER
 from server3.constants import ADMIN_TOKEN
+from server3.business.user_business import UserBusiness
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
@@ -94,19 +95,18 @@ app.register_blueprint(dataset_route.dataset_app)
 # This method will get whatever object is passed into the
 # create_access_token method.
 @jwt.user_claims_loader
-def add_claims_to_access_token(user):
+def add_claims_to_access_token(user_ID):
     # add more claims in the future
-    user_json = json_utility.convert_to_json(user.to_mongo())
-    user_json.pop('password')
-    return {'user': user_json}
+
+    return {'user_ID': user_ID}
 
 
 # This method will also get whatever object is passed into the
 # create_access_token method, and let us define what the identity
 # should be for this object
 @jwt.user_identity_loader
-def user_identity_lookup(user):
-    return user.user_ID
+def user_identity_lookup(user_ID):
+    return user_ID
 
 
 # This is an example for jwt_required
@@ -118,7 +118,9 @@ def refresh_token():
     # Access the identity of the current user with get_jwt_identity
     # current_user = get_jwt_identity()
     claims = get_jwt_claims()
-    return jsonify({'response': {'user': claims['user']}}), 200
+    user = UserBusiness.get_by_user_ID(claims['user_ID'])
+    user = json_utility.convert_to_json(user.to_mongo())
+    return jsonify({'response': {'user': user}}), 200
 
 
 @app.route('/hub_png/user/<hub_username>/kernelspecs/<language>/<filename>',

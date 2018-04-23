@@ -41,3 +41,4 @@ gitpython
 cookiecutter
 psutil
 htpasswd
+pyjwt

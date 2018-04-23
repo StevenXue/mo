@@ -1,4 +1,5 @@
-import { login, tokenLogin } from '../services/login'
+import {twoStepVFC} from '../services/user'
+import {sendCaptchaToEmail} from '../services/user'
 import { routerRedux } from 'dva/router'
 import { message } from 'antd'
 import pathToRegexp from 'path-to-regexp'
@@ -46,6 +47,32 @@ export default {
         type: 'updateProjectNumber',
         payload: {projectNumber: projectNumber}
       })
+    },
+
+    *sendCaptchaToEmail({ payload }, { put, call }){
+      const response = yield call(sendCaptchaToEmail, payload)
+      console.log("response", response)
+      if(response.status === 200){
+        message.success('验证码发送成功!')
+      }else{
+        let errorMessage = response.data.error.message
+        message.error(errorMessage)
+      }
+    },
+
+    * twoStepVFC({ payload }, { put, call }) {
+      const response = yield call(twoStepVFC, payload)
+      if (response.status === 200) {
+        const { data } = response
+        if (data) {
+          localStorage.setItem('tokenForUpdateInfo', data.tokenForUpdateInfo)
+        } else {
+          throw data
+        }
+      } else {
+        let errorMessage = response.data.error.message
+        message.error(errorMessage)
+      }
     },
   },
   subscriptions: {

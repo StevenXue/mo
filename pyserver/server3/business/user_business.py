@@ -7,6 +7,7 @@ from server3.entity.user_request import UserRequest
 from server3.repository.user_request_repo import UserRequestRepo
 from server3.repository.project_repo import ProjectRepo
 from server3.entity.project import Project
+from werkzeug.security import generate_password_hash
 
 user_repo = UserRepo(User)
 
@@ -98,6 +99,13 @@ class UserBusiness(GeneralBusiness):
         user = get_by_user_ID(user_ID=user_ID)
         return cls.repo.update_one_by_id(obj_id=user.id, update=update)
 
+    @classmethod
+    def update_password(cls, user_ID, new_password):
+        user = get_by_user_ID(user_ID=user_ID)
+        user.password = generate_password_hash(new_password)
+
+    # @classmethod
+    # def checkTokenForUpdateInfo(cls):
 
     # @classmethod
     # def count_action_entity(cls, user_ID, page_no, page_size, action_entity,

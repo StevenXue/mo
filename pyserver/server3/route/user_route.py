@@ -9,7 +9,8 @@ Date: 2017.05.22
 """
 import json
 import requests
-
+import jwt
+import time
 from flask import Blueprint
 from flask import jsonify
 from flask import make_response
@@ -31,6 +32,7 @@ from server3.business.statistics_business import StatisticsBusiness
 from server3.service import request_answer_service
 from server3.service.request_answer_service import RequestAnswerService
 from server3.business.request_answer_business import RequestAnswerBusiness
+from server3.constants import UPDATE_USER_INFO_SK
 
 PREFIX = '/user'
 
@@ -45,7 +47,7 @@ user_app = Blueprint("user_app", __name__, url_prefix=PREFIX)
 @user_app.route('/send_verification_code/<phone>', methods=['get'])
 def send_verification_code(phone):
     try:
-        user_service.send_vewrification_code(phone)
+        user_service.send_verification_code(phone)
         return jsonify({
             "response": "success"
         }), 200
@@ -137,14 +139,16 @@ def login():
         user = user_service.authenticate(user_ID, password)
         user_obj = json_utility.convert_to_json(user.to_mongo())
         user_obj.pop('password')
+        del user.avatar
     except DoesNotExist as e:
         return jsonify({'response': '%s: %s' % (str(
             DoesNotExist), e.args)}), 400
     if not user:
         return jsonify({'response': 'Bad username or password'}), 400
     # Identity can be any data that is json serializable
-    response = {'response': {'token': create_access_token(identity=user),
-                             'user': user_obj}}
+    response = {
+        'response': {'token': create_access_token(identity=user.user_ID),
+                     'user': user_obj}}
     return jsonify(response), 200
 
 
@@ -160,7 +164,7 @@ def forgot():
     if not user:
         return jsonify({'response': 'Bad email'}), 400
     # Identity can be any data that is json serializable
-    response = {'response': {'token': create_access_token(identity=user)}}
+    response = {'response': 'ok'}
     return jsonify(response), 200
 
 
@@ -178,7 +182,7 @@ def newpassword():
     if not user:
         return jsonify({'response': 'Bad email'}), 400
     # Identity can be any data that is json serializable
-    response = {'response': {'token': create_access_token(identity=user)}}
+    response = {'response': 'ok'}
     return jsonify(response), 200
 
 
@@ -266,9 +270,71 @@ def login_with_phone():
         if result:
             user = user_business.get_by_phone(phone=phone)
             response = {'response': {
-                'token': create_access_token(identity=user),
+                'token': create_access_token(identity=user.user_ID),
                 'user': json_utility.convert_to_json(user.to_mongo())}}
             return jsonify(response), 200
+    except Error as e:
+        print("e.args[0]", e.args[0])
+        return jsonify({
+            "response": {
+                "error": e.args[0]
+            }
+        }), 400
+
+
+@user_app.route('/two_step_vfc', methods=['POST'])
+@jwt_required
+def two_step_vfc():
+    user_ID = get_jwt_identity()
+    data = request.get_json()
+
+    check_type = data.pop("checkType")
+    check_value = data.pop("checkValue")
+    code = data.pop("code")
+
+    try:
+        if check_type == 'phone':
+            result = user_service.verify_code(code=code, phone=check_value)
+        elif check_type == 'email':
+            user = UserBusiness.get_by_user_ID(user_ID)
+            if code and code == user.emailCaptcha:
+                result = True
+        else:
+            return jsonify({
+                "response": {
+                    "error": e.args[0]
+                }
+            }), 400
+        if result:
+            expire_time = time.time() + 3600
+            response = {'response': {
+                'tokenForUpdateInfo': jwt.encode({'user_ID': user_ID,
+                                                  'expireTime': expire_time},
+                                                 UPDATE_USER_INFO_SK,
+                                                 algorithm='HS256'),
+            }}
+            return jsonify(response), 200
+    except Error as e:
+        print("e.args[0]", e.args[0])
+        return jsonify({
+            "response": {
+                "error": e.args[0]
+            }
+        }), 400
+
+
+# 发送验证码到邮箱
+@user_app.route('/send_verification_code_to_email/<email>', methods=['get'])
+@jwt_required
+def send_verification_code_to_email(email):
+    user_ID = get_jwt_identity()
+    try:
+        from server3.business.user_business import UserBusiness
+        from server3.service.user_service import UserService
+        UserService.send_captcha_to_email(user_ID, email)
+        return jsonify({
+            "response": "success"
+        }), 200
     except Error as e:
         print("e.args[0]", e.args[0])
         return jsonify({
@@ -420,7 +486,8 @@ def get_statistics():
     page_size = int(request.args.get('page_size', 5))
     action = request.args.get("action")
     entity_type = request.args.get("entity_type")
-    statistics = UserService.get_statistics(user_ID, page_no, page_size, action, entity_type)
+    statistics = UserService.get_statistics(user_ID, page_no, page_size, action,
+                                            entity_type)
     return jsonify({
         'response': {
             "objects": statistics.objects,
@@ -433,14 +500,14 @@ def get_statistics():
     })
 
 
-# 用户更改基本信息 邮箱，手机号, 性别
+# 用户更改基本信息 性别，头像
 @user_app.route('', methods=['PUT'])
 @jwt_required
 def update_user():
     user_ID = get_jwt_identity()
     data = request.get_json()
-    # 检查data是否在 ["email", "phone", "gender"]
-    lists = ["email", "phone", "gender", "avatar"]
+    # 检查data是否在 ["email", "phone", "gender","avatar"]
+    lists = ["gender", "avatar"]
     for key, value in data.items():
         if key not in lists:
             return jsonify({'response': 'error arguments'}), 400
@@ -448,3 +515,38 @@ def update_user():
     return jsonify({'response': {
         "user": json_utility.convert_to_json(user.to_mongo())
     }}), 200
+
+
+# 用户更改重要信息 邮箱，手机号, 密码
+@user_app.route('/account', methods=['PUT'])
+@jwt_required
+def update_user_account():
+    user_ID = get_jwt_identity()
+    data = request.get_json()
+    token_for_update_info = data['tokenForUpdateInfo']
+    phone = data.get('phone', None)
+    email = data.get('email', None)
+    password = data.get('password', None)
+    captcha = data.get('captcha', None)
+    payload = jwt.decode(token_for_update_info, UPDATE_USER_INFO_SK,
+                         algorithm='HS256')
+    # if payload['user_ID'] != user_ID or payload['expireTime'] > time.time():
+    if payload['user_ID'] != user_ID :
+        return jsonify({'response': 'tokenForUpdateInfo error'}), 400
+    elif phone:
+        # 更改手机
+        # 验证手机 验证码
+        res = user_service.verify_code(code=captcha, phone=phone)
+        if res:
+            user = UserBusiness.get_by_user_ID(user_ID)
+            user.phone = phone
+            user.save()
+    elif email:
+        # 更改邮箱
+        # 验证邮箱 验证码
+        UserService.update_user_email(user_ID, email, captcha)
+    elif password:
+        UserBusiness.update_password(user_ID, password)
+    else:
+        return jsonify({'response': 'error'}), 400
+    return jsonify({'response': 'ok'}), 200

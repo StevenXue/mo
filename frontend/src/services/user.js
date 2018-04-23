@@ -61,3 +61,29 @@ export function updateUserInfo({ body, onJson }) {
     body: JSON.stringify(body),
   }, { onJson });
 }
+
+export function updateUserAccount({ body, onJson }) {
+  return request(`${CORS}/user/account`, {
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  }, { onJson });
+}
+
+
+
+export function twoStepVFC(payload) {
+  return request(CORS + "/user/two_step_vfc", {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+}
+
+export function sendCaptchaToEmail(payload) {
+  return request(`${CORS}/user/send_verification_code_to_email/${payload.email}`)
+}

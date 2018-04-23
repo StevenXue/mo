@@ -1,5 +1,5 @@
 from uuid import getnode as get_mac
-
+UPDATE_USER_INFO_SK = 'secret_mo_mo'
 MONGO = 'DEFAULT'
 # if get_mac() == 274973436731254:
 #     MONGO = 'DEFAULT'
