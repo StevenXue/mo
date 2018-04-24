@@ -92,9 +92,13 @@ class EditForm extends React.Component {
             },
             onJson: () => {
               message.success('Email修改成功')
+              this.cancelEdit({})
+            },
+            onError:() => {
+              message.error('验证码错误，请检查');
             }
           })
-          this.cancelEdit({})
+
         }
       },
     )
@@ -105,7 +109,6 @@ class EditForm extends React.Component {
     let tokenForUpdateInfo = localStorage.getItem('tokenForUpdateInfo')
     this.props.form.validateFields(['phone'], {force: true},
       (err, values) => {
-        console.log('values', values)
         if (!err) {
           updateUserAccount({
             body: {
@@ -115,9 +118,12 @@ class EditForm extends React.Component {
             },
             onJson: () => {
               message.success('手机号修改成功')
+              this.cancelEdit({})
+            },
+            onError:() => {
+              message.error('验证码错误，请检查');
             }
           })
-          this.cancelEdit({})
         }
       },
     )

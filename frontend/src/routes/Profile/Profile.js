@@ -202,7 +202,7 @@ class MyFavouriteList extends Component {
   }
 
   toObjectDetail(id, history) {
-    history.push(`/market/${id}`)
+    history.push(`/discovery/${id}`)
   }
 
   toUserRequestDetail(id, history) {

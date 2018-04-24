@@ -484,3 +484,6 @@ class UserService:
             user.email = email
             user.save()
             return user
+        else:
+            raise Error("error captcha")
+

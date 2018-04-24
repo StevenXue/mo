@@ -62,14 +62,14 @@ export function updateUserInfo({ body, onJson }) {
   }, { onJson });
 }
 
-export function updateUserAccount({ body, onJson }) {
+export function updateUserAccount({ body, onError, onJson }) {
   return request(`${CORS}/user/account`, {
     method: 'put',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
-  }, { onJson });
+  }, { onError, onJson });
 }
 
 
