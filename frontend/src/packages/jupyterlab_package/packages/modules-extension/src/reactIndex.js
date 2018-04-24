@@ -198,7 +198,7 @@ export class ModulePage extends React.Component {
         getModule({
             moduleId: this.state.project._id,
             version: value,
-            onJson: (response) => this.onModuleSuccess(response, func),
+            onJson: (response) => this.onModuleSuccess(responsio.connecte, func),
         })
         this.setState({
             version: value

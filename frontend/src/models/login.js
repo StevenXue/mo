@@ -258,7 +258,7 @@ export default {
         const userId = localStorage.getItem('user_ID')
         if (userId && !connected) {
 
-          const socket = io.connect(flaskServer + '/log/' + userId)
+          const socket = io.connect('/log/' + userId, {path: '/socketio/socket.io'})
           socket.on('log_epoch_end', (msg) => {
             dispatch({ type: 'handleSocket', payload: { msg, pathname } })
           })

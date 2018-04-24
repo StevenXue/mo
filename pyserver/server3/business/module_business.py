@@ -160,13 +160,13 @@ class ModuleBusiness(ProjectBusiness):
     #     return module
 
     @staticmethod
-    def load_module_params(module, version=''):
+    def load_module_params(module, version=DEV_DIR_NAME):
         # TODO remove 'try except' after modules all have versions
         try:
             if not version:
                 version = module.versions[-1]
         except:
-            version = ''
+            version = DEV_DIR_NAME
         yml_path = os.path.join(module.module_path, version, tail_path)
         with open(yml_path, 'r') as stream:
             obj = yaml.load(stream)
