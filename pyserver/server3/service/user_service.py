@@ -369,7 +369,10 @@ def verify_code(code, phone):
     }
     :rtype:
     """
-    msg_id = PhoneMessageId.objects(phone=phone).get().msg_id
+    try:
+        msg_id = PhoneMessageId.objects(phone=phone).get().msg_id
+    except:
+        raise Error("无效的手机号")
     url = 'https://api.sms.jpush.cn/v1/codes/' + msg_id + '/valid'
     payload = json.dumps({
         'code': code
@@ -476,3 +479,32 @@ class UserService:
         statistics.objects = json_utility.objs_to_json_with_args(
             statistics.objects, ["app", "caller"])
         return statistics
+
+    @classmethod
+    def send_captcha_to_email(cls, user_ID, email):
+        receiver = email
+        msg['To'] = email
+        rand = str(random.randint(100000, 999999))
+        user = UserBusiness.get_by_user_ID(user_ID)
+        user.emailCaptcha = rand
+        user.save()
+
+        text = f'您好！\n随机码为: {rand}, 半小时内有效，谢谢 '
+        text_plain = MIMEText(text, 'plain', 'utf-8')
+        msg.attach(text_plain)
+        smtp = smtplib.SMTP()
+        smtp.connect('smtp.163.com')
+        smtp.login(username, password)
+        smtp.sendmail(sender, receiver, msg.as_string())
+        smtp.quit()
+
+    @classmethod
+    def update_user_email(cls, user_ID, email, captcha):
+        user = UserBusiness.get_by_user_ID(user_ID)
+        if captcha and captcha == user.emailCaptcha:
+            user.email = email
+            user.save()
+            return user
+        else:
+            raise Error("验证码错误")
+

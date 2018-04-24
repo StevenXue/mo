@@ -348,7 +348,7 @@ export default {
     setup({dispatch, history}) {
       return history.listen(({pathname}) => {
         const match = pathToRegexp('/workspace/:projectId/:type?').exec(pathname)
-        const match2 = pathToRegexp('/market/:projectId/:type?').exec(pathname)
+        const match2 = pathToRegexp('/discovery/:projectId/:type?').exec(pathname)
         const url = new URL(location.href.replace('/#', ''))
         if (match) {
           const projectId = match[1]

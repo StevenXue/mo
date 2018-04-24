@@ -1,32 +1,16 @@
 # -*- coding: UTF-8 -*-
 
-from server3.service import user_service
-from server3.service.world_service import WorldService
-
-from server3.business import user_request_business
-from server3.business import user_business
-from server3.business import ownership_business
-from server3.repository import config
-from server3.utility import json_utility
 from server3.entity.world import CHANNEL
 from server3.business.user_request_business import UserRequestBusiness
 from server3.business.request_answer_business import RequestAnswerBusiness
 from server3.business.user_business import UserBusiness
-from server3.service.user_service import UserService
 from server3.business.statistics_business import StatisticsBusiness
-
-
-# class EntityMapper:
-#     userRequest = UserRequestBusiness
-#     requestAnswer = RequestAnswerBusiness
-#
-#     @classmethod
-#     def get(cls, attr='userRequest'):
-#         return getattr(cls, attr)
+from server3.business.comments_business import CommentsBusiness
+from server3.service.world_service import WorldService
+from server3.service.user_service import UserService
 
 
 class UserRequestService:
-
     @classmethod
     def get_list(cls, type, search_query, user_ID, page_no, page_size):
         user = UserBusiness.get_by_user_ID(user_ID) if user_ID else None
@@ -41,6 +25,10 @@ class UserRequestService:
 
     @classmethod
     def remove_by_id(cls, user_request_id, user_ID):
+        if (CommentsBusiness.get_comments_of_this_user_request(user_request_id)
+                or RequestAnswerBusiness.get_by_user_request_id(
+                    user_request_id)):
+            raise RuntimeError('Cannot delete user_request')
         return UserRequestBusiness.remove_by_id(user_request_id, user_ID)
 
     @classmethod
