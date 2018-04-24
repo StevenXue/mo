@@ -90,13 +90,15 @@ class EditForm extends React.Component {
               'captcha':values.captcha,
               tokenForUpdateInfo
             },
-            onJson: () => {
-              message.success('Email修改成功')
-              this.cancelEdit({})
+            onJson: (e) => {
+              if(e.error){
+                message.error('验证码错误，请检查')
+              }
+              else{
+                message.success('Email修改成功')
+                this.cancelEdit({})
+              }
             },
-            onError:() => {
-              message.error('验证码错误，请检查');
-            }
           })
 
         }
@@ -107,21 +109,24 @@ class EditForm extends React.Component {
 
   handleSubmitPhone = () => {
     let tokenForUpdateInfo = localStorage.getItem('tokenForUpdateInfo')
-    this.props.form.validateFields(['phone'], {force: true},
+    this.props.form.validateFields(['phone','captcha'], {force: true},
       (err, values) => {
         if (!err) {
+          console.log(values.captcha)
           updateUserAccount({
             body: {
               'phone': values.phone,
               'captcha':values.captcha,
               tokenForUpdateInfo
             },
-            onJson: () => {
-              message.success('手机号修改成功')
-              this.cancelEdit({})
-            },
-            onError:() => {
-              message.error('验证码错误，请检查');
+            onJson: (e) => {
+              if(e.error){
+                message.error('验证码错误，请检查')
+              }
+              else{
+                message.success('手机号码修改成功')
+                this.cancelEdit({})
+              }
             }
           })
         }
