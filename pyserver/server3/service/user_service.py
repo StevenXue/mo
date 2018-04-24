@@ -361,7 +361,10 @@ def verify_code(code, phone):
     }
     :rtype:
     """
-    msg_id = PhoneMessageId.objects(phone=phone).get().msg_id
+    try:
+        msg_id = PhoneMessageId.objects(phone=phone).get().msg_id
+    except:
+        raise Error("无效的手机号")
     url = 'https://api.sms.jpush.cn/v1/codes/' + msg_id + '/valid'
     payload = json.dumps({
         'code': code
@@ -485,5 +488,5 @@ class UserService:
             user.save()
             return user
         else:
-            raise Error("error captcha")
+            raise Error("验证码错误")
 

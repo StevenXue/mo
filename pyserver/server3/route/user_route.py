@@ -532,9 +532,8 @@ def update_user_account():
     captcha = data.get('captcha', None)
     payload = jwt.decode(token_for_update_info, UPDATE_USER_INFO_SK,
                          algorithm='HS256')
-    # if payload['user_ID'] != user_ID or payload['expireTime'] > time.time():
-    if payload['user_ID'] != user_ID:
-        return jsonify({'response': 'tokenForUpdateInfo error'}), 400
+    if payload['user_ID'] != user_ID or payload['expireTime'] < time.time():
+        return jsonify({'response': {'error': 'tokenError'}}), 400
     elif phone:
         # 更改手机
         # 验证手机 验证码
@@ -546,7 +545,7 @@ def update_user_account():
         except Error as e:
             return jsonify({
                 "response": {
-                    "error": e.args[0]
+                    "error": "验证码错误"
                 }
             }), 400
     elif email:
