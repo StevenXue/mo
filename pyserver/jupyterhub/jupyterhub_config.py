@@ -314,7 +314,6 @@ class MyProxy(ConfigurableHTTPProxy):
             '--error-target', url_path_join(self.hub.url, 'error'),
             '--no-include-prefix',
         ]
-        print('cmdcmdcmdcmd', cmd, self.auth_token)
         if self.app.subdomain_host:
             cmd.append('--host-routing')
         if self.debug:
@@ -1228,8 +1227,8 @@ c.DockerSpawner.container_ip = '0.0.0.0'
 c.DockerSpawner.volumes = \
     {
         '/Users/zhaofengli/projects/goldersgreen/pyserver/user_directory/{user_ID}/{project_name}': '/home/jovyan/work',
-        '/Users/zhaofengli/projects/goldersgreen/pyserver/server3/lib/modules': '/home/jovyan/modules',
-        '/Users/zhaofengli/projects/goldersgreen/pyserver/user_directory': '/home/jovyan/dataset'
+        # '/Users/zhaofengli/projects/goldersgreen/pyserver/server3/lib/empty_modules': '/home/jovyan/modules',
+        # '/Users/zhaofengli/projects/goldersgreen/pyserver/user_directory': '/home/jovyan/dataset'
         # '/Users/Chun/Documents/workspace/goldersgreen/pyserver/user_directory/{user_ID}/{project_name}': '/home/jovyan/work',
         # '/Users/Chun/Documents/workspace/goldersgreen/pyserver/server3/lib/modules': '/home/jovyan/modules',
         # '/Users/Chun/Documents/workspace/goldersgreen/pyserver/user_directory': '/home/jovyan/dataset'

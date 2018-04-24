@@ -271,7 +271,11 @@ RUN echo 'source /usr/local/bin/virtualenvwrapper.sh' >> ~/.bashrc
 #RUN /bin/bash -c "export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv"
 #RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh"
 #RUN source ~/.bashrc
+USER $NB_UID
 
-ADD run.sh /home/jovyan
-ADD add_venv.sh /home/jovyan
+ADD --chown=jovyan:users run.sh /home/jovyan
+ADD --chown=jovyan:users add_venv.sh /home/jovyan
+ADD --chown=jovyan:users remove_venv.sh /home/jovyan
+ADD --chown=jovyan:users modules /home/jovyan/modules
+ADD --chown=jovyan:users dataset /home/jovyan/dataset
 CMD ['bash', '/home/jovyan/run.sh']

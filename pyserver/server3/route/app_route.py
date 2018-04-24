@@ -62,12 +62,39 @@ def publish_in_docker(app_id, version):
 @jwt_required
 def add_used_module(app_id):
     data = request.get_json()
-    used_modules = data.get('used_modules', [])
+    used_module = data.get('used_module')
     func = data.get('func')
     version = data.get('version')
-    print(app_id)
-    app = AppService.add_used_module(app_id, used_modules, func, version)
-    return jsonify({"response": json_utility.convert_to_json(app.to_mongo())})
+    app = AppService.add_used_module(app_id, used_module, func, version)
+    return jsonify({"response": convert_used_modules(app)})
+
+
+@app_app.route("/remove_used_module/<app_id>", methods=["PUT"])
+@jwt_required
+def remove_used_module(app_id):
+    data = request.get_json()
+    used_module = data.get('used_module')
+    version = data.get('version')
+    app = AppService.remove_used_module(app_id, used_module, version)
+    return jsonify({"response": convert_used_modules(app)})
+
+
+@app_app.route("/add_used_dataset/<app_id>", methods=["PUT"])
+@jwt_required
+def add_used_dataset(app_id):
+    data = request.get_json()
+    used_dataset = data.get('used_dataset')
+    app = AppService.add_used_dataset(app_id, used_dataset)
+    return jsonify({"response": convert_used_datasets(app)})
+
+
+@app_app.route("/remove_used_dataset/<app_id>", methods=["PUT"])
+@jwt_required
+def remove_used_dataset(app_id):
+    data = request.get_json()
+    used_dataset = data.get('used_dataset')
+    app = AppService.remove_used_dataset(app_id, used_dataset)
+    return jsonify({"response": convert_used_datasets(app)})
 
 
 @app_app.route("/insert_envs/<project_name>", methods=["PUT"])
@@ -100,8 +127,8 @@ def add():
     :rtype:
     """
     if not request.json \
-        or 'name' not in request.json \
-        or 'type' not in request.json:
+            or 'name' not in request.json \
+            or 'type' not in request.json:
         return jsonify({'response': 'insufficient arguments'}), 400
 
     user_token = request.headers.get('Authorization').split()[1]
@@ -129,16 +156,42 @@ def get_app(app_id):
     yml = request.args.get('yml')
     commits = request.args.get('commits')
     version = request.args.get('version')
+    used_modules = request.args.get('used_modules')
+    used_datasets = request.args.get('used_datasets')
     app = AppService.get_by_id(app_id, yml=yml, commits=commits,
-                               version=version)
+                               version=version, used_modules=used_modules)
 
     # 将app.user 更换为 user_ID 还是name?
     user_ID = app.user.user_ID
-    app = json_utility.convert_to_json(app.to_mongo())
+    if used_modules == 'true':
+        app = convert_used_modules(app)
+    if used_datasets == 'true':
+        app = convert_used_datasets(app)
+    if used_modules != 'true' and used_datasets != 'true':
+        app = json_utility.convert_to_json(app.to_mongo())
     app["user_ID"] = user_ID
     return jsonify({
         "response": app
     }), 200
+
+
+def convert_used_modules(app):
+    ums = [{'module': json_utility.convert_to_json(m.module.to_mongo()),
+            'version': '.'.join(m.version.split('_'))} for m in
+           app.used_modules]
+    del app.used_modules
+    app = json_utility.convert_to_json(app.to_mongo())
+    app['used_modules'] = ums
+    return app
+
+
+def convert_used_datasets(app):
+    ums = [{'dataset': json_utility.convert_to_json(d.dataset.to_mongo())}
+           for d in app.used_datasets]
+    del app.used_datasets
+    app = json_utility.convert_to_json(app.to_mongo())
+    app['used_datasets'] = ums
+    return app
 
 
 @app_app.route('', methods=['GET'])

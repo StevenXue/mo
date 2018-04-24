@@ -38,8 +38,12 @@ export function getModule({moduleId, version, onJson}) {
     }
 }
 
-export function addModuleToApp({appId, moduleId, func, version}) {
-    if(version) {
+export function getApp({appId, version, onJson}) {
+    return request(`pyapi/apps/${appId}?used_modules=true`, undefined, {onJson})
+}
+
+export function addModuleToApp({appId, moduleId, func, version, onJson}) {
+    if (version) {
         version = version.split('.').join('_');
     }
     return request(`pyapi/apps/add_used_module/${appId}`, {
@@ -48,11 +52,25 @@ export function addModuleToApp({appId, moduleId, func, version}) {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            used_modules: [moduleId],
+            used_module: moduleId,
             func,
             version
         }),
-    })
+    }, {onJson})
+}
+
+export function removeModuleInApp({appId, moduleId, version, onJson}) {
+    version = version.split('.').join('_');
+    return request(`pyapi/apps/remove_used_module/${appId}`, {
+        method: 'put',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            used_module: moduleId,
+            version
+        }),
+    }, {onJson})
 }
 
 // 新建 module
