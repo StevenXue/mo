@@ -10,6 +10,9 @@ export function login(body) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
+
+    customErrorMsg: true,
+    noErrorMsg: true,
   })
 }
 

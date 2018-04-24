@@ -111,12 +111,13 @@ export default {
         type: 'changeSubmitting',
         payload: true,
       })
-      const { data: data } = yield call(login, payload)
+      const { data: data, noError } = yield call(login, payload)
       yield put({
         type: 'changeSubmitting',
         payload: false,
       })
-      if (data) {
+
+      if (data && noError) {
         localStorage.setItem('token', data.token)
         localStorage.setItem('user_ID', data.user.user_ID)
         localStorage.setItem('user_obj_id', data.user._id)
