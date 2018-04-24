@@ -3,6 +3,7 @@ import json
 import requests
 import hashlib
 import random
+from copy import deepcopy
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from mongoengine import DoesNotExist
@@ -417,17 +418,25 @@ class UserService:
 
         # 1. 在user下存favor_apps
         if object not in user[user_keyword]:
-            user[user_keyword].append(object)
+            refs = deepcopy(user[user_keyword])
+            refs.append(object)
+            user[user_keyword] = refs
             user_result = user.save()
         else:
-            user[user_keyword].remove(object)
+            refs = deepcopy(user[user_keyword])
+            refs.remove(object)
+            user[user_keyword] = refs
             user_result = user.save()
         # 2. 在object下存favor_users
         if user not in object[object_keyword]:
-            object[object_keyword].append(user)
+            refs = deepcopy(object[object_keyword])
+            refs.append(user)
+            object[object_keyword] = refs
             object_result = object.save()
         else:
-            object[object_keyword].remove(user)
+            refs = deepcopy(object[object_keyword])
+            refs.remove(user)
+            object[object_keyword] = refs
             object_result = object.save()
         if user_result and object_result:
             return UserEntity(user=user_result, entity=object_result)

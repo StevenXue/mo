@@ -238,6 +238,8 @@ def create_project():
         name, description, user_ID, tags=tags,
         type=type, user_token=user_token, **data)
     project = json_utility.convert_to_json(project.to_mongo())
+
+    print(project)
     return jsonify({'response': project}), 200
 
 

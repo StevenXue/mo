@@ -142,7 +142,7 @@ class ModuleBusiness(ProjectBusiness):
             update_time=create_time,
             type=type, tags=tags,
             hub_token=res.get('token'),
-            path=project_path, user=user,
+            path=project_path, user=user, status='inactive',
             privacy=privacy, category=category, commits=[commit],
             repo_path=f'http://{GIT_SERVER_IP}/repos/{user_ID}/{name}')
 
@@ -175,6 +175,9 @@ class ModuleBusiness(ProjectBusiness):
     @classmethod
     def deploy_or_publish(cls, project_id, commit_msg, version=DEV_DIR_NAME):
         module = cls.get_by_id(project_id)
+
+        module.status = 'deploying'
+        module.save()
 
         # commit module
         cls.commit(project_id, commit_msg, version)
@@ -214,7 +217,9 @@ class ModuleBusiness(ProjectBusiness):
         if version != DEV_DIR_NAME:
             module.privacy = 'public'
             module.versions.append(version)
-            module.save()
+
+        module.status = 'active'
+        module.save()
 
         return module
 

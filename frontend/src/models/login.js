@@ -274,7 +274,7 @@ export default {
               dispatch({ type: 'message/updateNewMessage', payload: { msg } })
             }
             console.log('msg', msg)
-            if (msg.message.message_type === 'deploy' || 'publish') {
+            if (msg.message.message_type === 'deploy' || msg.message.message_type === 'publish') {
               const match = pathToRegexp('/workspace/:projectId/:type?').exec(pathname)
               if (match) {
                 const projectId = match[1]

@@ -424,19 +424,19 @@ class ProjectService:
                                               user_token=user_token, **kwargs)
 
         from server3.service.user_service import UserService
-        UserService.action_entity(user_ID=project.user.user_ID,
+        user, project = UserService.action_entity(user_ID=project.user.user_ID,
                                   entity_id=project.id,
                                   action='favor', entity=project.type)
-
+        print(project.to_mongo())
         from server3.service.world_service import WorldService
         from server3.business.statistics_business import StatisticsBusiness
         # 记录历史记录
-        statistics = StatisticsBusiness.action(
-            user_obj=user,
-            entity_obj=project,
-            entity_type=type,
-            action="create"
-        )
+        # statistics = StatisticsBusiness.action(
+        #     user_obj=user,
+        #     entity_obj=project,
+        #     entity_type=type,
+        #     action="create"
+        # )
         # 记录世界频道消息  # 推送消息
         world = WorldService.system_send(
             channel=CHANNEL.request,
