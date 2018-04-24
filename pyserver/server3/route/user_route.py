@@ -45,7 +45,7 @@ user_app = Blueprint("user_app", __name__, url_prefix=PREFIX)
 @user_app.route('/send_verification_code/<phone>', methods=['get'])
 def send_verification_code(phone):
     try:
-        user_service.send_vewrification_code(phone)
+        user_service.send_verification_code(phone)
         return jsonify({
             "response": "success"
         }), 200
@@ -135,13 +135,15 @@ def login():
     password = request.json.get('password', None)
     try:
         user = user_service.authenticate(user_ID, password)
+        if not user:
+            return jsonify({'response': 'Bad username or password'}), 400
+
         user_obj = json_utility.convert_to_json(user.to_mongo())
         user_obj.pop('password')
     except DoesNotExist as e:
         return jsonify({'response': '%s: %s' % (str(
             DoesNotExist), e.args)}), 400
-    if not user:
-        return jsonify({'response': 'Bad username or password'}), 400
+
     # Identity can be any data that is json serializable
     response = {'response': {'token': create_access_token(identity=user),
                              'user': user_obj}}
@@ -276,6 +278,7 @@ def login_with_phone():
                 "error": e.args[0]
             }
         }), 400
+
 
 
 # @user_app.route('/favor_api', methods=['PUT'])
