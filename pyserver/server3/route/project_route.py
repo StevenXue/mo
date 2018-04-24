@@ -347,5 +347,10 @@ def nb_to_script(project_id):
     data = request.get_json()
     optimise = data.get('optimise')
     nb_path = data.get('nb_path')
-    ProjectBusiness.nb_to_script(project_id, nb_path, optimise)
+    try:
+        ProjectBusiness.nb_to_script(project_id, nb_path, optimise)
+    except FileNotFoundError as e:
+        return jsonify({"response": 'Try save your notebook and convert '
+                                    'again.'}),\
+               399
     return jsonify({"response": 1})

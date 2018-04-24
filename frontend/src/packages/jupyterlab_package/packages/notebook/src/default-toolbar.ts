@@ -239,7 +239,9 @@ export namespace ToolbarItems {
                 message.success(`${notebookPath} successfully export to script!`);
               },
               onJson: undefined,
-              onError: undefined,
+              onError: (err: string) => {
+                  message.error(err);
+              },
             });
           });
         }

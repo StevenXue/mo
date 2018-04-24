@@ -8,6 +8,7 @@ import tempfile
 import tarfile
 from copy import deepcopy
 from subprocess import call
+from io import BytesIO
 
 import synonyms
 import docker
@@ -20,6 +21,8 @@ from server3.utility.json_utility import args_converter
 from server3.constants import APP_DIR
 from server3.constants import MODULE_DIR
 from server3.constants import DOCKER_IP
+from server3.constants import APP_DIR
+from server3.constants import DEV_DIR_NAME
 from server3.constants import INIT_RES
 from server3.constants import Error, Warning, ErrorMessage
 from server3.entity.general_entity import Objects
@@ -32,7 +35,7 @@ yaml_tail_path = 'app_spec.yml'
 class AppBusiness(ProjectBusiness, GeneralBusiness):
     repo = Repo(project.App)
     __cls = project.App
-    base_func_path = './functions'
+    base_func_path = APP_DIR
 
     @classmethod
     def create_project(cls, *args, **kwargs):
@@ -42,7 +45,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
 
     @classmethod
     def deploy_or_publish(cls, app_id, commit_msg, handler_file_path,
-                          version='dev'):
+                          version=DEV_DIR_NAME):
         app = cls.get_by_id(app_id)
         app.status = 'deploying'
         app.save()
@@ -61,7 +64,6 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
              cwd=cls.base_func_path)
         # target path = new path
         func_path = os.path.join(cls.base_func_path, service_name)
-        module_dir_path = os.path.join(func_path, 'modules')
 
         cls.copytree_wrapper(app.path, func_path,
                              ignore=shutil.ignore_patterns('.git'))
@@ -82,21 +84,6 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         # 2. copy datasets from docker
         cls.copy_from_container(container, '/home/jovyan/dataset', func_path)
 
-        # used_modules = [m.user.user_ID + '/' + m.name for m in
-        #                 app.used_modules]
-        # for module in used_modules:
-        #     owner_ID = module.split('/')[0]
-        #     module_path = os.path.join(MODULE_DIR, module)
-        #     module_path_target = os.path.join(module_dir_path, module)
-        #     try:
-        #         os.makedirs(os.path.join(module_dir_path, owner_ID))
-        #     except FileExistsError:
-        #         print('dir exists, no need to create')
-        #     # copy module tree to target path
-        #     print(module_path, module_path_target)
-        #     cls.copytree_wrapper(module_path, module_path_target,
-        #                          ignore=shutil.ignore_patterns('.git'))
-
         # deploy
         call(['faas-cli', 'build', '-f', f'./{service_name}.yml'],
              cwd=cls.base_func_path)
@@ -104,24 +91,20 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
              cwd=cls.base_func_path)
 
         # when not dev(publish), change the privacy etc
-        if version != 'dev':
-            app.app_path = os.path.join(cls.base_func_path, service_name_no_v)
+        if version != DEV_DIR_NAME:
             app.privacy = 'public'
             app.versions.append(version)
 
+        app.app_path = os.path.join(cls.base_func_path, service_name_no_v)
         app.status = 'active'
         app.save()
         return app
 
     @staticmethod
     def copy_from_container(container, path_from, path_to):
-        with tempfile.NamedTemporaryFile() as destination:
-            strm, stat = container.get_archive(path_from)
-            for d in strm:
-                destination.write(d)
-            destination.seek(0)
-            with tarfile.open(mode='r', fileobj=destination) as t:
-                t.extractall(path_to)
+        strm, stat = container.get_archive(path_from)
+        with tarfile.open(mode='r', fileobj=BytesIO(strm.read())) as t:
+            t.extractall(path_to)
 
     @staticmethod
     def modify_handler_py(py_path):
@@ -132,16 +115,17 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
             print(line)
 
     @staticmethod
-    def load_app_params(app, version=''):
+    def load_app_params(app, version=DEV_DIR_NAME):
         # TODO remove 'try except' after modules all have versions
         try:
             # if no version provided, get the latest
             if not version:
                 version = app.versions[-1]
         except:
-            version = ''
+            version = DEV_DIR_NAME
         yml_path = os.path.join('-'.join([app.app_path, version]),
                                 yaml_tail_path)
+        print(yml_path)
         with open(yml_path, 'r') as stream:
             obj = yaml.load(stream)
             return {'input': obj.get('input'), 'output': obj.get('output')}

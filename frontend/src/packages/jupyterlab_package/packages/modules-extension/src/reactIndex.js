@@ -49,7 +49,9 @@ export class ModulePage extends React.Component {
         const hash = window.location.hash
         const match = pathToRegexp('#/workspace/:appId/:type').exec(hash)
         if (match) {
-            this.appId = match[1]
+            if(match[2] === 'app') {
+                this.appId = match[1]
+            }
         }
     }
 
@@ -74,7 +76,6 @@ export class ModulePage extends React.Component {
                 [key.hyphenToHump()]: payload[key],
             })
         }
-
         // fetch
         getProjects({
             filter,
@@ -83,12 +84,14 @@ export class ModulePage extends React.Component {
                 totalNumber: count,
             }),
         })
-        getApp({
-            appId: this.appId,
-            onJson: (app) => this.setState({
-                app,
-            }),
-        })
+        if(this.appId) {
+            getApp({
+                appId: this.appId,
+                onJson: (app) => this.setState({
+                    app,
+                }),
+            })
+        }
     }
 
     onModuleSuccess = (response, func) => {
@@ -139,23 +142,25 @@ export class ModulePage extends React.Component {
                 `result = ${this.state.func}('${this.state.project.user_ID}/${this.state.project.name}/${this.state.version}', conf)`,
             ],
         )
-        addModuleToApp({
-            appId: this.appId,
-            moduleId: this.state.projectId,
-            func: this.state.func,
-            version: this.state.version,
-            onJson: (app) => {
-                this.setState({
-                    app,
-                    projectId: undefined,
-                    project: undefined,
-                    func: undefined,
-                    args: undefined,
-                    showUsedModules: true
-                });
-                message.success('Import success!')
-            }
-        })
+        if(this.appId) {
+            addModuleToApp({
+                appId: this.appId,
+                moduleId: this.state.projectId,
+                func: this.state.func,
+                version: this.state.version,
+                onJson: (app) => {
+                    this.setState({
+                        app,
+                        projectId: undefined,
+                        project: undefined,
+                        func: undefined,
+                        args: undefined,
+                        showUsedModules: true
+                    });
+                    message.success('Import success!')
+                }
+            })
+        }
     }
 
     setValue(values) {
@@ -355,7 +360,7 @@ export class ModulePage extends React.Component {
                 // overview
                 return this.renderOverview()
             }
-        } else if (this.state.showUsedModules) {
+        } else if (this.state.showUsedModules && this.state.app) {
             return this.renderSelectedModules()
         } else {
             return this.renderPublicList()

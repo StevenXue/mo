@@ -64,6 +64,7 @@ class AppService(ProjectService):
         response = requests.request("POST", url, data=payload, headers=headers)
         pattern = re.compile(r'STRHEAD(.+?)STREND', flags=re.DOTALL)
         results = pattern.findall(response.text)
+        print(results)
         output_json = json.loads(results[0])
         # output_json = response.json()
         # 成功调用后 在新的collection存一笔

@@ -30,15 +30,18 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.header import Header
+
 smtpserver = 'smtp.163.com'
 username = '15669929857@163.com'
-password='wurao122'
-sender='15669929857@163.com'
+password = 'wurao122'
+sender = '15669929857@163.com'
 # receiver='374758875@qq.com'
 subject = 'Python email test'
 msg = MIMEMultipart('mixed')
 msg['Subject'] = subject
 msg['From'] = '15669929857@163.com <15669929857@163.com>'
+
+
 # msg['To'] = '374758875@qq.com'
 # text = "Hi!\nHow are you?\nHere is the link you wanted:\nhttp://localhost:8989/#/user/login"    
 # text_plain = MIMEText(text,'plain', 'utf-8')    
@@ -85,10 +88,11 @@ def authenticate(user_ID, password):
         return user
     return False
 
+
 def forgot_send(email):
     user = user_business.get_by_email(email)
     if user:
-        receiver= email
+        receiver = email
         msg['To'] = email
         suiji = str(random.randint(100000, 999999))
         # h = hashlib.md5(bytes(suiji,encoding="utf-8"))
@@ -96,10 +100,10 @@ def forgot_send(email):
         user.hashEmail = suiji
         user.save()
 
-        text = user.user_ID+'，您好！\n请点击下方链接重置密码。 如非您本人操作，请忽略此邮件。\n http://localhost:8989/#/newpassword?email='+email+'&user='+user.user_ID+'&hashEmail='+suiji
-        text_plain = MIMEText(text,'plain', 'utf-8')   
-        msg.attach(text_plain)   
-        smtp = smtplib.SMTP()    
+        text = user.user_ID + '，您好！\n请点击下方链接重置密码。 如非您本人操作，请忽略此邮件。\n http://localhost:8989/#/newpassword?email=' + email + '&user=' + user.user_ID + '&hashEmail=' + suiji
+        text_plain = MIMEText(text, 'plain', 'utf-8')
+        msg.attach(text_plain)
+        smtp = smtplib.SMTP()
         smtp.connect('smtp.163.com')
         smtp.login(username, password)
         smtp.sendmail(sender, receiver, msg.as_string())
@@ -108,8 +112,8 @@ def forgot_send(email):
     return False
 
 
-def newpassword_send(password,email,hashEmail):
-    user = user_business.get_by_hashEmail(email,hashEmail)
+def newpassword_send(password, email, hashEmail):
+    user = user_business.get_by_hashEmail(email, hashEmail)
     if user:
         user['password'] = generate_password_hash(password)
         del user.hashEmail
@@ -133,11 +137,13 @@ def no_tourtip(user_ID):
         return user
     return False
 
+
 def check_learning(user_ID):
     user = user_business.get_by_user_ID(user_ID)
     if user:
         return user
     return False
+
 
 def no_learning(user_ID):
     user = user_business.get_by_user_ID(user_ID)
@@ -146,6 +152,7 @@ def no_learning(user_ID):
         user.save()
         return user
     return False
+
 
 def update_request_vote(user_request_id, user_ID):
     user = user_business.get_by_user_ID(user_ID)
@@ -399,11 +406,13 @@ class UserService:
         # print("entity_id", entity_id)
         object = business.get_by_id(entity_id)
 
-        if entity == "request" or entity =='answer':
-            user_keyword = '{entity}_{action}'.format(action=action, entity=entity)
+        if entity == "request" or entity == 'answer':
+            user_keyword = '{entity}_{action}'.format(action=action,
+                                                      entity=entity)
             object_keyword = '{action}_user'.format(action=action)
         else:
-            user_keyword = '{action}_{entity}s'.format(action=action, entity=entity)
+            user_keyword = '{action}_{entity}s'.format(action=action,
+                                                       entity=entity)
             object_keyword = '{action}_users'.format(action=action)
 
         # 1. 在user下存favor_apps
@@ -458,4 +467,3 @@ class UserService:
         statistics.objects = json_utility.objs_to_json_with_args(
             statistics.objects, ["app", "caller"])
         return statistics
-

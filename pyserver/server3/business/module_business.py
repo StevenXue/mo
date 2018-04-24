@@ -173,7 +173,7 @@ class ModuleBusiness(ProjectBusiness):
             return {'input': obj.get('input'), 'output': obj.get('output')}
 
     @classmethod
-    def deploy_or_publish(cls, project_id, commit_msg, version='dev'):
+    def deploy_or_publish(cls, project_id, commit_msg, version=DEV_DIR_NAME):
         module = cls.get_by_id(project_id)
 
         # commit module
@@ -192,26 +192,26 @@ class ModuleBusiness(ProjectBusiness):
         bind_path = '/home/jovyan/modules'
 
         # copy compile related files to module src
-        shutil.copy('./setup.py',
-                    os.path.join(module.module_path, version, 'src'))
-        shutil.copy('./compile.sh',
-                    os.path.join(module.module_path, version, 'src'))
-
-        compile_dir = module.module_path.replace('./server3/lib/modules',
-                                                 bind_path)
-        compile_dir = os.path.join(compile_dir, version, 'src')
-
-        # start container with the singleuser docker, mount the whole pyserver
-        # compile the main.py and delete compile related files
-        client = docker.from_env()
-        client.containers.run(
-            "singleuser:latest",
-            volumes={os.path.abspath(MODULE_DIR):
-                         {'bind': bind_path, 'mode': 'rw'}},
-            command=f"/bin/bash -c 'cd {compile_dir} && bash ./compile.sh'")
+        # shutil.copy('./setup.py',
+        #             os.path.join(module.module_path, version, 'src'))
+        # shutil.copy('./compile.sh',
+        #             os.path.join(module.module_path, version, 'src'))
+        #
+        # compile_dir = module.module_path.replace('./server3/lib/modules',
+        #                                          bind_path)
+        # compile_dir = os.path.join(compile_dir, version, 'src')
+        #
+        # # start container with the singleuser docker, mount the whole pyserver
+        # # compile the main.py and delete compile related files
+        # client = docker.from_env()
+        # client.containers.run(
+        #     "singleuser:latest",
+        #     volumes={os.path.abspath(MODULE_DIR):
+        #                  {'bind': bind_path, 'mode': 'rw'}},
+        #     command=f"/bin/bash -c 'cd {compile_dir} && bash ./compile.sh'")
 
         # if publish update privacy and version
-        if version != 'dev':
+        if version != DEV_DIR_NAME:
             module.privacy = 'public'
             module.versions.append(version)
             module.save()

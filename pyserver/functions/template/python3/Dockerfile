@@ -24,8 +24,11 @@ RUN conda config --set show_channel_urls yes
 
 WORKDIR /root/
 
+RUN apt-get update
+RUN apt-get install -y --reinstall build-essential
+
 COPY requirements.txt   .
-RUN while read requirement; do conda install --yes $requirement || pip install $requirement -i https://mirrors.ustc.edu.cn/pypi/web/simple; done < requirements.txt
+RUN pip install -r requirements.txt -i https://mirrors.ustc.edu.cn/pypi/web/simple
 RUN pip install opencv-python -i https://mirrors.ustc.edu.cn/pypi/web/simple
 
 COPY index.py           .
