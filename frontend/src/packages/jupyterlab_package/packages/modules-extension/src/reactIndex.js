@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Card, Button, Row, Col, Input, Icon, Pagination, Select} from 'antd'
+import {Card, Button, Row, Col, Input, Icon, Pagination, Select, message, List, Modal} from 'antd'
 import * as pathToRegexp from 'path-to-regexp'
 import ReactMde from 'react-mde'
 // const {ReactMdeTypes, ReactMdeCommands} = ReactMde
@@ -18,14 +18,16 @@ import {
 
 import ParamsMapper from './ParamsMapper'
 
-import {addModuleToApp, getModule, getProjects} from './services'
+import {addModuleToApp, getModule, getProjects, getApp, removeModuleInApp} from './services'
 
 const Option = Select.Option;
+import 'antd/lib/list/style/css';
 
 function genConf(args) {
     return JSON.stringify(args).replace(/'/g, '`')
 }
 
+const confirm = Modal.confirm
 const Search = Input.Search
 
 const type = 'module'
@@ -81,6 +83,12 @@ export class ModulePage extends React.Component {
                 totalNumber: count,
             }),
         })
+        getApp({
+            appId: this.appId,
+            onJson: (app) => this.setState({
+                app,
+            }),
+        })
     }
 
     onModuleSuccess = (response, func) => {
@@ -106,6 +114,7 @@ export class ModulePage extends React.Component {
             project: undefined,
             func: undefined,
             args: undefined,
+            showUsedModules: undefined,
         })
     }
 
@@ -134,7 +143,18 @@ export class ModulePage extends React.Component {
             appId: this.appId,
             moduleId: this.state.projectId,
             func: this.state.func,
-            version: this.state.version
+            version: this.state.version,
+            onJson: (app) => {
+                this.setState({
+                    app,
+                    projectId: undefined,
+                    project: undefined,
+                    func: undefined,
+                    args: undefined,
+                    showUsedModules: true
+                });
+                message.success('Import success!')
+            }
         })
     }
 
@@ -180,94 +200,165 @@ export class ModulePage extends React.Component {
         })
     }
 
+    renderParams() {
+        return (
+            <div className='container'>
+                <header style={{cursor: 'pointer'}} onClick={() => this.backToList()}>
+                    <Icon type="left"/>{this.state.project.name}
+                </header>
+                <div>
+                    Version:&nbsp;&nbsp;
+                    <Select defaultValue={this.state.version} style={{width: 120}}
+                            onChange={(value) => this.handleVersionChange(value)}>
+                        {this.state.project.versions.map(version =>
+                            <Option key={version} value={version}>{version}</Option>)}
+                    </Select>
+                </div>
+                <div style={{height: 'auto', overflowY: 'auto'}}>
+                    {this.renderParameters()}
+                </div>
+                <Row>
+                    <Button type='primary' onClick={() => this.insertCode()}>Insert Code</Button>
+                </Row>
+            </div>
+        )
+    }
+
+    renderOverview() {
+        const overview = this.state.project.overview || defaultOverview
+        return (
+            <div className='container'>
+                <header style={{cursor: 'pointer'}} onClick={() => this.backToList()}>
+                    <Icon type="left"/>{this.state.project.name}
+                </header>
+                <div style={{height: 'auto', overflowY: 'auto'}}>
+                    <ReactMde
+                        textAreaProps={{
+                            id: 'ta1',
+                            name: 'ta1',
+                        }}
+                        value={{text: overview}}
+                        showdownOptions={{tables: true, simplifiedAutoLink: true}}
+                        visibility={{
+                            toolbar: false,
+                            textarea: false,
+                            previewHelp: false,
+                        }}
+                    />
+                </div>
+            </div>
+        )
+    }
+
+    renderSelectedModules() {
+        const onRemoveModule = (module, version) => {
+            confirm({
+                title: 'Are you sure to remove this module from project?',
+                okText: 'Yes',
+                okType: 'danger',
+                cancelText: 'No',
+                onOk: () => {
+                    removeModuleInApp({
+                        appId: this.appId,
+                        moduleId: module._id,
+                        version,
+                        onJson: (app) => this.setState({
+                            app,
+                        }),
+                    })
+                },
+            })
+
+        };
+
+        return (
+            // list
+            <div className='container'>
+                <header
+                    style={{
+                        cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+                    }}
+                    onClick={() => this.backToList()}>
+                    <Icon type="left"/><span style={{textAlign: 'center'}}>IMPORTED MODULES</span>
+                    <div/>
+                </header>
+                <div className='list'>
+                    <List
+                        style={{margin: '0 10px'}}
+                        itemLayout="horizontal"
+                        dataSource={this.state.app.used_modules}
+                        renderItem={item => (
+                            <List.Item actions={[<Icon onClick={() => onRemoveModule(item.module, item.version)}
+                                                       type="close"/>]}>
+                                <List.Item.Meta
+                                    title={<span>{item.module.name} v{item.version}</span>}
+                                    description={item.module.description}
+                                />
+                            </List.Item>
+                        )}
+                    />
+                </div>
+            </div>
+        )
+    }
+
+    renderPublicList() {
+        return (
+            // list
+            <div className='container'>
+                <header>
+                    MODULE LIST
+                    <Icon type="bars" style={{float: 'right', cursor: 'pointer', margin: 5}}
+                          onClick={() => this.setState({showUsedModules: true})}/>
+                </header>
+                <Search
+                    placeholder="input search text"
+                    onSearch={(value) => this.handleQueryChange(value)}
+                />
+                <div className='list'>
+                    {this.state.projects.map((project) =>
+                        <Card key={project.user + project.name} title={project.name}
+                              extra={<Button onClick={() => this.clickProject(project)}>Detail</Button>}
+                            // onClick={() => this.clickModule(project)}
+                              style={{margin: '5px 3px', cursor: 'pointer'}}>
+                            <Col>
+                                {project.description}
+                                {project.category === 'model' ? <Row>
+                                    <Button onClick={() => this.clickProject(project, 'train')}>train</Button>
+                                    <Button onClick={() => this.clickProject(project, 'predict')}>predict</Button>
+                                </Row> : <Row>
+                                    <Button onClick={() => this.clickProject(project, 'run')}>run</Button>
+                                </Row>}
+                            </Col>
+                        </Card>)}
+                    <div className='pagination'>
+                        <Pagination showSizeChanger
+                                    onShowSizeChange={this.onShowSizeChange}
+                                    onChange={this.onShowSizeChange}
+                                    defaultCurrent={1}
+                                    defaultPageSize={5}
+                                    pageSizeOptions={['5', '10', '15', '20', '25']}
+                                    total={this.state.totalNumber}/>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
     render() {
         if (this.state.projectId !== undefined) {
             if (this.state.func) {
                 // params
-                return (
-                    <div className='container'>
-                        <header style={{cursor: 'pointer'}} onClick={() => this.backToList()}>
-                            <Icon type="left"/>{this.state.project.name}
-                        </header>
-                        <div>
-                            Version:&nbsp;&nbsp;
-                            <Select defaultValue={this.state.version} style={{width: 120}}
-                                    onChange={(value) => this.handleVersionChange(value)}>
-                                {this.state.project.versions.map(version =>
-                                    <Option key={version} value={version}>{version}</Option>)}
-                            </Select>
-                        </div>
-                        <div style={{height: 'auto', overflowY: 'auto'}}>
-                            {this.renderParameters()}
-                        </div>
-                        <Row>
-                            <Button type='primary' onClick={() => this.insertCode()}>Insert Code</Button>
-                        </Row>
-                    </div>
-                )
+                return this.renderParams()
             } else {
                 // overview
-                const overview = this.state.project.overview || defaultOverview
-                return (
-                    <div className='container'>
-                        <header style={{cursor: 'pointer'}} onClick={() => this.backToList()}>
-                            <Icon type="left"/>{this.state.project.name}
-                        </header>
-                        <div style={{height: 'auto', overflowY: 'auto'}}>
-                            <ReactMde
-                                textAreaProps={{
-                                    id: 'ta1',
-                                    name: 'ta1',
-                                }}
-                                value={{text: overview}}
-                                showdownOptions={{tables: true, simplifiedAutoLink: true}}
-                                visibility={{
-                                    toolbar: false,
-                                    textarea: false,
-                                    previewHelp: false,
-                                }}
-                            />
-                        </div>
-                    </div>
-                )
+                return this.renderOverview()
             }
+        } else if (this.state.showUsedModules) {
+            return this.renderSelectedModules()
         } else {
-            return (
-                // list
-                <div className='container'>
-                    <header>MODULE LIST</header>
-                    <Search
-                        placeholder="input search text"
-                        onSearch={(value) => this.handleQueryChange(value)}
-                    />
-                    <div className='list'>
-                        {this.state.projects.map((project) =>
-                            <Card key={project.user+project.name} title={project.name}
-                                  extra={<Button onClick={() => this.clickProject(project)}>Detail</Button>}
-                                // onClick={() => this.clickModule(project)}
-                                  style={{margin: '5px 3px', cursor: 'pointer'}}>
-                                <Col>
-                                    {project.description}
-                                    {project.category === 'model' ? <Row>
-                                        <Button onClick={() => this.clickProject(project, 'train')}>train</Button>
-                                        <Button onClick={() => this.clickProject(project, 'predict')}>predict</Button>
-                                    </Row> : <Row>
-                                        <Button onClick={() => this.clickProject(project, 'run')}>run</Button>
-                                    </Row>}
-                                </Col>
-                            </Card>)}
-                        <div className='pagination'>
-                            <Pagination showSizeChanger
-                                        onShowSizeChange={this.onShowSizeChange}
-                                        onChange={this.onShowSizeChange}
-                                        defaultCurrent={1}
-                                        defaultPageSize={5}
-                                        pageSizeOptions={['5', '10', '15', '20', '25']}
-                                        total={this.state.totalNumber}/>
-                        </div>
-                    </div>
-                </div>
-            )
+            return this.renderPublicList()
         }
     }
 

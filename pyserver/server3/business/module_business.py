@@ -3,13 +3,17 @@ import uuid
 import yaml
 import shutil
 import subprocess
+from distutils.core import setup
 from importlib import import_module
 from datetime import datetime
-from git import Repo as GRepo
-from cookiecutter.main import cookiecutter
-
 from distutils.dir_util import copy_tree
 from distutils.dir_util import remove_tree
+
+import docker
+from git import Repo as GRepo
+from cookiecutter.main import cookiecutter
+from Cython.Build import cythonize
+
 # from server3.entity.module import Module
 from server3.entity import project
 from server3.repository.general_repo import Repo
@@ -155,16 +159,42 @@ class ModuleBusiness(ProjectBusiness):
     @classmethod
     def deploy_or_publish(cls, project_id, commit_msg, version='dev'):
         module = cls.get_by_id(project_id)
+
+        # commit module
+        cls.commit(project_id, commit_msg, version)
+
         module.module_path = os.path.join(MODULE_DIR, module.user.user_ID,
                                           module.name)
         dst = os.path.join(module.module_path, version)
+
+        # copy module
         cls.copytree_wrapper(module.path, dst,
                              ignore=shutil.ignore_patterns('.git'))
-        # WORKON_HOME=./ pipenv install vv
+        # install module env
         subprocess.call(['bash', 'install_venv.sh', os.path.abspath(dst)])
 
-        cls.commit(project_id, commit_msg, version)
+        bind_path = '/home/jovyan/modules'
 
+        # copy compile related files to module src
+        shutil.copy('./setup.py',
+                    os.path.join(module.module_path, version, 'src'))
+        shutil.copy('./compile.sh',
+                    os.path.join(module.module_path, version, 'src'))
+
+        compile_dir = module.module_path.replace('./server3/lib/modules',
+                                                 bind_path)
+        compile_dir = os.path.join(compile_dir, version, 'src')
+
+        # start container with the singleuser docker, mount the whole pyserver
+        # compile the main.py and delete compile related files
+        client = docker.from_env()
+        client.containers.run(
+            "singleuser:latest",
+            volumes={os.path.abspath(MODULE_DIR):
+                         {'bind': bind_path, 'mode': 'rw'}},
+            command=f"/bin/bash -c 'cd {compile_dir} && bash ./compile.sh'")
+
+        # if publish update privacy and version
         if version != 'dev':
             module.privacy = 'public'
             module.versions.append(version)

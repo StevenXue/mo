@@ -20,6 +20,8 @@ from server3.constants import DOCKER_IP
 from server3.constants import INIT_RES
 from server3.constants import Error, Warning, ErrorMessage
 from server3.entity.general_entity import Objects
+from server3.entity.project import UsedModule
+from server3.entity.project import UsedDataset
 
 yaml_tail_path = 'app_spec.yml'
 
@@ -125,48 +127,134 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
             return {'input': obj.get('input'), 'output': obj.get('output')}
 
     @classmethod
-    def add_used_module(cls, app_id, used_modules, func):
+    def add_used_module(cls, app_id, module, func, version):
         app = cls.get_by_id(app_id)
         app_yaml_path = os.path.join(app.path, yaml_tail_path)
         args = {}
         output = {}
+        cls.insert_module_env(app, module, version)
         # copy module yaml to app yaml
-        for module in used_modules:
-            cls.insert_module_env(app, module)
-            # copy yaml
-            input_args = module.to_mongo()['args']['input'].get(func, {})
-            output_args = module.to_mongo()['args']['output'].get(func, {})
-            if os.path.isfile(app_yaml_path):
-                with open(app_yaml_path, 'r') as stream:
-                    # read args
-                    obj = yaml.load(stream)
-                    args = cls.replace_dup_n_update(obj['input'], input_args,
-                                                    module.name)
-                    output = cls.update_with_module_name(obj.get('output', {}),
-                                                         output_args,
-                                                         module.name)
-            else:
-                args = cls.update_with_module_name(args, input_args,
-                                                   module.name)
-                output = cls.update_with_module_name(output, output_args,
+        input_args = module.to_mongo()['args']['input'].get(func, {})
+        output_args = module.to_mongo()['args']['output'].get(func, {})
+        if os.path.isfile(app_yaml_path):
+            with open(app_yaml_path, 'r') as stream:
+                # read args
+                obj = yaml.load(stream)
+                args = cls.replace_dup_n_update(obj['input'], input_args,
+                                                module.name)
+                output = cls.update_with_module_name(obj.get('output', {}),
+                                                     output_args,
                                                      module.name)
-            # write new args
-            with open(app_yaml_path, 'w') as stream:
-                yaml.dump({'input': args, 'output': output}, stream,
-                          default_flow_style=False)
-        return cls.repo.add_to_set(app_id, used_modules=used_modules)
+        else:
+            args = cls.update_with_module_name(args, input_args,
+                                               module.name)
+            output = cls.update_with_module_name(output, output_args,
+                                                 module.name)
+        # write new args
+        with open(app_yaml_path, 'w') as stream:
+            yaml.dump({'input': args, 'output': output}, stream,
+                      default_flow_style=False)
+        return cls.repo.add_to_set(app_id, used_modules=UsedModule(
+            module=module, version=version))
 
     @staticmethod
-    def insert_module_env(app, module):
+    def copy_to_container(container, path_w_version, path_in_ctnr):
+        container.exec_run(['mkdir', '-p', f'{path_in_ctnr}'])
+        with docker.utils.tar(path_w_version) as module_tar:
+            container.put_archive(path_in_ctnr, module_tar)
+        container.exec_run(['chown', '-R', 'jovyan:users', f'{path_in_ctnr}'],
+                           user='root', privileged=True)
+
+    @classmethod
+    def insert_module_env(cls, app, module, version):
         client = docker.from_env()
-        # copy venv
         module_user_ID = module.user.user_ID
         app_user_ID = app.user.user_ID.replace('_', '_5F')
         app_name = app.name.replace('_', '_5F')
-        container = client.containers. \
-            get(f'jupyter-{app_user_ID}_2B{app_name}')
+        container_name = f'jupyter-{app_user_ID}_2B{app_name}'
+        container = client.containers.get(container_name)
+        # copy module folder to container
+        path_w_version = os.path.join(module.module_path, version)
+        path_in_ctnr = path_w_version.replace('./server3/lib/modules',
+                                              '/home/jovyan/modules')
+
+        # do the copy, dir need be created first, and put_archive need
+        # ownership fix
+        cls.copy_to_container(container, path_w_version, path_in_ctnr)
+
+        # copy python env
         container.exec_run(['/bin/bash', '/home/jovyan/add_venv.sh',
-                            f'{module_user_ID}/{module.name}'])
+                            f'{module_user_ID}/{module.name}/{version}'])
+
+    @classmethod
+    def remove_used_module(cls, app_id, module, version):
+        app = cls.get_by_id(app_id)
+        cls.remove_module_env(app, module, version)
+        return cls.repo.pull_from_set(app_id, used_modules=UsedModule(
+            module=module, version=version))
+
+    @staticmethod
+    def remove_module_env(app, module, version):
+        client = docker.from_env()
+        module_user_ID = module.user.user_ID
+        app_user_ID = app.user.user_ID.replace('_', '_5F')
+        app_name = app.name.replace('_', '_5F')
+        container_name = f'jupyter-{app_user_ID}_2B{app_name}'
+        container = client.containers.get(container_name)
+
+        # copy module folder to container
+        path_w_version = os.path.join(module.module_path, version)
+        path_in_ctnr = path_w_version.replace('./server3/lib/modules',
+                                              '/home/jovyan/modules')
+        if len(path_in_ctnr.split('/')) == 7:
+            container.exec_run(['rm', '-rf', f'{path_in_ctnr}'])
+        else:
+            raise Exception('module path error')
+
+        # remove python env
+        container.exec_run(['/bin/bash', '/home/jovyan/remove_venv.sh',
+                            f'{module_user_ID}/{module.name}/{version}'])
+
+    @classmethod
+    def remove_used_dataset(cls, app_id, dataset):
+        app = cls.get_by_id(app_id)
+        cls.remove_dataset_dir(app, dataset)
+        return cls.repo.pull_from_set(app_id, used_datasets=UsedDataset(
+            dataset=dataset))
+
+    @staticmethod
+    def remove_dataset_dir(app, dataset):
+        client = docker.from_env()
+        app_user_ID = app.user.user_ID.replace('_', '_5F')
+        app_name = app.name.replace('_', '_5F')
+        container_id = f'jupyter-{app_user_ID}_2B{app_name}'
+        container = client.containers.get(container_id)
+
+        # copy dataset folder to container
+        path_in_ctnr = dataset.path.replace('./user_directory',
+                                            '/home/jovyan/dataset')
+        print(path_in_ctnr)
+        if len(path_in_ctnr.split('/')) == 6:
+            container.exec_run(['rm', '-rf', f'{path_in_ctnr}'])
+        else:
+            raise Exception('dataset path error')
+
+    @classmethod
+    def insert_dataset(cls, app, dataset):
+        client = docker.from_env()
+        app_user_ID = app.user.user_ID.replace('_', '_5F')
+        app_name = app.name.replace('_', '_5F')
+        container_id = f'jupyter-{app_user_ID}_2B{app_name}'
+        container = client.containers.get(container_id)
+
+        # copy dataset folder to container
+        path_in_ctnr = dataset.path.replace('./user_directory',
+                                            '/home/jovyan/dataset')
+        # do the copy, dir need be created first, and put_archive need
+        # ownership fix
+        cls.copy_to_container(container, dataset.path, path_in_ctnr)
+        return cls.repo.add_to_set(app.id, used_datasets=UsedDataset(
+            dataset=dataset))
 
     @classmethod
     def replace_dup_n_update(cls, args, func_args, module_name):
