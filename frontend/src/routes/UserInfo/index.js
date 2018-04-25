@@ -12,14 +12,15 @@ import {
   Form,
   Select,
   Modal,
-  Upload
+  Upload,
+  message
 } from 'antd'
 
 
 import {avatarList} from '../../constants'
 import styles from './index.less'
 import {showTime} from "../../utils"
-import {updateUserInfo} from "../../services/user"
+import {updateUserInfo, updateUserAccount} from "../../services/user"
 import {routerRedux} from "dva/router"
 import AvatarEditor from 'react-avatar-editor'
 
@@ -36,56 +37,188 @@ class EditForm extends React.Component {
   constructor() {
     super()
     this.state = {
-      status: 'show',
       value: 0,
       count: 0,
       modalVisible: false,
-      chechAuthBy: 'phone'
-
+      // phone or email
+      checkType: 'phone',
+      // 手机号 或 邮箱地址
+      checkValue: '',
+      editEmail: false,
+      editContent: ''
     }
   }
 
   componentDidMount() {
-  }
-
-  handleSubmit = () => {
-    updateUserInfo({
-      body: {
-        'gender': this.state.value
-      },
-      onJson: ({user}) => {
-        this.props.dispatch({
-          type: 'profile/setUserInfo',
-          'userInfo': user
-        })
-        this.setState({status: 'show'})
-      }
+    this.setState({
+      checkType: 'phone',
+      checkValue: this.props.phone,
     })
   }
 
-  startEdit = () => {
-    this.setState({modalVisible: true})
+  handleSubmitPw = () => {
+    let tokenForUpdateInfo = localStorage.getItem('tokenForUpdateInfo')
+    this.props.form.validateFields(['password'], {force: true},
+      (err, values) => {
+        console.log('values', values)
+        if (!err) {
+          updateUserAccount({
+            body: {
+              'password': values.password,
+              tokenForUpdateInfo
+            },
+            onJson: (e) => {
+              if (e.error) {
+                if (e.error === 'tokenError') {
+                  message.error('token已过期，请验证')
+                  localStorage.removeItem('tokenForUpdateInfo')
+                  this.cancelEdit({})
+                }
+                else {
+                  message.error('error')
+                }
+              }
+              else {
+                message.success('密码修改成功')
+                this.cancelEdit({})
+              }
+            }
+          })
+        }
+      }
+    )
+  }
+
+  handleSubmitEmail = () => {
+    let tokenForUpdateInfo = localStorage.getItem('tokenForUpdateInfo')
+    this.props.form.validateFields(['email', 'captcha'], {force: true},
+      (err, values) => {
+        console.log('values', values)
+        if (!err) {
+          updateUserAccount({
+            body: {
+              'email': values.email,
+              'captcha': values.captcha,
+              tokenForUpdateInfo
+            },
+            onJson: (e) => {
+              if (e.error) {
+                if (e.error === 'tokenError') {
+                  message.error('token已过期，请验证')
+                  localStorage.removeItem('tokenForUpdateInfo')
+                  this.cancelEdit({})
+                }
+                else {
+                  message.error(e.error )
+                }
+              }
+              else {
+                message.success('Email修改成功')
+                this.cancelEdit({})
+              }
+            },
+          })
+        }
+      },
+    )
+  }
+
+
+  handleSubmitPhone = () => {
+    let tokenForUpdateInfo = localStorage.getItem('tokenForUpdateInfo')
+    this.props.form.validateFields(['phone', 'captcha'], {force: true},
+      (err, values) => {
+        if (!err) {
+
+          updateUserAccount({
+            body: {
+              'phone': values.phone,
+              'captcha': values.captcha,
+              tokenForUpdateInfo
+            },
+            onJson: (e) => {
+              if (e.error) {
+                if (e.error === 'tokenError') {
+                  message.error('token已过期，请验证')
+                  localStorage.removeItem('tokenForUpdateInfo')
+                  this.cancelEdit({})
+                }
+                else {
+                  message.error(e.error)
+                }
+              }
+              else {
+                message.success('手机号码修改成功')
+                this.cancelEdit({})
+              }
+            }
+          })
+        }
+      },
+    )
+  }
+
+
+  startEdit = (e) => {
+    let tokenForUpdateInfo = localStorage.getItem('tokenForUpdateInfo')
+    if (tokenForUpdateInfo) {
+      this.setState({editContent: e})
+    }
+    else {
+      this.setState({modalVisible: true, toEditContent: e})
+    }
   }
 
   cancelEdit = () => {
-    this.setState({status: 'show'})
+    this.setState({modalVisible: false, editContent: '', toEditContent: ''})
   }
 
-  onChange = (e) => {
-    console.log('radio checked', e.target.value)
-    this.setState({
-      value: e.target.value,
-    })
-  }
 
-  onGetCaptcha = () => {
-    // 向后端请求验证码
-    this.props.dispatch({
-      type: "register/sendVerificationCode",
-      payload: {
-        phone: this.props.phone
+  onGetCaptcha = (checkType, type) => {
+    let payload
+    // 给手机号发送验证码
+    if (checkType === 'phone') {
+      if (type === 'checkAuth') {
+        // 给现有手机号发送验证码，确认修改权限
+        payload = {
+          phone: this.props.phone
+        }
       }
-    })
+      else if (type === 'new') {
+        payload = {
+          phone: this.props.form.getFieldValue("phone")
+        }
+      }
+      this.props.dispatch({
+        type: "register/sendVerificationCode",
+        payload
+      })
+    }
+    // 给邮箱发送验证码
+    else if (checkType === 'email') {
+      if (type === 'checkAuth') {
+        // 给现有手机号发送验证码，确认修改权限
+        payload = {
+          email: this.props.email
+        }
+      }
+      else if (type === 'new') {
+        payload = {
+          email: this.props.form.getFieldValue("email")
+        }
+      }
+      this.props.dispatch({
+        type: "profile/sendCaptchaToEmail",
+        payload
+      })
+    }
+    // // 向后端请求验证码
+    // this.props.dispatch({
+    //   type: "register/sendVerificationCode",
+    //   payload: {
+    //     phone: this.props.phone
+    //   }
+    // })
     let count = 59
     this.setState({count})
     this.interval = setInterval(() => {
@@ -97,38 +230,84 @@ class EditForm extends React.Component {
       }
     }, 1000)
   }
+
+
   checkAuth = (e) => {
-    console.log("handleLoginWithPhone")
-    this.props.form.validateFields(['phone', 'captcha'], {force: true},
+    this.props.form.validateFields(['captcha'], {force: true},
       (err, values) => {
         console.log('values', values)
         if (!err) {
           this.props.dispatch({
-            type: `login/loginWithPhone`,
+            type: `profile/twoStepVFC`,
             payload: {
-              phone: values.phone,
+              checkType: this.state.checkType,
+              checkValue: this.state.checkValue,
               code: values.captcha,
             },
+          })
+          this.setState({
+            modalVisible: false,
+            editContent: this.state.toEditContent
           })
         }
       },
     )
   }
 
-  cancelCheckAuth = () => {
-    this.setState({modalVisible: false})
+  chechAuthChange = (checkType) => {
+    if (checkType === 'phone') {
+      this.setState({
+        checkType,
+        checkValue: this.props.phone
+      })
+    }
+    else if (checkType === 'email') {
+      this.setState({
+        checkType,
+        checkValue: this.props.email
+      })
+    }
   }
 
-  chechAuthChange = (chechAuthBy) => {
-    this.setState({chechAuthBy})
-  }
 
+  compareToFirstPassword = (rule, value, callback) => {
+    const form = this.props.form
+    if (value && value !== form.getFieldValue('password')) {
+      callback('Two passwords that you enter is inconsistent!')
+    } else {
+      callback()
+    }
+  }
 
   render() {
     const {getFieldDecorator, getFieldsError, getFieldError, isFieldTouched} = this.props.form
     const emptyCommentError = isFieldTouched('value') && getFieldError('value')
     const {count} = this.state
     const {email, phone} = this.props
+    const tokenForUpdateInfo = localStorage.getItem('tokenForUpdateInfo')
+
+    const formItemLayout = {
+      labelCol: {
+        xs: {span: 24},
+        sm: {span: 4},
+      },
+      wrapperCol: {
+        xs: {span: 25},
+        sm: {span: 10},
+      },
+    }
+
+    const passwordFormItemLayout = {
+      labelCol: {
+        xs: {span: 16},
+        sm: {span: 8},
+      },
+      wrapperCol: {
+        xs: {span: 25},
+        sm: {span: 10},
+      },
+    }
+
 
     return (
       <div>
@@ -137,29 +316,165 @@ class EditForm extends React.Component {
         </div>
         <div className={styles.eachDiv}>
           <p>邮箱：{email.split("@")[0].slice(0, 2)}***@{email.split("@")[1]}</p>
-          <p className={styles.modify} onClick={this.startEdit}>更换邮箱</p>
+          <p className={styles.modify}
+             onClick={() => this.startEdit('email')}>更换邮箱</p>
         </div>
+        <Modal
+          title="更改邮箱"
+          visible={this.state.editContent === 'email'}
+          onCancel={this.cancelEdit}
+          onOk={this.handleSubmitEmail}
+        >
+          <Form onSubmit={this.handleSubmit}>
+            <FormItem label="Email"  {...formItemLayout} style={{padding: '0'}}>
+              {getFieldDecorator('email', {
+                rules: [{
+                  type: 'email', message: 'The input is not valid E-mail!',
+                }, {
+                  required: true, message: 'Please input your E-mail!',
+                }],
+              })(
+                <Input
+                  placeholder="youremail@gmail.com"
+                />
+              )}
+            </FormItem>
+            <FormItem>
+              <Row gutter={16} type="flex" justify="left" align="top">
+                <Col span={5} offset={4}>
+                  {getFieldDecorator('captcha', {
+                    rules: [{
+                      required: true, message: '请输入验证码！',
+                    }],
+                  })(
+                    <Input
+                      placeholder="验证码"
+                    />
+                  )}
+                </Col>
+                <Col span={5}>
+                  <Button
+                    disabled={count}
+                    className={styles.getCaptcha}
+                    onClick={() => this.onGetCaptcha('email', 'new')}
+                  >
+                    {count ? `${count} s` : '获取验证码'}
+                  </Button>
+                </Col>
+              </Row>
+            </FormItem>
+          </Form>
+        </Modal>
         <div className={styles.eachDiv}>
           <p>手机：{phone.slice(0, 3)}****{phone.slice(-4,)}</p>  <p
-          className={styles.modify} onClick={this.startEdit}>更换手机</p>
+          className={styles.modify}
+          onClick={() => this.startEdit('phone')}>更换手机</p>
         </div>
+        <Modal
+          title="更改手机"
+          visible={this.state.editContent === 'phone'}
+          onCancel={this.cancelEdit}
+          onOk={this.handleSubmitPhone}
+        >
+          <Form>
+            <FormItem label="Phone"  {...formItemLayout} style={{padding: '0'}}>
+              {getFieldDecorator('phone', {
+                rules: [{
+                  required: true, message: 'Please input your phone number!',
+                }],
+              })(
+                <Input
+                  placeholder=""
+                />
+              )}
+            </FormItem>
+            <FormItem>
+              <Row gutter={16} type="flex" justify="left" align="top">
+                <Col span={5} offset={4}>
+                  {getFieldDecorator('captcha', {
+                    rules: [{
+                      required: true, message: '请输入验证码！',
+                    }],
+                  })(
+                    <Input
+                      placeholder="验证码"
+                    />
+                  )}
+                </Col>
+                <Col span={5}>
+                  <Button
+                    disabled={count}
+                    className={styles.getCaptcha}
+                    onClick={() => this.onGetCaptcha('phone', 'new')}
+                  >
+                    {count ? `${count} s` : '获取验证码'}
+                  </Button>
+                </Col>
+              </Row>
+            </FormItem>
+          </Form>
+        </Modal>
+
         <div className={styles.eachDiv}>
           <p>密码</p>
-          <p className={styles.modify} onClick={this.startEdit}>修改密码</p>
+          <p className={styles.modify}
+             onClick={() => this.startEdit('password')}>修改密码</p>
         </div>
+
+        <Modal
+          title="更改密码"
+          visible={this.state.editContent === 'password'}
+          onCancel={this.cancelEdit}
+          onOk={this.handleSubmitPw}
+        >
+          <Form onSubmit={this.changePw} style={{padding: '0'}}>
+            <FormItem style={{padding: '0'}}
+                      label="Password"
+                      {...passwordFormItemLayout}
+            >
+              {getFieldDecorator('password', {
+                rules: [{
+                  required: true, message: 'Please input your password!',
+                }, {
+                  validator: this.validateToNextPassword,
+                }],
+              })(
+                <Input type="password"/>
+              )}
+            </FormItem>
+            <FormItem
+              {...passwordFormItemLayout}
+              label="Confirm Password"
+              style={{padding: '0'}}
+            >
+              {getFieldDecorator('confirm', {
+                rules: [{
+                  required: true, message: 'Please confirm your password!',
+                }, {
+                  validator: this.compareToFirstPassword,
+                }],
+              })(
+                <Input type="password"/>
+              )}
+            </FormItem>
+          </Form>
+        </Modal>
+
         <Modal
           title="为了保证你的帐号安全，请验证身份。"
           visible={this.state.modalVisible}
-          onCancel={this.cancelCheckAuth}
+          onCancel={this.cancelEdit}
           onOk={this.checkAuth}
         >
           <div>
             <Select
-              value={this.state.chechAuthBy}
+              value={this.state.checkType}
               onChange={this.chechAuthChange}
             >
               <Option
                 value="phone">使用手机 {phone.slice(0, 3)}****{phone.slice(-4,)} 进行验证 </Option>
+              <Option
+                value="email">使用邮箱 {email.split("@")[0].slice(0, 2)}***@{email.split("@")[1]} 进行验证 </Option>
             </Select>
           </div>
           <div style={{padding: '10px 0'}}>
@@ -181,7 +496,7 @@ class EditForm extends React.Component {
                     <Button
                       disabled={count}
                       className={styles.getCaptcha}
-                      onClick={this.onGetCaptcha}
+                      onClick={() => this.onGetCaptcha(this.state.checkType, 'checkAuth')}
                     >
                       {count ? `${count} s` : '获取验证码'}
                     </Button>
@@ -226,7 +541,6 @@ class GenderEditForm extends React.Component {
 
   startEdit = () => {
     this.setState({status: 'edit', value: this.props.gender})
-
   }
 
   cancelEdit = () => {
@@ -293,7 +607,7 @@ class AvatarEdit extends React.Component {
     this.state = {
       previewImage: null,
       previewVisible: false,
-      fileList:[]
+      fileList: []
     }
   }
 
@@ -307,7 +621,7 @@ class AvatarEdit extends React.Component {
     })
   }
 
-  getBase64 = (img , callback) => {
+  getBase64 = (img, callback) => {
     const reader = new FileReader()
     reader.addEventListener('load', () => callback(reader.result))
     reader.readAsDataURL(img)
@@ -337,12 +651,12 @@ class AvatarEdit extends React.Component {
     this.setState({
       previewImage: null,
       previewVisible: false,
-      fileList:[]
+      fileList: []
     })
   }
 
   confirmEdit = () => {
-    console.log('editor',this.editor.getImage().toDataURL())
+    console.log('editor', this.editor.getImage().toDataURL())
     updateUserInfo({
       body: {
         'avatar': this.editor.getImage().toDataURL()
@@ -362,7 +676,7 @@ class AvatarEdit extends React.Component {
   render() {
     const props = {
       onRemove: (file) => {
-        this.setState(({ fileList }) => {
+        this.setState(({fileList}) => {
           const index = fileList.indexOf(file)
           const newFileList = fileList.slice()
           newFileList.splice(index, 1)
@@ -389,8 +703,11 @@ class AvatarEdit extends React.Component {
         >
           {this.state.fileList.length >= 1 ? null :
             <div>
-            <img src={this.props.avatar?this.props.avatar:avatarList[this.props.picNumber]} alt="avatar"/>
-            <div className={styles.picDoc}>修改我的头像</div></div>}
+              <img
+                src={this.props.avatar ? this.props.avatar : avatarList[this.props.picNumber]}
+                alt="avatar"/>
+              <div className={styles.picDoc}>修改我的头像</div>
+            </div>}
         </Upload>
         <Modal
           visible={this.state.previewVisible}
@@ -426,8 +743,8 @@ function SettingProfile({login, profile, dispatch, history}) {
           <div className={styles.headerRow}>
             <Row type="flex" justify="space-around" align="middle">
               <Col span={3} style={{padding: '25px'}}>
-
-                <AvatarEdit picNumber={picNumber}  avatar={avatar} dispatch={dispatch}/>
+                <AvatarEdit picNumber={picNumber} avatar={avatar}
+                            dispatch={dispatch}/>
               </Col>
               <Col span={21}>
                 <div>
@@ -441,7 +758,6 @@ function SettingProfile({login, profile, dispatch, history}) {
           </div>
           <div>
             <WrappedEditForm email={email} phone={phone} dispatch={dispatch}/>
-
           </div>
         </div>
       </div>)

@@ -55,10 +55,10 @@ const menuConfig = [
   //   text: 'Model Market',
   // },
   {
-    key: '/market',
-    Link: '/market?tab=app',
+    key: '/discovery',
+    Link: '/discovery?tab=app',
     Icon: null,
-    text: 'Market',
+    text: 'Discovery',
   },
   {
     key: '/userrequest',

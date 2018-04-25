@@ -39,7 +39,7 @@ function Projects({history, project, dispatch,location}) {
   const paramList = Object.keys(defaultActiveKeyDic)
 
   function callback(key) {
-    history.push(`market${paramList[parseInt(key)-1]}`)
+    history.push(`discovery${paramList[parseInt(key)-1]}`)
   }
 
   return (
@@ -117,12 +117,11 @@ class ProjectList extends Component {
   }
 
   toProjectDetail(id, history, type, projectOwner, loginUser) {
-    // this.props.dispatch({type: 'project/push', id, route: 'market'})
     if (projectOwner === loginUser) {
       history.push(`/workspace/${id}?type=${type}`)
     }
     else {
-      history.push(`/market/${id}?type=${type}`)
+      history.push(`/discovery/${id}?type=${type}`)
     }
   }
 

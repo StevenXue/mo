@@ -11,6 +11,8 @@ from mongoengine import EmbeddedDocumentListField
 from mongoengine import EmbeddedDocument
 from mongoengine import PULL
 
+RE_TYPE = ('inactive', 'active', 'deploying')
+
 
 class Commit(EmbeddedDocument):
     oldhexsha = StringField()
@@ -73,9 +75,7 @@ class Module(Project):
     input = DictField()
     output = DictField()
     repo_path = StringField()
-
-
-RE_TYPE = ('inactive', 'active', 'deploying')
+    status = StringField(choices=RE_TYPE)
 
 
 class AppGetType:

@@ -47,7 +47,9 @@ export class DatasetPage extends React.Component {
         const hash = window.location.hash
         const match = pathToRegexp('#/workspace/:appId/:type').exec(hash)
         if (match) {
-            this.appId = match[1]
+            if(match[2] === 'app') {
+                this.appId = match[1]
+            }
         }
     }
 
@@ -81,13 +83,14 @@ export class DatasetPage extends React.Component {
                 totalNumber: count,
             }),
         })
-
-        getApp({
-            appId: this.appId,
-            onJson: (app) => this.setState({
-                app,
-            }),
-        })
+        if(this.appId) {
+            getApp({
+                appId: this.appId,
+                onJson: (app) => this.setState({
+                    app,
+                }),
+            })
+        }
     }
 
     clickProject(project) {
@@ -104,29 +107,6 @@ export class DatasetPage extends React.Component {
             project: undefined,
             showUsedDatasets: undefined
         })
-    }
-
-    insertCode() {
-        const user_ID = localStorage.getItem('user_ID')
-        NotebookActions.insertCode(this.props.tracker.currentWidget.notebook,
-            [
-                `conf = '${genConf(this.state.args)}'\n`,
-                `conf = json_parser(conf)\n`,
-                `result = ${this.state.func}('${user_ID}/${this.state.project.name}', conf)\n`,
-            ],
-        )
-    }
-
-    copyPath() {
-        let that = document.getElementById('copy-p')
-        // let inp = document.createElement('input')
-        Clipboard.copyToSystem(that.textContent)
-        // document.body.appendChild(inp)
-        // inp.value = that.textContent
-        // inp.select()
-        // document.execCommand('copy', false)
-        // inp.remove()
-        message.info('Successfully copied the dataset path!')
     }
 
     handleQueryChange(value) {
@@ -291,7 +271,7 @@ export class DatasetPage extends React.Component {
     render() {
         if (this.state.projectId !== undefined) {
             return this.renderOverview()
-        } else if (this.state.showUsedDatasets) {
+        } else if (this.state.showUsedDatasets && this.state.app) {
             return this.renderSelectedDatasets()
         } else {
             return this.renderPublicList()

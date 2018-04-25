@@ -64,6 +64,7 @@ class AppService(ProjectService):
         response = requests.request("POST", url, data=payload, headers=headers)
         pattern = re.compile(r'STRHEAD(.+?)STREND', flags=re.DOTALL)
         results = pattern.findall(response.text)
+        print(results)
         output_json = json.loads(results[0])
         # output_json = response.json()
         # 成功调用后 在新的collection存一笔
@@ -80,11 +81,19 @@ class AppService(ProjectService):
 
     @classmethod
     def insert_envs(cls, user_ID, app_name):
+        """
+        copy used modules and datasets to jl container when start
+        :param user_ID:
+        :param app_name:
+        :return:
+        """
         user = UserBusiness.get_by_user_ID(user_ID)
         app = AppBusiness.read_unique_one(name=app_name, user=user)
         for used_module in app.used_modules:
             AppBusiness.insert_module_env(app, used_module.module,
                                           used_module.version)
+        for used_dataset in app.used_datasets:
+            AppBusiness.insert_dataset(app, used_dataset.dataset)
 
     @classmethod
     def get_by_id(cls, project_id, **kwargs):

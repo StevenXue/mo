@@ -15,16 +15,17 @@ const CopyInput = ({text, appId, datasetId, setApp}) => {
 
         /* Copy the text inside the text field */
         document.execCommand('Copy')
-
-        addDatasetToApp({
-            appId,
-            datasetId,
-            onJson: (app) => {
-                /* Alert the copied text */
-                message.success('Import success and copied data path: ' + copyText.value)
-                setApp(app)
-            }
-        })
+        if(appId) {
+            addDatasetToApp({
+                appId,
+                datasetId,
+                onJson: (app) => {
+                    /* Alert the copied text */
+                    message.success('Import success and copied data path: ' + copyText.value)
+                    setApp(app)
+                }
+            })
+        }
     }
 
     return (

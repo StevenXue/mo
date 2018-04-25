@@ -100,6 +100,11 @@ def remove_used_dataset(app_id):
 @app_app.route("/insert_envs/<project_name>", methods=["PUT"])
 # @jwt_required
 def insert_envs(project_name):
+    """
+    insert env api when jl container start
+    :param project_name:
+    :return:
+    """
     [user_ID, app_name] = project_name.split('+')
     try:
         AppService.insert_envs(user_ID, app_name)

@@ -330,7 +330,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
     // project info page
     if (projectDetail.project && projectDetail.project.type) {
 
-      function appStatus() {
+      function projectStatus() {
         if (!projectDetail.project.status) {
           return <div/>
         }
@@ -340,7 +340,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
         } else if (projectDetail.project.status === 'active') {
           return <Tag color='green' style={{cursor: 'default',marginLeft:10}}>Online</Tag>
         } else {
-          return <Tag color='grey' style={{cursor: 'default',marginLeft:10}}>Offline2</Tag>
+          return <Tag color='grey' style={{cursor: 'default',marginLeft:10}}></Tag>
         }
       }
 

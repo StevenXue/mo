@@ -18,4 +18,6 @@ echo "activating env"
 workon $(workon)
 echo "adding env"
 add2virtualenv ${PACKAGE_DIR}
+echo "add env done"
+
 
