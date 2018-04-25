@@ -1,6 +1,5 @@
 import React, {Component} from 'react'
 import {connect} from 'dva'
-import Joyride from 'react-joyride'
 import {Select, Button, Card, Icon, Input, Pagination, Tabs} from 'antd'
 import ProjectModel from '../../../../components/ProjectModal/index'
 import {showTime} from '../../../../utils/index'
@@ -66,8 +65,11 @@ class ProjectList extends Component {
       totalNumber: 0,
       pageNo: 1,
       pageSize: 5,
-      steps: [],
     }
+  }
+
+  componentDidMount() {
+    this.fetchData({})
   }
 
   fetchData({payload = {}}) {
@@ -99,39 +101,6 @@ class ProjectList extends Component {
     })
   }
 
-  componentDidMount() {
-    this.fetchData({})
-    // if(this.props.location.search.indexOf("flag")!=-1&&this.props.location.pathname=="/workspace"&&this.props.location.search.indexOf("app")!=-1){
-    //   this.setState({
-    //     steps:[
-    //       {
-    //         title: '',
-    //         text: '新建应用',
-    //         selector: '#Newapp',
-    //         position: 'left',
-    //         // isFixed:true,
-    //         style: {
-    //           borderRadius: 0,
-    //           color: '#34BFE2',
-    //           textAlign: 'center',
-    //           width: '29rem',
-    //           mainColor: '#ffffff',
-    //           backgroundColor:'#ffffff',
-    //           beacon: {
-    //             inner: '#34BFE2',
-    //             outer: '#34BFE2',
-    //           },
-    //           close:{
-    //             display:"none"
-    //           }
-    //         }
-    //       }
-    //     ]
-    //   })
-    // }
-    // console.log(this.props.location ,'location')
-  }
-
   handlePrivacyChange(value) {
     this.fetchData({payload: {privacy: value === 'all' ? undefined : value}})
   }
@@ -141,6 +110,7 @@ class ProjectList extends Component {
   }
 
   toProjectDetail(id, history, type) {
+    this.props.dispatch({type:'launchpage/change',payload:{visibility:false}})  //关闭launchpage
     history.push(`/workspace/${id}?type=${type}`)
   }
 
@@ -148,32 +118,12 @@ class ProjectList extends Component {
     this.fetchData({payload: {page_no: pageNo, page_size: pageSize}})
   }
 
+
   render() {
     const {history, project, dispatch} = this.props
-    // console.log(document.getElementById("LaunchPage_Contain").scrollTop)
+    const {totalNumber, pageSize} = this.state
     return (
       <div>
-        <Joyride
-          ref={c => (this.joyride = c)}
-          // callback={this.callback}
-          debug={false}
-          // disableOverlay={selector === '.card-tickets'}
-          locale={{
-            back: (<span style={{color: "#34BFE2"}}>Back</span>),
-            close: (<span style={{color: "#34BFE2"}}>Close</span>),
-            last: (<span style={{color: "#34BFE2"}}>Last</span>),
-            next: (<span style={{color: "#34BFE2"}}>Next</span>),
-            skip: (<span style={{color: "#666666"}}>Skip</span>),
-          }}
-          // scrollToSteps  = {true}
-          run={true}
-          showOverlay={true}
-          showSkipButton={true}
-          showStepsProgress={true}
-          // stepIndex={stepIndex}
-          steps={this.state.steps}
-          type='continuous'
-        />
         <div className={styles.header}>
           <Select defaultValue='all' className={styles.select}
                   onChange={(value) => this.handlePrivacyChange(value)}>
@@ -203,7 +153,7 @@ class ProjectList extends Component {
           this.state.projects.length > 0 ? <div className={styles.projectList}>
             {this.state.projects.map(e =>
               <Card key={e._id} className={styles.card}
-                    title={<h3>{e.name}</h3>}
+                    title={<h3 style={{color:'#999999'}}>{e.name}</h3>}
                     extra={e.is_private && <Icon type="lock"/>}
                     onClick={() => this.toProjectDetail(e._id, history, e.type)}
                     style={{cursor: 'pointer'}}>
@@ -232,7 +182,7 @@ class ProjectList extends Component {
             <p style={{marginTop: 25}}>遇到困难？点击<span>“帮助文档”</span>了解更多。</p>
           </div>
         }
-        {
+        {/* {
           this.state.projects.length > 0 ? <div className={styles.pagination}>
             <Pagination showSizeChanger
                         onShowSizeChange={this.onShowSizeChange}
@@ -240,8 +190,26 @@ class ProjectList extends Component {
                         defaultCurrent={1}
                         defaultPageSize={5}
                         pageSizeOptions={['5', '10', '15', '20', '25']}
-                        total={this.state.totalNumber}/>
+                        total={this.state.totalNumber}
+                        hideOnSinglePage={true}/>
           </div> : null
+        } */}
+         {
+           parseInt(totalNumber/pageSize)>1?
+           <div className={styles.pagination}>
+            <Pagination 
+              showSizeChanger
+              onShowSizeChange={this.onShowSizeChange}
+              onChange={this.onShowSizeChange}
+              defaultCurrent={1}
+              defaultPageSize={5}
+              pageSizeOptions={['5', '10', '15', '20', '25']}
+              total={totalNumber}
+              hideOnSinglePage={true}/>
+          </div>:
+          <div style={{color:'#c1c1c1',fontSize:'14px',marginTop:30}}>
+           没有更多内容
+         </div>
         }
       </div>
     )
@@ -249,4 +217,4 @@ class ProjectList extends Component {
 }
 
 
-export default connect(({project}) => ({project}))(Projects)
+export default connect(({project,launchpage}) => ({project,launchpage}))(Projects)
