@@ -357,7 +357,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
         }
 
         componentDidMount() {
-          fetch(`http://localhost:5005/user/tourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
+          fetch(`/pyapi/user/tourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
             .then((response) => response.json())
             .then(({response}) => {
               this.setState({
@@ -382,7 +382,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
         }
 
         noLearning = ()=>{
-          fetch(`http://localhost:5005/user/notourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
+          fetch(`/pyapi/user/notourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
         }
 
         render() {
