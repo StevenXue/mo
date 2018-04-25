@@ -3,7 +3,7 @@ from server3.business import request_answer_business
 from server3.business.user_business import UserBusiness
 from server3.business import ownership_business
 from server3.service import ownership_service
-from server3.service import message_service
+from server3.service.message_service import MessageService
 from server3.business import user_request_business
 from server3.business.user_request_business import UserRequestBusiness
 
@@ -213,7 +213,7 @@ class RequestAnswerService:
             admin_user = UserBusiness.get_by_user_ID('admin')
 
             receivers = [el for el in user_request.star_user]
-            if message_service.create_message(
+            if MessageService.create_message(
                     sender=admin_user,
                     message_type='answer',
                     receivers=receivers,

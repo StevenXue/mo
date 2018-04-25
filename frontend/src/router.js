@@ -38,7 +38,7 @@ const breadcrumbNameMap = {
   '/userrequest': 'User Request',
   '/modellist': 'Module',
   '/profile': 'Profile',
-  '/discovery': 'Discovery',
+  '/explore': 'Explore',
 }
 
 const RouterConfig = ({history, location, projectDetail}) => {
@@ -89,8 +89,8 @@ const RouterConfig = ({history, location, projectDetail}) => {
               <Route path="/projects/:projectId" component={PublicProject}/>
               <Route path="/projects" component={Projects}/>
 
-              <Route path="/discovery/:projectId" render={(props) => <ProjectDetail {...props} market_use={true}/>}/>
-              <Route path="/discovery" component={MarketList}/>
+              <Route path="/explore/:projectId" render={(props) => <ProjectDetail {...props} market_use={true}/>}/>
+              <Route path="/explore" component={MarketList}/>
 
               <Route path="/modelmarket/:modelsId" component={PublicServedModelsDetail}/>
               <Route path="/modelmarket" component={PublicServedModels}/>

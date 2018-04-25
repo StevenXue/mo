@@ -1,7 +1,7 @@
 
 .normal {
   //width: 100%;
-
+ 
   .header {
     margin-bottom: 20px;
     .select {
@@ -27,7 +27,7 @@
     }
 
     .title {
-      color: #005999;
+      color: #333333;
       font-size: 22px;
       margin: 5px 0 5px 0;
       overflow: hidden;
@@ -48,6 +48,7 @@
       -webkit-box-orient: vertical;
     }
     .starAnswerDiv {
+      color: #828a92;
       display: flex;
     }
 
@@ -66,28 +67,43 @@
       text-align: center;
     }
     .tags {
-      font-size: 16px;
+      font-size: 14px;
       float: left;
-      color:#2db7f5;
+      color:#999999;
       cursor: default;
+      margin-right: -6px;
+    }
+    .tags:first-child{
+      background: ~"url(./img/mark.png)" no-repeat left center;
+      padding-left: 25px;
+      background-size: 22%;
     }
     .showTime {
       text-align: right;
-      float: right;
+      float: left;
       font-size: 14px;
       cursor: default;
     }
 
     .user_ID {
       text-align: right;
-      float: right;
+      float: left;
       font-size: 14px;
       cursor: pointer;
       color: #005999;
     }
 
     .timeAndUserDiv {
-
+      overflow: hidden;
+    }
+  }
+  :global{
+    .ant-card-bordered{
+      border: 1px solid #eeeeee;
+      border-bottom: 0;
+    }
+    .ant-tag{
+      border: 0;
     }
   }
 }
@@ -95,3 +111,4 @@
 .pagination {
   padding: 15px 0 0 0;
 }
+
