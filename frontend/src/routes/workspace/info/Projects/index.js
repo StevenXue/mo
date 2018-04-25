@@ -153,7 +153,7 @@ class ProjectList extends Component {
           this.state.projects.length > 0 ? <div className={styles.projectList}>
             {this.state.projects.map(e =>
               <Card key={e._id} className={styles.card}
-                    title={<h3 style={{color:'#999999'}}>{e.name}</h3>}
+                    title={<h3>{e.name}</h3>}
                     extra={e.is_private && <Icon type="lock"/>}
                     onClick={() => this.toProjectDetail(e._id, history, e.type)}
                     style={{cursor: 'pointer'}}>

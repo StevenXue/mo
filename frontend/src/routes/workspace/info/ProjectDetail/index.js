@@ -542,13 +542,14 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                                         projectDetail={projectDetail}
                                         type={projectDetail.project.type}
                           >
-                          <Button icon='edit' style={{marginRight: 15}}/>
+                          <Button icon='edit' style={{marginRight: 15}} style={{width:32}}/>
                         </ProjectModal>
                           {/* only private project can be deleted */}
                           {projectDetail.project.privacy === 'private' &&
-                          <Button icon='delete' style={{marginRight: 15}}
+                          <Button icon='delete' style={{marginRight: 15, marginLeft:15,width:32}}
                                   onClick={() => deleteProject()}/>}
                           <Button icon='cloud-download-o' className="mei"
+                                  style={{width:32,fontSize:16}}
                                   onClick={() => dispatch({
                                     type: 'projectDetail/showHelpModal',
                                   })}/>

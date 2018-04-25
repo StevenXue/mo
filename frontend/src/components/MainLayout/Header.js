@@ -229,7 +229,12 @@ function Header({location, login, history, dispatch, allRequest,message}) {
           className={styles.rightButton}
           title={
             <span onClick={toLoginPage}>
-                <Icon type="user"/>{login.user ? login.user.user_ID : 'Login'}
+            {
+              login.user?<img src={login.user.avatar} style={{width:25,borderRadius:0,marginRight:10}}/>:null
+            }
+                
+                {/* <Icon type="user"/>*/}
+                {login.user ? login.user.user_ID : 'Login'} 
               </span>
           }
         >
