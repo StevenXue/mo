@@ -21,7 +21,7 @@ p{
   .bottomRow {
     color: black;
     .radioGroupDiv{
-      margin: 0 0 20px 50px;
+      margin: 0 0 20px 20px;
       .radio{
         margin: 0 10px 0 10px;
         font-size: 14px;
@@ -87,6 +87,11 @@ p{
     .tabs{
       font-size: 14px;
       color:#999999;
+      :global{
+        .ant-tabs-nav .ant-tabs-tab{
+          padding-left: 20px;
+        }
+      }
       .ant-tabs{
         padding: 0 0 0 50px;
       }
@@ -184,6 +189,15 @@ p{
   .favorList {
     margin: 0 0;
     width: 100%;
+    :global{
+      .ant-card-bordered{
+        border: 1px solid #eeeeee;
+        border-bottom: 0;
+      }
+      .ant-card-bordered:first-child{
+        border-top: 0;
+      }
+    }
 
     .card {
       margin: 0 0;

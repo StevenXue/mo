@@ -268,7 +268,7 @@ class MyFavouriteList extends Component {
                     <div className={styles.footer}>
                       <Icon type="user" className={styles.firstIcon}/>
                       <p>{e.user_ID} </p>
-                      <Icon type="tags" className={styles.otherIcon}/>
+                      {/* <Icon type="tags" className={styles.otherIcon}/> */}
                       <p>{e.tags}</p>
                       <Icon type="clock-circle-o" className={styles.otherIcon}/>
                       <p>{showTime(e.create_time)}</p>
