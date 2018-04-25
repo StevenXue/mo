@@ -276,6 +276,8 @@ USER $NB_UID
 ADD --chown=jovyan:users run.sh /home/jovyan
 ADD --chown=jovyan:users add_venv.sh /home/jovyan
 ADD --chown=jovyan:users remove_venv.sh /home/jovyan
+ADD --chown=jovyan:users freeze_venv.sh /home/jovyan
 ADD --chown=jovyan:users modules /home/jovyan/modules
 ADD --chown=jovyan:users dataset /home/jovyan/dataset
+ADD --chown=jovyan:users pip.conf /home/jovyan/.pip/pip.conf
 CMD ['bash', '/home/jovyan/run.sh']

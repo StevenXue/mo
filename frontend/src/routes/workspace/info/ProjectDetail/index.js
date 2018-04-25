@@ -300,7 +300,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
     // project info page
     if (projectDetail.project && projectDetail.project.type) {
 
-      function appStatus() {
+      function projectStatus() {
         if (!projectDetail.project.status) {
           return <div/>
         }
@@ -577,7 +577,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
               <Tabs defaultActiveKey={projectDetail.activeTab}
                     onChange={callback}
                     activeKey={projectDetail.activeTab}
-                    tabBarExtraContent={appStatus()}
+                    tabBarExtraContent={projectStatus()}
                     className={styles.jobs}>
                 <TabPane tab="Overview" key="1">
                   <div className={styles.reactMdeEditorDiv}>

@@ -52,7 +52,7 @@ export default {
       return history.listen(({ pathname }) => {
         const userId = localStorage.getItem('user_ID')
         if (userId && !connected) {
-          const socket = io.connect(flaskServer + '/log')
+          const socket = io.connect('/log', {path: '/socketio/socket.io'})
 
           socket.on('world', (msg) => {
             console.log("msg", msg)

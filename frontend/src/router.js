@@ -38,7 +38,7 @@ const breadcrumbNameMap = {
   '/userrequest': 'User Request',
   '/modellist': 'Module',
   '/profile': 'Profile',
-  '/market': 'Market',
+  '/discovery': 'Discovery',
 }
 
 const RouterConfig = ({history, location, projectDetail}) => {
@@ -79,9 +79,9 @@ const RouterConfig = ({history, location, projectDetail}) => {
       <Route path="/:anything" component={() =>
         <MainLayout location={location} history={history}>
           <div style={{display: 'flex', flexDirection: 'column'}}>
-            <Breadcrumb>
-              {extraBreadcrumbItems}
-            </Breadcrumb>
+            {/*<Breadcrumb>*/}
+              {/*{extraBreadcrumbItems}*/}
+            {/*</Breadcrumb>*/}
             <Switch>
 
               <Route path="/workspace/:projectId" component={ProjectDetail}/>
@@ -89,8 +89,8 @@ const RouterConfig = ({history, location, projectDetail}) => {
               <Route path="/projects/:projectId" component={PublicProject}/>
               <Route path="/projects" component={Projects}/>
 
-              <Route path="/market/:projectId" render={(props) => <ProjectDetail {...props} market_use={true}/>}/>
-              <Route path="/market" component={MarketList}/>
+              <Route path="/discovery/:projectId" render={(props) => <ProjectDetail {...props} market_use={true}/>}/>
+              <Route path="/discovery" component={MarketList}/>
 
               <Route path="/modelmarket/:modelsId" component={PublicServedModelsDetail}/>
               <Route path="/modelmarket" component={PublicServedModels}/>

@@ -331,7 +331,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
       window.open('/#/workspace/' + e.select_project._id + '?type=' + e.select_project.type)
     }
     else {
-      window.open('/#/market/' + e.select_project._id + '?type=' + e.select_project.type)
+      window.open('/#/discovery/' + e.select_project._id + '?type=' + e.select_project.type)
     }
   }
 
@@ -437,7 +437,9 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                   <RequestModal new={false} requestDetail={focusUserRequest}>
                     <Button icon='edit' style={{marginRight: 15}}/>
                   </RequestModal>
-                  <Button icon='delete' onClick={() => deleteUserRequest()}/>
+              {focusUserRequest.comments && focusUserRequest.answer ?
+                null:<Button icon='delete' onClick={() => deleteUserRequest()}/>}
+
                 </span>}
             {/*{focusUserRequest['user_ID']===user_ID && <Icon type="close" onClick={() => deleteUserRequest()}/>}*/}
           </h2>

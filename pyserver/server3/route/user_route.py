@@ -533,21 +533,33 @@ def update_user_account():
     captcha = data.get('captcha', None)
     payload = jwt.decode(token_for_update_info, UPDATE_USER_INFO_SK,
                          algorithm='HS256')
-    # if payload['user_ID'] != user_ID or payload['expireTime'] > time.time():
-    if payload['user_ID'] != user_ID:
-        return jsonify({'response': 'tokenForUpdateInfo error'}), 400
+    if payload['user_ID'] != user_ID or payload['expireTime'] < time.time():
+        return jsonify({'response': {'error': 'tokenError'}}), 400
     elif phone:
         # 更改手机
         # 验证手机 验证码
-        res = user_service.verify_code(code=captcha, phone=phone)
-        if res:
+        try:
+            res = user_service.verify_code(code=captcha, phone=phone)
             user = UserBusiness.get_by_user_ID(user_ID)
             user.phone = phone
             user.save()
+        except Error as e:
+            return jsonify({
+                "response": {
+                    "error": "验证码错误"
+                }
+            }), 400
     elif email:
         # 更改邮箱
         # 验证邮箱 验证码
-        UserService.update_user_email(user_ID, email, captcha)
+        try:
+            UserService.update_user_email(user_ID, email, captcha)
+        except Error as e:
+            return jsonify({
+                "response": {
+                    "error": e.args[0]
+                }
+            }), 400
     elif password:
         UserBusiness.update_password(user_ID, password)
     else:

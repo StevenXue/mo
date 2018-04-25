@@ -496,8 +496,8 @@ class ProjectBusiness:
                         newhexsha=commit.newhexsha,
                         actor_name=commit.actor.name,
                         actor_email=commit.actor.email,
-                        timestamp=datetime.fromtimestamp(
-                            commit.time[0] + commit.time[1]),
+                        timestamp=datetime.fromtimestamp(commit.time[0]),
+                            #+ commit.time[1]), need utc
                         message=commit.message,
                         version=version
                         )

@@ -20,7 +20,7 @@ import {
 import {avatarList} from '../../constants'
 import styles from './index.less'
 import {showTime} from "../../utils"
-import {updateUserInfo,updateUserAccount} from "../../services/user"
+import {updateUserInfo, updateUserAccount} from "../../services/user"
 import {routerRedux} from "dva/router"
 import AvatarEditor from 'react-avatar-editor'
 
@@ -67,34 +67,57 @@ class EditForm extends React.Component {
               'password': values.password,
               tokenForUpdateInfo
             },
-            onJson: () => {
-              message.success('密码修改成功')
+            onJson: (e) => {
+              if (e.error) {
+                if (e.error === 'tokenError') {
+                  message.error('token已过期，请验证')
+                  localStorage.removeItem('tokenForUpdateInfo')
+                  this.cancelEdit({})
+                }
+                else {
+                  message.error('error')
+                }
+              }
+              else {
+                message.success('密码修改成功')
+                this.cancelEdit({})
+              }
             }
           })
-          this.cancelEdit({})
         }
-      },
+      }
     )
   }
 
-
   handleSubmitEmail = () => {
     let tokenForUpdateInfo = localStorage.getItem('tokenForUpdateInfo')
-    this.props.form.validateFields(['email','captcha'], {force: true},
+    this.props.form.validateFields(['email', 'captcha'], {force: true},
       (err, values) => {
         console.log('values', values)
         if (!err) {
           updateUserAccount({
             body: {
               'email': values.email,
-              'captcha':values.captcha,
+              'captcha': values.captcha,
               tokenForUpdateInfo
             },
-            onJson: () => {
-              message.success('Email修改成功')
-            }
+            onJson: (e) => {
+              if (e.error) {
+                if (e.error === 'tokenError') {
+                  message.error('token已过期，请验证')
+                  localStorage.removeItem('tokenForUpdateInfo')
+                  this.cancelEdit({})
+                }
+                else {
+                  message.error(e.error )
+                }
+              }
+              else {
+                message.success('Email修改成功')
+                this.cancelEdit({})
+              }
+            },
           })
-          this.cancelEdit({})
         }
       },
     )
@@ -103,26 +126,37 @@ class EditForm extends React.Component {
 
   handleSubmitPhone = () => {
     let tokenForUpdateInfo = localStorage.getItem('tokenForUpdateInfo')
-    this.props.form.validateFields(['phone'], {force: true},
+    this.props.form.validateFields(['phone', 'captcha'], {force: true},
       (err, values) => {
-        console.log('values', values)
         if (!err) {
+
           updateUserAccount({
             body: {
               'phone': values.phone,
-              'captcha':values.captcha,
+              'captcha': values.captcha,
               tokenForUpdateInfo
             },
-            onJson: () => {
-              message.success('手机号修改成功')
+            onJson: (e) => {
+              if (e.error) {
+                if (e.error === 'tokenError') {
+                  message.error('token已过期，请验证')
+                  localStorage.removeItem('tokenForUpdateInfo')
+                  this.cancelEdit({})
+                }
+                else {
+                  message.error(e.error)
+                }
+              }
+              else {
+                message.success('手机号码修改成功')
+                this.cancelEdit({})
+              }
             }
           })
-          this.cancelEdit({})
         }
       },
     )
   }
-
 
 
   startEdit = (e) => {

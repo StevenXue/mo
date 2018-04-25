@@ -29,7 +29,7 @@ def list_comments():
     for comment in comments:
         comment.user_ID = comment.comments_user.user_ID
         if hasattr(comment.comments_user, 'avatar'):
-            comment.avatar = comment.comments_user.get('avatar')
+            comment.avatar = comment.comments_user.avatar
     comments = json_utility. \
         me_obj_list_to_json_list(comments)
     return jsonify(

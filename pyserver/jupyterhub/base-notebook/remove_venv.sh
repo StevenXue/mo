@@ -16,6 +16,8 @@ cd ${W_DIR}
 echo "activating env"
 # FIXME will only work when one workon, like now
 workon $(workon)
-echo "adding env"
+echo "removing env"
 add2virtualenv -d ${PACKAGE_DIR}
+echo "remove env done"
+
 

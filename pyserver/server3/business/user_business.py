@@ -103,6 +103,7 @@ class UserBusiness(GeneralBusiness):
     def update_password(cls, user_ID, new_password):
         user = get_by_user_ID(user_ID=user_ID)
         user.password = generate_password_hash(new_password)
+        user.save()
 
     # @classmethod
     # def checkTokenForUpdateInfo(cls):
