@@ -55,10 +55,10 @@ const menuConfig = [
   //   text: 'Model Market',
   // },
   {
-    key: '/discovery',
-    Link: '/discovery?tab=app',
+    key: '/explore',
+    Link: '/explore?tab=app',
     Icon: null,
-    text: 'Discovery',
+    text: 'Explore',
   },
   {
     key: '/userrequest',
@@ -98,6 +98,21 @@ function Header({location, login, history, dispatch, allRequest,message}) {
       }
     })
     return unread
+  }
+  const divStyle = ()=>{
+    let str = String(numberOfUnreadMessage())
+    // console.log(str,'str')
+    return str.length>0? {
+      position:'absolute',
+      top:-9,
+      right:3,
+      backgroundColor:'#f5222d',
+      color:"#FFFFFF",
+      height:10,
+      borderRadius:10,
+      width:10,
+    }:{}
+
   }
   // 点击未读信息，进入详情
   const toMessage= (e) => {
@@ -180,7 +195,7 @@ function Header({location, login, history, dispatch, allRequest,message}) {
                   {e.dropdown.map(
                     (e) => {
                       return (
-                        <Menu.Item key={e.key}>
+                        <Menu.Item key={e.key} style={{marginRight:'70px'}}>
                           <div onClick={() => {
                             dispatch(routerRedux.push(e.Link))
                           }}>
@@ -194,7 +209,7 @@ function Header({location, login, history, dispatch, allRequest,message}) {
             }
             else {
               return (
-                <Menu.Item key={e.key}>
+                <Menu.Item key={e.key} style={{marginRight:'70px'}}>
                   <Link to={e.Link}>
                     {e.Icon && <Icon type={e.Icon}/>}
                     <FormattedMessage id={e.text} defaultMessage={e.text}/>
@@ -214,7 +229,12 @@ function Header({location, login, history, dispatch, allRequest,message}) {
           className={styles.rightButton}
           title={
             <span onClick={toLoginPage}>
-                <Icon type="user"/>{login.user ? login.user.user_ID : 'Login'}
+            {
+              login.user?<img src={login.user.avatar} style={{width:25,borderRadius:0,marginRight:10}}/>:null
+            }
+                
+                {/* <Icon type="user"/>*/}
+                {login.user ? login.user.user_ID : 'Login'} 
               </span>
           }
         >
@@ -246,10 +266,11 @@ function Header({location, login, history, dispatch, allRequest,message}) {
         <SubMenu
           className={styles.messageSubmenu}
           title={
-            <span onClick={toLoginPage}>
-                <Badge count={login.user ? numberOfUnreadMessage() : 0}>
-                <Icon style={{color:'white'}} type="message"/>
-                </Badge>
+            <span onClick={toLoginPage} style={{position:'relative'}}>
+                {/* <Badge count={login.user ? numberOfUnreadMessage() : 0}> */}
+                <Icon style={{color:'white',fontSize:'24px'}} type="message"/>
+                <div style={divStyle()}></div>
+                {/* </Badge> */}
               </span>
           }
         >

@@ -32,6 +32,8 @@ app.model(require('./models/allRequest'))
 app.model(require('./models/module'))
 app.model(require('./models/message'))
 app.model(require('./models/profile'))
+app.model(require('./models/launchpage'))
+
 app.model(modelling)
 app.model(projectDetail)
 app.model(worldChannel)

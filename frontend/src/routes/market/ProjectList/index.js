@@ -10,6 +10,10 @@ import avatar3 from '../../../img/avatar/3.png'
 import avatar4 from '../../../img/avatar/4.png'
 import avatar5 from '../../../img/avatar/5.png'
 import avatar6 from '../../../img/avatar/6.png'
+import star from './img/star.png'
+import star_o from './img/star-o.png'
+import like from './img/like.png'
+import like_o from './img/like-o.png'
 
 const avatarList =[avatar1,avatar2,avatar3,avatar4,avatar5,avatar6]
 
@@ -35,7 +39,7 @@ function Projects({history, project, dispatch,location}) {
   const paramList = Object.keys(defaultActiveKeyDic)
 
   function callback(key) {
-    history.push(`discovery${paramList[parseInt(key)-1]}`)
+    history.push(`explore${paramList[parseInt(key)-1]}`)
   }
 
   return (
@@ -117,7 +121,7 @@ class ProjectList extends Component {
       history.push(`/workspace/${id}?type=${type}`)
     }
     else {
-      history.push(`/discovery/${id}?type=${type}`)
+      history.push(`/explore/${id}?type=${type}`)
     }
   }
 
@@ -195,12 +199,12 @@ class ProjectList extends Component {
 function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
   const user_obj_id = localStorage.getItem('user_obj_id')
   const picNumber = parseInt(project.user.slice(20))%6
-  console.log('pp', project)
+  console.log(project.user)
   return (
     <div className={styles.projectCard}>
       <div className={styles.toDetail} onClick={() => onClickToDetail()}>
         <div className={styles.pic}>
-          <img src={avatarList[picNumber]}  alt="avatar" />
+          <img src={project.user_avatar?project.user_avatar:avatarList[picNumber]}  alt="avatar" />
         </div>
         <div className={styles.name}>
           <p className={styles.namep}>{project.name}</p>
@@ -224,11 +228,15 @@ function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
         <div className={styles.starFavorRightDiv}>
           <Icon className={styles.bottomIcon}
                 type={project.star_users.includes(user_obj_id) ? "like" : "like-o"}
-                onClick={() => onClickStarFavor('star')}/>
+                onClick={() => onClickStarFavor('star')}
+                style={{color:'transparent',background:project.star_users.includes(user_obj_id) ?`url(${like_o}) no-repeat`:`url(${like}) no-repeat`}}
+                />
           <p className={styles.bottomNumber}>{project.star_users.length}</p>
           <Icon className={styles.bottomIcon}
                 type={project.favor_users.includes(user_obj_id) ? "star" : "star-o"}
-                onClick={() => onClickStarFavor('favor')}/>
+                onClick={() => onClickStarFavor('favor')}
+                style={{color:'transparent',background:project.favor_users.includes(user_obj_id) ?`url(${star_o}) no-repeat`:`url(${star}) no-repeat`}}
+                />
           <p className={styles.bottomNumber}>{project.favor_users.length}</p>
         </div>
       </div>

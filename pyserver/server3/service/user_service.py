@@ -32,17 +32,6 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.header import Header
 
-smtpserver = 'smtp.163.com'
-username = '15669929857@163.com'
-password = 'wurao122'
-sender = '15669929857@163.com'
-# receiver='374758875@qq.com'
-subject = 'Python email test'
-msg = MIMEMultipart('mixed')
-msg['Subject'] = subject
-msg['From'] = '15669929857@163.com <15669929857@163.com>'
-
-
 # msg['To'] = '374758875@qq.com'
 # text = "Hi!\nHow are you?\nHere is the link you wanted:\nhttp://localhost:8989/#/user/login"    
 # text_plain = MIMEText(text,'plain', 'utf-8')    
@@ -92,19 +81,29 @@ def authenticate(user_ID, password):
 
 def forgot_send(email):
     user = user_business.get_by_email(email)
+    smtpserver = 'smtp.163.com'
+    username = '15669929857@163.com'
+    password='wurao122'
+    sender='15669929857@163.com'
+    # receiver='374758875@qq.com'
+    subject = '数据分析平台-用户密码找回(此邮件由系统产生不可回复)'
+    msg = MIMEMultipart('mixed')
+    msg['Subject'] = subject
+    msg['From'] = '15669929857@163.com <15669929857@163.com>'
     if user:
         receiver = email
         msg['To'] = email
-        suiji = str(random.randint(100000, 999999))
-        # h = hashlib.md5(bytes(suiji,encoding="utf-8"))
-        # h.update(email.encode("utf-8"))
-        user.hashEmail = suiji
+        suiji = str(random.randint(random.randint(1, 999999), random.randint(999999, 99999999999)))
+        h = hashlib.md5(bytes(suiji,encoding="utf-8"))
+        h.update(email.encode("utf-8"))
+        
+        user.hashEmail = h.hexdigest()
         user.save()
 
-        text = user.user_ID + '，您好！\n请点击下方链接重置密码。 如非您本人操作，请忽略此邮件。\n http://localhost:8989/#/newpassword?email=' + email + '&user=' + user.user_ID + '&hashEmail=' + suiji
-        text_plain = MIMEText(text, 'plain', 'utf-8')
-        msg.attach(text_plain)
-        smtp = smtplib.SMTP()
+        text = user.user_ID+'，您好！\n请点击下方链接重置密码。 如非您本人操作，请忽略此邮件。\n 192.168.31.7:8899/#/newpassword?email='+email+'&user='+user.user_ID+'&hashEmail='+h.hexdigest()
+        text_plain = MIMEText(text,'plain', 'utf-8')   
+        msg.attach(text_plain)   
+        smtp = smtplib.SMTP()    
         smtp.connect('smtp.163.com')
         smtp.login(username, password)
         smtp.sendmail(sender, receiver, msg.as_string())
@@ -121,6 +120,13 @@ def newpassword_send(password, email, hashEmail):
         user.save()
         return user
     return False
+
+def have_hashEmail(email,hashEmail):
+    user = user_business.get_by_hashEmail(email,hashEmail)
+    if user:
+        return user
+    return False
+
 
 
 def check_tourtip(user_ID):

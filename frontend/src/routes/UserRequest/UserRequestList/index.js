@@ -172,12 +172,10 @@ class RequestList extends Component {
                                                                        className={styles.tags}
                                                                        key={e}>{e}</Tag>)}
                         <div className={styles.timeAndUserDiv}>
+                          <p className={styles.user_ID}
+                             onClick={() => this.toUserProfile(e.user_ID, history)}>&nbsp;&nbsp;{e.user_ID} &nbsp;&nbsp;</p>
                           <p
                             className={styles.showTime}>{showTime(e.create_time)}</p>
-                          <p className={styles.showTime}>&nbsp;&nbsp; asked
-                            at &nbsp;&nbsp;</p>
-                          <p className={styles.user_ID}
-                             onClick={() => this.toUserProfile(e.user_ID, history)}>{e.user_ID} </p>
                         </div>
                       </div>
                     </div>

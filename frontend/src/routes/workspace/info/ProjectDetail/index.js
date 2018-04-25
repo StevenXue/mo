@@ -288,6 +288,36 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
     })
   }
 
+  const cloudNote = ()=>{
+    return <Row style={{width:'110%',marginLeft:'-5%'}}>
+      <Col span={13}>
+      {!market_use && <span className={styles.generalSpan}>
+      <Upload {...props1}>
+        <Button className="qing">
+          <Icon type="upload"/> Click to Upload
+        </Button>
+      </Upload>
+    </span>}
+      </Col>
+      <Col span={11}>
+      <span className={styles.enterNotebook}>
+      <Button type="primary"
+              className="zi"
+              onClick={() => {
+                // history.push(`/workspace/${match.params.projectId}/${projectDetail.project.type}`)
+                window.open(`/#/workspace/${projectId}/${projectDetail.project.type}`)
+              }}>
+        Notebook ->
+      </Button>
+    </span>
+      </Col>
+    </Row>
+  //   return <div style={{paddingBottom: '50px'}}><span>
+    
+    
+  // </span></div>
+  }
+
   if (location.pathname.split('/').length > 3) {
     // project 4 step pages
     return (
@@ -296,7 +326,6 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                      dispatch={dispatch}/>
     )
   } else {
-    console.log('detail path')
     // project info page
     if (projectDetail.project && projectDetail.project.type) {
 
@@ -305,12 +334,12 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
           return <div/>
         }
         if (projectDetail.project.status === 'deploying') {
-          return <Tag color='gold' style={{cursor: 'default'}}>Deploying <Icon
+          return <Tag color='gold' style={{cursor: 'default',marginLeft:10}}>Deploying <Icon
             type="loading"/></Tag>
         } else if (projectDetail.project.status === 'active') {
-          return <Tag color='green' style={{cursor: 'default'}}>Online</Tag>
+          return <Tag color='green' style={{cursor: 'default',marginLeft:10}}>Online</Tag>
         } else {
-          return <Tag color='grey' style={{cursor: 'default'}}>Offline</Tag>
+          return <Tag color='grey' style={{cursor: 'default',marginLeft:10}}></Tag>
         }
       }
 
@@ -328,16 +357,11 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
         }
 
         componentDidMount() {
-          fetch(`http://localhost:5005/user/tourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
+          fetch(`/pyapi/user/tourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
             .then((response) => response.json())
             .then(({response}) => {
-              // if (response.user.tourtip !== 0) {
-              //   this.setState({
-              //     tourtip: 1,
-              //   })
-              // }
               this.setState({
-                tourtip: response.user.tourtip,
+                tourtip:parseInt( response.user.tourtip),
               })
             })
         }
@@ -357,28 +381,28 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
           })
         }
 
+        noLearning = ()=>{
+          fetch(`/pyapi/user/notourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
+        }
+
         render() {
           return (
             <div>
               {
                 this.state.tourtip === 0 && <Joyride
                   ref={c => (this.joyride = c)}
-                  // callback={this.callback}
                   debug={false}
-                  // disableOverlay={selector === '.card-tickets'}
                   locale={{
-                    back: (<span style={{color: '#34BFE2'}}>Back</span>),
+                    back: (<span style={{color: '#34BFE2'}} >Back</span>),
                     close: (<span style={{color: '#34BFE2'}}>Close</span>),
-                    last: (<span style={{color: '#34BFE2'}}>Last</span>),
+                    last: (<span style={{color: '#34BFE2'}} onClick={this.noLearning}>Last</span>),
                     next: (<span style={{color: '#34BFE2'}}>Next</span>),
-                    skip: (<span style={{color: '#666666'}}>Skip</span>),
+                    skip: (<span style={{color: '#999999'}} onClick={this.noLearning}>Skip</span>),
                   }}
-                  // scrollToSteps  = {true}
                   run={true}
                   showOverlay={true}
                   showSkipButton={true}
                   showStepsProgress={true}
-                  // stepIndex={stepIndex}
                   steps={this.state.steps}
                   type='continuous'
                 />
@@ -395,10 +419,6 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
           this.state = {}
         }
 
-        componentWillUnmount() {
-          fetch(`http://localhost:5005/user/notourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
-        }
-
         componentDidMount() {
           this.props.addSteps(
             [{
@@ -411,12 +431,12 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                 borderRadius: 0,
                 color: '#34BFE2',
                 textAlign: 'center',
-                width: '29rem',
+                width: '24rem',
                 mainColor: '#ffffff',
                 backgroundColor: '#ffffff',
                 beacon: {
-                  inner: '#34BFE2',
-                  outer: '#34BFE2',
+                  inner: '#0ae713 ',
+                  outer: '#77Eb7c',
                 },
                 close: {
                   display: 'none',
@@ -432,7 +452,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                 borderRadius: 0,
                 color: '#34BFE2',
                 textAlign: 'center',
-                width: '29rem',
+                width: '24rem',
                 mainColor: '#ffffff',
                 backgroundColor: '#ffffff',
                 beacon: {
@@ -453,7 +473,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                 borderRadius: 0,
                 color: '#34BFE2',
                 textAlign: 'center',
-                width: '29rem',
+                width: '24rem',
                 mainColor: '#ffffff',
                 backgroundColor: '#ffffff',
                 beacon: {
@@ -508,22 +528,28 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                     <div className={styles.name}>
                       {/* project header area */}
                       <h1>
-                        {projectDetail.project.name}&nbsp;
-                        {!market_use && <Icon
-                          type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
-                          style={{fontSize: 20}}/>}
+                        <div style={{display:'flex',alignItems:'center'}}>
+                          {projectDetail.project.name}&nbsp;
+                          {!market_use && <Icon
+                            type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
+                            style={{fontSize: 20}}/>}
+                            {
+                              projectStatus()
+                            }
+                        </div>
                         {!market_use && <span className={styles.rightButton}>
                           <ProjectModal new={false}
                                         projectDetail={projectDetail}
                                         type={projectDetail.project.type}
                           >
-                          <Button icon='edit' style={{marginRight: 15}}/>
+                          <Button icon='edit' style={{marginRight: 15}} style={{width:32}}/>
                         </ProjectModal>
                           {/* only private project can be deleted */}
                           {projectDetail.project.privacy === 'private' &&
-                          <Button icon='delete' style={{marginRight: 15}}
+                          <Button icon='delete' style={{marginRight: 15, marginLeft:15,width:32}}
                                   onClick={() => deleteProject()}/>}
                           <Button icon='cloud-download-o' className="mei"
+                                  style={{width:32,fontSize:16}}
                                   onClick={() => dispatch({
                                     type: 'projectDetail/showHelpModal',
                                   })}/>
@@ -546,7 +572,8 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                                key={e}>{e}</Tag>)
                         : null}
                     </div>
-                    <div style={{paddingBottom: '50px'}}>
+                    
+                    {/* <div style={{paddingBottom: '50px'}}>
                     <span>
                       {!market_use && <span className={styles.generalSpan}>
                       <Upload {...props1}>
@@ -562,11 +589,11 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                                   // history.push(`/workspace/${match.params.projectId}/${projectDetail.project.type}`)
                                   window.open(`/#/workspace/${projectId}/${projectDetail.project.type}`)
                                 }}>
-                          Notebook ->
+                          Notebook 1->
                         </Button>
                       </span>
                     </span>
-                    </div>
+                    </div> */}
                   </Col>
                 </Row>
 
@@ -577,7 +604,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
               <Tabs defaultActiveKey={projectDetail.activeTab}
                     onChange={callback}
                     activeKey={projectDetail.activeTab}
-                    tabBarExtraContent={projectStatus()}
+                    tabBarExtraContent={cloudNote()}
                     className={styles.jobs}>
                 <TabPane tab="Overview" key="1">
                   <div className={styles.reactMdeEditorDiv}>
