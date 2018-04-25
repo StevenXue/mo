@@ -81,6 +81,9 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
 
         # 1. copy modules from docker
         cls.copy_from_container(container, '/home/jovyan/modules', func_path)
+        # copy path edited __init__.py
+        shutil.copy('./functions/template/python3/function/modules/__init__.py',
+                    os.path.join(func_path, 'modules'))
         # 2. copy datasets from docker
         cls.copy_from_container(container, '/home/jovyan/dataset', func_path)
 
