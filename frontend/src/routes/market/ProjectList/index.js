@@ -39,7 +39,7 @@ function Projects({history, project, dispatch,location}) {
   const paramList = Object.keys(defaultActiveKeyDic)
 
   function callback(key) {
-    history.push(`discovery${paramList[parseInt(key)-1]}`)
+    history.push(`explore${paramList[parseInt(key)-1]}`)
   }
 
   return (
@@ -121,7 +121,7 @@ class ProjectList extends Component {
       history.push(`/workspace/${id}?type=${type}`)
     }
     else {
-      history.push(`/discovery/${id}?type=${type}`)
+      history.push(`/explore/${id}?type=${type}`)
     }
   }
 
