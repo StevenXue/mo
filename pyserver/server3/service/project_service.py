@@ -29,7 +29,7 @@ from server3.business import staging_data_set_business
 from server3.business import staging_data_business
 from server3.business import served_model_business
 from server3.business.request_answer_business import RequestAnswerBusiness
-from server3.service import message_service
+from server3.service.message_service import MessageService
 from server3.business import world_business
 from server3.entity.world import CHANNEL
 
@@ -425,8 +425,9 @@ class ProjectService:
 
         from server3.service.user_service import UserService
         user, project = UserService.action_entity(user_ID=project.user.user_ID,
-                                  entity_id=project.id,
-                                  action='favor', entity=project.type)
+                                                  entity_id=project.id,
+                                                  action='favor',
+                                                  entity=project.type)
         print(project.to_mongo())
         from server3.service.world_service import WorldService
         from server3.business.statistics_business import StatisticsBusiness
@@ -512,16 +513,16 @@ class ProjectService:
         for each_anser in answers_has_module:
             user_request = each_anser.user_request
             request_owener = user_request.user
-            message_service.create_message(admin_user, 'publish_request',
-                                           [request_owener],
-                                           project.user,
-                                           project_name=project.name,
-                                           project_id=project.id,
-                                           user_request_title=user_request.title,
-                                           user_request_id=user_request.id,
-                                           project_type=project.type)
+            MessageService.create_message(admin_user, 'publish_request',
+                                          [request_owener],
+                                          project.user,
+                                          project_name=project.name,
+                                          project_id=project.id,
+                                          user_request_title=user_request.title,
+                                          user_request_id=user_request.id,
+                                          project_type=project.type)
 
-        message_service.create_message(admin_user, m_type, receivers,
-                                       project.user, project_name=project.name,
-                                       project_id=project.id,
-                                       project_type=project.type)
+        MessageService.create_message(admin_user, m_type, receivers,
+                                      project.user, project_name=project.name,
+                                      project_id=project.id,
+                                      project_type=project.type)

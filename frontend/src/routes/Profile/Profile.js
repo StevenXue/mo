@@ -52,7 +52,7 @@ function toWorkspace(dispatch, tabPane) {
 
 function Profile({login, profile, dispatch, history}) {
   if (profile.userInfo) {
-    const {age, email, name, phone, user_ID} = profile.userInfo
+    const {age, email, name, phone, user_ID,avatar} = profile.userInfo
     const {projectNumber} = profile
     const picNumber = parseInt(profile.userInfo._id.slice(20))%6
     return (
@@ -61,7 +61,7 @@ function Profile({login, profile, dispatch, history}) {
           <Row>
             <Col span={3} style={{padding: '20px 0 0 20px'}}>
               <div className={styles.photoDiv}>
-                <img src={avatarList[picNumber]}  alt="avatar" />
+                <img src={avatar?avatar:avatarList[picNumber]}  alt="avatar" />
               </div>
             </Col>
             <Col span={21}>
@@ -202,7 +202,7 @@ class MyFavouriteList extends Component {
   }
 
   toObjectDetail(id, history) {
-    history.push(`/discovery/${id}`)
+    history.push(`/explore/${id}`)
   }
 
   toUserRequestDetail(id, history) {
@@ -268,7 +268,7 @@ class MyFavouriteList extends Component {
                     <div className={styles.footer}>
                       <Icon type="user" className={styles.firstIcon}/>
                       <p>{e.user_ID} </p>
-                      <Icon type="tags" className={styles.otherIcon}/>
+                      {/* <Icon type="tags" className={styles.otherIcon}/> */}
                       <p>{e.tags}</p>
                       <Icon type="clock-circle-o" className={styles.otherIcon}/>
                       <p>{showTime(e.create_time)}</p>
