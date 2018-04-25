@@ -16,7 +16,7 @@ from kubernetes import client
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from server3.service import project_service
-from server3.service import message_service
+from server3.service.message_service import MessageService
 from server3.service.project_service import ProjectService
 from server3.service import ownership_service
 from server3.service.app_service import AppService
@@ -339,9 +339,9 @@ def commit_broadcast(project_id):
     receivers = project.favor_users  # get app subscriber
     # commits = ProjectBusiness.get_commits(project.path)
     admin_user = UserBusiness.get_by_user_ID('admin')
-    message_service.create_message(admin_user, 'commit', receivers,
-                                   project.user, project_type=project.type,
-                                   project_id=project_id)
+    MessageService.create_message(admin_user, 'commit', receivers,
+                                  project.user, project_type=project.type,
+                                  project_id=project_id)
     return jsonify({"response": 1})
 
 
@@ -355,6 +355,6 @@ def nb_to_script(project_id):
         ProjectBusiness.nb_to_script(project_id, nb_path, optimise)
     except FileNotFoundError as e:
         return jsonify({"response": 'Try save your notebook and convert '
-                                    'again.'}),\
+                                    'again.'}), \
                399
     return jsonify({"response": 1})

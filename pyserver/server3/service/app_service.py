@@ -98,6 +98,7 @@ class AppService(ProjectService):
     @classmethod
     def get_by_id(cls, project_id, **kwargs):
         project = super().get_by_id(project_id, **kwargs)
+        print(kwargs, project.app_path)
         if kwargs.get('yml') == 'true' and project.app_path:
             project.args = cls.business.load_app_params(project,
                                                         kwargs.get('version'))
