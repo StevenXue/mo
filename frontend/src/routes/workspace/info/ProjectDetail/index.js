@@ -548,9 +548,9 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                           {!market_use && <Icon
                             type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
                             style={{fontSize: 20}}/>}
-                            {
+                            {/* {
                               appStatus()
-                            }
+                            } */}
                         </div>
                         {!market_use && <span className={styles.rightButton}>
                           <ProjectModal new={false}
