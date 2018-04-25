@@ -181,6 +181,22 @@ def newpassword():
     response = {'response': {'token': create_access_token(identity=user)}}
     return jsonify(response), 200
 
+@user_app.route('/haveReset', methods=['GET'])
+def haveReset():
+    email = request.args.get('email', None)
+    hashEmail = request.args.get('hashEmail', None)
+    try:
+        user = user_service.have_hashEmail(email, hashEmail)
+        # user_obj.pop('password')
+    except DoesNotExist as e:
+        return jsonify({'response': '%s: %s' % (str(
+            DoesNotExist), e.args)}), 400
+    if not user:
+        return jsonify({'response': 'Bad email'}), 400
+    # Identity can be any data that is json serializable
+    response = {'response': {'token': create_access_token(identity=user)}}
+    return jsonify(response), 200
+
 
 @user_app.route('/tourtip', methods=['GET'])
 def tourtip():
