@@ -11,24 +11,28 @@ class LaunchPage extends React.Component {
     constructor() {
       super()
       this.state = {
-        flag:1
+        // flag:0
       }
     }
 
-    componentDidMount(){
-        fetch(`http://localhost:5005/user/learning?user_ID=${localStorage.user_ID}`, {method: 'GET'})
-        .then((response) => response.json())
-        .then(({response}) => {
-            if(response.user.welcome==0){
-                this.setState({
-                    flag:0
-                })
-            }
-        })
+    // 判断是不是第一次登录
+    // componentDidMount(){
+    //     fetch(`http://localhost:5005/user/learning?user_ID=${localStorage.user_ID}`, {method: 'GET'})
+    //     .then((response) => response.json())
+    //     .then(({response}) => {
+    //         if(response.user.welcome==0){
+    //             this.setState({
+    //                 flag:0
+    //             })
+    //         }
+    //     })
+    // }
+    // componentDidUpdate(){
+    //     this.checkWelcome()
+    // } 
+    componentWillUpdate(nextProps){
+        this.props.location.pathname!=nextProps.location.pathname?this.checkWelcome():null
     }
-    componentDidUpdate(){
-        this.checkWelcome()
-    } 
      //组件将被卸载  
     componentWillUnmount(){ 
         //重写组件的setState方法，直接返回空
@@ -37,21 +41,25 @@ class LaunchPage extends React.Component {
         }
     }
     checkWelcome = ()=>{
+        // console.log(11111111)
         if(this.props.location.search.indexOf("app")!=-1&&this.props.location.pathname.indexOf("/workspace/")!=-1){
-            if(this.state.flag==0){
-                this.setState({
-                    flag:1
-                })
+            // console.log(2222)
+            // if(this.state.flag==0){
+                // this.setState({
+                //     flag:1
+                // })
                 document.getElementById("LaunchPage_Contain").scrollTo(0,0)
-                fetch(`http://localhost:5005/user/nolearning?user_ID=${localStorage.user_ID}`, {method: 'GET'})
-            } 
+                // fetch(`http://localhost:5005/user/nolearning?user_ID=${localStorage.user_ID}`, {method: 'GET'})
+            // } 
         }
     }
     close =()=>{
-        fetch(`http://localhost:5005/user/nolearning?user_ID=${localStorage.user_ID}`, {method: 'GET'})
-        this.setState({
-            flag:1
-        })
+        // fetch(`http://localhost:5005/user/nolearning?user_ID=${localStorage.user_ID}`, {method: 'GET'})
+        // this.setState({
+        //     flag:1
+        // })
+        this.props.dispatch({type:'launchpage/change',payload:{visibility:false}})
+        // this.props.dispatch({type:'launchpage/visibility',payload:false})
     }
     ssscrollTo = ()=>{
         document.getElementById("LaunchPage_Contain").scrollTo(0,900)
@@ -163,8 +171,9 @@ class LaunchPage extends React.Component {
     //     window.onbeforeunload = ()=>{ alert("miaomiao")}
     // }
     render(){
+        // const {v}
         return <div className={styles.LaunchPage} 
-                    style={{display:this.state.flag==0?"block":"none"}}
+                    style={{display:this.props.launchpage.visibility?"block":"none"}}
                     >
             <div className={styles.LaunchPage_Content}>
                 <section className={styles.title}>
@@ -203,7 +212,7 @@ class LaunchPage extends React.Component {
                     <button onClick={this.helpDocument}>帮助文档</button>
                 </section>
             </div>
-            <section className={styles.close} onClick={this.close}>
+            <section className={styles.close} onClick={this.close} id="Close_CCC">
                 <Icon type="close" style={{marginRight:10}}/>
                 关闭
             </section>
@@ -211,4 +220,4 @@ class LaunchPage extends React.Component {
     }
 }
 // export default TourTip
-export default connect(({joyride})=>({joyride}))(LaunchPage)
+export default connect(({launchpage})=>({launchpage}))(LaunchPage)
