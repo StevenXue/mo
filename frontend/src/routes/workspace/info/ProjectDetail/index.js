@@ -326,7 +326,6 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                      dispatch={dispatch}/>
     )
   } else {
-    console.log('detail path')
     // project info page
     if (projectDetail.project && projectDetail.project.type) {
 
@@ -361,11 +360,6 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
           fetch(`http://localhost:5005/user/tourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
             .then((response) => response.json())
             .then(({response}) => {
-              // if (response.user.tourtip !== 0) {
-              //   this.setState({
-              //     tourtip: 1,
-              //   })
-              // }
               this.setState({
                 tourtip:parseInt( response.user.tourtip),
               })
@@ -397,9 +391,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
               {
                 this.state.tourtip === 0 && <Joyride
                   ref={c => (this.joyride = c)}
-                  // callback={this.callback}
                   debug={false}
-                  // disableOverlay={selector === '.card-tickets'}
                   locale={{
                     back: (<span style={{color: '#34BFE2'}} >Back</span>),
                     close: (<span style={{color: '#34BFE2'}}>Close</span>),
@@ -407,12 +399,10 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                     next: (<span style={{color: '#34BFE2'}}>Next</span>),
                     skip: (<span style={{color: '#999999'}} onClick={this.noLearning}>Skip</span>),
                   }}
-                  // scrollToSteps  = {true}
                   run={true}
                   showOverlay={true}
                   showSkipButton={true}
                   showStepsProgress={true}
-                  // stepIndex={stepIndex}
                   steps={this.state.steps}
                   type='continuous'
                 />
@@ -429,12 +419,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
           this.state = {}
         }
 
-        // componentWillUnmount() {
-        //   fetch(`http://localhost:5005/user/notourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
-        // }
-
         componentDidMount() {
-          console.log('addSteps')
           this.props.addSteps(
             [{
               title: '',
