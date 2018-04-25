@@ -41,7 +41,14 @@ export default {
     '/pyapi': {
       'target': flaskServer,
       'changeOrigin': true,
+      'ws': true,
       'pathRewrite': {'^/pyapi': ''},
+    },
+    '/socketio': {
+      'target': flaskServer,
+      'ws': true,
+      'changeOrigin': true,
+      'pathRewrite': {'^/socketio': ''},
     },
     '/tb': {
       'target': tbServer,

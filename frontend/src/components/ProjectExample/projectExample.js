@@ -61,6 +61,7 @@ class ProjectExample extends React.Component {
   render() {
     const { projectDetail } = this.props
     const { project, version } = this.props.projectDetail
+    const version_ = version || project.versions.slice(-1)[0] || 'dev'
     console.log(this.state.args)
     return (
       <div>
@@ -76,7 +77,7 @@ class ProjectExample extends React.Component {
         <div>
           API:
           <CopyInput
-            text={`${projectDetail.project.app_path.replace('.', 'http://192.168.31.23:8080')}-${version || project.versions.slice(-1)[0]}`}/>
+            text={`${projectDetail.project.app_path.replace('.', 'http://192.168.31.23:8080')}-${version_}`}/>
         </div>
         <br/>
         <Row gutter={16}>
@@ -98,7 +99,7 @@ class ProjectExample extends React.Component {
                               baseArgs={Object.values(this.props.projectDetail.project.args.input)}
                               appId={this.props.projectDetail.project._id}
                               dispatch={this.props.dispatch}
-                              version={version || project.versions.slice(-1)[0]}
+                              version={version_}
                 />
                 {/*<div >*/}
                 {/*<Button*/}

@@ -163,10 +163,21 @@ class Register extends Component {
           <FormItem>
             User ID
             {getFieldDecorator('user_ID', {
+              getValueFromEvent: (e) => e.target.value.toLowerCase(),
               rules: [{
                 required: true, message: 'Please enter your ID!',
               }, {
                 type: 'string', message: 'ID type error',
+              }, {
+                validator: (rule, value, callback) => {
+                  // escape对字符串进行编码时，字符值大于255的以"%u****"格式存储，而字符值大于255的恰好是非英文字符
+                  // （一般是中文字符，非中文字符也可以当作中文字符考虑）
+                  if (escape(value).indexOf('%u') < 0) {
+                    callback()
+                  } else {
+                    callback('Sorry, Chinese name is not supported yet')
+                  }
+                },
               }],
             })(
               <Input size="large" placeholder="User ID" />

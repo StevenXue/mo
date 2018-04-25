@@ -33,6 +33,7 @@ cat_dict = {
     'toolkit':
         'https://github.com/momodel/cookiecutter-python-toolkit.git'
 }
+TOOL_REPO = 'https://github.com/momodel/dev_cmd_tools.git'
 
 
 # def add(name, user, **kwargs):
@@ -86,6 +87,7 @@ class ModuleBusiness(ProjectBusiness):
         # generate project dir
         project_path = cls.gen_dir(user_ID, name)
         temp_path = cls.gen_dir(user_ID, uuid.uuid4().hex)
+        # temp_tool_path = cls.gen_dir(user_ID+'_tool', uuid.uuid4().hex)
 
         # init git repo
         cls.init_git_repo(user_ID, name)
@@ -109,6 +111,20 @@ class ModuleBusiness(ProjectBusiness):
         copy_tree(os.path.join(temp_path, name), project_path)
         remove_tree(temp_path)
 
+        # tools_path = os.path.join(project_path, 'dev_cmd_tools')
+        # os.makedirs(tools_path)
+        # copy_tree(temp_tool_path, tools_path)
+
+        # cookiecutter(
+        #     TOOL_REPO,
+        #     no_input=True, output_dir=project_path,
+        #     extra_context={
+        #         "author_name": user_ID,
+        #         "module_name": name,
+        #         "module_type": category,
+        #         "module_description": description,
+        #     })
+
         # add all
         repo.git.add(A=True)
         # initial commit
@@ -126,7 +142,7 @@ class ModuleBusiness(ProjectBusiness):
             update_time=create_time,
             type=type, tags=tags,
             hub_token=res.get('token'),
-            path=project_path, user=user,
+            path=project_path, user=user, status='inactive',
             privacy=privacy, category=category, commits=[commit],
             repo_path=f'http://{GIT_SERVER_IP}/repos/{user_ID}/{name}')
 
@@ -144,21 +160,24 @@ class ModuleBusiness(ProjectBusiness):
     #     return module
 
     @staticmethod
-    def load_module_params(module, version=''):
+    def load_module_params(module, version=DEV_DIR_NAME):
         # TODO remove 'try except' after modules all have versions
         try:
             if not version:
                 version = module.versions[-1]
         except:
-            version = ''
+            version = DEV_DIR_NAME
         yml_path = os.path.join(module.module_path, version, tail_path)
         with open(yml_path, 'r') as stream:
             obj = yaml.load(stream)
             return {'input': obj.get('input'), 'output': obj.get('output')}
 
     @classmethod
-    def deploy_or_publish(cls, project_id, commit_msg, version='dev'):
+    def deploy_or_publish(cls, project_id, commit_msg, version=DEV_DIR_NAME):
         module = cls.get_by_id(project_id)
+
+        module.status = 'deploying'
+        module.save()
 
         # commit module
         cls.commit(project_id, commit_msg, version)
@@ -176,29 +195,31 @@ class ModuleBusiness(ProjectBusiness):
         bind_path = '/home/jovyan/modules'
 
         # copy compile related files to module src
-        shutil.copy('./setup.py',
-                    os.path.join(module.module_path, version, 'src'))
-        shutil.copy('./compile.sh',
-                    os.path.join(module.module_path, version, 'src'))
-
-        compile_dir = module.module_path.replace('./server3/lib/modules',
-                                                 bind_path)
-        compile_dir = os.path.join(compile_dir, version, 'src')
-
-        # start container with the singleuser docker, mount the whole pyserver
-        # compile the main.py and delete compile related files
-        client = docker.from_env()
-        client.containers.run(
-            "singleuser:latest",
-            volumes={os.path.abspath(MODULE_DIR):
-                         {'bind': bind_path, 'mode': 'rw'}},
-            command=f"/bin/bash -c 'cd {compile_dir} && bash ./compile.sh'")
+        # shutil.copy('./setup.py',
+        #             os.path.join(module.module_path, version, 'src'))
+        # shutil.copy('./compile.sh',
+        #             os.path.join(module.module_path, version, 'src'))
+        #
+        # compile_dir = module.module_path.replace('./server3/lib/modules',
+        #                                          bind_path)
+        # compile_dir = os.path.join(compile_dir, version, 'src')
+        #
+        # # start container with the singleuser docker, mount the whole pyserver
+        # # compile the main.py and delete compile related files
+        # client = docker.from_env()
+        # client.containers.run(
+        #     "singleuser:latest",
+        #     volumes={os.path.abspath(MODULE_DIR):
+        #                  {'bind': bind_path, 'mode': 'rw'}},
+        #     command=f"/bin/bash -c 'cd {compile_dir} && bash ./compile.sh'")
 
         # if publish update privacy and version
-        if version != 'dev':
+        if version != DEV_DIR_NAME:
             module.privacy = 'public'
             module.versions.append(version)
-            module.save()
+
+        module.status = 'active'
+        module.save()
 
         return module
 

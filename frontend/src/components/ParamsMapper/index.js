@@ -148,7 +148,6 @@ const validator = (type, range) => {
     case '[float]':
       return {
         validator: (rule, value, callback) => {
-          console.log(111, rule, value)
           if (Array.isArray(value) && value.every(e => (!h || e <= h) && (!l || e >= l))) {
             callback()
           } else {

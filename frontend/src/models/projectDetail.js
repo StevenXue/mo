@@ -142,6 +142,7 @@ export default {
     },
     setExampleResult(state, action) {
       let output = state.project.args.output
+      console.log(action.payload)
       for (let key in action.payload) {
         output[key]['value'] = action.payload[key]
       }

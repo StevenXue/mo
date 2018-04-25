@@ -240,6 +240,8 @@ def create_project():
         name, description, user_ID, tags=tags,
         type=type, user_token=user_token, **data)
     project = json_utility.convert_to_json(project.to_mongo())
+
+    print(project)
     return jsonify({'response': project}), 200
 
 
@@ -349,5 +351,10 @@ def nb_to_script(project_id):
     data = request.get_json()
     optimise = data.get('optimise')
     nb_path = data.get('nb_path')
-    ProjectBusiness.nb_to_script(project_id, nb_path, optimise)
+    try:
+        ProjectBusiness.nb_to_script(project_id, nb_path, optimise)
+    except FileNotFoundError as e:
+        return jsonify({"response": 'Try save your notebook and convert '
+                                    'again.'}),\
+               399
     return jsonify({"response": 1})
