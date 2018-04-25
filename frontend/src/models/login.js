@@ -111,12 +111,13 @@ export default {
         type: 'changeSubmitting',
         payload: true,
       })
-      const { data: data } = yield call(login, payload)
+      const { data: data, noError } = yield call(login, payload)
       yield put({
         type: 'changeSubmitting',
         payload: false,
       })
-      if (data) {
+
+      if (data && noError) {
         localStorage.setItem('token', data.token)
         localStorage.setItem('user_ID', data.user.user_ID)
         localStorage.setItem('user_obj_id', data.user._id)
@@ -168,7 +169,7 @@ export default {
       try {
         const { data: data } = yield call(tokenLogin)
         if (!data.user) {
-          if (!(location.href.includes('/user/login') || location.href.includes('/user/register') || location.href.slice(-3) === '/#/')) {
+          if (!(location.href.includes('/user/login') || location.href.includes('/user/forgot') ||location.href.includes('/newpassword') || location.href.includes('/user/register') || location.href.slice(-3) === '/#/')) {
             // yield put(routerRedux.push('/user/login'))
             // FIXME reload is a workaround
             window.location.replace('/#/user/login')
@@ -258,7 +259,7 @@ export default {
         const userId = localStorage.getItem('user_ID')
         if (userId && !connected) {
 
-          const socket = io.connect(flaskServer + '/log/' + userId)
+          const socket = io.connect('/log/' + userId, {path: '/socketio/socket.io'})
           socket.on('log_epoch_end', (msg) => {
             dispatch({ type: 'handleSocket', payload: { msg, pathname } })
           })
@@ -270,9 +271,11 @@ export default {
           })
 
           socket.on('notification', (msg) => {
-            dispatch({ type: 'message/updateNewMessage', payload: { msg } })
+            if (msg.message.message_type !== 'deploy') {
+              dispatch({ type: 'message/updateNewMessage', payload: { msg } })
+            }
             console.log('msg', msg)
-            if (msg.message.message_type === 'deploy') {
+            if (msg.message.message_type === 'deploy' || msg.message.message_type === 'publish') {
               const match = pathToRegexp('/workspace/:projectId/:type?').exec(pathname)
               if (match) {
                 const projectId = match[1]

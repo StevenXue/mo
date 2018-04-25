@@ -6,6 +6,7 @@ import pathToRegexp from 'path-to-regexp'
 import {get} from 'lodash'
 
 import Users from './routes/Users.js'
+import NewPassword from './routes/login/NewPassword'
 import Account from './routes/login/Account'
 import MyProjects from './routes/workspace/info/Projects'
 import Projects from './routes/projects/Projects'
@@ -19,6 +20,7 @@ import UserRequestDetail from './routes/UserRequest/UserRequestDetail'
 import MyService from './routes/MyService'
 import {ModuleList, Module} from './routes/Module'
 import Profile from './routes/Profile'
+import UserInfo from './routes/UserInfo'
 import MarketList from './routes/market/ProjectList'
 import HomePage from './routes/HomePage'
 // import MarketDetail from './routes/market/ProjectDetail'
@@ -27,6 +29,8 @@ const breadcrumbNameMap = {
   '/user': 'User',
   '/user/login': 'Login',
   '/user/register': 'Register',
+  '/user/forgot': 'Forgot',
+  // '/user/newpassword': 'NewPassword',
   '/workspace': 'My Projects',
   '/projects': 'Projects',
   '/modelmarket': 'Model Market',
@@ -34,7 +38,7 @@ const breadcrumbNameMap = {
   '/userrequest': 'User Request',
   '/modellist': 'Module',
   '/profile': 'Profile',
-  '/market': 'Market',
+  '/discovery': 'Discovery',
 }
 
 const RouterConfig = ({history, location, projectDetail}) => {
@@ -71,13 +75,13 @@ const RouterConfig = ({history, location, projectDetail}) => {
   return (
     <Switch>
       <Route path="/user" component={Account}/>
-
+      <Route path="/newpassword" component={NewPassword}/>
       <Route path="/:anything" component={() =>
         <MainLayout location={location} history={history}>
           <div style={{display: 'flex', flexDirection: 'column'}}>
-            <Breadcrumb>
-              {extraBreadcrumbItems}
-            </Breadcrumb>
+            {/*<Breadcrumb>*/}
+              {/*{extraBreadcrumbItems}*/}
+            {/*</Breadcrumb>*/}
             <Switch>
 
               <Route path="/workspace/:projectId" component={ProjectDetail}/>
@@ -85,8 +89,8 @@ const RouterConfig = ({history, location, projectDetail}) => {
               <Route path="/projects/:projectId" component={PublicProject}/>
               <Route path="/projects" component={Projects}/>
 
-              <Route path="/market/:projectId" render={(props) => <ProjectDetail {...props} market_use={true}/>}/>
-              <Route path="/market" component={MarketList}/>
+              <Route path="/discovery/:projectId" render={(props) => <ProjectDetail {...props} market_use={true}/>}/>
+              <Route path="/discovery" component={MarketList}/>
 
               <Route path="/modelmarket/:modelsId" component={PublicServedModelsDetail}/>
               <Route path="/modelmarket" component={PublicServedModels}/>
@@ -97,6 +101,7 @@ const RouterConfig = ({history, location, projectDetail}) => {
               <Route path="/modulelist/:moduleId" component={Module}/>
               <Route path="/modulelist" component={ModuleList}/>
               <Route path="/profile/:userId" component={Profile}/>
+              <Route path="/setting/profile/:userId" component={UserInfo}/>
             </Switch>
           </div>
         </MainLayout>}

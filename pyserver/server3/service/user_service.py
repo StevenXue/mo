@@ -1,6 +1,9 @@
 # -*- coding: UTF-8 -*-
 import json
 import requests
+import hashlib
+import random
+from copy import deepcopy
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from mongoengine import DoesNotExist
@@ -19,10 +22,31 @@ from server3.business.user_business import UserBusiness
 from server3.constants import Error, ErrorMessage, GIT_SERVER
 from server3.entity.general_entity import UserEntity
 from server3.business.user_request_business import UserRequestBusiness
+from server3.business.request_answer_business import RequestAnswerBusiness
 from server3.business.data_set_business import DatasetBusiness
 
 from server3.entity.phone_message_id import PhoneMessageId
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from email.header import Header
 
+smtpserver = 'smtp.163.com'
+username = '15669929857@163.com'
+password = 'wurao122'
+sender = '15669929857@163.com'
+# receiver='374758875@qq.com'
+subject = 'Python email test'
+msg = MIMEMultipart('mixed')
+msg['Subject'] = subject
+msg['From'] = '15669929857@163.com <15669929857@163.com>'
+
+
+# msg['To'] = '374758875@qq.com'
+# text = "Hi!\nHow are you?\nHere is the link you wanted:\nhttp://localhost:8989/#/user/login"    
+# text_plain = MIMEText(text,'plain', 'utf-8')    
+# msg.attach(text_plain)   
 def add_git_http_user(user_ID, password):
     """
     auth jupyterhub with user token
@@ -62,6 +86,71 @@ def authenticate(user_ID, password):
     user = user_business.get_by_user_ID(user_ID)
     if user and check_password_hash(user.password, password):
         user.id = str(user.id)
+        return user
+    return False
+
+
+def forgot_send(email):
+    user = user_business.get_by_email(email)
+    if user:
+        receiver = email
+        msg['To'] = email
+        suiji = str(random.randint(100000, 999999))
+        # h = hashlib.md5(bytes(suiji,encoding="utf-8"))
+        # h.update(email.encode("utf-8"))
+        user.hashEmail = suiji
+        user.save()
+
+        text = user.user_ID + '，您好！\n请点击下方链接重置密码。 如非您本人操作，请忽略此邮件。\n http://localhost:8989/#/newpassword?email=' + email + '&user=' + user.user_ID + '&hashEmail=' + suiji
+        text_plain = MIMEText(text, 'plain', 'utf-8')
+        msg.attach(text_plain)
+        smtp = smtplib.SMTP()
+        smtp.connect('smtp.163.com')
+        smtp.login(username, password)
+        smtp.sendmail(sender, receiver, msg.as_string())
+        smtp.quit()
+        return user
+    return False
+
+
+def newpassword_send(password, email, hashEmail):
+    user = user_business.get_by_hashEmail(email, hashEmail)
+    if user:
+        user['password'] = generate_password_hash(password)
+        del user.hashEmail
+        user.save()
+        return user
+    return False
+
+
+def check_tourtip(user_ID):
+    user = user_business.get_by_user_ID(user_ID)
+    if user:
+        return user
+    return False
+
+
+def no_tourtip(user_ID):
+    user = user_business.get_by_user_ID(user_ID)
+    if user:
+        user['tourtip'] = "1"
+        user.save()
+        return user
+    return False
+
+
+def check_learning(user_ID):
+    user = user_business.get_by_user_ID(user_ID)
+    if user:
+        return user
+    return False
+
+
+def no_learning(user_ID):
+    user = user_business.get_by_user_ID(user_ID)
+    if user:
+        user['welcome'] = "1"
+        user.save()
         return user
     return False
 
@@ -234,7 +323,7 @@ def send_verification_code(phone):
     url = "https://api.sms.jpush.cn/v1/codes"
     payload = json.dumps({
         'mobile': phone,
-        'temp_id': 1,
+        'temp_id': 149269,
     })
     headers = {
         'content-type': "application/json",
@@ -280,7 +369,10 @@ def verify_code(code, phone):
     }
     :rtype:
     """
-    msg_id = PhoneMessageId.objects(phone=phone).get().msg_id
+    try:
+        msg_id = PhoneMessageId.objects(phone=phone).get().msg_id
+    except:
+        raise Error("无效的手机号")
     url = 'https://api.sms.jpush.cn/v1/codes/' + msg_id + '/valid'
     payload = json.dumps({
         'code': code
@@ -306,132 +398,113 @@ def verify_code(code, phone):
 class UserService:
     @classmethod
     def action_entity(cls, user_ID, entity_id, action, entity):
-        user = user_business.get_by_user_ID(user_ID=user_ID)
+        user = UserBusiness.get_by_user_ID(user_ID=user_ID)
         business_maper = {
             "app": AppBusiness,
             "module": ModuleBusiness,
             "request": UserRequestBusiness,
             "dataset": DatasetBusiness,
+            "answer": RequestAnswerBusiness
         }
         business = business_maper[entity]
-        print("entity_id", entity_id)
+        # print("entity_id", entity_id)
         object = business.get_by_id(entity_id)
 
-        if entity == "request":
-            user_keyword = '{action}_{entity}'.format(action=action, entity=entity)
+        if entity == "request" or entity == 'answer':
+            user_keyword = '{entity}_{action}'.format(action=action,
+                                                      entity=entity)
             object_keyword = '{action}_user'.format(action=action)
         else:
-            user_keyword = '{action}_{entity}s'.format(action=action, entity=entity)
+            user_keyword = '{action}_{entity}s'.format(action=action,
+                                                       entity=entity)
             object_keyword = '{action}_users'.format(action=action)
 
         # 1. 在user下存favor_apps
         if object not in user[user_keyword]:
-            user[user_keyword].append(object)
+            refs = deepcopy(user[user_keyword])
+            refs.append(object)
+            user[user_keyword] = refs
             user_result = user.save()
         else:
-            user[user_keyword].remove(object)
+            refs = deepcopy(user[user_keyword])
+            refs.remove(object)
+            user[user_keyword] = refs
             user_result = user.save()
         # 2. 在object下存favor_users
         if user not in object[object_keyword]:
-            object[object_keyword].append(user)
+            refs = deepcopy(object[object_keyword])
+            refs.append(user)
+            object[object_keyword] = refs
             object_result = object.save()
         else:
-            object[object_keyword].remove(user)
+            refs = deepcopy(object[object_keyword])
+            refs.remove(user)
+            object[object_keyword] = refs
             object_result = object.save()
         if user_result and object_result:
             return UserEntity(user=user_result, entity=object_result)
-    
-    @classmethod
-    def favor_app(cls, user_ID, app_id):
-        return FavorApp.action(user_ID, app_id)
-        # user = user_business.get_by_user_ID(user_ID=user_ID)
-        # app = AppBusiness.get_by_id(project_id=app_id)
-        # # 1. 在user下存favor_apps
-        # if app not in user.favor_apps:
-        #     user.favor_apps.append(app)
-        #     user_result = user.save()
-        # else:
-        #     user.favor_apps.remove(app)
-        #     user_result = user.save()
-        # # 2. 在app下存favor_users
-        # if user not in app.favor_users:
-        #     app.favor_users.append(user)
-        #     app_result = app.save()
-        # else:
-        #     app.favor_users.remove(user)
-        #     app_result = app.save()
-        #
-        # if user_result and app_result:
-        #     return FavorAppReturn(user=user_result, app=app_result)
 
     @classmethod
-    def star_app(cls, user_ID, app_id):
-        return StarApp.action(user_ID, app_id)
+    def get_statistics(cls, user_ID, page_no, page_size, action, entity_type):
+        """
+        获取用户统计信息
+
+        这里需要将 app, caller 从objectID转换成json吗？
+        1. service可能被其他service调用，应该在route层转换
+        2. 在其他service调用时也都需要转换，保证route调用结果一致
+        :param user_ID:
+        :type user_ID:
+        :param page_no:
+        :type page_no:
+        :param page_size:
+        :type page_size:
+        :param action:
+        :type action:
+        :param entity_type:
+        :type entity_type:
+        :return:
+        :rtype:
+        """
+        from server3.business.statistics_business import StatisticsBusiness
+        user_obj = UserBusiness.get_by_user_ID(user_ID=user_ID)
+        statistics = StatisticsBusiness.get_pagination(
+            query={
+                "action": action,
+                "entity_type": entity_type,
+                "caller": user_obj
+            },
+            page_no=page_no, page_size=page_size)
+        for _object in statistics.objects:
+            _object.app_obj_user_ID = _object.app.user.user_ID
+        statistics.objects = json_utility.objs_to_json_with_args(
+            statistics.objects, ["app", "caller"])
+        return statistics
 
     @classmethod
-    def star_request(cls, user_ID, app_id):
-        return StarApp.action(user_ID, app_id)
-
-    @classmethod
-    def get_user_info(cls, user_ID):
+    def send_captcha_to_email(cls, user_ID, email):
+        receiver = email
+        msg['To'] = email
+        rand = str(random.randint(100000, 999999))
         user = UserBusiness.get_by_user_ID(user_ID)
-        user = json_utility.convert_to_json(user.to_mongo())
-        return user
+        user.emailCaptcha = rand
+        user.save()
 
-# 尝试合并代码
-class Action:
-    business = None  # app / module
-    action_type = None  # favor / star /
-    # favor_apps
-    user_keyword = None
-    # user_keyword = '{business}_{action_type}s'.format(business=business, action_type=action_type)
-    # favor_users
-    # object_keyword = '{action_type}_users'.format(action_type=action_type)
-    object_keyword = None
+        text = f'您好！\n随机码为: {rand}, 半小时内有效，谢谢 '
+        text_plain = MIMEText(text, 'plain', 'utf-8')
+        msg.attach(text_plain)
+        smtp = smtplib.SMTP()
+        smtp.connect('smtp.163.com')
+        smtp.login(username, password)
+        smtp.sendmail(sender, receiver, msg.as_string())
+        smtp.quit()
 
     @classmethod
-    def action(cls, user_ID, object_id):
-        user = user_business.get_by_user_ID(user_ID=user_ID)
-        app = cls.business.get_by_id(project_id=object_id)
-
-        if app not in user[cls.user_keyword]:
-            user[cls.user_keyword].append(app)
-            user_result = user.save()
+    def update_user_email(cls, user_ID, email, captcha):
+        user = UserBusiness.get_by_user_ID(user_ID)
+        if captcha and captcha == user.emailCaptcha:
+            user.email = email
+            user.save()
+            return user
         else:
-            user[cls.user_keyword].remove(app)
-            user_result = user.save()
-        # 2. 在app下存favor_users
-        if user not in app[cls.object_keyword]:
-            app[cls.object_keyword].append(user)
-            app_result = app.save()
-        else:
-            app[cls.object_keyword].remove(user)
-            app_result = app.save()
-        if user_result and app_result:
-            return UserEntity(user=user_result, entity=app_result)
+            raise Error("验证码错误")
 
-
-class FavorApp(Action):
-    business = AppBusiness
-    action_type = 'favor'
-    user_keyword = 'favor_apps'
-    object_keyword = 'favor_users'
-
-
-class StarApp(Action):
-    business = AppBusiness
-    action_type = 'star'
-    user_keyword = 'star_apps'
-    object_keyword = 'favor_users'
-
-
-class StarRequest(Action):
-    business = UserRequestBusiness
-    action_type = 'star'
-    user_keyword = 'star_apps'
-    object_keyword = 'favor_users'
-
-
-class FavorModule(Action):
-    # business = ModuleBusiness
-    pass

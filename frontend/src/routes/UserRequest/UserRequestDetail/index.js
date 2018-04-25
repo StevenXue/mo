@@ -9,8 +9,8 @@ import {
 import debounce from 'lodash.debounce'
 import {get} from 'lodash'
 import {showTime} from '../../../utils/index'
-import BraftEditor from 'braft-editor'
-import 'braft-editor/dist/braft.css'
+// import BraftEditor from 'braft-editor'
+// import 'braft-editor/dist/braft.css'
 import {JsonToArray} from '../../../utils/JsonUtils'
 import RequestModal from '../../../components/RequestModal/index'
 import {getProjects} from '../../../services/project'
@@ -18,9 +18,8 @@ import ProjectModal from '../../../components/ProjectModal/index'
 
 
 const {TextArea} = Input
-const TabPane = Tabs.TabPane
-const FormItem = Form.Item
 const confirm = Modal.confirm
+const FormItem = Form.Item
 
 function hasErrors(fieldsError) {
   return Object.keys(fieldsError).some(field => fieldsError[field])
@@ -34,56 +33,48 @@ class CommentForm extends React.Component {
     this.input.focus()
   }
 
-  make_comment = (values) => {
-    // console.log('this.props: ', this.props)
-    if (this.props.comments_type === 'request') {
-      this.props.dispatch({
-        type: 'allRequest/makeNewRequestComment',
-        payload: {
-          comments: values['comment'],
-          comments_type: this.props.comments_type,
-        },
-      })
-    }
-    else {
-      this.props.dispatch({
-        type: 'allRequest/makeNewRequestComment',
-        payload: {
-          comments: values['comment'],
-          comments_type: this.props.comments_type,
-          request_answer_id: this.props.request_answer_id,
-        },
-      })
-    }
+  makeComment = (values) => {
+    this.props.dispatch({
+      type: 'allRequest/makeComment',
+      payload: {
+        comments: values['comment'],
+        comments_type: this.props.comments_type,
+        _id: this.props._id,
+      }
+    })
   }
 
   handleSubmit = (e) => {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        console.log('Received values of form: ', values)
-        this.make_comment(values)
+        // console.log('Received values of form: ', values)
+        this.makeComment(values)
       }
 
     })
   }
 
   onBlur = () => {
+    console.log('blur')
     if (this.props.comments_type === 'request') {
       showRequestCommentInput(this.props.dispatch)
     }
     if (this.props.comments_type === 'answer') {
-      showAnswerCommentInput(this.props.dispatch, this.props.request_answer_id,)
+      showAnswerCommentInput(this.props.dispatch, this.props._id)
     }
   }
+
 
   render() {
     const {getFieldDecorator, getFieldsError, getFieldError, isFieldTouched} = this.props.form
     // Only show error after a field is touched.
     const emptyCommentError = isFieldTouched('comment') && getFieldError('comment')
     return (
-      <Form layout="inline" onSubmit={this.handleSubmit}
-            onBlur={() => this.onBlur()}>
+      <Form layout="inline"
+            onBlur={() => this.onBlur()}
+            onSubmit={this.handleSubmit}
+      >
         <FormItem
           validateStatus={emptyCommentError ? 'error' : ''}
           help={emptyCommentError || ''}
@@ -94,17 +85,16 @@ class CommentForm extends React.Component {
             <Input className={styles.inputtext}
                    placeholder="Any idea to help?"
                    ref={inputRef => (this.input = inputRef)}
-            />,
+            />
           )}
         </FormItem>
         {/*<FormItem>*/}
-        {/*<Button*/}
-        {/*type="primary"*/}
-        {/*htmlType="submit"*/}
-        {/*disabled={hasErrors(getFieldsError())}*/}
-        {/*>*/}
-        {/*Comment*/}
-        {/*</Button>*/}
+          {/*<Button type="primary"*/}
+                  {/*htmlType="submit"*/}
+                  {/*disabled={hasErrors(getFieldsError())}*/}
+                  {/*onClick={this.handleSubmit}>*/}
+            {/*确定*/}
+          {/*</Button>*/}
         {/*</FormItem>*/}
       </Form>
     )
@@ -127,7 +117,7 @@ class AnswerForm extends React.Component {
     fetching: false,
     projects: [],
     selected: [],
-    inputValue: null,
+    inputValue: '',
   }
 
   fetchData = (value) => {
@@ -187,7 +177,7 @@ class AnswerForm extends React.Component {
       },
     })
     this.clearSelect()
-    this.setState({inputValue: null})
+    this.setState({inputValue: ''})
   }
 
   handleChange = (content) => {
@@ -232,13 +222,13 @@ class AnswerForm extends React.Component {
       },
     }
     const {fetching, data, value, projects, inputValue} = this.state
-    // console.log('lll')
     // console.log(this.state)
     return (
       <div className="demo">
-        {this.state.selected.length > 0 ? <Card title={this.state.selected[0].name}
-                                                extra={<Icon type="close" onClick={this.clearSelect}/>}>
-          <p>{this.state.selected[0].description}</p></Card> : null}
+        {this.state.selected.length > 0 ?
+          <Card title={this.state.selected[0].name}
+                extra={<Icon type="close" onClick={this.clearSelect}/>}>
+            <p>{this.state.selected[0].description}</p></Card> : null}
         {this.state.selected.length === 0 ? <div><Select
           mode="combobox"
           labelInValue
@@ -272,7 +262,7 @@ class AnswerForm extends React.Component {
           type="primary"
           htmlType="submit"
           // disabled={this.state.html === null}
-          disabled={this.state.inputValue === null}
+          disabled={this.state.inputValue === ''}
           onClick={this.handleSubmit}
         >
           Post Your Answer
@@ -287,6 +277,7 @@ function callback(key) {
 }
 
 function showAnswerCommentInput(dispatch, request_answer_id) {
+  console.log('2', request_answer_id)
   dispatch({
     type: 'allRequest/showAnswerCommentInput',
     payload: {
@@ -340,19 +331,9 @@ function UserRequestDetail({allRequest, login, dispatch}) {
       window.open('/#/workspace/' + e.select_project._id + '?type=' + e.select_project.type)
     }
     else {
-      window.open('/#/market/' + e.select_project._id + '?type=' + e.select_project.type)
+      window.open('/#/discovery/' + e.select_project._id + '?type=' + e.select_project.type)
     }
   }
-
-  // function acceptAnswer(request_answer) {
-  //   dispatch({
-  //     type: 'allRequest/acceptAnswer',
-  //     payload: {
-  //       user_request: focusUserRequest['_id'],
-  //       request_answer: request_answer,
-  //     }
-  //   })
-  // }
 
   const acceptAnswer = (request_answer_id) => {
     confirm({
@@ -385,7 +366,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
             user_request_id: focusUserRequest['_id'],
           },
         })
-        dispatch(routerRedux.push('/userrequest'))
+        dispatch(routerRedux.push('/userrequest?tab=app'))
       },
     })
   }
@@ -395,7 +376,8 @@ function UserRequestDetail({allRequest, login, dispatch}) {
       return <div/>
     }
     if (project.status === 'deploying') {
-      return <Tag color='gold' style={{cursor: 'default'}}>Deploying <Icon type="loading"/></Tag>
+      return <Tag color='gold' style={{cursor: 'default'}}>Deploying <Icon
+        type="loading"/></Tag>
     } else if (project.status === 'active') {
       return <Tag color='green' style={{cursor: 'default'}}>Online</Tag>
     } else {
@@ -409,7 +391,8 @@ function UserRequestDetail({allRequest, login, dispatch}) {
       return null
     }
     else if (e.select_project.deleted) {
-      return <Card bodyStyle={{color: 'red'}}>Ooops, this {type} has been deleted</Card>
+      return <Card bodyStyle={{color: 'red'}}>Ooops, this {type} has been
+        deleted</Card>
     }
     else {
       return <Card title={e.select_project.name}
@@ -421,7 +404,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
         {e.select_project.commits.length > 0 ?
           <div style={{marginTop: '35px', color: '#848d95'}}>
             <p>last commited
-              at {showTime(e.select_project.commits[e.select_project.commits.length - 1]['time'])}</p>
+              at {showTime(e.select_project.commits[e.select_project.commits.length - 1]['timestamp'])}</p>
             <p>{e.select_project.commits[e.select_project.commits.length - 1]['message']}</p>
           </div> : null}
       </Card>
@@ -439,9 +422,9 @@ function UserRequestDetail({allRequest, login, dispatch}) {
         <div>
           {/*<Button icon="caret-up"*/}
           {/*onClick={() => requestVotesUp()}*/}
-          {/*type={focusUserRequest['votes_up_user'].includes(user_obj_id) ? 'primary' : ''}*/}
+          {/*type={focusUserRequest['vote_up_user'].includes(user_obj_id) ? 'primary' : ''}*/}
           {/*/>*/}
-          {/*{focusUserRequest['votes_up_user'].length}*/}
+          {/*{focusUserRequest['vote_up_user'].length}*/}
           <h2
             style={{paddingBottom: 10}}>
             <Icon
@@ -454,7 +437,9 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                   <RequestModal new={false} requestDetail={focusUserRequest}>
                     <Button icon='edit' style={{marginRight: 15}}/>
                   </RequestModal>
-                  <Button icon='delete' onClick={() => deleteUserRequest()}/>
+              {focusUserRequest.comments && focusUserRequest.answer ?
+                null:<Button icon='delete' onClick={() => deleteUserRequest()}/>}
+
                 </span>}
             {/*{focusUserRequest['user_ID']===user_ID && <Icon type="close" onClick={() => deleteUserRequest()}/>}*/}
           </h2>
@@ -471,8 +456,9 @@ function UserRequestDetail({allRequest, login, dispatch}) {
 
         <p
           className={styles.description}>{get(focusUserRequest, 'description') ? get(focusUserRequest, 'description') : null}</p>
-        {focusUserRequest.input ? <div style={{margin: '16px 0'}}><p>Input: {focusUserRequest.input}</p>
-        </div> : null}
+        {focusUserRequest.input ?
+          <div style={{margin: '16px 0'}}><p>Input: {focusUserRequest.input}</p>
+          </div> : null}
         {focusUserRequest.output ? <div style={{margin: '16px 0'}}>
           <p>Output: {focusUserRequest.output}</p></div> : null}
         <h2
@@ -490,6 +476,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
           {focusUserRequest.commentState &&
           <WrappedCommentForm dispatch={dispatch}
                               comments_type={'request'}
+                              _id={focusUserRequest._id}
           />}
           {!(focusUserRequest.commentState) &&
           <p onClick={() => showRequestCommentInput(dispatch)}
@@ -515,7 +502,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                       cursor: 'pointer',
                     }}>
                       <Icon
-                        type={e['votes_up_user'].includes(user_obj_id) ? 'like' : 'like-o'}
+                        type={e['vote_up_user'].includes(user_obj_id) ? 'like' : 'like-o'}
                         onClick={() => answerVotesUp(e._id)}
                         style={{color: '#34c0e2'}}
                       />
@@ -525,7 +512,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                       textAlign: 'center',
                       fontSize: '28px',
                     }}>
-                      {e['votes_up_user'].length}
+                      {e['vote_up_user'].length}
                     </div>
                     {/*<div style={{*/}
                     {/*width: '100%',*/}
@@ -554,7 +541,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                       textAlign: 'center',
                       fontSize: '26px',
                       cursor: 'pointer',
-                      color: 'red',
+                      color: 'green',
                     }}>
                       <Icon type="check-circle-o"/>
                     </div>}
@@ -587,7 +574,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                     {e.commentState &&
                     <WrappedCommentForm dispatch={dispatch}
                                         comments_type={'answer'}
-                                        request_answer_id={e._id}/>}
+                                        _id={e._id}/>}
                     {!(e.commentState) &&
                     <p onClick={() => showAnswerCommentInput(dispatch, e._id)}
                        style={{color: '#848d95', cursor: 'pointer'}}>add a

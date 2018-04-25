@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-from mongoengine import Document
+from mongoengine import DynamicDocument
 from mongoengine import StringField
 from mongoengine import EmailField
 from mongoengine import IntField
@@ -9,18 +9,20 @@ from mongoengine import ReferenceField
 from server3.entity.project import Module
 GENDER = (
     (0, 'female'),
-    (1, 'male')
+    (1, 'male'),
+    (2, 'unknown')
 )
 
 
-class User(Document):
+class User(DynamicDocument):
     user_ID = StringField(max_length=20, unique=True, required=True)
     password = StringField(required=True)
     name = StringField(max_length=50)
     email = EmailField(unique=True, sparse=True)
     phone = StringField(unique=True, sparse=True)
-    gender = IntField(choices=GENDER)
+    gender = IntField(choices=GENDER, default=2)
     age = IntField()
+    avatar = StringField()
 
     # 用户收藏的api列表
     favor_apps = ListField(ReferenceField("App"))

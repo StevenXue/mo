@@ -2,6 +2,8 @@ import * as fetch from 'dva/fetch';
 import { message } from 'antd';
 import * as _ from 'lodash';
 
+export const tbServer = 'http://localhost:8111';
+
 function checkStatus(response: Response) {
   if (response.status >= 200 && response.status < 300) {
     // message.success('This is a message of success');

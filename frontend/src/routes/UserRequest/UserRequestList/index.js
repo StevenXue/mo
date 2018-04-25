@@ -137,7 +137,7 @@ class RequestList extends Component {
           />
           <RequestModal new={true} fetchData={() => this.fetchData({})}
                         type={this.props.type}>
-            <Button icon='plus-circle-o' type='primary'
+            <Button icon='plus-circle-o' type='primary' id="mei_rightButton"
                     className={styles.rightButton}>New {this.props.type} Request</Button>
           </RequestModal>
         </div>
@@ -153,7 +153,7 @@ class RequestList extends Component {
                       <div className={styles.starDiv}>
                         <p
                           className={styles.starNumber}>{e['star_user'].length}</p>
-                        <p className={styles.starText}>Star</p>
+                        <p className={styles.starText}>Favourite</p>
                       </div>
                       <div className={styles.starDiv}>
                         <p
@@ -168,8 +168,9 @@ class RequestList extends Component {
                          onClick={() => this.toUserRequestDetail(e._id, history)}>{e.title}</p>
                       {/*<p className={styles.description}>{e.description}</p>*/}
                       <div>
-                        {e['tags'].length > 0 && e['tags'].map(e => <Tag key={e}
-                                                                       className={styles.tags}>{e}</Tag>)}
+                        {e['tags'].length > 0 && e['tags'].map(e => <Tag
+                                                                       className={styles.tags}
+                                                                       key={e}>{e}</Tag>)}
                         <div className={styles.timeAndUserDiv}>
                           <p
                             className={styles.showTime}>{showTime(e.create_time)}</p>

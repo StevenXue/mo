@@ -19,16 +19,17 @@ from server3.business.app_business import AppBusiness
 from server3.business.module_business import ModuleBusiness
 from server3.business.data_set_business import DatasetBusiness
 from server3.business import job_business
-from server3.business import user_business
+from server3.business.user_business import UserBusiness
 from server3.business import ownership_business
-from server3.business import result_business
-from server3.business import data_set_business
 from server3.service import ownership_service
+from server3.service import logger_service
 from server3.service import staging_data_service
 from server3.service import kube_service
 from server3.business import staging_data_set_business
 from server3.business import staging_data_business
 from server3.business import served_model_business
+from server3.business.request_answer_business import RequestAnswerBusiness
+from server3.service import message_service
 from server3.business import world_business
 from server3.entity.world import CHANNEL
 
@@ -75,7 +76,7 @@ def list_projects_by_user_ID(user_ID, order=-1, privacy='all'):
         projects = ownership_service.get_all_public_objects('project')
     else:
         if privacy == 'all':
-            user = user_business.get_by_user_ID(user_ID)
+            user = UserBusiness.get_by_user_ID(user_ID)
             projects = ownership_service. \
                 get_ownership_objects_by_user_ID(user, 'project')
         elif privacy == 'private':
@@ -106,7 +107,7 @@ def list_projects(search_query=None, page_no=1, page_size=10,
     """
     user = None
     if user_ID:
-        user = user_business.get_by_user_ID(user_ID)
+        user = UserBusiness.get_by_user_ID(user_ID)
     cls = TypeMapper.get(type)
     return cls.get_objects(
         search_query=search_query,
@@ -343,7 +344,7 @@ def fork(project_id, new_user_ID):
     if ownership.user.user_ID == new_user_ID:
         raise NameError('you are forking your self project')
     # get user object
-    user = user_business.get_by_user_ID(new_user_ID)
+    user = UserBusiness.get_by_user_ID(new_user_ID)
     # copy and save project
     project_cp = project_business.copy(project)
     # create ownership relation
@@ -392,115 +393,6 @@ def fork(project_id, new_user_ID):
     return project_cp
 
 
-def start_project_playground(project_id):
-    # generate the project volume path
-    project = project_business.get_by_id(project_id)
-    user_ID = ownership_business.get_owner(project, 'project').user_ID
-    volume_dir = os.path.join(USER_DIR, user_ID, project.name, 'volume/')
-    if not os.path.exists(volume_dir):
-        os.makedirs(volume_dir)
-    abs_volume_dir = os.path.abspath(volume_dir)
-
-    deploy_name = project_id + '-jupyter'
-    port = port_for.select_random(ports=set(range(30000, 32767)))
-    # port = network_utility.get_free_port_with_range(30000, 32767)
-    kube_json = {
-        "apiVersion": "apps/v1beta1",
-        "kind": "Deployment",
-        "metadata": {
-            "name": deploy_name
-        },
-        "spec": {
-            "template": {
-                "metadata": {
-                    "labels": {
-                        "app": project_id
-                    }
-                },
-                "spec": {
-                    # "securityContext": {
-                    #     "runAsUser": 1001,
-                    # },
-                    "containers": [
-                        {
-                            "name": project_id,
-                            "image": "10.52.14.192/gzyw/jupyter_app",
-                            "imagePullPolicy": "IfNotPresent",
-                            "ports": [{
-                                "containerPort": 8888,
-                                # "hostPort": port
-                            }],
-                            "stdin": True,
-                            "command": ['python'],
-                            "args": ["-m", "notebook", "--no-browser",
-                                     "--allow-root",
-                                     "--ip=0.0.0.0",
-                                     "--NotebookApp.allow_origin=*",
-                                     "--NotebookApp.disable_check_xsrf=True",
-                                     "--NotebookApp.token=''",
-                                     "--NotebookApp.iopub_data_rate_limit=10000000000"],
-                            "volumeMounts": [{
-                                "mountPath": "/home/root/work/volume",
-                                "name": project_id + "-volume"
-                            }]
-                        }
-                    ],
-                    "volumes": [{
-                        "name": project_id + "-volume",
-                        "hostPath": {"path": abs_volume_dir},
-                    }]
-                },
-            },
-        }
-    }
-    service_json = {
-        "kind": "Service",
-        "apiVersion": "v1",
-        "metadata": {
-            "name": "my-" + project_id + "-service"
-        },
-        "spec": {
-            "type": "NodePort",
-            "ports": [
-                {
-                    "port": 8888,
-                    "nodePort": port
-                }
-            ],
-            "selector": {
-                "app": project_id
-            }
-        }
-    }
-    # import json
-    # from server3.utility import file_utils
-    # file_utils.write_to_filepath(json.dumps(kube_json), './jupyter_app.json')
-    # return
-    api = kube_service.deployment_api
-    s_api = kube_service.service_api
-    api.create_namespaced_deployment(body=kube_json,
-                                     namespace=NAMESPACE)
-    replicas = api.read_namespaced_deployment_status(
-        deploy_name, NAMESPACE).status.available_replicas
-    # wait until deployment is available
-    while replicas is None or replicas < 1:
-        replicas = api.read_namespaced_deployment_status(
-            deploy_name, NAMESPACE).status.available_replicas
-    # FIXME one second sleep to wait for container ready
-    import timemr
-    time.sleep(1)
-    s_api.create_namespaced_service(body=service_json, namespace=NAMESPACE)
-    time.sleep(1)
-    return port
-
-
-def get_playground(project_id):
-    service_name = "my-" + project_id + "-service"
-    api = kube_service.service_api
-    dep = api.read_namespaced_service(service_name, NAMESPACE)
-    return dep.spec.ports[0].node_port
-
-
 class ProjectService:
     business = ProjectBusiness
     channel = CHANNEL.project
@@ -522,27 +414,29 @@ class ProjectService:
         if tags is None:
             tags = []
         project_type = type
-        user = user_business.get_by_user_ID(user_ID)
+        user = UserBusiness.get_by_user_ID(user_ID)
         # message = "{}创建了app{}".format(user.name, name)
         # world_business.system_send(channel=cls.channel, message=message)
+
         project = cls.business.create_project(name=name,
                                               description=description,
                                               type=type, tags=tags, user=user,
                                               user_token=user_token, **kwargs)
+
         from server3.service.user_service import UserService
-        UserService.action_entity(user_ID=project.user.user_ID,
+        user, project = UserService.action_entity(user_ID=project.user.user_ID,
                                   entity_id=project.id,
                                   action='favor', entity=project.type)
-
+        print(project.to_mongo())
         from server3.service.world_service import WorldService
         from server3.business.statistics_business import StatisticsBusiness
         # 记录历史记录
-        statistics = StatisticsBusiness.action(
-            user_obj=user,
-            entity_obj=project,
-            entity_type=type,
-            action="create"
-        )
+        # statistics = StatisticsBusiness.action(
+        #     user_obj=user,
+        #     entity_obj=project,
+        #     entity_type=type,
+        #     action="create"
+        # )
         # 记录世界频道消息  # 推送消息
         world = WorldService.system_send(
             channel=CHANNEL.request,
@@ -573,7 +467,7 @@ class ProjectService:
 
         user = None
         if user_ID:
-            user = user_business.get_by_user_ID(user_ID)
+            user = UserBusiness.get_by_user_ID(user_ID)
         return cls.business.get_objects(
             search_query=search_query,
             privacy=privacy,
@@ -586,10 +480,48 @@ class ProjectService:
     @classmethod
     def get_by_id(cls, project_id, **kwargs):
         project = cls.business.get_by_id(project_id)
-        if kwargs.get('commits') == 'true':
-            commits = cls.business.get_commits(project.path)
-            project.commits = [{
-                'message': c.message,
-                'time': datetime.fromtimestamp(c.time[0] + c.time[1]),
-            } for c in commits]
+        # if kwargs.get('commits') == 'true':
+        #     commits = cls.business.get_commits(project.path)
+        #     project.commits = [{
+        #         'message': c.message,
+        #         'time': datetime.fromtimestamp(c.time[0] + c.time[1]),
+        #     } for c in commits]
         return project
+
+    @classmethod
+    def commit(cls, project_id, commit_msg):
+        project = cls.business.commit(project_id, commit_msg)
+        cls.send_message(project, m_type='commit')
+        return project
+
+    @classmethod
+    def send_message(cls, project, m_type='publish'):
+        receivers = project.favor_users  # get app subscriber
+        admin_user = UserBusiness.get_by_user_ID('admin')
+
+        if m_type == 'deploy':
+            logger_service.emit_anything_notification(
+                {'message': {'message_type': m_type}},
+                project.user)
+            return
+
+        # 获取所有包含此module的答案
+        answers_has_module = RequestAnswerBusiness. \
+            get_by_anwser_project_id(project.id)
+        # 根据答案获取对应的 request 的 owner
+        for each_anser in answers_has_module:
+            user_request = each_anser.user_request
+            request_owener = user_request.user
+            message_service.create_message(admin_user, 'publish_request',
+                                           [request_owener],
+                                           project.user,
+                                           project_name=project.name,
+                                           project_id=project.id,
+                                           user_request_title=user_request.title,
+                                           user_request_id=user_request.id,
+                                           project_type=project.type)
+
+        message_service.create_message(admin_user, m_type, receivers,
+                                       project.user, project_name=project.name,
+                                       project_id=project.id,
+                                       project_type=project.type)

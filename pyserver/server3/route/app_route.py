@@ -40,7 +40,20 @@ def run_in_docker():
 def deploy_in_docker(app_id):
     data = request.get_json()
     handler_file_path = data.get('file_path')
-    project = AppService.deploy(app_id, handler_file_path)
+    commit_msg = data.get('commit_msg')
+    project = AppService.deploy(app_id, commit_msg, handler_file_path)
+    project = json_utility.convert_to_json(project.to_mongo())
+    return jsonify({"response": project})
+
+
+@app_app.route("/publish/<app_id>/<version>", methods=["POST"])
+@jwt_required
+def publish_in_docker(app_id, version):
+    data = request.get_json()
+    handler_file_path = data.get('file_path')
+    commit_msg = data.get('commit_msg')
+    project = AppService.publish(app_id, commit_msg, handler_file_path,
+                                 version)
     project = json_utility.convert_to_json(project.to_mongo())
     return jsonify({"response": project})
 
@@ -49,15 +62,49 @@ def deploy_in_docker(app_id):
 @jwt_required
 def add_used_module(app_id):
     data = request.get_json()
-    used_modules = data.get('used_modules', [])
+    used_module = data.get('used_module')
     func = data.get('func')
-    app = AppService.add_used_module(app_id, used_modules, func)
-    return jsonify({"response": json_utility.convert_to_json(app.to_mongo())})
+    version = data.get('version')
+    app = AppService.add_used_module(app_id, used_module, func, version)
+    return jsonify({"response": convert_used_modules(app)})
+
+
+@app_app.route("/remove_used_module/<app_id>", methods=["PUT"])
+@jwt_required
+def remove_used_module(app_id):
+    data = request.get_json()
+    used_module = data.get('used_module')
+    version = data.get('version')
+    app = AppService.remove_used_module(app_id, used_module, version)
+    return jsonify({"response": convert_used_modules(app)})
+
+
+@app_app.route("/add_used_dataset/<app_id>", methods=["PUT"])
+@jwt_required
+def add_used_dataset(app_id):
+    data = request.get_json()
+    used_dataset = data.get('used_dataset')
+    app = AppService.add_used_dataset(app_id, used_dataset)
+    return jsonify({"response": convert_used_datasets(app)})
+
+
+@app_app.route("/remove_used_dataset/<app_id>", methods=["PUT"])
+@jwt_required
+def remove_used_dataset(app_id):
+    data = request.get_json()
+    used_dataset = data.get('used_dataset')
+    app = AppService.remove_used_dataset(app_id, used_dataset)
+    return jsonify({"response": convert_used_datasets(app)})
 
 
 @app_app.route("/insert_envs/<project_name>", methods=["PUT"])
 # @jwt_required
 def insert_envs(project_name):
+    """
+    insert env api when jl container start
+    :param project_name:
+    :return:
+    """
     [user_ID, app_name] = project_name.split('+')
     try:
         AppService.insert_envs(user_ID, app_name)
@@ -85,8 +132,8 @@ def add():
     :rtype:
     """
     if not request.json \
-        or 'name' not in request.json \
-        or 'type' not in request.json:
+            or 'name' not in request.json \
+            or 'type' not in request.json:
         return jsonify({'response': 'insufficient arguments'}), 400
 
     user_token = request.headers.get('Authorization').split()[1]
@@ -113,15 +160,43 @@ def add():
 def get_app(app_id):
     yml = request.args.get('yml')
     commits = request.args.get('commits')
-    app = AppService.get_by_id(app_id, yml=yml, commits=commits)
+    version = request.args.get('version')
+    used_modules = request.args.get('used_modules')
+    used_datasets = request.args.get('used_datasets')
+    app = AppService.get_by_id(app_id, yml=yml, commits=commits,
+                               version=version, used_modules=used_modules)
 
     # 将app.user 更换为 user_ID 还是name?
     user_ID = app.user.user_ID
-    app = json_utility.convert_to_json(app.to_mongo())
+    if used_modules == 'true':
+        app = convert_used_modules(app)
+    if used_datasets == 'true':
+        app = convert_used_datasets(app)
+    if used_modules != 'true' and used_datasets != 'true':
+        app = json_utility.convert_to_json(app.to_mongo())
     app["user_ID"] = user_ID
     return jsonify({
         "response": app
     }), 200
+
+
+def convert_used_modules(app):
+    ums = [{'module': json_utility.convert_to_json(m.module.to_mongo()),
+            'version': '.'.join(m.version.split('_'))} for m in
+           app.used_modules]
+    del app.used_modules
+    app = json_utility.convert_to_json(app.to_mongo())
+    app['used_modules'] = ums
+    return app
+
+
+def convert_used_datasets(app):
+    ums = [{'dataset': json_utility.convert_to_json(d.dataset.to_mongo())}
+           for d in app.used_datasets]
+    del app.used_datasets
+    app = json_utility.convert_to_json(app.to_mongo())
+    app['used_datasets'] = ums
+    return app
 
 
 @app_app.route('', methods=['GET'])
@@ -219,7 +294,10 @@ def run_app(app_id):
     user_ID = get_jwt_identity()
     data = request.get_json()
     input_json = data["app"]["input"]
-    result = AppService.run_app(app_id, input_json=input_json, user_ID=user_ID)
+    version = data["version"]
+    print("input_json", input_json)
+    result = AppService.run_app(app_id, input_json=input_json,
+                                user_ID=user_ID, version=version)
     return jsonify({"response": result})
 
 # if __name__ == "__main__":

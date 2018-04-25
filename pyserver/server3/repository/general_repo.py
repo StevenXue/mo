@@ -40,32 +40,6 @@ class Repo:
         return self.__instance.objects(**query).order_by('-_id')[
                int(skipping):int(skipping) + 10]
 
-    # def query_four(self, user_ID=None, related_fields=None,
-    #                related_tasks=None,
-    #                tags=None, privacy=None,
-    #                skipping=None, search_str=None):
-    #     query = {}
-    #     if related_fields != 'All':
-    #         query["related_fields"] = related_fields
-    #     if related_tasks:
-    #         query["related_tasks__in"] = related_tasks
-    #     if tags:
-    #         query["tags__in"] = tags
-    #     if privacy:
-    #         query['privacy'] = privacy
-    #     if user_ID:
-    #         query['user_ID'] = user_ID
-    #     print('query', query)
-    #     if search_str:
-    #         return self.__instance.objects().search_text(search_str)
-    #
-    #     if skipping:
-    #         print('skipping:', skipping)
-    #         return self.__instance.objects(**query).order_by('-_id')[
-    #                int(skipping):int(skipping) + 10]
-    #     else:
-    #         return self.__instance.objects(**query).order_by('-_id')
-
     def read_first_one(self, query):
         return self.__instance.objects(**query).first()
 
@@ -86,6 +60,15 @@ class Repo:
         :return: return the unique object corresponding to the query
         """
         return Repo.read_unique_one(self, {field_name: field_value})
+
+    def read_by_two_field(self, field_name, field_value, field_name_2, field_value_2):
+        """
+        general function to query the db by unique field
+        :param field_name:
+        :param field_value:
+        :return: return the unique object corresponding to the query
+        """
+        return Repo.read_unique_one(self, {field_name: field_value, field_name_2: field_value_2})
 
     def read_by_non_unique_field(self, field_name, field_value):
         """
@@ -169,6 +152,17 @@ class Repo:
         :return:
         """
         update = {'add_to_set__' + k: v for k, v in list(update.items())}
+        modified_obj = self.__instance.objects(id=obj_id).modify(**update)
+        return modified_obj.reload()
+
+    def pull_from_set(self, obj_id, **update):
+        """
+        remove item from list fields of document with given object id
+        :param obj_id:
+        :param update:
+        :return:
+        """
+        update = {'pull__' + k: v for k, v in list(update.items())}
         modified_obj = self.__instance.objects(id=obj_id).modify(**update)
         return modified_obj.reload()
 

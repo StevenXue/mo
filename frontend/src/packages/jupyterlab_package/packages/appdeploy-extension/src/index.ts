@@ -40,6 +40,7 @@ import {
 
 import {
     deploy,
+    publish
 } from './service';
 
 import '../style/index.css';
@@ -91,15 +92,17 @@ class DeployForm extends Form {
     /**
      * Get the input text node.
      */
-    get selectNode(): HTMLSelectElement {
-        return this.node.getElementsByTagName('select')[0] as HTMLSelectElement;
+    get inputNode(): HTMLInputElement {
+        return this.node.getElementsByClassName('fileSelect')[0] as HTMLInputElement;
     }
 
     /**
      * Get the value of the widget.
      */
-    getValue(): string {
-        return this.selectNode.value;
+    getValue(): { selectFile: string, versionNumber: string, commitMsg: string } {
+        const versionElement = this.node.getElementsByClassName('versionNumber')[0] as HTMLInputElement;
+        const commitMsg = this.node.getElementsByClassName('commitMsg')[0] as HTMLInputElement;
+        return {selectFile: this.inputNode.value, versionNumber: versionElement.value, commitMsg: commitMsg.value};
     }
 }
 
@@ -127,13 +130,27 @@ export function createDeployButton(): ToolbarButton {
                         return null;
                     }
                     console.log(result.value);
-                    // const hide = message.loading('App deploying...', 0);
-                    deploy({
-                        projectId, filePath: result.value, onJson: () => {
-                            message.success('App deploy success!');
-                            // hide();
-                        },
-                    });
+                    if (result.value.versionNumber) {
+                        publish({
+                            projectId,
+                            version: result.value.versionNumber,
+                            filePath: result.value.selectFile,
+                            commitMsg: result.value.commitMsg,
+                            onJson: () => {
+                                message.success('Module deploy success!');
+                            },
+                        });
+                    } else {
+                        deploy({
+                            projectId,
+                            filePath: result.value.selectFile,
+                            commitMsg: result.value.commitMsg,
+                            onJson: () => {
+                                message.success('App deploy success!');
+                                // hide();
+                            },
+                        });
+                    }
                     window.location.replace(`/#/workspace/${projectId}?type=app`);
                     window.location.reload();
                 });

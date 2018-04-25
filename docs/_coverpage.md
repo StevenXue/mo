@@ -8,4 +8,4 @@
 * 
 
 [GitHub](https://github.com/momodel)
-[Get Started](#goldersgreen)
+[Get Started](#平台介绍)

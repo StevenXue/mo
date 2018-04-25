@@ -19,6 +19,10 @@ import {
   getMyProjects
 } from '../../../services/project'
 
+import {
+  setStarFavor
+} from '../../../services/user'
+
 import styles from './index.less'
 
 const Option = Select.Option
@@ -31,7 +35,7 @@ function Projects({history, project, dispatch,location}) {
   const paramList = Object.keys(defaultActiveKeyDic)
 
   function callback(key) {
-    history.push(`market${paramList[parseInt(key)-1]}`)
+    history.push(`discovery${paramList[parseInt(key)-1]}`)
   }
 
   return (
@@ -81,7 +85,7 @@ class ProjectList extends Component {
           [key.dashToHump()]: payload[key],
         })
     }
-    console.log('filter', filter)
+    // console.log('filter', filter)
 
     getProjects({
       filter,
@@ -90,6 +94,8 @@ class ProjectList extends Component {
         totalNumber: count,
       })
     })
+
+
   }
 
   componentDidMount() {
@@ -107,22 +113,19 @@ class ProjectList extends Component {
   }
 
   toProjectDetail(id, history, type, projectOwner, loginUser) {
-    // this.props.dispatch({type: 'project/push', id, route: 'market'})
     if (projectOwner === loginUser) {
       history.push(`/workspace/${id}?type=${type}`)
     }
     else {
-      history.push(`/market/${id}?type=${type}`)
+      history.push(`/discovery/${id}?type=${type}`)
     }
   }
 
   starFavor(action, id, type) {
     const user_obj_id = localStorage.getItem('user_obj_id')
-    console.log('action',action)
     function findById(element) {
       return element._id === id
     }
-
     let toUpdateIndex = this.state.projects.findIndex(findById)
     let toUpdate = this.state.projects[toUpdateIndex]
     if (action === 'star') {
@@ -131,19 +134,27 @@ class ProjectList extends Component {
     else {
       toUpdate.favor_users.includes(user_obj_id) ? toUpdate.favor_users.pop(user_obj_id) : toUpdate.favor_users.push(user_obj_id)
     }
-    this.props.dispatch({
-      type: 'projectDetail/star_favor',
-      payload: {
+    // 刷新state
+    this.setState({})
+    setStarFavor({
         entity_id: id,
         action: action,
         entity: type
-      }
     })
+
+
+    // this.props.dispatch({
+    //   type: 'projectDetail/starFavor',
+    //   payload: {
+    //     entity_id: id,
+    //     action: action,
+    //     entity: type
+    //   }
+    // })
   }
 
   render() {
     const {history, project, dispatch} = this.props
-    console.log(this.state.projects)
     return (
       <div>
         <div className={styles.header}>
@@ -184,6 +195,7 @@ class ProjectList extends Component {
 function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
   const user_obj_id = localStorage.getItem('user_obj_id')
   const picNumber = parseInt(project.user.slice(20))%6
+  console.log('pp', project)
   return (
     <div className={styles.projectCard}>
       <div className={styles.toDetail} onClick={() => onClickToDetail()}>

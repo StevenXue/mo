@@ -6,6 +6,7 @@ from bson import ObjectId
 
 from server3.service.project_service import ProjectService
 from server3.business.module_business import ModuleBusiness
+from server3.business.data_set_business import DatasetBusiness
 from server3.business.app_business import AppBusiness
 from server3.business.user_business import UserBusiness
 from server3.business import user_business
@@ -18,28 +19,42 @@ class AppService(ProjectService):
     business = AppBusiness
 
     @classmethod
-    def add_used_module(cls, app_id, used_modules, func):
-        used_modules = [ModuleBusiness.get_by_id(mid) for mid in used_modules]
-        for module in used_modules:
-            module.args = ModuleBusiness.load_module_params(
-                module)
-        return AppBusiness.add_used_module(app_id, used_modules, func)
+    def add_used_module(cls, app_id, used_module, func, version):
+        used_module = ModuleBusiness.get_by_id(used_module)
+        used_module.args = ModuleBusiness.load_module_params(
+            used_module, version)
+        return cls.business.add_used_module(app_id, used_module, func, version)
 
     @classmethod
-    def run_app(cls, app_id, input_json, user_ID):
+    def remove_used_module(cls, app_id, used_module, version):
+        used_module = ModuleBusiness.get_by_id(used_module)
+        return cls.business.remove_used_module(app_id, used_module, version)
+
+    @classmethod
+    def add_used_dataset(cls, app_id, used_dataset):
+        used_dataset = DatasetBusiness.get_by_id(used_dataset)
+        app = cls.business.get_by_id(app_id)
+        return cls.business.insert_dataset(app, used_dataset)
+
+    @classmethod
+    def remove_used_dataset(cls, app_id, used_dataset):
+        print(used_dataset)
+        used_dataset = DatasetBusiness.get_by_id(used_dataset)
+        return cls.business.remove_used_dataset(app_id, used_dataset)
+
+    @classmethod
+    def run_app(cls, app_id, input_json, user_ID, version):
         """
 
         :param app_id: app id
-        :type app_id: ObjectId
         :param input_json:
-        :type input_json:
         :param user_ID:
-        :type user_ID:
+        :param version:
         :return:
         :rtype:
         """
         app = AppBusiness.get_by_id(project_id=app_id)
-        url = app.user.user_ID + "-" + app.name
+        url = '-'.join([app.user.user_ID, app.name, version])
         domin = f"http://{DOCKER_IP}:8080/function/"
         url = domin + url
         payload = json.dumps(input_json)
@@ -47,11 +62,10 @@ class AppService(ProjectService):
             'content-type': "application/json",
         }
         response = requests.request("POST", url, data=payload, headers=headers)
-        print(response.text)
         pattern = re.compile(r'STRHEAD(.+?)STREND', flags=re.DOTALL)
         results = pattern.findall(response.text)
+        print(results)
         output_json = json.loads(results[0])
-        print(output_json)
         # output_json = response.json()
         # 成功调用后 在新的collection存一笔
         user_obj = UserBusiness.get_by_user_ID(user_ID=user_ID)
@@ -67,27 +81,50 @@ class AppService(ProjectService):
 
     @classmethod
     def insert_envs(cls, user_ID, app_name):
+        """
+        copy used modules and datasets to jl container when start
+        :param user_ID:
+        :param app_name:
+        :return:
+        """
         user = UserBusiness.get_by_user_ID(user_ID)
         app = AppBusiness.read_unique_one(name=app_name, user=user)
-        for module in app.used_modules:
-            AppBusiness.insert_module_env(app, module)
+        for used_module in app.used_modules:
+            AppBusiness.insert_module_env(app, used_module.module,
+                                          used_module.version)
+        for used_dataset in app.used_datasets:
+            AppBusiness.insert_dataset(app, used_dataset.dataset)
 
     @classmethod
     def get_by_id(cls, project_id, **kwargs):
         project = super().get_by_id(project_id, **kwargs)
         if kwargs.get('yml') == 'true' and project.app_path:
-            project.args = cls.business.load_app_params(project)
+            project.args = cls.business.load_app_params(project,
+                                                        kwargs.get('version'))
+        # if kwargs.get('used_modules') == 'true':
+        #     project.used_modules = [{'module': m.module.to_mongo(),
+        #                              'version': m.version}
+        #                             for m in project.used_modules]
+
+        project.versions = \
+            ['.'.join(version.split('_')) for version in
+             project.versions]
         return project
 
     @classmethod
-    def deploy(cls, app_id, handler_file_path):
-        app = cls.business.deploy(app_id, handler_file_path)
-        receivers = app.favor_users  # get app subscriber
-        admin_user = user_business.get_by_user_ID('admin')
-        message_service.create_message(admin_user, 'deploy', receivers,
-                                       app.user, app_name=app.name,
-                                       app_id=app.id)
-        return app
+    def publish(cls, project_id, commit_msg, handler_file_path, version):
+        module = cls.business.deploy_or_publish(project_id, commit_msg,
+                                                handler_file_path, version)
+        cls.send_message(module, m_type='publish')
+        return module
+
+    @classmethod
+    def deploy(cls, project_id, commit_msg, handler_file_path):
+        module = cls.business.deploy_or_publish(project_id, commit_msg,
+                                                handler_file_path)
+        cls.send_message(module, m_type='deploy')
+        return module
+
 
 # @classmethod
 # def add_used_app(cls, user_ID, app_id):

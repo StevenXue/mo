@@ -17,18 +17,11 @@ const {Meta} = Card
 const Search = Input.Search
 
 import  {avatarList} from  '../../constants'
-// import avatar1 from '../../img/avatar/1.png'
-// import avatar2 from '../../img/avatar/2.png'
-// import avatar3 from '../../img/avatar/3.png'
-// import avatar4 from '../../img/avatar/4.png'
-// import avatar5 from '../../img/avatar/5.png'
-// import avatar6 from '../../img/avatar/6.png'
-//
-// const avatarList =[avatar1,avatar2,avatar3,avatar4,avatar5,avatar6]
+
 
 import styles from './index.less'
 import {fetchAllUserRequest} from "../../services/userRequest"
-import {get_star_favor} from "../../services/user"
+import {getStarFavor} from "../../services/user"
 import {fetchUserRequestAnswerByUserID} from "../../services/userRequestAnwser"
 import {showTime} from "../../utils"
 import {routerRedux} from "dva/router"
@@ -182,7 +175,7 @@ class MyFavouriteList extends Component {
       payload['action_entity'] = 'favor_'.concat(this.state.type).concat('s')
     }
 
-    get_star_favor({
+    getStarFavor({
       payload,
       onJson: ({objects: objects, count: totalNumber}) => {
         this.setState({
@@ -209,7 +202,7 @@ class MyFavouriteList extends Component {
   }
 
   toObjectDetail(id, history) {
-    history.push(`/market/${id}`)
+    history.push(`/discovery/${id}`)
   }
 
   toUserRequestDetail(id, history) {

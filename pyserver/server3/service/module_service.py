@@ -16,17 +16,23 @@ class ModuleService(ProjectService):
         project = super().get_by_id(project_id, **kwargs)
         if kwargs.get('yml') == 'true' and project.module_path:
             project.args = cls.business.load_module_params(
-                project)
+                project, kwargs.get('version'))
+        project.versions = \
+            ['.'.join(version.split('_')) for version in
+             project.versions]
         return project
 
     @classmethod
-    def publish(cls, project_id):
-        module = cls.business.publish(project_id)
-        receivers = module.favor_users  # get app subscriber
-        admin_user = user_business.get_by_user_ID('admin')
-        message_service.create_message(admin_user, 'publish', receivers,
-                                       module.user, module_name=module.name,
-                                       module_id=module.id)
+    def publish(cls, project_id, commit_msg, version):
+        module = cls.business.deploy_or_publish(project_id, commit_msg,
+                                                version=version)
+        cls.send_message(module, m_type='publish')
+        return module
+
+    @classmethod
+    def deploy(cls, project_id, commit_msg):
+        module = cls.business.deploy_or_publish(project_id, commit_msg)
+        cls.send_message(module, m_type='deploy')
         return module
 
 

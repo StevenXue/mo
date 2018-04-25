@@ -60,11 +60,11 @@ export default {
       console.log("module", module)
       yield put(routerRedux.push('/modulelist/' + module._id))
     },
-
-    * update(action, {call, put, select}) {
-      const {data: module} = yield call(moduleService.createModule, action.payload)
-      yield put({type: "updateModule", payload: {module}})
-    }
+    //
+    // * update(action, {call, put, select}) {
+    //   const {data: module} = yield call(moduleService.createModule, action.payload)
+    //   yield put({type: "updateModule", payload: {module}})
+    // }
   },
   subscriptions: {
     // 当进入该页面是 获取用户所有 Models

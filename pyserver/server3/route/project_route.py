@@ -23,7 +23,7 @@ from server3.service.app_service import AppService
 from server3.service.module_service import ModuleService
 from server3.service.dataset_service import DatasetService
 from server3.business.project_business import ProjectBusiness
-from server3.business import user_business
+from server3.business.user_business import UserBusiness
 from server3.utility import json_utility
 from server3.utility import str_utility
 from server3.constants import Error, Warning
@@ -238,6 +238,8 @@ def create_project():
         name, description, user_ID, tags=tags,
         type=type, user_token=user_token, **data)
     project = json_utility.convert_to_json(project.to_mongo())
+
+    print(project)
     return jsonify({'response': project}), 200
 
 
@@ -324,7 +326,7 @@ def get_project_playground(project_id):
 def commit(project_id):
     data = request.get_json()
     commit_msg = data.get('commit_msg')
-    ProjectBusiness.commit(project_id, commit_msg)
+    ProjectService.commit(project_id, commit_msg)
     return jsonify({"response": 1})
 
 
@@ -334,7 +336,7 @@ def commit_broadcast(project_id):
     # ProjectBusiness.commit(project_id, commit_msg)
     receivers = project.favor_users  # get app subscriber
     # commits = ProjectBusiness.get_commits(project.path)
-    admin_user = user_business.get_by_user_ID('admin')
+    admin_user = UserBusiness.get_by_user_ID('admin')
     message_service.create_message(admin_user, 'commit', receivers,
                                    project.user, project_type=project.type,
                                    project_id=project_id)
@@ -347,5 +349,10 @@ def nb_to_script(project_id):
     data = request.get_json()
     optimise = data.get('optimise')
     nb_path = data.get('nb_path')
-    ProjectBusiness.nb_to_script(project_id, nb_path, optimise)
+    try:
+        ProjectBusiness.nb_to_script(project_id, nb_path, optimise)
+    except FileNotFoundError as e:
+        return jsonify({"response": 'Try save your notebook and convert '
+                                    'again.'}),\
+               399
     return jsonify({"response": 1})

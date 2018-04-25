@@ -1,8 +1,9 @@
-* [首页](zh-cn/home.md)
-* [快速开始](zh-cn/quick_start.md)
-* [基本信息](zh-cn/basic_info.md)
-* [进阶使用](zh-cn/advance.md)
-* [开发者指南](zh-cn/developer.md)
+* [简介](zh-cn/简介.md)
+* [基本界面](zh-cn/基本界面.md)
+* [快速入门](zh-cn/快速入门.md)
+* [开发指南](zh-cn/开发指南.md)
+* [案例教学视频](zh-cn/案例教学视频.md)
+* [移动端](zh-cn/移动端.md)
 
 
   

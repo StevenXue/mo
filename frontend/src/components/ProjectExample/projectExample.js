@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import 'react-mde/lib/styles/css/react-mde-all.css'
-import { getProjects, updateProject } from '../../services/project'
+import { getApp } from '../../services/app'
 import JsonToArray from '../../utils/JsonUtils'
 import ParamsMapper from '../../components/ParamsMapper/index'
 import CopyInput from '../../components/CopyInput'
@@ -9,19 +9,12 @@ import CopyInput from '../../components/CopyInput'
 import {
   Row,
   Col,
-  Form,
-  Input,
-  Tooltip,
-  Icon,
-  Cascader,
   Select,
-  Checkbox,
-  Button,
-  AutoComplete,
 } from 'antd'
 import { connect } from 'dva'
 import { get, map } from 'lodash'
 
+const Option = Select.Option
 
 class ProjectExample extends React.Component {
 
@@ -35,7 +28,6 @@ class ProjectExample extends React.Component {
 
   componentDidMount() {
   }
-
 
   setValue(values) {
     let args = this.state.args
@@ -52,18 +44,41 @@ class ProjectExample extends React.Component {
     })
   }
 
+  handleVersionChange(value, projectId) {
+    this.props.dispatch({
+      type: 'projectDetail/fetch',
+      projectId,
+      projectType: 'app',
+      version: value,
+      notStartLab: true,
+    })
+    this.props.dispatch({
+      type: 'projectDetail/setVersion',
+      version: value,
+    })
+  }
+
   render() {
     const { projectDetail } = this.props
+    const { project, version } = this.props.projectDetail
+    const version_ = version || project.versions.slice(-1)[0] || 'dev'
     console.log(this.state.args)
     return (
       <div>
-        {this.props.projectDetail.project.status === 'active' &&
+        <div>
+          Version:&nbsp;&nbsp;
+          <Select defaultValue={version || project.versions.slice(-1)[0]} style={{ width: 120 }}
+                  onChange={(value) => this.handleVersionChange(value, project._id)}>
+            {project.versions.map(version =>
+              <Option key={version} value={version}>{version}</Option>)}
+          </Select>
+        </div>
+        <br/>
         <div>
           API:
           <CopyInput
-            text={`${projectDetail.project.app_path.replace('.', 'http://192.168.31.7:8080')}`}/>
-        </div>}
-        <br/>
+            text={`${projectDetail.project.app_path.replace('.', 'http://192.168.31.23:8080')}-${version_}`}/>
+        </div>
         <br/>
         <Row gutter={16}>
           <Col span={12}>
@@ -84,6 +99,7 @@ class ProjectExample extends React.Component {
                               baseArgs={Object.values(this.props.projectDetail.project.args.input)}
                               appId={this.props.projectDetail.project._id}
                               dispatch={this.props.dispatch}
+                              version={version_}
                 />
                 {/*<div >*/}
                 {/*<Button*/}
@@ -103,8 +119,9 @@ class ProjectExample extends React.Component {
                 {map(this.props.projectDetail.project.args.output).map(e =>
                   <div key={e.name}>
                     <p>{e.name}</p>
-                    {e.value_type === 'img' && e.value ?<img src={'data:image/jpeg;base64,'+e.value}  alt="img" />:<p>{e.value}</p>}
-                  </div>
+                    {e.value_type === 'img' && e.value ? <img src={'data:image/jpeg;base64,' + e.value} alt="img"/> :
+                      <p>{e.value}</p>}
+                  </div>,
                 )}
               </div>
             </div>

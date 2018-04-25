@@ -9,5 +9,7 @@ module.exports = {
   hubServer: 'http://10.52.22.14:8000',
 
   docsServer: 'http://localhost:3000',
+
+  tbServer: 'http://localhost:8111',
 }
 

@@ -26,7 +26,7 @@ import {
     Form,
 } from './vdomWrapper';
 
-import {publish} from './service';
+import {deploy, publish} from './service';
 
 import '../style/index.css';
 
@@ -43,35 +43,36 @@ const extension: JupyterLabPlugin<void> = {
     autoStart: true,
     requires: [IFileBrowserFactory],
     activate: (app: JupyterLab, fb: IFileBrowserFactory) => {
-        fb.defaultBrowser.toolbar.addItem('publishModule', createPublishButton());
+        fb.defaultBrowser.toolbar.addItem('deployModule', createDeployButton());
     },
 };
 
 /**
  * A widget used to rename a file.
  */
-class PublishForm extends Form {
+class DeployForm extends Form {
 
     /**
      * Get the input text node.
      */
     get inputNode(): HTMLInputElement {
-        return this.node.getElementsByClassName('testing-state')[0] as HTMLInputElement;
+        return this.node.getElementsByClassName('testingState')[0] as HTMLInputElement;
     }
 
     /**
      * Get the value of the widget.
      */
-    getValue(): string {
-        return this.inputNode.value;
-        // return '11';
+    getValue(): { testingState: string, versionNumber: string, commitMsg: string } {
+        const versionElement = this.node.getElementsByClassName('versionNumber')[0] as HTMLInputElement;
+        const commitMsg = this.node.getElementsByClassName('commitMsg')[0] as HTMLInputElement;
+        return {testingState: this.inputNode.value, versionNumber: versionElement.value, commitMsg: commitMsg.value};
     }
 }
 
 /**
- * Create a publish toolbar item.
+ * Create a deploy toolbar item.
  */
-export function createPublishButton(): ToolbarButton {
+export function createDeployButton(): ToolbarButton {
     const hash = window.location.hash;
     const match = pathToRegexp('#/workspace/:projectId/:type').exec(hash);
     if (match) {
@@ -80,27 +81,39 @@ export function createPublishButton(): ToolbarButton {
             className: TOOLBAR_DEPLOY_CLASS,
             onClick: () => {
                 return showDialog({
-                    title: 'Publish ' + document.title.split(' - ')[0],
-                    body: new PublishForm(() => {
+                    title: 'Deploy ' + document.title.split(' - ')[0],
+                    body: new DeployForm(() => {
                         console.log('click');
                     }),
                     focusNodeSelector: 'input',
-                    buttons: [Dialog.cancelButton(), Dialog.okButton({label: 'PUBLISH'})],
+                    buttons: [Dialog.cancelButton(), Dialog.okButton({label: 'DEPLOY'})],
                 }).then(result => {
                     console.log(result);
                     if (result.button.label === 'CANCEL') {
                         return;
                     }
                     if (result.value) {
-                        if (result.value === 'failed') {
+                        if (result.value.testingState === 'failed') {
                             message.error('Test not passed, please fix warnings!');
                         } else {
-                            publish({
-                                projectId,
-                                onJson: () => {
-                                    message.success('Module publish success!');
-                                },
-                            });
+                            if (result.value.versionNumber) {
+                                publish({
+                                    projectId,
+                                    version: result.value.versionNumber,
+                                    commitMsg: result.value.commitMsg,
+                                    onJson: () => {
+                                        message.success('Module deploy success!');
+                                    },
+                                });
+                            } else {
+                                deploy({
+                                    projectId,
+                                    commitMsg: result.value.commitMsg,
+                                    onJson: () => {
+                                        message.success('Module deploy success!');
+                                    },
+                                });
+                            }
                             window.location.replace(`/#/workspace/${projectId}?type=module`);
                             window.location.reload();
                         }
@@ -109,7 +122,7 @@ export function createPublishButton(): ToolbarButton {
                     }
                 });
             },
-            tooltip: 'Publish Module',
+            tooltip: 'Deploy Module',
         });
     } else {
         throw Error;

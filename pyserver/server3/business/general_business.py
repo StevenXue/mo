@@ -2,6 +2,16 @@ from server3.repository.general_repo import Repo
 from server3.entity.general_entity import Objects
 
 
+def check_auth(func):
+    def _deco(cls, object_id, user_ID, *args, **kwargs):
+        entity = cls.get_by_id(object_id)
+        if entity.user.user_ID == user_ID:
+            return func(cls, object_id, user_ID, *args, **kwargs)
+        else:
+            raise RuntimeError('no right to delete')
+    return _deco
+
+
 class GeneralBusiness:
     # 实例化后的 instance 走general repo
     repo = Repo(None)
@@ -49,4 +59,8 @@ class GeneralBusiness:
     def create_one(cls, **kwargs):
         cls.repo.create_one(**kwargs)
 
+    @classmethod
+    @check_auth
+    def remove_by_id(cls, object_id, user_ID):
+        return cls.repo.delete_by_id(object_id)
 

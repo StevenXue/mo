@@ -37,14 +37,14 @@ const WorldMessageItem = ({worldMessage, isRight}) => {
         <div
           style={{
             display: "flex",
-            height: 50, width: 50,
+            minHeight: 50, width: 40,
             justifyContent: "center",
             alignItems: "center",
+            minWidth: 40,
           }}
         >
           {
             message_type === 'admin' ?
-
               <div
                 style={{
                   height: 30, width: 30,
@@ -52,33 +52,16 @@ const WorldMessageItem = ({worldMessage, isRight}) => {
                 }}
                 className={styles.system_image}
               />
-
-              // <img
-              //   style={{
-              //     height: 30, width: 30,
-              //     color: "#34BFE2"
-              //   }}
-              //   src={require('../../img/icon/system.png')}
-              // />
-
               :
-
               <img style={{
                 height: 30, width: 30,
               }} src={avatarList[picNumber]}  alt="avatar" />
 
-              // <img
-              //   style={{
-              //     height: 30, width: 30,
-              //   }}
-              //   src={require('../../img/icon/mo.png')}
-              // />
           }
         </div>
 
         {
           isRight && renderText()
-
         }
       </div>
     )
@@ -93,6 +76,7 @@ const WorldMessageItem = ({worldMessage, isRight}) => {
       }}>
         <div style={{
           // padding: 2,
+          // justifyContent: "space-around",
           display: "flex", color: "grey"
         }}>
           <div>
@@ -106,8 +90,9 @@ const WorldMessageItem = ({worldMessage, isRight}) => {
 
         <div style={{
           // padding: 2,
-          color: message_type === 'admin' ? '#34BFE2' : "black"
-
+          color: message_type === 'admin' ? '#34BFE2' : "black",
+          wordWrap: "break-word",
+          width: 250,
         }}>
           {message}
         </div>

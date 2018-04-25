@@ -1,5 +1,5 @@
 from uuid import getnode as get_mac
-
+UPDATE_USER_INFO_SK = 'secret_mo_mo'
 MONGO = 'PROD'
 # if get_mac() == 274973436731254:
 #     MONGO = 'DEFAULT'
@@ -28,6 +28,7 @@ KUBE_NAME = {
     'serving': '{job_id}-serving'
 }
 MODULE_DIR = './server3/lib/modules'
+DEV_DIR_NAME = 'dev'
 APP_DIR = './functions'
 INIT_RES = [
     r"# coding: utf-8",
@@ -38,6 +39,8 @@ INIT_RES = [
     r"client = Client\('(.+)'\)",
     r"from modules import (.+)",
     r"(\S+) = client\.(\S+)",
+    r"# append work_path to head when you want to reference a path inside the working directory",
+    r"work_path = ''",
 ]
 PARAMETER_SPEC = [
     {

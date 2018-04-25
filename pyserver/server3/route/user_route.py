@@ -9,7 +9,8 @@ Date: 2017.05.22
 """
 import json
 import requests
-
+import jwt
+import time
 from flask import Blueprint
 from flask import jsonify
 from flask import make_response
@@ -29,6 +30,9 @@ from server3.service.user_service import UserService
 from server3.business.user_business import UserBusiness
 from server3.business.statistics_business import StatisticsBusiness
 from server3.service import request_answer_service
+from server3.service.request_answer_service import RequestAnswerService
+from server3.business.request_answer_business import RequestAnswerBusiness
+from server3.constants import UPDATE_USER_INFO_SK
 
 PREFIX = '/user'
 
@@ -69,7 +73,8 @@ def register():
     if user_ID is None or password is None or code is None:
         return jsonify({'response': 'invalid user or password'}), 400
     try:
-        added_user = user_service.register(user_ID, password, phone, code, **data)
+        added_user = user_service.register(user_ID, password, phone, code,
+                                           **data)
         added_user = json_utility.convert_to_json(added_user.to_mongo())
         added_user.pop('password')
         return jsonify({'response': added_user}), 200
@@ -111,7 +116,8 @@ def reset_password():
     code = data.pop("code")
     new_password = data.pop("new_password")
     try:
-        user = user_service.reset_password(phone, message_id, code, new_password)
+        user = user_service.reset_password(phone, message_id, code,
+                                           new_password)
     except Error as e:
         return jsonify({
             "message": e.args[0]
@@ -131,16 +137,122 @@ def login():
     password = request.json.get('password', None)
     try:
         user = user_service.authenticate(user_ID, password)
+        if not user:
+            return jsonify({'response': 'Bad username or password'}), 400
+
+        user_obj = json_utility.convert_to_json(user.to_mongo())
+        user_obj.pop('password')
+        del user.avatar
+    except DoesNotExist as e:
+        return jsonify({'response': '%s: %s' % (str(
+            DoesNotExist), e.args)}), 400
+
+    # Identity can be any data that is json serializable
+    response = {
+        'response': {'token': create_access_token(identity=user.user_ID),
+                     'user': user_obj}}
+    return jsonify(response), 200
+
+
+@user_app.route('/forgot', methods=['GET'])
+def forgot():
+    email = request.args.get('email', None)
+    try:
+        user = user_service.forgot_send(email)
+        # user_obj.pop('password')
+    except DoesNotExist as e:
+        return jsonify({'response': '%s: %s' % (str(
+            DoesNotExist), e.args)}), 400
+    if not user:
+        return jsonify({'response': 'Bad email'}), 400
+    # Identity can be any data that is json serializable
+    response = {'response': 'ok'}
+    return jsonify(response), 200
+
+
+@user_app.route('/newpassword', methods=['GET'])
+def newpassword():
+    password = request.args.get('password', None)
+    email = request.args.get('email', None)
+    hashEmail = request.args.get('hashEmail', None)
+    try:
+        user = user_service.newpassword_send(password, email, hashEmail)
+        # user_obj.pop('password')
+    except DoesNotExist as e:
+        return jsonify({'response': '%s: %s' % (str(
+            DoesNotExist), e.args)}), 400
+    if not user:
+        return jsonify({'response': 'Bad email'}), 400
+    # Identity can be any data that is json serializable
+    response = {'response': 'ok'}
+    return jsonify(response), 200
+
+
+@user_app.route('/tourtip', methods=['GET'])
+def tourtip():
+    user_ID = request.args.get('user_ID', None)
+    try:
+        user = user_service.check_tourtip(user_ID)
         user_obj = json_utility.convert_to_json(user.to_mongo())
         user_obj.pop('password')
     except DoesNotExist as e:
         return jsonify({'response': '%s: %s' % (str(
             DoesNotExist), e.args)}), 400
     if not user:
-        return jsonify({'response': 'Bad username or password'}), 400
+        return jsonify({'response': 'Bad email'}), 400
     # Identity can be any data that is json serializable
-    response = {'response': {'token': create_access_token(identity=user),
-                             'user': user_obj}}
+    response = {'response': {'user': user_obj}}
+    return jsonify(response), 200
+
+
+@user_app.route('/notourtip', methods=['GET'])
+def notourtip():
+    user_ID = request.args.get('user_ID', None)
+    try:
+        user = user_service.no_tourtip(user_ID)
+        user_obj = json_utility.convert_to_json(user.to_mongo())
+        user_obj.pop('password')
+    except DoesNotExist as e:
+        return jsonify({'response': '%s: %s' % (str(
+            DoesNotExist), e.args)}), 400
+    if not user:
+        return jsonify({'response': 'Bad email'}), 400
+    # Identity can be any data that is json serializable
+    response = {'response': {'user': user_obj}}
+    return jsonify(response), 200
+
+
+@user_app.route('/learning', methods=['GET'])
+def learning():
+    user_ID = request.args.get('user_ID', None)
+    try:
+        user = user_service.check_learning(user_ID)
+        user_obj = json_utility.convert_to_json(user.to_mongo())
+        user_obj.pop('password')
+    except DoesNotExist as e:
+        return jsonify({'response': '%s: %s' % (str(
+            DoesNotExist), e.args)}), 400
+    if not user:
+        return jsonify({'response': 'Bad email'}), 400
+    # Identity can be any data that is json serializable
+    response = {'response': {'user': user_obj}}
+    return jsonify(response), 200
+
+
+@user_app.route('/nolearning', methods=['GET'])
+def nolearning():
+    user_ID = request.args.get('user_ID', None)
+    try:
+        user = user_service.no_learning(user_ID)
+        user_obj = json_utility.convert_to_json(user.to_mongo())
+        user_obj.pop('password')
+    except DoesNotExist as e:
+        return jsonify({'response': '%s: %s' % (str(
+            DoesNotExist), e.args)}), 400
+    if not user:
+        return jsonify({'response': 'Bad email'}), 400
+    # Identity can be any data that is json serializable
+    response = {'response': {'user': user_obj}}
     return jsonify(response), 200
 
 
@@ -160,9 +272,71 @@ def login_with_phone():
         if result:
             user = user_business.get_by_phone(phone=phone)
             response = {'response': {
-                'token': create_access_token(identity=user),
+                'token': create_access_token(identity=user.user_ID),
                 'user': json_utility.convert_to_json(user.to_mongo())}}
             return jsonify(response), 200
+    except Error as e:
+        print("e.args[0]", e.args[0])
+        return jsonify({
+            "response": {
+                "error": e.args[0]
+            }
+        }), 400
+
+
+@user_app.route('/two_step_vfc', methods=['POST'])
+@jwt_required
+def two_step_vfc():
+    user_ID = get_jwt_identity()
+    data = request.get_json()
+
+    check_type = data.pop("checkType")
+    check_value = data.pop("checkValue")
+    code = data.pop("code")
+
+    try:
+        if check_type == 'phone':
+            result = user_service.verify_code(code=code, phone=check_value)
+        elif check_type == 'email':
+            user = UserBusiness.get_by_user_ID(user_ID)
+            if code and code == user.emailCaptcha:
+                result = True
+        else:
+            return jsonify({
+                "response": {
+                    "error": e.args[0]
+                }
+            }), 400
+        if result:
+            expire_time = time.time() + 3600
+            response = {'response': {
+                'tokenForUpdateInfo': jwt.encode({'user_ID': user_ID,
+                                                  'expireTime': expire_time},
+                                                 UPDATE_USER_INFO_SK,
+                                                 algorithm='HS256'),
+            }}
+            return jsonify(response), 200
+    except Error as e:
+        print("e.args[0]", e.args[0])
+        return jsonify({
+            "response": {
+                "error": e.args[0]
+            }
+        }), 400
+
+
+# 发送验证码到邮箱
+@user_app.route('/send_verification_code_to_email/<email>', methods=['get'])
+@jwt_required
+def send_verification_code_to_email(email):
+    user_ID = get_jwt_identity()
+    try:
+        from server3.business.user_business import UserBusiness
+        from server3.service.user_service import UserService
+        UserService.send_captcha_to_email(user_ID, email)
+        return jsonify({
+            "response": "success"
+        }), 200
     except Error as e:
         print("e.args[0]", e.args[0])
         return jsonify({
@@ -231,8 +405,6 @@ def set_action_entity(entity_id):
     """
     user_ID = get_jwt_identity()
     data = request.get_json()
-    print('data')
-    print(data)
     action = data.pop("action")
     entity = data.pop("entity")
 
@@ -243,7 +415,8 @@ def set_action_entity(entity_id):
         return jsonify({
             'message': "success",
             'response': {
-                "entity": json_utility.convert_to_json(result.entity.to_mongo()),
+                "entity": json_utility.convert_to_json(
+                    result.entity.to_mongo()),
                 "user": json_utility.convert_to_json(result.user.to_mongo())
             }
         }), 200
@@ -268,9 +441,8 @@ def get_action_entity():
             app.user_ID = app.user.user_ID
     else:
         for each_request in apps.objects:
-            each_request.answer_number = \
-                request_answer_service.get_all_answer_of_this_user_request(
-                    each_request.id, get_number=True)
+            each_request.answer_number = RequestAnswerBusiness. \
+                answer_number_of_user_request(each_request.id)
             each_request.user_ID = each_request.user.user_ID
     return jsonify({
         'response': {
@@ -284,10 +456,28 @@ def get_action_entity():
 
 @user_app.route('/profile/<user_ID>', methods=['GET'])
 def get_user_info(user_ID):
-    result = UserService.get_user_info(user_ID=user_ID)
-    print('result')
-    print(result)
-    return jsonify({'response': result}), 200
+    user = UserBusiness.get_by_user_ID(user_ID=user_ID)
+    user_info = json_utility.convert_to_json(user.to_mongo())
+    return jsonify({'response': user_info}), 200
+
+
+# 获取用户的统计信息， 收藏了多少app， 发布了多少需求
+@user_app.route('/user_statistics', methods=['GET'])
+@jwt_required
+def get_user_statistics():
+    from server3.business.user_request_business import UserRequestBusiness
+    user_ID = request.args.get("user_ID", get_jwt_identity())
+
+    apps = UserBusiness.get_action_entity(
+        user_ID=user_ID, action_entity="favor_apps",
+        page_no=1, page_size=1)
+    favor_apps_count = apps.count
+    user = UserBusiness.get_by_user_ID(user_ID)
+    requests_count = UserRequestBusiness.request_number_of_this_user(user)
+    return jsonify({'response': {
+        "favor_apps_count": favor_apps_count,
+        "requests_count": requests_count
+    }}), 200
 
 
 @user_app.route('/statistics', methods=['GET'])
@@ -296,32 +486,15 @@ def get_statistics():
     user_ID = get_jwt_identity()
     page_no = int(request.args.get('page_no', 1))
     page_size = int(request.args.get('page_size', 5))
-
     action = request.args.get("action")
     entity_type = request.args.get("entity_type")
-
-    user_obj = UserBusiness.get_by_user_ID(user_ID=user_ID)
-    statistics = StatisticsBusiness.get_pagination(
-        query={
-            "action": action,
-            "entity_type": entity_type,
-            "caller": user_obj
-        },
-        page_no=page_no, page_size=page_size)
-
-    # for object in statistics.objects:
-    #     # print("tom", json_utility.convert_to_json(object.app.to_mongo()))
-    #     # object.app_obj = "111"
-    #     app = json.dumps(object.app.to_mongo())#json_utility.convert_to_json(object.app.to_mongo())
-    #     object.app_obj = app
-    #
-    #     # object = json_utility.convert_to_json(object.to_mongo())
-    #     # object["app_obj"] = app
-    print("statistics.objects", statistics.objects)
-
+    statistics = UserService.get_statistics(user_ID, page_no, page_size, action,
+                                            entity_type)
     return jsonify({
         'response': {
-            "objects": json_utility.objs_to_json_with_args(statistics.objects, ["app", "caller"]),
+            "objects": statistics.objects,
+            # "objects": json_utility.objs_to_json_with_args(statistics.objects,
+            #                                                ["app", "caller"]),
             "page_size": statistics.page_size,
             "page_no": statistics.page_no,
             "count": statistics.count,
@@ -329,19 +502,65 @@ def get_statistics():
     })
 
 
-# 用户更改基本信息 邮箱，手机号, 性别
+# 用户更改基本信息 性别，头像
 @user_app.route('', methods=['PUT'])
 @jwt_required
 def update_user():
     user_ID = get_jwt_identity()
     data = request.get_json()
-    # 检查data是否在 ["email", "phone", "gender"]
-    lists = ["email", "phone", "gender"]
+    # 检查data是否在 ["email", "phone", "gender","avatar"]
+    lists = ["gender", "avatar"]
     for key, value in data.items():
         if key not in lists:
             return jsonify({'response': 'error arguments'}), 400
     user = UserBusiness.update_by_user_ID(user_ID=user_ID, update=data)
-    print("user", user)
     return jsonify({'response': {
         "user": json_utility.convert_to_json(user.to_mongo())
     }}), 200
+
+
+# 用户更改重要信息 邮箱，手机号, 密码
+@user_app.route('/account', methods=['PUT'])
+@jwt_required
+def update_user_account():
+    user_ID = get_jwt_identity()
+    data = request.get_json()
+    token_for_update_info = data['tokenForUpdateInfo']
+    phone = data.get('phone', None)
+    email = data.get('email', None)
+    password = data.get('password', None)
+    captcha = data.get('captcha', None)
+    payload = jwt.decode(token_for_update_info, UPDATE_USER_INFO_SK,
+                         algorithm='HS256')
+    if payload['user_ID'] != user_ID or payload['expireTime'] < time.time():
+        return jsonify({'response': {'error': 'tokenError'}}), 400
+    elif phone:
+        # 更改手机
+        # 验证手机 验证码
+        try:
+            res = user_service.verify_code(code=captcha, phone=phone)
+            user = UserBusiness.get_by_user_ID(user_ID)
+            user.phone = phone
+            user.save()
+        except Error as e:
+            return jsonify({
+                "response": {
+                    "error": "验证码错误"
+                }
+            }), 400
+    elif email:
+        # 更改邮箱
+        # 验证邮箱 验证码
+        try:
+            UserService.update_user_email(user_ID, email, captcha)
+        except Error as e:
+            return jsonify({
+                "response": {
+                    "error": e.args[0]
+                }
+            }), 400
+    elif password:
+        UserBusiness.update_password(user_ID, password)
+    else:
+        return jsonify({'response': 'error'}), 400
+    return jsonify({'response': 'ok'}), 200

@@ -6,7 +6,7 @@ import zipfile
 import pandas as pd
 
 from server3.business import file_business
-from server3.business import user_business
+from server3.business.user_business import UserBusiness
 from server3.business import ownership_business
 from server3.service import ownership_service
 from server3.service import data_service
@@ -42,7 +42,7 @@ def add_file(data_set_name, file, url_base, user_ID, is_private=False,
     if not user_ID:
         raise ValueError('no user id or private input')
     # check user existence
-    user = user_business.get_by_user_ID(user_ID)
+    user = UserBusiness.get_by_user_ID(user_ID)
     if not user:
         raise NameError('no user found')
 

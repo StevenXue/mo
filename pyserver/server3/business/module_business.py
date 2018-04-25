@@ -3,19 +3,24 @@ import uuid
 import yaml
 import shutil
 import subprocess
+from distutils.core import setup
 from importlib import import_module
 from datetime import datetime
-from git import Repo as GRepo
-from cookiecutter.main import cookiecutter
-
 from distutils.dir_util import copy_tree
 from distutils.dir_util import remove_tree
+
+import docker
+from git import Repo as GRepo
+from cookiecutter.main import cookiecutter
+from Cython.Build import cythonize
+
 # from server3.entity.module import Module
 from server3.entity import project
 from server3.repository.general_repo import Repo
 from server3.business.project_business import ProjectBusiness
 from server3.service.validation.validation import GDValidation
 from server3.constants import MODULE_DIR
+from server3.constants import DEV_DIR_NAME
 from server3.constants import USER_DIR
 from server3.constants import GIT_SERVER_IP
 
@@ -28,6 +33,8 @@ cat_dict = {
     'toolkit':
         'https://github.com/momodel/cookiecutter-python-toolkit.git'
 }
+TOOL_REPO = 'https://github.com/momodel/dev_cmd_tools.git'
+
 
 # def add(name, user, **kwargs):
 #     try:
@@ -80,6 +87,7 @@ class ModuleBusiness(ProjectBusiness):
         # generate project dir
         project_path = cls.gen_dir(user_ID, name)
         temp_path = cls.gen_dir(user_ID, uuid.uuid4().hex)
+        # temp_tool_path = cls.gen_dir(user_ID+'_tool', uuid.uuid4().hex)
 
         # init git repo
         cls.init_git_repo(user_ID, name)
@@ -99,15 +107,30 @@ class ModuleBusiness(ProjectBusiness):
             })
 
         # copy temp project to project dir and remove temp dir
+        # need to keep .git, cannot use cls.copytree_wrapper
         copy_tree(os.path.join(temp_path, name), project_path)
         remove_tree(temp_path)
+
+        # tools_path = os.path.join(project_path, 'dev_cmd_tools')
+        # os.makedirs(tools_path)
+        # copy_tree(temp_tool_path, tools_path)
+
+        # cookiecutter(
+        #     TOOL_REPO,
+        #     no_input=True, output_dir=project_path,
+        #     extra_context={
+        #         "author_name": user_ID,
+        #         "module_name": name,
+        #         "module_type": category,
+        #         "module_description": description,
+        #     })
 
         # add all
         repo.git.add(A=True)
         # initial commit
         repo.index.commit('Initial Commit')
         repo.remote(name='origin').push()
-
+        commit = cls.update_project_commits(repo)
         # auth jupyterhub with user token
         res = cls.auth_hub_user(user_ID, name, user_token)
 
@@ -119,8 +142,8 @@ class ModuleBusiness(ProjectBusiness):
             update_time=create_time,
             type=type, tags=tags,
             hub_token=res.get('token'),
-            path=project_path, user=user,
-            privacy=privacy, category=category,
+            path=project_path, user=user, status='inactive',
+            privacy=privacy, category=category, commits=[commit],
             repo_path=f'http://{GIT_SERVER_IP}/repos/{user_ID}/{name}')
 
     # @classmethod
@@ -137,28 +160,66 @@ class ModuleBusiness(ProjectBusiness):
     #     return module
 
     @staticmethod
-    def load_module_params(module):
-        yml_path = os.path.join(module.module_path, tail_path)
+    def load_module_params(module, version=DEV_DIR_NAME):
+        # TODO remove 'try except' after modules all have versions
+        try:
+            if not version:
+                version = module.versions[-1]
+        except:
+            version = DEV_DIR_NAME
+        yml_path = os.path.join(module.module_path, version, tail_path)
         with open(yml_path, 'r') as stream:
             obj = yaml.load(stream)
             return {'input': obj.get('input'), 'output': obj.get('output')}
 
     @classmethod
-    def publish(cls, project_id):
+    def deploy_or_publish(cls, project_id, commit_msg, version=DEV_DIR_NAME):
         module = cls.get_by_id(project_id)
-        module.module_path = os.path.join(MODULE_DIR, module.user.user_ID,
-                                          module.name)
-        module.privacy = 'public'
+
+        module.status = 'deploying'
         module.save()
 
-        dst = module.module_path
-        # if dir exists, remove it and copytree, cause copytree will
-        #  create the dir
-        if os.path.exists(dst):
-            shutil.rmtree(dst)
-        shutil.copytree(module.path, dst)
-        # WORKON_HOME=./ pipenv install vv
+        # commit module
+        cls.commit(project_id, commit_msg, version)
+
+        module.module_path = os.path.join(MODULE_DIR, module.user.user_ID,
+                                          module.name)
+        dst = os.path.join(module.module_path, version)
+
+        # copy module
+        cls.copytree_wrapper(module.path, dst,
+                             ignore=shutil.ignore_patterns('.git'))
+        # install module env
         subprocess.call(['bash', 'install_venv.sh', os.path.abspath(dst)])
+
+        bind_path = '/home/jovyan/modules'
+
+        # copy compile related files to module src
+        # shutil.copy('./setup.py',
+        #             os.path.join(module.module_path, version, 'src'))
+        # shutil.copy('./compile.sh',
+        #             os.path.join(module.module_path, version, 'src'))
+        #
+        # compile_dir = module.module_path.replace('./server3/lib/modules',
+        #                                          bind_path)
+        # compile_dir = os.path.join(compile_dir, version, 'src')
+        #
+        # # start container with the singleuser docker, mount the whole pyserver
+        # # compile the main.py and delete compile related files
+        # client = docker.from_env()
+        # client.containers.run(
+        #     "singleuser:latest",
+        #     volumes={os.path.abspath(MODULE_DIR):
+        #                  {'bind': bind_path, 'mode': 'rw'}},
+        #     command=f"/bin/bash -c 'cd {compile_dir} && bash ./compile.sh'")
+
+        # if publish update privacy and version
+        if version != DEV_DIR_NAME:
+            module.privacy = 'public'
+            module.versions.append(version)
+
+        module.status = 'active'
+        module.save()
 
         return module
 
@@ -169,4 +230,3 @@ class ModuleBusiness(ProjectBusiness):
                                        project.user.user_ID, project.category)
         failures = [f[1] for f in result.failures]
         return failures
-

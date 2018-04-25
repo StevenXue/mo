@@ -7,7 +7,21 @@ from mongoengine import ReferenceField
 from mongoengine import ListField
 from mongoengine import DictField
 from mongoengine import IntField
+from mongoengine import EmbeddedDocumentListField
+from mongoengine import EmbeddedDocument
 from mongoengine import PULL
+
+RE_TYPE = ('inactive', 'active', 'deploying')
+
+
+class Commit(EmbeddedDocument):
+    oldhexsha = StringField()
+    newhexsha = StringField()
+    actor_name = StringField()
+    actor_email = StringField()
+    timestamp = DateTimeField()
+    message = StringField()
+    version = StringField()
 
 
 class Project(DynamicDocument):
@@ -38,6 +52,8 @@ class Project(DynamicDocument):
     related_fields = ListField(StringField(max_length=100))
     user_name = StringField(max_length=50)
     results = ListField(ReferenceField('Result', reverse_delete_rule=PULL))
+    versions = ListField(StringField())
+    commits = EmbeddedDocumentListField(Commit)
 
     meta = {
         'allow_inheritance': True,
@@ -59,9 +75,7 @@ class Module(Project):
     input = DictField()
     output = DictField()
     repo_path = StringField()
-
-
-RE_TYPE = ('inactive', 'active', 'deploying')
+    status = StringField(choices=RE_TYPE)
 
 
 class AppGetType:
@@ -70,6 +84,15 @@ class AppGetType:
     star = "star"
     used = "used"
     chat = 'chat'
+
+
+class UsedModule(EmbeddedDocument):
+    module = ReferenceField(Module)
+    version = StringField()
+
+
+class UsedDataset(EmbeddedDocument):
+    dataset = ReferenceField(Dataset)
 
 
 class App(Project):
@@ -108,7 +131,8 @@ class App(Project):
     # 文档字符串
     doc = StringField()
     # 使用过的modules
-    used_modules = ListField(ReferenceField(Module))
+    used_modules = EmbeddedDocumentListField(UsedModule)
+    used_datasets = EmbeddedDocumentListField(UsedDataset)
     # app 路径
     app_path = StringField(default=None)
 

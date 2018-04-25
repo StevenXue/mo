@@ -104,11 +104,12 @@ ENV PATH=$PATH:$HOME/.local/bin
 # path in container
 RUN /bin/bash -c "export PATH=\$PATH:$HOME/.local/bin"
 
-# ENV PIP_INDEX_URL=https://mirrors.ustc.edu.cn/pypi/web/simple
-# RUN mkdir $HOME/.pip/
+# Change pipenv index url
 COPY --chown=jovyan:users Pipfile $HOME/
 
 RUN pipenv install
+
+#RUN cat Pipfile
 
 #RUN pipenv install && pipenv shell
 # Install Jupyter Notebook and Hub
@@ -270,7 +271,13 @@ RUN echo 'source /usr/local/bin/virtualenvwrapper.sh' >> ~/.bashrc
 #RUN /bin/bash -c "export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv"
 #RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh"
 #RUN source ~/.bashrc
+USER $NB_UID
 
-ADD run.sh /home/jovyan
-ADD add_venv.sh /home/jovyan
+ADD --chown=jovyan:users run.sh /home/jovyan
+ADD --chown=jovyan:users add_venv.sh /home/jovyan
+ADD --chown=jovyan:users remove_venv.sh /home/jovyan
+ADD --chown=jovyan:users freeze_venv.sh /home/jovyan
+ADD --chown=jovyan:users modules /home/jovyan/modules
+ADD --chown=jovyan:users dataset /home/jovyan/dataset
+ADD --chown=jovyan:users pip.conf /home/jovyan/.pip/pip.conf
 CMD ['bash', '/home/jovyan/run.sh']

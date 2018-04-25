@@ -1,0 +1,12 @@
+input:
+  newttt_param_1:
+    default_value: 21
+    des: null
+    name: DayofMonth
+    optional: false
+    value_range: null
+    value_type: int
+output:
+  flight_no:
+    name: flight_no
+    type: int

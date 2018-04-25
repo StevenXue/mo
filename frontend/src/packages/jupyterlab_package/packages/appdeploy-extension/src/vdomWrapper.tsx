@@ -12,7 +12,7 @@ import {
 
 // const Option = Select.Option;
 
-import {ModulePage} from './reactIndex.js';
+import {AppPage} from './reactIndex.js';
 
 /**
  * The CSS class added to form.
@@ -63,7 +63,9 @@ export class Form extends VDomRenderer<null> {
     protected render(): React.ReactElement<any> {
         return (
             <div>
-                <ModulePage/>
+                <input style={{display: 'none'}} className='fileSelect'/>
+                <input style={{display: 'none'}} className='versionNumber'/>
+                <AppPage/>
             </div>
         );
     }
