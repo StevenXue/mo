@@ -88,6 +88,8 @@ def list_projects_by_query():
     else:
         for project in projects.objects:
             project.user_ID = project.user.user_ID
+            if project.user.avatar:
+                project.user_avatar = project.user.avatar
         project_list = json_utility.me_obj_list_to_json_list(projects.objects)
         return jsonify({
             "response": {'projects': project_list, 'count': projects.count}
