@@ -313,8 +313,8 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
       </Col>
     </Row>
   //   return <div style={{paddingBottom: '50px'}}><span>
-    
-    
+
+
   // </span></div>
   }
 
@@ -339,7 +339,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
         } else if (projectDetail.project.status === 'active') {
           return <Tag color='green' style={{cursor: 'default',marginLeft:10}}>Online</Tag>
         } else {
-          return <Tag color='grey' style={{cursor: 'default',marginLeft:10}}></Tag>
+          return <Tag color='grey' style={{cursor: 'default',marginLeft:10}}>Offline</Tag>
         }
       }
 
@@ -572,7 +572,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                                key={e}>{e}</Tag>)
                         : null}
                     </div>
-                    
+
                     {/* <div style={{paddingBottom: '50px'}}>
                     <span>
                       {!market_use && <span className={styles.generalSpan}>
