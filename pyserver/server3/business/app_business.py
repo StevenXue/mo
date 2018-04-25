@@ -100,11 +100,21 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         app.save()
         return app
 
+    # @staticmethod
+    # def copy_from_container(container, path_from, path_to):
+    #     strm, stat = container.get_archive(path_from)
+    #     with tarfile.open(mode='r', fileobj=BytesIO(strm.read())) as t:
+    #         t.extractall(path_to)
+
     @staticmethod
     def copy_from_container(container, path_from, path_to):
-        strm, stat = container.get_archive(path_from)
-        with tarfile.open(mode='r', fileobj=BytesIO(strm.read())) as t:
-            t.extractall(path_to)
+        with tempfile.NamedTemporaryFile() as destination:
+            strm, stat = container.get_archive(path_from)
+            for d in strm:
+                destination.write(d)
+            destination.seek(0)
+            with tarfile.open(mode='r', fileobj=destination) as t:
+                t.extractall(path_to)
 
     @staticmethod
     def modify_handler_py(py_path):
