@@ -56,7 +56,6 @@ export default async function request(url, options = {}, funcs = {}) {
     }
     // const {status, statusText} = response
     const newRes = response
-    console.log("response", response)
 
     const data = await response.json()
     const res = data.response || data
