@@ -332,7 +332,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
       window.open('/#/workspace/' + e.select_project._id + '?type=' + e.select_project.type)
     }
     else {
-      window.open('/#/discovery/' + e.select_project._id + '?type=' + e.select_project.type)
+      window.open('/#/explore/' + e.select_project._id + '?type=' + e.select_project.type)
     }
   }
 

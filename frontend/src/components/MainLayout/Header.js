@@ -55,10 +55,10 @@ const menuConfig = [
   //   text: 'Model Market',
   // },
   {
-    key: '/discovery',
-    Link: '/discovery?tab=app',
+    key: '/explore',
+    Link: '/explore?tab=app',
     Icon: null,
-    text: 'Discovery',
+    text: 'Explore',
   },
   {
     key: '/userrequest',
@@ -112,7 +112,7 @@ function Header({location, login, history, dispatch, allRequest,message}) {
       borderRadius:10,
       width:10,
     }:{}
-    
+
   }
   // 点击未读信息，进入详情
   const toMessage= (e) => {

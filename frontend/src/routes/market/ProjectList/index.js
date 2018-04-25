@@ -39,7 +39,7 @@ function Projects({history, project, dispatch,location}) {
   const paramList = Object.keys(defaultActiveKeyDic)
 
   function callback(key) {
-    history.push(`discovery${paramList[parseInt(key)-1]}`)
+    history.push(`explore${paramList[parseInt(key)-1]}`)
   }
 
   return (
@@ -121,7 +121,7 @@ class ProjectList extends Component {
       history.push(`/workspace/${id}?type=${type}`)
     }
     else {
-      history.push(`/discovery/${id}?type=${type}`)
+      history.push(`/explore/${id}?type=${type}`)
     }
   }
 
@@ -199,12 +199,12 @@ class ProjectList extends Component {
 function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
   const user_obj_id = localStorage.getItem('user_obj_id')
   const picNumber = parseInt(project.user.slice(20))%6
-  console.log('pp', project)
+  console.log(project.user)
   return (
     <div className={styles.projectCard}>
       <div className={styles.toDetail} onClick={() => onClickToDetail()}>
         <div className={styles.pic}>
-          <img src={avatarList[picNumber]}  alt="avatar" />
+          <img src={project.user_avatar?project.user_avatar:avatarList[picNumber]}  alt="avatar" />
         </div>
         <div className={styles.name}>
           <p className={styles.namep}>{project.name}</p>
