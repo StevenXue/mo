@@ -161,16 +161,18 @@ class ModuleBusiness(ProjectBusiness):
 
     @staticmethod
     def load_module_params(module, version=DEV_DIR_NAME):
-        # TODO remove 'try except' after modules all have versions
-        try:
-            if not version:
+        if not version:
+            if len(module.versions) > 0:
                 version = module.versions[-1]
-        except:
-            version = DEV_DIR_NAME
+            else:
+                version = DEV_DIR_NAME
         yml_path = os.path.join(module.module_path, version, tail_path)
-        with open(yml_path, 'r') as stream:
-            obj = yaml.load(stream)
-            return {'input': obj.get('input'), 'output': obj.get('output')}
+        if os.path.exists(yml_path):
+            with open(yml_path, 'r') as stream:
+                obj = yaml.load(stream)
+                return {'input': obj.get('input'), 'output': obj.get('output')}
+        else:
+            return {'input': {}, 'output': {}}
 
     @classmethod
     def deploy_or_publish(cls, project_id, commit_msg, version=DEV_DIR_NAME):
