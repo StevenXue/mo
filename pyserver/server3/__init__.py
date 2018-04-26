@@ -35,6 +35,16 @@ App.register_delete_rule(User, 'favor_apps', PULL)
 App.register_delete_rule(User, 'star_apps', PULL)
 App.register_delete_rule(Statistics, 'app', CASCADE)
 
+# 删除module
+Module.register_delete_rule(User, 'favor_modules', PULL)
+Module.register_delete_rule(User, 'star_modules', PULL)
+Module.register_delete_rule(Statistics, 'module', CASCADE)
+
+# 删除dataset
+Dataset.register_delete_rule(User, 'favor_datasets', PULL)
+Module.register_delete_rule(User, 'star_datasets', PULL)
+Module.register_delete_rule(Statistics, 'datasets', CASCADE)
+
 # App.register_delete_rule(User, 'used_apps', PULL)  # TODO 把相关的used_apps删掉
 
 
