@@ -77,12 +77,13 @@ class ProjectExample extends React.Component {
         <div>
           API:
           <CopyInput
+            style={{width:'50%'}}
             text={`${projectDetail.project.app_path.replace('.', 'http://192.168.31.23:8080')}-${version_}`}/>
         </div>
         <br/>
         <Row gutter={16}>
-          <Col span={12}>
-            <div>
+          <Col span={12} >
+            <div style={{border:'1px solid #eeeeee'}}>
               <div>
                 <p>
                   INPUT
@@ -108,8 +109,10 @@ class ProjectExample extends React.Component {
               </div>
             </div>
           </Col>
-          <Col span={12}>
-            <div>
+          </Row>
+          <Row gutter={16}>
+          <Col span={12} >
+            <div style={{border:'1px solid #eeeeee',borderTop:0}}>
               <div>
                 <p>
                   OUTPUT

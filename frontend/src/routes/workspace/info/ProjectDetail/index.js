@@ -386,6 +386,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
           })
         }
 
+        //关闭tourtip时调用，此后登录不再显示tourtip
         noLearning = ()=>{
           fetch(`/pyapi/user/notourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
         }
