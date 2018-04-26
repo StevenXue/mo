@@ -32,6 +32,7 @@ def list_comments():
             comment.avatar = comment.comments_user.avatar
     comments = json_utility. \
         me_obj_list_to_json_list(comments)
+
     return jsonify(
         {'response': {'comments': comments, 'total_number': total_number}}), 200
 
