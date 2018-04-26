@@ -47,7 +47,7 @@ export class DatasetPage extends React.Component {
         const hash = window.location.hash
         const match = pathToRegexp('#/workspace/:appId/:type').exec(hash)
         if (match) {
-            if(match[2] === 'app') {
+            if (match[2] === 'app') {
                 this.appId = match[1]
             }
         }
@@ -83,7 +83,7 @@ export class DatasetPage extends React.Component {
                 totalNumber: count,
             }),
         })
-        if(this.appId) {
+        if (this.appId) {
             getApp({
                 appId: this.appId,
                 onJson: (app) => this.setState({
@@ -147,8 +147,8 @@ export class DatasetPage extends React.Component {
         return (
             <div className='container'>
                 <header>DATASET LIST
-                    <Icon type="bars" style={{float: 'right', cursor: 'pointer', margin: 5}}
-                          onClick={() => this.setState({showUsedDatasets: true})}/>
+                    {this.appId && <Icon type="bars" style={{float: 'right', cursor: 'pointer', margin: 5}}
+                                         onClick={() => this.setState({showUsedDatasets: true})}/>}
                 </header>
                 <Search
                     placeholder="input search text"

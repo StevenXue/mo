@@ -81,6 +81,9 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
 
         # 1. copy modules from docker
         cls.copy_from_container(container, '/home/jovyan/modules', func_path)
+        # copy path edited __init__.py
+        shutil.copy('./functions/template/python3/function/modules/__init__.py',
+                    os.path.join(func_path, 'modules'))
         # 2. copy datasets from docker
         cls.copy_from_container(container, '/home/jovyan/dataset', func_path)
 
@@ -100,11 +103,21 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         app.save()
         return app
 
+    # @staticmethod
+    # def copy_from_container(container, path_from, path_to):
+    #     strm, stat = container.get_archive(path_from)
+    #     with tarfile.open(mode='r', fileobj=BytesIO(strm.read())) as t:
+    #         t.extractall(path_to)
+
     @staticmethod
     def copy_from_container(container, path_from, path_to):
-        strm, stat = container.get_archive(path_from)
-        with tarfile.open(mode='r', fileobj=BytesIO(strm.read())) as t:
-            t.extractall(path_to)
+        with tempfile.NamedTemporaryFile() as destination:
+            strm, stat = container.get_archive(path_from)
+            for d in strm:
+                destination.write(d)
+            destination.seek(0)
+            with tarfile.open(mode='r', fileobj=destination) as t:
+                t.extractall(path_to)
 
     @staticmethod
     def modify_handler_py(py_path):
