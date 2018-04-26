@@ -110,9 +110,9 @@ class Repo:
     #     return modified_obj.reload()
 
     def update_one_by_id(self, obj_id, update):
-        update.pop('id')
-        update.pop('type')
-        update.pop('size')
+        update.pop('id', None)
+        update.pop('type', None)
+        update.pop('size', None)
         modified_obj = self.__instance.objects.get(id=obj_id)
         modified_obj.modify(**update)
         return modified_obj.reload()
