@@ -44,7 +44,7 @@ class Forgot extends Component {
             loading:true,
             flag:false,
         },()=>{
-            fetch(`http://localhost:5005/user/forgot?email=${this.state.email}`, {method: 'GET'})
+            fetch(`/pyapi/user/forgot?email=${this.state.email}`, {method: 'GET'})
             .then(({status}) => {
                 status==400?this.warning():this.victory();
             })

@@ -17,7 +17,7 @@ def module_general(module_id, action, *args, **kwargs):
     [user_ID, module_name, version] = module_id.split('/')
     version = '_'.join(version.split('.'))
     main_module = import_module(
-        f'modules.{user_ID}.{module_name}.{version}.src.main')
+        f'function.modules.{user_ID}.{module_name}.{version}.src.main')
     cls = getattr(main_module, module_name)()
     return getattr(cls, action)(*args, **kwargs)
 

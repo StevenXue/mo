@@ -15,7 +15,8 @@ import {JsonToArray} from '../../../utils/JsonUtils'
 import RequestModal from '../../../components/RequestModal/index'
 import {getProjects} from '../../../services/project'
 import ProjectModal from '../../../components/ProjectModal/index'
-
+import star from './img/star.png'
+import star_o from './img/star-o.png'
 
 const {TextArea} = Input
 const confirm = Modal.confirm
@@ -429,8 +430,10 @@ function UserRequestDetail({allRequest, login, dispatch}) {
             style={{paddingBottom: 10}}>
             <Icon
               type={focusUserRequest['star_user'].includes(user_obj_id) ? 'star' : 'star-o'}
-              style={{fontSize: '22px', color: '#34c0e2'}}
-              onClick={() => requestStar()}/>
+              className={styles.star}
+              style={{fontSize: '22px', color:'transparent', 
+              background:focusUserRequest['star_user'].includes(user_obj_id) ?`url(${star}) no-repeat`:`url(${star_o}) no-repeat`}}
+              onClick={() => requestStar()}/>...
             {focusUserRequest['title']} &nbsp;&nbsp;
             {focusUserRequest['user_ID'] === user_ID &&
             <span className={styles.rightButton}>
@@ -444,23 +447,26 @@ function UserRequestDetail({allRequest, login, dispatch}) {
             {/*{focusUserRequest['user_ID']===user_ID && <Icon type="close" onClick={() => deleteUserRequest()}/>}*/}
           </h2>
         </div>
-        <div className={styles.requestuser}>
+        <div className={styles.requestuser}  style={{color:'#828A92'}}>
           <Icon
-            type="user"/>&nbsp;{focusUserRequest['user_ID']} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            type='star'
+            style={{fontSize: '22px', color:'transparent'}}/>
+          <Icon
+            type="user" style={{color:'#828A92'}}/>&nbsp;{focusUserRequest['user_ID']} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           {focusUserRequest['tags'].length > 0 && <Icon type="tag-o"/>}&nbsp;
           {focusUserRequest['tags'].length > 0 && focusUserRequest['tags'].join(',')}
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           <Icon
-            type="clock-circle-o"/>&nbsp;{showTime(focusUserRequest['create_time'])}
+            type="clock-circle-o"  style={{color:'#828A92'}}/>&nbsp;{showTime(focusUserRequest['create_time'])}
         </div>
 
         <p
-          className={styles.description}>{get(focusUserRequest, 'description') ? get(focusUserRequest, 'description') : null}</p>
+          className={styles.description}  style={{color:'#828A92'}}>{get(focusUserRequest, 'description') ? get(focusUserRequest, 'description') : null}</p>
         {focusUserRequest.input ?
-          <div style={{margin: '16px 0'}}><p>Input: {focusUserRequest.input}</p>
+          <div style={{margin: '16px 0'}}><p  style={{color:'#828A92'}}>Input: {focusUserRequest.input}</p>
           </div> : null}
         {focusUserRequest.output ? <div style={{margin: '16px 0'}}>
-          <p>Output: {focusUserRequest.output}</p></div> : null}
+          <p  style={{color:'#828A92'}}>Output: {focusUserRequest.output}</p></div> : null}
         <h2
           className={styles.commentsAnswers}>{focusUserRequest.comments ? focusUserRequest.comments.length : 0} Comments</h2>
         <hr/>

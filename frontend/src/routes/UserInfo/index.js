@@ -560,8 +560,8 @@ class GenderEditForm extends React.Component {
       wrapperCol: {span: 14},
     }
     const genderDic = {
-      '1': '男',
       '0': '女',
+      '1': '男',
       '2': '保密'
     }
     if (this.state.status === 'show') {
@@ -656,7 +656,6 @@ class AvatarEdit extends React.Component {
   }
 
   confirmEdit = () => {
-    console.log('editor', this.editor.getImage().toDataURL())
     updateUserInfo({
       body: {
         'avatar': this.editor.getImage().toDataURL()

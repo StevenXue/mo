@@ -344,7 +344,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
         } else if (projectDetail.project.status === 'active') {
           return <Tag color='green' style={{cursor: 'default',marginLeft:10}}>Online</Tag>
         } else {
-          return <Tag color='grey' style={{cursor: 'default',marginLeft:10}}></Tag>
+          return <Tag color='grey' style={{cursor: 'default',marginLeft:10}}>Offline</Tag>
         }
       }
 
@@ -362,7 +362,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
         }
 
         componentDidMount() {
-          fetch(`http://localhost:5005/user/tourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
+          fetch(`/pyapi/user/tourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
             .then((response) => response.json())
             .then(({response}) => {
               this.setState({
@@ -387,7 +387,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
         }
 
         noLearning = ()=>{
-          fetch(`http://localhost:5005/user/notourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
+          fetch(`/pyapi/user/notourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
         }
 
         render() {
@@ -547,13 +547,14 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                                         projectDetail={projectDetail}
                                         type={projectDetail.project.type}
                           >
-                          <Button icon='edit' style={{marginRight: 15}}/>
+                          <Button icon='edit' style={{marginRight: 15}} style={{width:32}}/>
                         </ProjectModal>
                           {/* only private project can be deleted */}
                           {projectDetail.project.privacy === 'private' &&
-                          <Button icon='delete' style={{marginRight: 15}}
+                          <Button icon='delete' style={{marginRight: 15, marginLeft:15,width:32}}
                                   onClick={() => deleteProject()}/>}
                           <Button icon='cloud-download-o' className="mei"
+                                  style={{width:32,fontSize:16}}
                                   onClick={() => dispatch({
                                     type: 'projectDetail/showHelpModal',
                                   })}/>

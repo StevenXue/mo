@@ -17,7 +17,7 @@ class NewPassword extends Component {
 
     componentWillMount(){
         let url = new URL(window.location.href.replace('/#', ''))
-        fetch(`http://localhost:5005/user/haveReset?email=${url.searchParams.get('email')}&&hashEmail=${url.searchParams.get('hashEmail')}`, {method: 'GET'})
+        fetch(`/pyapi/user/haveReset?email=${url.searchParams.get('email')}&&hashEmail=${url.searchParams.get('hashEmail')}`, {method: 'GET'})
         .then(({status})=>{
             if(status==200){
                 this.setState({
@@ -66,7 +66,7 @@ class NewPassword extends Component {
     send = ()=>{
         const {password, email, hashEmail, password_two} = this.state
         if(password==password_two){
-            fetch(`http://localhost:5005/user/newpassword?password=${password}&&email=${email}&&hashEmail=${hashEmail}`, {method: 'GET'})
+            fetch(`/pyapi/user/newpassword?password=${password}&&email=${email}&&hashEmail=${hashEmail}`, {method: 'GET'})
             .then(({status})=>{
                 if(status==200){
                     this.vic();
