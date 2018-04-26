@@ -78,6 +78,8 @@ class MessageBusiness:
         end = page_no * page_size
         receivers = cls.receiver_repo.read()
         receivers = receivers(user=user)
+        # 该用户的所有信息的数量
+        total_number = receivers.count()
         receivers = receivers[start: end]
         receivers_info = json_utility.convert_to_json([i.to_mongo()
                                                        for i in receivers])
@@ -94,7 +96,7 @@ class MessageBusiness:
             message_info['receiver_id'] = receiver['_id']
             messages.append(message_info)
         messages = json_utility.convert_to_json(messages)
-        return messages
+        return messages, total_number
 
 
     @classmethod
