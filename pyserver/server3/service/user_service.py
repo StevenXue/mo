@@ -480,10 +480,7 @@ class UserService:
                 "caller": user_obj
             },
             page_no=page_no, page_size=page_size)
-        for _object in statistics.objects:
-            _object.app_obj_user_ID = _object.app.user.user_ID
-        statistics.objects = json_utility.objs_to_json_with_args(
-            statistics.objects, ["app", "caller"])
+
         return statistics
 
     @classmethod
