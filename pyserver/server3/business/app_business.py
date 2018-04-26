@@ -125,9 +125,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
             version = DEV_DIR_NAME
         yml_path = os.path.join('-'.join([app.app_path, version]),
                                 yaml_tail_path)
-        print(yml_path)
-        print('aaa')
-        with open(yml_path, 'r') as stream:
+        with open(yml_path.replace('\\', '/'), 'r') as stream:
             obj = yaml.load(stream)
             return {'input': obj.get('input'), 'output': obj.get('output')}
 
