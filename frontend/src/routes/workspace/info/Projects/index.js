@@ -124,6 +124,7 @@ class ProjectList extends Component {
 
   toProjectDetail(id, history, type) {
     this.props.dispatch({type:'launchpage/change',payload:{visibility:false}})  //关闭launchpage
+    localStorage.setItem('launchpage','hide')
     history.push(`/workspace/${id}?type=${type}`)
   }
 
@@ -172,7 +173,7 @@ class ProjectList extends Component {
                     style={{cursor: 'pointer'}}>
                 <div>
                   <p className={styles.des}>{e.description}</p>
-                  <p className={styles.other}>
+                  <div className={styles.other}>
                     <Icon type="clock-circle-o" style={{marginRight: 10}}/>
                     {showTime(e.create_time)}
                     {/* <Button style={{float: 'right'}}
@@ -198,7 +199,7 @@ class ProjectList extends Component {
                         <p className={styles.number} style={{float: 'left'}}>{e.favor_users.length}</p>
                       </div>
                     </div>
-                  </p>
+                  </div>
                   {/*<Icon type="user" style={{ marginRight: 10 }}/>*/}
                   {/*{e['user_name'] && <p>Owner: {e.user_name}</p>}*/}
                 </div>

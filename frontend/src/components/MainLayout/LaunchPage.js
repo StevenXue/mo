@@ -11,55 +11,36 @@ class LaunchPage extends React.Component {
     constructor() {
       super()
       this.state = {
-        // flag:0
+        visibility:localStorage.launchpage==='show'?'block':'none'
       }
     }
 
-    // 判断是不是第一次登录
-    // componentDidMount(){
-    //     fetch(`http://localhost:5005/user/learning?user_ID=${localStorage.user_ID}`, {method: 'GET'})
-    //     .then((response) => response.json())
-    //     .then(({response}) => {
-    //         if(response.user.welcome==0){
-    //             this.setState({
-    //                 flag:0
-    //             })
-    //         }
-    //     })
-    // }
-    // componentDidUpdate(){
-    //     this.checkWelcome()
-    // } 
+    //本组件控制显隐的方法：
+    //1.this.props.launchpage.visibility为false，组件隐藏
+    //2.this.props.launchpage.visibility为true, this.state.visibility控制组件显隐
+    //3.组件初始化时，localStorage.launchpage影响this.state.visibility 的值
+    //4.登陆时，localStorage.setItem('launchpage','show')
+    //5.关闭组件时， localStorage.setItem('launchpage','hide')
     componentWillUpdate(nextProps){
         this.props.location.pathname!=nextProps.location.pathname?this.checkWelcome():null
     }
      //组件将被卸载  
     componentWillUnmount(){ 
         //重写组件的setState方法，直接返回空
-        this.setState = (state,callback)=>{
-        return
-        }
+        this.setState = (state,callback)=>{return}
     }
     checkWelcome = ()=>{
-        // console.log(11111111)
         if(this.props.location.search.indexOf("app")!=-1&&this.props.location.pathname.indexOf("/workspace/")!=-1){
-            // console.log(2222)
-            // if(this.state.flag==0){
-                // this.setState({
-                //     flag:1
-                // })
+          
                 document.getElementById("LaunchPage_Contain").scrollTo(0,0)
-                // fetch(`http://localhost:5005/user/nolearning?user_ID=${localStorage.user_ID}`, {method: 'GET'})
-            // } 
         }
     }
     close =()=>{
-        // fetch(`http://localhost:5005/user/nolearning?user_ID=${localStorage.user_ID}`, {method: 'GET'})
-        // this.setState({
-        //     flag:1
-        // })
-        this.props.dispatch({type:'launchpage/change',payload:{visibility:false}})
-        // this.props.dispatch({type:'launchpage/visibility',payload:false})
+        // this.props.dispatch({type:'launchpage/change',payload:{visibility:false}})
+        localStorage.setItem('launchpage','hide')
+        this.setState({
+            visibility:'none'
+        })
     }
     ssscrollTo = ()=>{
         document.getElementById("LaunchPage_Contain").scrollTo(0,900)
@@ -67,34 +48,9 @@ class LaunchPage extends React.Component {
       
     newRequest = ()=>{
         this.props.dispatch(routerRedux.push('/userrequest?tab=app'))
-        // this.ssscrollTo()
         this.timer = setTimeout(()=>{
-        //     this.props.dispatch({type:'joyride/updateState',payload:{steps:[
-        //         {
-        //             title: '',
-        //             text: '发布需求',
-        //             selector: '#mei_rightButton',
-        //             position: 'left',
-        //             // isFixed:true,
-        //             style: {
-        //                 borderRadius: 0,
-        //                 color: '#34BFE2',
-        //                 textAlign: 'center',
-        //                 width: '29rem',
-        //                 mainColor: '#ffffff',
-        //                 backgroundColor:'#ffffff',
-        //                 beacon: {
-        //                 inner: '#34BFE2',
-        //                 outer: '#34BFE2',
-        //                 },
-        //                 close:{
-        //                 display:"none"
-        //                 }
-        //             }
-        //         }
-        //     ]}})
-        this.ssscrollTo()
-        document.getElementById('mei_rightButton').click()
+            this.ssscrollTo()
+            document.getElementById('mei_rightButton').click()
         },1000)
     }
     newApp = ()=>{
@@ -102,63 +58,13 @@ class LaunchPage extends React.Component {
         // this.ssscrollTo()
         
         this.timer = setTimeout(()=>{
-            // this.props.dispatch({type:'joyride/updateState',payload:{steps:[
-            //     {
-            //         title: '',
-            //         text: '新建应用',
-            //         selector: '#Newapp',
-            //         position: 'left',
-            //         // isFixed:true,
-            //         style: {
-            //             borderRadius: 0,
-            //             color: '#34BFE2',
-            //             textAlign: 'center',
-            //             width: '29rem',
-            //             mainColor: '#ffffff',
-            //             backgroundColor:'#ffffff',
-            //             beacon: {
-            //             inner: '#34BFE2',
-            //             outer: '#34BFE2',
-            //             },
-            //             close:{
-            //             display:"none"
-            //             }
-            //         }
-            //     }
-            // ]}})
-            // debugger
             this.ssscrollTo()
             document.getElementById('Newapp').click()
         },1000)
     }
     newModule = ()=>{
         this.props.dispatch(routerRedux.push('/workspace?tab=module'))
-        // this.ssscrollTo()
         this.timer = setTimeout(()=>{
-            // this.props.dispatch({type:'joyride/updateState',payload:{steps:[
-            //     {
-            //         title: '',
-            //         text: '新建模块',
-            //         selector: '#Newmodule',
-            //         position: 'left',
-            //         // isFixed:true,
-            //         style: {
-            //             borderRadius: 0,
-            //             color: '#34BFE2',
-            //             textAlign: 'center',
-            //             width: '29rem',
-            //             mainColor: '#ffffff',
-            //             backgroundColor:'#ffffff',
-            //             beacon: {
-            //             inner: '#34BFE2',
-            //             outer: '#34BFE2',
-            //             },
-            //             close:{
-            //             display:"none"
-            //             }
-            //         }
-            //     }
-            // ]}})
             this.ssscrollTo()
             document.getElementById('Newmodule').click()
         },1000)
@@ -167,13 +73,10 @@ class LaunchPage extends React.Component {
         // this.props.dispatch(routerRedux.push('/workspace?tab=module'))
         window.location = "https://momodel.github.io/mo/#/zh-cn/quick_start"
     }
-    // beforeClose = ()=>{
-    //     window.onbeforeunload = ()=>{ alert("miaomiao")}
-    // }
     render(){
-        // const {v}
+        const {visibility} = this.state
         return <div className={styles.LaunchPage} 
-                    style={{display:this.props.launchpage.visibility?"block":"none"}}
+                    style={{display:!this.props.launchpage.visibility?'none':visibility}}
                     >
             <div className={styles.LaunchPage_Content}>
                 <section className={styles.title}>
