@@ -1,7 +1,7 @@
 import React from 'react'
-import {Link, Route, Switch} from 'react-router-dom'
+import { Link, Route, Switch } from 'react-router-dom'
 import Joyride from 'react-joyride'
-import {connect} from 'dva'
+import { connect } from 'dva'
 import {
   Button,
   Col,
@@ -15,7 +15,7 @@ import {
   Input,
   Form,
   Pagination,
-  Card
+  Card,
 } from 'antd'
 // pages
 import JupyterLab from '../../modelling/Modelling/index'
@@ -25,20 +25,19 @@ import HelpModal from '../../../../components/HelpModal'
 import ReactMdeEditor from '../../../../components/ReactMdeCom/reactMde'
 import ProjectExample from '../../../../components/ProjectExample/projectExample'
 
-import {showTime} from '../../../../utils/index'
+import { showTime } from '../../../../utils/index'
 import styles from './index.less'
-import {get} from 'lodash'
-import {message} from 'antd/lib/index'
+import { get } from 'lodash'
+import { message } from 'antd/lib/index'
 import ReactMarkdown from 'react-markdown'
-import {avatarList, flaskServer, hubServer} from '../../../../constants'
+import { avatarList, flaskServer, hubServer } from '../../../../constants'
 // import {fetchComments} from "../../../../services/comments"
 
 const confirm = Modal.confirm
 const TabPane = Tabs.TabPane
-const {TextArea} = Input
+const { TextArea } = Input
 const FormItem = Form.Item
 const commitSvg = require('../../../../img/icon/git-commit.svg')
-
 
 const pages = ['import', 'analysis', 'modelling', 'deploy']
 
@@ -48,7 +47,6 @@ const projectTypeDict = {
   dataset: [],
 }
 
-
 class CommitsList extends React.Component {
   render() {
     return (
@@ -56,11 +54,12 @@ class CommitsList extends React.Component {
         {this.props.commits.map(e =>
           <div className={styles.commentDiv} key={e.newhexsha}>
             <Row type="flex" justify="space-around" align="middle">
-              <Col span={2} >
+              <Col span={2}>
                 <div>
-                  {e.version && <div className={styles.commitVersion}><Icon type="tag-o" /> {e.version}</div>
+                  {e.version && <div className={styles.commitVersion}><Icon type="tag-o"/> {e.version}</div>
                   }
-                  <div className={styles.commitHexsha}><img src={commitSvg} alt="commit"/> {e.newhexsha.slice(0,7)}</div>
+                  <div className={styles.commitHexsha}><img src={commitSvg} alt="commit"/> {e.newhexsha.slice(0, 7)}
+                  </div>
                 </div>
               </Col>
               <Col span={22} className={styles.commentCol}>
@@ -105,12 +104,12 @@ class CommentsList extends React.Component {
     })
     this.props.dispatch({
       type: 'projectDetail/fetchComments',
-      'projectId': this.props.projectId
+      'projectId': this.props.projectId,
     })
   }
 
   render() {
-    const {dispatch, projectId} = this.props
+    const { dispatch, projectId } = this.props
     console.log('coment', this.state.comments)
     return (
       <div>
@@ -148,7 +147,6 @@ class CommentsList extends React.Component {
   }
 }
 
-
 class CommentForm extends React.Component {
 
   constructor() {
@@ -165,17 +163,17 @@ class CommentForm extends React.Component {
         comments: this.state.inputValue,
         comments_type: 'project',
         _id: this.props.projectId,
-      }
+      },
     })
-    this.setState({inputValue: null})
+    this.setState({ inputValue: null })
   }
 
   handleInputChange(e) {
-    this.setState({inputValue: e.target.value})
+    this.setState({ inputValue: e.target.value })
   }
 
   render() {
-    const {fetching, data, value, projects, inputValue} = this.state
+    const { fetching, data, value, projects, inputValue } = this.state
     const userObjId = localStorage.getItem('user_obj_id')
     const picNumber = parseInt(userObjId.slice(20)) % 6
     return (
@@ -186,13 +184,13 @@ class CommentForm extends React.Component {
               <img src={avatarList[picNumber]} alt="avatar"/>
             </div>
           </Col>
-          <Col span={20} style={{margin: '20px 0'}}>
+          <Col span={20} style={{ margin: '20px 0' }}>
             <TextArea value={inputValue}
                       placeholder="enter your comments.."
-                      autosize={{minRows: 5, maxRows: 50}}
+                      autosize={{ minRows: 5, maxRows: 50 }}
                       onChange={(e) => this.handleInputChange(e)}
             />
-            <div style={{margin: '20px 0'}}/>
+            <div style={{ margin: '20px 0' }}/>
             <Button
               type="primary"
               htmlType="submit"
@@ -208,13 +206,12 @@ class CommentForm extends React.Component {
   }
 }
 
-
 const myShowTime = (time, format = 'yyyy-MM-dd hh:mm') => {
   let date = new Date(time).Format(format)
   return date.toLocaleString()
 }
 
-function ProjectInfo({market_use, match, history, location, dispatch, projectDetail, login}) {
+function ProjectInfo({ market_use, match, history, location, dispatch, projectDetail, login }) {
   const projectId = match.params.projectId
   const user_ID = localStorage.getItem('user_ID')
   const userObjId = localStorage.getItem('user_obj_id')
@@ -251,12 +248,11 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
       onOk() {
         dispatch({
           type: 'projectDetail/delete',
-          payload: {projectId, type: projectDetail.project.type}
+          payload: { projectId, type: projectDetail.project.type },
         })
       },
     })
   }
-
 
   function appStarFavor(action) {
     dispatch({
@@ -288,10 +284,10 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
     })
   }
 
-  const cloudNote = ()=>{
-    return <Row style={{width:'110%',marginLeft:'-5%'}}>
+  const cloudNote = () => {
+    return <Row style={{ width: '110%', marginLeft: '-5%' }}>
       <Col span={13}>
-      {!market_use && <span className={styles.generalSpan}>
+        {!market_use && <span className={styles.generalSpan}>
       <Upload {...props1}>
         <Button className="qing">
           <Icon type="upload"/> Click to Upload
@@ -312,10 +308,9 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
     </span>
       </Col>
     </Row>
-  //   return <div style={{paddingBottom: '50px'}}><span>
+    //   return <div style={{paddingBottom: '50px'}}><span>
 
-
-  // </span></div>
+    // </span></div>
   }
 
   if (location.pathname.split('/').length > 3) {
@@ -334,12 +329,12 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
           return <div/>
         }
         if (projectDetail.project.status === 'deploying') {
-          return <Tag color='gold' style={{cursor: 'default',marginLeft:10}}>Deploying <Icon
+          return <Tag color='gold' style={{ cursor: 'default', marginLeft: 10 }}>Deploying <Icon
             type="loading"/></Tag>
         } else if (projectDetail.project.status === 'active') {
-          return <Tag color='green' style={{cursor: 'default',marginLeft:10}}>Online</Tag>
+          return <Tag color='green' style={{ cursor: 'default', marginLeft: 10 }}>Online</Tag>
         } else {
-          return <Tag color='grey' style={{cursor: 'default',marginLeft:10}}>Offline</Tag>
+          return <Tag color='grey' style={{ cursor: 'default', marginLeft: 10 }}>Offline</Tag>
         }
       }
 
@@ -357,11 +352,11 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
         }
 
         componentDidMount() {
-          fetch(`/pyapi/user/tourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
+          fetch(`/pyapi/user/tourtip?user_ID=${localStorage.user_ID}`, { method: 'GET' })
             .then((response) => response.json())
-            .then(({response}) => {
+            .then(({ response }) => {
               this.setState({
-                tourtip:parseInt( response.user.tourtip),
+                tourtip: parseInt(response.user.tourtip),
               })
             })
         }
@@ -381,8 +376,8 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
           })
         }
 
-        noLearning = ()=>{
-          fetch(`/pyapi/user/notourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
+        noLearning = () => {
+          fetch(`/pyapi/user/notourtip?user_ID=${localStorage.user_ID}`, { method: 'GET' })
         }
 
         render() {
@@ -393,11 +388,11 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                   ref={c => (this.joyride = c)}
                   debug={false}
                   locale={{
-                    back: (<span style={{color: '#34BFE2'}} >Back</span>),
-                    close: (<span style={{color: '#34BFE2'}}>Close</span>),
-                    last: (<span style={{color: '#34BFE2'}} onClick={this.noLearning}>Last</span>),
-                    next: (<span style={{color: '#34BFE2'}}>Next</span>),
-                    skip: (<span style={{color: '#999999'}} onClick={this.noLearning}>Skip</span>),
+                    back: (<span style={{ color: '#34BFE2' }}>Back</span>),
+                    close: (<span style={{ color: '#34BFE2' }}>Close</span>),
+                    last: (<span style={{ color: '#34BFE2' }} onClick={this.noLearning}>Last</span>),
+                    next: (<span style={{ color: '#34BFE2' }}>Next</span>),
+                    skip: (<span style={{ color: '#999999' }} onClick={this.noLearning}>Skip</span>),
                   }}
                   run={true}
                   showOverlay={true}
@@ -497,11 +492,11 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                 projectType={projectDetail.project.type}/>}
               <div className={styles.info}>
                 <Row>
-                  <Col span={3} style={{padding: '10px 42px'}}>
+                  <Col span={3} style={{ padding: '10px 42px' }}>
                     <div className={styles.bigIconNunberDiv}>
                       <div
                         className={projectDetail.project.star_users.includes(userObjId) ? styles.iconNunberDivActive : styles.iconNunberDiv}
-                        style={market_use ? {cursor: 'pointer'} : {cursor: 'default'}}
+                        style={market_use ? { cursor: 'pointer' } : { cursor: 'default' }}
                         onClick={market_use ? () => appStarFavor('star') : null}
                       >
                         <p className={styles.icon}>
@@ -513,7 +508,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                       </div>
                       <div
                         className={projectDetail.project.favor_users.includes(userObjId) ? styles.iconNunberDivActive : styles.iconNunberDiv}
-                        style={market_use ? {cursor: 'pointer'} : {cursor: 'default'}}
+                        style={market_use ? { cursor: 'pointer' } : { cursor: 'default' }}
                         onClick={market_use ? () => appStarFavor('favor') : null}>
                         <p className={styles.icon}>
                           <Icon
@@ -524,39 +519,40 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                       </div>
                     </div>
                   </Col>
-                  <Col span={21} style={{paddingRight: '50px'}}>
+                  <Col span={21} style={{ paddingRight: '50px' }}>
                     <div className={styles.name}>
                       {/* project header area */}
-                      <h1>
-                        <div style={{display:'flex',alignItems:'center'}}>
+                      <h1 style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
                           {projectDetail.project.name}&nbsp;
                           {!market_use && <Icon
                             type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
-                            style={{fontSize: 20}}/>}
-                            {
-                              projectStatus()
-                            }
-                        </div>
-                        {!market_use && <span className={styles.rightButton}>
+                            style={{ fontSize: 20 }}/>}
+                          {
+                            projectStatus()
+                          }
+                        </span>
+                        {!market_use &&
+                        <span className={styles.rightButton}>
                           <ProjectModal new={false}
                                         projectDetail={projectDetail}
                                         type={projectDetail.project.type}
                           >
-                          <Button icon='edit' style={{marginRight: 15}} style={{width:32}}/>
+                          <Button icon='edit' style={{ marginRight: 15 }} />
                         </ProjectModal>
                           {/* only private project can be deleted */}
                           {projectDetail.project.privacy === 'private' &&
-                          <Button icon='delete' style={{marginRight: 15, marginLeft:15,width:32}}
+                          <Button icon='delete' style={{ marginRight: 15, width: 32 }}
                                   onClick={() => deleteProject()}/>}
                           <Button icon='cloud-download-o' className="mei"
-                                  style={{width:32,fontSize:16}}
+                                  style={{ width: 32, fontSize: 16 }}
                                   onClick={() => dispatch({
                                     type: 'projectDetail/showHelpModal',
                                   })}/>
                       </span>}
                       </h1>
                       <p className={styles.text}>
-                        <Icon type="clock-circle-o" style={{marginRight: 10}}/>
+                        <Icon type="clock-circle-o" style={{ marginRight: 10 }}/>
                         Create
                         Time: {showTime(projectDetail.project.create_time)}
                       </p>
@@ -568,7 +564,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                     <div className={styles.tags}>
                       {projectDetail.project.tags.length > 0 ? projectDetail.project.tags.map(e =>
                           <Tag color="#EEEEEE"
-                               style={{color: '#666666', cursor: 'default'}}
+                               style={{ color: '#666666', cursor: 'default' }}
                                key={e}>{e}</Tag>)
                         : null}
                     </div>
@@ -797,7 +793,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
   }
 }
 
-const Jobs = ({projectDetail, dispatch}) => {
+const Jobs = ({ projectDetail, dispatch }) => {
   return (
     <div>
       <h2>Jobs:
@@ -867,7 +863,7 @@ ProjectInfo.defaultProps = {
   market_use: false,
 }
 
-function ProjectDetail({match, history, location, dispatch, projectDetail}) {
+function ProjectDetail({ match, history, location, dispatch, projectDetail }) {
 
   return (
     <div className={`main-container ${styles.normal}`}>
@@ -878,7 +874,7 @@ function ProjectDetail({match, history, location, dispatch, projectDetail}) {
   )
 }
 
-export default connect(({projectDetail, login}) => ({
+export default connect(({ projectDetail, login }) => ({
   projectDetail,
   login,
 }))(ProjectInfo)
