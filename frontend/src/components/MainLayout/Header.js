@@ -228,14 +228,12 @@ function Header({location, login, history, dispatch, allRequest,message}) {
         <SubMenu
           className={styles.rightButton}
           title={
-            <span onClick={toLoginPage}>
+            <div onClick={toLoginPage}>
             {
               login.user?<img src={login.user.avatar} style={{width:25,borderRadius:0,marginRight:10}}/>:null
             }
-                
-                {/* <Icon type="user"/>*/}
-                {login.user ? login.user.user_ID : 'Login'} 
-              </span>
+              <span> {login.user ? login.user.user_ID : 'Login'} </span>
+            </div>
           }
         >
           {login.user &&
@@ -265,6 +263,7 @@ function Header({location, login, history, dispatch, allRequest,message}) {
         </SubMenu>
         <SubMenu
           className={styles.messageSubmenu}
+          style={{position:'absolute',top:6,right:'14%'}}
           title={
             <span onClick={toLoginPage} style={{position:'relative'}}>
                 {/* <Badge count={login.user ? numberOfUnreadMessage() : 0}> */}

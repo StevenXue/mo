@@ -79,9 +79,9 @@ const RouterConfig = ({history, location, projectDetail}) => {
       <Route path="/:anything" component={() =>
         <MainLayout location={location} history={history}>
           <div style={{display: 'flex', flexDirection: 'column'}}>
-            {/*<Breadcrumb>*/}
-              {/*{extraBreadcrumbItems}*/}
-            {/*</Breadcrumb>*/}
+            <Breadcrumb>
+              {extraBreadcrumbItems}
+            </Breadcrumb>
             <Switch>
 
               <Route path="/workspace/:projectId" component={ProjectDetail}/>
