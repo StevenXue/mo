@@ -12,10 +12,10 @@ module.exports = {
   apiPrefix: '/pyapi',
   // apiPrefix: 'http://122.224.116.44:5005',
 
-  jupyterServer: 'http://10.52.14.182:8888/api/contents/',  // kube master node ip
-  kubeServer: 'http://10.52.14.182:8888/api/contents/',  // kube master node ip
-  gitServerIp: '10.52.22.14',
-  hubIp: '10.52.22.14',
+  //jupyterServer: 'http://10.52.14.182:8888/api/contents/',  // kube master node ip
+  //kubeServer: 'http://10.52.14.182:8888/api/contents/',  // kube master node ip
+  gitServerIp: 'momodel.ai',
+  //hubIp: '10.52.22.14',
   // jupyterServer: 'http://10.52.14.182:8888/api/contents/',
   // jupyterServer: 'http://122.224.116.44:9001/api/contents/',
 
@@ -31,12 +31,12 @@ module.exports = {
   tbServer,
 
   //jupyter
-  kubeBaseUrl: 'http://10.52.14.182:8888',  // kube master node ip
+  //kubeBaseUrl: 'http://10.52.14.182:8888',  // kube master node ip
   // baseUrl: 'http://10.52.14.182:8888',
   // baseUrl: 'http://122.224.116.44:9001',
 
   // assets
-  assetsUrl: 'http://122.224.116.44:8008',
+  //assetsUrl: 'http://122.224.116.44:8008',
 
   mainColor,
 

@@ -100,7 +100,7 @@ def forgot_send(email):
         user.hashEmail = h.hexdigest()
         user.save()
 
-        text = user.user_ID+'，您好！\n请点击下方链接重置密码。 如非您本人操作，请忽略此邮件。\n 192.168.31.7:8899/#/newpassword?email='+email+'&user='+user.user_ID+'&hashEmail='+h.hexdigest()
+        text = user.user_ID+'，您好！\n请点击下方链接重置密码。 如非您本人操作，请忽略此邮件。\n momodel.ai/#/newpassword?email='+email+'&user='+user.user_ID+'&hashEmail='+h.hexdigest()
         text_plain = MIMEText(text,'plain', 'utf-8')   
         msg.attach(text_plain)   
         smtp = smtplib.SMTP()    
