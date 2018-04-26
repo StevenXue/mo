@@ -506,11 +506,12 @@ def get_statistics():
     entity_type = request.args.get("entity_type")
     statistics = UserService.get_statistics(user_ID, page_no, page_size, action,
                                             entity_type)
+
+    for _object in statistics.objects:
+        _object.app_obj_user_ID = _object.app.user.user_ID
     return jsonify({
         'response': {
-            "objects": statistics.objects,
-            # "objects": json_utility.objs_to_json_with_args(statistics.objects,
-            #                                                ["app", "caller"]),
+            "objects": json_utility.objs_to_json_with_args(statistics.objects, ["app", "caller"]),
             "page_size": statistics.page_size,
             "page_no": statistics.page_no,
             "count": statistics.count,

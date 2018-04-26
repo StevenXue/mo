@@ -198,7 +198,7 @@ class ProjectList extends Component {
 
 function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
   const user_obj_id = localStorage.getItem('user_obj_id')
-  const picNumber = parseInt(project.user.slice(20))%6
+  const picNumber = parseInt(project.user.slice(10))%6
   console.log(project.user)
   return (
     <div className={styles.projectCard}>

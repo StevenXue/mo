@@ -21,13 +21,15 @@ def add(user_ID, password, **kwargs):
 def get_by_user_ID(user_ID):
     return user_repo.read_by_unique_field('user_ID', user_ID)
 
+
 def get_by_email(email):
     return user_repo.read_by_unique_field('email', email)
 
-def get_by_hashEmail(email,hashEmail):
+
+def get_by_hashEmail(email, hashEmail):
     return user_repo.read_by_two_field('hashEmail', hashEmail, 'email', email)
 
-    
+
 def get_by_user_object_id(object_id):
     return user_repo.read_by_id(object_id)
 
@@ -93,7 +95,6 @@ class UserBusiness(GeneralBusiness):
             page_no=page_no,
             page_size=page_size)
 
-
     @classmethod
     def update_by_user_ID(cls, user_ID, update):
         user = get_by_user_ID(user_ID=user_ID)
@@ -111,9 +112,6 @@ class UserBusiness(GeneralBusiness):
     # @classmethod
     # def count_action_entity(cls, user_ID, page_no, page_size, action_entity,
     #                                  type, search_query):
-
-
-
 
     # @classmethod
     # def prepare(cls, user_ID, page_no, page_size):

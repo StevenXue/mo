@@ -405,8 +405,8 @@ function UserRequestDetail({allRequest, login, dispatch}) {
         {e.select_project.commits.length > 0 ?
           <div style={{marginTop: '35px', color: '#848d95'}}>
             <p>last commited
-              at {showTime(e.select_project.commits[e.select_project.commits.length - 1]['timestamp'])}</p>
-            <p>{e.select_project.commits[e.select_project.commits.length - 1]['message']}</p>
+              at {showTime(e.select_project.commits[0]['timestamp'])}</p>
+            <p>{e.select_project.commits[0]['message']}</p>
           </div> : null}
       </Card>
     }

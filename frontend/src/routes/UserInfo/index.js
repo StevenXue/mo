@@ -560,8 +560,8 @@ class GenderEditForm extends React.Component {
       wrapperCol: {span: 14},
     }
     const genderDic = {
-      '1': '男',
       '0': '女',
+      '1': '男',
       '2': '保密'
     }
     if (this.state.status === 'show') {
@@ -656,7 +656,6 @@ class AvatarEdit extends React.Component {
   }
 
   confirmEdit = () => {
-    console.log('editor', this.editor.getImage().toDataURL())
     updateUserInfo({
       body: {
         'avatar': this.editor.getImage().toDataURL()
@@ -733,7 +732,7 @@ function SettingProfile({login, profile, dispatch, history}) {
   if (profile.userInfo) {
     const {gender, age, email, name, phone, user_ID, avatar} = profile.userInfo
     const {projectNumber} = profile
-    const picNumber = parseInt(profile.userInfo._id.slice(20)) % 6
+    const picNumber = parseInt(profile.userInfo._id.slice(10)) % 6
     return (
       <div className={`main-container ${styles.container}`}>
         <div className={styles.all}>

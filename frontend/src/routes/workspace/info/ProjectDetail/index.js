@@ -88,6 +88,10 @@ class CommentsList extends React.Component {
     }
   }
 
+  toUserProfile(user_ID) {
+    this.props.history.push(`/profile/${user_ID}`)
+  }
+
   componentDidMount() {
   }
 
@@ -110,22 +114,23 @@ class CommentsList extends React.Component {
   }
 
   render() {
-    const {dispatch, projectId} = this.props
-    console.log('coment', this.state.comments)
+    const {dispatch, projectId, history} = this.props
+    const userObjId = localStorage.getItem('user_obj_id')
+    const picNumber = parseInt(userObjId.slice(10)) % 6
     return (
       <div>
         <div>
           {this.props.comments && this.props.comments.map(e =>
             <div className={styles.commentDiv}>
               <Row>
-                <Col span={2}>
-                  <div className={styles.photoDiv}>
-                    <img src={e.avatar} alt="avatar"/>
+                <Col span={2} style={{margin: '20px 0', textAlign:'center'}}>
+                  <div style={{height: '60px', width:'60px'}}>
+                    <img src={e.avatar?e.avatar:avatarList[picNumber]} alt="avatar"/>
                   </div>
                 </Col>
                 <Col span={20} className={styles.commentCol}>
                   <div>
-                    <div className={styles.commentUserID}>{e.user_ID}</div>
+                    <div className={styles.commentUserID} onClick={() => this.toUserProfile(e.user_ID)}>{e.user_ID}</div>
                     <div className={styles.commentContent}>{e.comments}</div>
                     <div
                       className={styles.commentCreateTime}>{showTime(e.create_time)}</div>
@@ -177,13 +182,13 @@ class CommentForm extends React.Component {
   render() {
     const {fetching, data, value, projects, inputValue} = this.state
     const userObjId = localStorage.getItem('user_obj_id')
-    const picNumber = parseInt(userObjId.slice(20)) % 6
+    const picNumber = parseInt(userObjId.slice(10)) % 6
     return (
       <div className="demo">
         <Row type="flex" justify="flex" align="top">
-          <Col span={2}>
-            <div className={styles.photoDiv}>
-              <img src={avatarList[picNumber]} alt="avatar"/>
+          <Col span={2} style={{margin: '20px 0', textAlign:'center'}}>
+            <div style={{height: '60px', width:'60px'}}>
+              <img src={this.props.login.user.avatar?this.props.login.user.avatar:avatarList[picNumber]} alt="avatar"/>
             </div>
           </Col>
           <Col span={20} style={{margin: '20px 0'}}>
@@ -313,8 +318,8 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
       </Col>
     </Row>
   //   return <div style={{paddingBottom: '50px'}}><span>
-    
-    
+
+
   // </span></div>
   }
 
@@ -339,7 +344,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
         } else if (projectDetail.project.status === 'active') {
           return <Tag color='green' style={{cursor: 'default',marginLeft:10}}>Online</Tag>
         } else {
-          return <Tag color='grey' style={{cursor: 'default',marginLeft:10}}></Tag>
+          return <Tag color='grey' style={{cursor: 'default',marginLeft:10}}>Offline</Tag>
         }
       }
 
@@ -573,7 +578,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                                key={e}>{e}</Tag>)
                         : null}
                     </div>
-                    
+
                     {/* <div style={{paddingBottom: '50px'}}>
                     <span>
                       {!market_use && <span className={styles.generalSpan}>
@@ -628,13 +633,13 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
                                       dispatch={dispatch}/> : null}
                   </TabPane> : null}
                 <TabPane tab="Comments" key="4">
-                  <CommentForm dispatch={dispatch} projectId={projectId}/>
+                  <CommentForm dispatch={dispatch} projectId={projectId} login={login}/>
                   <CommentsList dispatch={dispatch} projectId={projectId}
                                 comments={projectDetail.comments}
                                 totalNumber={projectDetail.totalNumber}
                                 pageSize={projectDetail.pageSize}
                                 pageNo={projectDetail.pageNo}
-
+                                history={history}
                   />
                 </TabPane>
                 <TabPane tab="Commits" key="5">
@@ -653,7 +658,7 @@ function ProjectInfo({market_use, match, history, location, dispatch, projectDet
       }
 
       return (
-        <Cloud_1/>
+        <Cloud_1 histroy={history}/>
         // <div className={`main-container ${styles.normal}`}>
         //   {/* <Joyride
         //     ref={c => (this.joyride = c)}
