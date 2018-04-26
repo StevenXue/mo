@@ -28,8 +28,8 @@ const HelpModal = ({ visible, projectDetail, dispatch }) => {
         <Button key="ok" type='primary' onClick={hideModelHandler}>Ok</Button>,
       ]}
     >
-      <h1>Clone Your Module</h1>
-      Clone your module template with git to start working locally.
+      <h1>Clone Your Project</h1>
+      Clone your project directory with git to start working locally.
       <CopyInput text={`git clone ${repoPath}`}/>
     </Modal>
   )

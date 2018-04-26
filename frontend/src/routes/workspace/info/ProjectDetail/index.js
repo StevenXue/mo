@@ -16,6 +16,7 @@ import {
   Form,
   Pagination,
   Card,
+  Tooltip,
 } from 'antd'
 // pages
 import JupyterLab from '../../modelling/Modelling/index'
@@ -42,9 +43,9 @@ const commitSvg = require('../../../../img/icon/git-commit.svg')
 const pages = ['import', 'analysis', 'modelling', 'deploy']
 
 const projectTypeDict = {
-  app: [],
+  app: ['help-modal'],
   module: ['help-modal'],
-  dataset: [],
+  dataset: ['help-modal'],
 }
 
 class CommitsList extends React.Component {
@@ -289,11 +290,14 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
       <Col span={13}>
         {!market_use && <span className={styles.generalSpan}>
       <Upload {...props1}>
+        <Tooltip
+          title='Files will be uploaded to your workspace, and archives will be auto unarchived into working directory.'>
         <Button className="qing">
           <Icon type="upload"/> Click to Upload
         </Button>
+        </Tooltip>
       </Upload>
-    </span>}
+        </span>}
       </Col>
       <Col span={11}>
       <span className={styles.enterNotebook}>
@@ -538,7 +542,7 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
                                         projectDetail={projectDetail}
                                         type={projectDetail.project.type}
                           >
-                          <Button icon='edit' style={{ marginRight: 15 }} />
+                          <Button icon='edit' style={{ marginRight: 15 }}/>
                         </ProjectModal>
                           {/* only private project can be deleted */}
                           {projectDetail.project.privacy === 'private' &&
