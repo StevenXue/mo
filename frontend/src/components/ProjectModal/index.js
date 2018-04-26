@@ -82,7 +82,6 @@ class ProjectModal extends Component {
                 notStartLab: true,
                 projectType: this.props.projectDetail.project.type,
               })
-              this.props.dispatch({ type: 'project/setTags', payload: [] })
             },
           })
         }
