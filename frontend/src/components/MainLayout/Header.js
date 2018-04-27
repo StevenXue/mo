@@ -220,7 +220,7 @@ function Header({location, login, history, dispatch, allRequest,message}) {
         )}
         {
           <Menu.Item key={"docs"}>
-            <div onClick={()=> window.location = "https://momodel.github.io/mo/#/zh-cn/quick_start" }>
+            <div onClick={()=> window.location = "https://momodel.github.io/mo/#/" }>
               <FormattedMessage id={"docs"} defaultMessage={"Docs"}/>
             </div>
           </Menu.Item>
