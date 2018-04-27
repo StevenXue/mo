@@ -48,6 +48,8 @@ class ProjectModal extends Component {
       if (!err) {
         // TODO move fetch and dispatch to model
         if (this.props.new) {
+          this.props.dispatch({type:'launchpage/change',payload:{visibility:false}})  //关闭launchpage
+          localStorage.setItem('launchpage','hide')
           const hide = message.loading('Project Creating...', 0)
           createProject({
             body,
@@ -266,4 +268,4 @@ class ProjectModal extends Component {
   }
 }
 
-export default connect(({ project }) => ({ project }))(Form.create()(ProjectModal))
+export default connect(({ project, launchpage}) => ({ project, launchpage}))(Form.create()(ProjectModal))
