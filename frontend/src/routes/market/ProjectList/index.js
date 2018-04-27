@@ -77,22 +77,22 @@ class ProjectList extends Component {
 
   componentDidMount() {
     this.fetchData({})
-    this.hideBreadcrumb()
+    // this.hideBreadcrumb()
   }
 
-  hideBreadcrumb = ()=>{
-    const {location} = this.props
-    // console.log(document.getElementsByTagName('a') instanceof Array);  //false
-    if(location.pathname==='/explore'){
-      let array = Array.from(document.getElementsByTagName('a'))
-      let arr = []
-      array.map((e,i)=>{
-        //之所以与Workspace和Request方法不同，因为Explore的tab名与面包屑很巧合的一样
-        e.text==='Explore'?arr.push(i):null
-      })
-      document.getElementsByTagName('a')[arr[arr.length-1]].style.color ='transparent'
-    }
-  }
+  // hideBreadcrumb = ()=>{
+  //   const {location} = this.props
+  //   // console.log(document.getElementsByTagName('a') instanceof Array);  //false
+  //   if(location.pathname==='/explore'){
+  //     let array = Array.from(document.getElementsByTagName('a'))
+  //     let arr = []
+  //     array.map((e,i)=>{
+  //       //之所以与Workspace和Request方法不同，因为Explore的tab名与面包屑很巧合的一样
+  //       e.text==='Explore'?arr.push(i):null
+  //     })
+  //     document.getElementsByTagName('a')[arr[arr.length-1]].style.color ='transparent'
+  //   }
+  // }
 
   fetchData({payload= {}}) {
     const {type} = this.props
