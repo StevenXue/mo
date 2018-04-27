@@ -20,6 +20,7 @@ from server3.business.module_business import ModuleBusiness
 from server3.business.user_business import UserBusiness
 
 from server3.constants import Error, ErrorMessage, GIT_SERVER
+from server3.constants import WEB_ADDR
 from server3.entity.general_entity import UserEntity
 from server3.business.user_request_business import UserRequestBusiness
 from server3.business.request_answer_business import RequestAnswerBusiness
@@ -31,6 +32,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.header import Header
+
 
 # msg['To'] = '374758875@qq.com'
 # text = "Hi!\nHow are you?\nHere is the link you wanted:\nhttp://localhost:8989/#/user/login"    
@@ -83,8 +85,8 @@ def forgot_send(email):
     user = user_business.get_by_email(email)
     smtpserver = 'smtp.163.com'
     username = '15669929857@163.com'
-    password='wurao122'
-    sender='15669929857@163.com'
+    password = 'wurao122'
+    sender = '15669929857@163.com'
     # receiver='374758875@qq.com'
     subject = '数据分析平台-用户密码找回(此邮件由系统产生不可回复)'
     msg = MIMEMultipart('mixed')
@@ -93,17 +95,21 @@ def forgot_send(email):
     if user:
         receiver = email
         msg['To'] = email
-        suiji = str(random.randint(random.randint(1, 999999), random.randint(999999, 99999999999)))
-        h = hashlib.md5(bytes(suiji,encoding="utf-8"))
+        suiji = str(random.randint(random.randint(1, 999999),
+                                   random.randint(999999, 99999999999)))
+        h = hashlib.md5(bytes(suiji, encoding="utf-8"))
         h.update(email.encode("utf-8"))
-        
+
         user.hashEmail = h.hexdigest()
         user.save()
 
-        text = user.user_ID+'，您好！\n请点击下方链接重置密码。 如非您本人操作，请忽略此邮件。\n 192.168.31.7:8899/#/newpassword?email='+email+'&user='+user.user_ID+'&hashEmail='+h.hexdigest()
-        text_plain = MIMEText(text,'plain', 'utf-8')   
-        msg.attach(text_plain)   
-        smtp = smtplib.SMTP()    
+        text = user.user_ID + '，您好！\n请点击下方链接重置密码。 如非您本人操作，' \
+                              '请忽略此邮件。\n ' + WEB_ADDR + '/#/newpassword?email=' + email + '&user' \
+                                                                                          '=' + user \
+                   .user_ID + '&hashEmail=' + h.hexdigest()
+        text_plain = MIMEText(text, 'plain', 'utf-8')
+        msg.attach(text_plain)
+        smtp = smtplib.SMTP()
         smtp.connect('smtp.163.com')
         smtp.login(username, password)
         smtp.sendmail(sender, receiver, msg.as_string())
@@ -121,12 +127,12 @@ def newpassword_send(password, email, hashEmail):
         return user
     return False
 
-def have_hashEmail(email,hashEmail):
-    user = user_business.get_by_hashEmail(email,hashEmail)
+
+def have_hashEmail(email, hashEmail):
+    user = user_business.get_by_hashEmail(email, hashEmail)
     if user:
         return user
     return False
-
 
 
 def check_tourtip(user_ID):
@@ -510,4 +516,3 @@ class UserService:
             return user
         else:
             raise Error("验证码错误")
-

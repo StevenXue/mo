@@ -431,9 +431,9 @@ function UserRequestDetail({allRequest, login, dispatch}) {
             <Icon
               type={focusUserRequest['star_user'].includes(user_obj_id) ? 'star' : 'star-o'}
               className={styles.star}
-              style={{fontSize: '22px', color:'transparent', 
+              style={{fontSize: '22px', color:'transparent',
               background:focusUserRequest['star_user'].includes(user_obj_id) ?`url(${star}) no-repeat`:`url(${star_o}) no-repeat`}}
-              onClick={() => requestStar()}/>...
+              onClick={() => requestStar()}/>
             {focusUserRequest['title']} &nbsp;&nbsp;
             {focusUserRequest['user_ID'] === user_ID &&
             <span className={styles.rightButton}>
