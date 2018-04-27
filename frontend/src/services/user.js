@@ -4,7 +4,7 @@ import {formatParam} from '../utils'
 const { CORS } = config
 const prefix = '/user'
 
-export function setStarFavor(payload) {
+export function setStarFavor(payload,onJson) {
   return request(`${CORS}/user/action_entity/${payload.entity_id}`, {
     method: 'put',
     headers: {
@@ -14,7 +14,7 @@ export function setStarFavor(payload) {
       action : payload.action,
       entity : payload.entity
     }),
-  },);
+  }, { onJson });
 }
 
 export function getStarFavor({payload, onJson}) {

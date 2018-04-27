@@ -120,7 +120,7 @@ class ProjectExample extends React.Component {
               </div>
               <div>
                 {map(this.props.projectDetail.project.args.output).map(e =>
-                  <div key={e.name}>
+                  <div key={e.name} style={{margin: '10px 0'}}>
                     <p>{e.name}</p>
                     {e.value_type === 'img' && e.value ? <img src={'data:image/jpeg;base64,' + e.value} alt="img"/> :
                       <p>{e.value}</p>}

@@ -125,7 +125,7 @@ class ProjectList extends Component {
     }
   }
 
-  starFavor(action, id, type) {
+  starFavorSetState =(id,action)=> {
     const user_obj_id = localStorage.getItem('user_obj_id')
     function findById(element) {
       return element._id === id
@@ -138,24 +138,18 @@ class ProjectList extends Component {
     else {
       toUpdate.favor_users.includes(user_obj_id) ? toUpdate.favor_users.pop(user_obj_id) : toUpdate.favor_users.push(user_obj_id)
     }
-    // 刷新state
     this.setState({})
+  }
+
+  starFavor(action, id, type) {
+    // 刷新state
     setStarFavor({
         entity_id: id,
         action: action,
         entity: type
-    })
-
-
-    // this.props.dispatch({
-    //   type: 'projectDetail/starFavor',
-    //   payload: {
-    //     entity_id: id,
-    //     action: action,
-    //     entity: type
-    //   }
-    // })
+    },()=>this.starFavorSetState(id,action))
   }
+
 
   render() {
     const {history, project, dispatch} = this.props
@@ -198,8 +192,8 @@ class ProjectList extends Component {
 
 function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
   const user_obj_id = localStorage.getItem('user_obj_id')
+  const user_ID = localStorage.getItem('user_ID')
   const picNumber = parseInt(project.user.slice(10))%6
-  console.log(project.user)
   return (
     <div className={styles.projectCard}>
       <div className={styles.toDetail} onClick={() => onClickToDetail()}>
@@ -228,14 +222,19 @@ function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
         <div className={styles.starFavorRightDiv}>
           <Icon className={styles.bottomIcon}
                 type={project.star_users.includes(user_obj_id) ? "like" : "like-o"}
-                onClick={() => onClickStarFavor('star')}
-                style={{color:'transparent',background:project.star_users.includes(user_obj_id) ?`url(${like_o}) no-repeat`:`url(${like}) no-repeat`}}
+                onClick={project.user_ID===user_ID?null:() => onClickStarFavor('star')}
+                style={{
+                  cursor:project.user_ID===user_ID?"default":"pointer",
+                  color:'transparent',
+                  background:project.star_users.includes(user_obj_id) ?`url(${like_o}) no-repeat`:`url(${like}) no-repeat`}}
                 />
           <p className={styles.bottomNumber}>{project.star_users.length}</p>
           <Icon className={styles.bottomIcon}
                 type={project.favor_users.includes(user_obj_id) ? "star" : "star-o"}
-                onClick={() => onClickStarFavor('favor')}
-                style={{color:'transparent',background:project.favor_users.includes(user_obj_id) ?`url(${star_o}) no-repeat`:`url(${star}) no-repeat`}}
+                onClick={project.user_ID===user_ID?null:() => onClickStarFavor('favor')}
+                style={{cursor:project.user_ID===user_ID?"default":"pointer",
+                  color:'transparent',
+                  background:project.favor_users.includes(user_obj_id) ?`url(${star_o}) no-repeat`:`url(${star}) no-repeat`}}
                 />
           <p className={styles.bottomNumber}>{project.favor_users.length}</p>
         </div>

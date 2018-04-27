@@ -230,7 +230,7 @@ function Header({location, login, history, dispatch, allRequest,message}) {
           title={
             <div onClick={toLoginPage}>
             {
-              login.user?<img src={login.user.avatar} style={{width:25,borderRadius:0,marginRight:10}}/>:null
+              login.user?<img src={login.user.avatar} style={{width:25,borderRadius:12.5,marginRight:10}}/>:null
             }
               <span> {login.user ? login.user.user_ID : 'Login'} </span>
             </div>
