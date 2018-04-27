@@ -312,7 +312,7 @@ class MyFavouriteList extends Component {
                       <div className={styles.footer}>
                         <Icon type="user" className={styles.firstIcon}/>
                         <p>{e.user_ID} </p>
-                        <Icon type="tags" className={styles.otherIcon}/>
+                        {e['tags'].length > 0 && <Icon type="tags" className={styles.otherIcon}/>}
                         {e['tags'].length > 0 &&
                         <p key={e}>{e['tags'].join(',')}</p>}
                         <Icon type="clock-circle-o"
@@ -325,7 +325,6 @@ class MyFavouriteList extends Component {
               </div>
             </Card>)}
         </div>}
-
         <div className={styles.pagination}>
           <Pagination showSizeChanger
                       onShowSizeChange={this.onShowSizeChange.bind(this)}
