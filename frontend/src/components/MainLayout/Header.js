@@ -275,7 +275,6 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
         </SubMenu>
         <SubMenu
           className={styles.messageSubmenu}
-          // style={{position:'absolute',top:6,right:'14%'}}
           title={
             <span onClick={toLoginPage} style={{ position: 'relative' }}>
                  <Badge count={login.user ? numberOfUnreadMessage() : 0}>

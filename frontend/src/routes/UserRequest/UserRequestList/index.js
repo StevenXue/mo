@@ -41,13 +41,13 @@ function AllRequest({ history, allRequest, dispatch, location }) {
     <div className={`main-container ${styles.normal}`}>
       <Tabs defaultActiveKey={defaultActiveKeyDic[location.search]} onChange={callback}>
         <TabPane tab="Apps" key="1">
-          <RequestList {...{ history, allRequest, dispatch }} type='app'/>
+          <RequestList {...{ history, allRequest, dispatch, location}} type='app'/>
         </TabPane>
         <TabPane tab="Modules" key="2">
-          <RequestList {...{ history, allRequest, dispatch }} type='module'/>
+          <RequestList {...{ history, allRequest, dispatch, location}} type='module'/>
         </TabPane>
         <TabPane tab="Datasets" key="3">
-          <RequestList {...{ history, allRequest, dispatch }} type='dataset'/>
+          <RequestList {...{ history, allRequest, dispatch, location}} type='dataset'/>
         </TabPane>
       </Tabs>
     </div>
@@ -93,6 +93,18 @@ class RequestList extends Component {
         page_size: this.state.pageSize,
       },
     })
+    this.hideBreadcrumb()
+  }
+
+  hideBreadcrumb = ()=>{
+    const {location} = this.props
+    // console.log(document.getElementsByTagName('a') instanceof Array);  //false
+    if(location.pathname==='/userrequest'){
+      let array = Array.from(document.getElementsByTagName('a'))
+      array.map((e,i)=>{
+        e.text==='User Request'?document.getElementsByTagName('a')[i].style.color ='transparent':null
+      })
+    }
   }
 
   handleQueryChange(value) {
