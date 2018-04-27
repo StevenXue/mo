@@ -137,7 +137,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         yml_path = os.path.join('-'.join([app.app_path, version]),
                                 yaml_tail_path)
         if os.path.exists(yml_path):
-            with open(yml_path, 'r') as stream:
+            with open(yml_path.replace('\\', '/'), 'r') as stream:
                 obj = yaml.load(stream)
                 return {'input': obj.get('input'), 'output': obj.get('output')}
         else:

@@ -13,7 +13,6 @@ from server3.repository import config
 from server3.utility import json_utility
 from server3.service.message_service import MessageService
 
-
 PREFIX = '/message'
 message_app = Blueprint("message_app", __name__, url_prefix=PREFIX)
 
@@ -33,8 +32,8 @@ def create_message():
     # receivers is a list
     receivers = data.get('receivers', [])
     MessageService.create_message(sender, message_type,
-                                   receivers, title=title,
-                                   content=content)
+                                  receivers, title=title,
+                                  content=content)
     return jsonify({'response': 'create message success'}), 200
 
 
@@ -42,10 +41,12 @@ def create_message():
 @jwt_required
 def get_message():
     user_ID = get_jwt_identity()
-    page_no = request.args.get("pageNo", 1)
-    page_size = request.args.get("pageSize", 100)
-    messages = MessageService.get_by_user_ID(user_ID, page_no, page_size)
-    return jsonify({'response': messages}), 200
+    page_no = request.args.get("page_no", 1)
+    page_size = request.args.get("page_size", 100)
+    messages, total_number = MessageService.get_by_user_ID(user_ID, page_no,
+                                                           page_size)
+    return jsonify({'response': {'messages': messages,
+                                 'total_number': total_number}}), 200
 
 
 @message_app.route('/read', methods=['PUT'])

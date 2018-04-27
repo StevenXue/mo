@@ -70,6 +70,19 @@ class ProjectList extends Component {
 
   componentDidMount() {
     this.fetchData({})
+    this.hideBreadcrumb()
+
+  }
+
+  hideBreadcrumb = ()=>{
+    const {location} = this.props
+    // console.log(document.getElementsByTagName('a') instanceof Array);  //false
+    if(location.pathname==='/workspace'&&location.search==='?tab=app'){
+      let array = Array.from(document.getElementsByTagName('a'))
+      array.map((e,i)=>{
+        e.text==='My Projects'?document.getElementsByTagName('a')[i].style.color ='transparent':null
+      })
+    }
   }
 
   fetchData({payload = {}}) {
@@ -111,6 +124,7 @@ class ProjectList extends Component {
 
   toProjectDetail(id, history, type) {
     this.props.dispatch({type:'launchpage/change',payload:{visibility:false}})  //关闭launchpage
+    localStorage.setItem('launchpage','hide')
     history.push(`/workspace/${id}?type=${type}`)
   }
 
@@ -159,17 +173,33 @@ class ProjectList extends Component {
                     style={{cursor: 'pointer'}}>
                 <div>
                   <p className={styles.des}>{e.description}</p>
-                  <p className={styles.other}>
+                  <div className={styles.other}>
                     <Icon type="clock-circle-o" style={{marginRight: 10}}/>
                     {showTime(e.create_time)}
-                    <Button style={{float: 'right'}}
+                    {/* <Button style={{float: 'right'}}
                             onClick={(ev) => {
                               ev.stopPropagation()
                               window.open(`/#/workspace/${e._id}/${e.type}`)
                             }}>
-                      Notebook ->
-                    </Button>
-                  </p>
+                      Notebook -1>
+                    </Button> */}
+                    <div className={styles.bigIconNunberDiv} style={{float: 'right'}}>
+                      <div style={{float: 'right',marginLeft:10,color:e.star_users.length!=0 ?'#34c0e2':'#999999'}} >
+                        <p className={styles.icon} style={{float: 'left',marginRight:5}}>
+                          <Icon
+                            type={e.star_users.length!=0 ? 'like' : 'like-o'}/>
+                        </p>
+                        <p className={styles.number} style={{float: 'left'}}>{e.star_users.length}</p>
+                      </div>
+                      <div style={{float: 'right',marginLeft:10,color:e.favor_users.length!=0 ?'#34c0e2':'#999999'}}> 
+                        <p className={styles.icon} style={{float: 'left',marginRight:5}}>
+                          <Icon
+                            type={e.favor_users.length!=0 ? 'star' : 'star-o'}/>
+                        </p>
+                        <p className={styles.number} style={{float: 'left'}}>{e.favor_users.length}</p>
+                      </div>
+                    </div>
+                  </div>
                   {/*<Icon type="user" style={{ marginRight: 10 }}/>*/}
                   {/*{e['user_name'] && <p>Owner: {e.user_name}</p>}*/}
                 </div>

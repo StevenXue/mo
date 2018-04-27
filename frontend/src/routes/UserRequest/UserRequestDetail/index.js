@@ -405,8 +405,8 @@ function UserRequestDetail({allRequest, login, dispatch}) {
         {e.select_project.commits.length > 0 ?
           <div style={{marginTop: '35px', color: '#848d95'}}>
             <p>last commited
-              at {showTime(e.select_project.commits[e.select_project.commits.length - 1]['timestamp'])}</p>
-            <p>{e.select_project.commits[e.select_project.commits.length - 1]['message']}</p>
+              at {showTime(e.select_project.commits[0]['timestamp'])}</p>
+            <p>{e.select_project.commits[0]['message']}</p>
           </div> : null}
       </Card>
     }
@@ -474,7 +474,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
         {focusUserRequest.comments && focusUserRequest.comments.map(e =>
           <div key={e._id}>
             <div className={styles.eachCommentDiv}>
-              <p>{e.comments} - {e.comments_user_ID} {showTime(e.create_time)}</p>
+              <p>{e.comments} - {e.user_ID} {showTime(e.create_time)}</p>
             </div>
             <hr className={styles.eachCommentDiv}/>
           </div>)}
@@ -572,7 +572,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                     {e.comment && e.comment.map(e =>
                       <div key={e._id}>
                         <div className={styles.eachAnswerComment}>
-                          <p>{e.comments} - {e.comments_user_ID} at {showTime(e.create_time)}</p>
+                          <p>{e.comments} - {e.user_ID} at {showTime(e.create_time)}</p>
                         </div>
                         <hr/>
                       </div>,

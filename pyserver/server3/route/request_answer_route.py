@@ -41,23 +41,26 @@ def list_request_answer():
             me_obj_list_to_json_list(request_answer)
         # 得到每一个answer下的comments 和 selcet project
         for index, answer in enumerate(request_answer_info):
-            answer_comment, total_number = CommentsBusiness.get_comments(
+            answer_comments, total_number = CommentsBusiness.get_comments(
                 answer['_id'], comments_type='answer', page_no=1, page_size=100)
-            answer_comment_info = json_utility. \
-                me_obj_list_to_json_list(answer_comment)
-            answer['comment'] = answer_comment_info
+            for answer_comment in answer_comments:
+                answer_comment.user_ID = answer_comment.comments_user.user_ID
+            answer_comments_info = json_utility. \
+                me_obj_list_to_json_list(answer_comments)
+            answer['comment'] = answer_comments_info
             if 'select_project' in answer:
                 # 获取commit
                 try:
-                    commits = ProjectBusiness.get_commits(
-                        request_answer[index].select_project.path)
+                    # commits = ProjectBusiness.get_commits(
+                    #     request_answer[index].select_project.path)
                     select_project = request_answer[index].select_project
-                    select_project.commits = [{
-                        'message': c.message,
-                        'time': datetime.fromtimestamp(c.time[0] + c.time[1]),
-                    } for c in commits]
+                    # select_project.commits = [{
+                    #     'message': c.message,
+                    #     'time': datetime.fromtimestamp(c.time[0] + c.time[1]),
+                    # } for c in commits]
                     answer['select_project'] = json_utility.convert_to_json(
                         select_project.to_mongo())
+                    answer['select_project']['commits'].reverse()
                 except:
                     answer['select_project'] = {'deleted': True}
         return jsonify({'response': request_answer_info}), 200

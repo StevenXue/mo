@@ -103,14 +103,14 @@ def get_project(project_id):
     if not project_id:
         return jsonify({'response': 'no project_id arg'}), 400
     project = ProjectBusiness.get_by_id(project_id)
-    if request.args.get('commits') == 'true':
-        commits = ProjectBusiness.get_commits(project.path)
-        project.commits = [{
-            'message': c.message,
-            'time': datetime.fromtimestamp(c.time[0] + c.time[1]),
-        } for c in commits]
+    # if request.args.get('commits') == 'true':
+    #     commits = ProjectBusiness.get_commits(project.path)
+    #     project.commits = [{
+    #         'message': c.message,
+    #         'time': datetime.fromtimestamp(c.time[0] + c.time[1]),
+    #     } for c in commits]
     project = json_utility.convert_to_json(project.to_mongo())
-
+    project['commits'].reverse()
     return make_response(jsonify({'response': project}), 200)
 
 

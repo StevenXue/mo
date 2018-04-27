@@ -175,6 +175,7 @@ def get_app(app_id):
     if used_modules != 'true' and used_datasets != 'true':
         app = json_utility.convert_to_json(app.to_mongo())
     app["user_ID"] = user_ID
+    app["commits"].reverse()
     return jsonify({
         "response": app
     }), 200

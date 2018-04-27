@@ -88,6 +88,10 @@ class CommentsList extends React.Component {
     }
   }
 
+  toUserProfile(user_ID) {
+    this.props.history.push(`/profile/${user_ID}`)
+  }
+
   componentDidMount() {
   }
 
@@ -110,22 +114,23 @@ class CommentsList extends React.Component {
   }
 
   render() {
-    const { dispatch, projectId } = this.props
-    console.log('coment', this.state.comments)
+    const {dispatch, projectId, history} = this.props
+    const userObjId = localStorage.getItem('user_obj_id')
+    const picNumber = parseInt(userObjId.slice(10)) % 6
     return (
       <div>
         <div>
           {this.props.comments && this.props.comments.map(e =>
             <div className={styles.commentDiv}>
               <Row>
-                <Col span={2}>
-                  <div className={styles.photoDiv}>
-                    <img src={e.avatar} alt="avatar"/>
+                <Col span={2} style={{margin: '20px 0', textAlign:'center'}}>
+                  <div style={{height: '60px', width:'60px'}}>
+                    <img src={e.avatar?e.avatar:avatarList[picNumber]} alt="avatar"/>
                   </div>
                 </Col>
                 <Col span={20} className={styles.commentCol}>
                   <div>
-                    <div className={styles.commentUserID}>{e.user_ID}</div>
+                    <div className={styles.commentUserID} onClick={() => this.toUserProfile(e.user_ID)}>{e.user_ID}</div>
                     <div className={styles.commentContent}>{e.comments}</div>
                     <div
                       className={styles.commentCreateTime}>{showTime(e.create_time)}</div>
@@ -176,13 +181,13 @@ class CommentForm extends React.Component {
   render() {
     const { fetching, data, value, projects, inputValue } = this.state
     const userObjId = localStorage.getItem('user_obj_id')
-    const picNumber = parseInt(userObjId.slice(20)) % 6
+    const picNumber = parseInt(userObjId.slice(10)) % 6
     return (
       <div className="demo">
         <Row type="flex" justify="flex" align="top">
-          <Col span={2}>
-            <div className={styles.photoDiv}>
-              <img src={avatarList[picNumber]} alt="avatar"/>
+          <Col span={2} style={{margin: '20px 0', textAlign:'center'}}>
+            <div style={{height: '60px', width:'60px'}}>
+              <img src={this.props.login.user.avatar?this.props.login.user.avatar:avatarList[picNumber]} alt="avatar"/>
             </div>
           </Col>
           <Col span={20} style={{ margin: '20px 0' }}>
@@ -380,8 +385,9 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
           })
         }
 
-        noLearning = () => {
-          fetch(`/pyapi/user/notourtip?user_ID=${localStorage.user_ID}`, { method: 'GET' })
+        //关闭tourtip时调用，此后登录不再显示tourtip
+        noLearning = ()=>{
+          fetch(`/pyapi/user/notourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
         }
 
         render() {
@@ -627,13 +633,13 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
                                       dispatch={dispatch}/> : null}
                   </TabPane> : null}
                 <TabPane tab="Comments" key="4">
-                  <CommentForm dispatch={dispatch} projectId={projectId}/>
+                  <CommentForm dispatch={dispatch} projectId={projectId} login={login}/>
                   <CommentsList dispatch={dispatch} projectId={projectId}
                                 comments={projectDetail.comments}
                                 totalNumber={projectDetail.totalNumber}
                                 pageSize={projectDetail.pageSize}
                                 pageNo={projectDetail.pageNo}
-
+                                history={history}
                   />
                 </TabPane>
                 <TabPane tab="Commits" key="5">
@@ -652,7 +658,7 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
       }
 
       return (
-        <Cloud_1/>
+        <Cloud_1 histroy={history}/>
         // <div className={`main-container ${styles.normal}`}>
         //   {/* <Joyride
         //     ref={c => (this.joyride = c)}

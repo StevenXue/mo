@@ -54,7 +54,7 @@ function Profile({login, profile, dispatch, history}) {
   if (profile.userInfo) {
     const {age, email, name, phone, user_ID,avatar} = profile.userInfo
     const {projectNumber} = profile
-    const picNumber = parseInt(profile.userInfo._id.slice(20))%6
+    const picNumber = parseInt(profile.userInfo._id.slice(10))%6
     return (
       <div className={`main-container ${styles.container}`}>
         <div className={styles.headerRow}>
@@ -148,7 +148,6 @@ class MyFavouriteList extends Component {
   }
 
   changePOrR(pOrR) {
-    console.log(pOrR)
     this.setState({
       pOrR: pOrR,
       pageNo: 1,
@@ -269,7 +268,7 @@ class MyFavouriteList extends Component {
                       <Icon type="user" className={styles.firstIcon}/>
                       <p>{e.user_ID} </p>
                       {/* <Icon type="tags" className={styles.otherIcon}/> */}
-                      <p>{e.tags}</p>
+                      {/*<p>{e.tags}</p>*/}
                       <Icon type="clock-circle-o" className={styles.otherIcon}/>
                       <p>{showTime(e.create_time)}</p>
                     </div>

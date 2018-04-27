@@ -732,7 +732,7 @@ function SettingProfile({login, profile, dispatch, history}) {
   if (profile.userInfo) {
     const {gender, age, email, name, phone, user_ID, avatar} = profile.userInfo
     const {projectNumber} = profile
-    const picNumber = parseInt(profile.userInfo._id.slice(20)) % 6
+    const picNumber = parseInt(profile.userInfo._id.slice(10)) % 6
     return (
       <div className={`main-container ${styles.container}`}>
         <div className={styles.all}>
