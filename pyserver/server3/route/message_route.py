@@ -41,8 +41,8 @@ def create_message():
 @jwt_required
 def get_message():
     user_ID = get_jwt_identity()
-    page_no = request.args.get("page_no", 1)
-    page_size = request.args.get("page_size", 100)
+    page_no = int(request.args.get("pageNo", 1))
+    page_size = int(request.args.get("pageSize", 100))
     messages, total_number = MessageService.get_by_user_ID(user_ID, page_no,
                                                            page_size)
     return jsonify({'response': {'messages': messages,
