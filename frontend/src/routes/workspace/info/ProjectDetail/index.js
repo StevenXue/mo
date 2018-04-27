@@ -291,20 +291,20 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
   }
 
   const cloudNote = () => {
-    return <Row style={{ width: '110%', marginLeft: '-5%' }}>
-      <Col span={13}>
+    return <Row style={{ width: '110%', marginLeft: '-8%' }}>
+      <Col span={14}>
         {!market_use && <span className={styles.generalSpan}>
       <Upload {...props1}>
         <Tooltip
           title='Files will be uploaded to your workspace, and archives will be auto unarchived into working directory.'>
-        <Button className="qing">
+        <Button className="qing" type="primary" ghost>
           <Icon type="upload"/> Click to Upload
         </Button>
         </Tooltip>
       </Upload>
         </span>}
       </Col>
-      <Col span={11}>
+      <Col span={10}>
       <span className={styles.enterNotebook}>
       <Button type="primary"
               className="zi"
@@ -632,7 +632,16 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
                       <ProjectExample projectDetail={projectDetail}
                                       dispatch={dispatch}/> : null}
                   </TabPane> : null}
-                <TabPane tab="Comments" key="4">
+                <TabPane tab="Commits" key="4">
+                  <CommitsList dispatch={dispatch} projectId={projectId}
+                               commits={projectDetail.project.commits}
+                               totalNumber={projectDetail.totalNumber}
+                               pageSize={projectDetail.pageSize}
+                               pageNo={projectDetail.pageNo}
+
+                  />
+                </TabPane>
+                <TabPane tab="Comments" key="5">
                   <CommentForm dispatch={dispatch} projectId={projectId} login={login}/>
                   <CommentsList dispatch={dispatch} projectId={projectId}
                                 comments={projectDetail.comments}
@@ -640,15 +649,6 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
                                 pageSize={projectDetail.pageSize}
                                 pageNo={projectDetail.pageNo}
                                 history={history}
-                  />
-                </TabPane>
-                <TabPane tab="Commits" key="5">
-                  <CommitsList dispatch={dispatch} projectId={projectId}
-                               commits={projectDetail.project.commits}
-                               totalNumber={projectDetail.totalNumber}
-                               pageSize={projectDetail.pageSize}
-                               pageNo={projectDetail.pageNo}
-
                   />
                 </TabPane>
               </Tabs>

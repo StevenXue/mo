@@ -102,9 +102,9 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
     return unread
   }
   const divStyle = () => {
-    let str = String(numberOfUnreadMessage())
-    // console.log(str,'str')
-    return str.length > 0 ? {
+    let unreadNum = numberOfUnreadMessage()
+    console.log(unreadNum,'str')
+    return unreadNum > 0 ? {
       position: 'absolute',
       top: '-25%',
       right: '15%',

@@ -154,7 +154,7 @@ class ProjectList extends Component {
   render() {
     const {history, project, dispatch} = this.props
     return (
-      <div>
+      <div >
         <div className={styles.header}>
           {/*<Select defaultValue='all' className={styles.select}*/}
           {/*onChange={(value) => this.handlePrivacyChange(value)}>*/}
@@ -170,7 +170,9 @@ class ProjectList extends Component {
         </div>
         <div className={styles.projectList}>
           {this.state.projects.map(e =>
-            <ProjectCard key={e._id} project={e}
+            <ProjectCard
+
+              key={e._id} project={e}
                          onClickToDetail={() => this.toProjectDetail(e._id, history, e.type, e.user, this.state.user_obj_id)}
                          onClickStarFavor={(action) => this.starFavor(action, e._id, e.type)}
             />

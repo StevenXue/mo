@@ -74,7 +74,7 @@ class ProjectList extends Component {
 
   }
 
-  hideBreadcrumb = ()=>{
+  hideBreadcrumb = ()=> {
     const {location} = this.props
     // console.log(document.getElementsByTagName('a') instanceof Array);  //false
     if(location.pathname==='/workspace'&&location.search==='?tab=app'){
@@ -137,7 +137,7 @@ class ProjectList extends Component {
     const {history, project, dispatch} = this.props
     const {totalNumber, pageSize} = this.state
     return (
-      <div>
+      <div style={{marginBottom:'80px'}}>
         <div className={styles.header}>
           <Select defaultValue='all' className={styles.select}
                   onChange={(value) => this.handlePrivacyChange(value)}>
@@ -191,7 +191,7 @@ class ProjectList extends Component {
                         </p>
                         <p className={styles.number} style={{float: 'left'}}>{e.star_users.length}</p>
                       </div>
-                      <div style={{float: 'right',marginLeft:10,color:e.favor_users.length!=0 ?'#34c0e2':'#999999'}}> 
+                      <div style={{float: 'right',marginLeft:10,color:e.favor_users.length!=0 ?'#34c0e2':'#999999'}}>
                         <p className={styles.icon} style={{float: 'left',marginRight:5}}>
                           <Icon
                             type={e.favor_users.length!=0 ? 'star' : 'star-o'}/>
@@ -227,7 +227,7 @@ class ProjectList extends Component {
          {
            parseInt(totalNumber/pageSize)>1?
            <div className={styles.pagination}>
-            <Pagination 
+            <Pagination
               showSizeChanger
               onShowSizeChange={this.onShowSizeChange}
               onChange={this.onShowSizeChange}
@@ -238,7 +238,7 @@ class ProjectList extends Component {
               hideOnSinglePage={true}/>
           </div>:
           <div style={{color:'#c1c1c1',fontSize:'14px',marginTop:30}}>
-           没有更多内容
+
          </div>
         }
       </div>

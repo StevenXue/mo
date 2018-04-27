@@ -224,10 +224,21 @@ class AnswerForm extends React.Component {
     const { fetching, data, value, projects, inputValue } = this.state
     // console.log(this.state)
     return (
-      <div className="demo">
+      <div className="demo" style={{marginBottom:'80px'}}>
+                <TextArea
+                  value={inputValue}
+                  style={{width: '52%' }}
+                  placeholder="More description about your answer more help"
+                  autosize={{ minRows: 5, maxRows: 50 }}
+                  onChange={(e) => this.handleInputChange(e)}
+                />
+        <div style={{ margin: '24px 0' }}/>
         {this.state.selected.length > 0 ?
-          <Card title={this.state.selected[0].name}
-                extra={<Icon type="close" onClick={this.clearSelect}/>}>
+          <Card
+            style={{width:'52%'}}
+            title={this.state.selected[0].name}
+                extra={<Icon type="close" onClick={this.clearSelect}/>}
+          >
             <p>{this.state.selected[0].description}</p></Card> : null}
         {this.state.selected.length === 0 ? <div><Select
           mode="combobox"
@@ -251,14 +262,7 @@ class AnswerForm extends React.Component {
           </ProjectModal></div> : null}
         {/*<BraftEditor {...editorProps}/>*/}
         <div style={{ margin: '24px 0' }}/>
-        <TextArea
-          value={inputValue}
-          style={{width: '70%'}}
-          placeholder="More description about your answer more help"
-          autosize={{ minRows: 5, maxRows: 50 }}
-          onChange={(e) => this.handleInputChange(e)}
-        />
-        <div style={{ margin: '24px 0' }}/>
+
         <Button
           type="primary"
           htmlType="submit"
@@ -396,7 +400,7 @@ function UserRequestDetail({ allRequest, login, dispatch }) {
     }
     else {
       return <Card title={e.select_project.name}
-                   style={{ cursor: 'pointer' }}
+                   style={{ cursor: 'pointer' ,width:'52%'}}
                    onClick={() => clickSelectedProject(e)}
                    extra={<div
                      style={{ fontSize: '14px' }}> {appStatus(e.select_project)}</div>}>
