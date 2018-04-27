@@ -15,6 +15,7 @@ SERVING_PORT = 9000
 REDIS_SERVER = 'redis://10.52.14.182:6379'
 GIT_SERVER = 'http://10.52.14.182:2333'
 GIT_SERVER_IP = '10.52.14.182'
+WEB_ADDR = 'http://momodel.ai'
 DOCKER_IP = '127.0.0.1'
 GIT_LOCAL = f'root@{GIT_SERVER_IP}:'
 # REDIS_SERVER = 'redis://localhost:6379'

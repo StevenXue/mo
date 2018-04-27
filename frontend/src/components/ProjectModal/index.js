@@ -9,7 +9,7 @@ const FormItem = Form.Item
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
 const Option = Select.Option
-
+const { TextArea } = Input;
 const fields = ['Business', 'Government', 'Education', 'Environment', 'Health', 'Housing & Development',
   'Public Services', 'Social', 'Transportation', 'Science', 'Technology']
 const tasks = ['Classification', 'Regression', 'Clustering', 'Reinforcement Learning']
@@ -183,7 +183,7 @@ class ProjectModal extends Component {
                       required: true,
                     },
                   ],
-                })(<Input/>)
+                })(<TextArea/>)
               }
             </FormItem>
             {!this.props.new && privacy === 'private' && <FormItem

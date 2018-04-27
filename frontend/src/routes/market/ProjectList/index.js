@@ -139,7 +139,7 @@ class ProjectList extends Component {
     }
   }
 
-  starFavor(action, id, type) {
+  starFavorSetState =(id,action)=> {
     const user_obj_id = localStorage.getItem('user_obj_id')
     function findById(element) {
       return element._id === id
@@ -152,24 +152,18 @@ class ProjectList extends Component {
     else {
       toUpdate.favor_users.includes(user_obj_id) ? toUpdate.favor_users.pop(user_obj_id) : toUpdate.favor_users.push(user_obj_id)
     }
-    // 刷新state
     this.setState({})
+  }
+
+  starFavor(action, id, type) {
+    // 刷新state
     setStarFavor({
         entity_id: id,
         action: action,
         entity: type
-    })
-
-
-    // this.props.dispatch({
-    //   type: 'projectDetail/starFavor',
-    //   payload: {
-    //     entity_id: id,
-    //     action: action,
-    //     entity: type
-    //   }
-    // })
+    },()=>this.starFavorSetState(id,action))
   }
+
 
   render() {
     const {history, project, dispatch} = this.props
@@ -212,8 +206,8 @@ class ProjectList extends Component {
 
 function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
   const user_obj_id = localStorage.getItem('user_obj_id')
+  const user_ID = localStorage.getItem('user_ID')
   const picNumber = parseInt(project.user.slice(10))%6
-  console.log(project.user)
   return (
     <div className={styles.projectCard}>
       <div className={styles.toDetail} onClick={() => onClickToDetail()}>
