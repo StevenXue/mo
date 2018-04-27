@@ -8,6 +8,7 @@ import { FormattedMessage } from 'react-intl'
 import { config } from '../../utils'
 // import PostRequestModal from '../../components/postRequestModal/postRequestModal'
 import { JsonToArray } from '../../utils/JsonUtils'
+import * as storage from '../../packages/react-simple-chatbot-master/lib/storage'
 
 const Search = Input.Search
 
@@ -102,8 +103,11 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
     return unread
   }
   const divStyle = () => {
-    let unreadNum = numberOfUnreadMessage()
-    console.log(unreadNum,'str')
+    let unreadNum = 0
+    setTimeout(() => {
+      unreadNum = numberOfUnreadMessage()
+    }, 300)
+    // console.log(unreadNum,'str')
     return unreadNum > 0 ? {
       position: 'absolute',
       top: '-25%',
@@ -274,10 +278,10 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
           // style={{position:'absolute',top:6,right:'14%'}}
           title={
             <span onClick={toLoginPage} style={{ position: 'relative' }}>
-                {/* <Badge count={login.user ? numberOfUnreadMessage() : 0}> */}
+                 <Badge count={login.user ? numberOfUnreadMessage() : 0}>
               <Icon style={{ color: 'white', fontSize: '18px' }} type="message"/>
-                <div style={divStyle()}></div>
-              {/* </Badge> */}
+                {/*<div style={divStyle()}></div>*/}
+               </Badge>
               </span>
           }
         >

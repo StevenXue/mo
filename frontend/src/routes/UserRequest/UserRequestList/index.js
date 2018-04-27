@@ -122,7 +122,7 @@ class RequestList extends Component {
       pageNo: current,
       pageSize: pageSize,
     })
-    this.fetchData({ payload: { search_query: this.state.search_query, page_no: current, page_size: pageSize, } })
+    this.fetchData({ payload: { search_query: this.state.search_query, page_no: current, page_size: pageSize } })
   }
 
   render() {
@@ -145,7 +145,7 @@ class RequestList extends Component {
           {this.state.requests.map(e =>
             <Card key={e._id} className={styles.card}
                   bodyStyle={{ padding: '24px 32px' }}
-              >
+            >
               <div>
                 <Row gutter={16} type="flex" justify="space-around" align="middle">
                   <Col span={4}>
@@ -168,16 +168,27 @@ class RequestList extends Component {
                       <p className={styles.title}
                          onClick={() => this.toUserRequestDetail(e._id, history)}>{e.title}</p>
                       {/*<p className={styles.description}>{e.description}</p>*/}
-                      <div>
-                        {e['tags'].length > 0 && e['tags'].map(e => <Tag
-                                                                       className={styles.tags}
-                                                                       key={e}>{e}</Tag>)}
-                        <div className={styles.timeAndUserDiv}>
-                          <p className={styles.user_ID}
-                             onClick={() => this.toUserProfile(e.user_ID, history)}>{e.user_ID} &nbsp;&nbsp;</p>
-                          <p
-                            className={styles.showTime}>{showTime(e.create_time)}</p>
-                        </div>
+                      {/*<div>*/}
+                      {/*{e['tags'].length > 0 && e['tags'].map(e => <Tag*/}
+                      {/*className={styles.tags}*/}
+                      {/*key={e}>{e}</Tag>)}*/}
+                      {/*<div className={styles.timeAndUserDiv}>*/}
+                      {/*<p className={styles.user_ID}*/}
+                      {/*onClick={() => this.toUserProfile(e.user_ID, history)}>{e.user_ID} &nbsp;&nbsp;</p>*/}
+                      {/*<p*/}
+                      {/*className={styles.showTime}>{showTime(e.create_time)}</p>*/}
+                      {/*</div>*/}
+                      {/*</div>*/}
+                      <div className={styles.footer}>
+                        <Icon type="user" className={styles.firstIcon}/>
+                        <p className={styles.user_ID}
+                           onClick={() => this.toUserProfile(e.user_ID, history)}>{e.user_ID} &nbsp;&nbsp;</p>
+                        {e['tags'].length > 0 && <Icon type="tags" className={styles.otherIcon}/>}
+                        {e['tags'].length > 0 &&
+                        <p key={e}>{e['tags'].join(',')}</p>}
+                        <Icon type="clock-circle-o"
+                              className={styles.otherIcon}/>
+                        <p>{showTime(e.create_time)}</p>
                       </div>
                     </div>
                   </Col>
