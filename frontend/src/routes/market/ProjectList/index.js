@@ -10,10 +10,10 @@ import avatar3 from '../../../img/avatar/3.png'
 import avatar4 from '../../../img/avatar/4.png'
 import avatar5 from '../../../img/avatar/5.png'
 import avatar6 from '../../../img/avatar/6.png'
-import star from './img/star.png'
-import star_o from './img/star-o.png'
-import like from './img/like.png'
-import like_o from './img/like-o.png'
+import star from '../../../img/star.png'
+import star_o from '../../../img/star-o.png'
+import like from '../../../img/like.png'
+import like_o from '../../../img/like-o.png'
 
 const avatarList =[avatar1,avatar2,avatar3,avatar4,avatar5,avatar6]
 
@@ -46,13 +46,13 @@ function Projects({history, project, dispatch,location}) {
     <div className={`main-container ${styles.normal}`}>
       <Tabs defaultActiveKey={defaultActiveKeyDic[location.search]} onChange={callback}>
         <TabPane tab="Apps" key="1">
-          <ProjectList {...{history, project, dispatch}} type='app'/>
+          <ProjectList {...{history, project, dispatch, location}} type='app'/>
         </TabPane>
         <TabPane tab="Modules" key="2">
-          <ProjectList {...{history, project, dispatch}} type='module'/>
+          <ProjectList {...{history, project, dispatch, location}} type='module'/>
         </TabPane>
         <TabPane tab="Datasets" key="3">
-          <ProjectList {...{history, project, dispatch}} type='dataset'/>
+          <ProjectList {...{history, project, dispatch, location}} type='dataset'/>
         </TabPane>
       </Tabs>
     </div>
@@ -72,6 +72,25 @@ class ProjectList extends Component {
       totalNumber: 0,
       pageNo: 1,
       pageSize: 8,
+    }
+  }
+
+  componentDidMount() {
+    this.fetchData({})
+    this.hideBreadcrumb()
+  }
+
+  hideBreadcrumb = ()=>{
+    const {location} = this.props
+    // console.log(document.getElementsByTagName('a') instanceof Array);  //false
+    if(location.pathname==='/explore'){
+      let array = Array.from(document.getElementsByTagName('a'))
+      let arr = []
+      array.map((e,i)=>{
+        //之所以与Workspace和Request方法不同，因为Explore的tab名与面包屑很巧合的一样
+        e.text==='Explore'?arr.push(i):null
+      })
+      document.getElementsByTagName('a')[arr[arr.length-1]].style.color ='transparent'
     }
   }
 
@@ -101,11 +120,6 @@ class ProjectList extends Component {
 
 
   }
-
-  componentDidMount() {
-    this.fetchData({})
-  }
-
 
   handleQueryChange(value) {
     this.fetchData({payload: {query: value}})
@@ -154,7 +168,7 @@ class ProjectList extends Component {
   render() {
     const {history, project, dispatch} = this.props
     return (
-      <div>
+      <div >
         <div className={styles.header}>
           {/*<Select defaultValue='all' className={styles.select}*/}
           {/*onChange={(value) => this.handlePrivacyChange(value)}>*/}
@@ -170,7 +184,9 @@ class ProjectList extends Component {
         </div>
         <div className={styles.projectList}>
           {this.state.projects.map(e =>
-            <ProjectCard key={e._id} project={e}
+            <ProjectCard
+
+              key={e._id} project={e}
                          onClickToDetail={() => this.toProjectDetail(e._id, history, e.type, e.user, this.state.user_obj_id)}
                          onClickStarFavor={(action) => this.starFavor(action, e._id, e.type)}
             />
@@ -226,19 +242,14 @@ function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
         <div className={styles.starFavorRightDiv}>
           <Icon className={styles.bottomIcon}
                 type={project.star_users.includes(user_obj_id) ? "like" : "like-o"}
-                onClick={project.user_ID===user_ID?null:() => onClickStarFavor('star')}
-                style={{
-                  cursor:project.user_ID===user_ID?"default":"pointer",
-                  color:'transparent',
-                  background:project.star_users.includes(user_obj_id) ?`url(${like_o}) no-repeat`:`url(${like}) no-repeat`}}
+                onClick={() => onClickStarFavor('star')}
+                style={{color:'transparent',background:project.star_users.includes(user_obj_id) ?`url(${like_o}) no-repeat center`:`url(${like}) no-repeat center`}}
                 />
           <p className={styles.bottomNumber}>{project.star_users.length}</p>
           <Icon className={styles.bottomIcon}
                 type={project.favor_users.includes(user_obj_id) ? "star" : "star-o"}
-                onClick={project.user_ID===user_ID?null:() => onClickStarFavor('favor')}
-                style={{cursor:project.user_ID===user_ID?"default":"pointer",
-                  color:'transparent',
-                  background:project.favor_users.includes(user_obj_id) ?`url(${star_o}) no-repeat`:`url(${star}) no-repeat`}}
+                onClick={() => onClickStarFavor('favor')}
+                style={{color:'transparent',background:project.favor_users.includes(user_obj_id) ?`url(${star_o}) no-repeat center`:`url(${star}) no-repeat center`}}
                 />
           <p className={styles.bottomNumber}>{project.favor_users.length}</p>
         </div>

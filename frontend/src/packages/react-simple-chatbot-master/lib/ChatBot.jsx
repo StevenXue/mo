@@ -629,9 +629,11 @@ class ChatBot extends Component {
             onClick={() => this.toggleChatBot(true)}
             style={
               this.props.isRight ? {
+                background: '#ffffff',
                   right: 312,
                 } :
                 {
+                  background: '#ffffff',
                   right: 32+30,
                 }
             }

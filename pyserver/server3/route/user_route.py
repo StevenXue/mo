@@ -200,7 +200,7 @@ def haveReset():
     if not user:
         return jsonify({'response': 'Bad email'}), 400
     # Identity can be any data that is json serializable
-    response = {'response': {'token': create_access_token(identity=user)}}
+    response = {'response': {'token': create_access_token(identity=user.user_ID)}}
     return jsonify(response), 200
 
 
