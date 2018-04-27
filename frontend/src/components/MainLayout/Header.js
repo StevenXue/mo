@@ -8,6 +8,7 @@ import { FormattedMessage } from 'react-intl'
 import { config } from '../../utils'
 // import PostRequestModal from '../../components/postRequestModal/postRequestModal'
 import { JsonToArray } from '../../utils/JsonUtils'
+import * as storage from '../../packages/react-simple-chatbot-master/lib/storage'
 
 const Search = Input.Search
 
@@ -102,9 +103,12 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
     return unread
   }
   const divStyle = () => {
-    let str = String(numberOfUnreadMessage())
-    // console.log(str,'str')
-    return str.length > 0 ? {
+    let unreadNum = 0
+    setTimeout(() => {
+      unreadNum = numberOfUnreadMessage()
+    }, 300)
+    // console.log(unreadNum,'str')
+    return unreadNum > 0 ? {
       position: 'absolute',
       top: '-25%',
       right: '15%',
@@ -226,7 +230,7 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
         )}
         {
           <Menu.Item key={'docs'}>
-            <div onClick={() => window.location = 'https://momodel.github.io/mo/#/zh-cn/quick_start'}>
+            <div onClick={() => window.location = 'https://momodel.github.io/mo/#/'}>
               <div style={menuStyle}>Docs</div>
               {/*<FormattedMessage id={'docs'} defaultMessage={'Docs'}/>*/}
             </div>
@@ -273,10 +277,10 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
           className={styles.messageSubmenu}
           title={
             <span onClick={toLoginPage} style={{ position: 'relative' }}>
-                {/* <Badge count={login.user ? numberOfUnreadMessage() : 0}> */}
+                 <Badge count={login.user ? numberOfUnreadMessage() : 0}>
               <Icon style={{ color: 'white', fontSize: '18px' }} type="message"/>
-                <div style={divStyle()}></div>
-              {/* </Badge> */}
+                {/*<div style={divStyle()}></div>*/}
+               </Badge>
               </span>
           }
         >

@@ -141,7 +141,7 @@ class ProjectList extends Component {
     const {history, project, dispatch} = this.props
     const {totalNumber, pageSize} = this.state
     return (
-      <div>
+      <div style={{marginBottom:'80px'}}>
         <div className={styles.header}>
           <Select defaultValue='all' className={styles.select}
                   onChange={(value) => this.handlePrivacyChange(value)}>
@@ -178,13 +178,13 @@ class ProjectList extends Component {
                 <div>
                   <p className={styles.des}>{e.description}</p>
                   <div className={styles.other}>
-                  <Icon 
-                      type='like' 
+                  <Icon
+                      type='like'
                       style={{background:e.star_users.length!=0  ?`url(${like_o}) no-repeat center`:`url(${like}) no-repeat center`}}
                   />
                     {e.star_users.length}
-                  <Icon 
-                    type='star' 
+                  <Icon
+                    type='star'
                     style={{marginLeft:10,background:e.favor_users.length!=0  ?`url(${star_o}) no-repeat center`:`url(${star}) no-repeat center`}}
                 />
                   {e.favor_users.length}
@@ -225,7 +225,7 @@ class ProjectList extends Component {
          {
            parseInt(totalNumber/pageSize)>1?
            <div className={styles.pagination}>
-            <Pagination 
+            <Pagination
               showSizeChanger
               onShowSizeChange={this.onShowSizeChange}
               onChange={this.onShowSizeChange}
@@ -236,7 +236,7 @@ class ProjectList extends Component {
               hideOnSinglePage={true}/>
           </div>:
           <div style={{color:'#c1c1c1',fontSize:'14px',marginTop:30}}>
-           没有更多内容
+
          </div>
         }
       </div>
