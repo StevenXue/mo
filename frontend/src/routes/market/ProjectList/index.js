@@ -190,6 +190,7 @@ class ProjectList extends Component {
   }
 }
 
+
 function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
   const user_obj_id = localStorage.getItem('user_obj_id')
   const user_ID = localStorage.getItem('user_ID')
@@ -214,8 +215,11 @@ function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
               <p>{showTime(project.create_time, "yyyy-MM-dd")}</p></div>
           </div>
           <div className={styles.categoryDiv}>
-            <p className={styles.categoryP}>CATEGORY</p>
-            <p>{project.category}</p></div>
+            <div className={styles.categoryP}>TAG</div>
+            <div style={{display: 'flex'}}>
+              {project.tags.map((e,index,array) =><p>{e}&nbsp; {array.indexOf(e)===(array.length-1)?null:'•'} &nbsp; </p>)}
+            </div>
+          </div>
         </div>
       </div>
       <div className={styles.starFavorDiv}>
