@@ -41,13 +41,13 @@ function AllRequest({ history, allRequest, dispatch, location }) {
     <div className={`main-container ${styles.normal}`}>
       <Tabs defaultActiveKey={defaultActiveKeyDic[location.search]} onChange={callback}>
         <TabPane tab="Apps" key="1">
-          <RequestList {...{ history, allRequest, dispatch }} type='app'/>
+          <RequestList {...{ history, allRequest, dispatch, location}} type='app'/>
         </TabPane>
         <TabPane tab="Modules" key="2">
-          <RequestList {...{ history, allRequest, dispatch }} type='module'/>
+          <RequestList {...{ history, allRequest, dispatch, location}} type='module'/>
         </TabPane>
         <TabPane tab="Datasets" key="3">
-          <RequestList {...{ history, allRequest, dispatch }} type='dataset'/>
+          <RequestList {...{ history, allRequest, dispatch, location}} type='dataset'/>
         </TabPane>
       </Tabs>
     </div>
@@ -93,6 +93,18 @@ class RequestList extends Component {
         page_size: this.state.pageSize,
       },
     })
+    this.hideBreadcrumb()
+  }
+
+  hideBreadcrumb = ()=>{
+    const {location} = this.props
+    // console.log(document.getElementsByTagName('a') instanceof Array);  //false
+    if(location.pathname==='/userrequest'){
+      let array = Array.from(document.getElementsByTagName('a'))
+      array.map((e,i)=>{
+        e.text==='User Request'?document.getElementsByTagName('a')[i].style.color ='transparent':null
+      })
+    }
   }
 
   handleQueryChange(value) {
@@ -122,7 +134,7 @@ class RequestList extends Component {
       pageNo: current,
       pageSize: pageSize,
     })
-    this.fetchData({ payload: { search_query: this.state.search_query, page_no: current, page_size: pageSize, } })
+    this.fetchData({ payload: { search_query: this.state.search_query, page_no: current, page_size: pageSize } })
   }
 
   render() {
@@ -144,10 +156,11 @@ class RequestList extends Component {
         <div className={styles.requestList}>
           {this.state.requests.map(e =>
             <Card key={e._id} className={styles.card}
-                  bodyStyle={{ paddingLeft: '5px' }}>
+                  bodyStyle={{ padding: '24px 32px' }}
+            >
               <div>
-                <Row gutter={5} type="flex" justify="space-around" align="middle">
-                  <Col span={3}>
+                <Row gutter={16} type="flex" justify="space-around" align="middle">
+                  <Col span={4}>
                     <div className={styles.starAnswerDiv}
                          onClick={() => this.toUserRequestDetail(e._id, history)}>
                       <div className={styles.starDiv}>
@@ -162,21 +175,32 @@ class RequestList extends Component {
                       </div>
                     </div>
                   </Col>
-                  <Col span={21}>
+                  <Col span={20}>
                     <div>
                       <p className={styles.title}
                          onClick={() => this.toUserRequestDetail(e._id, history)}>{e.title}</p>
                       {/*<p className={styles.description}>{e.description}</p>*/}
-                      <div>
-                        {e['tags'].length > 0 && e['tags'].map(e => <Tag
-                                                                       className={styles.tags}
-                                                                       key={e}>{e}</Tag>)}
-                        <div className={styles.timeAndUserDiv}>
-                          <p className={styles.user_ID}
-                             onClick={() => this.toUserProfile(e.user_ID, history)}>&nbsp;&nbsp;{e.user_ID} &nbsp;&nbsp;</p>
-                          <p
-                            className={styles.showTime}>{showTime(e.create_time)}</p>
-                        </div>
+                      {/*<div>*/}
+                      {/*{e['tags'].length > 0 && e['tags'].map(e => <Tag*/}
+                      {/*className={styles.tags}*/}
+                      {/*key={e}>{e}</Tag>)}*/}
+                      {/*<div className={styles.timeAndUserDiv}>*/}
+                      {/*<p className={styles.user_ID}*/}
+                      {/*onClick={() => this.toUserProfile(e.user_ID, history)}>{e.user_ID} &nbsp;&nbsp;</p>*/}
+                      {/*<p*/}
+                      {/*className={styles.showTime}>{showTime(e.create_time)}</p>*/}
+                      {/*</div>*/}
+                      {/*</div>*/}
+                      <div className={styles.footer}>
+                        <Icon type="user" className={styles.firstIcon}/>
+                        <p className={styles.user_ID}
+                           onClick={() => this.toUserProfile(e.user_ID, history)}>{e.user_ID} &nbsp;&nbsp;</p>
+                        {e['tags'].length > 0 && <Icon type="tags" className={styles.otherIcon}/>}
+                        {e['tags'].length > 0 &&
+                        <p key={e}>{e['tags'].join(',')}</p>}
+                        <Icon type="clock-circle-o"
+                              className={styles.otherIcon}/>
+                        <p>{showTime(e.create_time)}</p>
                       </div>
                     </div>
                   </Col>

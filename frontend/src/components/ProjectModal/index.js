@@ -9,7 +9,7 @@ const FormItem = Form.Item
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
 const Option = Select.Option
-
+const { TextArea } = Input;
 const fields = ['Business', 'Government', 'Education', 'Environment', 'Health', 'Housing & Development',
   'Public Services', 'Social', 'Transportation', 'Science', 'Technology']
 const tasks = ['Classification', 'Regression', 'Clustering', 'Reinforcement Learning']
@@ -27,20 +27,14 @@ class ProjectModal extends Component {
   }
 
   showModelHandler = (e) => {
-    // if (e) e.stopPropagation()
-    // this.setState({
-    //   visible: true,
-    // });
+    if (this.props.new) {
+      this.props.dispatch({ type: 'project/setTags', payload: [] })
+    }
     this.props.dispatch({ type: 'project/showModal' })
   }
 
   hideModelHandler = () => {
-    // if (e) e.stopPropagation()
-    // this.setState({
-    //   visible: false,
-    // });
     this.props.dispatch({ type: 'project/hideModal' })
-    this.props.dispatch({ type: 'project/setTags', payload: [] })
   }
 
   okHandler = () => {
@@ -54,6 +48,8 @@ class ProjectModal extends Component {
       if (!err) {
         // TODO move fetch and dispatch to model
         if (this.props.new) {
+          this.props.dispatch({type:'launchpage/change',payload:{visibility:false}})  //关闭launchpage
+          localStorage.setItem('launchpage','hide')
           const hide = message.loading('Project Creating...', 0)
           createProject({
             body,
@@ -65,7 +61,6 @@ class ProjectModal extends Component {
               } else {
                 this.props.dispatch(routerRedux.push('/workspace/' + response._id + `?type=${this.props.type}`))
               }
-              this.props.dispatch({ type: 'project/setTags', payload: [] })
               hide()
             },
           })
@@ -82,7 +77,6 @@ class ProjectModal extends Component {
                 notStartLab: true,
                 projectType: this.props.projectDetail.project.type,
               })
-              this.props.dispatch({ type: 'project/setTags', payload: [] })
             },
           })
         }
@@ -137,7 +131,6 @@ class ProjectModal extends Component {
     // default values
     const { name, description, category, privacy } = _.get(projectDetail, 'project', {})
     let tags = _.get(project, 'tags', [])
-
     return (
       <span>
         <span onClick={this.showModelHandler}>
@@ -190,7 +183,7 @@ class ProjectModal extends Component {
                       required: true,
                     },
                   ],
-                })(<Input/>)
+                })(<TextArea/>)
               }
             </FormItem>
             {!this.props.new && privacy === 'private' && <FormItem
@@ -275,4 +268,4 @@ class ProjectModal extends Component {
   }
 }
 
-export default connect(({ project }) => ({ project }))(Form.create()(ProjectModal))
+export default connect(({ project, launchpage}) => ({ project, launchpage}))(Form.create()(ProjectModal))

@@ -27,7 +27,7 @@ const WorldMessageItem = ({worldMessage, isRight}) => {
   let picNumber = ""
 
   if(sender) {
-    picNumber = parseInt(sender.slice(20))%6
+    picNumber = parseInt(sender.slice(10))%6
   }
 
 

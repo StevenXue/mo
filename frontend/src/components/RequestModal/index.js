@@ -108,8 +108,10 @@ class RequestModal extends Component {
 
     let tags=[]
     let title, description, input, output
-    if (requestDetail) {
+    if (allRequest) {
       tags = allRequest.tags;
+    }
+    if (requestDetail) {
       ({ title, description, input, output }= requestDetail);
     }
     return (
@@ -169,7 +171,7 @@ class RequestModal extends Component {
               ],
             })(
               <div>
-                {tags.length !== 0 && tags.map((tag, index) => {
+                {tags.length > 0 && tags.map((tag, index) => {
                   const isLongTag = tag.length > 15
                   const tagElem = (
                     <Tag key={tag} closable={true}

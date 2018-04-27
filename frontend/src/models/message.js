@@ -48,7 +48,7 @@ export default {
   effects: {
     * fetchAllMessage(action, {call, put, select}) {
       // const user_id = yield select(state => state.login.user._id)
-      const {data: messages} = yield call(messageService.fetchMessage, {})
+      const {data: {messages,total_number}} = yield call(messageService.fetchMessage, {})
       if (messages.length > 0) {
         yield put({
           type: 'setMessage',

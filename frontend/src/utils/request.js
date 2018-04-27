@@ -37,7 +37,6 @@ function checkStatus({data, noErrorMsg, customErrorMsg, newRes}) {
  */
 export default async function request(url, options = {}, funcs = {}) {
   const { onSuccess, onJson, onError } = funcs
-
   try {
     const token = localStorage.getItem('token')
     if (token) {
@@ -56,11 +55,9 @@ export default async function request(url, options = {}, funcs = {}) {
     }
     // const {status, statusText} = response
     const newRes = response
-    console.log("response", response)
 
     const data = await response.json()
     const res = data.response || data
-
     if(onJson) {
       await onJson(res)
       return null

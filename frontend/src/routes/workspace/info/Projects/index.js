@@ -11,7 +11,11 @@ import {
 } from '../../../../services/project'
 
 import styles from './index.less'
-import blank from './blank.png'
+import blank from '../../../../img/blank.png'
+import star from '../../../../img/star.png'
+import star_o from '../../../../img/star-o.png'
+import like from '../../../../img/like.png'
+import like_o from '../../../../img/like-o.png'
 
 const Option = Select.Option
 const Search = Input.Search
@@ -70,6 +74,19 @@ class ProjectList extends Component {
 
   componentDidMount() {
     this.fetchData({})
+    this.hideBreadcrumb()
+
+  }
+
+  hideBreadcrumb = ()=> {
+    const {location} = this.props
+    // console.log(document.getElementsByTagName('a') instanceof Array);  //false
+    if(location.pathname==='/workspace'){
+      let array = Array.from(document.getElementsByTagName('a'))
+      array.map((e,i)=>{
+        e.text==='My Projects'?document.getElementsByTagName('a')[i].style.color ='transparent':null
+      })
+    }
   }
 
   fetchData({payload = {}}) {
@@ -111,6 +128,7 @@ class ProjectList extends Component {
 
   toProjectDetail(id, history, type) {
     this.props.dispatch({type:'launchpage/change',payload:{visibility:false}})  //关闭launchpage
+    localStorage.setItem('launchpage','hide')
     history.push(`/workspace/${id}?type=${type}`)
   }
 
@@ -123,7 +141,7 @@ class ProjectList extends Component {
     const {history, project, dispatch} = this.props
     const {totalNumber, pageSize} = this.state
     return (
-      <div>
+      <div style={{marginBottom:'80px'}}>
         <div className={styles.header}>
           <Select defaultValue='all' className={styles.select}
                   onChange={(value) => this.handlePrivacyChange(value)}>
@@ -159,8 +177,18 @@ class ProjectList extends Component {
                     style={{cursor: 'pointer'}}>
                 <div>
                   <p className={styles.des}>{e.description}</p>
-                  <p className={styles.other}>
-                    <Icon type="clock-circle-o" style={{marginRight: 10}}/>
+                  <div className={styles.other}>
+                  <Icon
+                      type='like'
+                      style={{background:e.star_users.length!=0  ?`url(${like_o}) no-repeat center`:`url(${like}) no-repeat center`}}
+                  />
+                    {e.star_users.length}
+                  <Icon
+                    type='star'
+                    style={{marginLeft:10,background:e.favor_users.length!=0  ?`url(${star_o}) no-repeat center`:`url(${star}) no-repeat center`}}
+                />
+                  {e.favor_users.length}
+                    <Icon type="clock-circle-o" style={{marginRight: 10,marginLeft:10}}/>
                     {showTime(e.create_time)}
                     <Button style={{float: 'right'}}
                             onClick={(ev) => {
@@ -169,7 +197,7 @@ class ProjectList extends Component {
                             }}>
                       Notebook ->
                     </Button>
-                  </p>
+                  </div>
                   {/*<Icon type="user" style={{ marginRight: 10 }}/>*/}
                   {/*{e['user_name'] && <p>Owner: {e.user_name}</p>}*/}
                 </div>
@@ -197,7 +225,7 @@ class ProjectList extends Component {
          {
            parseInt(totalNumber/pageSize)>1?
            <div className={styles.pagination}>
-            <Pagination 
+            <Pagination
               showSizeChanger
               onShowSizeChange={this.onShowSizeChange}
               onChange={this.onShowSizeChange}
@@ -208,7 +236,7 @@ class ProjectList extends Component {
               hideOnSinglePage={true}/>
           </div>:
           <div style={{color:'#c1c1c1',fontSize:'14px',marginTop:30}}>
-           没有更多内容
+
          </div>
         }
       </div>
