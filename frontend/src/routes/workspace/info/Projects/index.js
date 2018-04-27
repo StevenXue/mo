@@ -74,20 +74,20 @@ class ProjectList extends Component {
 
   componentDidMount() {
     this.fetchData({})
-    this.hideBreadcrumb()
+    // this.hideBreadcrumb()
 
   }
 
-  hideBreadcrumb = ()=>{
-    const {location} = this.props
-    // console.log(document.getElementsByTagName('a') instanceof Array);  //false
-    if(location.pathname==='/workspace'){
-      let array = Array.from(document.getElementsByTagName('a'))
-      array.map((e,i)=>{
-        e.text==='My Projects'?document.getElementsByTagName('a')[i].style.color ='transparent':null
-      })
-    }
-  }
+  // hideBreadcrumb = ()=>{
+  //   const {location} = this.props
+  //   // console.log(document.getElementsByTagName('a') instanceof Array);  //false
+  //   if(location.pathname==='/workspace'){
+  //     let array = Array.from(document.getElementsByTagName('a'))
+  //     array.map((e,i)=>{
+  //       e.text==='My Projects'?document.getElementsByTagName('a')[i].style.color ='transparent':null
+  //     })
+  //   }
+  // }
 
   fetchData({payload = {}}) {
     const {type} = this.props
