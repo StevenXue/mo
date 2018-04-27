@@ -144,10 +144,11 @@ class RequestList extends Component {
         <div className={styles.requestList}>
           {this.state.requests.map(e =>
             <Card key={e._id} className={styles.card}
-                  bodyStyle={{ paddingLeft: '5px' }}>
+                  bodyStyle={{ padding: '24px 32px' }}
+              >
               <div>
-                <Row gutter={5} type="flex" justify="space-around" align="middle">
-                  <Col span={3}>
+                <Row gutter={16} type="flex" justify="space-around" align="middle">
+                  <Col span={4}>
                     <div className={styles.starAnswerDiv}
                          onClick={() => this.toUserRequestDetail(e._id, history)}>
                       <div className={styles.starDiv}>
@@ -162,7 +163,7 @@ class RequestList extends Component {
                       </div>
                     </div>
                   </Col>
-                  <Col span={21}>
+                  <Col span={20}>
                     <div>
                       <p className={styles.title}
                          onClick={() => this.toUserRequestDetail(e._id, history)}>{e.title}</p>
@@ -173,7 +174,7 @@ class RequestList extends Component {
                                                                        key={e}>{e}</Tag>)}
                         <div className={styles.timeAndUserDiv}>
                           <p className={styles.user_ID}
-                             onClick={() => this.toUserProfile(e.user_ID, history)}>&nbsp;&nbsp;{e.user_ID} &nbsp;&nbsp;</p>
+                             onClick={() => this.toUserProfile(e.user_ID, history)}>{e.user_ID} &nbsp;&nbsp;</p>
                           <p
                             className={styles.showTime}>{showTime(e.create_time)}</p>
                         </div>
