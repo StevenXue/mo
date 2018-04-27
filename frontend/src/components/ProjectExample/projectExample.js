@@ -81,9 +81,9 @@ class ProjectExample extends React.Component {
             text={`${projectDetail.project.app_path.replace('.', 'http://192.168.31.23:8080')}-${version_}`}/>
         </div>
         <br/>
-        <Row gutter={16}>
+        <Row gutter={24}>
           <Col span={12} >
-            <div style={{border:'1px solid #eeeeee'}}>
+            <div>
               <div>
                 <p>
                   INPUT
@@ -109,10 +109,8 @@ class ProjectExample extends React.Component {
               </div>
             </div>
           </Col>
-          </Row>
-          <Row gutter={16}>
           <Col span={12} >
-            <div style={{border:'1px solid #eeeeee',borderTop:0}}>
+            <div>
               <div>
                 <p>
                   OUTPUT
