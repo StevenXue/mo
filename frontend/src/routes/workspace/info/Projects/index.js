@@ -11,7 +11,11 @@ import {
 } from '../../../../services/project'
 
 import styles from './index.less'
-import blank from './blank.png'
+import blank from '../../../../img/blank.png'
+import star from '../../../../img/star.png'
+import star_o from '../../../../img/star-o.png'
+import like from '../../../../img/like.png'
+import like_o from '../../../../img/like-o.png'
 
 const Option = Select.Option
 const Search = Input.Search
@@ -77,7 +81,7 @@ class ProjectList extends Component {
   hideBreadcrumb = ()=>{
     const {location} = this.props
     // console.log(document.getElementsByTagName('a') instanceof Array);  //false
-    if(location.pathname==='/workspace'&&location.search==='?tab=app'){
+    if(location.pathname==='/workspace'){
       let array = Array.from(document.getElementsByTagName('a'))
       array.map((e,i)=>{
         e.text==='My Projects'?document.getElementsByTagName('a')[i].style.color ='transparent':null
@@ -174,31 +178,25 @@ class ProjectList extends Component {
                 <div>
                   <p className={styles.des}>{e.description}</p>
                   <div className={styles.other}>
-                    <Icon type="clock-circle-o" style={{marginRight: 10}}/>
+                  <Icon 
+                      type='like' 
+                      style={{background:e.star_users.length!=0  ?`url(${like_o}) no-repeat center`:`url(${like}) no-repeat center`}}
+                  />
+                    {e.star_users.length}
+                  <Icon 
+                    type='star' 
+                    style={{marginLeft:10,background:e.favor_users.length!=0  ?`url(${star_o}) no-repeat center`:`url(${star}) no-repeat center`}}
+                />
+                  {e.favor_users.length}
+                    <Icon type="clock-circle-o" style={{marginRight: 10,marginLeft:10}}/>
                     {showTime(e.create_time)}
-                    {/* <Button style={{float: 'right'}}
+                    <Button style={{float: 'right'}}
                             onClick={(ev) => {
                               ev.stopPropagation()
                               window.open(`/#/workspace/${e._id}/${e.type}`)
                             }}>
-                      Notebook -1>
-                    </Button> */}
-                    <div className={styles.bigIconNunberDiv} style={{float: 'right'}}>
-                      <div style={{float: 'right',marginLeft:10,color:e.star_users.length!=0 ?'#34c0e2':'#999999'}} >
-                        <p className={styles.icon} style={{float: 'left',marginRight:5}}>
-                          <Icon
-                            type={e.star_users.length!=0 ? 'like' : 'like-o'}/>
-                        </p>
-                        <p className={styles.number} style={{float: 'left'}}>{e.star_users.length}</p>
-                      </div>
-                      <div style={{float: 'right',marginLeft:10,color:e.favor_users.length!=0 ?'#34c0e2':'#999999'}}> 
-                        <p className={styles.icon} style={{float: 'left',marginRight:5}}>
-                          <Icon
-                            type={e.favor_users.length!=0 ? 'star' : 'star-o'}/>
-                        </p>
-                        <p className={styles.number} style={{float: 'left'}}>{e.favor_users.length}</p>
-                      </div>
-                    </div>
+                      Notebook ->
+                    </Button>
                   </div>
                   {/*<Icon type="user" style={{ marginRight: 10 }}/>*/}
                   {/*{e['user_name'] && <p>Owner: {e.user_name}</p>}*/}
