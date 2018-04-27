@@ -291,9 +291,10 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
   }
 
   const cloudNote = () => {
-    return <Row style={{ width: '110%', marginLeft: '-8%' }}>
-      <Col span={14}>
-        {!market_use && <span className={styles.generalSpan}>
+    if(!market_use) {
+      return <Row style={{ width: '110%', marginLeft: '-8%' }}>
+        <Col span={14}>
+       <span className={styles.generalSpan}>
       <Upload {...props1}>
         <Tooltip
           title='Files will be uploaded to your workspace, and archives will be auto unarchived into working directory.'>
@@ -302,9 +303,9 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
         </Button>
         </Tooltip>
       </Upload>
-        </span>}
-      </Col>
-      <Col span={10}>
+        </span>
+        </Col>
+        <Col span={10}>
       <span className={styles.enterNotebook}>
       <Button type="primary"
               className="zi"
@@ -315,8 +316,9 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
         Notebook ->
       </Button>
     </span>
-      </Col>
-    </Row>
+        </Col>
+      </Row>
+    }
     //   return <div style={{paddingBottom: '50px'}}><span>
 
     // </span></div>
