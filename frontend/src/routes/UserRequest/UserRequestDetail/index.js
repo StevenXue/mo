@@ -445,7 +445,7 @@ function UserRequestDetail({ allRequest, login, dispatch }) {
                   <RequestModal new={false} requestDetail={focusUserRequest}>
                     <Button icon='edit' style={{ marginRight: 15 }}/>
                   </RequestModal>
-              {focusUserRequest.comments && focusUserRequest.answer ?
+              {focusUserRequest.comments || focusUserRequest.answer ?
                 null : <Button icon='delete' onClick={() => deleteUserRequest()}/>}
 
                 </span>}
