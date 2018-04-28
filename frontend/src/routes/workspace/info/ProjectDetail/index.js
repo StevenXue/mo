@@ -114,7 +114,7 @@ class CommentsList extends React.Component {
   }
 
   render() {
-    const {dispatch, projectId, history} = this.props
+    const { dispatch, projectId, history } = this.props
     const userObjId = localStorage.getItem('user_obj_id')
     const picNumber = parseInt(userObjId.slice(10)) % 6
     return (
@@ -123,14 +123,15 @@ class CommentsList extends React.Component {
           {this.props.comments && this.props.comments.map(e =>
             <div className={styles.commentDiv}>
               <Row>
-                <Col span={2} style={{margin: '20px 0', textAlign:'center'}}>
-                  <div style={{height: '60px', width:'60px'}}>
-                    <img src={e.avatar?e.avatar:avatarList[picNumber]} alt="avatar"/>
+                <Col span={2} style={{ margin: '20px 0', textAlign: 'center' }}>
+                  <div style={{ height: '60px', width: '60px' }}>
+                    <img src={e.avatar ? e.avatar : avatarList[picNumber]} alt="avatar"/>
                   </div>
                 </Col>
                 <Col span={20} className={styles.commentCol}>
                   <div>
-                    <div className={styles.commentUserID} onClick={() => this.toUserProfile(e.user_ID)}>{e.user_ID}</div>
+                    <div className={styles.commentUserID}
+                         onClick={() => this.toUserProfile(e.user_ID)}>{e.user_ID}</div>
                     <div className={styles.commentContent}>{e.comments}</div>
                     <div
                       className={styles.commentCreateTime}>{showTime(e.create_time)}</div>
@@ -185,9 +186,10 @@ class CommentForm extends React.Component {
     return (
       <div className="demo">
         <Row type="flex" justify="flex" align="top">
-          <Col span={2} style={{margin: '20px 0', textAlign:'center'}}>
-            <div style={{height: '60px', width:'60px'}}>
-              <img src={this.props.login.user.avatar?this.props.login.user.avatar:avatarList[picNumber]} alt="avatar"/>
+          <Col span={2} style={{ margin: '20px 0', textAlign: 'center' }}>
+            <div style={{ height: '60px', width: '60px' }}>
+              <img src={this.props.login.user.avatar ? this.props.login.user.avatar : avatarList[picNumber]}
+                   alt="avatar"/>
             </div>
           </Col>
           <Col span={20} style={{ margin: '20px 0' }}>
@@ -291,9 +293,10 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
   }
 
   const cloudNote = () => {
-    return <Row style={{ width: '110%', marginLeft: '-8%' }}>
-      <Col span={14}>
-        {!market_use && <span className={styles.generalSpan}>
+    if (!market_use) {
+      return <Row style={{ width: '110%', marginLeft: '-8%' }}>
+        <Col span={14}>
+      <span className={styles.generalSpan}>
       <Upload {...props1}>
         <Tooltip
           title='Files will be uploaded to your workspace, and archives will be auto unarchived into working directory.'>
@@ -302,9 +305,9 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
         </Button>
         </Tooltip>
       </Upload>
-        </span>}
-      </Col>
-      <Col span={10}>
+        </span>
+        </Col>
+        <Col span={10}>
       <span className={styles.enterNotebook}>
       <Button type="primary"
               className="zi"
@@ -315,8 +318,9 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
         Notebook ->
       </Button>
     </span>
-      </Col>
-    </Row>
+        </Col>
+      </Row>
+    }
     //   return <div style={{paddingBottom: '50px'}}><span>
 
     // </span></div>
@@ -386,8 +390,8 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
         }
 
         //关闭tourtip时调用，此后登录不再显示tourtip
-        noLearning = ()=>{
-          fetch(`/pyapi/user/notourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
+        noLearning = () => {
+          fetch(`/pyapi/user/notourtip?user_ID=${localStorage.user_ID}`, { method: 'GET' })
         }
 
         render() {

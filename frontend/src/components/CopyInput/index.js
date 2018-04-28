@@ -3,7 +3,7 @@ import { Input, Button, message } from 'antd'
 import styles from './index.less'
 const InputGroup = Input.Group
 
-const CopyInput = ({ text }) => {
+const CopyInput = ({ text, fog}) => {
 
   const copyHandler = () => {
     /* Get the text field */
@@ -19,8 +19,12 @@ const CopyInput = ({ text }) => {
     message.success('Copied the text: ' + copyText.value)
   }
 
+  const check = ()=>{
+    return fog?{width:fog}:{}
+  }
+
   return (
-    <div>
+    <div style={check()}>
       <InputGroup>
         <Input value={text} id={'git-command'+text}
                className={styles.input} readOnly/>
