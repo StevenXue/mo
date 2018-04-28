@@ -434,8 +434,24 @@ class ProjectBusiness:
         # delete tmp jupyterhub user
         cls.delete_hub_user(user_ID, project.name)
         # delete project directory
-        if os.path.isdir(project.path):
-            shutil.rmtree(project.path)
+        if project.type == 'app':
+            paths = [
+                project.path,
+                '-'.join([getattr(project, 'app_path') or 'NO_PATH', 'dev']),
+            ]
+        elif project.type == 'module':
+            paths = [
+                project.path,
+                os.path.join(getattr(project, 'module_path') or 'NO_PATH', 'dev')
+            ]
+        else:
+            paths = [
+                project.path,
+            ]
+        for path in paths:
+            if 'NO_PATH' not in path:
+                if os.path.isdir(path):
+                    shutil.rmtree(path)
         # remove git repo
         cls.remove_git_repo(user_ID, project.name)
         # delete project object
@@ -497,7 +513,7 @@ class ProjectBusiness:
                         actor_name=commit.actor.name,
                         actor_email=commit.actor.email,
                         timestamp=datetime.fromtimestamp(commit.time[0]),
-                            #+ commit.time[1]), need utc
+                        # + commit.time[1]), need utc
                         message=commit.message,
                         version=version
                         )
