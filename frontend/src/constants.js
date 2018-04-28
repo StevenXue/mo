@@ -15,6 +15,7 @@ module.exports = {
   // jupyterServer: 'http://10.52.14.182:8888/api/contents/',  // kube master node ip
   // kubeServer: 'http://10.52.14.182:8888/api/contents/',  // kube master node ip
   gitServerIp: '10.52.14.182',
+  webServer: 'http://192.168.31.6',
   // hubIp: '192.168.31.7',
   // jupyterServer: 'http://10.52.14.182:8888/api/contents/',
   // jupyterServer: 'http://122.224.116.44:9001/api/contents/',
