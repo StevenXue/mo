@@ -5,6 +5,7 @@ import { getApp } from '../../services/app'
 import JsonToArray from '../../utils/JsonUtils'
 import ParamsMapper from '../../components/ParamsMapper/index'
 import CopyInput from '../../components/CopyInput'
+import {webServer} from '../../constants'
 
 import {
   Row,
@@ -78,7 +79,9 @@ class ProjectExample extends React.Component {
           API:
           <CopyInput
             fog='50%'
-            text={`${projectDetail.project.app_path.replace('.', 'http://192.168.31.23:8080')}-${version_}`}/>
+            // text={`${projectDetail.project.app_path.replace('.', 'http://192.168.31.23:8080')}-${version_}`}
+            text={`${webServer}/pyapi/apps/run/${project._id}`}
+          />
         </div>
         <br/>
         <Row gutter={24}>
