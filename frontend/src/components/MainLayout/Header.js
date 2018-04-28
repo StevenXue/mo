@@ -135,6 +135,12 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
       case 'publish':
         toProject(e)
         break
+      case 'deploy_request':
+        toProject(e)
+        break
+      case 'publish_request':
+        toProject(e)
+        break
     }
     dispatch({
       type: 'message/readMessage',
