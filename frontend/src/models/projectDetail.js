@@ -142,17 +142,24 @@ export default {
     },
     setExampleResult(state, action) {
       let output = state.project.args.output
-      console.log(action.payload)
       for (let key in action.payload) {
-        output[key]['value'] = action.payload[key]
+        if(output[key]) {
+          output[key]['value'] = action.payload[key]
+        }
       }
+
+      let errors = action.payload.errors
+      if (errors) {
+        output.errors = errors
+      }
+
       return {
         ...state,
         project: {
           ...state.project,
           args: {
             ...state.project.args,
-            output: output,
+            output,
           },
         },
       }

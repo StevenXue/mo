@@ -2,6 +2,7 @@
 import os
 import re
 import yaml
+import time
 import shutil
 import fileinput
 import tempfile
@@ -9,6 +10,8 @@ import tarfile
 from copy import deepcopy
 from subprocess import call
 from io import BytesIO
+from datetime import datetime
+from datetime import timedelta
 
 import synonyms
 import docker
@@ -42,6 +45,21 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         ProjectBusiness.repo = Repo(project.App)
         return ProjectBusiness.create_project(*args, status='inactive',
                                               **kwargs)
+
+    @staticmethod
+    def get_service_name(app, version):
+        return '-'.join([app.user.user_ID, app.name, version])
+
+    @classmethod
+    def get_service_logs(cls, app, version, since=1):
+        client = docker.APIClient()
+        service_name = cls.get_service_name(app, version)
+        service = client.services(filters={'name': service_name})[0]
+        from_time = datetime.now() - timedelta(minutes=since)
+        logs = client.service_logs(service['ID'], stdout=True, stderr=True,
+                                   since=int(time.mktime(from_time.timetuple())))
+        logs = list(logs)
+        return logs
 
     @classmethod
     def deploy_or_publish(cls, app_id, commit_msg, handler_file_path,
