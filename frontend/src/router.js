@@ -87,27 +87,25 @@ const RouterConfig = ({history, location, projectDetail, app}) => {
       component: () => import('./routes/market/ProjectList'),
     },{
       path: '/userrequest/:userrequestId',
-      models: () => [import('./models/allRequest')],
+      // models: () => [import('./models/allRequest')],
       component: () => import('./routes/UserRequest/UserRequestDetail'),
     },{
       path: '/userrequest',
-      models: () => [import('./models/allRequest')],
+      // models: () => [import('./models/allRequest')],
       component: () => import('./routes/UserRequest/UserRequestList'),
     },{
       path: '/profile/:userId',
-      models: () => [
-        import('./models/profile'),
-        import('./models/login'),
-        import('./models/allRequest'),
-      ],
+      // models: () => [
+      //   import('./models/profile'),
+      //   import('./models/login'),
+      // ],
       component: () => import('./routes/Profile'),
     },{
       path: '/setting/profile/:userId',
-      models: () => [
-        import('./models/profile'),
-        import('./models/login'),
-        import('./models/allRequest'),
-      ],
+      // models: () => [
+      //   import('./models/profile'),
+      //   import('./models/login'),
+      // ],
       component: () => import('./routes/UserInfo'),
     },
   ]
