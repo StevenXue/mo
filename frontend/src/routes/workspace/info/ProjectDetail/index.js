@@ -19,7 +19,7 @@ import {
   Tooltip,
 } from 'antd'
 // pages
-import JupyterLab from '../../modelling/Modelling/index'
+// import JupyterLab from '../../modelling/Modelling/index'
 // components
 import ProjectModal from '../../../../components/ProjectModal/index'
 import HelpModal from '../../../../components/HelpModal'
@@ -32,6 +32,8 @@ import { get } from 'lodash'
 import { message } from 'antd/lib/index'
 import ReactMarkdown from 'react-markdown'
 import { avatarList, flaskServer, hubServer } from '../../../../constants'
+import dynamic from 'dva/dynamic'
+import modelling from '../../../../models/modelling'
 // import {fetchComments} from "../../../../services/comments"
 
 const confirm = Modal.confirm
@@ -219,7 +221,7 @@ const myShowTime = (time, format = 'yyyy-MM-dd hh:mm') => {
   return date.toLocaleString()
 }
 
-function ProjectInfo({ market_use, match, history, location, dispatch, projectDetail, login }) {
+function ProjectInfo({ app, market_use, match, history, location, dispatch, projectDetail, login }) {
   const projectId = match.params.projectId
   const user_ID = localStorage.getItem('user_ID')
   const userObjId = localStorage.getItem('user_obj_id')
@@ -329,7 +331,7 @@ function ProjectInfo({ market_use, match, history, location, dispatch, projectDe
   if (location.pathname.split('/').length > 3) {
     // project 4 step pages
     return (
-      <ProjectDetail match={match} history={history} location={location}
+      <ProjectDetail app={app} match={match} history={history} location={location}
                      projectDetail={projectDetail}
                      dispatch={dispatch}/>
     )
@@ -878,12 +880,17 @@ ProjectInfo.defaultProps = {
   market_use: false,
 }
 
-function ProjectDetail({ match, history, location, dispatch, projectDetail }) {
-
+function ProjectDetail({ app, match, history, location, dispatch, projectDetail }) {
   return (
     <div className={`main-container ${styles.normal}`}>
       <Switch>
-        <Route path="/workspace/:projectID/:type" component={JupyterLab}/>
+        <Route path="/workspace/:projectID/:type" component={dynamic({
+          app,
+          models: () => [
+            modelling,
+          ],
+          component: () => import('../../modelling/Modelling'),
+        })}/>
       </Switch>
     </div>
   )

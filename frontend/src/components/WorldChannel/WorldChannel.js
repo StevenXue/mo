@@ -16,9 +16,17 @@ class worldChannelC extends Component {
       }
     })
   }
+  onClickIcon = () => {
+    this.props.dispatch({
+      type: 'worldChannel/toggleIsRight',
+      payload: {
+
+      }
+    })
+  }
 
   render() {
-    const {worldMessages, onClickIcon, isRight, dispatch, login} = this.props
+    const {worldMessages, isRight, dispatch, login} = this.props
     if (!login.user) {
       return (
         <div/>
@@ -26,7 +34,7 @@ class worldChannelC extends Component {
     }
     else {
       return <WorldChannel worldMessages={worldMessages}
-                   onClickIcon={onClickIcon}
+                   onClickIcon={this.onClickIcon}
                    dispatch={dispatch}
                    isRight={isRight}
 
