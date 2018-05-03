@@ -71,7 +71,7 @@ class LaunchPage extends React.Component {
     }
     helpDocument = ()=>{
         // this.props.dispatch(routerRedux.push('/workspace?tab=module'))
-        window.location = "https://momodel.github.io/mo/#/zh-cn/quick_start"
+        window.location = "https://momodel.github.io/mo/#/"
     }
     render(){
         const {visibility} = this.state
