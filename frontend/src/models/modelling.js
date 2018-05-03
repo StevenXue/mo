@@ -329,7 +329,6 @@ const modelling = modelExtend(workBench, {
     // 当进入该页面是 获取用户所有 section
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
-        console.log('modelling pathname', pathname)
         const match = pathToRegexp('/workspace/:projectId/:type').exec(pathname)
         if (match) {
           let projectId = match[1]

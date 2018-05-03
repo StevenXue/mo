@@ -9,8 +9,6 @@ import { get } from 'lodash'
 import NewPassword from './routes/login/NewPassword'
 import Account from './routes/login/Account'
 import MainLayout from './components/MainLayout/MainLayout'
-import projectDetail from './models/projectDetail'
-import worldChannel from './models/worldChannel'
 
 const breadcrumbNameMap = {
   '/user': 'User',
