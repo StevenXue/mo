@@ -217,7 +217,7 @@ function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
     <div className={styles.projectCard}>
       <div className={styles.toDetail} onClick={() => onClickToDetail()}>
         <div className={styles.pic}>
-          <img src={project.user_avatar?project.user_avatar:avatarList[picNumber]}  alt="avatar" />
+          <img className={styles.avt} src={project.user_avatar?project.user_avatar:avatarList[picNumber]}  alt="avatar" />
         </div>
         <div className={styles.name}>
           <p className={styles.namep}>{project.name}</p>

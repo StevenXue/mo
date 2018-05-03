@@ -1,14 +1,17 @@
 import React from 'react'
-import {HashRouter, Route, Switch, Link, withRouter, routerRedux} from 'dva/router'
-import {Breadcrumb} from 'antd'
-import {connect} from 'dva'
-import dynamic from 'dva/dynamic';
+import { HashRouter, Route, Switch, Link, withRouter, routerRedux } from 'dva/router'
+import { Breadcrumb } from 'antd'
+import { connect } from 'dva'
+import dynamic from 'dva/dynamic'
 import pathToRegexp from 'path-to-regexp'
-import {get} from 'lodash'
+import { get } from 'lodash'
 
 import NewPassword from './routes/login/NewPassword'
 import Account from './routes/login/Account'
 import MainLayout from './components/MainLayout/MainLayout'
+import projectDetail from './models/projectDetail'
+import worldChannel from './models/worldChannel'
+
 const breadcrumbNameMap = {
   '/user': 'User',
   '/user/login': 'Login',
@@ -25,7 +28,7 @@ const breadcrumbNameMap = {
   '/explore': 'Explore',
 }
 
-const RouterConfig = ({history, location, projectDetail, app}) => {
+const RouterConfig = ({ history, location, projectDetail, app }) => {
   const pathSnippets = location.pathname.split('/').filter(i => i)
 
   const extraBreadcrumbItems = pathSnippets.map((_, index) => {
@@ -44,7 +47,7 @@ const RouterConfig = ({history, location, projectDetail, app}) => {
     return (
       <Breadcrumb.Item key={url}>
         <Link to={url + location.search.replace('type', 'tab')}
-              style={{textTransform: 'capitalize'}}>
+              style={{ textTransform: 'capitalize' }}>
           {breadcrumbName || breadcrumbNameMap[url]}
         </Link>
       </Breadcrumb.Item>
@@ -58,7 +61,14 @@ const RouterConfig = ({history, location, projectDetail, app}) => {
 
   const ProjectDetail = dynamic({
     app,
-    models: () => [import('./models/modelling')],
+    // models: () => [
+    //   import('./models/modelling'),
+    //   import('./models/projectDetail'),
+    //   import('./models/login'),
+    //   import('./models/project'),
+    //   import('./models/profile'),
+    //   import('./models/launchpage'),
+    // ],
     component: () => import('./routes/workspace/info/ProjectDetail'),
   });
 
@@ -70,14 +80,10 @@ const RouterConfig = ({history, location, projectDetail, app}) => {
 
   const routes = [
     {
-      path: '/workspace/:projectId',
-      models: () => [import('./models/modelling')],
-      component: () => import('./routes/workspace/info/ProjectDetail'),
-    }, {
       path: '/workspace',
       // models: () => [import('./models/dashboard')],
       component: () => import('./routes/workspace/info/Projects'),
-    }
+    },
   ]
 
   const routes2 = [
@@ -87,25 +93,27 @@ const RouterConfig = ({history, location, projectDetail, app}) => {
       component: () => import('./routes/market/ProjectList'),
     },{
       path: '/userrequest/:userrequestId',
-      // models: () => [import('./models/allRequest')],
+      models: () => [import('./models/allRequest')],
       component: () => import('./routes/UserRequest/UserRequestDetail'),
     },{
       path: '/userrequest',
-      // models: () => [import('./models/allRequest')],
+      models: () => [import('./models/allRequest')],
       component: () => import('./routes/UserRequest/UserRequestList'),
     },{
       path: '/profile/:userId',
-      // models: () => [
-      //   import('./models/profile'),
+      models: () => [
+        import('./models/profile'),
+        import('./models/allRequest'),
       //   import('./models/login'),
-      // ],
+      ],
       component: () => import('./routes/Profile'),
     },{
       path: '/setting/profile/:userId',
-      // models: () => [
-      //   import('./models/profile'),
+      models: () => [
+        import('./models/profile'),
+        import('./models/allRequest'),
       //   import('./models/login'),
-      // ],
+      ],
       component: () => import('./routes/UserInfo'),
     },
   ]
@@ -124,6 +132,7 @@ const RouterConfig = ({history, location, projectDetail, app}) => {
               {/*{extraBreadcrumbItems}*/}
             {/*</Breadcrumb>*/}
             <Switch>
+              <Route path="/workspace/:projectId" render={(props) => <ProjectDetail {...props} app={app}/>}/>
               {
                 routes.map(({ path, ...dynamics }, key) => (
                   <Route key={key}
@@ -136,7 +145,8 @@ const RouterConfig = ({history, location, projectDetail, app}) => {
                   />
                 ))
               }
-              <Route path="/explore/:projectId" render={(props) => <ProjectDetail {...props} market_use={true}/>}/>
+              <Route path="/explore/:projectId"
+                     render={(props) => <ProjectDetail {...props} app={app} market_use={true}/>}/>
               {
                 routes2.map(({ path, ...dynamics }, key) => (
                   <Route key={key}
@@ -160,12 +170,13 @@ const RouterConfig = ({history, location, projectDetail, app}) => {
   )
 }
 
-const Main = withRouter(connect(({projectDetail}) => ({projectDetail}))(RouterConfig))
+const Main = withRouter(connect(({ projectDetail }) => ({ projectDetail }))(RouterConfig))
 
-const App = ((props) =>
-    <HashRouter>
-      <Main/>
+const App = ((props) => {
+    return <HashRouter>
+      <Main {...props}/>
     </HashRouter>
+  }
 )
 
 export default App
