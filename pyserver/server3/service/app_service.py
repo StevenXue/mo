@@ -42,6 +42,7 @@ class AppService(ProjectService):
         used_dataset = DatasetBusiness.get_by_id(used_dataset)
         return cls.business.remove_used_dataset(app_id, used_dataset)
 
+
     @classmethod
     def run_app(cls, app_id, input_json, user_ID, version):
         """
@@ -65,7 +66,13 @@ class AppService(ProjectService):
         pattern = re.compile(r'STRHEAD(.+?)STREND', flags=re.DOTALL)
         results = pattern.findall(response.text)
         print(results)
-        output_json = json.loads(results[0])
+        try:
+            output_json = json.loads(results[0])
+        except IndexError as e:
+            errors = cls.business.get_service_logs(app, version)
+            output_json = {
+                'errors': errors
+            }
         # output_json = response.json()
         # 成功调用后 在新的collection存一笔
         user_obj = UserBusiness.get_by_user_ID(user_ID=user_ID)

@@ -5,11 +5,13 @@ import { getApp } from '../../services/app'
 import JsonToArray from '../../utils/JsonUtils'
 import ParamsMapper from '../../components/ParamsMapper/index'
 import CopyInput from '../../components/CopyInput'
+import { webServer } from '../../constants'
 
 import {
   Row,
   Col,
   Select,
+  Alert,
 } from 'antd'
 import { connect } from 'dva'
 import { get, map } from 'lodash'
@@ -62,7 +64,6 @@ class ProjectExample extends React.Component {
     const { projectDetail } = this.props
     const { project, version } = this.props.projectDetail
     const version_ = version || project.versions.slice(-1)[0] || 'dev'
-    console.log(this.state.args)
     return (
       <div>
         <div>
@@ -78,11 +79,13 @@ class ProjectExample extends React.Component {
           API:
           <CopyInput
             fog='50%'
-            text={`${projectDetail.project.app_path.replace('.', 'http://192.168.31.23:8080')}-${version_}`}/>
+            // text={`${projectDetail.project.app_path.replace('.', 'http://192.168.31.23:8080')}-${version_}`}
+            text={`${webServer}/pyapi/apps/run/${project._id}`}
+          />
         </div>
         <br/>
         <Row gutter={24}>
-          <Col span={12} >
+          <Col span={12}>
             <div>
               <div>
                 <p>
@@ -109,24 +112,38 @@ class ProjectExample extends React.Component {
               </div>
             </div>
           </Col>
-          <Col span={12} >
-            <div>
+          {!this.props.projectDetail.project.args.output.errors ?
+            <Col span={12}>
               <div>
-                <p>
-                  OUTPUT
-                </p>
+                <div>
+                  <p>
+                    OUTPUT
+                  </p>
+                </div>
+                <div style={{ border: '1px solid #eeeeee', minHeight: 200, paddingTop: 20 }}>
+                  {map(this.props.projectDetail.project.args.output).map(e =>
+                    <div key={e.name} style={{ margin: '10px 0' }}>
+                      <p style={{ marginLeft: 20 }}>{e.name}</p>
+                      {e.value_type === 'img' && e.value ? <img src={'data:image/jpeg;base64,' + e.value} alt="img"/> :
+                        <p>{e.value}</p>}
+                    </div>,
+                  )}
+                </div>
               </div>
+            </Col> : <Col span={12}>
               <div>
-                {map(this.props.projectDetail.project.args.output).map(e =>
-                  <div key={e.name} style={{margin: '10px 0'}}>
-                    <p>{e.name}</p>
-                    {e.value_type === 'img' && e.value ? <img src={'data:image/jpeg;base64,' + e.value} alt="img"/> :
-                      <p>{e.value}</p>}
-                  </div>,
-                )}
+                <div>
+                  <p>
+                    Error
+                  </p>
+                </div>
+                <div>
+                  <Alert message={<div
+                    style={{ whiteSpace: 'pre-line' }}>{this.props.projectDetail.project.args.output.errors}</div>}
+                         type="error" showIcon/>
+                </div>
               </div>
-            </div>
-          </Col>
+            </Col>}
         </Row>
       </div>
     )

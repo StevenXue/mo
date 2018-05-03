@@ -2,29 +2,13 @@ import React from 'react'
 import {HashRouter, Route, Switch, Link, withRouter, routerRedux} from 'dva/router'
 import {Breadcrumb} from 'antd'
 import {connect} from 'dva'
+import dynamic from 'dva/dynamic';
 import pathToRegexp from 'path-to-regexp'
 import {get} from 'lodash'
 
-import Users from './routes/Users.js'
 import NewPassword from './routes/login/NewPassword'
 import Account from './routes/login/Account'
-import MyProjects from './routes/workspace/info/Projects'
-import Projects from './routes/projects/Projects'
-import ProjectDetail from './routes/workspace/info/ProjectDetail'
-import PublicProject from './routes/projects/PublicProject'
 import MainLayout from './components/MainLayout/MainLayout'
-import PublicServedModels from './routes/DeployedModels/ModelsList'
-import PublicServedModelsDetail from './routes/DeployedModels/ModelsDetail'
-import UserRequest from './routes/UserRequest/UserRequestList'
-import UserRequestDetail from './routes/UserRequest/UserRequestDetail'
-import MyService from './routes/MyService'
-import {ModuleList, Module} from './routes/Module'
-import Profile from './routes/Profile'
-import UserInfo from './routes/UserInfo'
-import MarketList from './routes/market/ProjectList'
-import HomePage from './routes/HomePage'
-// import MarketDetail from './routes/market/ProjectDetail'
-// import ApiList from './components/Chat/ApiList'
 const breadcrumbNameMap = {
   '/user': 'User',
   '/user/login': 'Login',
@@ -41,7 +25,7 @@ const breadcrumbNameMap = {
   '/explore': 'Explore',
 }
 
-const RouterConfig = ({history, location, projectDetail}) => {
+const RouterConfig = ({history, location, projectDetail, app}) => {
   const pathSnippets = location.pathname.split('/').filter(i => i)
 
   const extraBreadcrumbItems = pathSnippets.map((_, index) => {
@@ -72,6 +56,60 @@ const RouterConfig = ({history, location, projectDetail}) => {
     </Breadcrumb.Item>
   )].concat(extraBreadcrumbItems)
 
+  const ProjectDetail = dynamic({
+    app,
+    models: () => [import('./models/modelling')],
+    component: () => import('./routes/workspace/info/ProjectDetail'),
+  });
+
+  const HomePage = dynamic({
+    app,
+    // models: () => [import('./models/launchpage')],
+    component: () => import('./routes/HomePage'),
+  });
+
+  const routes = [
+    {
+      path: '/workspace/:projectId',
+      models: () => [import('./models/modelling')],
+      component: () => import('./routes/workspace/info/ProjectDetail'),
+    }, {
+      path: '/workspace',
+      // models: () => [import('./models/dashboard')],
+      component: () => import('./routes/workspace/info/Projects'),
+    }
+  ]
+
+  const routes2 = [
+    {
+      path: '/explore',
+      // models: () => [import('./models/modelling')],
+      component: () => import('./routes/market/ProjectList'),
+    },{
+      path: '/userrequest/:userrequestId',
+      // models: () => [import('./models/allRequest')],
+      component: () => import('./routes/UserRequest/UserRequestDetail'),
+    },{
+      path: '/userrequest',
+      // models: () => [import('./models/allRequest')],
+      component: () => import('./routes/UserRequest/UserRequestList'),
+    },{
+      path: '/profile/:userId',
+      // models: () => [
+      //   import('./models/profile'),
+      //   import('./models/login'),
+      // ],
+      component: () => import('./routes/Profile'),
+    },{
+      path: '/setting/profile/:userId',
+      // models: () => [
+      //   import('./models/profile'),
+      //   import('./models/login'),
+      // ],
+      component: () => import('./routes/UserInfo'),
+    },
+  ]
+
   return (
     <Switch>
       <Route path="/user" component={Account}/>
@@ -83,35 +121,36 @@ const RouterConfig = ({history, location, projectDetail}) => {
               {/*{extraBreadcrumbItems}*/}
             {/*</Breadcrumb>*/}
             <Switch>
-
-              <Route path="/workspace/:projectId" component={ProjectDetail}/>
-              <Route path="/workspace" component={MyProjects}/>
-              <Route path="/projects/:projectId" component={PublicProject}/>
-              <Route path="/projects" component={Projects}/>
-
+              {
+                routes.map(({ path, ...dynamics }, key) => (
+                  <Route key={key}
+                         exact
+                         path={path}
+                         component={dynamic({
+                           app,
+                           ...dynamics,
+                         })}
+                  />
+                ))
+              }
               <Route path="/explore/:projectId" render={(props) => <ProjectDetail {...props} market_use={true}/>}/>
-              <Route path="/explore" component={MarketList}/>
-
-              <Route path="/modelmarket/:modelsId" component={PublicServedModelsDetail}/>
-              <Route path="/modelmarket" component={PublicServedModels}/>
-              <Route path="/myservice" component={MyService}/>
-              <Route path="/userrequest/:userrequestId" component={UserRequestDetail}/>
-              <Route path="/userrequest" component={UserRequest}/>
-
-              <Route path="/modulelist/:moduleId" component={Module}/>
-              <Route path="/modulelist" component={ModuleList}/>
-              <Route path="/profile/:userId" component={Profile}/>
-              <Route path="/setting/profile/:userId" component={UserInfo}/>
-            </Switch>
+              {
+                routes2.map(({ path, ...dynamics }, key) => (
+                  <Route key={key}
+                         exact
+                         path={path}
+                         component={dynamic({
+                           app,
+                           ...dynamics,
+                         })}
+                  />
+                ))
+              }
+              </Switch>
           </div>
         </MainLayout>}
       />
-
-
       <Route path="/" component={HomePage}/>
-
-
-
     </Switch>
   )
 }

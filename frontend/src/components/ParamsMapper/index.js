@@ -231,7 +231,7 @@ const handleSubmit = (e, validateFieldsAndScroll, appId, dispatch, version) => {
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },
-    sm: { span: 6 },
+    sm: { span: 5 },
   },
   wrapperCol: {
     xs: { span: 24 },
@@ -342,7 +342,7 @@ function ParamsMapper({
           return formItems(arg, i, getFieldDecorator, baseArgs[i], setFieldsValue)
         })
       }
-      <FormItem wrapperCol={{ span: 12, offset: 11 }}>
+      <FormItem wrapperCol={{ span: 6, offset: 5 }}>
         <Button
           type="primary" htmlType="submit">Submit</Button>
       </FormItem>
