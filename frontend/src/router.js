@@ -150,7 +150,7 @@ const RouterConfig = ({history, location, projectDetail, app}) => {
           </div>
         </MainLayout>}
       />
-      <Route path="/" component={HomePage}/>
+      <Route path="/" component={HomePage} location={location}/>
     </Switch>
   )
 }

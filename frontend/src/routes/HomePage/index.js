@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Row, Col, Button, Icon } from 'antd'
+import { Row, Col, Button, Icon, Menu} from 'antd'
 import { Link, Route, Switch } from 'dva/router'
 
 import styles from './css/App.less'
@@ -9,7 +9,8 @@ import bg2 from './image/bg2.jpg'
 import bg3 from './image/bg3.jpg'
 import bg_v from './image/bg_v.jpg'
 import bottom from './image/bottom.png'
-import logo from './image/logo.png'
+// import logo from './image/logo.png'
+import logo from '../../assets/logo.png'
 import phone1 from './image/phone1.jpg'
 import phone2 from './image/phone2.jpg'
 import phone3 from './image/phone3.jpg'
@@ -27,7 +28,26 @@ import computer1 from './image/computer1.jpg'
 import computer2 from './image/computer2.jpg'
 import computer3 from './image/computer3.jpg'
 import computer4 from './image/computer4.jpg'
-
+const menuConfig = [
+  {
+    key: '/workspace',
+    Link: '/workspace?tab=app',
+    Icon: null,
+    text: 'Workspace',
+  },
+  {
+    key: '/explore',
+    Link: '/explore?tab=app',
+    Icon: null,
+    text: 'Explore',
+  },
+  {
+    key: '/userrequest',
+    Link: '/userrequest?tab=app',
+    Icon: null,
+    text: 'Request',
+  },
+]
 class App extends Component {
   constructor(props) {
     super(props)
@@ -44,9 +64,48 @@ class App extends Component {
   }
 
   render() {
+    const key = '/' + this.props.location.pathname.split('/')[1]
     return (
       <div className={styles.App}><img src={banner} alt="" width='100%'/>
-        <img src={logo} alt="" style={{ position: 'absolute', left: '10%', top: 16 }}/>
+        {/* <img src={logo} alt="" style={{ position: 'absolute', left: '10%', top: 16 }}/> */}
+        <div className={styles.homecotain}>
+          <div className={styles.box}>
+            <Menu
+              className={styles.normal}
+              mode='horizontal'
+              theme='dark'
+              selectedKeys={[key]}
+            >
+              <Menu.Item key='logo' className={styles.logoBox}
+              >
+                <Link to={'/'}>
+                  <img src={logo} className={styles.logo}/>
+                </Link>
+              </Menu.Item>
+                {
+                  menuConfig.map(
+                    (e) => {
+                        return (
+                          <Menu.Item key={e.key}>
+                            {/* <Link to={e.Link}> */}
+                            <Link to='/user/login'>
+                              {e.Icon && <Icon type={e.Icon}/>}
+                              <div className={styles.menuStyle}>{e.text}</div>
+                            </Link>
+                          </Menu.Item>)
+                    }
+                  )
+                }
+                {
+                  <Menu.Item key={'docs'}>
+                    <div onClick={() => window.location = '/#/user/login'}>
+                      <div className={styles.menuStyle}>Docs</div>
+                    </div>
+                  </Menu.Item>
+                }
+              </Menu>
+          </div>
+        </div>
         <div className={styles.login}>
           <Link to='/user/login'>
             <span>登录</span>

@@ -1,6 +1,6 @@
 import CONSTANT from '../constants'
 import logo from '../blue-logo.png'
-import whiteLogo from '../white-logo.png'
+import whiteLogo from '../assets/logo.png'
 
 module.exports = {
   name: "MO",
