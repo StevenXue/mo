@@ -242,14 +242,14 @@ function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
         <div className={styles.starFavorRightDiv}>
           <Icon className={styles.bottomIcon}
                 type={project.star_users.includes(user_obj_id) ? "like" : "like-o"}
-                onClick={() => onClickStarFavor('star')}
-                style={{color:'transparent',background:project.star_users.includes(user_obj_id) ?`url(${like_o}) no-repeat center`:`url(${like}) no-repeat center`}}
+                onClick={project.user_ID===user_ID?null:() => onClickStarFavor('star')}
+                style={{cursor:project.user_ID===user_ID?"default":"pointer",color:'transparent',background:project.star_users.includes(user_obj_id) ?`url(${like_o}) no-repeat center`:`url(${like}) no-repeat center`}}
                 />
           <p className={styles.bottomNumber}>{project.star_users.length}</p>
           <Icon className={styles.bottomIcon}
                 type={project.favor_users.includes(user_obj_id) ? "star" : "star-o"}
-                onClick={() => onClickStarFavor('favor')}
-                style={{color:'transparent',background:project.favor_users.includes(user_obj_id) ?`url(${star_o}) no-repeat center`:`url(${star}) no-repeat center`}}
+                onClick={project.user_ID===user_ID?null:() => onClickStarFavor('favor')}
+                style={{cursor:project.user_ID===user_ID?"default":"pointer",color:'transparent',background:project.favor_users.includes(user_obj_id) ?`url(${star_o}) no-repeat center`:`url(${star}) no-repeat center`}}
                 />
           <p className={styles.bottomNumber}>{project.favor_users.length}</p>
         </div>
