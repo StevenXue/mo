@@ -53,7 +53,9 @@ const WorldMessageItem = ({worldMessage, isRight}) => {
                 className={styles.system_image}
               />
               :
-              <img style={{
+              <img
+                className={styles.avt}
+                style={{
                 height: 30, width: 30,
               }} src={avatarList[picNumber]}  alt="avatar" />
 

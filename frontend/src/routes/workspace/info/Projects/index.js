@@ -207,7 +207,7 @@ class ProjectList extends Component {
             <img src={blank} alt="null" width="200px" height="207px"/>
             <p style={{marginTop: 44}}>您还没有创建过任何应用, 点击<span>“新建应用”</span>快速创建。
             </p>
-            <p style={{marginTop: 25}}>遇到困难？点击<span>“帮助文档”</span>了解更多。</p>
+            <p style={{marginTop: 25}}>遇到困难？点击<span  onClick={() => window.location = 'https://momodel.github.io/mo/#/'}>“帮助文档”</span>了解更多。</p>
           </div>
         }
         {/* {

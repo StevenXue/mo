@@ -61,7 +61,7 @@ function Profile({login, profile, dispatch, history}) {
           <Row>
             <Col span={3} style={{padding: '20px 0 0 20px'}}>
               <div className={styles.photoDiv}>
-                <img src={avatar?avatar:avatarList[picNumber]}  alt="avatar" />
+                <img className={styles.avt} src={avatar?avatar:avatarList[picNumber]}  alt="avatar" />
               </div>
             </Col>
             <Col span={21}>

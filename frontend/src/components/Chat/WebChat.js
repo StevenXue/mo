@@ -287,11 +287,23 @@ function finalSteps() {
     {
       id: "createUserRequest1",
       options: [
-        { value: 1, label: 'App',  type: 'goto', url: '/userrequest?tab=app'},
-        { value: 2, label: 'Module',  type: 'goto',  url: '/userrequest?tab=module' },
-        { value: 3, label: 'DataSet',  type: 'goto',  url: '/userrequest?tab=dataSet' },
+        { value: 1, label: 'App',  type: 'goto', url: '/userrequest?tab=app',
+          trigger: "createUserRequest2",
+
+        },
+        { value: 2, label: 'Module',  type: 'goto',  url: '/userrequest?tab=module',
+          trigger: "createUserRequest2",
+        },
+        { value: 3, label: 'DataSet',  type: 'goto',  url: '/userrequest?tab=dataSet',
+          trigger: "createUserRequest2",
+        },
       ],
     },
+
+    {
+      id: "createUserRequest2",
+      message: '已前往创建页面',
+    }
 
     // {
     //   id: "createUserRequest",
@@ -347,6 +359,9 @@ class WebChat extends React.Component {
     //   opened: true,
     // }
   }
+  componentWillMount(){
+    console.log("我刷新了")
+  }
 
   myToggleFloating = ({opened}) => {
     this.props.dispatch({
@@ -362,28 +377,6 @@ class WebChat extends React.Component {
     const {opened} = this.props
     return (
       <ThemeProvider theme={theme}>
-        {/*<ChatBot*/}
-          {/*floating={true}*/}
-          {/*headerTitle="Speech Recognition"*/}
-          {/*recognitionEnable={true}*/}
-          {/*steps={[*/}
-            {/*{*/}
-              {/*id: '1',*/}
-              {/*message: 'What is your name?',*/}
-              {/*trigger: '2',*/}
-            {/*},*/}
-            {/*{*/}
-              {/*id: '2',*/}
-              {/*user: true,*/}
-              {/*trigger: '3',*/}
-            {/*},*/}
-            {/*{*/}
-              {/*id: '3',*/}
-              {/*message: 'Hi {previousValue}, nice to meet you!',*/}
-              {/*end: true,*/}
-            {/*},*/}
-          {/*]}*/}
-        {/*/>*/}
         <ChatBot
         floating={true}
         headerTitle="MO平台机器人"
@@ -397,20 +390,16 @@ class WebChat extends React.Component {
         userDelay={10}
         botBubbleColor="white"
         botFontColor="black"
-
         opened={opened}
         toggleFloating={this.myToggleFloating}
         isRight={this.props.isRight}
-        // customStyle={{"background-color": "red"}}
-        // userBubbleColor='#ffe695'
-        // userFontColor=''
         />
       </ThemeProvider>
     )
   }
 }
 
-export default connect(({chatbot}) => ({...chatbot}))(WebChat)
+export default connect(({chatbot, worldChannel}) => ({...chatbot, isRight: worldChannel.isRight}))(WebChat)
 
 /**
  * <ChatBot

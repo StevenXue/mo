@@ -2,6 +2,8 @@ import React from 'react'
 import { connect } from 'dva'
 
 import styles from './index.less'
+// import 'antd/lib/list/style/css';
+import 'antd/dist/antd.css'
 
 
 function JupyterLab() {
