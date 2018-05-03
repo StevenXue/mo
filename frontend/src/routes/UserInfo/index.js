@@ -635,7 +635,6 @@ class AvatarEdit extends React.Component {
         thumbUrl: imageUrl,
         uid: thisFile.uid
       }]
-      console.log(imageUrl)
       this.setState({
         fileList: newList,
         loading: false,
@@ -644,7 +643,6 @@ class AvatarEdit extends React.Component {
         previewImage: imageUrl,
         previewVisible: true,
       })
-      // this.props.setFieldsValue({[this.props.keyName]: newList[0].thumbUrl})
     })
   }
   handleCancel = () => {
@@ -666,6 +664,10 @@ class AvatarEdit extends React.Component {
           'userInfo': user
         })
         this.handleCancel()
+        this.props.dispatch({
+          type:'login/setUser',
+          payload: user
+        })
       }
     })
   }
