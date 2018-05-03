@@ -126,7 +126,7 @@ export default {
         if (from) {
           yield put(routerRedux.push(from))
         } else {
-          yield put(routerRedux.push('/userrequest?tab=app'))
+          yield put(routerRedux.push('/launchpage'))
         }
       } else {
         throw data

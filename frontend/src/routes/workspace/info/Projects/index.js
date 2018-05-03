@@ -127,8 +127,8 @@ class ProjectList extends Component {
   }
 
   toProjectDetail(id, history, type) {
-    this.props.dispatch({type:'launchpage/change',payload:{visibility:false}})  //关闭launchpage
-    localStorage.setItem('launchpage','hide')
+    // this.props.dispatch({type:'launchpage/change',payload:{visibility:false}})  //关闭launchpage
+    // localStorage.setItem('launchpage','hide')
     history.push(`/workspace/${id}?type=${type}`)
   }
 
@@ -245,4 +245,4 @@ class ProjectList extends Component {
 }
 
 
-export default connect(({project,launchpage}) => ({project,launchpage}))(Projects)
+export default connect(({project}) => ({project}))(Projects)

@@ -254,9 +254,11 @@ class AnswerForm extends React.Component {
           {projects.map(d => <Select.Option
             key={d._id}>{d.name}</Select.Option>)}
         </Select>
-          <ProjectModal new={true} type={this.props.type}
-                        newAnswer={true}
-                        handleCreate={this.handleCreate}>
+          <ProjectModal 
+            new={true} 
+            type={this.props.type}
+            newAnswer={true}
+            handleCreate={this.handleCreate}>
             <Button icon='plus-circle-o' type='primary'
                     style={{ 'marginLeft': '30px' }}>New {this.props.type}</Button>
           </ProjectModal></div> : null}

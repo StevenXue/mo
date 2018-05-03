@@ -27,9 +27,12 @@ function MainLayout({children, location, history, modal, isRight, onClickIcon}) 
     <Layout style={{height: '100%',position:"relative"}}>
       <Header location={location} history={history} />
       <Content style={{height:'100%',overflowY:'auto'}} id="LaunchPage_Contain">
-        <LaunchPage location={location}/>
+        {/* <LaunchPage location={location}/> */}
         <div style={{display: "flex",height:'100%'}}>
-          <div className={styles.content}>
+          <div className={styles.content} 
+          style={{padding:location.pathname==='/launchpage'?'0':'24px 15px'}}
+          // style={{padding:'24px 15px'}}
+          >
             {children}
           </div>
           <WorldChannel onClickIcon={onClickIcon} isRight={isRight}/>

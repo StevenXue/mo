@@ -23,7 +23,7 @@ app.model(require('./models/login'))
 app.model(require('./models/register'))
 app.model(require('./models/allRequest'))
 app.model(require('./models/message'))
-app.model(require('./models/launchpage'))
+// app.model(require('./models/launchpage'))
 app.model(require('./models/profile'))
 
 // app.model(modelling)

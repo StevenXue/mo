@@ -9,6 +9,7 @@ import {get} from 'lodash'
 import NewPassword from './routes/login/NewPassword'
 import Account from './routes/login/Account'
 import MainLayout from './components/MainLayout/MainLayout'
+import LaunchPage from './components/MainLayout/LaunchPage';
 
 const breadcrumbNameMap = {
   '/user': 'User',
@@ -68,7 +69,11 @@ const RouterConfig = ({history, location, projectDetail, app}) => {
     // models: () => [import('./models/launchpage')],
     component: () => import('./routes/HomePage'),
   })
-
+  const LaunchPage = dynamic({
+    app,
+    // models: () => [import('./models/launchpage')],
+    component: () => import('./components/MainLayout/LaunchPage.js'),
+  })
   const routes = [
     {
       path: '/workspace/:projectId',
@@ -110,7 +115,6 @@ const RouterConfig = ({history, location, projectDetail, app}) => {
       component: () => import('./routes/UserInfo'),
     },
   ]
-
   return (
     <div>
       
@@ -119,7 +123,9 @@ const RouterConfig = ({history, location, projectDetail, app}) => {
           <Route path="/newpassword" component={NewPassword}/>
           <Route path="/:anything" component={() =>
           <MainLayout location={location} history={history}>
-            <div style={{display: 'flex', flexDirection: 'column'}}>
+            <div style={{display: 'flex', flexDirection: 'column',
+            width:location.pathname==='/launchpage'?'100%':'auto'
+            }}>
             {/*<Breadcrumb>*/}
             {/*{extraBreadcrumbItems}*/}
             {/*</Breadcrumb>*/}
@@ -149,6 +155,7 @@ const RouterConfig = ({history, location, projectDetail, app}) => {
                   />
                 ))
               }
+              <Route path="/launchpage" component={LaunchPage} location={location}/>
             </Switch>
         </div>
         </MainLayout>
