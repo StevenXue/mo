@@ -1,18 +1,19 @@
 import React, { Component } from 'react'
-import { Row, Col, Button, Icon } from 'antd'
+import { Row, Col, Button, Icon, Menu} from 'antd'
 import { Link, Route, Switch } from 'dva/router'
 
 import styles from './css/App.less'
-import banner from './image/banner.png'
-import bg1 from './image/bg1.png'
-import bg2 from './image/bg2.png'
-import bg3 from './image/bg3.png'
-import bg_v from './image/bg_v.png'
+import banner from './image/banner.jpg'
+import bg1 from './image/bg1.jpg'
+import bg2 from './image/bg2.jpg'
+import bg3 from './image/bg3.jpg'
+import bg_v from './image/bg_v.jpg'
 import bottom from './image/bottom.png'
-import logo from './image/logo.png'
-import phone1 from './image/phone1.png'
-import phone2 from './image/phone2.png'
-import phone3 from './image/phone3.png'
+// import logo from './image/logo.png'
+import logo from '../../assets/logo.png'
+import phone1 from './image/phone1.jpg'
+import phone2 from './image/phone2.jpg'
+import phone3 from './image/phone3.jpg'
 import system from './image/system.png'
 import right1 from './image/right1.png'
 import right2 from './image/right2.png'
@@ -23,12 +24,30 @@ import two from './image/two.jpg'
 import pc from './image/pc.png'
 import phone from './image/phone.png'
 
-import computer from './image/computer.png'
-import computer1 from './image/computer1.png'
-import computer2 from './image/computer2.png'
-import computer3 from './image/computer3.png'
-import computer4 from './image/computer4.png'
-
+import computer1 from './image/computer1.jpg'
+import computer2 from './image/computer2.jpg'
+import computer3 from './image/computer3.jpg'
+import computer4 from './image/computer4.jpg'
+const menuConfig = [
+  {
+    key: '/workspace',
+    Link: '/workspace?tab=app',
+    Icon: null,
+    text: 'Workspace',
+  },
+  {
+    key: '/explore',
+    Link: '/explore?tab=app',
+    Icon: null,
+    text: 'Explore',
+  },
+  {
+    key: '/userrequest',
+    Link: '/userrequest?tab=app',
+    Icon: null,
+    text: 'Request',
+  },
+]
 class App extends Component {
   constructor(props) {
     super(props)
@@ -45,9 +64,48 @@ class App extends Component {
   }
 
   render() {
+    const key = '/' + this.props.location.pathname.split('/')[1]
     return (
       <div className={styles.App}><img src={banner} alt="" width='100%'/>
-        <img src={logo} alt="" style={{ position: 'absolute', left: '10%', top: 16 }}/>
+        {/* <img src={logo} alt="" style={{ position: 'absolute', left: '10%', top: 16 }}/> */}
+        <div className={styles.homecotain}>
+          <div className={styles.box}>
+            <Menu
+              className={styles.normal}
+              mode='horizontal'
+              theme='dark'
+              selectedKeys={[key]}
+            >
+              <Menu.Item key='logo' className={styles.logoBox}
+              >
+                <Link to={'/'}>
+                  <img src={logo} className={styles.logo}/>
+                </Link>
+              </Menu.Item>
+                {
+                  menuConfig.map(
+                    (e) => {
+                        return (
+                          <Menu.Item key={e.key}>
+                            {/* <Link to={e.Link}> */}
+                            <Link to='/user/login'>
+                              {e.Icon && <Icon type={e.Icon}/>}
+                              <div className={styles.menuStyle}>{e.text}</div>
+                            </Link>
+                          </Menu.Item>)
+                    }
+                  )
+                }
+                {
+                  <Menu.Item key={'docs'}>
+                    <div onClick={() => window.location = '/#/user/login'}>
+                      <div className={styles.menuStyle}>Docs</div>
+                    </div>
+                  </Menu.Item>
+                }
+              </Menu>
+          </div>
+        </div>
         <div className={styles.login}>
           <Link to='/user/login'>
             <span>登录</span>
