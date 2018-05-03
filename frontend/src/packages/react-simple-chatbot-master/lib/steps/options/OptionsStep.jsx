@@ -18,18 +18,18 @@ class OptionsStep extends Component {
     this.onOptionClick = this.onOptionClick.bind(this);
   }
 
-  onOptionClick({ value, label, type }) {
-    console.log("value", value)
-
+  onOptionClick({ value, label, type, url }) {
     if(type === 'goto'){
-        this.props.dispatch({
-          type: 'chatbot/updateState',
-          payload: {
-            opened: false
-          }
-        })
-        this.props.dispatch(routerRedux.push(`/userrequest?tab=${label}`))
-        this.props.dispatch({type: 'allRequest/showModal'})
+        // this.props.dispatch({
+        //   type: 'chatbot/updateState',
+        //   payload: {
+        //     opened: false
+        //   }
+        // })
+      this.props.dispatch(routerRedux.push(url))
+      this.props.dispatch({type: 'allRequest/showModal'})
+      this.props.triggerNextStep({ value });
+
     }else{
 
       if(label === "我发布的需求"){
@@ -67,7 +67,7 @@ class OptionsStep extends Component {
   renderOption(option) {
     const { bubbleStyle } = this.props;
     const { user } = this.props.step;
-    const { value, label, route, type } = option;
+    const { value, label, route, type, url } = option;
     const border = `1px solid ${option.borderColor}`
     //border:1px solid red
     return (
@@ -79,7 +79,7 @@ class OptionsStep extends Component {
           className="rsc-os-option-element"
           style={bubbleStyle}
           user={user}
-          onClick={() => this.onOptionClick({ value, label, type })}
+          onClick={() => this.onOptionClick({ value, label, type, url })}
           border={border}
         >
           {label}
