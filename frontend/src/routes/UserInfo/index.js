@@ -13,7 +13,8 @@ import {
   Select,
   Modal,
   Upload,
-  message
+  message,
+  Slider
 } from 'antd'
 
 
@@ -109,7 +110,7 @@ class EditForm extends React.Component {
                   this.cancelEdit({})
                 }
                 else {
-                  message.error(e.error )
+                  message.error(e.error)
                 }
               }
               else {
@@ -614,11 +615,30 @@ class AvatarEdit extends React.Component {
   componentDidMount() {
   }
 
-  handlePreview = (file) => {
+  // handlePreview = (file) => {
+  //   if (this.beforeUpload(file)) {
+  //     this.setState({
+  //       previewImage: file.url || file.thumbUrl,
+  //       previewVisible: true,
+  //     })
+  //   }
+  // }
+  onChangeZoom = (value) => {
     this.setState({
-      previewImage: file.url || file.thumbUrl,
-      previewVisible: true,
+      zoom: value,
     })
+  }
+
+  checkTypeSize(file) {
+    const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
+    if (!isJPG) {
+      message.error('You can only upload JPG/PNG file!')
+    }
+    const isLt5M = file.size / 1024 / 1024 < 5
+    if (!isLt5M) {
+      message.error('Image must smaller than 5MB!')
+    }
+    return isJPG && isLt5M
   }
 
   getBase64 = (img, callback) => {
@@ -629,21 +649,23 @@ class AvatarEdit extends React.Component {
 
   handleChange = ({fileList}) => {
     let thisFile = fileList[0]
-    this.getBase64(thisFile, imageUrl => {
-      let newList = [{
-        originFileObj: thisFile,
-        thumbUrl: imageUrl,
-        uid: thisFile.uid
-      }]
-      this.setState({
-        fileList: newList,
-        loading: false,
+    if (this.checkTypeSize(thisFile)) {
+      this.getBase64(thisFile, imageUrl => {
+        let newList = [{
+          originFileObj: thisFile,
+          thumbUrl: imageUrl,
+          uid: thisFile.uid
+        }]
+        this.setState({
+          fileList: newList,
+          loading: false,
+        })
+        this.setState({
+          previewImage: imageUrl,
+          previewVisible: true,
+        })
       })
-      this.setState({
-        previewImage: imageUrl,
-        previewVisible: true,
-      })
-    })
+    }
   }
   handleCancel = () => {
     this.setState({
@@ -654,9 +676,18 @@ class AvatarEdit extends React.Component {
   }
 
   confirmEdit = () => {
+    let newAvatar = this.editor.getImage()
+    console.log(newAvatar)
+    let canvas = document.createElement('canvas')
+    let ctx = canvas.getContext('2d')
+    canvas.width = 80
+    canvas.height = 80
+    ctx.clearRect(0, 0, 80, 80)
+    ctx.drawImage(newAvatar, 0, 0, 80, 80)
+    console.log(canvas)
     updateUserInfo({
       body: {
-        'avatar': this.editor.getImage().toDataURL()
+        'avatar': canvas.toDataURL()
       },
       onJson: ({user}) => {
         this.props.dispatch({
@@ -665,7 +696,7 @@ class AvatarEdit extends React.Component {
         })
         this.handleCancel()
         this.props.dispatch({
-          type:'login/setUser',
+          type: 'login/setUser',
           payload: user
         })
       }
@@ -699,7 +730,6 @@ class AvatarEdit extends React.Component {
           action={URL + '/fake_upload'}
           listType="picture-card"
           fileList={this.state.fileList}
-          onPreview={this.handlePreview}
           onChange={this.handleChange}
         >
           {this.state.fileList.length >= 1 ? null :
@@ -715,16 +745,27 @@ class AvatarEdit extends React.Component {
           onCancel={this.handleCancel}
           onOk={this.confirmEdit}
         >
-          <AvatarEditor
-            ref={this.setEditorRef}
-            image={this.state.previewImage}
-            width={250}
-            height={250}
-            border={50}
-            color={[255, 255, 255, 0.6]} // RGBA
-            scale={1.2}
-            rotate={0}
-          />
+          <Row>
+            <Col span={12}>
+              <AvatarEditor
+                ref={this.setEditorRef}
+                image={this.state.previewImage}
+                width={200}
+                height={200}
+                border={50}
+                color={[255, 255, 255, 0.6]} // RGBA
+                scale={this.state.zoom}
+                rotate={0}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col span={8}>
+              Zoom:<Slider min={1.0} max={3.0} step={0.01} tipFormatter={null}
+                      onChange={this.onChangeZoom}
+                      value={this.state.zoom}/>
+            </Col>
+          </Row>
         </Modal>
       </div>)
   }

@@ -200,12 +200,12 @@ class MyFavouriteList extends Component {
     })
   }
 
-  toObjectDetail(id, history) {
-    history.push(`/explore/${id}`)
+  toObjectDetail(id, type ,history) {
+    history.push(`/explore/${id}?type=${type}`)
   }
 
-  toUserRequestDetail(id, history) {
-    history.push(`/userrequest/${id}`)
+  toUserRequestDetail(id, type, history) {
+    history.push(`/userrequest/${id}?type=${type}`)
   }
 
   onShowSizeChange = (current, pageSize) => {
@@ -259,7 +259,7 @@ class MyFavouriteList extends Component {
                   <div>
                     <div>
                       <p className={styles.title}
-                         onClick={() => this.toObjectDetail(e._id, history)}>{e.name}</p>
+                         onClick={() => this.toObjectDetail(e._id,e.type, history)}>{e.name}</p>
                     </div>
                     <div>
                       <p className={styles.description}>{e.description}</p>
@@ -288,7 +288,7 @@ class MyFavouriteList extends Component {
                 <Row>
                   <Col span={3}>
                     <div className={styles.starAnswerDiv}
-                         onClick={() => this.toUserRequestDetail(e._id, history)}>
+                         onClick={() => this.toUserRequestDetail(e._id,e.type, history)}>
                       <div className={styles.starDiv}>
                         {e.accept_answer ? <p className={styles.starNumber}>
                           <Icon style={{'color': '#439A46', 'fontSize': '18px'}}
@@ -307,7 +307,7 @@ class MyFavouriteList extends Component {
                   <Col span={21}>
                     <div className={styles.rightArea}>
                       <p className={styles.title}
-                         onClick={() => this.toUserRequestDetail(e._id, history)}>{e.title}</p>
+                         onClick={() => this.toUserRequestDetail(e._id,e.type, history)}>{e.title}</p>
                       {/*<p className={styles.description}>{e.description}</p>*/}
                       <div className={styles.footer}>
                         <Icon type="user" className={styles.firstIcon}/>
