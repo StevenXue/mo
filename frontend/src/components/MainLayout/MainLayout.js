@@ -22,7 +22,7 @@ import LaunchPage from './LaunchPage'
 
 import zh_CN from '../../intl/zh_CN'
 import en_US from '../../intl/en_US'
-function MainLayout({children, location, history, modal, isRight, onClickIcon}) {
+function MainLayout({children, location, history, isRight, onClickIcon}) {
   return (
     <Layout style={{height: '100%',position:"relative"}}>
       <Header location={location} history={history} />
@@ -32,7 +32,9 @@ function MainLayout({children, location, history, modal, isRight, onClickIcon}) 
           <div className={styles.content}>
             {children}
           </div>
-          <WorldChannel onClickIcon={onClickIcon} isRight={isRight}/>
+          <WorldChannel
+            // onClickIcon={onClickIcon} isRight={isRight}
+          />
         </div>
       </Content>
     </Layout>
@@ -76,9 +78,17 @@ class OutMainLayout extends React.Component {
       worldChannelIsOpen: false,
       visible: true,
 
-      isRight: false
     }
   }
+
+  componentWillMount(){
+    console.log("OutMainLayout 刷新了")
+  }
+
+  // shouldComponentUpdate(nextProps, nextState){
+  //   console.log("props", nextProps, nextState)
+  //   return false
+  // }
 
   // state = { visible: true }
 
@@ -118,6 +128,7 @@ class OutMainLayout extends React.Component {
   }
 
   render() {
+    console.log("OutMainLayout 刷新了")
     return (
       <div style={{height: '100%'}}>
         {/*<div className="change-locale">*/}
@@ -137,21 +148,15 @@ class OutMainLayout extends React.Component {
               location={this.props.location}
               history={this.props.history}
               children={this.props.children}
-              modal={{
-                visible: this.state.visible,
-                showModal: this.showModal,
-                handleOk: this.handleOk,
-                handleCancel: this.handleCancel
-              }}
-              isRight={this.state.isRight}
-              onClickIcon={() => this.setState({isRight: !this.state.isRight})}
             />
 
           </IntlProvider>
 
         </LocaleProvider>
 
-        <WebChat isRight={this.state.isRight}/>
+        <WebChat
+          // isRight={this.state.isRight}
+        />
       </div>
     )
   }

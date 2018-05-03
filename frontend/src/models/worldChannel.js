@@ -8,7 +8,8 @@ let connected = false
 export default {
   namespace: 'worldChannel',
   state: {
-    worldMessages: []
+    worldMessages: [],
+    isRight: false,
   },
 
   reducers: {
@@ -27,7 +28,14 @@ export default {
       return {...state,
         worldMessages
       }
+    },
 
+    // ?这种是不是纯函数 ,更换到effects里是解决方案吗
+    toggleIsRight(state, {payload}){
+      return {
+        ...state,
+        isRight: !state.isRight
+      }
     }
 
   },

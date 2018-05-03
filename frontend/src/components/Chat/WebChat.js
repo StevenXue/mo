@@ -399,7 +399,7 @@ class WebChat extends React.Component {
   }
 }
 
-export default connect(({chatbot}) => ({...chatbot}))(WebChat)
+export default connect(({chatbot, worldChannel}) => ({...chatbot, isRight: worldChannel.isRight}))(WebChat)
 
 /**
  * <ChatBot

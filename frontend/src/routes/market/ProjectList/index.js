@@ -184,12 +184,14 @@ class ProjectList extends Component {
         </div>
         <div className={styles.projectList}>
           {this.state.projects.map(e =>
-            <ProjectCard
-
+          {
+            return  <ProjectCard
               key={e._id} project={e}
-                         onClickToDetail={() => this.toProjectDetail(e._id, history, e.type, e.user, this.state.user_obj_id)}
-                         onClickStarFavor={(action) => this.starFavor(action, e._id, e.type)}
+              onClickToDetail={() => this.toProjectDetail(e._id, history, e.type, e.user, this.state.user_obj_id)}
+              onClickStarFavor={(action) => this.starFavor(action, e._id, e.type)}
             />
+          }
+
           )}
         </div>
         <div className={styles.pagination}>
@@ -233,7 +235,7 @@ function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
           <div className={styles.categoryDiv}>
             <div className={styles.categoryP}>TAG</div>
             <div style={{display: 'flex'}}>
-              {project.tags.map((e,index,array) =><p>{e}&nbsp; {array.indexOf(e)===(array.length-1)?null:'•'} &nbsp; </p>)}
+              {project.tags.map((e,index,array) =><p key={e+index}>{e}&nbsp; {array.indexOf(e)===(array.length-1)?null:'•'} &nbsp; </p>)}
             </div>
           </div>
         </div>
