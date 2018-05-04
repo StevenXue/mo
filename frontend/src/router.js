@@ -4,7 +4,7 @@ import {Breadcrumb} from 'antd'
 import {connect} from 'dva'
 import dynamic from 'dva/dynamic';
 import pathToRegexp from 'path-to-regexp'
-import { get } from 'lodash'
+import {get} from 'lodash'
 
 import NewPassword from './routes/login/NewPassword'
 import Account from './routes/login/Account'
@@ -26,7 +26,7 @@ const breadcrumbNameMap = {
   '/explore': 'Explore',
 }
 
-const RouterConfig = ({ history, location, projectDetail, app }) => {
+const RouterConfig = ({history, location, projectDetail, app}) => {
   const pathSnippets = location.pathname.split('/').filter(i => i)
 
   const extraBreadcrumbItems = pathSnippets.map((_, index) => {
@@ -45,7 +45,7 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
     return (
       <Breadcrumb.Item key={url}>
         <Link to={url + location.search.replace('type', 'tab')}
-              style={{ textTransform: 'capitalize' }}>
+              style={{textTransform: 'capitalize'}}>
           {breadcrumbName || breadcrumbNameMap[url]}
         </Link>
       </Breadcrumb.Item>
@@ -68,7 +68,7 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
     //   import('./models/launchpage'),
     // ],
     component: () => import('./routes/workspace/info/ProjectDetail'),
-  });
+  })
 
   const HomePage = dynamic({
     app,
@@ -93,86 +93,91 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
       path: '/explore',
       // models: () => [import('./models/modelling')],
       component: () => import('./routes/market/ProjectList'),
-    },{
+    }, {
       path: '/userrequest/:userrequestId',
       models: () => [import('./models/allRequest')],
       component: () => import('./routes/UserRequest/UserRequestDetail'),
-    },{
+    }, {
       path: '/userrequest',
       models: () => [import('./models/allRequest')],
       component: () => import('./routes/UserRequest/UserRequestList'),
-    },{
+    }, {
       path: '/profile/:userId',
       models: () => [
         import('./models/profile'),
         import('./models/allRequest'),
-      //   import('./models/login'),
+        //   import('./models/login'),
       ],
       component: () => import('./routes/Profile'),
-    },{
+    }, {
       path: '/setting/profile/:userId',
       models: () => [
         import('./models/profile'),
         import('./models/allRequest'),
-      //   import('./models/login'),
+        //   import('./models/login'),
       ],
       component: () => import('./routes/UserInfo'),
     },
   ]
 
   return (
-    <Switch>
-      <Route path="/user" component={Account}/>
-      <Route path="/newpassword" component={NewPassword}/>
-      <Route path="/:anything" component={() =>
-        <MainLayout location={location} history={history}>
-          <div style={{
-            display: 'flex', 
-            flexDirection: 'column',
-            width:location.pathname==='/launchpage'?'100%':'auto'
+    <div>
+      <MainLayout location={location} history={history}>
+        <Switch>
+          <Route path="/user" component={Account}/>
+          <Route path="/newpassword" component={NewPassword}/>
+          <Route path="/:anything" component={() =>
+
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              width:location.pathname==='/launchpage'?'100%':'auto'
             }}
-          >
-            {/*<Breadcrumb>*/}
+            >
+              {/*<Breadcrumb>*/}
               {/*{extraBreadcrumbItems}*/}
-            {/*</Breadcrumb>*/}
-            <Switch>
-              <Route path="/workspace/:projectId" render={(props) => <ProjectDetail {...props} app={app}/>}/>
-              {
-                routes.map(({ path, ...dynamics }, key) => (
-                  <Route key={key}
-                         exact
-                         path={path}
-                         component={dynamic({
-                           app,
-                           ...dynamics,
-                         })}
-                  />
-                ))
-              }
-              <Route path="/explore/:projectId" render={(props) => <ProjectDetail {...props} market_use={true}/>}/>
-              <Route path="/launchpage" component={LaunchPage} location={location}/>
-              {
-                routes2.map(({ path, ...dynamics }, key) => (
-                  <Route key={key}
-                         exact
-                         path={path}
-                         component={dynamic({
-                           app,
-                           ...dynamics,
-                         })}
-                  />
-                ))
-              }
+              {/*</Breadcrumb>*/}
+              <Switch>
+                <Route path="/workspace/:projectId" render={(props) => <ProjectDetail {...props} app={app}/>}/>
+                {
+                  routes.map(({path, ...dynamics}, key) => (
+                    <Route key={key}
+                           exact
+                           path={path}
+                           component={dynamic({
+                             app,
+                             ...dynamics,
+                           })}
+                    />
+                  ))
+                }
+                <Route path="/explore/:projectId"
+                       render={(props) => <ProjectDetail {...props} app={app} market_use={true}/>}/>
+                <Route path="/launchpage" component={LaunchPage} location={location}/>
+                {
+                  routes2.map(({path, ...dynamics}, key) => (
+                    <Route key={key}
+                           exact
+                           path={path}
+                           component={dynamic({
+                             app,
+                             ...dynamics,
+                           })}
+                    />
+                  ))
+                }
               </Switch>
-          </div>
-        </MainLayout>}
-      />
-      <Route path="/" component={HomePage}/>
-    </Switch>
+            </div>
+          }
+          />
+          <Route path="/" component={HomePage}/>
+        </Switch>
+      </MainLayout>
+    </div>
   )
 }
 
-const Main = withRouter(connect(({ projectDetail }) => ({ projectDetail }))(RouterConfig))
+const Main = withRouter(connect(({projectDetail}) => ({projectDetail}))(RouterConfig))
 
 const App = ((props) => {
     return <HashRouter>
