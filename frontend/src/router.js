@@ -119,9 +119,10 @@ const RouterConfig = ({history, location, projectDetail, app}) => {
       component: () => import('./routes/UserInfo'),
     },
   ]
-
+  console.log('location:',location)
   return (
     <div>
+      <Switch>
       <MainLayout location={location} history={history}>
         <Switch>
           <Route path="/user" component={Account}/>
@@ -170,9 +171,13 @@ const RouterConfig = ({history, location, projectDetail, app}) => {
             </div>
           }
           />
-          <Route path="/" component={HomePage}/>
+          
         </Switch>
       </MainLayout>
+      </Switch>
+      <Switch>
+        <Route path="/" component={HomePage}/>
+      </Switch>
     </div>
   )
 }

@@ -24,9 +24,9 @@ import zh_CN from '../../intl/zh_CN'
 import en_US from '../../intl/en_US'
 function MainLayout({children, location, history, isRight, onClickIcon}) {
   return (
-    <Layout style={{height: '100%',position:"relative"}}>
+    <Layout style={{height: '100%',position:"relative",backgroundColor:location.pathname.indexOf('/user')!=-1?'#F5F5F5':'transparent'}}>
       <Header location={location} history={history} />
-      <Content style={{height:'100%',overflowY:'auto'}} id="LaunchPage_Contain">
+      <Content style={{height:'100%',overflowY:'auto',marginTop:45}} id="LaunchPage_Contain">
         {/* <LaunchPage location={location}/> */}
         <div style={{display: "flex",height:'100%'}}>
           <div className={styles.content} 
@@ -132,8 +132,9 @@ class OutMainLayout extends React.Component {
 
   render() {
     console.log("OutMainLayout 刷新了")
+    const {location} = this.props
     return (
-      <div style={{height: '100%'}}>
+      <div style={{height: '100%',display:location.pathname==='/'?'none':'block'}}> 
         {/*<div className="change-locale">*/}
         {/*<span style={{marginRight: 16}}>Change locale of components: </span>*/}
         {/*<Radio.Group defaultValue={enUS} onChange={this.changeLocale}>*/}
