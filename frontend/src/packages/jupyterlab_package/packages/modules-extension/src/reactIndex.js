@@ -142,6 +142,15 @@ export class ModulePage extends React.Component {
                 `result = ${this.state.func}('${this.state.project.user_ID}/${this.state.project.name}/${this.state.version}', conf)`,
             ],
         )
+
+        // NotebookActions.insertMarkdown(this.props.tracker.currentWidget.notebook,
+        //     [
+        //         `result = ${this.state.func}('${this.state.project.user_ID}/${this.state.project.name}/${this.state.version}', conf)`,
+        //     ],
+        // )
+
+
+
         if (this.appId) {
             addModuleToApp({
                 appId: this.appId,
