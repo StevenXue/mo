@@ -75,7 +75,11 @@ class LaunchPage extends React.Component {
     }
     render(){
         const {visibility} = this.state
-        return <div className={styles.LaunchPage}>
+        return <div className={styles.LaunchPage} style={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+        }}>
             <div className={styles.LaunchPage_Content}>
                 <section className={styles.title}>
                     <p>欢迎来到蓦</p>

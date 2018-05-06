@@ -47,12 +47,14 @@ class UserLayout extends React.PureComponent {
             </Link>
           </div>
           {
-            lastPathName!="forgot"&&lastPathName!="newpassword"?<div className={styles.switcher}>
-            <Link to='/user/login' className={lastPathName === 'login' ? styles.selected:styles.unSelected} >Log In</Link>
-            <Link to='/user/register' className={lastPathName === 'register' ? styles.selected:styles.unSelected}>Sign Up</Link>
-          </div>:null
+            lastPathName !== 'forgot' && lastPathName !== 'newpassword' ? <div className={styles.switcher}>
+              <Link to='/user/login' className={lastPathName === 'login' ? styles.selected : styles.unSelected}>Log
+                In</Link>
+              <Link to='/user/register' className={lastPathName === 'register' ? styles.selected : styles.unSelected}>Sign
+                Up</Link>
+            </div> : null
           }
-          
+
         </div>
         <div className={styles.container}>
 

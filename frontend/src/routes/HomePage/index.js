@@ -66,7 +66,7 @@ class App extends Component {
   render() {
     const key = '/' + this.props.location.pathname.split('/')[1]
     return (
-      <div className={styles.App} style={{display:this.props.location.pathname!='/'?'none':'block'}}><img src={banner} alt="" width='100%'/>
+      <div className={styles.App}><img src={banner} alt="" width='100%'/>
         {/* <img src={logo} alt="" style={{ position: 'absolute', left: '10%', top: 16 }}/> */}
         <div className={styles.homecotain}>
           <div className={styles.box}>
