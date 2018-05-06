@@ -186,9 +186,9 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
           className={styles.messageP}>{`${e.user_ID} 为您的答案${e.user_request_title} 发布了${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
     }
   }
-
-  return <div className={styles.container}>
-    <div className={styles.box}>
+  
+  return <div className={styles.container} style={{display:location.pathname.indexOf('user/')!=-1||location.pathname.indexOf('/newpassword')!=-1?'none':'block'}}>
+    <div className={styles.box} style={{width:1170,margin:'0 auto'}}>
 
       <Menu
         className={styles.normal}

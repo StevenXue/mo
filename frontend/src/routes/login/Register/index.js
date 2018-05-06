@@ -81,7 +81,6 @@ class Register extends Component {
       (err, values) => {
         if (!err) {
           console.log('values', values)
-          values.welcome="0"
           values.tourtip="0"
           delete values.confirm
           delete values.prefix
