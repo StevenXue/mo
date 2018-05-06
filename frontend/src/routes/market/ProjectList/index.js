@@ -117,8 +117,6 @@ class ProjectList extends Component {
         totalNumber: count,
       })
     })
-
-
   }
 
   handleQueryChange(value) {

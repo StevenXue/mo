@@ -43,6 +43,9 @@
       ],
       "@jupyterlab/modulepublish-extension": [
         "../modulepublish-extension/src"
+      ],
+      "@jupyterlab/resourceslist-extension": [
+        "../resourceslist-extension/src"
       ]
     },
     "jsx": "react",

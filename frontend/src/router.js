@@ -9,7 +9,8 @@ import { get } from 'lodash'
 import NewPassword from './routes/login/NewPassword'
 import Account from './routes/login/Account'
 import MainLayout from './components/MainLayout/MainLayout'
-import LaunchPage from './components/MainLayout/LaunchPage';
+// import modelling from './models/modelling';
+
 const breadcrumbNameMap = {
   '/user': 'User',
   '/user/login': 'Login',
@@ -60,12 +61,7 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
   const ProjectDetail = dynamic({
     app,
     // models: () => [
-    //   import('./models/modelling'),
-    //   import('./models/projectDetail'),
-    //   import('./models/login'),
-    //   import('./models/project'),
-    //   import('./models/profile'),
-    //   import('./models/launchpage'),
+    //   modelling
     // ],
     component: () => import('./routes/workspace/info/ProjectDetail'),
   });
@@ -127,7 +123,7 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
       <Route path="/:anything" component={() =>
         <MainLayout location={location} history={history}>
           <div style={{
-            display: 'flex', 
+            display: 'flex',
             flexDirection: 'column',
             width:location.pathname==='/launchpage'?'100%':'auto'
             }}

@@ -29,7 +29,7 @@ function MainLayout({children, location, history, isRight, onClickIcon}) {
       <Content style={{height:'100%',overflowY:'auto'}} id="LaunchPage_Contain">
         {/* <LaunchPage location={location}/> */}
         <div style={{display: "flex",height:'100%'}}>
-          <div className={styles.content} 
+          <div className={styles.content}
           style={{padding:location.pathname==='/launchpage'?'0':'24px 15px'}}
           // style={{padding:'24px 15px'}}
           >
@@ -85,7 +85,7 @@ class OutMainLayout extends React.Component {
   }
 
   componentWillMount(){
-    console.log("OutMainLayout 刷新了")
+    // console.log("OutMainLayout 刷新了")
   }
 
   // shouldComponentUpdate(nextProps, nextState){
@@ -131,7 +131,7 @@ class OutMainLayout extends React.Component {
   }
 
   render() {
-    console.log("OutMainLayout 刷新了")
+    // console.log("OutMainLayout 刷新了")
     return (
       <div style={{height: '100%'}}>
         {/*<div className="change-locale">*/}

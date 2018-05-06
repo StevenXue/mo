@@ -360,7 +360,6 @@ class WebChat extends React.Component {
     // }
   }
   componentWillMount(){
-    console.log("我刷新了")
   }
 
   myToggleFloating = ({opened}) => {
