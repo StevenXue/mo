@@ -742,7 +742,7 @@ class AvatarEdit extends React.Component {
 
             <div>
               <img className={styles.avt}
-                src={`/pyapi/user/avatar/${this.props.user_ID}.jpeg?${new Date().getTime()}`}
+                src={this.props.userAvatar}
                 alt="avatar"/>
               <div className={styles.picDoc}>修改我的头像</div>
             </div>
@@ -782,8 +782,8 @@ class AvatarEdit extends React.Component {
 function SettingProfile({login, profile, dispatch, history}) {
   if (profile.userInfo) {
     const {gender, age, email, name, phone, user_ID} = profile.userInfo
+    const {userAvatar} = login
     const {projectNumber} = profile
-    const picNumber = parseInt(profile.userInfo._id.slice(10)) % 6
     return (
       <div className={`main-container ${styles.container}`}>
         <div className={styles.all}>
@@ -793,7 +793,7 @@ function SettingProfile({login, profile, dispatch, history}) {
           <div className={styles.headerRow}>
             <Row type="flex" justify="space-around" align="middle">
               <Col span={3} style={{padding: '25px'}}>
-                <AvatarEdit picNumber={picNumber} user_ID={user_ID}
+                <AvatarEdit userAvatar={userAvatar} user_ID={user_ID}
                             dispatch={dispatch}/>
               </Col>
               <Col span={21}>

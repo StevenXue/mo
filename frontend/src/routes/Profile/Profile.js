@@ -50,15 +50,15 @@ function toWorkspace(dispatch, tabPane) {
 function Profile({login, profile, dispatch, history}) {
   if (profile.userInfo) {
     const {age, email, name, phone, user_ID} = profile.userInfo
+    const {userAvatar} = login
     const {projectNumber} = profile
-    const picNumber = parseInt(profile.userInfo._id.slice(10))%6
     return (
       <div className={`main-container ${styles.container}`}>
         <div className={styles.headerRow}>
           <Row>
             <Col span={3} style={{padding: '20px 0 0 20px'}}>
               <div className={styles.photoDiv}>
-                <img className={styles.avt} src={`/pyapi/user/avatar/${user_ID}.jpeg?${new Date().getTime()}`}  alt="avatar" />
+                <img className={styles.avt} src={userAvatar}  alt="avatar" />
               </div>
             </Col>
             <Col span={21}>

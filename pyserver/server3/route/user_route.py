@@ -602,7 +602,9 @@ def download_file(filename):
     if os.path.isfile(f'../user_avatar/{filename}'):
         return send_from_directory('../user_avatar', filename)
     else:
-        print(f'filename{filename}')
-        hash_value = hash(filename)
+        # hash_value = hash(filename)
+        import hashlib
+        hash_value = int(hashlib.md5(filename.encode('utf-8')).hexdigest()[:8], 16)
+        print(f'filename {filename} hash {hash_value}')
         filename = str(hash_value % 6)+'.png'
         return send_from_directory('../user_avatar', filename)

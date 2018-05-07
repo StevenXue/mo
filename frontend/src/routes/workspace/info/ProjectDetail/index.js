@@ -128,7 +128,7 @@ class CommentsList extends React.Component {
                 <Col span={2} style={{ margin: '20px 0', textAlign: 'center' }}>
                   <div style={{ height: '80px', width: '80px' }}>
                     <img style={{ height: '80px', width: '80px',borderRadius:'40px'}}
-                         src={`/pyapi/user/avatar/${e.user_ID}.jpeg?${new Date().getTime()}`} alt="avatar"/>
+                         src={e.user_ID===this.props.login.user_ID?`/pyapi/user/avatar/${e.user_ID}.jpeg`:this.props.login.userAvatar} alt="avatar"/>
                   </div>
                 </Col>
                 <Col span={20} className={styles.commentCol}>
@@ -191,7 +191,7 @@ class CommentForm extends React.Component {
           <Col span={2} style={{ margin: '20px 0', textAlign: 'center' }}>
             <div style={{ height: '80px', width: '80px' }}>
               <img style={{ height: '80px', width: '80px',borderRadius:'40px' }}
-              src={`/pyapi/user/avatar/${this.props.login.user.user_ID}.jpeg?${new Date().getTime()}`}
+              src={this.props.login.userAvatar}
                    alt="avatar"/>
             </div>
           </Col>
@@ -657,6 +657,7 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
                                 pageSize={projectDetail.pageSize}
                                 pageNo={projectDetail.pageNo}
                                 history={history}
+                                login={login}
                   />
                 </TabPane>
               </Tabs>
