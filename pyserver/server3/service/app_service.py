@@ -133,6 +133,11 @@ class AppService(ProjectService):
         cls.send_message(module, m_type='deploy')
         return module
 
+    @classmethod
+    def get_action_entity(cls, app_id, **kwargs):
+        app = AppBusiness.get_by_id(app_id)
+        return AppBusiness.get_action_entity(app, **kwargs)
+
 
 # @classmethod
 # def add_used_app(cls, user_ID, app_id):

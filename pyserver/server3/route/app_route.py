@@ -181,6 +181,43 @@ def get_app(app_id):
     }), 200
 
 
+def convert_action_entity(objects, action_entity):
+    if action_entity == 'used_modules':
+        ums = [{'module': json_utility.convert_to_json(m.module.to_mongo()),
+                'version': '.'.join(m.version.split('_'))} for m in
+               objects]
+        return ums
+    if action_entity == 'used_datasets':
+        uds = [{'dataset': json_utility.convert_to_json(m.module.to_mongo()),
+                'version': '.'.join(m.version.split('_'))} for m in
+               objects]
+        return uds
+
+
+@app_app.route('/get_action_entity/<app_id>', methods=['GET'])
+def get_app_action_entity(app_id):
+    action_entity = request.args.get("action_entity")
+    page_no = int(request.args.get('page_no', 1))
+    page_size = int(request.args.get('page_size', 5))
+    at_objs = AppService.get_action_entity(
+        app_id=app_id,
+        action_entity=action_entity,
+        page_no=page_no,
+        page_size=page_size,
+    )
+
+    objects = convert_action_entity(at_objs.objects, action_entity)
+
+    return jsonify({
+        'response': {
+            "objects": objects,
+            "page_size": at_objs.page_size,
+            "page_no": at_objs.page_no,
+            "count": at_objs.count,
+        }
+    })
+
+
 def convert_used_modules(app):
     ums = [{'module': json_utility.convert_to_json(m.module.to_mongo()),
             'version': '.'.join(m.version.split('_'))} for m in

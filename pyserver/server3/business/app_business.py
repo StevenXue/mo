@@ -374,6 +374,18 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         #     response = requests.request("POST", url, data=payload, headers=headers)
         #     return response.json()
 
+    @classmethod
+    def get_action_entity(cls, app_obj, page_no, page_size, action_entity):
+        start = (page_no - 1) * page_size
+        end = page_no * page_size
+        objects = getattr(app_obj, action_entity)
+        objects.reverse()
+        return Objects(
+            objects=objects[start:end],
+            count=len(objects),
+            page_no=page_no,
+            page_size=page_size)
+
 
 if __name__ == "__main__":
     # apps = project.App.objects(user=)
