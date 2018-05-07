@@ -117,8 +117,6 @@ class ProjectList extends Component {
         totalNumber: count,
       })
     })
-
-
   }
 
   handleQueryChange(value) {
@@ -227,15 +225,18 @@ function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
         </div>
         <div>
           <div className={styles.authorDateDiv}>
-            <div className={styles.authorDiv}><p
-              className={styles.authorP}>AUTHOR</p><p>{project.user_ID}</p></div>
-            <div className={styles.dateDiv}><p className={styles.dateP}>DATE</p>
+            <div className={styles.authorDiv}>
+              <p className={styles.authorP}>AUTHOR</p>
+              <p>{project.user_ID}</p>
+            </div>
+            <div className={styles.dateDiv}>
+              <p className={styles.dateP}>DATE</p>
               <p>{showTime(project.create_time, "yyyy-MM-dd")}</p></div>
           </div>
           <div className={styles.categoryDiv}>
             <div className={styles.categoryP}>TAG</div>
             <div style={{display: 'flex'}}>
-              {project.tags.map((e,index,array) =><p key={e+index}>{e}&nbsp; {array.indexOf(e)===(array.length-1)?null:'•'} &nbsp; </p>)}
+              {project.tags.map((e,index,array) =><p key={index}>{e}&nbsp; {array.indexOf(e)===(array.length-1)?null:'•'} &nbsp; </p>)}
             </div>
           </div>
         </div>

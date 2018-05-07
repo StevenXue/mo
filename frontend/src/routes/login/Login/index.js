@@ -82,7 +82,7 @@ class Login extends Component {
         }
       },
     )
-    localStorage.setItem('launchpage','show')
+    // localStorage.setItem('launchpage','show')
   }
 
   handleLoginWithPhone = (e) => {

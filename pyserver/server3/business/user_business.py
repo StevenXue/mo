@@ -89,6 +89,7 @@ class UserBusiness(GeneralBusiness):
                 objects = objects.filter(id__in=objectsId)
             else:
                 objects = getattr(user, action_entity)
+            objects.reverse()
         return Objects(
             objects=objects[start:end],
             count=len(objects),

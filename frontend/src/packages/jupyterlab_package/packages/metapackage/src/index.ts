@@ -50,6 +50,7 @@ import '@jupyterlab/pdf-extension';
 import '@jupyterlab/rendermime';
 import '@jupyterlab/rendermime-extension';
 import '@jupyterlab/rendermime-interfaces';
+import '@jupyterlab/resourceslist-extension';
 import '@jupyterlab/running';
 import '@jupyterlab/running-extension';
 import '@jupyterlab/services';

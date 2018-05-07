@@ -122,11 +122,21 @@ class ProjectExample extends React.Component {
                 </div>
                 <div style={{ border: '1px solid #eeeeee', minHeight: 200, paddingTop: 20 }}>
                   {map(this.props.projectDetail.project.args.output).map(e =>
-                    <div key={e.name} style={{ margin: '10px 0' }}>
-                      <p style={{ marginLeft: 20 }}>{e.name}</p>
-                      {e.value_type === 'img' && e.value ? <img src={'data:image/jpeg;base64,' + e.value} alt="img"/> :
-                        <p>{e.value}</p>}
-                    </div>,
+                    <Row key={e.name} style={{ margin: '10px 0' }} gutter={8}>
+                      <Col xs={24} sm={5}>
+                        <p style={{ float: 'right' }}>{e.name}:</p>
+                      </Col>
+                      <Col xs={24} sm={14}>
+                        {e.value ?
+                          <div>
+                            {e.value_type === 'img' && e.value ?
+                              <img src={'data:image/jpeg;base64,' + e.value} alt="img"/> :
+                              <p>{e.value}</p>}
+                          </div>
+                          : <span style={{ color: 'lightgrey' }}>submit your input to get the output</span>
+                        }
+                      </Col>
+                    </Row>,
                   )}
                 </div>
               </div>

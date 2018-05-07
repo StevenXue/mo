@@ -1,5 +1,5 @@
 import React from 'react'
-import {Icon} from "antd"
+// import {Icon} from "antd"
 import {routerRedux} from 'dva/router'
 import {connect} from 'dva'
 
@@ -15,7 +15,7 @@ class LaunchPage extends React.Component {
       }
     }
 
-    //本组件控制显隐的方法：
+    //本组件控制显隐的方法：(已作废)
     //1.this.props.launchpage.visibility为false，组件隐藏
     //2.this.props.launchpage.visibility为true, this.state.visibility控制组件显隐
     //3.组件初始化时，localStorage.launchpage影响this.state.visibility 的值
@@ -35,13 +35,13 @@ class LaunchPage extends React.Component {
                 document.getElementById("LaunchPage_Contain").scrollTo(0,0)
         }
     }
-    close =()=>{
-        // this.props.dispatch({type:'launchpage/change',payload:{visibility:false}})
-        localStorage.setItem('launchpage','hide')
-        this.setState({
-            visibility:'none'
-        })
-    }
+    // close =()=>{
+    //     // this.props.dispatch({type:'launchpage/change',payload:{visibility:false}})
+    //     localStorage.setItem('launchpage','hide')
+    //     this.setState({
+    //         visibility:'none'
+    //     })
+    // }
     ssscrollTo = ()=>{
         document.getElementById("LaunchPage_Contain").scrollTo(0,900)
     }
@@ -75,9 +75,11 @@ class LaunchPage extends React.Component {
     }
     render(){
         const {visibility} = this.state
-        return <div className={styles.LaunchPage}
-                    style={{display:!this.props.launchpage.visibility?'none':visibility}}
-                    >
+        return <div className={styles.LaunchPage} style={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+        }}>
             <div className={styles.LaunchPage_Content}>
                 <section className={styles.title}>
                     <p>欢迎来到蓦</p>
@@ -115,12 +117,12 @@ class LaunchPage extends React.Component {
                     <button onClick={this.helpDocument}>帮助文档</button>
                 </section>
             </div>
-            <section className={styles.close} onClick={this.close} id="Close_CCC">
+            {/* <section className={styles.close} onClick={this.close} id="Close_CCC">
                 <Icon type="close" style={{marginRight:10}}/>
                 关闭
-            </section>
+            </section> */}
         </div>
     }
 }
 // export default TourTip
-export default connect(({launchpage})=>({launchpage}))(LaunchPage)
+export default connect(({})=>({}))(LaunchPage)
