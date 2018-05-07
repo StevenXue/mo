@@ -442,7 +442,8 @@ class ProjectBusiness:
         elif project.type == 'module':
             paths = [
                 project.path,
-                os.path.join(getattr(project, 'module_path') or 'NO_PATH', 'dev')
+                os.path.join(getattr(project, 'module_path') or 'NO_PATH',
+                             'dev')
             ]
         else:
             paths = [
@@ -570,3 +571,11 @@ class ProjectBusiness:
                 else:
                     line = '\t' + line
             print(line)
+        my_open = open(script_path, 'a')
+        # main_func = r"if __name__ == '__main__':" \
+        #             r"" + "\n" + "\t" + "conf = {}" + "\n" +"\t" + "handle()"
+        main_func = r"if __name__ == '__main__': " + "\n" + "\t" \
+                    r"conf = {}" + "\n" + "\t" \
+                    r"handle()"
+
+        my_open.write(main_func)
