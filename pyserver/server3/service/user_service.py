@@ -530,8 +530,7 @@ class UserService:
         img = img.convert('RGB')
         save_path = "../user_avatar"
         image_path = save_path+f'/{user_ID}.jpeg'
-        try:
-            img.save(image_path.replace('\\', '/'))
-        except:
-            raise Error("头像存储失败")
-        return
+        img.save(image_path.replace('\\', '/'))
+        user = UserBusiness.get_by_user_ID(user_ID)
+        user.avatarV += 1
+        user.save()

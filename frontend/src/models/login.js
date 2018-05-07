@@ -132,7 +132,7 @@ export default {
         yield put({type: 'setUser', payload: data.user})
         yield put({
           type: 'setUserAvatar',
-          userAvatar: `/pyapi/user/avatar/${data.user.user_ID}.jpeg`
+          userAvatar: `/pyapi/user/avatar/${data.user.user_ID}.jpeg?${data.user.avatarV}`
         })
         if (from) {
           yield put(routerRedux.push(from))
@@ -165,7 +165,7 @@ export default {
           yield put({type: 'setUser', payload: data.user})
           yield put({
             type: 'setUserAvatar',
-            userAvatar: `/pyapi/user/avatar/${data.user.user_ID}.jpeg`
+            userAvatar: `/pyapi/user/avatar/${data.user.user_ID}.jpeg?${data.user.avatarV}`
           })
           if (from) {
             yield put(routerRedux.push(from))
@@ -197,7 +197,7 @@ export default {
           })
           yield put({
             type: 'setUserAvatar',
-            userAvatar: `/pyapi/user/avatar/${data.user.user_ID}.jpeg`
+            userAvatar: `/pyapi/user/avatar/${data.user.user_ID}.jpeg?${data.user.avatarV}`
           })
           // FIXME regex can't catch whole url
           // const from = queryURL('from')

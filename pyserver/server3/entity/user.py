@@ -22,7 +22,7 @@ class User(DynamicDocument):
     phone = StringField(unique=True, sparse=True)
     gender = IntField(choices=GENDER, default=2)
     age = IntField()
-    # avatar = BooleanField(default=False)
+    avatarV = IntField(default=0)
 
     # 用户收藏的api列表
     favor_apps = ListField(ReferenceField("App"))
