@@ -7,6 +7,7 @@ Blueprint for user
 Author: Zhaofeng Li
 Date: 2017.05.22
 """
+import os
 import json
 import requests
 import jwt
@@ -580,4 +581,15 @@ def update_user_account():
         UserBusiness.update_password(user_ID, password)
     else:
         return jsonify({'response': 'error'}), 400
+    return jsonify({'response': 'ok'}), 200
+
+
+# 用户更改头像
+@user_app.route('/avatar', methods=['POST'])
+@jwt_required
+def update_user_avatar():
+    user_ID = get_jwt_identity()
+    data = request.get_json()
+    base64_str = data.get('dataUrl', None)
+    UserService.update_user_avatar(user_ID, base64_str)
     return jsonify({'response': 'ok'}), 200

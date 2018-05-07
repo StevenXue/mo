@@ -21,7 +21,7 @@ import {
 import {avatarList} from '../../constants'
 import styles from './index.less'
 import {showTime} from "../../utils"
-import {updateUserInfo, updateUserAccount} from "../../services/user"
+import {updateUserInfo, updateUserAccount,updateUserAvatar } from "../../services/user"
 import {routerRedux} from "dva/router"
 import AvatarEditor from 'react-avatar-editor'
 
@@ -677,28 +677,34 @@ class AvatarEdit extends React.Component {
 
   confirmEdit = () => {
     let newAvatar = this.editor.getImage()
-    console.log(newAvatar)
     let canvas = document.createElement('canvas')
     let ctx = canvas.getContext('2d')
     canvas.width = 80
     canvas.height = 80
     ctx.clearRect(0, 0, 80, 80)
     ctx.drawImage(newAvatar, 0, 0, 80, 80)
-    console.log(canvas)
-    updateUserInfo({
-      body: {
-        'avatar': canvas.toDataURL()
-      },
-      onJson: ({user}) => {
-        this.props.dispatch({
-          type: 'profile/setUserInfo',
-          'userInfo': user
-        })
+    // let uploadAvatar=(blob)=>{
+    //   let fd = new FormData()
+    //   fd.append("avatarFile", blob, "avatar.jpg")
+    //   updateUserAvatar({
+    //     fd,
+    //     onJson: ({user}) => {
+    //       // this.props.dispatch({
+    //       //   type: 'profile/setUserInfo',
+    //       //   'userInfo': user
+    //       // })
+    //       this.handleCancel()
+    //       // this.props.dispatch({
+    //       //   type: 'login/setUser',
+    //       //   payload: user
+    //       // })
+    //     }
+    //   })}
+    // canvas.toBlob((blob)=>uploadAvatar(blob),'image/jpeg',1.0)
+    let dataUrl = canvas.toDataURL('image/png')
+    updateUserAvatar({dataUrl,
+      onJson: () => {
         this.handleCancel()
-        this.props.dispatch({
-          type: 'login/setUser',
-          payload: user
-        })
       }
     })
   }
@@ -728,17 +734,18 @@ class AvatarEdit extends React.Component {
           {...props}
           className={styles.photoUpload}
           action={URL + '/fake_upload'}
-          listType="picture-card"
+          // listType="picture-card"
           fileList={this.state.fileList}
           onChange={this.handleChange}
+          showUploadList ={false}
         >
-          {this.state.fileList.length >= 1 ? null :
+
             <div>
-              <img
+              <img className={styles.avt}
                 src={this.props.avatar ? this.props.avatar : avatarList[this.props.picNumber]}
                 alt="avatar"/>
               <div className={styles.picDoc}>修改我的头像</div>
-            </div>}
+            </div>
         </Upload>
         <Modal
           visible={this.state.previewVisible}
@@ -753,6 +760,7 @@ class AvatarEdit extends React.Component {
                 width={200}
                 height={200}
                 border={50}
+                borderRadius={30}
                 color={[255, 255, 255, 0.6]} // RGBA
                 scale={this.state.zoom}
                 rotate={0}

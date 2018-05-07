@@ -52,6 +52,18 @@ export const getFavorApps = async (payload, callback, onSuccess, onError) => {
 }
 
 
+export function updateUserAvatar({ dataUrl, onJson }) {
+  console.log('dataUrl',dataUrl)
+  return request(`${CORS}/user/avatar`, {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body:JSON.stringify({dataUrl:dataUrl}),
+  }, { onJson });
+}
+
+
 export function updateUserInfo({ body, onJson }) {
   return request(`${CORS}/user`, {
     method: 'put',
