@@ -4,18 +4,10 @@ import {Select, Icon, Input, Pagination, Tabs} from 'antd'
 import ProjectModel from '../../../components/ProjectModal/index'
 import {showTime} from '../../../utils/index'
 import {privacyChoices, projectChoices} from '../../../constants'
-import avatar1 from '../../../img/avatar/1.png'
-import avatar2 from '../../../img/avatar/2.png'
-import avatar3 from '../../../img/avatar/3.png'
-import avatar4 from '../../../img/avatar/4.png'
-import avatar5 from '../../../img/avatar/5.png'
-import avatar6 from '../../../img/avatar/6.png'
 import star from '../../../img/star.png'
 import star_o from '../../../img/star-o.png'
 import like from '../../../img/like.png'
 import like_o from '../../../img/like-o.png'
-
-const avatarList =[avatar1,avatar2,avatar3,avatar4,avatar5,avatar6]
 
 import {
   createProject,
@@ -210,12 +202,11 @@ class ProjectList extends Component {
 function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
   const user_obj_id = localStorage.getItem('user_obj_id')
   const user_ID = localStorage.getItem('user_ID')
-  const picNumber = parseInt(project.user.slice(10))%6
   return (
     <div className={styles.projectCard}>
       <div className={styles.toDetail} onClick={() => onClickToDetail()}>
         <div className={styles.pic}>
-          <img className={styles.avt} src={project.user_avatar?project.user_avatar:avatarList[picNumber]}  alt="avatar" />
+          <img className={styles.avt} src={`/pyapi/user/avatar/${project.user_ID}.jpeg`}  alt="avatar" />
         </div>
         <div className={styles.name}>
           <p className={styles.namep}>{project.name}</p>

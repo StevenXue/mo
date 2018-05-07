@@ -16,9 +16,6 @@ const TabPane = Tabs.TabPane
 const {Meta} = Card
 const Search = Input.Search
 
-import  {avatarList} from  '../../constants'
-
-
 import styles from './index.less'
 import {fetchAllUserRequest} from "../../services/userRequest"
 import {getStarFavor} from "../../services/user"
@@ -52,7 +49,7 @@ function toWorkspace(dispatch, tabPane) {
 
 function Profile({login, profile, dispatch, history}) {
   if (profile.userInfo) {
-    const {age, email, name, phone, user_ID,avatar} = profile.userInfo
+    const {age, email, name, phone, user_ID} = profile.userInfo
     const {projectNumber} = profile
     const picNumber = parseInt(profile.userInfo._id.slice(10))%6
     return (
@@ -61,7 +58,7 @@ function Profile({login, profile, dispatch, history}) {
           <Row>
             <Col span={3} style={{padding: '20px 0 0 20px'}}>
               <div className={styles.photoDiv}>
-                <img className={styles.avt} src={avatar?avatar:avatarList[picNumber]}  alt="avatar" />
+                <img className={styles.avt} src={`/pyapi/user/avatar/${user_ID}.jpeg?${new Date().getTime()}`}  alt="avatar" />
               </div>
             </Col>
             <Col span={21}>

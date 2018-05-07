@@ -31,7 +31,8 @@ export default {
         ...state,
         userInfo
       }
-    }
+    },
+
   },
   effects: {
     * fetchUserInfo(action, {call, put, select}){

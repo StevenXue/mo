@@ -53,7 +53,6 @@ export const getFavorApps = async (payload, callback, onSuccess, onError) => {
 
 
 export function updateUserAvatar({ dataUrl, onJson }) {
-  console.log('dataUrl',dataUrl)
   return request(`${CORS}/user/avatar`, {
     method: 'post',
     headers: {
@@ -99,3 +98,5 @@ export function twoStepVFC(payload) {
 export function sendCaptchaToEmail(payload) {
   return request(`${CORS}/user/send_verification_code_to_email/${payload.email}`)
 }
+
+
