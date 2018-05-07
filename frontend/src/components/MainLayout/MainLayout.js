@@ -34,7 +34,8 @@ function MainLayout({ children, location, history, isRight, onClickIcon }) {
       position: 'relative',
       backgroundColor: location.pathname !== '/' || location.pathname.indexOf('/user') !== -1 ? '#F5F5F5' : 'transparent',
     }}>
-      {location.pathname !== '/' && <Header location={location} history={history}/>}
+      {/*{location.pathname !== '/' && <Header location={location} history={history}/>}*/}
+      <Header location={location} history={history}/>
       <Content style={{ height: '100%', overflowY: 'auto', marginTop: location.pathname !== '/' ? 45 : 0 }}
                id="LaunchPage_Contain">
         {/* <LaunchPage location={location}/> */}
