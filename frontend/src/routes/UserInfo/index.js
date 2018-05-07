@@ -18,7 +18,6 @@ import {
 } from 'antd'
 
 
-import {avatarList} from '../../constants'
 import styles from './index.less'
 import {showTime} from "../../utils"
 import {updateUserInfo, updateUserAccount,updateUserAvatar } from "../../services/user"
@@ -679,10 +678,10 @@ class AvatarEdit extends React.Component {
     let newAvatar = this.editor.getImage()
     let canvas = document.createElement('canvas')
     let ctx = canvas.getContext('2d')
-    canvas.width = 80
-    canvas.height = 80
-    ctx.clearRect(0, 0, 80, 80)
-    ctx.drawImage(newAvatar, 0, 0, 80, 80)
+    canvas.width = 140
+    canvas.height = 140
+    ctx.clearRect(0, 0, 140, 140)
+    ctx.drawImage(newAvatar, 0, 0, 140, 140)
     // let uploadAvatar=(blob)=>{
     //   let fd = new FormData()
     //   fd.append("avatarFile", blob, "avatar.jpg")
@@ -705,6 +704,7 @@ class AvatarEdit extends React.Component {
     updateUserAvatar({dataUrl,
       onJson: () => {
         this.handleCancel()
+        this.props.dispatch({ type: 'login/setUserAvatar',userAvatar: `/pyapi/user/avatar/${this.props.user_ID}.jpeg?${new Date().getTime()}` })
       }
     })
   }
@@ -742,7 +742,7 @@ class AvatarEdit extends React.Component {
 
             <div>
               <img className={styles.avt}
-                src={this.props.avatar ? this.props.avatar : avatarList[this.props.picNumber]}
+                src={`/pyapi/user/avatar/${this.props.user_ID}.jpeg?${new Date().getTime()}`}
                 alt="avatar"/>
               <div className={styles.picDoc}>修改我的头像</div>
             </div>
@@ -781,7 +781,7 @@ class AvatarEdit extends React.Component {
 
 function SettingProfile({login, profile, dispatch, history}) {
   if (profile.userInfo) {
-    const {gender, age, email, name, phone, user_ID, avatar} = profile.userInfo
+    const {gender, age, email, name, phone, user_ID} = profile.userInfo
     const {projectNumber} = profile
     const picNumber = parseInt(profile.userInfo._id.slice(10)) % 6
     return (
@@ -793,7 +793,7 @@ function SettingProfile({login, profile, dispatch, history}) {
           <div className={styles.headerRow}>
             <Row type="flex" justify="space-around" align="middle">
               <Col span={3} style={{padding: '25px'}}>
-                <AvatarEdit picNumber={picNumber} avatar={avatar}
+                <AvatarEdit picNumber={picNumber} user_ID={user_ID}
                             dispatch={dispatch}/>
               </Col>
               <Col span={21}>

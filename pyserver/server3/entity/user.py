@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 from mongoengine import DynamicDocument
 from mongoengine import StringField
+from mongoengine import BooleanField
 from mongoengine import EmailField
 from mongoengine import IntField
 from mongoengine import ListField
@@ -13,7 +14,6 @@ GENDER = (
     (2, 'unknown')
 )
 
-
 class User(DynamicDocument):
     user_ID = StringField(max_length=20, unique=True, required=True)
     password = StringField(required=True)
@@ -22,7 +22,7 @@ class User(DynamicDocument):
     phone = StringField(unique=True, sparse=True)
     gender = IntField(choices=GENDER, default=2)
     age = IntField()
-    avatar = StringField()
+    # avatar = BooleanField(default=False)
 
     # 用户收藏的api列表
     favor_apps = ListField(ReferenceField("App"))

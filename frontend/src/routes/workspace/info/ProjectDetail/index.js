@@ -31,7 +31,7 @@ import styles from './index.less'
 import { get } from 'lodash'
 import { message } from 'antd/lib/index'
 import ReactMarkdown from 'react-markdown'
-import { avatarList, flaskServer, hubServer } from '../../../../constants'
+import { flaskServer, hubServer } from '../../../../constants'
 import dynamic from 'dva/dynamic'
 import modelling from '../../../../models/modelling'
 // import {fetchComments} from "../../../../services/comments"
@@ -126,8 +126,9 @@ class CommentsList extends React.Component {
             <div className={styles.commentDiv}>
               <Row>
                 <Col span={2} style={{ margin: '20px 0', textAlign: 'center' }}>
-                  <div style={{ height: '60px', width: '60px' }}>
-                    <img src={e.avatar ? e.avatar : avatarList[picNumber]} alt="avatar"/>
+                  <div style={{ height: '80px', width: '80px' }}>
+                    <img style={{ height: '80px', width: '80px',borderRadius:'40px'}}
+                         src={`/pyapi/user/avatar/${e.user_ID}.jpeg?${new Date().getTime()}`} alt="avatar"/>
                   </div>
                 </Col>
                 <Col span={20} className={styles.commentCol}>
@@ -184,13 +185,13 @@ class CommentForm extends React.Component {
   render() {
     const { fetching, data, value, projects, inputValue } = this.state
     const userObjId = localStorage.getItem('user_obj_id')
-    const picNumber = parseInt(userObjId.slice(10)) % 6
     return (
       <div className="demo">
         <Row type="flex" justify="flex" align="top">
           <Col span={2} style={{ margin: '20px 0', textAlign: 'center' }}>
-            <div style={{ height: '60px', width: '60px' }}>
-              <img src={this.props.login.user.avatar ? this.props.login.user.avatar : avatarList[picNumber]}
+            <div style={{ height: '80px', width: '80px' }}>
+              <img style={{ height: '80px', width: '80px',borderRadius:'40px' }}
+              src={`/pyapi/user/avatar/${this.props.login.user.user_ID}.jpeg?${new Date().getTime()}`}
                    alt="avatar"/>
             </div>
           </Col>

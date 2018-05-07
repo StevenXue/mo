@@ -2,7 +2,6 @@ import React, {Component} from 'react'
 import {Popover} from 'antd'
 import styles from './index.less'
 import {showTime} from "../../utils/index"
-import {avatarList} from "../../constants"
 
 
 export const WorldMessages = ({worldMessages = [], ref1, isRight}) => {
@@ -24,12 +23,6 @@ export const WorldMessages = ({worldMessages = [], ref1, isRight}) => {
 const WorldMessageItem = ({worldMessage, isRight}) => {
 
   const {message, _id, create_time, sender_user_ID, message_type, sender} = worldMessage
-  let picNumber = ""
-
-  if(sender) {
-    picNumber = parseInt(sender.slice(10))%6
-  }
-
 
   const renderItem = () => {
     return (
@@ -57,8 +50,7 @@ const WorldMessageItem = ({worldMessage, isRight}) => {
                 className={styles.avt}
                 style={{
                 height: 30, width: 30,
-              }} src={avatarList[picNumber]}  alt="avatar" />
-
+              }} src={`/pyapi/user/avatar/${sender_user_ID}.jpeg?${new Date().getTime()}`}  alt="avatar" />
           }
         </div>
 

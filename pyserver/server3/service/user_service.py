@@ -527,7 +527,11 @@ class UserService:
         byte_data = base64.b64decode(base64_data)
         img_data = BytesIO(byte_data)
         img = Image.open(img_data)
-        save_path = "../../../user_avatar"
+        img = img.convert('RGB')
+        save_path = "../user_avatar"
         image_path = save_path+f'/{user_ID}.jpeg'
-        img.save(image_path.replace('\\', '/'))
-        return img
+        try:
+            img.save(image_path.replace('\\', '/'))
+        except:
+            raise Error("头像存储失败")
+        return
