@@ -61,7 +61,7 @@ def add(user_ID, password, **kwargs):
 
 def register(user_ID, password, phone, code, **kwargs):
     # 验证失败会抛出错误
-    verify_code(code=code, phone=phone)
+    # verify_code(code=code, phone=phone)
     return add(user_ID=user_ID, password=password, phone=phone, **kwargs)
 
 

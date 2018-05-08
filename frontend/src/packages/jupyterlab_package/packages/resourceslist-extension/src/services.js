@@ -45,6 +45,10 @@ export function getApp({appId, version, onJson, prefix}) {
     return request(`pyapi/apps/${appId}?used_${prefix}s=true`, undefined, {onJson})
 }
 
+export function getAppActionEntity({appId, version, onJson, actionEntity}) {
+  return request(`pyapi/apps/get_action_entity/${appId}?action_entity=${actionEntity}`, undefined, {onJson})
+}
+
 export function addModuleToApp({appId, moduleId, func, version, onJson}) {
     if (version) {
         version = version.split('.').join('_');

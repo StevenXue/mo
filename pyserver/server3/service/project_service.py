@@ -398,6 +398,36 @@ class ProjectService:
     channel = CHANNEL.project
 
     @classmethod
+    def create_tutorial_project(cls, user_ID, name='', description='',
+                                tags=None, user_token='', type='project',
+                                **kwargs):
+        """
+        Create a tutorial project
+
+        :param name: str
+        :param description: str
+        :param user_ID: ObjectId
+        :param type: string (app/module/dataset)
+        :param tags: list of string
+        :param user_token: string
+        :return: a new created project object
+        """
+        name = 'tutorial'
+        description = 'this is a official tutorial for our platform beginner'
+        tags = ['tutorial', 'official']
+        type = 'app'
+
+        if tags is None:
+            tags = []
+        project_type = type
+        user = UserBusiness.get_by_user_ID(user_ID)
+        project = cls.business.create_project(name=name,
+                                              description=description,
+                                              type=type, tags=tags, user=user,
+                                              user_token=user_token, **kwargs)
+        return project
+
+    @classmethod
     def create_project(cls, name, description, user_ID, tags=None,
                        user_token='', type='project', **kwargs):
         """
