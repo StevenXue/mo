@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {connect} from 'dva'
-import {Select, Button, Card, Icon, Input, Pagination, Tabs} from 'antd'
+import {Select, Button, Card, Icon, Input, Pagination, Tabs, Spin,} from 'antd'
 import ProjectModel from '../../../../components/ProjectModal/index'
 import {showTime} from '../../../../utils/index'
 import {privacyChoices, projectChoices} from '../../../../constants'
@@ -69,6 +69,7 @@ class ProjectList extends Component {
       totalNumber: 0,
       pageNo: 1,
       pageSize: 5,
+      loading:true
     }
   }
 
@@ -91,7 +92,9 @@ class ProjectList extends Component {
 
   fetchData({payload = {}}) {
     const {type} = this.props
-
+    this.setState({
+      loading: true,
+    })
     // default filter
     let filter = {type, group: 'my'};
 
@@ -114,6 +117,7 @@ class ProjectList extends Component {
       onJson: ({projects, count}) => this.setState({
         projects,
         totalNumber: count,
+        loading: false
       }),
     })
   }
@@ -168,7 +172,8 @@ class ProjectList extends Component {
           </ProjectModel>
         </div>
         {
-          this.state.projects.length > 0 ? <div className={styles.projectList}>
+          this.state.loading===true || this.state.projects.length > 0 ? <Spin spinning={this.state.loading}>
+            <div className={styles.projectList}>
             {this.state.projects.map(e =>
               <Card key={e._id} className={styles.card}
                     title={<h3>{e.name}</h3>}
@@ -203,7 +208,7 @@ class ProjectList extends Component {
                 </div>
               </Card>)}
             {/*{project.projects.public_projects.map(e => e.name)}*/}
-          </div> : <div className={styles.kong}>
+            </div></Spin> : <div className={styles.kong}>
             <img src={blank} alt="null" width="200px" height="207px"/>
             <p style={{marginTop: 44}}>您还没有创建过任何应用, 点击<span>“新建应用”</span>快速创建。
             </p>

@@ -11,6 +11,7 @@ import {
   Pagination,
   Tabs,
   Tag,
+  Spin,
 } from 'antd'
 import { showTime } from '../../../utils/index'
 import { arrayToJson, JsonToArray } from '../../../utils/JsonUtils'
@@ -65,11 +66,15 @@ class RequestList extends Component {
       pageNo: 1,
       pageSize: 10,
       search_query: null,
+      loading:true
     }
   }
 
   fetchData({ payload }) {
     const { type } = this.props
+    this.setState({
+      loading: true,
+    })
     if (payload) {
       payload['type'] = type
     }
@@ -81,6 +86,7 @@ class RequestList extends Component {
       onJson: ({ user_request: requests, total_number: totalNumber }) => {
         this.setState({
           requests, totalNumber,
+          loading:false
         })
       },
     })
@@ -153,6 +159,7 @@ class RequestList extends Component {
                     className={styles.rightButton}>New {this.props.type} Request</Button>
           </RequestModal>
         </div>
+        <Spin spinning={this.state.loading}>
         <div className={styles.requestList}>
           {this.state.requests.map(e =>
             <Card key={e._id} className={styles.card}
@@ -217,6 +224,7 @@ class RequestList extends Component {
                         total={this.state.totalNumber}/>
           </div>
         </div>
+        </Spin>
       </div>
     )
   }

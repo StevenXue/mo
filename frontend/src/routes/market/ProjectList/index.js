@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {connect} from 'dva'
-import {Select, Icon, Input, Pagination, Tabs} from 'antd'
+import {Select, Icon, Input, Pagination, Tabs,Spin} from 'antd'
 import ProjectModel from '../../../components/ProjectModal/index'
 import {showTime} from '../../../utils/index'
 import {privacyChoices, projectChoices} from '../../../constants'
@@ -64,6 +64,7 @@ class ProjectList extends Component {
       totalNumber: 0,
       pageNo: 1,
       pageSize: 8,
+      loading:true
     }
   }
 
@@ -88,6 +89,9 @@ class ProjectList extends Component {
 
   fetchData({payload= {}}) {
     const {type} = this.props
+    this.setState({
+      loading: true,
+    })
 
     let filter = {type};
     ['query', 'privacy', 'page_no', 'page_size'].forEach((key) => {
@@ -107,6 +111,7 @@ class ProjectList extends Component {
       onJson: ({projects, count}) => this.setState({
         projects,
         totalNumber: count,
+        loading: false
       })
     })
   }
@@ -172,6 +177,7 @@ class ProjectList extends Component {
             style={{width: 200}}
           />
         </div>
+        <Spin spinning={this.state.loading}>
         <div className={styles.projectList}>
           {this.state.projects.map(e =>
           {
@@ -184,6 +190,7 @@ class ProjectList extends Component {
 
           )}
         </div>
+        </Spin>
         <div className={styles.pagination}>
           <Pagination showSizeChanger
                       onShowSizeChange={this.onShowSizeChange}

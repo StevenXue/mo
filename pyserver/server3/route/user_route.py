@@ -12,6 +12,7 @@ import json
 import requests
 import jwt
 import time
+import hashlib
 from flask import Blueprint
 from flask import jsonify
 from flask import make_response
@@ -609,13 +610,9 @@ def update_user_avatar():
 
 @user_app.route('/avatar/<path:filename>', methods=['GET'])
 def download_file(filename):
-    import os.path
     if os.path.isfile(f'../user_avatar/{filename}'):
         return send_from_directory('../user_avatar', filename)
     else:
-        # hash_value = hash(filename)
-        import hashlib
         hash_value = int(hashlib.md5(filename.encode('utf-8')).hexdigest()[:8], 16)
-        print(f'filename {filename} hash {hash_value}')
-        filename = str(hash_value % 6)+'.png'
+        filename = str(hash_value % 6)+'.jpg'
         return send_from_directory('../user_avatar', filename)

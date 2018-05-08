@@ -494,13 +494,19 @@ class UserService:
 
     @classmethod
     def send_captcha_to_email(cls, user_ID, email):
+        msg = MIMEMultipart('mixed')
+        subject = '数据分析平台-用户身份验证(此邮件由系统产生不可回复)'
+        msg['Subject'] = subject
+        msg['From'] = '15669929857@163.com <15669929857@163.com>'
         receiver = email
         msg['To'] = email
         rand = str(random.randint(100000, 999999))
         user = UserBusiness.get_by_user_ID(user_ID)
         user.emailCaptcha = rand
         user.save()
-
+        username = '15669929857@163.com'
+        password = 'wurao122'
+        sender = '15669929857@163.com'
         text = f'您好！\n随机码为: {rand}, 半小时内有效，谢谢 '
         text_plain = MIMEText(text, 'plain', 'utf-8')
         msg.attach(text_plain)

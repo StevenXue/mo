@@ -9,7 +9,8 @@ import {
   Col,
   Input,
   Pagination,
-  Button
+  Button,
+  Spin
 } from 'antd'
 
 const TabPane = Tabs.TabPane
@@ -141,6 +142,7 @@ class MyFavouriteList extends Component {
       pageNo: 1,
       pageSize: 10,
       type: 'app',
+      loading:true
     }
   }
 
@@ -155,6 +157,9 @@ class MyFavouriteList extends Component {
 
 
   fetchData({payload}) {
+    this.setState({
+      loading: true,
+    })
     if (payload) {
       payload['user_ID'] = this.props.user_ID
     }
@@ -175,7 +180,9 @@ class MyFavouriteList extends Component {
       payload,
       onJson: ({objects: objects, count: totalNumber}) => {
         this.setState({
-          objects, totalNumber
+          objects,
+          totalNumber,
+          loading:false
         })
         console.log(this.state.objects)
       }
@@ -248,6 +255,7 @@ class MyFavouriteList extends Component {
           />
         </div>
         {this.state.pOrR === 'project' &&
+        <Spin spinning={this.state.loading}>
         <div className={styles.favorList}>
           {this.state.objects.map(e =>
             <Card noHovering={true} key={e._id} bordered={true}>
@@ -277,8 +285,10 @@ class MyFavouriteList extends Component {
                 </Row>
               </div>
             </Card>)}
-        </div>}
-        {this.state.pOrR === 'request' && <div className={styles.requestList}>
+        </div>
+        </Spin>
+        }
+        {this.state.pOrR === 'request' && <Spin spinning={this.state.loading}><div className={styles.requestList}>
           {this.state.objects.map(e =>
             <Card noHovering={true} key={e._id} bordered={true}>
               <div>
@@ -321,7 +331,7 @@ class MyFavouriteList extends Component {
                 </Row>
               </div>
             </Card>)}
-        </div>}
+        </div></Spin>}
         <div className={styles.pagination}>
           <Pagination showSizeChanger
                       onShowSizeChange={this.onShowSizeChange.bind(this)}
@@ -347,10 +357,14 @@ class MyRequestList extends Component {
       pageNo: 1,
       pageSize: 10,
       type: 'all',
+      loading:true
     }
   }
 
   fetchData({payload}) {
+    this.setState({
+      loading:true
+    })
     if (payload) {
       payload['type'] = this.state.type
     }
@@ -366,7 +380,9 @@ class MyRequestList extends Component {
       payload,
       onJson: ({user_request: requests, total_number: totalNumber}) => {
         this.setState({
-          requests, totalNumber
+          requests,
+          totalNumber,
+          loading:false
         })
       }
     })
@@ -386,8 +402,8 @@ class MyRequestList extends Component {
     })
   }
 
-  toUserRequestDetail(id, history) {
-    history.push(`/userrequest/${id}`)
+  toUserRequestDetail(id, type,history) {
+    history.push(`/userrequest/${id}?tab=${type}`)
   }
 
   onShowSizeChange = (current, pageSize) => {
@@ -424,6 +440,7 @@ class MyRequestList extends Component {
                   style={{width: 200}}
           />
         </div>
+        <Spin spinning={this.state.loading}>
         <div className={styles.requestList}>
           {this.state.requests.map(e =>
             <Card noHovering={true} key={e._id} bordered={true}>
@@ -431,7 +448,7 @@ class MyRequestList extends Component {
                 <Row>
                   <Col span={3}>
                     <div className={styles.starAnswerDiv}
-                         onClick={() => this.toUserRequestDetail(e._id, history)}>
+                         onClick={() => this.toUserRequestDetail(e._id, e.type,history)}>
                       <div className={styles.starDiv}>
                         {e.accept_answer ? <p className={styles.starNumber}>
                           <Icon style={{'color': '#439A46', 'fontSize': '18px'}}
@@ -451,7 +468,7 @@ class MyRequestList extends Component {
                   <Col span={21}>
                     <div className={styles.rightArea}>
                       <p className={styles.title}
-                         onClick={() => this.toUserRequestDetail(e._id, history)}>{e.title}</p>
+                         onClick={() => this.toUserRequestDetail(e._id,e.type, history)}>{e.title}</p>
                       {/*<p className={styles.description}>{e.description}</p>*/}
                       <div className={styles.footer}>
                         <Icon type="tags" className={styles.firstIcon}/>
@@ -476,6 +493,7 @@ class MyRequestList extends Component {
                         total={this.state.totalNumber}/>
           </div>
         </div>
+        </Spin>
       </div>
     )
   }
@@ -491,10 +509,14 @@ class MyAnswerList extends Component {
       pageNo: 1,
       pageSize: 10,
       type: 'all',
+      loading:true
     }
   }
 
   fetchData({payload}) {
+    this.setState({
+      loading: true,
+    })
     if (payload) {
       payload['type'] = this.state.type
     }
@@ -510,7 +532,9 @@ class MyAnswerList extends Component {
       onJson: ({request_answer_info: requests, total_number: totalNumber}) => {
         console.log(requests)
         this.setState({
-          requests, totalNumber
+          requests,
+          totalNumber,
+          loading:false,
         })
       }
     })
@@ -568,6 +592,7 @@ class MyAnswerList extends Component {
                   style={{width: 200}}
           />
         </div>
+        <Spin spinning={this.state.loading}>
         <div className={styles.requestList}>
           {this.state.requests.map(e =>
             <Card noHovering={true} key={e._id} bordered={true}>
@@ -598,6 +623,7 @@ class MyAnswerList extends Component {
                         total={this.state.totalNumber}/>
           </div>
         </div>
+        </Spin>
       </div>
     )
   }
