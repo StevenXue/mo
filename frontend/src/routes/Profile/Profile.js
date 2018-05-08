@@ -9,7 +9,8 @@ import {
   Col,
   Input,
   Pagination,
-  Button
+  Button,
+  Spin
 } from 'antd'
 
 const TabPane = Tabs.TabPane
@@ -141,6 +142,7 @@ class MyFavouriteList extends Component {
       pageNo: 1,
       pageSize: 10,
       type: 'app',
+      loading:true
     }
   }
 
@@ -155,6 +157,9 @@ class MyFavouriteList extends Component {
 
 
   fetchData({payload}) {
+    this.setState({
+      loading: true,
+    })
     if (payload) {
       payload['user_ID'] = this.props.user_ID
     }
@@ -175,7 +180,9 @@ class MyFavouriteList extends Component {
       payload,
       onJson: ({objects: objects, count: totalNumber}) => {
         this.setState({
-          objects, totalNumber
+          objects,
+          totalNumber,
+          loading:false
         })
         console.log(this.state.objects)
       }
@@ -248,6 +255,7 @@ class MyFavouriteList extends Component {
           />
         </div>
         {this.state.pOrR === 'project' &&
+        <Spin spinning={this.state.loading}>
         <div className={styles.favorList}>
           {this.state.objects.map(e =>
             <Card noHovering={true} key={e._id} bordered={true}>
@@ -277,8 +285,10 @@ class MyFavouriteList extends Component {
                 </Row>
               </div>
             </Card>)}
-        </div>}
-        {this.state.pOrR === 'request' && <div className={styles.requestList}>
+        </div>
+        </Spin>
+        }
+        {this.state.pOrR === 'request' && <Spin spinning={this.state.loading}><div className={styles.requestList}>
           {this.state.objects.map(e =>
             <Card noHovering={true} key={e._id} bordered={true}>
               <div>
@@ -321,7 +331,7 @@ class MyFavouriteList extends Component {
                 </Row>
               </div>
             </Card>)}
-        </div>}
+        </div></Spin>}
         <div className={styles.pagination}>
           <Pagination showSizeChanger
                       onShowSizeChange={this.onShowSizeChange.bind(this)}
@@ -347,10 +357,14 @@ class MyRequestList extends Component {
       pageNo: 1,
       pageSize: 10,
       type: 'all',
+      loading:true
     }
   }
 
   fetchData({payload}) {
+    this.setState({
+      loading:true
+    })
     if (payload) {
       payload['type'] = this.state.type
     }
@@ -366,7 +380,9 @@ class MyRequestList extends Component {
       payload,
       onJson: ({user_request: requests, total_number: totalNumber}) => {
         this.setState({
-          requests, totalNumber
+          requests,
+          totalNumber,
+          loading:false
         })
       }
     })
@@ -424,6 +440,7 @@ class MyRequestList extends Component {
                   style={{width: 200}}
           />
         </div>
+        <Spin spinning={this.state.loading}>
         <div className={styles.requestList}>
           {this.state.requests.map(e =>
             <Card noHovering={true} key={e._id} bordered={true}>
@@ -476,6 +493,7 @@ class MyRequestList extends Component {
                         total={this.state.totalNumber}/>
           </div>
         </div>
+        </Spin>
       </div>
     )
   }
@@ -491,10 +509,14 @@ class MyAnswerList extends Component {
       pageNo: 1,
       pageSize: 10,
       type: 'all',
+      loading:true
     }
   }
 
   fetchData({payload}) {
+    this.setState({
+      loading: true,
+    })
     if (payload) {
       payload['type'] = this.state.type
     }
@@ -510,7 +532,9 @@ class MyAnswerList extends Component {
       onJson: ({request_answer_info: requests, total_number: totalNumber}) => {
         console.log(requests)
         this.setState({
-          requests, totalNumber
+          requests,
+          totalNumber,
+          loading:false,
         })
       }
     })
@@ -568,6 +592,7 @@ class MyAnswerList extends Component {
                   style={{width: 200}}
           />
         </div>
+        <Spin spinning={this.state.loading}>
         <div className={styles.requestList}>
           {this.state.requests.map(e =>
             <Card noHovering={true} key={e._id} bordered={true}>
@@ -598,6 +623,7 @@ class MyAnswerList extends Component {
                         total={this.state.totalNumber}/>
           </div>
         </div>
+        </Spin>
       </div>
     )
   }

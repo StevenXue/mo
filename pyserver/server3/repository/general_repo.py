@@ -216,6 +216,6 @@ class Repo:
         # Or the Q object with the ones remaining in the list
         for item in q_list:
             query |= item
-        return self.__instance.objects(query)
+        return self.__instance.objects(query).order_by('-_id')
 
 
