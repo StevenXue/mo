@@ -225,6 +225,7 @@ export namespace ToolbarItems {
             // focusNodeSelector: 'input',
             buttons: [Dialog.cancelButton({ label: 'KEEP ORIGINAL' }), Dialog.okButton({ label: 'OPTIMISE' })],
           }).then(result => {
+            const hide = message.loading('converting..', 0);
             request(`pyapi/project/nb_to_script/${match[1]}`, {
               method: 'post',
               headers: {
@@ -236,10 +237,12 @@ export namespace ToolbarItems {
               }),
             }, {
               onSuccess: () => {
+                hide()
                 message.success(`${notebookPath} successfully export to script!`);
               },
               onJson: undefined,
               onError: (err: string) => {
+                  hide()
                   message.error(err);
               },
             });

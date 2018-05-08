@@ -291,7 +291,7 @@ class ProjectBusiness:
     @staticmethod
     def gen_dir(user_ID, name):
         """
-        auth jupyterhub with user token
+        gen_dir for project
         :param user_ID:
         :param project_name:
         :param token:

@@ -80,6 +80,16 @@ def register():
                                            **data)
         added_user = json_utility.convert_to_json(added_user.to_mongo())
         added_user.pop('password')
+
+        # 为新用户创建tutorial project
+        from server3.service.project_service import ProjectService
+        from server3.service.app_service import AppService
+        user_token = create_access_token(identity=added_user["user_ID"])
+        AppService.create_tutorial_project(
+            user_ID=added_user["user_ID"],
+            user_token=user_token
+        )
+
         return jsonify({'response': added_user}), 200
     except Error as e:
         print("e.args[0]", e.args[0])
@@ -145,7 +155,8 @@ def login():
 
         user_obj = json_utility.convert_to_json(user.to_mongo())
         user_obj.pop('password')
-        del user.avatar
+        if hasattr(user, "avatar"):
+            del user.avatar
     except DoesNotExist as e:
         return jsonify({'response': '%s: %s' % (str(
             DoesNotExist), e.args)}), 400

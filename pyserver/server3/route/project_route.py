@@ -61,6 +61,7 @@ def list_projects_by_query():
     privacy = request.args.get('privacy', None)
     default_max_score = float(request.args.get('max_score', 0.4))
     type = request.args.get('type', 'project')
+
     if group == 'my':
         user_ID = get_jwt_identity()
     else:
@@ -88,8 +89,8 @@ def list_projects_by_query():
     else:
         for project in projects.objects:
             project.user_ID = project.user.user_ID
-            if project.user.avatar:
-                project.user_avatar = project.user.avatar
+            # if project.user.avatar:
+            #     project.user_avatar = project.user.avatar
         project_list = json_utility.me_obj_list_to_json_list(projects.objects)
         return jsonify({
             "response": {'projects': project_list, 'count': projects.count}
