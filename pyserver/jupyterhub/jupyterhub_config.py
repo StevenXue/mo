@@ -1220,13 +1220,14 @@ c.Authenticator.admin_users = {'admin'}
 ## The number of threads to allocate for encryption
 # c.CryptKeeper.n_threads = 8
 
-
+import os
+cwd = os.getcwd()
 c.DockerSpawner.image = 'singleuser:latest'
 c.DockerSpawner.remove_containers = True
 c.DockerSpawner.container_ip = '0.0.0.0'
 c.DockerSpawner.volumes = \
     {
-        '/Users/chen/myPoject/gitRepo/goldersgreen/pyserver/user_directory/{user_ID}/{project_name}':
+        os.path.abspath(cwd)+'/user_directory/{user_ID}/{project_name}':
             '/home/jovyan/work',
         # '/Users/zhaofengli/projects/goldersgreen/pyserver/server3/lib/empty_modules': '/home/jovyan/modules',
         # '/Users/zhaofengli/projects/goldersgreen/pyserver/user_directory': '/home/jovyan/dataset'

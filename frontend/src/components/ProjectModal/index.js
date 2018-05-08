@@ -151,7 +151,8 @@ class ProjectModal extends Component {
               {
                 getFieldDecorator('name', {
                   initialValue: name,
-                  getValueFromEvent: (e) => e.target.value.toLowerCase(),
+                  // not allow uppercase and whitespace
+                  getValueFromEvent: (e) => e.target.value.toLowerCase().replace(/\s/g, ""),
                   rules: [
                     {
                       required: true,

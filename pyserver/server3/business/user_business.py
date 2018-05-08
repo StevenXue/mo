@@ -82,7 +82,7 @@ class UserBusiness(GeneralBusiness):
                 objects = ProjectRepo(Project). \
                     search(search_query,
                            q_dict={
-                               'title': 'icontains',
+                               'name': 'icontains',
                                'description': 'icontains',
                                'tags': 'icontains'
                            })

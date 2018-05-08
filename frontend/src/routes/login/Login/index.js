@@ -72,8 +72,6 @@ class Login extends Component {
     const {type} = this.state
     this.props.form.validateFields(['user_ID', 'password'], {},
       (err, values) => {
-        console.log('values', values)
-        console.log('err', err)
         if (!err) {
           this.props.dispatch({
             type: `login/login`,
