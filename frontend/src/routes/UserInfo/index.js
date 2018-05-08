@@ -91,14 +91,14 @@ class EditForm extends React.Component {
 
   handleSubmitEmail = () => {
     let tokenForUpdateInfo = localStorage.getItem('tokenForUpdateInfo')
-    this.props.form.validateFields(['email', 'captcha'], {force: true},
+    this.props.form.validateFields(['email', 'captcha1'], {force: true},
       (err, values) => {
         console.log('values', values)
         if (!err) {
           updateUserAccount({
             body: {
               'email': values.email,
-              'captcha': values.captcha,
+              'captcha': values.captcha1,
               tokenForUpdateInfo
             },
             onJson: (e) => {
@@ -126,14 +126,14 @@ class EditForm extends React.Component {
 
   handleSubmitPhone = () => {
     let tokenForUpdateInfo = localStorage.getItem('tokenForUpdateInfo')
-    this.props.form.validateFields(['phone', 'captcha'], {force: true},
+    this.props.form.validateFields(['phone', 'captcha2'], {force: true},
       (err, values) => {
         if (!err) {
 
           updateUserAccount({
             body: {
               'phone': values.phone,
-              'captcha': values.captcha,
+              'captcha': values.captcha2,
               tokenForUpdateInfo
             },
             onJson: (e) => {
@@ -339,16 +339,16 @@ class EditForm extends React.Component {
                 />
               )}
             </FormItem>
-            <FormItem>
+            <FormItem >
               <Row gutter={16} type="flex" justify="left" align="top">
                 <Col span={5} offset={4}>
-                  {getFieldDecorator('captcha', {
+                  {getFieldDecorator('captcha1', {
                     rules: [{
                       required: true, message: '请输入验证码！',
                     }],
                   })(
-                    <Input
-                      placeholder="验证码"
+                    <Input id={'验证码'}
+                      placeholder=""
                     />
                   )}
                 </Col>
@@ -388,16 +388,16 @@ class EditForm extends React.Component {
                 />
               )}
             </FormItem>
-            <FormItem>
+            <FormItem >
               <Row gutter={16} type="flex" justify="left" align="top">
                 <Col span={5} offset={4}>
-                  {getFieldDecorator('captcha', {
+                  {getFieldDecorator('captcha2', {
                     rules: [{
                       required: true, message: '请输入验证码！',
                     }],
                   })(
-                    <Input
-                      placeholder="验证码"
+                    <Input id={'验证码'}
+                      placeholder=""
                     />
                   )}
                 </Col>
@@ -487,7 +487,7 @@ class EditForm extends React.Component {
                         required: true, message: '请输入验证码！',
                       }],
                     })(
-                      <Input
+                      <Input id={'captcha3'}
                         placeholder="验证码"
                       />
                     )}
@@ -589,8 +589,10 @@ class GenderEditForm extends React.Component {
               <FormItem
                 wrapperCol={{span: 12}}
               >
-                <Button type="primary" htmlType="submit">保存</Button>
+                <div style={{display: 'flex'}}>
+                <Button type="primary" htmlType="submit" style={{marginRight: '10px'}}>保存</Button>
                 <Button onClick={this.cancelEdit}>取消</Button>
+                </div>
               </FormItem>
             </FormItem>
           </Form>
