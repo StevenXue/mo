@@ -1,13 +1,13 @@
-import { login, tokenLogin, loginWithPhone } from '../services/login'
-import { routerRedux } from 'dva/router'
-import { message } from 'antd'
+import {login, tokenLogin, loginWithPhone} from '../services/login'
+import {routerRedux} from 'dva/router'
+import {message} from 'antd'
 import pathToRegexp from 'path-to-regexp'
 import io from 'socket.io-client'
-import { invert } from 'lodash'
+import {invert} from 'lodash'
 
-import { queryURL } from '../utils'
+import {queryURL} from '../utils'
 import * as projectService from '../services/project'
-import { flaskServer, translateDict } from '../constants'
+import {flaskServer, translateDict} from '../constants'
 import * as userRequestService from '../services/userRequest'
 
 let connected = false
@@ -18,14 +18,14 @@ export default {
     loginLoading: false,
   },
   reducers: {
-    changeLoginStatus(state, { payload }) {
+    changeLoginStatus(state, {payload}) {
       return {
         ...state,
         status: payload.status,
         type: payload.type,
       }
     },
-    changeSubmitting(state, { payload }) {
+    changeSubmitting(state, {payload}) {
       return {
         ...state,
         submitting: payload,
@@ -43,13 +43,13 @@ export default {
         loginLoading: false,
       }
     },
-    setUser(state, { payload: user }) {
+    setUser(state, {payload: user}) {
       return {
         ...state,
         user,
       }
     },
-    resetUser(state, { payload: user }) {
+    resetUser(state, {payload: user}) {
       return {
         ...state,
         user: undefined,
@@ -65,9 +65,16 @@ export default {
         },
       }
     },
+    setUserAvatar(state, {userAvatar}) {
+      console.log('userAvatar', userAvatar)
+      return {
+        ...state,
+        userAvatar
+      }
+    }
   },
   effects: {
-    *accountSubmit({ payload }, { call, put }) {
+    * accountSubmit({payload}, {call, put}) {
       yield put({
         type: 'changeSubmitting',
         payload: true,
@@ -82,7 +89,7 @@ export default {
         payload: false,
       })
     },
-    *mobileSubmit(_, { call, put }) {
+    * mobileSubmit(_, {call, put}) {
       yield put({
         type: 'changeSubmitting',
         payload: true,
@@ -97,7 +104,7 @@ export default {
         payload: false,
       })
     },
-    *logout(_, { put }) {
+    * logout(_, {put}) {
       yield put({
         type: 'changeLoginStatus',
         payload: {
@@ -107,12 +114,11 @@ export default {
       yield put(routerRedux.push('/user/login'))
     },
     *login({ payload }, { put, call }) {
-
       yield put({
         type: 'changeSubmitting',
         payload: true,
       })
-      const { data: data, noError } = yield call(login, payload)
+      const {data: data, noError} = yield call(login, payload)
       yield put({
         type: 'changeSubmitting',
         payload: false,
@@ -123,7 +129,11 @@ export default {
         localStorage.setItem('user_ID', data.user.user_ID)
         localStorage.setItem('user_obj_id', data.user._id)
         const from = queryURL('from')
-        yield put({ type: 'setUser', payload: data.user })
+        yield put({type: 'setUser', payload: data.user})
+        yield put({
+          type: 'setUserAvatar',
+          userAvatar: `/pyapi/user/avatar/${data.user.user_ID}.jpeg?${data.user.avatarV}`
+        })
         if (from) {
           yield put(routerRedux.push(from))
         } else {
@@ -134,7 +144,7 @@ export default {
       }
     },
 
-    *loginWithPhone({ payload }, { put, call }) {
+    * loginWithPhone({payload}, {put, call}) {
       yield put({
         type: 'changeSubmitting',
         payload: true,
@@ -146,13 +156,17 @@ export default {
       })
 
       if (response.status === 200) {
-        const { data } = response
+        const {data} = response
         if (data) {
           localStorage.setItem('token', data.token)
           localStorage.setItem('user_ID', data.user.user_ID)
           localStorage.setItem('user_obj_id', data.user._id)
           const from = queryURL('from')
-          yield put({ type: 'setUser', payload: data.user })
+          yield put({type: 'setUser', payload: data.user})
+          yield put({
+            type: 'setUserAvatar',
+            userAvatar: `/pyapi/user/avatar/${data.user.user_ID}.jpeg?${data.user.avatarV}`
+          })
           if (from) {
             yield put(routerRedux.push(from))
           } else {
@@ -167,11 +181,10 @@ export default {
       }
     },
     *query({ payload }, { call, put }) {
-
       try {
-        const { data: data } = yield call(tokenLogin)
+        const {data: data} = yield call(tokenLogin)
         if (!data.user) {
-          if (!(location.href.includes('/user/login') || location.href.includes('/user/forgot') ||location.href.includes('/newpassword') || location.href.includes('/user/register') || location.href.slice(-3) === '/#/')) {
+          if (!(location.href.includes('/user/login') || location.href.includes('/user/forgot') || location.href.includes('/newpassword') || location.href.includes('/user/register') || location.href.slice(-3) === '/#/')) {
             // yield put(routerRedux.push('/user/login'))
             // FIXME reload is a workaround
             window.location.replace('/#/user/login')
@@ -181,6 +194,10 @@ export default {
           yield put({
             type: 'setUser',
             payload: data.user,
+          })
+          yield put({
+            type: 'setUserAvatar',
+            userAvatar: `/pyapi/user/avatar/${data.user.user_ID}.jpeg?${data.user.avatarV}`
           })
           // FIXME regex can't catch whole url
           // const from = queryURL('from')
@@ -202,8 +219,8 @@ export default {
         }
       }
     },
-    *handleSocket({ payload }, { call, put }) {
-      const { msg, pathname } = payload
+    * handleSocket({payload}, {call, put}) {
+      const {msg, pathname} = payload
       const projectIdMsg = msg.project_id
       const jobIdMsg = msg.job_id
       const match = pathToRegexp('/workspace/:projectId*').exec(pathname)
@@ -214,17 +231,17 @@ export default {
           // in project
           yield put({
             type: 'modelling/setMetrics',
-            payload: { msg },
+            payload: {msg},
           })
         }
       }
     },
-    *handleError({ payload }, { call, put }) {
-      const { msg, pathname } = payload
+    * handleError({payload}, {call, put}) {
+      const {msg, pathname} = payload
       const projectIdMsg = msg.project_id
       const jobIdMsg = msg.job_id
       message.error(JSON.stringify(msg))
-      yield put({ type: 'modelling/hideResult' })
+      yield put({type: 'modelling/hideResult'})
       yield put({
         type: invert(translateDict)[msg.type] + '/setStatus', payload: {
           sectionId: jobIdMsg,
@@ -234,8 +251,8 @@ export default {
       console.log(' '.join(msg.error))
       // console.log(msg.error)
     },
-    *handleSuccess({ payload }, { call, put }) {
-      const { msg, pathname } = payload
+    * handleSuccess({payload}, {call, put}) {
+      const {msg, pathname} = payload
       const projectIdMsg = msg.project_id
       const jobIdMsg = msg.job_id
       message.success(msg.content)
@@ -251,30 +268,32 @@ export default {
     },
   },
   subscriptions: {
-    setup({ dispatch, history }) {
-      return history.listen(({ pathname }) => {
+    setup({dispatch, history}) {
+      return history.listen(({pathname}) => {
         console.log('pathname', pathname)
         const match = pathToRegexp('/user/login').exec(pathname)
 
-        if (!match) {dispatch({ type: 'query' })}
+        if (!match) {
+          dispatch({type: 'query'})
+        }
 
         const userId = localStorage.getItem('user_ID')
         if (userId && !connected) {
 
           const socket = io.connect('/log/' + userId, {path: '/socketio/socket.io'})
           socket.on('log_epoch_end', (msg) => {
-            dispatch({ type: 'handleSocket', payload: { msg, pathname } })
+            dispatch({type: 'handleSocket', payload: {msg, pathname}})
           })
           socket.on('error', (msg) => {
-            dispatch({ type: 'handleError', payload: { msg, pathname } })
+            dispatch({type: 'handleError', payload: {msg, pathname}})
           })
           socket.on('success', (msg) => {
-            dispatch({ type: 'handleSuccess', payload: { msg, pathname } })
+            dispatch({type: 'handleSuccess', payload: {msg, pathname}})
           })
 
           socket.on('notification', (msg) => {
             if (msg.message.message_type !== 'deploy') {
-              dispatch({ type: 'message/updateNewMessage', payload: { msg } })
+              dispatch({type: 'message/updateNewMessage', payload: {msg}})
             }
             console.log('msg', msg)
             if (msg.message.message_type === 'deploy' || msg.message.message_type === 'publish') {
@@ -283,7 +302,11 @@ export default {
                 const projectId = match[1]
                 const url = new URL(location.href.replace('/#', ''))
                 const projectType = url.searchParams.get('type') || match[2]
-                dispatch({ type: 'projectDetail/refresh', projectId,  projectType})
+                dispatch({
+                  type: 'projectDetail/refresh',
+                  projectId,
+                  projectType
+                })
               }
             }
           })

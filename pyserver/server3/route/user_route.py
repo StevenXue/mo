@@ -7,6 +7,7 @@ Blueprint for user
 Author: Zhaofeng Li
 Date: 2017.05.22
 """
+import os
 import json
 import requests
 import jwt
@@ -16,6 +17,7 @@ from flask import jsonify
 from flask import make_response
 from flask import redirect
 from flask import request
+from flask import send_from_directory
 from flask_jwt_extended import create_access_token
 from mongoengine import DoesNotExist
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -581,3 +583,28 @@ def update_user_account():
     else:
         return jsonify({'response': 'error'}), 400
     return jsonify({'response': 'ok'}), 200
+
+
+# 用户更改头像
+@user_app.route('/avatar', methods=['POST'])
+@jwt_required
+def update_user_avatar():
+    user_ID = get_jwt_identity()
+    data = request.get_json()
+    base64_str = data.get('dataUrl', None)
+    UserService.update_user_avatar(user_ID, base64_str)
+    return jsonify({'response': 'ok'}), 200
+
+
+@user_app.route('/avatar/<path:filename>', methods=['GET'])
+def download_file(filename):
+    import os.path
+    if os.path.isfile(f'../user_avatar/{filename}'):
+        return send_from_directory('../user_avatar', filename)
+    else:
+        # hash_value = hash(filename)
+        import hashlib
+        hash_value = int(hashlib.md5(filename.encode('utf-8')).hexdigest()[:8], 16)
+        print(f'filename {filename} hash {hash_value}')
+        filename = str(hash_value % 6)+'.png'
+        return send_from_directory('../user_avatar', filename)

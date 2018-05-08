@@ -137,6 +137,8 @@ export class ModulePage extends React.Component {
     }
 
     insertCode() {
+
+
         let dict = {}
         this.state.args.forEach(arg => {
             dict[arg.name] = arg.value || arg.default_value
@@ -154,11 +156,12 @@ export class ModulePage extends React.Component {
             ],
         )
 
-        // NotebookActions.insertMarkdown(this.props.tracker.currentWidget.notebook,
-        //     [
-        //         `result = ${this.state.func}('${this.state.project.user_ID}/${this.state.project.name}/${this.state.version}', conf)`,
-        //     ],
-        // )
+
+        NotebookActions.insertMarkdown(this.props.tracker.currentWidget.notebook,
+            [
+                "this.state.project.overview",
+            ],
+        )
 
 
 

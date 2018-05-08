@@ -22,7 +22,7 @@ class LaunchPage extends React.Component {
     //4.登陆时，localStorage.setItem('launchpage','show')
     //5.关闭组件时， localStorage.setItem('launchpage','hide')
     componentWillUpdate(nextProps){
-        this.props.location.pathname!=nextProps.location.pathname?this.checkWelcome():null
+        this.props.location.pathname!==nextProps.location.pathname?this.checkWelcome():null
     }
      //组件将被卸载
     componentWillUnmount(){
@@ -30,7 +30,7 @@ class LaunchPage extends React.Component {
         this.setState = (state,callback)=>{return}
     }
     checkWelcome = ()=>{
-        if(this.props.location.search.indexOf("app")!=-1&&this.props.location.pathname.indexOf("/workspace/")!=-1){
+        if(this.props.location.search.indexOf("app")!==-1&&this.props.location.pathname.indexOf("/workspace/")!==-1){
 
                 document.getElementById("LaunchPage_Contain").scrollTo(0,0)
         }

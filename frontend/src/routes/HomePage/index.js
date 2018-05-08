@@ -68,53 +68,53 @@ class App extends Component {
     return (
       <div className={styles.App}><img src={banner} alt="" width='100%'/>
         {/* <img src={logo} alt="" style={{ position: 'absolute', left: '10%', top: 16 }}/> */}
-        <div className={styles.homecotain}>
-          <div className={styles.box}>
-            <Menu
-              className={styles.normal}
-              mode='horizontal'
-              theme='dark'
-              selectedKeys={[key]}
-            >
-              <Menu.Item key='logo' className={styles.logoBox}
-              >
-                <Link to={'/'}>
-                  <img src={logo} className={styles.logo}/>
-                </Link>
-              </Menu.Item>
-                {
-                  menuConfig.map(
-                    (e) => {
-                        return (
-                          <Menu.Item key={e.key}>
-                            {/* <Link to={e.Link}> */}
-                            <Link to='/user/login'>
-                              {e.Icon && <Icon type={e.Icon}/>}
-                              <div className={styles.menuStyle}>{e.text}</div>
-                            </Link>
-                          </Menu.Item>)
-                    }
-                  )
-                }
-                {
-                  <Menu.Item key={'docs'}>
-                    <div onClick={() => window.location = '/#/user/login'}>
-                      <div className={styles.menuStyle}>Docs</div>
-                    </div>
-                  </Menu.Item>
-                }
-              </Menu>
-          </div>
-        </div>
-        <div className={styles.login}>
-          <Link to='/user/login'>
-            <span>登录</span>
-          </Link>
-          <i></i>
-          <Link to='/user/register'>
-            <span>注册</span>
-          </Link>
-        </div>
+        {/*<div className={styles.homecotain}>*/}
+          {/*<div className={styles.box}>*/}
+            {/*<Menu*/}
+              {/*className={styles.normal}*/}
+              {/*mode='horizontal'*/}
+              {/*theme='dark'*/}
+              {/*selectedKeys={[key]}*/}
+            {/*>*/}
+              {/*<Menu.Item key='logo' className={styles.logoBox}*/}
+              {/*>*/}
+                {/*<Link to={'/'}>*/}
+                  {/*<img src={logo} className={styles.logo}/>*/}
+                {/*</Link>*/}
+              {/*</Menu.Item>*/}
+                {/*{*/}
+                  {/*menuConfig.map(*/}
+                    {/*(e) => {*/}
+                        {/*return (*/}
+                          {/*<Menu.Item key={e.key}>*/}
+                            {/*/!* <Link to={e.Link}> *!/*/}
+                            {/*<Link to='/user/login'>*/}
+                              {/*{e.Icon && <Icon type={e.Icon}/>}*/}
+                              {/*<div className={styles.menuStyle}>{e.text}</div>*/}
+                            {/*</Link>*/}
+                          {/*</Menu.Item>)*/}
+                    {/*}*/}
+                  {/*)*/}
+                {/*}*/}
+                {/*{*/}
+                  {/*<Menu.Item key={'docs'}>*/}
+                    {/*<div onClick={() => window.location = '/#/user/login'}>*/}
+                      {/*<div className={styles.menuStyle}>Docs</div>*/}
+                    {/*</div>*/}
+                  {/*</Menu.Item>*/}
+                {/*}*/}
+              {/*</Menu>*/}
+          {/*</div>*/}
+        {/*</div>*/}
+        {/*<div className={styles.login}>*/}
+          {/*<Link to='/user/login'>*/}
+            {/*<span>登录</span>*/}
+          {/*</Link>*/}
+          {/*<i></i>*/}
+          {/*<Link to='/user/register'>*/}
+            {/*<span>注册</span>*/}
+          {/*</Link>*/}
+        {/*</div>*/}
         <Row className={styles.Row_R} type="flex">
           <Col span={2}></Col>
           <Col span={8} className={styles.Col_C} style={{ paddingTop: 138, paddingBottom: 128 }}> {/* check */}

@@ -19,7 +19,7 @@ import {
 import ParamsMapper from './ParamsMapper'
 import CopyInput from './CopyInput'
 
-import { addModuleToApp, getProject, getProjects, getApp, getFavs } from './services'
+import { addModuleToApp, getProject, getProjects, getApp, getFavs, getAppActionEntity } from './services'
 
 const Option = Select.Option
 import 'antd/lib/list/style/css'
@@ -46,8 +46,12 @@ export class ListPage extends React.Component {
       totalNumber: 0,
       pageNo: 1,
       pageSize: 5,
+
+      totalUsedNumber: 0,
+
+
+
     }
-    console.log('this.props', this.props)
     this.pageType = this.props.pageType
     this.pageTypeUC = this.pageType.charAt(0).toUpperCase() + this.pageType.slice(1)
     const hash = window.location.hash
@@ -98,6 +102,7 @@ export class ListPage extends React.Component {
     })
 
     if (this.appId) {
+      // 获取本项目
       getApp({
         appId: this.appId,
         prefix: this.pageType,
@@ -105,6 +110,22 @@ export class ListPage extends React.Component {
           app,
         }),
       })
+
+      //获取used modules 或 used datasets
+      getAppActionEntity({
+        appId: this.appId,
+        actionEntity: `used_${this.pageType}s`,
+        onJson: ({ objects, count }) => {
+          console.log("objects", objects)
+          this.setState({
+            usedProjects: objects,
+            totalUsedNumber: count,
+          })
+        }
+
+        ,
+      })
+
     }
   }
 
@@ -126,6 +147,7 @@ export class ListPage extends React.Component {
   }
 
   clickProject(project, func) {
+    console.log('project', project)
     getProject({
       projectId: project._id,
       prefix: this.pageType,
@@ -133,14 +155,14 @@ export class ListPage extends React.Component {
     })
   }
 
-  backToList({ params }) {
+  backToList({ toDetail }) {
     this.setState({
       projectId: undefined,
       project: undefined,
       func: undefined,
       args: undefined,
       [`showUsed${this.pageTypeUC}s`]: undefined,
-      [`showFav${this.pageTypeUC}s`]: params ? this.state[`showFav${this.pageTypeUC}s`] : undefined,
+      [`showFav${this.pageTypeUC}s`]: toDetail ? this.state[`showFav${this.pageTypeUC}s`] : undefined,
     })
   }
 
@@ -153,6 +175,14 @@ export class ListPage extends React.Component {
     this.state.args.forEach(arg => {
       dict[arg.name] = arg.value || arg.default_value
     })
+
+    NotebookActions.insertMarkdown(this.props.tracker.currentWidget.notebook,
+      [
+        `# ${this.state.project.name}/${this.state.version}`,
+        this.state.project.overview,
+      ],
+    )
+
     NotebookActions.insertCode(this.props.tracker.currentWidget.notebook,
       [
         `conf = '${JSON.stringify(dict)}'\n`,
@@ -165,7 +195,9 @@ export class ListPage extends React.Component {
         `result = ${this.state.func}('${this.state.project.user_ID}/${this.state.project.name}/${this.state.version}', conf)`,
       ],
     )
+
     if (this.appId) {
+      const hide = message.loading('Importing..', 0);
       addModuleToApp({
         appId: this.appId,
         moduleId: this.state.projectId,
@@ -180,6 +212,7 @@ export class ListPage extends React.Component {
             args: undefined,
             showUsedModules: true,
           })
+          hide()
           message.success('Import success!')
         },
       })
@@ -232,7 +265,7 @@ export class ListPage extends React.Component {
   renderParams() {
     return (
       <div className='container'>
-        <header style={{ cursor: 'pointer' }} onClick={() => this.backToList({ params: true })}>
+        <header style={{ cursor: 'pointer' }} onClick={() => this.backToList({ toDetail: true })}>
           <Icon type="left"/>{this.state.project.name}
         </header>
         <div>
@@ -292,7 +325,7 @@ export class ListPage extends React.Component {
 
     return (
       <div className='container'>
-        <header style={{ cursor: 'pointer' }} onClick={() => this.backToList({})}>
+        <header style={{ cursor: 'pointer' }} onClick={() => this.backToList({ toDetail: true })}>
           <Icon type="left"/>{this.state.project.name}
         </header>
         <div style={{ height: 'auto', overflowY: 'auto' }}>
@@ -351,41 +384,61 @@ export class ListPage extends React.Component {
         <div className='list'>
           <List
             style={{ margin: '0 10px' }}
-            itemLayout="horizontal"
-            dataSource={this.state.app[`used_${this.pageType}s`]}
-            renderItem={item => (
+            itemLayout="vertical"
+            // dataSource={this.state.app[`used_${this.pageType}s`]}
+            dataSource={this.state.usedProjects}
+            renderItem={project => (
               <List.Item
-                // actions={[<Icon onClick={() => onRemoveModule(item.module, item.version)}
-                //                        type="close"/>]}
+                actions={[<a
+                  onClick={() =>
+                    this.clickProject(project[this.pageType])}>Detail</a>].concat(this.getOtherButtons(project[this.pageType]))}
               >
                 <List.Item.Meta
                   title={
                     <span>
-                                            {item[this.pageType].name}&nbsp;&nbsp;
+                      {project[this.pageType].name}&nbsp;&nbsp;
                       {this.pageType === 'module' &&
-                      <span>v{item.version}</span>}
-                                    </span>}
-                  description={item[this.pageType].description}
+                      <span>v{project.version}</span>}
+                    </span>}
+                  description={project[this.pageType].description}
                 />
               </List.Item>
             )}
+
+            pagination={{
+              onChange: (page) => {
+                getAppActionEntity({
+                  page_no: page,
+                  appId: this.appId,
+                  actionEntity: [`used_${this.pageType}s`],
+                  onJson: ({ objects, count }) => this.setState({
+                    usedProjects: objects,
+                    totalUsedNumber: count,
+                  }),
+                })
+              },
+              pageSize: 5,
+              total: this.state.totalUsedNumber,
+            }}
+
           />
         </div>
       </div>
     )
   }
 
-  renderFavProjects() {
-    const getOtherButtons = (project) => {
-      let otherButtons = []
-      if (project.category === 'model') {
-        otherButtons = [<a onClick={() => this.clickProject(project, 'train')}>Train</a>,
-          <a onClick={() => this.clickProject(project, 'predict')}>Predict</a>]
-      } else if (project.category === 'dataset') {
-        otherButtons = [<a onClick={() => this.clickProject(project, 'run')}>Run</a>]
-      }
-      return otherButtons
+  getOtherButtons = (project) => {
+    let otherButtons = []
+    if (project.category === 'model') {
+      otherButtons = [<a onClick={() => this.clickProject(project, 'train')}>Train</a>,
+        <a onClick={() => this.clickProject(project, 'predict')}>Predict</a>]
+    } else if (project.category === 'dataset') {
+      otherButtons = [<a onClick={() => this.clickProject(project, 'run')}>Run</a>]
     }
+    return otherButtons
+  }
+
+  renderFavProjects() {
 
     return (
       // list
@@ -423,7 +476,7 @@ export class ListPage extends React.Component {
               <List.Item
                 actions={[<a
                   onClick={() =>
-                    this.clickProject(project)}>Detail</a>].concat(getOtherButtons(project))}
+                    this.clickProject(project)}>Detail</a>].concat(this.getOtherButtons(project))}
               >
                 <List.Item.Meta
                   title={<span>{project.name}</span>}

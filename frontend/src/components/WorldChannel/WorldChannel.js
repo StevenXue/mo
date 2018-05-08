@@ -16,12 +16,11 @@ class worldChannelC extends Component {
       }
     })
   }
+
   onClickIcon = () => {
     this.props.dispatch({
       type: 'worldChannel/toggleIsRight',
-      payload: {
-
-      }
+      payload: {}
     })
   }
 
@@ -34,9 +33,10 @@ class worldChannelC extends Component {
     }
     else {
       return <WorldChannel worldMessages={worldMessages}
-                   onClickIcon={this.onClickIcon}
-                   dispatch={dispatch}
-                   isRight={isRight}
+                           onClickIcon={this.onClickIcon}
+                           dispatch={dispatch}
+                           isRight={isRight}
+                           login={login}
 
       />
     }
@@ -58,9 +58,9 @@ class WorldChannel extends Component {
     this.scrollToBottom(false)
   }
 
-  scrollToBottom = (force=true) => {
+  scrollToBottom = (force = true) => {
     const messagesContainer = ReactDOM.findDOMNode(this.scrollView)
-    if(messagesContainer.scrollHeight-messagesContainer.scrollTop <= messagesContainer.clientHeight+50+20 || force){
+    if (messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight + 50 + 20 || force) {
       messagesContainer.scrollTop = messagesContainer.scrollHeight - messagesContainer.clientHeight
     }
 
@@ -91,10 +91,16 @@ class WorldChannel extends Component {
   }
 
   render() {
-    const {worldMessages, onClickIcon, isRight} = this.props
+    const {worldMessages, onClickIcon, isRight, login} = this.props
+    console.log(login)
     return (
       <div className={styles.container}
-           style={{width: isRight ? 300 : 50, display: "flex", flexDirection: "column",position:'fixed'}}
+           style={{
+             width: isRight ? 300 : 50,
+             display: "flex",
+             flexDirection: "column",
+             position: 'fixed'
+           }}
       >
         {
           isRight ?
@@ -125,6 +131,7 @@ class WorldChannel extends Component {
             this.scrollView = el
           }}
           isRight={isRight}
+          login={login}
         />
         {
           isRight &&

@@ -79,6 +79,13 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
       history.push('/user/login')
     }
   }
+
+  const toSignUpPage = () => {
+    if (!login.user) {
+      history.push('/user/register')
+    }
+  }
+
   const logout = () => {
     localStorage.removeItem('token')
     dispatch({ type: 'login/resetUser' })
@@ -186,9 +193,11 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
           className={styles.messageP}>{`${e.user_ID} 为您的答案${e.user_request_title} 发布了${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
     }
   }
-  
-  return <div className={styles.container} style={{display:location.pathname.indexOf('user/')!=-1||location.pathname.indexOf('/newpassword')!=-1?'none':'block'}}>
-    <div className={styles.box} style={{width:1170,margin:'0 auto'}}>
+
+  return <div className={styles.container} style={{display:location.pathname.indexOf('user/')!==-1||location.pathname.indexOf('/newpassword')!==-1?'none':'block',
+    backgroundColor:location.pathname === '/'?'#33333399':'#464E78'}}
+  >
+    <div className={styles.box} style={{width:1170,margin:'0 auto', backgroundColor:location.pathname === '/'?'#464E7800':'#464E78'}}>
 
       <Menu
         className={styles.normal}
@@ -247,11 +256,12 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
           title={
             <div onClick={toLoginPage} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
               {
-                login.user ? <img src={login.user.avatar}
+                login.user ? <img src={`${login.userAvatar}`}
                                   style={{ width: 25, borderRadius: '50%', marginRight: 10 }}/> : null
               }
               <span> {login.user ? login.user.user_ID : 'Login'} </span>
             </div>
+
           }
         >
           {login.user &&
@@ -279,7 +289,17 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
           }
 
         </SubMenu>
-        <SubMenu
+
+        {!login.user &&<SubMenu
+          className={styles.rightButton}
+          title={
+          <div onClick={toSignUpPage} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+            <span>SignUp</span>
+          </div>
+        }>
+        </SubMenu>}
+
+        {login.user &&<SubMenu
           className={styles.messageSubmenu}
           title={
             <span onClick={toLoginPage} style={{ position: 'relative' }}>
@@ -317,6 +337,7 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
           {/*)*/}
           {/*}*/}
         </SubMenu>
+        }
       </Menu>
     </div>
   </div>
