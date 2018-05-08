@@ -402,8 +402,8 @@ class MyRequestList extends Component {
     })
   }
 
-  toUserRequestDetail(id, history) {
-    history.push(`/userrequest/${id}`)
+  toUserRequestDetail(id, type,history) {
+    history.push(`/userrequest/${id}?tab=${type}`)
   }
 
   onShowSizeChange = (current, pageSize) => {
@@ -448,7 +448,7 @@ class MyRequestList extends Component {
                 <Row>
                   <Col span={3}>
                     <div className={styles.starAnswerDiv}
-                         onClick={() => this.toUserRequestDetail(e._id, history)}>
+                         onClick={() => this.toUserRequestDetail(e._id, e.type,history)}>
                       <div className={styles.starDiv}>
                         {e.accept_answer ? <p className={styles.starNumber}>
                           <Icon style={{'color': '#439A46', 'fontSize': '18px'}}
@@ -468,7 +468,7 @@ class MyRequestList extends Component {
                   <Col span={21}>
                     <div className={styles.rightArea}>
                       <p className={styles.title}
-                         onClick={() => this.toUserRequestDetail(e._id, history)}>{e.title}</p>
+                         onClick={() => this.toUserRequestDetail(e._id,e.type, history)}>{e.title}</p>
                       {/*<p className={styles.description}>{e.description}</p>*/}
                       <div className={styles.footer}>
                         <Icon type="tags" className={styles.firstIcon}/>
