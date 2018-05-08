@@ -82,14 +82,14 @@ class UserBusiness(GeneralBusiness):
                 objects = ProjectRepo(Project). \
                     search(search_query,
                            q_dict={
-                               'title': 'icontains',
+                               'name': 'icontains',
                                'description': 'icontains',
                                'tags': 'icontains'
                            })
                 objects = objects.filter(id__in=objectsId)
             else:
                 objects = getattr(user, action_entity)
-            objects.reverse()
+                objects.reverse()
         return Objects(
             objects=objects[start:end],
             count=len(objects),

@@ -114,19 +114,19 @@ def get_project(project_id):
     return make_response(jsonify({'response': project}), 200)
 
 
-@project_app.route('/projects', methods=['GET'])
-def list_projects():
-    user_ID = request.args.get('user_ID')
-    privacy = request.args.get('privacy')
-    others = request.args.get('others')
-    if others == 'true':
-        projects = ownership_service.get_all_public_projects_of_others(user_ID)
-    else:
-        projects = project_service. \
-            list_projects_by_user_ID(user_ID, -1, privacy=privacy)
-    projects = json_utility. \
-        me_obj_list_to_json_list(projects)
-    return jsonify({'response': projects}), 200
+# @project_app.route('/projects', methods=['GET'])
+# def list_projects():
+#     user_ID = request.args.get('user_ID')
+#     privacy = request.args.get('privacy')
+#     others = request.args.get('others')
+#     if others == 'true':
+#         projects = ownership_service.get_all_public_projects_of_others(user_ID)
+#     else:
+#         projects = project_service. \
+#             list_projects_by_user_ID(user_ID, -1, privacy=privacy)
+#     projects = json_utility. \
+#         me_obj_list_to_json_list(projects)
+#     return jsonify({'response': projects}), 200
 
 
 # @project_app.route('/models/<string:user_ID>', methods=['GET'])

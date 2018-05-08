@@ -107,6 +107,7 @@ export default {
       yield put(routerRedux.push('/user/login'))
     },
     *login({ payload }, { put, call }) {
+
       yield put({
         type: 'changeSubmitting',
         payload: true,
@@ -166,6 +167,7 @@ export default {
       }
     },
     *query({ payload }, { call, put }) {
+
       try {
         const { data: data } = yield call(tokenLogin)
         if (!data.user) {

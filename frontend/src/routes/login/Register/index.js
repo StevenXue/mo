@@ -162,7 +162,8 @@ class Register extends Component {
           <FormItem>
             User ID
             {getFieldDecorator('user_ID', {
-              getValueFromEvent: (e) => e.target.value.toLowerCase(),
+              // not allow uppercase and whitespace
+              getValueFromEvent: (e) => e.target.value.toLowerCase().replace(/\s/g, ""),
               rules: [{
                 required: true, message: 'Please enter your ID!',
               }, {
