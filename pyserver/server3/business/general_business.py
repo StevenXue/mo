@@ -53,11 +53,11 @@ class GeneralBusiness:
 
     @classmethod
     def create(cls, obj):
-        cls.repo.create(obj)
+        return cls.repo.create(obj)
 
     @classmethod
     def create_one(cls, **kwargs):
-        cls.repo.create_one(**kwargs)
+        return cls.repo.create_one(**kwargs)
 
     @classmethod
     @check_auth

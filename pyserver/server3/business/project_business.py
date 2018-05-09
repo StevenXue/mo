@@ -420,6 +420,20 @@ class ProjectBusiness:
         return project
 
     @classmethod
+    def get_by_identity(cls, identity):
+        """
+        Get a project object by its identity
+
+        :param identity: string
+        :return: a matched Project object
+        """
+        [user_ID, project_name] = identity.split('+')
+        user = UserBusiness.get_by_user_ID(user_ID)
+        project = cls.repo.read_unique_one(dict(name=project_name, user=user))
+        cls.project = project
+        return project
+
+    @classmethod
     def remove_project_by_id(cls, project_id, user_ID):
         """
         remove project by its object_id
