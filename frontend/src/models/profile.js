@@ -61,20 +61,20 @@ export default {
       }
     },
 
-    * twoStepVFC({ payload }, { put, call }) {
-      const response = yield call(twoStepVFC, payload)
-      if (response.status === 200) {
-        const { data } = response
-        if (data) {
-          localStorage.setItem('tokenForUpdateInfo', data.tokenForUpdateInfo)
-        } else {
-          throw data
-        }
-      } else {
-        let errorMessage = response.data.error.message
-        message.error(errorMessage)
-      }
-    },
+    // * twoStepVFC({ payload }, { put, call }) {
+    //   const response = yield call(twoStepVFC, payload)
+    //   console.log('response',response)
+    //   if (response.status === 200) {
+    //     const { data } = response
+    //     if (data) {
+    //       localStorage.setItem('tokenForUpdateInfo', data.tokenForUpdateInfo)
+    //     } else {
+    //       throw data
+    //     }
+    //   } else {
+    //     console.log('eeeee')
+    //   }
+    // },
   },
   subscriptions: {
     setup({ dispatch, history }) {
@@ -82,12 +82,13 @@ export default {
         const match = pathToRegexp('/profile/:userId').exec(pathname)
         const match2 = pathToRegexp('/setting/profile/:userId').exec(pathname)
         if (match2) {
-          console.log(match2)
+          console.log('match2')
           dispatch({
             type: 'fetchUserInfo',
             payload: {user_ID: match2[1]}
           })}
         if (match) {
+          console.log('match1')
           dispatch({
             type: 'fetchUserInfo',
             payload: {user_ID: match[1]}
