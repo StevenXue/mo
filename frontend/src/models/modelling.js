@@ -18,7 +18,7 @@ const checker = (value, arr) =>
 const extFilter = {
   app: ['moduledeploy-extension'],
   module: ['appdeploy-extension'],
-  dataset: ['moduledeploy-extension', 'datasets-extension', 'appdeploy-extension'],
+  dataset: ['moduledeploy-extension', 'appdeploy-extension'],
 }
 
 // Load the core theming before any other package.
@@ -162,7 +162,7 @@ const modelling = {
       const hubToken = project.hub_token
       yield call(startLabBack, { payload: { hubUserName, hubToken } }, { call })
       yield call(insertLabConfig, { payload: { hubUserName, hubToken } }, { call })
-      document.body = document.createElement('body')
+      // document.body = document.createElement('body')
       yield call(loadnStartJL, projectType)
     },
   },

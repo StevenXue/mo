@@ -3,6 +3,8 @@ import { Card, Button, Row, Col, Input, Icon, Pagination, Select, message, List,
 import * as pathToRegexp from 'path-to-regexp'
 import ReactMde from 'react-mde'
 // const {ReactMdeTypes, ReactMdeCommands} = ReactMde
+import Floater from 'react-floater';
+import Joyride from 'react-joyride';
 
 import {
   VDomRenderer,
@@ -49,6 +51,8 @@ export class ListPage extends React.Component {
 
       totalUsedNumber: 0,
 
+      tooltip: false,
+      steps: []
 
 
     }
@@ -64,7 +68,35 @@ export class ListPage extends React.Component {
   }
 
   componentDidMount() {
+    let event = new Event('trigger_tooltip');
+    window.dispatchEvent(event);
+
+
     this.fetchData({})
+    this.setState({
+      steps: [{
+        text: '进入项目开发环境',
+        selector: '.p-TabBar-tab.p-mod-current',
+        position: 'right',
+        // isFixed:true,
+        style: {
+          borderRadius: 0,
+          color: '#34BFE2',
+          textAlign: 'center',
+          width: '24rem',
+          mainColor: '#ffffff',
+          backgroundColor: '#ffffff',
+          zIndex: 2147483647,
+          beacon: {
+            inner: '#0ae713 ',
+            outer: '#77Eb7c',
+          },
+          close: {
+            display: 'none',
+          },
+        },
+      }]
+    })
   }
 
   fetchData({ payload = {} }) {
@@ -500,6 +532,16 @@ export class ListPage extends React.Component {
                                className='history-btn'
                                onClick={() => this.setState({ [`showUsed${this.pageTypeUC}s`]: true })}/>}
           <div className='fav-btn' onClick={() => this.setState({ [`showFav${this.pageTypeUC}s`]: true })}/>
+
+
+          <div className='fav-btn' onClick={() => {
+            if(this.state.tooltip){
+              this.joyride1.reset()
+              // this.joyride2.reset()
+            }
+            this.setState({ tooltip: !this.state.tooltip })
+          }}/>
+
         </header>
         <Search
           placeholder="input search text"
@@ -529,7 +571,64 @@ export class ListPage extends React.Component {
     )
   }
 
+  // render() {
+  //   if (this.state.projectId !== undefined) {
+  //     if (this.state.func) {
+  //       // params
+  //       return this.renderParams()
+  //     } else {
+  //       // overview
+  //       return this.renderOverview()
+  //     }
+  //   } else if (this.state[`showFav${this.pageTypeUC}s`]) {
+  //     return this.renderFavProjects()
+  //   } else if (this.state[`showUsed${this.pageTypeUC}s`] && this.state.app) {
+  //     return this.renderUsedProjects()
+  //   } else {
+  //     return this.renderPublicList()
+  //   }
+  // }
+
+
   render() {
+    return <div>
+      {/*<Floater content="This is the Floater content">*/}
+        {/*<span>click me</span>*/}
+      {/*</Floater>*/}
+
+      {
+        this.renderInner()
+      }
+      {/*<div style={{position: 'absolute', top: 0, left: -500}}>*/}
+      {/*<Joyride*/}
+        {/*ref={c => (this.joyride1 = c)}*/}
+        {/*debug={false}*/}
+        {/*run={true}*/}
+        {/*steps={this.state.steps}*/}
+        {/*autoStart*/}
+        {/*tooltipOffset={10}*/}
+        {/*showOverlay={false}*/}
+        {/*locale={{*/}
+          {/*close: null,*/}
+        {/*}}*/}
+      {/*/>*/}
+      {/*</div>*/}
+      {/*<Floater*/}
+        {/*content="This is arrow"*/}
+        {/*open={this.state.tooltip}*/}
+        {/*target=".history-btn"*/}
+        {/*// placement='bottom'*/}
+        {/*// component={<div>This is arrow</div>}*/}
+        {/*wrapperOptions={{*/}
+          {/*// offset: -22,*/}
+          {/*placement: 'bottom',*/}
+          {/*// position: true,*/}
+        {/*}}*/}
+      {/*/>*/}
+    </div>
+  }
+
+  renderInner (){
     if (this.state.projectId !== undefined) {
       if (this.state.func) {
         // params

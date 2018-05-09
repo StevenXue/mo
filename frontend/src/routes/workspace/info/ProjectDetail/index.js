@@ -407,7 +407,7 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
                   locale={{
                     back: (<span style={{ color: '#34BFE2' }}>Back</span>),
                     close: (<span style={{ color: '#34BFE2' }}>Close</span>),
-                    last: (<span style={{ color: '#34BFE2' }} onClick={this.noLearning}>Last</span>),
+                    last: (<span style={{ color: '#34BFE2' }} onClick={this.noLearning}>Finish</span>),
                     next: (<span style={{ color: '#34BFE2' }}>Next</span>),
                     skip: (<span style={{ color: '#999999' }} onClick={this.noLearning}>Skip</span>),
                   }}

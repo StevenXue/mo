@@ -23,11 +23,15 @@ import LaunchPage from './LaunchPage'
 
 import zh_CN from '../../intl/zh_CN'
 import en_US from '../../intl/en_US'
+import pathToRegexp from 'path-to-regexp/index'
 
 const NO_CHAT_PATHS = ['/', '/launchpage', '/user/login', '/user/register', '/user/newpassword'
   ,'/user/forgot', '/newpassword']
 
 function MainLayout({ children, location, history, isRight, onClickIcon }) {
+
+  const match = pathToRegexp('/workspace/:projectId/:type').exec(location)
+
   return (
     <Layout style={{
       height: '100%',
@@ -35,7 +39,7 @@ function MainLayout({ children, location, history, isRight, onClickIcon }) {
       backgroundColor: location.pathname !== '/' || location.pathname.indexOf('/user') !== -1 ? '#F5F5F5' : 'transparent',
     }}>
       {/*{location.pathname !== '/' && <Header location={location} history={history}/>}*/}
-      <Header location={location} history={history}/>
+      {match&&<Header location={location} history={history}/>}
       <Content style={{ height: '100%', overflowY: 'auto', marginTop: location.pathname !== '/' ? 45 : 0 }}
                id="LaunchPage_Contain">
         {/* <LaunchPage location={location}/> */}
