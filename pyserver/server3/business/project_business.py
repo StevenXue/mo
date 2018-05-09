@@ -566,11 +566,12 @@ class ProjectBusiness:
                         r"# Please use current \(work\) folder to store your data "
                         r"and models",
                         r'', line.rstrip())
-                    line = re.sub(r"sys.path.append\('\.\./'\)", r'',
+                    line = re.sub(r"""sys.path.append\('(.+)'\)""", r'',
                                   line.rstrip())
-                    line = re.sub(r"""client = Client\('(.+)'\)""",
-                                  r"""client = Client('\1', silent=True)""",
+                    line = re.sub(r"""(\s+)project_type='(.+)', source_file_path='(.+)'\)""",
+                                  r"""\1project_type='\2', source_file_path='\3', silent=True)""",
                                   line.rstrip())
+
                     line = re.sub(r"""from modules import (.+)""",
                                   r"""from function.modules import \1""",
                                   line.rstrip())
