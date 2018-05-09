@@ -527,14 +527,16 @@ class ProjectService:
 
     @classmethod
     def send_message(cls, project, m_type='publish'):
-        receivers = project.favor_users  # get app subscriber
-        admin_user = UserBusiness.get_by_user_ID('admin')
 
-        if m_type == 'deploy':
+        if m_type in ['deploy', 'deploy_fail', 'publish_fail']:
             logger_service.emit_anything_notification(
-                {'message': {'message_type': m_type}},
+                {'message': {'message_type': m_type,
+                             'project_type': project.type,
+                             'project_name': project.name}},
                 project.user)
             return
+        receivers = project.favor_users  # get app subscriber
+        admin_user = UserBusiness.get_by_user_ID('admin')
 
         # 获取所有包含此module的答案
         answers_has_module = RequestAnswerBusiness. \

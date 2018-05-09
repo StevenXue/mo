@@ -1,6 +1,6 @@
 import {login, tokenLogin, loginWithPhone} from '../services/login'
 import {routerRedux} from 'dva/router'
-import {message} from 'antd'
+import {message, notification,Icon} from 'antd'
 import pathToRegexp from 'path-to-regexp'
 import io from 'socket.io-client'
 import {invert} from 'lodash'
@@ -11,6 +11,45 @@ import {flaskServer, translateDict} from '../constants'
 import * as userRequestService from '../services/userRequest'
 
 let connected = false
+
+function deploySuccNoti(messageType,projectType,projectName ) {
+  let args = {}
+
+  if (messageType === 'deploy') {
+    args = {
+      message: '部署成功！',
+      description: `恭喜，您的${projectType} ${projectName} 已经部署成功.`,
+      duration: 5,
+      icon: <Icon type="smile-circle" style={{ color: '#108ee9' }} />,
+    }
+  }
+  else if (messageType === 'publish'){
+    args = {
+      message: '发布成功！',
+      description: `恭喜，您的${projectType} ${projectName} 已经发布成功.`,
+      duration: 5,
+      icon: <Icon type="smile-circle" style={{ color: '#108ee9' }} />,
+    }
+  }
+  else if (messageType === 'deploy_fail'){
+    args = {
+      message: '部署未能成功...',
+      description: `Oops，您的${projectType} ${projectName} 未能部署成功。请检查您的代码`,
+      duration: 0,
+      icon: <Icon type="frown-circle" style={{ color: 'red' }} />,
+    }
+  }
+  else if (messageType === 'publish_fail'){
+    args = {
+      message: '发布未能成功...',
+      description: `Oops，您的${projectType} ${projectName} 未能发布成功。请检查您的代码`,
+      duration: 0,
+      icon: <Icon type="smile-circle" style={{ color: 'red' }} />,
+    }
+  }
+  notification.open(args)
+}
+
 
 export default {
   namespace: 'login',
@@ -71,7 +110,8 @@ export default {
         ...state,
         userAvatar
       }
-    }
+    },
+
   },
   effects: {
     * accountSubmit({payload}, {call, put}) {
@@ -113,7 +153,7 @@ export default {
       })
       yield put(routerRedux.push('/user/login'))
     },
-    *login({ payload }, { put, call }) {
+    * login({payload}, {put, call}) {
       yield put({
         type: 'changeSubmitting',
         payload: true,
@@ -180,7 +220,7 @@ export default {
         message.error(errorMessage)
       }
     },
-    *query({ payload }, { call, put }) {
+    * query({payload}, {call, put}) {
       try {
         const {data: data} = yield call(tokenLogin)
         if (!data.user) {
@@ -296,7 +336,11 @@ export default {
               dispatch({type: 'message/updateNewMessage', payload: {msg}})
             }
             console.log('msg', msg)
-            if (msg.message.message_type === 'deploy' || msg.message.message_type === 'publish') {
+            if (msg.message.message_type === 'deploy' || msg.message.message_type === 'publish' ||
+              msg.message.message_type === 'deploy_fail' || msg.message.message_type === 'publish_fail') {
+              if (msg.message.user_ID ===userId) {
+                deploySuccNoti(msg.message.message_type,msg.message.project_type, msg.message.project_name)
+              }
               const match = pathToRegexp('/workspace/:projectId/:type?').exec(pathname)
               if (match) {
                 const projectId = match[1]

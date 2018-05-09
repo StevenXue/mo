@@ -43,10 +43,12 @@ class CommentForm extends React.Component {
         _id: this.props._id,
       },
     })
-    this.props.dispatch({
-      type: 'allRequest/showRequestCommentInput',
-      payload: {},
-    })
+    if (this.props.comments_type === 'request') {
+      showRequestCommentInput(this.props.dispatch)
+    }
+    else{
+      showAnswerCommentInput(this.props.dispatch, this.props._id)
+    }
   }
 
   handleSubmit = (e) => {
@@ -287,7 +289,6 @@ function callback(key) {
 }
 
 function showAnswerCommentInput(dispatch, request_answer_id) {
-  console.log('2', request_answer_id)
   dispatch({
     type: 'allRequest/showAnswerCommentInput',
     payload: {
@@ -306,8 +307,9 @@ function showRequestCommentInput(dispatch) {
 function UserRequestDetail({allRequest, login, dispatch}) {
   const {
     focusUserRequest,
+    focusUserRequestLoading
   } = allRequest
-
+  console.log('focusUserRequestLoading',focusUserRequestLoading)
   function requestVotesUp() {
     dispatch({
       type: 'allRequest/votesUpRequest',
@@ -428,6 +430,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
       = login.user
     return (
       <div className={`main-container ${styles.normal}`}>
+        <Spin spinning={focusUserRequestLoading}>
         <div>
           {/*<Button icon="caret-up"*/}
           {/*onClick={() => requestVotesUp()}*/}
@@ -623,6 +626,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
           </h2>
           <AnswerForm dispatch={dispatch} type={focusUserRequest.type}/>
         </div>
+        </Spin>
       </div>
     )
   }

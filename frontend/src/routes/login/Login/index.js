@@ -245,11 +245,8 @@ class Login extends Component {
                   Login
                 </Button>
               </FormItem>
-
             </Form>
           </TabPane>
-
-
         </Tabs>
       </div>
     )
