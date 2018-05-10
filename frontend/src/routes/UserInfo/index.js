@@ -14,13 +14,14 @@ import {
   Modal,
   Upload,
   message,
-  Slider
+  Slider,
+  Spin,
 } from 'antd'
 
 
 import styles from './index.less'
 import {showTime} from "../../utils"
-import {updateUserInfo, updateUserAccount,updateUserAvatar } from "../../services/user"
+import {updateUserInfo, updateUserAccount,updateUserAvatar ,twoStepVFC} from "../../services/user"
 import {routerRedux} from "dva/router"
 import AvatarEditor from 'react-avatar-editor'
 
@@ -45,7 +46,8 @@ class EditForm extends React.Component {
       // 手机号 或 邮箱地址
       checkValue: '',
       editEmail: false,
-      editContent: ''
+      editContent: '',
+      loading:false
     }
   }
 
@@ -91,14 +93,14 @@ class EditForm extends React.Component {
 
   handleSubmitEmail = () => {
     let tokenForUpdateInfo = localStorage.getItem('tokenForUpdateInfo')
-    this.props.form.validateFields(['email', 'captcha'], {force: true},
+    this.props.form.validateFields(['email', 'captcha1'], {force: true},
       (err, values) => {
         console.log('values', values)
         if (!err) {
           updateUserAccount({
             body: {
               'email': values.email,
-              'captcha': values.captcha,
+              'captcha': values.captcha1,
               tokenForUpdateInfo
             },
             onJson: (e) => {
@@ -126,14 +128,14 @@ class EditForm extends React.Component {
 
   handleSubmitPhone = () => {
     let tokenForUpdateInfo = localStorage.getItem('tokenForUpdateInfo')
-    this.props.form.validateFields(['phone', 'captcha'], {force: true},
+    this.props.form.validateFields(['phone', 'captcha2'], {force: true},
       (err, values) => {
         if (!err) {
 
           updateUserAccount({
             body: {
               'phone': values.phone,
-              'captcha': values.captcha,
+              'captcha': values.captcha2,
               tokenForUpdateInfo
             },
             onJson: (e) => {
@@ -212,17 +214,9 @@ class EditForm extends React.Component {
         payload
       })
     }
-    // // 向后端请求验证码
-    // this.props.dispatch({
-    //   type: "register/sendVerificationCode",
-    //   payload: {
-    //     phone: this.props.phone
-    //   }
-    // })
     let count = 59
     this.setState({count})
     this.interval = setInterval(() => {
-      console.log(this.state.count)
       count -= 1
       this.setState({count})
       if (count === 0) {
@@ -235,20 +229,46 @@ class EditForm extends React.Component {
   checkAuth = (e) => {
     this.props.form.validateFields(['captcha'], {force: true},
       (err, values) => {
-        console.log('values', values)
         if (!err) {
-          this.props.dispatch({
-            type: `profile/twoStepVFC`,
+          this.setState({loading:true})
+          twoStepVFC({
             payload: {
               checkType: this.state.checkType,
               checkValue: this.state.checkValue,
               code: values.captcha,
             },
+            onSuccess: async (res) => {
+              this.setState({loading:false})
+              const resj = await res.json()
+              if(res.ok){
+                message.success('验证成功')
+                const { tokenForUpdateInfo } = resj.response
+                localStorage.setItem('tokenForUpdateInfo', tokenForUpdateInfo)
+                this.setState({
+                  modalVisible: false,
+                  editContent: this.state.toEditContent,
+                  count:0
+                })
+                clearInterval(this.interval)
+              }
+              else{
+                message.error(resj.response)
+                }
+            }
           })
-          this.setState({
-            modalVisible: false,
-            editContent: this.state.toEditContent
-          })
+
+          // this.props.dispatch({
+          //   type: `profile/twoStepVFC`,
+          //   payload: {
+          //     checkType: this.state.checkType,
+          //     checkValue: this.state.checkValue,
+          //     code: values.captcha,
+          //   },
+          // })
+          // this.setState({
+          //   modalVisible: false,
+          //   editContent: this.state.toEditContent
+          // })
         }
       },
     )
@@ -339,16 +359,16 @@ class EditForm extends React.Component {
                 />
               )}
             </FormItem>
-            <FormItem>
+            <FormItem >
               <Row gutter={16} type="flex" justify="left" align="top">
                 <Col span={5} offset={4}>
-                  {getFieldDecorator('captcha', {
+                  {getFieldDecorator('captcha1', {
                     rules: [{
                       required: true, message: '请输入验证码！',
                     }],
                   })(
-                    <Input
-                      placeholder="验证码"
+                    <Input id={'验证码'}
+                      placeholder=""
                     />
                   )}
                 </Col>
@@ -388,16 +408,16 @@ class EditForm extends React.Component {
                 />
               )}
             </FormItem>
-            <FormItem>
+            <FormItem >
               <Row gutter={16} type="flex" justify="left" align="top">
                 <Col span={5} offset={4}>
-                  {getFieldDecorator('captcha', {
+                  {getFieldDecorator('captcha2', {
                     rules: [{
                       required: true, message: '请输入验证码！',
                     }],
                   })(
-                    <Input
-                      placeholder="验证码"
+                    <Input id={'验证码'}
+                      placeholder=""
                     />
                   )}
                 </Col>
@@ -466,6 +486,7 @@ class EditForm extends React.Component {
           onCancel={this.cancelEdit}
           onOk={this.checkAuth}
         >
+          <Spin spinning={this.state.loading}>
           <div>
             <Select
               value={this.state.checkType}
@@ -487,7 +508,7 @@ class EditForm extends React.Component {
                         required: true, message: '请输入验证码！',
                       }],
                     })(
-                      <Input
+                      <Input id={'captcha3'}
                         placeholder="验证码"
                       />
                     )}
@@ -505,7 +526,9 @@ class EditForm extends React.Component {
               </FormItem>
             </Form>
           </div>
+          </Spin>
         </Modal>
+
       </div>
     )
   }
@@ -589,8 +612,10 @@ class GenderEditForm extends React.Component {
               <FormItem
                 wrapperCol={{span: 12}}
               >
-                <Button type="primary" htmlType="submit">保存</Button>
+                <div style={{display: 'flex'}}>
+                <Button type="primary" htmlType="submit" style={{marginRight: '10px'}}>保存</Button>
                 <Button onClick={this.cancelEdit}>取消</Button>
+                </div>
               </FormItem>
             </FormItem>
           </Form>

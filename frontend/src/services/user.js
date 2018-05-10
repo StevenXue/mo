@@ -85,14 +85,16 @@ export function updateUserAccount({ body, onError, onJson }) {
 
 
 
-export function twoStepVFC(payload) {
+export function twoStepVFC({payload,onSuccess}) {
   return request(CORS + "/user/two_step_vfc", {
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(payload),
-  })
+    customErrorMsg: true,
+    noErrorMsg: true,
+  },{onSuccess})
 }
 
 export function sendCaptchaToEmail(payload) {

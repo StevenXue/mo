@@ -121,17 +121,31 @@ class AppService(ProjectService):
 
     @classmethod
     def publish(cls, project_id, commit_msg, handler_file_path, version):
-        module = cls.business.deploy_or_publish(project_id, commit_msg,
-                                                handler_file_path, version)
-        cls.send_message(module, m_type='publish')
-        return module
+        try:
+            app = cls.business.deploy_or_publish(project_id, commit_msg,
+                                                    handler_file_path, version)
+            cls.send_message(app, m_type='publish')
+        except:
+            app = cls.business.get_by_id(project_id)
+            app.status = 'inactive'
+            app.save()
+            cls.send_message(app, m_type='publish_fail')
+        else:
+            return app
 
     @classmethod
     def deploy(cls, project_id, commit_msg, handler_file_path):
-        module = cls.business.deploy_or_publish(project_id, commit_msg,
-                                                handler_file_path)
-        cls.send_message(module, m_type='deploy')
-        return module
+        try:
+            app = cls.business.deploy_or_publish(project_id, commit_msg,
+                                                    handler_file_path)
+            cls.send_message(app, m_type='deploy')
+        except:
+            app = cls.business.get_by_id(project_id)
+            app.status = 'inactive'
+            app.save()
+            cls.send_message(app, m_type='deploy_fail')
+        else:
+            return app
 
     @classmethod
     def get_action_entity(cls, app_id, **kwargs):
