@@ -104,11 +104,6 @@ const insertConfigData = (html) => {
   document.head.insertBefore(JCD, document.head.children[3])
 }
 
-const onSuccess = async (res) => {
-  const html = await res.text()
-  insertConfigData(html)
-}
-
 export function *startLabFront({ payload: { projectType } }, { call }) {
   // load lab frontend
   let labContainer = document.getElementById('mo-jlContainer')
@@ -131,11 +126,24 @@ export function *startLabFront({ payload: { projectType } }, { call }) {
 }
 
 export function *startLabBack({ payload: { hubUserName, hubToken } }, { call }) {
+  const onSuccess = async (res) => {
+    function timeout(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms))
+    }
+
+    timeout(5000)
+  }
+
   // auth hub fake user and start lab backend
-  yield call(startLab, { hubUserName, hubToken })
+  yield call(startLab, { hubUserName, hubToken, onSuccess })
 }
 
 export function *insertLabConfig({ payload: { hubUserName, hubToken } }, { call }) {
+  const onSuccess = async (res) => {
+    const html = await res.text()
+    insertConfigData(html)
+  }
+
   // insert lab config from hub
   const configDataNode = document.getElementById('jupyter-config-data')
   if (configDataNode !== null) {
@@ -147,8 +155,7 @@ export function *insertLabConfig({ payload: { hubUserName, hubToken } }, { call 
 const modelling = {
   namespace: 'modelling',
   state: {},
-  reducers: {
-  },
+  reducers: {},
   effects: {
     *startLabBnF({ projectId, projectType }, { call, put, select }) {
       let project = yield select(state => state.projectDetail['project'])
@@ -162,7 +169,7 @@ const modelling = {
       const hubToken = project.hub_token
       yield call(startLabBack, { payload: { hubUserName, hubToken } }, { call })
       yield call(insertLabConfig, { payload: { hubUserName, hubToken } }, { call })
-      document.body = document.createElement('body')
+      // document.body = document.createElement('body')
       yield call(loadnStartJL, projectType)
     },
   },
