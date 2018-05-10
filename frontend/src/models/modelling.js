@@ -130,8 +130,7 @@ export function *startLabBack({ payload: { hubUserName, hubToken } }, { call }) 
     function timeout(ms) {
       return new Promise(resolve => setTimeout(resolve, ms))
     }
-
-    timeout(5000)
+    await timeout(5000)
   }
 
   // auth hub fake user and start lab backend

@@ -10,7 +10,7 @@ function JupyterLab() {
 
   return (
     <div className={styles.container} id='mo-jlContainer'>
-      <Spin tip="JupyterLab Starting..." size='large'>
+      <Spin tip="JupyterLab Loading..." size='large'>
 
       </Spin>
     </div>

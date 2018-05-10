@@ -24,14 +24,14 @@ export function openNotebook(payload) {
 }
 
 export function startLab(payload) {
-  const { hubUserName, hubToken } = payload
+  const { hubUserName, hubToken, onSuccess } = payload
   return request(`${hubPrefix}/hub/api/users/${hubUserName}/server`, {
     method: 'post',
     headers: {
       'Authorization': `token ${hubToken}`,
     },
     noErrorMsg: true
-  })
+  }, { onSuccess })
 }
 
 export function deleteLab(payload) {
