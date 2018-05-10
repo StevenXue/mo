@@ -26,58 +26,58 @@ class worldChannelC extends Component {
       },
     })
 
-    window.addEventListener('trigger_tooltip', () => {
-      console.log('触发了')
-      setTimeout(() => {
-        this.setState({ run: true })
-        this.setState({
-          steps: [{
-            text: '进入项目开发环境',
-            selector: '.jp-PythonIcon',
-            position: 'bottom-left',
-            // isFixed:true,
-            style: {
-              borderRadius: 0,
-              color: '#34BFE2',
-              textAlign: 'center',
-              width: '12rem',
-              height: "60px",
-              mainColor: '#ffffff',
-              backgroundColor: '#ffffff',
-              beacon: {
-                inner: '#0ae713 ',
-                outer: '#77Eb7c',
-              },
-              close: {
-                display: 'none',
-              },
-            },
-          }],
-          steps2: [{
-            text: '状态',
-            selector: '.jp-CircleIcon',
-            position: 'bottom-left',
-            // isFixed:true,
-            style: {
-              borderRadius: 0,
-              color: '#34BFE2',
-              textAlign: 'center',
-              width: '12rem',
-              height: "60px",
-              mainColor: '#ffffff',
-              backgroundColor: '#ffffff',
-              beacon: {
-                inner: '#0ae713 ',
-                outer: '#77Eb7c',
-              },
-              close: {
-                display: 'none',
-              },
-            },
-          }],
-        })
-      }, 1000)
-    }, false)
+    // window.addEventListener('trigger_tooltip', () => {
+    //   console.log('触发了')
+    //   setTimeout(() => {
+    //     this.setState({ run: true })
+    //     this.setState({
+    //       steps: [{
+    //         text: '进入项目开发环境',
+    //         selector: '.jp-PythonIcon',
+    //         position: 'bottom-left',
+    //         // isFixed:true,
+    //         style: {
+    //           borderRadius: 0,
+    //           color: '#34BFE2',
+    //           textAlign: 'center',
+    //           width: '12rem',
+    //           height: "60px",
+    //           mainColor: '#ffffff',
+    //           backgroundColor: '#ffffff',
+    //           beacon: {
+    //             inner: '#0ae713 ',
+    //             outer: '#77Eb7c',
+    //           },
+    //           close: {
+    //             display: 'none',
+    //           },
+    //         },
+    //       }],
+    //       steps2: [{
+    //         text: '状态',
+    //         selector: '.jp-CircleIcon',
+    //         position: 'bottom-left',
+    //         // isFixed:true,
+    //         style: {
+    //           borderRadius: 0,
+    //           color: '#34BFE2',
+    //           textAlign: 'center',
+    //           width: '12rem',
+    //           height: "60px",
+    //           mainColor: '#ffffff',
+    //           backgroundColor: '#ffffff',
+    //           beacon: {
+    //             inner: '#0ae713 ',
+    //             outer: '#77Eb7c',
+    //           },
+    //           close: {
+    //             display: 'none',
+    //           },
+    //         },
+    //       }],
+    //     })
+    //   }, 1000)
+    // }, false)
 
   }
 
@@ -106,31 +106,31 @@ class worldChannelC extends Component {
 
       return (
         <div>
-          <Joyride
-            ref={c => (this.joyride1 = c)}
-            debug={false}
-            run={true}
-            steps={this.state.steps}
-            autoStart
-            tooltipOffset={10}
-            showOverlay={false}
-            locale={{
-              close: null,
-            }}
-          />
+          {/*<Joyride*/}
+            {/*ref={c => (this.joyride1 = c)}*/}
+            {/*debug={false}*/}
+            {/*run={true}*/}
+            {/*steps={this.state.steps}*/}
+            {/*autoStart*/}
+            {/*tooltipOffset={10}*/}
+            {/*showOverlay={false}*/}
+            {/*locale={{*/}
+              {/*close: null,*/}
+            {/*}}*/}
+          {/*/>*/}
 
-          <Joyride
-            ref={c => (this.joyride1 = c)}
-            debug={false}
-            run={true}
-            steps={this.state.steps2}
-            autoStart
-            tooltipOffset={10}
-            showOverlay={false}
-            locale={{
-              close: null,
-            }}
-          />
+          {/*<Joyride*/}
+            {/*ref={c => (this.joyride1 = c)}*/}
+            {/*debug={false}*/}
+            {/*run={true}*/}
+            {/*steps={this.state.steps2}*/}
+            {/*autoStart*/}
+            {/*tooltipOffset={10}*/}
+            {/*showOverlay={false}*/}
+            {/*locale={{*/}
+              {/*close: null,*/}
+            {/*}}*/}
+          {/*/>*/}
 
 
 

@@ -352,7 +352,8 @@ class ProjectBusiness:
 
     @classmethod
     def create_project(cls, name, description, user, privacy='private',
-                       tags=None, user_token='', type='app', **kwargs):
+                       tags=None, user_token='', type='app',
+                       create_tutorial=False, **kwargs):
         """
         Create a new project
 
@@ -363,6 +364,7 @@ class ProjectBusiness:
         :param type: string (app/module/dataset)
         :param tags: list of string
         :param user_token: string
+        :param create_tutorial: boolean
         :return: a new created project object
         """
         if tags is None:
@@ -377,6 +379,9 @@ class ProjectBusiness:
 
         # clone to project dir
         repo = cls.clone(user_ID, name, project_path)
+
+        if create_tutorial:
+            shutil.copy('tutorial/hello_world.ipynb', project_path)
 
         # config repo user
         with repo.config_writer(config_level="repository") as c:

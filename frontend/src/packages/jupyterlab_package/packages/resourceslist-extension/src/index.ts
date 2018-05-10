@@ -35,6 +35,7 @@ const plugin: JupyterLabPlugin<void> = {
         restorer.add(modulePage, 'modules-manager');
         modulePage.id = 'list-manager';
         modulePage.title.label = 'Modules';
+        modulePage.title.className = 'ModulesLabel';
         shell.addToRightArea(modulePage, {rank: 600});
         shell.activateById(modulePage.id);
 
@@ -42,6 +43,7 @@ const plugin: JupyterLabPlugin<void> = {
         restorer.add(datasetPage, 'datasets-manager');
         datasetPage.id = 'list-manager';
         datasetPage.title.label = 'Datasets';
+        datasetPage.title.className = 'DatasetsLabel';
         shell.addToRightArea(datasetPage, {rank: 600});
         shell.activateById(datasetPage.id);
     },
