@@ -7,6 +7,11 @@ import {
 import styles from './index.less'
 import { get } from 'lodash'
 
+const myShowTime = (time, format = 'yyyy-MM-dd hh:mm') => {
+  let date = new Date(time).Format(format)
+  return date.toLocaleString()
+}
+
 const Jobs = ({ projectDetail, dispatch }) => {
   return (
     <div>
