@@ -556,40 +556,46 @@ def update_user_account():
     payload = jwt.decode(token_for_update_info, UPDATE_USER_INFO_SK,
                          algorithm='HS256')
     if payload['user_ID'] != user_ID or payload['expireTime'] < time.time():
-        return jsonify({'response': 'tokenError'}), 400
+        return jsonify({'response': {'error': 'tokenError'}}), 400
     elif phone:
         # 更改手机
         # 验证手机 验证码
         try:
             if UserBusiness.get_by_phone(phone):
                 return jsonify({
-                    "response": "手机号已被注册，请更换手机号"
+                    "response": {'error': "手机号已被注册，请更换手机号"}
                 }), 400
             res = user_service.verify_code(code=captcha, phone=phone)
             user = UserBusiness.get_by_user_ID(user_ID)
             user.phone = phone
             user.save()
+            return jsonify({'response': {
+                "user": json_utility.convert_to_json(user.to_mongo())
+            }}), 200
         except Error as e:
             return jsonify({
-                "response": "验证码错误"
+                "response": {'error': "验证码错误"}
             }), 400
     elif email:
         # 更改邮箱
         # 验证邮箱 验证码
         if UserBusiness.get_by_email(email):
             return jsonify({
-                "response":  "邮箱已被注册，请更换邮箱"
+                "response": {'error':  "邮箱已被注册，请更换邮箱"}
             }), 400
         try:
-            UserService.update_user_email(user_ID, email, captcha)
+            user = UserService.update_user_email(user_ID, email, captcha)
+            return jsonify({'response': {
+                "user": json_utility.convert_to_json(user.to_mongo())
+            }}), 200
         except Error as e:
             return jsonify({
-                "response":  e.args[0]
+                "response":  {'error':e.args[0]}
             }), 400
     elif password:
         UserBusiness.update_password(user_ID, password)
     else:
-        return jsonify({'response': 'error'}), 400
+        return jsonify({'response': {'error': 'unkownError'}}), 400
     return jsonify({'response': 'ok'}), 200
 
 

@@ -519,8 +519,10 @@ class UserService:
     @classmethod
     def update_user_email(cls, user_ID, email, captcha):
         user = UserBusiness.get_by_user_ID(user_ID)
-        if captcha and captcha == user.emailCaptcha:
+        if captcha and getattr(user, 'emailCaptcha',
+                               None) and captcha == user.emailCaptcha:
             user.email = email
+            user.emailCaptcha = None
             user.save()
             return user
         else:
@@ -535,7 +537,7 @@ class UserService:
         img = Image.open(img_data)
         img = img.convert('RGB')
         save_path = "../user_avatar"
-        image_path = save_path+f'/{user_ID}.jpeg'
+        image_path = save_path + f'/{user_ID}.jpeg'
         img.save(image_path.replace('\\', '/'))
         user = UserBusiness.get_by_user_ID(user_ID)
         user.avatarV += 1
