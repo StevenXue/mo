@@ -36,6 +36,7 @@ def create_job():
     :rtype:
     """
     data = request.get_json()
+    print(data)
     project_id = data.get("project_id")
     type = data.get("type")
     user_ID = data.get("user_ID")
@@ -68,7 +69,7 @@ def update_job_log(job_id):
     result = json_utility.convert_to_json(result.to_mongo())
     return jsonify({
         "response": result
-        }), 200
+    }), 200
 
 
 @job_app.route("/<string:job_id>/terminate", methods=["PUT"])
@@ -86,6 +87,44 @@ def success_job(job_id):
     result = json_utility.convert_to_json(result.to_mongo())
     return jsonify({
         "response": result
+    }), 200
+
+
+@job_app.route("/project/<string:project_type>/<string:project_id>",
+               methods=["GET"])
+def get_by_project(project_type, project_id):
+    """
+
+    :param project_type:
+    :param project_id:
+    :return:
+    """
+    def process(job):
+        from datetime import datetime
+        if job.status != 'running':
+            job.duration = (job.updated_time - job.create_time).total_seconds()
+        else:
+            job.duration = (datetime.utcnow() - job.create_time).total_seconds()
+        if not job.running_module:
+            return json_utility.convert_to_json(job.to_mongo())
+        rm = {'module': json_utility.convert_to_json(
+            job.running_module.module.to_mongo()),
+            'version': job.running_module.version}
+        del job.running_module
+        job = json_utility.convert_to_json(job.to_mongo())
+        job['running_module'] = rm
+        return job
+
+    jobs = JobService.get_by_project(project_type, project_id)
+    jobs = [process(job) for job in jobs]
+    jobs_by_path = {}
+    for job in jobs:
+        if job['source_file_path'] in jobs_by_path:
+            jobs_by_path[job['source_file_path']].append(job)
+        else:
+            jobs_by_path[job['source_file_path']] = [job]
+    return jsonify({
+        "response": jobs_by_path
     }), 200
 
 

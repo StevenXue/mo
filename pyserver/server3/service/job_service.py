@@ -37,14 +37,23 @@ class JobService:
                 'module_version': module_version
             }
         user = UserBusiness.get_by_user_ID(user_ID)
-
-        new_job = JobBusiness.create_job(project, type, user, source_file_path,
-                                         run_args, running_code, **options)
+        new_job = JobBusiness.create_job(project=project, type=type, user=user, source_file_path=source_file_path,
+                                         run_args=run_args, running_code=running_code, **options)
         # add job to project
         project.jobs.append(new_job)
         project.save()
 
         return new_job
+
+    @classmethod
+    def get_by_project(cls, project_type, project_id):
+        business_mapper = {
+            'app': AppBusiness,
+            'module': ModuleBusiness,
+            'dataset': DatasetBusiness,
+        }
+        project = business_mapper[project_type].get_by_id(project_id)
+        return JobBusiness.get_by_project(project_type, project)
 
 
 if __name__ == '__main__':

@@ -21,6 +21,7 @@ from server3.business.general_business import GeneralBusiness
 
 class JobBusiness(GeneralBusiness):
     repo = JobRepo(Job)
+    entity = Job
 
     @classmethod
     def create_job(cls, project, type, user, source_file_path, run_args=None,
@@ -28,7 +29,8 @@ class JobBusiness(GeneralBusiness):
         project_dict = {
             type: project
         }
-        running_module = RunningModule(module=running_module, version=module_version)
+        if running_module:
+            running_module = RunningModule(module=running_module, version=module_version)
         new_job = Job(user=user, source_file_path=source_file_path, run_args=run_args,
                       running_module=running_module, running_code=running_code,
                       status='running', create_time=datetime.utcnow(), updated_time=datetime.utcnow(),
@@ -51,3 +53,10 @@ class JobBusiness(GeneralBusiness):
         job.status = status
         job.save()
         return job
+
+    @classmethod
+    def get_by_project(cls, project_type, project):
+        project_dict = {
+            project_type: project
+        }
+        return cls.read(project_dict)

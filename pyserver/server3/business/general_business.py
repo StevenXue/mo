@@ -16,7 +16,7 @@ class GeneralBusiness:
     # 实例化后的 instance 走general repo
     repo = Repo(None)
     # class 不走general repo
-    __cls = None
+    entity = None
 
     @classmethod
     def get_all(cls):
@@ -32,7 +32,7 @@ class GeneralBusiness:
     def read(cls, query=None):
         if query is None:
             query = {}
-        return cls.__cls.objects(**query).order_by('-_id')
+        return cls.entity.objects(**query).order_by('-_id')
 
     @classmethod
     def get_by_id(cls, object_id):

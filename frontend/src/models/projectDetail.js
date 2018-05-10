@@ -10,6 +10,7 @@ import {fetchApp} from '../services/app'
 import {fetchModule} from '../services/module'
 import {fetchDataset} from '../services/dataset'
 import {
+  getJobs,
   getSessions,
   getTerminals,
   deleteSession,
@@ -32,11 +33,13 @@ import * as commentsService from "../services/comments"
 export default {
   namespace: 'projectDetail',
   state: {
-    terminals: [],
-    sessions: [],
+    // terminals: undefined,
+    // sessions: [],
+    jobs: {},
+    jobIds: [],
     // doneIndices: new Set([]),
     helpModalVisible: false,
-    activeTab: '1',
+    activeTab: '2',
     pageNo: 1,
     pageSize: 10,
   },
@@ -44,7 +47,26 @@ export default {
     changeActiveTab(state, {activeTab}) {
       return {...state, activeTab}
     },
-
+    addJobLog(state, {payload: jobId}) {
+      let jobIds = state.jobIds
+      if (!jobIds.includes(jobId)) {
+        jobIds.push(jobId)
+      }
+      return {
+        ...state,
+        jobIds,
+      }
+    },
+    removeJobLog(state, {payload: jobId}) {
+      let jobIds = state.jobIds
+      if (jobIds.includes(jobId)) {
+        jobIds.splice(jobIds.indexOf(jobId),1)
+      }
+      return {
+        ...state,
+        jobIds,
+      }
+    },
     showHelpModal(state) {
       return {...state, helpModalVisible: true}
     },
@@ -70,6 +92,12 @@ export default {
       return {
         ...state,
         sessions,
+      }
+    },
+    setJobs(state, {payload: jobs}) {
+      return {
+        ...state,
+        jobs,
       }
     },
     setStep(state, {payload}) {
@@ -230,6 +258,11 @@ export default {
           hubUserName,
           hubToken
         })
+        const {data: jobs} = yield call(getJobs, {
+          projectId,
+          projectType
+        })
+        yield put({type: 'setJobs', payload: jobs})
         yield put({type: 'setTerminals', payload: terminals})
         yield put({type: 'setSessions', payload: sessions})
       } catch (e) {

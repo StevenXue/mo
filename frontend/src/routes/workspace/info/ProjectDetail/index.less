@@ -1,11 +1,14 @@
 @import "../../../../index";
-.joyride-tooltip__main{
+
+.joyride-tooltip__main {
   font-size: 20px;
 }
-.joyride-tooltip__footer{
+
+.joyride-tooltip__footer {
   margin-top: 13px;
   margin-bottom: -8px;
 }
+
 .normal {
 
   //width: 100%;
@@ -113,12 +116,12 @@
       margin-left: 0;
       padding-right: 50px;
 
-      .descriptionP{
-        display:-webkit-box;
-        overflow:hidden;
-        text-overflow:ellipsis;
+      .descriptionP {
+        display: -webkit-box;
+        overflow: hidden;
+        text-overflow: ellipsis;
         //-webkit-line-clamp:3;
-        -webkit-box-orient:vertical;
+        -webkit-box-orient: vertical;
         color: #999999;
       }
 
@@ -193,13 +196,14 @@
 
     .jobCols {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
+      //flex-wrap: wrap;
       margin: 5px 0;
 
       .jobCell {
         margin: 5px 0;
         padding-right: 45px;
-        width: 50%;
+        width: 100%;
         line-height: 25px;
         //flex-direction: column;
 
@@ -226,6 +230,26 @@
       }
 
     }
+    .jobReactRow {
+      width: 100%;
+
+      .jobReactCol {
+        margin: 5px 0;
+        padding: 0 80px 0 20px;
+
+        .jobTitle {
+          display: flex;
+          justify-content: space-between;
+          .tag {
+            margin: 0 5px;
+          }
+        }
+        .log {
+          //background: #ffffff;
+        }
+      }
+    }
+
   }
 }
 
@@ -248,29 +272,29 @@
   }
 }
 
-.commentDiv{
+.commentDiv {
   //padding: 20px 0;
   font-size: 14px;
-  .commitVersion{
+  .commitVersion {
     color: #333333;
     font-size: 15px;
   }
-  .commitHexsha{
+  .commitHexsha {
     color: #999999;
     font-size: 13px;
   }
-  .commentCol{
+  .commentCol {
     border-top: #E9E9E9 1px solid;
     //border-bottom: #E9E9E9 1px solid;
     padding: 20px 0;
-    .commentUserID{
+    .commentUserID {
       color: #34BFE2;
       cursor: pointer;
     }
-    .commentContent{
+    .commentContent {
       color: #333333;
     }
-    .commentCreateTime{
+    .commentCreateTime {
       color: #999999;
       font-size: 13px;
     }

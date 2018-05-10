@@ -68,7 +68,8 @@ def json_parser(json_obj):
 
 class Client:
 
-    def __init__(self, api_key, project_id, user_ID, project_type, source_file_path, silent=False):
+    def __init__(self, api_key, project_id, user_ID, project_type,
+                 source_file_path, silent=False):
         self.silent = silent
         self.api_key = api_key
         self.project_id = project_id
@@ -93,10 +94,12 @@ class Client:
             }
         # log start
         job = requests.post(f'{SERVER}/jobs',
-                            json={'project_id': self.project_id, 'type': self.project_type,
+                            json={'project_id': self.project_id,
+                                  'type': self.project_type,
                                   'source_file_path': self.source_file_path,
                                   'user_ID': self.user_ID,
-                                  'run_args': {'args': args, 'kwargs': kw}, **other},
+                                  'run_args': {'args': args, 'kwargs': kw},
+                                  **other},
                             ).json()['response']
         job_id = job['_id']
         with RedirectPrints(job_id):
@@ -110,9 +113,11 @@ class Client:
     def run(self, module_id, *args, with_control=False, **kwargs):
         if self.silent and with_control:
             with HiddenPrints():
-                return self.controller(module_general, module_id, 'run', *args, **kwargs)
+                return self.controller(module_general, module_id, 'run', *args,
+                                       **kwargs)
         elif not self.silent and with_control:
-            return self.controller(module_general, module_id, 'run', *args, **kwargs)
+            return self.controller(module_general, module_id, 'run', *args,
+                                   **kwargs)
         elif self.silent and not with_control:
             with HiddenPrints():
                 return module_general(module_id, 'run', *args, **kwargs)
@@ -122,9 +127,11 @@ class Client:
     def train(self, module_id, *args, with_control=False, **kwargs):
         if self.silent and with_control:
             with HiddenPrints():
-                return self.controller(module_general, module_id, 'train', *args, **kwargs)
+                return self.controller(module_general, module_id, 'train',
+                                       *args, **kwargs)
         elif not self.silent and with_control:
-            return self.controller(module_general, module_id, 'train', *args, **kwargs)
+            return self.controller(module_general, module_id, 'train', *args,
+                                   **kwargs)
         elif self.silent and not with_control:
             with HiddenPrints():
                 return module_general(module_id, 'train', *args, **kwargs)
@@ -134,9 +141,11 @@ class Client:
     def predict(self, module_id, *args, with_control=False, **kwargs):
         if self.silent and with_control:
             with HiddenPrints():
-                return self.controller(module_general, module_id, 'predict', *args, **kwargs)
+                return self.controller(module_general, module_id, 'predict',
+                                       *args, **kwargs)
         elif not self.silent and with_control:
-            return self.controller(module_general, module_id, 'predict', *args, **kwargs)
+            return self.controller(module_general, module_id, 'predict', *args,
+                                   **kwargs)
         elif self.silent and not with_control:
             with HiddenPrints():
                 return module_general(module_id, 'predict', *args, **kwargs)
