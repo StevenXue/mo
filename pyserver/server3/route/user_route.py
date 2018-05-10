@@ -319,26 +319,22 @@ def login_with_phone():
 def two_step_vfc():
     user_ID = get_jwt_identity()
     data = request.get_json()
-
+    print(data)
     check_type = data.pop("checkType")
     check_value = data.pop("checkValue")
     code = data.pop("code")
 
     try:
+        result = False
         if check_type == 'phone':
             result = user_service.verify_code(code=code, phone=check_value)
         elif check_type == 'email':
             user = UserBusiness.get_by_user_ID(user_ID)
             if code and code == user.emailCaptcha:
                 result = True
-        else:
-            return jsonify({
-                "response": {
-                    "error": e.args[0]
-                }
-            }), 400
         if result:
-            expire_time = time.time() + 3600
+            # 默认一周
+            expire_time = time.time() + 604800
             response = {'response': {
                 'tokenForUpdateInfo': jwt.encode({'user_ID': user_ID,
                                                   'expireTime': expire_time},
@@ -347,12 +343,8 @@ def two_step_vfc():
             }}
             return jsonify(response), 200
     except Error as e:
-        print("e.args[0]", e.args[0])
         return jsonify({
-            "response": {
-                "error": e.args[0]
-            }
-        }), 400
+            "response": '验证码错误，请重新输入'}), 400
 
 
 # 发送验证码到邮箱
@@ -564,31 +556,35 @@ def update_user_account():
     payload = jwt.decode(token_for_update_info, UPDATE_USER_INFO_SK,
                          algorithm='HS256')
     if payload['user_ID'] != user_ID or payload['expireTime'] < time.time():
-        return jsonify({'response': {'error': 'tokenError'}}), 400
+        return jsonify({'response': 'tokenError'}), 400
     elif phone:
         # 更改手机
         # 验证手机 验证码
         try:
+            if UserBusiness.get_by_phone(phone):
+                return jsonify({
+                    "response": "手机号已被注册，请更换手机号"
+                }), 400
             res = user_service.verify_code(code=captcha, phone=phone)
             user = UserBusiness.get_by_user_ID(user_ID)
             user.phone = phone
             user.save()
         except Error as e:
             return jsonify({
-                "response": {
-                    "error": "验证码错误"
-                }
+                "response": "验证码错误"
             }), 400
     elif email:
         # 更改邮箱
         # 验证邮箱 验证码
+        if UserBusiness.get_by_email(email):
+            return jsonify({
+                "response":  "邮箱已被注册，请更换邮箱"
+            }), 400
         try:
             UserService.update_user_email(user_ID, email, captcha)
         except Error as e:
             return jsonify({
-                "response": {
-                    "error": e.args[0]
-                }
+                "response":  e.args[0]
             }), 400
     elif password:
         UserBusiness.update_password(user_ID, password)
@@ -597,19 +593,19 @@ def update_user_account():
     return jsonify({'response': 'ok'}), 200
 
 
-# 用户更改头像
-@user_app.route('/avatar', methods=['POST'])
-@jwt_required
-def update_user_avatar():
-    user_ID = get_jwt_identity()
-    data = request.get_json()
-    base64_str = data.get('dataUrl', None)
-    UserService.update_user_avatar(user_ID, base64_str)
-    return jsonify({'response': 'ok'}), 200
+# # 用户更改头像
+# @user_app.route('/avatar', methods=['POST'])
+# @jwt_required
+# def update_user_avatar():
+#     user_ID = get_jwt_identity()
+#     data = request.get_json()
+#     base64_str = data.get('dataUrl', None)
+#     UserService.update_user_avatar(user_ID, base64_str)
+#     return jsonify({'response': 'ok'}), 200
 
 
 @user_app.route('/avatar/<path:filename>', methods=['GET'])
-def download_file(filename):
+def update_user_avatar(filename):
     if os.path.isfile(f'../user_avatar/{filename}'):
         return send_from_directory('../user_avatar', filename)
     else:

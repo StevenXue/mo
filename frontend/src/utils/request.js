@@ -16,10 +16,8 @@ function checkStatus({data, noErrorMsg, customErrorMsg, newRes}) {
   }
   if(!noErrorMsg) {
     message.error('This is a message of error: ' + newRes.statusText)
-    console.log("response", response)
   }
   else if(customErrorMsg){
-    // console.log("response", msg.response)
     message.error(data.response)
   }
 

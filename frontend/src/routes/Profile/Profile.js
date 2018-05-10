@@ -258,7 +258,7 @@ class MyFavouriteList extends Component {
         <Spin spinning={this.state.loading}>
         <div className={styles.favorList}>
           {this.state.objects.map(e =>
-            <Card noHovering={true} key={e._id} bordered={true}>
+            <Card hoverable={false} key={e._id} bordered={true}>
               <div>
                 <Row>
                   <div>
@@ -290,7 +290,7 @@ class MyFavouriteList extends Component {
         }
         {this.state.pOrR === 'request' && <Spin spinning={this.state.loading}><div className={styles.requestList}>
           {this.state.objects.map(e =>
-            <Card noHovering={true} key={e._id} bordered={true}>
+            <Card hoverable={false} key={e._id} bordered={true}>
               <div>
                 <Row>
                   <Col span={3}>
@@ -443,7 +443,7 @@ class MyRequestList extends Component {
         <Spin spinning={this.state.loading}>
         <div className={styles.requestList}>
           {this.state.requests.map(e =>
-            <Card noHovering={true} key={e._id} bordered={true}>
+            <Card hoverable={false} key={e._id} bordered={true}>
               <div>
                 <Row>
                   <Col span={3}>
@@ -595,7 +595,7 @@ class MyAnswerList extends Component {
         <Spin spinning={this.state.loading}>
         <div className={styles.requestList}>
           {this.state.requests.map(e =>
-            <Card noHovering={true} key={e._id} bordered={true}>
+            <Card hoverable={false} key={e._id} bordered={true}>
               <div>
                 <Row>
                   <Col span={21}>

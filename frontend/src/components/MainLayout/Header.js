@@ -185,6 +185,12 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
       case 'publish':
         return <p
           className={styles.messageP}>{`${e.user_ID} 发布了您关注的${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
+      case 'deploy_fail':
+        return <p
+          className={styles.messageP}>{`您的${translatorTemp[e.project_type]}  ${e.project_name} 部署失败`}</p>
+      case 'publish_fail':
+        return <p
+          className={styles.messageP}>{`您的${translatorTemp[e.project_type]}  ${e.project_name} 发布失败`}</p>
       case 'deploy_request':
         return <p
           className={styles.messageP}>{`${e.user_ID} 为您的答案${e.user_request_title} 上线了${translatorTemp[e.project_type]}  ${e.project_name}`}</p>

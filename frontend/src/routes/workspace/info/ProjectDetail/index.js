@@ -407,7 +407,7 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
                   locale={{
                     back: (<span style={{ color: '#34BFE2' }}>Back</span>),
                     close: (<span style={{ color: '#34BFE2' }}>Close</span>),
-                    last: (<span style={{ color: '#34BFE2' }} onClick={this.noLearning}>Last</span>),
+                    last: (<span style={{ color: '#34BFE2' }} onClick={this.noLearning}>Finish</span>),
                     next: (<span style={{ color: '#34BFE2' }}>Next</span>),
                     skip: (<span style={{ color: '#999999' }} onClick={this.noLearning}>Skip</span>),
                   }}
@@ -500,6 +500,21 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
           )
         }
 
+        chooseColor(star_users,user,userObjId){
+          if(user===userObjId){
+            return styles.gray
+          }
+          else if(star_users.includes(userObjId))
+          {
+            return styles.blue
+          }
+          else{
+            return styles.lightBlue
+          }
+
+        }
+
+
         render() {
           return (
             <div className={`main-container ${styles.normal}`}>
@@ -512,7 +527,7 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
                   <Col span={3} style={{ padding: '10px 42px' }}>
                     <div className={styles.bigIconNunberDiv}>
                       <div
-                        className={projectDetail.project.star_users.includes(userObjId) ? styles.iconNunberDivActive : styles.iconNunberDiv}
+                        className={this.chooseColor(projectDetail.project.star_users,projectDetail.project.user,userObjId)}
                         style={market_use ? { cursor: 'pointer' } : { cursor: 'default' }}
                         onClick={market_use ? () => appStarFavor('star') : null}
                       >
@@ -524,8 +539,7 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
                           className={styles.number}>{projectDetail.project.star_users.length}</p>
                       </div>
                       <div
-                        className={projectDetail.project.favor_users.includes(userObjId) ? styles.iconNunberDivActive : styles.iconNunberDiv}
-                        style={market_use ? { cursor: 'pointer' } : { cursor: 'default' }}
+                        className={this.chooseColor(projectDetail.project.favor_users,projectDetail.project.user,userObjId)}                        style={market_use ? { cursor: 'pointer' } : { cursor: 'default' }}
                         onClick={market_use ? () => appStarFavor('favor') : null}>
                         <p className={styles.icon}>
                           <Icon

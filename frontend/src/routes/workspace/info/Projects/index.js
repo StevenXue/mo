@@ -63,7 +63,6 @@ class ProjectList extends Component {
       projects: [],
       projectsLoading: false,
       projectType: 'project',
-
       query: undefined,
       privacy: undefined,
       totalNumber: 0,
@@ -76,7 +75,6 @@ class ProjectList extends Component {
   componentDidMount() {
     this.fetchData({})
     // this.hideBreadcrumb()
-
   }
 
   // hideBreadcrumb = ()=>{

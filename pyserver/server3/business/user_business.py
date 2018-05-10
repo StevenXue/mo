@@ -51,6 +51,14 @@ class UserBusiness(GeneralBusiness):
     repo = UserRepo(User)
 
     @classmethod
+    def get_by_email(cls, email):
+        return cls.repo.read_by_unique_field('email', email)
+
+    @classmethod
+    def get_by_phone(cls, phone):
+        return cls.repo.read_by_unique_field('phone', phone)
+
+    @classmethod
     def get_by_user_ID(cls, user_ID):
         return cls.repo.read_by_unique_field('user_ID', user_ID)
 

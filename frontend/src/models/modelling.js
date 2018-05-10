@@ -18,7 +18,7 @@ const checker = (value, arr) =>
 const extFilter = {
   app: ['moduledeploy-extension'],
   module: ['appdeploy-extension'],
-  dataset: ['moduledeploy-extension', 'datasets-extension', 'appdeploy-extension'],
+  dataset: ['moduledeploy-extension', 'appdeploy-extension'],
 }
 
 // Load the core theming before any other package.
