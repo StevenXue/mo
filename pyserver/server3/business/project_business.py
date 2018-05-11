@@ -567,7 +567,7 @@ class ProjectBusiness:
             f.write(json.dumps(nb_data))
 
     @classmethod
-    def nb_to_py_script(cls):
+    def nb_to_py_script(cls, project_id, nb_path, optimise=True):
         """
 
         :return:
