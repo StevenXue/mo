@@ -11,12 +11,14 @@ from server3.service.user_request_service import UserRequestService
 from server3.service.user_service import UserService
 from server3.service import request_answer_service
 from server3.service.request_answer_service import RequestAnswerService
+from server3.business.user_request_business import UserRequestBusiness
 from server3.business.request_answer_business import RequestAnswerBusiness
+from server3.entity.user_request import UserRequest
+
 from server3.service import comments_service
 from server3.service import user_service
 from server3.utility import json_utility
 from server3.business.comments_business import CommentsBusiness
-
 
 
 PREFIX = '/user_requests'
@@ -43,14 +45,19 @@ def list_user_request():
     page_no = int(request.args.get('page_no', 1))
     page_size = int(request.args.get('page_size', 5))
     search_query = request.args.get('search_query', None)
+
+    search_tags = request.args.get('search_tags', None)
+
     type = request.args.get('type', None)
     user_ID = request.args.get('user_ID', None)
     if type == 'all':
         type = None
-
+    if search_tags:
+        search_tags = search_tags.split(',')
     user_requests, total_number = UserRequestService.get_list(
         type=type,
         search_query=search_query,
+        search_tags=search_tags,
         page_no=page_no,
         page_size=page_size,
         user_ID=user_ID
@@ -149,3 +156,9 @@ def remove_user_request():
     user_ID = get_jwt_identity()
     result = UserRequestService.remove_by_user_ID(user_ID)
     return jsonify({'response': result}), 200
+
+
+@user_request_app.route("/get_hot_tag", methods=["GET"])
+def get_hot_tag():
+    search_query = request.args.get('search_query', None)
+    return jsonify(UserRequestBusiness.get_hot_tag(UserRequest, search_query))

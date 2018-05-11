@@ -52,11 +52,11 @@ class UserBusiness(GeneralBusiness):
 
     @classmethod
     def get_by_email(cls, email):
-        return cls.repo.read_by_unique_field('email', email)
+        return cls.repo.read_first_one({'email': email})
 
     @classmethod
     def get_by_phone(cls, phone):
-        return cls.repo.read_by_unique_field('phone', phone)
+        return cls.repo.read_first_one({'phone': phone})
 
     @classmethod
     def get_by_user_ID(cls, user_ID):

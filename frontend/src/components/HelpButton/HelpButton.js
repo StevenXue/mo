@@ -9,17 +9,18 @@ const gitList = [gifNew, gifImport, gifDeploy]
 const titleList = ['1/3 创建项目', '2/3 使用module', '3/3 部署项目']
 
 import styles from './index.less'
-
+// button.jp-AddIcon.jp-MaterialIcon 新建文件
+// button.jp-id-upload.jp-Toolbar-item 上传文件
 const JOYRIDE = [
   {
     text: '生成py文件',
     selector: '.jp-PythonIcon',
-    position: 'bottom-left',
+    position: 'bottom',
   },
   {
     text: 'jupyter notebook 运行状态',
     selector: '.jp-CircleIcon',
-    position: 'bottom-left',
+    position: 'bottom-right',
   },
   {
     text: '部署',
@@ -32,6 +33,33 @@ const JOYRIDE = [
     position: 'left',
 
   },
+
+  {
+    text: '新建文件',
+    selector: 'button.jp-AddIcon.jp-MaterialIcon',
+    position: 'bottom',
+  },
+
+  // {
+  //   text: '上传文件',
+  //   selector: 'button.jp-id-upload.jp-Toolbar-item',
+  //   position: 'bottom',
+  // },
+
+  {
+    text: '输出操作',
+    selector: 'select.jp-Notebook-toolbarCellTypeDropdown.jp-mod-styled',
+    position: 'top',
+  },
+
+  {
+    text: '数据集列表',
+    selector: 'li.p-TabBar-tab.DatasetsLabel',
+    position: 'left',
+  },
+
+
+
 ]
 
 const convertAllSteps = () => {
