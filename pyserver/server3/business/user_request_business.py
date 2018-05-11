@@ -53,12 +53,8 @@ class UserRequestBusiness(GeneralBusiness):
             objects = objects(user=user)
         if search_tags:
             # todo 是否有直接的查询语句取代
-            print('search_tags', search_tags)
-            print(objects.count)
             for each_tag in search_tags:
-                print(each_tag)
                 objects = objects(tags=each_tag)
-                print(objects.count)
 
         number_of_objects = objects.count()
         return objects.order_by('-create_time')[

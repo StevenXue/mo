@@ -217,6 +217,20 @@ class CommentForm extends React.Component {
   }
 }
 
+export function projectStatus(project) {
+  if (!project.status) {
+    return <div/>
+  }
+  if (project.status === 'deploying') {
+    return <Tag color='gold' style={{ cursor: 'default', marginLeft: 10 }}>Deploying <Icon
+      type="loading"/></Tag>
+  } else if (project.status === 'active') {
+    return <Tag color='green' style={{ cursor: 'default', marginLeft: 10 }}>Online</Tag>
+  } else {
+    return <Tag color='grey' style={{ cursor: 'default', marginLeft: 10 }}>Offline</Tag>
+  }
+}
+
 function ProjectInfo({ app, market_use, match, history, location, dispatch, projectDetail, login }) {
   const projectId = match.params.projectId
   const user_ID = localStorage.getItem('user_ID')
@@ -334,20 +348,6 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
   } else {
     // project info page
     if (projectDetail.project && projectDetail.project.type) {
-
-      function projectStatus() {
-        if (!projectDetail.project.status) {
-          return <div/>
-        }
-        if (projectDetail.project.status === 'deploying') {
-          return <Tag color='gold' style={{ cursor: 'default', marginLeft: 10 }}>Deploying <Icon
-            type="loading"/></Tag>
-        } else if (projectDetail.project.status === 'active') {
-          return <Tag color='green' style={{ cursor: 'default', marginLeft: 10 }}>Online</Tag>
-        } else {
-          return <Tag color='grey' style={{ cursor: 'default', marginLeft: 10 }}>Offline</Tag>
-        }
-      }
 
       // optional component list by project type
       const components = projectTypeDict[projectDetail.project.type]
@@ -555,7 +555,7 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
                             type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
                             style={{ fontSize: 20 }}/>}
                           {
-                            projectStatus()
+                            projectStatus(projectDetail.project)
                           }
                         </span>
                         {!market_use &&

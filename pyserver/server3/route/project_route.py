@@ -24,7 +24,6 @@ from server3.service.module_service import ModuleService
 from server3.service.dataset_service import DatasetService
 from server3.business.project_business import ProjectBusiness
 from server3.business.user_business import UserBusiness
-from server3.entity.project import Project
 from server3.utility import json_utility
 from server3.utility import str_utility
 from server3.constants import Error, Warning
@@ -62,6 +61,9 @@ def list_projects_by_query():
     privacy = request.args.get('privacy', None)
     default_max_score = float(request.args.get('max_score', 0.4))
     type = request.args.get('type', 'project')
+    tags = request.args.get('tags', None)
+    if tags:
+        tags = tags.split(',')
 
     if group == 'my':
         user_ID = get_jwt_identity()
@@ -72,11 +74,12 @@ def list_projects_by_query():
         projects = project_service.list_projects(
             search_query=search_query,
             privacy=privacy,
+            type=type,
             page_no=page_no,
             page_size=page_size,
             default_max_score=default_max_score,
-            type=type,
-            user_ID=user_ID
+            user_ID=user_ID,
+            tags=tags
         )
     except Warning as e:
         return jsonify({
@@ -365,4 +368,5 @@ def nb_to_script(project_id):
 @project_app.route("/get_hot_tag", methods=["GET"])
 def get_hot_tag():
     search_query = request.args.get('search_query', None)
-    return jsonify(ProjectBusiness.get_hot_tag(Project, search_query))
+    project_type = request.args.get('project_type', None)
+    return jsonify(ProjectBusiness.get_hot_tag(search_query, project_type))
