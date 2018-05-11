@@ -327,6 +327,20 @@ export default {
   subscriptions: {
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
+        function refreshProject(msgProjectId) {
+          const match = pathToRegexp('/workspace/:projectId').exec(pathname)
+          if (match) {
+            const projectId = match[1]
+            const url = new URL(location.href.replace('/#', ''))
+            const projectType = url.searchParams.get('type')
+            projectId === msgProjectId && dispatch({
+              type: 'projectDetail/refresh',
+              projectId,
+              projectType,
+            })
+          }
+        }
+
         console.log('pathname', pathname)
         const match = pathToRegexp('/user/login').exec(pathname)
 
@@ -356,21 +370,11 @@ export default {
             if (msg.message.user_ID === userId) {
               if (deployEvs.includes(msg.message.message_type)) {
                 deploySuccNoti(msg.message.message_type, msg.message.project_type, msg.message.project_name)
+                refreshProject(msg.message.project_id)
               }
               if (jobEvs.includes(msg.message.message_type)) {
                 jobNotification(msg.message.message_type, msg.message.job_type, msg.message.job_name)
-
-              }
-              const match = pathToRegexp('/workspace/:projectId/:type?').exec(pathname)
-              if (match) {
-                const projectId = match[1]
-                const url = new URL(location.href.replace('/#', ''))
-                const projectType = url.searchParams.get('type') || match[2]
-                dispatch({
-                  type: 'projectDetail/refresh',
-                  projectId,
-                  projectType,
-                })
+                refreshProject(msg.message.project_id)
               }
             }
 

@@ -77,7 +77,6 @@ class JobBusiness(GeneralBusiness):
     def send_message(cls, job, m_type='job_success'):
         if job.running_code:
             job_type = 'function'
-            print(job.running_code)
             job_name = re.match(r'def (\S+)\(\S*\):.*',
                                 job.running_code).group(1)
         else:
@@ -86,10 +85,11 @@ class JobBusiness(GeneralBusiness):
             module_name = job.running_module.module.name
             version = job.running_module.version
             job_name = f'{user_ID}/{module_name}/{version}'
-
+        project = job.app or job.module or job.dataset
         admin_user = UserBusiness.get_by_user_ID('admin')
 
         MessageService.create_message(admin_user, m_type, [job.user.id],
                                       job.user, job_name=job_name,
                                       job_id=job.id,
-                                      job_type=job_type)
+                                      job_type=job_type,
+                                      project_id=project.id)
