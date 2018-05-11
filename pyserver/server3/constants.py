@@ -1,5 +1,4 @@
 from uuid import getnode as get_mac
-
 UPDATE_USER_INFO_SK = 'secret_mo_mo'
 MONGO = 'DEFAULT'
 # if get_mac() == 274973436731254:
@@ -37,14 +36,15 @@ APP_DIR = './functions'
 #     r"import os",
 #     r"import sys",
 #     r"# Please use current \(work\) folder to store your data and models",
-#     r"sys.path.append\('\.\./'\)",
-#     r"client = Client\('(.+)'\)",
+#     r"sys.path.append\('(.+)'\)",
+#     r"client = Client\('(.+)', project_id='(.+)', user_ID='(.+)',",
+#     r"(\s+)project_type='(.+)', source_file_path='(.+)'\)",
 #     r"from modules import (.+)",
 #     r"(\S+) = client\.(\S+)",
-#     r"# append work_path to head when you want to reference a path inside the working directory",
+#     r"# append work_path to head when you want to reference a path inside "
+#     r"the working directory",
 #     r"work_path = ''",
 # ]
-
 INIT_RES = [
     r'# You can use other public modules via our Client object with module\'s identifier \n',
     r'# and parameters.\n',
