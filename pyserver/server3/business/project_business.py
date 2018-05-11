@@ -570,7 +570,7 @@ class ProjectBusiness:
     def nb_to_py_script(cls, project_id, nb_path, optimise=True):
         """
 
-        :param project_id:
+        :param project_id: project's ObjectId in mongodb
         :param nb_path:
         :param optimise:
         :return:
