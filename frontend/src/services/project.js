@@ -105,3 +105,13 @@ export function forkProject(prjID) {
     },
   })
 }
+
+// get hot tag
+export function getHotTag(prjID) {
+  return request(`${CORS}${fork}/${prjID}`, {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+}

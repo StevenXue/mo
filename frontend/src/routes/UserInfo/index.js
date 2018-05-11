@@ -117,6 +117,10 @@ class EditForm extends React.Component {
               else {
                 message.success('Email修改成功')
                 this.cancelEdit({})
+                this.props.dispatch({
+                  type: 'profile/setUserInfo',
+                  'userInfo': e.user
+                })
               }
             },
           })
@@ -152,6 +156,10 @@ class EditForm extends React.Component {
               else {
                 message.success('手机号码修改成功')
                 this.cancelEdit({})
+                this.props.dispatch({
+                  type: 'profile/setUserInfo',
+                  'userInfo': e.user
+                })
               }
             }
           })

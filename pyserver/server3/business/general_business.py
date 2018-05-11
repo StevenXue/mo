@@ -1,5 +1,6 @@
 from server3.repository.general_repo import Repo
 from server3.entity.general_entity import Objects
+from operator import itemgetter
 
 
 def check_auth(func):
@@ -64,3 +65,35 @@ class GeneralBusiness:
     def remove_by_id(cls, object_id, user_ID):
         return cls.repo.delete_by_id(object_id)
 
+    @staticmethod
+    def get_hot_tag(entity, search_query):
+        if search_query:
+            tag_freqs = entity.objects(
+                tags__icontains=search_query).item_frequencies(
+                'tags', normalize=True)
+            top_tags = sorted(tag_freqs.items(), key=itemgetter(1),
+                              reverse=True)[:100]
+            res = []
+            max_number = 5
+            number = 0
+            top_five = []
+            top_five_length = 0
+            for i in top_tags:
+                if search_query in i[0]:
+                    res.append(i)
+                    number += 1
+                else:
+                    if top_five_length < max_number:
+                        top_five.append(i)
+                        top_five_length += 1
+                if number == max_number:
+                    return res
+            if number < max_number:
+                res += top_five[:max_number - number]
+            return res
+        else:
+            tag_freqs = entity.objects().item_frequencies(
+                'tags', normalize=True)
+            top_tags = sorted(tag_freqs.items(), key=itemgetter(1),
+                              reverse=True)[:5]
+            return top_tags
