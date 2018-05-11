@@ -1,64 +1,70 @@
 import React, { Component } from 'react'
-import { Button, Modal, Carousel, Icon } from 'antd'
+import { Button, Modal, Carousel, Icon, Steps } from 'antd'
 import Joyride from 'react-joyride'
 import gifNew from '../../img/gif/new.gif'
 import gifImport from '../../img/gif/import.gif'
 import gifDeploy from '../../img/gif/deploy.gif'
+import { connect } from 'dva'
 
 const gitList = [gifNew, gifImport, gifDeploy]
 const titleList = ['1/3 创建项目', '2/3 使用module', '3/3 部署项目']
 
 import styles from './index.less'
-// button.jp-AddIcon.jp-MaterialIcon 新建文件
-// button.jp-id-upload.jp-Toolbar-item 上传文件
+const Step = Steps.Step;
+import _ from 'lodash'
 const JOYRIDE = [
-  {
-    text: '生成py文件',
-    selector: '.jp-PythonIcon',
-    position: 'bottom',
-  },
-  {
-    text: 'jupyter notebook 运行状态',
-    selector: '.jp-CircleIcon',
-    position: 'bottom-right',
-  },
-  {
-    text: '部署',
-    selector: 'button.jp-LauncherIcon',
-    position: 'bottom-left',
-  },
-  {
-    text: '模块列表',
-    selector: '.ModulesLabel',
-    position: 'left',
-
-  },
 
   {
     text: '新建文件',
     selector: 'button.jp-AddIcon.jp-MaterialIcon',
     position: 'bottom',
+    // width: "80px"
   },
-
-  // {
-  //   text: '上传文件',
-  //   selector: 'button.jp-id-upload.jp-Toolbar-item',
-  //   position: 'bottom',
-  // },
 
   {
-    text: '输出操作',
-    selector: 'select.jp-Notebook-toolbarCellTypeDropdown.jp-mod-styled',
-    position: 'top',
+    text: '上传文件',
+    selector: 'button.jp-id-upload.jp-Toolbar-item',
+    position: 'bottom',
+    // width: "80px"
+  },
+  {
+    text: '部署',
+    selector: 'button.jp-LauncherIcon',
+    position: 'bottom',
+    // width: "60px"
   },
 
+  {
+    text: '生成py文件',
+    selector: 'button.jp-PythonIcon',
+    position: 'bottom',
+  },
+  {
+    text: '输出操作',
+    selector: 'select.jp-Notebook-toolbarCellTypeDropdown.jp-mod-styled#Insert',
+    position: 'bottom',
+  },
+  {
+    text: 'jupyter notebook 运行状态',
+    selector: 'div.jp-CircleIcon',
+    position: 'bottom-left',
+    width: '140px',
+  },
+
+  {
+    text: '模块列表',
+    selector: 'li.ModulesLabel',
+    position: 'left',
+    width: '120px',
+    tooltipOffset: 50,
+  },
   {
     text: '数据集列表',
     selector: 'li.p-TabBar-tab.DatasetsLabel',
     position: 'left',
+    width: '120px',
+    tooltipOffset: 50,
   },
-
-
 
 ]
 
@@ -73,22 +79,23 @@ const convertAllSteps = () => {
         text: ele.text,
         selector: ele.selector,
         position: ele.position,
-        // isFixed:true,
+        isFixed: true,
         style: {
           borderRadius: 0,
           color: '#34BFE2',
           textAlign: 'center',
-          width: '12rem',
+          width: ele.width ? ele.width : '5rem',
           // height: '60px',
           // maxHeight: "30px",
           mainColor: '#ffffff',
           backgroundColor: '#ffffff',
-          beacon: {
-            inner: '#0ae713 ',
-            outer: '#77Eb7c',
-          },
+          // beacon: {
+          //   inner: '#0ae713 ',
+          //   outer: '#77Eb7c',
+          // },
           main: {
-            padding: '5px',
+            padding: '1px',
+
           },
           header: {
             display: 'none',
@@ -115,7 +122,7 @@ function onChange(a, b, c) {
   console.log(a, b, c)
 }
 
-export class HelpButton extends React.Component {
+class HelpButton extends React.Component {
   state = {
     run: false,
     allSteps: [],
@@ -124,19 +131,35 @@ export class HelpButton extends React.Component {
     visible: false,
 
     helpState: 0,
+    isNotebookLoaded: false
   }
 
   componentDidMount() {
-    // window.addEventListener('trigger_tooltip', () => {
-    //   // console.log('触发了')
-    //   setTimeout(() => {
-    //     // this.setState({ run: true })
-    //     this.setState({
-    //       allSteps: convertAllSteps(),
-    //     })
-    //   }, 2000)
-    // }, false)
+    window.addEventListener('trigger_tooltip', () => {
+      this.setState({isNotebookLoaded: true})
+      // console.log('触发了')
+      // setTimeout(() => {
+      //   // this.setState({ run: true })
+      //   this.setState({
+      //     allSteps: convertAllSteps(),
+      //   })
+      // }, 2000)
+    }, false)
   }
+  componentWillReceiveProps(nextProps){
+    if(!this.props.projectDetail.project){
+      const AutoShowHelp = _.get(nextProps.projectDetail.project, "auto_show_help")
+      if (AutoShowHelp){
+        this.setState({
+          visible: true
+        })
+      }
+
+    }
+
+
+  }
+
 
   showModal = () => {
     this.setState({
@@ -154,6 +177,17 @@ export class HelpButton extends React.Component {
     this.setState({
       visible: false,
     })
+
+    // const project = this.props.projectDetail.project
+    // project.auto_show_help = false
+    // console.log("cancel", project)
+    this.props.dispatch({
+      type: 'projectDetail/updateProjectIsAutoHelp',
+      payload: {
+        auto_show_help: false
+      }
+    })
+
   }
 
   handleOnClick = () => {
@@ -170,31 +204,32 @@ export class HelpButton extends React.Component {
   }
 
   renderHelp = () => {
-
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        {/*标题*/}
         <div style={{ fontSize: 30, padding: 20 }}>
           {titleList[this.state.helpState]}
         </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', }}>
+        {/*图片*/}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           {this.state.helpState !== 0 ?
-          <Icon type="left" style={{ fontSize: 40, color:" #c1c1c1" }}
-                onClick={() => {
-                  if (this.state.helpState === 0) {
-                    return
-                  }
-                  this.setState({ helpState: this.state.helpState - 1 })
+            <Icon type="left" style={{ fontSize: 40, color: ' #c1c1c1' }}
+                  onClick={() => {
+                    if (this.state.helpState === 0) {
+                      return
+                    }
+                    this.setState({ helpState: this.state.helpState - 1 })
 
-                }}
-          />: <Icon type="left" style={{ fontSize: 40, color: 'transparent' }}/>}
-          <img style={{ width: 1920 / 2.3, height: 1023 / 2.3,
+                  }}
+            /> : <Icon type="left" style={{ fontSize: 40, color: 'transparent' }}/>}
+          <img style={{
+            width: 1920 / 2.3, height: 1023 / 2.3,
             marginTop: 8,
             marginBottom: 50,
-            border: "1px solid #c1c1c1",
+            border: '1px solid #c1c1c1',
           }}
                src={gitList[this.state.helpState]} alt='loading...'/>
-          <Icon type="right" style={{ fontSize: 40, color:" #c1c1c1" }}
+          <Icon type="right" style={{ fontSize: 40, color: ' #c1c1c1' }}
                 onClick={() => {
                   if (this.state.helpState === titleList.length - 1) {
                     this.setState({ helpState: 0 })
@@ -206,14 +241,28 @@ export class HelpButton extends React.Component {
                 }}
           />
         </div>
-
+        {/*底部*/}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Steps current={this.state.helpState+1} progressDot={(dot, { status, index }) => (
+            <div>
+              {dot}
+            </div>
+          )}>
+            <Step />
+            <Step />
+            <Step />
+            <Step />
+          </Steps>
+        </div>
       </div>
     )
 
   }
 
   render() {
-    return <div>
+    return <div className={styles.notebook_joyride}
+                style={this.state.isNotebookLoaded?null:{display: "none"}}
+    >
       {
         JOYRIDE.map((ele, index) => {
             return (
@@ -224,19 +273,19 @@ export class HelpButton extends React.Component {
                 run={this.state.run}
                 steps={this.state.allSteps[index]}
                 autoStart
-                tooltipOffset={1}
+                tooltipOffset={ele.tooltipOffset ? ele.tooltipOffset : 2}
                 showOverlay={false}
-                locale={{
-                  close: null,
-                }}
+                holePadding={0}
+                scrollToSteps={false}
+                // locale={{
+                //   close: null,
+                // }}
               />
             )
           },
         )
       }
-
       <div className={styles.cbtn}>
-
         <Button
           size="small"
           onMouseEnter={this.handleOnClick}
@@ -262,6 +311,7 @@ export class HelpButton extends React.Component {
               justifyContent: 'center',
               alignItems: 'center',
             }}
+
           >
             {this.renderHelp()}
           </Modal>
@@ -272,3 +322,5 @@ export class HelpButton extends React.Component {
     </div>
   }
 }
+export default connect(({ projectDetail }) => ({ projectDetail }))(HelpButton)
+

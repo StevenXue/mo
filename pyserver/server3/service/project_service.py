@@ -97,14 +97,7 @@ def list_projects_by_user_ID(user_ID, order=-1, privacy='all'):
 
 def list_projects(search_query=None, page_no=1, page_size=10,
                   default_max_score=0.4, privacy=None, type='project',
-                  user_ID=None):
-    """
-    list projects
-    :param user_ID:
-    :param order:
-    :param privacy:
-    :return:
-    """
+                  user_ID=None, tags=None):
     user = None
     if user_ID:
         user = UserBusiness.get_by_user_ID(user_ID)
@@ -116,10 +109,10 @@ def list_projects(search_query=None, page_no=1, page_size=10,
         page_size=page_size,
         default_max_score=default_max_score,
         user=user,
+        tags=tags
     )
 
 
-# 增加result_obj和job_obj到project
 def add_job_and_result_to_project(result_obj, project_id):
     """
     add job and result to project
@@ -426,6 +419,7 @@ class ProjectService:
             type=type, tags=tags, user=user,
             user_token=user_token,
             create_tutorial=True,
+            auto_show_help=True,
             **kwargs)
         return project
 
@@ -460,7 +454,6 @@ class ProjectService:
                                                   entity_id=project.id,
                                                   action='favor',
                                                   entity=project.type)
-        print(project.to_mongo())
         from server3.service.world_service import WorldService
         from server3.business.statistics_business import StatisticsBusiness
         # 记录历史记录
@@ -479,7 +472,8 @@ class ProjectService:
 
     @classmethod
     def list_projects(cls, search_query, page_no=None, page_size=None,
-                      default_max_score=0.4, privacy=None, user_ID=None):
+                      default_max_score=0.4, privacy=None, user_ID=None,
+                      tags=None):
         """
         list projects
         :param search_query:
@@ -507,7 +501,8 @@ class ProjectService:
             page_no=page_no,
             page_size=page_size,
             default_max_score=default_max_score,
-            user=user
+            user=user,
+            tags=tags,
         )
 
     @classmethod

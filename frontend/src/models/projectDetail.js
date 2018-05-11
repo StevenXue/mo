@@ -389,6 +389,11 @@ export default {
         payload: result,
       })
     },
+
+    * updateProjectIsAutoHelp({payload}, {call, put, select}) {
+      const projectId = yield select(state => state.projectDetail.project._id)
+      const result = yield call(updateProject, {body: payload, projectId,})
+      }
   },
   subscriptions: {
     // 当进入该页面获取project
