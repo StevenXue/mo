@@ -567,6 +567,10 @@ class ProjectBusiness:
             f.write(json.dumps(nb_data))
 
     @classmethod
+    def nb_to_py_script(cls):
+        pass
+
+    @classmethod
     def nb_to_script(cls, project_id, nb_path, optimise=True):
         app = cls.get_by_id(project_id)
         call(['jupyter', 'nbconvert', '--to', 'script', nb_path],
