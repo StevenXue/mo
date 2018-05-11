@@ -398,6 +398,7 @@ export default {
         const match2 = pathToRegexp('/explore/:projectId/:type?').exec(pathname)
         const url = new URL(location.href.replace('/#', ''))
         if (match) {
+          console.log('ppp', pathname)
           const projectId = match[1]
           const projectType = url.searchParams.get('type') || match[2]
           dispatch({ type: 'refresh', projectId, projectType })
