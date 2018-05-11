@@ -217,11 +217,6 @@ class CommentForm extends React.Component {
   }
 }
 
-const myShowTime = (time, format = 'yyyy-MM-dd hh:mm') => {
-  let date = new Date(time).Format(format)
-  return date.toLocaleString()
-}
-
 function ProjectInfo({ app, market_use, match, history, location, dispatch, projectDetail, login }) {
   const projectId = match.params.projectId
   const user_ID = localStorage.getItem('user_ID')

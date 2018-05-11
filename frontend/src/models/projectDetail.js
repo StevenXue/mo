@@ -10,6 +10,7 @@ import {fetchApp} from '../services/app'
 import {fetchModule} from '../services/module'
 import {fetchDataset} from '../services/dataset'
 import {
+  getJobs,
   getSessions,
   getTerminals,
   deleteSession,
@@ -32,11 +33,13 @@ import * as commentsService from "../services/comments"
 export default {
   namespace: 'projectDetail',
   state: {
-    terminals: [],
-    sessions: [],
+    // terminals: undefined,
+    // sessions: [],
+    jobs: {},
+    jobIds: [],
     // doneIndices: new Set([]),
     helpModalVisible: false,
-    activeTab: '1',
+    activeTab: '2',
     pageNo: 1,
     pageSize: 10,
   },
@@ -44,7 +47,26 @@ export default {
     changeActiveTab(state, {activeTab}) {
       return {...state, activeTab}
     },
-
+    addJobLog(state, {payload: jobId}) {
+      let jobIds = state.jobIds
+      if (!jobIds.includes(jobId)) {
+        jobIds.push(jobId)
+      }
+      return {
+        ...state,
+        jobIds,
+      }
+    },
+    removeJobLog(state, {payload: jobId}) {
+      let jobIds = state.jobIds
+      if (jobIds.includes(jobId)) {
+        jobIds.splice(jobIds.indexOf(jobId),1)
+      }
+      return {
+        ...state,
+        jobIds,
+      }
+    },
     showHelpModal(state) {
       return {...state, helpModalVisible: true}
     },
@@ -70,6 +92,12 @@ export default {
       return {
         ...state,
         sessions,
+      }
+    },
+    setJobs(state, {payload: jobs}) {
+      return {
+        ...state,
+        jobs,
       }
     },
     setStep(state, {payload}) {
@@ -230,6 +258,19 @@ export default {
           hubUserName,
           hubToken
         })
+        // jobs is a dict with notebook path as key
+        const {data: jobs} = yield call(getJobs, {
+          projectId,
+          projectType
+        })
+        sessions.forEach(sess => {
+          if(jobs[sess.path] !== undefined) {
+            sess.jobs = jobs[sess.path]
+            delete jobs[sess.path]
+          }
+        })
+
+        yield put({type: 'setJobs', payload: jobs})
         yield put({type: 'setTerminals', payload: terminals})
         yield put({type: 'setSessions', payload: sessions})
       } catch (e) {
@@ -263,12 +304,12 @@ export default {
       const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
       const hubToken = project.hub_token
       yield sessionId && call(deleteSession, {hubUserName, hubToken, sessionId})
-      yield terminalName && call(deleteTerminal, {
+      yield terminalName && console.log('runrunrun') && call(deleteTerminal, {
         hubUserName,
         hubToken,
         terminalName,
       })
-      yield put({type: 'fetch', projectId: project._id})
+      yield put({type: 'fetch', projectId: project._id, projectType: project.type})
     },
     // 获取该 project 的 Jobs
     // *fetchJobs(action, { call, put }) {

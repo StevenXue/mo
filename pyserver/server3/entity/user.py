@@ -24,13 +24,6 @@ class User(DynamicDocument):
     age = IntField()
     avatarV = IntField(default=0)
 
-    # 用户收藏的api列表
-    favor_apps = ListField(ReferenceField("App"))
-    # 用户点赞的api列表
-    star_apps = ListField(ReferenceField("App"))
-    # 用户使用过的api列表
-    used_apps = ListField(ReferenceField("App"))
-
     # 用户点赞的request列表
     request_vote_up = ListField(ReferenceField("UserRequest"))
     # 用户star的request列表

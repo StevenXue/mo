@@ -1,45 +1,43 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
+import * as pathToRegexp from 'path-to-regexp';
 
 import {
-  JupyterLab, JupyterLabPlugin
+  JupyterLab, JupyterLabPlugin,
 } from '@jupyterlab/application';
 
 import {
-  ICommandPalette
+  ICommandPalette,
 } from '@jupyterlab/apputils';
 
 import {
-  ILauncher, LauncherModel, Launcher
+  ILauncher, LauncherModel, Launcher,
 } from '@jupyterlab/launcher';
 
 import {
-  toArray
+  toArray,
 } from '@phosphor/algorithm';
 
 import {
-  JSONObject
+  JSONObject,
 } from '@phosphor/coreutils';
 
 import {
-  Widget
+  Widget,
 } from '@phosphor/widgets';
 
 import {
-  NotebookActions
+  NotebookActions,
 } from '@jupyterlab/notebook';
 
 import '../style/index.css';
-
 
 /**
  * The command IDs used by the launcher plugin.
  */
 namespace CommandIDs {
-  export
-  const create = 'launcher:create';
+  export const create = 'launcher:create';
 }
-
 
 /**
  * A service providing an interface to the the launcher.
@@ -49,15 +47,13 @@ const plugin: JupyterLabPlugin<ILauncher> = {
   id: '@jupyterlab/launcher-extension:plugin',
   requires: [ICommandPalette],
   provides: ILauncher,
-  autoStart: true
+  autoStart: true,
 };
-
 
 /**
  * Export the plugin as default.
  */
 export default plugin;
-
 
 /**
  * Activate the launcher.
@@ -74,25 +70,35 @@ function activate(app: JupyterLab, palette: ICommandPalette): ILauncher {
       const callback = (item: Widget) => {
         shell.addToMainArea(item, { ref: id });
         shell.activateById(item.id);
+        console.log('item', item);
         if (item.hasOwnProperty('notebook')) {
-          NotebookActions.insertInitCode((item as any).notebook,
-            [
-              `# Please use current (work) folder to store your data and models\n`,
-              `import os\n`,
-              `import sys\n`,
-              `sys.path.append('../')\n`,
-              `\n`,
-              `from modules import json_parser\n`,
-              `from modules import Client\n`,
-              `\n`,
-              `client = Client('fackAPI')\n`,
-              `run = client.run\n`,
-              `train = client.train\n`,
-              `predict = client.predict\n`,
-              `\n`,
-              `# append work_path to head when you want to reference a path inside the working directory\n`,
-              `work_path = ''`,
-            ], (item as any).session);
+          const hash = window.location.hash;
+          const match = pathToRegexp('#/workspace/:projectId/:type').exec(hash);
+          if (match) {
+            let projectId = match[1];
+            let type = match[2];
+            const notebookPath = (item as any).context.path;
+            let sysPath = '../'.repeat(notebookPath.split('/').length);
+            NotebookActions.insertInitCode((item as any).notebook,
+              [
+                `# Please use current (work) folder to store your data and models\n`,
+                `import os\n`,
+                `import sys\n`,
+                `sys.path.append('${sysPath}')\n`,
+                `\n`,
+                `from modules import json_parser\n`,
+                `from modules import Client\n`,
+                `\n`,
+                `client = Client('fackAPI', project_id='${projectId}', user_ID='${localStorage.getItem('user_ID')}',\n`,
+                `                project_type='${type}', source_file_path='${(item as any).context.path}')\n`,
+                `run = client.run\n`,
+                `train = client.train\n`,
+                `predict = client.predict\n`,
+                `\n`,
+                `# append work_path to head when you want to reference a path inside the working directory\n`,
+                `work_path = ''`,
+              ], (item as any).session);
+          }
         }
       };
       const launcher = new Launcher({ cwd, callback });
@@ -116,14 +122,13 @@ function activate(app: JupyterLab, palette: ICommandPalette): ILauncher {
       }, launcher);
 
       return launcher;
-    }
+    },
   });
 
-  palette.addItem({ command: CommandIDs.create, category: 'Launcher'});
+  palette.addItem({ command: CommandIDs.create, category: 'Launcher' });
 
   return model;
 }
-
 
 /**
  * The namespace for module private data.
@@ -132,6 +137,5 @@ namespace Private {
   /**
    * The incrementing id used for launcher widgets.
    */
-  export
-  let id = 0;
+  export let id = 0;
 }
