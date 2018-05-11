@@ -627,7 +627,7 @@ class ProjectBusiness(GeneralBusiness):
 
                     # add handle function
                     line = re.sub(
-                        r"work_path = ''",
+                        r"work_path = '\./'",
                         r"work_path = 'function/'\n\n"
                         r"def handle(conf):\n"
                         r"\t# paste your code here",
@@ -640,6 +640,6 @@ class ProjectBusiness(GeneralBusiness):
         #             r"" + "\n" + "\t" + "conf = {}" + "\n" +"\t" + "handle()"
         main_func = r"if __name__ == '__main__': " + "\n" + "\t" \
                                                             r"conf = {}" + "\n" + "\t" \
-                                                                                  r"handle()"
+                                                                                  r"handle(conf)"
 
         my_open.write(main_func)
