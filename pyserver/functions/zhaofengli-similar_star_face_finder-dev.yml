@@ -1,0 +1,9 @@
+provider:
+  name: faas
+  gateway: http://127.0.0.1:8080
+
+functions:
+  zhaofengli-similar_star_face_finder-dev:
+    lang: python3
+    handler: ./zhaofengli-similar_star_face_finder-dev
+    image: zhaofengli-similar_star_face_finder-dev

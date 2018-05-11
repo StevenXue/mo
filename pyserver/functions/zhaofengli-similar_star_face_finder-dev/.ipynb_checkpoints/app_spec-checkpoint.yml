@@ -1,0 +1,12 @@
+input:
+  img:
+    default: null
+    des: upload your photo
+    name: img
+    range: null
+    required: true
+    value: null
+    value_type: img
+output:
+  fql:
+    value_type: img
