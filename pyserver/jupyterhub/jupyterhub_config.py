@@ -1222,7 +1222,7 @@ c.Authenticator.admin_users = {'admin'}
 
 import os
 cwd = os.getcwd()
-user_path = os.path.abspath(cwd). \
+user_path = os.path.abspath(cwd).\
     replace('jupyterhub', 'user_directory/{user_ID}/{project_name}')
 c.DockerSpawner.image = 'singleuser:latest'
 c.DockerSpawner.remove_containers = True

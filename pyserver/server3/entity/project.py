@@ -40,7 +40,7 @@ class Project(DynamicDocument):
     overview = StringField()
     tb_port = StringField()
     datasets = ListField(ReferenceField('DataSet', reverse_delete_rule=PULL))
-    jobs = ListField(ReferenceField('Job', reverse_delete_rule=PULL))
+    jobs = ListField(ReferenceField('Job'))
     # if forked project, which project fork from
     source_project = ReferenceField('Project')
     tags = ListField(StringField(max_length=50))

@@ -8,16 +8,16 @@ const onSuccessDef = function (response) {
 const onErrorDef = function (error) {
 }
 
-function checkStatus({data, noErrorMsg, customErrorMsg, newRes}) {
+function checkStatus({ data, noErrorMsg, customErrorMsg, newRes }) {
 
   if (newRes.status >= 200 && newRes.status < 300) {
     // message.success('This is a message of success');
     return true
   }
-  if(!noErrorMsg) {
+  if (!noErrorMsg) {
     message.error('This is a message of error: ' + newRes.statusText)
   }
-  else if(customErrorMsg){
+  else if (customErrorMsg) {
     message.error(data.response)
   }
 
@@ -47,7 +47,7 @@ export default async function request(url, options = {}, funcs = {}) {
     delete options.customErrorMsg
 
     const response = await fetch(url, options)
-    if(onSuccess) {
+    if (onSuccess) {
       await onSuccess(response)
       return null
     }
@@ -56,13 +56,12 @@ export default async function request(url, options = {}, funcs = {}) {
 
     const data = await response.json()
     const res = data.response || data
-    if(onJson) {
+    if (onJson) {
       await onJson(res)
       return null
     }
 
-    const noError = checkStatus({data, noErrorMsg, customErrorMsg, newRes})
-
+    const noError = checkStatus({ data, noErrorMsg, customErrorMsg, newRes })
 
     // 报错了就不要把data加进去了
     const ret = {
@@ -70,7 +69,7 @@ export default async function request(url, options = {}, funcs = {}) {
       res: data,
       headers: {},
       status: response.status,
-      noError
+      noError,
     }
 
     if (response.headers.get('x-total-count')) {
@@ -81,7 +80,9 @@ export default async function request(url, options = {}, funcs = {}) {
 
   } catch (err) {
     console.log(url, err)
-    onError && await onError(err)
+    if (onError) {
+      await onError(err)
+    }
   }
 }
 

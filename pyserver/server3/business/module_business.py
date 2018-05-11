@@ -232,3 +232,4 @@ class ModuleBusiness(ProjectBusiness):
                                        project.user.user_ID, project.category)
         failures = [f[1] for f in result.failures]
         return failures
+

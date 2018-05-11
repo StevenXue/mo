@@ -20,7 +20,6 @@ from copy import deepcopy
 from datetime import datetime
 # from distutils.dir_util import copy_tree
 from subprocess import call
-
 from git import Repo
 from flask_socketio import SocketIO
 
@@ -41,6 +40,7 @@ from server3.constants import INIT_RES
 from server3.constants import REDIS_SERVER
 from server3.business.request_answer_business import RequestAnswerBusiness
 from server3.constants import GIT_SERVER_IP
+from server3.business.general_business import GeneralBusiness
 
 socketio = SocketIO(message_queue=REDIS_SERVER)
 
@@ -220,7 +220,7 @@ def copytree(src, dst, symlinks=False, ignore=None, copy_function=shutil.copy2,
     return dst
 
 
-class ProjectBusiness:
+class ProjectBusiness(GeneralBusiness):
     project = None
     repo = ProjectRepo(Project)
 
@@ -426,6 +426,20 @@ class ProjectBusiness:
         return project
 
     @classmethod
+    def get_by_identity(cls, identity):
+        """
+        Get a project object by its identity
+
+        :param identity: string
+        :return: a matched Project object
+        """
+        [user_ID, project_name] = identity.split('+')
+        user = UserBusiness.get_by_user_ID(user_ID)
+        project = cls.repo.read_unique_one(dict(name=project_name, user=user))
+        cls.project = project
+        return project
+
+    @classmethod
     def remove_project_by_id(cls, project_id, user_ID):
         """
         remove project by its object_id
@@ -600,11 +614,12 @@ class ProjectBusiness:
                         r"# Please use current \(work\) folder to store your data "
                         r"and models",
                         r'', line.rstrip())
-                    line = re.sub(r"sys.path.append\('\.\./'\)", r'',
+                    line = re.sub(r"""sys.path.append\('(.+)'\)""", r'',
                                   line.rstrip())
-                    line = re.sub(r"""client = Client\('(.+)'\)""",
-                                  r"""client = Client('\1', silent=True)""",
+                    line = re.sub(r"""(\s+)project_type='(.+)', source_file_path='(.+)'\)""",
+                                  r"""\1project_type='\2', source_file_path='\3', silent=True)""",
                                   line.rstrip())
+
                     line = re.sub(r"""from modules import (.+)""",
                                   r"""from function.modules import \1""",
                                   line.rstrip())
@@ -623,7 +638,9 @@ class ProjectBusiness:
         # main_func = r"if __name__ == '__main__':" \
         #             r"" + "\n" + "\t" + "conf = {}" + "\n" +"\t" + "handle()"
         main_func = r"if __name__ == '__main__': " + "\n" + "\t" \
-                    r"conf = {}" + "\n" + "\t" \
-                    r"handle()"
+                                                            r"conf = {}" + "\n" + "\t" \
+                                                                                  r"handle()"
 
         my_open.write(main_func)
+
+
