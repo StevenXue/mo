@@ -1,11 +1,14 @@
 @import "../../../../index";
-.joyride-tooltip__main{
+
+.joyride-tooltip__main {
   font-size: 20px;
 }
-.joyride-tooltip__footer{
+
+.joyride-tooltip__footer {
   margin-top: 13px;
   margin-bottom: -8px;
 }
+
 .normal {
 
   //width: 100%;
@@ -14,7 +17,27 @@
     .bigIconNunberDiv {
       margin-top: 15px;
 
-      .iconNunberDivActive {
+      .blue {
+        background-color: #34c0e2;
+        border-radius: 5px;
+        align-items: center;
+        margin-top: 15px;
+        .icon {
+          text-align: center;
+          margin: 5px 0 0 0;
+          padding-top: 5px;
+          color: #ffffff;
+          font-size: 22px;
+        }
+        .number {
+          text-align: center;
+          margin: 0 0 5px 0;
+          padding-bottom: 5px;
+          color: #ffffff;
+          font-size: 14px;
+        }
+      }
+      .lightBlue {
         background-color: #E2F9FF;
         border-radius: 5px;
         align-items: center;
@@ -23,18 +46,18 @@
           text-align: center;
           margin: 5px 0 0 0;
           padding-top: 5px;
-          color: #34c0e2;
+          color: #34BfE2;
           font-size: 22px;
         }
         .number {
           text-align: center;
           margin: 0 0 5px 0;
           padding-bottom: 5px;
-          color: #34c0e2;
+          color: #34BfE2;
           font-size: 14px;
         }
       }
-      .iconNunberDiv {
+      .gray {
         background-color: #F5F5F5;
         border-radius: 5px;
         align-items: center;
@@ -93,12 +116,12 @@
       margin-left: 0;
       padding-right: 50px;
 
-      .descriptionP{
-        display:-webkit-box;
-        overflow:hidden;
-        text-overflow:ellipsis;
+      .descriptionP {
+        display: -webkit-box;
+        overflow: hidden;
+        text-overflow: ellipsis;
         //-webkit-line-clamp:3;
-        -webkit-box-orient:vertical;
+        -webkit-box-orient: vertical;
         color: #999999;
       }
 
@@ -157,6 +180,11 @@
       border-radius: 50%;
     }
 
+    .bulbDead {
+      .bulb;
+      border: 1px solid lightgrey;
+    }
+
     .bulbIdle {
       .bulb;
       border: 1px solid grey;
@@ -173,13 +201,14 @@
 
     .jobCols {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
+      //flex-wrap: wrap;
       margin: 5px 0;
 
       .jobCell {
         margin: 5px 0;
         padding-right: 45px;
-        width: 50%;
+        width: 100%;
         line-height: 25px;
         //flex-direction: column;
 
@@ -206,6 +235,26 @@
       }
 
     }
+    .jobReactRow {
+      width: 100%;
+
+      .jobReactCol {
+        margin: 5px 0;
+        padding: 0 80px 0 20px;
+
+        .jobTitle {
+          display: flex;
+          justify-content: space-between;
+          .tag {
+            margin: 0 5px;
+          }
+        }
+        .log {
+          //background: #ffffff;
+        }
+      }
+    }
+
   }
 }
 
@@ -228,29 +277,29 @@
   }
 }
 
-.commentDiv{
+.commentDiv {
   //padding: 20px 0;
   font-size: 14px;
-  .commitVersion{
+  .commitVersion {
     color: #333333;
     font-size: 15px;
   }
-  .commitHexsha{
+  .commitHexsha {
     color: #999999;
     font-size: 13px;
   }
-  .commentCol{
+  .commentCol {
     border-top: #E9E9E9 1px solid;
     //border-bottom: #E9E9E9 1px solid;
     padding: 20px 0;
-    .commentUserID{
+    .commentUserID {
       color: #34BFE2;
       cursor: pointer;
     }
-    .commentContent{
+    .commentContent {
       color: #333333;
     }
-    .commentCreateTime{
+    .commentCreateTime {
       color: #999999;
       font-size: 13px;
     }

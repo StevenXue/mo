@@ -15,6 +15,7 @@ module.exports = {
   // jupyterServer: 'http://10.52.14.182:8888/api/contents/',  // kube master node ip
   // kubeServer: 'http://10.52.14.182:8888/api/contents/',  // kube master node ip
   gitServerIp: 'momodel.ai',
+  webServer: 'http://momodel.ai',
   // hubIp: '192.168.31.7',
   // jupyterServer: 'http://10.52.14.182:8888/api/contents/',
   // jupyterServer: 'http://122.224.116.44:9001/api/contents/',
@@ -120,8 +121,6 @@ module.exports = {
     '_Provide and explain examples of input and output for your algorithm._\n' +
     '\n',
   },
-
-  avatarList: [avatar1, avatar2, avatar3, avatar4, avatar5, avatar6],
 
 }
 

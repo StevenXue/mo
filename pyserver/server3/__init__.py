@@ -28,22 +28,40 @@ Project.register_delete_rule(Job, 'project', CASCADE)
 DataSet.register_delete_rule(File, 'data_set', CASCADE)
 File.register_delete_rule(DataSet, 'file', NULLIFY)
 UserRequest.register_delete_rule(User, 'request_star', PULL)
-User.register_delete_rule(UserRequest, 'star_user', PULL)
 
-# 删除app
+# 删除 user
+User.register_delete_rule(App, 'star_users', PULL)
+User.register_delete_rule(App, 'favor_users', PULL)
+User.register_delete_rule(Module, 'star_users', PULL)
+User.register_delete_rule(Module, 'favor_users', PULL)
+User.register_delete_rule(Dataset, 'star_users', PULL)
+User.register_delete_rule(Dataset, 'favor_users', PULL)
+User.register_delete_rule(UserRequest, 'star_user', PULL)
+User.register_delete_rule(UserRequest, 'votes_up_user', PULL)
+
+
+# 删除 job
+Job.register_delete_rule(App, 'jobs', PULL)
+Job.register_delete_rule(Module, 'jobs', PULL)
+Job.register_delete_rule(Dataset, 'jobs', PULL)
+
+# 删除 app
 App.register_delete_rule(User, 'favor_apps', PULL)
 App.register_delete_rule(User, 'star_apps', PULL)
 App.register_delete_rule(Statistics, 'app', CASCADE)
+App.register_delete_rule(Job, 'app', CASCADE)
 
-# 删除module
+# 删除 module
 Module.register_delete_rule(User, 'favor_modules', PULL)
 Module.register_delete_rule(User, 'star_modules', PULL)
 Module.register_delete_rule(Statistics, 'module', CASCADE)
+Module.register_delete_rule(Job, 'module', CASCADE)
 
-# 删除dataset
+# 删除 dataset
 Dataset.register_delete_rule(User, 'favor_datasets', PULL)
-Module.register_delete_rule(User, 'star_datasets', PULL)
-Module.register_delete_rule(Statistics, 'datasets', CASCADE)
+Dataset.register_delete_rule(User, 'star_datasets', PULL)
+Dataset.register_delete_rule(Statistics, 'dataset', CASCADE)
+Dataset.register_delete_rule(Job, 'dataset', CASCADE)
 
 # App.register_delete_rule(User, 'used_apps', PULL)  # TODO 把相关的used_apps删掉
 

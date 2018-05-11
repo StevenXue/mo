@@ -79,6 +79,13 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
       history.push('/user/login')
     }
   }
+
+  const toSignUpPage = () => {
+    if (!login.user) {
+      history.push('/user/register')
+    }
+  }
+
   const logout = () => {
     localStorage.removeItem('token')
     dispatch({ type: 'login/resetUser' })
@@ -135,6 +142,12 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
       case 'publish':
         toProject(e)
         break
+      case 'deploy_request':
+        toProject(e)
+        break
+      case 'publish_request':
+        toProject(e)
+        break
     }
     dispatch({
       type: 'message/readMessage',
@@ -163,26 +176,40 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
   const switchMessage = (e) => {
     switch (e.message_type) {
       case 'answer':
-        return <p className={styles.messageP}>{`${e.user_ID}回答了您关注的需求${e.user_request_title}`}</p>
+        return <p className={styles.messageP}>{`${e.user_ID} 回答了您关注的需求${e.user_request_title}`}</p>
       case 'commit':
         return <p className={styles.messageP}>{`${e.user_ID} 更新了您关注的需求  ${e.user_request_title}`} 的答案</p>
       case 'deploy':
         return <p
-          className={styles.messageP}>{`${e.user_ID} 上线了您关注的${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
+          className={styles.messageP}>{`${e.user_ID} 上线了您关注的 ${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
       case 'publish':
         return <p
-          className={styles.messageP}>{`${e.user_ID} 发布了您关注的${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
+          className={styles.messageP}>{`${e.user_ID} 发布了您关注的 ${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
+      case 'deploy_fail':
+        return <p
+          className={styles.messageP}>{`您的 ${translatorTemp[e.project_type]}  ${e.project_name} 部署失败`}</p>
+      case 'publish_fail':
+        return <p
+          className={styles.messageP}>{`您的 ${translatorTemp[e.project_type]}  ${e.project_name} 发布失败`}</p>
       case 'deploy_request':
         return <p
-          className={styles.messageP}>{`${e.user_ID} 为您的答案${e.user_request_title} 上线了${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
+          className={styles.messageP}>{`${e.user_ID} 为您的答案 ${e.user_request_title} 上线了 ${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
       case 'publish_request':
         return <p
-          className={styles.messageP}>{`${e.user_ID} 为您的答案${e.user_request_title} 发布了${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
+          className={styles.messageP}>{`${e.user_ID} 为您的答案 ${e.user_request_title} 发布了 ${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
+      case 'job_success':
+        return <p
+          className={styles.messageP}>{`Your running ${e.job_type}  ${e.job_name} was finished successfully.`}</p>
+      case 'job_error':
+        return <p
+          className={styles.messageP}>{`Your running ${e.job_type}  ${e.job_name} was failed.`}</p>
     }
   }
 
-  return <div className={styles.container}>
-    <div className={styles.box}>
+  return <div className={styles.container} style={{display:location.pathname.indexOf('user/')!==-1||location.pathname.indexOf('/newpassword')!==-1?'none':'block',
+    backgroundColor:location.pathname === '/'?'#33333399':'#464E78'}}
+  >
+    <div className={styles.box} style={{width:1170,margin:'0 auto', backgroundColor:location.pathname === '/'?'#464E7800':'#464E78'}}>
 
       <Menu
         className={styles.normal}
@@ -241,11 +268,12 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
           title={
             <div onClick={toLoginPage} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
               {
-                login.user ? <img src={login.user.avatar}
+                login.user ? <img src={`${login.userAvatar}`}
                                   style={{ width: 25, borderRadius: '50%', marginRight: 10 }}/> : null
               }
               <span> {login.user ? login.user.user_ID : 'Login'} </span>
             </div>
+
           }
         >
           {login.user &&
@@ -273,7 +301,17 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
           }
 
         </SubMenu>
-        <SubMenu
+
+        {!login.user &&<SubMenu
+          className={styles.rightButton}
+          title={
+          <div onClick={toSignUpPage} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+            <span>SignUp</span>
+          </div>
+        }>
+        </SubMenu>}
+
+        {login.user &&<SubMenu
           className={styles.messageSubmenu}
           title={
             <span onClick={toLoginPage} style={{ position: 'relative' }}>
@@ -311,6 +349,7 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
           {/*)*/}
           {/*}*/}
         </SubMenu>
+        }
       </Menu>
     </div>
   </div>

@@ -81,7 +81,6 @@ class Register extends Component {
       (err, values) => {
         if (!err) {
           console.log('values', values)
-          values.welcome="0"
           values.tourtip="0"
           delete values.confirm
           delete values.prefix
@@ -163,7 +162,8 @@ class Register extends Component {
           <FormItem>
             User ID
             {getFieldDecorator('user_ID', {
-              getValueFromEvent: (e) => e.target.value.toLowerCase(),
+              // not allow uppercase and whitespace
+              getValueFromEvent: (e) => e.target.value.toLowerCase().replace(/\s/g, ""),
               rules: [{
                 required: true, message: 'Please enter your ID!',
               }, {

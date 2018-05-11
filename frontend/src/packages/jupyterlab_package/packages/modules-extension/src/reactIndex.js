@@ -18,7 +18,7 @@ import {
 
 import ParamsMapper from './ParamsMapper'
 
-import {addModuleToApp, getModule, getProjects, getApp, removeModuleInApp} from './services'
+import {addModuleToApp, getModule, getProjects, getApp, removeModuleInApp, getFavs} from './services'
 
 const Option = Select.Option;
 import 'antd/lib/list/style/css';
@@ -76,7 +76,7 @@ export class ModulePage extends React.Component {
                 [key.hyphenToHump()]: payload[key],
             })
         }
-        // fetch
+        // fetch projects
         getProjects({
             filter,
             onJson: ({projects, count}) => this.setState({
@@ -84,6 +84,16 @@ export class ModulePage extends React.Component {
                 totalNumber: count,
             }),
         })
+        // fetch user fav modules
+        getFavs({
+            filter,
+            fav_entity: 'favor_modules',
+            onJson: ({objects, count}) => this.setState({
+                favModules: objects,
+                totalFavNumber: count,
+            }),
+        })
+
         if (this.appId) {
             getApp({
                 appId: this.appId,
@@ -111,13 +121,14 @@ export class ModulePage extends React.Component {
         })
     }
 
-    backToList(project) {
+    backToList({params}) {
         this.setState({
             projectId: undefined,
             project: undefined,
             func: undefined,
             args: undefined,
             showUsedModules: undefined,
+            showFavModules: params ? this.state.showFavModules : undefined,
         })
     }
 
@@ -126,6 +137,8 @@ export class ModulePage extends React.Component {
     }
 
     insertCode() {
+
+
         let dict = {}
         this.state.args.forEach(arg => {
             dict[arg.name] = arg.value || arg.default_value
@@ -142,6 +155,16 @@ export class ModulePage extends React.Component {
                 `result = ${this.state.func}('${this.state.project.user_ID}/${this.state.project.name}/${this.state.version}', conf)`,
             ],
         )
+
+
+        NotebookActions.insertMarkdown(this.props.tracker.currentWidget.notebook,
+            [
+                "this.state.project.overview",
+            ],
+        )
+
+
+
         if (this.appId) {
             addModuleToApp({
                 appId: this.appId,
@@ -208,7 +231,7 @@ export class ModulePage extends React.Component {
     renderParams() {
         return (
             <div className='container'>
-                <header style={{cursor: 'pointer'}} onClick={() => this.backToList()}>
+                <header style={{cursor: 'pointer'}} onClick={() => this.backToList({params: true})}>
                     <Icon type="left"/>{this.state.project.name}
                 </header>
                 <div>
@@ -233,7 +256,7 @@ export class ModulePage extends React.Component {
         const overview = this.state.project.overview || defaultOverview
         return (
             <div className='container'>
-                <header style={{cursor: 'pointer'}} onClick={() => this.backToList()}>
+                <header style={{cursor: 'pointer'}} onClick={() => this.backToList({})}>
                     <Icon type="left"/>{this.state.project.name}
                 </header>
                 <div style={{height: 'auto', overflowY: 'auto'}}>
@@ -284,7 +307,7 @@ export class ModulePage extends React.Component {
                         cursor: 'pointer',
                         display: 'flex', alignItems: 'center', justifyContent: 'space-between'
                     }}
-                    onClick={() => this.backToList()}>
+                    onClick={() => this.backToList({})}>
                     <Icon type="left"/><span style={{textAlign: 'center'}}>IMPORTED MODULES</span>
                     <div/>
                 </header>
@@ -294,11 +317,72 @@ export class ModulePage extends React.Component {
                         itemLayout="horizontal"
                         dataSource={this.state.app.used_modules}
                         renderItem={item => (
-                            <List.Item actions={[<Icon onClick={() => onRemoveModule(item.module, item.version)}
-                                                       type="close"/>]}>
+                            <List.Item
+                                // actions={[<Icon onClick={() => onRemoveModule(item.module, item.version)}
+                                //                        type="close"/>]}
+                            >
                                 <List.Item.Meta
                                     title={<span>{item.module.name} v{item.version}</span>}
                                     description={item.module.description}
+                                />
+                            </List.Item>
+                        )}
+                    />
+                </div>
+            </div>
+        )
+    }
+
+    renderFavModules() {
+        const onRemoveModule = (module, version) => {
+            confirm({
+                title: 'Are you sure to remove this module from project?',
+                okText: 'Yes',
+                okType: 'danger',
+                cancelText: 'No',
+                onOk: () => {
+                    removeModuleInApp({
+                        appId: this.appId,
+                        moduleId: module._id,
+                        version,
+                        onJson: (app) => this.setState({
+                            app,
+                        }),
+                    })
+                },
+            })
+
+        };
+
+        return (
+            // list
+            <div className='container'>
+                <header
+                    style={{
+                        cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+                    }}
+                    onClick={() => this.backToList({})}>
+                    <Icon type="left"/><span style={{textAlign: 'center'}}>FAVOURITE MODULES</span>
+                    <div/>
+                </header>
+                <div className='list'>
+                    <List
+                        style={{margin: '0 10px'}}
+                        itemLayout="vertical"
+                        dataSource={this.state.favModules}
+                        renderItem={project => (
+                            <List.Item
+                                actions={[<a onClick={() => this.clickProject(project)}>Detail</a>].concat(
+                                    project.category === 'model' ?
+                                        [<a onClick={() => this.clickProject(project, 'train')}>Train</a>,
+                                            <a onClick={() => this.clickProject(project, 'predict')}>Predict</a>]
+                                        : [<a onClick={() => this.clickProject(project, 'run')}>Run</a>])
+                                }
+                            >
+                                <List.Item.Meta
+                                    title={<span>{project.name}</span>}
+                                    description={project.description}
                                 />
                             </List.Item>
                         )}
@@ -314,8 +398,10 @@ export class ModulePage extends React.Component {
             <div className='container'>
                 <header>
                     MODULE LIST
-                    {this.appId && <Icon type="bars" style={{float: 'right', cursor: 'pointer', margin: 5}}
+                    {this.appId && <Icon type="clock-circle-o"
+                                         className='history-module-btn'
                                          onClick={() => this.setState({showUsedModules: true})}/>}
+                    <div className='fav-module-btn' onClick={() => this.setState({showFavModules: true})}/>
                 </header>
                 <Search
                     placeholder="input search text"
@@ -360,6 +446,8 @@ export class ModulePage extends React.Component {
                 // overview
                 return this.renderOverview()
             }
+        } else if (this.state.showFavModules) {
+            return this.renderFavModules()
         } else if (this.state.showUsedModules && this.state.app) {
             return this.renderSelectedModules()
         } else {

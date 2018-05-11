@@ -1,40 +1,61 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
-import {connect} from 'dva'
-import {Tabs, Input, Icon} from 'antd'
-import {WorldMessages} from './index'
+import { connect } from 'dva'
+import { Tabs, Input, Icon, Button } from 'antd'
+import { WorldMessages } from './index'
 import styles from './index.less'
 
 class worldChannelC extends Component {
+  state = {
+    run: false,
+    steps: [],
+    steps2: [],
+  }
 
   componentDidMount() {
-    // To disabled submit button at the beginning.
+    // this.setState({ run: true });
+
+
+
+  }
+
+  onClickIcon = () => {
     this.props.dispatch({
-      type: "worldChannel/getWorldMessages",
-      payload: {
-        channel: "all"
-      }
+      type: 'worldChannel/toggleIsRight',
+      payload: {},
     })
   }
 
+  callback = (tour) => {
+    const { action, index, type } = data
+  }
+
   render() {
-    const {worldMessages, onClickIcon, isRight, dispatch, login} = this.props
+    const { steps, run } = this.state
+    console.log('steps', steps)
+
+    const { worldMessages, isRight, dispatch, login } = this.props
     if (!login.user) {
       return (
         <div/>
       )
     }
     else {
-      return <WorldChannel worldMessages={worldMessages}
-                   onClickIcon={onClickIcon}
-                   dispatch={dispatch}
-                   isRight={isRight}
 
-      />
+      return (
+        <div>
+          <WorldChannel worldMessages={worldMessages}
+                        onClickIcon={this.onClickIcon}
+                        dispatch={dispatch}
+                        isRight={isRight}
+                        login={login}
+
+          />
+        </div>
+      )
     }
   }
 }
-
 
 class WorldChannel extends Component {
   constructor(props) {
@@ -43,50 +64,65 @@ class WorldChannel extends Component {
   }
 
   componentDidMount() {
-    this.scrollToBottom(true)
+    // To disabled submit button at the beginning.
+    this.props.dispatch({
+      type: 'worldChannel/getWorldMessages',
+      payload: {
+        channel: 'all',
+        scrollToBottom: this.scrollToBottom
+      },
+    })
   }
 
   componentDidUpdate() {
     this.scrollToBottom(false)
   }
 
-  scrollToBottom = (force=true) => {
+  scrollToBottom = (force = true) => {
     const messagesContainer = ReactDOM.findDOMNode(this.scrollView)
-    if(messagesContainer.scrollHeight-messagesContainer.scrollTop <= messagesContainer.clientHeight+50+20 || force){
+    if (messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight + 50 + 20 || force) {
       messagesContainer.scrollTop = messagesContainer.scrollHeight - messagesContainer.clientHeight
     }
 
   }
 
   handleSendMessage = (e) => {
+    this.scrollToBottom(true)
     const inputMessage = e.target.value
     this.props.dispatch({
-      type: "worldChannel/sendMessage",
+      type: 'worldChannel/sendMessage',
       payload: {
-        channel: "all",
-        message: inputMessage
-      }
+        channel: 'all',
+        message: inputMessage,
+      },
     })
-    e.target.value = ""
+    e.target.value = ''
   }
 
   subHadleSendMessage = (e) => {
+    this.scrollToBottom(true)
     const inputMessage = e.input.value
     this.props.dispatch({
-      type: "worldChannel/sendMessage",
+      type: 'worldChannel/sendMessage',
       payload: {
-        channel: "all",
-        message: inputMessage
-      }
+        channel: 'all',
+        message: inputMessage,
+      },
     })
-    e.input.value = ""
+    e.input.value = ''
+
   }
 
   render() {
-    const {worldMessages, onClickIcon, isRight} = this.props
+    const { worldMessages, onClickIcon, isRight, login } = this.props
     return (
       <div className={styles.container}
-           style={{width: isRight ? 300 : 50, display: "flex", flexDirection: "column"}}
+           style={{
+             width: isRight ? 300 : 50,
+             display: 'flex',
+             flexDirection: 'column',
+             position: 'fixed',
+           }}
       >
         {
           isRight ?
@@ -102,6 +138,7 @@ class WorldChannel extends Component {
 
               <Icon type="caret-down"
                     className={styles.icon_container}
+                    style={{color: 'transparent'}}
               />
             </div> :
 
@@ -117,6 +154,7 @@ class WorldChannel extends Component {
             this.scrollView = el
           }}
           isRight={isRight}
+          login={login}
         />
         {
           isRight &&
@@ -141,7 +179,7 @@ class WorldChannel extends Component {
               }}
             >
               <img
-                style={{height: 25, width: 25}}
+                style={{ height: 25, width: 25 }}
                 src={require('../../img/icon/aircraft.png')}
                 onClick={() => {
                   let object = this.refs.myInput
@@ -152,11 +190,13 @@ class WorldChannel extends Component {
 
           </div>
         }
+
+
       </div>
 
     )
   }
 }
 
-export default connect(({login, worldChannel}) => ({login, ...worldChannel}))(worldChannelC)
+export default connect(({ login, worldChannel }) => ({ login, ...worldChannel }))(worldChannelC)
 

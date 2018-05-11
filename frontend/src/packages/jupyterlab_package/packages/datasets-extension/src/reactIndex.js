@@ -143,35 +143,40 @@ export class DatasetPage extends React.Component {
         this.fetchData({payload: {page_no: pageNo, page_size: pageSize}})
     }
 
-    renderPublicList() {
+    renderOverview() {
+        const overview = this.state.project.overview || defaultOverview
         return (
             <div className='container'>
-                <header>DATASET LIST
-                    {this.appId && <Icon type="bars" style={{float: 'right', cursor: 'pointer', margin: 5}}
-                                         onClick={() => this.setState({showUsedDatasets: true})}/>}
+                <header style={{cursor: 'pointer'}} onClick={() => this.backToList()}>
+                    <Icon type="left"/>{this.state.project.name}
                 </header>
-                <Search
-                    placeholder="input search text"
-                    onSearch={(value) => this.handleQueryChange(value)}
-                />
-                <div className='list'>
-                    {this.state.projects.map((project) =>
-                        <Card key={project.name} title={project.name}
-                              onClick={() => this.clickProject(project)}
-                              style={{margin: '5px 3px', cursor: 'pointer'}}>
-                            <Col>
-                                {project.description}
-                            </Col>
-                        </Card>)}
-                    <div className='pagination'>
-                        <Pagination showSizeChanger
-                                    onShowSizeChange={this.onShowSizeChange}
-                                    onChange={this.onShowSizeChange}
-                                    defaultCurrent={1}
-                                    defaultPageSize={5}
-                                    pageSizeOptions={['5', '10', '15', '20', '25']}
-                                    total={this.state.totalNumber}/>
+                <div style={{height: '100%', overflowY: 'auto'}}>
+                    <p className='des'>{this.state.project.description}</p>
+                    <div className='des'>
+                        <CopyInput text={this.state.project.path.replace('./user_directory', '../dataset')}
+                                   datasetId={this.state.projectId}
+                                   appId={this.appId}
+                                   setApp={(app) => this.setState({
+                                       app,
+                                       projectId: undefined,
+                                       project: undefined,
+                                       showUsedDatasets: true
+                                   })}
+                        />
                     </div>
+                    <ReactMde
+                        textAreaProps={{
+                            id: 'ta1',
+                            name: 'ta1',
+                        }}
+                        value={{text: overview}}
+                        showdownOptions={{tables: true, simplifiedAutoLink: true}}
+                        visibility={{
+                            toolbar: false,
+                            textarea: false,
+                            previewHelp: false,
+                        }}
+                    />
                 </div>
             </div>
         )
@@ -229,40 +234,35 @@ export class DatasetPage extends React.Component {
         )
     }
 
-    renderOverview() {
-        const overview = this.state.project.overview || defaultOverview
+    renderPublicList() {
         return (
             <div className='container'>
-                <header style={{cursor: 'pointer'}} onClick={() => this.backToList()}>
-                    <Icon type="left"/>{this.state.project.name}
+                <header>DATASET LIST
+                    {this.appId && <Icon type="bars" style={{float: 'right', cursor: 'pointer', margin: 5}}
+                                         onClick={() => this.setState({showUsedDatasets: true})}/>}
                 </header>
-                <div style={{height: '100%', overflowY: 'auto'}}>
-                    <p className='des'>{this.state.project.description}</p>
-                    <div className='des'>
-                        <CopyInput text={this.state.project.path.replace('./user_directory', '../dataset')}
-                                   datasetId={this.state.projectId}
-                                   appId={this.appId}
-                                   setApp={(app) => this.setState({
-                                       app,
-                                       projectId: undefined,
-                                       project: undefined,
-                                       showUsedDatasets: true
-                                   })}
-                        />
+                <Search
+                    placeholder="input search text"
+                    onSearch={(value) => this.handleQueryChange(value)}
+                />
+                <div className='list'>
+                    {this.state.projects.map((project) =>
+                        <Card key={project.name} title={project.name}
+                              onClick={() => this.clickProject(project)}
+                              style={{margin: '5px 3px', cursor: 'pointer'}}>
+                            <Col>
+                                {project.description}
+                            </Col>
+                        </Card>)}
+                    <div className='pagination'>
+                        <Pagination showSizeChanger
+                                    onShowSizeChange={this.onShowSizeChange}
+                                    onChange={this.onShowSizeChange}
+                                    defaultCurrent={1}
+                                    defaultPageSize={5}
+                                    pageSizeOptions={['5', '10', '15', '20', '25']}
+                                    total={this.state.totalNumber}/>
                     </div>
-                    <ReactMde
-                        textAreaProps={{
-                            id: 'ta1',
-                            name: 'ta1',
-                        }}
-                        value={{text: overview}}
-                        showdownOptions={{tables: true, simplifiedAutoLink: true}}
-                        visibility={{
-                            toolbar: false,
-                            textarea: false,
-                            previewHelp: false,
-                        }}
-                    />
                 </div>
             </div>
         )

@@ -15,11 +15,11 @@ import re
 import fileinput
 import requests
 import collections
+import json
 from copy import deepcopy
 from datetime import datetime
 # from distutils.dir_util import copy_tree
 from subprocess import call
-
 from git import Repo
 from flask_socketio import SocketIO
 
@@ -40,6 +40,7 @@ from server3.constants import INIT_RES
 from server3.constants import REDIS_SERVER
 from server3.business.request_answer_business import RequestAnswerBusiness
 from server3.constants import GIT_SERVER_IP
+from server3.business.general_business import GeneralBusiness
 
 socketio = SocketIO(message_queue=REDIS_SERVER)
 
@@ -219,7 +220,7 @@ def copytree(src, dst, symlinks=False, ignore=None, copy_function=shutil.copy2,
     return dst
 
 
-class ProjectBusiness:
+class ProjectBusiness(GeneralBusiness):
     project = None
     repo = ProjectRepo(Project)
 
@@ -291,7 +292,7 @@ class ProjectBusiness:
     @staticmethod
     def gen_dir(user_ID, name):
         """
-        auth jupyterhub with user token
+        gen_dir for project
         :param user_ID:
         :param project_name:
         :param token:
@@ -307,19 +308,15 @@ class ProjectBusiness:
         return project_path
 
     @classmethod
-    def get_objects(cls, search_query, user=None, page_no=PAGE_NO,
-                    page_size=PAGE_SIZE, default_max_score=0.4,
-                    privacy=None):
-        """
-        Search for objects
-
-        :param search_query:
-        :param user:
-        :param page_no:
-        :param page_size:
-        :param default_max_score:
-        :return:
-        """
+    def get_objects(cls, search_query,
+                    privacy,
+                    page_no,
+                    page_size,
+                    default_max_score,
+                    user, tags):
+        # def get_objects(cls, search_query, user=None, page_no=PAGE_NO,
+        #             page_size=PAGE_SIZE, default_max_score=0.4,
+        #             privacy=None,tags=tags):
 
         start = (page_no - 1) * page_size
         end = page_no * page_size
@@ -334,6 +331,11 @@ class ProjectBusiness:
             objects = objects(privacy=privacy)
         if user:
             objects = objects(user=user)
+        if tags:
+            # todo 是否有直接的查询语句取代
+            for each_tag in tags:
+                objects = objects(tags=each_tag)
+
         count = objects.count()
         return Objects(objects=objects[start: end], count=count,
                        page_no=page_no, page_size=page_size)
@@ -352,7 +354,8 @@ class ProjectBusiness:
 
     @classmethod
     def create_project(cls, name, description, user, privacy='private',
-                       tags=None, user_token='', type='app', **kwargs):
+                       tags=None, user_token='', type='app',
+                       create_tutorial=False, **kwargs):
         """
         Create a new project
 
@@ -363,6 +366,7 @@ class ProjectBusiness:
         :param type: string (app/module/dataset)
         :param tags: list of string
         :param user_token: string
+        :param create_tutorial: boolean
         :return: a new created project object
         """
         if tags is None:
@@ -377,6 +381,9 @@ class ProjectBusiness:
 
         # clone to project dir
         repo = cls.clone(user_ID, name, project_path)
+
+        if create_tutorial:
+            shutil.copy('tutorial/hello_world.ipynb', project_path)
 
         # config repo user
         with repo.config_writer(config_level="repository") as c:
@@ -420,6 +427,20 @@ class ProjectBusiness:
         return project
 
     @classmethod
+    def get_by_identity(cls, identity):
+        """
+        Get a project object by its identity
+
+        :param identity: string
+        :return: a matched Project object
+        """
+        [user_ID, project_name] = identity.split('+')
+        user = UserBusiness.get_by_user_ID(user_ID)
+        project = cls.repo.read_unique_one(dict(name=project_name, user=user))
+        cls.project = project
+        return project
+
+    @classmethod
     def remove_project_by_id(cls, project_id, user_ID):
         """
         remove project by its object_id
@@ -434,8 +455,25 @@ class ProjectBusiness:
         # delete tmp jupyterhub user
         cls.delete_hub_user(user_ID, project.name)
         # delete project directory
-        if os.path.isdir(project.path):
-            shutil.rmtree(project.path)
+        if project.type == 'app':
+            paths = [
+                project.path,
+                '-'.join([getattr(project, 'app_path') or 'NO_PATH', 'dev']),
+            ]
+        elif project.type == 'module':
+            paths = [
+                project.path,
+                os.path.join(getattr(project, 'module_path') or 'NO_PATH',
+                             'dev')
+            ]
+        else:
+            paths = [
+                project.path,
+            ]
+        for path in paths:
+            if 'NO_PATH' not in path:
+                if os.path.isdir(path):
+                    shutil.rmtree(path)
         # remove git repo
         cls.remove_git_repo(user_ID, project.name)
         # delete project object
@@ -497,7 +535,7 @@ class ProjectBusiness:
                         actor_name=commit.actor.name,
                         actor_email=commit.actor.email,
                         timestamp=datetime.fromtimestamp(commit.time[0]),
-                            #+ commit.time[1]), need utc
+                        # + commit.time[1]), need utc
                         message=commit.message,
                         version=version
                         )
@@ -519,6 +557,99 @@ class ProjectBusiness:
             return master.log()
 
     @classmethod
+    def nb_to_py_script(cls, project_id, nb_path, optimise=True):
+        """
+
+        Convert notebook file to python script to deploy
+
+        :param project_id: project's ObjectId in mongodb
+        :param nb_path: notebook file path
+        :param optimise: flag to optimise some settings
+        :return: N/A
+        """
+        app = cls.get_by_id(project_id)
+        full_path = os.path.join(app.path, nb_path)
+
+        # read source notebook file
+        with open(full_path, 'r') as f:
+            nb_data = json.loads(f.read())
+
+        # write to destination file
+        script = ''
+        for cell in nb_data['cells']:
+            if cell['cell_type'] == 'code':
+                for line in cell['source']:
+                    if optimise:
+                        script += '\n' + cls.code_formatting(line)
+                    else:
+                        script += '\n' + line
+
+        script = script.replace('\n\n', '\n')
+
+        # add __main__ function
+        main_func = "\n\n" + \
+                    "if __name__ == '__main__':\n" + \
+                    "\tconf = {}\n" + \
+                    "\thandle(conf)"
+        script += '\n' + main_func
+
+        script_path = full_path.replace('ipynb', 'py')
+        with open(script_path, 'w') as f:
+            f.write(script)
+
+
+    @classmethod
+    def code_formatting(cls, line_of_code):
+        """
+
+        Process line of code to be prepared for deployment.
+
+        :param line_of_code: the line of code to be formatted
+        :return: processed single line code
+        """
+        if any(re.search(reg, line_of_code.rstrip()) for reg in INIT_RES):
+            # line_of_code = re.sub(
+            #     r"# Please use current \(work\) folder to store your data "
+            #     r"and models",
+            #     r'', line_of_code.rstrip())
+            line_of_code = re.sub(r'# Define root path', r'',
+                                  line_of_code.rstrip())
+            line_of_code = re.sub(r"""sys.path.append\('(.+)'\)""", r'',
+                          line_of_code.rstrip())
+            line_of_code = re.sub(
+                r"""(\s+)project_type='(.+)', source_file_path='(.+)'\)""",
+                r"""\1project_type='\2', source_file_path='\3', silent=True)""",
+                line_of_code.rstrip())
+
+            line_of_code = re.sub(r"""from modules import (.+)""",
+                          r"""from function.modules import \1""",
+                                  line_of_code.rstrip())
+
+            # add handle function
+            line_of_code = re.sub(
+                r"work_path = '\./'",
+                r"work_path = 'function/'\n\n"
+                r"def handle(conf):\n"
+                r"\t# paste your code here",
+                line_of_code.rstrip())
+        else:
+
+            # if re.match(r'^(!|ls +|rm +|pwd +|cd +)', line_of_code.strip()):
+            if re.match(r'^(!)', line_of_code.strip()):
+                line_of_code = ''
+            else:
+                line_of_code = '\t' + line_of_code
+
+            # if line_of_code[0] in ['!']:
+            #     line_of_code = ''
+            # elif line_of_code[0:2] in ['ls', 'cd']:
+            #     line_of_code = ''
+            # else:
+            #     line_of_code = '\t' + line_of_code
+
+        return line_of_code
+
+    @classmethod
     def nb_to_script(cls, project_id, nb_path, optimise=True):
         app = cls.get_by_id(project_id)
         call(['jupyter', 'nbconvert', '--to', 'script', nb_path],
@@ -535,22 +666,32 @@ class ProjectBusiness:
                         r"# Please use current \(work\) folder to store your data "
                         r"and models",
                         r'', line.rstrip())
-                    line = re.sub(r"sys.path.append\('\.\./'\)", r'',
+                    line = re.sub(r"""sys.path.append\('(.+)'\)""", r'',
                                   line.rstrip())
-                    line = re.sub(r"""client = Client\('(.+)'\)""",
-                                  r"""client = Client('\1', silent=True)""",
-                                  line.rstrip())
+                    line = re.sub(
+                        r"""(\s+)project_type='(.+)', source_file_path='(.+)'\)""",
+                        r"""\1project_type='\2', source_file_path='\3', silent=True)""",
+                        line.rstrip())
+
                     line = re.sub(r"""from modules import (.+)""",
                                   r"""from function.modules import \1""",
                                   line.rstrip())
 
                     # add handle function
                     line = re.sub(
-                        r"work_path = ''",
-                        r"work_path = ''\n\n"
+                        r"work_path = '\./'",
+                        r"work_path = 'function/'\n\n"
                         r"def handle(conf):\n"
                         r"\t# paste your code here",
                         line.rstrip())
                 else:
                     line = '\t' + line
             print(line)
+        my_open = open(script_path, 'a')
+        # main_func = r"if __name__ == '__main__':" \
+        #             r"" + "\n" + "\t" + "conf = {}" + "\n" +"\t" + "handle()"
+        main_func = r"if __name__ == '__main__': " + "\n" + "\t" \
+                                                            r"conf = {}" + "\n" + "\t" \
+                                                                                  r"handle(conf)"
+
+        my_open.write(main_func)

@@ -45,6 +45,7 @@
     "react-dnd": "^2.5.4",
     "react-dnd-html5-backend": "^2.5.4",
     "react-dom": "^16.2.0",
+    "react-floater": "^0.5.3",
     "react-highlight": "^0.10.0",
     "react-intl": "^2.4.0",
     "react-joyride": "^1.11.4",

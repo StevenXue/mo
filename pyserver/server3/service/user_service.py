@@ -4,6 +4,9 @@ import requests
 import hashlib
 import random
 from copy import deepcopy
+import base64
+from io import BytesIO
+from PIL import Image
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from mongoengine import DoesNotExist
@@ -58,7 +61,7 @@ def add(user_ID, password, **kwargs):
 
 def register(user_ID, password, phone, code, **kwargs):
     # 验证失败会抛出错误
-    verify_code(code=code, phone=phone)
+    # verify_code(code=code, phone=phone)
     return add(user_ID=user_ID, password=password, phone=phone, **kwargs)
 
 
@@ -491,13 +494,19 @@ class UserService:
 
     @classmethod
     def send_captcha_to_email(cls, user_ID, email):
+        msg = MIMEMultipart('mixed')
+        subject = '数据分析平台-用户身份验证(此邮件由系统产生不可回复)'
+        msg['Subject'] = subject
+        msg['From'] = '15669929857@163.com <15669929857@163.com>'
         receiver = email
         msg['To'] = email
         rand = str(random.randint(100000, 999999))
         user = UserBusiness.get_by_user_ID(user_ID)
         user.emailCaptcha = rand
         user.save()
-
+        username = '15669929857@163.com'
+        password = 'wurao122'
+        sender = '15669929857@163.com'
         text = f'您好！\n随机码为: {rand}, 半小时内有效，谢谢 '
         text_plain = MIMEText(text, 'plain', 'utf-8')
         msg.attach(text_plain)
@@ -510,9 +519,26 @@ class UserService:
     @classmethod
     def update_user_email(cls, user_ID, email, captcha):
         user = UserBusiness.get_by_user_ID(user_ID)
-        if captcha and captcha == user.emailCaptcha:
+        if captcha and getattr(user, 'emailCaptcha',
+                               None) and captcha == user.emailCaptcha:
             user.email = email
+            user.emailCaptcha = None
             user.save()
             return user
         else:
             raise Error("验证码错误")
+
+    @classmethod
+    def update_user_avatar(cls, user_ID, base64_str):
+        import re
+        base64_data = re.sub('^data:image/.+;base64,', '', base64_str)
+        byte_data = base64.b64decode(base64_data)
+        img_data = BytesIO(byte_data)
+        img = Image.open(img_data)
+        img = img.convert('RGB')
+        save_path = "../user_avatar"
+        image_path = save_path + f'/{user_ID}.jpeg'
+        img.save(image_path.replace('\\', '/'))
+        user = UserBusiness.get_by_user_ID(user_ID)
+        user.avatarV += 1
+        user.save()

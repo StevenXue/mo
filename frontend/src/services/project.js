@@ -105,3 +105,20 @@ export function forkProject(prjID) {
     },
   })
 }
+
+// get hot tag
+export function getHotTag(prjID) {
+  return request(`${CORS}${fork}/${prjID}`, {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+}
+
+
+export function getHotTagOfProject({payload, onJson}) {
+  const searchQuery=payload.searchQuery
+  const projectType=payload.objectType
+  return request(`${CORS}/project/get_hot_tag?search_query=${searchQuery}&project_type=${projectType}`, undefined, {onJson})
+}

@@ -52,6 +52,17 @@ export const getFavorApps = async (payload, callback, onSuccess, onError) => {
 }
 
 
+export function updateUserAvatar({ dataUrl, onJson }) {
+  return request(`${CORS}/user/avatar`, {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body:JSON.stringify({dataUrl:dataUrl}),
+  }, { onJson });
+}
+
+
 export function updateUserInfo({ body, onJson }) {
   return request(`${CORS}/user`, {
     method: 'put',
@@ -74,16 +85,20 @@ export function updateUserAccount({ body, onError, onJson }) {
 
 
 
-export function twoStepVFC(payload) {
+export function twoStepVFC({payload,onSuccess}) {
   return request(CORS + "/user/two_step_vfc", {
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(payload),
-  })
+    customErrorMsg: true,
+    noErrorMsg: true,
+  },{onSuccess})
 }
 
 export function sendCaptchaToEmail(payload) {
   return request(`${CORS}/user/send_verification_code_to_email/${payload.email}`)
 }
+
+

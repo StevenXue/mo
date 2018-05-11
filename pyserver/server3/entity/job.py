@@ -10,6 +10,9 @@
 """
 
 from mongoengine import DynamicDocument
+from mongoengine import EmbeddedDocument
+from mongoengine import EmbeddedDocumentField
+from mongoengine import EmbeddedDocumentListField
 from mongoengine import ReferenceField
 from mongoengine import ListField
 from mongoengine import IntField
@@ -19,36 +22,33 @@ from mongoengine import DictField
 from mongoengine import CASCADE
 from mongoengine import NULLIFY
 
-# from server3.entity import StagingDataSet
-# from server3.entity import Toolkit
-# from server3.entity import Model
-# from server3.entity import Project
 
-STATUS = (
-    (0, 'ready'),
-    (100, 'running'),
-    (200, 'completed'),
-    (300, 'error')
-)
+class Log(EmbeddedDocument):
+    log_type = StringField(choices=('stdout', 'stderr', 'exception'))
+    message = StringField()
+    timestamp = DateTimeField()
+
+
+class RunningModule(EmbeddedDocument):
+    module = ReferenceField('Module')
+    version = StringField()
 
 
 class Job(DynamicDocument):
-    model = ReferenceField('Model', reverse_delete_rule=CASCADE)
-    toolkit = ReferenceField('Toolkit', reverse_delete_rule=CASCADE)
-    staging_data_set = ReferenceField('StagingDataSet')
-    status = IntField(choices=STATUS, required=True)
-    fields = DictField()
-    create_time = DateTimeField(required=True)
+    app = ReferenceField('App')  # belong to which app
+    module = ReferenceField('Module')  # belong to which module
+    dataset = ReferenceField('Dataset')  # belong to which dataset
+
+    source_file_path = StringField()  # which ipynb file path running this job
+    run_args = DictField()  # input args or kwargs
+    status = StringField(choices=('running', 'success', 'error', 'terminated'), required=True)
+    running_module = EmbeddedDocumentField(RunningModule)   # if running a module, which module
+    running_code = StringField()  # if running a piece of code, the code string
+    create_time = DateTimeField()
     updated_time = DateTimeField()
-    project = ReferenceField('Project')
-    params = DictField()
-    file = ReferenceField('File')
-    run_args = DictField()
-    steps = ListField(DictField())
-    active_steps = ListField(StringField(), default=['0'])
-    visual_sds_id = ReferenceField('StagingDataSet')
-    served_model = ReferenceField('ServedModel', reverse_delete_rule=NULLIFY)
-    result = DictField()
-    display_steps = ListField(default=['0'])
-    used_steps = ListField(default=[])
+    user = ReferenceField('User')
+    logs = EmbeddedDocumentListField(Log)
+
+
+
 

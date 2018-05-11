@@ -51,7 +51,7 @@ import '../style/index.css';
 const TOOLBAR_DEPLOY_CLASS = 'jp-LauncherIcon';
 
 /**
- * Initialization data for the moduledeploy-extension extension.
+ * Initialization data for the appdeploy-extension extension.
  */
 const extension: JupyterLabPlugin<void> = {
     id: '@jupyterlab/appdeploy-extension:plugin',
@@ -59,7 +59,7 @@ const extension: JupyterLabPlugin<void> = {
     requires: [IFileBrowserFactory],
     activate: (app: JupyterLab, fb: IFileBrowserFactory) => {
         // add to filebrowser toolbar
-        fb.defaultBrowser.toolbar.addItem('publishModule', createDeployButton());
+        fb.defaultBrowser.toolbar.addItem('deployApp', createDeployButton());
 
         // add to editor toolbar
         app.docRegistry.addWidgetExtension('Editor', new ButtonExtension());
@@ -137,7 +137,7 @@ export function createDeployButton(): ToolbarButton {
                             filePath: result.value.selectFile,
                             commitMsg: result.value.commitMsg,
                             onJson: () => {
-                                message.success('Module deploy success!');
+                                message.success('App publish success!');
                             },
                         });
                     } else {

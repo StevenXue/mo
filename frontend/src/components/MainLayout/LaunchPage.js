@@ -1,5 +1,5 @@
 import React from 'react'
-import {Icon} from "antd"
+// import {Icon} from "antd"
 import {routerRedux} from 'dva/router'
 import {connect} from 'dva'
 
@@ -15,37 +15,37 @@ class LaunchPage extends React.Component {
       }
     }
 
-    //本组件控制显隐的方法：
+    //本组件控制显隐的方法：(已作废)
     //1.this.props.launchpage.visibility为false，组件隐藏
     //2.this.props.launchpage.visibility为true, this.state.visibility控制组件显隐
     //3.组件初始化时，localStorage.launchpage影响this.state.visibility 的值
     //4.登陆时，localStorage.setItem('launchpage','show')
     //5.关闭组件时， localStorage.setItem('launchpage','hide')
     componentWillUpdate(nextProps){
-        this.props.location.pathname!=nextProps.location.pathname?this.checkWelcome():null
+        this.props.location.pathname!==nextProps.location.pathname?this.checkWelcome():null
     }
-     //组件将被卸载  
-    componentWillUnmount(){ 
+     //组件将被卸载
+    componentWillUnmount(){
         //重写组件的setState方法，直接返回空
         this.setState = (state,callback)=>{return}
     }
     checkWelcome = ()=>{
-        if(this.props.location.search.indexOf("app")!=-1&&this.props.location.pathname.indexOf("/workspace/")!=-1){
-          
+        if(this.props.location.search.indexOf("app")!==-1&&this.props.location.pathname.indexOf("/workspace/")!==-1){
+
                 document.getElementById("LaunchPage_Contain").scrollTo(0,0)
         }
     }
-    close =()=>{
-        // this.props.dispatch({type:'launchpage/change',payload:{visibility:false}})
-        localStorage.setItem('launchpage','hide')
-        this.setState({
-            visibility:'none'
-        })
-    }
+    // close =()=>{
+    //     // this.props.dispatch({type:'launchpage/change',payload:{visibility:false}})
+    //     localStorage.setItem('launchpage','hide')
+    //     this.setState({
+    //         visibility:'none'
+    //     })
+    // }
     ssscrollTo = ()=>{
         document.getElementById("LaunchPage_Contain").scrollTo(0,900)
     }
-      
+
     newRequest = ()=>{
         this.props.dispatch(routerRedux.push('/userrequest?tab=app'))
         this.timer = setTimeout(()=>{
@@ -56,7 +56,7 @@ class LaunchPage extends React.Component {
     newApp = ()=>{
         this.props.dispatch(routerRedux.push('/workspace?tab=app'))
         // this.ssscrollTo()
-        
+
         this.timer = setTimeout(()=>{
             this.ssscrollTo()
             document.getElementById('Newapp').click()
@@ -71,13 +71,15 @@ class LaunchPage extends React.Component {
     }
     helpDocument = ()=>{
         // this.props.dispatch(routerRedux.push('/workspace?tab=module'))
-        window.location = "https://momodel.github.io/mo/#/zh-cn/quick_start"
+        window.location = "https://momodel.github.io/mo/#/"
     }
     render(){
         const {visibility} = this.state
-        return <div className={styles.LaunchPage} 
-                    style={{display:!this.props.launchpage.visibility?'none':visibility}}
-                    >
+        return <div className={styles.LaunchPage} style={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+        }}>
             <div className={styles.LaunchPage_Content}>
                 <section className={styles.title}>
                     <p>欢迎来到蓦</p>
@@ -115,12 +117,12 @@ class LaunchPage extends React.Component {
                     <button onClick={this.helpDocument}>帮助文档</button>
                 </section>
             </div>
-            <section className={styles.close} onClick={this.close} id="Close_CCC">
+            {/* <section className={styles.close} onClick={this.close} id="Close_CCC">
                 <Icon type="close" style={{marginRight:10}}/>
                 关闭
-            </section>
+            </section> */}
         </div>
     }
 }
 // export default TourTip
-export default connect(({launchpage})=>({launchpage}))(LaunchPage)
+export default connect(({})=>({}))(LaunchPage)

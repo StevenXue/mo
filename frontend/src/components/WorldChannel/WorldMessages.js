@@ -2,10 +2,9 @@ import React, {Component} from 'react'
 import {Popover} from 'antd'
 import styles from './index.less'
 import {showTime} from "../../utils/index"
-import {avatarList} from "../../constants"
 
 
-export const WorldMessages = ({worldMessages = [], ref1, isRight}) => {
+export const WorldMessages = ({worldMessages = [], ref1, isRight, login}) => {
   return <div
     className={styles.messages_container}
     ref={ref1}
@@ -15,22 +14,16 @@ export const WorldMessages = ({worldMessages = [], ref1, isRight}) => {
         key={worldMessage._id}
         worldMessage={worldMessage}
         isRight={isRight}
+        login={login}
       />
     })}
   </div>
 }
 
 
-const WorldMessageItem = ({worldMessage, isRight}) => {
+const WorldMessageItem = ({worldMessage, isRight,login}) => {
 
   const {message, _id, create_time, sender_user_ID, message_type, sender} = worldMessage
-  let picNumber = ""
-
-  if(sender) {
-    picNumber = parseInt(sender.slice(10))%6
-  }
-
-
   const renderItem = () => {
     return (
       <div className={styles.message_container}>
@@ -53,10 +46,11 @@ const WorldMessageItem = ({worldMessage, isRight}) => {
                 className={styles.system_image}
               />
               :
-              <img style={{
+              <img
+                className={styles.avt}
+                style={{
                 height: 30, width: 30,
-              }} src={avatarList[picNumber]}  alt="avatar" />
-
+              }} src={sender_user_ID===login.user.user_ID?login.userAvatar:`/pyapi/user/avatar/${sender_user_ID}.jpeg?`}  alt="avatar" />
           }
         </div>
 

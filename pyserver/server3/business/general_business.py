@@ -1,5 +1,6 @@
 from server3.repository.general_repo import Repo
 from server3.entity.general_entity import Objects
+from operator import itemgetter
 
 
 def check_auth(func):
@@ -16,7 +17,7 @@ class GeneralBusiness:
     # 实例化后的 instance 走general repo
     repo = Repo(None)
     # class 不走general repo
-    __cls = None
+    entity = None
 
     @classmethod
     def get_all(cls):
@@ -32,7 +33,7 @@ class GeneralBusiness:
     def read(cls, query=None):
         if query is None:
             query = {}
-        return cls.__cls.objects(**query).order_by('-_id')
+        return cls.entity.objects(**query).order_by('-_id')
 
     @classmethod
     def get_by_id(cls, object_id):
@@ -53,14 +54,51 @@ class GeneralBusiness:
 
     @classmethod
     def create(cls, obj):
-        cls.repo.create(obj)
+        return cls.repo.create(obj)
 
     @classmethod
     def create_one(cls, **kwargs):
-        cls.repo.create_one(**kwargs)
+        return cls.repo.create_one(**kwargs)
 
     @classmethod
     @check_auth
     def remove_by_id(cls, object_id, user_ID):
         return cls.repo.delete_by_id(object_id)
 
+    @classmethod
+    def get_hot_tag(cls, search_query, object_type, user_request=False):
+        if user_request:
+            objects = cls.repo.read({'type': object_type})
+        else:
+            objects = cls.repo.read()
+        # objects = entity.objects(type=object_type)
+        if search_query:
+            tag_freqs = objects(
+                tags__icontains=search_query).item_frequencies(
+                'tags', normalize=True)
+            top_tags = sorted(tag_freqs.items(), key=itemgetter(1),
+                              reverse=True)[:100]
+            res = []
+            max_number = 5
+            number = 0
+            top_five = []
+            top_five_length = 0
+            for i in top_tags:
+                if search_query in i[0]:
+                    res.append(i)
+                    number += 1
+                else:
+                    if top_five_length < max_number:
+                        top_five.append(i)
+                        top_five_length += 1
+                if number == max_number:
+                    return res
+            if number < max_number:
+                res += top_five[:max_number - number]
+            return res
+        else:
+            tag_freqs = objects().item_frequencies(
+                'tags', normalize=True)
+            top_tags = sorted(tag_freqs.items(), key=itemgetter(1),
+                              reverse=True)[:5]
+            return top_tags

@@ -2,13 +2,17 @@
 import os
 import re
 import yaml
+import time
 import shutil
 import fileinput
 import tempfile
 import tarfile
+
 from copy import deepcopy
 from subprocess import call
 from io import BytesIO
+from datetime import datetime
+from datetime import timedelta
 
 import synonyms
 import docker
@@ -34,7 +38,7 @@ yaml_tail_path = 'app_spec.yml'
 
 class AppBusiness(ProjectBusiness, GeneralBusiness):
     repo = Repo(project.App)
-    __cls = project.App
+    entity = project.App
     base_func_path = APP_DIR
 
     @classmethod
@@ -42,6 +46,21 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         ProjectBusiness.repo = Repo(project.App)
         return ProjectBusiness.create_project(*args, status='inactive',
                                               **kwargs)
+
+    @staticmethod
+    def get_service_name(app, version):
+        return '-'.join([app.user.user_ID, app.name, version])
+
+    @classmethod
+    def get_service_logs(cls, app, version, since=1):
+        client = docker.APIClient()
+        service_name = cls.get_service_name(app, version)
+        service = client.services(filters={'name': service_name})[0]
+        from_time = datetime.now() - timedelta(minutes=since)
+        logs = client.service_logs(service['ID'], stdout=True, stderr=True,
+                                   since=int(time.mktime(from_time.timetuple())))
+        logs = list(logs)
+        return logs
 
     @classmethod
     def deploy_or_publish(cls, app_id, commit_msg, handler_file_path,
@@ -74,6 +93,8 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         handler_file_name = handler_file_path.split('/')[-1]
         handler_dst_path = handler_file_path.replace(handler_file_name,
                                                      'handler.py')
+
+        # TODO: read file from handler_file_path, tranformed .py file
         shutil.copy(handler_file_path, handler_dst_path)
 
         # change some configurable variable to deploy required
@@ -355,6 +376,18 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         #     }
         #     response = requests.request("POST", url, data=payload, headers=headers)
         #     return response.json()
+
+    @classmethod
+    def get_action_entity(cls, app_obj, page_no, page_size, action_entity):
+        start = (page_no - 1) * page_size
+        end = page_no * page_size
+        objects = getattr(app_obj, action_entity)
+        objects.reverse()
+        return Objects(
+            objects=objects[start:end],
+            count=len(objects),
+            page_no=page_no,
+            page_size=page_size)
 
 
 if __name__ == "__main__":

@@ -7,15 +7,18 @@ Blueprint for user
 Author: Zhaofeng Li
 Date: 2017.05.22
 """
+import os
 import json
 import requests
 import jwt
 import time
+import hashlib
 from flask import Blueprint
 from flask import jsonify
 from flask import make_response
 from flask import redirect
 from flask import request
+from flask import send_from_directory
 from flask_jwt_extended import create_access_token
 from mongoengine import DoesNotExist
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -77,6 +80,16 @@ def register():
                                            **data)
         added_user = json_utility.convert_to_json(added_user.to_mongo())
         added_user.pop('password')
+
+        # 为新用户创建tutorial project
+        from server3.service.project_service import ProjectService
+        from server3.service.app_service import AppService
+        user_token = create_access_token(identity=added_user["user_ID"])
+        AppService.create_tutorial_project(
+            user_ID=added_user["user_ID"],
+            user_token=user_token
+        )
+
         return jsonify({'response': added_user}), 200
     except Error as e:
         print("e.args[0]", e.args[0])
@@ -142,7 +155,8 @@ def login():
 
         user_obj = json_utility.convert_to_json(user.to_mongo())
         user_obj.pop('password')
-        del user.avatar
+        if hasattr(user, "avatar"):
+            del user.avatar
     except DoesNotExist as e:
         return jsonify({'response': '%s: %s' % (str(
             DoesNotExist), e.args)}), 400
@@ -305,26 +319,22 @@ def login_with_phone():
 def two_step_vfc():
     user_ID = get_jwt_identity()
     data = request.get_json()
-
+    print(data)
     check_type = data.pop("checkType")
     check_value = data.pop("checkValue")
     code = data.pop("code")
 
     try:
+        result = False
         if check_type == 'phone':
             result = user_service.verify_code(code=code, phone=check_value)
         elif check_type == 'email':
             user = UserBusiness.get_by_user_ID(user_ID)
             if code and code == user.emailCaptcha:
                 result = True
-        else:
-            return jsonify({
-                "response": {
-                    "error": e.args[0]
-                }
-            }), 400
         if result:
-            expire_time = time.time() + 3600
+            # 默认一周
+            expire_time = time.time() + 604800
             response = {'response': {
                 'tokenForUpdateInfo': jwt.encode({'user_ID': user_ID,
                                                   'expireTime': expire_time},
@@ -333,12 +343,8 @@ def two_step_vfc():
             }}
             return jsonify(response), 200
     except Error as e:
-        print("e.args[0]", e.args[0])
         return jsonify({
-            "response": {
-                "error": e.args[0]
-            }
-        }), 400
+            "response": '验证码错误，请重新输入'}), 400
 
 
 # 发送验证码到邮箱
@@ -555,29 +561,49 @@ def update_user_account():
         # 更改手机
         # 验证手机 验证码
         try:
+            if UserBusiness.get_by_phone(phone):
+                return jsonify({
+                    "response": {'error': "手机号已被注册，请更换手机号"}
+                }), 400
             res = user_service.verify_code(code=captcha, phone=phone)
             user = UserBusiness.get_by_user_ID(user_ID)
             user.phone = phone
             user.save()
+            return jsonify({'response': {
+                "user": json_utility.convert_to_json(user.to_mongo())
+            }}), 200
         except Error as e:
             return jsonify({
-                "response": {
-                    "error": "验证码错误"
-                }
+                "response": {'error': "验证码错误"}
             }), 400
     elif email:
         # 更改邮箱
         # 验证邮箱 验证码
+        if UserBusiness.get_by_email(email):
+            return jsonify({
+                "response": {'error':  "邮箱已被注册，请更换邮箱"}
+            }), 400
         try:
-            UserService.update_user_email(user_ID, email, captcha)
+            user = UserService.update_user_email(user_ID, email, captcha)
+            return jsonify({'response': {
+                "user": json_utility.convert_to_json(user.to_mongo())
+            }}), 200
         except Error as e:
             return jsonify({
-                "response": {
-                    "error": e.args[0]
-                }
+                "response":  {'error':e.args[0]}
             }), 400
     elif password:
         UserBusiness.update_password(user_ID, password)
     else:
-        return jsonify({'response': 'error'}), 400
+        return jsonify({'response': {'error': 'unkownError'}}), 400
     return jsonify({'response': 'ok'}), 200
+
+
+@user_app.route('/avatar/<path:filename>', methods=['GET'])
+def update_user_avatar(filename):
+    if os.path.isfile(f'../user_avatar/{filename}'):
+        return send_from_directory('../user_avatar', filename)
+    else:
+        hash_value = int(hashlib.md5(filename.encode('utf-8')).hexdigest()[:8], 16)
+        filename = str(hash_value % 6)+'.jpg'
+        return send_from_directory('../user_avatar', filename)

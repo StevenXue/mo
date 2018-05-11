@@ -1,0 +1,25 @@
+:global .layer-card .ant-form-item {
+  margin-bottom: 10px;
+}
+
+#modules-manager .parameter-form {
+  margin: 0;
+}
+
+/*.parameter-form .parameter-item {*/
+  /*width: 50%;*/
+/*}*/
+
+#modules-manager .parameter-form .parameter-row {
+  display: flex;
+  flex-direction: row;
+  margin-left: 10px;
+  align-items: center;
+  justify-content: center;;
+}
+
+#modules-manager .parameter-form .parameter-help {
+  margin-left: 10px;
+}
+
+
