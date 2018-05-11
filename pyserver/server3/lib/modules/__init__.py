@@ -110,44 +110,32 @@ class Client:
         # print('finish run', job)
         return ret
 
-    def run(self, module_id, *args, with_control=False, **kwargs):
+    def run_module_general(self, action, module_id, *args, with_control=False,
+                           **kwargs):
         if self.silent and with_control:
             with HiddenPrints():
-                return self.controller(module_general, module_id, 'run', *args,
-                                       **kwargs)
+                return self.controller(module_general, module_id, action,
+                                       *args, **kwargs)
         elif not self.silent and with_control:
-            return self.controller(module_general, module_id, 'run', *args,
+            return self.controller(module_general, module_id, action, *args,
                                    **kwargs)
         elif self.silent and not with_control:
             with HiddenPrints():
-                return module_general(module_id, 'run', *args, **kwargs)
+                return module_general(module_id, action, *args, **kwargs)
         else:
-            return module_general(module_id, 'run', *args, **kwargs)
+            return module_general(module_id, 'action', *args, **kwargs)
+
+    def run(self, module_id, *args, with_control=False, **kwargs):
+        return self.run_module_general('run', module_id, *args,
+                                       with_control=with_control,
+                                       **kwargs)
 
     def train(self, module_id, *args, with_control=False, **kwargs):
-        if self.silent and with_control:
-            with HiddenPrints():
-                return self.controller(module_general, module_id, 'train',
-                                       *args, **kwargs)
-        elif not self.silent and with_control:
-            return self.controller(module_general, module_id, 'train', *args,
-                                   **kwargs)
-        elif self.silent and not with_control:
-            with HiddenPrints():
-                return module_general(module_id, 'train', *args, **kwargs)
-        else:
-            return module_general(module_id, 'train', *args, **kwargs)
+        return self.run_module_general('train', module_id, *args,
+                                       with_control=with_control,
+                                       **kwargs)
 
     def predict(self, module_id, *args, with_control=False, **kwargs):
-        if self.silent and with_control:
-            with HiddenPrints():
-                return self.controller(module_general, module_id, 'predict',
-                                       *args, **kwargs)
-        elif not self.silent and with_control:
-            return self.controller(module_general, module_id, 'predict', *args,
-                                   **kwargs)
-        elif self.silent and not with_control:
-            with HiddenPrints():
-                return module_general(module_id, 'predict', *args, **kwargs)
-        else:
-            return module_general(module_id, 'predict', *args, **kwargs)
+        return self.run_module_general('predict', module_id, *args,
+                                       with_control=with_control,
+                                       **kwargs)
