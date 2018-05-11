@@ -15,6 +15,7 @@ import re
 import fileinput
 import requests
 import collections
+import json
 from copy import deepcopy
 from datetime import datetime
 # from distutils.dir_util import copy_tree
@@ -352,7 +353,8 @@ class ProjectBusiness:
 
     @classmethod
     def create_project(cls, name, description, user, privacy='private',
-                       tags=None, user_token='', type='app', **kwargs):
+                       tags=None, user_token='', type='app',
+                       create_tutorial=False, **kwargs):
         """
         Create a new project
 
@@ -363,6 +365,7 @@ class ProjectBusiness:
         :param type: string (app/module/dataset)
         :param tags: list of string
         :param user_token: string
+        :param create_tutorial: boolean
         :return: a new created project object
         """
         if tags is None:
@@ -377,6 +380,9 @@ class ProjectBusiness:
 
         # clone to project dir
         repo = cls.clone(user_ID, name, project_path)
+
+        if create_tutorial:
+            shutil.copy('tutorial/hello_world.ipynb', project_path)
 
         # config repo user
         with repo.config_writer(config_level="repository") as c:
@@ -550,6 +556,40 @@ class ProjectBusiness:
             return master.log()
 
     @classmethod
+    def remove_markdown_cell(cls, source_nb_path, dest_nb_path):
+        """
+        Remove markdown cell content in jupyter notebook file.
+
+        :param source_nb_path: jupyter notebook source file path
+        :param dest_nb_path: jupyter notebook destination file path
+        :return: N/A
+        """
+
+        # read source notebook file
+        with open(source_nb_path, 'r') as f:
+            nb_data = json.loads(f)
+
+        # remove markdown cell
+        for cell in nb_data['cells']:
+            if cell['cell_type'] == 'markdown':
+                del cell
+
+        # remove shell command?
+
+        # write to destination file
+        with open(dest_nb_path, 'w') as f:
+            f.write(json.dumps(nb_data))
+
+    @classmethod
+    def nb_to_py_script(cls, project_id, nb_path, optimise=True):
+        """
+
+        :return:
+        """
+        pass
+
+
+    @classmethod
     def nb_to_script(cls, project_id, nb_path, optimise=True):
         app = cls.get_by_id(project_id)
         call(['jupyter', 'nbconvert', '--to', 'script', nb_path],
@@ -579,7 +619,7 @@ class ProjectBusiness:
                     # add handle function
                     line = re.sub(
                         r"work_path = ''",
-                        r"work_path = ''\n\n"
+                        r"work_path = 'function/'\n\n"
                         r"def handle(conf):\n"
                         r"\t# paste your code here",
                         line.rstrip())
