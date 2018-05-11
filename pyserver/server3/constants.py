@@ -49,7 +49,7 @@ APP_DIR = './functions'
 INIT_RES = [
     r'# You can use other public modules via our Client object with module\'s identifier ',
     r'# and parameters.\n',
-    r'# For more detailes, please see our online document - https://momodel.github.io/mo/#',
+    r'# For more details, please see our online document - https://momodel.github.io/mo/#',
     r'import os',
     r'import sys',
     r'# Define root path',
@@ -57,7 +57,7 @@ INIT_RES = [
     r'# Import necessary packages',
     r"from modules import (.+)",
     r'# Initialise Client object',
-    r"client = Client\(key='(.+)', project_id='(.+)', user_ID='(.+)',",
+    r"client = Client\(api_key='(.+)', project_id='(.+)', user_ID='(.+)',",
     r"(\s+)project_type='(.+)', source_file_path='(.+)'\)",
     r'# Make run/train/predict commnad alias for furthur use',
     r"(\S+) = client\.(\S+)",
