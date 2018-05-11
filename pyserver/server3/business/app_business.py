@@ -14,7 +14,7 @@ from io import BytesIO
 from datetime import datetime
 from datetime import timedelta
 
-import synonyms
+# import synonyms
 import docker
 
 from server3.entity import project
@@ -63,6 +63,23 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         return logs
 
 
+    @classmethod
+    def find_imported_modules(cls, script):
+        """
+
+        :param script: python script
+        :return: list of imported modules
+        """
+        pattern = \
+                r"""^(?!#).*(run|predict|train)\s*\(('|")([\w\d_-]+/[\w\d_-]+/\d+\.\d+\.\d+)('|").*$"""
+
+        for match in re.finditer(pattern, script, re.MULTILINE):
+            print("matched:{}".format(match.group(0)))
+
+
+    @classmethod
+    def find_imported_datasets(cls, script):
+        pass
 
     @classmethod
     def deploy_or_publish(cls, app_id, commit_msg, handler_file_path,
@@ -96,7 +113,22 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         handler_dst_path = handler_file_path.replace(handler_file_name,
                                                      'handler.py')
 
-        # TODO: read file from handler_file_path, tranformed .py file
+        # TODO: read file from handler_file_path, transformed .py file, return tuple(user_id/project_name/version) list
+        print(handler_file_path)
+        with open(handler_file_path, 'r') as f:
+            # print(f.read())
+            cls.find_imported_modules(f.read())
+
+
+        # TODO: save data to app.deployments
+
+        # TODO: Copy related module folder from container, target folder '/home/jovyan/modules/chun/module_a/1_3_4
+
+
+        # Dataset
+        # TODO: 1. get possible imported dataset list from app.used_datasets[0].dataset.path.replace('./user_directory', '../dataset')
+        # TODO: 2. check if there is any matches in
+
         shutil.copy(handler_file_path, handler_dst_path)
 
         # change some configurable variable to deploy required
@@ -394,4 +426,29 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
 
 if __name__ == "__main__":
     # apps = project.App.objects(user=)
+
+    def find_imported_modules(script):
+        """
+
+        :param script: python script
+        :return: list of imported modules
+        """
+        pattern = \
+            r"""^(?!#).*(run|predict|train)\s*\(('|")(([\w\d_-]+)/([\w\d_-]+)/(\d+\.\d+\.\d+))('|")"""
+
+        modules = []
+        for match in re.finditer(pattern, script, re.MULTILINE):
+            if '#' not in match.group(0):
+                modules.append((match.group(4), match.group(5), match.grou(6)))
+
+        return modules
+
+    with open('/Users/Chun/Documents/workspace/momodel/mo/pyserver/user_directory/chun/my_exercise/Untitled.py', 'r') as f:
+        # print(f.read())
+        find_imported_modules(f.read())
+
+
+
+
+
     pass
