@@ -555,7 +555,7 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
                             type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
                             style={{ fontSize: 20 }}/>}
                           {
-                            projectStatus(project)
+                            projectStatus(projectDetail.project)
                           }
                         </span>
                         {!market_use &&

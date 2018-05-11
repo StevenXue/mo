@@ -42,7 +42,7 @@ class JobBusiness(GeneralBusiness):
         job = cls.get_by_id(job_id)
         job.logs.append(Log(log_type=log_type, message=message, timestamp=datetime.now()))
         job.updated_time = datetime.utcnow()
-        if log_type == 'stderr':
+        if log_type == 'exception':
             job.status = 'error'
         job.save()
         return job
@@ -60,3 +60,5 @@ class JobBusiness(GeneralBusiness):
             project_type: project
         }
         return cls.read(project_dict)
+
+

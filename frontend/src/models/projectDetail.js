@@ -14,7 +14,8 @@ import {
   getSessions,
   getTerminals,
   deleteSession,
-  deleteTerminal
+  deleteTerminal,
+  terminateJob
 } from '../services/job'
 import {deleteLab, startLab} from '../services/notebook'
 import {privacyChoices} from '../constants'
@@ -303,7 +304,18 @@ export default {
       const project = yield select(state => get(state, 'projectDetail.project'))
       const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
       const hubToken = project.hub_token
-      yield sessionId && call(deleteSession, {hubUserName, hubToken, sessionId})
+      if(sessionId) {
+        const sessions = yield select(state => get(state, 'projectDetail.sessions'))
+        const session = sessions.find(sess => sess.id === sessionId)
+        if(session.jobs) {
+          for (let job of session.jobs){
+            if(job.status === 'running') {
+              yield call(terminateJob, {jobId: job._id})
+            }
+          }
+        }
+        yield call(deleteSession, {hubUserName, hubToken, sessionId})
+      }
       yield terminalName && console.log('runrunrun') && call(deleteTerminal, {
         hubUserName,
         hubToken,
@@ -311,22 +323,9 @@ export default {
       })
       yield put({type: 'fetch', projectId: project._id, projectType: project.type})
     },
-    // 获取该 project 的 Jobs
-    // *fetchJobs(action, { call, put }) {
-    //   // const hubUserName = `${localStorage.getItem('user_ID')}+${project.name}`
-    //   const jobs = yield call(jobsByProject, { projectId: action.projectId })
-    //   yield put({ type: 'setJobs', payload: jobs })
-    // },
     * delete({payload}, {call, put, select}) {
       yield call(deleteProject, payload)
       yield put(routerRedux.push('/workspace?tab=' + payload.type))
-
-      // hub user will deleted in backend, no need to stop hub user server
-      // let project = yield select(state => state.projectDetail['project'])
-      // const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
-      // const hubToken = project.hub_token
-      // yield call(deleteLab, {hubUserName, hubToken})
-
     },
     * setEntered({projectId}, {call, put}) {
       console.log(projectId)
