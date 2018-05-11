@@ -99,6 +99,6 @@ export function removeRequest(payload) {
 
 export function getHotTagOfRequest({payload, onJson}) {
   const searchQuery=payload.searchQuery
-  const requestType=payload.requestType
+  const requestType=payload.objectType
   return request(`${CORS}/user_requests/get_hot_tag?search_query=${searchQuery}&request_type=${requestType}`, undefined, {onJson})
 }

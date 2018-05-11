@@ -22,7 +22,7 @@ class Index extends React.Component {
     this.props.getHotTag({
       payload: {
         searchQuery: value,
-        requestType:this.props.type
+        objectType:this.props.type
       },
       onJson: (res) => {
         const data = res.map(i => ({

@@ -115,3 +115,10 @@ export function getHotTag(prjID) {
     },
   })
 }
+
+
+export function getHotTagOfProject({payload, onJson}) {
+  const searchQuery=payload.searchQuery
+  const projectType=payload.objectType
+  return request(`${CORS}/project/get_hot_tag?search_query=${searchQuery}&project_type=${projectType}`, undefined, {onJson})
+}

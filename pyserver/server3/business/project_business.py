@@ -308,19 +308,15 @@ class ProjectBusiness(GeneralBusiness):
         return project_path
 
     @classmethod
-    def get_objects(cls, search_query, user=None, page_no=PAGE_NO,
-                    page_size=PAGE_SIZE, default_max_score=0.4,
-                    privacy=None):
-        """
-        Search for objects
-
-        :param search_query:
-        :param user:
-        :param page_no:
-        :param page_size:
-        :param default_max_score:
-        :return:
-        """
+    def get_objects(cls, search_query,
+                    privacy,
+                    page_no,
+                    page_size,
+                    default_max_score,
+                    user, tags):
+        # def get_objects(cls, search_query, user=None, page_no=PAGE_NO,
+        #             page_size=PAGE_SIZE, default_max_score=0.4,
+        #             privacy=None,tags=tags):
 
         start = (page_no - 1) * page_size
         end = page_no * page_size
@@ -335,6 +331,11 @@ class ProjectBusiness(GeneralBusiness):
             objects = objects(privacy=privacy)
         if user:
             objects = objects(user=user)
+        if tags:
+            # todo 是否有直接的查询语句取代
+            for each_tag in tags:
+                objects = objects(tags=each_tag)
+
         count = objects.count()
         return Objects(objects=objects[start: end], count=count,
                        page_no=page_no, page_size=page_size)
@@ -596,7 +597,6 @@ class ProjectBusiness(GeneralBusiness):
 
         pass
 
-
     @classmethod
     def nb_to_script(cls, project_id, nb_path, optimise=True):
         app = cls.get_by_id(project_id)
@@ -616,9 +616,10 @@ class ProjectBusiness(GeneralBusiness):
                         r'', line.rstrip())
                     line = re.sub(r"""sys.path.append\('(.+)'\)""", r'',
                                   line.rstrip())
-                    line = re.sub(r"""(\s+)project_type='(.+)', source_file_path='(.+)'\)""",
-                                  r"""\1project_type='\2', source_file_path='\3', silent=True)""",
-                                  line.rstrip())
+                    line = re.sub(
+                        r"""(\s+)project_type='(.+)', source_file_path='(.+)'\)""",
+                        r"""\1project_type='\2', source_file_path='\3', silent=True)""",
+                        line.rstrip())
 
                     line = re.sub(r"""from modules import (.+)""",
                                   r"""from function.modules import \1""",
@@ -642,5 +643,3 @@ class ProjectBusiness(GeneralBusiness):
                                                                                   r"handle()"
 
         my_open.write(main_func)
-
-
