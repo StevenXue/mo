@@ -379,7 +379,7 @@ class WebChat extends React.Component {
         <ChatBot
         floating={true}
         headerTitle="MO平台机器人"
-        recognitionEnable={true}
+        // recognitionEnable={true}
         placeholder="请输入你的问题"
         steps={finalSteps()}
         //steps={uiSteps}

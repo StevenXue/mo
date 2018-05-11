@@ -48,7 +48,7 @@ function MainLayout({ children, location, history, isRight, onClickIcon }) {
           >
             {children}
           </div>
-          {!(NO_CHAT_PATHS.includes(location.pathname)) && <WorldChannel/>}
+          {!(NO_CHAT_PATHS.includes(location.pathname)) && !match && <WorldChannel/>}
         </div>
       </Content>
       {match&&<HelpButton />}
