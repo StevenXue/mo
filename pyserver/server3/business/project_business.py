@@ -568,6 +568,10 @@ class ProjectBusiness:
 
     @classmethod
     def nb_to_py_script(cls):
+        """
+
+        :return:
+        """
         pass
 
     @classmethod
