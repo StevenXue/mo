@@ -392,10 +392,8 @@ export default {
     },
 
     * updateProjectIsAutoHelp({payload}, {call, put, select}) {
-      console.log("payload", payload)
       const projectId = yield select(state => state.projectDetail.project._id)
       const result = yield call(updateProject, {body: payload, projectId,})
-      console.log("result", result)
       }
   },
   subscriptions: {
