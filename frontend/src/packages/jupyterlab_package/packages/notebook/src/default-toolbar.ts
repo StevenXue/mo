@@ -453,6 +453,7 @@ function createCaptureSwitcherNode(): HTMLElement {
     select.appendChild(option);
   }
   select.className = TOOLBAR_CELLTYPE_DROPDOWN_CLASS;
+  select.id = 'Insert';
   div.appendChild(select);
   return div;
 }

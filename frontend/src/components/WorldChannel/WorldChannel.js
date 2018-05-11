@@ -15,13 +15,7 @@ class worldChannelC extends Component {
   componentDidMount() {
     // this.setState({ run: true });
 
-    // To disabled submit button at the beginning.
-    this.props.dispatch({
-      type: 'worldChannel/getWorldMessages',
-      payload: {
-        channel: 'all',
-      },
-    })
+
 
   }
 
@@ -70,7 +64,14 @@ class WorldChannel extends Component {
   }
 
   componentDidMount() {
-    this.scrollToBottom(true)
+    // To disabled submit button at the beginning.
+    this.props.dispatch({
+      type: 'worldChannel/getWorldMessages',
+      payload: {
+        channel: 'all',
+        scrollToBottom: this.scrollToBottom
+      },
+    })
   }
 
   componentDidUpdate() {
@@ -86,6 +87,7 @@ class WorldChannel extends Component {
   }
 
   handleSendMessage = (e) => {
+    this.scrollToBottom(true)
     const inputMessage = e.target.value
     this.props.dispatch({
       type: 'worldChannel/sendMessage',
@@ -98,6 +100,7 @@ class WorldChannel extends Component {
   }
 
   subHadleSendMessage = (e) => {
+    this.scrollToBottom(true)
     const inputMessage = e.input.value
     this.props.dispatch({
       type: 'worldChannel/sendMessage',
@@ -107,11 +110,11 @@ class WorldChannel extends Component {
       },
     })
     e.input.value = ''
+
   }
 
   render() {
     const { worldMessages, onClickIcon, isRight, login } = this.props
-    console.log(login)
     return (
       <div className={styles.container}
            style={{

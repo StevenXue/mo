@@ -98,10 +98,6 @@ function activate(app: JupyterLab, palette: ICommandPalette): ILauncher {
                 'from modules import Client\n',
                 '\n',
                 '# Initialise Client object\n',
-                'client = Client(key=\'5asdfoasd0fnd0983\', project_id=\'5ae0c6ae0c11f30f76b7060d\', \n',
-                '                user_ID=\'zhaofengli\', \n',
-                '                project_type=\'app\', source_file_path=\'Untitled.ipynb\')\n',
-
                 `client = Client(key='5asdfoasd0fnd0983', project_id='${projectId}', user_ID='${localStorage.getItem('user_ID')}',\n`,
                 `                project_type='${type}', source_file_path='${(item as any).context.path}')\n`,
                 '\n',

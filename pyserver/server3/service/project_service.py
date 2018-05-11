@@ -419,6 +419,7 @@ class ProjectService:
             type=type, tags=tags, user=user,
             user_token=user_token,
             create_tutorial=True,
+            auto_show_help=True,
             **kwargs)
         return project
 
