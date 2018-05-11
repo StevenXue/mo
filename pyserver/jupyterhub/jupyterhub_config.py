@@ -1222,13 +1222,14 @@ c.Authenticator.admin_users = {'admin'}
 
 import os
 cwd = os.getcwd()
+user_path = os.path.abspath(cwd).\
+    replace('jupyterhub', 'user_directory/{user_ID}/{project_name}')
 c.DockerSpawner.image = 'singleuser:latest'
 c.DockerSpawner.remove_containers = True
 c.DockerSpawner.container_ip = '0.0.0.0'
 c.DockerSpawner.volumes = \
     {
-        os.path.abspath(cwd)+'/user_directory/{user_ID}/{project_name}':
-            '/home/jovyan/work',
+        user_path: '/home/jovyan/work',
         # '/Users/zhaofengli/projects/goldersgreen/pyserver/server3/lib/empty_modules': '/home/jovyan/modules',
         # '/Users/zhaofengli/projects/goldersgreen/pyserver/user_directory': '/home/jovyan/dataset'
         # '/Users/Chun/Documents/workspace/goldersgreen/pyserver/user_directory/{user_ID}/{project_name}': '/home/jovyan/work',

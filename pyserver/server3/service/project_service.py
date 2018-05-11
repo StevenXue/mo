@@ -419,12 +419,14 @@ class ProjectService:
 
         if tags is None:
             tags = []
-        project_type = type
         user = UserBusiness.get_by_user_ID(user_ID)
-        project = cls.business.create_project(name=name,
-                                              description=description,
-                                              type=type, tags=tags, user=user,
-                                              user_token=user_token, **kwargs)
+        project = cls.business.create_project(
+            name=name,
+            description=description,
+            type=type, tags=tags, user=user,
+            user_token=user_token,
+            create_tutorial=True,
+            **kwargs)
         return project
 
     @classmethod

@@ -446,7 +446,7 @@ function createCellTypeSwitcherNode(): HTMLElement {
 function createCaptureSwitcherNode(): HTMLElement {
   let div = document.createElement('div');
   let select = document.createElement('select');
-  for (let t of ['Insert Code', 'Capture Output', 'Restore Output']) {
+  for (let t of ['Code Snippets', 'Capture Output', 'Restore Output']) {
     let option = document.createElement('option');
     option.value = t.toLowerCase();
     option.textContent = t;
@@ -473,7 +473,7 @@ class CaptureSwitcher extends Widget {
     this._notebook = widget;
 
     // Set the initial value.
-    this._select.value = 'insert code';
+    this._select.value = 'code snippets';
 
     // Follow the type of the active cell.
     // widget.activeCellChanged.connect(this._updateValue, this);
@@ -526,7 +526,7 @@ class CaptureSwitcher extends Widget {
    */
   private _evtChange(event: Event): void {
     let select = this._select;
-    if (select.value === 'insert code') {
+    if (select.value === 'code snippets') {
       return;
     }
 
@@ -537,7 +537,11 @@ class CaptureSwitcher extends Widget {
     const codeDict: ICodeDict = {
       'capture output': `%%capture output\n` +
       `# The output of code below this command would be captured\n` +
-      `# and could be restored using 'output.show()'\n`,
+      `# and could be restored using 'output.show()'\n` +
+      `# Add a full controller to running modules: \n` +
+      `# 'result = run('zhaofengli/newttt/0.0.12', conf, with_control=True)'\n` +
+      `# Add a full controller to running your own functions: \n` +
+      `# 'controller(your_function, 'any params')'`,
       'restore output': `output.show()\n` +
       `# The captured output can be printed by running this code`
     };

@@ -15,6 +15,7 @@ import re
 import fileinput
 import requests
 import collections
+import json
 from copy import deepcopy
 from datetime import datetime
 # from distutils.dir_util import copy_tree
@@ -352,7 +353,8 @@ class ProjectBusiness(GeneralBusiness):
 
     @classmethod
     def create_project(cls, name, description, user, privacy='private',
-                       tags=None, user_token='', type='app', **kwargs):
+                       tags=None, user_token='', type='app',
+                       create_tutorial=False, **kwargs):
         """
         Create a new project
 
@@ -363,6 +365,7 @@ class ProjectBusiness(GeneralBusiness):
         :param type: string (app/module/dataset)
         :param tags: list of string
         :param user_token: string
+        :param create_tutorial: boolean
         :return: a new created project object
         """
         if tags is None:
@@ -377,6 +380,9 @@ class ProjectBusiness(GeneralBusiness):
 
         # clone to project dir
         repo = cls.clone(user_ID, name, project_path)
+
+        if create_tutorial:
+            shutil.copy('tutorial/hello_world.ipynb', project_path)
 
         # config repo user
         with repo.config_writer(config_level="repository") as c:
@@ -416,6 +422,20 @@ class ProjectBusiness(GeneralBusiness):
         :return: a matched Project object
         """
         project = cls.repo.read_by_id(project_id)
+        cls.project = project
+        return project
+
+    @classmethod
+    def get_by_identity(cls, identity):
+        """
+        Get a project object by its identity
+
+        :param identity: string
+        :return: a matched Project object
+        """
+        [user_ID, project_name] = identity.split('+')
+        user = UserBusiness.get_by_user_ID(user_ID)
+        project = cls.repo.read_unique_one(dict(name=project_name, user=user))
         cls.project = project
         return project
 
@@ -536,6 +556,43 @@ class ProjectBusiness(GeneralBusiness):
             return master.log()
 
     @classmethod
+    def remove_markdown_cell(cls, source_nb_path, dest_nb_path):
+        """
+        Remove markdown cell content in jupyter notebook file.
+
+        :param source_nb_path: jupyter notebook source file path
+        :param dest_nb_path: jupyter notebook destination file path
+        :return: N/A
+        """
+
+        # read source notebook file
+        with open(source_nb_path, 'r') as f:
+            nb_data = json.loads(f)
+
+        # remove markdown cell
+        for cell in nb_data['cells']:
+            if cell['cell_type'] == 'markdown':
+                del cell
+
+        # remove shell command?
+
+        # write to destination file
+        with open(dest_nb_path, 'w') as f:
+            f.write(json.dumps(nb_data))
+
+    @classmethod
+    def nb_to_py_script(cls, project_id, nb_path, optimise=True):
+        """
+
+        :param project_id: project's ObjectId in mongodb
+        :param nb_path:
+        :param optimise:
+        :return:
+        """
+        pass
+
+
+    @classmethod
     def nb_to_script(cls, project_id, nb_path, optimise=True):
         app = cls.get_by_id(project_id)
         call(['jupyter', 'nbconvert', '--to', 'script', nb_path],
@@ -552,11 +609,12 @@ class ProjectBusiness(GeneralBusiness):
                         r"# Please use current \(work\) folder to store your data "
                         r"and models",
                         r'', line.rstrip())
-                    line = re.sub(r"sys.path.append\('\.\./'\)", r'',
+                    line = re.sub(r"""sys.path.append\('(.+)'\)""", r'',
                                   line.rstrip())
-                    line = re.sub(r"""client = Client\('(.+)'\)""",
-                                  r"""client = Client('\1', silent=True)""",
+                    line = re.sub(r"""(\s+)project_type='(.+)', source_file_path='(.+)'\)""",
+                                  r"""\1project_type='\2', source_file_path='\3', silent=True)""",
                                   line.rstrip())
+
                     line = re.sub(r"""from modules import (.+)""",
                                   r"""from function.modules import \1""",
                                   line.rstrip())
@@ -564,7 +622,7 @@ class ProjectBusiness(GeneralBusiness):
                     # add handle function
                     line = re.sub(
                         r"work_path = ''",
-                        r"work_path = ''\n\n"
+                        r"work_path = 'function/'\n\n"
                         r"def handle(conf):\n"
                         r"\t# paste your code here",
                         line.rstrip())

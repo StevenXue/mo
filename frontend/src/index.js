@@ -1,5 +1,5 @@
 import dva from 'dva'
-import '../node_modules/highlight.js/styles/mono-blue.css'
+import '../node_modules/highlight.js/styles/github.css'
 import './global.less'
 import './index.less'
 // import modelling from './models/modelling'

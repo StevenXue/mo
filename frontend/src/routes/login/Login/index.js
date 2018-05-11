@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {connect} from 'dva'
 import {routerRedux, Link} from 'dva/router'
-import {Form, Input, Tabs, Button, Icon, Checkbox, Row, Col, Alert, Select} from 'antd'
+import {Form, Input, Tabs, Button, Icon, Checkbox, Row, Col, Alert, Select, Carousel} from 'antd'
 import styles from './index.less'
 
 const FormItem = Form.Item
@@ -113,6 +113,7 @@ class Login extends Component {
       />
     )
   }
+
 
   render() {
     const {form, login} = this.props

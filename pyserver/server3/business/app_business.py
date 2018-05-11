@@ -7,6 +7,7 @@ import shutil
 import fileinput
 import tempfile
 import tarfile
+
 from copy import deepcopy
 from subprocess import call
 from io import BytesIO
@@ -37,7 +38,7 @@ yaml_tail_path = 'app_spec.yml'
 
 class AppBusiness(ProjectBusiness, GeneralBusiness):
     repo = Repo(project.App)
-    __cls = project.App
+    entity = project.App
     base_func_path = APP_DIR
 
     @classmethod

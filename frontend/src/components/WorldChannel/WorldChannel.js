@@ -5,9 +5,6 @@ import { Tabs, Input, Icon, Button } from 'antd'
 import { WorldMessages } from './index'
 import styles from './index.less'
 
-import Floater from 'react-floater'
-import Joyride from 'react-joyride'
-
 class worldChannelC extends Component {
   state = {
     run: false,
@@ -25,59 +22,6 @@ class worldChannelC extends Component {
         channel: 'all',
       },
     })
-
-    window.addEventListener('trigger_tooltip', () => {
-      console.log('触发了')
-      setTimeout(() => {
-        this.setState({ run: true })
-        this.setState({
-          steps: [{
-            text: '进入项目开发环境',
-            selector: '.jp-PythonIcon',
-            position: 'bottom-left',
-            // isFixed:true,
-            style: {
-              borderRadius: 0,
-              color: '#34BFE2',
-              textAlign: 'center',
-              width: '12rem',
-              height: "60px",
-              mainColor: '#ffffff',
-              backgroundColor: '#ffffff',
-              beacon: {
-                inner: '#0ae713 ',
-                outer: '#77Eb7c',
-              },
-              close: {
-                display: 'none',
-              },
-            },
-          }],
-          steps2: [{
-            text: '状态',
-            selector: '.jp-CircleIcon',
-            position: 'bottom-left',
-            // isFixed:true,
-            style: {
-              borderRadius: 0,
-              color: '#34BFE2',
-              textAlign: 'center',
-              width: '12rem',
-              height: "60px",
-              mainColor: '#ffffff',
-              backgroundColor: '#ffffff',
-              beacon: {
-                inner: '#0ae713 ',
-                outer: '#77Eb7c',
-              },
-              close: {
-                display: 'none',
-              },
-            },
-          }],
-        })
-      }, 1000)
-    }, false)
 
   }
 
@@ -106,34 +50,6 @@ class worldChannelC extends Component {
 
       return (
         <div>
-          <Joyride
-            ref={c => (this.joyride1 = c)}
-            debug={false}
-            run={true}
-            steps={this.state.steps}
-            autoStart
-            tooltipOffset={10}
-            showOverlay={false}
-            locale={{
-              close: null,
-            }}
-          />
-
-          <Joyride
-            ref={c => (this.joyride1 = c)}
-            debug={false}
-            run={true}
-            steps={this.state.steps2}
-            autoStart
-            tooltipOffset={10}
-            showOverlay={false}
-            locale={{
-              close: null,
-            }}
-          />
-
-
-
           <WorldChannel worldMessages={worldMessages}
                         onClickIcon={this.onClickIcon}
                         dispatch={dispatch}
@@ -219,6 +135,7 @@ class WorldChannel extends Component {
 
               <Icon type="caret-down"
                     className={styles.icon_container}
+                    style={{color: 'transparent'}}
               />
             </div> :
 
@@ -280,37 +197,3 @@ class WorldChannel extends Component {
 
 export default connect(({ login, worldChannel }) => ({ login, ...worldChannel }))(worldChannelC)
 
-/*
-<Floater
-          content="This is arrow"
-          open={true}
-          target=".icon_container___3Gxfl"
-          placement='left'
-          styles= {{
-            minWidth: 100
-          }}
-
-          component={<div>This is arrow</div>}
-          // wrapperOptions={{
-          //   offset: -22,
-          //   placement: 'top',
-          //   position: true,
-          // }}
-        />
-
-        <Floater
-          content="This is title1s"
-          open={true}
-          target=".title___1Od6_"
-          styles= {{
-            minWidth: 20,
-            width: 40
-          }}
-          component={<div>This is title1s</div>}
-          // wrapperOptions={{
-          //   offset: -22,
-          //   placement: 'top',
-          //   position: true,
-          // }}
-        />
- */

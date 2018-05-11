@@ -17,7 +17,7 @@ class GeneralBusiness:
     # 实例化后的 instance 走general repo
     repo = Repo(None)
     # class 不走general repo
-    __cls = None
+    entity = None
 
     @classmethod
     def get_all(cls):
@@ -33,7 +33,7 @@ class GeneralBusiness:
     def read(cls, query=None):
         if query is None:
             query = {}
-        return cls.__cls.objects(**query).order_by('-_id')
+        return cls.entity.objects(**query).order_by('-_id')
 
     @classmethod
     def get_by_id(cls, object_id):
@@ -54,11 +54,11 @@ class GeneralBusiness:
 
     @classmethod
     def create(cls, obj):
-        cls.repo.create(obj)
+        return cls.repo.create(obj)
 
     @classmethod
     def create_one(cls, **kwargs):
-        cls.repo.create_one(**kwargs)
+        return cls.repo.create_one(**kwargs)
 
     @classmethod
     @check_auth

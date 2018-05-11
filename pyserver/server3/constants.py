@@ -36,11 +36,13 @@ INIT_RES = [
     r"import os",
     r"import sys",
     r"# Please use current \(work\) folder to store your data and models",
-    r"sys.path.append\('\.\./'\)",
-    r"client = Client\('(.+)'\)",
+    r"sys.path.append\('(.+)'\)",
+    r"client = Client\('(.+)', project_id='(.+)', user_ID='(.+)',",
+    r"(\s+)project_type='(.+)', source_file_path='(.+)'\)",
     r"from modules import (.+)",
     r"(\S+) = client\.(\S+)",
-    r"# append work_path to head when you want to reference a path inside the working directory",
+    r"# append work_path to head when you want to reference a path inside "
+    r"the working directory",
     r"work_path = ''",
 ]
 PARAMETER_SPEC = [
