@@ -55,11 +55,12 @@ const plugin: JupyterLabPlugin<ILauncher> = {
  */
 export default plugin;
 
+
 /**
  * Activate the launcher.
  */
 function activate(app: JupyterLab, palette: ICommandPalette): ILauncher {
-  const { commands, shell } = app;
+  const {commands, shell} = app;
   const model = new LauncherModel();
 
   commands.addCommand(CommandIDs.create, {
@@ -68,7 +69,7 @@ function activate(app: JupyterLab, palette: ICommandPalette): ILauncher {
       const cwd = args['cwd'] ? String(args['cwd']) : '';
       const id = `launcher-${Private.id++}`;
       const callback = (item: Widget) => {
-        shell.addToMainArea(item, { ref: id });
+        shell.addToMainArea(item, {ref: id});
         shell.activateById(item.id);
         console.log('item', item);
         if (item.hasOwnProperty('notebook')) {
@@ -79,29 +80,57 @@ function activate(app: JupyterLab, palette: ICommandPalette): ILauncher {
             let type = match[2];
             const notebookPath = (item as any).context.path;
             let sysPath = '../'.repeat(notebookPath.split('/').length);
+
             NotebookActions.insertInitCode((item as any).notebook,
               [
-                `# Please use current (work) folder to store your data and models\n`,
-                `import os\n`,
-                `import sys\n`,
+                '# You can use other public modules via our Client object with module\'s identifier \n',
+                '# and parameters.\n',
+                '# For more detailes, please see our online document - https://momodel.github.io/mo/#\n',
+                '\n',
+                'import os\n',
+                'import sys\n',
+                '\n',
+                '# Define root path\n',
                 `sys.path.append('${sysPath}')\n`,
-                `\n`,
-                `from modules import json_parser\n`,
-                `from modules import Client\n`,
-                `\n`,
-                `client = Client('fackAPI', project_id='${projectId}', user_ID='${localStorage.getItem('user_ID')}',\n`,
+                '\n',
+                '# Import necessary packages\n',
+                'from modules import json_parser\n',
+                'from modules import Client\n',
+                '\n',
+                '# Initialise Client object\n',
+                'client = Client(key=\'5asdfoasd0fnd0983\', project_id=\'5ae0c6ae0c11f30f76b7060d\', \n',
+                '                user_ID=\'zhaofengli\', \n',
+                '                project_type=\'app\', source_file_path=\'Untitled.ipynb\')\n',
+
+                `client = Client(key='5asdfoasd0fnd0983', project_id='${projectId}', user_ID='${localStorage.getItem('user_ID')}',\n`,
                 `                project_type='${type}', source_file_path='${(item as any).context.path}')\n`,
-                `run = client.run\n`,
-                `train = client.train\n`,
-                `predict = client.predict\n`,
-                `\n`,
-                `# append work_path to head when you want to reference a path inside the working directory\n`,
-                `work_path = ''`,
+                '\n',
+                '# Make run/train/predict commnad alias for furthur use\n',
+                'run = client.run\n',
+                'train = client.train\n',
+                'predict = client.predict\n',
+                '\n',
+                '# Run a importred module \n',
+                '# e.g. \n',
+                '#      conf = json_parser(\'{"rgb_image":null,"gray_image":null}\') \n',
+                '#      result = run(\'zhaofengli/new_gender_classifier/0.0.2\', conf)\n',
+                '#\n',
+                '# \'conf\' is the parameters in dict form for the imported module\n',
+                '# \'[user_id]/[imported_module_name]/[version]\' is the identifier of the imported module\n',
+                '\n',
+                '\n',
+                '# Make controller alias for further use\n',
+                'controller = client.controller\n',
+                '\n',
+                '# IMPORTANT: Add \'work_path\' to the head of every file path in your code.\n',
+                '# e.g.\n',
+                '#      jpgfile = Image.open(work_path + "picture.jpg") \n',
+                'work_path = \'./\''
               ], (item as any).session);
           }
         }
       };
-      const launcher = new Launcher({ cwd, callback });
+      const launcher = new Launcher({cwd, callback});
 
       launcher.model = model;
       launcher.id = id;
@@ -125,7 +154,7 @@ function activate(app: JupyterLab, palette: ICommandPalette): ILauncher {
     },
   });
 
-  palette.addItem({ command: CommandIDs.create, category: 'Launcher' });
+  palette.addItem({command: CommandIDs.create, category: 'Launcher'});
 
   return model;
 }
