@@ -61,6 +61,10 @@ def list_projects_by_query():
     privacy = request.args.get('privacy', None)
     default_max_score = float(request.args.get('max_score', 0.4))
     type = request.args.get('type', 'project')
+    tags = request.args.get('tags', None)
+    if tags:
+        tags = tags.split(',')
+
     if group == 'my':
         user_ID = get_jwt_identity()
     else:
@@ -70,11 +74,12 @@ def list_projects_by_query():
         projects = project_service.list_projects(
             search_query=search_query,
             privacy=privacy,
+            type=type,
             page_no=page_no,
             page_size=page_size,
             default_max_score=default_max_score,
-            type=type,
-            user_ID=user_ID
+            user_ID=user_ID,
+            tags=tags
         )
     except Warning as e:
         return jsonify({
@@ -88,8 +93,8 @@ def list_projects_by_query():
     else:
         for project in projects.objects:
             project.user_ID = project.user.user_ID
-            if project.user.avatar:
-                project.user_avatar = project.user.avatar
+            # if project.user.avatar:
+            #     project.user_avatar = project.user.avatar
         project_list = json_utility.me_obj_list_to_json_list(projects.objects)
         return jsonify({
             "response": {'projects': project_list, 'count': projects.count}
@@ -114,19 +119,19 @@ def get_project(project_id):
     return make_response(jsonify({'response': project}), 200)
 
 
-@project_app.route('/projects', methods=['GET'])
-def list_projects():
-    user_ID = request.args.get('user_ID')
-    privacy = request.args.get('privacy')
-    others = request.args.get('others')
-    if others == 'true':
-        projects = ownership_service.get_all_public_projects_of_others(user_ID)
-    else:
-        projects = project_service. \
-            list_projects_by_user_ID(user_ID, -1, privacy=privacy)
-    projects = json_utility. \
-        me_obj_list_to_json_list(projects)
-    return jsonify({'response': projects}), 200
+# @project_app.route('/projects', methods=['GET'])
+# def list_projects():
+#     user_ID = request.args.get('user_ID')
+#     privacy = request.args.get('privacy')
+#     others = request.args.get('others')
+#     if others == 'true':
+#         projects = ownership_service.get_all_public_projects_of_others(user_ID)
+#     else:
+#         projects = project_service. \
+#             list_projects_by_user_ID(user_ID, -1, privacy=privacy)
+#     projects = json_utility. \
+#         me_obj_list_to_json_list(projects)
+#     return jsonify({'response': projects}), 200
 
 
 # @project_app.route('/models/<string:user_ID>', methods=['GET'])
@@ -352,9 +357,17 @@ def nb_to_script(project_id):
     optimise = data.get('optimise')
     nb_path = data.get('nb_path')
     try:
-        ProjectBusiness.nb_to_script(project_id, nb_path, optimise)
+        # ProjectBusiness.nb_to_script(project_id, nb_path, optimise)
+        ProjectBusiness.nb_to_py_script(project_id, nb_path, optimise)
     except FileNotFoundError as e:
         return jsonify({"response": 'Try save your notebook and convert '
                                     'again.'}), \
                399
     return jsonify({"response": 1})
+
+
+@project_app.route("/get_hot_tag", methods=["GET"])
+def get_hot_tag():
+    search_query = request.args.get('search_query', None)
+    project_type = request.args.get('project_type', None)
+    return jsonify(ProjectBusiness.get_hot_tag(search_query, project_type))

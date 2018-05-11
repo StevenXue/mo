@@ -13,14 +13,15 @@ import {
   Select,
   Modal,
   Upload,
-  message
+  message,
+  Slider,
+  Spin,
 } from 'antd'
 
 
-import {avatarList} from '../../constants'
 import styles from './index.less'
 import {showTime} from "../../utils"
-import {updateUserInfo, updateUserAccount} from "../../services/user"
+import {updateUserInfo, updateUserAccount,updateUserAvatar ,twoStepVFC} from "../../services/user"
 import {routerRedux} from "dva/router"
 import AvatarEditor from 'react-avatar-editor'
 
@@ -45,7 +46,8 @@ class EditForm extends React.Component {
       // 手机号 或 邮箱地址
       checkValue: '',
       editEmail: false,
-      editContent: ''
+      editContent: '',
+      loading:false
     }
   }
 
@@ -91,14 +93,14 @@ class EditForm extends React.Component {
 
   handleSubmitEmail = () => {
     let tokenForUpdateInfo = localStorage.getItem('tokenForUpdateInfo')
-    this.props.form.validateFields(['email', 'captcha'], {force: true},
+    this.props.form.validateFields(['email', 'captcha1'], {force: true},
       (err, values) => {
         console.log('values', values)
         if (!err) {
           updateUserAccount({
             body: {
               'email': values.email,
-              'captcha': values.captcha,
+              'captcha': values.captcha1,
               tokenForUpdateInfo
             },
             onJson: (e) => {
@@ -109,12 +111,16 @@ class EditForm extends React.Component {
                   this.cancelEdit({})
                 }
                 else {
-                  message.error(e.error )
+                  message.error(e.error)
                 }
               }
               else {
                 message.success('Email修改成功')
                 this.cancelEdit({})
+                this.props.dispatch({
+                  type: 'profile/setUserInfo',
+                  'userInfo': e.user
+                })
               }
             },
           })
@@ -126,14 +132,14 @@ class EditForm extends React.Component {
 
   handleSubmitPhone = () => {
     let tokenForUpdateInfo = localStorage.getItem('tokenForUpdateInfo')
-    this.props.form.validateFields(['phone', 'captcha'], {force: true},
+    this.props.form.validateFields(['phone', 'captcha2'], {force: true},
       (err, values) => {
         if (!err) {
 
           updateUserAccount({
             body: {
               'phone': values.phone,
-              'captcha': values.captcha,
+              'captcha': values.captcha2,
               tokenForUpdateInfo
             },
             onJson: (e) => {
@@ -150,6 +156,10 @@ class EditForm extends React.Component {
               else {
                 message.success('手机号码修改成功')
                 this.cancelEdit({})
+                this.props.dispatch({
+                  type: 'profile/setUserInfo',
+                  'userInfo': e.user
+                })
               }
             }
           })
@@ -212,17 +222,9 @@ class EditForm extends React.Component {
         payload
       })
     }
-    // // 向后端请求验证码
-    // this.props.dispatch({
-    //   type: "register/sendVerificationCode",
-    //   payload: {
-    //     phone: this.props.phone
-    //   }
-    // })
     let count = 59
     this.setState({count})
     this.interval = setInterval(() => {
-      console.log(this.state.count)
       count -= 1
       this.setState({count})
       if (count === 0) {
@@ -235,20 +237,46 @@ class EditForm extends React.Component {
   checkAuth = (e) => {
     this.props.form.validateFields(['captcha'], {force: true},
       (err, values) => {
-        console.log('values', values)
         if (!err) {
-          this.props.dispatch({
-            type: `profile/twoStepVFC`,
+          this.setState({loading:true})
+          twoStepVFC({
             payload: {
               checkType: this.state.checkType,
               checkValue: this.state.checkValue,
               code: values.captcha,
             },
+            onSuccess: async (res) => {
+              this.setState({loading:false})
+              const resj = await res.json()
+              if(res.ok){
+                message.success('验证成功')
+                const { tokenForUpdateInfo } = resj.response
+                localStorage.setItem('tokenForUpdateInfo', tokenForUpdateInfo)
+                this.setState({
+                  modalVisible: false,
+                  editContent: this.state.toEditContent,
+                  count:0
+                })
+                clearInterval(this.interval)
+              }
+              else{
+                message.error(resj.response)
+                }
+            }
           })
-          this.setState({
-            modalVisible: false,
-            editContent: this.state.toEditContent
-          })
+
+          // this.props.dispatch({
+          //   type: `profile/twoStepVFC`,
+          //   payload: {
+          //     checkType: this.state.checkType,
+          //     checkValue: this.state.checkValue,
+          //     code: values.captcha,
+          //   },
+          // })
+          // this.setState({
+          //   modalVisible: false,
+          //   editContent: this.state.toEditContent
+          // })
         }
       },
     )
@@ -339,16 +367,16 @@ class EditForm extends React.Component {
                 />
               )}
             </FormItem>
-            <FormItem>
+            <FormItem >
               <Row gutter={16} type="flex" justify="left" align="top">
                 <Col span={5} offset={4}>
-                  {getFieldDecorator('captcha', {
+                  {getFieldDecorator('captcha1', {
                     rules: [{
                       required: true, message: '请输入验证码！',
                     }],
                   })(
-                    <Input
-                      placeholder="验证码"
+                    <Input id={'验证码'}
+                      placeholder=""
                     />
                   )}
                 </Col>
@@ -388,16 +416,16 @@ class EditForm extends React.Component {
                 />
               )}
             </FormItem>
-            <FormItem>
+            <FormItem >
               <Row gutter={16} type="flex" justify="left" align="top">
                 <Col span={5} offset={4}>
-                  {getFieldDecorator('captcha', {
+                  {getFieldDecorator('captcha2', {
                     rules: [{
                       required: true, message: '请输入验证码！',
                     }],
                   })(
-                    <Input
-                      placeholder="验证码"
+                    <Input id={'验证码'}
+                      placeholder=""
                     />
                   )}
                 </Col>
@@ -466,6 +494,7 @@ class EditForm extends React.Component {
           onCancel={this.cancelEdit}
           onOk={this.checkAuth}
         >
+          <Spin spinning={this.state.loading}>
           <div>
             <Select
               value={this.state.checkType}
@@ -487,7 +516,7 @@ class EditForm extends React.Component {
                         required: true, message: '请输入验证码！',
                       }],
                     })(
-                      <Input
+                      <Input id={'captcha3'}
                         placeholder="验证码"
                       />
                     )}
@@ -505,7 +534,9 @@ class EditForm extends React.Component {
               </FormItem>
             </Form>
           </div>
+          </Spin>
         </Modal>
+
       </div>
     )
   }
@@ -589,8 +620,10 @@ class GenderEditForm extends React.Component {
               <FormItem
                 wrapperCol={{span: 12}}
               >
-                <Button type="primary" htmlType="submit">保存</Button>
+                <div style={{display: 'flex'}}>
+                <Button type="primary" htmlType="submit" style={{marginRight: '10px'}}>保存</Button>
                 <Button onClick={this.cancelEdit}>取消</Button>
+                </div>
               </FormItem>
             </FormItem>
           </Form>
@@ -614,11 +647,30 @@ class AvatarEdit extends React.Component {
   componentDidMount() {
   }
 
-  handlePreview = (file) => {
+  // handlePreview = (file) => {
+  //   if (this.beforeUpload(file)) {
+  //     this.setState({
+  //       previewImage: file.url || file.thumbUrl,
+  //       previewVisible: true,
+  //     })
+  //   }
+  // }
+  onChangeZoom = (value) => {
     this.setState({
-      previewImage: file.url || file.thumbUrl,
-      previewVisible: true,
+      zoom: value,
     })
+  }
+
+  checkTypeSize(file) {
+    const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
+    if (!isJPG) {
+      message.error('You can only upload JPG/PNG file!')
+    }
+    const isLt5M = file.size / 1024 / 1024 < 5
+    if (!isLt5M) {
+      message.error('Image must smaller than 5MB!')
+    }
+    return isJPG && isLt5M
   }
 
   getBase64 = (img, callback) => {
@@ -629,23 +681,23 @@ class AvatarEdit extends React.Component {
 
   handleChange = ({fileList}) => {
     let thisFile = fileList[0]
-    this.getBase64(thisFile, imageUrl => {
-      let newList = [{
-        originFileObj: thisFile,
-        thumbUrl: imageUrl,
-        uid: thisFile.uid
-      }]
-      console.log(imageUrl)
-      this.setState({
-        fileList: newList,
-        loading: false,
+    if (this.checkTypeSize(thisFile)) {
+      this.getBase64(thisFile, imageUrl => {
+        let newList = [{
+          originFileObj: thisFile,
+          thumbUrl: imageUrl,
+          uid: thisFile.uid
+        }]
+        this.setState({
+          fileList: newList,
+          loading: false,
+        })
+        this.setState({
+          previewImage: imageUrl,
+          previewVisible: true,
+        })
       })
-      this.setState({
-        previewImage: imageUrl,
-        previewVisible: true,
-      })
-      // this.props.setFieldsValue({[this.props.keyName]: newList[0].thumbUrl})
-    })
+    }
   }
   handleCancel = () => {
     this.setState({
@@ -656,16 +708,36 @@ class AvatarEdit extends React.Component {
   }
 
   confirmEdit = () => {
-    updateUserInfo({
-      body: {
-        'avatar': this.editor.getImage().toDataURL()
-      },
-      onJson: ({user}) => {
-        this.props.dispatch({
-          type: 'profile/setUserInfo',
-          'userInfo': user
-        })
+    let newAvatar = this.editor.getImage()
+    let canvas = document.createElement('canvas')
+    let ctx = canvas.getContext('2d')
+    canvas.width = 140
+    canvas.height = 140
+    ctx.clearRect(0, 0, 140, 140)
+    ctx.drawImage(newAvatar, 0, 0, 140, 140)
+    // let uploadAvatar=(blob)=>{
+    //   let fd = new FormData()
+    //   fd.append("avatarFile", blob, "avatar.jpg")
+    //   updateUserAvatar({
+    //     fd,
+    //     onJson: ({user}) => {
+    //       // this.props.dispatch({
+    //       //   type: 'profile/setUserInfo',
+    //       //   'userInfo': user
+    //       // })
+    //       this.handleCancel()
+    //       // this.props.dispatch({
+    //       //   type: 'login/setUser',
+    //       //   payload: user
+    //       // })
+    //     }
+    //   })}
+    // canvas.toBlob((blob)=>uploadAvatar(blob),'image/jpeg',1.0)
+    let dataUrl = canvas.toDataURL('image/png')
+    updateUserAvatar({dataUrl,
+      onJson: () => {
         this.handleCancel()
+        this.props.dispatch({ type: 'login/setUserAvatar',userAvatar: `/pyapi/user/avatar/${this.props.user_ID}.jpeg?${new Date().getTime()}` })
       }
     })
   }
@@ -695,34 +767,46 @@ class AvatarEdit extends React.Component {
           {...props}
           className={styles.photoUpload}
           action={URL + '/fake_upload'}
-          listType="picture-card"
+          // listType="picture-card"
           fileList={this.state.fileList}
-          onPreview={this.handlePreview}
           onChange={this.handleChange}
+          showUploadList ={false}
         >
-          {this.state.fileList.length >= 1 ? null :
+
             <div>
-              <img
-                src={this.props.avatar ? this.props.avatar : avatarList[this.props.picNumber]}
+              <img className={styles.avt}
+                src={this.props.userAvatar}
                 alt="avatar"/>
               <div className={styles.picDoc}>修改我的头像</div>
-            </div>}
+            </div>
         </Upload>
         <Modal
           visible={this.state.previewVisible}
           onCancel={this.handleCancel}
           onOk={this.confirmEdit}
         >
-          <AvatarEditor
-            ref={this.setEditorRef}
-            image={this.state.previewImage}
-            width={250}
-            height={250}
-            border={50}
-            color={[255, 255, 255, 0.6]} // RGBA
-            scale={1.2}
-            rotate={0}
-          />
+          <Row>
+            <Col span={12}>
+              <AvatarEditor
+                ref={this.setEditorRef}
+                image={this.state.previewImage}
+                width={200}
+                height={200}
+                border={50}
+                borderRadius={30}
+                color={[255, 255, 255, 0.6]} // RGBA
+                scale={this.state.zoom}
+                rotate={0}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col span={8}>
+              Zoom:<Slider min={1.0} max={3.0} step={0.01} tipFormatter={null}
+                      onChange={this.onChangeZoom}
+                      value={this.state.zoom}/>
+            </Col>
+          </Row>
         </Modal>
       </div>)
   }
@@ -730,9 +814,9 @@ class AvatarEdit extends React.Component {
 
 function SettingProfile({login, profile, dispatch, history}) {
   if (profile.userInfo) {
-    const {gender, age, email, name, phone, user_ID, avatar} = profile.userInfo
+    const {gender, age, email, name, phone, user_ID} = profile.userInfo
+    const {userAvatar} = login
     const {projectNumber} = profile
-    const picNumber = parseInt(profile.userInfo._id.slice(10)) % 6
     return (
       <div className={`main-container ${styles.container}`}>
         <div className={styles.all}>
@@ -742,7 +826,7 @@ function SettingProfile({login, profile, dispatch, history}) {
           <div className={styles.headerRow}>
             <Row type="flex" justify="space-around" align="middle">
               <Col span={3} style={{padding: '25px'}}>
-                <AvatarEdit picNumber={picNumber} avatar={avatar}
+                <AvatarEdit userAvatar={userAvatar} user_ID={user_ID}
                             dispatch={dispatch}/>
               </Col>
               <Col span={21}>

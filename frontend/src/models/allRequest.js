@@ -6,7 +6,7 @@ import * as messageService from '../services/message'
 import {arrayToJson, JsonToArray} from '../utils/JsonUtils'
 import {getRound} from '../utils/number'
 import pathToRegexp from 'path-to-regexp'
-
+import { message } from 'antd'
 // get 此request下所有的的 comment
 function* fetchAllCommentsOfThisRequest(action, {call, put}) {
   const {data} = yield call(
@@ -35,6 +35,13 @@ function* fetchAllAnswerOfThisRequest(action, {call, put}) {
     requestAnswerService.fetchAllAnswerOfThisUserRequest, {
       user_request_ID: action.payload.userrequestId
     })
+  if (allAnswerOfThisRequest){
+    yield put({
+      type: 'changeFocusloading',
+      payload: {focusUserRequestLoading: false}
+    })
+  }
+
   if (allAnswerOfThisRequest.length > 0) {
     allAnswerOfThisRequest.forEach(function (element) {
       element['commentState'] = false
@@ -59,6 +66,7 @@ export default {
     totalNumber: 0,
     modalVisible: false,
     tags: [],
+    focusUserRequestLoading:true
   },
   reducers: {
     // 获取所有的request
@@ -227,7 +235,6 @@ export default {
       }
     },
 
-
     showLoading(state, action) {
       return {
         ...state,
@@ -264,6 +271,14 @@ export default {
           ...state.focusUserRequest,
           commentState: !commentState,
         }
+      }
+    },
+
+    changeFocusloading(state, action) {
+      console.log('hhhh',action.payload.focusUserRequestLoading)
+      return {
+        ...state,
+        focusUserRequestLoading: action.payload.focusUserRequestLoading,
       }
     },
 
@@ -307,6 +322,10 @@ export default {
     },
 
     * fetchOneRequest(action, {call, put}) {
+      yield put({
+        type: 'changeFocusloading',
+        payload: {focusUserRequestLoading: true}
+      })
       const {data: focusUserRequest} = yield call(userRequestService.fetchOneUserRequest,
         {user_request_ID: action.payload.userrequestId})
       yield put({
@@ -343,6 +362,7 @@ export default {
           type: 'fetchAllRequest',
           payload: {},
         })
+        message.success('提问成功');
       }
     },
     // 发布新 comment
@@ -367,6 +387,7 @@ export default {
         }, {
           call, put
         })
+        message.success('评论成功');
       }
     },
     // 发布新回答
@@ -380,6 +401,7 @@ export default {
         yield call(fetchAllAnswerOfThisRequest, {payload: {userrequestId: payload.user_request_id}}, {
           call, put
         })
+        message.success('回答成功');
       }
     },
 

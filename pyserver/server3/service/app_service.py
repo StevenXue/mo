@@ -65,7 +65,13 @@ class AppService(ProjectService):
         pattern = re.compile(r'STRHEAD(.+?)STREND', flags=re.DOTALL)
         results = pattern.findall(response.text)
         print(results)
-        output_json = json.loads(results[0])
+        try:
+            output_json = json.loads(results[0])
+        except IndexError as e:
+            errors = cls.business.get_service_logs(app, version)
+            output_json = {
+                'errors': errors
+            }
         # output_json = response.json()
         # 成功调用后 在新的collection存一笔
         user_obj = UserBusiness.get_by_user_ID(user_ID=user_ID)
@@ -114,17 +120,36 @@ class AppService(ProjectService):
 
     @classmethod
     def publish(cls, project_id, commit_msg, handler_file_path, version):
-        module = cls.business.deploy_or_publish(project_id, commit_msg,
-                                                handler_file_path, version)
-        cls.send_message(module, m_type='publish')
-        return module
+        try:
+            app = cls.business.deploy_or_publish(project_id, commit_msg,
+                                                    handler_file_path, version)
+            cls.send_message(app, m_type='publish')
+        except:
+            app = cls.business.get_by_id(project_id)
+            app.status = 'inactive'
+            app.save()
+            cls.send_message(app, m_type='publish_fail')
+        else:
+            return app
 
     @classmethod
     def deploy(cls, project_id, commit_msg, handler_file_path):
-        module = cls.business.deploy_or_publish(project_id, commit_msg,
-                                                handler_file_path)
-        cls.send_message(module, m_type='deploy')
-        return module
+        try:
+            app = cls.business.deploy_or_publish(project_id, commit_msg,
+                                                    handler_file_path)
+            cls.send_message(app, m_type='deploy')
+        except:
+            app = cls.business.get_by_id(project_id)
+            app.status = 'inactive'
+            app.save()
+            cls.send_message(app, m_type='deploy_fail')
+        else:
+            return app
+
+    @classmethod
+    def get_action_entity(cls, app_id, **kwargs):
+        app = AppBusiness.get_by_id(app_id)
+        return AppBusiness.get_action_entity(app, **kwargs)
 
 
 # @classmethod

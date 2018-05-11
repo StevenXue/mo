@@ -24,16 +24,30 @@ class ModuleService(ProjectService):
 
     @classmethod
     def publish(cls, project_id, commit_msg, version):
-        module = cls.business.deploy_or_publish(project_id, commit_msg,
-                                                version=version)
-        cls.send_message(module, m_type='publish')
-        return module
+        try:
+            module = cls.business.deploy_or_publish(project_id, commit_msg,
+                                                    version=version)
+            cls.send_message(module, m_type='publish')
+        except:
+            module = cls.business.get_by_id(project_id)
+            module.status = 'inactive'
+            module.save()
+            cls.send_message(module, m_type='publish_fail')
+        else:
+            return module
 
     @classmethod
     def deploy(cls, project_id, commit_msg):
-        module = cls.business.deploy_or_publish(project_id, commit_msg)
-        cls.send_message(module, m_type='deploy')
-        return module
+        try:
+            module = cls.business.deploy_or_publish(project_id, commit_msg)
+            cls.send_message(module, m_type='deploy')
+        except:
+            module = cls.business.get_by_id(project_id)
+            module.status = 'inactive'
+            module.save()
+            cls.send_message(module, m_type='deploy_fail')
+        else:
+            return module
 
 
 if __name__ == '__main__':

@@ -1,21 +1,14 @@
 import React, {Component} from 'react'
 import {connect} from 'dva'
-import {Select, Icon, Input, Pagination, Tabs} from 'antd'
+import {Select, Icon, Input, Pagination, Tabs,Spin} from 'antd'
 import ProjectModel from '../../../components/ProjectModal/index'
 import {showTime} from '../../../utils/index'
 import {privacyChoices, projectChoices} from '../../../constants'
-import avatar1 from '../../../img/avatar/1.png'
-import avatar2 from '../../../img/avatar/2.png'
-import avatar3 from '../../../img/avatar/3.png'
-import avatar4 from '../../../img/avatar/4.png'
-import avatar5 from '../../../img/avatar/5.png'
-import avatar6 from '../../../img/avatar/6.png'
 import star from '../../../img/star.png'
 import star_o from '../../../img/star-o.png'
 import like from '../../../img/like.png'
 import like_o from '../../../img/like-o.png'
-
-const avatarList =[avatar1,avatar2,avatar3,avatar4,avatar5,avatar6]
+import TagSelect from '../../../components/TagSelect/index'
 
 import {
   createProject,
@@ -28,6 +21,7 @@ import {
 } from '../../../services/user'
 
 import styles from './index.less'
+import {getHotTagOfProject} from "../../../services/project"
 
 const Option = Select.Option
 const Search = Input.Search
@@ -72,6 +66,7 @@ class ProjectList extends Component {
       totalNumber: 0,
       pageNo: 1,
       pageSize: 8,
+      loading:true
     }
   }
 
@@ -96,6 +91,9 @@ class ProjectList extends Component {
 
   fetchData({payload= {}}) {
     const {type} = this.props
+    this.setState({
+      loading: true,
+    })
 
     let filter = {type};
     ['query', 'privacy', 'page_no', 'page_size'].forEach((key) => {
@@ -115,14 +113,13 @@ class ProjectList extends Component {
       onJson: ({projects, count}) => this.setState({
         projects,
         totalNumber: count,
+        loading: false
       })
     })
-
-
   }
 
-  handleQueryChange(value) {
-    this.fetchData({payload: {query: value}})
+  handleQueryChange(value,tags) {
+    this.fetchData({payload: {query: value,tags:tags}})
   }
 
 
@@ -176,22 +173,28 @@ class ProjectList extends Component {
           {/*<Option key={e.value} value={e.value}>{e.text}</Option>,*/}
           {/*)}*/}
           {/*</Select>*/}
-          <Search
-            placeholder="input search text"
-            onSearch={(value) => this.handleQueryChange(value)}
-            style={{width: 200}}
-          />
+          <TagSelect getHotTag={getHotTagOfProject} onSearch={(value,tags) => {
+            this.handleQueryChange(value,tags)}} type={this.props.type}/>
+          {/*<Search*/}
+            {/*placeholder="input search text"*/}
+            {/*onSearch={(value) => this.handleQueryChange(value)}*/}
+            {/*style={{width: 200}}*/}
+          {/*/>*/}
         </div>
+        <Spin spinning={this.state.loading}>
         <div className={styles.projectList}>
           {this.state.projects.map(e =>
-            <ProjectCard
-
+          {
+            return  <ProjectCard
               key={e._id} project={e}
-                         onClickToDetail={() => this.toProjectDetail(e._id, history, e.type, e.user, this.state.user_obj_id)}
-                         onClickStarFavor={(action) => this.starFavor(action, e._id, e.type)}
+              onClickToDetail={() => this.toProjectDetail(e._id, history, e.type, e.user, this.state.user_obj_id)}
+              onClickStarFavor={(action) => this.starFavor(action, e._id, e.type)}
             />
+          }
+
           )}
         </div>
+        </Spin>
         <div className={styles.pagination}>
           <Pagination showSizeChanger
                       onShowSizeChange={this.onShowSizeChange}
@@ -210,12 +213,11 @@ class ProjectList extends Component {
 function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
   const user_obj_id = localStorage.getItem('user_obj_id')
   const user_ID = localStorage.getItem('user_ID')
-  const picNumber = parseInt(project.user.slice(10))%6
   return (
     <div className={styles.projectCard}>
       <div className={styles.toDetail} onClick={() => onClickToDetail()}>
         <div className={styles.pic}>
-          <img src={project.user_avatar?project.user_avatar:avatarList[picNumber]}  alt="avatar" />
+          <img className={styles.avt} src={`/pyapi/user/avatar/${project.user_ID}.jpeg`}  alt="avatar" />
         </div>
         <div className={styles.name}>
           <p className={styles.namep}>{project.name}</p>
@@ -225,15 +227,18 @@ function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
         </div>
         <div>
           <div className={styles.authorDateDiv}>
-            <div className={styles.authorDiv}><p
-              className={styles.authorP}>AUTHOR</p><p>{project.user_ID}</p></div>
-            <div className={styles.dateDiv}><p className={styles.dateP}>DATE</p>
+            <div className={styles.authorDiv}>
+              <p className={styles.authorP}>AUTHOR</p>
+              <p>{project.user_ID}</p>
+            </div>
+            <div className={styles.dateDiv}>
+              <p className={styles.dateP}>DATE</p>
               <p>{showTime(project.create_time, "yyyy-MM-dd")}</p></div>
           </div>
           <div className={styles.categoryDiv}>
             <div className={styles.categoryP}>TAG</div>
             <div style={{display: 'flex'}}>
-              {project.tags.map((e,index,array) =><p>{e}&nbsp; {array.indexOf(e)===(array.length-1)?null:'•'} &nbsp; </p>)}
+              {project.tags.map((e,index,array) =><p key={index}>{e}&nbsp; {array.indexOf(e)===(array.length-1)?null:'•'} &nbsp; </p>)}
             </div>
           </div>
         </div>
@@ -242,14 +247,14 @@ function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
         <div className={styles.starFavorRightDiv}>
           <Icon className={styles.bottomIcon}
                 type={project.star_users.includes(user_obj_id) ? "like" : "like-o"}
-                onClick={() => onClickStarFavor('star')}
-                style={{color:'transparent',background:project.star_users.includes(user_obj_id) ?`url(${like_o}) no-repeat center`:`url(${like}) no-repeat center`}}
+                onClick={project.user_ID===user_ID?null:() => onClickStarFavor('star')}
+                style={{cursor:project.user_ID===user_ID?"default":"pointer",color:'transparent',background:project.star_users.includes(user_obj_id) ?`url(${like_o}) no-repeat center`:`url(${like}) no-repeat center`}}
                 />
           <p className={styles.bottomNumber}>{project.star_users.length}</p>
           <Icon className={styles.bottomIcon}
                 type={project.favor_users.includes(user_obj_id) ? "star" : "star-o"}
-                onClick={() => onClickStarFavor('favor')}
-                style={{color:'transparent',background:project.favor_users.includes(user_obj_id) ?`url(${star_o}) no-repeat center`:`url(${star}) no-repeat center`}}
+                onClick={project.user_ID===user_ID?null:() => onClickStarFavor('favor')}
+                style={{cursor:project.user_ID===user_ID?"default":"pointer",color:'transparent',background:project.favor_users.includes(user_obj_id) ?`url(${star_o}) no-repeat center`:`url(${star}) no-repeat center`}}
                 />
           <p className={styles.bottomNumber}>{project.favor_users.length}</p>
         </div>

@@ -1,14 +1,15 @@
 import React from 'react'
 import {
   LocaleProvider, Pagination, DatePicker, TimePicker, Calendar,
-  Popconfirm, Table, Modal, Button, Select, Transfer, Radio, Layout
+  Popconfirm, Table, Modal, Button, Select, Transfer, Radio, Layout,
 } from 'antd'
-import {  } from 'antd';
-const { Footer, Sider, Content } = Layout;
-import {IntlProvider} from 'react-intl'
+import {} from 'antd'
+
+const { Footer, Sider, Content } = Layout
+import { IntlProvider } from 'react-intl'
 import enUS from 'antd/lib/locale-provider/en_US'
-import {WebChat} from "../Chat"
-import {WorldChannel} from '../WorldChannel'
+import { WebChat } from '../Chat'
+import { WorldChannel } from '../WorldChannel'
 
 // ant design 组件国际化包
 import moment from 'moment'
@@ -22,19 +23,36 @@ import LaunchPage from './LaunchPage'
 
 import zh_CN from '../../intl/zh_CN'
 import en_US from '../../intl/en_US'
-function MainLayout({children, location, history, modal, isRight, onClickIcon}) {
+import pathToRegexp from 'path-to-regexp/index'
+
+const NO_CHAT_PATHS = ['/', '/launchpage', '/user/login', '/user/register', '/user/newpassword'
+  ,'/user/forgot', '/newpassword']
+import HelpButton from '../HelpButton/HelpButton'
+function MainLayout({ children, location, history, isRight, onClickIcon }) {
+  const match = pathToRegexp('/workspace/:projectId/:type').exec(location.pathname)
   return (
-    <Layout style={{height: '100%',position:"relative"}}>
-      <Header location={location} history={history} />
-      <Content style={{height:'100%',overflowY:'auto'}} id="LaunchPage_Contain">
-        <LaunchPage location={location}/>
-        <div style={{display: "flex",height:'100%'}}>
-          <div className={styles.content}>
+    <Layout style={{
+      height: '100%',
+      position: 'relative',
+      backgroundColor: location.pathname !== '/' || location.pathname.indexOf('/user') !== -1 ? '#F5F5F5' : 'transparent',
+    }}>
+      {/*{location.pathname !== '/' && <Header location={location} history={history}/>}*/}
+      {!match&&<Header location={location} history={history}/>}
+      <Content style={{ height: '100%', overflowY: 'auto', marginTop: location.pathname !== '/' ? 45 : 0 }}
+               id="LaunchPage_Contain">
+        {/* <LaunchPage location={location}/> */}
+        <div style={{ display: 'flex', height: '100%' }}>
+          <div className={styles.content}
+               style={{ padding: location.pathname === '/launchpage' || location.pathname === '/' ? '0' : '24px 15px' }}
+            // style={{padding:'24px 15px'}}
+          >
             {children}
           </div>
-          <WorldChannel onClickIcon={onClickIcon} isRight={isRight}/>
+          {!(NO_CHAT_PATHS.includes(location.pathname)) && !match && <WorldChannel/>}
         </div>
       </Content>
+      {match&&<HelpButton />}
+
     </Layout>
   )
 
@@ -60,11 +78,9 @@ function MainLayout({children, location, history, modal, isRight, onClickIcon}) 
   //     {/*<WorldChannel/>*/}
   //     {/*</Modal>*/}
 
-
   //   </div>
   // )
 }
-
 
 class OutMainLayout extends React.Component {
   constructor() {
@@ -76,9 +92,17 @@ class OutMainLayout extends React.Component {
       worldChannelIsOpen: false,
       visible: true,
 
-      isRight: false
     }
   }
+
+  componentWillMount() {
+    // console.log("OutMainLayout 刷新了")
+  }
+
+  // shouldComponentUpdate(nextProps, nextState){
+  //   console.log("props", nextProps, nextState)
+  //   return false
+  // }
 
   // state = { visible: true }
 
@@ -102,24 +126,27 @@ class OutMainLayout extends React.Component {
 
   changeLocale = (e) => {
     const localeValue = e.target.value
-    this.setState({locale: localeValue})
+    this.setState({ locale: localeValue })
     if (!localeValue) {
       moment.locale('zh-cn')
       this.setState({
-        language: zh_CN
+        language: zh_CN,
       })
 
     } else {
       moment.locale('en')
       this.setState({
-        language: en_US
+        language: en_US,
       })
     }
   }
 
   render() {
+    const { location } = this.props
+    // console.log("OutMainLayout 刷新了", location)
+
     return (
-      <div style={{height: '100%'}}>
+      <div style={{ height: '100%' }}>
         {/*<div className="change-locale">*/}
         {/*<span style={{marginRight: 16}}>Change locale of components: </span>*/}
         {/*<Radio.Group defaultValue={enUS} onChange={this.changeLocale}>*/}
@@ -137,25 +164,16 @@ class OutMainLayout extends React.Component {
               location={this.props.location}
               history={this.props.history}
               children={this.props.children}
-              modal={{
-                visible: this.state.visible,
-                showModal: this.showModal,
-                handleOk: this.handleOk,
-                handleCancel: this.handleCancel
-              }}
-              isRight={this.state.isRight}
-              onClickIcon={() => this.setState({isRight: !this.state.isRight})}
             />
 
           </IntlProvider>
 
         </LocaleProvider>
 
-        <WebChat isRight={this.state.isRight}/>
+        {!(NO_CHAT_PATHS.includes(location.pathname)) && <WebChat/>}
       </div>
     )
   }
 }
-
 
 export default OutMainLayout

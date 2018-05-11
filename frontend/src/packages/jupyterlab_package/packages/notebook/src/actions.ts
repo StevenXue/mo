@@ -300,6 +300,41 @@ export namespace NotebookActions {
      *
      * @param widget - The target notebook widget.
      * @param code - The string code to insert.
+     *
+     * #### Notes
+     * The widget mode will be preserved.
+     * This action can be undone.
+     * The existing selection will be cleared.
+     * The new cell will be the active cell.
+     */
+    export function insertMarkdown(widget: Notebook, code: nbformat.MultilineString): void {
+
+        if (!widget.model || !widget.activeCell) {
+            return;
+        }
+        let state = Private.getState(widget);
+        let model = widget.model;
+
+        // Create cell with code source
+        let codeCell = {
+            cell_type: 'markdown',
+            source: code,
+            metadata: {}
+        } as nbformat.IBaseCell;
+        let cell = model.contentFactory.createMarkdownCell({cell: codeCell});
+        // newCells.push(model.contentFactory.createMarkdownCell({cell}));
+        model.cells.insert(widget.activeCellIndex, cell);
+        // Make the newly inserted cell active.
+        widget.activeCellIndex++;
+        widget.deselectAll();
+        Private.handleState(widget, state, true);
+    }
+
+    /**
+     * Insert a new code cell below the active cell.
+     *
+     * @param widget - The target notebook widget.
+     * @param code - The string code to insert.
      * @param session - The optional client session object.
      *
      * #### Notes

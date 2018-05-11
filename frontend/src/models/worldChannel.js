@@ -8,7 +8,8 @@ let connected = false
 export default {
   namespace: 'worldChannel',
   state: {
-    worldMessages: []
+    worldMessages: [],
+    isRight: false,
   },
 
   reducers: {
@@ -27,7 +28,14 @@ export default {
       return {...state,
         worldMessages
       }
+    },
 
+    // ?这种是不是纯函数 ,更换到effects里是解决方案吗
+    toggleIsRight(state, {payload}){
+      return {
+        ...state,
+        isRight: !state.isRight
+      }
     }
 
   },
@@ -37,6 +45,8 @@ export default {
       // 上面的是早的， 只显示今天的或者50条，没有分页
       const result = yield call(worldMessageService.getWorldMessages, payload)
       yield put({type: 'updateState', payload: {worldMessages: _.reverse(result.data.objects)}})
+
+      payload.scrollToBottom(true)
     },
 
     * sendMessage({payload}, { call, put }) {
@@ -53,14 +63,12 @@ export default {
         const userId = localStorage.getItem('user_ID')
         if (userId && !connected) {
           const socket = io.connect('/log', {path: '/socketio/socket.io'})
-
           socket.on('world', (msg) => {
             console.log("msg", msg)
             dispatch({ type: 'updateWorldMessages', payload: { newMessage: msg } })
           })
           connected = true
         }
-
       })
     }
   }

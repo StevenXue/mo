@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {connect} from 'dva'
 import {routerRedux, Link} from 'dva/router'
-import {Form, Input, Tabs, Button, Icon, Checkbox, Row, Col, Alert, Select} from 'antd'
+import {Form, Input, Tabs, Button, Icon, Checkbox, Row, Col, Alert, Select, Carousel} from 'antd'
 import styles from './index.less'
 
 const FormItem = Form.Item
@@ -72,8 +72,6 @@ class Login extends Component {
     const {type} = this.state
     this.props.form.validateFields(['user_ID', 'password'], {},
       (err, values) => {
-        console.log('values', values)
-        console.log('err', err)
         if (!err) {
           this.props.dispatch({
             type: `login/login`,
@@ -82,7 +80,7 @@ class Login extends Component {
         }
       },
     )
-    localStorage.setItem('launchpage','show')
+    // localStorage.setItem('launchpage','show')
   }
 
   handleLoginWithPhone = (e) => {
@@ -115,6 +113,7 @@ class Login extends Component {
       />
     )
   }
+
 
   render() {
     const {form, login} = this.props
@@ -247,11 +246,8 @@ class Login extends Component {
                   Login
                 </Button>
               </FormItem>
-
             </Form>
           </TabPane>
-
-
         </Tabs>
       </div>
     )

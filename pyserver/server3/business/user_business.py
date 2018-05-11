@@ -51,6 +51,14 @@ class UserBusiness(GeneralBusiness):
     repo = UserRepo(User)
 
     @classmethod
+    def get_by_email(cls, email):
+        return cls.repo.read_first_one({'email': email})
+
+    @classmethod
+    def get_by_phone(cls, phone):
+        return cls.repo.read_first_one({'phone': phone})
+
+    @classmethod
     def get_by_user_ID(cls, user_ID):
         return cls.repo.read_by_unique_field('user_ID', user_ID)
 
@@ -82,13 +90,14 @@ class UserBusiness(GeneralBusiness):
                 objects = ProjectRepo(Project). \
                     search(search_query,
                            q_dict={
-                               'title': 'icontains',
+                               'name': 'icontains',
                                'description': 'icontains',
                                'tags': 'icontains'
                            })
                 objects = objects.filter(id__in=objectsId)
             else:
                 objects = getattr(user, action_entity)
+                objects.reverse()
         return Objects(
             objects=objects[start:end],
             count=len(objects),
@@ -105,6 +114,7 @@ class UserBusiness(GeneralBusiness):
         user = get_by_user_ID(user_ID=user_ID)
         user.password = generate_password_hash(new_password)
         user.save()
+
 
     # @classmethod
     # def checkTokenForUpdateInfo(cls):

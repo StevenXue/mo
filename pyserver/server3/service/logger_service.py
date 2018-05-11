@@ -185,7 +185,7 @@ def emit_notification(message, created_receivers):
 
 def emit_anything_notification(message, user):
     socketio.emit('notification', message,
-                  namespace='/log/%s' % user.user_ID)
+                  namespace=f'/log/{user.user_ID}')
 
 
 # if __name__ == '__main__':

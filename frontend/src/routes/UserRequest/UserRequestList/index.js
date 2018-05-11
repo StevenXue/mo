@@ -11,14 +11,16 @@ import {
   Pagination,
   Tabs,
   Tag,
+  Spin,
 } from 'antd'
 import { showTime } from '../../../utils/index'
 import { arrayToJson, JsonToArray } from '../../../utils/JsonUtils'
 import { routerRedux } from 'dva/router'
 import RequestModal from '../../../components/RequestModal/index'
+import TagSelect from '../../../components/TagSelect/index'
 
 import styles from './index.less'
-import { fetchAllUserRequest } from '../../../services/userRequest'
+import { fetchAllUserRequest,getHotTagOfRequest } from '../../../services/userRequest'
 
 const Option = Select.Option
 const Search = Input.Search
@@ -65,11 +67,15 @@ class RequestList extends Component {
       pageNo: 1,
       pageSize: 10,
       search_query: null,
+      loading:true
     }
   }
 
   fetchData({ payload }) {
     const { type } = this.props
+    this.setState({
+      loading: true,
+    })
     if (payload) {
       payload['type'] = type
     }
@@ -81,6 +87,7 @@ class RequestList extends Component {
       onJson: ({ user_request: requests, total_number: totalNumber }) => {
         this.setState({
           requests, totalNumber,
+          loading:false
         })
       },
     })
@@ -107,7 +114,7 @@ class RequestList extends Component {
   //   }
   // }
 
-  handleQueryChange(value) {
+  handleQueryChange(value,tags) {
     this.setState({
       search_query: value,
     })
@@ -116,6 +123,7 @@ class RequestList extends Component {
         search_query: value,
         page_no: this.state.current,
         page_size: this.state.pageSize,
+        search_tags:tags,
       },
     })
   }
@@ -142,17 +150,15 @@ class RequestList extends Component {
     return (
       <div>
         <div className={styles.header}>
-          <Search
-            placeholder="input search text"
-            onSearch={(value) => this.handleQueryChange(value)}
-            style={{ width: 200 }}
-          />
+          <TagSelect getHotTag={getHotTagOfRequest} onSearch={(value,tags) => {
+            this.handleQueryChange(value,tags)}} type={this.props.type}/>
           <RequestModal new={true} fetchData={() => this.fetchData({})}
-                        type={this.props.type}>
+                        type={this.props.type} >
             <Button icon='plus-circle-o' type='primary' id="mei_rightButton"
                     className={styles.rightButton}>New {this.props.type} Request</Button>
           </RequestModal>
         </div>
+        <Spin spinning={this.state.loading}>
         <div className={styles.requestList}>
           {this.state.requests.map(e =>
             <Card key={e._id} className={styles.card}
@@ -217,6 +223,7 @@ class RequestList extends Component {
                         total={this.state.totalNumber}/>
           </div>
         </div>
+        </Spin>
       </div>
     )
   }

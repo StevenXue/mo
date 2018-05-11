@@ -517,6 +517,9 @@ c.JupyterHub.admin_access = True
 #  
 #  Consider using service_tokens for general services that talk to the JupyterHub
 #  API.
+# c.JupyterHub.service_tokens = {
+#     '1d4afa72b00c4ffd9db82f26e1628f89': 'admin',
+# }
 c.JupyterHub.api_tokens = {
     '1d4afa72b00c4ffd9db82f26e1628f89': 'admin',
 }
@@ -1217,20 +1220,23 @@ c.Authenticator.admin_users = {'admin'}
 ## The number of threads to allocate for encryption
 # c.CryptKeeper.n_threads = 8
 
-
+import os
+cwd = os.getcwd()
+user_path = os.path.abspath(cwd).\
+    replace('jupyterhub', 'user_directory/{user_ID}/{project_name}')
 c.DockerSpawner.image = 'singleuser:latest'
 c.DockerSpawner.remove_containers = True
 c.DockerSpawner.container_ip = '0.0.0.0'
 c.DockerSpawner.host_ip = '0.0.0.0'
 c.DockerSpawner.volumes = \
     {
-        # '/Users/zhaofengli/projects/goldersgreen/pyserver/user_directory/{user_ID}/{project_name}': '/home/jovyan/work',
-        # '/Users/zhaofengli/projects/goldersgreen/pyserver/server3/lib/modules': '/home/jovyan/modules',
+        user_path: '/home/jovyan/work',
+        # '/Users/zhaofengli/projects/goldersgreen/pyserver/server3/lib/empty_modules': '/home/jovyan/modules',
         # '/Users/zhaofengli/projects/goldersgreen/pyserver/user_directory': '/home/jovyan/dataset'
         # '/Users/Chun/Documents/workspace/goldersgreen/pyserver/user_directory/{user_ID}/{project_name}': '/home/jovyan/work',
         # '/Users/Chun/Documents/workspace/goldersgreen/pyserver/server3/lib/modules': '/home/jovyan/modules',
         # '/Users/Chun/Documents/workspace/goldersgreen/pyserver/user_directory': '/home/jovyan/dataset'
-        '/home/admin/www/mo_prod/pyserver/user_directory/{user_ID}/{project_name}': '/home/jovyan/work',
-        # '/home/admin/www/mo_prod/pyserver/server3/lib/modules': '/home/jovyan/modules',
-        # '/home/admin/www/mo_prod/pyserver/user_directory': '/home/jovyan/dataset'
+        # '/home/git/www/mo_prod/pyserver/user_directory/{user_ID}/{project_name}': '/home/jovyan/work',
+        # '/home/git/www/mo_prod/pyserver/server3/lib/modules': '/home/jovyan/modules',
+        # '/home/git/www/mo_prod/pyserver/user_directory': '/home/jovyan/dataset'
     }

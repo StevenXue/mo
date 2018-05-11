@@ -1,14 +1,10 @@
-import modelExtend from 'dva-model-extend'
 import pathToRegexp from 'path-to-regexp'
 import _, { get, isEqual } from 'lodash'
-import * as dataAnalysisService from '../services/dataAnalysis'
 import { startLab, getLabConfig } from '../services/notebook'
 
 import {
   PageConfig,
 } from '../packages/jupyterlab_package/packages/coreutils'
-
-import workBench from './workBench'
 
 import { getRound } from '../utils/number'
 import { hubPrefix } from '../utils/config'
@@ -22,7 +18,7 @@ const checker = (value, arr) =>
 const extFilter = {
   app: ['moduledeploy-extension'],
   module: ['appdeploy-extension'],
-  dataset: ['moduledeploy-extension', 'datasets-extension', 'appdeploy-extension'],
+  dataset: ['moduledeploy-extension', 'appdeploy-extension'],
 }
 
 // Load the core theming before any other package.
@@ -59,8 +55,9 @@ const loadnStartJL = (projectType) => {
     require('../packages/jupyterlab_package/packages/theme-dark-extension'),
     require('../packages/jupyterlab_package/packages/theme-light-extension'),
     require('../packages/jupyterlab_package/packages/tooltip-extension'),
-    require('../packages/jupyterlab_package/packages/modules-extension'),
-    require('../packages/jupyterlab_package/packages/datasets-extension'),
+    // require('../packages/jupyterlab_package/packages/modules-extension'),
+    // require('../packages/jupyterlab_package/packages/datasets-extension'),
+    require('../packages/jupyterlab_package/packages/resourceslist-extension'),
     require('../packages/jupyterlab_package/packages/moduledeploy-extension'),
     require('../packages/jupyterlab_package/packages/appdeploy-extension'),
     require('../packages/jupyterlab_package/packages/commit-extension'),
@@ -107,11 +104,6 @@ const insertConfigData = (html) => {
   document.head.insertBefore(JCD, document.head.children[3])
 }
 
-const onSuccess = async (res) => {
-  const html = await res.text()
-  insertConfigData(html)
-}
-
 export function *startLabFront({ payload: { projectType } }, { call }) {
   // load lab frontend
   let labContainer = document.getElementById('mo-jlContainer')
@@ -134,11 +126,26 @@ export function *startLabFront({ payload: { projectType } }, { call }) {
 }
 
 export function *startLabBack({ payload: { hubUserName, hubToken } }, { call }) {
+  const onSuccess = async (res) => {
+    function timeout(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms))
+    }
+    if(res.status === 202) {
+      console.log('success 202', res)
+      await timeout(5000)
+    }
+  }
+
   // auth hub fake user and start lab backend
-  yield call(startLab, { hubUserName, hubToken })
+  yield call(startLab, { hubUserName, hubToken, onSuccess })
 }
 
 export function *insertLabConfig({ payload: { hubUserName, hubToken } }, { call }) {
+  const onSuccess = async (res) => {
+    const html = await res.text()
+    insertConfigData(html)
+  }
+
   // insert lab config from hub
   const configDataNode = document.getElementById('jupyter-config-data')
   if (configDataNode !== null) {
@@ -147,123 +154,10 @@ export function *insertLabConfig({ payload: { hubUserName, hubToken } }, { call 
   yield call(getLabConfig, { hubUserName, hubToken, onSuccess })
 }
 
-const modelling = modelExtend(workBench, {
+const modelling = {
   namespace: 'modelling',
   state: {},
-  reducers: {
-    setModels(state, action) {
-      let lengthModelsJson = Object.keys(action.payload.sectionsJson).length
-      let { payload: { sectionsJson } } = action
-      if (lengthModelsJson > 0) {
-        for (let modelKey in sectionsJson) {
-          let metrics = {
-            'acc': [],
-            'precision': [],
-            'recall': [],
-            'loss': [],
-            'val_acc': [],
-            'val_precision': [],
-            'val_recall': [],
-            'val_loss': [],
-          }
-          for (let eachMetricHis of Object.values(get(sectionsJson[modelKey], 'metrics_status', {}))) {
-            for (let metric of Object.keys(metrics)) {
-              if (eachMetricHis[metric] !== undefined) {
-                metrics[metric].push(getRound(eachMetricHis[metric], 2))
-              }
-            }
-          }
-          // 剔除空的metrics
-          for (let metric of Object.keys(metrics)) {
-            if (metrics[metric].length === 0) {
-              delete metrics[metric]
-            }
-          }
-
-          sectionsJson[modelKey]['metrics_status'] = metrics
-        }
-
-        return {
-          ...state,
-          sectionsJson: sectionsJson,
-          focusModelId: Object.keys(action.payload.sectionsJson)[0],
-        }
-      }
-      else {
-        return {
-          ...state,
-          sectionsJson: sectionsJson,
-          focusModelId: null,
-        }
-      }
-    },
-    setMetrics(state, { payload }) {
-      const { msg } = payload
-      const sectionId = msg.job_id
-      let sectionsJson = state.sectionsJson
-      console.log('message', msg)
-
-      let metrics = {
-        'acc': [],
-        'precision': [],
-        'recall': [],
-        'loss': [],
-        'val_acc': [],
-        'val_precision': [],
-        'val_recall': [],
-        'val_loss': [],
-      }
-
-      if (sectionsJson[sectionId].metrics_status) {
-        for (let metric in metrics) {
-          if (msg[metric] !== undefined) {
-            if (!sectionsJson[sectionId].metrics_status[metric]) {
-              sectionsJson[sectionId].metrics_status[metric] = [msg[metric]]
-            } else {
-              sectionsJson[sectionId].metrics_status[metric].push(msg[metric])
-            }
-          }
-        }
-      } else {
-        for (let metric in metrics) {
-          if (msg[metric] !== undefined) {
-            metric[metric].push(msg[metric])
-          }
-        }
-
-        for (let metric of Object.keys(metrics)) {
-          if (metrics[metric].length === 0) {
-            delete metrics[metric]
-          }
-        }
-        sectionsJson[sectionId].metrics_status = metrics
-      }
-
-      // receive batch
-      if (msg.batch) {
-        sectionsJson[sectionId].batch = msg.batch
-      }
-
-      if (msg.total_steps !== undefined && msg.n !== undefined) {
-        sectionsJson[sectionId].percent = (msg.n + 1) / msg.total_steps * 100
-      }
-
-      console.log('sectionsJson', sectionsJson, sectionsJson[sectionId].percent)
-      return {
-        ...state,
-        sectionsJson,
-      }
-    },
-    clearMetrics(state, { payload }) {
-      let sectionsJson = state.sectionsJson
-      sectionsJson[payload.sectionId].metrics_status = {}
-      sectionsJson[payload.sectionId].batch = undefined
-      return {
-        ...state,
-        sectionsJson,
-      }
-    },
-  },
+  reducers: {},
   effects: {
     *startLabBnF({ projectId, projectType }, { call, put, select }) {
       let project = yield select(state => state.projectDetail['project'])
@@ -277,56 +171,12 @@ const modelling = modelExtend(workBench, {
       const hubToken = project.hub_token
       yield call(startLabBack, { payload: { hubUserName, hubToken } }, { call })
       yield call(insertLabConfig, { payload: { hubUserName, hubToken } }, { call })
-      // loadnStartJL(projectType)
-      document.body = document.createElement('body')
+      // document.body = document.createElement('body')
       yield call(loadnStartJL, projectType)
-    },
-    *runSection(action, { call, put, select }) {
-      const { namespace, sectionId } = action.payload
-      yield put({ type: 'clearMetrics', payload: { sectionId } })
-      yield put({ type: 'showResult' })
-      yield put({
-        type: 'setLoading', payload: {
-          key: 'wholePage',
-          loading: true,
-        },
-      })
-      yield put({
-        type: 'setStatus', payload: {
-          sectionId,
-          status: 100,
-        },
-      })
-
-      // 先把 save section 复制过来
-      const sectionsJson = yield select(state => state[namespace].sectionsJson)
-      const section = sectionsJson[sectionId]
-      yield call(dataAnalysisService.saveSection, { section: section })
-
-      const projectId = yield select(state => state[namespace].projectId)
-
-      const { data: { result: { result } } } = yield call(dataAnalysisService.runJob, {
-        ...action.payload,
-        projectId: projectId,
-      })
-
-      // 更新result
-      yield put({
-        type: 'setSectionResult', payload: {
-          sectionId,
-          result,
-        },
-      })
-      yield put({
-        type: 'setLoading', payload: {
-          key: 'wholePage',
-          loading: false,
-        },
-      })
     },
   },
   subscriptions: {
-    // 当进入该页面是 获取用户所有 section
+    // 当进入该页面时 加载 jupyterlab
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
         const match = pathToRegexp('/workspace/:projectId/:type').exec(pathname)
@@ -345,7 +195,7 @@ const modelling = modelExtend(workBench, {
     },
 
   },
-})
+}
 
 export default modelling
 

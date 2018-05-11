@@ -1,4 +1,5 @@
 from uuid import getnode as get_mac
+
 UPDATE_USER_INFO_SK = 'secret_mo_mo'
 MONGO = 'PROD'
 # if get_mac() == 274973436731254:
@@ -31,18 +32,49 @@ KUBE_NAME = {
 MODULE_DIR = './server3/lib/modules'
 DEV_DIR_NAME = 'dev'
 APP_DIR = './functions'
+# INIT_RES = [
+#     r"# coding: utf-8",
+#     r"import os",
+#     r"import sys",
+#     r"# Please use current \(work\) folder to store your data and models",
+#     r"sys.path.append\('(.+)'\)",
+#     r"client = Client\('(.+)', project_id='(.+)', user_ID='(.+)',",
+#     r"(\s+)project_type='(.+)', source_file_path='(.+)'\)",
+#     r"from modules import (.+)",
+#     r"(\S+) = client\.(\S+)",
+#     r"# append work_path to head when you want to reference a path inside "
+#     r"the working directory",
+#     r"work_path = ''",
+# ]
 INIT_RES = [
-    r"# coding: utf-8",
-    r"import os",
-    r"import sys",
-    r"# Please use current \(work\) folder to store your data and models",
-    r"sys.path.append\('\.\./'\)",
-    r"client = Client\('(.+)'\)",
+    r'# You can use other public modules via our Client object with module\'s identifier ',
+    r'# and parameters.\n',
+    r'# For more details, please see our online document - https://momodel.github.io/mo/#',
+    r'import os',
+    r'import sys',
+    r'# Define root path',
+    r"sys.path.append\('(.+)'\)",
+    r'# Import necessary packages',
     r"from modules import (.+)",
+    r'# Initialise Client object',
+    r"client = Client\(api_key='(.+)', project_id='(.+)', user_ID='(.+)',",
+    r"(\s+)project_type='(.+)', source_file_path='(.+)'\)",
+    r'# Make run/train/predict commnad alias for furthur use',
     r"(\S+) = client\.(\S+)",
-    r"# append work_path to head when you want to reference a path inside the working directory",
-    r"work_path = ''",
-]
+    r'# Run a importred module ',
+    r'# e.g. ',
+    r'#      conf = json_parser(\'{"rgb_image":null,"gray_image":null}\') ',
+    r'#      result = run(\'zhaofengli/new_gender_classifier/0.0.2\', conf)',
+    r'#',
+    r'# \'conf\' is the parameters in dict form for the imported module',
+    r'# \'[user_id]/[imported_module_name]/[version]\' is the identifier of the imported module',
+    r'# Make controller alias for further use',
+    r'controller = client.controller',
+    r'# IMPORTANT: Add \'work_path\' to the head of every file path in your code.',
+    r'# e.g.',
+    r'#      jpgfile = Image.open(work_path + "picture.jpg") ',
+    r'work_path = \'./\'']
+
 PARAMETER_SPEC = [
     {
         "name": "validation",

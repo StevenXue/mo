@@ -31,7 +31,7 @@ class UserRequestBusiness(GeneralBusiness):
 
     @classmethod
     def get_list(cls, type, search_query, user, privacy,
-                 page_no, page_size):
+                 page_no, page_size, search_tags):
 
         start = (page_no - 1) * page_size
         end = page_no * page_size
@@ -51,6 +51,11 @@ class UserRequestBusiness(GeneralBusiness):
             objects = objects(privacy=privacy)
         if user:
             objects = objects(user=user)
+        if search_tags:
+            # todo 是否有直接的查询语句取代
+            for each_tag in search_tags:
+                objects = objects(tags=each_tag)
+
         number_of_objects = objects.count()
         return objects.order_by('-create_time')[
                start:end], number_of_objects
