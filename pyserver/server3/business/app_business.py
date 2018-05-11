@@ -93,6 +93,8 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         handler_file_name = handler_file_path.split('/')[-1]
         handler_dst_path = handler_file_path.replace(handler_file_name,
                                                      'handler.py')
+
+        # TODO: read file from handler_file_path, tranformed .py file
         shutil.copy(handler_file_path, handler_dst_path)
 
         # change some configurable variable to deploy required

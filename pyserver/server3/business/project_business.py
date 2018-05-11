@@ -572,7 +572,7 @@ class ProjectBusiness(GeneralBusiness):
 
         # read source notebook file
         with open(full_path, 'r') as f:
-            nb_data = json.loads(f)
+            nb_data = json.loads(f.read())
 
         # write to destination file
         script = ''
@@ -583,6 +583,15 @@ class ProjectBusiness(GeneralBusiness):
                         script += '\n' + cls.code_formatting(line)
                     else:
                         script += '\n' + line
+
+        script = script.replace('\n\n', '\n')
+
+        # add __main__ function
+        main_func = "\n\n" + \
+                    "if __name__ == '__main__':\n" + \
+                    "\tconf = {}\n" + \
+                    "\thandle(conf)"
+        script += '\n' + main_func
 
         script_path = full_path.replace('ipynb', 'py')
         with open(script_path, 'w') as f:
@@ -603,6 +612,8 @@ class ProjectBusiness(GeneralBusiness):
             #     r"# Please use current \(work\) folder to store your data "
             #     r"and models",
             #     r'', line_of_code.rstrip())
+            line_of_code = re.sub(r'# Define root path', r'',
+                                  line_of_code.rstrip())
             line_of_code = re.sub(r"""sys.path.append\('(.+)'\)""", r'',
                           line_of_code.rstrip())
             line_of_code = re.sub(
@@ -616,16 +627,25 @@ class ProjectBusiness(GeneralBusiness):
 
             # add handle function
             line_of_code = re.sub(
-                r"work_path = ''",
+                r"work_path = '\./'",
                 r"work_path = 'function/'\n\n"
                 r"def handle(conf):\n"
                 r"\t# paste your code here",
                 line_of_code.rstrip())
         else:
-            if line_of_code[0] == '!':
+
+            # if re.match(r'^(!|ls +|rm +|pwd +|cd +)', line_of_code.strip()):
+            if re.match(r'^(!)', line_of_code.strip()):
                 line_of_code = ''
             else:
                 line_of_code = '\t' + line_of_code
+
+            # if line_of_code[0] in ['!']:
+            #     line_of_code = ''
+            # elif line_of_code[0:2] in ['ls', 'cd']:
+            #     line_of_code = ''
+            # else:
+            #     line_of_code = '\t' + line_of_code
 
         return line_of_code
 

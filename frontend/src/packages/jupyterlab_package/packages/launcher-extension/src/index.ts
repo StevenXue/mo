@@ -98,7 +98,7 @@ function activate(app: JupyterLab, palette: ICommandPalette): ILauncher {
                 'from modules import Client\n',
                 '\n',
                 '# Initialise Client object\n',
-                `client = Client(key='5asdfoasd0fnd0983', project_id='${projectId}', user_ID='${localStorage.getItem('user_ID')}',\n`,
+                `client = Client(api_key='5asdfoasd0fnd0983', project_id='${projectId}', user_ID='${localStorage.getItem('user_ID')}',\n`,
                 `                project_type='${type}', source_file_path='${(item as any).context.path}')\n`,
                 '\n',
                 '# Make run/train/predict commnad alias for furthur use\n',

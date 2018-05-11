@@ -57,7 +57,7 @@ INIT_RES = [
     r'# Import necessary packages',
     r"from modules import (.+)",
     r'# Initialise Client object',
-    r"client = Client\(key='(.+)', project_id='(.+)', user_ID='(.+)',",
+    r"client = Client\(api_key='(.+)', project_id='(.+)', user_ID='(.+)',",
     r"(\s+)project_type='(.+)', source_file_path='(.+)'\)",
     r'# Make run/train/predict commnad alias for furthur use',
     r"(\S+) = client\.(\S+)",
