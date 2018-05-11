@@ -4,13 +4,14 @@ import Joyride from 'react-joyride'
 import gifNew from '../../img/gif/new.gif'
 import gifImport from '../../img/gif/import.gif'
 import gifDeploy from '../../img/gif/deploy.gif'
+import { connect } from 'dva'
 
 const gitList = [gifNew, gifImport, gifDeploy]
 const titleList = ['1/3 创建项目', '2/3 使用module', '3/3 部署项目']
 
 import styles from './index.less'
 const Step = Steps.Step;
-
+import _ from 'lodash'
 const JOYRIDE = [
 
   {
@@ -121,7 +122,7 @@ function onChange(a, b, c) {
   console.log(a, b, c)
 }
 
-export class HelpButton extends React.Component {
+class HelpButton extends React.Component {
   state = {
     run: false,
     allSteps: [],
@@ -130,19 +131,35 @@ export class HelpButton extends React.Component {
     visible: false,
 
     helpState: 0,
+    isNotebookLoaded: false
   }
 
   componentDidMount() {
-    // window.addEventListener('trigger_tooltip', () => {
-    //   // console.log('触发了')
-    //   setTimeout(() => {
-    //     // this.setState({ run: true })
-    //     this.setState({
-    //       allSteps: convertAllSteps(),
-    //     })
-    //   }, 2000)
-    // }, false)
+    window.addEventListener('trigger_tooltip', () => {
+      this.setState({isNotebookLoaded: true})
+      // console.log('触发了')
+      // setTimeout(() => {
+      //   // this.setState({ run: true })
+      //   this.setState({
+      //     allSteps: convertAllSteps(),
+      //   })
+      // }, 2000)
+    }, false)
   }
+  componentWillReceiveProps(nextProps){
+    if(!this.props.projectDetail.project){
+      const AutoShowHelp = _.get(nextProps.projectDetail.project, "auto_show_help")
+      if (AutoShowHelp){
+        this.setState({
+          visible: true
+        })
+      }
+
+    }
+
+
+  }
+
 
   showModal = () => {
     this.setState({
@@ -160,6 +177,17 @@ export class HelpButton extends React.Component {
     this.setState({
       visible: false,
     })
+
+    // const project = this.props.projectDetail.project
+    // project.auto_show_help = false
+    // console.log("cancel", project)
+    this.props.dispatch({
+      type: 'projectDetail/updateProjectIsAutoHelp',
+      payload: {
+        auto_show_help: false
+      }
+    })
+
   }
 
   handleOnClick = () => {
@@ -225,16 +253,16 @@ export class HelpButton extends React.Component {
             <Step />
             <Step />
           </Steps>
-
         </div>
-
       </div>
     )
 
   }
 
   render() {
-    return <div className={styles.notebook_joyride}>
+    return <div className={styles.notebook_joyride}
+                style={this.state.isNotebookLoaded?null:{display: "none"}}
+    >
       {
         JOYRIDE.map((ele, index) => {
             return (
@@ -257,13 +285,11 @@ export class HelpButton extends React.Component {
           },
         )
       }
-
       <div className={styles.cbtn}>
-
         <Button
           size="small"
           onMouseEnter={this.handleOnClick}
-          // onMouseLeave={this.handleOnClick}
+          onMouseLeave={this.handleOnClick}
           // onClick={this.handleOnClick}
         >
           hint
@@ -285,6 +311,7 @@ export class HelpButton extends React.Component {
               justifyContent: 'center',
               alignItems: 'center',
             }}
+
           >
             {this.renderHelp()}
           </Modal>
@@ -295,3 +322,5 @@ export class HelpButton extends React.Component {
     </div>
   }
 }
+export default connect(({ projectDetail }) => ({ projectDetail }))(HelpButton)
+

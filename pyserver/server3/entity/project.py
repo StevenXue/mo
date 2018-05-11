@@ -10,6 +10,8 @@ from mongoengine import IntField
 from mongoengine import EmbeddedDocumentListField
 from mongoengine import EmbeddedDocument
 from mongoengine import PULL
+from mongoengine import BooleanField
+
 
 RE_TYPE = ('inactive', 'active', 'deploying')
 
@@ -54,6 +56,8 @@ class Project(DynamicDocument):
     results = ListField(ReferenceField('Result', reverse_delete_rule=PULL))
     versions = ListField(StringField())
     commits = EmbeddedDocumentListField(Commit)
+
+    auto_show_help = BooleanField(default=False)
 
     meta = {
         'allow_inheritance': True,
