@@ -62,6 +62,8 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         logs = list(logs)
         return logs
 
+
+
     @classmethod
     def deploy_or_publish(cls, app_id, commit_msg, handler_file_path,
                           version=DEV_DIR_NAME):

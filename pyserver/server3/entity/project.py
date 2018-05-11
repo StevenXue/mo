@@ -99,6 +99,12 @@ class UsedDataset(EmbeddedDocument):
     dataset = ReferenceField(Dataset)
 
 
+class VersionInfo(EmbeddedDocument):
+    app_version = StringField()
+    modules = EmbeddedDocumentListField(UsedModule)
+    datasets = EmbeddedDocumentListField(UsedDataset)
+
+
 class App(Project):
     # 继承Project
     # # 名称
@@ -137,6 +143,9 @@ class App(Project):
     # 使用过的modules
     used_modules = EmbeddedDocumentListField(UsedModule)
     used_datasets = EmbeddedDocumentListField(UsedDataset)
+
+    deployments = EmbeddedDocumentListField(VersionInfo)
+
     # app 路径
     app_path = StringField(default=None)
 
