@@ -9,14 +9,14 @@ import {
 import debounce from 'lodash.debounce'
 import {get} from 'lodash'
 import {showTime} from '../../../utils/index'
-// import BraftEditor from 'braft-editor'
-// import 'braft-editor/dist/braft.css'
 import {JsonToArray} from '../../../utils/JsonUtils'
 import RequestModal from '../../../components/RequestModal/index'
 import {getProjects} from '../../../services/project'
 import ProjectModal from '../../../components/ProjectModal/index'
 import star from './img/star.png'
 import star_o from './img/star-o.png'
+
+
 
 const {TextArea} = Input
 const confirm = Modal.confirm
