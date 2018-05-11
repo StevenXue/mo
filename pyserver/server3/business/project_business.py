@@ -570,11 +570,16 @@ class ProjectBusiness:
     def nb_to_py_script(cls, project_id, nb_path, optimise=True):
         """
 
+        Convert notebook file to python script to deploy
+
         :param project_id: project's ObjectId in mongodb
-        :param nb_path:
-        :param optimise:
-        :return:
+        :param nb_path: notebook file path
+        :param optimise: flag to optimise some settings
+        :return: N/A
         """
+        app = cls.get_by_id(project_id)
+        full_path = os.path.join(app.path, nb_path)
+
         pass
 
 
