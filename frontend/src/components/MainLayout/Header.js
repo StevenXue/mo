@@ -176,27 +176,33 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
   const switchMessage = (e) => {
     switch (e.message_type) {
       case 'answer':
-        return <p className={styles.messageP}>{`${e.user_ID}回答了您关注的需求${e.user_request_title}`}</p>
+        return <p className={styles.messageP}>{`${e.user_ID} 回答了您关注的需求${e.user_request_title}`}</p>
       case 'commit':
         return <p className={styles.messageP}>{`${e.user_ID} 更新了您关注的需求  ${e.user_request_title}`} 的答案</p>
       case 'deploy':
         return <p
-          className={styles.messageP}>{`${e.user_ID} 上线了您关注的${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
+          className={styles.messageP}>{`${e.user_ID} 上线了您关注的 ${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
       case 'publish':
         return <p
-          className={styles.messageP}>{`${e.user_ID} 发布了您关注的${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
+          className={styles.messageP}>{`${e.user_ID} 发布了您关注的 ${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
       case 'deploy_fail':
         return <p
-          className={styles.messageP}>{`您的${translatorTemp[e.project_type]}  ${e.project_name} 部署失败`}</p>
+          className={styles.messageP}>{`您的 ${translatorTemp[e.project_type]}  ${e.project_name} 部署失败`}</p>
       case 'publish_fail':
         return <p
-          className={styles.messageP}>{`您的${translatorTemp[e.project_type]}  ${e.project_name} 发布失败`}</p>
+          className={styles.messageP}>{`您的 ${translatorTemp[e.project_type]}  ${e.project_name} 发布失败`}</p>
       case 'deploy_request':
         return <p
-          className={styles.messageP}>{`${e.user_ID} 为您的答案${e.user_request_title} 上线了${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
+          className={styles.messageP}>{`${e.user_ID} 为您的答案 ${e.user_request_title} 上线了 ${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
       case 'publish_request':
         return <p
-          className={styles.messageP}>{`${e.user_ID} 为您的答案${e.user_request_title} 发布了${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
+          className={styles.messageP}>{`${e.user_ID} 为您的答案 ${e.user_request_title} 发布了 ${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
+      case 'job_success':
+        return <p
+          className={styles.messageP}>{`Your running ${e.job_type}  ${e.job_name} was finished successfully.`}</p>
+      case 'job_error':
+        return <p
+          className={styles.messageP}>{`Your running ${e.job_type}  ${e.job_name} was failed.`}</p>
     }
   }
 
