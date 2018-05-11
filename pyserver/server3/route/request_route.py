@@ -161,4 +161,5 @@ def remove_user_request():
 @user_request_app.route("/get_hot_tag", methods=["GET"])
 def get_hot_tag():
     search_query = request.args.get('search_query', None)
-    return jsonify(UserRequestBusiness.get_hot_tag(UserRequest, search_query))
+    request_type = request.args.get('request_type', None)
+    return jsonify(UserRequestBusiness.get_hot_tag(UserRequest, search_query, request_type))
