@@ -49,7 +49,7 @@ APP_DIR = './functions'
 INIT_RES = [
     r'# You can use other public modules via our Client object with module\'s identifier ',
     r'# and parameters.\n',
-    r'# For more detailes, please see our online document - https://momodel.github.io/mo/#',
+    r'# For more details, please see our online document - https://momodel.github.io/mo/#',
     r'import os',
     r'import sys',
     r'# Define root path',

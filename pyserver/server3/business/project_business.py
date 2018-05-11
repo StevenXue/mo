@@ -557,31 +557,6 @@ class ProjectBusiness(GeneralBusiness):
             return master.log()
 
     @classmethod
-    def remove_markdown_cell(cls, source_nb_path, dest_nb_path):
-        """
-        Remove markdown cell content in jupyter notebook file.
-
-        :param source_nb_path: jupyter notebook source file path
-        :param dest_nb_path: jupyter notebook destination file path
-        :return: N/A
-        """
-
-        # read source notebook file
-        with open(source_nb_path, 'r') as f:
-            nb_data = json.loads(f)
-
-        # remove markdown cell
-        for cell in nb_data['cells']:
-            if cell['cell_type'] == 'markdown':
-                del cell
-
-        # remove shell command?
-
-        # write to destination file
-        with open(dest_nb_path, 'w') as f:
-            f.write(json.dumps(nb_data))
-
-    @classmethod
     def nb_to_py_script(cls, project_id, nb_path, optimise=True):
         """
 
@@ -595,7 +570,64 @@ class ProjectBusiness(GeneralBusiness):
         app = cls.get_by_id(project_id)
         full_path = os.path.join(app.path, nb_path)
 
-        pass
+        # read source notebook file
+        with open(full_path, 'r') as f:
+            nb_data = json.loads(f)
+
+        # write to destination file
+        script = ''
+        for cell in nb_data['cells']:
+            if cell['cell_type'] == 'code':
+                for line in cell['source']:
+                    if optimise:
+                        script += '\n' + cls.code_formatting(line)
+                    else:
+                        script += '\n' + line
+
+        script_path = full_path.replace('ipynb', 'py')
+        with open(script_path, 'w') as f:
+            f.write(script)
+
+
+    @classmethod
+    def code_formatting(cls, line_of_code):
+        """
+
+        Process line of code to be prepared for deployment.
+
+        :param line_of_code: the line of code to be formatted
+        :return: processed single line code
+        """
+        if any(re.search(reg, line_of_code.rstrip()) for reg in INIT_RES):
+            # line_of_code = re.sub(
+            #     r"# Please use current \(work\) folder to store your data "
+            #     r"and models",
+            #     r'', line_of_code.rstrip())
+            line_of_code = re.sub(r"""sys.path.append\('(.+)'\)""", r'',
+                          line_of_code.rstrip())
+            line_of_code = re.sub(
+                r"""(\s+)project_type='(.+)', source_file_path='(.+)'\)""",
+                r"""\1project_type='\2', source_file_path='\3', silent=True)""",
+                line_of_code.rstrip())
+
+            line_of_code = re.sub(r"""from modules import (.+)""",
+                          r"""from function.modules import \1""",
+                                  line_of_code.rstrip())
+
+            # add handle function
+            line_of_code = re.sub(
+                r"work_path = ''",
+                r"work_path = 'function/'\n\n"
+                r"def handle(conf):\n"
+                r"\t# paste your code here",
+                line_of_code.rstrip())
+        else:
+            if line_of_code[0] == '!':
+                line_of_code = ''
+            else:
+                line_of_code = '\t' + line_of_code
+
+        return line_of_code
 
     @classmethod
     def nb_to_script(cls, project_id, nb_path, optimise=True):
