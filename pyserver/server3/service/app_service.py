@@ -42,7 +42,6 @@ class AppService(ProjectService):
         used_dataset = DatasetBusiness.get_by_id(used_dataset)
         return cls.business.remove_used_dataset(app_id, used_dataset)
 
-
     @classmethod
     def run_app(cls, app_id, input_json, user_ID, version):
         """
