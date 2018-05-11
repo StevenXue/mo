@@ -15,6 +15,7 @@ import re
 import fileinput
 import requests
 import collections
+import json
 from copy import deepcopy
 from datetime import datetime
 # from distutils.dir_util import copy_tree
@@ -541,6 +542,31 @@ class ProjectBusiness:
             return master.log()
 
     @classmethod
+    def remove_markdown_cell(cls, source_nb_path, dest_nb_path):
+        """
+        Remove markdown cell content in jupyter notebook file.
+
+        :param source_nb_path: jupyter notebook source file path
+        :param dest_nb_path: jupyter notebook destination file path
+        :return: N/A
+        """
+
+        # read source notebook file
+        with open(source_nb_path, 'r') as f:
+            nb_data = json.loads(f)
+
+        # remove markdown cell
+        for cell in nb_data['cells']:
+            if cell['cell_type'] == 'markdown':
+                del cell
+
+        # remove shell command?
+
+        # write to destination file
+        with open(dest_nb_path, 'w') as f:
+            f.write(json.dumps(nb_data))
+
+    @classmethod
     def nb_to_script(cls, project_id, nb_path, optimise=True):
         app = cls.get_by_id(project_id)
         call(['jupyter', 'nbconvert', '--to', 'script', nb_path],
@@ -569,7 +595,7 @@ class ProjectBusiness:
                     # add handle function
                     line = re.sub(
                         r"work_path = ''",
-                        r"work_path = ''\n\n"
+                        r"work_path = 'function/'\n\n"
                         r"def handle(conf):\n"
                         r"\t# paste your code here",
                         line.rstrip())
