@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import inspect
+import traceback
 from importlib import import_module
 
 import requests
@@ -37,7 +38,10 @@ class Logger(object):
     def __init__(self, job_id, log_type):
         self.job_id = job_id
         self.log_type = log_type
-        self.terminal = sys.stdout
+        if log_type == 'stdout':
+            self.terminal = sys.stdout
+        else:
+            self.terminal = sys.stderr
 
     def write(self, message):
         self.terminal.write(message)
@@ -78,12 +82,6 @@ class Client:
         self.source_file_path = source_file_path
 
     def controller(self, func, *args, **kw):
-        # print('func', dir(func))
-        # print('args', args)
-        # print('kw', kw)
-        # print('project_id', self.project_id)
-        # print('project_type', self.project_type)
-        # print('code', inspect.getsource(func))
         if func.__name__ == 'module_general':
             other = {
                 'running_module': args[0]
@@ -103,10 +101,17 @@ class Client:
                             ).json()['response']
         job_id = job['_id']
         with RedirectPrints(job_id):
-            ret = func(*args, **kw)
+            try:
+                ret = func(*args, **kw)
+            except Exception as e:
+                exc = traceback.format_exc()
+                requests.put(f'{SERVER}/jobs/{job_id}/log',
+                             json={'log_type': 'exception',
+                                   'message': exc})
+                raise e
 
         # log end
-        job = requests.put(f'{SERVER}/jobs/{job_id}/success').json()
+        requests.put(f'{SERVER}/jobs/{job_id}/success').json()
         # print('finish run', job)
         return ret
 
