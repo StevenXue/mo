@@ -258,10 +258,18 @@ export default {
           hubUserName,
           hubToken
         })
+        // jobs is a dict with notebook path as key
         const {data: jobs} = yield call(getJobs, {
           projectId,
           projectType
         })
+        sessions.forEach(sess => {
+          if(jobs[sess.path] !== undefined) {
+            sess.jobs = jobs[sess.path]
+            delete jobs[sess.path]
+          }
+        })
+
         yield put({type: 'setJobs', payload: jobs})
         yield put({type: 'setTerminals', payload: terminals})
         yield put({type: 'setSessions', payload: sessions})
@@ -296,12 +304,12 @@ export default {
       const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
       const hubToken = project.hub_token
       yield sessionId && call(deleteSession, {hubUserName, hubToken, sessionId})
-      yield terminalName && call(deleteTerminal, {
+      yield terminalName && console.log('runrunrun') && call(deleteTerminal, {
         hubUserName,
         hubToken,
         terminalName,
       })
-      yield put({type: 'fetch', projectId: project._id})
+      yield put({type: 'fetch', projectId: project._id, projectType: project.type})
     },
     // 获取该 project 的 Jobs
     // *fetchJobs(action, { call, put }) {

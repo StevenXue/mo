@@ -99,6 +99,7 @@ def get_by_project(project_type, project_id):
     :param project_id:
     :return:
     """
+
     def process(job):
         from datetime import datetime
         if job.status != 'running':
@@ -109,7 +110,8 @@ def get_by_project(project_type, project_id):
             return json_utility.convert_to_json(job.to_mongo())
         rm = {'module': json_utility.convert_to_json(
             job.running_module.module.to_mongo()),
-            'version': job.running_module.version}
+            'version': job.running_module.version,
+            'user_ID': job.running_module.module.user.user_ID}
         del job.running_module
         job = json_utility.convert_to_json(job.to_mongo())
         job['running_module'] = rm
