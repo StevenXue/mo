@@ -24,6 +24,7 @@ from server3.service.module_service import ModuleService
 from server3.service.dataset_service import DatasetService
 from server3.business.project_business import ProjectBusiness
 from server3.business.user_business import UserBusiness
+from server3.entity.project import Project
 from server3.utility import json_utility
 from server3.utility import str_utility
 from server3.constants import Error, Warning
@@ -359,3 +360,9 @@ def nb_to_script(project_id):
                                     'again.'}), \
                399
     return jsonify({"response": 1})
+
+
+@project_app.route("/get_hot_tag", methods=["GET"])
+def get_hot_tag():
+    search_query = request.args.get('search_query', None)
+    return jsonify(ProjectBusiness.get_hot_tag(Project, search_query))

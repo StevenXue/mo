@@ -20,7 +20,6 @@ from copy import deepcopy
 from datetime import datetime
 # from distutils.dir_util import copy_tree
 from subprocess import call
-
 from git import Repo
 from flask_socketio import SocketIO
 
@@ -41,6 +40,7 @@ from server3.constants import INIT_RES
 from server3.constants import REDIS_SERVER
 from server3.business.request_answer_business import RequestAnswerBusiness
 from server3.constants import GIT_SERVER_IP
+from server3.business.general_business import GeneralBusiness
 
 socketio = SocketIO(message_queue=REDIS_SERVER)
 
@@ -220,7 +220,7 @@ def copytree(src, dst, symlinks=False, ignore=None, copy_function=shutil.copy2,
     return dst
 
 
-class ProjectBusiness:
+class ProjectBusiness(GeneralBusiness):
     project = None
     repo = ProjectRepo(Project)
 
@@ -638,7 +638,9 @@ class ProjectBusiness:
         # main_func = r"if __name__ == '__main__':" \
         #             r"" + "\n" + "\t" + "conf = {}" + "\n" +"\t" + "handle()"
         main_func = r"if __name__ == '__main__': " + "\n" + "\t" \
-                    r"conf = {}" + "\n" + "\t" \
-                    r"handle()"
+                                                            r"conf = {}" + "\n" + "\t" \
+                                                                                  r"handle()"
 
         my_open.write(main_func)
+
+

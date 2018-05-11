@@ -12,10 +12,10 @@ from server3.service.user_service import UserService
 
 class UserRequestService:
     @classmethod
-    def get_list(cls, type, search_query, user_ID, page_no, page_size):
+    def get_list(cls, type, search_query, user_ID, page_no, page_size, search_tags):
         user = UserBusiness.get_by_user_ID(user_ID) if user_ID else None
         user_request, total_number = UserRequestBusiness. \
-            get_list(type, search_query, user, False, page_no, page_size)
+            get_list(type, search_query, user, False, page_no, page_size, search_tags)
         return user_request, total_number
 
     @classmethod
