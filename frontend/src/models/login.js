@@ -207,42 +207,42 @@ export default {
       }
     },
 
-    *loginWithPhone({ payload }, { put, call }) {
-      yield put({
-        type: 'changeSubmitting',
-        payload: true,
-      })
-      const response = yield call(loginWithPhone, payload)
-      yield put({
-        type: 'changeSubmitting',
-        payload: false,
-      })
-
-      if (response.status === 200) {
-        const { data } = response
-        if (data) {
-          localStorage.setItem('token', data.token)
-          localStorage.setItem('user_ID', data.user.user_ID)
-          localStorage.setItem('user_obj_id', data.user._id)
-          const from = queryURL('from')
-          yield put({ type: 'setUser', payload: data.user })
-          yield put({
-            type: 'setUserAvatar',
-            userAvatar: `/pyapi/user/avatar/${data.user.user_ID}.jpeg?${data.user.avatarV}`,
-          })
-          if (from) {
-            yield put(routerRedux.push(from))
-          } else {
-            yield put(routerRedux.push('/launchpage'))
-          }
-        } else {
-          throw data
-        }
-      } else {
-        let errorMessage = response.data.error.message
-        message.error(errorMessage)
-      }
-    },
+    // *loginWithPhone({ payload }, { put, call }) {
+    //   yield put({
+    //     type: 'changeSubmitting',
+    //     payload: true,
+    //   })
+    //   const response = yield call(loginWithPhone, payload)
+    //   yield put({
+    //     type: 'changeSubmitting',
+    //     payload: false,
+    //   })
+    //
+    //   if (response.status === 200) {
+    //     const { data } = response
+    //     if (data) {
+    //       localStorage.setItem('token', data.token)
+    //       localStorage.setItem('user_ID', data.user.user_ID)
+    //       localStorage.setItem('user_obj_id', data.user._id)
+    //       const from = queryURL('from')
+    //       yield put({ type: 'setUser', payload: data.user })
+    //       yield put({
+    //         type: 'setUserAvatar',
+    //         userAvatar: `/pyapi/user/avatar/${data.user.user_ID}.jpeg?${data.user.avatarV}`,
+    //       })
+    //       if (from) {
+    //         yield put(routerRedux.push(from))
+    //       } else {
+    //         yield put(routerRedux.push('/launchpage'))
+    //       }
+    //     } else {
+    //       throw data
+    //     }
+    //   } else {
+    //     let errorMessage = response.data.error.message
+    //     message.error(errorMessage)
+    //   }
+    // },
     *query({ payload }, { call, put }) {
       try {
         const { data: data } = yield call(tokenLogin)
