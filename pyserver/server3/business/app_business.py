@@ -66,31 +66,6 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
 
 
     @classmethod
-    def find_imported_modules(cls, script):
-        """
-        Scan python script to get imported modules.
-
-        :param script: python script
-        :return: list of imported modules in
-                 (user_id, module_name, version) tuple format.
-        """
-        pattern = r"""^(?!#).*(run|predict|train)\s*\(('|")(([\w\d_-]+)/([\w\d_-]+)/(\d+\.\d+\.\d+))('|")"""
-
-        modules = []
-        for match in re.finditer(pattern, script, re.MULTILINE):
-            if '#' not in match.group(0):
-                modules.append((match.group(4), match.group(5), match.group(6)))
-
-        return modules
-
-
-    @classmethod
-    def find_imported_datasets(cls, script):
-        pass
-
-
-
-    @classmethod
     def deploy_or_publish(cls, app_id, commit_msg, handler_file_path,
                           version=DEFAULT_DEPLOY_VERSION):
         app = cls.get_by_id(app_id)
@@ -192,7 +167,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
             return {'input': {}, 'output': {}}
 
     @classmethod
-    def add_imported_module(cls, app_id, app_deploy_version, used_modules):
+    def add_imported_modules(cls, app_id, app_deploy_version, used_modules):
         """
 
         :param app_id:
@@ -202,7 +177,10 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         """
         cls.repo.add_imported_modules(app_id, app_deploy_version, used_modules)
 
-
+    # TODO: Finish the function
+    @classmethod
+    def add_imported_datasets(cls, app_id, app_deploy_version, used_datasets):
+        pass
 
     @classmethod
     def add_used_module(cls, app_id, module, func, version):

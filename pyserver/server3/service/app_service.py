@@ -172,6 +172,25 @@ class AppService(ProjectService):
         app = AppBusiness.get_by_id(app_id)
         return AppBusiness.get_action_entity(app, **kwargs)
 
+    # FIXME: Deprecated
+    @classmethod
+    def find_imported_modules(cls, script):
+        """
+        Scan python script to get imported modules.
+
+        :param script: python script
+        :return: list of imported modules in
+                 (user_id, module_name, version) tuple format.
+        """
+        pattern = r"""^(?!#).*(run|predict|train)\s*\(('|")(([\w\d_-]+)/([\w\d_-]+)/(\d+\.\d+\.\d+))('|")"""
+
+        modules = []
+        for match in re.finditer(pattern, script, re.MULTILINE):
+            if '#' not in match.group(0):
+                modules.append((match.group(4), match.group(5), match.group(6)))
+
+        return modules
+
     @classmethod
     def app_deploy_or_publish(cls, app_id, commit_msg, handler_file_path,
                               version=DEFAULT_DEPLOY_VERSION):
@@ -184,6 +203,9 @@ class AppService(ProjectService):
         :return:
         """
         with open(handler_file_path, 'r') as f:
+
+            script = f.read()
+
             # 1. for imported modules
             # find imported modules, and return
             # tuple(user_name, project_name, version) list
@@ -193,21 +215,39 @@ class AppService(ProjectService):
             # 2. for imported datasets
             # TODO: 1. get possible imported dataset list from app.used_datasets[0].dataset.path.replace('./user_directory', '../dataset')
             app = cls.get_by_id(app_id)
-            imported_datasets = [ds.dataset.path for ds in app.used_datasets]
-            imported_modules = \
-                [(m.module.user.user_ID, m.module.module_path, m.version)
-                 for m in app.used_modules]
+            used_datasets = \
+                [ds.dataset.path.replace('./user_directory/', 'dataset')
+                 for ds in app.used_datasets]
 
-            print(imported_datasets)
-            print(imported_modules)
-
+            used_modules = \
+                [(m.module, m.version) for m in app.used_modules]
 
 
             # TODO: 2. check if there is any matches
+            for d in used_datasets:
+                pattern = r"""^(?!#).*({})""".format(d)
+                if match:
+                    for match in re.finditer(pattern, script, re.MULTILINE):
+                        if '#' in match.group():
+                            used_datasets.remove(d)
+                else:
+                    used_datasets.remove(d)
+
+
+            for m in used_modules:
+                pattern = r"""^(?!#).*(run|predict|train)\s*\(('|")({}/{}/{})('|")"""\
+                    .format(m[0].user.user_ID, m[0].name, m[1].replace('_', '.'))
+                if match:
+                    for match in re.finditer(pattern, script, re.MULTILINE):
+                        if '#' in match.group():
+                            used_modules.remove(m)
+                else:
+                    used_modules.remove(m)
 
 
             # TODO: save data to app.deployments
-            cls.business.add_imported_module(app_id, version, [])
+            cls.business.add_imported_modules(app_id, version,
+                                             [m[0] for m in used_modules])
 
 
 
@@ -219,33 +259,7 @@ class AppService(ProjectService):
             # 3. work_path = './' -> 'function/'
 
 
-        shutil.copy(handler_file_path, handler_dst_path)
 
-        # change some configurable variable to deploy required
-        cls.modify_handler_py(handler_dst_path)
-
-        # 1. copy modules from docker
-        cls.copy_from_container(container, '/home/jovyan/modules', func_path)
-        # copy path edited __init__.py
-        shutil.copy('./functions/template/python3/function/modules/__init__.py',
-                    os.path.join(func_path, 'modules'))
-        # 2. copy datasets from docker
-        cls.copy_from_container(container, '/home/jovyan/dataset', func_path)
-
-        # deploy
-        call(['faas-cli', 'build', '-f', f'./{service_name}.yml'],
-             cwd=cls.base_func_path)
-        call(['faas-cli', 'deploy', '-f', f'./{service_name}.yml'],
-             cwd=cls.base_func_path)
-
-        # when not dev(publish), change the privacy etc
-        if version != DEFAULT_DEPLOY_VERSION:
-            app.privacy = 'public'
-            app.versions.append(version)
-
-        app.app_path = os.path.join(cls.base_func_path, service_name_no_v)
-        app.status = 'active'
-        app.save()
         return app
 
 # @classmethod
@@ -271,6 +285,6 @@ if __name__ == '__main__':
     import sys
     sys.path.append('../../')
 
-    AppService.app_deploy("5af50c74ea8db714444d7205", "test", "/Users/Chun/Documents/workspace/momodel/mo/pyserver/user_directory/chun/my_exercise/Untitled.py")
+    AppService.app_deploy_or_publish("5af50c74ea8db714444d7205", "test", "/Users/Chun/Documents/workspace/momodel/mo/pyserver/user_directory/chun/my_exercise/Untitled.py")
 
     pass
