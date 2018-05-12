@@ -142,9 +142,11 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
       case 'publish':
       case 'deploy_request':
       case 'publish_request':
+        toProject(e)
+        break
       case 'job_success':
       case 'job_error':
-        toProject(e)
+        toProject(e, '2')
         break
     }
     dispatch({
@@ -161,8 +163,13 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
     history.push(`/userrequest/${e.user_request}?type=${e.user_request_type}`)
   }
 
-  const toProject = (e) => {
-    history.push(`/workspace/${e.project_id}?type=${e.project_type}`)
+  const toProject = (e, tabNum) => {
+    if(tabNum) {
+      history.push(`/workspace/${e.project_id}?type=${e.project_type}&tab=${tabNum}`)
+    } else {
+      history.push(`/workspace/${e.project_id}?type=${e.project_type}`)
+    }
+
   }
 
   const translatorTemp = {
