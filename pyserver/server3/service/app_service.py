@@ -1,8 +1,12 @@
 # -*- coding: UTF-8 -*-
+import os
 import requests
 import json
 import re
+import shutil
+
 from bson import ObjectId
+from subprocess import call
 
 from server3.service.project_service import ProjectService
 from server3.business.module_business import ModuleBusiness
@@ -13,6 +17,7 @@ from server3.business import user_business
 from server3.business.statistics_business import StatisticsBusiness
 from server3.service import message_service
 from server3.constants import DOCKER_IP
+from server3.constants import DEFAULT_DEPLOY_VERSION
 
 
 class AppService(ProjectService):
@@ -24,6 +29,21 @@ class AppService(ProjectService):
         used_module.args = ModuleBusiness.load_module_params(
             used_module, version)
         return cls.business.add_used_module(app_id, used_module, func, version)
+
+    @classmethod
+    def add_imported_modules(cls, app_id, imported_module, deploy_version):
+        """
+        Add imported modules and datasets into app.deployment
+        while user deploy an app.
+
+        :param app_id: app id
+        :param imported_module: tuple (user_name, project_name, version)
+        :param version:
+        :return:
+        """
+        app = cls.get_by_id(app_id)
+        AppBusiness.add_imported_module()
+        pass
 
     @classmethod
     def remove_used_module(cls, app_id, used_module, version):
@@ -152,6 +172,81 @@ class AppService(ProjectService):
         app = AppBusiness.get_by_id(app_id)
         return AppBusiness.get_action_entity(app, **kwargs)
 
+    @classmethod
+    def app_deploy_or_publish(cls, app_id, commit_msg, handler_file_path,
+                              version=DEFAULT_DEPLOY_VERSION):
+        """
+
+        :param app_id:
+        :param commit_msg:
+        :param handler_file_path:
+        :param version:
+        :return:
+        """
+        with open(handler_file_path, 'r') as f:
+            # 1. for imported modules
+            # find imported modules, and return
+            # tuple(user_name, project_name, version) list
+            # imported_modules = cls.find_imported_modules(f.read())
+
+
+            # 2. for imported datasets
+            # TODO: 1. get possible imported dataset list from app.used_datasets[0].dataset.path.replace('./user_directory', '../dataset')
+            app = cls.get_by_id(app_id)
+            imported_datasets = [ds.dataset.path for ds in app.used_datasets]
+            imported_modules = \
+                [(m.module.user.user_ID, m.module.module_path, m.version)
+                 for m in app.used_modules]
+
+            print(imported_datasets)
+            print(imported_modules)
+
+
+
+            # TODO: 2. check if there is any matches
+
+
+            # TODO: save data to app.deployments
+            cls.business.add_imported_module(app_id, version, [])
+
+
+
+            # TODO: Copy related module folder from container, target folder '/home/jovyan/modules/chun/module_a/1_3_4
+
+
+
+
+            # 3. work_path = './' -> 'function/'
+
+
+        shutil.copy(handler_file_path, handler_dst_path)
+
+        # change some configurable variable to deploy required
+        cls.modify_handler_py(handler_dst_path)
+
+        # 1. copy modules from docker
+        cls.copy_from_container(container, '/home/jovyan/modules', func_path)
+        # copy path edited __init__.py
+        shutil.copy('./functions/template/python3/function/modules/__init__.py',
+                    os.path.join(func_path, 'modules'))
+        # 2. copy datasets from docker
+        cls.copy_from_container(container, '/home/jovyan/dataset', func_path)
+
+        # deploy
+        call(['faas-cli', 'build', '-f', f'./{service_name}.yml'],
+             cwd=cls.base_func_path)
+        call(['faas-cli', 'deploy', '-f', f'./{service_name}.yml'],
+             cwd=cls.base_func_path)
+
+        # when not dev(publish), change the privacy etc
+        if version != DEFAULT_DEPLOY_VERSION:
+            app.privacy = 'public'
+            app.versions.append(version)
+
+        app.app_path = os.path.join(cls.base_func_path, service_name_no_v)
+        app.status = 'active'
+        app.save()
+        return app
 
 # @classmethod
 # def add_used_app(cls, user_ID, app_id):
@@ -173,4 +268,9 @@ class AppService(ProjectService):
 
 
 if __name__ == '__main__':
+    import sys
+    sys.path.append('../../')
+
+    AppService.app_deploy("5af50c74ea8db714444d7205", "test", "/Users/Chun/Documents/workspace/momodel/mo/pyserver/user_directory/chun/my_exercise/Untitled.py")
+
     pass

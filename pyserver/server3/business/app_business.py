@@ -14,19 +14,21 @@ from io import BytesIO
 from datetime import datetime
 from datetime import timedelta
 
-# import synonyms
+import synonyms
 import docker
 
 from server3.entity import project
+from server3.entity.project import Deployment
 from server3.business.project_business import ProjectBusiness
 from server3.business.general_business import GeneralBusiness
+from server3.repository.app_repo import AppRepo
 from server3.repository.general_repo import Repo
 from server3.utility.json_utility import args_converter
 from server3.constants import APP_DIR
 from server3.constants import MODULE_DIR
 from server3.constants import DOCKER_IP
 from server3.constants import APP_DIR
-from server3.constants import DEV_DIR_NAME
+from server3.constants import DEFAULT_DEPLOY_VERSION
 from server3.constants import INIT_RES
 from server3.constants import Error, Warning, ErrorMessage
 from server3.entity.general_entity import Objects
@@ -37,7 +39,7 @@ yaml_tail_path = 'app_spec.yml'
 
 
 class AppBusiness(ProjectBusiness, GeneralBusiness):
-    repo = Repo(project.App)
+    repo = AppRepo(project.App)
     entity = project.App
     base_func_path = APP_DIR
 
@@ -66,24 +68,31 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
     @classmethod
     def find_imported_modules(cls, script):
         """
+        Scan python script to get imported modules.
 
         :param script: python script
-        :return: list of imported modules
+        :return: list of imported modules in
+                 (user_id, module_name, version) tuple format.
         """
-        pattern = \
-                r"""^(?!#).*(run|predict|train)\s*\(('|")([\w\d_-]+/[\w\d_-]+/\d+\.\d+\.\d+)('|").*$"""
+        pattern = r"""^(?!#).*(run|predict|train)\s*\(('|")(([\w\d_-]+)/([\w\d_-]+)/(\d+\.\d+\.\d+))('|")"""
 
+        modules = []
         for match in re.finditer(pattern, script, re.MULTILINE):
-            print("matched:{}".format(match.group(0)))
+            if '#' not in match.group(0):
+                modules.append((match.group(4), match.group(5), match.group(6)))
+
+        return modules
 
 
     @classmethod
     def find_imported_datasets(cls, script):
         pass
 
+
+
     @classmethod
     def deploy_or_publish(cls, app_id, commit_msg, handler_file_path,
-                          version=DEV_DIR_NAME):
+                          version=DEFAULT_DEPLOY_VERSION):
         app = cls.get_by_id(app_id)
         app.status = 'deploying'
         app.save()
@@ -113,22 +122,6 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         handler_dst_path = handler_file_path.replace(handler_file_name,
                                                      'handler.py')
 
-        # TODO: read file from handler_file_path, transformed .py file, return tuple(user_id/project_name/version) list
-        print(handler_file_path)
-        with open(handler_file_path, 'r') as f:
-            # print(f.read())
-            cls.find_imported_modules(f.read())
-
-
-        # TODO: save data to app.deployments
-
-        # TODO: Copy related module folder from container, target folder '/home/jovyan/modules/chun/module_a/1_3_4
-
-
-        # Dataset
-        # TODO: 1. get possible imported dataset list from app.used_datasets[0].dataset.path.replace('./user_directory', '../dataset')
-        # TODO: 2. check if there is any matches in
-
         shutil.copy(handler_file_path, handler_dst_path)
 
         # change some configurable variable to deploy required
@@ -149,7 +142,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
              cwd=cls.base_func_path)
 
         # when not dev(publish), change the privacy etc
-        if version != DEV_DIR_NAME:
+        if version != DEFAULT_DEPLOY_VERSION:
             app.privacy = 'public'
             app.versions.append(version)
 
@@ -183,12 +176,12 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
             print(line)
 
     @staticmethod
-    def load_app_params(app, version=DEV_DIR_NAME):
+    def load_app_params(app, version=DEFAULT_DEPLOY_VERSION):
         if not version:
             if len(app.versions) > 0:
                 version = app.versions[-1]
             else:
-                version = DEV_DIR_NAME
+                version = DEFAULT_DEPLOY_VERSION
         yml_path = os.path.join('-'.join([app.app_path, version]),
                                 yaml_tail_path)
         if os.path.exists(yml_path):
@@ -197,6 +190,19 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
                 return {'input': obj.get('input'), 'output': obj.get('output')}
         else:
             return {'input': {}, 'output': {}}
+
+    @classmethod
+    def add_imported_module(cls, app_id, app_deploy_version, used_modules):
+        """
+
+        :param app_id:
+        :param modules_with_verison: tuple (module_object
+        :param app_deploy_version:
+        :return:
+        """
+        cls.repo.add_imported_modules(app_id, app_deploy_version, used_modules)
+
+
 
     @classmethod
     def add_used_module(cls, app_id, module, func, version):
@@ -425,30 +431,4 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
 
 
 if __name__ == "__main__":
-    # apps = project.App.objects(user=)
-
-    def find_imported_modules(script):
-        """
-
-        :param script: python script
-        :return: list of imported modules
-        """
-        pattern = \
-            r"""^(?!#).*(run|predict|train)\s*\(('|")(([\w\d_-]+)/([\w\d_-]+)/(\d+\.\d+\.\d+))('|")"""
-
-        modules = []
-        for match in re.finditer(pattern, script, re.MULTILINE):
-            if '#' not in match.group(0):
-                modules.append((match.group(4), match.group(5), match.grou(6)))
-
-        return modules
-
-    with open('/Users/Chun/Documents/workspace/momodel/mo/pyserver/user_directory/chun/my_exercise/Untitled.py', 'r') as f:
-        # print(f.read())
-        find_imported_modules(f.read())
-
-
-
-
-
     pass

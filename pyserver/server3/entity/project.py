@@ -41,7 +41,7 @@ class Project(DynamicDocument):
     description = StringField()
     overview = StringField()
     tb_port = StringField()
-    datasets = ListField(ReferenceField('DataSet', reverse_delete_rule=PULL))
+
     jobs = ListField(ReferenceField('Job'))
     # if forked project, which project fork from
     source_project = ReferenceField('Project')
@@ -49,7 +49,9 @@ class Project(DynamicDocument):
     favor_users = ListField(ReferenceField("User"))
     star_users = ListField(ReferenceField("User"))
 
+    # TODO: To decide if delete these deprecated fields
     # deprecated
+    datasets = ListField(ReferenceField('DataSet', reverse_delete_rule=PULL))
     related_tasks = ListField(StringField(max_length=50))
     related_fields = ListField(StringField(max_length=100))
     user_name = StringField(max_length=50)
@@ -99,7 +101,7 @@ class UsedDataset(EmbeddedDocument):
     dataset = ReferenceField(Dataset)
 
 
-class VersionInfo(EmbeddedDocument):
+class Deployment(EmbeddedDocument):
     app_version = StringField()
     modules = EmbeddedDocumentListField(UsedModule)
     datasets = EmbeddedDocumentListField(UsedDataset)
@@ -144,7 +146,7 @@ class App(Project):
     used_modules = EmbeddedDocumentListField(UsedModule)
     used_datasets = EmbeddedDocumentListField(UsedDataset)
 
-    deployments = EmbeddedDocumentListField(VersionInfo)
+    deployments = EmbeddedDocumentListField(Deployment)
 
     # app 路径
     app_path = StringField(default=None)
