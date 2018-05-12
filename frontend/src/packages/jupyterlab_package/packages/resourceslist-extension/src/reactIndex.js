@@ -212,13 +212,20 @@ export class ListPage extends React.Component {
         func: this.state.func,
         version: this.state.version,
         onJson: (app) => {
-          this.setState({
-            app,
-            projectId: undefined,
-            project: undefined,
-            func: undefined,
-            args: undefined,
-            showUsedModules: true,
+          getAppActionEntity({
+            //page_no: page,
+            appId: this.appId,
+            actionEntity: [`used_${this.pageType}s`],
+            onJson: ({ objects, count }) => this.setState({
+              app,
+              projectId: undefined,
+              project: undefined,
+              func: undefined,
+              args: undefined,
+              showUsedModules: true,
+              usedProjects: objects,
+              totalUsedNumber: count,
+            }),
           })
           hide()
           message.success('Import success!')
@@ -306,12 +313,20 @@ export class ListPage extends React.Component {
             <CopyInput text={project.path.replace('./user_directory', '../dataset')}
                        datasetId={this.state.projectId}
                        appId={this.appId}
-                       setApp={(app) => this.setState({
-                         app,
-                         projectId: undefined,
-                         project: undefined,
-                         showUsedDatasets: true,
-                       })}
+                       setApp={(app) =>
+                         getAppActionEntity({
+                           //page_no: page,
+                           appId: this.appId,
+                           actionEntity: [`used_${this.pageType}s`],
+                           onJson: ({ objects, count }) => this.setState({
+                             app,
+                             projectId: undefined,
+                             project: undefined,
+                             showUsedDatasets: true,
+                             usedProjects: objects,
+                             totalUsedNumber: count,
+                           }),
+                         })}
             />
           </div>]
       } else {

@@ -140,12 +140,10 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
       //   history.push(`/workspace/${e.app_id}?type=app`)
       //   break
       case 'publish':
-        toProject(e)
-        break
       case 'deploy_request':
-        toProject(e)
-        break
       case 'publish_request':
+      case 'job_success':
+      case 'job_error':
         toProject(e)
         break
     }

@@ -216,7 +216,6 @@ def create_project():
     user_ID = get_jwt_identity()
 
     data = request.get_json()
-    print(data)
     name = data.pop('name')
     type = data.pop('type')
     description = data.pop('description')

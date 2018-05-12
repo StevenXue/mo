@@ -92,4 +92,6 @@ class JobBusiness(GeneralBusiness):
                                       job.user, job_name=job_name,
                                       job_id=job.id,
                                       job_type=job_type,
-                                      project_id=project.id)
+                                      project_id=project.id,
+                                      project_type=project.type
+                                      )
