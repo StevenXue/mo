@@ -214,6 +214,18 @@ export namespace ToolbarItems {
     return new ToolbarButton({
       className: TOOLBAR_PYTHON_CLASS,
       onClick: () => {
+        if (panel.context.model.readOnly) {
+          return showDialog({
+            title: 'Cannot Save',
+            body: 'Document is read-only',
+            buttons: [Dialog.okButton()],
+          });
+        }
+        panel.context.save().then(() => {
+          if (!panel.isDisposed) {
+            return panel.context.createCheckpoint();
+          }
+        });
         const notebookPath = URLExt.encodeParts(panel.context.path);
         console.log(notebookPath, panel);
         const hash = window.location.hash;
@@ -237,13 +249,13 @@ export namespace ToolbarItems {
               }),
             }, {
               onSuccess: () => {
-                hide()
+                hide();
                 message.success(`${notebookPath} successfully export to script!`);
               },
               onJson: undefined,
               onError: (err: string) => {
-                  hide()
-                  message.error(err);
+                hide();
+                message.error(err);
               },
             });
           });
@@ -535,6 +547,7 @@ class CaptureSwitcher extends Widget {
       'capture output': string;
       'restore output': string;
     }
+
     const codeDict: ICodeDict = {
       'capture output': `%%capture output\n` +
       `# The output of code below this command would be captured\n` +
@@ -544,7 +557,7 @@ class CaptureSwitcher extends Widget {
       `# Add a full controller to running your own functions: \n` +
       `# 'controller(your_function, 'any params')'`,
       'restore output': `output.show()\n` +
-      `# The captured output can be printed by running this code`
+      `# The captured output can be printed by running this code`,
     };
     const code = codeDict[select.value as keyof ICodeDict];
     NotebookActions.insertCodeBelow(this._notebook, code);
