@@ -324,11 +324,10 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
             {login.user && JsonToArray(message.messages).map(e =>
               <div onClick={() => toMessage(e)} key={e.receiver_id}
                    style={e.is_read === false ? {
-                     width: '400px',
                      margin: '0 -20px',
                      backgroundColor: '#f0f2f5',
                      color: 'black',
-                   } : { width: '400px', margin: '0 -20px', color: 'black' }}>
+                   } : {  margin: '0 -20px', color: 'black' }}>
                 {switchMessage(e)}</div>)}
           </Menu.Item>
           <Menu.Item style={{ color: 'black' }}>

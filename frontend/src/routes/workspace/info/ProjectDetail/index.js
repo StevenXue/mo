@@ -18,7 +18,7 @@ import {
   Card,
   Tooltip,
 } from 'antd'
-
+import { routerRedux } from 'dva/router'
 // components
 import ProjectModal from '../../../../components/ProjectModal/index'
 import HelpModal from '../../../../components/HelpModal'
@@ -236,6 +236,11 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
   const projectId = match.params.projectId
   const user_ID = localStorage.getItem('user_ID')
   const userObjId = localStorage.getItem('user_obj_id')
+
+
+  const url = new URL(window.location.href.replace('/#', ''))
+  const showTab = url.searchParams.get('tab')
+
   // const projectOwner = get(projectDetail, 'project.user')
   // const projectOwnerOrNot = (projectOwner === userObjId)
   const props1 = {
@@ -298,12 +303,12 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
     })
   }
 
-  const callback = (activeKey) => {
-    dispatch({
-      type: 'projectDetail/changeActiveTab',
-      activeTab: activeKey,
-    })
-  }
+  // const callback = (activeKey) => {
+  //   // dispatch({
+  //   //   type: 'projectDetail/changeActiveTab',
+  //   //   activeTab: activeKey,
+  //   // })
+  // }
 
   const cloudNote = () => {
     if (!market_use) {
@@ -624,9 +629,9 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
 
               </div>
               {/*content tabs*/}
-              <Tabs defaultActiveKey={projectDetail.activeTab}
-                    onChange={callback}
-                    activeKey={projectDetail.activeTab}
+              <Tabs defaultActiveKey={showTab}
+                    // onChange={callback}
+                    // activeKey={projectDetail.activeTab}
                     tabBarExtraContent={cloudNote()}
                     className={styles.jobs}>
                 <TabPane tab="Overview" key="1">
