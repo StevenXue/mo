@@ -4,7 +4,7 @@ import {routerRedux} from 'dva/router'
 import styles from './index.less'
 import {
   Tabs, Switch, Button, Input, Form, Card, Icon,
-  Row, Col, Select, Spin, Modal, Tag,
+  Row, Col, Select, Spin, Modal, Tag, message as antdMessage
 } from 'antd'
 import debounce from 'lodash.debounce'
 import {get} from 'lodash'
@@ -15,6 +15,7 @@ import {getProjects} from '../../../services/project'
 import ProjectModal from '../../../components/ProjectModal/index'
 import star from './img/star.png'
 import star_o from './img/star-o.png'
+import message from "../../../models/message"
 
 
 
@@ -320,12 +321,17 @@ function UserRequestDetail({allRequest, login, dispatch}) {
   }
 
   function requestStar() {
+    if (focusUserRequest.user !==login.user._id){
     dispatch({
       type: 'allRequest/starRequest',
       payload: {
         user_request_id: focusUserRequest['_id'],
       },
     })
+    }
+    else{
+      antdMessage.warning('sorry,不能收藏自己的需求');
+    }
   }
 
   function answerVotesUp(request_answer_id) {
@@ -440,7 +446,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
           <h2
             style={{paddingBottom: 10}}>
             <Icon
-              type={focusUserRequest['star_user'].includes(user_obj_id) ? 'star' : 'star-o'}
+              type={focusUserRequest.user===user_obj_id || focusUserRequest['star_user'].includes(user_obj_id) ? 'star' : 'star-o'}
               className={styles.star}
               style={{
                 fontSize: '22px', color: 'transparent',
