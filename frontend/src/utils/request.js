@@ -79,7 +79,7 @@ export default async function request(url, options = {}, funcs = {}) {
     return ret
 
   } catch (err) {
-    console.log(url, err)
+    // console.log(url, err)
     if (onError) {
       await onError(err)
     }

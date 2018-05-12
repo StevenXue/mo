@@ -51,6 +51,10 @@ class UserBusiness(GeneralBusiness):
     repo = UserRepo(User)
 
     @classmethod
+    def check_exist(cls, query):
+        return True if cls.repo.read(query) else False
+
+    @classmethod
     def get_by_email(cls, email):
         return cls.repo.read_first_one({'email': email})
 

@@ -60,17 +60,18 @@ class UserRequestService:
             message=f"用户{created_user_request.user.user_ID}" +
                     f"发布了需求{created_user_request.title}")
 
-        return created_user_request
+        # return created_user_request
 
         # 不再记录到favor list里面
-        # if created_user_request:
-        #     user_entity = UserService. \
-        #         action_entity(user_ID=user_ID,
-        #                       entity_id=created_user_request.id,
-        #                       action='star', entity='request')
-        #     return user_entity.entity
-        # else:
-        #     raise RuntimeError('Cannot create the new user_request')
+        # todo
+        if created_user_request:
+            user_entity = UserService. \
+                action_entity(user_ID=user_ID,
+                              entity_id=created_user_request.id,
+                              action='star', entity='request')
+            return user_entity.entity
+        else:
+            raise RuntimeError('Cannot create the new user_request')
 
     @classmethod
     def update_user_request(cls, user_request_id, **kwargs):

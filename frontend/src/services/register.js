@@ -81,6 +81,7 @@ export async function register(params) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({...params, code: params.captcha}),
+    noErrorMsg: true,
   });
 }
 
