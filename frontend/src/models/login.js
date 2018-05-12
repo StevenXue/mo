@@ -175,7 +175,13 @@ export default {
         type: 'changeSubmitting',
         payload: true,
       })
-      const { data: data, noError } = yield call(login, payload)
+      let res
+      if (payload.phone) {
+        res = yield call(loginWithPhone, payload)
+      } else {
+        res = yield call(login, payload)
+      }
+      const { data: data, noError } = res
       yield put({
         type: 'changeSubmitting',
         payload: false,
@@ -227,7 +233,7 @@ export default {
           if (from) {
             yield put(routerRedux.push(from))
           } else {
-            yield put(routerRedux.push('/userrequest?tab=app'))
+            yield put(routerRedux.push('/launchpage'))
           }
         } else {
           throw data
