@@ -597,7 +597,6 @@ class ProjectBusiness(GeneralBusiness):
         with open(script_path, 'w') as f:
             f.write(script)
 
-
     @classmethod
     def code_formatting(cls, line_of_code):
         """
@@ -615,20 +614,20 @@ class ProjectBusiness(GeneralBusiness):
             line_of_code = re.sub(r'# Define root path', r'',
                                   line_of_code.rstrip())
             line_of_code = re.sub(r"""sys.path.append\('(.+)'\)""", r'',
-                          line_of_code.rstrip())
+                                  line_of_code.rstrip())
             line_of_code = re.sub(
                 r"""(\s+)project_type='(.+)', source_file_path='(.+)'\)""",
                 r"""\1project_type='\2', source_file_path='\3', silent=True)""",
                 line_of_code.rstrip())
 
             line_of_code = re.sub(r"""from modules import (.+)""",
-                          r"""from function.modules import \1""",
+                                  r"""from function.modules import \1""",
                                   line_of_code.rstrip())
 
             # add handle function
             line_of_code = re.sub(
                 r"work_path = '\./'",
-                r"work_path = 'function/'\n\n"
+                r"work_path = '\./'\n\n"
                 r"def handle(conf):\n"
                 r"\t# paste your code here",
                 line_of_code.rstrip())
