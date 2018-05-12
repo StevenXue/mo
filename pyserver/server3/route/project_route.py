@@ -224,28 +224,19 @@ def create_project():
     if not isinstance(tags, list) and tags is not None:
         data['tags'] = str_utility.split_without_empty(tags)
 
-    # func = {
-    #     "app": AppService.create_project(name, description, user_ID,
-    #                                      tags=tags,
-    #                                      type=type, user_token=user_token,
-    #                                      **data),
-    #
-    # }
-    # project = func[type](name, description, user_ID,
-    #                      tags=tags,
-    #                      type=type, user_token=user_token,
-    #                      **data)
-    TypeMapper = {
+    type_mapper = {
         "app": AppService,
         "module": ModuleService,
         "dataset": DatasetService,
     }
-    project = TypeMapper[type].create_project(
-        name, description, user_ID, tags=tags,
-        type=type, user_token=user_token, **data)
+    try:
+        project = type_mapper[type].create_project(
+            name, description, user_ID, tags=tags,
+            type=type, user_token=user_token, **data)
+    except Exception as e:
+        return jsonify(
+            {'response': str(e)}), 400
     project = json_utility.convert_to_json(project.to_mongo())
-
-    print(project)
     return jsonify({'response': project}), 200
 
 

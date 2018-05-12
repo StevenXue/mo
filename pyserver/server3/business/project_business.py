@@ -304,7 +304,7 @@ class ProjectBusiness(GeneralBusiness):
             os.makedirs(project_path)
         else:
             # if exists means project exists
-            raise Exception('project exists')
+            raise Exception('Project exists, project should be unique between apps, modules and datsets')
         return project_path
 
     @classmethod
