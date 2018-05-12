@@ -39,7 +39,6 @@ export default {
     jobIds: [],
     // doneIndices: new Set([]),
     helpModalVisible: false,
-    activeTab: '2',
     pageNo: 1,
     pageSize: 10,
   },

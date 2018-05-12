@@ -449,11 +449,11 @@ class ProjectService:
                                               type=type, tags=tags, user=user,
                                               user_token=user_token, **kwargs)
 
-        from server3.service.user_service import UserService
-        user, project = UserService.action_entity(user_ID=project.user.user_ID,
-                                                  entity_id=project.id,
-                                                  action='favor',
-                                                  entity=project.type)
+        # from server3.service.user_service import UserService
+        # user, project = UserService.action_entity(user_ID=project.user.user_ID,
+        #                                           entity_id=project.id,
+        #                                           action='favor',
+        #                                           entity=project.type)
         from server3.service.world_service import WorldService
         from server3.business.statistics_business import StatisticsBusiness
         # 记录历史记录
@@ -532,7 +532,10 @@ class ProjectService:
                              'project_name': project.name}},
                 project.user)
             return
-        receivers = project.favor_users  # get app subscriber
+        # get app subscriber and user himself
+        receivers = project.favor_users
+        receivers.append(project.user.id)
+
         admin_user = UserBusiness.get_by_user_ID('admin')
 
         # 获取所有包含此module的答案
