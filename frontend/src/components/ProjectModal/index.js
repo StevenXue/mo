@@ -9,7 +9,7 @@ const FormItem = Form.Item
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
 const Option = Select.Option
-const { TextArea } = Input;
+const { TextArea } = Input
 const fields = ['Business', 'Government', 'Education', 'Environment', 'Health', 'Housing & Development',
   'Public Services', 'Social', 'Transportation', 'Science', 'Technology']
 const tasks = ['Classification', 'Regression', 'Clustering', 'Reinforcement Learning']
@@ -50,33 +50,22 @@ class ProjectModal extends Component {
         if (this.props.new) {
           // this.props.dispatch({type:'launchpage/change',payload:{visibility:false}})  //关闭launchpage
           // localStorage.setItem('launchpage','hide')
-          const hide = message.loading('Project Creating...', 0)
-          createProject({
-            body,
-            onJson: (response) => {
-              this.props.fetchData && this.props.fetchData()
-              this.props.dispatch({ type: 'project/hideModal' })
-              if (this.props.newAnswer) {
-                this.props.handleCreate([response])
-              } else {
-                this.props.dispatch(routerRedux.push('/workspace/' + response._id + `?type=${this.props.type}`))
-              }
-              hide()
+          this.props.dispatch({
+            type: 'project/create',
+            payload: {
+              body,
+              newAnswer: this.props.newAnswer,
+              fetchData: this.props.fetchData,
+              handleCreate: (e) => this.props.handleCreate(e)
             },
           })
         } else {
-          updateProject({
-            body,
-            projectId: this.props.projectDetail.project._id,
-            onJson: () => {
-              this.props.fetchData && this.props.fetchData()
-              this.props.dispatch({ type: 'project/hideModal' })
-              this.props.dispatch({
-                type: 'projectDetail/fetch',
-                projectId: this.props.projectDetail.project._id,
-                notStartLab: true,
-                projectType: this.props.projectDetail.project.type,
-              })
+          this.props.dispatch({
+            type: 'projectDetail/update',
+            payload: {
+              body,
+              projectId: this.props.projectDetail.project._id,
+              fetchData: this.props.fetchData,
             },
           })
         }
@@ -152,7 +141,7 @@ class ProjectModal extends Component {
                 getFieldDecorator('name', {
                   initialValue: name,
                   // not allow uppercase and whitespace
-                  getValueFromEvent: (e) => e.target.value.toLowerCase().replace(/\s/g, ""),
+                  getValueFromEvent: (e) => e.target.value.toLowerCase().replace(/\s/g, ''),
                   rules: [
                     {
                       required: true,
@@ -167,7 +156,7 @@ class ProjectModal extends Component {
                           callback('Sorry, Chinese name is not supported yet')
                         }
                       },
-                    }
+                    },
                   ],
                 })(<Input disabled={!this.props.new}/>)
               }
@@ -269,4 +258,4 @@ class ProjectModal extends Component {
   }
 }
 
-export default connect(({ project}) => ({ project}))(Form.create()(ProjectModal))
+export default connect(({ project }) => ({ project }))(Form.create()(ProjectModal))

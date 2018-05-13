@@ -170,6 +170,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         app_yaml_path = os.path.join(app.path, yaml_tail_path)
         args = {}
         output = {}
+        version = version or DEV_DIR_NAME
         cls.insert_module_env(app, module, version)
         # copy module yaml to app yaml
         input_args = module.to_mongo()['args']['input'].get(func, {})

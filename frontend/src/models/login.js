@@ -175,7 +175,13 @@ export default {
         type: 'changeSubmitting',
         payload: true,
       })
-      const { data: data, noError } = yield call(login, payload)
+      let res
+      if (payload.phone) {
+        res = yield call(loginWithPhone, payload)
+      } else {
+        res = yield call(login, payload)
+      }
+      const { data: data, noError } = res
       yield put({
         type: 'changeSubmitting',
         payload: false,
@@ -198,43 +204,6 @@ export default {
         }
       } else {
         throw data
-      }
-    },
-
-    *loginWithPhone({ payload }, { put, call }) {
-      yield put({
-        type: 'changeSubmitting',
-        payload: true,
-      })
-      const response = yield call(loginWithPhone, payload)
-      yield put({
-        type: 'changeSubmitting',
-        payload: false,
-      })
-
-      if (response.status === 200) {
-        const { data } = response
-        if (data) {
-          localStorage.setItem('token', data.token)
-          localStorage.setItem('user_ID', data.user.user_ID)
-          localStorage.setItem('user_obj_id', data.user._id)
-          const from = queryURL('from')
-          yield put({ type: 'setUser', payload: data.user })
-          yield put({
-            type: 'setUserAvatar',
-            userAvatar: `/pyapi/user/avatar/${data.user.user_ID}.jpeg?${data.user.avatarV}`,
-          })
-          if (from) {
-            yield put(routerRedux.push(from))
-          } else {
-            yield put(routerRedux.push('/userrequest?tab=app'))
-          }
-        } else {
-          throw data
-        }
-      } else {
-        let errorMessage = response.data.error.message
-        message.error(errorMessage)
       }
     },
     *query({ payload }, { call, put }) {
@@ -261,7 +230,7 @@ export default {
           // if (from) {
           //   yield put(routerRedux.push(from))
           // }
-          console.log(location.hash.substr(1))
+          // console.log(location.hash.substr(1))
           if (location.hash.substr(1) === '/login') {
             // user dashboard not build yet, push to project by default
             yield put(routerRedux.push('/workspace?tab=app'))

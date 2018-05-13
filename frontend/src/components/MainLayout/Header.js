@@ -140,13 +140,13 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
       //   history.push(`/workspace/${e.app_id}?type=app`)
       //   break
       case 'publish':
-        toProject(e)
-        break
       case 'deploy_request':
-        toProject(e)
-        break
       case 'publish_request':
         toProject(e)
+        break
+      case 'job_success':
+      case 'job_error':
+        toProject(e, '2')
         break
     }
     dispatch({
@@ -163,8 +163,13 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
     history.push(`/userrequest/${e.user_request}?type=${e.user_request_type}`)
   }
 
-  const toProject = (e) => {
-    history.push(`/workspace/${e.project_id}?type=${e.project_type}`)
+  const toProject = (e, tabNum) => {
+    if(tabNum) {
+      history.push(`/workspace/${e.project_id}?type=${e.project_type}&tab=${tabNum}`)
+    } else {
+      history.push(`/workspace/${e.project_id}?type=${e.project_type}`)
+    }
+
   }
 
   const translatorTemp = {
@@ -326,11 +331,10 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
             {login.user && JsonToArray(message.messages).map(e =>
               <div onClick={() => toMessage(e)} key={e.receiver_id}
                    style={e.is_read === false ? {
-                     width: '400px',
                      margin: '0 -20px',
                      backgroundColor: '#f0f2f5',
                      color: 'black',
-                   } : { width: '400px', margin: '0 -20px', color: 'black' }}>
+                   } : {  margin: '0 -20px', color: 'black' }}>
                 {switchMessage(e)}</div>)}
           </Menu.Item>
           <Menu.Item style={{ color: 'black' }}>

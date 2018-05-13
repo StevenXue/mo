@@ -38,7 +38,6 @@ class AppService(ProjectService):
 
     @classmethod
     def remove_used_dataset(cls, app_id, used_dataset):
-        print(used_dataset)
         used_dataset = DatasetBusiness.get_by_id(used_dataset)
         return cls.business.remove_used_dataset(app_id, used_dataset)
 
@@ -68,10 +67,16 @@ class AppService(ProjectService):
         try:
             output_json = json.loads(results[0])
         except IndexError as e:
-            errors = cls.business.get_service_logs(app, version)
-            output_json = {
-                'errors': errors
-            }
+            try:
+                errors = cls.business.get_service_logs(app, version)
+            except IndexError as e:
+                output_json = {
+                    'errors': ['Service is down please deploy again!']
+                }
+            else:
+                output_json = {
+                    'errors': errors
+                }
         # output_json = response.json()
         # 成功调用后 在新的collection存一笔
         user_obj = UserBusiness.get_by_user_ID(user_ID=user_ID)
