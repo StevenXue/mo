@@ -1,5 +1,5 @@
 import { routerRedux } from 'dva/router'
-
+import { message } from 'antd'
 import {
   fetchProject,
   deleteProject,
@@ -23,7 +23,6 @@ import pathToRegexp from 'path-to-regexp'
 import { get } from 'lodash'
 import { hubPrefix } from '../utils/config'
 import * as dataAnalysisService from '../services/dataAnalysis'
-import { message } from 'antd/lib/index'
 import CONSTANT from '../constants'
 
 import * as UserStarFavorService from '../services/user'
@@ -156,6 +155,7 @@ export default {
       return {
         ...state,
         project: undefined,
+        activeTab: '1',
       }
     },
 
@@ -200,7 +200,7 @@ export default {
     },
   },
   effects: {
-    *refresh({ projectId, notStartLab, projectType, version, activeTab}, { call, put }) {
+    *refresh({ projectId, notStartLab, projectType, version, activeTab }, { call, put }) {
       yield put({ type: 'clearProject' })
       yield put({ type: 'fetch', projectId, projectType, version, activeTab })
       yield put({ type: 'fetchComments', projectId })
@@ -332,7 +332,9 @@ export default {
       yield put({ type: 'fetch', projectId: project._id, projectType: project.type })
     },
     *delete({ payload }, { call, put, select }) {
+      const hide = message.loading('Project Deleting...', 0)
       yield call(deleteProject, payload)
+      hide()
       yield put(routerRedux.push('/workspace?tab=' + payload.type))
     },
     *setEntered({ projectId }, { call, put }) {
