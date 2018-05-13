@@ -7,8 +7,8 @@ from importlib import import_module
 
 import requests
 
-SERVER = 'http://host.docker.internal:8989/pyapi'
-# SERVER = 'http://172.17.0.1:8899/pyapi'
+# SERVER = 'http://host.docker.internal:8989/pyapi'
+SERVER = 'http://172.17.0.1:8899/pyapi'
 
 
 class RedirectPrints:
