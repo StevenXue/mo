@@ -164,11 +164,13 @@ def reset_password():
 def login():
     user_ID = request.json.get('user_ID', None)
     password = request.json.get('password', None)
+
+    if not UserBusiness.check_exist({'user_ID': user_ID}):
+        return jsonify({"response": "This user_ID is not registered, please input the right user_ID"}), 400
     try:
         user = user_service.authenticate(user_ID, password)
         if not user:
-            return jsonify({'response': 'Bad username or password'}), 400
-
+            return jsonify({'response': 'Wrong password'}), 400
         user_obj = json_utility.convert_to_json(user.to_mongo())
         user_obj.pop('password')
         if hasattr(user, "avatar"):
@@ -176,7 +178,6 @@ def login():
     except DoesNotExist as e:
         return jsonify({'response': '%s: %s' % (str(
             DoesNotExist), e.args)}), 400
-
     # Identity can be any data that is json serializable
     response = {
         'response': {'token': create_access_token(identity=user.user_ID),
@@ -315,6 +316,11 @@ def login_with_phone():
     phone = data.pop("phone")
     # message_id = data.pop("message_id")
     code = data.pop("code")
+    if not UserBusiness.check_exist({'phone': phone}):
+        return jsonify({"response": {
+            "error": "This phone number is not registered, "
+                     "please input the right phone number"}}), 400
+
     try:
         result = user_service.verify_code(code=code, phone=phone)
         if result:
@@ -324,10 +330,9 @@ def login_with_phone():
                 'user': json_utility.convert_to_json(user.to_mongo())}}
             return jsonify(response), 200
     except Error as e:
-        print("e.args[0]", e.args[0])
         return jsonify({
             "response": {
-                "error": e.args[0]
+                "error": 'Please enter correct verify code'
             }
         }), 400
 

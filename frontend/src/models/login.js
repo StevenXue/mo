@@ -216,7 +216,8 @@ export default {
           throw data
         }
       } else {
-        let errorMessage = response.data.error.message
+        // let errorMessage = response.data.error.message
+        let errorMessage = response.data.error
         message.error(errorMessage)
       }
     },
@@ -244,7 +245,7 @@ export default {
           // if (from) {
           //   yield put(routerRedux.push(from))
           // }
-          console.log(location.hash.substr(1))
+          // console.log(location.hash.substr(1))
           if (location.hash.substr(1) === '/login') {
             // user dashboard not build yet, push to project by default
             yield put(routerRedux.push('/workspace?tab=app'))
