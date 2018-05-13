@@ -129,7 +129,7 @@ class Client:
             with HiddenPrints():
                 return module_general(module_id, action, *args, **kwargs)
         else:
-            return module_general(module_id, 'action', *args, **kwargs)
+            return module_general(module_id, action, *args, **kwargs)
 
     def run(self, module_id, *args, with_control=False, **kwargs):
         return self.run_module_general('run', module_id, *args,
