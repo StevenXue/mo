@@ -188,9 +188,8 @@ def convert_action_entity(objects, action_entity):
                objects]
         return ums
     if action_entity == 'used_datasets':
-        uds = [{'dataset': json_utility.convert_to_json(m.module.to_mongo()),
-                'version': '.'.join(m.version.split('_'))} for m in
-               objects]
+        uds = [{'dataset': json_utility.convert_to_json(m.dataset.to_mongo())}
+               for m in objects]
         return uds
 
 
@@ -333,7 +332,6 @@ def run_app(app_id):
     data = request.get_json()
     input_json = data["app"]["input"]
     version = data["version"]
-    print("input_json", input_json)
     result = AppService.run_app(app_id, input_json=input_json,
                                 user_ID=user_ID, version=version)
     return jsonify({"response": result})

@@ -110,11 +110,11 @@ class Client:
                              json={'log_type': 'exception',
                                    'message': exc})
                 raise e
-
-        # log end
-        requests.put(f'{SERVER}/jobs/{job_id}/success').json()
-        # print('finish run', job)
-        return ret
+            else:
+                # log end
+                requests.put(f'{SERVER}/jobs/{job_id}/success').json()
+                # print('finish run', job)
+                return ret
 
     def run_module_general(self, action, module_id, *args, with_control=False,
                            **kwargs):

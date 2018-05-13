@@ -1,10 +1,10 @@
-import React, { Component } from 'react'
-import { connect } from 'dva'
-import { Select, Button, Card, Icon, Input, Pagination, Tabs, Spin } from 'antd'
+import React, {Component} from 'react'
+import {connect} from 'dva'
+import {Select, Button, Card, Icon, Input, Pagination, Tabs, Spin} from 'antd'
 import ProjectModel from '../../../../components/ProjectModal/index'
 import {projectStatus} from '../ProjectDetail'
-import { showTime } from '../../../../utils/index'
-import { privacyChoices, projectChoices } from '../../../../constants'
+import {showTime} from '../../../../utils/index'
+import {privacyChoices, projectChoices} from '../../../../constants'
 import {
   createProject,
   getProjects,
@@ -22,7 +22,7 @@ const Option = Select.Option
 const Search = Input.Search
 const TabPane = Tabs.TabPane
 
-function Projects({ history, project, dispatch, location }) {
+function Projects({history, project, dispatch, location}) {
   const url = new URL(window.location.href.replace('/#', ''))
   const projectType = url.searchParams.get('tab')
   const search = '?tab=' + projectType
@@ -42,14 +42,14 @@ function Projects({ history, project, dispatch, location }) {
       <Tabs defaultActiveKey={defaultActiveKeyDic[search]}
             onChange={callback}>
         <TabPane tab="应用" key="1">
-          <ProjectList {...{ history, project, dispatch, location }} type='app'/>
+          <ProjectList {...{history, project, dispatch, location}} type='app'/>
         </TabPane>
         <TabPane tab="模块" key="2">
-          <ProjectList {...{ history, project, dispatch, location }}
+          <ProjectList {...{history, project, dispatch, location}}
                        type='module'/>
         </TabPane>
         <TabPane tab="数据集" key="3">
-          <ProjectList {...{ history, project, dispatch, location }}
+          <ProjectList {...{history, project, dispatch, location}}
                        type='dataset'/>
         </TabPane>
       </Tabs>
@@ -89,13 +89,13 @@ class ProjectList extends Component {
   //   }
   // }
 
-  fetchData({ payload = {} }) {
-    const { type } = this.props
+  fetchData({payload = {}}) {
+    const {type} = this.props
     this.setState({
       loading: true,
     })
     // default filter
-    let filter = { type, group: 'my' };
+    let filter = {type, group: 'my'};
 
     // get state filter
     ['query', 'privacy', 'page_no', 'page_size'].forEach((key) => {
@@ -113,7 +113,7 @@ class ProjectList extends Component {
     // fetch
     getProjects({
       filter,
-      onJson: ({ projects, count }) => this.setState({
+      onJson: ({projects, count}) => this.setState({
         projects,
         totalNumber: count,
         loading: false,
@@ -122,11 +122,11 @@ class ProjectList extends Component {
   }
 
   handlePrivacyChange(value) {
-    this.fetchData({ payload: { privacy: value === 'all' ? undefined : value } })
+    this.fetchData({payload: {privacy: value === 'all' ? undefined : value}})
   }
 
   handleQueryChange(value) {
-    this.fetchData({ payload: { query: value } })
+    this.fetchData({payload: {query: value}})
   }
 
   toProjectDetail(id, history, type) {
@@ -136,14 +136,41 @@ class ProjectList extends Component {
   }
 
   onShowSizeChange = (pageNo, pageSize) => {
-    this.fetchData({ payload: { page_no: pageNo, page_size: pageSize } })
+    this.fetchData({payload: {page_no: pageNo, page_size: pageSize}})
+  }
+
+  newProject() {
+    if (this.props.type === 'app') {
+      return (<ProjectModel new={true} fetchData={() => this.fetchData({})}
+                            type={this.props.type}><p
+        style={{marginTop: 44}}>您还没有创建过任何应用, 点击<span
+        onClick={() => this.props.dispatch('project/showModal')}>“新建应用”</span>快速创建。
+      </p></ProjectModel>)
+    }
+    else if (this.props.type === 'module') {
+      return (<ProjectModel new={true} fetchData={() => this.fetchData({})}
+                            type={this.props.type}><p
+        style={{marginTop: 44}}>您还没有创建过任何应用, 点击<span
+        onClick={() => this.props.dispatch('project/showModal')}>“新建模块”</span>快速创建。
+      </p></ProjectModel>)
+    }
+    else if (this.props.type === 'dataset') {
+      return (<ProjectModel new={true} fetchData={() => this.fetchData({})}
+                            type={this.props.type}><p style={{marginTop: 44}}>您还没有创建过任何应用, 点击<span
+        onClick={() => this.props.dispatch('project/showModal')}>“新建数据集”</span>快速创建。
+      </p></ProjectModel>)
+
+    }
+    else {
+      return <p/>
+    }
   }
 
   render() {
-    const { history, project, dispatch } = this.props
-    const { totalNumber, pageSize } = this.state
+    const {history, project, dispatch} = this.props
+    const {totalNumber, pageSize} = this.state
     return (
-      <div style={{ marginBottom: '80px' }}>
+      <div style={{marginBottom: '80px'}}>
         <div className={styles.header}>
           <Select defaultValue='all' className={styles.select}
                   onChange={(value) => this.handlePrivacyChange(value)}>
@@ -154,7 +181,7 @@ class ProjectList extends Component {
           <Search
             placeholder="input search text"
             onSearch={(value) => this.handleQueryChange(value)}
-            style={{ width: 200 }}
+            style={{width: 200}}
           />
           <ProjectModel new={true} fetchData={() => this.fetchData({})}
                         type={this.props.type}>
@@ -170,53 +197,59 @@ class ProjectList extends Component {
           </ProjectModel>
         </div>
         {
-          this.state.loading === true || this.state.projects.length > 0 ? <Spin spinning={this.state.loading}>
-            <div className={styles.projectList}>
-              {this.state.projects.map(e =>
-                <Card key={e._id} className={styles.card}
-                      title={<h3>{e.name} <Icon style={{fontSize: 16}} type={e.privacy === 'private' ? 'lock' : 'unlock'}/></h3> }
-                      extra={[projectStatus(e)]}
-                      onClick={() => this.toProjectDetail(e._id, history, e.type)}
-                      style={{ cursor: 'pointer' }}>
-                  <div>
-                    <p className={styles.des}>{e.description}</p>
-                    <div className={styles.other}>
-                      <Icon
-                        type='like'
-                        style={{ background: e.star_users.length !== 0 ? `url(${like_o}) no-repeat center` : `url(${like}) no-repeat center` }}
-                      />
-                      {e.star_users.length}
-                      <Icon
-                        type='star'
-                        style={{
-                          marginLeft: 10,
-                          background: e.favor_users.length !== 0 ? `url(${star_o}) no-repeat center` : `url(${star}) no-repeat center`,
-                        }}
-                      />
-                      {e.favor_users.length}
-                      <Icon type="clock-circle-o" style={{ marginRight: 10, marginLeft: 10 }}/>
-                      {showTime(e.create_time)}
-                      <Button style={{ float: 'right' }}
-                              onClick={(ev) => {
-                                ev.stopPropagation()
-                                window.open(`/#/workspace/${e._id}/${e.type}`)
-                              }}>
-                        Notebook ->
-                      </Button>
+          this.state.loading === true || this.state.projects.length > 0 ?
+            <Spin spinning={this.state.loading}>
+              <div className={styles.projectList}>
+                {this.state.projects.map(e =>
+                  <Card key={e._id} className={styles.card}
+                        title={<h3>{e.name} <Icon style={{fontSize: 16}}
+                                                  type={e.privacy === 'private' ? 'lock' : 'unlock'}/>
+                        </h3>}
+                        extra={[projectStatus(e)]}
+                        onClick={() => this.toProjectDetail(e._id, history, e.type)}
+                        style={{cursor: 'pointer'}}>
+                    <div>
+                      <p className={styles.des}>{e.description}</p>
+                      <div className={styles.other}>
+                        <Icon
+                          type='like'
+                          style={{background: e.star_users.length !== 0 ? `url(${like_o}) no-repeat center` : `url(${like}) no-repeat center`}}
+                        />
+                        {e.star_users.length}
+                        <Icon
+                          type='star'
+                          style={{
+                            marginLeft: 10,
+                            background: e.favor_users.length !== 0 ? `url(${star_o}) no-repeat center` : `url(${star}) no-repeat center`,
+                          }}
+                        />
+                        {e.favor_users.length}
+                        <Icon type="clock-circle-o"
+                              style={{marginRight: 10, marginLeft: 10}}/>
+                        {showTime(e.create_time)}
+                        <Button style={{float: 'right'}}
+                                onClick={(ev) => {
+                                  ev.stopPropagation()
+                                  window.open(`/#/workspace/${e._id}/${e.type}`)
+                                }}>
+                          Notebook ->
+                        </Button>
+                      </div>
+                      {/*<Icon type="user" style={{ marginRight: 10 }}/>*/}
+                      {/*{e['user_name'] && <p>Owner: {e.user_name}</p>}*/}
                     </div>
-                    {/*<Icon type="user" style={{ marginRight: 10 }}/>*/}
-                    {/*{e['user_name'] && <p>Owner: {e.user_name}</p>}*/}
-                  </div>
-                </Card>)}
-              {/*{project.projects.public_projects.map(e => e.name)}*/}
+                  </Card>)}
+                {/*{project.projects.public_projects.map(e => e.name)}*/}
+              </div>
+            </Spin> : <div className={styles.kong}>
+              <img src={blank} alt="null" width="200px" height="207px"/>
+              {/*<p style={{marginTop: 44}}>您还没有创建过任何应用, 点击<span>“新建应用”</span>快速创建。*/}
+              {/*</p>*/}
+              {this.newProject()}
+              <p style={{marginTop: 25}}>遇到困难？点击<span
+                onClick={() => window.location = 'https://momodel.github.io/mo/#/'}>“帮助文档”</span>了解更多。
+              </p>
             </div>
-          </Spin> : <div className={styles.kong}>
-            <img src={blank} alt="null" width="200px" height="207px"/>
-            <p style={{ marginTop: 44 }}>您还没有创建过任何应用, 点击<span>“新建应用”</span>快速创建。
-            </p>
-            <p style={{ marginTop: 25 }}>遇到困难？点击<span
-              onClick={() => window.location = 'https://momodel.github.io/mo/#/'}>“帮助文档”</span>了解更多。</p>
-          </div>
         }
         {/* {
           this.state.projects.length > 0 ? <div className={styles.pagination}>
@@ -243,7 +276,7 @@ class ProjectList extends Component {
                 total={totalNumber}
                 hideOnSinglePage={true}/>
             </div> :
-            <div style={{ color: '#c1c1c1', fontSize: '14px', marginTop: 30 }}>
+            <div style={{color: '#c1c1c1', fontSize: '14px', marginTop: 30}}>
 
             </div>
         }
@@ -252,4 +285,4 @@ class ProjectList extends Component {
   }
 }
 
-export default connect(({ project }) => ({ project }))(Projects)
+export default connect(({project}) => ({project}))(Projects)

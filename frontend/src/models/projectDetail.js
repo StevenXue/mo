@@ -39,7 +39,7 @@ export default {
     jobIds: [],
     // doneIndices: new Set([]),
     helpModalVisible: false,
-    activeTab: '2',
+    activeTab: '1',
     pageNo: 1,
     pageSize: 10,
   },
@@ -335,21 +335,17 @@ export default {
       })
       yield put({ type: 'setProject', payload: project })
     },
-    *update({ body, fetchData }, { call, put, select }) {
-      const projectId = yield select(state => state.projectDetail.project._id)
-      // const user_ID = 'dev_1'
-      // body['user_ID'] = user_ID
-      const { data: project } = yield call(updateProject, {
-        body, projectId,
-        onJson: () => {
-          fetchData && this.props.fetchData()
-          this.props.dispatch({ type: 'project/hideModal' })
-          this.props.dispatch({ type: 'projectDetail/hideOverviewEditState' })
-        },
-      })
+    *update({ payload }, { call, put }) {
+      const { body, fetchData, projectId } = payload
+      const { data: project } = yield call(updateProject, { body, projectId })
+      yield fetchData && fetchData()
       yield put({ type: 'project/hideModal' })
-      yield put({ type: 'setProject', payload: project })
-      // yield put({ type: 'fetch', projectId })
+      yield put({
+        type: 'fetch',
+        projectId: project._id,
+        notStartLab: true,
+        projectType: project.type,
+      })
     },
     *setDoneStep({ payload }, { call, put, select }) {
       yield put({ type: 'setStep', payload })
@@ -390,10 +386,10 @@ export default {
       })
     },
 
-    * updateProjectIsAutoHelp({payload}, {call, put, select}) {
+    *updateProjectIsAutoHelp({ payload }, { call, put, select }) {
       const projectId = yield select(state => state.projectDetail.project._id)
-      const result = yield call(updateProject, {body: payload, projectId,})
-      }
+      const result = yield call(updateProject, { body: payload, projectId })
+    },
   },
   subscriptions: {
     // 当进入该页面获取project

@@ -18,7 +18,7 @@ import {
   Card,
   Tooltip,
 } from 'antd'
-
+import { routerRedux } from 'dva/router'
 // components
 import ProjectModal from '../../../../components/ProjectModal/index'
 import HelpModal from '../../../../components/HelpModal'
@@ -127,8 +127,9 @@ class CommentsList extends React.Component {
               <Row>
                 <Col span={2} style={{ margin: '20px 0', textAlign: 'center' }}>
                   <div style={{ height: '80px', width: '80px' }}>
-                    <img style={{ height: '80px', width: '80px',borderRadius:'40px'}}
-                         src={e.user_ID===this.props.login.user_ID?`/pyapi/user/avatar/${e.user_ID}.jpeg`:this.props.login.userAvatar} alt="avatar"/>
+                    <img style={{ height: '80px', width: '80px', borderRadius: '40px' }}
+                         src={e.user_ID === this.props.login.user_ID ? `/pyapi/user/avatar/${e.user_ID}.jpeg` : this.props.login.userAvatar}
+                         alt="avatar"/>
                   </div>
                 </Col>
                 <Col span={20} className={styles.commentCol}>
@@ -189,8 +190,8 @@ class CommentForm extends React.Component {
         <Row type="flex" justify="flex" align="top">
           <Col span={2} style={{ margin: '20px 0', textAlign: 'center' }}>
             <div style={{ height: '80px', width: '80px' }}>
-              <img style={{ height: '80px', width: '80px',borderRadius:'40px' }}
-              src={this.props.login.userAvatar}
+              <img style={{ height: '80px', width: '80px', borderRadius: '40px' }}
+                   src={this.props.login.userAvatar}
                    alt="avatar"/>
             </div>
           </Col>
@@ -234,6 +235,11 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
   const projectId = match.params.projectId
   const user_ID = localStorage.getItem('user_ID')
   const userObjId = localStorage.getItem('user_obj_id')
+
+
+  const url = new URL(window.location.href.replace('/#', ''))
+  const showTab = url.searchParams.get('tab')
+
   // const projectOwner = get(projectDetail, 'project.user')
   // const projectOwnerOrNot = (projectOwner === userObjId)
   const props1 = {
@@ -296,12 +302,12 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
     })
   }
 
-  const callback = (activeKey) => {
-    dispatch({
-      type: 'projectDetail/changeActiveTab',
-      activeTab: activeKey,
-    })
-  }
+  // const callback = (activeKey) => {
+  //   // dispatch({
+  //   //   type: 'projectDetail/changeActiveTab',
+  //   //   activeTab: activeKey,
+  //   // })
+  // }
 
   const cloudNote = () => {
     if(!market_use) {
@@ -494,20 +500,18 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
           )
         }
 
-        chooseColor(star_users,user,userObjId){
-          if(user===userObjId){
+        chooseColor(star_users, user, userObjId) {
+          if (user === userObjId) {
             return styles.gray
           }
-          else if(star_users.includes(userObjId))
-          {
+          else if (star_users.includes(userObjId)) {
             return styles.blue
           }
-          else{
+          else {
             return styles.lightBlue
           }
 
         }
-
 
         render() {
           return (
@@ -521,7 +525,7 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
                   <Col span={3} style={{ padding: '10px 42px' }}>
                     <div className={styles.bigIconNunberDiv}>
                       <div
-                        className={this.chooseColor(projectDetail.project.star_users,projectDetail.project.user,userObjId)}
+                        className={this.chooseColor(projectDetail.project.star_users, projectDetail.project.user, userObjId)}
                         style={market_use ? { cursor: 'pointer' } : { cursor: 'default' }}
                         onClick={market_use ? () => appStarFavor('star') : null}
                       >
@@ -533,7 +537,8 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
                           className={styles.number}>{projectDetail.project.star_users.length}</p>
                       </div>
                       <div
-                        className={this.chooseColor(projectDetail.project.favor_users,projectDetail.project.user,userObjId)}                        style={market_use ? { cursor: 'pointer' } : { cursor: 'default' }}
+                        className={this.chooseColor(projectDetail.project.favor_users, projectDetail.project.user, userObjId)}
+                        style={market_use ? { cursor: 'pointer' } : { cursor: 'default' }}
                         onClick={market_use ? () => appStarFavor('favor') : null}>
                         <p className={styles.icon}>
                           <Icon
@@ -623,9 +628,9 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
 
               </div>
               {/*content tabs*/}
-              <Tabs defaultActiveKey={projectDetail.activeTab}
-                    onChange={callback}
-                    activeKey={projectDetail.activeTab}
+              <Tabs defaultActiveKey={showTab}
+                    // onChange={callback}
+                    // activeKey={projectDetail.activeTab}
                     tabBarExtraContent={cloudNote()}
                     className={styles.jobs}>
                 <TabPane tab="Overview" key="1">
