@@ -241,10 +241,8 @@ class HelpButton extends React.Component {
               {dot}
             </div>
           )}>
-            <Step/>
-            <Step/>
-            <Step/>
-            <Step/>
+            {titleList.map((e, index)=><Step key={e} status={this.state.helpState===index?"finish": "wait"}/>)}
+            <Step status={"wait"}/>
           </Steps>
         </div>
       </div>
@@ -280,6 +278,10 @@ class HelpButton extends React.Component {
           size="small"
           onMouseEnter={this.handleOnClick}
           onMouseLeave={this.handleOnClick}
+          style={{
+            borderWidth: 0,
+            color: "#1890ff"
+          }}
           // onClick={this.handleOnClick}
         >
           hint
@@ -288,6 +290,10 @@ class HelpButton extends React.Component {
         <div>
           <Button size="small"
                   onClick={this.showModal}
+                  style={{
+                    borderWidth: 0,
+                    color: "#1890ff"
+                  }}
           >help</Button>
           <Modal
             // title="Basic Modal"
