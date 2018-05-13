@@ -220,15 +220,15 @@ class CommentForm extends React.Component {
 
 export function projectStatus(project) {
   if (!project.status) {
-    return <div/>
+    return <div key='1'/>
   }
   if (project.status === 'deploying') {
-    return <Tag color='gold' style={{ cursor: 'default', marginLeft: 10 }}>Deploying <Icon
+    return <Tag color='gold' style={{ cursor: 'default', marginLeft: 10 }} key='1'>Deploying <Icon
       type="loading"/></Tag>
   } else if (project.status === 'active') {
-    return <Tag color='green' style={{ cursor: 'default', marginLeft: 10 }}>Online</Tag>
+    return <Tag color='green' style={{ cursor: 'default', marginLeft: 10 }} key='1'>Online</Tag>
   } else {
-    return <Tag color='grey' style={{ cursor: 'default', marginLeft: 10 }}>Offline</Tag>
+    return <Tag color='grey' style={{ cursor: 'default', marginLeft: 10 }} key='1'>Offline</Tag>
   }
 }
 
