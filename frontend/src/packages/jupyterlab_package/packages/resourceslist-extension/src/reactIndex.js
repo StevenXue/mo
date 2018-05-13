@@ -148,7 +148,7 @@ export class ListPage extends React.Component {
       this.setState({
         projectId: response._id,
         project: response,
-        version: response.versions.slice(-1)[0],
+        version: response.versions.slice(-1)[0] || 'dev',
         func: func,
         args: func ? Object.values(response.args.input[func]) : undefined,
       })
@@ -408,7 +408,7 @@ export class ListPage extends React.Component {
                 })
                 hide()
                 message.success(`${this.pageTypeUC} deleted from notebook environment.`)
-              }
+              },
             }),
           })
         },
@@ -481,7 +481,7 @@ export class ListPage extends React.Component {
     if (project.category === 'model') {
       otherButtons = [<a onClick={() => this.clickProject(project, 'train')}>Train</a>,
         <a onClick={() => this.clickProject(project, 'predict')}>Predict</a>]
-    } else if (project.category === 'dataset') {
+    } else if (project.category === 'toolkit') {
       otherButtons = [<a onClick={() => this.clickProject(project, 'run')}>Run</a>]
     }
     return otherButtons
