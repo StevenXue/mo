@@ -10,10 +10,11 @@ const gitList = [gifNew, gifImport, gifDeploy]
 const titleList = ['1/3 创建项目', '2/3 使用module', '3/3 部署项目']
 
 import styles from './index.less'
-const Step = Steps.Step;
-import _ from 'lodash'
-const JOYRIDE = [
 
+const Step = Steps.Step
+import _ from 'lodash'
+
+const JOYRIDE = [
   {
     text: '新建文件',
     selector: 'button.jp-AddIcon.jp-MaterialIcon',
@@ -36,17 +37,17 @@ const JOYRIDE = [
 
   {
     text: '生成py文件',
-    selector: 'button.jp-PythonIcon',
+    selector: '.p-Widget.jp-NotebookPanel.jp-Document.jp-Activity.p-DockPanel-widget[class$=p-DockPanel-widget] button.jp-PythonIcon',
     position: 'bottom',
   },
   {
     text: '输出操作',
-    selector: 'select.jp-Notebook-toolbarCellTypeDropdown.jp-mod-styled#Insert',
+    selector: '.p-Widget.jp-NotebookPanel.jp-Document.jp-Activity.p-DockPanel-widget[class$=p-DockPanel-widget] select.jp-Notebook-toolbarCellTypeDropdown.jp-mod-styled#Insert',
     position: 'bottom',
   },
   {
     text: 'jupyter notebook 运行状态',
-    selector: 'div.jp-CircleIcon',
+    selector: '.p-Widget.jp-NotebookPanel.jp-Document.jp-Activity.p-DockPanel-widget[class$=p-DockPanel-widget] div.jp-CircleIcon',
     position: 'bottom-left',
     width: '140px',
   },
@@ -110,7 +111,6 @@ const convertAllSteps = () => {
           skip: {
             display: 'none',
           },
-
         },
       },
     ]
@@ -131,12 +131,12 @@ class HelpButton extends React.Component {
     visible: false,
 
     helpState: 0,
-    isNotebookLoaded: false
+    isNotebookLoaded: false,
   }
 
   componentDidMount() {
     window.addEventListener('trigger_tooltip', () => {
-      this.setState({isNotebookLoaded: true})
+      this.setState({ isNotebookLoaded: true })
       // console.log('触发了')
       // setTimeout(() => {
       //   // this.setState({ run: true })
@@ -146,20 +146,17 @@ class HelpButton extends React.Component {
       // }, 2000)
     }, false)
   }
-  componentWillReceiveProps(nextProps){
-    if(!this.props.projectDetail.project){
-      const AutoShowHelp = _.get(nextProps.projectDetail.project, "auto_show_help")
-      if (AutoShowHelp){
+
+  componentWillReceiveProps(nextProps) {
+    if (!this.props.projectDetail.project) {
+      const AutoShowHelp = _.get(nextProps.projectDetail.project, 'auto_show_help')
+      if (AutoShowHelp) {
         this.setState({
-          visible: true
+          visible: true,
         })
       }
-
     }
-
-
   }
-
 
   showModal = () => {
     this.setState({
@@ -177,15 +174,11 @@ class HelpButton extends React.Component {
     this.setState({
       visible: false,
     })
-
-    // const project = this.props.projectDetail.project
-    // project.auto_show_help = false
-    // console.log("cancel", project)
     this.props.dispatch({
       type: 'projectDetail/updateProjectIsAutoHelp',
       payload: {
-        auto_show_help: false
-      }
+        auto_show_help: false,
+      },
     })
 
   }
@@ -243,15 +236,15 @@ class HelpButton extends React.Component {
         </div>
         {/*底部*/}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Steps current={this.state.helpState+1} progressDot={(dot, { status, index }) => (
+          <Steps current={this.state.helpState + 1} progressDot={(dot, { status, index }) => (
             <div>
               {dot}
             </div>
           )}>
-            <Step />
-            <Step />
-            <Step />
-            <Step />
+            <Step/>
+            <Step/>
+            <Step/>
+            <Step/>
           </Steps>
         </div>
       </div>
@@ -261,7 +254,7 @@ class HelpButton extends React.Component {
 
   render() {
     return <div className={styles.notebook_joyride}
-                style={this.state.isNotebookLoaded?null:{display: "none"}}
+                style={this.state.isNotebookLoaded ? null : { display: 'none' }}
     >
       {
         JOYRIDE.map((ele, index) => {
@@ -277,9 +270,6 @@ class HelpButton extends React.Component {
                 showOverlay={false}
                 holePadding={0}
                 scrollToSteps={false}
-                // locale={{
-                //   close: null,
-                // }}
               />
             )
           },
@@ -311,16 +301,14 @@ class HelpButton extends React.Component {
               justifyContent: 'center',
               alignItems: 'center',
             }}
-
           >
             {this.renderHelp()}
           </Modal>
         </div>
-
-
       </div>
     </div>
   }
 }
+
 export default connect(({ projectDetail }) => ({ projectDetail }))(HelpButton)
 
