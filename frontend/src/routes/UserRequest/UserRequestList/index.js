@@ -203,10 +203,10 @@ class RequestList extends Component {
                            onClick={() => this.toUserProfile(e.user_ID, history)}>{e.user_ID} &nbsp;&nbsp;</p>
                         {e['tags'].length > 0 && <Icon type="tags" className={styles.otherIcon}/>}
                         {e['tags'].length > 0 &&
-                        <p key={e}>{e['tags'].join(',')}</p>}
+                        <p key={e} style={{marginBottom:'0'}}>{e['tags'].join(',')}</p>}
                         <Icon type="clock-circle-o"
                               className={styles.otherIcon}/>
-                        <p>{showTime(e.create_time)}</p>
+                        <p style={{marginBottom:'0'}}>{showTime(e.create_time)}</p>
                       </div>
                     </div>
                   </Col>
