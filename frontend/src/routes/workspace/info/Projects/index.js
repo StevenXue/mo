@@ -264,7 +264,7 @@ class ProjectList extends Component {
           </div> : null
         } */}
         {
-          parseInt(totalNumber / pageSize) > 1 ?
+          totalNumber / pageSize > 1 ?
             <div className={styles.pagination}>
               <Pagination
                 showSizeChanger
