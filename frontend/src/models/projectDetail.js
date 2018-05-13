@@ -42,6 +42,7 @@ export default {
     activeTab: '1',
     pageNo: 1,
     pageSize: 10,
+    resultLoading:false
   },
   reducers: {
     changeActiveTab(state, { activeTab }) {
@@ -168,6 +169,14 @@ export default {
         totalNumber,
       }
     },
+
+    setResultLoading(state,{resultLoading}){
+      return {
+        ...state,
+        resultLoading
+      }
+    },
+
     setExampleResult(state, action) {
       let output = state.project.args.output
       for (let key in action.payload) {
@@ -378,11 +387,19 @@ export default {
     },
 
     *getExampleResult(action, { call, put, select }) {
+      yield put({
+        type: 'setResultLoading',
+        resultLoading:false,
+      })
       let payload = action.payload
       const { data: result } = yield call(AppService.runApi, payload)
       yield put({
         type: 'setExampleResult',
         payload: result,
+      })
+      yield put({
+        type: 'setResultLoading',
+        resultLoading:true,
       })
     },
 

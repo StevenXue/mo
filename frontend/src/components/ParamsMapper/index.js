@@ -343,7 +343,7 @@ function ParamsMapper({
         })
       }
       <FormItem wrapperCol={{ span: 6, offset: 5 }}>
-        <Button
+        <Button loading={this.props.projectDetail}
           type="primary" htmlType="submit">Submit</Button>
       </FormItem>
     </Form>

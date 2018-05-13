@@ -104,6 +104,7 @@ class ProjectExample extends React.Component {
                               appId={this.props.projectDetail.project._id}
                               dispatch={this.props.dispatch}
                               version={version_}
+                              resultLoading={this.props.projectDetail.resultLoading}
                 />
                 {/*<div >*/}
                 {/*<Button*/}
