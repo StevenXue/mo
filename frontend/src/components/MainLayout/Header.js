@@ -140,6 +140,8 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
       case 'publish':
       case 'deploy_request':
       case 'publish_request':
+      case 'deploy_fail':
+      case 'publish_fail':
         toProject(e)
         break
       case 'job_success':
