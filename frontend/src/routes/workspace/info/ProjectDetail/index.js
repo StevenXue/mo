@@ -237,9 +237,8 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
   const user_ID = localStorage.getItem('user_ID')
   const userObjId = localStorage.getItem('user_obj_id')
 
-
   const url = new URL(window.location.href.replace('/#', ''))
-  const showTab = url.searchParams.get('tab')
+  // let showTab = url.searchParams.get('tab')
 
   // const projectOwner = get(projectDetail, 'project.user')
   // const projectOwnerOrNot = (projectOwner === userObjId)
@@ -303,12 +302,12 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
     })
   }
 
-  // const callback = (activeKey) => {
-  //   // dispatch({
-  //   //   type: 'projectDetail/changeActiveTab',
-  //   //   activeTab: activeKey,
-  //   // })
-  // }
+  const callback = (activeKey) => {
+    dispatch({
+      type: 'projectDetail/changeActiveTab',
+      activeTab: activeKey,
+    })
+  }
 
   const cloudNote = () => {
     if (!market_use) {
@@ -600,28 +599,6 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
                                key={e}>{e}</Tag>)
                         : null}
                     </div>
-
-                    {/* <div style={{paddingBottom: '50px'}}>
-                    <span>
-                      {!market_use && <span className={styles.generalSpan}>
-                      <Upload {...props1}>
-                        <Button className="qing">
-                          <Icon type="upload"/> Click to Upload
-                        </Button>
-                      </Upload>
-                      </span>}
-                      <span className={styles.enterNotebook}>
-                        <Button type="primary"
-                                className="zi"
-                                onClick={() => {
-                                  // history.push(`/workspace/${match.params.projectId}/${projectDetail.project.type}`)
-                                  window.open(`/#/workspace/${projectId}/${projectDetail.project.type}`)
-                                }}>
-                          Notebook 1->
-                        </Button>
-                      </span>
-                    </span>
-                    </div> */}
                   </Col>
                 </Row>
 
@@ -629,11 +606,12 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
 
               </div>
               {/*content tabs*/}
-              <Tabs defaultActiveKey={showTab}
-                    // onChange={callback}
-                    // activeKey={projectDetail.activeTab}
-                    tabBarExtraContent={cloudNote()}
-                    className={styles.jobs}>
+              <Tabs
+                // defaultActiveKey={showTab || projectDetail.activeTab}
+                onChange={callback}
+                activeKey={projectDetail.activeTab}
+                tabBarExtraContent={cloudNote()}
+                className={styles.jobs}>
                 <TabPane tab="Overview" key="1">
                   <div className={styles.reactMdeEditorDiv}>
                     {/*{!projectDetail.overviewEditState?<ReactMarkdown source={projectDetail.project.overview}/>:null}*/}
