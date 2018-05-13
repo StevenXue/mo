@@ -94,6 +94,12 @@ export default {
         sessions,
       }
     },
+    setActiveTab(state, { payload: activeTab }) {
+      return {
+        ...state,
+        activeTab,
+      }
+    },
     setJobs(state, { payload: jobs }) {
       return {
         ...state,
@@ -194,9 +200,9 @@ export default {
     },
   },
   effects: {
-    *refresh({ projectId, notStartLab, projectType, version }, { call, put }) {
+    *refresh({ projectId, notStartLab, projectType, version, activeTab}, { call, put }) {
       yield put({ type: 'clearProject' })
-      yield put({ type: 'fetch', projectId, projectType, version })
+      yield put({ type: 'fetch', projectId, projectType, version, activeTab })
       yield put({ type: 'fetchComments', projectId })
     },
 
@@ -221,7 +227,9 @@ export default {
     },
 
     // 获取该 project
-    *fetch({ projectId, notStartLab, projectType, version }, { call, put, select }) {
+    *fetch({ projectId, notStartLab, projectType, version, activeTab }, { call, put, select }) {
+      yield activeTab && put({ type: 'setActiveTab', payload: activeTab })
+
       const fetchMapper = {
         app: fetchApp,
         module: fetchModule,
@@ -399,10 +407,10 @@ export default {
         const match2 = pathToRegexp('/explore/:projectId/:type?').exec(pathname)
         const url = new URL(location.href.replace('/#', ''))
         if (match) {
-          console.log('ppp', pathname)
           const projectId = match[1]
           const projectType = url.searchParams.get('type') || match[2]
-          dispatch({ type: 'refresh', projectId, projectType })
+          const activeTab = url.searchParams.get('tab')
+          dispatch({ type: 'refresh', projectId, projectType, activeTab })
 
           // dispatch({ type: 'fetchJobs', projectId: projectId })
         } else if (match2) {

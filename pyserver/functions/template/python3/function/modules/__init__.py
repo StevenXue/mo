@@ -7,8 +7,8 @@ from importlib import import_module
 
 import requests
 
-SERVER = 'http://host.docker.internal:8989/pyapi'
-# SERVER = 'http://172.17.0.1:8899/pyapi'
+# SERVER = 'http://host.docker.internal:8989/pyapi'
+SERVER = 'http://172.17.0.1:8899/pyapi'
 
 
 class RedirectPrints:
@@ -62,7 +62,7 @@ def module_general(module_id, action, *args, **kwargs):
     [user_ID, module_name, version] = module_id.split('/')
     version = '_'.join(version.split('.'))
     main_module = import_module(
-        f'modules.{user_ID}.{module_name}.{version}.src.main')
+        f'function.modules.{user_ID}.{module_name}.{version}.src.main')
     cls = getattr(main_module, module_name)()
     return getattr(cls, action)(*args, **kwargs)
 
@@ -110,11 +110,11 @@ class Client:
                              json={'log_type': 'exception',
                                    'message': exc})
                 raise e
-
-        # log end
-        requests.put(f'{SERVER}/jobs/{job_id}/success').json()
-        # print('finish run', job)
-        return ret
+            else:
+                # log end
+                requests.put(f'{SERVER}/jobs/{job_id}/success').json()
+                # print('finish run', job)
+                return ret
 
     def run_module_general(self, action, module_id, *args, with_control=False,
                            **kwargs):
@@ -129,7 +129,7 @@ class Client:
             with HiddenPrints():
                 return module_general(module_id, action, *args, **kwargs)
         else:
-            return module_general(module_id, 'action', *args, **kwargs)
+            return module_general(module_id, action, *args, **kwargs)
 
     def run(self, module_id, *args, with_control=False, **kwargs):
         return self.run_module_general('run', module_id, *args,

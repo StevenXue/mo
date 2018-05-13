@@ -293,9 +293,8 @@ export class ListPage extends React.Component {
           Version:&nbsp;&nbsp;
           <Select defaultValue={this.state.version} style={{ width: 120 }}
                   onChange={(value) => this.handleVersionChange(value)}>
-            {this.state.project.versions.length > 0?this.state.project.versions.map(version =>
-              <Option key={version} value={version}>{version}</Option>):
-              <Option key={'dev'} value={'dev'}>{'dev'}</Option>}
+            {this.state.project.versions.map(version =>
+              <Option key={version} value={version}>{version}</Option>)}
           </Select>
         </div>
         <div style={{ height: 'auto', overflowY: 'auto' }}>
