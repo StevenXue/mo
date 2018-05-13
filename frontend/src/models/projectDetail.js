@@ -41,7 +41,7 @@ export default {
     activeTab: '1',
     pageNo: 1,
     pageSize: 10,
-    resultLoading:false
+    resultLoading: false,
   },
   reducers: {
     changeActiveTab(state, { activeTab }) {
@@ -157,6 +157,7 @@ export default {
         ...state,
         project: undefined,
         activeTab: '1',
+        resultLoading: false,
       }
     },
 
@@ -176,10 +177,10 @@ export default {
       }
     },
 
-    setResultLoading(state,{resultLoading}){
+    setResultLoading(state, { resultLoading }) {
       return {
         ...state,
-        resultLoading
+        resultLoading,
       }
     },
 
@@ -399,7 +400,7 @@ export default {
     *getExampleResult(action, { call, put, select }) {
       yield put({
         type: 'setResultLoading',
-        resultLoading:false,
+        resultLoading: false,
       })
       let payload = action.payload
       const { data: result } = yield call(AppService.runApi, payload)
@@ -409,7 +410,7 @@ export default {
       })
       yield put({
         type: 'setResultLoading',
-        resultLoading:true,
+        resultLoading: true,
       })
     },
 
