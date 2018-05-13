@@ -148,7 +148,7 @@ export class ListPage extends React.Component {
       this.setState({
         projectId: response._id,
         project: response,
-        version: response.versions.slice(-1)[0],
+        version: response.versions.slice(-1)[0] || 'dev',
         func: func,
         args: func ? Object.values(response.args.input[func]) : undefined,
       })
@@ -293,8 +293,9 @@ export class ListPage extends React.Component {
           Version:&nbsp;&nbsp;
           <Select defaultValue={this.state.version} style={{ width: 120 }}
                   onChange={(value) => this.handleVersionChange(value)}>
-            {this.state.project.versions.map(version =>
-              <Option key={version} value={version}>{version}</Option>)}
+            {this.state.project.versions.length > 0?this.state.project.versions.map(version =>
+              <Option key={version} value={version}>{version}</Option>):
+              <Option key={'dev'} value={'dev'}>{'dev'}</Option>}
           </Select>
         </div>
         <div style={{ height: 'auto', overflowY: 'auto' }}>
@@ -408,7 +409,7 @@ export class ListPage extends React.Component {
                 })
                 hide()
                 message.success(`${this.pageTypeUC} deleted from notebook environment.`)
-              }
+              },
             }),
           })
         },
@@ -481,7 +482,7 @@ export class ListPage extends React.Component {
     if (project.category === 'model') {
       otherButtons = [<a onClick={() => this.clickProject(project, 'train')}>Train</a>,
         <a onClick={() => this.clickProject(project, 'predict')}>Predict</a>]
-    } else if (project.category === 'dataset') {
+    } else if (project.category === 'toolkit') {
       otherButtons = [<a onClick={() => this.clickProject(project, 'run')}>Run</a>]
     }
     return otherButtons
