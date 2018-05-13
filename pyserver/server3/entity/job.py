@@ -24,7 +24,7 @@ from mongoengine import NULLIFY
 
 
 class Log(EmbeddedDocument):
-    log_type = StringField(choices=('stdout', 'stderr'))
+    log_type = StringField(choices=('stdout', 'stderr', 'exception'))
     message = StringField()
     timestamp = DateTimeField()
 

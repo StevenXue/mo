@@ -25,8 +25,8 @@ export function getProjects({ filter, onJson }) {
   return request(path.join(CORS, PREFIX) + `?${params}`, undefined, { onJson })
 }
 
-export function countProjects({user_ID}){
-   return request(path.join(CORS, PREFIX) + `/count?user_ID=${user_ID}`)
+export function countProjects({ user_ID }) {
+  return request(path.join(CORS, PREFIX) + `/count?user_ID=${user_ID}`)
 }
 
 // 获取用户所有 projects
@@ -73,6 +73,8 @@ export function createProject({ body, onJson }) {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     },
     body: JSON.stringify(body),
+    customErrorMsg: true,
+    noErrorMsg: true,
   }, { onJson })
 }
 
@@ -88,7 +90,7 @@ export function updateProject({ body, projectId, onJson }) {
 }
 
 // 删除 project
-export function deleteProject({projectId}) {
+export function deleteProject({ projectId }) {
   const user_ID = localStorage.getItem('user_ID')
   return request(`${CORS}${projects}/${projectId}?user_ID=${user_ID}`, {
     method: 'delete',
@@ -116,9 +118,8 @@ export function getHotTag(prjID) {
   })
 }
 
-
-export function getHotTagOfProject({payload, onJson}) {
-  const searchQuery=payload.searchQuery
-  const projectType=payload.objectType
-  return request(`${CORS}/project/get_hot_tag?search_query=${searchQuery}&project_type=${projectType}`, undefined, {onJson})
+export function getHotTagOfProject({ payload, onJson }) {
+  const searchQuery = payload.searchQuery
+  const projectType = payload.objectType
+  return request(`${CORS}/project/get_hot_tag?search_query=${searchQuery}&project_type=${projectType}`, undefined, { onJson })
 }

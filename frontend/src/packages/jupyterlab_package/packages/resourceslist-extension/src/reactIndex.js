@@ -3,8 +3,8 @@ import { Card, Button, Row, Col, Input, Icon, Pagination, Select, message, List,
 import * as pathToRegexp from 'path-to-regexp'
 import ReactMde from 'react-mde'
 // const {ReactMdeTypes, ReactMdeCommands} = ReactMde
-import Floater from 'react-floater';
-import Joyride from 'react-joyride';
+import Floater from 'react-floater'
+import Joyride from 'react-joyride'
 
 import {
   VDomRenderer,
@@ -21,7 +21,15 @@ import {
 import ParamsMapper from './ParamsMapper'
 import CopyInput from './CopyInput'
 
-import { addModuleToApp, getProject, getProjects, getApp, getFavs, getAppActionEntity } from './services'
+import {
+  addModuleToApp,
+  getProject,
+  getProjects,
+  getApp,
+  getFavs,
+  getAppActionEntity,
+  removeUsedEntityInApp,
+} from './services'
 
 const Option = Select.Option
 import 'antd/lib/list/style/css'
@@ -51,8 +59,7 @@ export class ListPage extends React.Component {
 
       totalUsedNumber: 0,
 
-      steps: []
-
+      steps: [],
 
     }
     this.pageType = this.props.pageType
@@ -67,9 +74,8 @@ export class ListPage extends React.Component {
   }
 
   componentDidMount() {
-    let event = new Event('trigger_tooltip');
-    window.dispatchEvent(event);
-
+    let event = new Event('trigger_tooltip')
+    window.dispatchEvent(event)
 
     this.fetchData({})
 
@@ -124,7 +130,7 @@ export class ListPage extends React.Component {
         appId: this.appId,
         actionEntity: `used_${this.pageType}s`,
         onJson: ({ objects, count }) => {
-          console.log("objects", objects)
+          console.log('objects', objects)
           this.setState({
             usedProjects: objects,
             totalUsedNumber: count,
@@ -205,20 +211,27 @@ export class ListPage extends React.Component {
     )
 
     if (this.appId) {
-      const hide = message.loading('Importing..', 0);
+      const hide = message.loading('Importing..', 0)
       addModuleToApp({
         appId: this.appId,
         moduleId: this.state.projectId,
         func: this.state.func,
         version: this.state.version,
         onJson: (app) => {
-          this.setState({
-            app,
-            projectId: undefined,
-            project: undefined,
-            func: undefined,
-            args: undefined,
-            showUsedModules: true,
+          getAppActionEntity({
+            //page_no: page,
+            appId: this.appId,
+            actionEntity: [`used_${this.pageType}s`],
+            onJson: ({ objects, count }) => this.setState({
+              app,
+              projectId: undefined,
+              project: undefined,
+              func: undefined,
+              args: undefined,
+              showUsedModules: true,
+              usedProjects: objects,
+              totalUsedNumber: count,
+            }),
           })
           hide()
           message.success('Import success!')
@@ -306,12 +319,20 @@ export class ListPage extends React.Component {
             <CopyInput text={project.path.replace('./user_directory', '../dataset')}
                        datasetId={this.state.projectId}
                        appId={this.appId}
-                       setApp={(app) => this.setState({
-                         app,
-                         projectId: undefined,
-                         project: undefined,
-                         showUsedDatasets: true,
-                       })}
+                       setApp={(app) =>
+                         getAppActionEntity({
+                           //page_no: page,
+                           appId: this.appId,
+                           actionEntity: [`used_${this.pageType}s`],
+                           onJson: ({ objects, count }) => this.setState({
+                             app,
+                             projectId: undefined,
+                             project: undefined,
+                             showUsedDatasets: true,
+                             usedProjects: objects,
+                             totalUsedNumber: count,
+                           }),
+                         })}
             />
           </div>]
       } else {
@@ -357,24 +378,42 @@ export class ListPage extends React.Component {
   }
 
   renderUsedProjects() {
-    // const onRemoveModule = (module, version) => {
-    //     confirm({
-    //         title: 'Are you sure to remove this module from project?',
-    //         okText: 'Yes',
-    //         okType: 'danger',
-    //         cancelText: 'No',
-    //         onOk: () => {
-    //             removeModuleInApp({
-    //                 appId: this.appId,
-    //                 moduleId: module._id,
-    //                 version,
-    //                 onJson: (app) => this.setState({
-    //                     app,
-    //                 }),
-    //             })
-    //         },
-    //     })
-    // };
+    const onRemove = (usedProject, version) => {
+
+      confirm({
+        title: `Are you sure to remove this ${this.pageType} from project?`,
+        okText: 'Yes',
+        okType: 'danger',
+        cancelText: 'No',
+        onOk: () => {
+          const hide = message.loading('Deleting...', 0)
+          removeUsedEntityInApp({
+            pageType: this.pageType,
+            appId: this.appId,
+            entityId: usedProject._id,
+            version,
+            onJson: (app) => getAppActionEntity({
+              appId: this.appId,
+              actionEntity: [`used_${this.pageType}s`],
+              onJson: ({ objects, count }) => {
+                this.setState({
+                  app,
+                  projectId: undefined,
+                  project: undefined,
+                  func: undefined,
+                  args: undefined,
+                  [`showUsed${this.pageTypeUC}s`]: true,
+                  usedProjects: objects,
+                  totalUsedNumber: count,
+                })
+                hide()
+                message.success(`${this.pageTypeUC} deleted from notebook environment.`)
+              }
+            }),
+          })
+        },
+      })
+    }
 
     return (
       // list
@@ -400,12 +439,14 @@ export class ListPage extends React.Component {
                 actions={[<a
                   onClick={() =>
                     this.clickProject(project[this.pageType])}>Detail</a>].concat(this.getOtherButtons(project[this.pageType]))}
+                extra={<Icon style={{ cursor: 'pointer' }} type='close'
+                             onClick={() => onRemove(project[this.pageType], project.version)}/>}
               >
                 <List.Item.Meta
                   title={
                     <span>
                       {project[this.pageType].name}&nbsp;&nbsp;
-                      {this.pageType === 'module' &&
+                      {project.version &&
                       <span>v{project.version}</span>}
                     </span>}
                   description={project[this.pageType].description}
@@ -545,7 +586,7 @@ export class ListPage extends React.Component {
     </div>
   }
 
-  renderInner (){
+  renderInner() {
     if (this.state.projectId !== undefined) {
       if (this.state.func) {
         // params

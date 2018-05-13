@@ -209,7 +209,6 @@ class App extends Component {
                 <p>蓦的网页端不仅仅是一个实用的开发工具，除了预测模型和模型组件的训练、监控与部署，更是开发者们交流讨论的平台。</p>
                 <p>在需求版块您也可以分享自己的研究成果或者解决不了的技术难题。我们还提供世界频道的小功能，可以和网站的在线用户进行实时交流。</p>
               </div>
-              <Button type="primary" style={{ width: 200, height: 48 }}>客户端下载</Button>
             </Col>
           </Row>
           <Row className={styles.Row_3}>  {/* check */}

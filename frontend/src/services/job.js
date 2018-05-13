@@ -36,6 +36,14 @@ export function deleteSession(payload) {
   })
 }
 
+
+export function terminateJob(payload) {
+  const { jobId } = payload
+  return request(`/pyapi${PREFIX}/${jobId}/terminate`, {
+    method: 'put',
+  })
+}
+
 export function deleteTerminal(payload) {
   const { hubUserName, hubToken, terminalName } = payload
   return request(`/hub_api/user/${hubUserName}/api/terminals/${terminalName}?${(new Date()).getTime()}`, {

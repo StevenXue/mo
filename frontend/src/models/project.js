@@ -2,7 +2,8 @@ import { routerRedux } from 'dva/router'
 import { tokenLogin } from '../services/login'
 import { fetchProjects, createProject, deleteProject, updateProject, getProjects } from '../services/project'
 import { privacyChoices } from '../constants'
-import * as commentsService from "../services/comments"
+import * as commentsService from '../services/comments'
+import { message } from 'antd/lib/index'
 
 export default {
   namespace: 'project',
@@ -103,17 +104,38 @@ export default {
       yield put({ type: 'setProjectsLoading', payload: false })
     },
 
-    *push({id, route}, { call, put, select, take }) {
+    *push({ id, route }, { call, put, select, take }) {
       yield put({ type: 'projectDetail/setProject', payload: undefined })
       yield put(routerRedux.push(`/${route}/${id}`))
     },
 
-    *create({ body }, { call, put, select }) {
-      // const user_ID = 'dev_1'
-      // body['user_ID'] = yield select(state => state.login.user.user_ID)
-      yield call(createProject, { body })
-      yield put({ type: 'hideModal' })
-      yield put({ type: 'fetch', privacy: 'all' })
+    *create({ payload }, { call, put, select }) {
+      const { body, newAnswer, fetchData, handleCreate } = payload
+      const hide = message.loading('Project Creating...', 0)
+      const { data: project, noError } = yield call(createProject, { body })
+      if (project && noError) {
+        yield fetchData && fetchData()
+        yield put({ type: 'hideModal' })
+        if (newAnswer) {
+          yield handleCreate([project])
+        } else {
+          yield put(routerRedux.push('/workspace/' + project._id + `?type=${project.type}`))
+        }
+      }
+      hide()
+      // createProject({
+      //   body,
+      //   onJson: (response) => {
+      //     this.props.fetchData && this.props.fetchData()
+      //     this.props.dispatch({ type: 'project/hideModal' })
+      //     if (this.props.newAnswer) {
+      //       this.props.handleCreate([response])
+      //     } else {
+      //       this.props.dispatch(routerRedux.push('/workspace/' + response._id + `?type=${this.props.type}`))
+      //     }
+      //     hide()
+      //   },
+      // })
     },
   },
   subscriptions: {

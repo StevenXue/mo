@@ -144,12 +144,14 @@ class ProjectExample extends React.Component {
               <div>
                 <div>
                   <p>
-                    Error
+                    ERROR
                   </p>
                 </div>
                 <div>
                   <Alert message={<div
-                    style={{ whiteSpace: 'pre-line' }}>{this.props.projectDetail.project.args.output.errors}</div>}
+                    style={{ whiteSpace: 'pre-line' }}>
+                    {this.props.projectDetail.project.args.output.errors
+                    || 'No error log, please check your app code'}</div>}
                          type="error" showIcon/>
                 </div>
               </div>
