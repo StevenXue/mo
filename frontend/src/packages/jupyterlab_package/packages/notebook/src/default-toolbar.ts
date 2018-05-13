@@ -214,6 +214,19 @@ export namespace ToolbarItems {
     return new ToolbarButton({
       className: TOOLBAR_PYTHON_CLASS,
       onClick: () => {
+        // 保存
+        if (panel.context.model.readOnly) {
+          return showDialog({
+            title: 'Cannot Save',
+            body: 'Document is read-only',
+            buttons: [Dialog.okButton()],
+          });
+        }
+        panel.context.save().then(() => {
+          if (!panel.isDisposed) {
+            return panel.context.createCheckpoint();
+          }
+        });
         const notebookPath = URLExt.encodeParts(panel.context.path);
         console.log(notebookPath, panel);
         const hash = window.location.hash;

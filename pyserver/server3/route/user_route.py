@@ -68,6 +68,7 @@ def register():
     data = request.get_json()
     user_ID = data['user_ID']
     password = data['password']
+    email = data['email']
     code = data.pop('code')
     captcha = data.pop("captcha")
     phone = data.pop('phone')
@@ -75,12 +76,29 @@ def register():
     data.pop('password')
     if user_ID is None or password is None or code is None:
         return jsonify({'response': 'invalid user or password'}), 400
+    # 检查user_ID phone email 是否被占用
+    if UserBusiness.check_exist({'user_ID': user_ID}):
+        return jsonify({"response": {
+            "error": "this user_ID has been used,please try an other one"}}), 400
+    if UserBusiness.check_exist({'phone': phone}):
+        return jsonify({"response": {
+            "error": "this phone number has been used,please try an other one"}}), 400
+    if UserBusiness.check_exist({'email': email}):
+        return jsonify({"response": {
+            "error": "this email has been used,please try an other one"}}), 400
+    # 检查 captcha
+    try:
+        res = user_service.verify_code(code=captcha, phone=phone)
+    except Error:
+        return jsonify({
+            "response": {'error': "验证码错误"}
+        }), 400
+    # 建立用户并创建tutorial project
     try:
         added_user = user_service.register(user_ID, password, phone, code,
                                            **data)
         added_user = json_utility.convert_to_json(added_user.to_mongo())
         added_user.pop('password')
-
         # 为新用户创建tutorial project
         from server3.service.project_service import ProjectService
         from server3.service.app_service import AppService
@@ -89,10 +107,8 @@ def register():
             user_ID=added_user["user_ID"],
             user_token=user_token
         )
-
         return jsonify({'response': added_user}), 200
     except Error as e:
-        print("e.args[0]", e.args[0])
         return jsonify({
             "response": {"error": e.args[0]}
         }), 400
@@ -148,11 +164,13 @@ def reset_password():
 def login():
     user_ID = request.json.get('user_ID', None)
     password = request.json.get('password', None)
+
+    if not UserBusiness.check_exist({'user_ID': user_ID}):
+        return jsonify({"response": "This user_ID is not registered, please input the right user_ID"}), 400
     try:
         user = user_service.authenticate(user_ID, password)
         if not user:
-            return jsonify({'response': 'Bad username or password'}), 400
-
+            return jsonify({'response': 'Wrong password'}), 400
         user_obj = json_utility.convert_to_json(user.to_mongo())
         user_obj.pop('password')
         if hasattr(user, "avatar"):
@@ -160,7 +178,6 @@ def login():
     except DoesNotExist as e:
         return jsonify({'response': '%s: %s' % (str(
             DoesNotExist), e.args)}), 400
-
     # Identity can be any data that is json serializable
     response = {
         'response': {'token': create_access_token(identity=user.user_ID),
@@ -201,6 +218,7 @@ def newpassword():
     response = {'response': 'ok'}
     return jsonify(response), 200
 
+
 @user_app.route('/haveReset', methods=['GET'])
 def haveReset():
     email = request.args.get('email', None)
@@ -214,7 +232,8 @@ def haveReset():
     if not user:
         return jsonify({'response': 'Bad email'}), 400
     # Identity can be any data that is json serializable
-    response = {'response': {'token': create_access_token(identity=user.user_ID)}}
+    response = {
+        'response': {'token': create_access_token(identity=user.user_ID)}}
     return jsonify(response), 200
 
 
@@ -297,6 +316,11 @@ def login_with_phone():
     phone = data.pop("phone")
     # message_id = data.pop("message_id")
     code = data.pop("code")
+    if not UserBusiness.check_exist({'phone': phone}):
+        return jsonify({"response": {
+            "error": "This phone number is not registered, "
+                     "please input the right phone number"}}), 400
+
     try:
         result = user_service.verify_code(code=code, phone=phone)
         if result:
@@ -306,10 +330,9 @@ def login_with_phone():
                 'user': json_utility.convert_to_json(user.to_mongo())}}
             return jsonify(response), 200
     except Error as e:
-        print("e.args[0]", e.args[0])
         return jsonify({
             "response": {
-                "error": e.args[0]
+                "error": 'Please enter correct verify code'
             }
         }), 400
 
@@ -517,7 +540,8 @@ def get_statistics():
         _object.app_obj_user_ID = _object.app.user.user_ID
     return jsonify({
         'response': {
-            "objects": json_utility.objs_to_json_with_args(statistics.objects, ["app", "caller"]),
+            "objects": json_utility.objs_to_json_with_args(statistics.objects,
+                                                           ["app", "caller"]),
             "page_size": statistics.page_size,
             "page_no": statistics.page_no,
             "count": statistics.count,
@@ -581,7 +605,7 @@ def update_user_account():
         # 验证邮箱 验证码
         if UserBusiness.get_by_email(email):
             return jsonify({
-                "response": {'error':  "邮箱已被注册，请更换邮箱"}
+                "response": {'error': "邮箱已被注册，请更换邮箱"}
             }), 400
         try:
             user = UserService.update_user_email(user_ID, email, captcha)
@@ -590,7 +614,7 @@ def update_user_account():
             }}), 200
         except Error as e:
             return jsonify({
-                "response":  {'error':e.args[0]}
+                "response": {'error': e.args[0]}
             }), 400
     elif password:
         UserBusiness.update_password(user_ID, password)
@@ -604,6 +628,7 @@ def update_user_avatar(filename):
     if os.path.isfile(f'../user_avatar/{filename}'):
         return send_from_directory('../user_avatar', filename)
     else:
-        hash_value = int(hashlib.md5(filename.encode('utf-8')).hexdigest()[:8], 16)
-        filename = str(hash_value % 6)+'.jpg'
+        hash_value = int(hashlib.md5(filename.encode('utf-8')).hexdigest()[:8],
+                         16)
+        filename = str(hash_value % 6) + '.jpg'
         return send_from_directory('../user_avatar', filename)

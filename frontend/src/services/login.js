@@ -27,6 +27,7 @@ export function loginWithPhone(payload) {
       phone: payload.phone,
       code: payload.code
     }),
+    noErrorMsg: true,
   })
 }
 

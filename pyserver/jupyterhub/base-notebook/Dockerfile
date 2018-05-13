@@ -267,6 +267,15 @@ RUN echo 'export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3.6' >> ~/.bashrc
 RUN echo 'export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv' >> ~/.bashrc
 RUN echo 'source /usr/local/bin/virtualenvwrapper.sh' >> ~/.bashrc
 
+USER root
+
+RUN apt-get update && apt-get install -yq graphviz tzdata
+RUN ln -sf /usr/share/zoneinfo/Etc/UTC  /etc/localtime
+RUN echo "Asia/Shanghai" > /etc/timezone
+RUN dpkg-reconfigure -f noninteractive tzdata
+RUN echo -e "`/sbin/ip route|awk '/default/ { print $3 }'`\thost.docker.internal" | tee -a /etc/hosts > /dev/null
+#RUN echo '172.17.0.1    host.docker.internal' >> /etc/hosts
+
 #RUN /bin/bash -c "export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3.6"
 #RUN /bin/bash -c "export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv"
 #RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh"

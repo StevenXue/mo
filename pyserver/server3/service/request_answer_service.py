@@ -212,8 +212,8 @@ class RequestAnswerService:
             #  新建通知消息
             admin_user = UserBusiness.get_by_user_ID('admin')
 
-            receivers = [user_request.user.id]
-            receivers += [el for el in user_request.star_user]
+            # receivers = [user_request.user.id]
+            receivers = [el for el in user_request.star_user]
 
             if MessageService.create_message(
                     sender=admin_user,

@@ -92,7 +92,7 @@ class Login extends Component {
         console.log('values', values)
         if (!err) {
           this.props.dispatch({
-            type: `login/loginWithPhone`,
+            type: `login/login`,
             payload: {
               phone: values.phone,
               code: values.captcha,
