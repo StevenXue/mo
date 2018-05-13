@@ -623,8 +623,19 @@ def update_user_account():
     return jsonify({'response': 'ok'}), 200
 
 
+# 用户更改头像
+@user_app.route('/avatar', methods=['POST'])
+@jwt_required
+def update_user_avatar():
+    user_ID = get_jwt_identity()
+    data = request.get_json()
+    base64_str = data.get('dataUrl', None)
+    UserService.update_user_avatar(user_ID, base64_str)
+    return jsonify({'response': 'ok'}), 200
+
+
 @user_app.route('/avatar/<path:filename>', methods=['GET'])
-def update_user_avatar(filename):
+def get_user_avatar(filename):
     if os.path.isfile(f'../user_avatar/{filename}'):
         return send_from_directory('../user_avatar', filename)
     else:

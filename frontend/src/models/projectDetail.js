@@ -1,5 +1,5 @@
 import { routerRedux } from 'dva/router'
-
+import { message } from 'antd'
 import {
   fetchProject,
   deleteProject,
@@ -23,7 +23,6 @@ import pathToRegexp from 'path-to-regexp'
 import { get } from 'lodash'
 import { hubPrefix } from '../utils/config'
 import * as dataAnalysisService from '../services/dataAnalysis'
-import { message } from 'antd/lib/index'
 import CONSTANT from '../constants'
 
 import * as UserStarFavorService from '../services/user'
@@ -42,6 +41,7 @@ export default {
     activeTab: '1',
     pageNo: 1,
     pageSize: 10,
+    resultLoading: false,
   },
   reducers: {
     changeActiveTab(state, { activeTab }) {
@@ -156,6 +156,8 @@ export default {
       return {
         ...state,
         project: undefined,
+        activeTab: '1',
+        resultLoading: false,
       }
     },
 
@@ -174,6 +176,14 @@ export default {
         totalNumber,
       }
     },
+
+    setResultLoading(state, { resultLoading }) {
+      return {
+        ...state,
+        resultLoading,
+      }
+    },
+
     setExampleResult(state, action) {
       let output = state.project.args.output
       for (let key in action.payload) {
@@ -200,7 +210,7 @@ export default {
     },
   },
   effects: {
-    *refresh({ projectId, notStartLab, projectType, version, activeTab}, { call, put }) {
+    *refresh({ projectId, notStartLab, projectType, version, activeTab }, { call, put }) {
       yield put({ type: 'clearProject' })
       yield put({ type: 'fetch', projectId, projectType, version, activeTab })
       yield put({ type: 'fetchComments', projectId })
@@ -332,7 +342,9 @@ export default {
       yield put({ type: 'fetch', projectId: project._id, projectType: project.type })
     },
     *delete({ payload }, { call, put, select }) {
+      const hide = message.loading('Project Deleting...', 0)
       yield call(deleteProject, payload)
+      hide()
       yield put(routerRedux.push('/workspace?tab=' + payload.type))
     },
     *setEntered({ projectId }, { call, put }) {
@@ -386,11 +398,19 @@ export default {
     },
 
     *getExampleResult(action, { call, put, select }) {
+      yield put({
+        type: 'setResultLoading',
+        resultLoading: false,
+      })
       let payload = action.payload
       const { data: result } = yield call(AppService.runApi, payload)
       yield put({
         type: 'setExampleResult',
         payload: result,
+      })
+      yield put({
+        type: 'setResultLoading',
+        resultLoading: true,
       })
     },
 
