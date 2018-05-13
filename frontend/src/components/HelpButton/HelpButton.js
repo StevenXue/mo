@@ -284,7 +284,7 @@ class HelpButton extends React.Component {
           }}
           // onClick={this.handleOnClick}
         >
-          hint
+          Hint
         </Button>
 
         <div>
@@ -294,7 +294,7 @@ class HelpButton extends React.Component {
                     borderWidth: 0,
                     color: "#1890ff"
                   }}
-          >help</Button>
+          >Tips</Button>
           <Modal
             // title="Basic Modal"
             visible={this.state.visible}
