@@ -136,9 +136,7 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
       case 'commit':
         history.push(`/workspace/${e.project_id}?type=${e.project_type}`)
         break
-      // case 'deploy':
-      //   history.push(`/workspace/${e.app_id}?type=app`)
-      //   break
+      case 'deploy':
       case 'publish':
       case 'deploy_request':
       case 'publish_request':
