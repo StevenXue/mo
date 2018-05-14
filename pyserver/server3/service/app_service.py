@@ -63,7 +63,7 @@ class AppService(ProjectService):
         response = requests.request("POST", url, data=payload, headers=headers)
         pattern = re.compile(r'STRHEAD(.+?)STREND', flags=re.DOTALL)
         results = pattern.findall(response.text)
-        print(results)
+        print(results, 111)
         try:
             output_json = json.loads(results[0])
         except IndexError as e:

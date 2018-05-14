@@ -393,7 +393,7 @@ class ProjectService:
     @classmethod
     def create_tutorial_project(cls, user_ID, name='', description='',
                                 tags=None, user_token='', type='project',
-                                **kwargs):
+        **kwargs):
         """
         Create a tutorial project
 
@@ -410,17 +410,15 @@ class ProjectService:
         tags = ['tutorial', 'official']
         type = 'app'
 
-        if tags is None:
-            tags = []
-        user = UserBusiness.get_by_user_ID(user_ID)
-        project = cls.business.create_project(
+        project = cls.create_project(
             name=name,
-            description=description,
-            type=type, tags=tags, user=user,
+            description=description, user_ID=user_ID,
+            type=type, tags=tags,
             user_token=user_token,
             create_tutorial=True,
             auto_show_help=True,
             **kwargs)
+
         return project
 
     @classmethod
