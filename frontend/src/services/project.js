@@ -48,6 +48,23 @@ export function getMyProjects({ filter }) {
   return request(path.join(CORS, PREFIX) + `?${params}`)
 }
 
+export function addModuleToApp({ appId, moduleId, func, version, onJson }) {
+  if (version) {
+    version = version.split('.').join('_')
+  }
+  return request(`pyapi/apps/add_used_module/${appId}`, {
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      used_module: moduleId,
+      func,
+      version,
+    }),
+  }, { onJson })
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // 获取用户所有 projects
 export function fetchProjects(payload) {
