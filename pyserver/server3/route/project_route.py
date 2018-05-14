@@ -360,4 +360,4 @@ def nb_to_script(project_id):
 def get_hot_tag():
     search_query = request.args.get('search_query', None)
     project_type = request.args.get('project_type', None)
-    return jsonify(ProjectBusiness.get_hot_tag(search_query, project_type))
+    return jsonify(ProjectService.get_hot_tag(search_query, project_type))

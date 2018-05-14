@@ -557,3 +557,8 @@ class ProjectService:
                                       project.user, project_name=project.name,
                                       project_id=project.id,
                                       project_type=project.type)
+
+    @staticmethod
+    def get_hot_tag(search_query, object_type):
+        return TypeMapper.get(object_type).get_hot_tag(search_query,
+                                                       object_type)
