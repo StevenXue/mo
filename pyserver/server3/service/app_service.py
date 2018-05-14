@@ -38,10 +38,8 @@ class AppService(ProjectService):
 
     @classmethod
     def remove_used_dataset(cls, app_id, used_dataset):
-        print(used_dataset)
         used_dataset = DatasetBusiness.get_by_id(used_dataset)
         return cls.business.remove_used_dataset(app_id, used_dataset)
-
 
     @classmethod
     def run_app(cls, app_id, input_json, user_ID, version):
@@ -65,14 +63,20 @@ class AppService(ProjectService):
         response = requests.request("POST", url, data=payload, headers=headers)
         pattern = re.compile(r'STRHEAD(.+?)STREND', flags=re.DOTALL)
         results = pattern.findall(response.text)
-        print(results)
+        print(results, 111)
         try:
             output_json = json.loads(results[0])
         except IndexError as e:
-            errors = cls.business.get_service_logs(app, version)
-            output_json = {
-                'errors': errors
-            }
+            try:
+                errors = cls.business.get_service_logs(app, version)
+            except IndexError as e:
+                output_json = {
+                    'errors': ['Service is down please deploy again!']
+                }
+            else:
+                output_json = {
+                    'errors': errors
+                }
         # output_json = response.json()
         # 成功调用后 在新的collection存一笔
         user_obj = UserBusiness.get_by_user_ID(user_ID=user_ID)
@@ -144,8 +148,7 @@ class AppService(ProjectService):
             app.status = 'inactive'
             app.save()
             cls.send_message(app, m_type='deploy_fail')
-        else:
-            return app
+        return app
 
     @classmethod
     def get_action_entity(cls, app_id, **kwargs):

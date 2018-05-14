@@ -8,6 +8,7 @@ import star from '../../../img/star.png'
 import star_o from '../../../img/star-o.png'
 import like from '../../../img/like.png'
 import like_o from '../../../img/like-o.png'
+import TagSelect from '../../../components/TagSelect/index'
 
 import {
   createProject,
@@ -20,6 +21,7 @@ import {
 } from '../../../services/user'
 
 import styles from './index.less'
+import {getHotTagOfProject} from "../../../services/project"
 
 const Option = Select.Option
 const Search = Input.Search
@@ -116,8 +118,8 @@ class ProjectList extends Component {
     })
   }
 
-  handleQueryChange(value) {
-    this.fetchData({payload: {query: value}})
+  handleQueryChange(value,tags) {
+    this.fetchData({payload: {query: value,tags:tags}})
   }
 
 
@@ -171,11 +173,13 @@ class ProjectList extends Component {
           {/*<Option key={e.value} value={e.value}>{e.text}</Option>,*/}
           {/*)}*/}
           {/*</Select>*/}
-          <Search
-            placeholder="input search text"
-            onSearch={(value) => this.handleQueryChange(value)}
-            style={{width: 200}}
-          />
+          <TagSelect getHotTag={getHotTagOfProject} onSearch={(value,tags) => {
+            this.handleQueryChange(value,tags)}} type={this.props.type}/>
+          {/*<Search*/}
+            {/*placeholder="input search text"*/}
+            {/*onSearch={(value) => this.handleQueryChange(value)}*/}
+            {/*style={{width: 200}}*/}
+          {/*/>*/}
         </div>
         <Spin spinning={this.state.loading}>
         <div className={styles.projectList}>

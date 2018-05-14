@@ -25,8 +25,8 @@ export function getProjects({ filter, onJson }) {
   return request(path.join(CORS, PREFIX) + `?${params}`, undefined, { onJson })
 }
 
-export function countProjects({user_ID}){
-   return request(path.join(CORS, PREFIX) + `/count?user_ID=${user_ID}`)
+export function countProjects({ user_ID }) {
+  return request(path.join(CORS, PREFIX) + `/count?user_ID=${user_ID}`)
 }
 
 // 获取用户所有 projects
@@ -46,6 +46,23 @@ export function getMyProjects({ filter }) {
   }
   params += `&group=my`
   return request(path.join(CORS, PREFIX) + `?${params}`)
+}
+
+export function addModuleToApp({ appId, moduleId, func, version, onJson }) {
+  if (version) {
+    version = version.split('.').join('_')
+  }
+  return request(`pyapi/apps/add_used_module/${appId}`, {
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      used_module: moduleId,
+      func,
+      version,
+    }),
+  }, { onJson })
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,6 +90,8 @@ export function createProject({ body, onJson }) {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     },
     body: JSON.stringify(body),
+    customErrorMsg: true,
+    noErrorMsg: true,
   }, { onJson })
 }
 
@@ -88,7 +107,7 @@ export function updateProject({ body, projectId, onJson }) {
 }
 
 // 删除 project
-export function deleteProject({projectId}) {
+export function deleteProject({ projectId }) {
   const user_ID = localStorage.getItem('user_ID')
   return request(`${CORS}${projects}/${projectId}?user_ID=${user_ID}`, {
     method: 'delete',
@@ -114,4 +133,10 @@ export function getHotTag(prjID) {
       'Content-Type': 'application/json',
     },
   })
+}
+
+export function getHotTagOfProject({ payload, onJson }) {
+  const searchQuery = payload.searchQuery
+  const projectType = payload.objectType
+  return request(`${CORS}/project/get_hot_tag?search_query=${searchQuery}&project_type=${projectType}`, undefined, { onJson })
 }

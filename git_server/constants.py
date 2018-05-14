@@ -1,1 +1,1 @@
-REDIS_SERVER = 'redis://10.52.14.182:6379'
+REDIS_SERVER = 'redis://localhost:6379'

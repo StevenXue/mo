@@ -20,7 +20,7 @@ import RequestModal from '../../../components/RequestModal/index'
 import TagSelect from '../../../components/TagSelect/index'
 
 import styles from './index.less'
-import { fetchAllUserRequest,getHotTag } from '../../../services/userRequest'
+import { fetchAllUserRequest,getHotTagOfRequest } from '../../../services/userRequest'
 
 const Option = Select.Option
 const Search = Input.Search
@@ -150,8 +150,8 @@ class RequestList extends Component {
     return (
       <div>
         <div className={styles.header}>
-          <TagSelect getHotTag={getHotTag} onSearch={(value,tags) => {
-            this.handleQueryChange(value,tags)}}/>
+          <TagSelect getHotTag={getHotTagOfRequest} onSearch={(value,tags) => {
+            this.handleQueryChange(value,tags)}} type={this.props.type}/>
           <RequestModal new={true} fetchData={() => this.fetchData({})}
                         type={this.props.type} >
             <Button icon='plus-circle-o' type='primary' id="mei_rightButton"
@@ -203,10 +203,10 @@ class RequestList extends Component {
                            onClick={() => this.toUserProfile(e.user_ID, history)}>{e.user_ID} &nbsp;&nbsp;</p>
                         {e['tags'].length > 0 && <Icon type="tags" className={styles.otherIcon}/>}
                         {e['tags'].length > 0 &&
-                        <p key={e}>{e['tags'].join(',')}</p>}
+                        <p key={e} style={{marginBottom: '0'}}>{e['tags'].join(',')}</p>}
                         <Icon type="clock-circle-o"
                               className={styles.otherIcon}/>
-                        <p>{showTime(e.create_time)}</p>
+                        <p style={{marginBottom: '0'}}>{showTime(e.create_time)}</p>
                       </div>
                     </div>
                   </Col>

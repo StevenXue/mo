@@ -6,16 +6,18 @@ from mongoengine import CASCADE
 from mongoengine import BooleanField
 from mongoengine import ListField
 
-
 MESSAGE_TYPE = ('answer', 'chat', 'commit', 'deploy', 'publish',
-                'deploy_request', 'publish_request',)
+                'deploy_request', 'publish_request',
+                'deploy_fail',  'publish_fail',
+                'job_success', 'job_error')
 
 
 class Message(DynamicDocument):
     create_time = DateTimeField(required=True)
     sender = ReferenceField("User", reverse_delete_rule=CASCADE, required=True)
     title = StringField()
-    message_type = StringField(max_length=100, choices=MESSAGE_TYPE, required=True)
+    message_type = StringField(max_length=100, choices=MESSAGE_TYPE,
+                               required=True)
     content = StringField()
     # receivers = ListField(ReferenceField(Receiver))
     user = ReferenceField("User", reverse_delete_rule=CASCADE)
@@ -28,6 +30,3 @@ class Receiver(DynamicDocument):
     is_read = BooleanField(default=False)
     message = ReferenceField("Message", required=True,
                              reverse_delete_rule=CASCADE)
-
-
-

@@ -34,7 +34,7 @@ const Jobs = ({ projectDetail, dispatch }) => {
 
   const renderJob = (job, i) => {
     const ifLog = projectDetail.jobIds.includes(job._id)
-    return <Col span={12} className={styles.jobReactCol} key={job._id} order={i + 1}>
+    return <Col span={12} className={styles.jobReactCol} key={job._id}>
       <h4 className={styles.jobTitle}>
                 <span>
                   {job.running_code ?

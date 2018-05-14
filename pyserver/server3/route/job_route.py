@@ -74,7 +74,7 @@ def update_job_log(job_id):
 
 @job_app.route("/<string:job_id>/terminate", methods=["PUT"])
 def terminate_job(job_id):
-    result = JobBusiness.update_job_status(job_id, 'terminate')
+    result = JobBusiness.update_job_status(job_id, 'terminated')
     result = json_utility.convert_to_json(result.to_mongo())
     return jsonify({
         "response": result

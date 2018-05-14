@@ -1,0 +1,34 @@
+# reference block
+default_value_range:
+  int: &default_int_range "0-65536" # e.g. "0-65536" | [2, 4, 6] | ">10"
+  float: &default_float_range "0-65536"
+  datetime: &default_datetime_range "xxxx"
+
+param_spec: &default
+  name:               # required,
+  value_type:         # required, available Types: int, str, float, img, datetime, [int], [str], [float]
+  default_value:      # required, must match the value_type
+  value_range:        # optional, reference to default_value_range
+  des:
+  optional: False
+
+# basic block
+author_name: luxu
+module_name: gender_classify
+module_description: return the gender of the people in the photo
+
+input: # mapping to input parameter in main.py
+  run:
+    param_1:
+      <<: *default
+      name: "rgb_image"
+      value_type: "str"
+    param_2:
+      <<: *default
+      name: "gray_image"
+      value_type: "str"
+output:
+  run:
+    gender:
+      name: 'gender'
+      type: '[str]'

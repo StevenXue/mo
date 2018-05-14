@@ -29,8 +29,12 @@ export default {
         })
         yield put(routerRedux.push('/user/login'))
       }else{
-        let errorMessage = response.data.error.message
+        let errorMessage = response.data.error
         message.error(errorMessage)
+        yield put({
+          type: 'changeSubmitting',
+          payload: false,
+        })
       }
 
     },

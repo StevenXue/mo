@@ -136,17 +136,17 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
       case 'commit':
         history.push(`/workspace/${e.project_id}?type=${e.project_type}`)
         break
-      // case 'deploy':
-      //   history.push(`/workspace/${e.app_id}?type=app`)
-      //   break
+      case 'deploy':
       case 'publish':
-        toProject(e)
-        break
       case 'deploy_request':
+      case 'publish_request':
+      case 'deploy_fail':
+      case 'publish_fail':
         toProject(e)
         break
-      case 'publish_request':
-        toProject(e)
+      case 'job_success':
+      case 'job_error':
+        toProject(e, '2')
         break
     }
     dispatch({
@@ -163,8 +163,13 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
     history.push(`/userrequest/${e.user_request}?type=${e.user_request_type}`)
   }
 
-  const toProject = (e) => {
-    history.push(`/workspace/${e.project_id}?type=${e.project_type}`)
+  const toProject = (e, tabNum) => {
+    if(tabNum) {
+      history.push(`/workspace/${e.project_id}?type=${e.project_type}&tab=${tabNum}`)
+    } else {
+      history.push(`/workspace/${e.project_id}?type=${e.project_type}`)
+    }
+
   }
 
   const translatorTemp = {
@@ -176,27 +181,33 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
   const switchMessage = (e) => {
     switch (e.message_type) {
       case 'answer':
-        return <p className={styles.messageP}>{`${e.user_ID}回答了您关注的需求${e.user_request_title}`}</p>
+        return <p className={styles.messageP}>{`${e.user_ID} 回答了您关注的需求${e.user_request_title}`}</p>
       case 'commit':
         return <p className={styles.messageP}>{`${e.user_ID} 更新了您关注的需求  ${e.user_request_title}`} 的答案</p>
       case 'deploy':
         return <p
-          className={styles.messageP}>{`${e.user_ID} 上线了您关注的${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
+          className={styles.messageP}>{`${e.user_ID} 上线了您关注的 ${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
       case 'publish':
         return <p
-          className={styles.messageP}>{`${e.user_ID} 发布了您关注的${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
+          className={styles.messageP}>{`${e.user_ID} 发布了您关注的 ${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
       case 'deploy_fail':
         return <p
-          className={styles.messageP}>{`您的${translatorTemp[e.project_type]}  ${e.project_name} 部署失败`}</p>
+          className={styles.messageP}>{`您的 ${translatorTemp[e.project_type]}  ${e.project_name} 部署失败`}</p>
       case 'publish_fail':
         return <p
-          className={styles.messageP}>{`您的${translatorTemp[e.project_type]}  ${e.project_name} 发布失败`}</p>
+          className={styles.messageP}>{`您的 ${translatorTemp[e.project_type]}  ${e.project_name} 发布失败`}</p>
       case 'deploy_request':
         return <p
-          className={styles.messageP}>{`${e.user_ID} 为您的答案${e.user_request_title} 上线了${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
+          className={styles.messageP}>{`${e.user_ID} 为您的答案 ${e.user_request_title} 上线了 ${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
       case 'publish_request':
         return <p
-          className={styles.messageP}>{`${e.user_ID} 为您的答案${e.user_request_title} 发布了${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
+          className={styles.messageP}>{`${e.user_ID} 为您的答案 ${e.user_request_title} 发布了 ${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
+      case 'job_success':
+        return <p
+          className={styles.messageP}>{`Your running ${e.job_type}  ${e.job_name} was finished successfully.`}</p>
+      case 'job_error':
+        return <p
+          className={styles.messageP}>{`Your running ${e.job_type}  ${e.job_name} was failed.`}</p>
     }
   }
 
@@ -320,11 +331,10 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
             {login.user && JsonToArray(message.messages).map(e =>
               <div onClick={() => toMessage(e)} key={e.receiver_id}
                    style={e.is_read === false ? {
-                     width: '400px',
                      margin: '0 -20px',
                      backgroundColor: '#f0f2f5',
                      color: 'black',
-                   } : { width: '400px', margin: '0 -20px', color: 'black' }}>
+                   } : {  margin: '0 -20px', color: 'black' }}>
                 {switchMessage(e)}</div>)}
           </Menu.Item>
           <Menu.Item style={{ color: 'black' }}>

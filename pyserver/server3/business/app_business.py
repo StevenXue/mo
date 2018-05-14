@@ -93,6 +93,8 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         handler_file_name = handler_file_path.split('/')[-1]
         handler_dst_path = handler_file_path.replace(handler_file_name,
                                                      'handler.py')
+
+        # TODO: read file from handler_file_path, tranformed .py file
         shutil.copy(handler_file_path, handler_dst_path)
 
         # change some configurable variable to deploy required
@@ -168,6 +170,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         app_yaml_path = os.path.join(app.path, yaml_tail_path)
         args = {}
         output = {}
+        version = version or DEV_DIR_NAME
         cls.insert_module_env(app, module, version)
         # copy module yaml to app yaml
         input_args = module.to_mongo()['args']['input'].get(func, {})

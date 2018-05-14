@@ -65,10 +65,15 @@ class GeneralBusiness:
     def remove_by_id(cls, object_id, user_ID):
         return cls.repo.delete_by_id(object_id)
 
-    @staticmethod
-    def get_hot_tag(entity, search_query):
+    @classmethod
+    def get_hot_tag(cls, search_query, object_type, user_request=False):
+        if user_request:
+            objects = cls.repo.read({'type': object_type})
+        else:
+            objects = cls.repo.read()
+        # objects = entity.objects(type=object_type)
         if search_query:
-            tag_freqs = entity.objects(
+            tag_freqs = objects(
                 tags__icontains=search_query).item_frequencies(
                 'tags', normalize=True)
             top_tags = sorted(tag_freqs.items(), key=itemgetter(1),
@@ -92,7 +97,7 @@ class GeneralBusiness:
                 res += top_five[:max_number - number]
             return res
         else:
-            tag_freqs = entity.objects().item_frequencies(
+            tag_freqs = objects().item_frequencies(
                 'tags', normalize=True)
             top_tags = sorted(tag_freqs.items(), key=itemgetter(1),
                               reverse=True)[:5]

@@ -18,7 +18,7 @@ import {
   Card,
   Tooltip,
 } from 'antd'
-
+import { routerRedux } from 'dva/router'
 // components
 import ProjectModal from '../../../../components/ProjectModal/index'
 import HelpModal from '../../../../components/HelpModal'
@@ -116,7 +116,7 @@ class CommentsList extends React.Component {
   }
 
   render() {
-    const { dispatch, projectId, history } = this.props
+    const {dispatch, projectId, history} = this.props
     const userObjId = localStorage.getItem('user_obj_id')
     const picNumber = parseInt(userObjId.slice(10)) % 6
     return (
@@ -127,14 +127,14 @@ class CommentsList extends React.Component {
               <Row>
                 <Col span={2} style={{ margin: '20px 0', textAlign: 'center' }}>
                   <div style={{ height: '80px', width: '80px' }}>
-                    <img style={{ height: '80px', width: '80px',borderRadius:'40px'}}
-                         src={e.user_ID===this.props.login.user_ID?`/pyapi/user/avatar/${e.user_ID}.jpeg`:this.props.login.userAvatar} alt="avatar"/>
+                    <img style={{ height: '80px', width: '80px', borderRadius: '40px' }}
+                         src={e.user_ID === this.props.login.user_ID ? `/pyapi/user/avatar/${e.user_ID}.jpeg` : this.props.login.userAvatar}
+                         alt="avatar"/>
                   </div>
                 </Col>
                 <Col span={20} className={styles.commentCol}>
                   <div>
-                    <div className={styles.commentUserID}
-                         onClick={() => this.toUserProfile(e.user_ID)}>{e.user_ID}</div>
+                    <div className={styles.commentUserID} onClick={() => this.toUserProfile(e.user_ID)}>{e.user_ID}</div>
                     <div className={styles.commentContent}>{e.comments}</div>
                     <div
                       className={styles.commentCreateTime}>{showTime(e.create_time)}</div>
@@ -190,8 +190,8 @@ class CommentForm extends React.Component {
         <Row type="flex" justify="flex" align="top">
           <Col span={2} style={{ margin: '20px 0', textAlign: 'center' }}>
             <div style={{ height: '80px', width: '80px' }}>
-              <img style={{ height: '80px', width: '80px',borderRadius:'40px' }}
-              src={this.props.login.userAvatar}
+              <img style={{ height: '80px', width: '80px', borderRadius: '40px' }}
+                   src={this.props.login.userAvatar}
                    alt="avatar"/>
             </div>
           </Col>
@@ -217,10 +217,28 @@ class CommentForm extends React.Component {
   }
 }
 
+export function projectStatus(project) {
+  if (!project.status) {
+    return <div key='1'/>
+  }
+  if (project.status === 'deploying') {
+    return <Tag color='gold' style={{ cursor: 'default', marginLeft: 10 }} key='1'>Deploying <Icon
+      type="loading"/></Tag>
+  } else if (project.status === 'active') {
+    return <Tag color='green' style={{ cursor: 'default', marginLeft: 10 }} key='1'>Online</Tag>
+  } else {
+    return <Tag color='grey' style={{ cursor: 'default', marginLeft: 10 }} key='1'>Offline</Tag>
+  }
+}
+
 function ProjectInfo({ app, market_use, match, history, location, dispatch, projectDetail, login }) {
   const projectId = match.params.projectId
   const user_ID = localStorage.getItem('user_ID')
   const userObjId = localStorage.getItem('user_obj_id')
+
+  const url = new URL(window.location.href.replace('/#', ''))
+  // let showTab = url.searchParams.get('tab')
+
   // const projectOwner = get(projectDetail, 'project.user')
   // const projectOwnerOrNot = (projectOwner === userObjId)
   const props1 = {
@@ -291,10 +309,10 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
   }
 
   const cloudNote = () => {
-    if (!market_use) {
+    if(!market_use) {
       return <Row style={{ width: '110%', marginLeft: '-8%' }}>
         <Col span={14}>
-      <span className={styles.generalSpan}>
+       <span className={styles.generalSpan}>
       <Upload {...props1}>
         <Tooltip
           title='Files will be uploaded to your workspace, and archives will be auto unarchived into working directory.'>
@@ -335,20 +353,6 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
     // project info page
     if (projectDetail.project && projectDetail.project.type) {
 
-      function projectStatus() {
-        if (!projectDetail.project.status) {
-          return <div/>
-        }
-        if (projectDetail.project.status === 'deploying') {
-          return <Tag color='gold' style={{ cursor: 'default', marginLeft: 10 }}>Deploying <Icon
-            type="loading"/></Tag>
-        } else if (projectDetail.project.status === 'active') {
-          return <Tag color='green' style={{ cursor: 'default', marginLeft: 10 }}>Online</Tag>
-        } else {
-          return <Tag color='grey' style={{ cursor: 'default', marginLeft: 10 }}>Offline</Tag>
-        }
-      }
-
       // optional component list by project type
       const components = projectTypeDict[projectDetail.project.type]
 
@@ -388,8 +392,8 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
         }
 
         //关闭tourtip时调用，此后登录不再显示tourtip
-        noLearning = () => {
-          fetch(`/pyapi/user/notourtip?user_ID=${localStorage.user_ID}`, { method: 'GET' })
+        noLearning = ()=>{
+          fetch(`/pyapi/user/notourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
         }
 
         render() {
@@ -495,20 +499,18 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
           )
         }
 
-        chooseColor(star_users,user,userObjId){
-          if(user===userObjId){
+        chooseColor(star_users, user, userObjId) {
+          if (user === userObjId) {
             return styles.gray
           }
-          else if(star_users.includes(userObjId))
-          {
+          else if (star_users.includes(userObjId)) {
             return styles.blue
           }
-          else{
+          else {
             return styles.lightBlue
           }
 
         }
-
 
         render() {
           return (
@@ -522,7 +524,7 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
                   <Col span={3} style={{ padding: '10px 42px' }}>
                     <div className={styles.bigIconNunberDiv}>
                       <div
-                        className={this.chooseColor(projectDetail.project.star_users,projectDetail.project.user,userObjId)}
+                        className={this.chooseColor(projectDetail.project.star_users, projectDetail.project.user, userObjId)}
                         style={market_use ? { cursor: 'pointer' } : { cursor: 'default' }}
                         onClick={market_use ? () => appStarFavor('star') : null}
                       >
@@ -534,7 +536,8 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
                           className={styles.number}>{projectDetail.project.star_users.length}</p>
                       </div>
                       <div
-                        className={this.chooseColor(projectDetail.project.favor_users,projectDetail.project.user,userObjId)}                        style={market_use ? { cursor: 'pointer' } : { cursor: 'default' }}
+                        className={this.chooseColor(projectDetail.project.favor_users, projectDetail.project.user, userObjId)}
+                        style={market_use ? { cursor: 'pointer' } : { cursor: 'default' }}
                         onClick={market_use ? () => appStarFavor('favor') : null}>
                         <p className={styles.icon}>
                           <Icon
@@ -555,7 +558,7 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
                             type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
                             style={{ fontSize: 20 }}/>}
                           {
-                            projectStatus()
+                            projectStatus(projectDetail.project)
                           }
                         </span>
                         {!market_use &&
@@ -595,28 +598,6 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
                                key={e}>{e}</Tag>)
                         : null}
                     </div>
-
-                    {/* <div style={{paddingBottom: '50px'}}>
-                    <span>
-                      {!market_use && <span className={styles.generalSpan}>
-                      <Upload {...props1}>
-                        <Button className="qing">
-                          <Icon type="upload"/> Click to Upload
-                        </Button>
-                      </Upload>
-                      </span>}
-                      <span className={styles.enterNotebook}>
-                        <Button type="primary"
-                                className="zi"
-                                onClick={() => {
-                                  // history.push(`/workspace/${match.params.projectId}/${projectDetail.project.type}`)
-                                  window.open(`/#/workspace/${projectId}/${projectDetail.project.type}`)
-                                }}>
-                          Notebook 1->
-                        </Button>
-                      </span>
-                    </span>
-                    </div> */}
                   </Col>
                 </Row>
 
@@ -624,11 +605,12 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
 
               </div>
               {/*content tabs*/}
-              <Tabs defaultActiveKey={projectDetail.activeTab}
-                    onChange={callback}
-                    activeKey={projectDetail.activeTab}
-                    tabBarExtraContent={cloudNote()}
-                    className={styles.jobs}>
+              <Tabs
+                // defaultActiveKey={showTab || projectDetail.activeTab}
+                onChange={callback}
+                activeKey={projectDetail.activeTab}
+                tabBarExtraContent={cloudNote()}
+                className={styles.jobs}>
                 <TabPane tab="Overview" key="1">
                   <div className={styles.reactMdeEditorDiv}>
                     {/*{!projectDetail.overviewEditState?<ReactMarkdown source={projectDetail.project.overview}/>:null}*/}

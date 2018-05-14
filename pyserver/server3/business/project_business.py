@@ -21,7 +21,6 @@ from datetime import datetime
 # from distutils.dir_util import copy_tree
 from subprocess import call
 from git import Repo
-from flask_socketio import SocketIO
 
 from eventlet import spawn_n
 
@@ -42,7 +41,6 @@ from server3.business.request_answer_business import RequestAnswerBusiness
 from server3.constants import GIT_SERVER_IP
 from server3.business.general_business import GeneralBusiness
 
-socketio = SocketIO(message_queue=REDIS_SERVER)
 
 PAGE_NO = 1
 PAGE_SIZE = 5
@@ -304,23 +302,19 @@ class ProjectBusiness(GeneralBusiness):
             os.makedirs(project_path)
         else:
             # if exists means project exists
-            raise Exception('project exists')
+            raise Exception('Project exists, project should be unique between apps, modules and datsets')
         return project_path
 
     @classmethod
-    def get_objects(cls, search_query, user=None, page_no=PAGE_NO,
-                    page_size=PAGE_SIZE, default_max_score=0.4,
-                    privacy=None):
-        """
-        Search for objects
-
-        :param search_query:
-        :param user:
-        :param page_no:
-        :param page_size:
-        :param default_max_score:
-        :return:
-        """
+    def get_objects(cls, search_query,
+                    privacy,
+                    page_no,
+                    page_size,
+                    default_max_score,
+                    user, tags):
+        # def get_objects(cls, search_query, user=None, page_no=PAGE_NO,
+        #             page_size=PAGE_SIZE, default_max_score=0.4,
+        #             privacy=None,tags=tags):
 
         start = (page_no - 1) * page_size
         end = page_no * page_size
@@ -335,6 +329,11 @@ class ProjectBusiness(GeneralBusiness):
             objects = objects(privacy=privacy)
         if user:
             objects = objects(user=user)
+        if tags:
+            # todo 是否有直接的查询语句取代
+            for each_tag in tags:
+                objects = objects(tags=each_tag)
+
         count = objects.count()
         return Objects(objects=objects[start: end], count=count,
                        page_no=page_no, page_size=page_size)
@@ -382,7 +381,8 @@ class ProjectBusiness(GeneralBusiness):
         repo = cls.clone(user_ID, name, project_path)
 
         if create_tutorial:
-            shutil.copy('tutorial/hello_world.ipynb', project_path)
+            # shutil.copy('tutorial/hello_world.ipynb', project_path)
+            copytree('tutorial', project_path)
 
         # config repo user
         with repo.config_writer(config_level="repository") as c:
@@ -556,31 +556,6 @@ class ProjectBusiness(GeneralBusiness):
             return master.log()
 
     @classmethod
-    def remove_markdown_cell(cls, source_nb_path, dest_nb_path):
-        """
-        Remove markdown cell content in jupyter notebook file.
-
-        :param source_nb_path: jupyter notebook source file path
-        :param dest_nb_path: jupyter notebook destination file path
-        :return: N/A
-        """
-
-        # read source notebook file
-        with open(source_nb_path, 'r') as f:
-            nb_data = json.loads(f)
-
-        # remove markdown cell
-        for cell in nb_data['cells']:
-            if cell['cell_type'] == 'markdown':
-                del cell
-
-        # remove shell command?
-
-        # write to destination file
-        with open(dest_nb_path, 'w') as f:
-            f.write(json.dumps(nb_data))
-
-    @classmethod
     def nb_to_py_script(cls, project_id, nb_path, optimise=True):
         """
 
@@ -594,8 +569,83 @@ class ProjectBusiness(GeneralBusiness):
         app = cls.get_by_id(project_id)
         full_path = os.path.join(app.path, nb_path)
 
-        pass
+        # read source notebook file
+        with open(full_path, 'r') as f:
+            nb_data = json.loads(f.read())
 
+        # write to destination file
+        script = ''
+        for cell in nb_data['cells']:
+            if cell['cell_type'] == 'code':
+                for line in cell['source']:
+                    if optimise:
+                        script += '\n' + cls.code_formatting(line)
+                    else:
+                        script += '\n' + line
+
+        script = script.replace('\n\n', '\n')
+
+        # add __main__ function
+        main_func = "\n\n" + \
+                    "if __name__ == '__main__':\n" + \
+                    "\tconf = {}\n" + \
+                    "\thandle(conf)"
+        script += '\n' + main_func
+
+        script_path = full_path.replace('ipynb', 'py')
+        with open(script_path, 'w') as f:
+            f.write(script)
+
+    @classmethod
+    def code_formatting(cls, line_of_code):
+        """
+
+        Process line of code to be prepared for deployment.
+
+        :param line_of_code: the line of code to be formatted
+        :return: processed single line code
+        """
+        if any(re.search(reg, line_of_code.rstrip()) for reg in INIT_RES):
+            # line_of_code = re.sub(
+            #     r"# Please use current \(work\) folder to store your data "
+            #     r"and models",
+            #     r'', line_of_code.rstrip())
+            line_of_code = re.sub(r'# Define root path', r'',
+                                  line_of_code.rstrip())
+            line_of_code = re.sub(r"""sys.path.append\('(.+)'\)""", r'',
+                                  line_of_code.rstrip())
+            line_of_code = re.sub(
+                r"""(\s+)project_type='(.+)', source_file_path='(.+)'\)""",
+                r"""\1project_type='\2', source_file_path='\3', silent=True)""",
+                line_of_code.rstrip())
+
+            line_of_code = re.sub(r"""from modules import (.+)""",
+                                  r"""from function.modules import \1""",
+                                  line_of_code.rstrip())
+
+            # add handle function
+            line_of_code = re.sub(
+                r"work_path = '\./'",
+                r"work_path = '\./'\n\n"
+                r"def handle(conf):\n"
+                r"\t# paste your code here",
+                line_of_code.rstrip())
+        else:
+
+            # if re.match(r'^(!|ls +|rm +|pwd +|cd +)', line_of_code.strip()):
+            if re.match(r'^(!)', line_of_code.strip()):
+                line_of_code = ''
+            else:
+                line_of_code = '\t' + line_of_code
+
+            # if line_of_code[0] in ['!']:
+            #     line_of_code = ''
+            # elif line_of_code[0:2] in ['ls', 'cd']:
+            #     line_of_code = ''
+            # else:
+            #     line_of_code = '\t' + line_of_code
+
+        return line_of_code
 
     @classmethod
     def nb_to_script(cls, project_id, nb_path, optimise=True):
@@ -616,9 +666,10 @@ class ProjectBusiness(GeneralBusiness):
                         r'', line.rstrip())
                     line = re.sub(r"""sys.path.append\('(.+)'\)""", r'',
                                   line.rstrip())
-                    line = re.sub(r"""(\s+)project_type='(.+)', source_file_path='(.+)'\)""",
-                                  r"""\1project_type='\2', source_file_path='\3', silent=True)""",
-                                  line.rstrip())
+                    line = re.sub(
+                        r"""(\s+)project_type='(.+)', source_file_path='(.+)'\)""",
+                        r"""\1project_type='\2', source_file_path='\3', silent=True)""",
+                        line.rstrip())
 
                     line = re.sub(r"""from modules import (.+)""",
                                   r"""from function.modules import \1""",
@@ -626,7 +677,7 @@ class ProjectBusiness(GeneralBusiness):
 
                     # add handle function
                     line = re.sub(
-                        r"work_path = ''",
+                        r"work_path = '\./'",
                         r"work_path = 'function/'\n\n"
                         r"def handle(conf):\n"
                         r"\t# paste your code here",
@@ -639,8 +690,6 @@ class ProjectBusiness(GeneralBusiness):
         #             r"" + "\n" + "\t" + "conf = {}" + "\n" +"\t" + "handle()"
         main_func = r"if __name__ == '__main__': " + "\n" + "\t" \
                                                             r"conf = {}" + "\n" + "\t" \
-                                                                                  r"handle()"
+                                                                                  r"handle(conf)"
 
         my_open.write(main_func)
-
-

@@ -27,7 +27,7 @@ import pathToRegexp from 'path-to-regexp/index'
 
 const NO_CHAT_PATHS = ['/', '/launchpage', '/user/login', '/user/register', '/user/newpassword'
   ,'/user/forgot', '/newpassword']
-import {HelpButton} from '../HelpButton/HelpButton'
+import HelpButton from '../HelpButton/HelpButton'
 function MainLayout({ children, location, history, isRight, onClickIcon }) {
   const match = pathToRegexp('/workspace/:projectId/:type').exec(location.pathname)
   return (
@@ -48,7 +48,7 @@ function MainLayout({ children, location, history, isRight, onClickIcon }) {
           >
             {children}
           </div>
-          {!(NO_CHAT_PATHS.includes(location.pathname)) && <WorldChannel/>}
+          {!(NO_CHAT_PATHS.includes(location.pathname)) && !match && <WorldChannel/>}
         </div>
       </Content>
       {match&&<HelpButton />}

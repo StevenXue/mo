@@ -16,12 +16,14 @@ class Index extends React.Component {
     selectedTags:[],
     fetching: false,
     showDropDown: false,
-    select:null
   }
   fetchTags = (value) => {
     this.setState({data: [], fetching: true})
     this.props.getHotTag({
-      searchQuery: value,
+      payload: {
+        searchQuery: value,
+        objectType:this.props.type
+      },
       onJson: (res) => {
         const data = res.map(i => ({
           number: i[1],
@@ -43,14 +45,13 @@ class Index extends React.Component {
       value,
       selectedTags,
       fetching: false,
-    })
+    },()=>this.startSearch())
   }
 
   showDropDown = () => {
     this.setState({
       showDropDown: true,
     })
-    this.select.focus()
   }
 
   hideDropDown = () => {
@@ -59,10 +60,14 @@ class Index extends React.Component {
     })
   }
 
-  showOrHideDropDown = () => {
+  searchChange = (e) =>{
     this.setState({
-      showDropDown: !this.state.showDropDown,
+      searchText:e.target.value
     })
+  }
+
+  startSearch =() =>{
+    this.props.onSearch(this.state.searchText,this.state.selectedTags)
   }
 
   render() {
@@ -70,11 +75,12 @@ class Index extends React.Component {
     return (
       <div style={{display:'flex'}}>
         <div  onClick={this.showDropDown} >
-          <Dropdown visible={this.state.showDropDown} trigger={['click']}
+          <Dropdown visible={this.state.showDropDown}
+                    trigger={['click']}
                     onClick={this.showDropDown}
                     overlay={<Menu style={{width: '400px'}} >
-                      <Menu.Item key="0">
-                        <Select
+                      {this.state.showDropDown && <Menu.Item key="0">
+                         <Select
                           mode="multiple"
                           labelInValue
                           value={value}
@@ -85,7 +91,7 @@ class Index extends React.Component {
                           onSearch={this.fetchTags}
                           onChange={this.handleChange}
                           style={{width: '100%'}}
-                          ref={inputRef => (this.select = inputRef)}
+                          autoFocus
                           onBlur={this.hideDropDown}
                         >
                           {data ? data.map(d => <Option
@@ -93,7 +99,7 @@ class Index extends React.Component {
                             <Option key={'disable'} disabled={true}>No
                               result</Option>}
                         </Select>
-                      </Menu.Item>
+                      </Menu.Item>}
                     </Menu>}>
             <Button  icon='down-circle-o' style={{alignItems:'center',display:'flex'}}>
               {value.length>0?<p style={{marginBottom:'0'}}> &nbsp; {value.length} tag</p>:<p style={{marginBottom:'0'}}> &nbsp;Tags</p>}
@@ -103,9 +109,9 @@ class Index extends React.Component {
         <div style={{marginLeft:'20px'}}>
           <Search
             placeholder="input search text"
-            onSearch={(value)=>this.props.onSearch(value,this.state.selectedTags)}
+            onChange={(value)=>this.searchChange(value)}
+            onSearch={this.startSearch}
             style={{width: 200}}
-
           />
         </div>
       </div>

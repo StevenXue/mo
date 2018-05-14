@@ -24,7 +24,6 @@ from server3.service.module_service import ModuleService
 from server3.service.dataset_service import DatasetService
 from server3.business.project_business import ProjectBusiness
 from server3.business.user_business import UserBusiness
-from server3.entity.project import Project
 from server3.utility import json_utility
 from server3.utility import str_utility
 from server3.constants import Error, Warning
@@ -62,6 +61,9 @@ def list_projects_by_query():
     privacy = request.args.get('privacy', None)
     default_max_score = float(request.args.get('max_score', 0.4))
     type = request.args.get('type', 'project')
+    tags = request.args.get('tags', None)
+    if tags:
+        tags = tags.split(',')
 
     if group == 'my':
         user_ID = get_jwt_identity()
@@ -72,11 +74,12 @@ def list_projects_by_query():
         projects = project_service.list_projects(
             search_query=search_query,
             privacy=privacy,
+            type=type,
             page_no=page_no,
             page_size=page_size,
             default_max_score=default_max_score,
-            type=type,
-            user_ID=user_ID
+            user_ID=user_ID,
+            tags=tags
         )
     except Warning as e:
         return jsonify({
@@ -213,7 +216,6 @@ def create_project():
     user_ID = get_jwt_identity()
 
     data = request.get_json()
-    print(data)
     name = data.pop('name')
     type = data.pop('type')
     description = data.pop('description')
@@ -222,28 +224,19 @@ def create_project():
     if not isinstance(tags, list) and tags is not None:
         data['tags'] = str_utility.split_without_empty(tags)
 
-    # func = {
-    #     "app": AppService.create_project(name, description, user_ID,
-    #                                      tags=tags,
-    #                                      type=type, user_token=user_token,
-    #                                      **data),
-    #
-    # }
-    # project = func[type](name, description, user_ID,
-    #                      tags=tags,
-    #                      type=type, user_token=user_token,
-    #                      **data)
-    TypeMapper = {
+    type_mapper = {
         "app": AppService,
         "module": ModuleService,
         "dataset": DatasetService,
     }
-    project = TypeMapper[type].create_project(
-        name, description, user_ID, tags=tags,
-        type=type, user_token=user_token, **data)
+    try:
+        project = type_mapper[type].create_project(
+            name, description, user_ID, tags=tags,
+            type=type, user_token=user_token, **data)
+    except Exception as e:
+        return jsonify(
+            {'response': str(e)}), 400
     project = json_utility.convert_to_json(project.to_mongo())
-
-    print(project)
     return jsonify({'response': project}), 200
 
 
@@ -354,7 +347,8 @@ def nb_to_script(project_id):
     optimise = data.get('optimise')
     nb_path = data.get('nb_path')
     try:
-        ProjectBusiness.nb_to_script(project_id, nb_path, optimise)
+        # ProjectBusiness.nb_to_script(project_id, nb_path, optimise)
+        ProjectBusiness.nb_to_py_script(project_id, nb_path, optimise)
     except FileNotFoundError as e:
         return jsonify({"response": 'Try save your notebook and convert '
                                     'again.'}), \
@@ -365,4 +359,5 @@ def nb_to_script(project_id):
 @project_app.route("/get_hot_tag", methods=["GET"])
 def get_hot_tag():
     search_query = request.args.get('search_query', None)
-    return jsonify(ProjectBusiness.get_hot_tag(Project, search_query))
+    project_type = request.args.get('project_type', None)
+    return jsonify(ProjectBusiness.get_hot_tag(search_query, project_type))

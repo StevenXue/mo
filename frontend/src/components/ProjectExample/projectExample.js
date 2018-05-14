@@ -68,7 +68,7 @@ class ProjectExample extends React.Component {
       <div>
         <div>
           Version:&nbsp;&nbsp;
-          <Select defaultValue={version || project.versions.slice(-1)[0]} style={{ width: 120 }}
+          <Select defaultValue={version_} style={{ width: 120 }}
                   onChange={(value) => this.handleVersionChange(value, project._id)}>
             {project.versions.map(version =>
               <Option key={version} value={version}>{version}</Option>)}
@@ -104,6 +104,7 @@ class ProjectExample extends React.Component {
                               appId={this.props.projectDetail.project._id}
                               dispatch={this.props.dispatch}
                               version={version_}
+                              resultLoading={this.props.projectDetail.resultLoading}
                 />
                 {/*<div >*/}
                 {/*<Button*/}
@@ -144,12 +145,14 @@ class ProjectExample extends React.Component {
               <div>
                 <div>
                   <p>
-                    Error
+                    ERROR
                   </p>
                 </div>
                 <div>
                   <Alert message={<div
-                    style={{ whiteSpace: 'pre-line' }}>{this.props.projectDetail.project.args.output.errors}</div>}
+                    style={{ whiteSpace: 'pre-line' }}>
+                    {this.props.projectDetail.project.args.output.errors
+                    || 'No error log, please check your app code'}</div>}
                          type="error" showIcon/>
                 </div>
               </div>
