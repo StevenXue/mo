@@ -400,7 +400,7 @@ export default {
     *getExampleResult(action, { call, put, select }) {
       yield put({
         type: 'setResultLoading',
-        resultLoading: false,
+        resultLoading: true,
       })
       let payload = action.payload
       const { data: result } = yield call(AppService.runApi, payload)
@@ -410,7 +410,7 @@ export default {
       })
       yield put({
         type: 'setResultLoading',
-        resultLoading: true,
+        resultLoading: false,
       })
     },
 

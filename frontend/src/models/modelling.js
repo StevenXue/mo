@@ -132,7 +132,7 @@ export function *startLabBack({ payload: { hubUserName, hubToken } }, { call }) 
     }
     if(res.status === 202) {
       console.log('success 202', res)
-      await timeout(5000)
+      await timeout(15000)
     }
   }
 
