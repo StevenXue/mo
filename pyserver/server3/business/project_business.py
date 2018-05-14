@@ -381,6 +381,7 @@ class ProjectBusiness(GeneralBusiness):
         repo = cls.clone(user_ID, name, project_path)
 
         if create_tutorial:
+            # shutil.copy('tutorial/hello_world.ipynb', project_path)
             copytree('tutorial', project_path)
 
         # config repo user

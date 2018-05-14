@@ -8,7 +8,7 @@ import {
 
 import { getRound } from '../utils/number'
 import { hubPrefix } from '../utils/config'
-import { fetchProject, addModuleToApp} from '../services/project'
+import { fetchProject, addModuleToApp } from '../services/project'
 
 const categories = 'model'
 // check value includes any of
@@ -132,7 +132,7 @@ export function *startLabBack({ payload: { hubUserName, hubToken } }, { call }) 
     }
     if(res.status === 202) {
       console.log('success 202', res)
-      await timeout(15000)
+      await timeout(5000)
     }
   }
 
