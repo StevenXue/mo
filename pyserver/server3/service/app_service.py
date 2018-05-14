@@ -206,6 +206,17 @@ class AppService(ProjectService):
         :param version:
         :return:
         """
+
+        # update app status to 'deploying
+        app = cls.get_by_id(app_id)
+        app.status = 'deploying'
+        app.save()
+
+        # get container
+
+        container = cls.get_container(app)
+
+
         with open(handler_file_path, 'r') as f:
 
             script = f.read()
@@ -218,10 +229,13 @@ class AppService(ProjectService):
 
             # 2. for imported datasets
             # TODO: 1. get possible imported dataset list from app.used_datasets[0].dataset.path.replace('./user_directory', '../dataset')
-            app = cls.get_by_id(app_id)
+
+
+
             used_datasets = \
-                [ds.dataset.path.replace('./user_directory/', 'dataset')
-                 for ds in app.used_datasets]
+                [(d.dataset, d.dataset.path.replace(
+                    './user_directory', 'dataset'))
+                 for d in app.used_datasets]
 
             used_modules = \
                 [(m.module, m.version) for m in app.used_modules]
@@ -229,21 +243,22 @@ class AppService(ProjectService):
 
             # TODO: 2. check if there is any matches
             for d in used_datasets:
-                pattern = r"""^(?!#).*({})""".format(d)
-                if match:
-                    for match in re.finditer(pattern, script, re.MULTILINE):
-                        if '#' in match.group():
+                pattern = r"""^(?!#).*({})""".format(d[1])
+                matches = re.finditer(pattern, script, re.MULTILINE)
+                if matches:
+                    for ma in matches:
+                        if '#' in ma.group():
                             used_datasets.remove(d)
                 else:
                     used_datasets.remove(d)
 
-
             for m in used_modules:
                 pattern = r"""^(?!#).*(run|predict|train)\s*\(('|")({}/{}/{})('|")"""\
                     .format(m[0].user.user_ID, m[0].name, m[1].replace('_', '.'))
-                if match:
-                    for match in re.finditer(pattern, script, re.MULTILINE):
-                        if '#' in match.group():
+                matches = re.finditer(pattern, script, re.MULTILINE)
+                if matches:
+                    for ma in matches:
+                        if '#' in ma.group():
                             used_modules.remove(m)
                 else:
                     used_modules.remove(m)
@@ -251,13 +266,19 @@ class AppService(ProjectService):
 
             # TODO: save data to app.deployments
             cls.business.add_imported_modules(app_id, version,
-                                             [m[0] for m in used_modules])
+                                              [m[0] for m in used_modules])
+
+            cls.business.add_imported_datasets(app_id, version,
+                                               [d[0] for d in used_datasets])
 
 
 
-            # TODO: Copy related module folder from container, target folder '/home/jovyan/modules/chun/module_a/1_3_4
+            # TODO: Move module from project.module_path(./server3/lib/modules/zhaofengli/newttt/[module_version]/) to
+            #                        (./fucntion/[user_ID]-[app_name]-[app_version]/modules/[user_ID]/[module_name]/[module_version]
 
 
+
+            # TODO: Move dataset from 引用者的DOCKER CONTAINER 里面的 ~/dataset/[user_ID]
 
 
             # 3. work_path = './' -> 'function/'

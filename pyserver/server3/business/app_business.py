@@ -180,7 +180,14 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
     # TODO: Finish the function
     @classmethod
     def add_imported_datasets(cls, app_id, app_deploy_version, used_datasets):
-        pass
+        """
+
+        :param app_id:
+        :param app_deploy_version:
+        :param used_datasets:
+        :return:
+        """
+        cls.repo.add_imported_datasets(app_id, app_deploy_version, used_datasets)
 
     @classmethod
     def add_used_module(cls, app_id, module, func, version):
