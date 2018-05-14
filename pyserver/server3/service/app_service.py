@@ -168,8 +168,7 @@ class AppService(ProjectService):
             app.status = 'inactive'
             app.save()
             cls.send_message(app, m_type='deploy_fail')
-        else:
-            return app
+        return app
 
     @classmethod
     def get_action_entity(cls, app_id, **kwargs):

@@ -8,7 +8,7 @@ import {
 
 import { getRound } from '../utils/number'
 import { hubPrefix } from '../utils/config'
-import { fetchProject } from '../services/project'
+import { fetchProject, addModuleToApp } from '../services/project'
 
 const categories = 'model'
 // check value includes any of
@@ -172,6 +172,9 @@ const modelling = {
       yield call(startLabBack, { payload: { hubUserName, hubToken } }, { call })
       yield call(insertLabConfig, { payload: { hubUserName, hubToken } }, { call })
       // document.body = document.createElement('body')
+      if(project.name === 'tutorial') {
+        yield call(addModuleToApp, {appId: projectId, moduleId: '5af7fe54e13823cabec3c1ac', func: 'run', version: '1.0.0'})
+      }
       yield call(loadnStartJL, projectType)
     },
   },

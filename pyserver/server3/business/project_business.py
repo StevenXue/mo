@@ -21,7 +21,6 @@ from datetime import datetime
 # from distutils.dir_util import copy_tree
 from subprocess import call
 from git import Repo
-from flask_socketio import SocketIO
 
 from eventlet import spawn_n
 
@@ -42,7 +41,6 @@ from server3.business.request_answer_business import RequestAnswerBusiness
 from server3.constants import GIT_SERVER_IP
 from server3.business.general_business import GeneralBusiness
 
-socketio = SocketIO(message_queue=REDIS_SERVER)
 
 PAGE_NO = 1
 PAGE_SIZE = 5
@@ -383,7 +381,8 @@ class ProjectBusiness(GeneralBusiness):
         repo = cls.clone(user_ID, name, project_path)
 
         if create_tutorial:
-            shutil.copy('tutorial/hello_world.ipynb', project_path)
+            # shutil.copy('tutorial/hello_world.ipynb', project_path)
+            copytree('tutorial', project_path)
 
         # config repo user
         with repo.config_writer(config_level="repository") as c:
