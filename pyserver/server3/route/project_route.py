@@ -114,6 +114,11 @@ def get_project(project_id):
     #         'message': c.message,
     #         'time': datetime.fromtimestamp(c.time[0] + c.time[1]),
     #     } for c in commits]
+    # user_ID = get_jwt_identity()
+    # print(project_id,project.user.user_ID,user_ID)
+    # if project.privacy == 'private' and project.user.user_ID != user_ID:
+    #     return make_response(jsonify({'response': 'project'}), 200)
+
     project = json_utility.convert_to_json(project.to_mongo())
     project['commits'].reverse()
     return make_response(jsonify({'response': project}), 200)
