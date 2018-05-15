@@ -154,8 +154,8 @@ export function createDeployButton(): ToolbarButton {
                 },
               });
             }
-            window.location.replace(`/#/workspace/${projectId}?type=app`);
-            window.location.reload();
+            // window.location.replace(`/#/workspace/${projectId}?type=app`);
+            // window.location.reload();
           }
         });
       },
