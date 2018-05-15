@@ -294,7 +294,7 @@ function finalSteps() {
         { value: 2, label: 'Module',  type: 'goto',  url: '/userrequest?tab=module',
           trigger: "createUserRequest2",
         },
-        { value: 3, label: 'DataSet',  type: 'goto',  url: '/userrequest?tab=dataSet',
+        { value: 3, label: 'DataSet',  type: 'goto',  url: '/userrequest?tab=dataset',
           trigger: "createUserRequest2",
         },
       ],
