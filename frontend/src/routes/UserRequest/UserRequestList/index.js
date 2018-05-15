@@ -94,12 +94,18 @@ class RequestList extends Component {
   }
 
   componentDidMount() {
+    localStorage.getItem('mei_1')==='ok'?document.getElementById('mei_rightButton').click():null
+    localStorage.setItem('mei_1','no')
     this.fetchData({
       payload: {
         page_no: this.state.current,
         page_size: this.state.pageSize,
       },
     })
+    // .then(res=>{
+    //   this.props.location.search.indexOf('from')==-1?document.getElementById('mei_rightButton').click():null
+    // })
+    
     // this.hideBreadcrumb()
   }
 
