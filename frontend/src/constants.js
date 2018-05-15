@@ -6,38 +6,12 @@ import avatar4 from './img/avatar/4.png'
 import avatar5 from './img/avatar/5.png'
 import avatar6 from './img/avatar/6.png'
 
-import { flaskServer, hubServer, tbServer } from '../config.js'
+import config from '../config.js'
 
 module.exports = {
   apiPrefix: '/pyapi',
-  // apiPrefix: 'http://122.224.116.44:5005',
 
-  // jupyterServer: 'http://10.52.14.182:8888/api/contents/',  // kube master node ip
-  // kubeServer: 'http://10.52.14.182:8888/api/contents/',  // kube master node ip
-  gitServerIp: '10.52.14.182',
-  webServer: 'http://192.168.31.6',
-  // hubIp: '192.168.31.7',
-  // jupyterServer: 'http://10.52.14.182:8888/api/contents/',
-  // jupyterServer: 'http://122.224.116.44:9001/api/contents/',
-
-  // server api
-  flaskServer,
-  // flaskServer: 'http://10.52.14.182:5005',
-  // flaskServer: 'http://122.224.116.44:5005',
-  // flaskServer: 'http://192.168.31.7:5005',
-
-  hubServer,
-  // hubServer: 'http://192.168.31.7:8000',
-
-  tbServer,
-
-  //jupyter
-  // kubeBaseUrl: 'http://10.52.14.182:8888',  // kube master node ip
-  // baseUrl: 'http://10.52.14.182:8888',
-  // baseUrl: 'http://122.224.116.44:9001',
-
-  // assets
-  // assetsUrl: 'http://122.224.116.44:8008',
+  ...config,
 
   mainColor,
 

@@ -2,9 +2,24 @@
 M_DIR="$1"
 REQ_TXT=${M_DIR}/requirements.txt
 
-export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python3
-export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv
-source /usr/local/bin/virtualenvwrapper.sh
+DEV_ARRAY=(/usr/local/bin/python3 /usr/local/bin/virtualenv /usr/local/bin/virtualenvwrapper.sh)
+PROD_ARRAY=(/usr/bin/python3.6 /usr/bin/virtualenv /usr/bin/virtualenvwrapper.sh)
+
+if [ -f ${DEV_ARRAY[0]} ] && [ -f ${DEV_ARRAY[1]} ] && [ -f ${DEV_ARRAY[2]} ];
+then
+    export VIRTUALENVWRAPPER_PYTHON=${DEV_ARRAY[0]}
+    export VIRTUALENVWRAPPER_VIRTUALENV=${DEV_ARRAY[1]}
+    source ${DEV_ARRAY[2]}
+elif [ -f ${PROD_ARRAY[0]} ] && [ -f ${PROD_ARRAY[1]} ] && [ -f ${PROD_ARRAY[2]} ];
+then
+    export VIRTUALENVWRAPPER_PYTHON=${PROD_ARRAY[0]}
+    export VIRTUALENVWRAPPER_VIRTUALENV=${PROD_ARRAY[1]}
+    source ${PROD_ARRAY[2]}
+else
+    echo "Python Env Error!"
+    exit 1
+fi
+
 
 if [ ! -d ${M_DIR} ]; then
     echo "No such directory: $M_DIR"
