@@ -157,6 +157,7 @@ def add():
 @jwt_optional
 def get_app(app_id):
     user_ID = get_jwt_identity()
+    print('user_ID', user_ID)
     yml = request.args.get('yml')
     commits = request.args.get('commits')
     version = request.args.get('version')
@@ -167,7 +168,7 @@ def get_app(app_id):
 
     # 如果是私有项目，需要确定其登陆才能查看，否则返回error
     if app.privacy == 'private'and app.user.user_ID != user_ID:
-            return make_response(jsonify({'response': 'error'}), 200)
+            return jsonify({'response': 'error'}), 200
 
     # 将app.user 更换为 user_ID 还是name?
     user_ID = app.user.user_ID

@@ -1,6 +1,6 @@
-import request from "../utils/requestPro"
+import {request} from "../utils"
 
-const prefix = "/datasets"
+const prefix = "/pyapi/datasets"
 
 // // 新建 module
 // export function createModule(payload) {

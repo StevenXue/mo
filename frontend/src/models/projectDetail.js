@@ -258,6 +258,7 @@ export default {
         yield put(routerRedux.push(`/workspace/${projectId}?type=${projectType}`))
       }
       if (match[0] === `/workspace/${projectId}` && projectDetailOwner !== user_ID) {
+        console.log('projectDetailOwner',projectDetailOwner)
         yield put(routerRedux.push(`/explore/${projectId}?type=${projectType}`))
       }
 
