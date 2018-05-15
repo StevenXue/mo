@@ -1227,6 +1227,7 @@ user_path = os.path.abspath(cwd).\
 c.DockerSpawner.image = 'singleuser:latest'
 c.DockerSpawner.remove_containers = True
 c.DockerSpawner.container_ip = '0.0.0.0'
+c.DockerSpawner.host_ip = '0.0.0.0'
 c.DockerSpawner.volumes = \
     {
         user_path: '/home/jovyan/work',
