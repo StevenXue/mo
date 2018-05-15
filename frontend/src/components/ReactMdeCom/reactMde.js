@@ -93,7 +93,7 @@ class ReactMdeEditor extends React.Component {
               this.cancelEditOverviewState()
             }}>Cancel</Button>
           </div> : null}
-        {!this.state.modifyState && !this.props.market_use?
+        {!this.state.modifyState && this.props.ownerOrNot?
           <div style={{"textAlign": "center"}}><Button
             type='primary' style={{marginTop: 15}}
             onClick={() => {

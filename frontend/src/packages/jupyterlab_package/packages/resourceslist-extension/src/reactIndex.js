@@ -2,13 +2,6 @@ import * as React from 'react'
 import { Card, Button, Row, Col, Input, Icon, Pagination, Select, message, List, Modal } from 'antd'
 import * as pathToRegexp from 'path-to-regexp'
 import ReactMde from 'react-mde'
-// const {ReactMdeTypes, ReactMdeCommands} = ReactMde
-import Floater from 'react-floater'
-import Joyride from 'react-joyride'
-
-import {
-  VDomRenderer,
-} from '@jupyterlab/apputils'
 
 import {
   NotebookActions,
@@ -29,7 +22,10 @@ import {
   getFavs,
   getAppActionEntity,
   removeUsedEntityInApp,
+  getHotTagOfProject
 } from './services'
+// import { getHotTagOfProject } from '../../../../../services/project'
+import TagSelect from './TagSelect'
 
 const Option = Select.Option
 import 'antd/lib/list/style/css'
@@ -180,8 +176,8 @@ export class ListPage extends React.Component {
     })
   }
 
-  handleQueryChange(value) {
-    this.fetchData({ payload: { query: value } })
+  handleQueryChange(value, tags) {
+    this.fetchData({ payload: { query: value, tags: tags } })
   }
 
   insertCode() {
@@ -550,10 +546,9 @@ export class ListPage extends React.Component {
                                onClick={() => this.setState({ [`showUsed${this.pageTypeUC}s`]: true })}/>}
           <div className='fav-btn' onClick={() => this.setState({ [`showFav${this.pageTypeUC}s`]: true })}/>
         </header>
-        <Search
-          placeholder="input search text"
-          onSearch={(value) => this.handleQueryChange(value)}
-        />
+        <TagSelect getHotTag={getHotTagOfProject} onSearch={(value, tags) => {
+          this.handleQueryChange(value, tags)
+        }} type={this.pageType}/>
         <div className='list'>
           {this.state.projects.map((project) =>
             <Card key={project.user + project.name} title={project.name}

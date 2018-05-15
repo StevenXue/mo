@@ -94,3 +94,9 @@ export function removeUsedEntityInApp({ pageType, appId, entityId, version, onJs
   }, { onJson })
 }
 
+export function getHotTagOfProject({ payload, onJson }) {
+  const searchQuery = payload.searchQuery
+  const projectType = payload.objectType
+  return request(`pyapi/project/get_hot_tag?search_query=${searchQuery}&project_type=${projectType}`, undefined, { onJson })
+}
+
