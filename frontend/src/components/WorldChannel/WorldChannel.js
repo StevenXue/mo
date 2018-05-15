@@ -15,8 +15,6 @@ class worldChannelC extends Component {
   componentDidMount() {
     // this.setState({ run: true });
 
-
-
   }
 
   onClickIcon = () => {
@@ -69,7 +67,7 @@ class WorldChannel extends Component {
       type: 'worldChannel/getWorldMessages',
       payload: {
         channel: 'all',
-        scrollToBottom: this.scrollToBottom
+        scrollToBottom: this.scrollToBottom,
       },
     })
   }
@@ -89,28 +87,31 @@ class WorldChannel extends Component {
   handleSendMessage = (e) => {
     this.scrollToBottom(true)
     const inputMessage = e.target.value
-    this.props.dispatch({
-      type: 'worldChannel/sendMessage',
-      payload: {
-        channel: 'all',
-        message: inputMessage,
-      },
-    })
-    e.target.value = ''
+    if (inputMessage) {
+      this.props.dispatch({
+        type: 'worldChannel/sendMessage',
+        payload: {
+          channel: 'all',
+          message: inputMessage,
+        },
+      })
+      e.target.value = ''
+    }
   }
 
   subHadleSendMessage = (e) => {
     this.scrollToBottom(true)
     const inputMessage = e.input.value
-    this.props.dispatch({
-      type: 'worldChannel/sendMessage',
-      payload: {
-        channel: 'all',
-        message: inputMessage,
-      },
-    })
-    e.input.value = ''
-
+    if (inputMessage) {
+      this.props.dispatch({
+        type: 'worldChannel/sendMessage',
+        payload: {
+          channel: 'all',
+          message: inputMessage,
+        },
+      })
+      e.input.value = ''
+    }
   }
 
   render() {
@@ -138,7 +139,7 @@ class WorldChannel extends Component {
 
               <Icon type="caret-down"
                     className={styles.icon_container}
-                    style={{color: 'transparent'}}
+                    style={{ color: 'transparent' }}
               />
             </div> :
 
