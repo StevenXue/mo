@@ -328,7 +328,7 @@ class Demo extends React.Component {
 }
 
 function ParamsMapper({
-                        args, layerIndex, baseArgs, appId, dispatch, version,
+                        args, layerIndex, baseArgs, appId, dispatch, version, resultLoading,
                         form: { getFieldDecorator, validateFieldsAndScroll, setFieldsValue },
                       }) {
 
@@ -343,7 +343,7 @@ function ParamsMapper({
         })
       }
       <FormItem wrapperCol={{ span: 6, offset: 5 }}>
-        <Button loading={this.props.projectDetail}
+        <Button loading={resultLoading}
           type="primary" htmlType="submit">Submit</Button>
       </FormItem>
     </Form>

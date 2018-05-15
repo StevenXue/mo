@@ -175,11 +175,6 @@ class ProjectList extends Component {
           {/*</Select>*/}
           <TagSelect getHotTag={getHotTagOfProject} onSearch={(value,tags) => {
             this.handleQueryChange(value,tags)}} type={this.props.type}/>
-          {/*<Search*/}
-            {/*placeholder="input search text"*/}
-            {/*onSearch={(value) => this.handleQueryChange(value)}*/}
-            {/*style={{width: 200}}*/}
-          {/*/>*/}
         </div>
         <Spin spinning={this.state.loading}>
         <div className={styles.projectList}>
@@ -191,7 +186,6 @@ class ProjectList extends Component {
               onClickStarFavor={(action) => this.starFavor(action, e._id, e.type)}
             />
           }
-
           )}
         </div>
         </Spin>

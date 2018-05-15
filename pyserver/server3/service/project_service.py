@@ -410,17 +410,15 @@ class ProjectService:
         tags = ['tutorial', 'official']
         type = 'app'
 
-        if tags is None:
-            tags = []
-        user = UserBusiness.get_by_user_ID(user_ID)
-        project = cls.business.create_project(
+        project = cls.create_project(
             name=name,
-            description=description,
-            type=type, tags=tags, user=user,
+            description=description, user_ID=user_ID,
+            type=type, tags=tags,
             user_token=user_token,
             create_tutorial=True,
             auto_show_help=True,
             **kwargs)
+
         return project
 
     @classmethod
@@ -559,3 +557,8 @@ class ProjectService:
                                       project.user, project_name=project.name,
                                       project_id=project.id,
                                       project_type=project.type)
+
+    @staticmethod
+    def get_hot_tag(search_query, object_type):
+        return TypeMapper.get(object_type).get_hot_tag(search_query,
+                                                       object_type)
