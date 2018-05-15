@@ -146,6 +146,11 @@ class MyDockerSpawner(DockerSpawner):
 
             if extra_host_config:
                 host_config.update(extra_host_config)
+            from sys import platform
+            if platform != 'darwin':
+                host_config.update({'extra_hosts': {
+                    'host.docker.internal': '172.17.0.1'
+                }})
 
             self.log.debug("Starting host with config: %s", host_config)
 
@@ -1221,8 +1226,9 @@ c.Authenticator.admin_users = {'admin'}
 # c.CryptKeeper.n_threads = 8
 
 import os
+
 cwd = os.getcwd()
-user_path = os.path.abspath(cwd).\
+user_path = os.path.abspath(cwd). \
     replace('jupyterhub', 'user_directory/{user_ID}/{project_name}')
 c.DockerSpawner.image = 'singleuser:latest'
 c.DockerSpawner.remove_containers = True

@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "start": "cross-env PORT=8989 roadhog server",
+    "start": "cross-env PORT=8899 roadhog server",
     "build": "roadhog build",
     "lint": "eslint --ext .js src test"
   },
