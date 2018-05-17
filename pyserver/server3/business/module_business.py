@@ -20,7 +20,7 @@ from server3.repository.general_repo import Repo
 from server3.business.project_business import ProjectBusiness
 from server3.service.validation.validation import GDValidation
 from server3.constants import MODULE_DIR
-from server3.constants import DEV_DIR_NAME
+from server3.constants import DEFAULT_DEPLOY_VERSION
 from server3.constants import USER_DIR
 from server3.constants import GIT_SERVER_IP
 
@@ -160,12 +160,12 @@ class ModuleBusiness(ProjectBusiness):
     #     return module
 
     @staticmethod
-    def load_module_params(module, version=DEV_DIR_NAME):
+    def load_module_params(module, version=DEFAULT_DEPLOY_VERSION):
         if not version:
             if len(module.versions) > 0:
                 version = module.versions[-1]
             else:
-                version = DEV_DIR_NAME
+                version = DEFAULT_DEPLOY_VERSION
         yml_path = os.path.join(module.module_path, version, tail_path)
         if os.path.exists(yml_path):
             with open(yml_path, 'r') as stream:
@@ -175,7 +175,7 @@ class ModuleBusiness(ProjectBusiness):
             return {'input': {}, 'output': {}}
 
     @classmethod
-    def deploy_or_publish(cls, project_id, commit_msg, version=DEV_DIR_NAME):
+    def deploy_or_publish(cls, project_id, commit_msg, version=DEFAULT_DEPLOY_VERSION):
         module = cls.get_by_id(project_id)
 
         module.status = 'deploying'
@@ -216,7 +216,7 @@ class ModuleBusiness(ProjectBusiness):
         #     command=f"/bin/bash -c 'cd {compile_dir} && bash ./compile.sh'")
 
         # if publish update privacy and version
-        if version != DEV_DIR_NAME:
+        if version != DEFAULT_DEPLOY_VERSION:
             module.privacy = 'public'
             module.versions.append(version)
 

@@ -18,15 +18,17 @@ import synonyms
 import docker
 
 from server3.entity import project
+from server3.entity.project import Deployment
 from server3.business.project_business import ProjectBusiness
 from server3.business.general_business import GeneralBusiness
+from server3.repository.app_repo import AppRepo
 from server3.repository.general_repo import Repo
 from server3.utility.json_utility import args_converter
 from server3.constants import APP_DIR
 from server3.constants import MODULE_DIR
 from server3.constants import DOCKER_IP
 from server3.constants import APP_DIR
-from server3.constants import DEV_DIR_NAME
+from server3.constants import DEFAULT_DEPLOY_VERSION
 from server3.constants import INIT_RES
 from server3.constants import Error, Warning, ErrorMessage
 from server3.entity.general_entity import Objects
@@ -37,7 +39,7 @@ yaml_tail_path = 'app_spec.yml'
 
 
 class AppBusiness(ProjectBusiness, GeneralBusiness):
-    repo = Repo(project.App)
+    repo = AppRepo(project.App)
     entity = project.App
     base_func_path = APP_DIR
 
@@ -73,7 +75,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
 
     @classmethod
     def deploy_or_publish(cls, app_id, commit_msg, handler_file_path,
-                          version=DEV_DIR_NAME):
+                          version=DEFAULT_DEPLOY_VERSION):
         app = cls.get_by_id(app_id)
         app.status = 'deploying'
         app.save()
@@ -111,9 +113,6 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         # do some deploy necessary change to handler.py
         cls.process_handler_py(handler_dst_path)
 
-        # change some configurable variable to deploy required
-        cls.modify_handler_py(handler_dst_path)
-
         # 1. copy modules from docker
         cls.copy_from_container(container, '/home/jovyan/modules', func_path)
         # copy path edited __init__.py
@@ -129,7 +128,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
              cwd=cls.base_func_path)
 
         # when not dev(publish), change the privacy etc
-        if version != DEV_DIR_NAME:
+        if version != DEFAULT_DEPLOY_VERSION:
             app.privacy = 'public'
             app.versions.append(version)
 
@@ -155,20 +154,12 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
                 t.extractall(path_to)
 
     @staticmethod
-    def modify_handler_py(py_path):
-        for line in fileinput.input(files=py_path, inplace=1):
-            line = re.sub(r"""work_path = ''""",
-                          r"""work_path = 'function/'""",
-                          line.rstrip())
-            print(line)
-
-    @staticmethod
-    def load_app_params(app, version=DEV_DIR_NAME):
+    def load_app_params(app, version=DEFAULT_DEPLOY_VERSION):
         if not version:
             if len(app.versions) > 0:
                 version = app.versions[-1]
             else:
-                version = DEV_DIR_NAME
+                version = DEFAULT_DEPLOY_VERSION
         yml_path = os.path.join('-'.join([app.app_path, version]),
                                 yaml_tail_path)
         if os.path.exists(yml_path):
@@ -179,12 +170,27 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
             return {'input': {}, 'output': {}}
 
     @classmethod
+    def add_imported_entities(cls, app_id, app_deploy_version, used_datasets,
+                              used_modules):
+        """
+
+        :param app_id:
+        :param app_deploy_version:
+        :param used_datasets:
+        :param used_modules:
+        :return:
+        """
+        cls.repo.add_imported_entities(app_id, app_deploy_version,
+                                       used_datasets=used_datasets,
+                                       used_modules=used_modules)
+
+    @classmethod
     def add_used_module(cls, app_id, module, func, version):
         app = cls.get_by_id(app_id)
         app_yaml_path = os.path.join(app.path, yaml_tail_path)
         args = {}
         output = {}
-        version = version or DEV_DIR_NAME
+        version = version or DEFAULT_DEPLOY_VERSION
         cls.insert_module_env(app, module, version)
         # copy module yaml to app yaml
         input_args = module.to_mongo()['args']['input'].get(func, {})
@@ -406,5 +412,4 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
 
 
 if __name__ == "__main__":
-    # apps = project.App.objects(user=)
     pass

@@ -41,7 +41,7 @@ KUBE_NAME = {
     'serving': '{job_id}-serving'
 }
 MODULE_DIR = './server3/lib/modules'
-DEV_DIR_NAME = 'dev'
+DEFAULT_DEPLOY_VERSION = 'dev'
 APP_DIR = './functions'
 # INIT_RES = [
 #     r"# coding: utf-8",
