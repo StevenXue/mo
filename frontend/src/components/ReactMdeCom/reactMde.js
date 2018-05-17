@@ -10,7 +10,16 @@ import styles from './reactMde.less'
 
 class ReactMdeEditor extends React.Component {
 
-  converter = new Converter({tables: true, simplifiedAutoLink: true})
+  converter = new Converter({
+    tables: true,
+    simplifiedAutoLink: true,
+    excludeTrailingPunctuationFromURLs:true,
+    tasklists: true,
+    strikethrough:true,
+    ghCodeBlocks:true,
+    emoji: true,
+    underline:true,
+  })
 
   constructor(props) {
     super(props)
@@ -39,30 +48,30 @@ class ReactMdeEditor extends React.Component {
   }
 
   cancelEdit() {
-      this.props.dispatch({
-        type: 'projectDetail/setOverviewEditorState',
-        overviewEditorState: false
-      })
+    this.props.dispatch({
+      type: 'projectDetail/setOverviewEditorState',
+      overviewEditorState: false
+    })
   }
 
   render() {
     return (
       <div>
-          <ReactMde
-            layout='tabbed'
-            editorState={this.state.reactMdeValue}
-            onChange={this.handleValueChange}
-            generateMarkdownPreview={(markdown) => Promise.resolve(this.converter.makeHtml(markdown))}
-          />
-          <div style={{"textAlign": "center", "marginTop": "15px"}}>
-            <Button type='primary' style={{marginRight: 15}}
-                    onClick={() => {
-                      this.editOverview()
-                    }}>OK</Button>
-            <Button onClick={() => {
-              this.cancelEdit()
-            }}>Cancel</Button>
-          </div>
+        <ReactMde
+          layout='tabbed'
+          editorState={this.state.reactMdeValue}
+          onChange={this.handleValueChange}
+          generateMarkdownPreview={(markdown) => Promise.resolve(this.converter.makeHtml(markdown))}
+        />
+        <div style={{"textAlign": "center", "marginTop": "15px"}}>
+          <Button type='primary' style={{marginRight: 15}}
+                  onClick={() => {
+                    this.editOverview()
+                  }}>OK</Button>
+          <Button onClick={() => {
+            this.cancelEdit()
+          }}>Cancel</Button>
+        </div>
       </div>
     )
   }
@@ -70,7 +79,16 @@ class ReactMdeEditor extends React.Component {
 
 export class ReactMdePreview extends React.Component {
 
-  converter = new Converter({tables: true, simplifiedAutoLink: true})
+  converter = new Converter({
+    tables: true,
+    simplifiedAutoLink: true,
+    excludeTrailingPunctuationFromURLs:true,
+    tasklists: true,
+    strikethrough:true,
+    ghCodeBlocks:true,
+    emoji: true,
+    underline:true
+  })
 
   constructor(props) {
     super(props)
@@ -80,25 +98,28 @@ export class ReactMdePreview extends React.Component {
       },
     }
   }
+
   handleValueChange = (value) => {
-    this.setState({reactMdeValue:value})
+    this.setState({reactMdeValue: value})
   }
-  startEditOverviewState(){
+
+  startEditOverviewState() {
     this.props.dispatch({
       type: 'projectDetail/setOverviewEditorState',
       overviewEditorState: true
     })
   }
+
   render() {
     return (
-      <div className={styles.mdeVertical} >
-          <ReactMde
-            layout='vertical'
-            commands={null}
-            editorState={this.state.reactMdeValue}
-            onChange={this.handleValueChange}
-            generateMarkdownPreview={(markdown) => Promise.resolve(this.converter.makeHtml(markdown))}
-          />
+      <div className={styles.mdeVertical}>
+        <ReactMde
+          layout='vertical'
+          commands={null}
+          editorState={this.state.reactMdeValue}
+          onChange={this.handleValueChange}
+          generateMarkdownPreview={(markdown) => Promise.resolve(this.converter.makeHtml(markdown))}
+        />
         {this.props.ownerOrNot ?
           <div style={{"textAlign": "center"}}><Button
             type='primary' style={{marginTop: 15}}

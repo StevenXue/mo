@@ -53,7 +53,7 @@
     "react-json-tree": "^0.11.0",
     "react-jupyter": "^0.1.0",
     "react-markdown": "^3.3.0",
-    "react-mde": "^5.5.1",
+    "react-mde": "^5.5.0-alpha.4",
     "react-simple-chatbot": "^0.2.9",
     "reqwest": "^2.0.5",
     "rxjs": "^5.5.2",
