@@ -338,12 +338,12 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
                    } : { margin: '0 -20px', color: 'black' }}>
                 {switchMessage(e)}</div>)}
           </Menu.Item>
-          <Menu.Item style={{ color: 'black' }}>
-            <div>
-              <div><Icon type="setting"/>设置</div>
-              <div>查看全部提醒</div>
-            </div>
-          </Menu.Item>
+          {/*<Menu.Item style={{ color: 'black' }}>*/}
+            {/*<div>*/}
+              {/*<div><Icon type="setting"/>设置</div>*/}
+              {/*<div>查看全部提醒</div>*/}
+            {/*</div>*/}
+          {/*</Menu.Item>*/}
           {/*{login.user && JsonToArray(message.messages).map(e =>*/}
           {/*<Menu.Item key={e._id} className={styles.messageMenuItem}*/}
           {/*style={e.is_read === false?{backgroundColor: '#f0f2f5',color:'black'}:{color:'black'}}>*/}
