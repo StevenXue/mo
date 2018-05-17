@@ -133,7 +133,6 @@ export async function customRequest(url,
     ...newOptions.headers,
   }
 
-
   return fetch(newUrl, newOptions)
     .then(checkStatus)
     // .then(response => response.json())

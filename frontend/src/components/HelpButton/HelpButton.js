@@ -1,19 +1,16 @@
 import React, { Component } from 'react'
-import { Button, Modal, Carousel, Icon, Steps } from 'antd'
+import { Button, Modal, Icon, Steps } from 'antd'
 import Joyride from 'react-joyride'
 import gifNew from '../../img/gif/new.gif'
 import gifImport from '../../img/gif/import.gif'
 import gifDeploy from '../../img/gif/deploy.gif'
 import { connect } from 'dva'
-
-const gitList = [gifNew, gifImport, gifDeploy]
-const titleList = ['1/3 创建项目', '2/3 使用module', '3/3 部署项目']
-
+import _ from 'lodash'
 import styles from './index.less'
 
 const Step = Steps.Step
-import _ from 'lodash'
-
+const gitList = [gifNew, gifImport, gifDeploy]
+const titleList = ['1/3 创建项目', '2/3 使用module', '3/3 部署项目']
 const JOYRIDE = [
   {
     text: '新建文件',
@@ -66,11 +63,10 @@ const JOYRIDE = [
     width: '120px',
     tooltipOffset: 50,
   },
-
 ]
+const [imgWidth, imgHeight, scale] = [1920, 1023, 2.3]
 
 const convertAllSteps = () => {
-
   let result = JOYRIDE.map((ele) => {
     if (!document.querySelector(ele.selector)) {
       return
@@ -86,21 +82,13 @@ const convertAllSteps = () => {
           color: '#34BFE2',
           textAlign: 'center',
           width: ele.width ? ele.width : '5rem',
-          // height: '60px',
-          // maxHeight: "30px",
           mainColor: '#ffffff',
           backgroundColor: '#ffffff',
-          // beacon: {
-          //   inner: '#0ae713 ',
-          //   outer: '#77Eb7c',
-          // },
           main: {
             padding: '1px',
-
           },
           header: {
             display: 'none',
-            // or any style attribute
           },
           close: {
             display: 'none',
@@ -118,10 +106,6 @@ const convertAllSteps = () => {
   return result.filter((item) => item !== undefined)
 }
 
-function onChange(a, b, c) {
-  console.log(a, b, c)
-}
-
 class HelpButton extends React.Component {
   state = {
     run: false,
@@ -136,14 +120,17 @@ class HelpButton extends React.Component {
 
   componentDidMount() {
     window.addEventListener('trigger_tooltip', () => {
+      // 当notebook 加载完成触发
       this.setState({ isNotebookLoaded: true })
-      // console.log('触发了')
+
+      // 自动显示tooltip, 延迟 2s 等html完全加载 （需求更改，注释掉了）
       // setTimeout(() => {
       //   // this.setState({ run: true })
       //   this.setState({
       //     allSteps: convertAllSteps(),
       //   })
       // }, 2000)
+
     }, false)
   }
 
@@ -196,6 +183,7 @@ class HelpButton extends React.Component {
     this.setState({ run: !this.state.run })
   }
 
+  // 使用教程弹窗
   renderHelp = () => {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -216,7 +204,7 @@ class HelpButton extends React.Component {
                   }}
             /> : <Icon type="left" style={{ fontSize: 40, color: 'transparent' }}/>}
           <img style={{
-            width: 1920 / 2.3, height: 1023 / 2.3,
+            width: imgWidth / scale, height: imgHeight / scale,
             marginTop: 8,
             marginBottom: 50,
             border: '1px solid #c1c1c1',
@@ -241,8 +229,8 @@ class HelpButton extends React.Component {
               {dot}
             </div>
           )}>
-            {titleList.map((e, index)=><Step key={e} status={this.state.helpState===index?"finish": "wait"}/>)}
-            <Step status={"wait"}/>
+            {titleList.map((e, index) => <Step key={e} status={this.state.helpState === index ? 'finish' : 'wait'}/>)}
+            <Step status={'wait'}/>
           </Steps>
         </div>
       </div>
@@ -280,28 +268,25 @@ class HelpButton extends React.Component {
           onMouseLeave={this.handleOnClick}
           style={{
             borderWidth: 0,
-            color: "#1890ff"
+            color: '#1890ff',
           }}
-          // onClick={this.handleOnClick}
         >
           Hint
         </Button>
-
         <div>
           <Button size="small"
                   onClick={this.showModal}
                   style={{
                     borderWidth: 0,
-                    color: "#1890ff"
+                    color: '#1890ff',
                   }}
           >Tips</Button>
           <Modal
-            // title="Basic Modal"
             visible={this.state.visible}
             onOk={this.handleOk}
             onCancel={this.handleCancel}
             footer={null}
-            width={1920 / 2.3 + 100}
+            width={imgWidth / scale + 100}
             bodyStyle={{
               display: 'flex',
               justifyContent: 'center',
