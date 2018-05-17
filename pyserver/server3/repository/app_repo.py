@@ -8,47 +8,40 @@ class AppRepo(ProjectRepo):
     def __init__(self, instance):
         ProjectRepo.__init__(self, instance)
 
-
-    def add_imported_modules(self, app_id, app_deploy_version, used_modules):
+    def add_imported_entities(self, app_id, app_deploy_version,
+                              used_datasets=None, used_modules=None):
         """
-
-        :param app_id:
-        :param app_deploy_version:
-        :param used_modules:
-        :return:
-        """
-        app = self.read_by_id(app_id)
-
-        deployment = app.deployments.filter(app_version=app_deploy_version)
-
-        if len(deployment) == 0:
-            # add new Deployment
-            app.deployments.create(app_version=app_deploy_version,
-                                   modules=used_modules)
-        else:
-            deployment[0].modules += used_modules
-            app.save()
-
-    def add_imported_datasets(self, app_id, app_deploy_version, used_datasets):
-        """
-
+        add imported datasets or modules to app deployments
         :param app_id:
         :param app_deploy_version:
         :param used_datasets:
+        :param used_modules:
         :return:
         """
+        if used_datasets is None:
+            used_datasets = []
+
+        if used_modules is None:
+            used_modules = []
         app = self.read_by_id(app_id)
 
-        deployment = app.deployments.filter(app_version=app_deploy_version)
+        deployments = app.deployments.filter(app_version=app_deploy_version)
 
-        if len(deployment) == 0:
+        if len(deployments) == 0:
             # add new Deployment
-            app.deployments.create(app_version=app_deploy_version,
-                                   datasets=used_datasets)
+            deployments.create(app_version=app_deploy_version,
+                               datasets=used_datasets,
+                               modules=used_modules)
+        elif len(deployments) == 1:
+            for um in used_modules:
+                m_list = set(m.to_json() for m in deployments[0].modules)
+                if um.to_json() not in m_list:
+                    deployments[0].modules.append(um)
+            for ud in used_datasets:
+                d_list = set(d.to_json() for d in deployments[0].datasets)
+                if ud.to_json() not in d_list:
+                    deployments[0].datasets.append(ud)
+
         else:
-            deployment[0].datasets += used_datasets
-            app.save()
-
-
-
-
+            raise Exception('deployments duplicate')
+        app.save()

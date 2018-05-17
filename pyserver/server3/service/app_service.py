@@ -129,7 +129,6 @@ class AppService(ProjectService):
     @classmethod
     def get_by_id(cls, project_id, **kwargs):
         project = super().get_by_id(project_id, **kwargs)
-        print(kwargs, project.app_path)
         if kwargs.get('yml') == 'true' and project.app_path:
             project.args = cls.business.load_app_params(project,
                                                         kwargs.get('version'))
@@ -146,28 +145,30 @@ class AppService(ProjectService):
     @classmethod
     def publish(cls, project_id, commit_msg, handler_file_path, version):
         try:
-            app = cls.business.deploy_or_publish(project_id, commit_msg,
-                                                    handler_file_path, version)
+            app = cls.deploy_or_publish(project_id, commit_msg,
+                                        handler_file_path, version)
             cls.send_message(app, m_type='publish')
-        except:
+        except Exception as e:
             app = cls.business.get_by_id(project_id)
             app.status = 'inactive'
             app.save()
             cls.send_message(app, m_type='publish_fail')
+            raise e
         else:
             return app
 
     @classmethod
     def deploy(cls, project_id, commit_msg, handler_file_path):
         try:
-            app = cls.business.deploy_or_publish(project_id, commit_msg,
-                                                    handler_file_path)
+            app = cls.deploy_or_publish(project_id, commit_msg,
+                                        handler_file_path)
             cls.send_message(app, m_type='deploy')
-        except:
+        except Exception as e:
             app = cls.business.get_by_id(project_id)
             app.status = 'inactive'
             app.save()
             cls.send_message(app, m_type='deploy_fail')
+            raise e
         return app
 
     @classmethod
@@ -190,13 +191,14 @@ class AppService(ProjectService):
         modules = []
         for match in re.finditer(pattern, script, re.MULTILINE):
             if '#' not in match.group(0):
-                modules.append((match.group(4), match.group(5), match.group(6)))
+                modules.append(
+                    (match.group(4), match.group(5), match.group(6)))
 
         return modules
 
     @classmethod
-    def app_deploy_or_publish(cls, app_id, commit_msg, handler_file_path,
-                              version=DEFAULT_DEPLOY_VERSION):
+    def deploy_or_publish(cls, app_id, commit_msg, handler_file_path,
+                          version=DEFAULT_DEPLOY_VERSION):
         """
 
         App project go deploy or publish.
@@ -223,24 +225,25 @@ class AppService(ProjectService):
         service_name_no_v = '-'.join([app.user.user_ID, app.name])
 
         # faas new in functions dir
+        s_path = os.path.join(cls.business.base_func_path, service_name)
+        if os.path.exists(s_path):
+            shutil.rmtree(s_path)
         call(['faas-cli', 'new', service_name, '--lang=python3',
               f'--gateway=http://{DOCKER_IP}:8080'],
              cwd=cls.business.base_func_path)
-
         # target path = new path
         func_path = os.path.join(cls.business.base_func_path, service_name)
 
         cls.business.copytree_wrapper(app.path, func_path,
-                             ignore=shutil.ignore_patterns('.git'))
-
+                                      ignore=shutil.ignore_patterns('.git'))
         # rename py to handler.py
         handler_file_path = handler_file_path.replace('work', func_path)
         handler_file_path = os.path.join(func_path, handler_file_path)
         handler_file_name = handler_file_path.split('/')[-1]
-        handler_dst_path = handler_file_path.replace(handler_file_name, 'handler.py')
+        handler_dst_path = handler_file_path.replace(handler_file_name,
+                                                     'handler.py')
 
         shutil.copy(handler_file_path, handler_dst_path)
-
         # change some configurable variable to deploy required
         cls.business.modify_handler_py(handler_dst_path)
 
@@ -251,64 +254,58 @@ class AppService(ProjectService):
             # 1. get possible imported dataset list from
             # app.used_datasets[n].dataset.path
             # e.g. './user_directory/zhaofengli/anone
-            possible_used_datasets = \
-                [(d.dataset, d.dataset.path.replace(
-                    './user_directory', 'dataset'))
-                 for d in app.used_datasets]
+            possible_used_datasets = [d for d in app.used_datasets]
 
             # 2. get possible imported module list from
             # app.used_modules in list of
             # tuple (module_object, module_version) format
-            possible_used_modules = \
-                [(m.module, m.version) for m in app.used_modules]
-
+            possible_used_modules = [m for m in app.used_modules]
 
             # 3. check if there is any matches in script
             for d in possible_used_datasets:
-                pattern = r"""^(?!#).*({})""".format(d[1])
-                matches = re.findall(pattern, script, re.MULTILINE)
-
-                if len(matches) > 0:
-                    for ma in matches:
-                        if '#' in ma.group(0):
-                            possible_used_datasets.remove(d)
+                pattern = r"""^(?!#).*({})""".format(d.dataset.path.replace(
+                    './user_directory', 'dataset'))
+                matches = re.finditer(pattern, script, re.MULTILINE)
+                for ma in matches:
+                    if '#' not in ma.group(0):
+                        break
                 else:
-                    possible_used_datasets.remove(d)
+                    app.used_datasets.remove(d)
 
             for m in possible_used_modules:
                 pattern = \
-                    r"""^(?!#).*(run|predict|train)\s*\(('|")({}/{}/{})('|")"""\
-                    .format(m[0].user.user_ID,
-                            m[0].name,
-                            m[1].replace('_', '.'))
-                matches = re.findall(pattern, script, re.MULTILINE)
-                if len(matches) > 0:
-                    for ma in matches:
-                        if '#' in ma.group(0):
-                            possible_used_modules.remove(m)
+                    r"""^(?!#).*(run|predict|train)\s*\(('|")({}/{}/{})('|")""" \
+                        .format(m.module.user.user_ID,
+                                m.module.name,
+                                m.version.replace('_', '.'))
+                matches = re.finditer(pattern, script, re.MULTILINE)
+                for ma in matches:
+                    if '#' not in ma.group(0):
+                        break
                 else:
-                    possible_used_modules.remove(m)
+                    app.used_modules.remove(m)
 
             # 4. save verified possible_imported_modules/datasets
             # to app.deployments
-            cls.business.add_imported_modules(
-                app_id, version, [m[0] for m in possible_used_modules])
-
-            cls.business.add_imported_datasets(
-                app_id, version, [d[0] for d in possible_used_datasets])
-
+            cls.business.add_imported_entities(
+                app_id, version,
+                used_modules=possible_used_modules,
+                used_datasets=possible_used_datasets)
 
             # Move module from project.module_path
             # ./server3/lib/modules/zhaofengli/newttt/[module_version]/ to
             # ./fucntion/[user_ID]-[app_name]-[app_version]/modules/
             # [user_ID]/[module_name]/[module_version]
             for m in possible_used_modules:
-                shutil.copytree('{}/{}/'.format(m[0].module_path,
-                                                m[1].replace('.', '_')),
-                                './function/{}-{}-{}/modules/{}/{}/{}/'.format(
-                                    app.user.user_ID, app.name, version,
-                                    m[0].user.name, m[0].name,
-                                    m[1].replace('.', '_')))
+                src = '{}/{}/'.format(m.module.module_path,
+                                      m.version.replace('.', '_'))
+                dst = './functions/{}-{}-{}/modules/{}/{}/{}/'.format(
+                    app.user.user_ID, app.name, version,
+                    m.module.user.name, m.module.name,
+                    m.version.replace('.', '_'))
+                if os.path.isdir(dst):
+                    shutil.rmtree(dst)
+                shutil.copytree(src, dst)
 
             # Move dataset from 引用者的DOCKER CONTAINER 里面的
             # ~/dataset/[user_ID] to
@@ -316,16 +313,20 @@ class AppService(ProjectService):
             # dataset/[user_ID]/[dataset_name]/
 
             for d in possible_used_datasets:
-                cls.business.copy_from_container(
-                    container,
-                    '/home/jovyan/{}'.format(d[1]),
-                    './function/{}-{}-{}/modules/{}/{}'.format(
-                        app.user.user_ID, app.name, version,
-                        d[0].use.name, d[0].name))
+                src = '/home/jovyan/{}'.format(
+                    d.dataset.path.replace('./user_directory', 'dataset'))
+                dst = './functions/{}-{}-{}/dataset/{}/{}'.format(
+                    app.user.user_ID, app.name, version,
+                    d.dataset.user.name, d.dataset.name)
+                if os.path.isdir(dst):
+                    shutil.rmtree(dst)
+                cls.business.copy_from_container(container, src, dst)
 
         # copy path edited __init__.py
-        shutil.copy('./functions/template/python3/function/modules/__init__.py',
-                    os.path.join(func_path, 'modules'))
+        shutil.copy(
+            './functions/template/python3/function/modules/__init__.py',
+            os.path.join(func_path, 'modules')
+        )
 
         # deploy
         call(['faas-cli', 'build', '-f', f'./{service_name}.yml'],
@@ -363,11 +364,13 @@ class AppService(ProjectService):
 #     }
 #     AppService.create_project(name="预测航班延误", description="description")
 
-
-if __name__ == '__main__':
-    import sys
-    sys.path.append('../../')
-
-    AppService.app_deploy_or_publish("5af50c74ea8db714444d7205", "test", "/Users/Chun/Documents/workspace/momodel/mo/pyserver/user_directory/chun/my_exercise/Untitled.py")
-
-    pass
+#
+# if __name__ == '__main__':
+#     import sys
+#
+#     sys.path.append('../../')
+#
+#     AppService.app_deploy_or_publish("5af50c74ea8db714444d7205", "test",
+#                                      "/Users/Chun/Documents/workspace/momodel/mo/pyserver/user_directory/chun/my_exercise/Untitled.py")
+#
+#     pass

@@ -60,10 +60,10 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         service = client.services(filters={'name': service_name})[0]
         from_time = datetime.now() - timedelta(minutes=since)
         logs = client.service_logs(service['ID'], stdout=True, stderr=True,
-                                   since=int(time.mktime(from_time.timetuple())))
+                                   since=int(
+                                       time.mktime(from_time.timetuple())))
         logs = list(logs)
         return logs
-
 
     @classmethod
     def deploy_or_publish(cls, app_id, commit_msg, handler_file_path,
@@ -105,8 +105,9 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         # 1. copy modules from docker
         cls.copy_from_container(container, '/home/jovyan/modules', func_path)
         # copy path edited __init__.py
-        shutil.copy('./functions/template/python3/function/modules/__init__.py',
-                    os.path.join(func_path, 'modules'))
+        shutil.copy(
+            './functions/template/python3/function/modules/__init__.py',
+            os.path.join(func_path, 'modules'))
         # 2. copy datasets from docker
         cls.copy_from_container(container, '/home/jovyan/dataset', func_path)
 
@@ -167,27 +168,19 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
             return {'input': {}, 'output': {}}
 
     @classmethod
-    def add_imported_modules(cls, app_id, app_deploy_version, used_modules):
-        """
-
-        :param app_id:
-        :param modules_with_verison: tuple (module_object
-        :param app_deploy_version:
-        :return:
-        """
-        cls.repo.add_imported_modules(app_id, app_deploy_version, used_modules)
-
-    # TODO: Finish the function
-    @classmethod
-    def add_imported_datasets(cls, app_id, app_deploy_version, used_datasets):
+    def add_imported_entities(cls, app_id, app_deploy_version, used_datasets,
+                              used_modules):
         """
 
         :param app_id:
         :param app_deploy_version:
         :param used_datasets:
+        :param used_modules:
         :return:
         """
-        cls.repo.add_imported_datasets(app_id, app_deploy_version, used_datasets)
+        cls.repo.add_imported_entities(app_id, app_deploy_version,
+                                       used_datasets=used_datasets,
+                                       used_modules=used_modules)
 
     @classmethod
     def add_used_module(cls, app_id, module, func, version):
@@ -195,7 +188,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         app_yaml_path = os.path.join(app.path, yaml_tail_path)
         args = {}
         output = {}
-        version = version or DEV_DIR_NAME
+        version = version or DEFAULT_DEPLOY_VERSION
         cls.insert_module_env(app, module, version)
         # copy module yaml to app yaml
         input_args = module.to_mongo()['args']['input'].get(func, {})
