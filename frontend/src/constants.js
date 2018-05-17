@@ -91,8 +91,7 @@ module.exports = {
     300: 'error',
   },
 
-  defaultOverviewDocs: {
-    'text': '## Overview\n' +
+  defaultOverviewDocs: '## Overview\n' +
     '\n' +
     '_Provide a short overview of your algorithm that explains the value and primary use cases._\n' +
     '\n' +
@@ -120,7 +119,5 @@ module.exports = {
     '\n' +
     '_Provide and explain examples of input and output for your algorithm._\n' +
     '\n',
-  },
-
 }
 

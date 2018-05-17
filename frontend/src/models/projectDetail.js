@@ -42,6 +42,8 @@ export default {
     pageNo: 1,
     pageSize: 10,
     resultLoading: false,
+    overviewEditorState:false,
+    loadingOverview:false
   },
   reducers: {
     changeActiveTab(state, {activeTab}) {
@@ -137,13 +139,16 @@ export default {
         },
       }
     },
-    changeOverview(state, action) {
+    changeOverviewLoading(state, ) {
       return {
         ...state,
-        project: {
-          ...state.project,
-          overview: action.payload.overview,
-        },
+        loadingOverview:!state.loadingOverview,
+      }
+    },
+    setOverviewEditorState(state, {overviewEditorState}) {
+      return {
+        ...state,
+        overviewEditorState
       }
     },
     setVersion(state, {version}) {
@@ -216,6 +221,16 @@ export default {
       yield put({type: 'fetchComments', projectId})
     },
 
+    *updateProjectOverview({projectId,body}, {call, put}){
+      yield put({type: 'changeOverviewLoading'})
+      const {data: project} = yield call(updateProject, {
+        projectId,
+        body,
+      })
+      yield put({type: 'setProject', payload: project})
+      yield put({type: 'changeOverviewLoading'})
+      yield put({type: 'setOverviewEditorState',overviewEditorState:false})
+    },
 
     // 获取 project 下的 comments
     * fetchComments({projectId}, {call, put, select}) {
@@ -254,10 +269,10 @@ export default {
 
       const projectDetailOwner = project.user_ID
       const user_ID = localStorage.getItem('user_ID')
-      if (match[0] === `/explore/${projectId}` && projectDetailOwner === user_ID) {
+      if (match && match[0] === `/explore/${projectId}` && projectDetailOwner === user_ID) {
         yield put(routerRedux.push(`/workspace/${projectId}?type=${projectType}`))
       }
-      if (match[0] === `/workspace/${projectId}` && projectDetailOwner !== user_ID) {
+      if (match && match[0] === `/workspace/${projectId}` && projectDetailOwner !== user_ID) {
         console.log('projectDetailOwner',projectDetailOwner)
         yield put(routerRedux.push(`/explore/${projectId}?type=${projectType}`))
       }
@@ -320,7 +335,7 @@ export default {
         project['overview'] = defaultDocs
       }
       else {
-        project['overview'] = {'text': project['overview']}
+        project['overview'] = project['overview']
       }
       yield put({type: 'setProjectReducer', payload: project})
       yield put({type: 'project/setTags', payload: project.tags})
@@ -448,7 +463,6 @@ export default {
           const projectId = match2[1]
           const projectType = url.searchParams.get('type') || match[2]
           dispatch({type: 'refresh', projectId, projectType, match:match2})
-
         }
       })
     }

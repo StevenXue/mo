@@ -90,6 +90,7 @@ class ProjectList extends Component {
   // }
 
   fetchData({payload= {}}) {
+    console.log('?????????fetch')
     const {type} = this.props
     this.setState({
       loading: true,
