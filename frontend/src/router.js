@@ -139,7 +139,7 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
           ))
         }
         <Route path="/explore/:projectId"
-               render={(props) => <ProjectDetail {...props} app={app} market_use={true}/>}/>
+               render={(props) => <ProjectDetail {...props} app={app} />}/>
         <Route path="/launchpage" component={LaunchPage} location={location}/>
         {
           routes2.map(({ path, ...dynamics }, key) => (

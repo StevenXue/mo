@@ -232,16 +232,11 @@ export function projectStatus(project) {
   }
 }
 
-function ProjectInfo({ app, market_use, match, history, location, dispatch, projectDetail, login }) {
+function ProjectInfo({ app, match, history, location, dispatch, projectDetail, login }) {
   const projectId = match.params.projectId
   const user_ID = localStorage.getItem('user_ID')
   const userObjId = localStorage.getItem('user_obj_id')
-
-  const url = new URL(window.location.href.replace('/#', ''))
-  // let showTab = url.searchParams.get('tab')
-
-  // const projectOwner = get(projectDetail, 'project.user')
-  // const projectOwnerOrNot = (projectOwner === userObjId)
+  const ownerOrNot = get(projectDetail, 'project.user_ID') === user_ID
   const props1 = {
     name: 'file',
     action: flaskServer + '/file/project_file',
@@ -310,7 +305,7 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
   }
 
   const cloudNote = () => {
-    if (!market_use) {
+    if (ownerOrNot) {
       return <Row style={{ width: '110%', marginLeft: '-8%' }}>
         <Col span={14}>
       <span className={styles.generalSpan}>
@@ -526,8 +521,8 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
                     <div className={styles.bigIconNunberDiv}>
                       <div
                         className={this.chooseColor(projectDetail.project.star_users, projectDetail.project.user, userObjId)}
-                        style={market_use ? { cursor: 'pointer' } : { cursor: 'default' }}
-                        onClick={market_use ? () => appStarFavor('star') : null}
+                        style={!ownerOrNot ? { cursor: 'pointer' } : { cursor: 'default' }}
+                        onClick={!ownerOrNot ? () => appStarFavor('star') : null}
                       >
                         <p className={styles.icon}>
                           <Icon
@@ -538,8 +533,8 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
                       </div>
                       <div
                         className={this.chooseColor(projectDetail.project.favor_users, projectDetail.project.user, userObjId)}
-                        style={market_use ? { cursor: 'pointer' } : { cursor: 'default' }}
-                        onClick={market_use ? () => appStarFavor('favor') : null}>
+                        style={!ownerOrNot ? { cursor: 'pointer' } : { cursor: 'default' }}
+                        onClick={!ownerOrNot ? () => appStarFavor('favor') : null}>
                         <p className={styles.icon}>
                           <Icon
                             type={projectDetail.project.favor_users.includes(userObjId) ? 'star' : 'star-o'}/>
@@ -555,14 +550,14 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
                       <h1 style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span style={{ display: 'flex', alignItems: 'center' }}>
                           {projectDetail.project.name}&nbsp;
-                          {!market_use && <Icon
+                          {ownerOrNot && <Icon
                             type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
                             style={{ fontSize: 20 }}/>}
                           {
                             projectStatus(projectDetail.project)
                           }
                         </span>
-                        {!market_use &&
+                        {ownerOrNot &&
                         <span className={styles.rightButton}>
                           <ProjectModal
                             new={false}
@@ -619,10 +614,10 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
                     {/*projectDetail={projectDetail} dispatch={dispatch}/>:null}*/}
                     <ReactMdeEditor
                       projectDetail={projectDetail} dispatch={dispatch}
-                      market_use={market_use}/>
+                      ownerOrNot={ownerOrNot}/>
                   </div>
                 </TabPane>
-                {!market_use && <TabPane tab="Jobs" key="2">
+                {ownerOrNot && <TabPane tab="Jobs" key="2">
                   <Jobs projectDetail={projectDetail} dispatch={dispatch}/>
                 </TabPane>}
                 {projectDetail.project.type === 'app' && projectDetail.project.status === 'active' ?
@@ -667,9 +662,9 @@ function ProjectInfo({ app, market_use, match, history, location, dispatch, proj
   }
 }
 
-ProjectInfo.defaultProps = {
-  market_use: false,
-}
+// ProjectInfo.defaultProps = {
+//   market_use: false,
+// }
 
 function ProjectDetail({ app, match, history, location, dispatch, projectDetail }) {
   return (

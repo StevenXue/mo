@@ -339,6 +339,7 @@ def send_verification_code(phone):
     payload = json.dumps({
         'mobile': phone,
         'temp_id': 149269,
+        # TODO 10min的短信模板 150417
     })
     headers = {
         'content-type': "application/json",

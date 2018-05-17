@@ -1,16 +1,16 @@
-import request from "../utils/requestPro"
+import {request} from "../utils"
 
-const prefix = "/modules"
+const prefix = "/pyapi/modules"
 
 // 新建 module
 export function createModule(payload) {
   return request(`${prefix}`, {
     method: 'POST',
-    body: {
+    body: JSON.stringify({
       user_ID:payload.user_ID,
       name:payload.name,
       description: payload.description
-    }
+    })
   });
 }
 
@@ -26,8 +26,8 @@ export function fetchModule({projectId}) {
 export function updateModule(payload) {
   return request(`${prefix}/update_module`, {
     method: 'POST',
-    body: {
+    body: JSON.stringify({
       ...payload
-    }
+    })
   });
 }
