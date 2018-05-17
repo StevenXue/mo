@@ -12,8 +12,7 @@ from server3.constants import REDIS_SERVER
 
 UPLOAD_FOLDER = config.get_file_prop('UPLOAD_FOLDER')
 
-app = Flask(__name__, static_url_path='/static',
-            static_folder='../static')
+app = Flask(__name__)
 app.secret_key = 'super-super-secret'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 

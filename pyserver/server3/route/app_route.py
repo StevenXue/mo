@@ -156,7 +156,6 @@ def add():
 @jwt_optional
 def get_app(app_id):
     user_ID = get_jwt_identity()
-    print('user_ID', user_ID)
     yml = request.args.get('yml')
     commits = request.args.get('commits')
     version = request.args.get('version')
