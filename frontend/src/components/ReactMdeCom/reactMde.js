@@ -18,7 +18,6 @@ class ReactMdeEditor extends React.Component {
     strikethrough:true,
     ghCodeBlocks:true,
     emoji: true,
-    underline:true,
   })
 
   constructor(props) {
@@ -87,7 +86,6 @@ export class ReactMdePreview extends React.Component {
     strikethrough:true,
     ghCodeBlocks:true,
     emoji: true,
-    underline:true
   })
 
   constructor(props) {
