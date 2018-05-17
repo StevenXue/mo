@@ -1,9 +1,22 @@
-from uuid import getnode as get_mac
-
-UPDATE_USER_INFO_SK = 'secret_mo_mo'
-MONGO = 'DEFAULT'
+# from uuid import getnode as get_mac
 # if get_mac() == 274973436731254:
 #     MONGO = 'DEFAULT'
+
+# DEV
+MONGO = 'DEFAULT'
+REDIS_SERVER = 'redis://10.52.14.182:6379'
+GIT_SERVER = 'http://10.52.14.182:2333'
+GIT_SERVER_IP = '10.52.14.182'
+GIT_LOCAL = f'root@{GIT_SERVER_IP}:'
+
+# PROD
+# MONGO = 'PROD'
+# REDIS_SERVER = 'redis://localhost:6379'
+# GIT_SERVER = 'http://localhost:2333'
+# GIT_SERVER_IP = 'momodel.ai'
+# GIT_LOCAL = ''
+
+UPDATE_USER_INFO_SK = 'secret_mo_mo'
 PORT = 5005
 SOCKET_IO_PORT = 5006
 FILL_BLANK = 'BLANK_GRID'
@@ -14,12 +27,8 @@ PREDICT_FOLDER = 'predict_data/'
 MODEL_EXPORT_BASE = '/tmp'
 MODEL_SCRIPT_PATH = './run_model.py'
 SERVING_PORT = 9000
-REDIS_SERVER = 'redis://10.52.14.182:6379'
-GIT_SERVER = 'http://10.52.14.182:2333'
-GIT_SERVER_IP = '10.52.14.182'
 WEB_ADDR = 'http://momodel.ai'
 DOCKER_IP = '127.0.0.1'
-GIT_LOCAL = f'root@{GIT_SERVER_IP}:'
 # REDIS_SERVER = 'redis://localhost:6379'
 HUB_SERVER = 'http://localhost:8000'
 ADMIN_TOKEN = '1d4afa72b00c4ffd9db82f26e1628f89'

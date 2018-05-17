@@ -3,7 +3,6 @@ import {
   LocaleProvider, Pagination, DatePicker, TimePicker, Calendar,
   Popconfirm, Table, Modal, Button, Select, Transfer, Radio, Layout,
 } from 'antd'
-import {} from 'antd'
 
 const { Footer, Sider, Content } = Layout
 import { IntlProvider } from 'react-intl'
@@ -146,7 +145,8 @@ class OutMainLayout extends React.Component {
     // console.log("OutMainLayout 刷新了", location)
 
     return (
-      <div style={{ height: '100%' }}>
+      //  <div style={{ height: '100%' }}>
+      <div>
         {/*<div className="change-locale">*/}
         {/*<span style={{marginRight: 16}}>Change locale of components: </span>*/}
         {/*<Radio.Group defaultValue={enUS} onChange={this.changeLocale}>*/}

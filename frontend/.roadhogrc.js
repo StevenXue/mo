@@ -1,16 +1,48 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require('fs')
+const path = require('path')
 // const re = /src\/jupyterlab\/packages\/.+\/style\/.+\.css$/
-const re = /.+\.css$/;
-const paths = require('./paths');
+const re = /.+\.css$/
+const paths = require('./paths')
 
-import {flaskServer, hubServer, tbServer} from './config.js'
+import { flaskServer, hubServer, tbServer, env } from './config.js'
+
+const proxy = env === 'DEV' ? {
+  '/pyapi': {
+    'target': flaskServer,
+    'changeOrigin': true,
+    'ws': true,
+    'pathRewrite': { '^/pyapi': '' },
+  },
+  '/socketio': {
+    'target': flaskServer,
+    'ws': true,
+    'changeOrigin': true,
+    'pathRewrite': { '^/socketio': '' },
+  },
+  '/tb': {
+    'target': tbServer,
+    'changeOrigin': true,
+    // 'pathRewrite': {'^/tb': ''},
+  },
+  '/hub_api': {
+    'target': hubServer,
+    'changeOrigin': true,
+    'ws': true,
+    'pathRewrite': { '^/hub_api': '' },
+    'onProxyReq': function onProxyReq(proxyReq, req, res) {
+      if (req.headers.accept.indexOf('image') !== -1) {
+        // add custom header to request
+        proxyReq.setHeader('Authorization', 'token 1d4afa72b00c4ffd9db82f26e1628f89')
+      }
+    },
+  },
+} : {}
 
 const walkSync = (dir) =>
   fs.readdirSync(dir)
     .reduce((files, file) =>
         fs.statSync(path.join(dir, file)).isDirectory() ? files.concat(walkSync(path.join(dir, file))) : files.concat(path.join(dir, file)),
-      []);
+      [])
 const jupyterPackageCSS = walkSync('./src/packages/jupyterlab_package/packages/').filter(file => re.test(file))
 
 export default {
@@ -20,13 +52,13 @@ export default {
       'extraBabelPlugins': [
         'dva-hmr',
         'transform-runtime',
-        ['import', {'libraryName': 'antd', 'style': true}],
+        ['import', { 'libraryName': 'antd', 'style': true }],
       ],
     },
     'production': {
       'extraBabelPlugins': [
         'transform-runtime',
-        ['import', {'libraryName': 'antd', 'style': true}],
+        ['import', { 'libraryName': 'antd', 'style': true }],
       ],
     },
   },
@@ -38,35 +70,7 @@ export default {
     ...jupyterPackageCSS,
   ],
   'proxy': {
-    '/pyapi': {
-      'target': flaskServer,
-      'changeOrigin': true,
-      'ws': true,
-      'pathRewrite': {'^/pyapi': ''},
-    },
-    '/socketio': {
-      'target': flaskServer,
-      'ws': true,
-      'changeOrigin': true,
-      'pathRewrite': {'^/socketio': ''},
-    },
-    '/tb': {
-      'target': tbServer,
-      'changeOrigin': true,
-      // 'pathRewrite': {'^/tb': ''},
-    },
-    '/hub_api': {
-      'target': hubServer,
-      'changeOrigin': true,
-      'ws': true,
-      'pathRewrite': {'^/hub_api': ''},
-      'onProxyReq': function onProxyReq(proxyReq, req, res) {
-        if (req.headers.accept.indexOf('image') !== -1) {
-          // add custom header to request
-          proxyReq.setHeader('Authorization', 'token 1d4afa72b00c4ffd9db82f26e1628f89')
-        }
-      },
-    },
+    ...proxy,
   },
   'theme': {
     'primary-color': '#34C0E2',

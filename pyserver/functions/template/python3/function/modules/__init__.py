@@ -83,38 +83,39 @@ class Client:
         self.source_file_path = source_file_path
 
     def controller(self, func, *args, **kw):
-        if func.__name__ == 'module_general':
-            other = {
-                'running_module': args[0]
-            }
-        else:
-            other = {
-                'running_code': inspect.getsource(func)
-            }
-        # log start
-        job = requests.post(f'{SERVER}/jobs',
-                            json={'project_id': self.project_id,
-                                  'type': self.project_type,
-                                  'source_file_path': self.source_file_path,
-                                  'user_ID': self.user_ID,
-                                  'run_args': {'args': args, 'kwargs': kw},
-                                  **other},
-                            ).json()['response']
-        job_id = job['_id']
-        with RedirectPrints(job_id):
-            try:
-                ret = func(*args, **kw)
-            except Exception as e:
-                exc = traceback.format_exc()
-                requests.put(f'{SERVER}/jobs/{job_id}/log',
-                             json={'log_type': 'exception',
-                                   'message': exc})
-                raise e
-            else:
-                # log end
-                requests.put(f'{SERVER}/jobs/{job_id}/success').json()
-                # print('finish run', job)
-                return ret
+        return func(*args, **kw)
+        # if func.__name__ == 'module_general':
+        #     other = {
+        #         'running_module': args[0]
+        #     }
+        # else:
+        #     other = {
+        #         'running_code': inspect.getsource(func)
+        #     }
+        # # log start
+        # job = requests.post(f'{SERVER}/jobs',
+        #                     json={'project_id': self.project_id,
+        #                           'type': self.project_type,
+        #                           'source_file_path': self.source_file_path,
+        #                           'user_ID': self.user_ID,
+        #                           'run_args': {'args': args, 'kwargs': kw},
+        #                           **other},
+        #                     ).json()['response']
+        # job_id = job['_id']
+        # with RedirectPrints(job_id):
+        #     try:
+        #         ret = func(*args, **kw)
+        #     except Exception as e:
+        #         exc = traceback.format_exc()
+        #         requests.put(f'{SERVER}/jobs/{job_id}/log',
+        #                      json={'log_type': 'exception',
+        #                            'message': exc})
+        #         raise e
+        #     else:
+        #         # log end
+        #         requests.put(f'{SERVER}/jobs/{job_id}/success').json()
+        #         # print('finish run', job)
+        #         return ret
 
     def run_module_general(self, action, module_id, *args, with_control=False,
                            **kwargs):

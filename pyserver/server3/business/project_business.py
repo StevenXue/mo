@@ -41,7 +41,6 @@ from server3.business.request_answer_business import RequestAnswerBusiness
 from server3.constants import GIT_SERVER_IP
 from server3.business.general_business import GeneralBusiness
 
-
 PAGE_NO = 1
 PAGE_SIZE = 5
 
@@ -302,7 +301,8 @@ class ProjectBusiness(GeneralBusiness):
             os.makedirs(project_path)
         else:
             # if exists means project exists
-            raise Exception('Project exists, project should be unique between apps, modules and datsets')
+            raise Exception(
+                'Project exists, project should be unique between apps, modules and datsets')
         return project_path
 
     @classmethod
@@ -586,10 +586,14 @@ class ProjectBusiness(GeneralBusiness):
         script = script.replace('\n\n', '\n')
 
         # add __main__ function
-        main_func = "\n\n" + \
-                    "if __name__ == '__main__':\n" + \
-                    "\tconf = {}\n" + \
-                    "\thandle(conf)"
+        main_func = \
+            "\n" + \
+            "\t# return your result consistent with .yml you defined\n" + \
+            "\t# .e.g return {'iris_class': 1, 'possibility': '88%'}" + \
+            "\n\n" + \
+            "if __name__ == '__main__':\n" + \
+            "\tconf = {}\n" + \
+            "\thandle(conf)"
         script += '\n' + main_func
 
         script_path = full_path.replace('ipynb', 'py')
@@ -626,7 +630,7 @@ class ProjectBusiness(GeneralBusiness):
             # add handle function
             line_of_code = re.sub(
                 r"work_path = '\./'",
-                r"work_path = '\./'\n\n"
+                r"work_path = './'\n\n\n\n"
                 r"def handle(conf):\n"
                 r"\t# paste your code here",
                 line_of_code.rstrip())
@@ -647,49 +651,49 @@ class ProjectBusiness(GeneralBusiness):
 
         return line_of_code
 
-    @classmethod
-    def nb_to_script(cls, project_id, nb_path, optimise=True):
-        app = cls.get_by_id(project_id)
-        call(['jupyter', 'nbconvert', '--to', 'script', nb_path],
-             cwd=app.path)
-        full_path = os.path.join(app.path, nb_path)
-        script_path = full_path.replace('ipynb', 'py')
-        for line in fileinput.input(files=script_path, inplace=1):
-            # remove input tag comments
-            line = re.sub(r"# In\[(\d+)\]:", r"", line.rstrip())
-
-            if optimise:
-                if any(re.search(reg, line.rstrip()) for reg in INIT_RES):
-                    line = re.sub(
-                        r"# Please use current \(work\) folder to store your data "
-                        r"and models",
-                        r'', line.rstrip())
-                    line = re.sub(r"""sys.path.append\('(.+)'\)""", r'',
-                                  line.rstrip())
-                    line = re.sub(
-                        r"""(\s+)project_type='(.+)', source_file_path='(.+)'\)""",
-                        r"""\1project_type='\2', source_file_path='\3', silent=True)""",
-                        line.rstrip())
-
-                    line = re.sub(r"""from modules import (.+)""",
-                                  r"""from function.modules import \1""",
-                                  line.rstrip())
-
-                    # add handle function
-                    line = re.sub(
-                        r"work_path = '\./'",
-                        r"work_path = 'function/'\n\n"
-                        r"def handle(conf):\n"
-                        r"\t# paste your code here",
-                        line.rstrip())
-                else:
-                    line = '\t' + line
-            print(line)
-        my_open = open(script_path, 'a')
-        # main_func = r"if __name__ == '__main__':" \
-        #             r"" + "\n" + "\t" + "conf = {}" + "\n" +"\t" + "handle()"
-        main_func = r"if __name__ == '__main__': " + "\n" + "\t" \
-                                                            r"conf = {}" + "\n" + "\t" \
-                                                                                  r"handle(conf)"
-
-        my_open.write(main_func)
+    # @classmethod
+    # def nb_to_script(cls, project_id, nb_path, optimise=True):
+    #     app = cls.get_by_id(project_id)
+    #     call(['jupyter', 'nbconvert', '--to', 'script', nb_path],
+    #          cwd=app.path)
+    #     full_path = os.path.join(app.path, nb_path)
+    #     script_path = full_path.replace('ipynb', 'py')
+    #     for line in fileinput.input(files=script_path, inplace=1):
+    #         # remove input tag comments
+    #         line = re.sub(r"# In\[(\d+)\]:", r"", line.rstrip())
+    #
+    #         if optimise:
+    #             if any(re.search(reg, line.rstrip()) for reg in INIT_RES):
+    #                 line = re.sub(
+    #                     r"# Please use current \(work\) folder to store your data "
+    #                     r"and models",
+    #                     r'', line.rstrip())
+    #                 line = re.sub(r"""sys.path.append\('(.+)'\)""", r'',
+    #                               line.rstrip())
+    #                 line = re.sub(
+    #                     r"""(\s+)project_type='(.+)', source_file_path='(.+)'\)""",
+    #                     r"""\1project_type='\2', source_file_path='\3', silent=True)""",
+    #                     line.rstrip())
+    #
+    #                 line = re.sub(r"""from modules import (.+)""",
+    #                               r"""from function.modules import \1""",
+    #                               line.rstrip())
+    #
+    #                 # add handle function
+    #                 line = re.sub(
+    #                     r"work_path = '\./'",
+    #                     r"work_path = '11./'\n\n"
+    #                     r"def handle(conf):\n"
+    #                     r"\t# paste your code here",
+    #                     line.rstrip())
+    #             else:
+    #                 line = '\t' + line
+    #         print(line)
+    #     my_open = open(script_path, 'a')
+    #     # main_func = r"if __name__ == '__main__':" \
+    #     #             r"" + "\n" + "\t" + "conf = {}" + "\n" +"\t" + "handle()"
+    #     main_func = r"if __name__ == '__main__': " + "\n" + "\t" \
+    #                                                         r"conf = {}" + "\n" + "\t" \
+    #                                                                               r"handle(conf)"
+    #
+    #     my_open.write(main_func)

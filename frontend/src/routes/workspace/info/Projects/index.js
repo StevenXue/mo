@@ -75,6 +75,7 @@ class ProjectList extends Component {
 
   componentDidMount() {
     this.fetchData({})
+    this.props.location.search.indexOf('from')!==-1?document.getElementById('Newapp').click():null
     // this.hideBreadcrumb()
   }
 

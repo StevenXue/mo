@@ -69,8 +69,8 @@ const menuConfig = [
   },
 ]
 
-const menuStyle = {width: 70, display: 'flex', justifyContent: 'center'}
-const menuDiv = {padding: '0 2%'}
+const menuStyle = { width: 70, display: 'flex', justifyContent: 'center' }
+const menuDiv = { padding: '0 2%' }
 
 function Header({ location, login, history, dispatch, allRequest, message }) {
   const key = '/' + location.pathname.split('/')[1]
@@ -164,7 +164,7 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
   }
 
   const toProject = (e, tabNum) => {
-    if(tabNum) {
+    if (tabNum) {
       history.push(`/workspace/${e.project_id}?type=${e.project_type}&tab=${tabNum}`)
     } else {
       history.push(`/workspace/${e.project_id}?type=${e.project_type}`)
@@ -211,7 +211,8 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
     }
   }
 
-  return <div className={styles.container} style={{display:location.pathname.indexOf('user/')!==-1||location.pathname.indexOf('/newpassword')!==-1?'none':'block',
+  return <div className={styles.container} style={{
+    display: location.pathname.indexOf('user/') !== -1 || location.pathname.indexOf('/newpassword') !== -1 ? 'none' : 'block',
     backgroundColor:location.pathname === '/'?'#33333399':'#464E78'}}
   >
     <div className={styles.box} style={{width:1170,margin:'0 auto', backgroundColor:location.pathname === '/'?'#464E7800':'#464E78'}}>
@@ -249,14 +250,14 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
             //     </SubMenu>
             //   )
             // } else {
-              return (
-                <Menu.Item key={e.key} style={menuDiv}>
-                  <Link to={e.Link}>
-                    {e.Icon && <Icon type={e.Icon}/>}
-                    <div style={menuStyle}>{e.text}</div>
-                    {/*<FormattedMessage id={e.text} defaultMessage={e.text} style={{width: '5%'}}/>*/}
-                  </Link>
-                </Menu.Item>)
+            return (
+              <Menu.Item key={e.key} style={menuDiv}>
+                <Link to={e.Link}>
+                  {e.Icon && <Icon type={e.Icon}/>}
+                  <div style={menuStyle}>{e.text}</div>
+                  {/*<FormattedMessage id={e.text} defaultMessage={e.text} style={{width: '5%'}}/>*/}
+                </Link>
+              </Menu.Item>)
             // }
           },
         )}
@@ -271,7 +272,7 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
         <SubMenu
           className={styles.rightButton}
           title={
-            <div onClick={toLoginPage} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+            <div onClick={toLoginPage} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {
                 login.user ? <img src={`${login.userAvatar}`}
                                   style={{ width: 25, borderRadius: '50%', marginRight: 10 }}/> : null
@@ -307,22 +308,22 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
 
         </SubMenu>
 
-        {!login.user &&<SubMenu
+        {!login.user && <SubMenu
           className={styles.rightButton}
           title={
-          <div onClick={toSignUpPage} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-            <span>SignUp</span>
-          </div>
-        }>
+            <div onClick={toSignUpPage} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span>SignUp</span>
+            </div>
+          }>
         </SubMenu>}
 
-        {login.user &&<SubMenu
+        {login.user && <SubMenu
           className={styles.messageSubmenu}
           title={
             <span onClick={toLoginPage} style={{ position: 'relative' }}>
                  <Badge count={login.user ? numberOfUnreadMessage() : 0}>
               <Icon style={{ color: 'white', fontSize: '18px' }} type="message"/>
-                {/*<div style={divStyle()}></div>*/}
+                   {/*<div style={divStyle()}></div>*/}
                </Badge>
               </span>
           }
@@ -334,7 +335,7 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
                      margin: '0 -20px',
                      backgroundColor: '#f0f2f5',
                      color: 'black',
-                   } : {  margin: '0 -20px', color: 'black' }}>
+                   } : { margin: '0 -20px', color: 'black' }}>
                 {switchMessage(e)}</div>)}
           </Menu.Item>
           <Menu.Item style={{ color: 'black' }}>
