@@ -4,6 +4,7 @@
 
 # DEV
 MONGO = 'DEFAULT'
+# REDIS_SERVER need to be changed to localhost on 182 itself
 REDIS_SERVER = 'redis://10.52.14.182:6379'
 GIT_SERVER = 'http://10.52.14.182:2333'
 GIT_SERVER_IP = '10.52.14.182'
