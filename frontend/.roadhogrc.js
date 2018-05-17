@@ -4,7 +4,7 @@ const path = require('path')
 const re = /.+\.css$/
 const paths = require('./paths')
 
-import { flaskServer, hubServer, tbServer, env } from './config.js'
+import { flaskServer, socketioServer, hubServer, tbServer, env } from './config.js'
 
 const proxy = env === 'DEV' ? {
   '/pyapi': {
@@ -14,7 +14,7 @@ const proxy = env === 'DEV' ? {
     'pathRewrite': { '^/pyapi': '' },
   },
   '/socketio': {
-    'target': flaskServer,
+    'target': socketioServer,
     'ws': true,
     'changeOrigin': true,
     'pathRewrite': { '^/socketio': '' },

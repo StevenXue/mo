@@ -1,11 +1,4 @@
 # -*- coding: UTF-8 -*-
-import eventlet
-eventlet.monkey_patch()
-
-# looks like the problem was fixed in eventlet 0.22
-# eventlet.monkey_patch(thread=False)
-# eventlet.import_patched('mongoengine')
-
 import os
 import requests
 from datetime import timedelta
@@ -17,7 +10,6 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import get_jwt_claims
-from flask_socketio import SocketIO
 
 from server3.repository import config
 from server3.utility import json_utility
@@ -35,9 +27,6 @@ app = Flask(__name__, static_url_path='/static',
 app.secret_key = 'super-super-secret'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
-
-socketio = SocketIO(app, logger=True, engineio_logger=True, ping_timeout=600,
-                    async_mode='eventlet', message_queue=REDIS_SERVER)
 
 CORS(app, supports_credentials=True)
 
@@ -135,4 +124,4 @@ def hub_png(hub_username, language, filename):
 
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=PORT, debug=True)
+    app.run(host='0.0.0.0', port=PORT, debug=True)
