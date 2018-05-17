@@ -30,20 +30,20 @@ class AppService(ProjectService):
             used_module, version)
         return cls.business.add_used_module(app_id, used_module, func, version)
 
-    @classmethod
-    def add_imported_modules(cls, app_id, imported_module, deploy_version):
-        """
-        Add imported modules and datasets into app.deployment
-        while user deploy an app.
-
-        :param app_id: app id
-        :param imported_module: tuple (user_name, project_name, version)
-        :param version:
-        :return:
-        """
-        app = cls.get_by_id(app_id)
-        AppBusiness.add_imported_module()
-        pass
+    # @classmethod
+    # def add_imported_modules(cls, app_id, imported_module, deploy_version):
+    #     """
+    #     Add imported modules and datasets into app.deployment
+    #     while user deploy an app.
+    #
+    #     :param app_id: app id
+    #     :param imported_module: tuple (user_name, project_name, version)
+    #     :param version:
+    #     :return:
+    #     """
+    #     app = cls.get_by_id(app_id)
+    #     AppBusiness.add_imported_module()
+    #     pass
 
     @classmethod
     def remove_used_module(cls, app_id, used_module, version):
@@ -199,11 +199,13 @@ class AppService(ProjectService):
                               version=DEFAULT_DEPLOY_VERSION):
         """
 
-        :param app_id:
-        :param commit_msg:
-        :param handler_file_path:
-        :param version:
-        :return:
+        App project go deploy or publish.
+
+        :param app_id: app project id
+        :param commit_msg: commit msg
+        :param handler_file_path: work/XXXX.py file, source
+        :param version: app project go production version
+        :return: app object
         """
 
         # update app status to 'deploying
@@ -211,78 +213,135 @@ class AppService(ProjectService):
         app.status = 'deploying'
         app.save()
 
-        # get container
+        container = cls.business.get_container(app)
+        # freeze working env
+        # FIXME too slow to install env
+        container.exec_run(['/bin/bash', '/home/jovyan/freeze_venv.sh'])
+        cls.business.commit(app_id, commit_msg, version)
 
-        container = cls.get_container(app)
+        service_name = '-'.join([app.user.user_ID, app.name, version])
+        service_name_no_v = '-'.join([app.user.user_ID, app.name])
 
+        # faas new in functions dir
+        call(['faas-cli', 'new', service_name, '--lang=python3',
+              f'--gateway=http://{DOCKER_IP}:8080'],
+             cwd=cls.business.base_func_path)
+
+        # target path = new path
+        func_path = os.path.join(cls.business.base_func_path, service_name)
+
+        cls.business.copytree_wrapper(app.path, func_path,
+                             ignore=shutil.ignore_patterns('.git'))
+
+        # rename py to handler.py
+        handler_file_path = handler_file_path.replace('work', func_path)
+        handler_file_path = os.path.join(func_path, handler_file_path)
+        handler_file_name = handler_file_path.split('/')[-1]
+        handler_dst_path = handler_file_path.replace(handler_file_name, 'handler.py')
+
+        shutil.copy(handler_file_path, handler_dst_path)
+
+        # change some configurable variable to deploy required
+        cls.business.modify_handler_py(handler_dst_path)
 
         with open(handler_file_path, 'r') as f:
 
             script = f.read()
 
-            # 1. for imported modules
-            # find imported modules, and return
-            # tuple(user_name, project_name, version) list
-            # imported_modules = cls.find_imported_modules(f.read())
-
-
-            # 2. for imported datasets
-            # TODO: 1. get possible imported dataset list from app.used_datasets[0].dataset.path.replace('./user_directory', '../dataset')
-
-
-
-            used_datasets = \
+            # 1. get possible imported dataset list from
+            # app.used_datasets[n].dataset.path
+            # e.g. './user_directory/zhaofengli/anone
+            possible_used_datasets = \
                 [(d.dataset, d.dataset.path.replace(
                     './user_directory', 'dataset'))
                  for d in app.used_datasets]
 
-            used_modules = \
+            # 2. get possible imported module list from
+            # app.used_modules in list of
+            # tuple (module_object, module_version) format
+            possible_used_modules = \
                 [(m.module, m.version) for m in app.used_modules]
 
 
-            # TODO: 2. check if there is any matches
-            for d in used_datasets:
+            # 3. check if there is any matches in script
+            for d in possible_used_datasets:
                 pattern = r"""^(?!#).*({})""".format(d[1])
-                matches = re.finditer(pattern, script, re.MULTILINE)
-                if matches:
+                matches = re.findall(pattern, script, re.MULTILINE)
+
+                if len(matches) > 0:
                     for ma in matches:
-                        if '#' in ma.group():
-                            used_datasets.remove(d)
+                        if '#' in ma.group(0):
+                            possible_used_datasets.remove(d)
                 else:
-                    used_datasets.remove(d)
+                    possible_used_datasets.remove(d)
 
-            for m in used_modules:
-                pattern = r"""^(?!#).*(run|predict|train)\s*\(('|")({}/{}/{})('|")"""\
-                    .format(m[0].user.user_ID, m[0].name, m[1].replace('_', '.'))
-                matches = re.finditer(pattern, script, re.MULTILINE)
-                if matches:
+            for m in possible_used_modules:
+                pattern = \
+                    r"""^(?!#).*(run|predict|train)\s*\(('|")({}/{}/{})('|")"""\
+                    .format(m[0].user.user_ID,
+                            m[0].name,
+                            m[1].replace('_', '.'))
+                matches = re.findall(pattern, script, re.MULTILINE)
+                if len(matches) > 0:
                     for ma in matches:
-                        if '#' in ma.group():
-                            used_modules.remove(m)
+                        if '#' in ma.group(0):
+                            possible_used_modules.remove(m)
                 else:
-                    used_modules.remove(m)
+                    possible_used_modules.remove(m)
+
+            # 4. save verified possible_imported_modules/datasets
+            # to app.deployments
+            cls.business.add_imported_modules(
+                app_id, version, [m[0] for m in possible_used_modules])
+
+            cls.business.add_imported_datasets(
+                app_id, version, [d[0] for d in possible_used_datasets])
 
 
-            # TODO: save data to app.deployments
-            cls.business.add_imported_modules(app_id, version,
-                                              [m[0] for m in used_modules])
+            # Move module from project.module_path
+            # ./server3/lib/modules/zhaofengli/newttt/[module_version]/ to
+            # ./fucntion/[user_ID]-[app_name]-[app_version]/modules/
+            # [user_ID]/[module_name]/[module_version]
+            for m in possible_used_modules:
+                shutil.copytree('{}/{}/'.format(m[0].module_path,
+                                                m[1].replace('.', '_')),
+                                './function/{}-{}-{}/modules/{}/{}/{}/'.format(
+                                    app.user.user_ID, app.name, version,
+                                    m[0].user.name, m[0].name,
+                                    m[1].replace('.', '_')))
 
-            cls.business.add_imported_datasets(app_id, version,
-                                               [d[0] for d in used_datasets])
+            # Move dataset from 引用者的DOCKER CONTAINER 里面的
+            # ~/dataset/[user_ID] to
+            # ./fucntion/[user_ID]-[app_name]-[app_version]/
+            # dataset/[user_ID]/[dataset_name]/
 
+            for d in possible_used_datasets:
+                cls.business.copy_from_container(
+                    container,
+                    '/home/jovyan/{}'.format(d[1]),
+                    './function/{}-{}-{}/modules/{}/{}'.format(
+                        app.user.user_ID, app.name, version,
+                        d[0].use.name, d[0].name))
 
+        # copy path edited __init__.py
+        shutil.copy('./functions/template/python3/function/modules/__init__.py',
+                    os.path.join(func_path, 'modules'))
 
-            # TODO: Move module from project.module_path(./server3/lib/modules/zhaofengli/newttt/[module_version]/) to
-            #                        (./fucntion/[user_ID]-[app_name]-[app_version]/modules/[user_ID]/[module_name]/[module_version]
+        # deploy
+        call(['faas-cli', 'build', '-f', f'./{service_name}.yml'],
+             cwd=cls.business.base_func_path)
+        call(['faas-cli', 'deploy', '-f', f'./{service_name}.yml'],
+             cwd=cls.business.base_func_path)
 
+        # when not dev(publish), change the privacy etc
+        if version != DEFAULT_DEPLOY_VERSION:
+            app.privacy = 'public'
+            app.versions.append(version)
 
-
-            # TODO: Move dataset from 引用者的DOCKER CONTAINER 里面的 ~/dataset/[user_ID]
-
-
-            # 3. work_path = './' -> 'function/'
-
-
+        app.app_path = os.path.join(cls.business.base_func_path,
+                                    service_name_no_v)
+        app.status = 'active'
+        app.save()
 
         return app
 
