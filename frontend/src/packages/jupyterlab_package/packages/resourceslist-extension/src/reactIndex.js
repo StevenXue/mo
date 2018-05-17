@@ -1,17 +1,13 @@
 import * as React from 'react'
 import { Card, Button, Row, Col, Input, Icon, Pagination, Select, message, List, Modal } from 'antd'
 import * as pathToRegexp from 'path-to-regexp'
-import {ReactMdePreview} from '../../../../components/ReactMdeCom/reactMde'
 import {
   NotebookActions,
 } from '@jupyterlab/notebook'
 
-import {
-  defaultOverview,
-} from '@jupyterlab/services'
-
 import ParamsMapper from './ParamsMapper'
 import CopyInput from './CopyInput'
+import ReactMdePreview from './reactMde'
 
 import {
   addModuleToApp,
@@ -303,7 +299,6 @@ export class ListPage extends React.Component {
   }
 
   renderOverview() {
-    const overview = this.state.project.overview || defaultOverview
 
     const upperArea = () => {
       const { project } = this.state
@@ -355,7 +350,7 @@ export class ListPage extends React.Component {
         <div style={{ height: 'auto', overflowY: 'auto' }}>
           {upperArea()}
           <ReactMdePreview
-            project={project} ownerOrNot={false}
+            project={this.state.project} ownerOrNot={false}
           />
         </div>
       </div>
@@ -563,7 +558,7 @@ export class ListPage extends React.Component {
   }
 
   render() {
-    return <div>
+    return <div style={{height: '100%'}}>
       {
         this.renderInner()
       }
