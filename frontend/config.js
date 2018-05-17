@@ -2,7 +2,8 @@ const conf = {
   DEV: {
     // server api
     flaskServer: 'http://localhost:5005',
-    socketioServer: 'http://localhost:5006',
+
+    socketioServer: 'http://10.52.14.182:5006',
 
     hubServer: 'http://localhost:8000',
 
@@ -31,9 +32,9 @@ const conf = {
 
     webServer: 'http://momodel.ai',
 
-    env: 'PROD'
+    env: 'PROD',
 
-  }
+  },
 }
 
 module.exports = conf.DEV
