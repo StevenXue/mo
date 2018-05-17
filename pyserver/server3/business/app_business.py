@@ -66,6 +66,15 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         return logs
 
     @classmethod
+    def process_handler_py(cls, script_path):
+        for line in fileinput.input(files=script_path, inplace=1):
+            # change work_path, due to deploy dir different
+            line = re.sub(r"work_path = '\./'",
+                          r"work_path = 'function/'",
+                          line.rstrip())
+            print(line)
+
+    @classmethod
     def deploy_or_publish(cls, app_id, commit_msg, handler_file_path,
                           version=DEFAULT_DEPLOY_VERSION):
         app = cls.get_by_id(app_id)
@@ -99,8 +108,8 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
 
         shutil.copy(handler_file_path, handler_dst_path)
 
-        # change some configurable variable to deploy required
-        cls.modify_handler_py(handler_dst_path)
+        # do some deploy necessary change to handler.py
+        cls.process_handler_py(handler_dst_path)
 
         # 1. copy modules from docker
         cls.copy_from_container(container, '/home/jovyan/modules', func_path)
@@ -142,14 +151,6 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
             destination.seek(0)
             with tarfile.open(mode='r', fileobj=destination) as t:
                 t.extractall(path_to)
-
-    @staticmethod
-    def modify_handler_py(py_path):
-        for line in fileinput.input(files=py_path, inplace=1):
-            line = re.sub(r"""work_path = ''""",
-                          r"""work_path = 'function/'""",
-                          line.rstrip())
-            print(line)
 
     @staticmethod
     def load_app_params(app, version=DEFAULT_DEPLOY_VERSION):

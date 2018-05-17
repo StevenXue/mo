@@ -245,7 +245,7 @@ class AppService(ProjectService):
 
         shutil.copy(handler_file_path, handler_dst_path)
         # change some configurable variable to deploy required
-        cls.business.modify_handler_py(handler_dst_path)
+        cls.business.process_handler_py(handler_dst_path)
 
         with open(handler_file_path, 'r') as f:
 

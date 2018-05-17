@@ -586,7 +586,11 @@ class ProjectBusiness(GeneralBusiness):
         script = script.replace('\n\n', '\n')
 
         # add __main__ function
-        main_func = "\n\n" + \
+        main_func = \
+            "\n" + \
+            "\t# return your result consistent with .yml you defined\n" + \
+            "\t# .e.g return {'iris_class': 1, 'possibility': '88%'}" + \
+            "\n\n" + \
                     "if __name__ == '__main__':\n" + \
                     "\tconf = {}\n" + \
                     "\thandle(conf)"
@@ -626,7 +630,7 @@ class ProjectBusiness(GeneralBusiness):
             # add handle function
             line_of_code = re.sub(
                 r"work_path = '\./'",
-                r"work_path = '\./'\n\n"
+                r"work_path = './'\n\n\n\n"
                 r"def handle(conf):\n"
                 r"\t# paste your code here",
                 line_of_code.rstrip())
