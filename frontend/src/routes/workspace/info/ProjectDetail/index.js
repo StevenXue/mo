@@ -1,7 +1,7 @@
 import React from 'react'
-import { Link, Route, Switch } from 'react-router-dom'
+import {Link, Route, Switch} from 'react-router-dom'
 import Joyride from 'react-joyride'
-import { connect } from 'dva'
+import {connect} from 'dva'
 import {
   Button,
   Col,
@@ -18,27 +18,28 @@ import {
   Card,
   Tooltip,
 } from 'antd'
-import { routerRedux } from 'dva/router'
+import {routerRedux} from 'dva/router'
 // components
 import ProjectModal from '../../../../components/ProjectModal/index'
 import HelpModal from '../../../../components/HelpModal'
-import ReactMdeEditor from '../../../../components/ReactMdeCom/reactMde'
-import ProjectExample from '../../../../components/ProjectExample/projectExample'
+import ReactMdeEditor, {ReactMdePreview} from '../../../../components/ReactMdeCom/reactMde'
+import ProjectExample
+  from '../../../../components/ProjectExample/projectExample'
 import Jobs from './Jobs'
 
-import { showTime } from '../../../../utils/index'
+import {showTime} from '../../../../utils/index'
 import styles from './index.less'
-import { get } from 'lodash'
-import { message } from 'antd/lib/index'
-import ReactMarkdown from 'react-markdown'
-import { flaskServer, hubServer } from '../../../../constants'
+import {get} from 'lodash'
+import {message} from 'antd/lib/index'
+// import ReactMarkdown from 'react-markdown'
+import {flaskServer, hubServer} from '../../../../constants'
 import dynamic from 'dva/dynamic'
 import modelling from '../../../../models/modelling'
 // import {fetchComments} from "../../../../services/comments"
 
 const confirm = Modal.confirm
 const TabPane = Tabs.TabPane
-const { TextArea } = Input
+const {TextArea} = Input
 const FormItem = Form.Item
 const commitSvg = require('../../../../img/icon/git-commit.svg')
 
@@ -59,9 +60,11 @@ class CommitsList extends React.Component {
             <Row type="flex" justify="space-around" align="middle">
               <Col span={2}>
                 <div>
-                  {e.version && <div className={styles.commitVersion}><Icon type="tag-o"/> {e.version}</div>
+                  {e.version && <div className={styles.commitVersion}><Icon
+                    type="tag-o"/> {e.version}</div>
                   }
-                  <div className={styles.commitHexsha}><img src={commitSvg} alt="commit"/> {e.newhexsha.slice(0, 7)}
+                  <div className={styles.commitHexsha}><img src={commitSvg}
+                                                            alt="commit"/> {e.newhexsha.slice(0, 7)}
                   </div>
                 </div>
               </Col>
@@ -116,7 +119,7 @@ class CommentsList extends React.Component {
   }
 
   render() {
-    const { dispatch, projectId, history } = this.props
+    const {dispatch, projectId, history} = this.props
     const userObjId = localStorage.getItem('user_obj_id')
     const picNumber = parseInt(userObjId.slice(10)) % 6
     return (
@@ -125,9 +128,13 @@ class CommentsList extends React.Component {
           {this.props.comments && this.props.comments.map(e =>
             <div className={styles.commentDiv}>
               <Row>
-                <Col span={2} style={{ margin: '20px 0', textAlign: 'center' }}>
-                  <div style={{ height: '80px', width: '80px' }}>
-                    <img style={{ height: '80px', width: '80px', borderRadius: '40px' }}
+                <Col span={2} style={{margin: '20px 0', textAlign: 'center'}}>
+                  <div style={{height: '80px', width: '80px'}}>
+                    <img style={{
+                      height: '80px',
+                      width: '80px',
+                      borderRadius: '40px'
+                    }}
                          src={e.user_ID === this.props.login.user_ID ? `/pyapi/user/avatar/${e.user_ID}.jpeg` : this.props.login.userAvatar}
                          alt="avatar"/>
                   </div>
@@ -176,33 +183,33 @@ class CommentForm extends React.Component {
         _id: this.props.projectId,
       },
     })
-    this.setState({ inputValue: null })
+    this.setState({inputValue: null})
   }
 
   handleInputChange(e) {
-    this.setState({ inputValue: e.target.value })
+    this.setState({inputValue: e.target.value})
   }
 
   render() {
-    const { fetching, data, value, projects, inputValue } = this.state
+    const {fetching, data, value, projects, inputValue} = this.state
     const userObjId = localStorage.getItem('user_obj_id')
     return (
       <div className="demo">
         <Row type="flex" justify="flex" align="top">
-          <Col span={2} style={{ margin: '20px 0', textAlign: 'center' }}>
-            <div style={{ height: '80px', width: '80px' }}>
-              <img style={{ height: '80px', width: '80px', borderRadius: '40px' }}
+          <Col span={2} style={{margin: '20px 0', textAlign: 'center'}}>
+            <div style={{height: '80px', width: '80px'}}>
+              <img style={{height: '80px', width: '80px', borderRadius: '40px'}}
                    src={this.props.login.userAvatar}
                    alt="avatar"/>
             </div>
           </Col>
-          <Col span={20} style={{ margin: '20px 0' }}>
+          <Col span={20} style={{margin: '20px 0'}}>
             <TextArea value={inputValue}
                       placeholder="enter your comments.."
-                      autosize={{ minRows: 5, maxRows: 50 }}
+                      autosize={{minRows: 5, maxRows: 50}}
                       onChange={(e) => this.handleInputChange(e)}
             />
-            <div style={{ margin: '20px 0' }}/>
+            <div style={{margin: '20px 0'}}/>
             <Button
               type="primary"
               htmlType="submit"
@@ -223,16 +230,19 @@ export function projectStatus(project) {
     return <div key='1'/>
   }
   if (project.status === 'deploying') {
-    return <Tag color='gold' style={{ cursor: 'default', marginLeft: 10 }} key='1'>Deploying <Icon
+    return <Tag color='gold' style={{cursor: 'default', marginLeft: 10}}
+                key='1'>Deploying <Icon
       type="loading"/></Tag>
   } else if (project.status === 'active') {
-    return <Tag color='green' style={{ cursor: 'default', marginLeft: 10 }} key='1'>Online</Tag>
+    return <Tag color='green' style={{cursor: 'default', marginLeft: 10}}
+                key='1'>Online</Tag>
   } else {
-    return <Tag color='grey' style={{ cursor: 'default', marginLeft: 10 }} key='1'>Offline</Tag>
+    return <Tag color='grey' style={{cursor: 'default', marginLeft: 10}}
+                key='1'>Offline</Tag>
   }
 }
 
-function ProjectInfo({ app, match, history, location, dispatch, projectDetail, login }) {
+function ProjectInfo({app, match, history, location, dispatch, projectDetail, login}) {
   const projectId = match.params.projectId
   const user_ID = localStorage.getItem('user_ID')
   const userObjId = localStorage.getItem('user_obj_id')
@@ -268,7 +278,7 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
       onOk() {
         dispatch({
           type: 'projectDetail/delete',
-          payload: { projectId, type: projectDetail.project.type },
+          payload: {projectId, type: projectDetail.project.type},
         })
       },
     })
@@ -306,7 +316,7 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
 
   const cloudNote = () => {
     if (ownerOrNot) {
-      return <Row style={{ width: '110%', marginLeft: '-8%' }}>
+      return <Row style={{width: '110%', marginLeft: '-8%'}}>
         <Col span={14}>
       <span className={styles.generalSpan}>
       <Upload {...props1}>
@@ -341,7 +351,8 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
   if (location.pathname.split('/').length > 3) {
     // project 4 step pages
     return (
-      <ProjectDetail app={app} match={match} history={history} location={location}
+      <ProjectDetail app={app} match={match} history={history}
+                     location={location}
                      projectDetail={projectDetail}
                      dispatch={dispatch}/>
     )
@@ -363,9 +374,9 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
         }
 
         componentDidMount() {
-          fetch(`/pyapi/user/tourtip?user_ID=${localStorage.user_ID}`, { method: 'GET' })
+          fetch(`/pyapi/user/tourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
             .then((response) => response.json())
-            .then(({ response }) => {
+            .then(({response}) => {
               this.setState({
                 tourtip: parseInt(response.user.tourtip),
               })
@@ -389,7 +400,7 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
 
         //关闭tourtip时调用，此后登录不再显示tourtip
         noLearning = () => {
-          fetch(`/pyapi/user/notourtip?user_ID=${localStorage.user_ID}`, { method: 'GET' })
+          fetch(`/pyapi/user/notourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
         }
 
         render() {
@@ -400,11 +411,13 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
                   ref={c => (this.joyride = c)}
                   debug={false}
                   locale={{
-                    back: (<span style={{ color: '#34BFE2' }}>Back</span>),
-                    close: (<span style={{ color: '#34BFE2' }}>Close</span>),
-                    last: (<span style={{ color: '#34BFE2' }} onClick={this.noLearning}>Finish</span>),
-                    next: (<span style={{ color: '#34BFE2' }}>Next</span>),
-                    skip: (<span style={{ color: '#999999' }} onClick={this.noLearning}>Skip</span>),
+                    back: (<span style={{color: '#34BFE2'}}>Back</span>),
+                    close: (<span style={{color: '#34BFE2'}}>Close</span>),
+                    last: (<span style={{color: '#34BFE2'}}
+                                 onClick={this.noLearning}>Finish</span>),
+                    next: (<span style={{color: '#34BFE2'}}>Next</span>),
+                    skip: (<span style={{color: '#999999'}}
+                                 onClick={this.noLearning}>Skip</span>),
                   }}
                   run={true}
                   showOverlay={true}
@@ -517,11 +530,11 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
                 projectType={projectDetail.project.type}/>}
               <div className={styles.info}>
                 <Row>
-                  <Col span={3} style={{ padding: '10px 42px' }}>
+                  <Col span={3} style={{padding: '10px 42px'}}>
                     <div className={styles.bigIconNunberDiv}>
                       <div
                         className={this.chooseColor(projectDetail.project.star_users, projectDetail.project.user, userObjId)}
-                        style={!ownerOrNot ? { cursor: 'pointer' } : { cursor: 'default' }}
+                        style={!ownerOrNot ? {cursor: 'pointer'} : {cursor: 'default'}}
                         onClick={!ownerOrNot ? () => appStarFavor('star') : null}
                       >
                         <p className={styles.icon}>
@@ -533,7 +546,7 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
                       </div>
                       <div
                         className={this.chooseColor(projectDetail.project.favor_users, projectDetail.project.user, userObjId)}
-                        style={!ownerOrNot ? { cursor: 'pointer' } : { cursor: 'default' }}
+                        style={!ownerOrNot ? {cursor: 'pointer'} : {cursor: 'default'}}
                         onClick={!ownerOrNot ? () => appStarFavor('favor') : null}>
                         <p className={styles.icon}>
                           <Icon
@@ -544,15 +557,18 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
                       </div>
                     </div>
                   </Col>
-                  <Col span={21} style={{ paddingRight: '50px' }}>
+                  <Col span={21} style={{paddingRight: '50px'}}>
                     <div className={styles.name}>
                       {/* project header area */}
-                      <h1 style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                      <h1 style={{
+                        display: 'flex',
+                        justifyContent: 'space-between'
+                      }}>
+                        <span style={{display: 'flex', alignItems: 'center'}}>
                           {projectDetail.project.name}&nbsp;
                           {ownerOrNot && <Icon
                             type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
-                            style={{ fontSize: 20 }}/>}
+                            style={{fontSize: 20}}/>}
                           {
                             projectStatus(projectDetail.project)
                           }
@@ -564,21 +580,22 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
                             projectDetail={projectDetail}
                             type={projectDetail.project.type}
                           >
-                          <Button icon='edit' style={{ marginRight: 15 }}/>
+                          <Button icon='edit' style={{marginRight: 15}}/>
                         </ProjectModal>
                           {/* only private project can be deleted */}
                           {projectDetail.project.privacy === 'private' &&
-                          <Button icon='delete' style={{ marginRight: 15, width: 32 }}
+                          <Button icon='delete'
+                                  style={{marginRight: 15, width: 32}}
                                   onClick={() => deleteProject()}/>}
                           <Button icon='cloud-download-o' className="mei"
-                                  style={{ width: 32, fontSize: 16 }}
+                                  style={{width: 32, fontSize: 16}}
                                   onClick={() => dispatch({
                                     type: 'projectDetail/showHelpModal',
                                   })}/>
                       </span>}
                       </h1>
                       <p className={styles.text}>
-                        <Icon type="clock-circle-o" style={{ marginRight: 10 }}/>
+                        <Icon type="clock-circle-o" style={{marginRight: 10}}/>
                         Create
                         Time: {showTime(projectDetail.project.create_time)}
                       </p>
@@ -590,7 +607,7 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
                     <div className={styles.tags}>
                       {projectDetail.project.tags.length > 0 ? projectDetail.project.tags.map(e =>
                           <Tag color="#EEEEEE"
-                               style={{ color: '#666666', cursor: 'default' }}
+                               style={{color: '#666666', cursor: 'default'}}
                                key={e}>{e}</Tag>)
                         : null}
                     </div>
@@ -608,14 +625,15 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
                 tabBarExtraContent={cloudNote()}
                 className={styles.jobs}>
                 <TabPane tab="Overview" key="1">
-                  <div className={styles.reactMdeEditorDiv}>
-                    {/*{!projectDetail.overviewEditState?<ReactMarkdown source={projectDetail.project.overview}/>:null}*/}
-                    {/*{projectDetail.overviewEditState?<ReactMdeEditor*/}
-                    {/*projectDetail={projectDetail} dispatch={dispatch}/>:null}*/}
-                    <ReactMdeEditor
-                      projectDetail={projectDetail} dispatch={dispatch}
-                      ownerOrNot={ownerOrNot}/>
-                  </div>
+                  <Spin spinning={projectDetail.loadingOverview}>
+                    <div className={styles.reactMdeEditorDiv}>
+                      {projectDetail.overviewEditorState ? <ReactMdeEditor
+                        project={projectDetail.project} dispatch={dispatch}
+                        ownerOrNot={ownerOrNot}/> : <ReactMdePreview
+                        project={projectDetail.project} dispatch={dispatch}
+                        ownerOrNot={ownerOrNot}/>}
+                    </div>
+                  </Spin>
                 </TabPane>
                 {ownerOrNot && <TabPane tab="Jobs" key="2">
                   <Jobs projectDetail={projectDetail} dispatch={dispatch}/>
@@ -637,7 +655,8 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
                   />
                 </TabPane>
                 <TabPane tab="Comments" key="5">
-                  <CommentForm dispatch={dispatch} projectId={projectId} login={login}/>
+                  <CommentForm dispatch={dispatch} projectId={projectId}
+                               login={login}/>
                   <CommentsList dispatch={dispatch} projectId={projectId}
                                 comments={projectDetail.comments}
                                 totalNumber={projectDetail.totalNumber}
@@ -666,7 +685,7 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
 //   market_use: false,
 // }
 
-function ProjectDetail({ app, match, history, location, dispatch, projectDetail }) {
+function ProjectDetail({app, match, history, location, dispatch, projectDetail}) {
   return (
     <div className={`main-container ${styles.normal}`}>
       <Switch>
@@ -682,7 +701,7 @@ function ProjectDetail({ app, match, history, location, dispatch, projectDetail 
   )
 }
 
-export default connect(({ projectDetail, login }) => ({
+export default connect(({projectDetail, login}) => ({
   projectDetail,
   login,
 }))(ProjectInfo)

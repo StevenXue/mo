@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { Card, Button, Row, Col, Input, Icon, Pagination, Select, message, List, Modal } from 'antd'
 import * as pathToRegexp from 'path-to-regexp'
-import ReactMde from 'react-mde'
-
+import {ReactMdePreview} from '../../../../components/ReactMdeCom/reactMde'
 import {
   NotebookActions,
 } from '@jupyterlab/notebook'
@@ -355,18 +354,8 @@ export class ListPage extends React.Component {
         </header>
         <div style={{ height: 'auto', overflowY: 'auto' }}>
           {upperArea()}
-          <ReactMde
-            textAreaProps={{
-              id: 'ta1',
-              name: 'ta1',
-            }}
-            value={{ text: overview }}
-            showdownOptions={{ tables: true, simplifiedAutoLink: true }}
-            visibility={{
-              toolbar: false,
-              textarea: false,
-              previewHelp: false,
-            }}
+          <ReactMdePreview
+            project={project} ownerOrNot={false}
           />
         </div>
       </div>
