@@ -230,6 +230,7 @@ export default {
       yield put({type: 'setProject', payload: project})
       yield put({type: 'changeOverviewLoading'})
       yield put({type: 'setOverviewEditorState',overviewEditorState:false})
+      message.success('Overview修改成功')
     },
 
     // 获取 project 下的 comments
