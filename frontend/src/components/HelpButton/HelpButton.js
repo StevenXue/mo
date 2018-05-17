@@ -113,8 +113,6 @@ class HelpButton extends React.Component {
     steps: [],
     steps2: [],
     visible: false,
-
-    helpState: 0,
     isNotebookLoaded: false,
   }
 
@@ -151,13 +149,11 @@ class HelpButton extends React.Component {
     })
   }
   handleOk = (e) => {
-    console.log(e)
     this.setState({
       visible: false,
     })
   }
   handleCancel = (e) => {
-    console.log(e)
     this.setState({
       visible: false,
     })
@@ -181,61 +177,6 @@ class HelpButton extends React.Component {
       allSteps: allSteps,
     })
     this.setState({ run: !this.state.run })
-  }
-
-  // 使用教程弹窗
-  renderHelp = () => {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        {/*标题*/}
-        <div style={{ fontSize: 30, padding: 20 }}>
-          {titleList[this.state.helpState]}
-        </div>
-        {/*图片*/}
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          {this.state.helpState !== 0 ?
-            <Icon type="left" style={{ fontSize: 40, color: ' #c1c1c1' }}
-                  onClick={() => {
-                    if (this.state.helpState === 0) {
-                      return
-                    }
-                    this.setState({ helpState: this.state.helpState - 1 })
-
-                  }}
-            /> : <Icon type="left" style={{ fontSize: 40, color: 'transparent' }}/>}
-          <img style={{
-            width: imgWidth / scale, height: imgHeight / scale,
-            marginTop: 8,
-            marginBottom: 50,
-            border: '1px solid #c1c1c1',
-          }}
-               src={gitList[this.state.helpState]} alt='loading...'/>
-          <Icon type="right" style={{ fontSize: 40, color: ' #c1c1c1' }}
-                onClick={() => {
-                  if (this.state.helpState === titleList.length - 1) {
-                    this.setState({ helpState: 0 })
-
-                  } else {
-                    this.setState({ helpState: this.state.helpState + 1 })
-                  }
-
-                }}
-          />
-        </div>
-        {/*底部*/}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Steps current={this.state.helpState + 1} progressDot={(dot, { status, index }) => (
-            <div>
-              {dot}
-            </div>
-          )}>
-            {titleList.map((e, index) => <Step key={e} status={this.state.helpState === index ? 'finish' : 'wait'}/>)}
-            <Step status={'wait'}/>
-          </Steps>
-        </div>
-      </div>
-    )
-
   }
 
   render() {
@@ -262,25 +203,15 @@ class HelpButton extends React.Component {
         )
       }
       <div className={styles.cbtn}>
-        <Button
-          size="small"
-          onMouseEnter={this.handleOnClick}
-          onMouseLeave={this.handleOnClick}
-          style={{
-            borderWidth: 0,
-            color: '#1890ff',
-          }}
-        >
+        <Button size="small" onMouseEnter={this.handleOnClick} // 鼠标滑入
+                onMouseLeave={this.handleOnClick} // 鼠标滑出
+                style={{ borderWidth: 0, color: '#1890ff' }}>
           Hint
         </Button>
         <div>
-          <Button size="small"
-                  onClick={this.showModal}
-                  style={{
-                    borderWidth: 0,
-                    color: '#1890ff',
-                  }}
-          >Tips</Button>
+          <Button size="small" onClick={this.showModal} style={{ borderWidth: 0, color: '#1890ff' }}>
+            Tips
+          </Button>
           <Modal
             visible={this.state.visible}
             onOk={this.handleOk}
@@ -293,11 +224,70 @@ class HelpButton extends React.Component {
               alignItems: 'center',
             }}
           >
-            {this.renderHelp()}
+            <HelpModal/>
           </Modal>
         </div>
       </div>
     </div>
+  }
+}
+
+// 使用教程弹窗
+class HelpModal extends React.Component {
+  state = {
+    helpState: 0,
+  }
+
+  render() {
+    const { helpState } = this.state
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        {/*标题*/}
+        <div style={{ fontSize: 30, padding: 20 }}>
+          {titleList[helpState]}
+        </div>
+        {/*图片*/}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          {helpState !== 0 ?
+            <Icon type="left" style={{ fontSize: 40, color: ' #c1c1c1' }}
+                  onClick={() => {
+                    if (helpState === 0) {
+                      return
+                    }
+                    this.setState({ helpState: helpState - 1 })
+
+                  }}
+            /> : <Icon type="left" style={{ fontSize: 40, color: 'transparent' }}/>}
+          <img style={{
+            width: imgWidth / scale, height: imgHeight / scale,
+            marginTop: 8,
+            marginBottom: 50,
+            border: '1px solid #c1c1c1',
+          }}
+               src={gitList[helpState]} alt='loading...'/>
+          <Icon type="right" style={{ fontSize: 40, color: ' #c1c1c1' }}
+                onClick={() => {
+                  if (helpState === titleList.length - 1) {
+                    this.setState({ helpState: 0 })
+                  } else {
+                    this.setState({ helpState: helpState + 1 })
+                  }
+                }}
+          />
+        </div>
+        {/*底部*/}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Steps current={helpState + 1} progressDot={(dot, { status, index }) => (
+            <div>
+              {dot}
+            </div>
+          )}>
+            {titleList.map((e, index) => <Step key={e} status={helpState === index ? 'finish' : 'wait'}/>)}
+            <Step status={'wait'}/>
+          </Steps>
+        </div>
+      </div>
+    )
   }
 }
 
