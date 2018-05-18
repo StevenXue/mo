@@ -41,7 +41,6 @@ export default {
 
     *sendVerificationCode({ payload }, { call, put }) {
       const response = yield call(send_verification_code, payload)
-      console.log("response", response)
       if(response.status === 200){
         message.success('验证码发送成功!')
       }else{
