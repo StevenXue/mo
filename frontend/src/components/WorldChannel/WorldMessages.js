@@ -3,10 +3,11 @@ import { Popover } from 'antd'
 import styles from './index.less'
 import { showTime } from '../../utils/index'
 
-export const WorldMessages = ({ worldMessages = [], ref1, isRight, login }) => {
+export const WorldMessages = ({ worldMessages = [], ref1, isRight, login, onClickIcon }) => {
   return <div
     className={styles.messages_container}
     ref={ref1}
+    onClick={!isRight&&onClickIcon}
   >
     {worldMessages.map((worldMessage) => {
       return <WorldMessageItem

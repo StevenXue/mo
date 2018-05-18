@@ -133,7 +133,8 @@ class WorldChannel extends Component {
             this.scrollView = el
           }}
           isRight={isRight}
-          login={login}/>
+          login={login}
+          onClickIcon={onClickIcon}/>
         {
           isRight &&
           <div className={styles.input}>
