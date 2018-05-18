@@ -18,7 +18,7 @@ import sys
 from flask import Blueprint
 from flask import jsonify
 from flask import request
-import synonyms
+# import synonyms
 
 from server3.service import user_service, api_service
 from server3.business import api_business, user_business
