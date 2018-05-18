@@ -16,8 +16,10 @@ from server3.business.user_business import UserBusiness
 from server3.business import user_business
 from server3.business.statistics_business import StatisticsBusiness
 from server3.service import message_service
+from server3.utility.diff_requirements import diff
 from server3.constants import DOCKER_IP
 from server3.constants import DEFAULT_DEPLOY_VERSION
+from server3.constants import TEMPLATE_PATH
 
 
 class AppService(ProjectService):
@@ -197,6 +199,116 @@ class AppService(ProjectService):
         return modules
 
     @classmethod
+    def read_handler_py(cls, script, app):
+        """
+
+        :param f: file stream
+        :param app:
+        :return:
+        """
+
+        # 1. get possible imported dataset list from
+        # app.used_datasets[n].dataset.path
+        # e.g. './user_directory/zhaofengli/anone
+        possible_used_datasets = [d for d in app.used_datasets]
+
+        # 2. get possible imported module list from
+        # app.used_modules in list of
+        # tuple (module_object, module_version) format
+        possible_used_modules = [m for m in app.used_modules]
+
+        # 3. check if there is any matches in script
+        for d in possible_used_datasets:
+            pattern = r"""^(?!#).*({})""".format(d.dataset.path.replace(
+                './user_directory', 'dataset'))
+            matches = re.finditer(pattern, script, re.MULTILINE)
+            for ma in matches:
+                if '#' not in ma.group(0):
+                    break
+            else:
+                app.used_datasets.remove(d)
+
+        for m in possible_used_modules:
+            pattern = \
+                r"""^(?!#).*(run|predict|train)\s*\(('|")({}/{}/{})('|")""" \
+                    .format(m.module.user.user_ID,
+                            m.module.name,
+                            m.version.replace('_', '.'))
+            matches = re.finditer(pattern, script, re.MULTILINE)
+            for ma in matches:
+                if '#' not in ma.group(0):
+                    break
+            else:
+                app.used_modules.remove(m)
+        return possible_used_datasets, possible_used_modules
+
+    @classmethod
+    def copy_entities(cls, container, app, version, possible_used_datasets,
+                      possible_used_modules):
+        """
+
+        :param container:
+        :param app:
+        :param version:
+        :param possible_used_datasets:
+        :param possible_used_modules:
+        :return:
+        """
+        # Move module from project.module_path
+        # ./server3/lib/modules/zhaofengli/newttt/[module_version]/ to
+        # ./fucntion/[user_ID]-[app_name]-[app_version]/modules/
+        # [user_ID]/[module_name]/[module_version]
+        for m in possible_used_modules:
+            src = '{}/{}/'.format(m.module.module_path,
+                                  m.version.replace('.', '_'))
+            dst = './functions/{}-{}-{}/modules/{}/{}/{}/'.format(
+                app.user.user_ID, app.name, version,
+                m.module.user.name, m.module.name,
+                m.version.replace('.', '_'))
+            if os.path.isdir(dst):
+                shutil.rmtree(dst)
+            shutil.copytree(src, dst)
+
+        # Move dataset from 引用者的DOCKER CONTAINER 里面的
+        # ~/dataset/[user_ID] to
+        # ./fucntion/[user_ID]-[app_name]-[app_version]/
+        # dataset/[user_ID]/[dataset_name]/
+
+        for d in possible_used_datasets:
+            src = '/home/jovyan/{}'.format(
+                d.dataset.path.replace('./user_directory', 'dataset'))
+            dst = './functions/{}-{}-{}/dataset/{}/{}'.format(
+                app.user.user_ID, app.name, version,
+                d.dataset.user.name, d.dataset.name)
+            if os.path.isdir(dst):
+                shutil.rmtree(dst)
+            cls.business.copy_from_container(container, src, dst)
+
+    @classmethod
+    def rename_handler_py(cls, handler_file_path, func_path):
+        """
+
+        :param handler_file_path:
+        :param func_path: path of function folder
+        :return:
+        """
+        handler_file_path = handler_file_path.replace('work', func_path)
+        handler_file_path = os.path.join(func_path, handler_file_path)
+        handler_file_name = handler_file_path.split('/')[-1]
+        handler_dst_path = handler_file_path.replace(handler_file_name,
+                                                     'handler.py')
+        shutil.copy(handler_file_path, handler_dst_path)
+        return handler_file_path, handler_dst_path
+
+    @classmethod
+    def diff_n_gen_new_requirements(cls, func_path):
+        old = os.path.join(TEMPLATE_PATH, 'requirements.txt')
+        new = os.path.join(func_path, 'requirements.txt')
+        r = os.path.join(func_path, 'requirements_tmp.txt')
+        diff(old_req=old, new_req=new, result_req=r)
+        shutil.move(r, new)
+
+    @classmethod
     def deploy_or_publish(cls, app_id, commit_msg, handler_file_path,
                           version=DEFAULT_DEPLOY_VERSION):
         """
@@ -231,59 +343,24 @@ class AppService(ProjectService):
         call(['faas-cli', 'new', service_name, '--lang=python3',
               f'--gateway=http://{DOCKER_IP}:8080'],
              cwd=cls.business.base_func_path)
+
         # target path = new path
         func_path = os.path.join(cls.business.base_func_path, service_name)
 
         cls.business.copytree_wrapper(app.path, func_path,
                                       ignore=shutil.ignore_patterns('.git'))
         # rename py to handler.py
-        handler_file_path = handler_file_path.replace('work', func_path)
-        handler_file_path = os.path.join(func_path, handler_file_path)
-        handler_file_name = handler_file_path.split('/')[-1]
-        handler_dst_path = handler_file_path.replace(handler_file_name,
-                                                     'handler.py')
+        handler_file_path, handler_dst_path = cls.rename_handler_py(
+            handler_file_path, func_path)
 
-        shutil.copy(handler_file_path, handler_dst_path)
         # change some configurable variable to deploy required
         cls.business.process_handler_py(handler_dst_path)
 
         with open(handler_file_path, 'r') as f:
-
             script = f.read()
 
-            # 1. get possible imported dataset list from
-            # app.used_datasets[n].dataset.path
-            # e.g. './user_directory/zhaofengli/anone
-            possible_used_datasets = [d for d in app.used_datasets]
-
-            # 2. get possible imported module list from
-            # app.used_modules in list of
-            # tuple (module_object, module_version) format
-            possible_used_modules = [m for m in app.used_modules]
-
-            # 3. check if there is any matches in script
-            for d in possible_used_datasets:
-                pattern = r"""^(?!#).*({})""".format(d.dataset.path.replace(
-                    './user_directory', 'dataset'))
-                matches = re.finditer(pattern, script, re.MULTILINE)
-                for ma in matches:
-                    if '#' not in ma.group(0):
-                        break
-                else:
-                    app.used_datasets.remove(d)
-
-            for m in possible_used_modules:
-                pattern = \
-                    r"""^(?!#).*(run|predict|train)\s*\(('|")({}/{}/{})('|")""" \
-                        .format(m.module.user.user_ID,
-                                m.module.name,
-                                m.version.replace('_', '.'))
-                matches = re.finditer(pattern, script, re.MULTILINE)
-                for ma in matches:
-                    if '#' not in ma.group(0):
-                        break
-                else:
-                    app.used_modules.remove(m)
+            possible_used_datasets, possible_used_modules = \
+                cls.read_handler_py(script, app)
 
             # 4. save verified possible_imported_modules/datasets
             # to app.deployments
@@ -292,41 +369,17 @@ class AppService(ProjectService):
                 used_modules=possible_used_modules,
                 used_datasets=possible_used_datasets)
 
-            # Move module from project.module_path
-            # ./server3/lib/modules/zhaofengli/newttt/[module_version]/ to
-            # ./fucntion/[user_ID]-[app_name]-[app_version]/modules/
-            # [user_ID]/[module_name]/[module_version]
-            for m in possible_used_modules:
-                src = '{}/{}/'.format(m.module.module_path,
-                                      m.version.replace('.', '_'))
-                dst = './functions/{}-{}-{}/modules/{}/{}/{}/'.format(
-                    app.user.user_ID, app.name, version,
-                    m.module.user.name, m.module.name,
-                    m.version.replace('.', '_'))
-                if os.path.isdir(dst):
-                    shutil.rmtree(dst)
-                shutil.copytree(src, dst)
-
-            # Move dataset from 引用者的DOCKER CONTAINER 里面的
-            # ~/dataset/[user_ID] to
-            # ./fucntion/[user_ID]-[app_name]-[app_version]/
-            # dataset/[user_ID]/[dataset_name]/
-
-            for d in possible_used_datasets:
-                src = '/home/jovyan/{}'.format(
-                    d.dataset.path.replace('./user_directory', 'dataset'))
-                dst = './functions/{}-{}-{}/dataset/{}/{}'.format(
-                    app.user.user_ID, app.name, version,
-                    d.dataset.user.name, d.dataset.name)
-                if os.path.isdir(dst):
-                    shutil.rmtree(dst)
-                cls.business.copy_from_container(container, src, dst)
+            cls.copy_entities(container, app, version,
+                              possible_used_datasets, possible_used_modules)
 
         # copy path edited __init__.py
         shutil.copy(
-            './functions/template/python3/function/modules/__init__.py',
+            f'{TEMPLATE_PATH}/function/modules/__init__.py',
             os.path.join(func_path, 'modules')
         )
+
+        # gen diffed requirements.txt
+        cls.diff_n_gen_new_requirements(func_path)
 
         # deploy
         call(['faas-cli', 'build', '-f', f'./{service_name}.yml'],
