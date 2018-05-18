@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "start": "cross-env PORT=8989 roadhog server",
+    "start": "cross-env PORT=8899 roadhog server",
     "build": "roadhog build",
     "lint": "eslint --ext .js src test"
   },
@@ -22,6 +22,7 @@
     "babel-runtime": "^6.9.2",
     "braft-editor": "^1.3.2",
     "codemirror": "^5.31.0",
+    "draft-js": "^0.10.5",
     "dva": "^2.0.4",
     "dva-model-extend": "^0.1.2",
     "echarts": "^3.7.2",
@@ -52,7 +53,7 @@
     "react-json-tree": "^0.11.0",
     "react-jupyter": "^0.1.0",
     "react-markdown": "^3.3.0",
-    "react-mde": "^4.0.3",
+    "react-mde": "5.5.1",
     "react-simple-chatbot": "^0.2.9",
     "reqwest": "^2.0.5",
     "rxjs": "^5.5.2",

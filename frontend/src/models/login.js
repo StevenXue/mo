@@ -112,7 +112,6 @@ export default {
       }
     },
     updateProjectNumber(state, action) {
-      console.log('action', action)
       return {
         ...state,
         user: {
@@ -122,7 +121,6 @@ export default {
       }
     },
     setUserAvatar(state, { userAvatar }) {
-      console.log('userAvatar', userAvatar)
       return {
         ...state,
         userAvatar,

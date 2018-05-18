@@ -48,7 +48,8 @@ class Register extends Component {
     this.props.dispatch({
       type: "register/sendVerificationCode",
       payload: {
-        phone: phone
+        phone: phone,
+        usage:"register"
       }
     })
 

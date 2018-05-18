@@ -28,7 +28,6 @@ app_app = Blueprint("app_app", __name__, url_prefix=PREFIX)
 @app_app.route("/run", methods=["POST"])
 def run_in_docker():
     data = request.get_json()
-    print(data['code'])
     return jsonify({"response": {"code": 11}})
 
 
@@ -157,7 +156,6 @@ def add():
 @jwt_optional
 def get_app(app_id):
     user_ID = get_jwt_identity()
-    print('user_ID', user_ID)
     yml = request.args.get('yml')
     commits = request.args.get('commits')
     version = request.args.get('version')

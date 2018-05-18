@@ -14,7 +14,6 @@ from io import BytesIO
 from datetime import datetime
 from datetime import timedelta
 
-import synonyms
 import docker
 
 from server3.entity import project
@@ -63,6 +62,15 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         return logs
 
     @classmethod
+    def process_handler_py(cls, script_path):
+        for line in fileinput.input(files=script_path, inplace=1):
+            # change work_path, due to deploy dir different
+            line = re.sub(r"work_path = '\./'",
+                          r"work_path = 'function/'",
+                          line.rstrip())
+            print(line)
+
+    @classmethod
     def deploy_or_publish(cls, app_id, commit_msg, handler_file_path,
                           version=DEV_DIR_NAME):
         app = cls.get_by_id(app_id)
@@ -95,7 +103,12 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
                                                      'handler.py')
         # Repo test
         # TODO: read file from handler_file_path, tranformed .py file
+        # handler_file_path: path in work dir
+        # handler_dst_path: path in pyserver/function/
         shutil.copy(handler_file_path, handler_dst_path)
+
+        # do some deploy necessary change to handler.py
+        cls.process_handler_py(handler_dst_path)
 
         # change some configurable variable to deploy required
         cls.modify_handler_py(handler_dst_path)
@@ -320,6 +333,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
     @classmethod
     def list_projects_chat(cls, search_query, page_no=None, page_size=None,
                            default_max_score=0.4, privacy="public"):
+        import synonyms
         start = (page_no - 1) * page_size
         end = page_no * page_size
 

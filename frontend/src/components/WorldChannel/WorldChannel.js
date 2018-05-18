@@ -6,17 +6,6 @@ import { WorldMessages } from './index'
 import styles from './index.less'
 
 class worldChannelC extends Component {
-  state = {
-    run: false,
-    steps: [],
-    steps2: [],
-  }
-
-  componentDidMount() {
-    // this.setState({ run: true });
-
-  }
-
   onClickIcon = () => {
     this.props.dispatch({
       type: 'worldChannel/toggleIsRight',
@@ -24,14 +13,7 @@ class worldChannelC extends Component {
     })
   }
 
-  callback = (tour) => {
-    const { action, index, type } = data
-  }
-
   render() {
-    const { steps, run } = this.state
-    console.log('steps', steps)
-
     const { worldMessages, isRight, dispatch, login } = this.props
     if (!login.user) {
       return (
@@ -99,7 +81,7 @@ class WorldChannel extends Component {
     }
   }
 
-  subHadleSendMessage = (e) => {
+  subHandleSendMessage = (e) => {
     this.scrollToBottom(true)
     const inputMessage = e.input.value
     if (inputMessage) {
@@ -128,15 +110,12 @@ class WorldChannel extends Component {
         {
           isRight ?
             <div className={styles.first_row}>
-
               <Icon type="arrow-right" onClick={onClickIcon}
                     className={styles.icon_container}
               />
-
               <div className={styles.title}>
                 ALL
               </div>
-
               <Icon type="caret-down"
                     className={styles.icon_container}
                     style={{ color: 'transparent' }}
@@ -145,8 +124,7 @@ class WorldChannel extends Component {
 
             <div className={styles.first_row}>
               <Icon type="arrow-left" onClick={onClickIcon}
-                    className={styles.icon_container}
-              />
+                    className={styles.icon_container}/>
             </div>
         }
         <WorldMessages
@@ -156,7 +134,7 @@ class WorldChannel extends Component {
           }}
           isRight={isRight}
           login={login}
-        />
+          onClickIcon={onClickIcon}/>
         {
           isRight &&
           <div className={styles.input}>
@@ -165,7 +143,6 @@ class WorldChannel extends Component {
               onPressEnter={this.handleSendMessage}
               id="myInput"
               ref="myInput"
-              // ref={(el) => this.input = el}
             />
 
             <div
@@ -173,10 +150,6 @@ class WorldChannel extends Component {
                 height: 30, width: 30,
                 marginLeft: 10,
                 marginRight: 10,
-                // display: "flex",
-                // justifyContent: "center",
-                // alignItem: "center",
-                // flex: 1
               }}
             >
               <img
@@ -184,15 +157,12 @@ class WorldChannel extends Component {
                 src={require('../../img/icon/aircraft.png')}
                 onClick={() => {
                   let object = this.refs.myInput
-                  this.subHadleSendMessage(object)
+                  this.subHandleSendMessage(object)
                 }}
               />
             </div>
-
           </div>
         }
-
-
       </div>
 
     )

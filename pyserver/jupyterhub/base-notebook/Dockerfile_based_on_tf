@@ -1,0 +1,31 @@
+FROM jupyter/tensorflow-notebook
+
+LABEL maintainer="Mo Project"
+
+USER root
+
+RUN apt-get update && apt-get install -yq graphviz tzdata
+
+USER $NB_UID
+
+RUN pip install virtualenvwrapper
+ENV VIRTUALENVWRAPPER_PYTHON $CONDA_DIR/bin/python
+ENV VIRTUALENVWRAPPER_VIRTUALENV $CONDA_DIR/bin/virtualenv
+SHELL ["/bin/bash", "-c"]
+
+RUN source $CONDA_DIR/bin/virtualenvwrapper.sh && \
+    mkvirtualenv jlenv && \
+    workon jlenv && \
+    pip install -U tensorflow opencv-python jupyter && \
+    pip install jupyterlab==0.31.1 && \
+    toggleglobalsitepackages
+
+
+ADD --chown=jovyan:users run.sh /home/jovyan
+ADD --chown=jovyan:users add_venv.sh /home/jovyan
+ADD --chown=jovyan:users remove_venv.sh /home/jovyan
+ADD --chown=jovyan:users freeze_venv.sh /home/jovyan
+ADD --chown=jovyan:users modules /home/jovyan/modules
+ADD --chown=jovyan:users dataset /home/jovyan/dataset
+ADD --chown=jovyan:users pip.conf /home/jovyan/.pip/pip.conf
+CMD ['bash', '/home/jovyan/run.sh']

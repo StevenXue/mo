@@ -64,7 +64,8 @@ class ModuleBusiness(ProjectBusiness):
 
     @classmethod
     def create_project(cls, name, description, user, privacy='private',
-                       tags=None, user_token='', type='app', category='model'):
+                       tags=None, user_token='', type='app',
+                       category='model', **kwargs):
         """
         Create a new project
 
