@@ -61,8 +61,9 @@ def compare(old_packages, new_packages, result):
     for package_name, versions in list(requirements.items()):
         if not is_unique_value(versions):
             version = versions[1]
-            print(f'{package_name}=={version}', file=result)
-            print(f'{package_name}=={version}')
+            if version is not None:
+                print(f'{package_name}=={version}', file=result)
+            # print(f'{package_name}=={version}')
 
 
 def diff(old_req, new_req, result_req='./requirements.txt'):
@@ -74,7 +75,7 @@ def diff(old_req, new_req, result_req='./requirements.txt'):
     :param result_req:
     :return:
     """
-    print(f"Diff between {old_req} and {new_req}, write into {result_req}")
+    # print(f"Diff between {old_req} and {new_req}, write into {result_req}")
     with open(old_req, 'r') as old, open(new_req, 'r') as new, \
             open(result_req, 'w') as result:
         old_packages = dict(packages(old))

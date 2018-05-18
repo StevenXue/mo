@@ -16,8 +16,10 @@ from server3.business.user_business import UserBusiness
 from server3.business import user_business
 from server3.business.statistics_business import StatisticsBusiness
 from server3.service import message_service
+from server3.utility.diff_requirements import diff
 from server3.constants import DOCKER_IP
 from server3.constants import DEFAULT_DEPLOY_VERSION
+from server3.constants import TEMPLATE_PATH
 
 
 class AppService(ProjectService):
@@ -299,6 +301,14 @@ class AppService(ProjectService):
         return handler_file_path, handler_dst_path
 
     @classmethod
+    def diff_n_gen_new_requirements(cls, func_path):
+        old = os.path.join(TEMPLATE_PATH, 'requirements.txt')
+        new = os.path.join(func_path, 'requirements.txt')
+        r = os.path.join(func_path, 'requirements_tmp.txt')
+        diff(old_req=old, new_req=new, result_req=r)
+        shutil.move(r, new)
+
+    @classmethod
     def deploy_or_publish(cls, app_id, commit_msg, handler_file_path,
                           version=DEFAULT_DEPLOY_VERSION):
         """
@@ -364,9 +374,12 @@ class AppService(ProjectService):
 
         # copy path edited __init__.py
         shutil.copy(
-            './functions/template/python3/function/modules/__init__.py',
+            f'{TEMPLATE_PATH}/function/modules/__init__.py',
             os.path.join(func_path, 'modules')
         )
+
+        # gen diffed requirements.txt
+        cls.diff_n_gen_new_requirements(func_path)
 
         # deploy
         call(['faas-cli', 'build', '-f', f'./{service_name}.yml'],

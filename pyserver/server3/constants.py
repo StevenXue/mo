@@ -27,9 +27,11 @@ ALLOWED_EXTENSIONS = {'zip', 'csv', 'png', 'jpg', 'jpeg', 'svg', 'txt', 'py',
 PREDICT_FOLDER = 'predict_data/'
 MODEL_EXPORT_BASE = '/tmp'
 MODEL_SCRIPT_PATH = './run_model.py'
+TEMPLATE_PATH = './functions/template/python3'
 SERVING_PORT = 9000
 WEB_ADDR = 'http://momodel.ai'
 DOCKER_IP = '127.0.0.1'
+
 # REDIS_SERVER = 'redis://localhost:6379'
 HUB_SERVER = 'http://localhost:8000'
 ADMIN_TOKEN = '1d4afa72b00c4ffd9db82f26e1628f89'
