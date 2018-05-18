@@ -253,7 +253,7 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
                 <Menu.Item key={e.key} style={menuDiv}>
                   <Link to={e.Link}>
                     {e.Icon && <Icon type={e.Icon}/>}
-                    <div style={menuStyle}>{e.text}</div>
+                    <div style={menuStyle} className={styles.menuStyle}>{e.text}</div>
                     {/*<FormattedMessage id={e.text} defaultMessage={e.text} style={{width: '5%'}}/>*/}
                   </Link>
                 </Menu.Item>)
@@ -263,7 +263,7 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
         {
           <Menu.Item key={'docs'}>
             <div onClick={() => window.location = 'https://momodel.github.io/mo/#/'}>
-              <div style={menuStyle}>Docs</div>
+              <div style={menuStyle} className={styles.menuStyle}>Docs</div>
               {/*<FormattedMessage id={'docs'} defaultMessage={'Docs'}/>*/}
             </div>
           </Menu.Item>
