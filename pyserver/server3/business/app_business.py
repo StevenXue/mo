@@ -14,7 +14,6 @@ from io import BytesIO
 from datetime import datetime
 from datetime import timedelta
 
-import synonyms
 import docker
 
 from server3.entity import project
@@ -340,6 +339,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
     @classmethod
     def list_projects_chat(cls, search_query, page_no=None, page_size=None,
                            default_max_score=0.4, privacy="public"):
+        import synonyms
         start = (page_no - 1) * page_size
         end = page_no * page_size
 

@@ -1,14 +1,16 @@
 import React from 'react'
-import { connect } from 'dva'
+import {connect} from 'dva'
 
 import styles from './Header.less'
-import { Menu, Icon, Select, Input, Button, Badge } from 'antd'
-import { Link, routerRedux } from 'dva/router'
-import { FormattedMessage } from 'react-intl'
-import { config } from '../../utils'
+import {Menu, Icon, Select, Input, Button, Badge} from 'antd'
+import {Link, routerRedux} from 'dva/router'
+import {FormattedMessage} from 'react-intl'
+import {config} from '../../utils'
 // import PostRequestModal from '../../components/postRequestModal/postRequestModal'
-import { JsonToArray } from '../../utils/JsonUtils'
-import * as storage from '../../packages/react-simple-chatbot-master/lib/storage'
+import {JsonToArray} from '../../utils/JsonUtils'
+import * as storage
+  from '../../packages/react-simple-chatbot-master/lib/storage'
+import messageBox from './img/messageBox.jpg'
 
 const Search = Input.Search
 
@@ -69,10 +71,10 @@ const menuConfig = [
   },
 ]
 
-const menuStyle = { width: 70, display: 'flex', justifyContent: 'center' }
-const menuDiv = { padding: '0 2%' }
+const menuStyle = {width: 70, display: 'flex', justifyContent: 'center'}
+const menuDiv = {padding: '0 2%'}
 
-function Header({ location, login, history, dispatch, allRequest, message }) {
+function Header({location, login, history, dispatch, allRequest, message}) {
   const key = '/' + location.pathname.split('/')[1]
   const toLoginPage = () => {
     if (!login.user) {
@@ -88,14 +90,14 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
 
   const logout = () => {
     localStorage.removeItem('token')
-    dispatch({ type: 'login/resetUser' })
+    dispatch({type: 'login/resetUser'})
     history.push('/user/login')
   }
 
   const onClickModifyModal = (modalState) => {
     dispatch({
       type: 'allRequest/showModal',
-      payload: { modalState: modalState },
+      payload: {modalState: modalState},
     })
   }
 
@@ -151,7 +153,7 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
     }
     dispatch({
       type: 'message/readMessage',
-      payload: { receiver_id: e.receiver_id },
+      payload: {receiver_id: e.receiver_id},
     })
   }
 
@@ -181,9 +183,11 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
   const switchMessage = (e) => {
     switch (e.message_type) {
       case 'answer':
-        return <p className={styles.messageP}>{`${e.user_ID} 回答了您关注的需求${e.user_request_title}`}</p>
+        return <p
+          className={styles.messageP}>{`${e.user_ID} 回答了您关注的需求${e.user_request_title}`}</p>
       case 'commit':
-        return <p className={styles.messageP}>{`${e.user_ID} 更新了您关注的需求  ${e.user_request_title}`} 的答案</p>
+        return <p
+          className={styles.messageP}>{`${e.user_ID} 更新了您关注的需求  ${e.user_request_title}`} 的答案</p>
       case 'deploy':
         return <p
           className={styles.messageP}>{`${e.user_ID} 上线了您关注的 ${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
@@ -213,9 +217,14 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
 
   return <div className={styles.container} style={{
     display: location.pathname.indexOf('user/') !== -1 || location.pathname.indexOf('/newpassword') !== -1 ? 'none' : 'block',
-    backgroundColor:location.pathname === '/'?'#33333399':'#464E78'}}
+    backgroundColor: location.pathname === '/' ? '#33333399' : '#464E78'
+  }}
   >
-    <div className={styles.box} style={{width:1170,margin:'0 auto', backgroundColor:location.pathname === '/'?'#464E7800':'#464E78'}}>
+    <div className={styles.box} style={{
+      width: 1170,
+      margin: '0 auto',
+      backgroundColor: location.pathname === '/' ? '#464E7800' : '#464E78'
+    }}>
 
       <Menu
         className={styles.normal}
@@ -250,21 +259,21 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
             //     </SubMenu>
             //   )
             // } else {
-            return (
-              <Menu.Item key={e.key} style={menuDiv}>
-                <Link to={e.Link}>
-                  {e.Icon && <Icon type={e.Icon}/>}
-                  <div style={menuStyle}>{e.text}</div>
-                  {/*<FormattedMessage id={e.text} defaultMessage={e.text} style={{width: '5%'}}/>*/}
-                </Link>
-              </Menu.Item>)
+              return (
+                <Menu.Item key={e.key} style={menuDiv}>
+                  <Link to={e.Link}>
+                    {e.Icon && <Icon type={e.Icon}/>}
+                    <div style={menuStyle} className={styles.menuStyle}>{e.text}</div>
+                    {/*<FormattedMessage id={e.text} defaultMessage={e.text} style={{width: '5%'}}/>*/}
+                  </Link>
+                </Menu.Item>)
             // }
           },
         )}
         {
           <Menu.Item key={'docs'}>
             <div onClick={() => window.location = 'https://momodel.github.io/mo/#/'}>
-              <div style={menuStyle}>Docs</div>
+              <div style={menuStyle} className={styles.menuStyle}>Docs</div>
               {/*<FormattedMessage id={'docs'} defaultMessage={'Docs'}/>*/}
             </div>
           </Menu.Item>
@@ -272,10 +281,18 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
         <SubMenu
           className={styles.rightButton}
           title={
-            <div onClick={toLoginPage} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div onClick={toLoginPage} style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
               {
                 login.user ? <img src={`${login.userAvatar}`}
-                                  style={{ width: 25, borderRadius: '50%', marginRight: 10 }}/> : null
+                                  style={{
+                                    width: 25,
+                                    borderRadius: '50%',
+                                    marginRight: 10
+                                  }}/> : null
               }
               <span> {login.user ? login.user.user_ID : 'Login'} </span>
             </div>
@@ -283,7 +300,7 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
           }
         >
           {login.user &&
-          <Menu.Item key={'/profile'} style={{ color: 'black' }}>
+          <Menu.Item key={'/profile'} style={{color: 'black'}}>
             <div onClick={() => history.push('/profile/' + login.user.user_ID)}>
               Profile
             </div>
@@ -291,15 +308,16 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
           }
 
           {login.user &&
-          <Menu.Item key={'/setting'} style={{ color: 'black' }}>
-            <div onClick={() => history.push('/setting/profile/' + login.user.user_ID)}>
+          <Menu.Item key={'/setting'} style={{color: 'black'}}>
+            <div
+              onClick={() => history.push('/setting/profile/' + login.user.user_ID)}>
               Setting
             </div>
           </Menu.Item>
           }
 
           {login.user &&
-          <Menu.Item key={'/logout'} style={{ color: 'black' }}>
+          <Menu.Item key={'/logout'} style={{color: 'black'}}>
             <div onClick={logout}>
               Logout
             </div>
@@ -311,7 +329,11 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
         {!login.user && <SubMenu
           className={styles.rightButton}
           title={
-            <div onClick={toSignUpPage} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div onClick={toSignUpPage} style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
               <span>SignUp</span>
             </div>
           }>
@@ -320,29 +342,36 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
         {login.user && <SubMenu
           className={styles.messageSubmenu}
           title={
-            <span onClick={toLoginPage} style={{ position: 'relative' }}>
+            <span onClick={toLoginPage} style={{position: 'relative'}}>
                  <Badge count={login.user ? numberOfUnreadMessage() : 0}>
-              <Icon style={{ color: 'white', fontSize: '18px' }} type="message"/>
+              <Icon style={{color: 'white', fontSize: '18px'}} type="message"/>
                    {/*<div style={divStyle()}></div>*/}
                </Badge>
               </span>
           }
         >
-          <Menu.Item style={{ color: 'black', height: '250px', overflowY: 'auto' }}>
+          <Menu.Item
+            style={{color: 'black', height: '250px', overflowY: 'auto'}}>
+            {JsonToArray(message.messages).length===0?
+              <div style={{textAlign:'center',width:'200px',cursor:'default',height:'100%'}}>
+                <img src={messageBox} style={{width:'136px',height:'122px',margin:'50px 0 10px 0'}}/>
+                <p style={{color:'#828a92'}}>No message in your box yet</p>
+              </div>:null
+            }
             {login.user && JsonToArray(message.messages).map(e =>
               <div onClick={() => toMessage(e)} key={e.receiver_id}
                    style={e.is_read === false ? {
                      margin: '0 -20px',
                      backgroundColor: '#f0f2f5',
                      color: 'black',
-                   } : { margin: '0 -20px', color: 'black' }}>
+                   } : {margin: '0 -20px', color: 'black'}}>
                 {switchMessage(e)}</div>)}
           </Menu.Item>
           {/*<Menu.Item style={{ color: 'black' }}>*/}
-            {/*<div>*/}
-              {/*<div><Icon type="setting"/>设置</div>*/}
-              {/*<div>查看全部提醒</div>*/}
-            {/*</div>*/}
+          {/*<div>*/}
+          {/*<div><Icon type="setting"/>设置</div>*/}
+          {/*<div>查看全部提醒</div>*/}
+          {/*</div>*/}
           {/*</Menu.Item>*/}
           {/*{login.user && JsonToArray(message.messages).map(e =>*/}
           {/*<Menu.Item key={e._id} className={styles.messageMenuItem}*/}
@@ -360,4 +389,8 @@ function Header({ location, login, history, dispatch, allRequest, message }) {
   </div>
 }
 
-export default connect(({ login, allRequest, message }) => ({ login, allRequest, message }))(Header)
+export default connect(({login, allRequest, message}) => ({
+  login,
+  allRequest,
+  message
+}))(Header)

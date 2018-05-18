@@ -1,5 +1,10 @@
 @import "../../index";
-
+@font-face {
+  font-family: "PingFangSC-Medium";
+  src: url('../../font/PingFang_Medium.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+}
 .container {
   background-color: #464E78;
   #center;
@@ -15,6 +20,9 @@
     .normal {
       display: inline;
       background-color: @custom-purple;
+      .menuStyle{
+        font-family: PingFangSC-Medium;
+      }
       .logoBox {
         padding: 0;
 
