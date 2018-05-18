@@ -392,6 +392,12 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
           fetch(`/pyapi/user/notourtip?user_ID=${localStorage.user_ID}`, { method: 'GET' })
         }
 
+        //点击蒙层，不再显示toutip包括beacon
+        closeTourtip = (data)=>{
+          data.type==='overlay:click'?this.setState({
+            steps:[]
+          }):null;
+        }
         render() {
           return (
             <div>
@@ -399,6 +405,7 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
                 this.state.tourtip === 0 && <Joyride
                   ref={c => (this.joyride = c)}
                   debug={false}
+                  autoStart={true}  //自动打开第一个
                   locale={{
                     back: (<span style={{ color: '#34BFE2' }}>Back</span>),
                     close: (<span style={{ color: '#34BFE2' }}>Close</span>),
@@ -406,12 +413,13 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
                     next: (<span style={{ color: '#34BFE2' }}>Next</span>),
                     skip: (<span style={{ color: '#999999' }} onClick={this.noLearning}>Skip</span>),
                   }}
-                  run={true}
+                  run={true}  //是否可以触发弹框
                   showOverlay={true}
                   showSkipButton={true}
                   showStepsProgress={true}
                   steps={this.state.steps}
                   type='continuous'
+                  callback={this.closeTourtip}
                 />
               }
               <Cloud_2 addSteps={this.addSteps}/>
@@ -463,8 +471,8 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
                 mainColor: '#ffffff',
                 backgroundColor: '#ffffff',
                 beacon: {
-                  inner: '#34BFE2',
-                  outer: '#34BFE2',
+                  inner: '#0ae713 ',
+                  outer: '#77Eb7c',
                 },
                 close: {
                   display: 'none',
@@ -484,8 +492,8 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
                 mainColor: '#ffffff',
                 backgroundColor: '#ffffff',
                 beacon: {
-                  inner: '#34BFE2',
-                  outer: '#34BFE2',
+                  inner: '#0ae713 ',
+                  outer: '#77Eb7c',
                 },
                 close: {
                   display: 'none',
