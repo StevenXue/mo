@@ -32,7 +32,7 @@ class LaunchPage extends React.Component {
             <div className={styles.contain}>
                 <section style={{float:'left'}}>
                     <div>
-                        <img src={planet} style={{width:181,height:147}}/>
+                        <img src={planet} style={{width:'56%',marginLeft:-20}}/>
                     </div>
                     <p className={styles.p1}>To:</p>
                     <p className={styles.p2}>不甘平庸的梦想家</p>
@@ -41,7 +41,7 @@ class LaunchPage extends React.Component {
                 </section>
                 <section style={{float:'right'}}>
                     <div>
-                        <img src={wave} style={{width:184,height:134}}/>
+                        <img src={wave} style={{width:'56%'}}/>
                     </div>
                     <p className={styles.p1}>To:</p>
                     <p className={styles.p2}>乘风破浪的工程狮</p>
