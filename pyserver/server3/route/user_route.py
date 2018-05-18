@@ -49,6 +49,12 @@ user_app = Blueprint("user_app", __name__, url_prefix=PREFIX)
 # 发送验证码
 @user_app.route('/send_verification_code/<phone>', methods=['get'])
 def send_verification_code(phone):
+    usage = request.args.get('usage', None)
+    if usage == 'register' and UserBusiness.check_exist({'phone': phone}):
+        return jsonify({"response": {
+            "error": {
+                "message": "this phone has been used,please try an other one"}
+        }}), 400
     try:
         user_service.send_verification_code(phone)
         return jsonify({
@@ -166,7 +172,8 @@ def login():
     password = request.json.get('password', None)
 
     if not UserBusiness.check_exist({'user_ID': user_ID}):
-        return jsonify({"response": "This user_ID is not registered, please input the right user_ID"}), 400
+        return jsonify({
+            "response": "This user_ID is not registered, please input the right user_ID"}), 400
     try:
         user = user_service.authenticate(user_ID, password)
         if not user:

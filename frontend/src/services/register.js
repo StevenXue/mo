@@ -90,7 +90,8 @@ export async function queryNotices() {
 }
 
 export async function send_verification_code(params) {
-  return request(`/pyapi/user/send_verification_code/${params.phone}`, {
+  return request(`/pyapi/user/send_verification_code/${params.phone}?usage=${params.usage}`, {
     method: 'GET',
+    noErrorMsg: true,
   });
 }
