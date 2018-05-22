@@ -32,7 +32,6 @@ import {
 } from './services'
 
 const Option = Select.Option
-import 'antd/lib/list/style/css'
 
 function genConf(args) {
   return JSON.stringify(args).replace(/'/g, '`')
