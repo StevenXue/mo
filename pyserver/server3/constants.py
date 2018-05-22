@@ -2,13 +2,21 @@
 # if get_mac() == 274973436731254:
 #     MONGO = 'DEFAULT'
 
-# DEV
-MONGO = 'DEFAULT'
+# CY
+MONGO = 'CY'
 # REDIS_SERVER need to be changed to localhost on 182 itself
-REDIS_SERVER = 'redis://10.52.14.182:6379'
-GIT_SERVER = 'http://10.52.14.182:2333'
-GIT_SERVER_IP = '10.52.14.182'
+REDIS_SERVER = 'redis://192.168.31.56:6379'
+GIT_SERVER = 'http://192.168.31.56:2333'
+GIT_SERVER_IP = '192.168.31.56'
 GIT_LOCAL = f'root@{GIT_SERVER_IP}:'
+
+# DEV
+# MONGO = 'DEFAULT'
+# # REDIS_SERVER need to be changed to localhost on 182 itself
+# REDIS_SERVER = 'redis://10.52.14.182:6379'
+# GIT_SERVER = 'http://10.52.14.182:2333'
+# GIT_SERVER_IP = '10.52.14.182'
+# GIT_LOCAL = f'root@{GIT_SERVER_IP}:'
 
 # PROD
 # MONGO = 'PROD'

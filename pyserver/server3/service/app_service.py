@@ -302,6 +302,11 @@ class AppService(ProjectService):
 
     @classmethod
     def diff_n_gen_new_requirements(cls, func_path):
+        """
+        diff two requirements.txt
+        :param func_path:
+        :return:
+        """
         old = os.path.join(TEMPLATE_PATH, 'requirements.txt')
         new = os.path.join(func_path, 'requirements.txt')
         r = os.path.join(func_path, 'requirements_tmp.txt')

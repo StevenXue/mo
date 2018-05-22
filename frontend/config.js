@@ -1,4 +1,22 @@
 const conf = {
+  CY: {
+    // server api
+    flaskServer: 'http://localhost:5005',
+
+    socketioServer: 'http://192.168.31.56:5006',
+
+    hubServer: 'http://localhost:8000',
+
+    docsServer: 'http://localhost:3000',
+
+    tbServer: 'http://localhost:8111',
+
+    gitServerIp: '192.168.31.56',
+
+    webServer: 'http://192.168.31.6',
+
+    env: 'CY',
+  },
   DEV: {
     // server api
     flaskServer: 'http://localhost:5005',
@@ -37,6 +55,7 @@ const conf = {
   },
 }
 
-module.exports = conf.DEV
+module.exports = conf.CY
+// module.exports = conf.DEV
 // module.exports = conf.PROD
 
