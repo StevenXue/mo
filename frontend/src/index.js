@@ -1,4 +1,5 @@
 import dva from 'dva'
+import 'antd/dist/antd.less'
 import '../node_modules/highlight.js/styles/github.css'
 import './global.less'
 import './index.less'

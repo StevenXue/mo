@@ -3,8 +3,6 @@ import { connect } from 'dva'
 import {Spin, Alert} from 'antd'
 import styles from './index.less'
 // import 'antd/lib/list/style/css';
-import 'antd/dist/antd.css'
-
 
 function JupyterLab() {
 
