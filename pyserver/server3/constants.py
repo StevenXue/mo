@@ -4,11 +4,11 @@
 
 # CY
 MONGO = 'CY'
-# REDIS_SERVER need to be changed to localhost on 182 itself
+# REDIS_SERVER need to be changed to localhost on 小米机器 itself
 REDIS_SERVER = 'redis://192.168.31.56:6379'
 GIT_SERVER = 'http://192.168.31.56:2333'
 GIT_SERVER_IP = '192.168.31.56'
-GIT_LOCAL = f'root@{GIT_SERVER_IP}:'
+GIT_LOCAL = f'admin@{GIT_SERVER_IP}:'
 
 # DEV
 # MONGO = 'DEFAULT'
