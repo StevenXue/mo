@@ -3,7 +3,7 @@ const conf = {
     // server api
     flaskServer: 'http://localhost:5005',
 
-    socketioServer: 'http://192.168.31.56:5006',
+    socketioServer: 'http://192.168.31.9:5006',
 
     hubServer: 'http://localhost:8000',
 
@@ -11,7 +11,7 @@ const conf = {
 
     tbServer: 'http://localhost:8111',
 
-    gitServerIp: '192.168.31.56',
+    gitServerIp: '192.168.31.9',
 
     webServer: 'http://192.168.31.6',
 
