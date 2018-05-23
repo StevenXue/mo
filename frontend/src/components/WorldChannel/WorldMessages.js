@@ -7,7 +7,7 @@ export const WorldMessages = ({ worldMessages = [], ref1, isRight, login, onClic
   return <div
     className={styles.messages_container}
     ref={ref1}
-    onClick={!isRight&&onClickIcon}
+    onClick={!isRight && onClickIcon}
   >
     {worldMessages.map((worldMessage) => {
       return <WorldMessageItem
@@ -20,6 +20,14 @@ export const WorldMessages = ({ worldMessages = [], ref1, isRight, login, onClic
   </div>
 }
 
+/**
+ * 单条世界频道信息内容
+ * @param worldMessage 世界频道单个object
+ * @param isRight 是否展示右侧信息栏
+ * @param login 用户登录信息
+ * @returns {*}
+ * @constructor
+ */
 const WorldMessageItem = ({ worldMessage, isRight, login }) => {
   const { message, _id, create_time, sender_user_ID, message_type, sender } = worldMessage
   const renderItem = () => {
@@ -66,8 +74,6 @@ const WorldMessageItem = ({ worldMessage, isRight, login }) => {
         flexDirection: 'column',
       }}>
         <div style={{
-          // padding: 2,
-          // justifyContent: "space-around",
           display: 'flex', color: 'grey',
         }}>
           <div>
@@ -80,7 +86,6 @@ const WorldMessageItem = ({ worldMessage, isRight, login }) => {
         </div>
 
         <div style={{
-          // padding: 2,
           color: message_type === 'admin' ? '#34BFE2' : 'black',
           wordWrap: 'break-word',
           width: 250,
@@ -99,7 +104,6 @@ const WorldMessageItem = ({ worldMessage, isRight, login }) => {
       >
         {renderItem()}
       </Popover>
-
     </div>
   )
 }

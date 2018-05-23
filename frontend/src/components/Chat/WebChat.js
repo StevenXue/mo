@@ -7,43 +7,28 @@
  * {n}_select 用户选择
  * {n}_api 后台服务发起
  *
+ * 这是主要文件
+ * ApiList app 横向列表页
+ * Asking (暂时未使用）用于用户发送文字提需求
+ * index 入口文件
+ * Intent 与用户一次交流
+ * Result (暂时未使用）
+ * Search (暂时未使用）
+ * ShowApiDetail (暂时未使用）
  *
  */
 
-import React, {Component} from 'react'
-import {connect} from 'dva'
-
-// import ChatBot from 'react-simple-chatbot'
+import React, { Component } from 'react'
+import { connect } from 'dva'
 import ChatBot from '../../packages/react-simple-chatbot-master/lib/ChatBot'
-
-// import {Search, UISearch} from './Search'
-// import {ShowApiDetail, UIShowApiDetail} from './ShowApiDetail'
-// import Result from './Result'
-// import Asking from './Asking'
-// // import {} from '../../constants'
-// import {themeColor} from "../../utils/theme"
-// // 把 props 放到component will mount 的state里可以只在第一次触发的时候出现内容，之后更改props，块可以不刷新
-
-import {ThemeProvider} from 'styled-components'
+import { ThemeProvider } from 'styled-components'
 import Intent from './Intent'
 import ApiList from './ApiList'
 
-
 const theme = {
   userBubbleColor: '#ffe695',
-  botBubbleColor: "white",
-  botFontColor: "black"
-  // background: "red", //'#f5f8fb',
-  // fontFamily: 'Helvetica Neue',
-  // headerBgColor: '#aa0000',
-  // //themeColor["custom-dark-purple"],
-  // headerFontColor: '#fff',
-  // headerFontSize: '309px',
-  // botBubbleColor: '#aa0000',
-  // //themeColor["custom-dark-purple"],
-  // botFontColor: 'red',
-  // userBubbleColor: '#fff',
-  // userFontColor: '#4a4a4a',
+  botBubbleColor: 'white',
+  botFontColor: 'black',
 }
 
 export const WebChatId = {
@@ -80,7 +65,7 @@ export const WebChatId = {
   failed: {
     requirement_failed_select: 'requirement_failed_select',
     not_opened: '服务暂未开放',
-    can_not_recognize: "无法识别",
+    can_not_recognize: '无法识别',
   },
 }
 
@@ -96,7 +81,7 @@ export const optionStep = {
     {
       value: 2,
       label: '发布需求',
-      trigger: "createUserRequest", // WebChatId.asking.text,
+      trigger: 'createUserRequest', // WebChatId.asking.text,
       borderColor: 'yellow',
     },
 
@@ -104,13 +89,13 @@ export const optionStep = {
       value: 6,
       label: '我发布的需求',
       borderColor: 'yellow',
-      route: "Requests"
+      route: 'Requests',
     },
 
     {
       value: 3,
       label: '我收藏的服务',
-      trigger: "favor_api_list",
+      trigger: 'favor_api_list',
       borderColor: 'white',
     },
 
@@ -140,19 +125,8 @@ function finalSteps() {
     {
       id: WebChatId.message.hello,
       message: '欢迎使用小蓦语音助手，有什么我可以帮助你的吗',
-      //'你好，欢迎来到MO机器学习平台。',
       trigger: WebChatId.message.input,
     },
-    // {
-    //   id: WebChatId.message.desc,
-    //   message: 'MO平台将会帮助你轻松的使用机器学习的各种工具。',
-    //   trigger: WebChatId.message.desc1,
-    // },
-    // {
-    //   id: WebChatId.message.desc1,
-    //   message: '机器人服务现在只支持普通用户（使用服务的非开发者）',
-    //   trigger: WebChatId.message.input,
-    // },
     {
       id: WebChatId.message.apiList,
       message: '下面数小蓦为你精选的几个应用，快来试试吧',
@@ -175,37 +149,16 @@ function finalSteps() {
       id: WebChatId.message.intent,
       component: <Intent/>,
       waitAction: true,
-      replace: true
+      replace: true,
     },
 
     {
-      id: "custom_message",
-      message: ({previousValue}) => `${previousValue}`,
+      id: 'custom_message',
+      message: ({ previousValue }) => `${previousValue}`,
       trigger: WebChatId.message.hello,
     },
 
     /*********** 分割线  **********/
-
-    // functions select
-    // {
-    //   id: WebChatId.functionSelect.text,
-    //   message: '请选择下列功能: ',
-    //   trigger: WebChatId.functionSelect.select,
-    // },
-    // {
-    //   id: WebChatId.functionSelect.select,
-    //   options: [
-    //     {
-    //       value: 1,
-    //       label: '使用平台服务',
-    //       trigger: WebChatId.requirement.text,
-    //     },
-    //     // {value: 2, label: '我要提问', trigger: WebChatId.asking.text},
-    //
-    //     // {value: 3, label: '查看我的收藏', trigger: WebChatId.asking.text},
-    //     // {value: 4, label: '查看我的使用历史', trigger: WebChatId.asking.text},
-    //   ],
-    // },
 
     // 服务暂未开放
     {
@@ -214,14 +167,6 @@ function finalSteps() {
       trigger: WebChatId.message.hello,
     },
 
-    // // 匹配服务失败时
-    // {
-    //   id: WebChatId.failed.requirement_failed_select,
-    //   options: [
-    //     {value: 1, label: '重新告知需求', trigger: WebChatId.requirement.text},
-    //     {value: 2, label: '我要提问', trigger: WebChatId.asking.text},
-    //   ],
-    // },
   ]
 
   const requirement = [
@@ -251,164 +196,88 @@ function finalSteps() {
 
     {
       // display api list or go to asking (api list)
-      id: "favor_api_list",
+      id: 'favor_api_list',
       component: <ApiList get_type="favor"/>,
       waitAction: true,
       // asMessage: true,
     },
-    // {
-    //   id: WebChatId.requirement.api_detail,
-    //   component: <ShowApiDetail/>,
-    //   waitAction: true,
-    //   trigger: WebChatId.requirement.api_result,
-    //   asMessage: true
-    // },
-    // {
-    //   id: WebChatId.requirement.api_result,
-    //   message: ({ previousValue, steps }) => `result: ${previousValue}`,
-    //   trigger: WebChatId.functionSelect.text,
-    // },
-
-    // {
-    //   id: WebChatId.requirement.api_result,
-    //   component: <Result/>,
-    //   waitAction: true,
-    //   trigger: WebChatId.functionSelect.text,
-    //   asMessage: true
-    // },
   ]
-  //
   const asking = [
     {
-      id: "createUserRequest",
+      id: 'createUserRequest',
       message: '请选择你要创建的需求类型',
       trigger: 'createUserRequest1',
     },
     {
-      id: "createUserRequest1",
+      id: 'createUserRequest1',
       options: [
-        { value: 1, label: 'App',  type: 'goto', url: '/userrequest?tab=app',
-          trigger: "createUserRequest2",
+        {
+          value: 1, label: 'App', type: 'goto', url: '/userrequest?tab=app',
+          trigger: 'createUserRequest2',
 
         },
-        { value: 2, label: 'Module',  type: 'goto',  url: '/userrequest?tab=module',
-          trigger: "createUserRequest2",
+        {
+          value: 2, label: 'Module', type: 'goto', url: '/userrequest?tab=module',
+          trigger: 'createUserRequest2',
         },
-        { value: 3, label: 'DataSet',  type: 'goto',  url: '/userrequest?tab=dataset',
-          trigger: "createUserRequest2",
+        {
+          value: 3, label: 'DataSet', type: 'goto', url: '/userrequest?tab=dataset',
+          trigger: 'createUserRequest2',
         },
       ],
     },
 
     {
-      id: "createUserRequest2",
+      id: 'createUserRequest2',
       message: '已前往创建页面',
-    }
-
-    // {
-    //   id: "createUserRequest",
-    //   message: '请选择你要创建的需求类型',
-    //   trigger: 'gotoApp',
-    //   trigger: 'gotoModule',
-    //   trigger: 'gotoDataset',
-    // }
-
-
-
-    //
-    // {
-    //   id: WebChatId.asking.text,
-    //   message: '请输入你的问题？',
-    //   trigger: WebChatId.asking.input,
-    // },
-    //
-    // {
-    //   id: WebChatId.asking.input,
-    //   user: true,
-    //   trigger: WebChatId.asking.api,
-    //   validator: value => {
-    //     if (value.trim() === '') {
-    //       return '输入不能为空'
-    //     }
-    //     return true
-    //   },
-    // },
-    //
-    // {
-    //   // 使用提问api
-    //   id: WebChatId.asking.api,
-    //   component: <Asking/>,
-    //   waitAction: true,
-    //   trigger: WebChatId.functionSelect.text,
-    //   asMessage: true,
-    // },
+    },
   ]
 
   return [
     ...start,
     ...requirement,
-    ...asking
+    ...asking,
   ]
 }
 
 class WebChat extends React.Component {
   constructor(props) {
     super(props)
-
-    // this.state = {
-    //   opened: true,
-    // }
-  }
-  componentWillMount(){
   }
 
-  myToggleFloating = ({opened}) => {
+  myToggleFloating = ({ opened }) => {
     this.props.dispatch({
       type: 'chatbot/updateState',
       payload: {
-        opened
-      }
+        opened,
+      },
     })
-    // this.setState({  opened });
   }
 
   render() {
-    const {opened} = this.props
+    const { opened } = this.props
     return (
       <ThemeProvider theme={theme}>
         <ChatBot
-        floating={true}
-        headerTitle="MO平台机器人"
-        // recognitionEnable={true}
-        placeholder="请输入你的问题"
-        steps={finalSteps()}
-        //steps={uiSteps}
-        hideUserAvatar
-        hideBotAvatar
-        botDelay={100}
-        userDelay={10}
-        botBubbleColor="white"
-        botFontColor="black"
-        opened={opened}
-        toggleFloating={this.myToggleFloating}
-        isRight={this.props.isRight}
+          floating={true}
+          headerTitle="MO平台机器人"
+          // recognitionEnable={true}
+          placeholder="请输入你的问题"
+          steps={finalSteps()}
+          //steps={uiSteps}
+          hideUserAvatar
+          hideBotAvatar
+          botDelay={100}
+          userDelay={10}
+          botBubbleColor="white"
+          botFontColor="black"
+          opened={opened}
+          toggleFloating={this.myToggleFloating}
+          isRight={this.props.isRight}
         />
       </ThemeProvider>
     )
   }
 }
 
-export default connect(({chatbot, worldChannel}) => ({...chatbot, isRight: worldChannel.isRight}))(WebChat)
-
-/**
- * <ChatBot
- floating={true}
- headerTitle="MO平台机器人"
- // recognitionEnable={true}
- placeholder="请输入你的问题"
- steps={finalSteps()}
- // steps={uiSteps}
- hideUserAvatar={true}
- />
-
- */
+export default connect(({ chatbot, worldChannel }) => ({ ...chatbot, isRight: worldChannel.isRight }))(WebChat)

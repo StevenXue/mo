@@ -5,6 +5,7 @@ import { Tabs, Input, Icon, Button } from 'antd'
 import { WorldMessages } from './index'
 import styles from './index.less'
 
+// 外层container 感觉没有用了，将user为空判断提到里面后删除
 class worldChannelC extends Component {
   onClickIcon = () => {
     this.props.dispatch({
@@ -21,15 +22,14 @@ class worldChannelC extends Component {
       )
     }
     else {
-
       return (
         <div>
-          <WorldChannel worldMessages={worldMessages}
-                        onClickIcon={this.onClickIcon}
-                        dispatch={dispatch}
-                        isRight={isRight}
-                        login={login}
-
+          <WorldChannel
+            worldMessages={worldMessages}
+            onClickIcon={this.onClickIcon}
+            dispatch={dispatch}
+            isRight={isRight}
+            login={login}
           />
         </div>
       )
@@ -44,7 +44,7 @@ class WorldChannel extends Component {
   }
 
   componentDidMount() {
-    // To disabled submit button at the beginning.
+    // 获取信息
     this.props.dispatch({
       type: 'worldChannel/getWorldMessages',
       payload: {
@@ -55,17 +55,25 @@ class WorldChannel extends Component {
   }
 
   componentDidUpdate() {
+    // 在页面发送变化时下拉到底部 （软下拉：是否停留在底部）
     this.scrollToBottom(false)
   }
 
+  /**
+   * 下拉到底部
+   * @param force true 强行下拉， false 软下拉, 判断是否停留在底部， 是的话下拉
+   */
   scrollToBottom = (force = true) => {
     const messagesContainer = ReactDOM.findDOMNode(this.scrollView)
     if (messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight + 50 + 20 || force) {
       messagesContainer.scrollTop = messagesContainer.scrollHeight - messagesContainer.clientHeight
     }
-
   }
 
+  /**
+   * 提交世界频道输入内容， 回车键
+   * @param e
+   */
   handleSendMessage = (e) => {
     this.scrollToBottom(true)
     const inputMessage = e.target.value
@@ -81,6 +89,10 @@ class WorldChannel extends Component {
     }
   }
 
+  /**
+   * 提交世界频道输入内容， 小飞机按钮
+   * @param e
+   */
   subHandleSendMessage = (e) => {
     this.scrollToBottom(true)
     const inputMessage = e.input.value
