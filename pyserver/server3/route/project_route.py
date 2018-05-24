@@ -35,7 +35,6 @@ project_app = Blueprint("project_app", __name__, url_prefix=PREFIX)
 
 
 @project_app.route('/count', methods=['GET'])
-@jwt_required
 def count_projects():
     user_ID = request.args.get('user_ID')
     types = ['app', 'module', 'dataset']
