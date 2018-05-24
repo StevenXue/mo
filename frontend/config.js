@@ -55,7 +55,7 @@ const conf = {
   },
 }
 
-module.exports = conf.CY
-// module.exports = conf.DEV
+// module.exports = conf.CY
+module.exports = conf.DEV
 // module.exports = conf.PROD
 
