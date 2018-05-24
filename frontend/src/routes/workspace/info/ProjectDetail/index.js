@@ -19,14 +19,12 @@ import {
   Tooltip,
 } from 'antd'
 import {routerRedux} from 'dva/router'
-// components
 import ProjectModal from '../../../../components/ProjectModal/index'
 import HelpModal from '../../../../components/HelpModal'
 import ReactMdeEditor, {ReactMdePreview} from '../../../../components/ReactMdeCom/reactMde'
 import ProjectExample
   from '../../../../components/ProjectExample/projectExample'
 import Jobs from './Jobs'
-
 import {showTime} from '../../../../utils/index'
 import styles from './index.less'
 import {get} from 'lodash'
@@ -36,6 +34,7 @@ import {flaskServer, hubServer} from '../../../../constants'
 import dynamic from 'dva/dynamic'
 import modelling from '../../../../models/modelling'
 // import {fetchComments} from "../../../../services/comments"
+import NotLogin from '../../../../components/NotLogin/notLogin'
 
 const confirm = Modal.confirm
 const TabPane = Tabs.TabPane
@@ -119,11 +118,14 @@ class CommentsList extends React.Component {
           {this.props.comments && this.props.comments.map(e =>
             <div className={styles.commentDiv} key={e.id}>
               <Row>
-                <Col span={2} style={{margin: '20px 0', textAlign: 'center'}}>
-                  <div style={{height: '80px', width: '80px'}}>
+                <Col span={2} style={{
+                  margin: '20px 0', textAlign: 'center',
+                  display: 'flex', justifyContent: 'center'
+                }}>
+                  <div style={{height: '50px', width: '50px'}}>
                     <img style={{
-                      height: '80px',
-                      width: '80px',
+                      height: '50px',
+                      width: '50px',
                       borderRadius: '40px'
                     }}
                          src={e.user_ID !== this.props.login.user_ID ? `/pyapi/user/avatar/${e.user_ID}.jpeg` : this.props.login.userAvatar}
@@ -187,9 +189,12 @@ class CommentForm extends React.Component {
     return (
       <div className="demo">
         <Row type="flex" justify="flex" align="top">
-          <Col span={2} style={{margin: '20px 0', textAlign: 'center'}}>
-            <div style={{height: '80px', width: '80px'}}>
-              <img style={{height: '80px', width: '80px', borderRadius: '40px'}}
+          <Col span={2} style={{
+            margin: '20px 0', textAlign: 'center',
+            display: 'flex', justifyContent: 'center'
+          }}>
+            <div style={{height: '50px', width: '50px'}}>
+              <img style={{height: '50px', width: '50px', borderRadius: '40px'}}
                    src={this.props.login.userAvatar}
                    alt="avatar"/>
             </div>
@@ -276,14 +281,20 @@ function ProjectInfo({app, match, history, location, dispatch, projectDetail, lo
   }
 
   function appStarFavor(action) {
-    dispatch({
-      type: 'projectDetail/starFavor',
-      payload: {
-        entity_id: projectDetail.project['_id'],
-        action: action,
-        entity: projectDetail.project.type,
-      },
-    })
+    if (login.user) {
+      dispatch({
+        type: 'projectDetail/starFavor',
+        payload: {
+          entity_id: projectDetail.project['_id'],
+          action: action,
+          entity: projectDetail.project.type,
+        },
+      })
+    }
+    else {
+      message.warning('Please login')
+      dispatch(routerRedux.push('/user/login'))
+    }
   }
 
   function showOverviewEditState() {
@@ -395,11 +406,12 @@ function ProjectInfo({app, match, history, location, dispatch, projectDetail, lo
         }
 
         //点击蒙层，不再显示toutip包括beacon
-        closeTourtip = (data)=>{
-          data.type==='overlay:click'?this.setState({
-            steps:[]
-          }):null;
+        closeTourtip = (data) => {
+          data.type === 'overlay:click' ? this.setState({
+            steps: []
+          }) : null
         }
+
         render() {
           return (
             <div>
@@ -654,8 +666,10 @@ function ProjectInfo({app, match, history, location, dispatch, projectDetail, lo
                   />
                 </TabPane>
                 <TabPane tab="Comments" key="5">
-                  <CommentForm dispatch={dispatch} projectId={projectId}
-                               login={login}/>
+                  {login.user ?
+                    <CommentForm dispatch={dispatch} projectId={projectId}
+                                 login={login}/> :
+                    <NotLogin dispatch={dispatch} text={'评论'}/>}
                   <CommentsList dispatch={dispatch} projectId={projectId}
                                 comments={projectDetail.comments}
                                 totalNumber={projectDetail.totalNumber}

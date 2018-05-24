@@ -31,7 +31,7 @@ const related_fields = ['All',
   'Health', 'Housing & Development', 'Public Services',
   'Social', 'Transportation', 'Science', 'Technology']
 
-function AllRequest({ history, allRequest, dispatch, location }) {
+function AllRequest({ history, allRequest,login, dispatch, location }) {
   const defaultActiveKeyDic = { '?tab=app': '1', '?tab=module': '2', '?tab=dataset': '3' }
   const paramList = Object.keys(defaultActiveKeyDic)
 
@@ -43,13 +43,13 @@ function AllRequest({ history, allRequest, dispatch, location }) {
     <div className={`main-container ${styles.normal}`}>
       <Tabs defaultActiveKey={defaultActiveKeyDic[location.search]} onChange={callback}>
         <TabPane tab="Apps" key="1">
-          <RequestList {...{ history, allRequest, dispatch, location}} type='app'/>
+          <RequestList {...{ history, allRequest, login, dispatch, location}} type='app'/>
         </TabPane>
         <TabPane tab="Modules" key="2">
-          <RequestList {...{ history, allRequest, dispatch, location}} type='module'/>
+          <RequestList {...{ history, allRequest, login, dispatch, location}} type='module'/>
         </TabPane>
         <TabPane tab="Datasets" key="3">
-          <RequestList {...{ history, allRequest, dispatch, location}} type='dataset'/>
+          <RequestList {...{ history, allRequest, login, dispatch, location}} type='dataset'/>
         </TabPane>
       </Tabs>
     </div>
@@ -105,7 +105,7 @@ class RequestList extends Component {
     // .then(res=>{
     //   this.props.location.search.indexOf('from')==-1?document.getElementById('mei_rightButton').click():null
     // })
-    
+
     // this.hideBreadcrumb()
   }
 
@@ -152,14 +152,14 @@ class RequestList extends Component {
   }
 
   render() {
-    const { history, project, dispatch } = this.props
+    const { history, project, dispatch, login} = this.props
     return (
       <div>
         <div className={styles.header}>
           <TagSelect getHotTag={getHotTagOfRequest} onSearch={(value,tags) => {
             this.handleQueryChange(value,tags)}} type={this.props.type}/>
           <RequestModal new={true} fetchData={() => this.fetchData({})}
-                        type={this.props.type} >
+                        type={this.props.type} login={login}>
             <Button icon='plus-circle-o' type='primary' id="mei_rightButton"
                     className={styles.rightButton}>New {this.props.type} Request</Button>
           </RequestModal>
@@ -235,4 +235,4 @@ class RequestList extends Component {
   }
 }
 
-export default connect(({ allRequest }) => ({ allRequest }))(AllRequest)
+export default connect(({ allRequest, login }) => ({ allRequest, login }))(AllRequest)

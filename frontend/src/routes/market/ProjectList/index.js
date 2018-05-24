@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {connect} from 'dva'
-import {Select, Icon, Input, Pagination, Tabs,Spin} from 'antd'
+import {Select, Icon, Input, Pagination, Tabs, Spin} from 'antd'
 import ProjectModel from '../../../components/ProjectModal/index'
 import {showTime} from '../../../utils/index'
 import {privacyChoices, projectChoices} from '../../../constants'
@@ -9,7 +9,8 @@ import star_o from '../../../img/star-o.png'
 import like from '../../../img/like.png'
 import like_o from '../../../img/like-o.png'
 import TagSelect from '../../../components/TagSelect/index'
-
+import { routerRedux } from 'dva/router'
+import {message} from 'antd/lib/index'
 import {
   createProject,
   getProjects,
@@ -27,26 +28,34 @@ const Option = Select.Option
 const Search = Input.Search
 const TabPane = Tabs.TabPane
 
-function Projects({history, project, dispatch,location}) {
+function Projects({history, login, project, dispatch, location}) {
 
-  const defaultActiveKeyDic = {"?tab=app":"1","?tab=module":"2","?tab=dataset":"3"}
+  const defaultActiveKeyDic = {
+    "?tab=app": "1",
+    "?tab=module": "2",
+    "?tab=dataset": "3"
+  }
   const paramList = Object.keys(defaultActiveKeyDic)
 
   function callback(key) {
-    history.push(`explore${paramList[parseInt(key)-1]}`)
+    history.push(`explore${paramList[parseInt(key) - 1]}`)
   }
 
   return (
     <div className={`main-container ${styles.normal}`}>
-      <Tabs defaultActiveKey={defaultActiveKeyDic[location.search]} onChange={callback}>
+      <Tabs defaultActiveKey={defaultActiveKeyDic[location.search]}
+            onChange={callback}>
         <TabPane tab="Apps" key="1">
-          <ProjectList {...{history, project, dispatch, location}} type='app'/>
+          <ProjectList {...{history, project, login, dispatch, location}}
+                       type='app'/>
         </TabPane>
         <TabPane tab="Modules" key="2">
-          <ProjectList {...{history, project, dispatch, location}} type='module'/>
+          <ProjectList {...{history, project, login, dispatch, location}}
+                       type='module'/>
         </TabPane>
         <TabPane tab="Datasets" key="3">
-          <ProjectList {...{history, project, dispatch, location}} type='dataset'/>
+          <ProjectList {...{history, project, login, dispatch, location}}
+                       type='dataset'/>
         </TabPane>
       </Tabs>
     </div>
@@ -66,7 +75,7 @@ class ProjectList extends Component {
       totalNumber: 0,
       pageNo: 1,
       pageSize: 8,
-      loading:true
+      loading: true
     }
   }
 
@@ -89,8 +98,7 @@ class ProjectList extends Component {
   //   }
   // }
 
-  fetchData({payload= {}}) {
-    console.log('?????????fetch')
+  fetchData({payload = {}}) {
     const {type} = this.props
     this.setState({
       loading: true,
@@ -102,10 +110,10 @@ class ProjectList extends Component {
     })
 
     for (let key in payload) {
-        filter[key] = payload[key]
-        this.setState({
-          [key.dashToHump()]: payload[key],
-        })
+      filter[key] = payload[key]
+      this.setState({
+        [key.dashToHump()]: payload[key],
+      })
     }
     // console.log('filter', filter)
 
@@ -119,13 +127,13 @@ class ProjectList extends Component {
     })
   }
 
-  handleQueryChange(value,tags) {
-    this.fetchData({payload: {query: value,tags:tags}})
+  handleQueryChange(value, tags) {
+    this.fetchData({payload: {query: value, tags: tags}})
   }
 
 
   onShowSizeChange = (pageNo, pageSize) => {
-    this.fetchData({ payload: { page_no: pageNo, page_size: pageSize } })
+    this.fetchData({payload: {page_no: pageNo, page_size: pageSize}})
   }
 
   toProjectDetail(id, history, type, projectOwner, loginUser) {
@@ -137,11 +145,13 @@ class ProjectList extends Component {
     }
   }
 
-  starFavorSetState =(id,action)=> {
+  starFavorSetState = (id, action) => {
     const user_obj_id = localStorage.getItem('user_obj_id')
+
     function findById(element) {
       return element._id === id
     }
+
     let toUpdateIndex = this.state.projects.findIndex(findById)
     let toUpdate = this.state.projects[toUpdateIndex]
     if (action === 'star') {
@@ -154,19 +164,25 @@ class ProjectList extends Component {
   }
 
   starFavor(action, id, type) {
-    // 刷新state
-    setStarFavor({
+    if (this.props.login.user) {
+      // 刷新state
+      setStarFavor({
         entity_id: id,
         action: action,
         entity: type
-    },()=>this.starFavorSetState(id,action))
+      }, () => this.starFavorSetState(id, action))
+    }
+    else{
+      message.warning('Please login')
+      this.props.dispatch(routerRedux.push('/user/login'))
+    }
   }
 
 
   render() {
     const {history, project, dispatch} = this.props
     return (
-      <div >
+      <div>
         <div className={styles.header}>
           {/*<Select defaultValue='all' className={styles.select}*/}
           {/*onChange={(value) => this.handlePrivacyChange(value)}>*/}
@@ -174,21 +190,21 @@ class ProjectList extends Component {
           {/*<Option key={e.value} value={e.value}>{e.text}</Option>,*/}
           {/*)}*/}
           {/*</Select>*/}
-          <TagSelect getHotTag={getHotTagOfProject} onSearch={(value,tags) => {
-            this.handleQueryChange(value,tags)}} type={this.props.type}/>
+          <TagSelect getHotTag={getHotTagOfProject} onSearch={(value, tags) => {
+            this.handleQueryChange(value, tags)
+          }} type={this.props.type}/>
         </div>
         <Spin spinning={this.state.loading}>
-        <div className={styles.projectList}>
-          {this.state.projects.map(e =>
-          {
-            return  <ProjectCard
-              key={e._id} project={e}
-              onClickToDetail={() => this.toProjectDetail(e._id, history, e.type, e.user, this.state.user_obj_id)}
-              onClickStarFavor={(action) => this.starFavor(action, e._id, e.type)}
-            />
-          }
-          )}
-        </div>
+          <div className={styles.projectList}>
+            {this.state.projects.map(e => {
+                return <ProjectCard
+                  key={e._id} project={e}
+                  onClickToDetail={() => this.toProjectDetail(e._id, history, e.type, e.user, this.state.user_obj_id)}
+                  onClickStarFavor={(action) => this.starFavor(action, e._id, e.type)}
+                />
+              }
+            )}
+          </div>
         </Spin>
         <div className={styles.pagination}>
           <Pagination showSizeChanger
@@ -196,7 +212,7 @@ class ProjectList extends Component {
                       onChange={this.onShowSizeChange}
                       defaultCurrent={1}
                       defaultPageSize={8}
-                      pageSizeOptions={['4','8', '16', '32']}
+                      pageSizeOptions={['4', '8', '16', '32']}
                       total={this.state.totalNumber}/>
         </div>
       </div>
@@ -212,7 +228,8 @@ function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
     <div className={styles.projectCard}>
       <div className={styles.toDetail} onClick={() => onClickToDetail()}>
         <div className={styles.pic}>
-          <img className={styles.avt} src={`/pyapi/user/avatar/${project.user_ID}.jpeg`}  alt="avatar" />
+          <img className={styles.avt}
+               src={`/pyapi/user/avatar/${project.user_ID}.jpeg`} alt="avatar"/>
         </div>
         <div className={styles.name}>
           <p className={styles.namep}>{project.name}</p>
@@ -233,7 +250,8 @@ function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
           <div className={styles.categoryDiv}>
             <div className={styles.categoryP}>TAG</div>
             <div style={{display: 'flex'}}>
-              {project.tags.map((e,index,array) =><p key={index}>{e}&nbsp; {array.indexOf(e)===(array.length-1)?null:'•'} &nbsp; </p>)}
+              {project.tags.map((e, index, array) => <p
+                key={index}>{e}&nbsp; {array.indexOf(e) === (array.length - 1) ? null : '•'} &nbsp; </p>)}
             </div>
           </div>
         </div>
@@ -242,15 +260,23 @@ function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
         <div className={styles.starFavorRightDiv}>
           <Icon className={styles.bottomIcon}
                 type={project.star_users.includes(user_obj_id) ? "like" : "like-o"}
-                onClick={project.user_ID===user_ID?null:() => onClickStarFavor('star')}
-                style={{cursor:project.user_ID===user_ID?"default":"pointer",color:'transparent',background:project.star_users.includes(user_obj_id) ?`url(${like_o}) no-repeat center`:`url(${like}) no-repeat center`}}
-                />
+                onClick={project.user_ID === user_ID ? null : () => onClickStarFavor('star')}
+                style={{
+                  cursor: project.user_ID === user_ID ? "default" : "pointer",
+                  color: 'transparent',
+                  background: project.star_users.includes(user_obj_id) ? `url(${like_o}) no-repeat center` : `url(${like}) no-repeat center`
+                }}
+          />
           <p className={styles.bottomNumber}>{project.star_users.length}</p>
           <Icon className={styles.bottomIcon}
                 type={project.favor_users.includes(user_obj_id) ? "star" : "star-o"}
-                onClick={project.user_ID===user_ID?null:() => onClickStarFavor('favor')}
-                style={{cursor:project.user_ID===user_ID?"default":"pointer",color:'transparent',background:project.favor_users.includes(user_obj_id) ?`url(${star_o}) no-repeat center`:`url(${star}) no-repeat center`}}
-                />
+                onClick={project.user_ID === user_ID ? null : () => onClickStarFavor('favor')}
+                style={{
+                  cursor: project.user_ID === user_ID ? "default" : "pointer",
+                  color: 'transparent',
+                  background: project.favor_users.includes(user_obj_id) ? `url(${star_o}) no-repeat center` : `url(${star}) no-repeat center`
+                }}
+          />
           <p className={styles.bottomNumber}>{project.favor_users.length}</p>
         </div>
       </div>
@@ -259,7 +285,7 @@ function ProjectCard({project, onClickToDetail, onClickStarFavor}) {
 }
 
 
-export default connect(({project}) => ({project}))(Projects)
+export default connect(({project, login}) => ({project, login}))(Projects)
 
 
 // <Card noHovering={true}
