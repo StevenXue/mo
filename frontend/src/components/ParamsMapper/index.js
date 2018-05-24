@@ -18,6 +18,15 @@ function getArgs(baseSteps, stepIndex, argIndex) {
 
 }
 
+const formItemLayout = {
+  labelCol: {
+    span: 24
+  },
+  wrapperCol: {
+    span: 24
+  },
+}
+
 const valueParser = {
   int: (e) => parseInt(e),
   float: (e) => parseFloat(e),
@@ -195,6 +204,7 @@ const formItems = (arg, i, getFieldDecorator, baseArg, setFieldsValue, key) => {
 
   return <FormItem
     key={key}
+    className='example-form-item'
     label={key}
     help={`need ${arg.value_type || ''}` + (arg.value_range ? ` in range ${arg.value_range}` : '')}
     {...formItemLayout}
@@ -242,16 +252,6 @@ const handleSubmit = (e, validateFieldsAndScroll, appId, dispatch, version, args
       dispatch({ type: 'projectDetail/getExampleResult', payload: payload })
     }
   })
-}
-const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 5 },
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 14 },
-  },
 }
 
 function getBase64(img, callback) {

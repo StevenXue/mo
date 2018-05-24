@@ -122,16 +122,16 @@ class ProjectExample extends React.Component {
                     OUTPUT
                   </p>
                 </div>
-                <div style={{ border: '1px solid #eeeeee', minHeight: 200, paddingTop: 20 }}>
+                <div style={{ border: '1px solid #eeeeee', padding: '20px 90px' }}>
                   {Object.keys(this.props.projectDetail.project.args.output).map((key, i) =>
                     {
                       const e = this.props.projectDetail.project.args.output[key]
                       return (
                         <Row key={key} style={{ margin: '10px 0' }} gutter={8}>
-                          <Col xs={24} sm={5}>
-                            <p style={{ float: 'right' }}>{key}:</p>
+                          <Col span={24}>
+                            <p >{key}:</p>
                           </Col>
-                          <Col xs={24} sm={14}>
+                          <Col span={24}>
                             {e.value ?
                               <div>
                                 {e.value_type === 'img' && e.value ?
