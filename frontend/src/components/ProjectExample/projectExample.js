@@ -23,7 +23,7 @@ class ProjectExample extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      args: Object.values(this.props.projectDetail.project.args.input),
+      args: this.props.projectDetail.project.args.input,
       output: this.props.projectDetail.project.args.output,
     }
   }
@@ -34,11 +34,12 @@ class ProjectExample extends React.Component {
   setValue(values) {
     let args = this.state.args
     for (let key in values) {
-      let idx = args.findIndex(e => e.name === key)
-      if (Array.isArray(values)) {
-        args[idx].values = values[key]
-      } else {
-        args[idx].value = values[key]
+      if(args.hasOwnProperty(key) && values.hasOwnProperty(key)) {
+        if (Array.isArray(values)) {
+          args[key].values = values[key]
+        } else {
+          args[key].value = values[key]
+        }
       }
     }
     this.setState({
@@ -100,7 +101,7 @@ class ProjectExample extends React.Component {
               <div>
                 <ParamsMapper args={this.state.args}
                               setValue={(values) => this.setValue(values)}
-                              baseArgs={Object.values(this.props.projectDetail.project.args.input)}
+                              baseArgs={this.props.projectDetail.project.args.input}
                               appId={this.props.projectDetail.project._id}
                               dispatch={this.props.dispatch}
                               version={version_}
@@ -122,22 +123,27 @@ class ProjectExample extends React.Component {
                   </p>
                 </div>
                 <div style={{ border: '1px solid #eeeeee', minHeight: 200, paddingTop: 20 }}>
-                  {map(this.props.projectDetail.project.args.output).map(e =>
-                    <Row key={e.name} style={{ margin: '10px 0' }} gutter={8}>
-                      <Col xs={24} sm={5}>
-                        <p style={{ float: 'right' }}>{e.name}:</p>
-                      </Col>
-                      <Col xs={24} sm={14}>
-                        {e.value ?
-                          <div>
-                            {e.value_type === 'img' && e.value ?
-                              <img src={'data:image/jpeg;base64,' + e.value} alt="img"/> :
-                              <p>{e.value}</p>}
-                          </div>
-                          : <span style={{ color: 'lightgrey' }}>submit your input to get the output</span>
-                        }
-                      </Col>
-                    </Row>,
+                  {Object.keys(this.props.projectDetail.project.args.output).map((key, i) =>
+                    {
+                      const e = this.props.projectDetail.project.args.output[key]
+                      return (
+                        <Row key={key} style={{ margin: '10px 0' }} gutter={8}>
+                          <Col xs={24} sm={5}>
+                            <p style={{ float: 'right' }}>{key}:</p>
+                          </Col>
+                          <Col xs={24} sm={14}>
+                            {e.value ?
+                              <div>
+                                {e.value_type === 'img' && e.value ?
+                                  <img src={'data:image/jpeg;base64,' + e.value} alt="img"/> :
+                                  <p>{e.value}</p>}
+                              </div>
+                              : <span style={{ color: 'lightgrey' }}>submit your input to get the output</span>
+                            }
+                          </Col>
+                        </Row>
+                      )
+                    }
                   )}
                 </div>
               </div>

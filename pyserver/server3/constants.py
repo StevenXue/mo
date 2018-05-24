@@ -64,20 +64,6 @@ KUBE_NAME = {
 MODULE_DIR = './server3/lib/modules'
 DEFAULT_DEPLOY_VERSION = 'dev'
 APP_DIR = './functions'
-# INIT_RES = [
-#     r"# coding: utf-8",
-#     r"import os",
-#     r"import sys",
-#     r"# Please use current \(work\) folder to store your data and models",
-#     r"sys.path.append\('(.+)'\)",
-#     r"client = Client\('(.+)', project_id='(.+)', user_ID='(.+)',",
-#     r"(\s+)project_type='(.+)', source_file_path='(.+)'\)",
-#     r"from modules import (.+)",
-#     r"(\S+) = client\.(\S+)",
-#     r"# append work_path to head when you want to reference a path inside "
-#     r"the working directory",
-#     r"work_path = ''",
-# ]
 INIT_RES = [
     r'# You can use other public modules via our Client object with module\'s identifier ',
     r'# and parameters.\n',
