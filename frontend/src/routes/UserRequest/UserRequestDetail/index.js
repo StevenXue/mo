@@ -428,12 +428,14 @@ function UserRequestDetail({allRequest, login, dispatch}) {
     }
   }
 
-  if (login.user && focusUserRequest !== null) {
-    const {
-      _id: user_obj_id,
-      user_ID,
-    }
-      = login.user
+  if (focusUserRequest !== null) {
+    // const {
+    //   _id: user_obj_id,
+    //   user_ID,
+    // }
+    //   = login.user
+    const user_obj_id = get(login,'user._id')
+    const user_ID = get(login,'user.user_ID')
     return (
       <div className={`main-container ${styles.normal}`}>
         <Spin spinning={focusUserRequestLoading}>

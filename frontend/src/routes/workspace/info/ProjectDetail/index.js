@@ -75,7 +75,6 @@ class CommitsList extends React.Component {
                     className={styles.commentCreateTime}>{showTime(e.timestamp)}</div>
                 </div>
               </Col>
-
             </Row>
           </div>)}
       </div>)
@@ -101,12 +100,6 @@ class CommentsList extends React.Component {
   }
 
   onShowSizeChange = (current, pageSize) => {
-
-    // const payload = {
-    //   'pageNo': current,
-    //   'pageSize': pageSize,
-    //   'projectId': this.props.projectId
-    // }
     this.props.dispatch({
       type: 'projectDetail/setCommentsPageNoSize',
       'pageNo': current,
@@ -120,13 +113,11 @@ class CommentsList extends React.Component {
 
   render() {
     const {dispatch, projectId, history} = this.props
-    const userObjId = localStorage.getItem('user_obj_id')
-    const picNumber = parseInt(userObjId.slice(10)) % 6
     return (
       <div>
         <div>
           {this.props.comments && this.props.comments.map(e =>
-            <div className={styles.commentDiv}>
+            <div className={styles.commentDiv} key={e.id}>
               <Row>
                 <Col span={2} style={{margin: '20px 0', textAlign: 'center'}}>
                   <div style={{height: '80px', width: '80px'}}>
@@ -135,7 +126,7 @@ class CommentsList extends React.Component {
                       width: '80px',
                       borderRadius: '40px'
                     }}
-                         src={e.user_ID === this.props.login.user_ID ? `/pyapi/user/avatar/${e.user_ID}.jpeg` : this.props.login.userAvatar}
+                         src={e.user_ID !== this.props.login.user_ID ? `/pyapi/user/avatar/${e.user_ID}.jpeg` : this.props.login.userAvatar}
                          alt="avatar"/>
                   </div>
                 </Col>

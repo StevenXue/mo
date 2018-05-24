@@ -311,9 +311,9 @@ export default {
         console.log('pathname', pathname)
         const match = pathToRegexp('/user/login').exec(pathname)
 
-        if (!match) {
-          dispatch({ type: 'query' })
-        }
+        // if (!match) {
+        //   dispatch({ type: 'query' })
+        // }
 
         const userId = localStorage.getItem('user_ID')
         if (userId && !connected) {
