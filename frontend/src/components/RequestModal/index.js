@@ -13,7 +13,7 @@ const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
 const Option = Select.Option
 const { TextArea } = Input;
-
+import {message} from 'antd/lib/index'
 const fields = ['Business', 'Government', 'Education', 'Environment', 'Health', 'Housing & Development',
   'Public Services', 'Social', 'Transportation', 'Science', 'Technology']
 const TYPE = ['app', 'module', 'dataset']
@@ -32,7 +32,13 @@ class RequestModal extends Component {
   }
 
   showModelHandler = () => {
-    this.props.dispatch({type: 'allRequest/showModal'})
+    if(this.props.login.user){
+      this.props.dispatch({type: 'allRequest/showModal'})
+    }
+    else{
+      message.warning('Please login')
+      this.props.dispatch(routerRedux.push('/user/login'))
+    }
   }
 
   hideModelHandler = () => {

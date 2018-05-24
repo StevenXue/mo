@@ -7,7 +7,7 @@ from flask import redirect
 from flask import request
 from flask_jwt_extended import create_access_token
 from mongoengine import DoesNotExist
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 
 from server3.repository import config
 from server3.utility import json_utility
@@ -38,9 +38,15 @@ def create_message():
 
 
 @message_app.route('', methods=['GET'])
-@jwt_required
+@jwt_optional
 def get_message():
+    # 返回用户的所有的message
     user_ID = get_jwt_identity()
+    # 如果用户没登陆，返回空
+    if user_ID is None:
+        return jsonify({'response': {'messages': [],
+                                     'total_number': 0}}), 200
+    # 目前先返回最近的100条，以后做消息中心了再做翻页
     page_no = int(request.args.get("pageNo", 1))
     page_size = int(request.args.get("pageSize", 100))
     messages, total_number = MessageService.get_by_user_ID(user_ID, page_no,
