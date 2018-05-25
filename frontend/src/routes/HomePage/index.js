@@ -28,7 +28,7 @@ class App extends Component {
       }}>
 
         {/*第一张*/}
-        <div className={styles.imgContainer} style={{ background: '#6D9CF9' }}>
+        <div className={styles.imgContainer} style={{ background: '#6D9CF9', width: '100%' }}>
           <div style={{
             // background: '#6D9CF9',
             justifyContent: 'flex-end',
@@ -52,7 +52,7 @@ class App extends Component {
 
             <TitleText
               titleList={['发现意外 创造可能']}
-              textList={['蓦始与数据， 忠于用户，致力降低AI技术使用门槛、缩短学习',
+              textList={['蓦始于数据， 忠于用户，致力降低AI技术使用门槛、缩短学习',
                 '曲线， 为实现 人工智能民主化、应用普及化 目标而生。']}
               color='white'
               center={false}
