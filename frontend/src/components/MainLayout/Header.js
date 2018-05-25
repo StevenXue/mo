@@ -217,13 +217,13 @@ function Header({location, login, history, dispatch, allRequest, message}) {
 
   return <div className={styles.container} style={{
     display: location.pathname.indexOf('user/') !== -1 || location.pathname.indexOf('/newpassword') !== -1 ? 'none' : 'block',
-    backgroundColor: location.pathname === '/' ? '#33333399' : '#464E78'
+    backgroundColor: location.pathname === '/' ? 'transparent' : '#464E78'
   }}
   >
     <div className={styles.box} style={{
       width: 1170,
       margin: '0 auto',
-      backgroundColor: location.pathname === '/' ? '#464E7800' : '#464E78'
+      backgroundColor: location.pathname === '/' ? 'transparent' : '#464E78'
     }}>
 
       <Menu

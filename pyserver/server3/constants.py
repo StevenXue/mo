@@ -2,21 +2,21 @@
 # if get_mac() == 274973436731254:
 #     MONGO = 'DEFAULT'
 
-# CY
-MONGO = 'CY'
-# REDIS_SERVER need to be changed to localhost on 小米机器 itself
-REDIS_SERVER = 'redis://192.168.31.9:6379'
-GIT_SERVER = 'http://192.168.31.9:2333'
-GIT_SERVER_IP = '192.168.31.9'
-GIT_LOCAL = f'admin@{GIT_SERVER_IP}:'
+# # CY
+# MONGO = 'CY'
+# # REDIS_SERVER need to be changed to localhost on 小米机器 itself
+# REDIS_SERVER = 'redis://192.168.31.9:6379'
+# GIT_SERVER = 'http://192.168.31.9:2333'
+# GIT_SERVER_IP = '192.168.31.9'
+# GIT_LOCAL = f'admin@{GIT_SERVER_IP}:'
 
 # DEV
-# MONGO = 'DEFAULT'
-# # REDIS_SERVER need to be changed to localhost on 182 itself
-# REDIS_SERVER = 'redis://10.52.14.182:6379'
-# GIT_SERVER = 'http://10.52.14.182:2333'
-# GIT_SERVER_IP = '10.52.14.182'
-# GIT_LOCAL = f'root@{GIT_SERVER_IP}:'
+MONGO = 'DEFAULT'
+# REDIS_SERVER need to be changed to localhost on 182 itself
+REDIS_SERVER = 'redis://10.52.14.182:6379'
+GIT_SERVER = 'http://10.52.14.182:2333'
+GIT_SERVER_IP = '10.52.14.182'
+GIT_LOCAL = f'root@{GIT_SERVER_IP}:'
 
 # PROD
 # MONGO = 'PROD'

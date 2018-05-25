@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Row, Col, Button, Icon, Menu} from 'antd'
+import { Row, Col, Button, Icon, Menu } from 'antd'
 import { Link, Route, Switch } from 'dva/router'
 
 import styles from './css/App.less'
@@ -28,6 +28,7 @@ import computer1 from './image/computer1.jpg'
 import computer2 from './image/computer2.jpg'
 import computer3 from './image/computer3.jpg'
 import computer4 from './image/computer4.jpg'
+
 const menuConfig = [
   {
     key: '/workspace',
@@ -48,6 +49,7 @@ const menuConfig = [
     text: 'Request',
   },
 ]
+
 class App extends Component {
   constructor(props) {
     super(props)
@@ -64,56 +66,223 @@ class App extends Component {
   }
 
   render() {
+
+    return (
+      <div style={{
+        width: '100%', alignItems: 'center', display: 'flex',
+        justifyContent: 'center', flexDirection: 'column', height: '100%',
+      }}>
+
+        {/*第一张*/}
+        <div className={styles.imgContainer} style={{ background: '#6D9CF9' }}>
+          <div style={{
+            // background: '#6D9CF9',
+            justifyContent: 'flex-end',
+            display: 'flex',
+            alignItems: 'flex-end',
+            width: '100%',
+            height: '100%',
+          }}>
+            <img src={require('./imageNew/banner.jpg')} alt="" width='50%' height="50%"
+                 style={{ marginRight: '14%', marginTop: 50 }}/>
+          </div>
+
+          <div style={{
+            height: '100%',
+            position: 'absolute',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            paddingLeft: '14%',
+          }}>
+            <div className={styles.title_w}>
+              发现意外 创造可能
+            </div>
+            <div className={styles.text_w}>
+              123123123123123123123123123123123123123123123123
+            </div>
+            <div style={{ marginTop: 30 }}>
+              <Button type="primary" className={styles.button}>立即使用</Button>
+            </div>
+          </div>
+        </div>
+
+        {/*第二张*/}
+        <div className={styles.imgContainer} style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <img src={require('./imageNew/bg_white.jpg')} alt="" width='100%' height='100%'/>
+          <div style={{ position: 'absolute' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+
+              <TitleText titleList={['全生态人工智能', '应用开发平台']}
+                         textList={['蓦是一个交互式的线上数据模型开发平台，通过构建用户间协同的生态',
+                           '促进人工智能应用的开发与使用。']}
+
+              />
+              <div style={{
+                backgroundSize: '100% 100%',
+                display: 'flex',
+                justifyContent: 'center',
+                marginTop: 50,
+              }}>
+                <div className={styles.video} style={{ display: this.state.playDisplay }}>
+                  <Icon type="play-circle" style={{ fontSize: 100, color: 'white', cursor: 'pointer' }}
+                        onClick={() => this.startVideo()}/>
+                </div>
+                <video id='intro-video' width="800px" height='449.6px' src="/pyapi/static/videos/intro.mp4"
+                       style={{
+                         borderRadius: 10, boxShadow: '0 8px 25px rgba(0,0,0,0.7)', background: '#5A64E8',
+                         opacity: 0.6,
+                       }}/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/*第三张*/}
+        <div className={styles.imgContainer}
+             style={{
+               display: 'flex', flexDirection: 'column', backgroundColor: '#6D9CF9',
+               justifyContent: 'center', alignItems: 'center', width: '100%', padding: 50,
+               paddingTop: 80, paddingBottom: 80,
+             }}>
+
+          {/*第一段*/}
+          <div style={{ marginTop: 50 }}>
+            <TitleText titleList={['蓦的诞生']}
+                       textList={['蓦致力于构建用户、数据和产品的生态循环，降低AI的技',
+                         '术和使用门槛，使AI应用能够真正融入生活']}
+                       color="white"
+            />
+          </div>
+          {/*三张卡片*/}
+          <div style={{
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            paddingLeft: '14%', paddingRight: '14%', marginTop: 30,
+          }}>
+
+            <CardA title="交流门槛" text1='AI开发者与使用者之间' text2='存在鸿沟'
+                   icon={<img src={require('./imageNew/chat.jpg')} width="80px" height="80px"/>}/>
+            <CardA title="使用门槛" text1='个人用户对于AI的渴望' text2='未得到关注'
+                   icon={<img src={require('./imageNew/use.jpg')} width="80px" height="80px"/>}/>
+            <CardA title="技术门槛" text1='普通企业存在难以逾越的' text2='AI技术门槛'
+                   icon={<img src={require('./imageNew/computer.png')} width="80px" height="80px"/>}/>
+          </div>
+
+          {/*第二段*/}
+          <div style={{ marginTop: 50 }}>
+            <TitleText titleList={['我们的用户']}
+                       textList={['蓦联结了 AI需求发布者、模块开发与组装者、应用使用者，实现了需求提出-模块开发',
+                         '-模型组装-应用发布使用的循环生态链']}
+                       color="white"
+            />
+          </div>
+          {/*三张大卡片*/}
+          <div style={{
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            paddingLeft: '14%', paddingRight: '14%', marginTop: 30,
+          }}>
+            <CardBig
+              title="需求发布者"
+              textList={['您可以提出任何AI需求或渴望，我们会为您',
+                '寻找既有的解决方案或潜在问题解决者，帮',
+                '助您实现技术合作或企业转型。']}
+              image={<img src={require('./imageNew/requester.png')} width="250px"/>}
+              textBottom='发现问题、提出需要'
+            />
+
+            <CardBig
+              title="模块开发与组装者"
+              textList={['您是玩转算法的AI大咖、特定领域的专家',
+                '或编程爱好者，利用平台提供的开发环境和',
+                '开源资源，您开发或组装的模块将为千千',
+                '万万用户解决难题。']}
+              image={<img src={require('./imageNew/developer.jpg')} width="250px"/>}
+              textBottom='玩转模块、实现功能'
+            />
+
+            <CardBig
+              title="应用使用者"
+              textList={['您是AI成果的享用者，同时您的使用记录',
+                '也在缔造数据帝国。大数据模型为您的衣食',
+                '住行提供最优方案，在特定领域帮助您',
+                '记录、追踪并预判信息。']}
+              image={<img src={require('./imageNew/user.jpg')} width="250px"/>}
+              textBottom='享用科技、缔造数据'
+            />
+          </div>
+        </div>
+
+        {/*第四张*/}
+        <div className={styles.imgContainer}
+             style={{ justifyContent: 'center', alignItems: 'center', paddingTop: 80, paddingBottom: 80}}>
+          <img src={require('./imageNew/bg_white2.jpg')} alt="" width='100%' height='100%'/>
+          <div style={{ position: 'absolute' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
+
+            }}>
+              <TitleText titleList={['优质开源的学习资源']}
+                         textList={['在发现区您可以通过搜索关键词查看并学习所有用户公开发布的数据集、模块和应用，也可以',
+                           '分享自己的开发成果。无需门槛，只要有热情，您可以和志同道合的朋友共同学习共同进步。']}
+              />
+              <img src={require('./imageNew/workspace.jpg')} alt="" width='80%' height='80%'/>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    )
+
     const key = '/' + this.props.location.pathname.split('/')[1]
     return (
       <div className={styles.App}><img src={banner} alt="" width='100%'/>
         {/* <img src={logo} alt="" style={{ position: 'absolute', left: '10%', top: 16 }}/> */}
         {/*<div className={styles.homecotain}>*/}
-          {/*<div className={styles.box}>*/}
-            {/*<Menu*/}
-              {/*className={styles.normal}*/}
-              {/*mode='horizontal'*/}
-              {/*theme='dark'*/}
-              {/*selectedKeys={[key]}*/}
-            {/*>*/}
-              {/*<Menu.Item key='logo' className={styles.logoBox}*/}
-              {/*>*/}
-                {/*<Link to={'/'}>*/}
-                  {/*<img src={logo} className={styles.logo}/>*/}
-                {/*</Link>*/}
-              {/*</Menu.Item>*/}
-                {/*{*/}
-                  {/*menuConfig.map(*/}
-                    {/*(e) => {*/}
-                        {/*return (*/}
-                          {/*<Menu.Item key={e.key}>*/}
-                            {/*/!* <Link to={e.Link}> *!/*/}
-                            {/*<Link to='/user/login'>*/}
-                              {/*{e.Icon && <Icon type={e.Icon}/>}*/}
-                              {/*<div className={styles.menuStyle}>{e.text}</div>*/}
-                            {/*</Link>*/}
-                          {/*</Menu.Item>)*/}
-                    {/*}*/}
-                  {/*)*/}
-                {/*}*/}
-                {/*{*/}
-                  {/*<Menu.Item key={'docs'}>*/}
-                    {/*<div onClick={() => window.location = '/#/user/login'}>*/}
-                      {/*<div className={styles.menuStyle}>Docs</div>*/}
-                    {/*</div>*/}
-                  {/*</Menu.Item>*/}
-                {/*}*/}
-              {/*</Menu>*/}
-          {/*</div>*/}
+        {/*<div className={styles.box}>*/}
+        {/*<Menu*/}
+        {/*className={styles.normal}*/}
+        {/*mode='horizontal'*/}
+        {/*theme='dark'*/}
+        {/*selectedKeys={[key]}*/}
+        {/*>*/}
+        {/*<Menu.Item key='logo' className={styles.logoBox}*/}
+        {/*>*/}
+        {/*<Link to={'/'}>*/}
+        {/*<img src={logo} className={styles.logo}/>*/}
+        {/*</Link>*/}
+        {/*</Menu.Item>*/}
+        {/*{*/}
+        {/*menuConfig.map(*/}
+        {/*(e) => {*/}
+        {/*return (*/}
+        {/*<Menu.Item key={e.key}>*/}
+        {/*/!* <Link to={e.Link}> *!/*/}
+        {/*<Link to='/user/login'>*/}
+        {/*{e.Icon && <Icon type={e.Icon}/>}*/}
+        {/*<div className={styles.menuStyle}>{e.text}</div>*/}
+        {/*</Link>*/}
+        {/*</Menu.Item>)*/}
+        {/*}*/}
+        {/*)*/}
+        {/*}*/}
+        {/*{*/}
+        {/*<Menu.Item key={'docs'}>*/}
+        {/*<div onClick={() => window.location = '/#/user/login'}>*/}
+        {/*<div className={styles.menuStyle}>Docs</div>*/}
+        {/*</div>*/}
+        {/*</Menu.Item>*/}
+        {/*}*/}
+        {/*</Menu>*/}
+        {/*</div>*/}
         {/*</div>*/}
         {/*<div className={styles.login}>*/}
-          {/*<Link to='/user/login'>*/}
-            {/*<span>登录</span>*/}
-          {/*</Link>*/}
-          {/*<i></i>*/}
-          {/*<Link to='/user/register'>*/}
-            {/*<span>注册</span>*/}
-          {/*</Link>*/}
+        {/*<Link to='/user/login'>*/}
+        {/*<span>登录</span>*/}
+        {/*</Link>*/}
+        {/*<i></i>*/}
+        {/*<Link to='/user/register'>*/}
+        {/*<span>注册</span>*/}
+        {/*</Link>*/}
         {/*</div>*/}
         <Row className={styles.Row_R} type="flex">
           <Col span={2}></Col>
@@ -360,6 +529,77 @@ class App extends Component {
     )
   }
 }
+
+/**
+ * 卡片
+ * @param title
+ * @param text1
+ * @param text2
+ * @param icon
+ * @returns {*}
+ * @constructor
+ */
+const CardA = ({ title, text1, text2, icon }) =>
+  <div className={styles.card}>
+    {icon}
+    <div style={{ justifyContent: 'center', marginLeft: 10, display: 'flex', flexDirection: 'column' }}>
+      <div className={styles.title_card}>
+        {title}
+      </div>
+      <div className={styles.text_card}>
+        {text1}
+      </div>
+      <div className={styles.text_card}>
+        {text2}
+      </div>
+    </div>
+  </div>
+
+const CardBig = ({ title, textList, image, textBottom }) =>
+  <div className={styles.card}
+       style={{
+         height: 480,
+         justifyContent: 'center',
+         alignItems: 'center',
+         display: 'flex',
+         flexDirection: 'column',
+         paddingTop: 30,
+         paddingBottom: 30,
+       }}>
+    <div className={styles.title_card} style={{ marginBottom: 10 }}>
+      {title}
+    </div>
+    {textList.map((text, index) => {
+      return (
+        <div className={styles.text_card} key={'cardText' + text + index}>
+          {text}
+        </div>
+      )
+    })}
+    <div style={{ margin: 40 }}>
+      {image}
+    </div>
+    <div className={styles.text_bottom}>
+      {textBottom}
+    </div>
+  </div>
+
+const TitleText = ({ titleList, textList, color, center = true }) =>
+  <div style={center && { display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
+    {
+      titleList.map((title, index) =>
+        <div className={styles.title} key={'cardText' + title + index} style={color && { color: color }}>
+          {title}
+        </div>)
+    }
+    {textList.map((text, index) => {
+      return (
+        <div className={styles.text} key={'cardText' + text + index} style={color && { color: color }}>
+          {text}
+        </div>
+      )
+    })}
+  </div>
 
 export default App
 
