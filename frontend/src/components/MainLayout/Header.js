@@ -25,11 +25,11 @@ const menuConfig = [
   //   Icon: 'home',
   //   text: 'Home',
   // },
-  {
-    key: '/workspace',
-    Link: '/workspace?tab=app',
-    Icon: null,
-    text: 'Workspace',
+  // {
+  //   key: '/workspace',
+  //   Link: '/workspace?tab=app',
+  //   Icon: null,
+  //   text: 'Workspace',
     // dropdown: [
     //       {
     //     key: '/myprojects',
@@ -44,7 +44,7 @@ const menuConfig = [
     //     text: 'My Service',
     //   },
     // ]
-  },
+  // },
   // {
   //   key: '/projects',
   //   Link: '/projects',
@@ -239,6 +239,13 @@ function Header({location, login, history, dispatch, allRequest, message}) {
             <img src={logo} className={styles.logo}/>
           </Link>
         </Menu.Item>
+
+        {login.user &&<Menu.Item key='/workspace' style={menuDiv} className={styles.menuStyle}
+        >
+          <Link to={'/workspace?tab=app'}>
+            <div style={menuStyle} className={styles.menuStyle}>Workspace</div>
+          </Link>
+        </Menu.Item>}
         {menuConfig.map(
           (e) => {
             // if (e.dropdown) {

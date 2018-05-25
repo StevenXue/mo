@@ -12,7 +12,8 @@ const FormItem = Form.Item
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
 const Option = Select.Option
-const { TextArea } = Input;
+const {TextArea} = Input
+import {message} from 'antd/lib/index'
 
 const fields = ['Business', 'Government', 'Education', 'Environment', 'Health', 'Housing & Development',
   'Public Services', 'Social', 'Transportation', 'Science', 'Technology']
@@ -27,12 +28,18 @@ class RequestModal extends Component {
     }
   }
 
-  componentWillMount(){
+  componentWillMount() {
 
   }
 
   showModelHandler = () => {
-    this.props.dispatch({type: 'allRequest/showModal'})
+    if (this.props.login.user) {
+      this.props.dispatch({type: 'allRequest/showModal'})
+    }
+    else {
+      message.warning('Please login')
+      this.props.dispatch(routerRedux.push('/user/login'))
+    }
   }
 
   hideModelHandler = () => {
@@ -55,7 +62,7 @@ class RequestModal extends Component {
             onJson: (response) => {
               this.props.fetchData && this.props.fetchData()
               this.props.dispatch({type: 'allRequest/hideModal'})
-              this.props.dispatch(routerRedux.push('/userrequest/' + response._id +'?type='+this.props.type))
+              this.props.dispatch(routerRedux.push('/userrequest/' + response._id + '?type=' + this.props.type))
             },
           })
         } else {
@@ -65,8 +72,10 @@ class RequestModal extends Component {
             onJson: (response) => {
               this.props.fetchData && this.props.fetchData()
               this.props.dispatch({type: 'allRequest/hideModal'})
-              this.props.dispatch({type: 'allRequest/fetchOneRequest',
-                payload: {userrequestId: response._id}})
+              this.props.dispatch({
+                type: 'allRequest/fetchOneRequest',
+                payload: {userrequestId: response._id}
+              })
             },
           })
         }
@@ -77,7 +86,7 @@ class RequestModal extends Component {
   handleClose(tags, removedTag) {
     tags = tags.filter(tag => tag !== removedTag).filter(e => e)
     this.setState({inputValue: undefined})
-    this.props.dispatch({ type: 'allRequest/setTags', payload: tags })
+    this.props.dispatch({type: 'allRequest/setTags', payload: tags})
   }
 
   showInput() {
@@ -92,13 +101,13 @@ class RequestModal extends Component {
   handleInputConfirm(tags) {
     if (this.state.inputValue && tags.indexOf(this.state.inputValue) === -1) {
       tags = [...tags, this.state.inputValue]
-      this.setState({ inputValue: undefined, inputVisible: false })
-      this.props.dispatch({ type: 'allRequest/setTags', payload: tags })
+      this.setState({inputValue: undefined, inputVisible: false})
+      this.props.dispatch({type: 'allRequest/setTags', payload: tags})
     }
   }
 
   render() {
-    const {children, requestDetail,allRequest} = this.props
+    const {children, requestDetail, allRequest} = this.props
     const {getFieldDecorator} = this.props.form
     // const { name, description, privacy } = this.props.record
     const formItemLayout = {
@@ -106,13 +115,13 @@ class RequestModal extends Component {
       wrapperCol: {span: 14},
     }
 
-    let tags=[]
+    let tags = []
     let title, description, input, output
     if (allRequest) {
-      tags = allRequest.tags;
+      tags = allRequest.tags
     }
     if (requestDetail) {
-      ({ title, description, input, output }= requestDetail);
+      ({title, description, input, output} = requestDetail)
     }
     return (
       <span>
@@ -136,7 +145,18 @@ class RequestModal extends Component {
                   rules: [
                     {
                       required: true,
-                    },
+                    }, {
+                      validator: (rule, value, callback) => {
+                        if (value.length > 50) {
+                          callback('title is too long')
+                        }
+                        else if (value.length < 5 && value.length > 0) {
+                          callback('title is too short')
+                        } else {
+                          callback()
+                        }
+                      },
+                    }
                   ],
                 })(<Input disabled={!this.props.new}/>)
               }
@@ -151,9 +171,18 @@ class RequestModal extends Component {
                   rules: [
                     {
                       required: false,
-                    },
+                    }, {
+                      validator: (rule, value, callback) => {
+                        if (value.length > 128) {
+                          callback('description is too long')
+                        }
+                        else {
+                          callback()
+                        }
+                      },
+                    }
                   ],
-                })(<TextArea autosize={{ minRows: 3, maxRows: 20 }}/>)
+                })(<TextArea autosize={{minRows: 3, maxRows: 20}}/>)
               }
             </FormItem>
             <FormItem
@@ -207,7 +236,16 @@ class RequestModal extends Component {
                   rules: [
                     {
                       required: false,
-                    },
+                    },{
+                      validator: (rule, value, callback) => {
+                        if (value.length > 50) {
+                          callback('please make a shorter description of your input')
+                        }
+                        else {
+                          callback()
+                        }
+                      },
+                    }
                   ],
                 })(<Input/>)
               }
@@ -222,7 +260,16 @@ class RequestModal extends Component {
                   rules: [
                     {
                       required: false,
-                    },
+                    },{
+                      validator: (rule, value, callback) => {
+                        if (value.length > 50) {
+                          callback('please make a shorter description of your output')
+                        }
+                        else {
+                          callback()
+                        }
+                      },
+                    }
                   ],
                 })(<Input/>)
               }
