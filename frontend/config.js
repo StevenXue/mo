@@ -51,7 +51,6 @@ const conf = {
     webServer: 'http://momodel.ai',
 
     env: 'PROD',
-
   },
 }
 

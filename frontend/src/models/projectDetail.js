@@ -217,7 +217,7 @@ export default {
   effects: {
     *refresh({ projectId, notStartLab, projectType, version, activeTab, match }, { call, put, select }) {
       yield put({ type: 'clearProject' })
-      yield put({ type: 'fetch', projectId, projectType, version, activeTab, match })
+      yield put({ type: 'fetch', projectId, projectType, version, activeTab, match, notStartLab })
       yield put({ type: 'fetchComments', projectId })
     },
 
@@ -358,7 +358,7 @@ export default {
         }
         yield call(deleteSession, { hubUserName, hubToken, sessionId })
       }
-      yield terminalName && console.log('runrunrun') && call(deleteTerminal, {
+      yield terminalName && call(deleteTerminal, {
         hubUserName,
         hubToken,
         terminalName,
@@ -458,7 +458,9 @@ export default {
           const projectId = match[1]
           const projectType = url.searchParams.get('type') || match[2]
           const activeTab = url.searchParams.get('tab')
-          dispatch({ type: 'refresh', projectId, projectType, activeTab, match })
+          // when notebook path, lab will started in modelling model, no need to start here
+          const notStartLab = match[2] !== undefined
+          dispatch({ type: 'refresh', projectId, projectType, activeTab, match, notStartLab })
           // dispatch({ type: 'fetchJobs', projectId: projectId })
         } else if (match2) {
           const projectId = match2[1]
