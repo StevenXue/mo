@@ -25,7 +25,6 @@ export function getProjects({ filter, onJson }) {
 
 export function getFavs({ onJson, fav_entity, page_no }) {
   const pageParam = page_no !== undefined ? `&page_no=${page_no}` : ''
-  console.log('pageParam', pageParam)
   return request(path.join('/pyapi', 'user/action_entity') +
     `?user_ID=${localStorage.getItem('user_ID')}&action_entity=${fav_entity}` + pageParam, undefined, { onJson })
 }
