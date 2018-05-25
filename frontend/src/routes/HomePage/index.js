@@ -124,7 +124,7 @@ class App extends Component {
             <CardA title="使用门槛" text1='个人用户对于AI的渴望' text2='未得到关注'
                    icon={<img src={require('./imageNew/use.jpg')} width="80px" height="80px"/>}/>
             <CardA title="技术门槛" text1='普通企业存在难以逾越的' text2='AI技术门槛'
-                   icon={<img src={require('./imageNew/computer.png')} width="80px" height="80px"/>}/>
+                   icon={<img src={require('./imageNew/tech.jpg')} width="80px" height="80px"/>}/>
           </div>
 
           {/*第二段*/}
