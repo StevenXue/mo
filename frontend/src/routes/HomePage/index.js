@@ -105,7 +105,9 @@ class App extends Component {
             />
 
             <div style={{ marginTop: 30 }}>
-              <Button type="primary" className={styles.button}>立即使用</Button>
+              <Button type="primary" className={styles.button}
+                      onClick={() => {this.props.history.push('/explore?tab=app')}}
+              >立即使用</Button>
             </div>
           </div>
         </div>
@@ -264,12 +266,13 @@ class App extends Component {
              style={{ justifyContent: 'center', alignItems: 'center' }}>
           <img src={require('./imageNew/bg_grey.jpg')} alt="" width='100%' height='100%'/>
           <div style={{
-            position: 'absolute', display: 'flex', flexDirection: 'column', alignItems: 'center', height: "100%"}}>
+            position: 'absolute', display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%',
+          }}>
 
             <div style={{
               display: 'flex', flexDirection: 'row',
               justifyContent: 'center', alignItems: 'center',
-              height: "90%"
+              height: '90%',
             }}>
               <div>
                 <div className={styles.text}>
@@ -280,11 +283,13 @@ class App extends Component {
                 </div>
               </div>
               <div style={{ marginLeft: 50 }}>
-                <Button style={{ backgroundColor: '#4A83F4', color: 'white' }} className={styles.button}>立即使用</Button>
+                <Button style={{ backgroundColor: '#4A83F4', color: 'white' }} className={styles.button}
+                        onClick={() => {this.props.history.push('/explore?tab=app')}}
+                >立即使用</Button>
               </div>
             </div>
 
-            <div className={styles.footer} >
+            <div className={styles.footer}>
               bingweichen @2017.Proudly published with mo
             </div>
           </div>
