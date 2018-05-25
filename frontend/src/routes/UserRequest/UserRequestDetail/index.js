@@ -86,12 +86,21 @@ class CommentForm extends React.Component {
           help={emptyCommentError || ''}
         >
           {getFieldDecorator('comment', {
-            rules: [{required: true, message: ''}],
+            rules: [{required: true, message: ''}, {
+              validator: (rule, value, callback) => {
+                if (value && value.length > 128) {
+                  callback('comment is too long')
+                }
+                else {
+                  callback()
+                }
+              },
+            }],
           })(
             <Input className={styles.inputtext}
                    placeholder="Any idea to help?"
                    ref={inputRef => (this.input = inputRef)}
-            />,
+            />
           )}
         </FormItem>
         {/*<FormItem>*/}
@@ -169,75 +178,105 @@ class AnswerForm extends React.Component {
   }
 
   handleSubmit = () => {
-    console.log(this.state)
-    let selectProjectID = null
-    if (this.state.selected.length > 0) {
-      selectProjectID = this.state.selected[0]['_id']
-    }
-    this.props.dispatch({
-      type: 'allRequest/makeNewRequestAnswer',
-      payload: {
-        // answer: this.state.html,
-        answer: this.state.inputValue,
-        selectProject: selectProjectID,
-      },
-    })
-    this.clearSelect()
-    this.setState({inputValue: ''})
-  }
-
-  handleChange = (content) => {
-    // console.log(content)
-    this.setState({
-      content,
-    })
-  }
-
-  handleHTMLChange = (html) => {
-    if (html === '<p></p>') {
-      html = null
-    }
-    this.setState({
-      html,
+    const {form} = this.props
+    form.validateFields((err, values) => {
+      if (!err) {
+        let selectProjectID = null
+        if (this.state.selected.length > 0) {
+          selectProjectID = this.state.selected[0]['_id']
+        }
+        if (
+          this.props.dispatch({
+            type: 'allRequest/makeNewRequestAnswer',
+            payload: {
+              // answer: this.state.html,
+              ...values,
+              selectProject: selectProjectID,
+            },
+          })) {
+          this.clearSelect()
+          // this.setState({inputValue: ''})
+          //清空输入框
+          form.setFieldsValue({'answer': null})
+        }
+      }
     })
   }
 
-  validateFn = (file) => {
-    return file.size < 1024 * 100
-  }
+  // handleChange = (content) => {
+  //   // console.log(content)
+  //   this.setState({
+  //     content,
+  //   })
+  // }
+  //
+  // handleHTMLChange = (html) => {
+  //   if (html === '<p></p>') {
+  //     html = null
+  //   }
+  //   this.setState({
+  //     html,
+  //   })
+  // }
+  //
+  // validateFn = (file) => {
+  //   return file.size < 1024 * 100
+  // }
 
-  handleInputChange(e) {
-    this.setState({inputValue: e.target.value})
-  }
+  // handleInputChange(e) {
+  //   this.setState({inputValue: e.target.value})
+  // }
 
   render() {
 
-    const editorProps = {
-      placeholder: 'More description about your answer more help',
-      height: 200,
-      language: 'en',
-      initialContent: this.state.content,
-      onChange: this.handleChange,
-      onHTMLChange: this.handleHTMLChange,
-      media: {
-        image: true, // 开启图片插入功能
-        video: false, // 关闭视频插入功能
-        audio: false, // 关闭音频插入功能
-        validateFn: this.validateFn, // 指定本地校验函数
-        uploadFn: null, // 指定上传函数
-      },
-    }
+    // const editorProps = {
+    //   placeholder: 'More description about your answer more help',
+    //   height: 200,
+    //   language: 'en',
+    //   initialContent: this.state.content,
+    //   onChange: this.handleChange,
+    //   onHTMLChange: this.handleHTMLChange,
+    //   media: {
+    //     image: true, // 开启图片插入功能
+    //     video: false, // 关闭视频插入功能
+    //     audio: false, // 关闭音频插入功能
+    //     validateFn: this.validateFn, // 指定本地校验函数
+    //     uploadFn: null, // 指定上传函数
+    //   },
+    // }
     const {fetching, data, value, projects, inputValue} = this.state
     // console.log(this.state)
+    const {getFieldDecorator, getFieldsError, getFieldError, isFieldTouched} = this.props.form
+    const answerError = !isFieldTouched('answer') || getFieldError('answer')
     return (
       <div className="demo" style={{marginBottom: '80px'}}>
-                <TextArea
-                  value={inputValue}
-                  style={{width: '52%'}}
-                  placeholder="More description about your answer more help"
-                  autosize={{minRows: 5, maxRows: 50}}
-                  onChange={(e) => this.handleInputChange(e)}
-                />
+        <Form layout='horizontal'>
+          <FormItem>
+            {
+              getFieldDecorator('answer', {
+                rules: [
+                  {
+                    required: true,
+                  }, {
+                    validator: (rule, value, callback) => {
+                      if (value.length > 500) {
+                        callback('answer is too long')
+                      } else {
+                        callback()
+                      }
+                    },
+                  }
+                ],
+              })(<TextArea
+                // value={inputValue}
+                style={{width: '52%'}}
+                placeholder="More description about your answer more help"
+                autosize={{minRows: 5, maxRows: 50}}
+                // onChange={(e) => this.handleInputChange(e)}
+              />)
+            }
+          </FormItem>
+        </Form>
         <div style={{margin: '24px 0'}}/>
         {this.state.selected.length > 0 ?
           <Card
@@ -266,7 +305,7 @@ class AnswerForm extends React.Component {
             newAnswer={true}
             handleCreate={this.handleCreate}>
             <Button icon='plus-circle-o' type='primary'
-                    style={{'marginLeft': '30px'}}>New {this.props.type}</Button>
+                    style={{'marginLeft': '30px'}} >New {this.props.type}</Button>
           </ProjectModal></div> : null}
         {/*<BraftEditor {...editorProps}/>*/}
         <div style={{margin: '24px 0'}}/>
@@ -274,8 +313,7 @@ class AnswerForm extends React.Component {
         <Button
           type="primary"
           htmlType="submit"
-          // disabled={this.state.html === null}
-          disabled={this.state.inputValue === ''}
+          disabled={answerError}
           onClick={this.handleSubmit}
         >
           Post Your Answer
@@ -535,9 +573,10 @@ function UserRequestDetail({allRequest, login, dispatch}) {
             <WrappedCommentForm dispatch={dispatch}
                                 comments_type={'request'}
                                 _id={focusUserRequest._id}
+                                login={login}
             />}
             {!(focusUserRequest.commentState) &&
-            <p onClick={() => showRequestCommentInput(dispatch,login)}
+            <p onClick={() => showRequestCommentInput(dispatch, login)}
                style={{color: '#848d95', cursor: 'pointer'}}>add a
               comment</p>}
             {/*<WrappedCommentForm dispatch={dispatch} comments_type={'request'}/>*/}
@@ -637,7 +676,8 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                       {e.commentState &&
                       <WrappedCommentForm dispatch={dispatch}
                                           comments_type={'answer'}
-                                          _id={e._id}/>}
+                                          _id={e._id}
+                                          login={login}/>}
                       {!(e.commentState) &&
                       <p
                         onClick={() => showAnswerCommentInput(dispatch, e._id, login)}
@@ -656,7 +696,9 @@ function UserRequestDetail({allRequest, login, dispatch}) {
               <Icon type="edit"/>
             </h2>
             {login.user ?
-              <AnswerForm dispatch={dispatch} type={focusUserRequest.type}/> :
+              <WrappedAnswerForm dispatch={dispatch}
+                                 type={focusUserRequest.type}
+                                 login={login}/> :
               <NotLogin dispatch={dispatch} text={'回答'}/>}
           </div>
         </Spin>
@@ -669,6 +711,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
 }
 
 const WrappedCommentForm = Form.create()(CommentForm)
+const WrappedAnswerForm = Form.create()(AnswerForm)
 export default connect(({allRequest, login}) => ({
   allRequest,
   login,

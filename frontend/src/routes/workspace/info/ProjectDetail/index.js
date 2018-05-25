@@ -113,47 +113,47 @@ class CommentsList extends React.Component {
   render() {
     const {dispatch, projectId, history} = this.props
     return (
-      <div>
-        <div>
-          {this.props.comments && this.props.comments.map(e =>
-            <div className={styles.commentDiv} key={e.id}>
-              <Row>
-                <Col span={2} style={{
-                  margin: '20px 0', textAlign: 'center',
-                  display: 'flex', justifyContent: 'center'
-                }}>
-                  <div style={{height: '50px', width: '50px'}}>
-                    <img style={{
-                      height: '50px',
-                      width: '50px',
-                      borderRadius: '40px'
-                    }}
-                         src={e.user_ID !== this.props.login.user_ID ? `/pyapi/user/avatar/${e.user_ID}.jpeg` : this.props.login.userAvatar}
-                         alt="avatar"/>
-                  </div>
-                </Col>
-                <Col span={20} className={styles.commentCol}>
-                  <div>
-                    <div className={styles.commentUserID}
-                         onClick={() => this.toUserProfile(e.user_ID)}>{e.user_ID}</div>
-                    <div className={styles.commentContent}>{e.comments}</div>
-                    <div
-                      className={styles.commentCreateTime}>{showTime(e.create_time)}</div>
-                  </div>
-                </Col>
-              </Row>
-            </div>)}
-          <div className={styles.pagination}>
-            <Pagination showSizeChanger
-                        onShowSizeChange={this.onShowSizeChange.bind(this)}
-                        onChange={this.onShowSizeChange}
-                        defaultCurrent={this.props.pageNo}
-                        defaultPageSize={this.props.pageSize}
-                        pageSizeOptions={['5', '10', '15', '20', '25']}
-                        total={this.props.totalNumber}/>
-          </div>
+
+      <div key={'commentsList'}>
+        {this.props.comments && this.props.comments.map(e =>
+          <div className={styles.commentDiv} key={e._id}>
+            <Row>
+              <Col span={2} style={{
+                margin: '20px 0', textAlign: 'center',
+                display: 'flex', justifyContent: 'center'
+              }}>
+                <div style={{height: '50px', width: '50px'}}>
+                  <img style={{
+                    height: '50px',
+                    width: '50px',
+                    borderRadius: '40px'
+                  }}
+                       src={e.user_ID !== this.props.login.user_ID ? `/pyapi/user/avatar/${e.user_ID}.jpeg` : this.props.login.userAvatar}
+                       alt="avatar"/>
+                </div>
+              </Col>
+              <Col span={20} className={styles.commentCol}>
+                <div>
+                  <div className={styles.commentUserID}
+                       onClick={() => this.toUserProfile(e.user_ID)}>{e.user_ID}</div>
+                  <div className={styles.commentContent}>{e.comments}</div>
+                  <div
+                    className={styles.commentCreateTime}>{showTime(e.create_time)}</div>
+                </div>
+              </Col>
+            </Row>
+          </div>)}
+        <div className={styles.pagination}>
+          <Pagination showSizeChanger
+                      onShowSizeChange={this.onShowSizeChange.bind(this)}
+                      onChange={this.onShowSizeChange}
+                      defaultCurrent={this.props.pageNo}
+                      defaultPageSize={this.props.pageSize}
+                      pageSizeOptions={['5', '10', '15', '20', '25']}
+                      total={this.props.totalNumber}/>
         </div>
       </div>
+
     )
   }
 }
@@ -168,24 +168,34 @@ class CommentForm extends React.Component {
   }
 
   handleSubmit = () => {
-    this.props.dispatch({
-      type: 'projectDetail/makeComment',
-      payload: {
-        comments: this.state.inputValue,
-        comments_type: 'project',
-        _id: this.props.projectId,
-      },
+    const {form} = this.props
+    form.validateFields((err, values) => {
+      if (!err) {
+        if (
+          this.props.dispatch({
+            type: 'projectDetail/makeComment',
+            payload: {
+              ...values,
+              comments_type: 'project',
+              _id: this.props.projectId,
+            },
+          })) {
+          form.setFieldsValue({'comments': null})
+        }
+        else{
+          message.error('oops,something goes wrong')
+        }
+      }
     })
-    this.setState({inputValue: null})
   }
 
-  handleInputChange(e) {
-    this.setState({inputValue: e.target.value})
-  }
 
   render() {
-    const {fetching, data, value, projects, inputValue} = this.state
+    const {fetching, data, value, projects} = this.state
     const userObjId = localStorage.getItem('user_obj_id')
+    const {getFieldDecorator, getFieldsError, getFieldError, isFieldTouched} = this.props.form
+    const commentsError = !isFieldTouched('comments') || getFieldError('comments')
+
     return (
       <div className="demo">
         <Row type="flex" justify="flex" align="top">
@@ -200,20 +210,40 @@ class CommentForm extends React.Component {
             </div>
           </Col>
           <Col span={20} style={{margin: '20px 0'}}>
-            <TextArea value={inputValue}
-                      placeholder="enter your comments.."
-                      autosize={{minRows: 5, maxRows: 50}}
-                      onChange={(e) => this.handleInputChange(e)}
-            />
+            <Form>
+              <FormItem>{
+                getFieldDecorator('comments', {
+                  rules: [
+                    {
+                      required: true,
+                    }, {
+                      validator: (rule, value, callback) => {
+                        if (value.length > 500) {
+                          callback('comments is too long')
+                        } else {
+                          callback()
+                        }
+                      },
+                    }
+                  ],
+                })(
+                  <TextArea
+                    placeholder="enter your comments.."
+                    autosize={{minRows: 5, maxRows: 50}}
+                  />)}
+              </FormItem>
+            </Form>
             <div style={{margin: '20px 0'}}/>
             <Button
               type="primary"
               htmlType="submit"
-              disabled={this.state.inputValue === ''}
+              disabled={commentsError}
               onClick={this.handleSubmit}
             >
               Post Comment
             </Button>
+
+
           </Col>
         </Row>
       </div>
@@ -667,8 +697,9 @@ function ProjectInfo({app, match, history, location, dispatch, projectDetail, lo
                 </TabPane>
                 <TabPane tab="Comments" key="5">
                   {login.user ?
-                    <CommentForm dispatch={dispatch} projectId={projectId}
-                                 login={login}/> :
+                    <WrappedCommentForm dispatch={dispatch}
+                                        projectId={projectId}
+                                        login={login}/> :
                     <NotLogin dispatch={dispatch} text={'评论'}/>}
                   <CommentsList dispatch={dispatch} projectId={projectId}
                                 comments={projectDetail.comments}
@@ -714,6 +745,7 @@ function ProjectDetail({app, match, history, location, dispatch, projectDetail})
   )
 }
 
+const WrappedCommentForm = Form.create()(CommentForm)
 export default connect(({projectDetail, login}) => ({
   projectDetail,
   login,
