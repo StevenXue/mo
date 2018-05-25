@@ -24,6 +24,7 @@ export function openNotebook(payload) {
 }
 
 export function startLab(payload) {
+
   const { hubUserName, hubToken, onSuccess } = payload
   return request(`${hubPrefix}/hub/api/users/${hubUserName}/server`, {
     method: 'post',

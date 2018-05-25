@@ -1,6 +1,8 @@
 import * as React from 'react'
-import { Form, Select, Input, Tooltip, Icon } from 'antd'
+import { Form, Select, Input, Tooltip, Icon, Table, Divider } from 'antd'
 // import styles from './index.less'
+import * as _ from 'lodash'
+
 import '../style/ParamsMapper.css'
 
 const FormItem = Form.Item
@@ -13,6 +15,15 @@ function getArgs(baseSteps, stepIndex, argIndex) {
     return baseSteps[stepIndex]
   }
 
+}
+
+const formItemLayout = {
+  labelCol: {
+    span: 24,
+  },
+  wrapperCol: {
+    span: 24,
+  },
 }
 
 const valueParser = {
@@ -32,54 +43,59 @@ const parse = (e, valueType) => {
 }
 
 const typeParser = (valueType) => {
+  const STR_EXP = '\\S+'
+  const INT_EXP = '[+-]?\\d+'
+  const FLOAT_EXP = '[+-]?\\d+(.\\d+)?'
   switch (valueType) {
     case '[int]':
+      return new RegExp(`^([ ]*${INT_EXP}[ ]*)([ ]*,[ ]*${INT_EXP}[ ]*)*$`)
     case '[str]':
+      return new RegExp(`^([ ]*${STR_EXP}[ ]*)([ ]*,[ ]*${STR_EXP}[ ]*)*$`)
     case '[float]':
-      return 'array'
+      return new RegExp(`^([ ]*${FLOAT_EXP}[ ]*)([ ]*,[ ]*${FLOAT_EXP}[ ]*)*$`)
     case 'str':
-      return 'string'
+      return new RegExp(`^${STR_EXP}$`)
     case 'int':
-      return 'integer'
+      return new RegExp(`^${INT_EXP}$`)
     case 'float':
-      return 'float'
+      return new RegExp(`^${FLOAT_EXP}$`)
     default:
-      return 'string'
+      return new RegExp(`^${STR_EXP}$`)
   }
 }
 
-const splitHandler = (e, valueType, valueRange) => {
+const splitHandler = (value, valueType, valueRange) => {
+  console.log(value, valueType, valueRange)
   if (Array.isArray(valueRange)) {
     // choice or multiple_choice
-    return e
+    return value
   } // others are input or upload
   switch (valueType) {
     case '[int]':
     case '[str]':
     case '[float]':
-      const splitValue = e.target.value.split(',')
+      const splitValue = value.split(',')
       // FIXME
       if (splitValue.includes('')) {
-        return e.target.value
+        return value
       } else {
         try {
-          return splitValue.map(e => parse(e, valueType.replace('[', '').replace(']', '')))
+          return splitValue.map(e => parse(_.trim(e), valueType.replace('[', '').replace(']', '')))
         } catch (err) {
-          return e.target.value
+          return value
         }
       }
     case 'str':
     case 'int':
     case 'float':
       try {
-        return parse(e.target.value, valueType)
+        return parse(_.trim(value), valueType)
       } catch (err) {
-        console.log(err, e.target.value)
-        return e.target.value
+        return value
       }
     default:
       // choice or multiple_choice
-      return e
+      return value
   }
 }
 
@@ -118,10 +134,10 @@ const switchComponent = (arg, baseArg) => {
       }
       return <Input/>
 
-    case 'img':
-      return (
-        <Demo setFieldsValue={setFieldsValue} keyName={arg.name}/>
-      )
+    // case 'img':
+    //   return (
+    //     <Demo setFieldsValue={setFieldsValue} keyName={arg.name}/>
+    //   )
 
     default:
       return <Input/>
@@ -138,7 +154,7 @@ const validator = (type, range) => {
   } else if (range.includes('>=')) {
     l = range.split('>=').map(e => parseFloat(e.replace(/\s/g, ''))).slice(-1)[0]
   } else if (range.includes('<=')) {
-    h = range.split('>=').map(e => parseFloat(e.replace(/\s/g, ''))).slice(-1)[0]
+    h = range.split('<=').map(e => parseFloat(e.replace(/\s/g, ''))).slice(-1)[0]
   }
   switch (type) {
     case '[int]':
@@ -146,7 +162,8 @@ const validator = (type, range) => {
     case '[float]':
       return {
         validator: (rule, value, callback) => {
-          console.log(111, rule, value)
+          value = splitHandler(value, type, range)
+          console.log(value, range, h, l)
           if (Array.isArray(value) && value.every(e => (!h || e <= h) && (!l || e >= l))) {
             callback()
           } else {
@@ -160,7 +177,7 @@ const validator = (type, range) => {
     case 'float':
       return {
         validator: (rule, value, callback) => {
-          console.log(111, rule, value)
+          value = splitHandler(value, type, range)
           if ((!h || value <= h) && (!l || value >= l)) {
             callback()
           } else {
@@ -177,7 +194,7 @@ const validator = (type, range) => {
   }
 }
 
-const formItems = (arg, i, getFieldDecorator, baseArg, setFieldsValue) => {
+const formItems = (arg, i, getFieldDecorator, baseArg, key) => {
   console.log('arg', arg)
   let v
   if (arg.value || (arg.values && arg.values.length > 0)) {
@@ -185,21 +202,24 @@ const formItems = (arg, i, getFieldDecorator, baseArg, setFieldsValue) => {
   }
 
   return <FormItem
-    key={arg.display_name ? arg.display_name : arg.name}
-    label={arg.display_name ? arg.display_name : arg.name}
+    key={key}
+    className='example-form-item'
+    label={key}
     help={`need ${arg.value_type || ''}` + (arg.value_range ? ` in range ${arg.value_range}` : '')}
+    {...formItemLayout}
   >
     <div className='parameter-row'>
       {
-        getFieldDecorator(arg.name, {
+        getFieldDecorator(key, {
           initialValue: v || arg.default,
-          getValueFromEvent: (value) => splitHandler(value, arg.value_type, arg.value_range),
+          // getValueFromEvent: (value) => splitHandler(value, arg.value_type, arg.value_range),
           rules: [
             {
               required: !arg.optional,
               // message: `need ${arg.value_type || ''}` + (arg.value_range ? ` in range ${arg.value_range}` : ''),
-              type: typeParser(arg.value_type),
               ...validator(arg.value_type, arg.value_range),
+            }, {
+              pattern: typeParser(arg.value_type),
             },
           ],
         })(switchComponent(arg, baseArg))
@@ -213,19 +233,23 @@ const formItems = (arg, i, getFieldDecorator, baseArg, setFieldsValue) => {
   </FormItem>
 }
 
+
+
 function ParamsMapper({
                         args, baseArgs,
                         form: { getFieldDecorator },
                       }) {
+  const data = Object.keys(args).map((key, i) => {
+    let arg = args[key]
+    arg.key = key
+    return arg
+  })
   return (
-    <Form layout='inline' className='parameter-form'
+    <Form layout='inline'
+          className='parameter-form'
           key={`params-form`}
     >
-      {
-        args.map((arg, i) => {
-          return formItems(arg, i, getFieldDecorator, baseArgs[i])
-        })
-      }
+      <Table columns={columns} dataSource={data} pagination={false}/>
     </Form>
   )
 }

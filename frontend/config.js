@@ -51,11 +51,10 @@ const conf = {
     webServer: 'http://momodel.ai',
 
     env: 'PROD',
-
   },
 }
 
-module.exports = conf.CY
-// module.exports = conf.DEV
+// module.exports = conf.CY
+module.exports = conf.DEV
 // module.exports = conf.PROD
 
