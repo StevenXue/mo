@@ -188,7 +188,8 @@ class AppService(ProjectService):
         :return: list of imported modules in
                  (user_id, module_name, version) tuple format.
         """
-        pattern = r"""^(?!#).*(run|predict|train)\s*\(('|")(([\w\d_-]+)/([\w\d_-]+)/(\d+\.\d+\.\d+))('|")"""
+        pattern = \
+            r"""^(?!#).*(run|predict|train)\s*\(('|")(([\w\d_-]+)/([\w\d_-]+)/(\d+\.\d+\.\d+))('|")"""
 
         modules = []
         for match in re.finditer(pattern, script, re.MULTILINE):
@@ -202,8 +203,10 @@ class AppService(ProjectService):
     def read_handler_py(cls, script, app):
         """
 
-        :param f: file stream
-        :param app:
+        Get imported modules/dataset from py script.
+
+        :param script: py script in str format
+        :param app: app object
         :return:
         """
 
@@ -247,11 +250,15 @@ class AppService(ProjectService):
                       possible_used_modules):
         """
 
-        :param container:
-        :param app:
-        :param version:
+        Copy imported modules/datasets into right place for deployment.
+
+        :param container: app project docker
+        :param app: app object
+        :param version: deployment version
         :param possible_used_datasets:
+        list of dataset objects in imported history
         :param possible_used_modules:
+        list of module objects in imported history
         :return:
         """
         # Move module from project.module_path
@@ -287,6 +294,7 @@ class AppService(ProjectService):
     @classmethod
     def rename_handler_py(cls, handler_file_path, func_path):
         """
+        Rename *.py to 'handler.py' for deplyment.
 
         :param handler_file_path:
         :param func_path: path of function folder
@@ -303,7 +311,8 @@ class AppService(ProjectService):
     @classmethod
     def diff_n_gen_new_requirements(cls, func_path):
         """
-        diff two requirements.txt
+        diff two requirements.txt for package installation in deployed docker.
+
         :param func_path:
         :return:
         """

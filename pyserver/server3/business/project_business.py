@@ -610,14 +610,13 @@ class ProjectBusiness(GeneralBusiness):
         :return: processed single line code
         """
         if any(re.search(reg, line_of_code.rstrip()) for reg in INIT_RES):
-            # line_of_code = re.sub(
-            #     r"# Please use current \(work\) folder to store your data "
-            #     r"and models",
-            #     r'', line_of_code.rstrip())
+            # replace some redundant comments
             line_of_code = re.sub(r'# Define root path', r'',
                                   line_of_code.rstrip())
             line_of_code = re.sub(r"""sys.path.append\('(.+)'\)""", r'',
                                   line_of_code.rstrip())
+
+            # set the flag to silent mode
             line_of_code = re.sub(
                 r"""(\s+)project_type='(.+)', source_file_path='(.+)'\)""",
                 r"""\1project_type='\2', source_file_path='\3', silent=True)""",
@@ -636,18 +635,12 @@ class ProjectBusiness(GeneralBusiness):
                 line_of_code.rstrip())
         else:
 
-            # if re.match(r'^(!|ls +|rm +|pwd +|cd +)', line_of_code.strip()):
+            # erase magic function start with '!'
             if re.match(r'^(!)', line_of_code.strip()):
                 line_of_code = ''
             else:
                 line_of_code = '\t' + line_of_code
 
-            # if line_of_code[0] in ['!']:
-            #     line_of_code = ''
-            # elif line_of_code[0:2] in ['ls', 'cd']:
-            #     line_of_code = ''
-            # else:
-            #     line_of_code = '\t' + line_of_code
 
         return line_of_code
 
