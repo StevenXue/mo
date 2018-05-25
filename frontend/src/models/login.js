@@ -208,12 +208,12 @@ export default {
       try {
         const { data: data } = yield call(tokenLogin)
         if (!data.user) {
-          if (!(location.href.includes('/user/login') || location.href.includes('/user/forgot') || location.href.includes('/newpassword') || location.href.includes('/user/register') || location.href.slice(-3) === '/#/')) {
-            // yield put(routerRedux.push('/user/login'))
-            // FIXME reload is a workaround
-            window.location.replace('/#/user/login')
-            window.location.reload()
-          }
+          // if (!(location.href.includes('/user/login') || location.href.includes('/user/forgot') || location.href.includes('/newpassword') || location.href.includes('/user/register') || location.href.slice(-3) === '/#/')) {
+          //   // yield put(routerRedux.push('/user/login'))
+          //   // FIXME reload is a workaround
+          //   window.location.replace('/#/user/login')
+          //   window.location.reload()
+          // }
         } else {
           yield put({
             type: 'setUser',
@@ -311,9 +311,9 @@ export default {
         console.log('pathname', pathname)
         const match = pathToRegexp('/user/login').exec(pathname)
 
-        // if (!match) {
-        //   dispatch({ type: 'query' })
-        // }
+        if (!match) {
+          dispatch({ type: 'query' })
+        }
 
         const userId = localStorage.getItem('user_ID')
         if (userId && !connected) {
