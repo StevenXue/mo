@@ -48,7 +48,9 @@ def post(user_ID, repo_name):
         os.makedirs(repo_path)
     # git init repo from template
     bare_repo = Repo.init(repo_path, bare=True,
-                          template='./templates/')
+                          template='/home/admin/www/mo/git_server/templates')
+
+    # call(['chown', '-R', 'apache:apache', f'{repo_path}'])
     assert bare_repo.bare
     return jsonify({'response': 1})
 
