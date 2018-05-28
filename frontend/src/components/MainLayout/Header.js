@@ -217,7 +217,8 @@ function Header({location, login, history, dispatch, allRequest, message}) {
 
   return <div className={styles.container} style={{
     display: location.pathname.indexOf('user/') !== -1 || location.pathname.indexOf('/newpassword') !== -1 ? 'none' : 'block',
-    backgroundColor: location.pathname === '/' ? 'transparent' : '#464E78'
+    backgroundColor: location.pathname === '/' ? '#6D9CF9' : '#464E78',
+    position: location.pathname === '/' ? 'relative': 'fixed'
   }}
   >
     <div className={styles.box} style={{

@@ -5,10 +5,18 @@ import { Link } from 'dva/router'
 import styles from './css/App.less'
 
 class App extends Component {
+
+  // state = {
+  //   //   // 发现区， 工作台，需求区状态
+  //   //   tabState: 1
+  //   // }
+
   constructor(props) {
     super(props)
     this.state = {
       playDisplay: 'flex',
+      // 发现区， 工作台，需求区状态
+      tabState: 0,
     }
   }
 
@@ -17,6 +25,17 @@ class App extends Component {
       playDisplay: 'none',
     })
     document.getElementById('intro-video').play()
+  }
+
+  selectImages() {
+    switch (this.state.tabState) {
+      case 0:
+        return <img src={require('./imageNew/workspace.jpg')} alt="" width='70%' height='70%'/>
+      case 1:
+        return <img src={require('./imageNew/notebook.jpg')} alt="" width='70%' height='70%'/>
+      case 2:
+        return <img src={require('./imageNew/request.jpg')} alt="" width='70%' height='70%'/>
+    }
   }
 
   render() {
@@ -106,7 +125,7 @@ class App extends Component {
              }}>
 
           {/*第一段*/}
-          <div >
+          <div>
             <TitleText titleList={['蓦的诞生']}
                        textList={['蓦致力于构建用户、数据和产品的生态循环，降低AI的技',
                          '术和使用门槛，使AI应用能够真正融入生活']}
@@ -173,9 +192,11 @@ class App extends Component {
 
         {/*第四张*/}
         <div className={styles.imgContainer}
-             style={{ justifyContent: 'center', alignItems: 'center', paddingTop: 80, paddingBottom: 80 }}>
+             style={{ justifyContent: 'center', alignItems: 'center'}}>
           <img src={require('./imageNew/bg_white2.jpg')} alt="" width='100%' height='100%'/>
           <div style={{ position: 'absolute' }}>
+
+
             <div style={{
               display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
 
@@ -184,8 +205,29 @@ class App extends Component {
                          textList={['在发现区您可以通过搜索关键词查看并学习所有用户公开发布的数据集、模块和应用，也可以',
                            '分享自己的开发成果。无需门槛，只要有热情，您可以和志同道合的朋友共同学习共同进步。']}
               />
-              <img src={require('./imageNew/workspace.jpg')} alt="" width='80%' height='80%'/>
+              {/*多张图片*/}
+              {this.selectImages()}
+              {/*多个按钮*/}
+              <div className={styles.tabs}>
+                {[{ src: require('./imageNew/explore.png'), text: '发现区' },
+                  { src: require('./imageNew/computer.png'), text: '工作台' },
+                  { src: require('./imageNew/message.png'), text: '需求区' },
+                ].map((ele, index) => {
+                  return <div key={`tab_${index}`}
+                              className={this.state.tabState === index ? styles.tab_button_active : styles.tab_button}
+                              onClick={()=>this.setState({tabState: index})}
+                  >
+                    <img src={ele.src} alt="" width='30px' height='30px'/>
+                    <div className={styles.tab_text}>
+                      {ele.text}
+                    </div>
+                  </div>
+                })}
+              </div>
+
             </div>
+
+
           </div>
         </div>
 
@@ -374,6 +416,8 @@ const LeftTitleText = ({ titleList, textList, color, center = true }) =>
       )
     })}
   </div>
+
+// const SelectImages = ({images}) =>
 
 export default App
 
