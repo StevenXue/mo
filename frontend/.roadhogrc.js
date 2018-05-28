@@ -69,9 +69,7 @@ export default {
   'cssModulesExclude': [
     ...jupyterPackageCSS,
   ],
-  'proxy': {
-    ...proxy,
-  },
+  'proxy': proxy,
   'theme': {
     '@primary-color': '#34C0E2',
     // "font-family": "Roboto",

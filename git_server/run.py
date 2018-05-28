@@ -50,7 +50,7 @@ def post(user_ID, repo_name):
     bare_repo = Repo.init(repo_path, bare=True,
                           template='/home/admin/www/mo/git_server/templates')
 
-    # call(['chown', '-R', 'apache:apache', f'{repo_path}'])
+    call(['chown', '-R', 'apache:apache', f'{repo_path}'])
     assert bare_repo.bare
     return jsonify({'response': 1})
 
