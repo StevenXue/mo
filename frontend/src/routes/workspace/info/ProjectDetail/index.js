@@ -35,13 +35,14 @@ import {message} from 'antd/lib/index'
 import {flaskServer, hubServer} from '../../../../constants'
 import dynamic from 'dva/dynamic'
 import modelling from '../../../../models/modelling'
-// import {fetchComments} from "../../../../services/comments"
+import Modelling from '../../modelling/Modelling'
 
 const confirm = Modal.confirm
 const TabPane = Tabs.TabPane
 const {TextArea} = Input
 const FormItem = Form.Item
 const commitSvg = require('../../../../img/icon/git-commit.svg')
+
 
 const pages = ['import', 'analysis', 'modelling', 'deploy']
 
@@ -60,8 +61,8 @@ class CommitsList extends React.Component {
             <Row type="flex" justify="space-around" align="middle">
               <Col span={2}>
                 <div>
-                  {e.version && <div className={styles.commitVersion}><Icon
-                    type="tag-o"/> {e.version}</div>
+                  {e.version && <div className={styles.commitVersion}>
+                    <Icon type="tag-o"/> {e.version}</div>
                   }
                   <div className={styles.commitHexsha}><img src={commitSvg}
                                                             alt="commit"/> {e.newhexsha.slice(0, 7)}
@@ -697,13 +698,7 @@ function ProjectDetail({app, match, history, location, dispatch, projectDetail})
   return (
     <div className={`main-container ${styles.normal}`}>
       <Switch>
-        <Route path="/workspace/:projectID/:type" component={dynamic({
-          app,
-          models: () => [
-            modelling,
-          ],
-          component: () => import('../../modelling/Modelling'),
-        })}/>
+        <Route path="/workspace/:projectID/:type" component={Modelling}/>
       </Switch>
     </div>
   )
