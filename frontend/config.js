@@ -37,18 +37,18 @@ const conf = {
   },
   PROD: {
     // server api
-    flaskServer: 'http://momodel.ai/pyapi',
+    flaskServer: 'http://momodel-ai.s3.natapp.cc/pyapi',
 
     // hubServer: 'http://localhost:8000',
-    hubServer: 'http://momodel.ai/hub_api',
+    hubServer: 'http://momodel-ai.s3.natapp.cc/hub_api',
 
     docsServer: 'http://localhost:3000',
 
     tbServer: 'http://localhost:8111',
 
-    gitServerIp: 'momodel.ai',
+    gitServerIp: 'momodel-ai.s3.natapp.cc',
 
-    webServer: 'http://momodel.ai',
+    webServer: 'http://momodel-ai.s3.natapp.cc',
 
     env: 'PROD',
   },

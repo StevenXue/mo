@@ -29,7 +29,7 @@ elif ENV == 'PROD':
     MONGO = 'PROD'
     REDIS_SERVER = 'redis://localhost:6379'
     GIT_SERVER = 'http://localhost:2333'
-    GIT_SERVER_IP = 'momodel.ai'
+    GIT_SERVER_IP = 'momodel-ai.s3.natapp.cc'
     GIT_LOCAL = ''
 
 else:
@@ -48,7 +48,7 @@ MODEL_EXPORT_BASE = '/tmp'
 MODEL_SCRIPT_PATH = './run_model.py'
 TEMPLATE_PATH = './functions/template/python3'
 SERVING_PORT = 9000
-WEB_ADDR = 'http://momodel.ai'
+WEB_ADDR = 'http://momodel-ai.s3.natapp.cc'
 DOCKER_IP = '127.0.0.1'
 
 # REDIS_SERVER = 'redis://localhost:6379'
