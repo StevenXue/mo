@@ -477,9 +477,8 @@ def set_action_entity(entity_id):
 
 
 @user_app.route('/action_entity', methods=['GET'])
-@jwt_required
 def get_action_entity():
-    user_ID = request.args.get("user_ID", get_jwt_identity())
+    user_ID = request.args.get("user_ID")
     action_entity = request.args.get("action_entity")
     page_no = int(request.args.get('page_no', 1))
     page_size = int(request.args.get('page_size', 5))

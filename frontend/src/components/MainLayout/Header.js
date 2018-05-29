@@ -25,11 +25,11 @@ const menuConfig = [
   //   Icon: 'home',
   //   text: 'Home',
   // },
-  {
-    key: '/workspace',
-    Link: '/workspace?tab=app',
-    Icon: null,
-    text: 'Workspace',
+  // {
+  //   key: '/workspace',
+  //   Link: '/workspace?tab=app',
+  //   Icon: null,
+  //   text: 'Workspace',
     // dropdown: [
     //       {
     //     key: '/myprojects',
@@ -44,7 +44,7 @@ const menuConfig = [
     //     text: 'My Service',
     //   },
     // ]
-  },
+  // },
   // {
   //   key: '/projects',
   //   Link: '/projects',
@@ -220,13 +220,14 @@ function Header({location, login, history, dispatch, allRequest, message}) {
 
   return <div className={styles.container} style={{
     display: location.pathname.indexOf('user/') !== -1 || location.pathname.indexOf('/newpassword') !== -1 ? 'none' : 'block',
-    backgroundColor: location.pathname === '/' ? '#33333399' : '#464E78'
+    backgroundColor: location.pathname === '/' ? '#6D9CF9' : '#464E78',
+    position: location.pathname === '/' ? 'relative': 'fixed'
   }}
   >
     <div className={styles.box} style={{
       width: 1170,
       margin: '0 auto',
-      backgroundColor: location.pathname === '/' ? '#464E7800' : '#464E78'
+      backgroundColor: location.pathname === '/' ? 'transparent' : '#464E78'
     }}>
 
       <Menu
@@ -242,6 +243,13 @@ function Header({location, login, history, dispatch, allRequest, message}) {
             <img src={logo} className={styles.logo}/>
           </Link>
         </Menu.Item>
+
+        {login.user &&<Menu.Item key='/workspace' style={menuDiv} className={styles.menuStyle}
+        >
+          <Link to={'/workspace?tab=app'}>
+            <div style={menuStyle} className={styles.menuStyle}>Workspace</div>
+          </Link>
+        </Menu.Item>}
         {menuConfig.map(
           (e) => {
             // if (e.dropdown) {

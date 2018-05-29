@@ -10,7 +10,7 @@ import styles from './index.less'
 
 const Step = Steps.Step
 const gitList = [gifNew, gifImport, gifDeploy]
-const titleList = ['1/3 创建项目', '2/3 使用module', '3/3 部署项目']
+const titleList = ['1/3 部署项目', '2/3 使用module', '3/3 部署项目']
 const JOYRIDE = [
   {
     text: '新建文件',
@@ -238,13 +238,38 @@ class HelpModal extends React.Component {
     helpState: 0,
   }
 
+  renderHeader = () => {
+    switch(this.state.helpState){
+      case 0:
+        return <TitleText
+          titleList={['创建项目']}
+          textList={['点击左侧侧边栏“+”新建文件，我们使用内嵌的 JupyterLab 作为开发环境，',
+          '你可以在这里用 Python 语言编写你的项目。']}
+        />
+      case 1:
+        return <TitleText
+            titleList={['使用 Module']}
+            textList={['右侧侧边栏包含平台中所有的模块与数据集列表，查找到需要的模块后',
+            '可以查看使用说明并直接将代码插入到文件中。']}
+          />
+      case 2:
+        return <TitleText
+          titleList={['部署项目']}
+          textList={['训练完成的应用或模块如果想要提供给他人使用，需要将其进行部署。',
+            '选择想要部署的文件并点击部署按钮即可。']}
+        />
+
+    }
+
+  }
+
   render() {
     const { helpState } = this.state
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         {/*标题*/}
         <div style={{ fontSize: 30, padding: 20 }}>
-          {titleList[helpState]}
+          {this.renderHeader()}
         </div>
         {/*图片*/}
         <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -290,6 +315,35 @@ class HelpModal extends React.Component {
     )
   }
 }
+
+/**
+ * 大标题和文字 组件
+ * @param titleList 标题列表
+ * @param textList 文字列表
+ * @param color 文字的颜色
+ * @param center 是否居中
+ * @returns {*}
+ * @constructor
+ */
+const TitleText = ({ titleList, textList, color, center = true }) =>
+  <div style={center ? { display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' } :
+    { display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+    {
+      titleList.map((title, index) =>
+        <div className={styles.title} key={'cardText' + title + index} style={color && { color: color }}>
+          {title}
+        </div>)
+    }
+    <div style={{ height: 10 }}/>
+
+    {textList.map((text, index) => {
+      return (
+        <div className={styles.text} key={'cardText' + text + index} style={color && { color: color }}>
+          {text}
+        </div>
+      )
+    })}
+  </div>
 
 export default connect(({ projectDetail }) => ({ projectDetail }))(HelpButton)
 

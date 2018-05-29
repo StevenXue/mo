@@ -75,10 +75,9 @@ export default {
   },
 
   subscriptions: {
-    // 登陆后
+    // 在进入任何的新页面时，获取用户的所有message
     setup({dispatch, history}) {
       return history.listen(({pathname}) => {
-        console.log('messsage')
           dispatch({
             type: 'fetchAllMessage',
             payload: {}
