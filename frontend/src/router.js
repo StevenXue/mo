@@ -9,7 +9,7 @@ import { get } from 'lodash'
 import NewPassword from './routes/login/NewPassword'
 import Account from './routes/login/Account'
 import MainLayout from './components/MainLayout/MainLayout'
-// import modelling from './models/modelling';
+import modelling from './models/modelling';
 
 const breadcrumbNameMap = {
   '/user': 'User',
@@ -60,9 +60,9 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
 
   const ProjectDetail = dynamic({
     app,
-    // models: () => [
-    //   modelling
-    // ],
+    models: () => [
+      modelling
+    ],
     component: () => import('./routes/workspace/info/ProjectDetail'),
   })
 
