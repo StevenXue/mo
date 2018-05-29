@@ -151,9 +151,15 @@ class AppService(ProjectService):
                                         handler_file_path, version)
             cls.send_message(app, m_type='publish')
         except Exception as e:
-            app = cls.business.get_by_id(project_id)
-            app.status = 'inactive'
-            app.save()
+            # app = cls.business.get_by_id(project_id)
+            # app.status = 'inactive'
+            # app.save()
+
+            # update app status
+            cls.business.repo.update_status(
+                project_id,
+                cls.business.repo.AppStatus.Inactive)
+
             cls.send_message(app, m_type='publish_fail')
             raise e
         else:
@@ -166,9 +172,15 @@ class AppService(ProjectService):
                                         handler_file_path)
             cls.send_message(app, m_type='deploy')
         except Exception as e:
-            app = cls.business.get_by_id(project_id)
-            app.status = 'inactive'
-            app.save()
+            # app = cls.business.get_by_id(project_id)
+            # app.status = 'inactive'
+            # app.save()
+
+            # update app status
+            cls.business.repo.update_status(
+                project_id,
+                cls.business.repo.AppStatus.Inactive)
+
             cls.send_message(app, m_type='deploy_fail')
             raise e
         return app
@@ -337,9 +349,12 @@ class AppService(ProjectService):
         """
 
         # update app status to 'deploying
-        app = cls.get_by_id(app_id)
-        app.status = 'deploying'
-        app.save()
+        # app = cls.get_by_id(app_id)
+        # app.status = 'deploying'
+        # app.save()
+        app = cls.business.repo.update_status(
+            app_id,
+            cls.business.repo.AppStatus.Deploying)
 
         container = cls.business.get_container(app)
         # freeze working env
@@ -403,13 +418,24 @@ class AppService(ProjectService):
 
         # when not dev(publish), change the privacy etc
         if version != DEFAULT_DEPLOY_VERSION:
-            app.privacy = 'public'
-            app.versions.append(version)
+            # app.privacy = 'public'
+            cls.business.repo.update_privacy(
+                app_id, cls.business.repo.AppPrivacy.PUBLIC)
+            # app.versions.append(version)
+            cls.business.repo.add_version(app_id, version)
 
-        app.app_path = os.path.join(cls.business.base_func_path,
-                                    service_name_no_v)
-        app.status = 'active'
-        app.save()
+        # app.app_path = os.path.join(cls.business.base_func_path,
+        #                             service_name_no_v)
+        cls.business.repo.update_path(
+            app_id, os.path.join(cls.business.base_func_path,
+                                 service_name_no_v))
+
+        # app.status = 'active'
+        # app.save()
+
+        # update app status
+        cls.business.repo.update_status(app_id,
+                                        cls.business.repo.AppStatus.ACTIVE)
 
         return app
 
