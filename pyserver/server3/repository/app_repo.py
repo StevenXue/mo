@@ -1,17 +1,84 @@
 # -*- coding: UTF-8 -*-
 
 from server3.repository.project_repo import ProjectRepo
-from server3.entity.project import Deployment
+from enum import Enum
 
 
 class AppRepo(ProjectRepo):
     def __init__(self, instance):
         ProjectRepo.__init__(self, instance)
 
+    class AppStatus(Enum):
+        """
+        App status
+        """
+        DEPLOYING = 'deploying'
+        ACTIVE = 'active'
+        INACTIVE = 'inactive'
+
+    class AppPrivacy(Enum):
+        """
+        App Privacy
+        """
+        PUBLIC = 'public'
+        PRIVATE = 'private'
+
+    def add_version(self, app_id, version):
+        """
+        To add a new version
+
+        :param app_id: app id
+        :param version: version to add
+        :return:
+        """
+        app = self.read_by_id(app_id)
+        app.versions.append(version)
+        app.save()
+
+    def update_path(self, app_id, path):
+        """
+        To update app path.
+
+        :param app_id: app id
+        :param path: app path
+        :return:
+        """
+        app = self.read_by_id(app_id)
+        app.app_path = path
+        app.save()
+
+
+    def update_privacy(self, app_id, privacy):
+        """
+        To update app privacy.
+
+        :param app_id: app id
+        :param privacy: new privacy of app
+        :return:
+        """
+        app = self.read_by_id(app_id)
+        app.privacy = privacy
+        app.save()
+
+    def update_status(self, app_id, status):
+        """
+        To update app status.
+
+        :param app_id: app id
+        :param status: new status of app
+        :return: updated app objecty
+        """
+        app = self.read_by_id(app_id)
+        app.status = status
+        updated_app = app.save()
+        return updated_app
+
+
     def add_imported_entities(self, app_id, app_deploy_version,
                               used_datasets=None, used_modules=None):
         """
-        add imported datasets or modules to app deployments
+        Add imported datasets or modules to app deployments
+
         :param app_id:
         :param app_deploy_version:
         :param used_datasets:
