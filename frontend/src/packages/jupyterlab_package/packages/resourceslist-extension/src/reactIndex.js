@@ -1,11 +1,10 @@
 import * as React from 'react'
-import { Card, Button, Row, Col, Input, Icon, Pagination, Select, message, List, Modal } from 'antd'
+import { Card, Button, Row, Col, Input, Icon, Pagination, Select, message, List, Modal, Table } from 'antd'
 import * as pathToRegexp from 'path-to-regexp'
 import {
   NotebookActions,
 } from '@jupyterlab/notebook'
 
-import ParamsMapper from './ParamsMapper'
 import CopyInput from './CopyInput'
 import ReactMdePreview from './reactMde'
 
@@ -17,7 +16,7 @@ import {
   getFavs,
   getAppActionEntity,
   removeUsedEntityInApp,
-  getHotTagOfProject
+  getHotTagOfProject,
 } from './services'
 // import { getHotTagOfProject } from '../../../../../services/project'
 import TagSelect from './TagSelect'
@@ -72,7 +71,6 @@ export class ListPage extends React.Component {
   }
 
   fetchData({ payload = {} }) {
-
     // default filter
     let filter = { type: this.pageType, privacy };
 
@@ -120,27 +118,29 @@ export class ListPage extends React.Component {
         appId: this.appId,
         actionEntity: `used_${this.pageType}s`,
         onJson: ({ objects, count }) => {
-          console.log('objects', objects)
           this.setState({
             usedProjects: objects,
             totalUsedNumber: count,
           })
-        }
-
-        ,
+        },
       })
 
     }
   }
 
-  onGetProjectSuccess = (response, func) => {
+  onGetProjectSuccess = (response) => {
     if (this.pageType === 'module') {
+      let version
+      if (!this.state.version) {
+        version = response.versions.slice(-1)[0] || 'dev'
+      } else {
+        version = this.state.version
+      }
       this.setState({
         projectId: response._id,
         project: response,
-        version: response.versions.slice(-1)[0] || 'dev',
-        func: func,
-        args: func ? Object.values(response.args.input[func]) : undefined,
+        version,
+        args: response.args.input,
       })
     } else {
       this.setState({
@@ -151,7 +151,6 @@ export class ListPage extends React.Component {
   }
 
   clickProject(project, func) {
-    console.log('project', project)
     getProject({
       projectId: project._id,
       prefix: this.pageType,
@@ -174,11 +173,15 @@ export class ListPage extends React.Component {
     this.fetchData({ payload: { query: value, tags: tags } })
   }
 
-  insertCode() {
+  insertCode(func) {
     let dict = {}
-    this.state.args.forEach(arg => {
-      dict[arg.name] = arg.value || arg.default_value
-    })
+    let args = this.state.args[func]
+    for (let key in args) {
+      if (args.hasOwnProperty(key)) {
+        let arg = args[key]
+        dict[key] = arg.value || arg.default_value
+      }
+    }
 
     NotebookActions.insertMarkdown(this.props.tracker.currentWidget.notebook,
       [
@@ -245,53 +248,80 @@ export class ListPage extends React.Component {
     })
   }
 
-  renderParameters() {
-    return (
-      <div>
-        <ParamsMapper args={this.state.args}
-                      setValue={(values) => this.setValue(values)}
-                      baseArgs={Object.values(this.state.project.args.input[this.state.func])}
-        />
-      </div>
-    )
-  }
-
   onShowSizeChange = (pageNo, pageSize) => {
     this.fetchData({ payload: { page_no: pageNo, page_size: pageSize } })
   }
 
   handleVersionChange(value) {
-    console.log(`selected ${value}`)
     getProject({
       projectId: this.state.project._id,
       prefix: this.pageType,
       version: value,
-      onJson: (response) => this.onGetProjectSuccess(response, func),
+      onJson: (response) => this.onGetProjectSuccess(response),
     })
     this.setState({
       version: value,
     })
   }
 
-  renderParams() {
+  renderParams(func) {
+
+    const columns = [{
+      title: 'Name',
+      dataIndex: 'key',
+      // render: text => <a href="javascript:;">{text}</a>,
+    }, {
+      title: 'Type',
+      dataIndex: 'value_type',
+    }, {
+      title: 'Default',
+      dataIndex: 'default_value',
+    }]
+
+    const extendColumns = [
+      {
+        title: 'Description',
+        dataIndex: 'des',
+      },
+      {
+        title: 'Range',
+        dataIndex: 'value_range',
+      },
+    ]
+
+    const args = this.state.args[func]
+    const data = Object.keys(args).map((key, i) => {
+      let arg = args[key]
+      arg.key = key
+      return arg
+    })
+
     return (
       <div className='container'>
-        <header style={{ cursor: 'pointer' }} onClick={() => this.backToList({ toDetail: true })}>
-          <Icon type="left"/>{this.state.project.name}
-        </header>
-        <div>
-          Version:&nbsp;&nbsp;
-          <Select defaultValue={this.state.version} style={{ width: 120 }}
-                  onChange={(value) => this.handleVersionChange(value)}>
-            {this.state.project.versions.map(version =>
-              <Option key={version} value={version}>{version}</Option>)}
-          </Select>
-        </div>
+        <h4 style={{ textTransform: 'capitalize' }}>{func}:&nbsp;&nbsp;</h4>
         <div style={{ height: 'auto', overflowY: 'auto' }}>
-          {this.renderParameters()}
+          <Table columns={columns} dataSource={data} pagination={false}
+                 expandedRowRender={record => {
+                   const extendRows = []
+                   extendColumns.forEach(e => {
+                       if (record[e.dataIndex]) {
+                         extendRows.push(<Row style={{ margin: '5px 0' }} key={e.dataIndex} gutter={16}>
+                           <Col span={12}>{e.title}:</Col>
+                           <Col span={12}>{record[e.dataIndex]}</Col>
+                         </Row>)
+                       }
+                     }
+                   )
+                   return extendRows
+                 }}/>
         </div>
         <Row>
-          <Button type='primary' onClick={() => this.insertCode()}>Import Module</Button>
+          <Button type='primary'
+                  style={{ textTransform: 'capitalize' }}
+                  onClick={() => this.insertCode(func)}
+          >
+            Import {func}
+          </Button>
         </Row>
       </div>
     )
@@ -326,17 +356,25 @@ export class ListPage extends React.Component {
           </div>]
       } else {
         return <div>
-          <h4>Choose Function:</h4>
+          <div>
+            Version:&nbsp;&nbsp;
+            <Select defaultValue={this.state.version} style={{ width: 120 }}
+                    onChange={(value) => this.handleVersionChange(value)}>
+              {this.state.project.versions.map(version =>
+                <Option key={version} value={version}>{version}</Option>)}
+            </Select>
+          </div>
           {
             project.category === 'model' ?
               <Row>
-                <Button onClick={() => this.clickProject(project, 'train')}>train</Button>
-                <Button onClick={() => this.clickProject(project, 'predict')}>predict</Button>
+                {this.renderParams('train')}
+                {this.renderParams('predict')}
               </Row> :
               <Row>
-                <Button onClick={() => this.clickProject(project, 'run')}>run</Button>
+                {this.renderParams('run')}
               </Row>
           }
+
         </div>
       }
     }
@@ -558,13 +596,14 @@ export class ListPage extends React.Component {
 
   render() {
     if (this.state.projectId !== undefined) {
-      if (this.state.func) {
-        // params
-        return this.renderParams()
-      } else {
-        // overview
-        return this.renderOverview()
-      }
+      // if (this.state.func) {
+      //   // params
+      //   return this.renderParams()
+      // } else {
+      //   // overview
+      //   return this.renderOverview()
+      // }
+      return this.renderOverview()
     } else if (this.state[`showFav${this.pageTypeUC}s`]) {
       return this.renderFavProjects()
     } else if (this.state[`showUsed${this.pageTypeUC}s`] && this.state.app) {

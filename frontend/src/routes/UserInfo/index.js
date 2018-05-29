@@ -62,7 +62,6 @@ class EditForm extends React.Component {
     let tokenForUpdateInfo = localStorage.getItem('tokenForUpdateInfo')
     this.props.form.validateFields(['password'], {force: true},
       (err, values) => {
-        console.log('values', values)
         if (!err) {
           updateUserAccount({
             body: {
@@ -95,7 +94,6 @@ class EditForm extends React.Component {
     let tokenForUpdateInfo = localStorage.getItem('tokenForUpdateInfo')
     this.props.form.validateFields(['email', 'captcha1'], {force: true},
       (err, values) => {
-        console.log('values', values)
         if (!err) {
           updateUserAccount({
             body: {
@@ -464,7 +462,13 @@ class EditForm extends React.Component {
                 rules: [{
                   required: true, message: 'Please input your password!',
                 }, {
-                  validator: this.validateToNextPassword,
+                  validator: (rule, value, callback) => {
+                    if (value.length < 6) {
+                      callback('password is too short')
+                    } else {
+                      callback()
+                    }
+                  },
                 }],
               })(
                 <Input type="password"/>

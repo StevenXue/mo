@@ -13,7 +13,7 @@ from flask import jsonify
 from flask import make_response
 from flask import request
 from kubernetes import client
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 
 from server3.service import project_service
 from server3.service.message_service import MessageService
@@ -35,7 +35,6 @@ project_app = Blueprint("project_app", __name__, url_prefix=PREFIX)
 
 
 @project_app.route('/count', methods=['GET'])
-@jwt_required
 def count_projects():
     user_ID = request.args.get('user_ID')
     types = ['app', 'module', 'dataset']
@@ -52,7 +51,7 @@ def count_projects():
 
 
 @project_app.route('', methods=['GET'])
-@jwt_required
+@jwt_optional
 def list_projects_by_query():
     group = request.args.get('group')
     page_no = int(request.args.get('page_no', 1))
@@ -274,8 +273,10 @@ def update_project(project_identity):
 
 
 @project_app.route('/projects/<string:project_id>', methods=['DELETE'])
+@jwt_required
 def remove_project(project_id):
-    user_ID = request.args.get('user_ID')
+    # user_ID = request.args.get('user_ID')
+    user_ID = get_jwt_identity()
     if not project_id:
         return jsonify({'response': 'no project_id arg'}), 400
     if not user_ID:
