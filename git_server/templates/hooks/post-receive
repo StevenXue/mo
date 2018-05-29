@@ -4,13 +4,10 @@
 # dumb transports.
 #
 # To enable this hook, rename this file to "post-receive".
-export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3.6
-export WORKON_HOME=$HOME/.virtualenvs
-source /usr/bin/virtualenvwrapper.sh
 
 echo 'hook start'
-GIT_SERVER_DIR=/home/admin/www/mo/git_server/
+echo $(whoami)
+GIT_SERVER_DIR=/var/www/git_server/
 cd ${GIT_SERVER_DIR}
-workon moenv
 python3.6 messager.py ${GIT_PUSH_OPTION_0}
 echo 'hook end'
