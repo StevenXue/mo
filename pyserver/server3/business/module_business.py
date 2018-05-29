@@ -69,10 +69,11 @@ class ModuleBusiness(ProjectBusiness):
         """
         Create a new project
 
+        :param user:
+        :param privacy:
+        :param category:
         :param name: str
         :param description: str
-        :param user_ID: ObjectId
-        :param is_private: boolean
         :param type: string (app/module/dataset)
         :param tags: list of string
         :param user_token: string

@@ -2,8 +2,8 @@
 # if get_mac() == 274973436731254:
 #     MONGO = 'DEFAULT'
 
-# ENV = 'CY'
-ENV = 'DEFAULT'
+ENV = 'CY'
+# ENV = 'DEFAULT'
 # ENV = 'PROD'
 
 if ENV == 'CY':
@@ -13,7 +13,7 @@ if ENV == 'CY':
     REDIS_SERVER = 'redis://192.168.31.9:6379'
     GIT_SERVER = 'http://192.168.31.9:2333'
     GIT_SERVER_IP = '192.168.31.9'
-    GIT_LOCAL = f'admin@{GIT_SERVER_IP}:'
+    GIT_LOCAL = f'root@{GIT_SERVER_IP}:'
 
 elif ENV == 'DEFAULT':
     # DEV
