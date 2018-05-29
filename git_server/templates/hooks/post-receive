@@ -6,7 +6,6 @@
 # To enable this hook, rename this file to "post-receive".
 export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3.6
 export WORKON_HOME=$HOME/.virtualenvs
-export PROJECT_HOME=$HOME/admin
 source /usr/bin/virtualenvwrapper.sh
 
 echo 'hook start'
