@@ -1,6 +1,6 @@
 import React from 'react'
 import { HashRouter, Route, Switch, Link, withRouter, routerRedux } from 'dva/router'
-import { Breadcrumb } from 'antd'
+import { Breadcrumb, Modal } from 'antd'
 import { connect } from 'dva'
 import dynamic from 'dva/dynamic'
 import pathToRegexp from 'path-to-regexp'
@@ -9,6 +9,7 @@ import { get } from 'lodash'
 import NewPassword from './routes/login/NewPassword'
 import Account from './routes/login/Account'
 import MainLayout from './components/MainLayout/MainLayout'
+// import ProjectDetail from './routes/workspace/info/ProjectDetail'
 import modelling from './models/modelling';
 
 const breadcrumbNameMap = {
@@ -125,7 +126,7 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
         {/*{extraBreadcrumbItems}*/}
         {/*</Breadcrumb>*/}
 
-        <Route path="/workspace/:projectId" render={(props) => <ProjectDetail {...props} app={app}/>}/>
+        <Route path="/workspace/:projectId" render={(props) => <ProjectDetail {...props}/>}/>
         {
           routes.map(({ path, ...dynamics }, key) => (
             <Route key={key}
@@ -139,7 +140,7 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
           ))
         }
         <Route path="/explore/:projectId"
-               render={(props) => <ProjectDetail {...props} app={app} />}/>
+               render={(props) => <ProjectDetail {...props} />}/>
         <Route path="/launchpage" component={LaunchPage} location={location}/>
         {
           routes2.map(({ path, ...dynamics }, key) => (

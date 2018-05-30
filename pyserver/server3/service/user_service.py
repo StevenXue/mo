@@ -148,7 +148,7 @@ def check_tourtip(user_ID):
 def no_tourtip(user_ID):
     user = user_business.get_by_user_ID(user_ID)
     if user:
-        user['tourtip'] = "1"
+        user.tourtip = 1
         user.save()
         return user
     return False

@@ -5,7 +5,6 @@ import styles from './index.less'
 // import 'antd/lib/list/style/css';
 
 function JupyterLab() {
-
   return (
     <div className={styles.container} id='mo-jlContainer'>
       <Spin tip="JupyterLab Loading..." size='large'>

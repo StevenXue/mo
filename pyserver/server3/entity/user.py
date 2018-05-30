@@ -8,11 +8,13 @@ from mongoengine import ListField
 from mongoengine import ReferenceField
 
 from server3.entity.project import Module
+
 GENDER = (
     (0, 'female'),
     (1, 'male'),
     (2, 'unknown')
 )
+
 
 class User(DynamicDocument):
     user_ID = StringField(max_length=20, unique=True, required=True)
@@ -23,6 +25,7 @@ class User(DynamicDocument):
     gender = IntField(choices=GENDER, default=2)
     age = IntField()
     avatarV = IntField(default=0)
+    tourtip = IntField(choices=(0, 1))
 
     # 用户点赞的request列表
     request_vote_up = ListField(ReferenceField("UserRequest"))
@@ -52,7 +55,6 @@ class User(DynamicDocument):
     star_datasets = ListField(ReferenceField("Dataset"))
     # 用户使用过的的dataset列表
     used_datasets = ListField(ReferenceField("Dataset"))
-
 
     # TODO 将数据库内数据删除后删掉
     # 用户收藏的api列表
