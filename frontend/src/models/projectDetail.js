@@ -44,10 +44,77 @@ export default {
     resultLoading: false,
     overviewEditorState: false,
     loadingOverview: false,
+    steps: [{
+      title: '',
+      text: '进入项目开发环境',
+      selector: '.zi',
+      position: 'left',
+      // isFixed:true,
+      style: {
+        borderRadius: 0,
+        color: '#34BFE2',
+        textAlign: 'center',
+        width: '24rem',
+        mainColor: '#ffffff',
+        backgroundColor: '#ffffff',
+        beacon: {
+          inner: '#0ae713 ',
+          outer: '#77Eb7c',
+        },
+        close: {
+          display: 'none',
+        },
+      },
+    }, {
+      title: '',
+      text: '上传并解压代码或数据集到开发环境',
+      selector: '.qing',
+      position: 'left',
+      // isFixed:true,
+      style: {
+        borderRadius: 0,
+        color: '#34BFE2',
+        textAlign: 'center',
+        width: '24rem',
+        mainColor: '#ffffff',
+        backgroundColor: '#ffffff',
+        beacon: {
+          inner: '#0ae713 ',
+          outer: '#77Eb7c',
+        },
+        close: {
+          display: 'none',
+        },
+      },
+    }, {
+      title: '',
+      text: '下载在线的目录到本地进行开发',
+      selector: '.mei',
+      position: 'left',
+      // isFixed:true,
+      style: {
+        borderRadius: 0,
+        color: '#34BFE2',
+        textAlign: 'center',
+        width: '24rem',
+        mainColor: '#ffffff',
+        backgroundColor: '#ffffff',
+        beacon: {
+          inner: '#0ae713 ',
+          outer: '#77Eb7c',
+        },
+        close: {
+          display: 'none',
+        },
+      },
+    }]
   },
   reducers: {
     changeActiveTab(state, { activeTab }) {
       return { ...state, activeTab }
+    },
+    clearStep(state) {
+      return { ...state, steps: [] }
     },
     addJobLog(state, { payload: jobId }) {
       let jobIds = state.jobIds
