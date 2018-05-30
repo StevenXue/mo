@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link, Route, Switch } from 'react-router-dom'
+import { Link, Route, Switch } from 'dva/router'
 import Joyride from 'react-joyride'
 import { connect } from 'dva'
 import {
@@ -395,11 +395,11 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
 
     // </span></div>
   }
+
   return (
     <div className={`main-container ${styles.normal}`}>
       <Switch>
-        <Route path="/workspace/:projectID/:type" component={Modelling}/>
-        <Route path="/workspace/:projectID" component={() => {
+        <Route exact path="/workspace/:projectID" component={() => {
           if (projectDetail.project && projectDetail.project.type) {
 
             // optional component list by project type
@@ -601,6 +601,7 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
             return <Spin spinning={true}>Loading...</Spin>
           }
         }}/>
+        <Route exact path="/workspace/:projectID/:type" component={Modelling}/>
       </Switch>
     </div>
   )

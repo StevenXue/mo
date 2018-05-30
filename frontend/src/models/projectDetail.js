@@ -355,10 +355,8 @@ export default {
           projectId,
           version,
         })).data
-        // yield put({ type: 'setProject', payload: project })
       }
 
-      yield put({ type: 'setProject', payload: project })
       // fetch jobs
       try {
         const { data: terminals } = yield call(getTerminals, {
@@ -383,6 +381,9 @@ export default {
         yield put({ type: 'setJobs', payload: jobs })
         yield put({ type: 'setTerminals', payload: terminals })
         yield put({ type: 'setSessions', payload: sessions })
+
+        yield put({ type: 'setProject', payload: project })
+
       } catch (e) {
         console.log('get jobs', e)
       }
