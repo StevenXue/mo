@@ -406,7 +406,7 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
             const components = projectTypeDict[projectDetail.project.type]
             const visible = !projectDetail.project.entered || projectDetail.helpModalVisible
 
-            const RenderCloud2 = () => {
+            const RenderDetail = () => {
               return (
                 <div className={`main-container ${styles.normal}`}>
                   {components.includes('help-modal') &&
@@ -594,7 +594,7 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
                     callback={closeTourtip}
                   />
                 }
-                <RenderCloud2 />
+                <RenderDetail />
               </div>
             )
           } else {
