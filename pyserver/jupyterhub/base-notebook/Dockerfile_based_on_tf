@@ -12,7 +12,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 USER $NB_UID
 
-RUN pip install virtualenvwrapper
+RUN conda install -c eumetsat virtualenvwrapper
 ENV VIRTUALENVWRAPPER_PYTHON $CONDA_DIR/bin/python
 ENV VIRTUALENVWRAPPER_VIRTUALENV $CONDA_DIR/bin/virtualenv
 SHELL ["/bin/bash", "-c"]
