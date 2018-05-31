@@ -1,22 +1,22 @@
 import React, {Component} from 'react'
 import {connect} from 'dva'
 import {Select, Button, Card, Icon, Input, Pagination, Tabs, Spin} from 'antd'
-import ProjectModel from '../../../../components/ProjectModal/index'
+import ProjectModel from '../../../components/ProjectModal/index'
 import {projectStatus} from '../ProjectDetail'
-import {showTime} from '../../../../utils/index'
-import {privacyChoices, projectChoices} from '../../../../constants'
+import {showTime} from '../../../utils/index'
+import {privacyChoices, projectChoices} from '../../../constants'
 import {
   createProject,
   getProjects,
   getMyProjects,
-} from '../../../../services/project'
+} from '../../../services/project'
 
 import styles from './index.less'
-import blank from '../../../../img/blank.png'
-import star from '../../../../img/star.png'
-import star_o from '../../../../img/star-o.png'
-import like from '../../../../img/like.png'
-import like_o from '../../../../img/like-o.png'
+import blank from '../../../img/blank.png'
+import star from '../../../img/star.png'
+import star_o from '../../../img/star-o.png'
+import like from '../../../img/like.png'
+import like_o from '../../../img/like-o.png'
 
 const Option = Select.Option
 const Search = Input.Search

@@ -9,7 +9,7 @@ import { get } from 'lodash'
 import NewPassword from './routes/login/NewPassword'
 import Account from './routes/login/Account'
 import MainLayout from './components/MainLayout/MainLayout'
-// import ProjectDetail from './routes/workspace/info/ProjectDetail'
+// import ProjectDetail from './routes/workspace/ProjectDetail'
 import modelling from './models/modelling';
 
 const breadcrumbNameMap = {
@@ -64,7 +64,7 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
     models: () => [
       modelling
     ],
-    component: () => import('./routes/workspace/info/ProjectDetail'),
+    component: () => import('./routes/workspace/ProjectDetail'),
   })
 
   const HomePage = dynamic({
@@ -81,7 +81,7 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
     {
       path: '/workspace',
       // models: () => [import('./models/dashboard')],
-      component: () => import('./routes/workspace/info/Projects'),
+      component: () => import('./routes/workspace/Projects'),
     },
   ]
 

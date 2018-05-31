@@ -11,7 +11,7 @@ import {
 import styles from './index.less'
 import { get } from 'lodash'
 import Highlight from 'react-highlight'
-import { showTime } from '../../../../utils/index'
+import { showTime } from '../../../utils/index'
 
 const myShowTime = (time, format = 'yyyy-MM-dd hh:mm') => {
   let date = new Date(time).Format(format)
