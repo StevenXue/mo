@@ -1,6 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
-<svg fill="#616161" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 18 18">
-    <path d="M13.7,4.3C12.5,3.1,10.8,2.4,9,2.4c-3.6,0-6.6,3-6.6,6.6s2.9,6.6,6.6,6.6c3.1,0,5.6-2.1,6.4-5h-1.7
-        c-0.7,1.9-2.5,3.3-4.7,3.3c-2.7,0-5-2.2-5-4.9s2.2-4.9,5-4.9c1.4,0,2.6,0.6,3.5,1.5L9.8,8.2h5.8V2.4L13.7,4.3z"/>
-    <path fill="none" d="M0,0h18v18H0V0z"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="15px" height="14px" viewBox="0 0 15 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50 (54983) - http://www.bohemiancoding.com/sketch -->
+    <title>Shape</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Notebook-Copy-5" transform="translate(-222.000000, -64.000000)" fill="#38507F" fill-rule="nonzero">
+            <g id="Group-7" transform="translate(0.000000, 40.000000)">
+                <g id="Group-13-Copy" transform="translate(48.000000, 0.000000)">
+                    <g id="Group-9" transform="translate(21.000000, 23.000000)">
+                        <path d="M165.416848,3.01515152 C164.144121,1.74242424 162.341091,1 160.432,1 C156.613818,1 153.432,4.18181818 153.432,8 C153.432,11.8181818 156.507758,15 160.432,15 C163.719879,15 166.371394,12.7727273 167.219879,9.6969697 L165.416848,9.6969697 C164.674424,11.7121212 162.765333,13.1969697 160.432,13.1969697 C157.568364,13.1969697 155.12897,10.8636364 155.12897,8 C155.12897,5.13636364 157.462303,2.8030303 160.432,2.8030303 C161.916848,2.8030303 163.189576,3.43939394 164.144121,4.39393939 L161.280485,7.15151515 L167.432,7.15151515 L167.432,1 L165.416848,3.01515152 Z" id="Shape"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
 </svg>

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Card, Button, Row, Col, Input, Icon, Pagination, Select, message, List, Modal, Table } from 'antd'
+import { Card, Button, Row, Col, Input, Icon, Pagination, Select, message, List, Modal, Table,Tag } from 'antd'
 import * as pathToRegexp from 'path-to-regexp'
 import {
   NotebookActions,
@@ -560,11 +560,14 @@ export class ListPage extends React.Component {
     return (
       // list
       <div className='container'>
-        <header>
+        <header style={{background:'white'}}>
           {this.pageType.toUpperCase()} LIST
-          {this.appId && <Icon type="clock-circle-o"
-                               className='history-btn'
-                               onClick={() => this.setState({ [`showUsed${this.pageTypeUC}s`]: true })}/>}
+          {this.appId && <div className='history-btn'
+                              onClick={() => this.setState({ [`showUsed${this.pageTypeUC}s`]: true })}/>}
+          {/*{this.appId && <Icon type="clock-circle-o"*/}
+                               {/*className='history-btn'*/}
+                               {/*onClick={() => this.setState({ [`showUsed${this.pageTypeUC}s`]: true })}/>}*/}
+
           <div className='fav-btn' onClick={() => this.setState({ [`showFav${this.pageTypeUC}s`]: true })}/>
         </header>
         <TagSelect getHotTag={getHotTagOfProject} onSearch={(value, tags) => {
@@ -575,7 +578,10 @@ export class ListPage extends React.Component {
             <Card key={project.user + project.name} title={project.name}
               // extra={<Button onClick={() => this.clickProject(project)}>Detail</Button>}
                   onClick={() => this.clickProject(project)}
-                  style={{ margin: '5px 3px', cursor: 'pointer' }}>
+                  style={{ margin: '5px 3px', cursor: 'pointer'  }}
+                  bordered={false}
+                  extra={project.category?<Tag color={project.category==='model'?"#FFB850":"#8986EA"}>{project.category}</Tag>:null}
+            >
               <Col>
                 {project.description}
               </Col>
