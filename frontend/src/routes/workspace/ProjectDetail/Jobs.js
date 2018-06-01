@@ -52,10 +52,9 @@ const Jobs = ({ projectDetail, dispatch }) => {
                       </span>}</span>,
     },
     {
-      title: 'Start Time',
-      key: 'create_time',
-      dataIndex: 'create_time',
-      render: text => showTime(text),
+      title: 'Status',
+      key: 'status',
+      render: (text, record) => <Tag className={styles.tag} color={tagSwitcher[record.status]}>{record.status}</Tag>,
     },
     {
       title: 'Type',
@@ -69,11 +68,40 @@ const Jobs = ({ projectDetail, dispatch }) => {
       render: text => text.toHHMMSS(),
     },
     {
-      title: 'Status',
-      key: 'status',
-      render: (text, record) => <Tag className={styles.tag} color={tagSwitcher[record.status]}>{record.status}</Tag>,
+      title: 'Start Time',
+      key: 'create_time',
+      dataIndex: 'create_time',
+      render: text => showTime(text),
     },
   ]
+
+  const renderJobs = (jobs) => {
+    let renderedJobs = jobs
+    if (!projectDetail.jobShowAll) {
+      renderedJobs = jobs.slice(0, 5)
+    }
+    renderedJobs.forEach(e => e.key = e._id)
+    return <div><Table
+      columns={columns}
+      expandedRowRender={record => <div>
+        <h5>Logs:</h5>
+        <Highlight
+          className={`accesslog hljs code-container inline-code-container ${styles.log}`}
+        >
+          {(record.logs.map(e => e.message).join('') || 'no log')}
+        </Highlight>
+      </div>}
+      dataSource={renderedJobs}
+      pagination={false}
+    />
+      <Col align='center' style={{ margin: 5 }}>
+        {renderedJobs < jobs &&
+        <Button size='small' onClick={() => dispatch({ type: 'projectDetail/showAllJobs' })}>Show All</Button>}
+        {projectDetail.jobShowAll &&
+        <Button size='small' onClick={() => dispatch({ type: 'projectDetail/hideJobs' })}>Hide</Button>}
+      </Col>
+    </div>
+  }
 
   return (
     <div>
@@ -113,20 +141,10 @@ const Jobs = ({ projectDetail, dispatch }) => {
                 &nbsp;&nbsp;
                 Last Activity: {myShowTime(session.kernel.last_activity)}</p>
             </div>
-            <Row className={styles.jobReactRow} type="flex">
-              {session.jobs !== undefined && session.jobs.map((job, i) => {
-                  return renderJob(job, i)
-                },
-              )}
-            </Row>
+            {session.jobs !== undefined && renderJobs(session.jobs)}
           </div>
         })}
         {Object.entries(projectDetail.jobs).map(([path, jobs]) => {
-          let renderedJobs = jobs
-          if (!projectDetail.jobShowAll) {
-            renderedJobs = jobs.slice(0, 5)
-          }
-          renderedJobs.forEach(e => e.key = e._id)
           return <div key={path} className={styles.jobCell}>
             <div className={styles.jobContainer}>
               <h4>{path}</h4>
@@ -136,22 +154,7 @@ const Jobs = ({ projectDetail, dispatch }) => {
                 No Activity
               </p>
             </div>
-            <Table
-              columns={columns}
-              expandedRowRender={record => <Highlight
-                className={`accesslog hljs code-container inline-code-container ${styles.log}`}
-              >
-                {(record.logs.map(e => e.message).join('') || 'no log')}
-              </Highlight>}
-              dataSource={renderedJobs}
-              pagination={false}
-            />
-            <Col align='center' style={{ margin: 5 }}>
-              {renderedJobs < jobs &&
-              <Button size='small' onClick={() => dispatch({ type: 'projectDetail/showAllJobs' })}>Show All</Button>}
-              {projectDetail.jobShowAll &&
-              <Button size='small' onClick={() => dispatch({ type: 'projectDetail/hideJobs' })}>Hide</Button>}
-            </Col>
+            {jobs !== undefined && renderJobs(jobs)}
           </div>
         })}
         {/*{projectDetail.sessions[0] === undefined && 'No Running Sessions'}*/}
