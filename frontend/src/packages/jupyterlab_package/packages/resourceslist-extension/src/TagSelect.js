@@ -72,7 +72,7 @@ class Index extends React.Component {
   render() {
     const {fetching, data, value} = this.state
     return (
-      <div style={{display:'flex'}}>
+      <div style={{display:'flex',margin:'5px',height:'35px'}}>
         <div  onClick={this.showDropDown} >
           <Dropdown visible={this.state.showDropDown}
                     trigger={['click']}
@@ -100,7 +100,7 @@ class Index extends React.Component {
                         </Select>
                       </Menu.Item>}
                     </Menu>}>
-            <Button  icon='down-circle-o' style={{alignItems:'center',display:'flex'}}>
+            <Button  icon="caret-down"  style={{alignItems:'center',display:'flex'}}>
               {value.length>0?<p style={{marginBottom:'0'}}> &nbsp; {value.length} tag</p>:<p style={{marginBottom:'0'}}> &nbsp;Tags</p>}
             </Button>
           </Dropdown>
