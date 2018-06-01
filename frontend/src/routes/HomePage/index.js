@@ -5,12 +5,6 @@ import { Link } from 'dva/router'
 import styles from './css/App.less'
 
 class App extends Component {
-
-  // state = {
-  //   //   // 发现区， 工作台，需求区状态
-  //   //   tabState: 1
-  //   // }
-
   constructor(props) {
     super(props)
     this.state = {
@@ -30,16 +24,15 @@ class App extends Component {
   selectImages() {
     switch (this.state.tabState) {
       case 0:
-        return <img src={require('./imageNew/workspace.jpg')} alt="" width='70%' height='70%'/>
+        return <img src={require('./imageNew/workspace.jpg')} alt="" width='60%' height='60%'/>
       case 1:
-        return <img src={require('./imageNew/notebook.jpg')} alt="" width='70%' height='70%'/>
+        return <img src={require('./imageNew/notebook.jpg')} alt="" width='60%' height='60%'/>
       case 2:
-        return <img src={require('./imageNew/request.jpg')} alt="" width='70%' height='70%'/>
+        return <img src={require('./imageNew/request.jpg')} alt="" width='60%' height='60%'/>
     }
   }
 
   render() {
-
     return (
       <div style={{
         width: '100%', alignItems: 'center', display: 'flex',
@@ -56,7 +49,7 @@ class App extends Component {
             width: '100%',
             height: '100%',
           }}>
-            <img src={require('./imageNew/banner.jpg')} alt="" width='45%' height="45%"
+            <img src={require('./imageNew/banner.jpg')} alt="" width='40%' height="40%"
                  style={{ marginRight: '14%', marginTop: 50 }}/>
           </div>
 
@@ -202,11 +195,13 @@ class App extends Component {
 
             }}>
               <TitleText titleList={['优质开源的学习资源']}
-                         textList={['在发现区您可以通过搜索关键词查看并学习所有用户公开发布的数据集、模块和应用，也可以',
+                           textList={['在发现区您可以通过搜索关键词查看并学习所有用户公开发布的数据集、模块和应用，也可以',
                            '分享自己的开发成果。无需门槛，只要有热情，您可以和志同道合的朋友共同学习共同进步。']}
               />
+              <div style={{height: 20}}/>
               {/*多张图片*/}
               {this.selectImages()}
+              <div style={{height: 20}}/>
               {/*多个按钮*/}
               <div className={styles.tabs}>
                 {[{ src: require('./imageNew/explore.png'), text: '发现区' },
@@ -217,7 +212,7 @@ class App extends Component {
                               className={this.state.tabState === index ? styles.tab_button_active : styles.tab_button}
                               onClick={()=>this.setState({tabState: index})}
                   >
-                    <img src={ele.src} alt="" width='30px' height='30px'/>
+                    <img src={ele.src} alt="" width='20px' height='20px'/>
                     <div className={styles.tab_text}>
                       {ele.text}
                     </div>
@@ -257,7 +252,6 @@ class App extends Component {
         </div>
 
         {/*第六张*/}
-
         <div className={styles.imgContainer}
              style={{ justifyContent: 'center', alignItems: 'center' }}>
           <img src={require('./imageNew/bg_grey.jpg')} alt="" width='100%' height='100%'/>
@@ -343,6 +337,7 @@ const CardBig = ({ title, textList, image, textBottom }) =>
     <div className={styles.title_card} style={{ marginBottom: 10 }}>
       {title}
     </div>
+    <div style={{height: "25%", justifyContent: "center", alignItems: "center"}}>
     {textList.map((text, index) => {
       return (
         <div className={styles.text_card} key={'cardText' + text + index}>
@@ -350,6 +345,7 @@ const CardBig = ({ title, textList, image, textBottom }) =>
         </div>
       )
     })}
+    </div>
     <div style={{ margin: 40 }}>
       {image}
     </div>
@@ -367,7 +363,7 @@ const CardBig = ({ title, textList, image, textBottom }) =>
  * @returns {*}
  * @constructor
  */
-const TitleText = ({ titleList, textList, color, center = true }) =>
+const TitleText = ({ titleList, textList, color, center = true}) =>
   <div style={center ? { display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' } :
     { display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
     {
@@ -380,7 +376,7 @@ const TitleText = ({ titleList, textList, color, center = true }) =>
 
     {textList.map((text, index) => {
       return (
-        <div className={styles.text} key={'cardText' + text + index} style={color && { color: color }}>
+        <div className={styles.text} key={'cardText' + text + index} style={color && { color: '#E8EEF9' }}>
           {text}
         </div>
       )
@@ -416,8 +412,6 @@ const LeftTitleText = ({ titleList, textList, color, center = true }) =>
       )
     })}
   </div>
-
-// const SelectImages = ({images}) =>
 
 export default App
 
