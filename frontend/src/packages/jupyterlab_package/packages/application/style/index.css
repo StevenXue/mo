@@ -11,9 +11,9 @@
 }
 
 
-#mo-jlContainer body {
+#mo-jlContainer {
   font-family: var(--jp-ui-font-family);
-  background: var(--jp-layout-color3);
+  /*background: var(--jp-layout-color3);*/
   margin: 0;
   padding: 0;
   overflow: hidden;
