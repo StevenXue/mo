@@ -2,8 +2,8 @@
 # if get_mac() == 274973436731254:
 #     MONGO = 'DEFAULT'
 
-# ENV = 'CY'
-ENV = 'DEFAULT'
+ENV = 'CY'
+# ENV = 'DEFAULT'
 # ENV = 'PROD'
 
 if ENV == 'CY':

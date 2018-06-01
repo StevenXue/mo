@@ -35,7 +35,7 @@ export default {
     // terminals: undefined,
     // sessions: [],
     jobs: {},
-    jobIds: [],
+    jobShowAll: false,
     // doneIndices: new Set([]),
     helpModalVisible: false,
     activeTab: '1',
@@ -116,24 +116,16 @@ export default {
     clearStep(state) {
       return { ...state, steps: [] }
     },
-    addJobLog(state, { payload: jobId }) {
-      let jobIds = state.jobIds
-      if (!jobIds.includes(jobId)) {
-        jobIds.push(jobId)
-      }
+    showAllJobs(state) {
       return {
         ...state,
-        jobIds,
+        jobShowAll: true,
       }
     },
-    removeJobLog(state, { payload: jobId }) {
-      let jobIds = state.jobIds
-      if (jobIds.includes(jobId)) {
-        jobIds.splice(jobIds.indexOf(jobId), 1)
-      }
+    hideJobs(state) {
       return {
         ...state,
-        jobIds,
+        jobShowAll: false,
       }
     },
     showHelpModal(state) {
