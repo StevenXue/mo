@@ -14,9 +14,9 @@ require('es6-promise/auto')
 // 1. Initialize
 const app = dva({
   onError(e) {
-    console.log("error", e)
+    console.log('error', e)
     e.preventDefault()
-  }
+  },
 })
 
 app.model(require('./models/project'))
