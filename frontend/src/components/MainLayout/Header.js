@@ -184,10 +184,13 @@ function Header({location, login, history, dispatch, allRequest, message}) {
     switch (e.message_type) {
       case 'answer':
         return <p
-          className={styles.messageP}>{`${e.user_ID} 回答了您关注的需求${e.user_request_title}`}</p>
+          className={styles.messageP}>{`${e.user_ID} 回答了您关注的需求 ${e.user_request_title}`}</p>
       case 'commit':
         return <p
-          className={styles.messageP}>{`${e.user_ID} 更新了您关注的需求  ${e.user_request_title}`} 的答案</p>
+          className={styles.messageP}>{`${e.user_ID} 更新了您关注的项目 ${e.project_name}`}</p>
+      case 'commit_request':
+        return <p
+          className={styles.messageP}>{`${e.user_ID} 更新了您关注的需求 ${e.user_request_title}`} 的答案</p>
       case 'deploy':
         return <p
           className={styles.messageP}>{`${e.user_ID} 上线了您关注的 ${translatorTemp[e.project_type]}  ${e.project_name}`}</p>

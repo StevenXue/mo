@@ -1,7 +1,7 @@
 import React from 'react'
-import {Link, Route, Switch} from 'react-router-dom'
+import { Link, Route, Switch } from 'react-router-dom'
 import Joyride from 'react-joyride'
-import {connect} from 'dva'
+import { connect } from 'dva'
 import {
   Button,
   Col,
@@ -18,27 +18,30 @@ import {
   Card,
   Tooltip,
 } from 'antd'
-import {routerRedux} from 'dva/router'
+import { routerRedux } from 'dva/router'
+// components
 import ProjectModal from '../../../../components/ProjectModal/index'
 import HelpModal from '../../../../components/HelpModal'
-import ReactMdeEditor, {ReactMdePreview} from '../../../../components/ReactMdeCom/reactMde'
+import ReactMdeEditor, { ReactMdePreview } from '../../../../components/ReactMdeCom/reactMde'
 import ProjectExample
   from '../../../../components/ProjectExample/projectExample'
 import Jobs from './Jobs'
-import {showTime} from '../../../../utils/index'
+
+import { showTime } from '../../../../utils/index'
 import styles from './index.less'
-import {get} from 'lodash'
-import {message} from 'antd/lib/index'
+import { get } from 'lodash'
+import { message } from 'antd/lib/index'
 // import ReactMarkdown from 'react-markdown'
-import {flaskServer, hubServer} from '../../../../constants'
+import { flaskServer, hubServer } from '../../../../constants'
 import dynamic from 'dva/dynamic'
 import modelling from '../../../../models/modelling'
 // import {fetchComments} from "../../../../services/comments"
 import NotLogin from '../../../../components/NotLogin/notLogin'
+import Modelling from '../../modelling/Modelling'
 
 const confirm = Modal.confirm
 const TabPane = Tabs.TabPane
-const {TextArea} = Input
+const { TextArea } = Input
 const FormItem = Form.Item
 const commitSvg = require('../../../../img/icon/git-commit.svg')
 
@@ -59,8 +62,8 @@ class CommitsList extends React.Component {
             <Row type="flex" justify="space-around" align="middle">
               <Col span={2}>
                 <div>
-                  {e.version && <div className={styles.commitVersion}><Icon
-                    type="tag-o"/> {e.version}</div>
+                  {e.version && <div className={styles.commitVersion}>
+                    <Icon type="tag-o"/> {e.version}</div>
                   }
                   <div className={styles.commitHexsha}><img src={commitSvg}
                                                             alt="commit"/> {e.newhexsha.slice(0, 7)}
@@ -111,7 +114,7 @@ class CommentsList extends React.Component {
   }
 
   render() {
-    const {dispatch, projectId, history} = this.props
+    const { dispatch, projectId, history } = this.props
     return (
 
       <div key={'commentsList'}>
@@ -120,13 +123,13 @@ class CommentsList extends React.Component {
             <Row>
               <Col span={2} style={{
                 margin: '20px 0', textAlign: 'center',
-                display: 'flex', justifyContent: 'center'
+                display: 'flex', justifyContent: 'center',
               }}>
-                <div style={{height: '50px', width: '50px'}}>
+                <div style={{ height: '50px', width: '50px' }}>
                   <img style={{
                     height: '50px',
                     width: '50px',
-                    borderRadius: '40px'
+                    borderRadius: '40px',
                   }}
                        src={e.user_ID !== this.props.login.user_ID ? `/pyapi/user/avatar/${e.user_ID}.jpeg` : this.props.login.userAvatar}
                        alt="avatar"/>
@@ -168,7 +171,7 @@ class CommentForm extends React.Component {
   }
 
   handleSubmit = () => {
-    const {form} = this.props
+    const { form } = this.props
     form.validateFields((err, values) => {
       if (!err) {
         if (
@@ -180,20 +183,19 @@ class CommentForm extends React.Component {
               _id: this.props.projectId,
             },
           })) {
-          form.setFieldsValue({'comments': null})
+          form.setFieldsValue({ 'comments': null })
         }
-        else{
+        else {
           message.error('oops,something goes wrong')
         }
       }
     })
   }
 
-
   render() {
-    const {fetching, data, value, projects} = this.state
+    const { fetching, data, value, projects } = this.state
     const userObjId = localStorage.getItem('user_obj_id')
-    const {getFieldDecorator, getFieldsError, getFieldError, isFieldTouched} = this.props.form
+    const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form
     const commentsError = !isFieldTouched('comments') || getFieldError('comments')
 
     return (
@@ -201,15 +203,15 @@ class CommentForm extends React.Component {
         <Row type="flex" justify="flex" align="top">
           <Col span={2} style={{
             margin: '20px 0', textAlign: 'center',
-            display: 'flex', justifyContent: 'center'
+            display: 'flex', justifyContent: 'center',
           }}>
-            <div style={{height: '50px', width: '50px'}}>
-              <img style={{height: '50px', width: '50px', borderRadius: '40px'}}
+            <div style={{ height: '50px', width: '50px' }}>
+              <img style={{ height: '50px', width: '50px', borderRadius: '40px' }}
                    src={this.props.login.userAvatar}
                    alt="avatar"/>
             </div>
           </Col>
-          <Col span={20} style={{margin: '20px 0'}}>
+          <Col span={20} style={{ margin: '20px 0' }}>
             <Form>
               <FormItem>{
                 getFieldDecorator('comments', {
@@ -224,16 +226,16 @@ class CommentForm extends React.Component {
                           callback()
                         }
                       },
-                    }
+                    },
                   ],
                 })(
                   <TextArea
                     placeholder="enter your comments.."
-                    autosize={{minRows: 5, maxRows: 50}}
+                    autosize={{ minRows: 5, maxRows: 50 }}
                   />)}
               </FormItem>
             </Form>
-            <div style={{margin: '20px 0'}}/>
+            <div style={{ margin: '20px 0' }}/>
             <Button
               type="primary"
               htmlType="submit"
@@ -256,19 +258,20 @@ export function projectStatus(project) {
     return <div key='1'/>
   }
   if (project.status === 'deploying') {
-    return <Tag color='gold' style={{cursor: 'default', marginLeft: 10}}
+    return <Tag color='gold' style={{ cursor: 'default', marginLeft: 10 }}
                 key='1'>Deploying <Icon
       type="loading"/></Tag>
   } else if (project.status === 'active') {
-    return <Tag color='green' style={{cursor: 'default', marginLeft: 10}}
+    return <Tag color='green' style={{ cursor: 'default', marginLeft: 10 }}
                 key='1'>Online</Tag>
   } else {
-    return <Tag color='grey' style={{cursor: 'default', marginLeft: 10}}
+    return <Tag color='grey' style={{ cursor: 'default', marginLeft: 10 }}
                 key='1'>Offline</Tag>
   }
 }
 
-function ProjectInfo({app, match, history, location, dispatch, projectDetail, login}) {
+function ProjectInfo({ app, match, history, location, dispatch, projectDetail, login }) {
+
   const projectId = match.params.projectId
   const user_ID = localStorage.getItem('user_ID')
   const userObjId = localStorage.getItem('user_obj_id')
@@ -304,7 +307,7 @@ function ProjectInfo({app, match, history, location, dispatch, projectDetail, lo
       onOk() {
         dispatch({
           type: 'projectDetail/delete',
-          payload: {projectId, type: projectDetail.project.type},
+          payload: { projectId, type: projectDetail.project.type },
         })
       },
     })
@@ -346,9 +349,22 @@ function ProjectInfo({app, match, history, location, dispatch, projectDetail, lo
     })
   }
 
+  const chooseColor = (star_users, user, userObjId) => {
+    if (user === userObjId) {
+      return styles.gray
+    }
+    else if (star_users.includes(userObjId)) {
+      return styles.blue
+    }
+    else {
+      return styles.lightBlue
+    }
+
+  }
+
   const cloudNote = () => {
     if (ownerOrNot) {
-      return <Row style={{width: '110%', marginLeft: '-8%'}}>
+      return <Row style={{ width: '110%', marginLeft: '-8%' }}>
         <Col span={14}>
       <span className={styles.generalSpan}>
       <Upload {...props1}>
@@ -379,374 +395,219 @@ function ProjectInfo({app, match, history, location, dispatch, projectDetail, lo
 
     // </span></div>
   }
+  return (
+    <div className={`main-container ${styles.normal}`}>
+      <Switch>
+        <Route path="/workspace/:projectID/:type" component={Modelling}/>
+        <Route path="/workspace/:projectID" component={() => {
+          if (projectDetail.project && projectDetail.project.type) {
 
-  if (location.pathname.split('/').length > 3) {
-    // project 4 step pages
-    return (
-      <ProjectDetail app={app} match={match} history={history}
-                     location={location}
-                     projectDetail={projectDetail}
-                     dispatch={dispatch}/>
-    )
-  } else {
-    // project info page
-    if (projectDetail.project && projectDetail.project.type) {
+            // optional component list by project type
+            const components = projectTypeDict[projectDetail.project.type]
+            const visible = !projectDetail.project.entered || projectDetail.helpModalVisible
 
-      // optional component list by project type
-      const components = projectTypeDict[projectDetail.project.type]
-
-      class Cloud_1 extends React.Component {
-        constructor() {
-          super()
-          this.state = {
-            steps: [],
-            // tourtip: 0,
-            tourtip: 1, // 0: display tourtip, 0: not display tourtip
-          }
-        }
-
-        componentDidMount() {
-          fetch(`/pyapi/user/tourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
-            .then((response) => response.json())
-            .then(({response}) => {
-              this.setState({
-                tourtip: parseInt(response.user.tourtip),
-              })
-            })
-        }
-
-        addSteps = (steps) => {
-          let newSteps = steps
-
-          if (!Array.isArray(newSteps)) {
-            newSteps = [newSteps]
-          }
-
-          if (!newSteps.length) {
-            return
-          }
-          this.setState({
-            steps: [...newSteps],
-          })
-        }
-
-        //关闭tourtip时调用，此后登录不再显示tourtip
-        noLearning = () => {
-          fetch(`/pyapi/user/notourtip?user_ID=${localStorage.user_ID}`, {method: 'GET'})
-        }
-
-        //点击蒙层，不再显示toutip包括beacon
-        closeTourtip = (data) => {
-          data.type === 'overlay:click' ? this.setState({
-            steps: []
-          }) : null
-        }
-
-        render() {
-          return (
-            <div>
-              {
-                this.state.tourtip === 0 && <Joyride
-                  ref={c => (this.joyride = c)}
-                  debug={false}
-                  autoStart={true}  //自动打开第一个
-                  locale={{
-                    back: (<span style={{color: '#34BFE2'}}>Back</span>),
-                    close: (<span style={{color: '#34BFE2'}}>Close</span>),
-                    last: (<span style={{color: '#34BFE2'}}
-                                 onClick={this.noLearning}>Finish</span>),
-                    next: (<span style={{color: '#34BFE2'}}>Next</span>),
-                    skip: (<span style={{color: '#999999'}}
-                                 onClick={this.noLearning}>Skip</span>),
-                  }}
-                  run={true}  //是否可以触发弹框
-                  showOverlay={true}
-                  showSkipButton={true}
-                  showStepsProgress={true}
-                  steps={this.state.steps}
-                  type='continuous'
-                  callback={this.closeTourtip}
-                />
-              }
-              <Cloud_2 addSteps={this.addSteps}/>
-            </div>
-          )
-        }
-      }
-
-      class Cloud_2 extends React.Component {
-        constructor() {
-          super()
-          this.state = {}
-        }
-
-        componentDidMount() {
-          this.props.addSteps(
-            [{
-              title: '',
-              text: '进入项目开发环境',
-              selector: '.zi',
-              position: 'left',
-              // isFixed:true,
-              style: {
-                borderRadius: 0,
-                color: '#34BFE2',
-                textAlign: 'center',
-                width: '24rem',
-                mainColor: '#ffffff',
-                backgroundColor: '#ffffff',
-                beacon: {
-                  inner: '#0ae713 ',
-                  outer: '#77Eb7c',
-                },
-                close: {
-                  display: 'none',
-                },
-              },
-            }, {
-              title: '',
-              text: '上传并解压代码或数据集到开发环境',
-              selector: '.qing',
-              position: 'left',
-              // isFixed:true,
-              style: {
-                borderRadius: 0,
-                color: '#34BFE2',
-                textAlign: 'center',
-                width: '24rem',
-                mainColor: '#ffffff',
-                backgroundColor: '#ffffff',
-                beacon: {
-                  inner: '#0ae713 ',
-                  outer: '#77Eb7c',
-                },
-                close: {
-                  display: 'none',
-                },
-              },
-            }, {
-              title: '',
-              text: '下载在线的目录到本地进行开发',
-              selector: '.mei',
-              position: 'left',
-              // isFixed:true,
-              style: {
-                borderRadius: 0,
-                color: '#34BFE2',
-                textAlign: 'center',
-                width: '24rem',
-                mainColor: '#ffffff',
-                backgroundColor: '#ffffff',
-                beacon: {
-                  inner: '#0ae713 ',
-                  outer: '#77Eb7c',
-                },
-                close: {
-                  display: 'none',
-                },
-              },
-            }],
-          )
-        }
-
-        chooseColor(star_users, user, userObjId) {
-          if (user === userObjId) {
-            return styles.gray
-          }
-          else if (star_users.includes(userObjId)) {
-            return styles.blue
-          }
-          else {
-            return styles.lightBlue
-          }
-
-        }
-
-        render() {
-          return (
-            <div className={`main-container ${styles.normal}`}>
-              {components.includes('help-modal') &&
-              <HelpModal
-                visible={!projectDetail.project.entered || projectDetail.helpModalVisible}
-                projectType={projectDetail.project.type}/>}
-              <div className={styles.info}>
-                <Row>
-                  <Col span={3} style={{padding: '10px 42px'}}>
-                    <div className={styles.bigIconNunberDiv}>
-                      <div
-                        className={this.chooseColor(projectDetail.project.star_users, projectDetail.project.user, userObjId)}
-                        style={!ownerOrNot ? {cursor: 'pointer'} : {cursor: 'default'}}
-                        onClick={!ownerOrNot ? () => appStarFavor('star') : null}
-                      >
-                        <p className={styles.icon}>
-                          <Icon
-                            type={projectDetail.project.star_users.includes(userObjId) ? 'like' : 'like-o'}/>
-                        </p>
-                        <p
-                          className={styles.number}>{projectDetail.project.star_users.length}</p>
-                      </div>
-                      <div
-                        className={this.chooseColor(projectDetail.project.favor_users, projectDetail.project.user, userObjId)}
-                        style={!ownerOrNot ? {cursor: 'pointer'} : {cursor: 'default'}}
-                        onClick={!ownerOrNot ? () => appStarFavor('favor') : null}>
-                        <p className={styles.icon}>
-                          <Icon
-                            type={projectDetail.project.favor_users.includes(userObjId) ? 'star' : 'star-o'}/>
-                        </p>
-                        <p
-                          className={styles.number}>{projectDetail.project.favor_users.length}</p>
-                      </div>
-                    </div>
-                  </Col>
-                  <Col span={21} style={{paddingRight: '50px'}}>
-                    <div className={styles.name}>
-                      {/* project header area */}
-                      <h1 style={{
-                        display: 'flex',
-                        justifyContent: 'space-between'
-                      }}>
-                        <span style={{display: 'flex', alignItems: 'center'}}>
+            const RenderDetail = () => {
+              return (
+                <div className={`main-container ${styles.normal}`}>
+                  {components.includes('help-modal') &&
+                  <HelpModal
+                    visible={visible}
+                    projectType={projectDetail.project.type}/>}
+                  <div className={styles.info}>
+                    <Row>
+                      <Col span={3} style={{ padding: '10px 42px' }}>
+                        <div className={styles.bigIconNunberDiv}>
+                          <div
+                            className={chooseColor(projectDetail.project.star_users, projectDetail.project.user, userObjId)}
+                            style={!ownerOrNot ? { cursor: 'pointer' } : { cursor: 'default' }}
+                            onClick={!ownerOrNot ? () => appStarFavor('star') : null}
+                          >
+                            <p className={styles.icon}>
+                              <Icon
+                                type={projectDetail.project.star_users.includes(userObjId) ? 'like' : 'like-o'}/>
+                            </p>
+                            <p
+                              className={styles.number}>{projectDetail.project.star_users.length}</p>
+                          </div>
+                          <div
+                            className={chooseColor(projectDetail.project.favor_users, projectDetail.project.user, userObjId)}
+                            style={!ownerOrNot ? { cursor: 'pointer' } : { cursor: 'default' }}
+                            onClick={!ownerOrNot ? () => appStarFavor('favor') : null}>
+                            <p className={styles.icon}>
+                              <Icon
+                                type={projectDetail.project.favor_users.includes(userObjId) ? 'star' : 'star-o'}/>
+                            </p>
+                            <p
+                              className={styles.number}>{projectDetail.project.favor_users.length}</p>
+                          </div>
+                        </div>
+                      </Col>
+                      <Col span={21} style={{ paddingRight: '50px' }}>
+                        <div className={styles.name}>
+                          {/* project header area */}
+                          <h1 style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                          }}>
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
                           {projectDetail.project.name}&nbsp;
                           {ownerOrNot && <Icon
                             type={projectDetail.project.privacy === 'private' ? 'lock' : 'unlock'}
-                            style={{fontSize: 20}}/>}
+                            style={{ fontSize: 20 }}/>}
                           {
                             projectStatus(projectDetail.project)
                           }
                         </span>
-                        {ownerOrNot &&
-                        <span className={styles.rightButton}>
+                            {ownerOrNot &&
+                            <span className={styles.rightButton}>
                           <ProjectModal
                             new={false}
                             projectDetail={projectDetail}
                             type={projectDetail.project.type}
                           >
-                          <Button icon='edit' style={{marginRight: 15}}/>
+                          <Button icon='edit' style={{ marginRight: 15 }}/>
                         </ProjectModal>
-                          {/* only private project can be deleted */}
-                          {projectDetail.project.privacy === 'private' &&
-                          <Button icon='delete'
-                                  style={{marginRight: 15, width: 32}}
-                                  onClick={() => deleteProject()}/>}
-                          <Button icon='cloud-download-o' className="mei"
-                                  style={{width: 32, fontSize: 16}}
-                                  onClick={() => dispatch({
-                                    type: 'projectDetail/showHelpModal',
-                                  })}/>
+                              {/* only private project can be deleted */}
+                              {projectDetail.project.privacy === 'private' &&
+                              <Button icon='delete'
+                                      style={{ marginRight: 15, width: 32 }}
+                                      onClick={() => deleteProject()}/>}
+                              <Button icon='cloud-download-o' className="mei"
+                                      style={{ width: 32, fontSize: 16 }}
+                                      onClick={() => dispatch({
+                                        type: 'projectDetail/showHelpModal',
+                                      })}/>
                       </span>}
-                      </h1>
-                      <p className={styles.text}>
-                        <Icon type="clock-circle-o" style={{marginRight: 10}}/>
-                        Create
-                        Time: {showTime(projectDetail.project.create_time)}
-                      </p>
-                    </div>
-                    <div className={styles.descriptionDiv}>
-                      <p
-                        className={styles.descriptionP}>{projectDetail.project.description}</p>
-                    </div>
-                    <div className={styles.tags}>
-                      {projectDetail.project.tags.length > 0 ? projectDetail.project.tags.map(e =>
-                          <Tag color="#EEEEEE"
-                               style={{color: '#666666', cursor: 'default'}}
-                               key={e}>{e}</Tag>)
-                        : null}
-                    </div>
-                  </Col>
-                </Row>
+                          </h1>
+                          <p className={styles.text}>
+                            <Icon type="clock-circle-o" style={{ marginRight: 10 }}/>
+                            Create
+                            Time: {showTime(projectDetail.project.create_time)}
+                          </p>
+                        </div>
+                        <div className={styles.descriptionDiv}>
+                          <p
+                            className={styles.descriptionP}>{projectDetail.project.description}</p>
+                        </div>
+                        <div className={styles.tags}>
+                          {projectDetail.project.tags.length > 0 ? projectDetail.project.tags.map(e =>
+                              <Tag color="#EEEEEE"
+                                   style={{ color: '#666666', cursor: 'default' }}
+                                   key={e}>{e}</Tag>)
+                            : null}
+                        </div>
+                      </Col>
+                    </Row>
 
-                {/*info body*/}
+                    {/*info body*/}
 
+                  </div>
+                  {/*content tabs*/}
+                  <Tabs
+                    // defaultActiveKey={showTab || projectDetail.activeTab}
+                    onChange={callback}
+                    activeKey={projectDetail.activeTab}
+                    tabBarExtraContent={cloudNote()}
+                    className={styles.jobs}>
+                    <TabPane tab="Overview" key="1">
+                      <Spin spinning={projectDetail.loadingOverview}>
+                        <div className={styles.reactMdeEditorDiv}>
+                          {projectDetail.overviewEditorState ? <ReactMdeEditor
+                            project={projectDetail.project} dispatch={dispatch}
+                            ownerOrNot={ownerOrNot}/> : <ReactMdePreview
+                            project={projectDetail.project} dispatch={dispatch}
+                            ownerOrNot={ownerOrNot}/>}
+                        </div>
+                      </Spin>
+                    </TabPane>
+                    {ownerOrNot && <TabPane tab="Jobs" key="2">
+                      <Jobs projectDetail={projectDetail} dispatch={dispatch}/>
+                    </TabPane>}
+                    {projectDetail.project.type === 'app' && projectDetail.project.status === 'active' ?
+                      <TabPane
+                        tab="Examples" key="3">
+                        {projectDetail.project.args ?
+                          <ProjectExample projectDetail={projectDetail}
+                                          dispatch={dispatch}/> : null}
+                      </TabPane> : null}
+                    <TabPane tab="Commits" key="4">
+                      <CommitsList dispatch={dispatch} projectId={projectId}
+                                   commits={projectDetail.project.commits}
+                                   totalNumber={projectDetail.totalNumber}
+                                   pageSize={projectDetail.pageSize}
+                                   pageNo={projectDetail.pageNo}
+
+                      />
+                    </TabPane>
+                    <TabPane tab="Comments" key="5">
+                      {login.user ?
+                        <WrappedCommentForm dispatch={dispatch}
+                                            projectId={projectId}
+                                            login={login}/> :
+                        <NotLogin dispatch={dispatch} text={'评论'}/>}
+                      <CommentsList dispatch={dispatch} projectId={projectId}
+                                    comments={projectDetail.comments}
+                                    totalNumber={projectDetail.totalNumber}
+                                    pageSize={projectDetail.pageSize}
+                                    pageNo={projectDetail.pageNo}
+                                    history={history}
+                                    login={login}
+                      />
+                    </TabPane>
+                  </Tabs>
+                </div>
+              )
+            }
+
+            //关闭tourtip时调用，此后登录不再显示tourtip
+            const noLearning = () => {
+              fetch(`/pyapi/user/notourtip?user_ID=${localStorage.user_ID}`, { method: 'GET' })
+            }
+
+            //点击蒙层，不再显示toutip包括beacon
+            const closeTourtip = (data) => {
+              data.type === 'overlay:click' && dispatch({type: 'projectDetail/clearStep'})
+            }
+
+            return (
+              <div>
+                {
+                  login.user.tourtip === 0 && <Joyride
+                    // ref={c => (this.joyride = c)}
+                    debug={false}
+                    autoStart={true}  //自动打开第一个
+                    locale={{
+                      back: (<span style={{ color: '#34BFE2' }}>Back</span>),
+                      close: (<span style={{ color: '#34BFE2' }}>Close</span>),
+                      last: (<span style={{ color: '#34BFE2' }}
+                                   onClick={noLearning}>Finish</span>),
+                      next: (<span style={{ color: '#34BFE2' }}>Next</span>),
+                      skip: (<span style={{ color: '#999999' }}
+                                   onClick={noLearning}>Skip</span>),
+                    }}
+                    run={true}  //是否可以触发弹框
+                    showOverlay={true}
+                    showSkipButton={true}
+                    showStepsProgress={true}
+                    steps={projectDetail.steps}
+                    type='continuous'
+                    callback={closeTourtip}
+                  />
+                }
+                <RenderDetail />
               </div>
-              {/*content tabs*/}
-              <Tabs
-                // defaultActiveKey={showTab || projectDetail.activeTab}
-                onChange={callback}
-                activeKey={projectDetail.activeTab}
-                tabBarExtraContent={cloudNote()}
-                className={styles.jobs}>
-                <TabPane tab="Overview" key="1">
-                  <Spin spinning={projectDetail.loadingOverview}>
-                    <div className={styles.reactMdeEditorDiv}>
-                      {projectDetail.overviewEditorState ? <ReactMdeEditor
-                        project={projectDetail.project} dispatch={dispatch}
-                        ownerOrNot={ownerOrNot}/> : <ReactMdePreview
-                        project={projectDetail.project} dispatch={dispatch}
-                        ownerOrNot={ownerOrNot}/>}
-                    </div>
-                  </Spin>
-                </TabPane>
-                {ownerOrNot && <TabPane tab="Jobs" key="2">
-                  <Jobs projectDetail={projectDetail} dispatch={dispatch}/>
-                </TabPane>}
-                {projectDetail.project.type === 'app' && projectDetail.project.status === 'active' ?
-                  <TabPane
-                    tab="Examples" key="3">
-                    {projectDetail.project.args ?
-                      <ProjectExample projectDetail={projectDetail}
-                                      dispatch={dispatch}/> : null}
-                  </TabPane> : null}
-                <TabPane tab="Commits" key="4">
-                  <CommitsList dispatch={dispatch} projectId={projectId}
-                               commits={projectDetail.project.commits}
-                               totalNumber={projectDetail.totalNumber}
-                               pageSize={projectDetail.pageSize}
-                               pageNo={projectDetail.pageNo}
-
-                  />
-                </TabPane>
-                <TabPane tab="Comments" key="5">
-                  {login.user ?
-                    <WrappedCommentForm dispatch={dispatch}
-                                        projectId={projectId}
-                                        login={login}/> :
-                    <NotLogin dispatch={dispatch} text={'评论'}/>}
-                  <CommentsList dispatch={dispatch} projectId={projectId}
-                                comments={projectDetail.comments}
-                                totalNumber={projectDetail.totalNumber}
-                                pageSize={projectDetail.pageSize}
-                                pageNo={projectDetail.pageNo}
-                                history={history}
-                                login={login}
-                  />
-                </TabPane>
-              </Tabs>
-            </div>
-          )
-        }
-      }
-
-      return (
-        <Cloud_1 histroy={history}/>
-      )
-    } else {
-      return <Spin spinning={true}>Loading...</Spin>
-    }
-  }
-}
-
-// ProjectInfo.defaultProps = {
-//   market_use: false,
-// }
-
-function ProjectDetail({app, match, history, location, dispatch, projectDetail}) {
-  return (
-    <div className={`main-container ${styles.normal}`}>
-      <Switch>
-        <Route path="/workspace/:projectID/:type" component={dynamic({
-          app,
-          models: () => [
-            modelling,
-          ],
-          component: () => import('../../modelling/Modelling'),
-        })}/>
+            )
+          } else {
+            return <Spin spinning={true}>Loading...</Spin>
+          }
+        }}/>
       </Switch>
     </div>
   )
 }
 
 const WrappedCommentForm = Form.create()(CommentForm)
-export default connect(({projectDetail, login}) => ({
+export default connect(({ projectDetail, login }) => ({
   projectDetail,
   login,
 }))(ProjectInfo)

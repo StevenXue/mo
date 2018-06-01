@@ -1,4 +1,16 @@
-<svg fill="#616161" height="18" viewBox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg">
-    <path d="M19 2h-4.18C14.4.84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z"/>
-    <path d="M0 0h24v24H0z" fill="none"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="11px" height="14px" viewBox="0 0 11 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50 (54983) - http://www.bohemiancoding.com/sketch -->
+    <title>Shape</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Notebook-Copy-5" transform="translate(-571.000000, -112.000000)" fill="#38507F" fill-rule="nonzero">
+            <g id="Group-14" transform="translate(394.000000, 109.000000)">
+                <g id="Group-20">
+                    <path d="M180.610693,3.0610906 L180.004518,4.74783759 L184.790663,4.74783759 L184.184488,3.0610906 L180.610693,3.0610906 Z M177,4.41048819 L177,16.8924159 L187.795181,16.8924159 L187.795181,4.41048819 L185.381024,4.41048819 L185.581325,4.96922313 C185.619149,5.07259654 185.604166,5.18792191 185.541182,5.27819816 C185.478199,5.36847442 185.375136,5.42234886 185.26506,5.42253639 L179.53012,5.42253639 C179.420045,5.42234886 179.316982,5.36847442 179.253998,5.27819816 C179.191015,5.18792191 179.176031,5.07259654 179.213855,4.96922313 L179.414157,4.41048819 L177,4.41048819 Z" id="Shape"></path>
+                </g>
+            </g>
+        </g>
+    </g>
 </svg>

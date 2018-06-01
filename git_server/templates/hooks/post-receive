@@ -4,9 +4,10 @@
 # dumb transports.
 #
 # To enable this hook, rename this file to "post-receive".
+
 echo 'hook start'
-GIT_SERVER_DIR=/root/git_server/
+echo $(whoami)
+GIT_SERVER_DIR=/var/www/git_server/
 cd ${GIT_SERVER_DIR}
-workon lzfenv
 python3.6 messager.py ${GIT_PUSH_OPTION_0}
 echo 'hook end'

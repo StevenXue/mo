@@ -42,9 +42,6 @@ cookiecutter
 psutil
 htpasswd
 eventlet
-flask_jwt_extended
-flask_socketio
 synonyms
 docker
-fcntl
 psutil
