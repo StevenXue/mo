@@ -7,6 +7,7 @@ import {
   Col,
   Popover,
   Tag,
+  Table,
 } from 'antd'
 import styles from './index.less'
 import { get } from 'lodash'
@@ -32,51 +33,47 @@ const Jobs = ({ projectDetail, dispatch }) => {
     dead: styles.bulbDead,
   }
 
-  const renderJob = (job, i) => {
-    const ifLog = projectDetail.jobIds.includes(job._id)
-    return <Col span={12} className={styles.jobReactCol} key={job._id}>
-      <h4 className={styles.jobTitle}>
-                <span>
-                  {job.running_code ?
-                    <Popover placement='topLeft'
-                             trigger='hover'
-                             content={<Highlight
-                               className='Python hljs code-container inline-code-container'>
-                               {job.running_code}
-                             </Highlight>}
-                    >
-                      <span>{job.running_code.split('\n')[0]} ...</span>
-                    </Popover> :
-                    <span>
-                      {job.running_module.user_ID}/{job.running_module.module.name}/{job.running_module.version}
-                      </span>}
-                  <Tag className={styles.tag}>{job.running_code ? 'function' : 'module'}</Tag>
-                  <Tag className={styles.tag} color={tagSwitcher[job.status]}>{job.status}</Tag>
-                </span>
-        <Button size='small' onClick={() => {
-          if (ifLog) {
-            dispatch({
-              type: 'projectDetail/removeJobLog',
-              payload: job._id,
-            })
-          } else {
-            dispatch({
-              type: 'projectDetail/addJobLog',
-              payload: job._id,
-            })
-          }
-        }}>{ifLog ? 'Hide Log' : 'Show Log'}</Button>
-      </h4>
-
-      <p>Start Time: {showTime(job.create_time)}</p>
-      <p><Icon type="clock-circle"/> {job.duration.toHHMMSS()}</p>
-      {ifLog && <Highlight
-        className={`accesslog hljs code-container inline-code-container ${styles.log}`}
-      >
-        {(job.logs.map(e => e.message).join('') || 'no log')}
-      </Highlight>}
-    </Col>
-  }
+  const columns = [
+    {
+      title: 'Job Name',
+      key: 'name',
+      render: (text, record) => <span>{
+        record.running_code ?
+          <Popover placement='topLeft'
+                   trigger='hover'
+                   content={<Highlight
+                     className='Python hljs code-container inline-code-container'>
+                     {record.running_code}
+                   </Highlight>}
+          >
+            <span>{record.running_code.split('\n')[0]} ...</span>
+          </Popover> : <span>
+                      {record.running_module.user_ID}/{record.running_module.module.name}/{record.running_module.version}
+                      </span>}</span>,
+    },
+    {
+      title: 'Start Time',
+      key: 'create_time',
+      dataIndex: 'create_time',
+      render: text => showTime(text),
+    },
+    {
+      title: 'Type',
+      key: 'type',
+      render: (text, record) => record.running_code ? 'function' : 'module',
+    },
+    {
+      title: 'Duration',
+      key: 'duration',
+      dataIndex: 'duration',
+      render: text => text.toHHMMSS(),
+    },
+    {
+      title: 'Status',
+      key: 'status',
+      render: (text, record) => <Tag className={styles.tag} color={tagSwitcher[record.status]}>{record.status}</Tag>,
+    },
+  ]
 
   return (
     <div>
@@ -124,23 +121,39 @@ const Jobs = ({ projectDetail, dispatch }) => {
             </Row>
           </div>
         })}
-        {Object.entries(projectDetail.jobs).map(([path, jobs]) =>
-          <div key={path} className={styles.jobCell}>
+        {Object.entries(projectDetail.jobs).map(([path, jobs]) => {
+          let renderedJobs = jobs
+          if (!projectDetail.jobShowAll) {
+            renderedJobs = jobs.slice(0, 5)
+          }
+          renderedJobs.forEach(e => e.key = e._id)
+          return <div key={path} className={styles.jobCell}>
             <div className={styles.jobContainer}>
               <h4>{path}</h4>
               <p className={styles.jobInfo}>
                 <span className={blobDict.dead}/>
                 &nbsp;&nbsp;
                 No Activity
-                </p>
+              </p>
             </div>
-            <Row className={styles.jobReactRow} type="flex">
-              {jobs !== undefined && jobs.map((job, i) => {
-                  return renderJob(job, i)
-                },
-              )}
-            </Row>
-          </div>)}
+            <Table
+              columns={columns}
+              expandedRowRender={record => <Highlight
+                className={`accesslog hljs code-container inline-code-container ${styles.log}`}
+              >
+                {(record.logs.map(e => e.message).join('') || 'no log')}
+              </Highlight>}
+              dataSource={renderedJobs}
+              pagination={false}
+            />
+            <Col align='center' style={{ margin: 5 }}>
+              {renderedJobs < jobs &&
+              <Button size='small' onClick={() => dispatch({ type: 'projectDetail/showAllJobs' })}>Show All</Button>}
+              {projectDetail.jobShowAll &&
+              <Button size='small' onClick={() => dispatch({ type: 'projectDetail/hideJobs' })}>Hide</Button>}
+            </Col>
+          </div>
+        })}
         {/*{projectDetail.sessions[0] === undefined && 'No Running Sessions'}*/}
       </div>
 
