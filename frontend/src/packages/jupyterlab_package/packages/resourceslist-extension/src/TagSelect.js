@@ -100,8 +100,9 @@ class Index extends React.Component {
                         </Select>
                       </Menu.Item>}
                     </Menu>}>
-            <Button  icon="caret-down"  style={{alignItems:'center',display:'flex'}}>
+            <Button  style={{alignItems:'center',display:'flex'}}>
               {value.length>0?<p style={{marginBottom:'0'}}> &nbsp; {value.length} tag</p>:<p style={{marginBottom:'0'}}> &nbsp;Tags</p>}
+              <Icon type="caret-down" />
             </Button>
           </Dropdown>
         </div>
@@ -110,7 +111,6 @@ class Index extends React.Component {
             placeholder="input search text"
             onChange={(value)=>this.searchChange(value)}
             onSearch={this.startSearch}
-            style={{width: 200}}
           />
         </div>
       </div>

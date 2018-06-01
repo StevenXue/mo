@@ -125,7 +125,7 @@ const menuPlugin: JupyterLabPlugin<IMainMenu> = {
       category: 'Kernel Operations'
     });
     let projectNameNode = document.createElement('div');
-    projectNameNode.innerHTML=`<div class="p-MenuBar-itemLabel">${document.title.replace(' - MO','')}</div>`;
+    projectNameNode.innerHTML=`<div class="p-Menu-ProjectName">${document.title.replace(' - MO','')}</div>`;
 
     let projectName = new Widget({node:projectNameNode});
     projectName.id = 'jp-projectName';
