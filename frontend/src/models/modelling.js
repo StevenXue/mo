@@ -182,18 +182,13 @@ const modelling = {
     // 当进入该页面时 加载 jupyterlab
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
-        const match = pathToRegexp('/workspace/:projectId/:type').exec(pathname)
-        if (match) {
-          let projectId = match[1]
-          let type = match[2]
-          dispatch({ type: 'startLabBnF', projectId, projectType: type })
-          dispatch({ type: 'fetchSections', projectId, categories })
-          dispatch({ type: 'fetchAlgorithms', categories })
-          // dispatch({ type: 'fetchStagingDatasetList', projectId: projectId })
-
-          //将project id存起来
-          dispatch({ type: 'setProjectId', payload: { projectId } })
-        }
+        // const match = pathToRegexp('/workspace/:projectId/:type').exec(pathname)
+        // if (match) {
+        //   let projectId = match[1]
+        //   let type = match[2]
+        //   dispatch({ type: 'startLabBnF', projectId, projectType: type })
+        //
+        // }
       })
     },
 

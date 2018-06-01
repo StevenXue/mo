@@ -42,6 +42,7 @@ export default {
     pageNo: 1,
     pageSize: 10,
     resultLoading: false,
+    helpLoading: false,
     overviewEditorState: false,
     loadingOverview: false,
     steps: [{
@@ -247,6 +248,12 @@ export default {
         resultLoading,
       }
     },
+    setHelpLoading(state, { helpLoading }) {
+      return {
+        ...state,
+        helpLoading,
+      }
+    },
 
     setExampleResult(state, action) {
       let output = state.project.args.output
@@ -373,9 +380,10 @@ export default {
         yield put({ type: 'setJobs', payload: jobs })
         yield put({ type: 'setTerminals', payload: terminals })
         yield put({ type: 'setSessions', payload: sessions })
-
         yield put({ type: 'setProject', payload: project })
-
+        if(notStartLab) {
+          yield put({ type: 'modelling/startLabBnF', projectId, projectType: project.type })
+        }
       } catch (e) {
         console.log('get jobs', e)
       }
@@ -435,13 +443,18 @@ export default {
       hide()
       yield put(routerRedux.push('/workspace?tab=' + payload.type))
     },
-    *setEntered({ projectId }, { call, put }) {
-      console.log(projectId)
-      const { data: project } = yield call(updateProject, {
-        projectId,
-        body: { entered: true },
-      })
-      yield put({ type: 'setProject', payload: project })
+    *setEntered({ projectId }, { call, put, select }) {
+      const nowProject = yield select(state => get(state, 'projectDetail.project'))
+      yield put({ type: 'hideHelpModal' })
+      if(!nowProject.entered) {
+        // yield put({ type: 'setHelpLoading', helpLoading: true })
+        const { data: project } = yield call(updateProject, {
+          projectId,
+          body: { entered: true },
+        })
+        yield put({ type: 'setProject', payload: project })
+        // yield put({ type: 'setHelpLoading', helpLoading: false })
+      }
     },
     *update({ payload }, { call, put }) {
       const { body, fetchData, projectId } = payload
@@ -513,6 +526,7 @@ export default {
       return history.listen(({ pathname }) => {
         const match = pathToRegexp('/workspace/:projectId/:type?').exec(pathname)
         const match2 = pathToRegexp('/explore/:projectId/:type?').exec(pathname)
+        const matchLab = pathToRegexp('/workspace/:projectId/:type').exec(pathname)
         const url = new URL(location.href.replace('/#', ''))
         if (match) {
           const projectId = match[1]
