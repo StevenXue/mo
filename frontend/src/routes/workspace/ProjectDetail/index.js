@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link, Route, Switch } from 'react-router-dom'
+import { Link, Route, Switch } from 'dva/router'
 import Joyride from 'react-joyride'
 import { connect } from 'dva'
 import {
@@ -20,30 +20,28 @@ import {
 } from 'antd'
 import { routerRedux } from 'dva/router'
 // components
-import ProjectModal from '../../../../components/ProjectModal/index'
-import HelpModal from '../../../../components/HelpModal'
-import ReactMdeEditor, { ReactMdePreview } from '../../../../components/ReactMdeCom/reactMde'
+import ProjectModal from '../../../components/ProjectModal/index'
+import HelpModal from '../../../components/HelpModal'
+import ReactMdeEditor, { ReactMdePreview } from '../../../components/ReactMdeCom/reactMde'
 import ProjectExample
-  from '../../../../components/ProjectExample/projectExample'
-import Jobs from './Jobs'
+  from '../../../components/ProjectExample/projectExample'
 
-import { showTime } from '../../../../utils/index'
-import styles from './index.less'
+import { showTime } from '../../../utils/index'
 import { get } from 'lodash'
 import { message } from 'antd/lib/index'
-// import ReactMarkdown from 'react-markdown'
-import { flaskServer, hubServer } from '../../../../constants'
-import dynamic from 'dva/dynamic'
-import modelling from '../../../../models/modelling'
-// import {fetchComments} from "../../../../services/comments"
-import NotLogin from '../../../../components/NotLogin/notLogin'
-import Modelling from '../../modelling/Modelling'
+import { flaskServer } from '../../../constants'
+import modelling from '../../../models/modelling'
+import NotLogin from '../../../components/NotLogin/notLogin'
+import Lab from '../Lab'
+import Jobs from './Jobs'
+
+import styles from './index.less'
 
 const confirm = Modal.confirm
 const TabPane = Tabs.TabPane
 const { TextArea } = Input
 const FormItem = Form.Item
-const commitSvg = require('../../../../img/icon/git-commit.svg')
+const commitSvg = require('../../../img/icon/git-commit.svg')
 
 const pages = ['import', 'analysis', 'modelling', 'deploy']
 
@@ -395,11 +393,11 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
 
     // </span></div>
   }
+
   return (
     <div className={`main-container ${styles.normal}`}>
       <Switch>
-        <Route path="/workspace/:projectID/:type" component={Modelling}/>
-        <Route path="/workspace/:projectID" component={() => {
+        <Route exact path="/workspace/:projectID" component={() => {
           if (projectDetail.project && projectDetail.project.type) {
 
             // optional component list by project type
@@ -601,6 +599,7 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
             return <Spin spinning={true}>Loading...</Spin>
           }
         }}/>
+        <Route exact path="/workspace/:projectID/:type" component={Lab}/>
       </Switch>
     </div>
   )

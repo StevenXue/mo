@@ -12,7 +12,6 @@ const HelpModal = ({ visible, projectDetail, dispatch }) => {
 
   const hideModelHandler = () => {
     dispatch({ type: 'projectDetail/setEntered', projectId: projectDetail.project._id })
-    dispatch({ type: 'projectDetail/hideHelpModal' })
   }
 
   const { name, repo_path } = projectDetail.project
@@ -25,7 +24,7 @@ const HelpModal = ({ visible, projectDetail, dispatch }) => {
       // onOk={hideModelHandler}
       onCancel={hideModelHandler}
       footer={[
-        <Button key="ok" type='primary' onClick={hideModelHandler}>Ok</Button>,
+        <Button key="ok" type='primary' loading={projectDetail.helpLoading} onClick={hideModelHandler}>Ok</Button>,
       ]}
     >
       <h1>Clone Your Project</h1>

@@ -1,4 +1,4 @@
-@import "../../../../index";
+@import "../../../index";
 
 .joyride-tooltip__main {
   font-size: 20px;
@@ -207,7 +207,7 @@
 
       .jobCell {
         margin: 5px 0;
-        padding-right: 45px;
+        padding: 10px 20px;
         width: 100%;
         line-height: 25px;
         //flex-direction: column;
@@ -225,15 +225,14 @@
             //float: right;
           }
         }
-        .jobContainer:hover {
-          background: @custom-grey-background;
+      }
+      .jobCell:hover {
+        background: @custom-grey-background;
 
-          .shutDown {
-            display: initial;
-          }
+        .shutDown {
+          display: initial;
         }
       }
-
     }
     .jobReactRow {
       width: 100%;
