@@ -1,0 +1,33 @@
+input:
+  iris_classifier_toolkit_param_1:
+    default_value: 4.9
+    des: null
+    name: petal_length
+    optional: false
+    value_range: null
+    value_type: float
+  iris_classifier_toolkit_param_2:
+    default_value: 3.6
+    des: null
+    name: petal_width
+    optional: false
+    value_range: null
+    value_type: float
+  iris_classifier_toolkit_param_3:
+    default_value: 1.4
+    des: null
+    name: sepal_length
+    optional: false
+    value_range: null
+    value_type: float
+  iris_classifier_toolkit_param_4:
+    default_value: 0.1
+    des: null
+    name: sepal_width
+    optional: false
+    value_range: null
+    value_type: float
+output:
+  iris_classifier_toolkit_class:
+    name: class
+    type: str
