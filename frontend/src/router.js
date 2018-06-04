@@ -121,13 +121,10 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
     <MainLayout location={location} history={history}>
       <Switch>
         <Route exact path="/" component={HomePage}/>
-
-        <Route exact path="/user" component={Account}/>
+        {/*if has child routes move exact inside*/}
+        <Route path="/user" component={Account}/>
         <Route exact path="/newpassword" component={NewPassword}/>
-        {/*<Breadcrumb>*/}
-        {/*{extraBreadcrumbItems}*/}
-        {/*</Breadcrumb>*/}
-
+        {/*if has child routes move exact inside*/}
         <Route path="/workspace/:projectId" component={ProjectDetail}/>
         {
           routes.map(({ path, ...dynamics }, key) => (
@@ -141,6 +138,7 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
             />
           ))
         }
+        {/*if has child routes move exact inside*/}
         <Route path="/explore/:projectId"
                component={ProjectDetail}/>
         <Route exact path="/launchpage" component={LaunchPage} location={location}/>
