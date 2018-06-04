@@ -62,6 +62,7 @@ KUBE_NAME = {
     'serving': '{job_id}-serving'
 }
 MODULE_DIR = './server3/lib/modules'
+DATASET_DIR = './datasets'
 DEFAULT_DEPLOY_VERSION = 'dev'
 APP_DIR = './functions'
 INIT_RES = [
