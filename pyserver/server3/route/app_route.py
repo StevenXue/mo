@@ -80,7 +80,8 @@ def remove_used_module(app_id):
 def add_used_dataset(app_id):
     data = request.get_json()
     used_dataset = data.get('used_dataset')
-    app = AppService.add_used_dataset(app_id, used_dataset)
+    version = data.get('version')
+    app = AppService.add_used_dataset(app_id, used_dataset, version)
     return jsonify({"response": convert_used_datasets(app)})
 
 
@@ -89,7 +90,8 @@ def add_used_dataset(app_id):
 def remove_used_dataset(app_id):
     data = request.get_json()
     used_dataset = data.get('used_dataset')
-    app = AppService.remove_used_dataset(app_id, used_dataset)
+    version = data.get('version')
+    app = AppService.remove_used_dataset(app_id, used_dataset, version)
     return jsonify({"response": convert_used_datasets(app)})
 
 

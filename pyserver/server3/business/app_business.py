@@ -59,7 +59,8 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         service = client.services(filters={'name': service_name})[0]
         from_time = datetime.now() - timedelta(minutes=since)
         logs = client.service_logs(service['ID'], stdout=True, stderr=True,
-                                   since=int(time.mktime(from_time.timetuple())))
+                                   since=int(
+                                       time.mktime(from_time.timetuple())))
         logs = list(logs)
         return logs
 
@@ -204,24 +205,26 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
                             f'{module_user_ID}/{module.name}/{version}'])
 
     @classmethod
-    def insert_dataset(cls, app, dataset):
+    def insert_dataset(cls, app, dataset, version):
         container = cls.get_container(app)
 
         # copy dataset folder to container
-        path_in_ctnr = dataset.path.replace('./user_directory',
-                                            '/home/jovyan/dataset')
+        path_w_version = os.path.join(dataset.dataset_path, version)
+        path_in_ctnr = path_w_version.replace('./datasets',
+                                              '/home/jovyan/dataset')
+
         # do the copy, dir need be created first, and put_archive need
         # ownership fix
         cls.copy_to_container(container, dataset.path, path_in_ctnr)
         return cls.repo.add_to_set(app.id, used_datasets=UsedDataset(
-            dataset=dataset))
+            dataset=dataset, version=version))
 
     @classmethod
-    def remove_used_dataset(cls, app_id, dataset):
+    def remove_used_dataset(cls, app_id, dataset, version):
         app = cls.get_by_id(app_id)
         cls.remove_dataset_dir(app, dataset)
         return cls.repo.pull_from_set(app_id, used_datasets=UsedDataset(
-            dataset=dataset))
+            dataset=dataset, version=version))
 
     @classmethod
     def remove_dataset_dir(cls, app, dataset):
