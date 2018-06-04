@@ -1,6 +1,6 @@
 import React from 'react'
 import { HashRouter, Route, Switch, Link, withRouter, routerRedux } from 'dva/router'
-import { Breadcrumb } from 'antd'
+import { Breadcrumb, Modal } from 'antd'
 import { connect } from 'dva'
 import dynamic from 'dva/dynamic'
 import pathToRegexp from 'path-to-regexp'
@@ -9,7 +9,8 @@ import { get } from 'lodash'
 import NewPassword from './routes/login/NewPassword'
 import Account from './routes/login/Account'
 import MainLayout from './components/MainLayout/MainLayout'
-// import modelling from './models/modelling';
+// import ProjectDetail from './routes/workspace/ProjectDetail'
+import modelling from './models/modelling';
 
 const breadcrumbNameMap = {
   '/user': 'User',
@@ -60,10 +61,10 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
 
   const ProjectDetail = dynamic({
     app,
-    // models: () => [
-    //   modelling
-    // ],
-    component: () => import('./routes/workspace/info/ProjectDetail'),
+    models: () => [
+      modelling
+    ],
+    component: () => import('./routes/workspace/ProjectDetail'),
   })
 
   const HomePage = dynamic({
@@ -80,7 +81,7 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
     {
       path: '/workspace',
       // models: () => [import('./models/dashboard')],
-      component: () => import('./routes/workspace/info/Projects'),
+      component: () => import('./routes/workspace/Projects'),
     },
   ]
 
@@ -89,7 +90,8 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
       path: '/explore',
       // models: () => [import('./models/modelling')],
       component: () => import('./routes/market/ProjectList'),
-    }, {
+    },
+   {
       path: '/userrequest/:userrequestId',
       models: () => [import('./models/allRequest')],
       component: () => import('./routes/UserRequest/UserRequestDetail'),
@@ -118,14 +120,12 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
   return (
     <MainLayout location={location} history={history}>
       <Switch>
-
+        <Route exact path="/" component={HomePage}/>
+        {/*if has child routes move exact inside*/}
         <Route path="/user" component={Account}/>
-        <Route path="/newpassword" component={NewPassword}/>
-        {/*<Breadcrumb>*/}
-        {/*{extraBreadcrumbItems}*/}
-        {/*</Breadcrumb>*/}
-
-        <Route path="/workspace/:projectId" render={(props) => <ProjectDetail {...props} app={app}/>}/>
+        <Route exact path="/newpassword" component={NewPassword}/>
+        {/*if has child routes move exact inside*/}
+        <Route path="/workspace/:projectId" component={ProjectDetail}/>
         {
           routes.map(({ path, ...dynamics }, key) => (
             <Route key={key}
@@ -138,9 +138,10 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
             />
           ))
         }
+        {/*if has child routes move exact inside*/}
         <Route path="/explore/:projectId"
-               render={(props) => <ProjectDetail {...props} app={app} market_use={true}/>}/>
-        <Route path="/launchpage" component={LaunchPage} location={location}/>
+               component={ProjectDetail}/>
+        <Route exact path="/launchpage" component={LaunchPage} location={location}/>
         {
           routes2.map(({ path, ...dynamics }, key) => (
             <Route key={key}
@@ -153,7 +154,6 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
             />
           ))
         }
-        <Route path="/" component={HomePage}/>
 
       </Switch>
 

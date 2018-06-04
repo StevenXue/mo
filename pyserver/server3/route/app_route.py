@@ -11,11 +11,8 @@ from flask import Blueprint
 from flask import jsonify
 from flask import make_response
 from flask import request
-from flask_jwt_extended import jwt_required
-from bson import ObjectId
 from mongoengine import DoesNotExist
-
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, jwt_optional
 
 from server3.service.app_service import AppService
 from server3.business.app_business import AppBusiness
@@ -31,7 +28,6 @@ app_app = Blueprint("app_app", __name__, url_prefix=PREFIX)
 @app_app.route("/run", methods=["POST"])
 def run_in_docker():
     data = request.get_json()
-    print(data['code'])
     return jsonify({"response": {"code": 11}})
 
 
@@ -157,7 +153,9 @@ def add():
 
 
 @app_app.route('/<app_id>', methods=['GET'])
+@jwt_optional
 def get_app(app_id):
+    user_ID = get_jwt_identity()
     yml = request.args.get('yml')
     commits = request.args.get('commits')
     version = request.args.get('version')
@@ -165,6 +163,10 @@ def get_app(app_id):
     used_datasets = request.args.get('used_datasets')
     app = AppService.get_by_id(app_id, yml=yml, commits=commits,
                                version=version, used_modules=used_modules)
+
+    # 如果是私有项目，需要确定其登陆才能查看，否则返回error
+    if app.privacy == 'private'and app.user.user_ID != user_ID:
+            return jsonify({'response': 'error'}), 200
 
     # 将app.user 更换为 user_ID 还是name?
     user_ID = app.user.user_ID

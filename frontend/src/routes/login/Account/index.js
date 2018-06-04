@@ -59,10 +59,10 @@ class UserLayout extends React.PureComponent {
         <div className={styles.container}>
 
           <Switch>
-            <Route path="/user/newpassword" component={NewPassword}/>
-            <Route path="/user/login" component={Login}/>
-            <Route path="/user/register" component={Register}/>
-            <Route path="/user/forgot" component={Forgot}/>
+            <Route exact path="/user/newpassword" component={NewPassword}/>
+            <Route exact path="/user/login" component={Login}/>
+            <Route exact path="/user/register" component={Register}/>
+            <Route exact path="/user/forgot" component={Forgot}/>
           </Switch>
         </div>
       </div>

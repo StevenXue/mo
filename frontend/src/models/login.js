@@ -112,7 +112,6 @@ export default {
       }
     },
     updateProjectNumber(state, action) {
-      console.log('action', action)
       return {
         ...state,
         user: {
@@ -122,7 +121,6 @@ export default {
       }
     },
     setUserAvatar(state, { userAvatar }) {
-      console.log('userAvatar', userAvatar)
       return {
         ...state,
         userAvatar,
@@ -210,12 +208,12 @@ export default {
       try {
         const { data: data } = yield call(tokenLogin)
         if (!data.user) {
-          if (!(location.href.includes('/user/login') || location.href.includes('/user/forgot') || location.href.includes('/newpassword') || location.href.includes('/user/register') || location.href.slice(-3) === '/#/')) {
-            // yield put(routerRedux.push('/user/login'))
-            // FIXME reload is a workaround
-            window.location.replace('/#/user/login')
-            window.location.reload()
-          }
+          // if (!(location.href.includes('/user/login') || location.href.includes('/user/forgot') || location.href.includes('/newpassword') || location.href.includes('/user/register') || location.href.slice(-3) === '/#/')) {
+          //   // yield put(routerRedux.push('/user/login'))
+          //   // FIXME reload is a workaround
+          //   window.location.replace('/#/user/login')
+          //   window.location.reload()
+          // }
         } else {
           yield put({
             type: 'setUser',
@@ -321,15 +319,15 @@ export default {
         if (userId && !connected) {
 
           const socket = io.connect('/log/' + userId, { path: '/socketio/socket.io' })
-          socket.on('log_epoch_end', (msg) => {
-            dispatch({ type: 'handleSocket', payload: { msg, pathname } })
-          })
-          socket.on('error', (msg) => {
-            dispatch({ type: 'handleError', payload: { msg, pathname } })
-          })
-          socket.on('success', (msg) => {
-            dispatch({ type: 'handleSuccess', payload: { msg, pathname } })
-          })
+          // socket.on('log_epoch_end', (msg) => {
+          //   dispatch({ type: 'handleSocket', payload: { msg, pathname } })
+          // })
+          // socket.on('error', (msg) => {
+          //   dispatch({ type: 'handleError', payload: { msg, pathname } })
+          // })
+          // socket.on('success', (msg) => {
+          //   dispatch({ type: 'handleSuccess', payload: { msg, pathname } })
+          // })
 
           socket.on('notification', (msg) => {
             dispatch({ type: 'message/updateNewMessage', payload: { msg } })

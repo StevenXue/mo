@@ -16,7 +16,7 @@ import ProjectModal from '../../../components/ProjectModal/index'
 import star from './img/star.png'
 import star_o from './img/star-o.png'
 import message from "../../../models/message"
-
+import NotLogin from '../../../components/NotLogin/notLogin'
 
 
 const {TextArea} = Input
@@ -45,10 +45,10 @@ class CommentForm extends React.Component {
       },
     })
     if (this.props.comments_type === 'request') {
-      showRequestCommentInput(this.props.dispatch)
+      showRequestCommentInput(this.props.dispatch, this.props.login)
     }
-    else{
-      showAnswerCommentInput(this.props.dispatch, this.props._id)
+    else {
+      showAnswerCommentInput(this.props.dispatch, this.props._id, this.props.login)
     }
   }
 
@@ -65,10 +65,10 @@ class CommentForm extends React.Component {
 
   onBlur = () => {
     if (this.props.comments_type === 'request') {
-      showRequestCommentInput(this.props.dispatch)
+      showRequestCommentInput(this.props.dispatch, this.props.login)
     }
     if (this.props.comments_type === 'answer') {
-      showAnswerCommentInput(this.props.dispatch, this.props._id)
+      showAnswerCommentInput(this.props.dispatch, this.props._id, this.props.login)
     }
   }
 
@@ -86,12 +86,21 @@ class CommentForm extends React.Component {
           help={emptyCommentError || ''}
         >
           {getFieldDecorator('comment', {
-            rules: [{required: true, message: ''}],
+            rules: [{required: true, message: ''}, {
+              validator: (rule, value, callback) => {
+                if (value && value.length > 128) {
+                  callback('comment is too long')
+                }
+                else {
+                  callback()
+                }
+              },
+            }],
           })(
             <Input className={styles.inputtext}
                    placeholder="Any idea to help?"
                    ref={inputRef => (this.input = inputRef)}
-            />,
+            />
           )}
         </FormItem>
         {/*<FormItem>*/}
@@ -169,75 +178,106 @@ class AnswerForm extends React.Component {
   }
 
   handleSubmit = () => {
-    console.log(this.state)
-    let selectProjectID = null
-    if (this.state.selected.length > 0) {
-      selectProjectID = this.state.selected[0]['_id']
-    }
-    this.props.dispatch({
-      type: 'allRequest/makeNewRequestAnswer',
-      payload: {
-        // answer: this.state.html,
-        answer: this.state.inputValue,
-        selectProject: selectProjectID,
-      },
-    })
-    this.clearSelect()
-    this.setState({inputValue: ''})
-  }
-
-  handleChange = (content) => {
-    // console.log(content)
-    this.setState({
-      content,
-    })
-  }
-
-  handleHTMLChange = (html) => {
-    if (html === '<p></p>') {
-      html = null
-    }
-    this.setState({
-      html,
+    const {form} = this.props
+    form.validateFields((err, values) => {
+      if (!err) {
+        let selectProjectID = null
+        if (this.state.selected.length > 0) {
+          selectProjectID = this.state.selected[0]['_id']
+        }
+        if (
+          this.props.dispatch({
+            type: 'allRequest/makeNewRequestAnswer',
+            payload: {
+              // answer: this.state.html,
+              ...values,
+              selectProject: selectProjectID,
+            },
+          })) {
+          this.clearSelect()
+          // this.setState({inputValue: ''})
+          //清空输入框
+          form.setFieldsValue({'answer': null})
+        }
+      }
     })
   }
 
-  validateFn = (file) => {
-    return file.size < 1024 * 100
-  }
+  // handleChange = (content) => {
+  //   // console.log(content)
+  //   this.setState({
+  //     content,
+  //   })
+  // }
+  //
+  // handleHTMLChange = (html) => {
+  //   if (html === '<p></p>') {
+  //     html = null
+  //   }
+  //   this.setState({
+  //     html,
+  //   })
+  // }
+  //
+  // validateFn = (file) => {
+  //   return file.size < 1024 * 100
+  // }
 
-  handleInputChange(e) {
-    this.setState({inputValue: e.target.value})
-  }
+  // handleInputChange(e) {
+  //   this.setState({inputValue: e.target.value})
+  // }
 
   render() {
 
-    const editorProps = {
-      placeholder: 'More description about your answer more help',
-      height: 200,
-      language: 'en',
-      initialContent: this.state.content,
-      onChange: this.handleChange,
-      onHTMLChange: this.handleHTMLChange,
-      media: {
-        image: true, // 开启图片插入功能
-        video: false, // 关闭视频插入功能
-        audio: false, // 关闭音频插入功能
-        validateFn: this.validateFn, // 指定本地校验函数
-        uploadFn: null, // 指定上传函数
-      },
-    }
+    // const editorProps = {
+    //   placeholder: 'More description about your answer more help',
+    //   height: 200,
+    //   language: 'en',
+    //   initialContent: this.state.content,
+    //   onChange: this.handleChange,
+    //   onHTMLChange: this.handleHTMLChange,
+    //   media: {
+    //     image: true, // 开启图片插入功能
+    //     video: false, // 关闭视频插入功能
+    //     audio: false, // 关闭音频插入功能
+    //     validateFn: this.validateFn, // 指定本地校验函数
+    //     uploadFn: null, // 指定上传函数
+    //   },
+    // }
     const {fetching, data, value, projects, inputValue} = this.state
     // console.log(this.state)
+    const {getFieldDecorator, getFieldsError, getFieldError, isFieldTouched} = this.props.form
+    const answerError = !isFieldTouched('answer') || getFieldError('answer')
     return (
       <div className="demo" style={{marginBottom: '80px'}}>
-                <TextArea
-                  value={inputValue}
-                  style={{width: '52%'}}
-                  placeholder="More description about your answer more help"
-                  autosize={{minRows: 5, maxRows: 50}}
-                  onChange={(e) => this.handleInputChange(e)}
-                />
+
+        <Form layout='horizontal'>
+          <FormItem>
+            {
+              getFieldDecorator('answer', {
+                rules: [
+                  {
+                    required: true,
+                  }, {
+                    validator: (rule, value, callback) => {
+                      if (value.length > 500) {
+                        callback('answer is too long')
+                      } else {
+                        callback()
+                      }
+                    },
+                  }
+                ],
+              })(<TextArea
+                // value={inputValue}
+                style={{width: '52%'}}
+                placeholder="More description about your answer more help"
+                autosize={{minRows: 5, maxRows: 50}}
+                // onChange={(e) => this.handleInputChange(e)}
+              />)
+            }
+          </FormItem>
+        </Form>
         <div style={{margin: '24px 0'}}/>
         {this.state.selected.length > 0 ?
           <Card
@@ -266,7 +306,7 @@ class AnswerForm extends React.Component {
             newAnswer={true}
             handleCreate={this.handleCreate}>
             <Button icon='plus-circle-o' type='primary'
-                    style={{'marginLeft': '30px'}}>New {this.props.type}</Button>
+                    style={{'marginLeft': '30px'}} >New {this.props.type}</Button>
           </ProjectModal></div> : null}
         {/*<BraftEditor {...editorProps}/>*/}
         <div style={{margin: '24px 0'}}/>
@@ -274,8 +314,7 @@ class AnswerForm extends React.Component {
         <Button
           type="primary"
           htmlType="submit"
-          // disabled={this.state.html === null}
-          disabled={this.state.inputValue === ''}
+          disabled={answerError}
           onClick={this.handleSubmit}
         >
           Post Your Answer
@@ -289,20 +328,34 @@ function callback(key) {
   console.log(key)
 }
 
-function showAnswerCommentInput(dispatch, request_answer_id) {
-  dispatch({
-    type: 'allRequest/showAnswerCommentInput',
-    payload: {
-      request_answer_id: request_answer_id,
-    },
-  })
+function showAnswerCommentInput(dispatch, request_answer_id, login) {
+  if (login.user) {
+    dispatch({
+      type: 'allRequest/showAnswerCommentInput',
+      payload: {
+        request_answer_id: request_answer_id,
+      },
+    })
+  }
+  else {
+    antdMessage.warning('Please login')
+    dispatch(routerRedux.push('/user/login'))
+  }
+
 }
 
-function showRequestCommentInput(dispatch) {
-  dispatch({
-    type: 'allRequest/showRequestCommentInput',
-    payload: {},
-  })
+function showRequestCommentInput(dispatch, login) {
+  if (login.user) {
+    dispatch({
+      type: 'allRequest/showRequestCommentInput',
+      payload: {},
+    })
+  }
+  else {
+    antdMessage.warning('Please login')
+    dispatch(routerRedux.push('/user/login'))
+  }
+
 }
 
 function UserRequestDetail({allRequest, login, dispatch}) {
@@ -310,7 +363,8 @@ function UserRequestDetail({allRequest, login, dispatch}) {
     focusUserRequest,
     focusUserRequestLoading
   } = allRequest
-  console.log('focusUserRequestLoading',focusUserRequestLoading)
+  console.log('focusUserRequestLoading', focusUserRequestLoading)
+
   function requestVotesUp() {
     dispatch({
       type: 'allRequest/votesUpRequest',
@@ -321,17 +375,24 @@ function UserRequestDetail({allRequest, login, dispatch}) {
   }
 
   function requestStar() {
-    if (focusUserRequest.user !==login.user._id){
-    dispatch({
-      type: 'allRequest/starRequest',
-      payload: {
-        user_request_id: focusUserRequest['_id'],
-      },
-    })
+    if (login.user) {
+      if (focusUserRequest.user !== login.user._id) {
+        dispatch({
+          type: 'allRequest/starRequest',
+          payload: {
+            user_request_id: focusUserRequest['_id'],
+          },
+        })
+      }
+      else {
+        antdMessage.warning('sorry,不能收藏自己的需求')
+      }
     }
-    else{
-      antdMessage.warning('sorry,不能收藏自己的需求');
+    else {
+      antdMessage.warning('Please login')
+      dispatch(routerRedux.push('/user/login'))
     }
+
   }
 
   function answerVotesUp(request_answer_id) {
@@ -417,6 +478,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                    onClick={() => clickSelectedProject(e)}
                    extra={<div
                      style={{fontSize: '14px'}}> {appStatus(e.select_project)}</div>}>
+
         <p>{e.select_project.description}</p>
         {e.select_project.commits.length > 0 ?
           <div style={{marginTop: '35px', color: '#848d95'}}>
@@ -428,210 +490,219 @@ function UserRequestDetail({allRequest, login, dispatch}) {
     }
   }
 
-  if (login.user && focusUserRequest !== null) {
-    const {
-      _id: user_obj_id,
-      user_ID,
-    }
-      = login.user
+  if (focusUserRequest !== null) {
+    // const {
+    //   _id: user_obj_id,
+    //   user_ID,
+    // }
+    //   = login.user
+    const user_obj_id = get(login, 'user._id')
+    const user_ID = get(login, 'user.user_ID')
     return (
       <div className={`main-container ${styles.normal}`}>
         <Spin spinning={focusUserRequestLoading}>
-        <div>
-          {/*<Button icon="caret-up"*/}
-          {/*onClick={() => requestVotesUp()}*/}
-          {/*type={focusUserRequest['vote_up_user'].includes(user_obj_id) ? 'primary' : ''}*/}
-          {/*/>*/}
-          {/*{focusUserRequest['vote_up_user'].length}*/}
-          <h2
-            style={{paddingBottom: 10}}>
-            <Icon
-              type={focusUserRequest.user===user_obj_id || focusUserRequest['star_user'].includes(user_obj_id) ? 'star' : 'star-o'}
-              className={styles.star}
-              style={{
-                fontSize: '22px', color: 'transparent',
-                background: focusUserRequest['star_user'].includes(user_obj_id) ? `url(${star}) no-repeat` : `url(${star_o}) no-repeat`,
-              }}
-              onClick={() => requestStar()}/>
-            {focusUserRequest['title']} &nbsp;&nbsp;
-            {focusUserRequest['user_ID'] === user_ID &&
-            <span className={styles.rightButton}>
+          <div>
+            {/*<Button icon="caret-up"*/}
+            {/*onClick={() => requestVotesUp()}*/}
+            {/*type={focusUserRequest['vote_up_user'].includes(user_obj_id) ? 'primary' : ''}*/}
+            {/*/>*/}
+            {/*{focusUserRequest['vote_up_user'].length}*/}
+            <h2
+              style={{paddingBottom: 10}}>
+              <Icon
+                type={focusUserRequest.user === user_obj_id || focusUserRequest['star_user'].includes(user_obj_id) ? 'star' : 'star-o'}
+                className={styles.star}
+                style={{
+                  fontSize: '22px', color: 'transparent',
+                  background: focusUserRequest['star_user'].includes(user_obj_id) ? `url(${star}) no-repeat` : `url(${star_o}) no-repeat`,
+                }}
+                onClick={() => requestStar()}/>
+              {focusUserRequest['title']} &nbsp;&nbsp;
+              {focusUserRequest['user_ID'] === user_ID &&
+              <span className={styles.rightButton}>
                   <RequestModal new={false} requestDetail={focusUserRequest}>
                     <Button icon='edit' style={{marginRight: 15}}/>
                   </RequestModal>
-              {focusUserRequest.comments || focusUserRequest.answer ?
-                null :
-                <Button icon='delete' onClick={() => deleteUserRequest()}/>}
+                {focusUserRequest.comments || focusUserRequest.answer ?
+                  null :
+                  <Button icon='delete' onClick={() => deleteUserRequest()}/>}
 
                 </span>}
-            {/*{focusUserRequest['user_ID']===user_ID && <Icon type="close" onClick={() => deleteUserRequest()}/>}*/}
-          </h2>
-        </div>
-        <div className={styles.requestuser} style={{color: '#828A92'}}>
-          <Icon
-            type='star'
-            style={{fontSize: '22px', color: 'transparent'}}/>
-          <Icon
-            type="user"
-            style={{color: '#828A92'}}/>&nbsp;{focusUserRequest['user_ID']} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          {focusUserRequest['tags'].length > 0 && <Icon type="tag-o"/>}&nbsp;
-          {focusUserRequest['tags'].length > 0 && focusUserRequest['tags'].join(',')}
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <Icon
-            type="clock-circle-o"
-            style={{color: '#828A92'}}/>&nbsp;{showTime(focusUserRequest['create_time'])}
-        </div>
+              {/*{focusUserRequest['user_ID']===user_ID && <Icon type="close" onClick={() => deleteUserRequest()}/>}*/}
+            </h2>
+          </div>
+          <div className={styles.requestuser} style={{color: '#828A92'}}>
+            <Icon
+              type='star'
+              style={{fontSize: '22px', color: 'transparent'}}/>
+            <Icon
+              type="user"
+              style={{color: '#828A92'}}/>&nbsp;{focusUserRequest['user_ID']} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            {focusUserRequest['tags'].length > 0 && <Icon type="tag-o"/>}&nbsp;
+            {focusUserRequest['tags'].length > 0 && focusUserRequest['tags'].join(',')}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <Icon
+              type="clock-circle-o"
+              style={{color: '#828A92'}}/>&nbsp;{showTime(focusUserRequest['create_time'])}
+          </div>
 
-        <p
-          className={styles.description}
-          style={{color: '#828A92'}}>{get(focusUserRequest, 'description') ? get(focusUserRequest, 'description') : null}</p>
-        {focusUserRequest.input ?
-          <div style={{margin: '16px 0'}}><p
-            style={{color: '#828A92'}}>Input: {focusUserRequest.input}</p>
+          <p
+            className={styles.description}
+            style={{color: '#828A92'}}>{get(focusUserRequest, 'description') ? get(focusUserRequest, 'description') : null}</p>
+          {focusUserRequest.input ?
+            <div style={{margin: '16px 0'}}><p
+              style={{color: '#828A92'}}>Input: {focusUserRequest.input}</p>
+            </div> : null}
+          {focusUserRequest.output ? <div style={{margin: '16px 0'}}>
+            <p style={{color: '#828A92'}}>Output: {focusUserRequest.output}</p>
           </div> : null}
-        {focusUserRequest.output ? <div style={{margin: '16px 0'}}>
-          <p style={{color: '#828A92'}}>Output: {focusUserRequest.output}</p>
-        </div> : null}
-        <h2
-          className={styles.commentsAnswers}>{focusUserRequest.comments ? focusUserRequest.comments.length : 0} Comments</h2>
-        <hr/>
-        {/*{focusUserRequest.comments && <hr className={styles.eachCommentDiv}/>}*/}
-        {focusUserRequest.comments && focusUserRequest.comments.map(e =>
-          <div key={e._id}>
-            <div className={styles.eachCommentDiv}>
-              <p>{e.comments}&nbsp;-&nbsp;
-                <span
-                  style={{color: '#828A92'}}>{e.user_ID} {showTime(e.create_time)}</span>
-              </p>
-            </div>
-            <hr className={styles.eachCommentDiv}/>
-          </div>)}
-        <div style={{margin: '20px 8px 8px 0'}}>
-          {focusUserRequest.commentState &&
-          <WrappedCommentForm dispatch={dispatch}
-                              comments_type={'request'}
-                              _id={focusUserRequest._id}
-          />}
-          {!(focusUserRequest.commentState) &&
-          <p onClick={() => showRequestCommentInput(dispatch)}
-             style={{color: '#848d95', cursor: 'pointer'}}>add a
-            comment</p>}
-          {/*<WrappedCommentForm dispatch={dispatch} comments_type={'request'}/>*/}
-        </div>
-        <div>
           <h2
-            className={styles.commentsAnswers}>{focusUserRequest.answer ? Object.keys(focusUserRequest.answer).length : 0} Answers</h2>
+            className={styles.commentsAnswers}>{focusUserRequest.comments ? focusUserRequest.comments.length : 0} Comments</h2>
           <hr/>
-          <div>
+          {/*{focusUserRequest.comments && <hr className={styles.eachCommentDiv}/>}*/}
+          {focusUserRequest.comments && focusUserRequest.comments.map(e =>
+            <div key={e._id}>
+              <div className={styles.eachCommentDiv}>
+                <p>{e.comments}&nbsp;-&nbsp;
+                  <span
+                    style={{color: '#828A92'}}>{e.user_ID} {showTime(e.create_time)}</span>
+                </p>
+              </div>
+              <hr className={styles.eachCommentDiv}/>
+            </div>)}
+          <div style={{margin: '20px 8px 8px 0'}}>
+            {focusUserRequest.commentState &&
+            <WrappedCommentForm dispatch={dispatch}
+                                comments_type={'request'}
+                                _id={focusUserRequest._id}
+                                login={login}
+            />}
+            {!(focusUserRequest.commentState) &&
+            <p onClick={() => showRequestCommentInput(dispatch, login)}
+               style={{color: '#848d95', cursor: 'pointer'}}>add a
+              comment</p>}
+            {/*<WrappedCommentForm dispatch={dispatch} comments_type={'request'}/>*/}
           </div>
           <div>
-            {focusUserRequest.answer && JsonToArray(focusUserRequest.answer).map(e =>
-              <div key={e._id}>
-                <Row className={styles.eachAnswerDiv}>
-                  <Col span={2}>
-                    <div style={{
-                      width: '100%',
-                      textAlign: 'center',
-                      fontSize: '22px',
-                      cursor: 'pointer',
-                    }}>
-                      <Icon
-                        type={e['vote_up_user'].includes(user_obj_id) ? 'like' : 'like-o'}
-                        onClick={() => answerVotesUp(e._id)}
-                        style={{color: '#34c0e2'}}
-                      />
-                    </div>
-                    <div style={{
-                      width: '100%',
-                      textAlign: 'center',
-                      fontSize: '22px',
-                    }}>
-                      {e['vote_up_user'].length}
-                    </div>
-                    {/*<div style={{*/}
-                    {/*width: '100%',*/}
-                    {/*textAlign: 'center',*/}
-                    {/*fontSize: '26px',*/}
-                    {/*cursor: 'pointer'*/}
-                    {/*}}>*/}
-                    {/*<Icon type="caret-down"/>*/}
-                    {/*</div>*/}
-                    {user_ID === focusUserRequest.user_ID &&
-                    !focusUserRequest.accept_answer &&
-                    <div style={{
-                      width: '100%',
-                      textAlign: 'center',
-                      fontSize: '22px',
-                      cursor: 'pointer',
-                    }}>
-                      <Icon type="check-circle-o"
-                            style={{color: '#c1c1c1'}}
-                            onClick={() => acceptAnswer(e._id)}/>
-                    </div>}
-
-                    {focusUserRequest.accept_answer &&
-                    focusUserRequest.accept_answer === e._id &&
-                    <div style={{
-                      width: '100%',
-                      textAlign: 'center',
-                      fontSize: '26px',
-                      cursor: 'pointer',
-                      color: 'green',
-                    }}>
-                      <Icon type="check-circle-o"/>
-                    </div>}
-
-                  </Col>
-                  <Col span={22}>
-                    <div
-                      style={{fontSize: '14px'}}>{projectCard(e, focusUserRequest.type)}
-                    </div>
-                    <div>
-                      <div className={styles.eachAnswer}>
-                        <div dangerouslySetInnerHTML={{
-                          __html: e.answer,
-                        }}/>
+            <h2
+              className={styles.commentsAnswers}>{focusUserRequest.answer ? Object.keys(focusUserRequest.answer).length : 0} Answers</h2>
+            <hr/>
+            <div>
+            </div>
+            <div>
+              {focusUserRequest.answer && JsonToArray(focusUserRequest.answer).map(e =>
+                <div key={e._id}>
+                  <Row className={styles.eachAnswerDiv}>
+                    <Col span={2}>
+                      <div style={{
+                        width: '100%',
+                        textAlign: 'center',
+                        fontSize: '22px',
+                        cursor: 'pointer',
+                      }}>
+                        <Icon
+                          type={e['vote_up_user'].includes(user_obj_id) ? 'like' : 'like-o'}
+                          onClick={() => answerVotesUp(e._id)}
+                          style={{color: '#34c0e2'}}
+                        />
                       </div>
-                      <div className={styles.eachAnswerContentDiv}>
-                        <p>{e.answer_user_ID}</p>
-                        <p>{showTime(e.create_time)}</p>
-                        {/*<span></span>*/}
-                        {/*<span style={{float: 'right'}}>*/}
-                        {/**/}
-                        {/*</span>*/}
+                      <div style={{
+                        width: '100%',
+                        textAlign: 'center',
+                        fontSize: '22px',
+                      }}>
+                        {e['vote_up_user'].length}
                       </div>
-                    </div>
-                    {e.comment && <hr/>}
-                    {e.comment && e.comment.map(e =>
-                      <div key={e._id}>
-                        <div className={styles.eachAnswerComment}>
-                          <p>{e.comments} - {e.user_ID} at {showTime(e.create_time)}</p>
+                      {/*<div style={{*/}
+                      {/*width: '100%',*/}
+                      {/*textAlign: 'center',*/}
+                      {/*fontSize: '26px',*/}
+                      {/*cursor: 'pointer'*/}
+                      {/*}}>*/}
+                      {/*<Icon type="caret-down"/>*/}
+                      {/*</div>*/}
+                      {user_ID === focusUserRequest.user_ID &&
+                      !focusUserRequest.accept_answer &&
+                      <div style={{
+                        width: '100%',
+                        textAlign: 'center',
+                        fontSize: '22px',
+                        cursor: 'pointer',
+                      }}>
+                        <Icon type="check-circle-o"
+                              style={{color: '#c1c1c1'}}
+                              onClick={() => acceptAnswer(e._id)}/>
+                      </div>}
+
+                      {focusUserRequest.accept_answer &&
+                      focusUserRequest.accept_answer === e._id &&
+                      <div style={{
+                        width: '100%',
+                        textAlign: 'center',
+                        fontSize: '26px',
+                        cursor: 'pointer',
+                        color: 'green',
+                      }}>
+                        <Icon type="check-circle-o"/>
+                      </div>}
+
+                    </Col>
+                    <Col span={22}>
+                      <div
+                        style={{fontSize: '14px'}}>{projectCard(e, focusUserRequest.type)}
+                      </div>
+                      <div>
+                        <div className={styles.eachAnswer}>
+                          <div dangerouslySetInnerHTML={{
+                            __html: e.answer,
+                          }}/>
                         </div>
-                        <hr/>
-                      </div>,
-                    )}
-                    {e.commentState &&
-                    <WrappedCommentForm dispatch={dispatch}
-                                        comments_type={'answer'}
-                                        _id={e._id}/>}
-                    {!(e.commentState) &&
-                    <p onClick={() => showAnswerCommentInput(dispatch, e._id)}
-                       style={{color: '#848d95', cursor: 'pointer'}}>add a
-                      comment</p>}
-                  </Col>
-                </Row>
-                <hr/>
-              </div>)}
+                        <div className={styles.eachAnswerContentDiv}>
+                          <p>{e.answer_user_ID}</p>
+                          <p>{showTime(e.create_time)}</p>
+                          {/*<span></span>*/}
+                          {/*<span style={{float: 'right'}}>*/}
+                          {/**/}
+                          {/*</span>*/}
+                        </div>
+                      </div>
+                      {e.comment && <hr/>}
+                      {e.comment && e.comment.map(e =>
+                        <div key={e._id}>
+                          <div className={styles.eachAnswerComment}>
+                            <p>{e.comments} - {e.user_ID} at {showTime(e.create_time)}</p>
+                          </div>
+                          <hr/>
+                        </div>,
+                      )}
+                      {e.commentState &&
+                      <WrappedCommentForm dispatch={dispatch}
+                                          comments_type={'answer'}
+                                          _id={e._id}
+                                          login={login}/>}
+                      {!(e.commentState) &&
+                      <p
+                        onClick={() => showAnswerCommentInput(dispatch, e._id, login)}
+                        style={{color: '#848d95', cursor: 'pointer'}}>add a
+                        comment</p>}
+                    </Col>
+                  </Row>
+                  <hr/>
+                </div>)}
+            </div>
           </div>
-        </div>
-        <div className="demo">
-          <h2
-            style={{paddingBottom: 10}}>
-            Answer&nbsp;
-            <Icon type="edit"/>
-          </h2>
-          <AnswerForm dispatch={dispatch} type={focusUserRequest.type}/>
-        </div>
+          <div className="demo">
+            <h2
+              style={{paddingBottom: 10}}>
+              Answer&nbsp;
+              <Icon type="edit"/>
+            </h2>
+            {login.user ?
+              <WrappedAnswerForm dispatch={dispatch}
+                                 type={focusUserRequest.type}
+                                 login={login}/> :
+              <NotLogin dispatch={dispatch} text={'回答'}/>}
+          </div>
         </Spin>
       </div>
     )
@@ -642,6 +713,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
 }
 
 const WrappedCommentForm = Form.create()(CommentForm)
+const WrappedAnswerForm = Form.create()(AnswerForm)
 export default connect(({allRequest, login}) => ({
   allRequest,
   login,

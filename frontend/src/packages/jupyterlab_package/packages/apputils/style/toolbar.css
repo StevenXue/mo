@@ -6,6 +6,7 @@
 
 :root {
   --jp-private-toolbar-height: 28px;
+  --jp-private-toolbar-height1: 100%;
 }
 
 
@@ -24,8 +25,8 @@
   padding-left: 8px;
   padding-right: 8px;
   font-size: var(--jp-ui-font-size1);
-  line-height: var(--jp-private-toolbar-height);
-  height: 100%;
+  line-height: var(--jp-private-toolbar-height1);
+  height: 24px;
 }
 
 
@@ -36,8 +37,9 @@
   background-color: var(--jp-layout-color1);
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 16px;
+  background-size: 14px;
   border: 1px solid var(--jp-layout-color1);
+  margin:0 4px;
 }
 
 

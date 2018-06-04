@@ -12,17 +12,13 @@
 import os
 import shutil
 import re
-import fileinput
 import requests
 import collections
 import json
 from copy import deepcopy
 from datetime import datetime
 # from distutils.dir_util import copy_tree
-from subprocess import call
 from git import Repo
-
-from eventlet import spawn_n
 
 from server3.entity.project import Project
 from server3.entity.project import Commit
@@ -36,11 +32,9 @@ from server3.constants import ADMIN_TOKEN
 from server3.entity.general_entity import Objects
 from server3.constants import GIT_LOCAL
 from server3.constants import INIT_RES
-from server3.constants import REDIS_SERVER
-from server3.business.request_answer_business import RequestAnswerBusiness
 from server3.constants import GIT_SERVER_IP
 from server3.business.general_business import GeneralBusiness
-
+from server3.utility.file_utils import copytree
 
 PAGE_NO = 1
 PAGE_SIZE = 5
@@ -127,97 +121,6 @@ def copy(project):
     return project_cp
 
 
-def copytree(src, dst, symlinks=False, ignore=None, copy_function=shutil.copy2,
-             ignore_dangling_symlinks=False):
-    """Recursively copy a directory tree.
-
-    The destination directory must not already exist.
-    If exception(s) occur, an Error is raised with a list of reasons.
-
-    If the optional symlinks flag is true, symbolic links in the
-    source tree result in symbolic links in the destination tree; if
-    it is false, the contents of the files pointed to by symbolic
-    links are copied. If the file pointed by the symlink doesn't
-    exist, an exception will be added in the list of errors raised in
-    an Error exception at the end of the copy process.
-
-    You can set the optional ignore_dangling_symlinks flag to true if you
-    want to silence this exception. Notice that this has no effect on
-    platforms that don't support os.symlink.
-
-    The optional ignore argument is a callable. If given, it
-    is called with the `src` parameter, which is the directory
-    being visited by copytree(), and `names` which is the list of
-    `src` contents, as returned by os.listdir():
-
-        callable(src, names) -> ignored_names
-
-    Since copytree() is called recursively, the callable will be
-    called once for each directory that is copied. It returns a
-    list of names relative to the `src` directory that should
-    not be copied.
-
-    The optional copy_function argument is a callable that will be used
-    to copy each file. It will be called with the source path and the
-    destination path as arguments. By default, copy2() is used, but any
-    function that supports the same signature (like copy()) can be used.
-
-    """
-    names = os.listdir(src)
-    if ignore is not None:
-        ignored_names = ignore(src, names)
-    else:
-        ignored_names = set()
-
-    os.makedirs(dst, exist_ok=True)
-    errors = []
-    for name in names:
-        if name in ignored_names:
-            continue
-        srcname = os.path.join(src, name)
-        dstname = os.path.join(dst, name)
-        try:
-            if os.path.islink(srcname):
-                linkto = os.readlink(srcname)
-                if symlinks:
-                    # We can't just leave it to `copy_function` because legacy
-                    # code with a custom `copy_function` may rely on copytree
-                    # doing the right thing.
-                    os.symlink(linkto, dstname)
-                    shutil.copystat(srcname, dstname, follow_symlinks=not
-                    symlinks)
-                else:
-                    # ignore dangling symlink if the flag is on
-                    if not os.path.exists(linkto) and ignore_dangling_symlinks:
-                        continue
-                    # otherwise let the copy occurs. copy2 will raise an error
-                    if os.path.isdir(srcname):
-                        copytree(srcname, dstname, symlinks, ignore,
-                                 copy_function)
-                    else:
-                        copy_function(srcname, dstname)
-            elif os.path.isdir(srcname):
-                copytree(srcname, dstname, symlinks, ignore, copy_function)
-            else:
-                # Will raise a SpecialFileError for unsupported file types
-                copy_function(srcname, dstname)
-        # catch the Error from the recursive copytree so that we can
-        # continue with other files
-        except shutil.Error as err:
-            errors.extend(err.args[0])
-        except OSError as why:
-            errors.append((srcname, dstname, str(why)))
-    try:
-        shutil.copystat(src, dst)
-    except OSError as why:
-        # Copying file access times may fail on Windows
-        if getattr(why, 'winerror', None) is None:
-            errors.append((src, dst, str(why)))
-    if errors:
-        raise shutil.Error(errors)
-    return dst
-
-
 class ProjectBusiness(GeneralBusiness):
     project = None
     repo = ProjectRepo(Project)
@@ -302,7 +205,8 @@ class ProjectBusiness(GeneralBusiness):
             os.makedirs(project_path)
         else:
             # if exists means project exists
-            raise Exception('Project exists, project should be unique between apps, modules and datsets')
+            raise Exception(
+                'Project exists, project should be unique between apps, modules and datsets')
         return project_path
 
     @classmethod
@@ -586,10 +490,14 @@ class ProjectBusiness(GeneralBusiness):
         script = script.replace('\n\n', '\n')
 
         # add __main__ function
-        main_func = "\n\n" + \
-                    "if __name__ == '__main__':\n" + \
-                    "\tconf = {}\n" + \
-                    "\thandle(conf)"
+        main_func = \
+            "\n" + \
+            "\t# return your result consistent with .yml you defined\n" + \
+            "\t# .e.g return {'iris_class': 1, 'possibility': '88%'}" + \
+            "\n\n" + \
+            "if __name__ == '__main__':\n" + \
+            "\tconf = {}\n" + \
+            "\thandle(conf)"
         script += '\n' + main_func
 
         script_path = full_path.replace('ipynb', 'py')
@@ -606,14 +514,13 @@ class ProjectBusiness(GeneralBusiness):
         :return: processed single line code
         """
         if any(re.search(reg, line_of_code.rstrip()) for reg in INIT_RES):
-            # line_of_code = re.sub(
-            #     r"# Please use current \(work\) folder to store your data "
-            #     r"and models",
-            #     r'', line_of_code.rstrip())
+            # replace some redundant comments
             line_of_code = re.sub(r'# Define root path', r'',
                                   line_of_code.rstrip())
             line_of_code = re.sub(r"""sys.path.append\('(.+)'\)""", r'',
                                   line_of_code.rstrip())
+
+            # set the flag to silent mode
             line_of_code = re.sub(
                 r"""(\s+)project_type='(.+)', source_file_path='(.+)'\)""",
                 r"""\1project_type='\2', source_file_path='\3', silent=True)""",
@@ -626,70 +533,64 @@ class ProjectBusiness(GeneralBusiness):
             # add handle function
             line_of_code = re.sub(
                 r"work_path = '\./'",
-                r"work_path = '\./'\n\n"
+                r"work_path = './'\n\n\n\n"
                 r"def handle(conf):\n"
                 r"\t# paste your code here",
                 line_of_code.rstrip())
         else:
 
-            # if re.match(r'^(!|ls +|rm +|pwd +|cd +)', line_of_code.strip()):
+            # erase magic function start with '!'
             if re.match(r'^(!)', line_of_code.strip()):
                 line_of_code = ''
             else:
                 line_of_code = '\t' + line_of_code
 
-            # if line_of_code[0] in ['!']:
-            #     line_of_code = ''
-            # elif line_of_code[0:2] in ['ls', 'cd']:
-            #     line_of_code = ''
-            # else:
-            #     line_of_code = '\t' + line_of_code
 
         return line_of_code
 
-    @classmethod
-    def nb_to_script(cls, project_id, nb_path, optimise=True):
-        app = cls.get_by_id(project_id)
-        call(['jupyter', 'nbconvert', '--to', 'script', nb_path],
-             cwd=app.path)
-        full_path = os.path.join(app.path, nb_path)
-        script_path = full_path.replace('ipynb', 'py')
-        for line in fileinput.input(files=script_path, inplace=1):
-            # remove input tag comments
-            line = re.sub(r"# In\[(\d+)\]:", r"", line.rstrip())
-
-            if optimise:
-                if any(re.search(reg, line.rstrip()) for reg in INIT_RES):
-                    line = re.sub(
-                        r"# Please use current \(work\) folder to store your data "
-                        r"and models",
-                        r'', line.rstrip())
-                    line = re.sub(r"""sys.path.append\('(.+)'\)""", r'',
-                                  line.rstrip())
-                    line = re.sub(
-                        r"""(\s+)project_type='(.+)', source_file_path='(.+)'\)""",
-                        r"""\1project_type='\2', source_file_path='\3', silent=True)""",
-                        line.rstrip())
-
-                    line = re.sub(r"""from modules import (.+)""",
-                                  r"""from function.modules import \1""",
-                                  line.rstrip())
-
-                    # add handle function
-                    line = re.sub(
-                        r"work_path = '\./'",
-                        r"work_path = 'function/'\n\n"
-                        r"def handle(conf):\n"
-                        r"\t# paste your code here",
-                        line.rstrip())
-                else:
-                    line = '\t' + line
-            print(line)
-        my_open = open(script_path, 'a')
-        # main_func = r"if __name__ == '__main__':" \
-        #             r"" + "\n" + "\t" + "conf = {}" + "\n" +"\t" + "handle()"
-        main_func = r"if __name__ == '__main__': " + "\n" + "\t" \
-                                                            r"conf = {}" + "\n" + "\t" \
-                                                                                  r"handle(conf)"
-
-        my_open.write(main_func)
+    # @classmethod
+    # def nb_to_script(cls, project_id, nb_path, optimise=True):
+    #     app = cls.get_by_id(project_id)
+    #     call(['jupyter', 'nbconvert', '--to', 'script', nb_path],
+    #          cwd=app.path)
+    #     full_path = os.path.join(app.path, nb_path)
+    #     script_path = full_path.replace('ipynb', 'py')
+    #     for line in fileinput.input(files=script_path, inplace=1):
+    #         # remove input tag comments
+    #         line = re.sub(r"# In\[(\d+)\]:", r"", line.rstrip())
+    #
+    #         if optimise:
+    #             if any(re.search(reg, line.rstrip()) for reg in INIT_RES):
+    #                 line = re.sub(
+    #                     r"# Please use current \(work\) folder to store your data "
+    #                     r"and models",
+    #                     r'', line.rstrip())
+    #                 line = re.sub(r"""sys.path.append\('(.+)'\)""", r'',
+    #                               line.rstrip())
+    #                 line = re.sub(
+    #                     r"""(\s+)project_type='(.+)', source_file_path='(.+)'\)""",
+    #                     r"""\1project_type='\2', source_file_path='\3', silent=True)""",
+    #                     line.rstrip())
+    #
+    #                 line = re.sub(r"""from modules import (.+)""",
+    #                               r"""from function.modules import \1""",
+    #                               line.rstrip())
+    #
+    #                 # add handle function
+    #                 line = re.sub(
+    #                     r"work_path = '\./'",
+    #                     r"work_path = '11./'\n\n"
+    #                     r"def handle(conf):\n"
+    #                     r"\t# paste your code here",
+    #                     line.rstrip())
+    #             else:
+    #                 line = '\t' + line
+    #         print(line)
+    #     my_open = open(script_path, 'a')
+    #     # main_func = r"if __name__ == '__main__':" \
+    #     #             r"" + "\n" + "\t" + "conf = {}" + "\n" +"\t" + "handle()"
+    #     main_func = r"if __name__ == '__main__': " + "\n" + "\t" \
+    #                                                         r"conf = {}" + "\n" + "\t" \
+    #                                                                               r"handle(conf)"
+    #
+    #     my_open.write(main_func)

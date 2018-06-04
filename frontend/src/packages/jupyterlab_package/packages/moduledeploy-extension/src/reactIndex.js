@@ -147,10 +147,10 @@ export class ModulePage extends React.Component {
                             <RadioGroup onChange={(e) => this.onVersionChange(e)}
                                         value={this.state.version || `${v1}.${v2}.${v3 + 1}`}>
                                 <Radio key='r1' style={radioStyle}
-                                       value={`${v1 + 1}.${v2}.${v3}`}>{v1 + 1}.{v2}.{v3} (Major: for API breaking
+                                       value={`${v1 + 1}.0.0`}>{v1 + 1}.0.0 (Major: for API breaking
                                     changes)</Radio>
                                 <Radio key='r2' style={radioStyle}
-                                       value={`${v1}.${v2 + 1}.${v3}`}>{v1}.{v2 + 1}.{v3} (Minor: for
+                                       value={`${v1}.${v2 + 1}.0`}>{v1}.{v2 + 1}.0 (Minor: for
                                     backward-compatible features)</Radio>
                                 <Radio key='r3' style={radioStyle}
                                        value={`${v1}.${v2}.${v3 + 1}`}>{v1}.{v2}.{v3 + 1} (Revision: for

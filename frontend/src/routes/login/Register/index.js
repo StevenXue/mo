@@ -48,7 +48,8 @@ class Register extends Component {
     this.props.dispatch({
       type: "register/sendVerificationCode",
       payload: {
-        phone: phone
+        phone: phone,
+        usage:"register"
       }
     })
 
@@ -173,7 +174,14 @@ class Register extends Component {
                   // escape对字符串进行编码时，字符值大于255的以"%u****"格式存储，而字符值大于255的恰好是非英文字符
                   // （一般是中文字符，非中文字符也可以当作中文字符考虑）
                   if (escape(value).indexOf('%u') < 0) {
+                    if(value.length>30){
+                      callback('user_ID is too long')
+                    }
+                    else if(value.length<5 && value.length>0){
+                      callback('user_ID is too short')
+                    }else {
                     callback()
+                    }
                   } else {
                     callback('Sorry, Chinese name is not supported yet')
                   }

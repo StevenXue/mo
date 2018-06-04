@@ -4,7 +4,39 @@ const path = require('path')
 const re = /.+\.css$/
 const paths = require('./paths')
 
-import { flaskServer, hubServer } from './config.js'
+import { flaskServer, socketioServer, hubServer, tbServer, env } from './config.js'
+
+const proxy = env !== 'PROD' ? {
+  '/pyapi': {
+    'target': flaskServer,
+    'changeOrigin': true,
+    'ws': true,
+    'pathRewrite': { '^/pyapi': '' },
+  },
+  '/socketio': {
+    'target': socketioServer,
+    'ws': true,
+    'changeOrigin': true,
+    'pathRewrite': { '^/socketio': '' },
+  },
+  '/tb': {
+    'target': tbServer,
+    'changeOrigin': true,
+    // 'pathRewrite': {'^/tb': ''},
+  },
+  '/hub_api': {
+    'target': hubServer,
+    'changeOrigin': true,
+    'ws': true,
+    'pathRewrite': { '^/hub_api': '' },
+    'onProxyReq': function onProxyReq(proxyReq, req, res) {
+      if (req.headers.accept.indexOf('image') !== -1) {
+        // add custom header to request
+        proxyReq.setHeader('Authorization', 'token 1d4afa72b00c4ffd9db82f26e1628f89')
+      }
+    },
+  },
+} : {}
 
 const walkSync = (dir) =>
   fs.readdirSync(dir)
@@ -37,11 +69,9 @@ export default {
   'cssModulesExclude': [
     ...jupyterPackageCSS,
   ],
-  'proxy': {
-
-  },
+  'proxy': proxy,
   'theme': {
-    'primary-color': '#34C0E2',
+    '@primary-color': '#34C0E2',
     // "font-family": "Roboto",
     'text-color': 'fade(#000, 90%)',
     // "font-family": "Helvetica Neue","Helvetica","PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑", "Arial", "sans-serif"

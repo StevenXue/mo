@@ -3,10 +3,10 @@ import 'antd/dist/antd.less'
 import '../node_modules/highlight.js/styles/github.css'
 import './global.less'
 import './index.less'
-// import modelling from './models/modelling'
 import projectDetail from './models/projectDetail'
 import worldChannel from './models/worldChannel'
 import chatbot from './models/chatbot'
+// import modelling from './models/modelling'
 
 // ES6 Promise polyfill
 require('es6-promise/auto')
@@ -14,9 +14,9 @@ require('es6-promise/auto')
 // 1. Initialize
 const app = dva({
   onError(e) {
-    console.log("error", e)
+    console.log('error', e)
     e.preventDefault()
-  }
+  },
 })
 
 app.model(require('./models/project'))

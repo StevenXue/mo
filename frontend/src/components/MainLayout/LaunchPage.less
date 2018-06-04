@@ -1,103 +1,97 @@
-@import "../../index";
-
-.LaunchPage{
-    padding: 70px 0;
-    background: #282E33;
-    position: relative;
-    //margin-bottom: 40px;
-    .LaunchPage_Content{
-        width: 960px;
-        margin:0 auto;
+@font-face {
+    font-family: 'JennaSue';
+    src: ~'url(./JennaSue.ttf)' format('truetype');
+    font-weight: 100;
+    font-style: normal;
+}
+@font-face {
+    font-family: "PingFangSC-Medium";
+    src: url('../../font/PingFang_Medium.ttf') format('truetype');
+    font-weight: 100;
+    font-style: normal;
+  }
+.Landing{
+    width: 1080px;
+    margin: 0 auto;
+    padding: 51px 0 122px;
+    font-family: PingFangSC-Medium;
+    h3{
+        font-size: 36px;
+        color: #6D9CF9;
+        line-height: 53px;
+        text-align: center;
+        margin-bottom: 20px;
     }
-    .title{
-        margin-bottom: 19px;
-        p{
-            //font-family: SFProDisplay-Medium;
-            font-size: 54px;
-            color: #FFFFFF;
+    >p{
+        font-size: 18px;
+        color: #666666;
+        text-align: center;
+        line-height: 30px;
+        margin-bottom: 60px;
+    }
+    .contain{
+        overflow: hidden;
+        section{
+            background: #ffffff;
+            box-shadow: 0 11px 25px 0 rgba(226,228,232,0.55);
+            border-radius: 10px;
+            width: 465px;
+            padding: 0 82px 67px 93px;
             text-align: center;
-        }
-    }
-    .subhead{
-        p{
-            //font-family: SFProDisplay-Light;
-            font-size: 22px;
-            color: #CECECE;
-            text-align: center;
-        }
-    }
-    ul{
-        display: flex;
-        justify-content:space-between;
-        margin-top: 44px;
-        li{
-            list-style: none;
-            width:230px;
-            ol{
-                height: 60px;
-                width: 140px;
-                margin: 0 auto;
-            }
             >div{
-                width: 140px;
-                height: 140px;
-                border-radius: 140px;
-                background: #464E78;
+                width: 100%;
+                height: 181.1px;
                 display: flex;
-                justify-content: space-around;
-                align-items: center;
-                margin: 0 auto;
-                img{
-                    width:76px;
-                    height: 76px;
-                }
+                justify-content:center;
+                align-items:flex-end;
+                margin-bottom: 51.7px;
             }
             p{
-                //font-family: SFProDisplay-Semibold;
-                font-size: 24px;
-                color: #FFFFFF;
-                text-align: center;
-                margin-top: 23px;
+                text-align: left;
             }
-            article{
-                margin-top: 17px;
-                //font-family: SFProDisplay-Regular;
-                font-size: 16px;
-                color: #CECECE;
+            .p1{
+                font-family: JennaSue;
+                font-size: 20px;
+                color: #333333;
+                letter-spacing: 6px;
+                line-height: 25px;
+                margin-bottom: 20px;
+                font-weight: 900;
+            }
+            .p2{
+                font-size: 20px;
+                color: #6D9CF9;
+                letter-spacing: 0.4px;
                 line-height: 32px;
-                span{
-                    color: #34BFE2;
-                    cursor: pointer;
+                margin-bottom: 9px;
+            }
+            .p3{
+                font-size: 16px;
+                color: #666666;
+                letter-spacing: 0.4px;
+                line-height: 32px;
+                margin-bottom: 50px;
+            }
+            :global{
+                .ant-btn{
+                    width: 160px;
+                    height: 50px;
+                    margin: 0 auto;
+                    background: #6D9CF9;
+                    border-radius: 100px;
+                    border-width: 0;
+                    >span{
+                        font-size: 18px;
+                        color: #FFFFFF;
+                        letter-spacing: 1.35px;
+                        text-align: left;
+                        line-height: 25px;
+                    }
                 }
             }
+            
         }
+        
     }
-    .help{
-        margin: 0 auto;
-        text-align: center;
-        button{
-            width: 150px;
-            height: 36px;
-            background: #34C0E2;
-            border-radius: 4px;
-            font-size: 14px;
-            border: 0;
-            color:#ffffff;
-            cursor: pointer;
-        }
-    }
-    // .close{
-    //     width: 117px;
-    //     height: 40px;
-    //     position: absolute;
-    //     bottom: -40px;
-    //     left: 50%;
-    //     margin-left: -59px;
-    //     background: #191D21;
-    //     border-radius: 0 0 10px 10px;
-    //     color: #CECECE;
-    //     text-align: center;
-    //     line-height: 40px;
-    //     cursor: pointer;
-    // }
+    
 }

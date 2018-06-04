@@ -1,15 +1,60 @@
-module.exports = {
-  // server api
-  // flaskServer: 'http://localhost:5005',
-  // flaskServer: 'http://10.52.14.182:5005',
-  // flaskServer: 'http://122.224.116.44:5005',
-  flaskServer: 'http://momodel-ai.s3.natapp.cc/pyapi',
+const conf = {
+  CY: {
+    // server api
+    flaskServer: 'http://localhost:5005',
 
-  // hubServer: 'http://localhost:8000',
-  hubServer: 'http://momodel-ai.s3.natapp.cc/hub_api',
+    socketioServer: 'http://192.168.31.9:5006',
 
-  docsServer: 'http://localhost:3000',
+    hubServer: 'http://localhost:8000',
 
-  tbServer: 'http://localhost:8111',
+    docsServer: 'http://localhost:3000',
+
+    tbServer: 'http://localhost:8111',
+
+    gitServerIp: '192.168.31.9',
+
+    webServer: 'http://192.168.31.6',
+
+    env: 'CY',
+  },
+  DEV: {
+    // server api
+    flaskServer: 'http://localhost:5005',
+
+    socketioServer: 'http://10.52.14.182:5006',
+
+    hubServer: 'http://localhost:8000',
+
+    docsServer: 'http://localhost:3000',
+
+    tbServer: 'http://localhost:8111',
+
+    gitServerIp: '10.52.14.182',
+
+    webServer: 'http://192.168.31.6',
+
+    env: 'DEV',
+  },
+  PROD: {
+    // server api
+    flaskServer: 'http://momodel-ai.s3.natapp.cc/pyapi',
+
+    // hubServer: 'http://localhost:8000',
+    hubServer: 'http://momodel-ai.s3.natapp.cc/hub_api',
+
+    docsServer: 'http://localhost:3000',
+
+    tbServer: 'http://localhost:8111',
+
+    gitServerIp: 'momodel-ai.s3.natapp.cc',
+
+    webServer: 'http://momodel-ai.s3.natapp.cc',
+
+    env: 'PROD',
+  },
 }
+
+// module.exports = conf.CY
+// module.exports = conf.DEV
+module.exports = conf.PROD
 

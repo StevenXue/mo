@@ -2,66 +2,54 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import ReactMde, {ReactMdeTypes, ReactMdeCommands} from 'react-mde'
 import 'react-mde/lib/styles/css/react-mde-all.css'
-import {updateProject} from "../../services/project"
 import {Button} from 'antd'
 import {connect} from "dva"
 import {get} from 'lodash'
+import {Converter} from "showdown"
+import styles from './reactMde.less'
 
 class ReactMdeEditor extends React.Component {
+
+  converter = new Converter({
+    tables: true,
+    simplifiedAutoLink: true,
+    excludeTrailingPunctuationFromURLs:true,
+    tasklists: true,
+    strikethrough:true,
+    ghCodeBlocks:true,
+    emoji: true,
+  })
 
   constructor(props) {
     super(props)
     this.state = {
       reactMdeValue: {
-        text: get(this.props.projectDetail, 'project.overview.text')
+        markdown: get(this.props.project, 'overview'),
       },
-      modifyState: false,
     }
-  }
-
-  componentDidMount() {
   }
 
   editOverview() {
     const body = {
-      overview: this.state.reactMdeValue.text
+      overview: this.state.reactMdeValue.markdown
     }
-
-    updateProject({
+    this.props.dispatch({
+      type: 'projectDetail/updateProjectOverview',
       body,
-      projectId: this.props.projectDetail.project._id,
-      onJson: () => {
-        this.props.dispatch({
-          type: 'projectDetail/fetch',
-          projectId: this.props.projectDetail.project._id,
-          projectType:this.props.projectDetail.project.type,
-          notStartLab: true,
-        })
-        this.changeEditOverviewState()
-      },
+      projectId: this.props.project._id,
     })
   }
 
-  changeEditOverviewState() {
-    this.setState({modifyState: !this.state.modifyState})
-  }
-
-  handleValueChange = (value: ReactMdeTypes.Value) => {
+  handleValueChange = (value) => {
     this.setState({
-      reactMdeValue:value,
+      reactMdeValue: value,
     })
   }
 
-  startEditOverviewState(){
-    this.setState({
-      modifyState: true,
-    })
-  }
-
-  cancelEditOverviewState() {
-    this.setState({
-      modifyState: false,
-      reactMdeValue:this.props.projectDetail.project.overview
+  cancelEdit() {
+    this.props.dispatch({
+      type: 'projectDetail/setOverviewEditorState',
+      overviewEditorState: false
     })
   }
 
@@ -69,31 +57,68 @@ class ReactMdeEditor extends React.Component {
     return (
       <div>
         <ReactMde
-          textAreaProps={{
-            id: "ta1",
-            name: "ta1",
-          }}
-          value={this.state.reactMdeValue}
+          layout='tabbed'
+          editorState={this.state.reactMdeValue}
           onChange={this.handleValueChange}
-          commands={ReactMdeCommands.getDefaultCommands()}
-          showdownOptions={{tables: true, simplifiedAutoLink: true}}
-          visibility={{
-            toolbar: this.state.modifyState,
-            textarea: this.state.modifyState,
-            previewHelp: false
-          }}
+          generateMarkdownPreview={(markdown) => Promise.resolve(this.converter.makeHtml(markdown))}
         />
-        {this.state.modifyState ?
-          <div style={{"textAlign": "center", "marginTop": "15px"}}>
-            <Button type='primary' style={{marginRight: 15}}
-                    onClick={() => {
-                      this.editOverview()
-                    }}>OK</Button>
-            <Button onClick={() => {
-              this.cancelEditOverviewState()
-            }}>Cancel</Button>
-          </div> : null}
-        {!this.state.modifyState && !this.props.market_use?
+        <div style={{"textAlign": "center", "marginTop": "15px"}}>
+          <Button type='primary' style={{marginRight: 15}}
+                  onClick={() => {
+                    this.editOverview()
+                  }}>OK</Button>
+          <Button onClick={() => {
+            this.cancelEdit()
+          }}>Cancel</Button>
+        </div>
+      </div>
+    )
+  }
+}
+
+export class ReactMdePreview extends React.Component {
+
+  converter = new Converter({
+    tables: true,
+    simplifiedAutoLink: true,
+    excludeTrailingPunctuationFromURLs:true,
+    tasklists: true,
+    strikethrough:true,
+    ghCodeBlocks:true,
+    emoji: true,
+  })
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      reactMdeValue: {
+        markdown: get(this.props.project, 'overview'),
+      },
+    }
+  }
+
+  handleValueChange = (value) => {
+    this.setState({reactMdeValue: value})
+  }
+
+  startEditOverviewState() {
+    this.props.dispatch({
+      type: 'projectDetail/setOverviewEditorState',
+      overviewEditorState: true
+    })
+  }
+
+  render() {
+    return (
+      <div className={styles.mdeVertical}>
+        <ReactMde
+          layout='vertical'
+          commands={null}
+          editorState={this.state.reactMdeValue}
+          onChange={this.handleValueChange}
+          generateMarkdownPreview={(markdown) => Promise.resolve(this.converter.makeHtml(markdown))}
+        />
+        {this.props.ownerOrNot ?
           <div style={{"textAlign": "center"}}><Button
             type='primary' style={{marginTop: 15}}
             onClick={() => {
@@ -103,7 +128,6 @@ class ReactMdeEditor extends React.Component {
     )
   }
 }
-
 
 export default connect(({projectDetail}) => ({projectDetail}))(ReactMdeEditor)
 

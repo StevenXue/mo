@@ -25,7 +25,6 @@ export function getProjects({ filter, onJson }) {
 
 export function getFavs({ onJson, fav_entity, page_no }) {
   const pageParam = page_no !== undefined ? `&page_no=${page_no}` : ''
-  console.log('pageParam', pageParam)
   return request(path.join('/pyapi', 'user/action_entity') +
     `?user_ID=${localStorage.getItem('user_ID')}&action_entity=${fav_entity}` + pageParam, undefined, { onJson })
 }
@@ -92,5 +91,11 @@ export function removeUsedEntityInApp({ pageType, appId, entityId, version, onJs
       version,
     }),
   }, { onJson })
+}
+
+export function getHotTagOfProject({ payload, onJson }) {
+  const searchQuery = payload.searchQuery
+  const projectType = payload.objectType
+  return request(`pyapi/project/get_hot_tag?search_query=${searchQuery}&project_type=${projectType}`, undefined, { onJson })
 }
 

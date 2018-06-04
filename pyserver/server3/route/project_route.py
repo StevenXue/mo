@@ -13,7 +13,7 @@ from flask import jsonify
 from flask import make_response
 from flask import request
 from kubernetes import client
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 
 from server3.service import project_service
 from server3.service.message_service import MessageService
@@ -35,7 +35,6 @@ project_app = Blueprint("project_app", __name__, url_prefix=PREFIX)
 
 
 @project_app.route('/count', methods=['GET'])
-@jwt_required
 def count_projects():
     user_ID = request.args.get('user_ID')
     types = ['app', 'module', 'dataset']
@@ -52,7 +51,7 @@ def count_projects():
 
 
 @project_app.route('', methods=['GET'])
-@jwt_required
+@jwt_optional
 def list_projects_by_query():
     group = request.args.get('group')
     page_no = int(request.args.get('page_no', 1))
@@ -274,8 +273,10 @@ def update_project(project_identity):
 
 
 @project_app.route('/projects/<string:project_id>', methods=['DELETE'])
+@jwt_required
 def remove_project(project_id):
-    user_ID = request.args.get('user_ID')
+    # user_ID = request.args.get('user_ID')
+    user_ID = get_jwt_identity()
     if not project_id:
         return jsonify({'response': 'no project_id arg'}), 400
     if not user_ID:
@@ -330,13 +331,7 @@ def commit(project_id):
 @project_app.route("/commit_broadcast/<project_id>", methods=["POST"])
 def commit_broadcast(project_id):
     project = ProjectBusiness.get_by_id(project_id)
-    # ProjectBusiness.commit(project_id, commit_msg)
-    receivers = project.favor_users  # get app subscriber
-    # commits = ProjectBusiness.get_commits(project.path)
-    admin_user = UserBusiness.get_by_user_ID('admin')
-    MessageService.create_message(admin_user, 'commit', receivers,
-                                  project.user, project_type=project.type,
-                                  project_id=project_id)
+    ProjectService.send_message(project, m_type='commit')
     return jsonify({"response": 1})
 
 
@@ -360,4 +355,4 @@ def nb_to_script(project_id):
 def get_hot_tag():
     search_query = request.args.get('search_query', None)
     project_type = request.args.get('project_type', None)
-    return jsonify(ProjectBusiness.get_hot_tag(search_query, project_type))
+    return jsonify(ProjectService.get_hot_tag(search_query, project_type))

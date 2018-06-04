@@ -124,8 +124,14 @@ const menuPlugin: JupyterLabPlugin<IMainMenu> = {
       command: CommandIDs.shutdownAllKernels,
       category: 'Kernel Operations'
     });
+    let projectNameNode = document.createElement('div');
+    projectNameNode.innerHTML=`<div class="p-Menu-ProjectName">${document.title.replace(' - MO','')}</div>`;
 
+    let projectName = new Widget({node:projectNameNode});
+    projectName.id = 'jp-projectName';
+    projectName.addClass("p-MenuBar-item");
     app.shell.addToTopArea(logo);
+    app.shell.addToTopArea(projectName);
     app.shell.addToTopArea(menu);
 
     return menu;

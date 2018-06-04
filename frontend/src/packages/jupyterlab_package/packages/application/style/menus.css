@@ -20,7 +20,6 @@
 
 
 .p-MenuBar {
-  padding-left: 5px;
   background: var(--jp-layout-color1);
   color: var(--jp-ui-font-color1);
   font-size: var(--jp-ui-font-size1);
@@ -115,6 +114,11 @@
 
 .p-Menu-itemLabel {
   padding: 0px 32px 0px 2px;
+}
+
+.p-Menu-ProjectName {
+  padding: 0px 2px 0px 2px;
+  color: #6D9CF9;
 }
 
 

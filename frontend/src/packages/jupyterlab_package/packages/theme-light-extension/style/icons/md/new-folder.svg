@@ -1,17 +1,24 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 19.2.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg fill="#616161" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 10 9" style="enable-background:new 0 0 10 9;" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:none;}
-	.st1{fill:none;stroke:#FFFFFF;stroke-miterlimit:10;}
-</style>
-<g transform="translate(-1.000000, -1.148148)">
-	<path id="Shape" d="M5,2H2C1.5,2,1,2.5,1,3v6c0,0.6,0.5,1,1,1h8c0.6,0,1-0.4,1-1V4c0-0.5-0.4-1-1-1H6L5,2L5,2z"/>
-	<polygon id="Shape_1_" class="st0" points="0,0 12,0 12,12 0,12 	"/>
-</g>
-<g>
-	<line class="st1" x1="5" y1="3.3" x2="5" y2="7.7"/>
-	<line class="st1" x1="7.2" y1="5.5" x2="2.8" y2="5.5"/>
-</g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="15px" height="13px" viewBox="0 0 15 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50 (54983) - http://www.bohemiancoding.com/sketch -->
+    <title>new-folder.02a28606</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Notebook-Copy-5" transform="translate(-120.000000, -65.000000)">
+            <g id="Group-7" transform="translate(0.000000, 40.000000)">
+                <g id="Group-13-Copy" transform="translate(48.000000, 0.000000)">
+                    <g id="Group-9" transform="translate(19.000000, 22.000000)">
+                        <g id="new-folder.02a28606" transform="translate(53.000000, 3.000000)">
+                            <path d="M5.94285729,0.151322975 L1.48571432,0.151322975 C0.742857161,0.151322975 0,0.894180136 0,1.6370373 L0,10.5513232 C0,11.4427518 0.742857161,12.0370376 1.48571432,12.0370376 L13.3714289,12.0370376 C14.2628575,12.0370376 14.8571432,11.4427518 14.8571432,10.5513232 L14.8571432,3.12275162 C14.8571432,2.37989446 14.2628575,1.6370373 13.3714289,1.6370373 L7.42857161,1.6370373 L5.94285729,0.151322975 Z" id="Shape" fill="#38507F" fill-rule="nonzero"></path>
+                            <g id="Group" transform="translate(4.085714, 3.342857)" stroke="#FFFFFF">
+                                <path d="M3.34285722,0.445714297 L3.34285722,6.98285731" id="Shape"></path>
+                                <path d="M6.61142873,3.71428581 L0.0742857161,3.71428581" id="Shape"></path>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
 </svg>

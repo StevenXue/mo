@@ -1,25 +1,56 @@
-from uuid import getnode as get_mac
-
-UPDATE_USER_INFO_SK = 'secret_mo_mo'
-MONGO = 'PROD'
+# from uuid import getnode as get_mac
 # if get_mac() == 274973436731254:
 #     MONGO = 'DEFAULT'
+
+# ENV = 'CY'
+# ENV = 'DEFAULT'
+ENV = 'PROD'
+
+if ENV == 'CY':
+    # CY
+    MONGO = 'CY'
+    # REDIS_SERVER need to be changed to localhost on 小米机器 itself
+    REDIS_SERVER = 'redis://192.168.31.9:6379'
+    GIT_SERVER = 'http://192.168.31.9:2333'
+    GIT_SERVER_IP = '192.168.31.9'
+    GIT_LOCAL = f'root@{GIT_SERVER_IP}:'
+
+elif ENV == 'DEFAULT':
+    # DEV
+    MONGO = 'DEFAULT'
+    # REDIS_SERVER need to be changed to localhost on 182 itself
+    REDIS_SERVER = 'redis://10.52.14.182:6379'
+    GIT_SERVER = 'http://10.52.14.182:2333'
+    GIT_SERVER_IP = '10.52.14.182'
+    GIT_LOCAL = f'root@{GIT_SERVER_IP}:'
+
+elif ENV == 'PROD':
+    # PROD
+    MONGO = 'PROD'
+    REDIS_SERVER = 'redis://localhost:6379'
+    GIT_SERVER = 'http://localhost:2333'
+    GIT_SERVER_IP = 'momodel-ai.s3.natapp.cc'
+    GIT_LOCAL = ''
+
+else:
+    raise Exception('Wrong ENV value')
+
+
+UPDATE_USER_INFO_SK = 'secret_mo_mo'
 PORT = 5005
 SOCKET_IO_PORT = 5006
 FILL_BLANK = 'BLANK_GRID'
 ALLOWED_EXTENSIONS = {'zip', 'csv', 'png', 'jpg', 'jpeg', 'svg', 'txt', 'py',
-                      'pyc', 'md', 'h5', 'npz', 'pkl', 'pdf', 'doc', 'docx',
-                      'yml'}
+                      'pyc',
+                      'md', 'h5', 'npz', 'pkl', 'pdf', 'doc', 'docx', 'yml'}
 PREDICT_FOLDER = 'predict_data/'
 MODEL_EXPORT_BASE = '/tmp'
 MODEL_SCRIPT_PATH = './run_model.py'
+TEMPLATE_PATH = './functions/template/python3'
 SERVING_PORT = 9000
-REDIS_SERVER = 'redis://localhost:6379'
-GIT_SERVER = 'http://localhost:2333'
-GIT_SERVER_IP = 'momodel-ai.s3.natapp.cc'
 WEB_ADDR = 'http://momodel-ai.s3.natapp.cc'
 DOCKER_IP = '127.0.0.1'
-GIT_LOCAL = ''
+
 # REDIS_SERVER = 'redis://localhost:6379'
 HUB_SERVER = 'http://localhost:8000'
 ADMIN_TOKEN = '1d4afa72b00c4ffd9db82f26e1628f89'
@@ -31,22 +62,8 @@ KUBE_NAME = {
     'serving': '{job_id}-serving'
 }
 MODULE_DIR = './server3/lib/modules'
-DEV_DIR_NAME = 'dev'
+DEFAULT_DEPLOY_VERSION = 'dev'
 APP_DIR = './functions'
-# INIT_RES = [
-#     r"# coding: utf-8",
-#     r"import os",
-#     r"import sys",
-#     r"# Please use current \(work\) folder to store your data and models",
-#     r"sys.path.append\('(.+)'\)",
-#     r"client = Client\('(.+)', project_id='(.+)', user_ID='(.+)',",
-#     r"(\s+)project_type='(.+)', source_file_path='(.+)'\)",
-#     r"from modules import (.+)",
-#     r"(\S+) = client\.(\S+)",
-#     r"# append work_path to head when you want to reference a path inside "
-#     r"the working directory",
-#     r"work_path = ''",
-# ]
 INIT_RES = [
     r'# You can use other public modules via our Client object with module\'s identifier ',
     r'# and parameters.\n',

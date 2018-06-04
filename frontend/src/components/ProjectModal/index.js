@@ -1,15 +1,30 @@
-import React, { Component } from 'react'
-import { Modal, Form, Input, Radio, Select, Tag, Tooltip, Button, message } from 'antd'
-import { connect } from 'dva'
-import { createProject, updateProject, getMyProjects, getProjects } from '../../services/project'
-import { routerRedux } from 'dva/router'
+import React, {Component} from 'react'
+import {
+  Modal,
+  Form,
+  Input,
+  Radio,
+  Select,
+  Tag,
+  Tooltip,
+  Button,
+  message
+} from 'antd'
+import {connect} from 'dva'
+import {
+  createProject,
+  updateProject,
+  getMyProjects,
+  getProjects
+} from '../../services/project'
+import {routerRedux} from 'dva/router'
 import _ from 'lodash'
 
 const FormItem = Form.Item
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
 const Option = Select.Option
-const { TextArea } = Input
+const {TextArea} = Input
 const fields = ['Business', 'Government', 'Education', 'Environment', 'Health', 'Housing & Development',
   'Public Services', 'Social', 'Transportation', 'Science', 'Technology']
 const tasks = ['Classification', 'Regression', 'Clustering', 'Reinforcement Learning']
@@ -28,17 +43,17 @@ class ProjectModal extends Component {
 
   showModelHandler = (e) => {
     if (this.props.new) {
-      this.props.dispatch({ type: 'project/setTags', payload: [] })
+      this.props.dispatch({type: 'project/setTags', payload: []})
     }
-    this.props.dispatch({ type: 'project/showModal' })
+    this.props.dispatch({type: 'project/showModal'})
   }
 
   hideModelHandler = () => {
-    this.props.dispatch({ type: 'project/hideModal' })
+    this.props.dispatch({type: 'project/hideModal'})
   }
 
   okHandler = () => {
-    const { form } = this.props
+    const {form} = this.props
     form.validateFields((err, values) => {
       const body = {
         ...values,
@@ -81,25 +96,25 @@ class ProjectModal extends Component {
 
   handleClose(tags, removedTag) {
     tags = tags.filter(tag => tag !== removedTag).filter(e => e)
-    this.setState({ inputValue: undefined })
-    this.props.dispatch({ type: 'project/setTags', payload: tags })
+    this.setState({inputValue: undefined})
+    this.props.dispatch({type: 'project/setTags', payload: tags})
   }
 
   showInput() {
-    this.setState({ inputVisible: true })
+    this.setState({inputVisible: true})
     // dispatch({ type: 'upload/showInput' })
   }
 
   handleInputChange(e) {
-    this.setState({ inputValue: e.target.value })
+    this.setState({inputValue: e.target.value})
     // dispatch({ type: 'upload/setInputValue', payload: e.target.value })
   }
 
   handleInputConfirm(tags) {
     if (this.state.inputValue && tags.indexOf(this.state.inputValue) === -1) {
       tags = [...tags, this.state.inputValue]
-      this.setState({ inputValue: undefined, inputVisible: false })
-      this.props.dispatch({ type: 'project/setTags', payload: tags })
+      this.setState({inputValue: undefined, inputVisible: false})
+      this.props.dispatch({type: 'project/setTags', payload: tags})
     }
 
     // if (upload.inputValue && upload.tags.indexOf(upload.inputValue) === -1) {
@@ -108,17 +123,17 @@ class ProjectModal extends Component {
   }
 
   render() {
-    const { children, projectDetail, project } = this.props
-    const { getFieldDecorator } = this.props.form
+    const {children, projectDetail, project} = this.props
+    const {getFieldDecorator} = this.props.form
     const formItemLayout = {
-      labelCol: { span: 6 },
-      wrapperCol: { span: 14 },
+      labelCol: {span: 6},
+      wrapperCol: {span: 14},
     }
     const url = new URL(location.href.replace('/#', ''))
     const projectType = url.searchParams.get('tab') || url.searchParams.get('type')
 
     // default values
-    const { name, description, category, privacy } = _.get(projectDetail, 'project', {})
+    const {name, description, category, privacy} = _.get(projectDetail, 'project', {})
     let tags = _.get(project, 'tags', [])
     return (
       <span>
@@ -151,8 +166,16 @@ class ProjectModal extends Component {
                         // escape对字符串进行编码时，字符值大于255的以"%u****"格式存储，而字符值大于255的恰好是非英文字符
                         // （一般是中文字符，非中文字符也可以当作中文字符考虑）
                         if (escape(value).indexOf('%u') < 0) {
-                          callback()
-                        } else {
+                          if (value.length > 50) {
+                            callback('title is too long')
+                          }
+                          else if (value.length < 5 && value.length > 0) {
+                            callback('title is too short')
+                          } else {
+                            callback()
+                          }
+                        }
+                        else {
                           callback('Sorry, Chinese name is not supported yet')
                         }
                       },
@@ -171,7 +194,16 @@ class ProjectModal extends Component {
                   rules: [
                     {
                       required: true,
-                    },
+                    }, {
+                      validator: (rule, value, callback) => {
+                        if (value.length > 128) {
+                          callback('description is too long')
+                        }
+                        else {
+                          callback()
+                        }
+                      },
+                    }
                   ],
                 })(<TextArea/>)
               }
@@ -183,7 +215,7 @@ class ProjectModal extends Component {
               {getFieldDecorator('privacy', {
                 initialValue: privacy,
                 rules: [
-                  { required: false },
+                  {required: false},
                 ],
               })(
                 <RadioGroup onChange={(e) => this.onChangePrivacy(e)}>
@@ -202,7 +234,7 @@ class ProjectModal extends Component {
               {getFieldDecorator('category', {
                 initialValue: category,
                 rules: [
-                  { required: true },
+                  {required: true},
                 ],
               })(
                 <Select disabled={!this.props.new}>
@@ -223,31 +255,34 @@ class ProjectModal extends Component {
                 return [...tags, e.target.value]
               },
               rules: [
-                { required: false },
+                {required: false},
               ],
             })(
               <div>
                 {tags.length > 0 && tags.map((tag, index) => {
                   const isLongTag = tag.length > 15
                   const tagElem = (
-                    <Tag key={tag} closable={true} afterClose={() => this.handleClose(tags, tag)}>
+                    <Tag key={tag} closable={true}
+                         afterClose={() => this.handleClose(tags, tag)}>
                       {isLongTag ? `${tag.slice(0, 15)}...` : tag}
                     </Tag>
                   )
-                  return isLongTag ? <Tooltip key={tag} title={tag}>{tagElem}</Tooltip> : tagElem
+                  return isLongTag ?
+                    <Tooltip key={tag} title={tag}>{tagElem}</Tooltip> : tagElem
                 })}
                 {this.state.inputVisible ? (
                   <Input
                     ref={input => input && input.focus()}
                     type="text"
                     size="small"
-                    style={{ width: 78 }}
+                    style={{width: 78}}
                     value={this.state.inputValue}
                     onChange={(e) => this.handleInputChange(e)}
                     // onBlur={() => this.handleInputConfirm(tags)}
                     onPressEnter={() => this.handleInputConfirm(tags)}
                   />
-                ) : <Button size="small" type="dashed" onClick={() => this.showInput()}>+ New Tag</Button>}
+                ) : <Button size="small" type="dashed"
+                            onClick={() => this.showInput()}>+ New Tag</Button>}
               </div>,
             )}
             </FormItem>
@@ -258,4 +293,4 @@ class ProjectModal extends Component {
   }
 }
 
-export default connect(({ project }) => ({ project }))(Form.create()(ProjectModal))
+export default connect(({project}) => ({project}))(Form.create()(ProjectModal))

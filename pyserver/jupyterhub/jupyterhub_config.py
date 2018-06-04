@@ -146,6 +146,11 @@ class MyDockerSpawner(DockerSpawner):
 
             if extra_host_config:
                 host_config.update(extra_host_config)
+            from sys import platform
+            if platform != 'darwin':
+                host_config.update({'extra_hosts': {
+                    'host.docker.internal': '172.17.0.1'
+                }})
 
             self.log.debug("Starting host with config: %s", host_config)
 
@@ -214,8 +219,10 @@ from jupyterhub.utils import url_path_join
 
 
 class MyProxy(ConfigurableHTTPProxy):
-    tb_public_url = 'http://127.0.0.1:8111'
-    tb_api_url = 'http://127.0.0.1:8222'
+    # tb_public_url = 'http://127.0.0.1:8111'
+    # tb_api_url = 'http://127.0.0.1:8222'
+    tb_public_url = 'http://0.0.0.0:8111'
+    tb_api_url = 'http://0.0.0.0:8222'
 
     # @property
     # def tb_public_url(self):
@@ -694,7 +701,7 @@ c.JupyterHub.ip = '0.0.0.0'
 # c.JupyterHub.proxy_api_port = 0
 
 ## DEPRECATED since version 0.8: Use ConfigurableHTTPProxy.auth_token
-# c.JupyterHub.proxy_auth_token = ''
+# c.JupyterHub.proxy_auth_token = '08ef15eafbe64d82a96938cb22e929ef'
 
 ## Interval (in seconds) at which to check if the proxy is running.
 # c.JupyterHub.proxy_check_interval = 30
@@ -1221,8 +1228,9 @@ c.Authenticator.admin_users = {'admin'}
 # c.CryptKeeper.n_threads = 8
 
 import os
+
 cwd = os.getcwd()
-user_path = os.path.abspath(cwd).\
+user_path = os.path.abspath(cwd). \
     replace('jupyterhub', 'user_directory/{user_ID}/{project_name}')
 c.DockerSpawner.image = 'singleuser:latest'
 c.DockerSpawner.remove_containers = True

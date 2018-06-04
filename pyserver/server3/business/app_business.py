@@ -14,19 +14,20 @@ from io import BytesIO
 from datetime import datetime
 from datetime import timedelta
 
-import synonyms
 import docker
 
 from server3.entity import project
+from server3.entity.project import Deployment
 from server3.business.project_business import ProjectBusiness
 from server3.business.general_business import GeneralBusiness
+from server3.repository.app_repo import AppRepo
 from server3.repository.general_repo import Repo
 from server3.utility.json_utility import args_converter
 from server3.constants import APP_DIR
 from server3.constants import MODULE_DIR
 from server3.constants import DOCKER_IP
 from server3.constants import APP_DIR
-from server3.constants import DEV_DIR_NAME
+from server3.constants import DEFAULT_DEPLOY_VERSION
 from server3.constants import INIT_RES
 from server3.constants import Error, Warning, ErrorMessage
 from server3.entity.general_entity import Objects
@@ -37,7 +38,7 @@ yaml_tail_path = 'app_spec.yml'
 
 
 class AppBusiness(ProjectBusiness, GeneralBusiness):
-    repo = Repo(project.App)
+    repo = AppRepo(project.App)
     entity = project.App
     base_func_path = APP_DIR
 
@@ -63,72 +64,13 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         return logs
 
     @classmethod
-    def deploy_or_publish(cls, app_id, commit_msg, handler_file_path,
-                          version=DEV_DIR_NAME):
-        app = cls.get_by_id(app_id)
-        app.status = 'deploying'
-        app.save()
-
-        container = cls.get_container(app)
-        # freeze working env
-        # FIXME too slow to install env
-        container.exec_run(['/bin/bash', '/home/jovyan/freeze_venv.sh'])
-        cls.commit(app_id, commit_msg, version)
-
-        service_name = '-'.join([app.user.user_ID, app.name, version])
-        service_name_no_v = '-'.join([app.user.user_ID, app.name])
-        # faas new in functions dir
-        call(['faas-cli', 'new', service_name, '--lang=python3',
-              f'--gateway=http://{DOCKER_IP}:8080'],
-             cwd=cls.base_func_path)
-        # target path = new path
-        func_path = os.path.join(cls.base_func_path, service_name)
-
-        cls.copytree_wrapper(app.path, func_path,
-                             ignore=shutil.ignore_patterns('.git'))
-
-        # rename py to handler.py
-        handler_file_path = handler_file_path.replace('work', func_path)
-        handler_file_path = os.path.join(func_path, handler_file_path)
-        handler_file_name = handler_file_path.split('/')[-1]
-        handler_dst_path = handler_file_path.replace(handler_file_name,
-                                                     'handler.py')
-
-        # TODO: read file from handler_file_path, tranformed .py file
-        shutil.copy(handler_file_path, handler_dst_path)
-
-        # change some configurable variable to deploy required
-        cls.modify_handler_py(handler_dst_path)
-
-        # 1. copy modules from docker
-        cls.copy_from_container(container, '/home/jovyan/modules', func_path)
-        # copy path edited __init__.py
-        shutil.copy('./functions/template/python3/function/modules/__init__.py',
-                    os.path.join(func_path, 'modules'))
-        # 2. copy datasets from docker
-        cls.copy_from_container(container, '/home/jovyan/dataset', func_path)
-
-        # deploy
-        call(['faas-cli', 'build', '-f', f'./{service_name}.yml'],
-             cwd=cls.base_func_path)
-        call(['faas-cli', 'deploy', '-f', f'./{service_name}.yml'],
-             cwd=cls.base_func_path)
-
-        # when not dev(publish), change the privacy etc
-        if version != DEV_DIR_NAME:
-            app.privacy = 'public'
-            app.versions.append(version)
-
-        app.app_path = os.path.join(cls.base_func_path, service_name_no_v)
-        app.status = 'active'
-        app.save()
-        return app
-
-    # @staticmethod
-    # def copy_from_container(container, path_from, path_to):
-    #     strm, stat = container.get_archive(path_from)
-    #     with tarfile.open(mode='r', fileobj=BytesIO(strm.read())) as t:
-    #         t.extractall(path_to)
+    def process_handler_py(cls, script_path):
+        for line in fileinput.input(files=script_path, inplace=1):
+            # change work_path, due to deploy dir different
+            line = re.sub(r"work_path = '\./'",
+                          r"work_path = 'function/'",
+                          line.rstrip())
+            print(line)
 
     @staticmethod
     def copy_from_container(container, path_from, path_to):
@@ -141,20 +83,12 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
                 t.extractall(path_to)
 
     @staticmethod
-    def modify_handler_py(py_path):
-        for line in fileinput.input(files=py_path, inplace=1):
-            line = re.sub(r"""work_path = ''""",
-                          r"""work_path = 'function/'""",
-                          line.rstrip())
-            print(line)
-
-    @staticmethod
-    def load_app_params(app, version=DEV_DIR_NAME):
+    def load_app_params(app, version=DEFAULT_DEPLOY_VERSION):
         if not version:
             if len(app.versions) > 0:
                 version = app.versions[-1]
             else:
-                version = DEV_DIR_NAME
+                version = DEFAULT_DEPLOY_VERSION
         yml_path = os.path.join('-'.join([app.app_path, version]),
                                 yaml_tail_path)
         if os.path.exists(yml_path):
@@ -165,12 +99,27 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
             return {'input': {}, 'output': {}}
 
     @classmethod
+    def add_imported_entities(cls, app_id, app_deploy_version, used_datasets,
+                              used_modules):
+        """
+
+        :param app_id:
+        :param app_deploy_version:
+        :param used_datasets:
+        :param used_modules:
+        :return:
+        """
+        cls.repo.add_imported_entities(app_id, app_deploy_version,
+                                       used_datasets=used_datasets,
+                                       used_modules=used_modules)
+
+    @classmethod
     def add_used_module(cls, app_id, module, func, version):
         app = cls.get_by_id(app_id)
         app_yaml_path = os.path.join(app.path, yaml_tail_path)
         args = {}
         output = {}
-        version = version or DEV_DIR_NAME
+        version = version or DEFAULT_DEPLOY_VERSION
         cls.insert_module_env(app, module, version)
         # copy module yaml to app yaml
         input_args = module.to_mongo()['args']['input'].get(func, {})
@@ -320,6 +269,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
     @classmethod
     def list_projects_chat(cls, search_query, page_no=None, page_size=None,
                            default_max_score=0.4, privacy="public"):
+        import synonyms
         start = (page_no - 1) * page_size
         end = page_no * page_size
 
@@ -392,5 +342,4 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
 
 
 if __name__ == "__main__":
-    # apps = project.App.objects(user=)
     pass

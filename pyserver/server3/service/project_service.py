@@ -541,11 +541,12 @@ class ProjectService:
         answers_has_module = RequestAnswerBusiness. \
             get_by_anwser_project_id(project.id)
         # 根据答案获取对应的 request 的 owner
-        for each_anser in answers_has_module:
-            user_request = each_anser.user_request
-            request_owener = user_request.user
-            MessageService.create_message(admin_user, 'publish_request',
-                                          [request_owener],
+        for each_answer in answers_has_module:
+            user_request = each_answer.user_request
+            request_owner = user_request.user
+            # send to request owner
+            MessageService.create_message(admin_user, f'{m_type}_request',
+                                          [request_owner],
                                           project.user,
                                           project_name=project.name,
                                           project_id=project.id,
@@ -553,7 +554,23 @@ class ProjectService:
                                           user_request_id=user_request.id,
                                           project_type=project.type)
 
+            # send to request favor user
+            MessageService.create_message(admin_user, f'{m_type}_request',
+                                          user_request.star_user,
+                                          project.user,
+                                          project_name=project.name,
+                                          project_id=project.id,
+                                          user_request_title=user_request.title,
+                                          user_request_id=user_request.id,
+                                          project_type=project.type)
+
+        # send to project favor user
         MessageService.create_message(admin_user, m_type, receivers,
                                       project.user, project_name=project.name,
                                       project_id=project.id,
                                       project_type=project.type)
+
+    @staticmethod
+    def get_hot_tag(search_query, object_type):
+        return TypeMapper.get(object_type).get_hot_tag(search_query,
+                                                       object_type)

@@ -35,36 +35,98 @@ export default {
     // terminals: undefined,
     // sessions: [],
     jobs: {},
-    jobIds: [],
+    jobShowAll: false,
     // doneIndices: new Set([]),
     helpModalVisible: false,
     activeTab: '1',
     pageNo: 1,
     pageSize: 10,
     resultLoading: false,
+    helpLoading: false,
+    overviewEditorState: false,
+    loadingOverview: false,
+    steps: [{
+      title: '',
+      text: '进入项目开发环境',
+      selector: '.zi',
+      position: 'left',
+      // isFixed:true,
+      style: {
+        borderRadius: 0,
+        color: '#34BFE2',
+        textAlign: 'center',
+        width: '24rem',
+        mainColor: '#ffffff',
+        backgroundColor: '#ffffff',
+        beacon: {
+          inner: '#0ae713 ',
+          outer: '#77Eb7c',
+        },
+        close: {
+          display: 'none',
+        },
+      },
+    }, {
+      title: '',
+      text: '上传并解压代码或数据集到开发环境',
+      selector: '.qing',
+      position: 'left',
+      // isFixed:true,
+      style: {
+        borderRadius: 0,
+        color: '#34BFE2',
+        textAlign: 'center',
+        width: '24rem',
+        mainColor: '#ffffff',
+        backgroundColor: '#ffffff',
+        beacon: {
+          inner: '#0ae713 ',
+          outer: '#77Eb7c',
+        },
+        close: {
+          display: 'none',
+        },
+      },
+    }, {
+      title: '',
+      text: '下载在线的目录到本地进行开发',
+      selector: '.mei',
+      position: 'left',
+      // isFixed:true,
+      style: {
+        borderRadius: 0,
+        color: '#34BFE2',
+        textAlign: 'center',
+        width: '24rem',
+        mainColor: '#ffffff',
+        backgroundColor: '#ffffff',
+        beacon: {
+          inner: '#0ae713 ',
+          outer: '#77Eb7c',
+        },
+        close: {
+          display: 'none',
+        },
+      },
+    }]
   },
   reducers: {
     changeActiveTab(state, { activeTab }) {
       return { ...state, activeTab }
     },
-    addJobLog(state, { payload: jobId }) {
-      let jobIds = state.jobIds
-      if (!jobIds.includes(jobId)) {
-        jobIds.push(jobId)
-      }
+    clearStep(state) {
+      return { ...state, steps: [] }
+    },
+    showAllJobs(state) {
       return {
         ...state,
-        jobIds,
+        jobShowAll: true,
       }
     },
-    removeJobLog(state, { payload: jobId }) {
-      let jobIds = state.jobIds
-      if (jobIds.includes(jobId)) {
-        jobIds.splice(jobIds.indexOf(jobId), 1)
-      }
+    hideJobs(state) {
       return {
         ...state,
-        jobIds,
+        jobShowAll: false,
       }
     },
     showHelpModal(state) {
@@ -137,13 +199,16 @@ export default {
         },
       }
     },
-    changeOverview(state, action) {
+    changeOverviewLoading(state) {
       return {
         ...state,
-        project: {
-          ...state.project,
-          overview: action.payload.overview,
-        },
+        loadingOverview: !state.loadingOverview,
+      }
+    },
+    setOverviewEditorState(state, { overviewEditorState }) {
+      return {
+        ...state,
+        overviewEditorState,
       }
     },
     setVersion(state, { version }) {
@@ -183,6 +248,12 @@ export default {
         resultLoading,
       }
     },
+    setHelpLoading(state, { helpLoading }) {
+      return {
+        ...state,
+        helpLoading,
+      }
+    },
 
     setExampleResult(state, action) {
       let output = state.project.args.output
@@ -210,10 +281,22 @@ export default {
     },
   },
   effects: {
-    *refresh({ projectId, notStartLab, projectType, version, activeTab }, { call, put }) {
+    *refresh({ projectId, notStartLab, projectType, version, activeTab, match }, { call, put, select }) {
       yield put({ type: 'clearProject' })
-      yield put({ type: 'fetch', projectId, projectType, version, activeTab })
+      yield put({ type: 'fetch', projectId, projectType, version, activeTab, match, notStartLab })
       yield put({ type: 'fetchComments', projectId })
+    },
+
+    *updateProjectOverview({ projectId, body }, { call, put }) {
+      yield put({ type: 'changeOverviewLoading' })
+      const { data: project } = yield call(updateProject, {
+        projectId,
+        body,
+      })
+      yield put({ type: 'setProject', payload: project })
+      yield put({ type: 'changeOverviewLoading' })
+      yield put({ type: 'setOverviewEditorState', overviewEditorState: false })
+      message.success('Overview修改成功')
     },
 
     // 获取 project 下的 comments
@@ -237,9 +320,8 @@ export default {
     },
 
     // 获取该 project
-    *fetch({ projectId, notStartLab, projectType, version, activeTab }, { call, put, select }) {
+    *fetch({ projectId, notStartLab, projectType, version, activeTab, match }, { call, put, select }) {
       yield activeTab && put({ type: 'setActiveTab', payload: activeTab })
-
       const fetchMapper = {
         app: fetchApp,
         module: fetchModule,
@@ -252,6 +334,16 @@ export default {
         version,
       })
 
+      const projectDetailOwner = project.user_ID
+      const user_ID = localStorage.getItem('user_ID')
+      if (match && match[0] === `/explore/${projectId}` && projectDetailOwner === user_ID) {
+        yield put(routerRedux.push(`/workspace/${projectId}?type=${projectType}`))
+      }
+      if (match && match[0] === `/workspace/${projectId}` && projectDetailOwner !== user_ID) {
+        console.log('projectDetailOwner', projectDetailOwner)
+        yield put(routerRedux.push(`/explore/${projectId}?type=${projectType}`))
+      }
+
       // start lab backend
       const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
       const hubToken = project.hub_token
@@ -262,10 +354,7 @@ export default {
           projectId,
           version,
         })).data
-        // yield put({ type: 'setProject', payload: project })
       }
-
-      yield put({ type: 'setProject', payload: project })
 
       // fetch jobs
       try {
@@ -288,12 +377,16 @@ export default {
             delete jobs[sess.path]
           }
         })
-
         yield put({ type: 'setJobs', payload: jobs })
         yield put({ type: 'setTerminals', payload: terminals })
         yield put({ type: 'setSessions', payload: sessions })
       } catch (e) {
         console.log('get jobs', e)
+      } finally {
+        yield put({ type: 'setProject', payload: project })
+        if(notStartLab) {
+          yield put({ type: 'modelling/startLabBnF', projectId, projectType: project.type })
+        }
       }
     },
 
@@ -312,7 +405,7 @@ export default {
         project['overview'] = defaultDocs
       }
       else {
-        project['overview'] = { 'text': project['overview'] }
+        project['overview'] = project['overview']
       }
       yield put({ type: 'setProjectReducer', payload: project })
       yield put({ type: 'project/setTags', payload: project.tags })
@@ -334,12 +427,16 @@ export default {
         }
         yield call(deleteSession, { hubUserName, hubToken, sessionId })
       }
-      yield terminalName && console.log('runrunrun') && call(deleteTerminal, {
+      yield terminalName && call(deleteTerminal, {
         hubUserName,
         hubToken,
         terminalName,
       })
-      yield put({ type: 'fetch', projectId: project._id, projectType: project.type })
+      yield put({
+        type: 'fetch',
+        projectId: project._id,
+        projectType: project.type,
+      })
     },
     *delete({ payload }, { call, put, select }) {
       const hide = message.loading('Project Deleting...', 0)
@@ -347,13 +444,18 @@ export default {
       hide()
       yield put(routerRedux.push('/workspace?tab=' + payload.type))
     },
-    *setEntered({ projectId }, { call, put }) {
-      console.log(projectId)
-      const { data: project } = yield call(updateProject, {
-        projectId,
-        body: { entered: true },
-      })
-      yield put({ type: 'setProject', payload: project })
+    *setEntered({ projectId }, { call, put, select }) {
+      const nowProject = yield select(state => get(state, 'projectDetail.project'))
+      yield put({ type: 'hideHelpModal' })
+      if(!nowProject.entered) {
+        // yield put({ type: 'setHelpLoading', helpLoading: true })
+        const { data: project } = yield call(updateProject, {
+          projectId,
+          body: { entered: true },
+        })
+        yield put({ type: 'setProject', payload: project })
+        // yield put({ type: 'setHelpLoading', helpLoading: false })
+      }
     },
     *update({ payload }, { call, put }) {
       const { body, fetchData, projectId } = payload
@@ -430,13 +532,14 @@ export default {
           const projectId = match[1]
           const projectType = url.searchParams.get('type') || match[2]
           const activeTab = url.searchParams.get('tab')
-          dispatch({ type: 'refresh', projectId, projectType, activeTab })
-
+          // when notebook path, lab will started in modelling model, no need to start here
+          const notStartLab = match[2] !== undefined
+          dispatch({ type: 'refresh', projectId, projectType, activeTab, match, notStartLab })
           // dispatch({ type: 'fetchJobs', projectId: projectId })
         } else if (match2) {
           const projectId = match2[1]
           const projectType = url.searchParams.get('type') || match[2]
-          dispatch({ type: 'refresh', projectId, projectType })
+          dispatch({ type: 'refresh', projectId, projectType, match: match2 })
         }
       })
     },

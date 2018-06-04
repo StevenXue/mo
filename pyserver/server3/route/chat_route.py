@@ -5,11 +5,10 @@ Blueprint for chat
 Author: Bingwei Chen
 Date: 2018.01.28
 """
-
+import synonyms
 from flask import Blueprint
 from flask import jsonify
 from flask import request
-import synonyms
 
 PREFIX = '/chat'
 
@@ -34,6 +33,7 @@ def get_intent():
     :return: label
     :rtype: str
     """
+    # import synonyms
     data = request.get_json()
     content = data.pop('content')
     intent_list = data.get("intent_list")

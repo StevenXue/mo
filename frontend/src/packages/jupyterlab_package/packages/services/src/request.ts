@@ -49,7 +49,7 @@ export async function request(url: string, options = {}, funcs = {}) {
     const data = await newRes.json();
 
     if (onJson) {
-      await onJson(data.response);
+      await onJson(data.response || data);
     }
 
     const ret = {

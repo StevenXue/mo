@@ -5,20 +5,8 @@ import { Tabs, Input, Icon, Button } from 'antd'
 import { WorldMessages } from './index'
 import styles from './index.less'
 
+// 外层container 感觉没有用了，将user为空判断提到里面后删除
 class worldChannelC extends Component {
-  state = {
-    run: false,
-    steps: [],
-    steps2: [],
-  }
-
-  componentDidMount() {
-    // this.setState({ run: true });
-
-
-
-  }
-
   onClickIcon = () => {
     this.props.dispatch({
       type: 'worldChannel/toggleIsRight',
@@ -26,14 +14,7 @@ class worldChannelC extends Component {
     })
   }
 
-  callback = (tour) => {
-    const { action, index, type } = data
-  }
-
   render() {
-    const { steps, run } = this.state
-    console.log('steps', steps)
-
     const { worldMessages, isRight, dispatch, login } = this.props
     if (!login.user) {
       return (
@@ -41,15 +22,14 @@ class worldChannelC extends Component {
       )
     }
     else {
-
       return (
         <div>
-          <WorldChannel worldMessages={worldMessages}
-                        onClickIcon={this.onClickIcon}
-                        dispatch={dispatch}
-                        isRight={isRight}
-                        login={login}
-
+          <WorldChannel
+            worldMessages={worldMessages}
+            onClickIcon={this.onClickIcon}
+            dispatch={dispatch}
+            isRight={isRight}
+            login={login}
           />
         </div>
       )
@@ -64,53 +44,68 @@ class WorldChannel extends Component {
   }
 
   componentDidMount() {
-    // To disabled submit button at the beginning.
+    // 获取信息
     this.props.dispatch({
       type: 'worldChannel/getWorldMessages',
       payload: {
         channel: 'all',
-        scrollToBottom: this.scrollToBottom
+        scrollToBottom: this.scrollToBottom,
       },
     })
   }
 
   componentDidUpdate() {
+    // 在页面发送变化时下拉到底部 （软下拉：是否停留在底部）
     this.scrollToBottom(false)
   }
 
+  /**
+   * 下拉到底部
+   * @param force true 强行下拉， false 软下拉, 判断是否停留在底部， 是的话下拉
+   */
   scrollToBottom = (force = true) => {
     const messagesContainer = ReactDOM.findDOMNode(this.scrollView)
     if (messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight + 50 + 20 || force) {
       messagesContainer.scrollTop = messagesContainer.scrollHeight - messagesContainer.clientHeight
     }
-
   }
 
+  /**
+   * 提交世界频道输入内容， 回车键
+   * @param e
+   */
   handleSendMessage = (e) => {
     this.scrollToBottom(true)
     const inputMessage = e.target.value
-    this.props.dispatch({
-      type: 'worldChannel/sendMessage',
-      payload: {
-        channel: 'all',
-        message: inputMessage,
-      },
-    })
-    e.target.value = ''
+    if (inputMessage) {
+      this.props.dispatch({
+        type: 'worldChannel/sendMessage',
+        payload: {
+          channel: 'all',
+          message: inputMessage,
+        },
+      })
+      e.target.value = ''
+    }
   }
 
-  subHadleSendMessage = (e) => {
+  /**
+   * 提交世界频道输入内容， 小飞机按钮
+   * @param e
+   */
+  subHandleSendMessage = (e) => {
     this.scrollToBottom(true)
     const inputMessage = e.input.value
-    this.props.dispatch({
-      type: 'worldChannel/sendMessage',
-      payload: {
-        channel: 'all',
-        message: inputMessage,
-      },
-    })
-    e.input.value = ''
-
+    if (inputMessage) {
+      this.props.dispatch({
+        type: 'worldChannel/sendMessage',
+        payload: {
+          channel: 'all',
+          message: inputMessage,
+        },
+      })
+      e.input.value = ''
+    }
   }
 
   render() {
@@ -127,25 +122,21 @@ class WorldChannel extends Component {
         {
           isRight ?
             <div className={styles.first_row}>
-
               <Icon type="arrow-right" onClick={onClickIcon}
                     className={styles.icon_container}
               />
-
               <div className={styles.title}>
                 ALL
               </div>
-
               <Icon type="caret-down"
                     className={styles.icon_container}
-                    style={{color: 'transparent'}}
+                    style={{ color: 'transparent' }}
               />
             </div> :
 
             <div className={styles.first_row}>
               <Icon type="arrow-left" onClick={onClickIcon}
-                    className={styles.icon_container}
-              />
+                    className={styles.icon_container}/>
             </div>
         }
         <WorldMessages
@@ -155,7 +146,7 @@ class WorldChannel extends Component {
           }}
           isRight={isRight}
           login={login}
-        />
+          onClickIcon={onClickIcon}/>
         {
           isRight &&
           <div className={styles.input}>
@@ -164,7 +155,6 @@ class WorldChannel extends Component {
               onPressEnter={this.handleSendMessage}
               id="myInput"
               ref="myInput"
-              // ref={(el) => this.input = el}
             />
 
             <div
@@ -172,10 +162,6 @@ class WorldChannel extends Component {
                 height: 30, width: 30,
                 marginLeft: 10,
                 marginRight: 10,
-                // display: "flex",
-                // justifyContent: "center",
-                // alignItem: "center",
-                // flex: 1
               }}
             >
               <img
@@ -183,15 +169,12 @@ class WorldChannel extends Component {
                 src={require('../../img/icon/aircraft.png')}
                 onClick={() => {
                   let object = this.refs.myInput
-                  this.subHadleSendMessage(object)
+                  this.subHandleSendMessage(object)
                 }}
               />
             </div>
-
           </div>
         }
-
-
       </div>
 
     )

@@ -4,7 +4,7 @@ from flask import Blueprint
 from flask import jsonify
 from flask import make_response
 from flask import request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 
 from server3.service.user_request_service import UserRequestService
 from server3.service.user_service import UserService
@@ -33,7 +33,7 @@ def get_user_request(user_request_id):
 
 
 @user_request_app.route('', methods=['GET'])
-@jwt_required
+@jwt_optional
 def list_user_request():
     group = request.args.get('group')
     page_no = int(request.args.get('page_no', 1))

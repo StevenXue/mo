@@ -72,13 +72,16 @@
   padding: 0 18px;
   border: none;
   overflow: visible;
+  background: var(--jp-layout-color5);
+  color:white;
+
 }
 
 
 .jp-SideBar .p-TabBar-tab:not(.p-mod-current) {
   background: var(--jp-layout-color2);
+  color: black;
 }
-
 
 
 .jp-SideBar .p-TabBar-tabLabel {
@@ -86,9 +89,16 @@
 }
 
 
-.jp-SideBar .p-TabBar-tab:hover:not(.p-mod-current) {
-  background: var(--jp-layout-color1);
+/*.jp-SideBar .p-TabBar-tab:hover:not(.p-mod-current) {*/
+  /*background: var(--jp-layout-color5);*/
+/*}*/
+
+.jp-SideBar .p-TabBar-tab:hover {
+  background: var(--jp-layout-color5);
+  color:white;
+  cursor:pointer;
 }
+
 
 
 .jp-SideBar.jp-mod-left .p-TabBar-tab {

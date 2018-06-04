@@ -1,4 +1,16 @@
-<svg fill="#616161" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-    <path d="M0 0h24v24H0z" fill="none"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="13px" height="12px" viewBox="0 0 13 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50 (54983) - http://www.bohemiancoding.com/sketch -->
+    <title>Shape</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Notebook-Copy-8" transform="translate(-67.000000, -105.000000)" fill="#38507F" fill-rule="nonzero">
+            <g id="Group-7" transform="translate(-1.000000, 40.000000)">
+                <g id="Group-13-Copy" transform="translate(49.000000, 0.000000)">
+                    <polygon id="Shape" points="24.2 76.05 24.2 72.15 26.8 72.15 26.8 76.05 30.05 76.05 30.05 70.85 32 70.85 25.5 65 19 70.85 20.95 70.85 20.95 76.05"></polygon>
+                </g>
+            </g>
+        </g>
+    </g>
 </svg>

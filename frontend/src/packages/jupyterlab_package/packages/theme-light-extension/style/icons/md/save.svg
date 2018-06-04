@@ -1,4 +1,16 @@
-<svg fill="#616161" height="18" viewBox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg">
-    <path d="M0 0h24v24H0z" fill="none"/>
-    <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="14px" height="14px" viewBox="0 0 14 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50 (54983) - http://www.bohemiancoding.com/sketch -->
+    <title>Shape</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Notebook-Copy-5" transform="translate(-394.000000, -111.000000)" fill="#38507F" fill-rule="nonzero">
+            <g id="Group-14" transform="translate(394.000000, 109.000000)">
+                <g id="Group-20">
+                    <path d="M10.8888889,2 L1.55555556,2 C0.692222222,2 0,2.7 0,3.55555556 L0,14.4444444 C0,15.3 0.692222222,16 1.55555556,16 L12.4444444,16 C13.3,16 14,15.3 14,14.4444444 L14,5.11111111 L10.8888889,2 Z M7,14.4444444 C5.70888889,14.4444444 4.66666667,13.4022222 4.66666667,12.1111111 C4.66666667,10.82 5.70888889,9.77777778 7,9.77777778 C8.29111111,9.77777778 9.33333333,10.82 9.33333333,12.1111111 C9.33333333,13.4022222 8.29111111,14.4444444 7,14.4444444 Z M9.33333333,6.66666667 L1.55555556,6.66666667 L1.55555556,3.55555556 L9.33333333,3.55555556 L9.33333333,6.66666667 Z" id="Shape"></path>
+                </g>
+            </g>
+        </g>
+    </g>
 </svg>

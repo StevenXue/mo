@@ -22,6 +22,11 @@ git_app = Blueprint("git_app", __name__, url_prefix=PREFIX)
 
 @git_app.route('/<user_ID>', methods=['POST'])
 def add_user(user_ID):
+    """
+    called every time when user registered
+    :param user_ID:
+    :return:
+    """
     data = request.get_json()
     password = data.get('password')
     # add user to passwd.git
@@ -32,18 +37,32 @@ def add_user(user_ID):
 
 @git_app.route('/<user_ID>/<repo_name>', methods=['POST'])
 def post(user_ID, repo_name):
+    """
+    create a new repo when project created
+    :param user_ID:
+    :param repo_name:
+    :return:
+    """
     repo_path = os.path.join(REPO_ROOT, user_ID, repo_name)
     if not os.path.exists(repo_path):
         os.makedirs(repo_path)
     # git init repo from template
     bare_repo = Repo.init(repo_path, bare=True,
-                          template='/root/git_server/templates/')
+                          template='/home/admin/www/mo/git_server/templates')
+
+    call(['chown', '-R', 'apache:apache', f'{repo_path}'])
     assert bare_repo.bare
     return jsonify({'response': 1})
 
 
 @git_app.route('/<user_ID>/<repo_name>', methods=['DELETE'])
 def delete(user_ID, repo_name):
+    """
+    delete repo when project deleted
+    :param user_ID:
+    :param repo_name:
+    :return:
+    """
     def onerror(func, path, exc_info):
         """
         Error handler for ``shutil.rmtree``.
