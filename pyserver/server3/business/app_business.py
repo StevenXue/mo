@@ -125,6 +125,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         # copy module yaml to app yaml
         input_args = module.to_mongo()['args']['input'].get(func, {})
         output_args = module.to_mongo()['args']['output'].get(func, {})
+
         if os.path.isfile(app_yaml_path):
             with open(app_yaml_path, 'r') as stream:
                 # read args
@@ -234,8 +235,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         path_w_version = os.path.join(dataset.dataset_path, version)
         path_in_ctnr = path_w_version.replace('./datasets',
                                               '/home/jovyan/dataset')
-        print(path_in_ctnr)
-        if len(path_in_ctnr.split('/')) == 6:
+        if len(path_in_ctnr.split('/')) == 7:
             container.exec_run(['rm', '-rf', f'{path_in_ctnr}'])
         else:
             raise Exception('dataset path error')

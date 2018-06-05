@@ -177,7 +177,8 @@ class ModuleBusiness(ProjectBusiness):
             return {'input': {}, 'output': {}}
 
     @classmethod
-    def deploy_or_publish(cls, project_id, commit_msg, version=DEFAULT_DEPLOY_VERSION):
+    def deploy_or_publish(cls, project_id, commit_msg,
+                          version=DEFAULT_DEPLOY_VERSION):
         module = cls.get_by_id(project_id)
 
         module.status = 'deploying'
@@ -234,4 +235,3 @@ class ModuleBusiness(ProjectBusiness):
                                        project.user.user_ID, project.category)
         failures = [f[1] for f in result.failures]
         return failures
-

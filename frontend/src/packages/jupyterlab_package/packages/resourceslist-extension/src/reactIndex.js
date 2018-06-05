@@ -130,13 +130,13 @@ export class ListPage extends React.Component {
   }
 
   onGetProjectSuccess = (response) => {
+    let version
+    if (!this.state.version) {
+      version = response.versions.slice(-1)[0] || 'dev'
+    } else {
+      version = this.state.version
+    }
     if (this.pageType === 'module') {
-      let version
-      if (!this.state.version) {
-        version = response.versions.slice(-1)[0] || 'dev'
-      } else {
-        version = this.state.version
-      }
       this.setState({
         projectId: response._id,
         project: response,
@@ -147,6 +147,7 @@ export class ListPage extends React.Component {
       this.setState({
         projectId: response._id,
         project: response,
+        version,
       })
     }
   }
@@ -200,7 +201,7 @@ export class ListPage extends React.Component {
     )
     NotebookActions.insertCode(this.props.tracker.currentWidget.notebook,
       [
-        `result = ${this.state.func}('${this.state.project.user_ID}/${this.state.project.name}/${this.state.version}', conf)`,
+        `result = ${func}('${this.state.project.user_ID}/${this.state.project.name}/${this.state.version}', conf)`,
       ],
     )
 
@@ -209,7 +210,7 @@ export class ListPage extends React.Component {
       addModuleToApp({
         appId: this.appId,
         moduleId: this.state.projectId,
-        func: this.state.func,
+        func,
         version: this.state.version,
         onJson: (app) => {
           getAppActionEntity({
@@ -606,13 +607,6 @@ export class ListPage extends React.Component {
 
   render() {
     if (this.state.projectId !== undefined) {
-      // if (this.state.func) {
-      //   // params
-      //   return this.renderParams()
-      // } else {
-      //   // overview
-      //   return this.renderOverview()
-      // }
       return this.renderOverview()
     } else if (this.state[`showFav${this.pageTypeUC}s`]) {
       return this.renderFavProjects()

@@ -192,7 +192,8 @@ def convert_action_entity(objects, action_entity):
                objects]
         return ums
     if action_entity == 'used_datasets':
-        uds = [{'dataset': json_utility.convert_to_json(m.dataset.to_mongo())}
+        uds = [{'dataset': json_utility.convert_to_json(m.dataset.to_mongo()),
+                'version': '.'.join(m.version.split('_'))}
                for m in objects]
         return uds
 

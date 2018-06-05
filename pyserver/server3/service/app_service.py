@@ -30,6 +30,7 @@ class AppService(ProjectService):
         used_module = ModuleBusiness.get_by_id(used_module)
         used_module.args = ModuleBusiness.load_module_params(
             used_module, version)
+        print('used_module.args', used_module.args)
         return cls.business.add_used_module(app_id, used_module, func, version)
 
     # @classmethod
