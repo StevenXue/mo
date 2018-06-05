@@ -26,6 +26,7 @@ class ProjectRepo(Repo):
 
         project.versions.append(version)
         project.save()
+        return project
 
     def update_privacy(self, project, privacy):
         """
@@ -40,6 +41,7 @@ class ProjectRepo(Repo):
 
         project.privacy = privacy
         project.save()
+        return project
 
     def update_status(self, project, status):
         """
@@ -52,8 +54,8 @@ class ProjectRepo(Repo):
         if isinstance(project, str):
             project = self.read_by_id(project)
         project.status = status
-        updated_project = project.save()
-        return updated_project
+        project.save()
+        return project
 
 
 
