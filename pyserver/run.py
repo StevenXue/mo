@@ -38,12 +38,12 @@ from server3.route import ownership_route
 from server3.route import project_route
 from server3.route import data_route
 from server3.route import staging_data_route
-from server3.route import toolkit_route
+# from server3.route import toolkit_route
 from server3.route import user_route
-from server3.route import monitor_route
-from server3.route import model_route
+# from server3.route import monitor_route
+# from server3.route import model_route
 from server3.route import visualization_route
-from server3.route import served_model_route
+# from server3.route import served_model_route
 from server3.route import job_route
 from server3.route import request_route
 from server3.route import chat_route
@@ -62,12 +62,12 @@ app.register_blueprint(ownership_route.ownership_app)
 app.register_blueprint(project_route.project_app)
 app.register_blueprint(data_route.data_app)
 app.register_blueprint(staging_data_route.staging_data_app)
-app.register_blueprint(toolkit_route.toolkit_app)
-app.register_blueprint(model_route.model_app)
+# app.register_blueprint(toolkit_route.toolkit_app)
+# app.register_blueprint(model_route.model_app)
 app.register_blueprint(user_route.user_app)
-app.register_blueprint(monitor_route.monitor_app)
+# app.register_blueprint(monitor_route.monitor_app)
 app.register_blueprint(visualization_route.visualization_app)
-app.register_blueprint(served_model_route.served_model_app)
+# app.register_blueprint(served_model_route.served_model_app)
 app.register_blueprint(job_route.job_app)
 app.register_blueprint(request_route.user_request_app)
 app.register_blueprint(chat_route.chat_app)

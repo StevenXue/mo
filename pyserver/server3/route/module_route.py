@@ -56,8 +56,8 @@ def get_module(module_id):
     app = ModuleService.get_by_id(module_id, yml=yml, commits=commits,
                                   version=version)
     # 如果是私有项目，需要确定其登陆才能查看，否则返回error
-    if app.privacy == 'private'and app.user.user_ID != user_ID:
-        print('aaaaa',app.user.user_ID)
+    if app.privacy == 'private' and app.user.user_ID != user_ID:
+        print('aaaaa', app.user.user_ID)
         return jsonify({'response': 'error'}), 200
 
     # 将app.user 更换为 user_ID 还是name?
@@ -100,7 +100,6 @@ def update_module():
 
         # module_id = module_business.get_by_module_id()
 
-
         # @module_app.route('update_doc', methods=['POST'])
         # def update_doc():
         #     data = request.get_json()
@@ -110,7 +109,8 @@ def update_module():
 def publish_module(project_id, version):
     data = request.get_json()
     commit_msg = data.get('commit_msg')
-    project = ModuleService.publish(project_id=project_id, commit_msg=commit_msg,
+    project = ModuleService.publish(project_id=project_id,
+                                    commit_msg=commit_msg,
                                     version=version)
     project = json_utility.convert_to_json(project.to_mongo())
     return jsonify({"response": project})
@@ -120,7 +120,8 @@ def publish_module(project_id, version):
 def deploy_module(project_id):
     data = request.get_json()
     commit_msg = data.get('commit_msg')
-    project = ModuleService.deploy(project_id=project_id, commit_msg=commit_msg)
+    project = ModuleService.deploy(project_id=project_id,
+                                   commit_msg=commit_msg)
     project = json_utility.convert_to_json(project.to_mongo())
     return jsonify({"response": project})
 

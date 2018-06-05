@@ -4,7 +4,7 @@ import { addDatasetToApp } from './services'
 // import styles from './index.less'
 const InputGroup = Input.Group
 
-const CopyInput = ({ text, appId, datasetId, setApp }) => {
+const CopyInput = ({ text, appId, datasetId, version, setApp }) => {
 
   const copyHandler = () => {
     /* Get the text field */
@@ -20,6 +20,7 @@ const CopyInput = ({ text, appId, datasetId, setApp }) => {
       addDatasetToApp({
         appId,
         datasetId,
+        version,
         onJson: (app) => {
           /* Alert the copied text */
           hide()

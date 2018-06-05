@@ -12,7 +12,6 @@ from mongoengine import EmbeddedDocument
 from mongoengine import PULL
 from mongoengine import BooleanField
 
-
 RE_TYPE = ('inactive', 'active', 'deploying')
 
 
@@ -41,6 +40,7 @@ class Project(DynamicDocument):
     description = StringField()
     overview = StringField()
     tb_port = StringField()
+    repo_path = StringField()
 
     jobs = ListField(ReferenceField('Job'))
     # if forked project, which project fork from
@@ -73,6 +73,7 @@ class Project(DynamicDocument):
 
 class Dataset(Project):
     size = IntField()  # by bytes
+    dataset_path = StringField()
 
 
 class Module(Project):
@@ -80,7 +81,6 @@ class Module(Project):
     module_path = StringField()
     input = DictField()
     output = DictField()
-    repo_path = StringField()
     status = StringField(choices=RE_TYPE)
 
 
@@ -99,6 +99,7 @@ class UsedModule(EmbeddedDocument):
 
 class UsedDataset(EmbeddedDocument):
     dataset = ReferenceField(Dataset)
+    version = StringField()
 
 
 class Deployment(EmbeddedDocument):

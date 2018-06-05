@@ -108,7 +108,7 @@ export default {
           display: 'none',
         },
       },
-    }]
+    }],
   },
   reducers: {
     changeActiveTab(state, { activeTab }) {
@@ -281,9 +281,9 @@ export default {
     },
   },
   effects: {
-    *refresh({ projectId, notStartLab, projectType, version, activeTab, match }, { call, put, select }) {
+    *refresh({ projectId, notStartLab, inLabPage, projectType, version, activeTab, match }, { call, put, select }) {
       yield put({ type: 'clearProject' })
-      yield put({ type: 'fetch', projectId, projectType, version, activeTab, match, notStartLab })
+      yield put({ type: 'fetch', projectId, projectType, version, activeTab, match, notStartLab, inLabPage })
       yield put({ type: 'fetchComments', projectId })
     },
 
@@ -320,7 +320,7 @@ export default {
     },
 
     // 获取该 project
-    *fetch({ projectId, notStartLab, projectType, version, activeTab, match }, { call, put, select }) {
+    *fetch({ projectId, notStartLab, inLabPage, projectType, version, activeTab, match }, { call, put, select }) {
       yield activeTab && put({ type: 'setActiveTab', payload: activeTab })
       const fetchMapper = {
         app: fetchApp,
@@ -347,7 +347,7 @@ export default {
       // start lab backend
       const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
       const hubToken = project.hub_token
-      if (!notStartLab) {
+      if (!notStartLab || !inLabPage) {
         yield call(startLab, { hubUserName, hubToken })
         // fetch and set project for tb_port restarted by startLab
         project = (yield call(fetchMapper[projectType], {
@@ -384,7 +384,7 @@ export default {
         console.log('get jobs', e)
       } finally {
         yield put({ type: 'setProject', payload: project })
-        if(notStartLab) {
+        if (inLabPage) {
           yield put({ type: 'modelling/startLabBnF', projectId, projectType: project.type })
         }
       }
@@ -447,7 +447,7 @@ export default {
     *setEntered({ projectId }, { call, put, select }) {
       const nowProject = yield select(state => get(state, 'projectDetail.project'))
       yield put({ type: 'hideHelpModal' })
-      if(!nowProject.entered) {
+      if (!nowProject.entered) {
         // yield put({ type: 'setHelpLoading', helpLoading: true })
         const { data: project } = yield call(updateProject, {
           projectId,
@@ -533,8 +533,8 @@ export default {
           const projectType = url.searchParams.get('type') || match[2]
           const activeTab = url.searchParams.get('tab')
           // when notebook path, lab will started in modelling model, no need to start here
-          const notStartLab = match[2] !== undefined
-          dispatch({ type: 'refresh', projectId, projectType, activeTab, match, notStartLab })
+          const inLabPage = match[2] !== undefined
+          dispatch({ type: 'refresh', projectId, projectType, activeTab, match, inLabPage })
           // dispatch({ type: 'fetchJobs', projectId: projectId })
         } else if (match2) {
           const projectId = match2[1]

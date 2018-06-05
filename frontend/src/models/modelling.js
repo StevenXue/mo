@@ -16,9 +16,9 @@ const checker = (value, arr) =>
   arr.some(element => value.includes(element))
 
 const extFilter = {
-  app: ['moduledeploy-extension'],
-  module: ['appdeploy-extension'],
-  dataset: ['moduledeploy-extension', 'appdeploy-extension'],
+  app: [],
+  module: [],
+  dataset: [],
 }
 
 // Load the core theming before any other package.
@@ -55,11 +55,10 @@ const loadnStartJL = (projectType) => {
     require('../packages/jupyterlab_package/packages/theme-dark-extension'),
     require('../packages/jupyterlab_package/packages/theme-light-extension'),
     require('../packages/jupyterlab_package/packages/tooltip-extension'),
-    // require('../packages/jupyterlab_package/packages/modules-extension'),
-    // require('../packages/jupyterlab_package/packages/datasets-extension'),
     require('../packages/jupyterlab_package/packages/resourceslist-extension'),
-    require('../packages/jupyterlab_package/packages/moduledeploy-extension'),
-    require('../packages/jupyterlab_package/packages/appdeploy-extension'),
+    require('../packages/jupyterlab_package/packages/deploy-extension'),
+    // require('../packages/jupyterlab_package/packages/moduledeploy-extension'),
+    // require('../packages/jupyterlab_package/packages/appdeploy-extension'),
     require('../packages/jupyterlab_package/packages/commit-extension'),
   ]
 
@@ -102,27 +101,6 @@ const insertConfigData = (html) => {
   localStorage.setItem('name', Math.random())
   JCD.innerHTML = JSON.stringify(jupyterConfigData)
   document.head.insertBefore(JCD, document.head.children[3])
-}
-
-export function *startLabFront({ payload: { projectType } }, { call }) {
-  // load lab frontend
-  let labContainer = document.getElementById('mo-jlContainer')
-  if (labContainer !== null) {
-
-    while (labContainer.firstChild) {
-      console.log('delete')
-      labContainer.removeChild(labContainer.firstChild)
-    }
-    // let apps = document.getElementsByClassName('p-Widget jp-ApplicationShell')
-    // if (apps.length !== 0) {
-    //   for (let app of apps) {
-    //     app.remove()
-    //   }
-    // }
-    console.log('app2', labContainer.firstChild)
-
-    loadnStartJL(projectType)
-  }
 }
 
 export function *startLabBack({ payload: { hubUserName, hubToken } }, { call }) {
@@ -178,21 +156,21 @@ const modelling = {
       yield call(loadnStartJL, projectType)
     },
   },
-  subscriptions: {
-    // 当进入该页面时 加载 jupyterlab
-    setup({ dispatch, history }) {
-      // return history.listen(({ pathname }) => {
-        // const match = pathToRegexp('/workspace/:projectId/:type').exec(pathname)
-        // if (match) {
-        //   let projectId = match[1]
-        //   let type = match[2]
-        //   dispatch({ type: 'startLabBnF', projectId, projectType: type })
-        //
-        // }
-      // })
-    },
-
-  },
+  // subscriptions: {
+  //   // 当进入该页面时 加载 jupyterlab
+  //   setup({ dispatch, history }) {
+  //     return history.listen(({ pathname }) => {
+  //       const match = pathToRegexp('/workspace/:projectId/:type').exec(pathname)
+  //       if (match) {
+  //         let projectId = match[1]
+  //         let type = match[2]
+  //         dispatch({ type: 'startLabBnF', projectId, projectType: type })
+  //
+  //       }
+  //     })
+  //   },
+  //
+  // },
 }
 
 export default modelling

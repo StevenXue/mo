@@ -21,14 +21,34 @@ dataset_app = Blueprint("dataset_app", __name__, url_prefix=PREFIX)
 
 @dataset_app.route('/<dataset_id>', methods=['GET'])
 @jwt_optional
-def get_app(dataset_id):
+def get_dataset(dataset_id):
     user_ID = get_jwt_identity()
     commits = request.args.get('commits')
     dataset = DatasetService.get_by_id(dataset_id, commits=commits)
-    if dataset.privacy == 'private'and dataset.user.user_ID != user_ID:
+    if dataset.privacy == 'private' and dataset.user.user_ID != user_ID:
         return jsonify({'response': 'error'}), 200
     # 将app.user 更换为 user_ID 还是name?
     dataset_info = json_utility.convert_to_json(dataset.to_mongo())
     dataset_info["user_ID"] = dataset.user.user_ID
     return jsonify({"response": dataset_info}), 200
 
+
+@dataset_app.route("/publish/<project_id>/<version>", methods=["POST"])
+def publish_module(project_id, version):
+    data = request.get_json()
+    commit_msg = data.get('commit_msg')
+    project = DatasetService.publish(project_id=project_id,
+                                     commit_msg=commit_msg,
+                                     version=version)
+    project = json_utility.convert_to_json(project.to_mongo())
+    return jsonify({"response": project})
+
+
+@dataset_app.route("/deploy/<project_id>", methods=["POST"])
+def deploy_module(project_id):
+    data = request.get_json()
+    commit_msg = data.get('commit_msg')
+    project = DatasetService.deploy(project_id=project_id,
+                                    commit_msg=commit_msg)
+    project = json_utility.convert_to_json(project.to_mongo())
+    return jsonify({"response": project})

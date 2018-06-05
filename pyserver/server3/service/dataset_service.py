@@ -10,6 +10,33 @@ from server3.constants import MODULE_DIR
 class DatasetService(ProjectService):
     business = DatasetBusiness
 
+    @classmethod
+    def publish(cls, project_id, commit_msg, version):
+        try:
+            dataset = cls.business.deploy_or_publish(project_id, commit_msg,
+                                                     version=version)
+            cls.send_message(dataset, m_type='publish')
+        except:
+            dataset = cls.business.get_by_id(project_id)
+            dataset.status = 'inactive'
+            dataset.save()
+            cls.send_message(dataset, m_type='publish_fail')
+        else:
+            return dataset
+
+    @classmethod
+    def deploy(cls, project_id, commit_msg):
+        try:
+            dataset = cls.business.deploy_or_publish(project_id, commit_msg)
+            cls.send_message(dataset, m_type='deploy')
+        except:
+            dataset = cls.business.get_by_id(project_id)
+            dataset.status = 'inactive'
+            dataset.save()
+            cls.send_message(dataset, m_type='deploy_fail')
+        else:
+            return dataset
+
 
 if __name__ == '__main__':
     pass

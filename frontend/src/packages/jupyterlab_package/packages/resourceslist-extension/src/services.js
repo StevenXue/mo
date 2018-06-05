@@ -65,7 +65,7 @@ export function addModuleToApp({ appId, moduleId, func, version, onJson }) {
   }, { onJson })
 }
 
-export function addDatasetToApp({ appId, datasetId, onJson }) {
+export function addDatasetToApp({ appId, datasetId, version, onJson }) {
   return request(`pyapi/apps/add_used_dataset/${appId}`, {
     method: 'put',
     headers: {
@@ -73,6 +73,7 @@ export function addDatasetToApp({ appId, datasetId, onJson }) {
     },
     body: JSON.stringify({
       used_dataset: datasetId,
+      version,
     }),
   }, { onJson })
 }

@@ -1,14 +1,13 @@
 # -*- coding: UTF-8 -*-
 
 from server3.repository.project_repo import ProjectRepo
-from enum import Enum
 
 
 class AppRepo(ProjectRepo):
     def __init__(self, instance):
         ProjectRepo.__init__(self, instance)
 
-    class AppStatus(Enum):
+    class AppStatus:
         """
         App status
         """
@@ -16,7 +15,7 @@ class AppRepo(ProjectRepo):
         ACTIVE = 'active'
         INACTIVE = 'inactive'
 
-    class AppPrivacy(Enum):
+    class AppPrivacy:
         """
         App Privacy
         """
@@ -34,6 +33,7 @@ class AppRepo(ProjectRepo):
         app = self.read_by_id(app_id)
         app.versions.append(version)
         app.save()
+        return app
 
     def update_path(self, app_id, path):
         """
@@ -46,7 +46,7 @@ class AppRepo(ProjectRepo):
         app = self.read_by_id(app_id)
         app.app_path = path
         app.save()
-
+        return app
 
     def update_privacy(self, app_id, privacy):
         """
@@ -59,6 +59,7 @@ class AppRepo(ProjectRepo):
         app = self.read_by_id(app_id)
         app.privacy = privacy
         app.save()
+        return app
 
     def update_status(self, app_id, status):
         """
@@ -70,9 +71,8 @@ class AppRepo(ProjectRepo):
         """
         app = self.read_by_id(app_id)
         app.status = status
-        updated_app = app.save()
-        return updated_app
-
+        app.save()
+        return app
 
     def add_imported_entities(self, app_id, app_deploy_version,
                               used_datasets=None, used_modules=None):
@@ -112,3 +112,4 @@ class AppRepo(ProjectRepo):
         else:
             raise Exception('deployments duplicate')
         app.save()
+        return app
