@@ -14,7 +14,7 @@ from unittest import TextTestRunner
 
 
 
-class GDValidation(unittest.TestCase):
+class ModuleValidation(unittest.TestCase):
     '''
         VALIDATE USER'S MODULE
     '''
@@ -334,11 +334,11 @@ class GDValidation(unittest.TestCase):
     @classmethod
     def run_test(cls, module_path, module_name, module_user_ID, module_type,
                  val_mode='basic'):
-        GDValidation.MODULE_PATH = module_path
-        GDValidation.MODULE_NAME = module_name
-        GDValidation.MODULE_AUTHOR = module_user_ID
-        GDValidation.MODULE_TYPE = module_type
-        GDValidation.MODULE_VALIDATION_MODE = val_mode
+        ModuleValidation.MODULE_PATH = module_path
+        ModuleValidation.MODULE_NAME = module_name
+        ModuleValidation.MODULE_AUTHOR = module_user_ID
+        ModuleValidation.MODULE_TYPE = module_type
+        ModuleValidation.MODULE_VALIDATION_MODE = val_mode
 
         test_suite = unittest.TestLoader().loadTestsFromTestCase(cls)
         return TextTestRunner().run(test_suite)
@@ -356,15 +356,15 @@ if __name__ == '__main__':
     # print(GDValidation.MODULE_PATH)
     import sys
     sys.path.append('../../../')
-    GDValidation.MODULE_PATH = "/Users/Chun/Documents/workspace/momodel/goldersgreen/pyserver/user_directory/zhaofengli/weather_prediction"
-    GDValidation.MODULE_NAME = "weather_prediction"
-    GDValidation.MODULE_AUTHOR = "zhaofengli"
-    GDValidation.MODULE_TYPE = 'model'
-    GDValidation.MODULE_VALIDATION_MODE = 'basic'
+    ModuleValidation.MODULE_PATH = "/Users/Chun/Documents/workspace/momodel/goldersgreen/pyserver/user_directory/zhaofengli/weather_prediction"
+    ModuleValidation.MODULE_NAME = "weather_prediction"
+    ModuleValidation.MODULE_AUTHOR = "zhaofengli"
+    ModuleValidation.MODULE_TYPE = 'model'
+    ModuleValidation.MODULE_VALIDATION_MODE = 'basic'
     # /Users/Chun/Documents/workspace/goldersgreen/pyserver/user_directory/zhaofengli/sesese
     # unittest.main()
 
-    test_suite = unittest.TestLoader().loadTestsFromTestCase(GDValidation)
+    test_suite = unittest.TestLoader().loadTestsFromTestCase(ModuleValidation)
     test_result = TextTestRunner().run(test_suite)
 
     print("total_errors", len(test_result.errors))

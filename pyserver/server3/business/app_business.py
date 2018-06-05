@@ -58,8 +58,9 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         service_name = cls.get_service_name(app, version)
         service = client.services(filters={'name': service_name})[0]
         from_time = datetime.now() - timedelta(minutes=since)
-        logs = client.service_logs(service['ID'], stdout=True, stderr=True,
-                                   since=int(time.mktime(from_time.timetuple())))
+        logs = client.service_logs(
+            service['ID'], stdout=True, stderr=True,
+            since=int(time.mktime(from_time.timetuple())))
         logs = list(logs)
         return logs
 
