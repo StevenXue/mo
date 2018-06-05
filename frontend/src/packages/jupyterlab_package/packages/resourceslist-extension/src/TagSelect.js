@@ -101,8 +101,8 @@ class Index extends React.Component {
                       </Menu.Item>}
                     </Menu>}>
             <Button  style={{alignItems:'center',display:'flex'}}>
-              {value.length>0?<p style={{marginBottom:'0'}}> &nbsp; {value.length} tag</p>:<p style={{marginBottom:'0'}}> &nbsp;Tags</p>}
-              <Icon type="caret-down" />
+              {value.length>0?<p style={{marginBottom:'0'}}> &nbsp; {value.length} tag &nbsp;</p>:<p style={{marginBottom:'0'}}> &nbsp;Tags &nbsp;</p>}
+              <Icon type={this.state.showDropDown?"caret-up":"caret-down"} style={{fontSize:'8px'}}/>
             </Button>
           </Dropdown>
         </div>
