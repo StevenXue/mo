@@ -96,7 +96,7 @@ def emit_success(message, project_id, **kw):
 
 
 def emit_message_url(message, project_id):
-    socketio.emit('send_message', message, namespace='/log/%s' % project_id)
+    socketio.emit('send_message_favor', message, namespace='/log/%s' % project_id)
 
 
 def save_log(event, n, logs, result_sds, project_id, **kw):

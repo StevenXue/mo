@@ -539,7 +539,8 @@ export default {
         } else if (match2) {
           const projectId = match2[1]
           const projectType = url.searchParams.get('type') || match[2]
-          dispatch({ type: 'refresh', projectId, projectType, match: match2 })
+          const activeTab = url.searchParams.get('tab')
+          dispatch({ type: 'refresh', projectId, projectType, match: match2, activeTab })
         }
       })
     },

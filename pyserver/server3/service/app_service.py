@@ -113,6 +113,10 @@ class AppService(ProjectService):
                 output_json = {
                     'errors': errors
                 }
+            finally:
+                # send input and errors to author
+                cls.send_msg_owner(app, m_type='run_error')
+
         # output_json = response.json()
         # 成功调用后 在新的collection存一笔
         user_obj = UserBusiness.get_by_user_ID(user_ID=user_ID)
@@ -164,7 +168,7 @@ class AppService(ProjectService):
         try:
             app = cls.deploy_or_publish(project_id, commit_msg,
                                         handler_file_path, version)
-            cls.send_message(app, m_type='publish')
+            cls.send_message_favor(app, m_type='publish')
         except Exception as e:
             # app = cls.business.get_by_id(project_id)
             # app.status = 'inactive'
@@ -175,7 +179,7 @@ class AppService(ProjectService):
                 project_id,
                 cls.business.repo.STATUS.INACTIVE)
 
-            cls.send_message(app, m_type='publish_fail')
+            cls.send_message_favor(app, m_type='publish_fail')
             raise e
         else:
             return app
@@ -185,7 +189,7 @@ class AppService(ProjectService):
         try:
             app = cls.deploy_or_publish(project_id, commit_msg,
                                         handler_file_path)
-            cls.send_message(app, m_type='deploy')
+            cls.send_message_favor(app, m_type='deploy')
         except Exception as e:
             # app = cls.business.get_by_id(project_id)
             # app.status = 'inactive'
@@ -194,7 +198,7 @@ class AppService(ProjectService):
                 project_id,
                 cls.business.repo.STATUS.INACTIVE)
 
-            cls.send_message(app, m_type='deploy_fail')
+            cls.send_message_favor(app, m_type='deploy_fail')
             raise e
         return app
 
