@@ -139,7 +139,8 @@ class AppService(ProjectService):
             AppBusiness.insert_module_env(app, used_module.module,
                                           used_module.version)
         for used_dataset in app.used_datasets:
-            AppBusiness.insert_dataset(app, used_dataset.dataset)
+            AppBusiness.insert_dataset(app, used_dataset.dataset,
+                                       used_dataset.version)
 
     @classmethod
     def get_by_id(cls, project_id, **kwargs):
@@ -188,8 +189,6 @@ class AppService(ProjectService):
             # app = cls.business.get_by_id(project_id)
             # app.status = 'inactive'
             # app.save()
-
-            # update app status
             app = cls.business.repo.update_status(
                 project_id,
                 cls.business.repo.AppStatus.INACTIVE)
@@ -307,6 +306,7 @@ class AppService(ProjectService):
     @staticmethod
     def copy_entity(app, app_version, entity, entity_path, entity_obj,
                     entity_dir):
+        print('nnn', entity_obj.name)
         src = '{}/{}/'.format(entity_path,
                               entity.version.replace('.', '_'))
         dst = './functions/{}-{}-{}/{}/{}/{}/{}/'.format(

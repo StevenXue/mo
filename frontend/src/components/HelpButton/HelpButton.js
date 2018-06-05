@@ -133,7 +133,7 @@ class HelpButton extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!this.props.projectDetail.project) {
+    if (this.props.projectDetail && !this.props.projectDetail.project) {
       const AutoShowHelp = _.get(nextProps.projectDetail.project, 'auto_show_help')
       if (AutoShowHelp) {
         this.setState({

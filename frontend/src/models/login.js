@@ -308,7 +308,6 @@ export default {
           }
         }
 
-        console.log('pathname', pathname)
         const match = pathToRegexp('/user/login').exec(pathname)
 
         if (!match) {

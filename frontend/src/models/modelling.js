@@ -156,21 +156,21 @@ const modelling = {
       yield call(loadnStartJL, projectType)
     },
   },
-  subscriptions: {
-    // 当进入该页面时 加载 jupyterlab
-    setup({ dispatch, history }) {
-      // return history.listen(({ pathname }) => {
-        // const match = pathToRegexp('/workspace/:projectId/:type').exec(pathname)
-        // if (match) {
-        //   let projectId = match[1]
-        //   let type = match[2]
-        //   dispatch({ type: 'startLabBnF', projectId, projectType: type })
-        //
-        // }
-      // })
-    },
-
-  },
+  // subscriptions: {
+  //   // 当进入该页面时 加载 jupyterlab
+  //   setup({ dispatch, history }) {
+  //     return history.listen(({ pathname }) => {
+  //       const match = pathToRegexp('/workspace/:projectId/:type').exec(pathname)
+  //       if (match) {
+  //         let projectId = match[1]
+  //         let type = match[2]
+  //         dispatch({ type: 'startLabBnF', projectId, projectType: type })
+  //
+  //       }
+  //     })
+  //   },
+  //
+  // },
 }
 
 export default modelling

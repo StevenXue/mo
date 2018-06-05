@@ -108,7 +108,7 @@ export default {
           display: 'none',
         },
       },
-    }]
+    }],
   },
   reducers: {
     changeActiveTab(state, { activeTab }) {
@@ -384,7 +384,7 @@ export default {
         console.log('get jobs', e)
       } finally {
         yield put({ type: 'setProject', payload: project })
-        if(notStartLab) {
+        if (notStartLab) {
           yield put({ type: 'modelling/startLabBnF', projectId, projectType: project.type })
         }
       }
@@ -447,7 +447,7 @@ export default {
     *setEntered({ projectId }, { call, put, select }) {
       const nowProject = yield select(state => get(state, 'projectDetail.project'))
       yield put({ type: 'hideHelpModal' })
-      if(!nowProject.entered) {
+      if (!nowProject.entered) {
         // yield put({ type: 'setHelpLoading', helpLoading: true })
         const { data: project } = yield call(updateProject, {
           projectId,

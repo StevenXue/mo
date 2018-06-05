@@ -222,17 +222,18 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
     @classmethod
     def remove_used_dataset(cls, app_id, dataset, version):
         app = cls.get_by_id(app_id)
-        cls.remove_dataset_dir(app, dataset)
+        cls.remove_dataset_dir(app, dataset, version)
         return cls.repo.pull_from_set(app_id, used_datasets=UsedDataset(
             dataset=dataset, version=version))
 
     @classmethod
-    def remove_dataset_dir(cls, app, dataset):
+    def remove_dataset_dir(cls, app, dataset, version):
         container = cls.get_container(app)
 
         # copy dataset folder to container
-        path_in_ctnr = dataset.path.replace('./user_directory',
-                                            '/home/jovyan/dataset')
+        path_w_version = os.path.join(dataset.dataset_path, version)
+        path_in_ctnr = path_w_version.replace('./datasets',
+                                              '/home/jovyan/dataset')
         print(path_in_ctnr)
         if len(path_in_ctnr.split('/')) == 6:
             container.exec_run(['rm', '-rf', f'{path_in_ctnr}'])
