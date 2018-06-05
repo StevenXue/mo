@@ -12,7 +12,6 @@ from mongoengine import EmbeddedDocument
 from mongoengine import PULL
 from mongoengine import BooleanField
 
-
 RE_TYPE = ('inactive', 'active', 'deploying')
 
 
@@ -100,6 +99,7 @@ class UsedModule(EmbeddedDocument):
 
 class UsedDataset(EmbeddedDocument):
     dataset = ReferenceField(Dataset)
+    version = StringField()
 
 
 class Deployment(EmbeddedDocument):

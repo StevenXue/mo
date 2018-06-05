@@ -55,8 +55,6 @@ const loadnStartJL = (projectType) => {
     require('../packages/jupyterlab_package/packages/theme-dark-extension'),
     require('../packages/jupyterlab_package/packages/theme-light-extension'),
     require('../packages/jupyterlab_package/packages/tooltip-extension'),
-    // require('../packages/jupyterlab_package/packages/modules-extension'),
-    // require('../packages/jupyterlab_package/packages/datasets-extension'),
     require('../packages/jupyterlab_package/packages/resourceslist-extension'),
     require('../packages/jupyterlab_package/packages/moduledeploy-extension'),
     require('../packages/jupyterlab_package/packages/appdeploy-extension'),
@@ -102,27 +100,6 @@ const insertConfigData = (html) => {
   localStorage.setItem('name', Math.random())
   JCD.innerHTML = JSON.stringify(jupyterConfigData)
   document.head.insertBefore(JCD, document.head.children[3])
-}
-
-export function *startLabFront({ payload: { projectType } }, { call }) {
-  // load lab frontend
-  let labContainer = document.getElementById('mo-jlContainer')
-  if (labContainer !== null) {
-
-    while (labContainer.firstChild) {
-      console.log('delete')
-      labContainer.removeChild(labContainer.firstChild)
-    }
-    // let apps = document.getElementsByClassName('p-Widget jp-ApplicationShell')
-    // if (apps.length !== 0) {
-    //   for (let app of apps) {
-    //     app.remove()
-    //   }
-    // }
-    console.log('app2', labContainer.firstChild)
-
-    loadnStartJL(projectType)
-  }
 }
 
 export function *startLabBack({ payload: { hubUserName, hubToken } }, { call }) {

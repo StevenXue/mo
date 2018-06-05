@@ -247,8 +247,9 @@ class AppService(ProjectService):
 
         # 3. check if there is any matches in script
         for d in possible_used_datasets:
-            pattern = r"""^(?!#).*({})""".format(d.dataset.path.replace(
-                './user_directory', 'dataset'))
+            pattern = r"""^(?!#).*({})/({})""".format(
+                d.dataset.path.replace('./user_directory', 'dataset'),
+                d.version)
             matches = re.finditer(pattern, script, re.MULTILINE)
             for ma in matches:
                 if '#' not in ma.group(0):
@@ -271,7 +272,7 @@ class AppService(ProjectService):
         return possible_used_datasets, possible_used_modules
 
     @classmethod
-    def copy_entities(cls, container, app, version, possible_used_datasets,
+    def copy_entities(cls, app, version, possible_used_datasets,
                       possible_used_modules):
         """
 
@@ -291,15 +292,8 @@ class AppService(ProjectService):
         # ./fucntion/[user_ID]-[app_name]-[app_version]/modules/
         # [user_ID]/[module_name]/[module_version]
         for m in possible_used_modules:
-            src = '{}/{}/'.format(m.module.module_path,
-                                  m.version.replace('.', '_'))
-            dst = './functions/{}-{}-{}/modules/{}/{}/{}/'.format(
-                app.user.user_ID, app.name, version,
-                m.module.user.name, m.module.name,
-                m.version.replace('.', '_'))
-            if os.path.isdir(dst):
-                shutil.rmtree(dst)
-            shutil.copytree(src, dst)
+            cls.copy_entity(app, version, m, m.module.module_path, m.module,
+                            'modules')
 
         # Move dataset from 引用者的DOCKER CONTAINER 里面的
         # ~/dataset/[user_ID] to
@@ -307,14 +301,22 @@ class AppService(ProjectService):
         # dataset/[user_ID]/[dataset_name]/
 
         for d in possible_used_datasets:
-            src = '/home/jovyan/{}'.format(
-                d.dataset.path.replace('./user_directory', 'dataset'))
-            dst = './functions/{}-{}-{}/dataset/{}/{}'.format(
-                app.user.user_ID, app.name, version,
-                d.dataset.user.name, d.dataset.name)
-            if os.path.isdir(dst):
-                shutil.rmtree(dst)
-            cls.business.copy_from_container(container, src, dst)
+            cls.copy_entity(app, version, d, d.dataset.dataset_path,
+                            d.dataset, 'dataset')
+
+    @staticmethod
+    def copy_entity(app, app_version, entity, entity_path, entity_obj,
+                    entity_dir):
+        src = '{}/{}/'.format(entity_path,
+                              entity.version.replace('.', '_'))
+        dst = './functions/{}-{}-{}/{}/{}/{}/{}/'.format(
+            app.user.user_ID, app.name, app_version,
+            entity_dir,
+            entity_obj.user.name, entity_obj.name,
+            entity.version.replace('.', '_'))
+        if os.path.isdir(dst):
+            shutil.rmtree(dst)
+        shutil.copytree(src, dst)
 
     @classmethod
     def rename_handler_py(cls, handler_file_path, func_path):
@@ -411,7 +413,7 @@ class AppService(ProjectService):
                 used_modules=possible_used_modules,
                 used_datasets=possible_used_datasets)
 
-            cls.copy_entities(container, app, version,
+            cls.copy_entities(app, version,
                               possible_used_datasets, possible_used_modules)
 
         # copy path edited __init__.py
