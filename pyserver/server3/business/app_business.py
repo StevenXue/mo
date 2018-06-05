@@ -41,11 +41,14 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
     repo = AppRepo(project.App)
     entity = project.App
     base_func_path = APP_DIR
+    DEFAULT_PRIVACY = repo.PRIVACY.PUBLIC
 
     @classmethod
     def create_project(cls, *args, **kwargs):
         ProjectBusiness.repo = Repo(project.App)
-        return ProjectBusiness.create_project(*args, status='inactive',
+
+        return ProjectBusiness.create_project(*args,
+                                              status=cls.repo.STATUS.INACTIVE,
                                               **kwargs)
 
     @staticmethod
@@ -58,8 +61,9 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
         service_name = cls.get_service_name(app, version)
         service = client.services(filters={'name': service_name})[0]
         from_time = datetime.now() - timedelta(minutes=since)
-        logs = client.service_logs(service['ID'], stdout=True, stderr=True,
-                                   since=int(time.mktime(from_time.timetuple())))
+        logs = client.service_logs(
+            service['ID'], stdout=True, stderr=True,
+            since=int(time.mktime(from_time.timetuple())))
         logs = list(logs)
         return logs
 
@@ -268,7 +272,7 @@ class AppBusiness(ProjectBusiness, GeneralBusiness):
 
     @classmethod
     def list_projects_chat(cls, search_query, page_no=None, page_size=None,
-                           default_max_score=0.4, privacy="public"):
+                           default_max_score=0.4, privacy=DEFAULT_PRIVACY):
         import synonyms
         start = (page_no - 1) * page_size
         end = page_no * page_size
