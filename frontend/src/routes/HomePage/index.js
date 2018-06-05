@@ -3,6 +3,7 @@ import { Button, Icon } from 'antd'
 import { Link } from 'dva/router'
 
 import styles from './css/App.less'
+const ratio = document.body.clientWidth/1527
 
 class App extends Component {
   constructor(props) {
@@ -24,15 +25,16 @@ class App extends Component {
   selectImages() {
     switch (this.state.tabState) {
       case 0:
-        return <img src={require('./imageNew/workspace.jpg')} alt="" width='60%' height='60%'/>
+        return <img src={require('./imageNew/workspace.jpg')} alt="" width='55%' height='55%'/>
       case 1:
-        return <img src={require('./imageNew/notebook.jpg')} alt="" width='60%' height='60%'/>
+        return <img src={require('./imageNew/notebook.jpg')} alt="" width='55%' height='55%'/>
       case 2:
-        return <img src={require('./imageNew/request.jpg')} alt="" width='60%' height='60%'/>
+        return <img src={require('./imageNew/request.jpg')} alt="" width='55%' height='55%'/>
     }
   }
 
   render() {
+    console.log("document.body.clientWidth", document.body.clientWidth)
     return (
       <div style={{
         width: '100%', alignItems: 'center', display: 'flex',
@@ -50,7 +52,7 @@ class App extends Component {
             height: '100%',
           }}>
             <img src={require('./imageNew/banner.jpg')} alt="" width='40%' height="40%"
-                 style={{ marginRight: '14%', marginTop: 50 }}/>
+                 style={{ marginRight: document.body.clientWidth<1300?`${document.body.clientWidth/1527*14}%`:'14%', marginTop: 50 }}/>
           </div>
 
           <div style={{
@@ -59,13 +61,13 @@ class App extends Component {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            paddingLeft: '14%',
+            paddingLeft: document.body.clientWidth<1300?`${document.body.clientWidth/1527*14}%`:'14%',
           }}>
 
             <TitleText
               titleList={['发现意外 创造可能']}
               textList={['蓦始于数据， 忠于用户，致力降低AI技术使用门槛、缩短学习',
-                '曲线， 为实现 人工智能民主化、应用普及化 目标而生。']}
+                '曲线， 为实现人工智能民主化、应用普及化目标而生。']}
               color='white'
               center={false}
             />
@@ -87,21 +89,24 @@ class App extends Component {
               <TitleText titleList={['全生态人工智能', '应用开发平台']}
                          textList={['蓦是一个交互式的线上数据模型开发平台，通过构建用户间协同的生态',
                            '促进人工智能应用的开发与使用。']}
-
               />
               <div style={{
                 backgroundSize: '100% 100%',
                 display: 'flex',
                 justifyContent: 'center',
-                marginTop: 50,
+                marginTop: 50*ratio,
               }}>
-                <div className={styles.video} style={{ display: this.state.playDisplay }}>
-                  <Icon type="play-circle" style={{ fontSize: 100, color: 'white', cursor: 'pointer' }}
+                <div className={styles.video} style={{
+                  display: this.state.playDisplay,
+                  width: `${800*ratio}px`,
+                  height: `${449.6*ratio}px`
+                }}>
+                  <Icon type="play-circle" style={{ fontSize: 50*ratio, color: 'white', cursor: 'pointer', zIndex: 110, }}
                         onClick={() => this.startVideo()}/>
                 </div>
-                <video id='intro-video' width="800px" height='449.6px' src="/pyapi/static/videos/intro.mp4"
+                <video id='intro-video' width={`${800*ratio}px`} height={`${449.6*ratio}px`} src="/pyapi/static/videos/intro.mp4"
                        style={{
-                         borderRadius: 10, boxShadow: '0 8px 25px rgba(0,0,0,0.7)', background: '#5A64E8',
+                         borderRadius: 10, boxShadow: 'rgba(126, 156, 198, 0.3) 0px 11px 25px', background: '#5A64E8',
                          opacity: 0.6,
                        }}/>
               </div>
@@ -114,14 +119,14 @@ class App extends Component {
              style={{
                display: 'flex', flexDirection: 'column', backgroundColor: '#6D9CF9',
                justifyContent: 'center', alignItems: 'center', width: '100%',
-               paddingTop: 120, paddingBottom: 120,
+               paddingTop: 120*ratio, paddingBottom: 120,
              }}>
 
           {/*第一段*/}
           <div>
             <TitleText titleList={['蓦的诞生']}
-                       textList={['蓦致力于构建用户、数据和产品的生态循环，降低AI的技',
-                         '术和使用门槛，使AI应用能够真正融入生活']}
+                       textList={['蓦致力于构建用户、数据和产品的生态循环，降低AI的',
+                         '技术和使用门槛，使AI应用能够真正融入生活']}
                        color="white"
             />
           </div>
@@ -140,10 +145,10 @@ class App extends Component {
           </div>
 
           {/*第二段*/}
-          <div style={{ marginTop: 120 }}>
+          <div style={{ marginTop: 100*ratio }}>
             <TitleText titleList={['我们的用户']}
-                       textList={['蓦联结了 AI需求发布者、模块开发与组装者、应用使用者，实现了需求提出-模块开发',
-                         '-模型组装-应用发布使用的循环生态链']}
+                       textList={['蓦联结了 AI需求发布者、模块开发与组装者、应用使用者，实现了',
+                         '需求提出-模块开发-模型组装-应用发布使用的循环生态链']}
                        color="white"
             />
           </div>
@@ -198,10 +203,10 @@ class App extends Component {
                            textList={['在发现区您可以通过搜索关键词查看并学习所有用户公开发布的数据集、模块和应用，也可以',
                            '分享自己的开发成果。无需门槛，只要有热情，您可以和志同道合的朋友共同学习共同进步。']}
               />
-              <div style={{height: 20}}/>
+              <div style={{height: 40*ratio}}/>
               {/*多张图片*/}
               {this.selectImages()}
-              <div style={{height: 20}}/>
+              {/*<div style={{height: 10*ratio}}/>*/}
               {/*多个按钮*/}
               <div className={styles.tabs}>
                 {[{ src: require('./imageNew/explore.png'), text: '发现区' },
@@ -305,10 +310,10 @@ const CardA = ({ title, text1, text2, icon }) =>
       <div className={styles.title_card}>
         {title}
       </div>
-      <div className={styles.text_card}>
+      <div className={styles.text_card} style={{textAlign: "left"}}>
         {text1}
       </div>
-      <div className={styles.text_card}>
+      <div className={styles.text_card} style={{textAlign: "left"}}>
         {text2}
       </div>
     </div>
@@ -405,7 +410,7 @@ const LeftTitleText = ({ titleList, textList, color, center = true }) =>
     {textList.map((text, index) => {
       return (
         <div className={styles.text} key={'cardText' + text + index} style={color && {
-          color: color, marginTop: 20, fontSize: 14,
+          color: '#E8EEF9', marginTop: 20, fontSize: 14,
         }}>
           {text}
         </div>
