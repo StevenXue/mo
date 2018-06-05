@@ -3,76 +3,23 @@
 from server3.repository.project_repo import ProjectRepo
 
 
+
 class AppRepo(ProjectRepo):
     def __init__(self, instance):
         ProjectRepo.__init__(self, instance)
 
-    class AppStatus:
+    def update_app_path(self, app, path):
         """
-        App status
-        """
-        DEPLOYING = 'deploying'
-        ACTIVE = 'active'
-        INACTIVE = 'inactive'
+        To update app's app_path.
 
-    class AppPrivacy:
-        """
-        App Privacy
-        """
-        PUBLIC = 'public'
-        PRIVATE = 'private'
-
-    def add_version(self, app_id, version):
-        """
-        To add a new version
-
-        :param app_id: app id
-        :param version: version to add
+        :param app: app id or app object
+        :param path: new path
         :return:
         """
-        app = self.read_by_id(app_id)
-        app.versions.append(version)
-        app.save()
-        return app
-
-    def update_path(self, app_id, path):
-        """
-        To update app path.
-
-        :param app_id: app id
-        :param path: app path
-        :return:
-        """
-        app = self.read_by_id(app_id)
+        if isinstance(app, str):
+            app = self.read_by_id(app)
         app.app_path = path
         app.save()
-        return app
-
-    def update_privacy(self, app_id, privacy):
-        """
-        To update app privacy.
-
-        :param app_id: app id
-        :param privacy: new privacy of app
-        :return:
-        """
-        app = self.read_by_id(app_id)
-        app.privacy = privacy
-        app.save()
-        return app
-
-    def update_status(self, app_id, status):
-        """
-        To update app status.
-
-        :param app_id: app id
-        :param status: new status of app
-        :return: updated app objecty
-        """
-        app = self.read_by_id(app_id)
-        app.status = status
-        app.save()
-        return app
 
     def add_imported_entities(self, app_id, app_deploy_version,
                               used_datasets=None, used_modules=None):
@@ -112,4 +59,3 @@ class AppRepo(ProjectRepo):
         else:
             raise Exception('deployments duplicate')
         app.save()
-        return app

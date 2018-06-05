@@ -12,7 +12,12 @@ from mongoengine import EmbeddedDocument
 from mongoengine import PULL
 from mongoengine import BooleanField
 
-RE_TYPE = ('inactive', 'active', 'deploying')
+from server3.constants import ProjectStatus
+
+
+RE_TYPE = (ProjectStatus.INACTIVE,
+           ProjectStatus.ACTIVE,
+           ProjectStatus.DEPLOYING)
 
 
 class Commit(EmbeddedDocument):
@@ -40,6 +45,7 @@ class Project(DynamicDocument):
     description = StringField()
     overview = StringField()
     tb_port = StringField()
+    status = StringField(choices=RE_TYPE)
     repo_path = StringField()
 
     jobs = ListField(ReferenceField('Job'))
@@ -81,7 +87,9 @@ class Module(Project):
     module_path = StringField()
     input = DictField()
     output = DictField()
-    status = StringField(choices=RE_TYPE)
+    # repo_path = StringField()
+    # moved to project entity
+    # status = StringField(choices=RE_TYPE)
 
 
 class AppGetType:
@@ -136,7 +144,8 @@ class App(Project):
     # 输出格式
     output = DictField()
     # api status
-    status = StringField(choices=RE_TYPE)
+    # moved to project entity
+    # status = StringField(choices=RE_TYPE)
     # 模拟的数据
     fake_response = StringField()
     # 调用次数

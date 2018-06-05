@@ -36,6 +36,28 @@ else:
     raise Exception('Wrong ENV value')
 
 
+# Project Status
+# PROJECT_STATUS = {'DEPLOYING': 'deploying',
+#                   'ACTIVE': 'active',
+#                   'INACTIVE': 'inactive'}
+
+class ProjectStatus:
+    """
+    Project status
+    """
+    DEPLOYING = 'deploying'
+    ACTIVE = 'active'
+    INACTIVE = 'inactive'
+
+
+class ProjectPrivacy:
+    """
+    Project Privacy
+    """
+    PUBLIC = 'public'
+    PRIVATE = 'private'
+
+
 UPDATE_USER_INFO_SK = 'secret_mo_mo'
 PORT = 5005
 SOCKET_IO_PORT = 5006

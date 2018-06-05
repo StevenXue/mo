@@ -173,7 +173,7 @@ class AppService(ProjectService):
             # update app status
             app = cls.business.repo.update_status(
                 project_id,
-                cls.business.repo.AppStatus.INACTIVE)
+                cls.business.repo.STATUS.INACTIVE)
 
             cls.send_message(app, m_type='publish_fail')
             raise e
@@ -192,7 +192,7 @@ class AppService(ProjectService):
             # app.save()
             app = cls.business.repo.update_status(
                 project_id,
-                cls.business.repo.AppStatus.INACTIVE)
+                cls.business.repo.STATUS.INACTIVE)
 
             cls.send_message(app, m_type='deploy_fail')
             raise e
@@ -365,12 +365,9 @@ class AppService(ProjectService):
         """
 
         # update app status to 'deploying
-        # app = cls.get_by_id(app_id)
-        # app.status = 'deploying'
-        # app.save()
         app = cls.business.repo.update_status(
             app_id,
-            cls.business.repo.AppStatus.DEPLOYING)
+            cls.business.repo.STATUS.DEPLOYING)
 
         container = cls.business.get_container(app)
         # freeze working env
@@ -434,24 +431,21 @@ class AppService(ProjectService):
 
         # when not dev(publish), change the privacy etc
         if version != DEFAULT_DEPLOY_VERSION:
-            # app.privacy = 'public'
-            app = cls.business.repo.update_privacy(
-                app_id, cls.business.repo.AppPrivacy.PUBLIC)
-            # app.versions.append(version)
-            app = cls.business.repo.add_version(app_id, version)
+            # update privacy
+            cls.business.repo.update_privacy(
+                app, cls.business.repo.PRIVACY.PUBLIC)
+            # add version
+            cls.business.repo.add_version(app, version)
 
-        # app.app_path = os.path.join(cls.business.base_func_path,
-        #                             service_name_no_v)
-        app = cls.business.repo.update_path(
-            app_id, os.path.join(cls.business.base_func_path,
-                                 service_name_no_v))
-
-        # app.status = 'active'
-        # app.save()
+        # update app_path
+        cls.business.repo.update_app_path(
+            app, os.path.join(cls.business.base_func_path,
+                              service_name_no_v))
 
         # update app status
-        app = cls.business.repo.update_status(app_id,
-                                              cls.business.repo.AppStatus.ACTIVE)
+        app = cls.business.repo.update_status(
+            app,
+            cls.business.repo.STATUS.ACTIVE)
 
         return app
 
