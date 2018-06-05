@@ -1,5 +1,6 @@
+import * as path from 'path'
 import * as React from 'react'
-import { Card, Button, Row, Col, Input, Icon, Pagination, Select, message, List, Modal, Table,Tag } from 'antd'
+import { Card, Button, Row, Col, Input, Icon, Pagination, Select, message, List, Modal, Table, Tag } from 'antd'
 import * as pathToRegexp from 'path-to-regexp'
 import {
   NotebookActions,
@@ -310,7 +311,7 @@ export class ListPage extends React.Component {
                            <Col span={12}>{record[e.dataIndex]}</Col>
                          </Row>)
                        }
-                     }
+                     },
                    )
                    return extendRows
                  }}/>
@@ -335,9 +336,11 @@ export class ListPage extends React.Component {
       if (this.pageType === 'dataset') {
         return [<p className='des'>{project.description}</p>,
           <div className='des'>
-            <CopyInput text={project.path.replace('./user_directory', '../dataset')}
+            <CopyInput text={path.join(project.path.replace('./user_directory', '../dataset'),
+              this.state.version.replace('.', '_'))}
                        datasetId={this.state.projectId}
                        appId={this.appId}
+                       version={this.state.version}
                        setApp={(app) =>
                          getAppActionEntity({
                            //page_no: page,
@@ -356,14 +359,6 @@ export class ListPage extends React.Component {
           </div>]
       } else {
         return <div>
-          <div>
-            Version:&nbsp;&nbsp;
-            <Select defaultValue={this.state.version} style={{ width: 120 }}
-                    onChange={(value) => this.handleVersionChange(value)}>
-              {this.state.project.versions.map(version =>
-                <Option key={version} value={version}>{version}</Option>)}
-            </Select>
-          </div>
           {
             project.category === 'model' ?
               <Row>
@@ -385,6 +380,14 @@ export class ListPage extends React.Component {
           <Icon type="left"/>{this.state.project.name}
         </header>
         <div style={{ height: 'auto', overflowY: 'auto' }}>
+          <div>
+            Version:&nbsp;&nbsp;
+            <Select defaultValue={this.state.version} style={{ width: 120 }}
+                    onChange={(value) => this.handleVersionChange(value)}>
+              {this.state.project.versions.map(version =>
+                <Option key={version} value={version}>{version}</Option>)}
+            </Select>
+          </div>
           {upperArea()}
           <ReactMdePreview
             project={this.state.project} ownerOrNot={false}
@@ -560,13 +563,13 @@ export class ListPage extends React.Component {
     return (
       // list
       <div className='container'>
-        <header style={{background:'white'}}>
+        <header style={{ background: 'white' }}>
           {this.pageType.toUpperCase()} LIST
           {this.appId && <div className='history-btn'
                               onClick={() => this.setState({ [`showUsed${this.pageTypeUC}s`]: true })}/>}
           {/*{this.appId && <Icon type="clock-circle-o"*/}
-                               {/*className='history-btn'*/}
-                               {/*onClick={() => this.setState({ [`showUsed${this.pageTypeUC}s`]: true })}/>}*/}
+          {/*className='history-btn'*/}
+          {/*onClick={() => this.setState({ [`showUsed${this.pageTypeUC}s`]: true })}/>}*/}
 
           <div className='fav-btn' onClick={() => this.setState({ [`showFav${this.pageTypeUC}s`]: true })}/>
         </header>
@@ -578,9 +581,10 @@ export class ListPage extends React.Component {
             <Card key={project.user + project.name} title={project.name}
               // extra={<Button onClick={() => this.clickProject(project)}>Detail</Button>}
                   onClick={() => this.clickProject(project)}
-                  style={{ margin: '5px 3px', cursor: 'pointer'  }}
+                  style={{ margin: '5px 3px', cursor: 'pointer' }}
                   bordered={false}
-                  extra={project.category?<Tag color={project.category==='model'?"#FFB850":"#8986EA"}>{project.category}</Tag>:null}
+                  extra={project.category ? <Tag
+                    color={project.category === 'model' ? '#FFB850' : '#8986EA'}>{project.category}</Tag> : null}
             >
               <Col>
                 {project.description}
