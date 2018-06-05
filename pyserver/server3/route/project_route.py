@@ -331,7 +331,7 @@ def commit(project_id):
 @project_app.route("/commit_broadcast/<project_id>", methods=["POST"])
 def commit_broadcast(project_id):
     project = ProjectBusiness.get_by_id(project_id)
-    ProjectService.send_message(project, m_type='commit')
+    ProjectService.send_message_favor(project, m_type='commit')
     return jsonify({"response": 1})
 
 

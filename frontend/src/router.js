@@ -97,7 +97,7 @@ const RouterConfig = ({ history, location, app }) => {
         <Route path="/user" component={Account}/>
         <Route exact path="/newpassword" component={NewPassword}/>
         {/*if has child routes move exact inside*/}
-        <Route path="/workspace/:projectId" component={ProjectDetail}/>
+        <Route path="/(workspace|explore)/:projectId" component={ProjectDetail}/>
         {
           routes.map(({ path, ...dynamics }, key) => (
             <Route key={key}
@@ -110,9 +110,6 @@ const RouterConfig = ({ history, location, app }) => {
             />
           ))
         }
-        {/*if has child routes move exact inside*/}
-        <Route path="/explore/:projectId"
-               component={ProjectDetail}/>
         <Route exact path="/launchpage" component={LaunchPage} location={location}/>
         {
           routes2.map(({ path, ...dynamics }, key) => (

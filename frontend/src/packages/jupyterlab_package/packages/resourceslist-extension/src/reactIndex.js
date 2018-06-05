@@ -2,6 +2,7 @@ import * as path from 'path'
 import * as React from 'react'
 import { Card, Button, Row, Col, Input, Icon, Pagination, Select, message, List, Modal, Table, Tag } from 'antd'
 import * as pathToRegexp from 'path-to-regexp'
+import * as _ from 'lodash'
 import {
   NotebookActions,
 } from '@jupyterlab/notebook'
@@ -291,7 +292,7 @@ export class ListPage extends React.Component {
       },
     ]
 
-    const args = this.state.args[func]
+    const args = _.get(this.state.args, func, {})
     const data = Object.keys(args).map((key, i) => {
       let arg = args[key]
       arg.key = key

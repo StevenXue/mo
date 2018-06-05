@@ -19,44 +19,6 @@ const logo = config.whiteLogo
 const SubMenu = Menu.SubMenu
 
 const menuConfig = [
-  // {
-  //   key: '/',
-  //   Link: '/',
-  //   Icon: 'home',
-  //   text: 'Home',
-  // },
-  // {
-  //   key: '/workspace',
-  //   Link: '/workspace?tab=app',
-  //   Icon: null,
-  //   text: 'Workspace',
-    // dropdown: [
-    //       {
-    //     key: '/myprojects',
-    //     Link: '/workspace',
-    //     Icon: null,
-    //     text: 'My Projects',
-    //   },
-    //   {
-    //     key: '/myservice',
-    //     Link: '/myservice',
-    //     Icon: null,
-    //     text: 'My Service',
-    //   },
-    // ]
-  // },
-  // {
-  //   key: '/projects',
-  //   Link: '/projects',
-  //   Icon: null,
-  //   text: 'Projects',
-  // },
-  // {
-  //   key: '/modelmarket',
-  //   Link: '/modelmarket',
-  //   Icon: null,
-  //   text: 'Model Market',
-  // },
   {
     key: '/explore',
     Link: '/explore?tab=app',
@@ -144,6 +106,7 @@ function Header({location, login, history, dispatch, allRequest, message}) {
       case 'publish_request':
       case 'deploy_fail':
       case 'publish_fail':
+      case 'run_error':
         toProject(e)
         break
       case 'job_success':
@@ -215,6 +178,9 @@ function Header({location, login, history, dispatch, allRequest, message}) {
       case 'job_error':
         return <p
           className={styles.messageP}>{`Your running ${e.job_type}  ${e.job_name} was failed.`}</p>
+      case 'run_error':
+        return <p
+          className={styles.messageP}>{`Your App ${e.project_name}  has received error.`}</p>
     }
   }
 

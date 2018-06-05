@@ -397,7 +397,7 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
   return (
     <div className={`main-container ${styles.normal}`}>
       <Switch>
-        <Route exact path="/workspace/:projectID" component={() => {
+        <Route exact path="/(workspace|explore)/:projectID" component={() => {
           if (projectDetail.project && projectDetail.project.type) {
 
             // optional component list by project type
@@ -599,7 +599,7 @@ function ProjectInfo({ app, match, history, location, dispatch, projectDetail, l
             return <Spin spinning={true}>Loading...</Spin>
           }
         }}/>
-        <Route exact path="/workspace/:projectID/:type" component={Lab}/>
+        <Route exact path="/(workspace|explore)/:projectID/:type" component={Lab}/>
       </Switch>
     </div>
   )

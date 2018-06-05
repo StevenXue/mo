@@ -57,7 +57,6 @@ def get_module(module_id):
                                   version=version)
     # 如果是私有项目，需要确定其登陆才能查看，否则返回error
     if app.privacy == 'private' and app.user.user_ID != user_ID:
-        print('aaaaa', app.user.user_ID)
         return jsonify({'response': 'error'}), 200
 
     # 将app.user 更换为 user_ID 还是name?

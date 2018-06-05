@@ -9,7 +9,8 @@ from mongoengine import ListField
 MESSAGE_TYPE = ('answer', 'chat', 'commit', 'deploy', 'publish',
                 'deploy_request', 'publish_request',
                 'deploy_fail',  'publish_fail',
-                'job_success', 'job_error')
+                'job_success', 'job_error',
+                'run_error')
 
 
 class Message(DynamicDocument):

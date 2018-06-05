@@ -1,24 +1,24 @@
-import React, { Component } from 'react';
-import { connect } from 'dva';
-import { routerRedux, Link } from 'dva/router';
-import { Form, Input, Button, Select, Row, Col, Popover, Progress } from 'antd';
-import styles from './index.less';
+import React, { Component } from 'react'
+import { connect } from 'dva'
+import { routerRedux, Link } from 'dva/router'
+import { Form, Input, Button, Select, Row, Col, Popover, Progress } from 'antd'
+import styles from './index.less'
 
-const FormItem = Form.Item;
-const { Option } = Select;
-const InputGroup = Input.Group;
+const FormItem = Form.Item
+const { Option } = Select
+const InputGroup = Input.Group
 
 const passwordStatusMap = {
   ok: <p className={styles.success}>Strength：Strong</p>,
   pass: <p className={styles.warning}>Strength： Medium</p>,
   pool: <p className={styles.error}>Strength：Too Short</p>,
-};
+}
 
 const passwordProgressMap = {
   ok: 'success',
   pass: 'normal',
   pool: 'exception',
-};
+}
 
 // @connect(state => ({
 //   register: state.register,
@@ -39,72 +39,72 @@ class Register extends Component {
   }
 
   componentWillUnmount() {
-    clearInterval(this.interval);
+    clearInterval(this.interval)
   }
 
   onGetCaptcha = () => {
     // 向后端请求验证码
-    let phone = this.props.form.getFieldValue("phone")
+    let phone = this.props.form.getFieldValue('phone')
     this.props.dispatch({
-      type: "register/sendVerificationCode",
+      type: 'register/sendVerificationCode',
       payload: {
         phone: phone,
-        usage:"register"
-      }
+        usage: 'register',
+      },
     })
 
-    let count = 59;
-    this.setState({ count });
+    let count = 59
+    this.setState({ count })
     this.interval = setInterval(() => {
-      count -= 1;
-      this.setState({ count });
+      count -= 1
+      this.setState({ count })
       if (count === 0) {
-        clearInterval(this.interval);
+        clearInterval(this.interval)
       }
-    }, 1000);
+    }, 1000)
   }
 
   getPasswordStatus = () => {
-    const { form } = this.props;
-    const value = form.getFieldValue('password');
+    const { form } = this.props
+    const value = form.getFieldValue('password')
     if (value && value.length > 9) {
-      return 'ok';
+      return 'ok'
     }
     if (value && value.length > 5) {
-      return 'pass';
+      return 'pass'
     }
-    return 'pool';
+    return 'pool'
   }
 
   handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     this.props.form.validateFields({ force: true },
       (err, values) => {
         if (!err) {
           console.log('values', values)
-          values.tourtip="0"
+          values.tourtip = 0
           delete values.confirm
           delete values.prefix
           this.props.dispatch({
             type: 'register/submit',
             payload: values,
-          });
+          })
         }
-      }
-    );
+      },
+    )
   }
 
   handleConfirmBlur = (e) => {
-    const { value } = e.target;
-    this.setState({ confirmDirty: this.state.confirmDirty || !!value });
+    const { value } = e.target
+    this.setState({ confirmDirty: this.state.confirmDirty || !!value })
   }
 
   checkConfirm = (rule, value, callback) => {
-    const { form } = this.props;
+    const { form } = this.props
     if (value && value !== form.getFieldValue('password')) {
-      callback('Two passwords that you enter is inconsistent!');
+      callback('Two passwords that you enter is inconsistent!')
     } else {
-      callback();
+      callback()
     }
   }
 
@@ -113,33 +113,33 @@ class Register extends Component {
       this.setState({
         help: 'Please input your password!',
         visible: !!value,
-      });
-      callback('error');
+      })
+      callback('error')
     } else {
       this.setState({
         help: '',
-      });
+      })
       if (!this.state.visible) {
         this.setState({
           visible: !!value,
-        });
+        })
       }
       if (value.length < 6) {
-        callback('error');
+        callback('error')
       } else {
-        const { form } = this.props;
+        const { form } = this.props
         if (value && this.state.confirmDirty) {
-          form.validateFields(['confirm'], { force: true });
+          form.validateFields(['confirm'], { force: true })
         }
-        callback();
+        callback()
       }
     }
   }
 
   renderPasswordProgress = () => {
-    const { form } = this.props;
-    const value = form.getFieldValue('password');
-    const passwordStatus = this.getPasswordStatus();
+    const { form } = this.props
+    const value = form.getFieldValue('password')
+    const passwordStatus = this.getPasswordStatus()
     return value && value.length ?
       <div className={styles[`progress-${passwordStatus}`]}>
         <Progress
@@ -149,13 +149,13 @@ class Register extends Component {
           percent={value.length * 10 > 100 ? 100 : value.length * 10}
           showInfo={false}
         />
-      </div> : null;
+      </div> : null
   }
 
   render() {
-    const { form, register } = this.props;
-    const { getFieldDecorator } = form;
-    const { count } = this.state;
+    const { form, register } = this.props
+    const { getFieldDecorator } = form
+    const { count } = this.state
     return (
       <div className={styles.main}>
         {/*<h3>Sign Up</h3>*/}
@@ -164,7 +164,7 @@ class Register extends Component {
             User ID
             {getFieldDecorator('user_ID', {
               // not allow uppercase and whitespace
-              getValueFromEvent: (e) => e.target.value.toLowerCase().replace(/\s/g, ""),
+              getValueFromEvent: (e) => e.target.value.toLowerCase().replace(/\s/g, ''),
               rules: [{
                 required: true, message: 'Please enter your ID!',
               }, {
@@ -174,13 +174,13 @@ class Register extends Component {
                   // escape对字符串进行编码时，字符值大于255的以"%u****"格式存储，而字符值大于255的恰好是非英文字符
                   // （一般是中文字符，非中文字符也可以当作中文字符考虑）
                   if (escape(value).indexOf('%u') < 0) {
-                    if(value.length>30){
+                    if (value.length > 30) {
                       callback('user_ID is too long')
                     }
-                    else if(value.length<5 && value.length>0){
+                    else if (value.length < 5 && value.length > 0) {
                       callback('user_ID is too short')
-                    }else {
-                    callback()
+                    } else {
+                      callback()
                     }
                   } else {
                     callback('Sorry, Chinese name is not supported yet')
@@ -188,7 +188,7 @@ class Register extends Component {
                 },
               }],
             })(
-              <Input size="large" placeholder="User ID" />
+              <Input size="large" placeholder="User ID"/>,
             )}
           </FormItem>
           <FormItem>
@@ -200,7 +200,7 @@ class Register extends Component {
                 type: 'email', message: 'Email type error',
               }],
             })(
-              <Input size="large" placeholder="Email" />
+              <Input size="large" placeholder="Email"/>,
             )}
           </FormItem>
           <FormItem help={this.state.help}>
@@ -226,7 +226,7 @@ class Register extends Component {
                   size="large"
                   type="password"
                   placeholder="Password. At least 6 digits"
-                />
+                />,
               )}
             </Popover>
           </FormItem>
@@ -243,7 +243,7 @@ class Register extends Component {
                 size="large"
                 type="password"
                 placeholder="Confirm Password"
-              />
+              />,
             )}
           </FormItem>
 
@@ -256,7 +256,7 @@ class Register extends Component {
                 })(
                   <Select size="large">
                     <Option value="86">+86</Option>
-                  </Select>
+                  </Select>,
                 )}
               </FormItem>
               <FormItem style={{ width: '80%' }}>
@@ -268,7 +268,7 @@ class Register extends Component {
                     pattern: /^1\d{10}$/, message: 'Mobile number type error!',
                   }],
                 })(
-                  <Input placeholder="11 digits mobile number" />
+                  <Input placeholder="11 digits mobile number"/>,
                 )}
               </FormItem>
             </InputGroup>
@@ -284,7 +284,7 @@ class Register extends Component {
                   <Input
                     size="large"
                     placeholder="验证码"
-                  />
+                  />,
                 )}
               </Col>
               <Col span={8}>
@@ -299,15 +299,16 @@ class Register extends Component {
               </Col>
             </Row>
           </FormItem>
-          <FormItem style={{marginTop: 20}}>
-            <Button size="large" loading={register.submitting} className={styles.submit} type="primary" htmlType="submit">
+          <FormItem style={{ marginTop: 20 }}>
+            <Button size="large" loading={register.submitting} className={styles.submit} type="primary"
+                    htmlType="submit">
               Sign Up
             </Button>
             <Link className={styles.login} to="/user/login">Already have an account?</Link>
           </FormItem>
         </Form>
       </div>
-    );
+    )
   }
 }
 

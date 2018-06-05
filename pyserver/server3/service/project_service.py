@@ -475,34 +475,23 @@ class ProjectService:
     @classmethod
     def get_by_id(cls, project_id, **kwargs):
         project = cls.business.get_by_id(project_id)
-        # if kwargs.get('commits') == 'true':
-        #     commits = cls.business.get_commits(project.path)
-        #     project.commits = [{
-        #         'message': c.message,
-        #         'time': datetime.fromtimestamp(c.time[0] + c.time[1]),
-        #     } for c in commits]
         return project
 
     @classmethod
     def commit(cls, project_id, commit_msg):
         project = cls.business.commit(project_id, commit_msg)
-        cls.send_message(project, m_type='commit')
+        cls.send_message_favor(project, m_type='commit')
         return project
 
     @classmethod
-    def send_message(cls, project, m_type='publish'):
+    def send_message_favor(cls, project, m_type='publish'):
+        """
+        send message to project favor user
+        :param project:
+        :param m_type:
+        :return:
+        """
         receivers = project.favor_users  # get app subscriber
-
-        # if m_type in ['deploy', 'deploy_fail', 'publish_fail']:
-        #     logger_service.emit_anything_notification(
-        #         {'message': {'message_type': m_type,
-        #                      'project_type': project.type,
-        #                      'project_name': project.name}},
-        #         project.user)
-        #     return
-        # get app subscriber and user himself
-        # receivers = project.favor_users
-        # receivers.append(project.user.id)
 
         admin_user = UserBusiness.get_by_user_ID('admin')
 
@@ -535,6 +524,20 @@ class ProjectService:
 
         # send to project favor user
         MessageService.create_message(admin_user, m_type, receivers,
+                                      project.user, project_name=project.name,
+                                      project_id=project.id,
+                                      project_type=project.type)
+
+    @staticmethod
+    def send_msg_owner(project, m_type='run_error'):
+        """
+        send message to project owner
+        :param project:
+        :param m_type:
+        :return:
+        """
+        admin_user = UserBusiness.get_by_user_ID('admin')
+        MessageService.create_message(admin_user, m_type, [project.user],
                                       project.user, project_name=project.name,
                                       project_id=project.id,
                                       project_type=project.type)
