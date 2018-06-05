@@ -380,12 +380,13 @@ export default {
         yield put({ type: 'setJobs', payload: jobs })
         yield put({ type: 'setTerminals', payload: terminals })
         yield put({ type: 'setSessions', payload: sessions })
+      } catch (e) {
+        console.log('get jobs', e)
+      } finally {
         yield put({ type: 'setProject', payload: project })
         if(notStartLab) {
           yield put({ type: 'modelling/startLabBnF', projectId, projectType: project.type })
         }
-      } catch (e) {
-        console.log('get jobs', e)
       }
     },
 
@@ -526,7 +527,6 @@ export default {
       return history.listen(({ pathname }) => {
         const match = pathToRegexp('/workspace/:projectId/:type?').exec(pathname)
         const match2 = pathToRegexp('/explore/:projectId/:type?').exec(pathname)
-        const matchLab = pathToRegexp('/workspace/:projectId/:type').exec(pathname)
         const url = new URL(location.href.replace('/#', ''))
         if (match) {
           const projectId = match[1]
