@@ -16,9 +16,9 @@ const checker = (value, arr) =>
   arr.some(element => value.includes(element))
 
 const extFilter = {
-  app: ['moduledeploy-extension'],
-  module: ['appdeploy-extension'],
-  dataset: ['moduledeploy-extension', 'appdeploy-extension'],
+  app: [],
+  module: [],
+  dataset: [],
 }
 
 // Load the core theming before any other package.
@@ -56,8 +56,9 @@ const loadnStartJL = (projectType) => {
     require('../packages/jupyterlab_package/packages/theme-light-extension'),
     require('../packages/jupyterlab_package/packages/tooltip-extension'),
     require('../packages/jupyterlab_package/packages/resourceslist-extension'),
-    require('../packages/jupyterlab_package/packages/moduledeploy-extension'),
-    require('../packages/jupyterlab_package/packages/appdeploy-extension'),
+    require('../packages/jupyterlab_package/packages/deploy-extension'),
+    // require('../packages/jupyterlab_package/packages/moduledeploy-extension'),
+    // require('../packages/jupyterlab_package/packages/appdeploy-extension'),
     require('../packages/jupyterlab_package/packages/commit-extension'),
   ]
 

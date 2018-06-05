@@ -169,9 +169,9 @@ class AppService(ProjectService):
             # app.save()
 
             # update app status
-            cls.business.repo.update_status(
+            app = cls.business.repo.update_status(
                 project_id,
-                cls.business.repo.AppStatus.Inactive)
+                cls.business.repo.AppStatus.INACTIVE)
 
             cls.send_message(app, m_type='publish_fail')
             raise e
@@ -190,9 +190,9 @@ class AppService(ProjectService):
             # app.save()
 
             # update app status
-            cls.business.repo.update_status(
+            app = cls.business.repo.update_status(
                 project_id,
-                cls.business.repo.AppStatus.Inactive)
+                cls.business.repo.AppStatus.INACTIVE)
 
             cls.send_message(app, m_type='deploy_fail')
             raise e
@@ -369,7 +369,7 @@ class AppService(ProjectService):
         # app.save()
         app = cls.business.repo.update_status(
             app_id,
-            cls.business.repo.AppStatus.Deploying)
+            cls.business.repo.AppStatus.DEPLOYING)
 
         container = cls.business.get_container(app)
         # freeze working env
@@ -434,14 +434,14 @@ class AppService(ProjectService):
         # when not dev(publish), change the privacy etc
         if version != DEFAULT_DEPLOY_VERSION:
             # app.privacy = 'public'
-            cls.business.repo.update_privacy(
+            app = cls.business.repo.update_privacy(
                 app_id, cls.business.repo.AppPrivacy.PUBLIC)
             # app.versions.append(version)
-            cls.business.repo.add_version(app_id, version)
+            app = cls.business.repo.add_version(app_id, version)
 
         # app.app_path = os.path.join(cls.business.base_func_path,
         #                             service_name_no_v)
-        cls.business.repo.update_path(
+        app = cls.business.repo.update_path(
             app_id, os.path.join(cls.business.base_func_path,
                                  service_name_no_v))
 
@@ -449,8 +449,8 @@ class AppService(ProjectService):
         # app.save()
 
         # update app status
-        cls.business.repo.update_status(app_id,
-                                        cls.business.repo.AppStatus.ACTIVE)
+        app = cls.business.repo.update_status(app_id,
+                                              cls.business.repo.AppStatus.ACTIVE)
 
         return app
 

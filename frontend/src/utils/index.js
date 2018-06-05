@@ -26,6 +26,11 @@ String.prototype.dashToHump = function () {
   })
 }
 
+// capitalizeFirstLetter
+String.prototype.capitalizeFirstLetter = function() {
+  return this.charAt(0).toUpperCase() + this.slice(1).toLowerCase();
+}
+
 // function dashToCamelCase( myStr ) {
 //   return myStr.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
 // }
