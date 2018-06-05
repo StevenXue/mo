@@ -158,7 +158,7 @@ class AppService(ProjectService):
             # update app status
             cls.business.repo.update_status(
                 project_id,
-                cls.business.repo.ProjectStatus.Inactive)
+                cls.business.repo.STATUS.INACTIVE)
 
             cls.send_message(app, m_type='publish_fail')
             raise e
@@ -179,7 +179,7 @@ class AppService(ProjectService):
             # update app status
             cls.business.repo.update_status(
                 project_id,
-                cls.business.repo.ProjectStatus.Inactive)
+                cls.business.repo.STATUS.INACTIVE)
 
             cls.send_message(app, m_type='deploy_fail')
             raise e
@@ -351,7 +351,7 @@ class AppService(ProjectService):
         # update app status to 'deploying
         app = cls.business.repo.update_status(
             app_id,
-            cls.business.repo.ProjectStatus.Deploying)
+            cls.business.repo.STATUS.DEPLOYING)
 
         container = cls.business.get_container(app)
         # freeze working env
@@ -417,19 +417,19 @@ class AppService(ProjectService):
         if version != DEFAULT_DEPLOY_VERSION:
             # update privacy
             cls.business.repo.update_privacy(
-                app, cls.business.repo.ProjectPrivacy.PUBLIC)
+                app, cls.business.repo.PRIVACY.PUBLIC)
             # add version
             cls.business.repo.add_version(app, version)
 
         # update app_path
         cls.business.repo.update_app_path(
             app, os.path.join(cls.business.base_func_path,
-                                 service_name_no_v))
+                              service_name_no_v))
 
         # update app status
         cls.business.repo.update_status(
             app,
-            cls.business.repo.ProjectStatus.ACTIVE)
+            cls.business.repo.STATUS.ACTIVE)
 
 
         return app

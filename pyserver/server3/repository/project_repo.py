@@ -1,27 +1,17 @@
 # -*- coding: UTF-8 -*-
 
-from enum import Enum
 from server3.repository.general_repo import Repo
+from server3.constants import ProjectStatus
+from server3.constants import ProjectPrivacy
 
 
 class ProjectRepo(Repo):
+
+    STATUS = ProjectStatus
+    PRIVACY = ProjectPrivacy
+
     def __init__(self, instance):
         Repo.__init__(self, instance)
-
-    class ProjectStatus(Enum):
-        """
-        Project status
-        """
-        DEPLOYING = 'deploying'
-        ACTIVE = 'active'
-        INACTIVE = 'inactive'
-
-    class ProjectPrivacy(Enum):
-        """
-        Project Privacy
-        """
-        PUBLIC = 'public'
-        PRIVATE = 'private'
 
     def add_version(self, project, version):
         """

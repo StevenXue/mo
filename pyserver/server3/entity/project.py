@@ -12,8 +12,12 @@ from mongoengine import EmbeddedDocument
 from mongoengine import PULL
 from mongoengine import BooleanField
 
+from server3.constants import ProjectStatus
 
-RE_TYPE = ('inactive', 'active', 'deploying')
+
+RE_TYPE = (ProjectStatus.INACTIVE,
+           ProjectStatus.ACTIVE,
+           ProjectStatus.DEPLOYING)
 
 
 class Commit(EmbeddedDocument):

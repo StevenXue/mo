@@ -17,6 +17,7 @@ from Cython.Build import cythonize
 # from server3.entity.module import Module
 from server3.entity import project
 from server3.repository.general_repo import Repo
+from server3.repository.project_repo import ProjectRepo
 from server3.business.project_business import ProjectBusiness
 from server3.service.validation.module_validation import ModuleValidation
 from server3.constants import MODULE_DIR
@@ -60,10 +61,12 @@ TOOL_REPO = 'https://github.com/momodel/dev_cmd_tools.git'
 
 
 class ModuleBusiness(ProjectBusiness):
-    repo = Repo(project.Module)
+    # repo = Repo(project.Module)
+    repo = ProjectRepo(project.Module)
+    DEFAULT_PRIVACY = repo.PRIVACY.PRIVATE
 
     @classmethod
-    def create_project(cls, name, description, user, privacy='private',
+    def create_project(cls, name, description, user, privacy=DEFAULT_PRIVACY,
                        tags=None, user_token='', type='app',
                        category='model', **kwargs):
         """
@@ -177,11 +180,13 @@ class ModuleBusiness(ProjectBusiness):
             return {'input': {}, 'output': {}}
 
     @classmethod
-    def deploy_or_publish(cls, project_id, commit_msg, version=DEFAULT_DEPLOY_VERSION):
-        module = cls.get_by_id(project_id)
+    def deploy_or_publish(cls, project_id, commit_msg,
+                          version=DEFAULT_DEPLOY_VERSION):
 
-        module.status = 'deploying'
-        module.save()
+        module = cls.repo.update_status(project_id, cls.repo.STATUS.DEPLOYING)
+        # module = cls.get_by_id(project_id)
+        # module.status = 'deploying'
+        # module.save()
 
         # commit module
         cls.commit(project_id, commit_msg, version)
@@ -219,11 +224,15 @@ class ModuleBusiness(ProjectBusiness):
 
         # if publish update privacy and version
         if version != DEFAULT_DEPLOY_VERSION:
-            module.privacy = 'public'
-            module.versions.append(version)
 
-        module.status = 'active'
-        module.save()
+            # update privacy
+            cls.repo.update_privacy(module, cls.repo.PRIVACY.PUBLIC)
+            # add version
+            cls.repo.add_version(module, version)
+
+        cls.repo.update_status(module, cls.repo.STATUS.ACTIVE)
+        # module.status = 'active'
+        # module.save()
 
         return module
 
