@@ -457,19 +457,17 @@ export class ListPage extends React.Component {
             dataSource={this.state.usedProjects}
             renderItem={project => (
               <List.Item
-                actions={[<a
-                  onClick={() =>
-                    this.clickProject(project[this.pageType])}>Detail</a>].concat(this.getOtherButtons(project[this.pageType]))}
                 extra={<Icon style={{ cursor: 'pointer' }} type='close'
                              onClick={() => onRemove(project[this.pageType], project.version)}/>}
               >
                 <List.Item.Meta
                   title={
-                    <span>
+                    <a onClick={() =>
+                      this.clickProject(project[this.pageType])}>
                       {project[this.pageType].name}&nbsp;&nbsp;
                       {project.version &&
                       <span>v{project.version}</span>}
-                    </span>}
+                    </a>}
                   description={project[this.pageType].description}
                 />
               </List.Item>
@@ -543,13 +541,10 @@ export class ListPage extends React.Component {
               total: this.state.totalFavNumber,
             }}
             renderItem={project => (
-              <List.Item
-                actions={[<a
-                  onClick={() =>
-                    this.clickProject(project)}>Detail</a>].concat(this.getOtherButtons(project))}
-              >
+              <List.Item>
                 <List.Item.Meta
-                  title={<span>{project.name}</span>}
+                  title={<a onClick={() =>
+                    this.clickProject(project)}>{project.name}</a>}
                   description={project.description}
                 />
               </List.Item>
