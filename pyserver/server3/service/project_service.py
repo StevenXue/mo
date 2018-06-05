@@ -64,37 +64,6 @@ class TypeMapper:
         return getattr(cls, attr)
 
 
-def list_projects_by_user_ID(user_ID, order=-1, privacy='all'):
-    """
-    list all projects
-    :param user_ID:
-    :param order:
-    :param privacy:
-    :return:
-    """
-    if not user_ID:
-        projects = ownership_service.get_all_public_objects('project')
-    else:
-        if privacy == 'all':
-            user = UserBusiness.get_by_user_ID(user_ID)
-            projects = ownership_service. \
-                get_ownership_objects_by_user_ID(user, 'project')
-        elif privacy == 'private':
-            projects = ownership_service. \
-                get_privacy_ownership_objects_by_user_ID(user_ID, 'project',
-                                                         private=True)
-        elif privacy == 'public':
-            projects = ownership_service. \
-                get_privacy_ownership_objects_by_user_ID(user_ID, 'project',
-                                                         private=False)
-        else:
-            projects = []
-
-    if order == -1:
-        projects.reverse()
-    return projects
-
-
 def list_projects(search_query=None, page_no=1, page_size=10,
                   default_max_score=0.4, privacy=None, type='project',
                   user_ID=None, tags=None):

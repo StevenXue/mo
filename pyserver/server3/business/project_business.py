@@ -116,6 +116,7 @@ def copy(project):
 class ProjectBusiness(GeneralBusiness):
     project = None
     repo = ProjectRepo(Project)
+    DEFAULT_PRIVACY = repo.PRIVACY.PRIVATE
 
     @staticmethod
     def copytree(o, dst, **kwargs):
@@ -247,7 +248,7 @@ class ProjectBusiness(GeneralBusiness):
             project_path)
 
     @classmethod
-    def create_project(cls, name, description, user, privacy='private',
+    def create_project(cls, name, description, user, privacy=DEFAULT_PRIVACY,
                        tags=None, user_token='', type='app',
                        create_tutorial=False, **kwargs):
         """

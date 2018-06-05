@@ -147,7 +147,7 @@ class ModuleBusiness(ProjectBusiness):
             update_time=create_time,
             type=type, tags=tags,
             hub_token=res.get('token'),
-            path=project_path, user=user, status='inactive',
+            path=project_path, user=user, status=cls.repo.STATUS.INACTIVE,
             privacy=privacy, category=category, commits=[commit],
             repo_path=f'http://{GIT_SERVER_IP}/repos/{user_ID}/{name}')
 
