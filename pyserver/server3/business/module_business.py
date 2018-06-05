@@ -18,7 +18,7 @@ from Cython.Build import cythonize
 from server3.entity import project
 from server3.repository.general_repo import Repo
 from server3.business.project_business import ProjectBusiness
-from server3.service.validation.validation import GDValidation
+from server3.service.validation.module_validation import ModuleValidation
 from server3.constants import MODULE_DIR
 from server3.constants import DEFAULT_DEPLOY_VERSION
 from server3.constants import USER_DIR
@@ -230,8 +230,8 @@ class ModuleBusiness(ProjectBusiness):
     @classmethod
     def run_test(cls, project_id):
         project = cls.get_by_id(project_id)
-        result = GDValidation.run_test(project.path, project.name,
-                                       project.user.user_ID, project.category)
+        result = ModuleValidation.run_test(project.path, project.name,
+                                           project.user.user_ID, project.category)
         failures = [f[1] for f in result.failures]
         return failures
 
