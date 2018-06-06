@@ -75,6 +75,26 @@ const Jobs = ({ projectDetail, dispatch }) => {
     },
   ]
 
+  const renderJobHeader = (state, path, time, sessionId) => {
+    return (
+      <div className={styles.jobContainer}>
+              <span className={styles.jobInfo}>
+                <span className={blobDict[state]}/>
+                 <span className={styles.path}>{path}</span>
+                &nbsp;&nbsp;
+                {time ? <span>Last Activity: {time}</span> :
+                  <span>No Activity</span>}
+                {state === 'busy' || state === 'idle' &&
+                <Icon className={styles.shutDown} type='close'
+                      onClick={() => dispatch({
+                        type: 'projectDetail/closeSession',
+                        sessionId,
+                      })}/>}
+              </span>
+      </div>
+    )
+  }
+
   const renderJobs = (jobs) => {
     let renderedJobs = jobs
     if (!projectDetail.jobShowAll) {
@@ -128,32 +148,13 @@ const Jobs = ({ projectDetail, dispatch }) => {
       <div className={styles.jobCols}>
         {projectDetail.sessions !== undefined && projectDetail.sessions.map((session) => {
           return <div key={session.id} className={styles.jobCell}>
-            <div className={styles.jobContainer}>
-              <h4>{session.path}
-                <Icon className={styles.shutDown} type='close'
-                      onClick={() => dispatch({
-                        type: 'projectDetail/closeSession',
-                        sessionId: session.id,
-                      })}/>
-              </h4>
-              <p className={styles.jobInfo}>
-                <span className={blobDict[session.kernel.execution_state]}/>
-                &nbsp;&nbsp;
-                Last Activity: {myShowTime(session.kernel.last_activity)}</p>
-            </div>
+            {renderJobHeader(session.kernel.execution_state, session.path, myShowTime(session.kernel.last_activity), session.id)}
             {session.jobs !== undefined && renderJobs(session.jobs)}
           </div>
         })}
         {Object.entries(projectDetail.jobs).map(([path, jobs]) => {
           return <div key={path} className={styles.jobCell}>
-            <div className={styles.jobContainer}>
-              <h4>{path}</h4>
-              <p className={styles.jobInfo}>
-                <span className={blobDict.dead}/>
-                &nbsp;&nbsp;
-                No Activity
-              </p>
-            </div>
+            {renderJobHeader('dead', path)}
             {jobs !== undefined && renderJobs(jobs)}
           </div>
         })}
