@@ -10,6 +10,7 @@ import {
   Table,
 } from 'antd'
 import styles from './index.less'
+// import TFIcon from '../../../img/tf.svg'
 import { get } from 'lodash'
 import Highlight from 'react-highlight'
 import { showTime } from '../../../utils/index'
@@ -127,11 +128,16 @@ const Jobs = ({ projectDetail, dispatch }) => {
     <div>
       <h2>Jobs:
         <span className={styles.rightButton}>
-                     <Button onClick={() => {
-                       window.open(`/tb/${localStorage.getItem('user_ID')}+${projectDetail.project.name}/`)
-                     }}>
-                       TensorBoard
-                     </Button>
+           {/*<TFIcon />*/}
+
+          <Button className={styles.tf}
+            onClick={() => {
+            window.open(`/tb/${localStorage.getItem('user_ID')}+${projectDetail.project.name}/`)
+          }}>
+            <svg className="icon" aria-hidden="true" style={{marginRight: 4}}>
+              <use href="#icon-tf-color"></use>
+            </svg>TensorBoard
+          </Button>
         </span>
       </h2>
       <p className={styles.overall}>
