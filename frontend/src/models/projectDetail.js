@@ -347,7 +347,7 @@ export default {
       // start lab backend
       const hubUserName = encodeURIComponent(`${localStorage.getItem('user_ID')}+${project.name}`)
       const hubToken = project.hub_token
-      if (!notStartLab || !inLabPage) {
+      if (!notStartLab) {
         yield call(startLab, { hubUserName, hubToken })
         // fetch and set project for tb_port restarted by startLab
         project = (yield call(fetchMapper[projectType], {
@@ -534,7 +534,7 @@ export default {
           const activeTab = url.searchParams.get('tab')
           // when notebook path, lab will started in modelling model, no need to start here
           const inLabPage = match[2] !== undefined
-          dispatch({ type: 'refresh', projectId, projectType, activeTab, match, inLabPage })
+          dispatch({ type: 'refresh', projectId, projectType, activeTab, match, inLabPage, notStartLab: inLabPage })
           // dispatch({ type: 'fetchJobs', projectId: projectId })
         } else if (match2) {
           const projectId = match2[1]
