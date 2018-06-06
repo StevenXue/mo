@@ -17,18 +17,18 @@ export default {
       })
       const response = yield call(register, payload)
 
-      if(response.status === 200){
+      if (response.status === 200) {
         message.success('Register Success!')
         yield put({
           type: 'registerHandle',
-          payload: {status: response.status===200?"ok":"failed"},
+          payload: { status: response.status === 200 ? 'ok' : 'failed' },
         })
         yield put({
           type: 'changeSubmitting',
           payload: false,
         })
         yield put(routerRedux.push('/user/login'))
-      }else{
+      } else {
         let errorMessage = response.data.error
         message.error(errorMessage)
         yield put({
@@ -41,14 +41,14 @@ export default {
 
     *sendVerificationCode({ payload }, { call, put }) {
       const response = yield call(send_verification_code, payload)
-      if(response.status === 200){
+      if (response.status === 200) {
         message.success('验证码发送成功!')
-      }else{
+      } else {
         let errorMessage = response.data.error.message
         message.error(errorMessage)
       }
 
-    }
+    },
   },
 
   reducers: {

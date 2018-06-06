@@ -1,10 +1,5 @@
 # -*- coding: UTF-8 -*-
-"""
-Blueprint for analysis
 
-Author: Tianyi Zhang
-Date: 2017.05.24
-"""
 from bson import ObjectId
 from flask import Blueprint
 from flask import jsonify

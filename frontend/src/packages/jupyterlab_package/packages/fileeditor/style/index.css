@@ -18,12 +18,13 @@
     box-shadow: var(--jp-toolbar-box-shadow);
     z-index: 10;
     /* new */
-    height: 28px !important;
+    /*height: 42px !important;*/
+    /*padding:10px 2px;*/
 }
 
-.jp-FileEditor > .jp-FileEditorCodeWrapper {
-    padding-top: 20px;
-}
+/*.jp-FileEditor > .jp-FileEditorCodeWrapper {*/
+    /*padding-top: 20px;*/
+/*}*/
 
 .jp-Deploy-body > .jp-Form {
   display: flex;

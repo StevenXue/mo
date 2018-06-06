@@ -27,7 +27,8 @@ import {
 } from '@phosphor/messaging';
 
 import {
-  Toolbar, ToolbarButton
+  // Toolbar,
+  ToolbarButton
   , Dialog, showDialog, getProjectId,
 } from '@jupyterlab/apputils';
 
@@ -353,11 +354,10 @@ export class FileEditor extends Widget implements DocumentRegistry.IReadyWidget 
     let layout = this.layout = new BoxLayout({ spacing: 0 });
     // let toolbar = new Widget();
     // toolbar.addClass('jp-Toolbar');
-    let toolbar = new Toolbar();
-    toolbar.addItem('run', createRunButton(context));
-    // toolbar.addItem('deploy', createDeployButton(context));
-    layout.addWidget(toolbar);
-    BoxLayout.setStretch(toolbar, 0);
+    // let toolbar = new Toolbar();
+    // toolbar.addItem('run', createRunButton(context));
+    // layout.addWidget(toolbar);
+    // BoxLayout.setStretch(toolbar, 0);
     layout.addWidget(editorWidget);
     BoxLayout.setStretch(editorWidget, 1);
   }

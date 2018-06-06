@@ -19,44 +19,6 @@ const logo = config.whiteLogo
 const SubMenu = Menu.SubMenu
 
 const menuConfig = [
-  // {
-  //   key: '/',
-  //   Link: '/',
-  //   Icon: 'home',
-  //   text: 'Home',
-  // },
-  // {
-  //   key: '/workspace',
-  //   Link: '/workspace?tab=app',
-  //   Icon: null,
-  //   text: 'Workspace',
-    // dropdown: [
-    //       {
-    //     key: '/myprojects',
-    //     Link: '/workspace',
-    //     Icon: null,
-    //     text: 'My Projects',
-    //   },
-    //   {
-    //     key: '/myservice',
-    //     Link: '/myservice',
-    //     Icon: null,
-    //     text: 'My Service',
-    //   },
-    // ]
-  // },
-  // {
-  //   key: '/projects',
-  //   Link: '/projects',
-  //   Icon: null,
-  //   text: 'Projects',
-  // },
-  // {
-  //   key: '/modelmarket',
-  //   Link: '/modelmarket',
-  //   Icon: null,
-  //   text: 'Model Market',
-  // },
   {
     key: '/explore',
     Link: '/explore?tab=app',
@@ -144,6 +106,7 @@ function Header({location, login, history, dispatch, allRequest, message}) {
       case 'publish_request':
       case 'deploy_fail':
       case 'publish_fail':
+      case 'run_error':
         toProject(e)
         break
       case 'job_success':
@@ -211,10 +174,13 @@ function Header({location, login, history, dispatch, allRequest, message}) {
           className={styles.messageP}>{`${e.user_ID} 为您的答案 ${e.user_request_title} 发布了 ${translatorTemp[e.project_type]}  ${e.project_name}`}</p>
       case 'job_success':
         return <p
-          className={styles.messageP}>{`Your running ${e.job_type}  ${e.job_name} was finished successfully.`}</p>
+          className={styles.messageP}>{`Your running ${e.job_type} ${e.job_name} was finished successfully.`}</p>
       case 'job_error':
         return <p
-          className={styles.messageP}>{`Your running ${e.job_type}  ${e.job_name} was failed.`}</p>
+          className={styles.messageP}>{`Your running ${e.job_type} ${e.job_name} was failed.`}</p>
+      case 'run_error':
+        return <p
+          className={styles.messageP}>{`Your App ${e.project_name} has received error.`}</p>
     }
   }
 
@@ -370,7 +336,7 @@ function Header({location, login, history, dispatch, allRequest, message}) {
               </div>:null
             }
             {login.user && JsonToArray(message.messages).map(e =>
-              <div onClick={() => toMessage(e)} key={e.receiver_id}
+              <div className={styles.msgBox} onClick={() => toMessage(e)} key={e.receiver_id}
                    style={e.is_read === false ? {
                      margin: '0 -20px',
                      backgroundColor: '#f0f2f5',

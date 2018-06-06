@@ -30,6 +30,7 @@ class AppService(ProjectService):
         used_module = ModuleBusiness.get_by_id(used_module)
         used_module.args = ModuleBusiness.load_module_params(
             used_module, version)
+        print('used_module.args', used_module.args)
         return cls.business.add_used_module(app_id, used_module, func, version)
 
     # @classmethod
@@ -53,15 +54,28 @@ class AppService(ProjectService):
         return cls.business.remove_used_module(app_id, used_module, version)
 
     @classmethod
-    def add_used_dataset(cls, app_id, used_dataset):
+    def add_used_dataset(cls, app_id, used_dataset, version):
+        """
+        add dataset to project
+        :param app_id:
+        :param used_dataset:
+        :param version:
+        :return:
+        """
         used_dataset = DatasetBusiness.get_by_id(used_dataset)
         app = cls.business.get_by_id(app_id)
-        return cls.business.insert_dataset(app, used_dataset)
+        return cls.business.insert_dataset(app, used_dataset, version)
 
     @classmethod
-    def remove_used_dataset(cls, app_id, used_dataset):
+    def remove_used_dataset(cls, app_id, used_dataset, version):
+        """
+        remove dataset from project
+        :param app_id:
+        :param used_dataset:
+        :return:
+        """
         used_dataset = DatasetBusiness.get_by_id(used_dataset)
-        return cls.business.remove_used_dataset(app_id, used_dataset)
+        return cls.business.remove_used_dataset(app_id, used_dataset, version)
 
     @classmethod
     def run_app(cls, app_id, input_json, user_ID, version):
@@ -99,6 +113,10 @@ class AppService(ProjectService):
                 output_json = {
                     'errors': errors
                 }
+            finally:
+                # send input and errors to author
+                cls.send_msg_owner(app, m_type='run_error')
+
         # output_json = response.json()
         # 成功调用后 在新的collection存一笔
         user_obj = UserBusiness.get_by_user_ID(user_ID=user_ID)
@@ -126,7 +144,8 @@ class AppService(ProjectService):
             AppBusiness.insert_module_env(app, used_module.module,
                                           used_module.version)
         for used_dataset in app.used_datasets:
-            AppBusiness.insert_dataset(app, used_dataset.dataset)
+            AppBusiness.insert_dataset(app, used_dataset.dataset,
+                                       used_dataset.version)
 
     @classmethod
     def get_by_id(cls, project_id, **kwargs):
@@ -149,18 +168,18 @@ class AppService(ProjectService):
         try:
             app = cls.deploy_or_publish(project_id, commit_msg,
                                         handler_file_path, version)
-            cls.send_message(app, m_type='publish')
+            cls.send_message_favor(app, m_type='publish')
         except Exception as e:
             # app = cls.business.get_by_id(project_id)
             # app.status = 'inactive'
             # app.save()
 
             # update app status
-            cls.business.repo.update_status(
+            app = cls.business.repo.update_status(
                 project_id,
-                cls.business.repo.AppStatus.Inactive)
+                cls.business.repo.STATUS.INACTIVE)
 
-            cls.send_message(app, m_type='publish_fail')
+            cls.send_message_favor(app, m_type='publish_fail')
             raise e
         else:
             return app
@@ -170,18 +189,16 @@ class AppService(ProjectService):
         try:
             app = cls.deploy_or_publish(project_id, commit_msg,
                                         handler_file_path)
-            cls.send_message(app, m_type='deploy')
+            cls.send_message_favor(app, m_type='deploy')
         except Exception as e:
             # app = cls.business.get_by_id(project_id)
             # app.status = 'inactive'
             # app.save()
-
-            # update app status
-            cls.business.repo.update_status(
+            app = cls.business.repo.update_status(
                 project_id,
-                cls.business.repo.AppStatus.Inactive)
+                cls.business.repo.STATUS.INACTIVE)
 
-            cls.send_message(app, m_type='deploy_fail')
+            cls.send_message_favor(app, m_type='deploy_fail')
             raise e
         return app
 
@@ -234,8 +251,9 @@ class AppService(ProjectService):
 
         # 3. check if there is any matches in script
         for d in possible_used_datasets:
-            pattern = r"""^(?!#).*({})""".format(d.dataset.path.replace(
-                './user_directory', 'dataset'))
+            pattern = r"""^(?!#).*({})/({})""".format(
+                d.dataset.path.replace('./user_directory', 'dataset'),
+                d.version)
             matches = re.finditer(pattern, script, re.MULTILINE)
             for ma in matches:
                 if '#' not in ma.group(0):
@@ -258,7 +276,7 @@ class AppService(ProjectService):
         return possible_used_datasets, possible_used_modules
 
     @classmethod
-    def copy_entities(cls, container, app, version, possible_used_datasets,
+    def copy_entities(cls, app, version, possible_used_datasets,
                       possible_used_modules):
         """
 
@@ -278,15 +296,8 @@ class AppService(ProjectService):
         # ./fucntion/[user_ID]-[app_name]-[app_version]/modules/
         # [user_ID]/[module_name]/[module_version]
         for m in possible_used_modules:
-            src = '{}/{}/'.format(m.module.module_path,
-                                  m.version.replace('.', '_'))
-            dst = './functions/{}-{}-{}/modules/{}/{}/{}/'.format(
-                app.user.user_ID, app.name, version,
-                m.module.user.name, m.module.name,
-                m.version.replace('.', '_'))
-            if os.path.isdir(dst):
-                shutil.rmtree(dst)
-            shutil.copytree(src, dst)
+            cls.copy_entity(app, version, m, m.module.module_path, m.module,
+                            'modules')
 
         # Move dataset from 引用者的DOCKER CONTAINER 里面的
         # ~/dataset/[user_ID] to
@@ -294,14 +305,23 @@ class AppService(ProjectService):
         # dataset/[user_ID]/[dataset_name]/
 
         for d in possible_used_datasets:
-            src = '/home/jovyan/{}'.format(
-                d.dataset.path.replace('./user_directory', 'dataset'))
-            dst = './functions/{}-{}-{}/dataset/{}/{}'.format(
-                app.user.user_ID, app.name, version,
-                d.dataset.user.name, d.dataset.name)
-            if os.path.isdir(dst):
-                shutil.rmtree(dst)
-            cls.business.copy_from_container(container, src, dst)
+            cls.copy_entity(app, version, d, d.dataset.dataset_path,
+                            d.dataset, 'dataset')
+
+    @staticmethod
+    def copy_entity(app, app_version, entity, entity_path, entity_obj,
+                    entity_dir):
+        print('nnn', entity_obj.name)
+        src = '{}/{}/'.format(entity_path,
+                              entity.version.replace('.', '_'))
+        dst = './functions/{}-{}-{}/{}/{}/{}/{}/'.format(
+            app.user.user_ID, app.name, app_version,
+            entity_dir,
+            entity_obj.user.name, entity_obj.name,
+            entity.version.replace('.', '_'))
+        if os.path.isdir(dst):
+            shutil.rmtree(dst)
+        shutil.copytree(src, dst)
 
     @classmethod
     def rename_handler_py(cls, handler_file_path, func_path):
@@ -349,12 +369,9 @@ class AppService(ProjectService):
         """
 
         # update app status to 'deploying
-        # app = cls.get_by_id(app_id)
-        # app.status = 'deploying'
-        # app.save()
         app = cls.business.repo.update_status(
             app_id,
-            cls.business.repo.AppStatus.Deploying)
+            cls.business.repo.STATUS.DEPLOYING)
 
         container = cls.business.get_container(app)
         # freeze working env
@@ -398,7 +415,7 @@ class AppService(ProjectService):
                 used_modules=possible_used_modules,
                 used_datasets=possible_used_datasets)
 
-            cls.copy_entities(container, app, version,
+            cls.copy_entities(app, version,
                               possible_used_datasets, possible_used_modules)
 
         # copy path edited __init__.py
@@ -418,24 +435,21 @@ class AppService(ProjectService):
 
         # when not dev(publish), change the privacy etc
         if version != DEFAULT_DEPLOY_VERSION:
-            # app.privacy = 'public'
+            # update privacy
             cls.business.repo.update_privacy(
-                app_id, cls.business.repo.AppPrivacy.PUBLIC)
-            # app.versions.append(version)
-            cls.business.repo.add_version(app_id, version)
+                app, cls.business.repo.PRIVACY.PUBLIC)
+            # add version
+            cls.business.repo.add_version(app, version)
 
-        # app.app_path = os.path.join(cls.business.base_func_path,
-        #                             service_name_no_v)
-        cls.business.repo.update_path(
-            app_id, os.path.join(cls.business.base_func_path,
-                                 service_name_no_v))
-
-        # app.status = 'active'
-        # app.save()
+        # update app_path
+        cls.business.repo.update_app_path(
+            app, os.path.join(cls.business.base_func_path,
+                              service_name_no_v))
 
         # update app status
-        cls.business.repo.update_status(app_id,
-                                        cls.business.repo.AppStatus.ACTIVE)
+        app = cls.business.repo.update_status(
+            app,
+            cls.business.repo.STATUS.ACTIVE)
 
         return app
 

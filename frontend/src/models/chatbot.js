@@ -4,9 +4,9 @@ export default {
     opened: false,
   },
   reducers: {
-    updateState(state, {payload}) {
-      return {...state, ...payload}
+    updateState(state, { payload }) {
+      return { ...state, ...payload }
     },
-  }
+  },
 
 }

@@ -104,7 +104,7 @@ def k_fold_cross_validation(data_train, data_target, ratio=0.1):
 def tensor_transform(data_matrix, order=(0, 1, 2)):
     """
     tensor_transform
-    @author   : Tianyi Zhang
+
 
     :param data_matrix: nd array
     :param order: transform to new order
@@ -118,7 +118,7 @@ def tensor_transform(data_matrix, order=(0, 1, 2)):
 def string_label_encoder(arr):
     """
     string to numeric method
-    @author   : Tianyi Zhang
+
 
     :param arr: arr of set(string list)
     :return: list of number
@@ -131,7 +131,7 @@ def string_label_encoder(arr):
 def one_hot_encoder(arr):
     """
     string to numeric method, the label is random and 无序
-    @author   : Tianyi Zhang
+
 
     :param arr: arr of set(string list)
     :return: list of number
@@ -147,7 +147,7 @@ def multi_one_hot_encoder(matrix):
     """
     string to numeric method, field selected is combined together
     a bedy bedy gud weib: https://ask.hellobi.com/blog/DataMiner/4897
-    @author   : Tianyi Zhang
+
 
     :param arr: arr of set(string list)
     # :param col: col is an array of field

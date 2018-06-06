@@ -12,8 +12,12 @@ from mongoengine import EmbeddedDocument
 from mongoengine import PULL
 from mongoengine import BooleanField
 
+from server3.constants import ProjectStatus
 
-RE_TYPE = ('inactive', 'active', 'deploying')
+
+RE_TYPE = (ProjectStatus.INACTIVE,
+           ProjectStatus.ACTIVE,
+           ProjectStatus.DEPLOYING)
 
 
 class Commit(EmbeddedDocument):
@@ -41,6 +45,8 @@ class Project(DynamicDocument):
     description = StringField()
     overview = StringField()
     tb_port = StringField()
+    status = StringField(choices=RE_TYPE)
+    repo_path = StringField()
 
     jobs = ListField(ReferenceField('Job'))
     # if forked project, which project fork from
@@ -73,6 +79,7 @@ class Project(DynamicDocument):
 
 class Dataset(Project):
     size = IntField()  # by bytes
+    dataset_path = StringField()
 
 
 class Module(Project):
@@ -80,8 +87,9 @@ class Module(Project):
     module_path = StringField()
     input = DictField()
     output = DictField()
-    repo_path = StringField()
-    status = StringField(choices=RE_TYPE)
+    # repo_path = StringField()
+    # moved to project entity
+    # status = StringField(choices=RE_TYPE)
 
 
 class AppGetType:
@@ -99,6 +107,7 @@ class UsedModule(EmbeddedDocument):
 
 class UsedDataset(EmbeddedDocument):
     dataset = ReferenceField(Dataset)
+    version = StringField()
 
 
 class Deployment(EmbeddedDocument):
@@ -135,7 +144,8 @@ class App(Project):
     # 输出格式
     output = DictField()
     # api status
-    status = StringField(choices=RE_TYPE)
+    # moved to project entity
+    # status = StringField(choices=RE_TYPE)
     # 模拟的数据
     fake_response = StringField()
     # 调用次数

@@ -2,8 +2,8 @@
 # if get_mac() == 274973436731254:
 #     MONGO = 'DEFAULT'
 
-ENV = 'CY'
-# ENV = 'DEFAULT'
+# ENV = 'CY'
+ENV = 'DEFAULT'
 # ENV = 'PROD'
 
 if ENV == 'CY':
@@ -36,6 +36,28 @@ else:
     raise Exception('Wrong ENV value')
 
 
+# Project Status
+# PROJECT_STATUS = {'DEPLOYING': 'deploying',
+#                   'ACTIVE': 'active',
+#                   'INACTIVE': 'inactive'}
+
+class ProjectStatus:
+    """
+    Project status
+    """
+    DEPLOYING = 'deploying'
+    ACTIVE = 'active'
+    INACTIVE = 'inactive'
+
+
+class ProjectPrivacy:
+    """
+    Project Privacy
+    """
+    PUBLIC = 'public'
+    PRIVATE = 'private'
+
+
 UPDATE_USER_INFO_SK = 'secret_mo_mo'
 PORT = 5005
 SOCKET_IO_PORT = 5006
@@ -62,6 +84,7 @@ KUBE_NAME = {
     'serving': '{job_id}-serving'
 }
 MODULE_DIR = './server3/lib/modules'
+DATASET_DIR = './datasets'
 DEFAULT_DEPLOY_VERSION = 'dev'
 APP_DIR = './functions'
 INIT_RES = [

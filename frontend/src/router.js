@@ -9,8 +9,8 @@ import { get } from 'lodash'
 import NewPassword from './routes/login/NewPassword'
 import Account from './routes/login/Account'
 import MainLayout from './components/MainLayout/MainLayout'
-// import ProjectDetail from './routes/workspace/ProjectDetail'
-import modelling from './models/modelling';
+import projectDetail from './models/projectDetail'
+import modelling from './models/modelling'
 
 const breadcrumbNameMap = {
   '/user': 'User',
@@ -28,41 +28,13 @@ const breadcrumbNameMap = {
   '/explore': 'Explore',
 }
 
-const RouterConfig = ({ history, location, projectDetail, app }) => {
-  const pathSnippets = location.pathname.split('/').filter(i => i)
-
-  const extraBreadcrumbItems = pathSnippets.map((_, index) => {
-    const url = `/${pathSnippets.slice(0, index + 1).join('/')}`
-    let breadcrumbName
-    const matchDetail = pathToRegexp('/workspace/:projectId').exec(url)
-    const matchPro = pathToRegexp('/workspace/:projectId/:step').exec(url)
-    const matchSubStep = pathToRegexp('/workspace/:projectId/:step/:subs').exec(url)
-    if (matchDetail) {
-      breadcrumbName = get(projectDetail, 'project.name', 'Project Info')
-    } else if (matchPro) {
-      breadcrumbName = matchPro[2]
-    } else if (matchSubStep) {
-      breadcrumbName = matchSubStep[3]
-    }
-    return (
-      <Breadcrumb.Item key={url}>
-        <Link to={url + location.search.replace('type', 'tab')}
-              style={{ textTransform: 'capitalize' }}>
-          {breadcrumbName || breadcrumbNameMap[url]}
-        </Link>
-      </Breadcrumb.Item>
-    )
-  })
-  const breadcrumbItems = [(
-    <Breadcrumb.Item key="home">
-      <Link to="/">Home</Link>
-    </Breadcrumb.Item>
-  )].concat(extraBreadcrumbItems)
+const RouterConfig = ({ history, location, app }) => {
 
   const ProjectDetail = dynamic({
     app,
     models: () => [
-      modelling
+      modelling,
+      projectDetail
     ],
     component: () => import('./routes/workspace/ProjectDetail'),
   })
@@ -90,7 +62,8 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
       path: '/explore',
       // models: () => [import('./models/modelling')],
       component: () => import('./routes/market/ProjectList'),
-    }, {
+    },
+   {
       path: '/userrequest/:userrequestId',
       models: () => [import('./models/allRequest')],
       component: () => import('./routes/UserRequest/UserRequestDetail'),
@@ -119,14 +92,12 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
   return (
     <MainLayout location={location} history={history}>
       <Switch>
-
+        <Route exact path="/" component={HomePage}/>
+        {/*if has child routes move exact inside*/}
         <Route path="/user" component={Account}/>
-        <Route path="/newpassword" component={NewPassword}/>
-        {/*<Breadcrumb>*/}
-        {/*{extraBreadcrumbItems}*/}
-        {/*</Breadcrumb>*/}
-
-        <Route path="/workspace/:projectId" render={(props) => <ProjectDetail {...props}/>}/>
+        <Route exact path="/newpassword" component={NewPassword}/>
+        {/*if has child routes move exact inside*/}
+        <Route path="/(workspace|explore)/:projectId" component={ProjectDetail}/>
         {
           routes.map(({ path, ...dynamics }, key) => (
             <Route key={key}
@@ -139,9 +110,7 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
             />
           ))
         }
-        <Route path="/explore/:projectId"
-               render={(props) => <ProjectDetail {...props} />}/>
-        <Route path="/launchpage" component={LaunchPage} location={location}/>
+        <Route exact path="/launchpage" component={LaunchPage} location={location}/>
         {
           routes2.map(({ path, ...dynamics }, key) => (
             <Route key={key}
@@ -154,7 +123,6 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
             />
           ))
         }
-        <Route path="/" component={HomePage}/>
 
       </Switch>
 
@@ -162,7 +130,7 @@ const RouterConfig = ({ history, location, projectDetail, app }) => {
   )
 }
 
-const Main = withRouter(connect(({ projectDetail }) => ({ projectDetail }))(RouterConfig))
+const Main = withRouter(connect()(RouterConfig))
 
 const App = ((props) => {
     return <HashRouter>

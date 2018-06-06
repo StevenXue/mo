@@ -250,6 +250,7 @@ class AnswerForm extends React.Component {
     const answerError = !isFieldTouched('answer') || getFieldError('answer')
     return (
       <div className="demo" style={{marginBottom: '80px'}}>
+
         <Form layout='horizontal'>
           <FormItem>
             {
@@ -477,6 +478,7 @@ function UserRequestDetail({allRequest, login, dispatch}) {
                    onClick={() => clickSelectedProject(e)}
                    extra={<div
                      style={{fontSize: '14px'}}> {appStatus(e.select_project)}</div>}>
+
         <p>{e.select_project.description}</p>
         {e.select_project.commits.length > 0 ?
           <div style={{marginTop: '35px', color: '#848d95'}}>

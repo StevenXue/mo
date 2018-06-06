@@ -1,6 +1,8 @@
+import * as path from 'path'
 import * as React from 'react'
-import { Card, Button, Row, Col, Input, Icon, Pagination, Select, message, List, Modal, Table,Tag } from 'antd'
+import { Card, Button, Row, Col, Input, Icon, Pagination, Select, message, List, Modal, Table, Tag } from 'antd'
 import * as pathToRegexp from 'path-to-regexp'
+import * as _ from 'lodash'
 import {
   NotebookActions,
 } from '@jupyterlab/notebook'
@@ -129,13 +131,13 @@ export class ListPage extends React.Component {
   }
 
   onGetProjectSuccess = (response) => {
+    let version
+    if (!this.state.version) {
+      version = response.versions.slice(-1)[0] || 'dev'
+    } else {
+      version = this.state.version
+    }
     if (this.pageType === 'module') {
-      let version
-      if (!this.state.version) {
-        version = response.versions.slice(-1)[0] || 'dev'
-      } else {
-        version = this.state.version
-      }
       this.setState({
         projectId: response._id,
         project: response,
@@ -146,6 +148,7 @@ export class ListPage extends React.Component {
       this.setState({
         projectId: response._id,
         project: response,
+        version,
       })
     }
   }
@@ -199,7 +202,7 @@ export class ListPage extends React.Component {
     )
     NotebookActions.insertCode(this.props.tracker.currentWidget.notebook,
       [
-        `result = ${this.state.func}('${this.state.project.user_ID}/${this.state.project.name}/${this.state.version}', conf)`,
+        `result = ${func}('${this.state.project.user_ID}/${this.state.project.name}/${this.state.version}', conf)`,
       ],
     )
 
@@ -208,7 +211,7 @@ export class ListPage extends React.Component {
       addModuleToApp({
         appId: this.appId,
         moduleId: this.state.projectId,
-        func: this.state.func,
+        func,
         version: this.state.version,
         onJson: (app) => {
           getAppActionEntity({
@@ -289,7 +292,7 @@ export class ListPage extends React.Component {
       },
     ]
 
-    const args = this.state.args[func]
+    const args = _.get(this.state.args, func, {})
     const data = Object.keys(args).map((key, i) => {
       let arg = args[key]
       arg.key = key
@@ -310,7 +313,7 @@ export class ListPage extends React.Component {
                            <Col span={12}>{record[e.dataIndex]}</Col>
                          </Row>)
                        }
-                     }
+                     },
                    )
                    return extendRows
                  }}/>
@@ -335,9 +338,11 @@ export class ListPage extends React.Component {
       if (this.pageType === 'dataset') {
         return [<p className='des'>{project.description}</p>,
           <div className='des'>
-            <CopyInput text={project.path.replace('./user_directory', '../dataset')}
+            <CopyInput text={path.join(project.path.replace('./user_directory', '../dataset'),
+              this.state.version.replace('.', '_'))}
                        datasetId={this.state.projectId}
                        appId={this.appId}
+                       version={this.state.version}
                        setApp={(app) =>
                          getAppActionEntity({
                            //page_no: page,
@@ -356,14 +361,6 @@ export class ListPage extends React.Component {
           </div>]
       } else {
         return <div>
-          <div>
-            Version:&nbsp;&nbsp;
-            <Select defaultValue={this.state.version} style={{ width: 120 }}
-                    onChange={(value) => this.handleVersionChange(value)}>
-              {this.state.project.versions.map(version =>
-                <Option key={version} value={version}>{version}</Option>)}
-            </Select>
-          </div>
           {
             project.category === 'model' ?
               <Row>
@@ -385,6 +382,14 @@ export class ListPage extends React.Component {
           <Icon type="left"/>{this.state.project.name}
         </header>
         <div style={{ height: 'auto', overflowY: 'auto' }}>
+          <div>
+            Version:&nbsp;&nbsp;
+            <Select defaultValue={this.state.version} style={{ width: 120 }}
+                    onChange={(value) => this.handleVersionChange(value)}>
+              {this.state.project.versions.map(version =>
+                <Option key={version} value={version}>{version}</Option>)}
+            </Select>
+          </div>
           {upperArea()}
           <ReactMdePreview
             project={this.state.project} ownerOrNot={false}
@@ -453,19 +458,17 @@ export class ListPage extends React.Component {
             dataSource={this.state.usedProjects}
             renderItem={project => (
               <List.Item
-                actions={[<a
-                  onClick={() =>
-                    this.clickProject(project[this.pageType])}>Detail</a>].concat(this.getOtherButtons(project[this.pageType]))}
                 extra={<Icon style={{ cursor: 'pointer' }} type='close'
                              onClick={() => onRemove(project[this.pageType], project.version)}/>}
               >
                 <List.Item.Meta
                   title={
-                    <span>
+                    <a onClick={() =>
+                      this.clickProject(project[this.pageType])}>
                       {project[this.pageType].name}&nbsp;&nbsp;
                       {project.version &&
                       <span>v{project.version}</span>}
-                    </span>}
+                    </a>}
                   description={project[this.pageType].description}
                 />
               </List.Item>
@@ -539,13 +542,10 @@ export class ListPage extends React.Component {
               total: this.state.totalFavNumber,
             }}
             renderItem={project => (
-              <List.Item
-                actions={[<a
-                  onClick={() =>
-                    this.clickProject(project)}>Detail</a>].concat(this.getOtherButtons(project))}
-              >
+              <List.Item>
                 <List.Item.Meta
-                  title={<span>{project.name}</span>}
+                  title={<a onClick={() =>
+                    this.clickProject(project)}>{project.name}</a>}
                   description={project.description}
                 />
               </List.Item>
@@ -560,13 +560,13 @@ export class ListPage extends React.Component {
     return (
       // list
       <div className='container'>
-        <header style={{background:'white'}}>
+        <header style={{ background: 'white' }}>
           {this.pageType.toUpperCase()} LIST
           {this.appId && <div className='history-btn'
                               onClick={() => this.setState({ [`showUsed${this.pageTypeUC}s`]: true })}/>}
           {/*{this.appId && <Icon type="clock-circle-o"*/}
-                               {/*className='history-btn'*/}
-                               {/*onClick={() => this.setState({ [`showUsed${this.pageTypeUC}s`]: true })}/>}*/}
+          {/*className='history-btn'*/}
+          {/*onClick={() => this.setState({ [`showUsed${this.pageTypeUC}s`]: true })}/>}*/}
 
           <div className='fav-btn' onClick={() => this.setState({ [`showFav${this.pageTypeUC}s`]: true })}/>
         </header>
@@ -578,9 +578,10 @@ export class ListPage extends React.Component {
             <Card key={project.user + project.name} title={project.name}
               // extra={<Button onClick={() => this.clickProject(project)}>Detail</Button>}
                   onClick={() => this.clickProject(project)}
-                  style={{ margin: '5px 3px', cursor: 'pointer'  }}
+                  style={{ margin: '5px 3px', cursor: 'pointer' }}
                   bordered={false}
-                  extra={project.category?<Tag color={project.category==='model'?"#FFB850":"#8986EA"}>{project.category}</Tag>:null}
+                  extra={project.category ? <Tag
+                    color={project.category === 'model' ? '#FFB850' : '#8986EA'}>{project.category}</Tag> : null}
             >
               <Col>
                 {project.description}
@@ -602,13 +603,6 @@ export class ListPage extends React.Component {
 
   render() {
     if (this.state.projectId !== undefined) {
-      // if (this.state.func) {
-      //   // params
-      //   return this.renderParams()
-      // } else {
-      //   // overview
-      //   return this.renderOverview()
-      // }
       return this.renderOverview()
     } else if (this.state[`showFav${this.pageTypeUC}s`]) {
       return this.renderFavProjects()

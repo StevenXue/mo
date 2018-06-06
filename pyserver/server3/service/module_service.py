@@ -27,12 +27,14 @@ class ModuleService(ProjectService):
         try:
             module = cls.business.deploy_or_publish(project_id, commit_msg,
                                                     version=version)
-            cls.send_message(module, m_type='publish')
+            cls.send_message_favor(module, m_type='publish')
         except:
-            module = cls.business.get_by_id(project_id)
-            module.status = 'inactive'
-            module.save()
-            cls.send_message(module, m_type='publish_fail')
+            module = cls.business.repo.update_status(
+                project_id, cls.business.repo.STATUS.INACTIVE)
+            # module = cls.business.get_by_id(project_id)
+            # module.status = 'inactive'
+            # module.save()
+            cls.send_message_favor(module, m_type='publish_fail')
         else:
             return module
 
@@ -40,12 +42,14 @@ class ModuleService(ProjectService):
     def deploy(cls, project_id, commit_msg):
         try:
             module = cls.business.deploy_or_publish(project_id, commit_msg)
-            cls.send_message(module, m_type='deploy')
+            cls.send_message_favor(module, m_type='deploy')
         except:
-            module = cls.business.get_by_id(project_id)
-            module.status = 'inactive'
-            module.save()
-            cls.send_message(module, m_type='deploy_fail')
+            module = cls.business.repo.update_status(
+                project_id, cls.business.repo.STATUS.INACTIVE)
+            # module = cls.business.get_by_id(project_id)
+            # module.status = 'inactive'
+            # module.save()
+            cls.send_message_favor(module, m_type='deploy_fail')
         else:
             return module
 

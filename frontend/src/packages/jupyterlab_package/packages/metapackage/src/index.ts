@@ -19,6 +19,7 @@ import '@jupyterlab/coreutils';
 import '@jupyterlab/csvviewer';
 import '@jupyterlab/csvviewer-extension';
 import '@jupyterlab/datasets-extension';
+import '@jupyterlab/deploy-extension';
 import '@jupyterlab/docmanager';
 import '@jupyterlab/docmanager-extension';
 import '@jupyterlab/docregistry';

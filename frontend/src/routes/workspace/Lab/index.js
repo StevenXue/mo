@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
-import {Spin, Alert} from 'antd'
+import {Spin} from 'antd'
 import styles from './index.less'
 // import 'antd/lib/list/style/css';
 

@@ -308,7 +308,6 @@ export default {
           }
         }
 
-        console.log('pathname', pathname)
         const match = pathToRegexp('/user/login').exec(pathname)
 
         if (!match) {
@@ -319,15 +318,6 @@ export default {
         if (userId && !connected) {
 
           const socket = io.connect('/log/' + userId, { path: '/socketio/socket.io' })
-          // socket.on('log_epoch_end', (msg) => {
-          //   dispatch({ type: 'handleSocket', payload: { msg, pathname } })
-          // })
-          // socket.on('error', (msg) => {
-          //   dispatch({ type: 'handleError', payload: { msg, pathname } })
-          // })
-          // socket.on('success', (msg) => {
-          //   dispatch({ type: 'handleSuccess', payload: { msg, pathname } })
-          // })
 
           socket.on('notification', (msg) => {
             dispatch({ type: 'message/updateNewMessage', payload: { msg } })
