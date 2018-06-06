@@ -130,7 +130,7 @@ const Jobs = ({ projectDetail, dispatch }) => {
                      <Button onClick={() => {
                        window.open(`/tb/${localStorage.getItem('user_ID')}+${projectDetail.project.name}/`)
                      }}>
-                       Jobs Visualization
+                       TensorBoard
                      </Button>
         </span>
       </h2>
