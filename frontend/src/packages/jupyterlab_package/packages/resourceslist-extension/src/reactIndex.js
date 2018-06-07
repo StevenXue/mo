@@ -220,11 +220,11 @@ export class ListPage extends React.Component {
             actionEntity: [`used_${this.pageType}s`],
             onJson: ({ objects, count }) => this.setState({
               app,
-              projectId: undefined,
-              project: undefined,
-              func: undefined,
-              args: undefined,
-              showUsedModules: true,
+              // projectId: undefined,
+              // project: undefined,
+              // func: undefined,
+              // args: undefined,
+              // showUsedModules: true,
               usedProjects: objects,
               totalUsedNumber: count,
             }),
@@ -272,7 +272,9 @@ export class ListPage extends React.Component {
     const columns = [{
       title: 'Name',
       dataIndex: 'key',
-      // render: text => <a href="javascript:;">{text}</a>,
+      render: (text, record) =>
+        <span
+          style={{ color: record.optional === false ? '#5AC12E' : '#000000' }}>{text}</span>,
     }, {
       title: 'Type',
       dataIndex: 'value_type',
@@ -280,17 +282,6 @@ export class ListPage extends React.Component {
       title: 'Default',
       dataIndex: 'default_value',
     }]
-
-    const extendColumns = [
-      {
-        title: 'Description',
-        dataIndex: 'des',
-      },
-      {
-        title: 'Range',
-        dataIndex: 'value_range',
-      },
-    ]
 
     const args = _.get(this.state.args, func, {})
     const data = Object.keys(args).map((key, i) => {
@@ -300,27 +291,31 @@ export class ListPage extends React.Component {
     })
 
     return (
-      <div className='container'>
+      <div className='detail-container'>
         <h4 style={{ textTransform: 'capitalize' }}>{func}:&nbsp;&nbsp;</h4>
         <div style={{ height: 'auto', overflowY: 'auto' }}>
           <Table columns={columns} dataSource={data} pagination={false}
+                 size="small"
+                 expandRowByClick={true}
                  expandedRowRender={record => {
                    const extendRows = []
-                   extendColumns.forEach(e => {
-                       if (record[e.dataIndex]) {
-                         extendRows.push(<Row style={{ margin: '5px 0' }} key={e.dataIndex} gutter={16}>
-                           <Col span={12}>{e.title}:</Col>
-                           <Col span={12}>{record[e.dataIndex]}</Col>
-                         </Row>)
-                       }
-                     },
-                   )
+                   if(record.optional === false) {
+                     extendRows.push(<Tag color="#5AC12E">Required</Tag>)
+                   }
+                   if(record.value_range) {
+                     extendRows.push(<div style={{ margin: '5px 0', color: '#8395A5' }}>
+                       Range: {record.value_range}
+                     </div>)
+                   }
+                   if(record.des) {
+                     extendRows.push(<div style={{color: '#8395A5'}}>{record.des}</div>)
+                   }
                    return extendRows
                  }}/>
         </div>
         <Row>
           <Button type='primary'
-                  style={{ textTransform: 'capitalize' }}
+                  style={{ textTransform: 'capitalize', margin: '10px 18px' }}
                   onClick={() => this.insertCode(func)}
           >
             Import {func}
@@ -363,13 +358,11 @@ export class ListPage extends React.Component {
         return <div>
           {
             project.category === 'model' ?
-              <Row>
-                {this.renderParams('train')}
-                {this.renderParams('predict')}
-              </Row> :
-              <Row>
-                {this.renderParams('run')}
-              </Row>
+
+              [this.renderParams('train'),
+                this.renderParams('predict')]
+              :
+              this.renderParams('run')
           }
 
         </div>
@@ -382,18 +375,21 @@ export class ListPage extends React.Component {
           <Icon type="left"/>{this.state.project.name}
         </header>
         <div style={{ height: 'auto', overflowY: 'auto' }}>
-          <div>
-            Version:&nbsp;&nbsp;
-            <Select defaultValue={this.state.version} style={{ width: 120 }}
+          <div className='detail-container'>
+            <h4>Version:</h4>
+            <Select defaultValue={this.state.version}
+                    style={{ width: '83%', margin: '10px 18px', display: 'block' }}
                     onChange={(value) => this.handleVersionChange(value)}>
               {this.state.project.versions.map(version =>
                 <Option key={version} value={version}>{version}</Option>)}
             </Select>
           </div>
           {upperArea()}
-          <ReactMdePreview
-            project={this.state.project} ownerOrNot={false}
-          />
+          <div className='detail-container'>
+            <ReactMdePreview
+              project={this.state.project} ownerOrNot={false}
+            />
+          </div>
         </div>
       </div>
     )
@@ -452,7 +448,7 @@ export class ListPage extends React.Component {
         </header>
         <div className='list'>
           <List
-            style={{ margin: '0 10px' }}
+            // style={{ margin: '0 10px' }}
             itemLayout="vertical"
             // dataSource={this.state.app[`used_${this.pageType}s`]}
             dataSource={this.state.usedProjects}
@@ -524,7 +520,7 @@ export class ListPage extends React.Component {
         </header>
         <div className='list'>
           <List
-            style={{ margin: '0 10px' }}
+            // style={{ margin: '0 10px' }}
             itemLayout="vertical"
             dataSource={this.state.favProjects}
             pagination={{

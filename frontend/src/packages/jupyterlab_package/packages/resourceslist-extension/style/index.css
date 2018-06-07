@@ -33,6 +33,7 @@
   margin: 0px;
   padding: 12px 0 4px 12px;
   text-transform: uppercase;
+  background: #ffffff;
 }
 
 #list-manager .p-TabBar-tab {
@@ -166,11 +167,40 @@
   border-bottom: 0;
 }
 
-
 #list-manager .ant-card-head-title {
   color: #495060;
   display: flex;
   align-items: center;
+}
+
+#list-manager .detail-container {
+  background: white;
+  margin: 5px 0;
+  padding: 5px 0;
+}
+
+#list-manager .detail-container h4 {
+  font-weight: bold;
+  margin: 10px 18px;
+}
+
+#list-manager .detail-container .ant-table.ant-table-small {
+  border-width: 0 0 1px 0;
+  border-radius: 0;
+}
+
+#list-manager .detail-container .ant-table.ant-table-small table {
+  padding: 0;
+}
+
+#list-manager .detail-container .ant-table.ant-table-small table tr th {
+  background: #FAFAFA;
+  border: none;
+}
+
+#list-manager .ant-list-item {
+  background: #FFFFFF;
+  padding:  12px 16px;
 }
 
 
