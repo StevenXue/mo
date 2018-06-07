@@ -59,13 +59,13 @@ function Steps({ match, history, location, dispatch, projectDetail }) {
                 // done
                 content = <Icon type="check" style={{ fontWeight: 900 }}/>
                 status = 2
-                color = '#34C0E2'
+                color = '#6D9CF9'
               }
               if (paths[i] === activePage) {
                 // doing
                 status = 1
                 content = i + 1
-                color = '#34C0E2'
+                color = '#6D9CF9'
               }
               return <div className={styles.step} key={paths[i]}>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>

@@ -152,7 +152,7 @@ function Sidebar({ model, dispatch, namespace }) {
                 let backgroundColor
                 let color
                 if (focusSectionsId && (section._id === focusSectionsId)) {
-                  backgroundColor = '#34C0E2'
+                  backgroundColor = '#6D9CF9'
                   color = 'white'
                 } else {
                   backgroundColor = i % 2 ? '#F5F5F5'

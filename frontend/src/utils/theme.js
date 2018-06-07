@@ -6,7 +6,7 @@ const themeColor = {
   "custom-grey": "#D8D8D8",
   "custom-grey-background": "#F5F5F5",
 
-  "custom-blue-active": "#34C0E2",
+  "custom-blue-active": "#6D9CF9",
   "custom-blue-light": "#F1F8FF",
   "custom-blue-table-head": "#F5FAFF",
 

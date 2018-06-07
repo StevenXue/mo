@@ -71,7 +71,6 @@ export default {
   ],
   'proxy': proxy,
   'theme': {
-    // '@primary-color': '#34C0E2',
     '@primary-color': '#6D9CF9',
     // "font-family": "Roboto",
     'text-color': 'fade(#000, 90%)',

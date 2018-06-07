@@ -248,7 +248,7 @@ function Deployment({deployment, dispatch}) {
               let backgroundColor
               let color
               if (focusModelId && (model._id === focusModelId)) {
-                backgroundColor = '#34C0E2'
+                backgroundColor = '#6D9CF9'
                 color = 'white'
               } else {
                 backgroundColor = i % 2 ? '#F5F5F5'

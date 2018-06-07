@@ -6,8 +6,8 @@ import styles from './Dots.less'
 
 const statusDict = {
   0: gradientColors('#D8D8D8', '#D8D8D8', 5),
-  1: gradientColors('#34C0E2', '#D8D8D8', 5),
-  2: gradientColors('#34C0E2', '#34C0E2', 5),
+  1: gradientColors('#6D9CF9', '#D8D8D8', 5),
+  2: gradientColors('#6D9CF9', '#6D9CF9', 5),
 }
 
 function Dots({ num, radius, status }) {

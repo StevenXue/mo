@@ -460,7 +460,7 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
                 if (fieldsJson[fieldName]) {
                   if (values.includes(fieldName)) {
                     // blue onclick
-                    backgroundColor = '#34C0E2'
+                    backgroundColor = '#6D9CF9'
                     onClick = true
                     className = styles.active_field
                   }
@@ -473,7 +473,7 @@ function WorkBench({ section, model, dispatch, namespace, preview, notebook, pro
                 } else {
                   if (values.includes(fieldName)) {
                     // blue onclick
-                    backgroundColor = '#34C0E2'
+                    backgroundColor = '#6D9CF9'
                     onClick = true
                     className = styles.active_field
 
